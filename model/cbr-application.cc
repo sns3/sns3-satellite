@@ -1,26 +1,4 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-//
-// Copyright (c) 2006 Georgia Tech Research Corporation
-//
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License version 2 as
-// published by the Free Software Foundation;
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// Author: George F. Riley<riley@ece.gatech.edu>
-//
-
-// ns3 - Cbr Data Source Application class
-// George F. Riley, Georgia Tech, Spring 2007
-// Adapted from ApplicationOnOff in GTNetS.
 
 #include "ns3/log.h"
 #include "ns3/address.h"
@@ -36,10 +14,10 @@
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
-#include "cbr-application.h"
 #include "ns3/udp-socket-factory.h"
 #include "ns3/string.h"
 #include "ns3/pointer.h"
+#include "cbr-application.h"
 
 NS_LOG_COMPONENT_DEFINE ("CbrApplication");
 
@@ -69,17 +47,6 @@ CbrApplication::GetTypeId (void)
                    TimeValue (Seconds (1)),
                    MakeTimeAccessor (&CbrApplication::m_interval),
                    MakeTimeChecker ())
-    .AddAttribute ("Delay", "CBR (first package) sending delay",
-                   TimeValue (Seconds (0)),
-                   MakeTimeAccessor (&CbrApplication::m_delay),
-                   MakeTimeChecker ())
-    .AddAttribute ("MaxBytes", 
-                   "The total number of bytes to send. Once these bytes are sent, "
-                   "no packet is sent again, even in on state. The value zero means "
-                   "that there is no limit.",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&CbrApplication::m_maxBytes),
-                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("Protocol", "The type of protocol to use.",
                    TypeIdValue (UdpSocketFactory::GetTypeId ()),
                    MakeTypeIdAccessor (&CbrApplication::m_tid),
@@ -93,8 +60,6 @@ CbrApplication::GetTypeId (void)
 
 CbrApplication::CbrApplication ()
   : m_socket (0),
-    m_connected (false),
-    m_residualBits (0),
     m_lastStartTime (Seconds (0)),
     m_totTxBytes (0)
 {
@@ -106,12 +71,6 @@ CbrApplication::~CbrApplication()
   NS_LOG_FUNCTION (this);
 }
 
-void 
-CbrApplication::SetMaxBytes (uint32_t maxBytes)
-{
-  NS_LOG_FUNCTION (this << maxBytes);
-  m_maxBytes = maxBytes;
-}
 
 Ptr<Socket>
 CbrApplication::GetSocket (void) const
@@ -140,30 +99,26 @@ void CbrApplication::StartApplication () // Called at time specified by Start
     {
       m_socket = Socket::CreateSocket (GetNode (), m_tid);
       m_socket->Bind ();
-      m_socket->Connect ((const Address&)m_peer);
-      m_socket->SetAllowBroadcast (true);
-      m_socket->ShutdownRecv ();
 
       m_socket->SetConnectCallback (
           MakeCallback (&CbrApplication::ConnectionSucceeded, this),
           MakeCallback (&CbrApplication::ConnectionFailed, this));
+
+      m_socket->Connect ((const Address&)m_peer);
+      m_socket->SetAllowBroadcast (true);
+      m_socket->ShutdownRecv ();
     }
   // Insure no pending event
-  CancelEvents ();
-  // If we are not yet connected, there is nothing to do here
-  // The ConnectionComplete upcall will start timers at that time
-  //if (!m_connected) return;
-  if ( m_interval.GetDouble() > 0 )
-    {
-      ScheduleStartEvent ();
-    }
+  Simulator::Cancel (m_sendEvent);
 }
 
 void CbrApplication::StopApplication () // Called at time specified by Stop
 {
   NS_LOG_FUNCTION (this);
 
-  CancelEvents ();
+  Simulator::Cancel (m_startEvent);
+  Simulator::Cancel (m_sendEvent);
+
   if(m_socket != 0)
     {
       m_socket->Close ();
@@ -180,21 +135,6 @@ uint32_t CbrApplication::GetSent (void) const
   return m_totTxBytes;
 }
 
-void CbrApplication::CancelEvents ()
-{
-  NS_LOG_FUNCTION (this);
-
-  if (m_sendEvent.IsRunning ())
-    { // Cancel the pending send packet event
-      // Calculate residual bits since last packet sent
-      Time delta (Simulator::Now () - m_lastStartTime);
-      int64x64_t bits = delta.To (Time::S) * m_cbrRate.GetBitRate ();
-      m_residualBits += bits.GetHigh ();
-    }
-  Simulator::Cancel (m_sendEvent);
-  Simulator::Cancel (m_startStopEvent);
-}
-
 // Event handlers
 void CbrApplication::StartSending ()
 {
@@ -208,34 +148,27 @@ void CbrApplication::ScheduleNextTx ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_maxBytes == 0 || m_totTxBytes < m_maxBytes)
+  uint32_t bits = m_pktSize * 8;
+  NS_LOG_LOGIC ("bits = " << bits);
+  Time nextTime (Seconds (bits / static_cast<double>(m_cbrRate.GetBitRate ()))); // Time till next packet
+
+  // use interval for next sending in case that time for sending of packet doesn't last longer than interval
+  if ( nextTime < m_interval )
     {
-      uint32_t bits = m_pktSize * 8 - m_residualBits;
-      NS_LOG_LOGIC ("bits = " << bits);
-      Time nextTime (Seconds (bits /
-                              static_cast<double>(m_cbrRate.GetBitRate ()))); // Time till next packet
-      NS_LOG_LOGIC ("nextTime = " << nextTime);
-
-      if ( nextTime < m_interval )
-        {
-          nextTime = m_interval;
-        }
-
-      m_sendEvent = Simulator::Schedule (nextTime, &CbrApplication::SendPacket, this);
+      nextTime = m_interval;
     }
-  else
-    { // All done, cancel any pending events
-      StopApplication ();
-    }
+
+  NS_LOG_LOGIC ("nextTime = " << nextTime);
+
+  m_sendEvent = Simulator::Schedule (nextTime, &CbrApplication::SendPacket, this);
 }
 
 void CbrApplication::ScheduleStartEvent ()
 {  // Schedules the event to start sending cbr data
   NS_LOG_FUNCTION (this);
 
-  Time delay = m_delay;
-  NS_LOG_LOGIC ("start at " << delay);
-  m_startStopEvent = Simulator::Schedule (delay, &CbrApplication::StartSending, this);
+  NS_LOG_LOGIC ("start at " << m_interval);
+  m_startEvent = Simulator::Schedule (m_interval, &CbrApplication::StartSending, this);
 }
 
 void CbrApplication::SendPacket ()
@@ -266,7 +199,7 @@ void CbrApplication::SendPacket ()
                    << " total Tx " << m_totTxBytes << " bytes");
     }
   m_lastStartTime = Simulator::Now ();
-  m_residualBits = 0;
+
   ScheduleNextTx ();
 }
 
@@ -274,7 +207,7 @@ void CbrApplication::SendPacket ()
 void CbrApplication::ConnectionSucceeded (Ptr<Socket> socket)
 {
   NS_LOG_FUNCTION (this << socket);
-  m_connected = true;
+  ScheduleStartEvent ();
 }
 
 void CbrApplication::ConnectionFailed (Ptr<Socket> socket)

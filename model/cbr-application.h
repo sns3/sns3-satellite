@@ -1,26 +1,4 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-//
-// Copyright (c) 2006 Georgia Tech Research Corporation
-//
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License version 2 as
-// published by the Free Software Foundation;
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// Author: George F. Riley<riley@ece.gatech.edu>
-//
-
-// ns3 - On/Off Data Source Application class
-// George F. Riley, Georgia Tech, Spring 2007
-// Adapted from ApplicationOnOff in GTNetS.
 
 #ifndef CBR_APPLICATION_H
 #define CBR_APPLICATION_H
@@ -35,50 +13,22 @@
 namespace ns3 {
 
 class Address;
-class RandomVariableStream;
 class Socket;
 
 /**
- * \ingroup applications 
- * \defgroup onoff CbrApplication
- *
- * This traffic generator follows an On/Off pattern: after 
- * Application::StartApplication
- * is called, "On" and "Off" states alternate. The duration of each of
- * these states is determined with the onTime and the offTime random
- * variables. During the "Off" state, no traffic is generated.
- * During the "On" state, cbr traffic is generated. This cbr traffic is
- * characterized by the specified "data rate" and "packet size".
- */
-/**
-* \ingroup onoff
+* \ingroup satellite
 *
 * \brief Generate traffic to a single destination according to an
-*        OnOff pattern.
+*        CBR pattern.
 *
-* This traffic generator follows an On/Off pattern: after
+* This traffic generator follows an CBR pattern: after
 * Application::StartApplication
-* is called, "On" and "Off" states alternate. The duration of each of
-* these states is determined with the onTime and the offTime random
-* variables. During the "Off" state, no traffic is generated.
-* During the "On" state, cbr traffic is generated. This cbr traffic is
-* characterized by the specified "data rate" and "packet size".
+* is called, CBR sending starts. The sending continues as long as applications runs.
+* This CBR traffic is characterized by the specified "data rate", "packet size" and "interval".
 *
 * Note:  When an application is started, the first packet transmission
-* occurs _after_ a delay equal to (packet size/bit rate).  Note also,
-* when an application transitions into an off state in between packet
-* transmissions, the remaining time until when the next transmission
-* would have occurred is cached and is used when the application starts
-* up again.  Example:  packet size = 1000 bits, bit rate = 500 bits/sec.
-* If the application is started at time 3 seconds, the first packet
-* transmission will be scheduled for time 5 seconds (3 + 1000/500)
-* and subsequent transmissions at 2 second intervals.  If the above
-* application were instead stopped at time 4 seconds, and restarted at
-* time 5.5 seconds, then the first packet would be sent at time 6.5 seconds,
-* because when it was stopped at 4 seconds, there was only 1 second remaining
-* until the originally scheduled transmission, and this time remaining
-* information is cached and used to schedule the next transmission
-* upon restarting.
+* occurs _after_ given interval.  Note also, that an application sends a packet
+* right after previous packet if interval is shorter than time needed for sending the packet.
 *
 * If the underlying socket type supports broadcast, this application
 * will automatically enable the SetAllowBroadcast(true) socket option.
@@ -91,15 +41,6 @@ public:
   CbrApplication ();
 
   virtual ~CbrApplication();
-
-  /**
-   * \param maxBytes the total number of bytes to send
-   *
-   * Set the total number of bytes to send. Once these bytes are sent, no packet 
-   * is sent again, even in on state. The value zero means that there is no 
-   * limit.
-   */
-  void SetMaxBytes (uint32_t maxBytes);
 
   /**
    * \return pointer to associated socket
@@ -129,9 +70,6 @@ private:
   virtual void StartApplication (void);    // Called at time specified by Start
   virtual void StopApplication (void);     // Called at time specified by Stop
 
-  //helpers
-  void CancelEvents ();
-
   void Construct (Ptr<Node> n,
                   const Address &remote,
                   std::string tid,
@@ -146,16 +84,12 @@ private:
 
   Ptr<Socket>     m_socket;       // Associated socket
   Address         m_peer;         // Peer address
-  bool            m_connected;    // True if connected
   Time            m_interval;     // Time interval for cbr sending
-  Time            m_delay;        // Time delay to start cbr sending
   DataRate        m_cbrRate;      // Rate that data is generated
   uint32_t        m_pktSize;      // Size of packets
-  uint32_t        m_residualBits; // Number of generated, but not sent, bits
   Time            m_lastStartTime; // Time last packet sent
-  uint32_t        m_maxBytes;     // Limit total number of bytes sent
   uint32_t        m_totTxBytes;   // Total bytes sent so far
-  EventId         m_startStopEvent;     // Event id for next start or stop event
+  EventId         m_startEvent;   // Event id for next start event
   EventId         m_sendEvent;    // Eventid of pending "send packet" event
   bool            m_sending;      // True if currently in sending state
   TypeId          m_tid;

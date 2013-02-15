@@ -1,18 +1,4 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
@@ -28,18 +14,17 @@ NS_LOG_COMPONENT_DEFINE ("cbr-example");
 int
 main (int argc, char *argv[])
 {
-  /*
-  //uint32_t nPackets = 1;
+  uint32_t packetSize = 512;
 
-  //CommandLine cmd;
-  //cmd.AddValue("nPackets", "Number of packets to echo", nPackets);
-  //cmd.Parse (argc, argv);*/
+  CommandLine cmd;
+  cmd.AddValue("packetSize", "Size of constant packet", packetSize);
+  cmd.Parse (argc, argv);
 
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
 
-  GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
-
-  NS_LOG_INFO ("Creating Topology");
+  // remove next line from comments to run real time simulation
+  //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
   NodeContainer nodes;
   nodes.Create (2);
@@ -61,27 +46,22 @@ main (int argc, char *argv[])
   Address serverAddress (InetSocketAddress (interfaces.GetAddress (1), port));
   Address clientAddress (InetSocketAddress (interfaces.GetAddress (0), port));
 
-  PacketSinkHelper sinkServer ("ns3::UdpSocketFactory", clientAddress);
+  PacketSinkHelper sinkServer ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), port));
 
   ApplicationContainer serverApps = sinkServer.Install (nodes.Get (1));
   serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (11.0));
+  serverApps.Stop (Seconds (10.0));
 
   CbrHelper cbrClient ("ns3::UdpSocketFactory", serverAddress);
-  cbrClient.SetAttribute("Interval", StringValue ("6s"));
+  cbrClient.SetAttribute("Interval", StringValue ("1s"));
+  cbrClient.SetAttribute("PacketSize", UintegerValue (packetSize) );
 
   ApplicationContainer clientApps = cbrClient.Install (nodes.Get (0));
   clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
+  clientApps.Stop (Seconds (8.0));
 
-  //AsciiTraceHelper ascii;
-  //pointToPoint.EnableAsciiAll (ascii.CreateFileStream ("cbrTest.tr"));
-  //pointToPoint.EnablePcapAll ("cbrTest");
-
-  Simulator::Stop (Seconds (12.0));
   Simulator::Run ();
   Simulator::Destroy ();
 
-  NS_LOG_INFO ("Simulation is over");
   return 0;
 }

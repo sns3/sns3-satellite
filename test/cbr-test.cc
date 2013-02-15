@@ -1,27 +1,19 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 // Include a header file from your module to test.
-#include "ns3/cbr-helper.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
-#include <fstream>
 #include "ns3/log.h"
-#include "ns3/abort.h"
-#include "ns3/config.h"
 #include "ns3/string.h"
-#include "ns3/uinteger.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/simple-net-device.h"
 #include "ns3/simple-channel.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/cbr-helper.h"
+#include "ns3/test.h"
 #include "ns3/simulator.h"
 
-// An essential include is test.h
-#include "ns3/test.h"
-
-// Do not put your test classes in namespace ns3.  You may find it useful
-// to use the using directive to access the ns3 namespace directly
 using namespace ns3;
 
 // This is an example TestCase.
@@ -37,7 +29,7 @@ private:
 
 // Add some help text to this case to describe what it is intended to test
 CbrTestCase1::CbrTestCase1 ()
-  : TestCase ("Cbr test case (does nothing)")
+  : TestCase ("Cbr test case to verify all sent data is got by receiver.")
 {
 }
 
@@ -83,22 +75,21 @@ CbrTestCase1::DoRun (void)
   PacketSinkHelper server ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), port));
   ApplicationContainer serverApps = server.Install (n.Get (1));
   serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (11.0));
+  serverApps.Stop (Seconds (10.0));
 
   CbrHelper client ("ns3::UdpSocketFactory", serverAddress);
-  client.SetAttribute ("Interval", StringValue ("6s"));
+  client.SetAttribute ("Interval", StringValue ("1s"));
   ApplicationContainer clientApps = client.Install (n.Get (0));
   clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
+  clientApps.Stop (Seconds (8.0));
 
-  //Simulator::Stop (Seconds (12.0));
   Simulator::Run ();
   Simulator::Destroy ();
 
   Ptr<PacketSink> sink = DynamicCast<PacketSink> (serverApps.Get (0));
   Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (clientApps.Get (0));
 
-
+  NS_TEST_ASSERT_MSG_NE (sender->GetSent(), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (sink->GetTotalRx(), sender->GetSent(), "Packets were lost !");
 }
 
@@ -113,7 +104,7 @@ public:
 };
 
 CbrTestSuite::CbrTestSuite ()
-  : TestSuite ("satellite-cbr", UNIT)
+  : TestSuite ("cbr-test", UNIT)
 {
   AddTestCase (new CbrTestCase1);
 }
