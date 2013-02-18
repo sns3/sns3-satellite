@@ -79,7 +79,6 @@ private:
 
 
   // Event handlers
-  void StartSending ();
   void SendPacket ();
 
   Ptr<Socket>     m_socket;       // Associated socket
@@ -89,7 +88,6 @@ private:
   uint32_t        m_pktSize;      // Size of packets
   Time            m_lastStartTime; // Time last packet sent
   uint32_t        m_totTxBytes;   // Total bytes sent so far
-  EventId         m_startEvent;   // Event id for next start event
   EventId         m_sendEvent;    // Eventid of pending "send packet" event
   bool            m_sending;      // True if currently in sending state
   TypeId          m_tid;

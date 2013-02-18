@@ -108,15 +108,12 @@ void CbrApplication::StartApplication () // Called at time specified by Start
       m_socket->SetAllowBroadcast (true);
       m_socket->ShutdownRecv ();
     }
-  // Insure no pending event
-  Simulator::Cancel (m_sendEvent);
 }
 
 void CbrApplication::StopApplication () // Called at time specified by Stop
 {
   NS_LOG_FUNCTION (this);
 
-  Simulator::Cancel (m_startEvent);
   Simulator::Cancel (m_sendEvent);
 
   if(m_socket != 0)
@@ -133,14 +130,6 @@ uint32_t CbrApplication::GetSent (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_totTxBytes;
-}
-
-// Event handlers
-void CbrApplication::StartSending ()
-{
-  NS_LOG_FUNCTION (this);
-  m_lastStartTime = Simulator::Now ();
-  ScheduleNextTx ();  // Schedule the send packet event
 }
 
 // Private helpers
@@ -161,14 +150,6 @@ void CbrApplication::ScheduleNextTx ()
   NS_LOG_LOGIC ("nextTime = " << nextTime);
 
   m_sendEvent = Simulator::Schedule (nextTime, &CbrApplication::SendPacket, this);
-}
-
-void CbrApplication::ScheduleStartEvent ()
-{  // Schedules the event to start sending cbr data
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_LOGIC ("start at " << m_interval);
-  m_startEvent = Simulator::Schedule (m_interval, &CbrApplication::StartSending, this);
 }
 
 void CbrApplication::SendPacket ()
@@ -207,7 +188,11 @@ void CbrApplication::SendPacket ()
 void CbrApplication::ConnectionSucceeded (Ptr<Socket> socket)
 {
   NS_LOG_FUNCTION (this << socket);
-  ScheduleStartEvent ();
+
+  // Insure no pending event
+  Simulator::Cancel (m_sendEvent);
+
+  ScheduleNextTx ();
 }
 
 void CbrApplication::ConnectionFailed (Ptr<Socket> socket)
