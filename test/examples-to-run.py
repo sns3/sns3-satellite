@@ -10,6 +10,8 @@
 # See test.py for more information.
 cpp_examples = [
     ("cbr-example", "True", "True"),
+    ("simple-scenario-p2p", "True", "True"),
+    ("larger-scenario-p2p", "True", "True"),
 ]
 
 # A list of Python examples to run in order to ensure that they remain

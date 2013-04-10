@@ -3,8 +3,16 @@
 def build(bld):
     obj = bld.create_ns3_program('satellite-example', ['satellite'])
     obj.source = 'satellite-example.cc'
-    
-    obj = bld.create_ns3_program('cbr-example', ['satellite','point-to-point', 'applications'])
+
+    obj = bld.create_ns3_program('cbr-example', ['satellite', 'point-to-point', 'applications'])
     obj.source = 'cbr-example.cc'
     
-
+    obj = bld.create_ns3_program('simple-scenario-p2p', ['core', 'point-to-point', 'applications', 'netanim', 'csma', 'flow-monitor'])
+    obj.source = 'simple-scenario-p2p.cc'
+    
+    obj = bld.create_ns3_program('larger-scenario-p2p', ['core', 'point-to-point', 'applications', 'netanim', 'csma', 'flow-monitor'])
+    obj.source = 'larger-scenario-p2p.cc'    
+        
+    
+    
+    
