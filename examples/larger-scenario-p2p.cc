@@ -28,21 +28,21 @@
 #include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/flow-monitor-helper.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
+#include "ns3/sat-net-dev-helper.h"
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("Larger-scenario");
+NS_LOG_COMPONENT_DEFINE ("Larger-scenario-p2p");
 
 int 
 main (int argc, char *argv[])
 {
-  LogComponentEnable ("Larger-scenario", LOG_LEVEL_INFO);
+  LogComponentEnable ("Larger-scenario-p2p", LOG_LEVEL_INFO);
 
 
   // Set up some default values for the simulation.  Use the 
@@ -71,7 +71,7 @@ main (int argc, char *argv[])
   Ptr<Node> UT3 = CreateObject<Node> ();
   Ptr<Node> UT4 = CreateObject<Node> ();
 
-  // Create SB or Satellire beams
+  // Create SB or Satellite beams
   Ptr<Node> SB1 = CreateObject<Node> ();
   Ptr<Node> SB2 = CreateObject<Node> ();
   Ptr<Node> SB3 = CreateObject<Node> ();
@@ -152,7 +152,7 @@ main (int argc, char *argv[])
   NetDeviceContainer d15 = csma.Install (IPrN0);
 
   // Point to point connection
-  PointToPointHelper p2p;
+  SatNetDevHelper p2p;
   p2p.SetDeviceAttribute ("DataRate", StringValue ("50Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
 
@@ -211,6 +211,7 @@ main (int argc, char *argv[])
   uint16_t port = 9;   // Discard port (RFC 863)
   OnOffHelper onoff ("ns3::UdpSocketFactory", 
                      Address (InetSocketAddress (id15.GetAddress (1), port)));
+
   onoff.SetConstantRate (DataRate ("448kb/s"));
   ApplicationContainer apps = onoff.Install (Nodes.Get (1));
   apps.Start (Seconds (1.0));
@@ -257,7 +258,7 @@ ApplicationContainer apps5 = onoff.Install (Nodes.Get (5));
   apps5.Stop (Seconds (6.0));
 
   AsciiTraceHelper ascii;
-  Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream ("larger-scenario.tr");
+  Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream ("larger-scenario-p2p.tr");
   p2p.EnableAsciiAll (stream);
   csma.EnableAsciiAll (stream);
 
@@ -287,7 +288,7 @@ ApplicationContainer apps5 = onoff.Install (Nodes.Get (5));
   AnimationInterface::SetNodeColor (SB1, 255, 0, 0); // Optional
   AnimationInterface::SetNodeColor (UT1, 0, 0, 255); // Optional
   AnimationInterface::SetNodeColor (GW1, 0, 0, 255); // Optional
-  AnimationInterface anim ("larger-scenario.xml"); // Mandatory
+  AnimationInterface anim ("larger-scenario-p2p.xml"); // Mandatory
   anim.EnablePacketMetadata (true); // Optional
 
   Simulator::Run ();
@@ -295,7 +296,7 @@ ApplicationContainer apps5 = onoff.Install (Nodes.Get (5));
 
   if (enableFlowMonitor)
     {
-      flowmon->SerializeToXmlFile ("larger-scenario.flowmon", false, false);
+      flowmon->SerializeToXmlFile ("larger-scenario-p2p.flowmon", false, false);
     }
 
   Simulator::Destroy ();

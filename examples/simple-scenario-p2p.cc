@@ -32,12 +32,13 @@
 #include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/flow-monitor-helper.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
+#include "ns3/sat-net-dev-helper.h"
+//#include "ns3/point-to-point-helper.h"
 
 using namespace ns3;
 
@@ -94,7 +95,8 @@ main (int argc, char *argv[])
   NetDeviceContainer d4 = csma.Install (GWN1);
 
 
-  PointToPointHelper p2p;
+  SatNetDevHelper p2p;
+  //PointToPointHelper p2p;
   p2p.SetDeviceAttribute ("DataRate", StringValue ("50Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
   NetDeviceContainer d2 = p2p.Install (UTSat);
@@ -140,8 +142,8 @@ main (int argc, char *argv[])
   apps.Stop (Seconds (10.0));
 
   AsciiTraceHelper ascii;
-  p2p.EnableAsciiAll (ascii.CreateFileStream ("simple-scenario.tr"));
-  p2p.EnablePcapAll ("simple-scenario");
+  p2p.EnableAsciiAll (ascii.CreateFileStream ("simple-scenario-p2p.tr"));
+  p2p.EnablePcapAll ("simple-scenario-p2p");
 
   // Flow Monitor
   Ptr<FlowMonitor> flowmon;
@@ -163,7 +165,7 @@ main (int argc, char *argv[])
   AnimationInterface::SetNodeColor (SB, 255, 0, 0); // Optional
   AnimationInterface::SetNodeColor (UT, 0, 0, 255); // Optional
   AnimationInterface::SetNodeColor (GW, 0, 0, 255); // Optional
-  AnimationInterface anim ("simple-scenario.xml"); // Mandatory
+  AnimationInterface anim ("simple-scenario-p2p.xml"); // Mandatory
   anim.EnablePacketMetadata (true); // Optional
 
   Simulator::Run ();
@@ -171,7 +173,7 @@ main (int argc, char *argv[])
 
   if (enableFlowMonitor)
     {
-      flowmon->SerializeToXmlFile ("simple-scenario.flowmon", false, false);
+      flowmon->SerializeToXmlFile ("simple-scenario-p2p.flowmon", false, false);
     }
 
   Simulator::Destroy ();
