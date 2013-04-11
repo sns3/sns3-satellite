@@ -11,7 +11,10 @@ def build(bld):
     module.source = [
         'model/satellite.cc',
         'model/cbr-application.cc',
+        'model/sat-channel.cc',
+        'model/sat-net-device.cc',       
         'helper/satellite-helper.cc',
+        'helper/sat-net-dev-helper.cc',
         'helper/cbr-helper.cc',
         ]
 
@@ -26,7 +29,10 @@ def build(bld):
     headers.source = [
         'model/satellite.h',
         'model/cbr-application.h',
+        'model/sat-channel.h',
+        'model/sat-net-device.h',
         'helper/satellite-helper.h',
+        'helper/sat-net-dev-helper.h',
         'helper/cbr-helper.h',
         ]
 
