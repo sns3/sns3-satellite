@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2008 INRIA
+ * Copyright (c) 2013 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
+ * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
-#include "cbr-helper.h"
+
 #include "ns3/inet-socket-address.h"
 #include "ns3/packet-socket-address.h"
 #include "ns3/string.h"
@@ -25,7 +25,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/names.h"
 #include "ns3/random-variable-stream.h"
-#include "ns3/cbr-application.h"
+#include "cbr-helper.h"
+
 
 namespace ns3 {
 
@@ -81,7 +82,6 @@ void
 CbrHelper::SetConstantRate (DataRate dataRate, uint32_t packetSize)
 {
   m_factory.Set ("Interval", StringValue ("1s"));
-  m_factory.Set ("Delay", StringValue ("0s"));
   m_factory.Set ("DataRate", DataRateValue (dataRate));
   m_factory.Set ("PacketSize", UintegerValue (packetSize));
 }

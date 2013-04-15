@@ -70,14 +70,6 @@ private:
   virtual void StartApplication (void);    // Called at time specified by Start
   virtual void StopApplication (void);     // Called at time specified by Stop
 
-  void Construct (Ptr<Node> n,
-                  const Address &remote,
-                  std::string tid,
-                  const Time& interval,
-                  const Time& delay,
-                  uint32_t size);
-
-
   // Event handlers
   void SendPacket ();
 

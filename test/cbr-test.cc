@@ -1,6 +1,23 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2013 Magister Solutions Ltd
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ */
 
-// Include a header file from your module to test.
 #include "ns3/log.h"
 #include "ns3/string.h"
 #include "ns3/inet-socket-address.h"
@@ -11,12 +28,13 @@
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
 #include "ns3/cbr-helper.h"
+#include "ns3/cbr-application.h"
 #include "ns3/test.h"
 #include "ns3/simulator.h"
 
 using namespace ns3;
 
-// This is an example TestCase.
+// \ brief Simple test case to verify Cbr application functionality.
 class CbrTestCase1 : public TestCase
 {
 public:
@@ -93,9 +111,8 @@ CbrTestCase1::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ (sink->GetTotalRx(), sender->GetSent(), "Packets were lost !");
 }
 
-// The TestSuite class names the TestSuite, identifies what type of TestSuite,
-// and enables the TestCases to be run.  Typically, only the constructor for
-// this class must be defined
+// The CbrTestSuite class names the TestSuite as cbr-test, identifies what type of TestSuite (UNIT),
+// and enables the TestCases to be run CbrTestCase1.
 //
 class CbrTestSuite : public TestSuite
 {
@@ -109,6 +126,6 @@ CbrTestSuite::CbrTestSuite ()
   AddTestCase (new CbrTestCase1);
 }
 
-// Do not forget to allocate an instance of this TestSuite
+// Allocate an instance of this TestSuite
 static CbrTestSuite cbrTestSuite;
 
