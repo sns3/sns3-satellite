@@ -213,7 +213,7 @@ SatNetDevice::IsPointToPoint (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return true;
+  return false;
 }
 
 bool 
