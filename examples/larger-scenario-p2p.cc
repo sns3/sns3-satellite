@@ -273,7 +273,12 @@ ApplicationContainer apps5 = onoff.Install (Nodes.Get (5));
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Stop (Seconds (7));
 
-  AnimationInterface::SetNodeDescription (Nodes, "Nodes"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (0), "Node 1"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (1), "Node 2"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (2), "Node 3"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (3), "Node 4"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (4), "Node 5"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (5), "Node 6"); // Optional
   AnimationInterface::SetNodeDescription (SB1, "SB1"); // Optional
   AnimationInterface::SetNodeDescription (SB2, "SB2"); // Optional
   AnimationInterface::SetNodeDescription (SB3, "SB3"); // Optional
