@@ -21,6 +21,7 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('satellite')
     module_test.source = [
         'test/satellite-test-suite.cc',
+        'test/simple-p2p.cc',
         'test/cbr-test.cc',
         ]
 
