@@ -25,6 +25,19 @@ using namespace ns3;
 
 /**
  * \brief 'Forward Link Unicast, Simple' test case implementation, id: simple-p2p-1 / TN4.
+ *
+ * This case tests successful transmission of a single UDP packet from GW connected user
+ * to UT connected user in simple scenario.
+ *  1.  Simple test scenario set with helper
+ *  2.  A single packet is transmitted from Node-1 UDP application to Node-2 UDP receiver.
+ *
+ *  Expected result:
+ *    A single UDP packet sent by GW connected node-1 using CBR application is received by
+ *    UT connected node-2.
+ *
+ *  Notes: Current test case uses very first versions of the sat net devices and channels.
+ *         Sat helper implementation is missing and not used by this test case yet.
+ *
  */
 class SimpleP2p1 : public TestCase
 {
@@ -54,6 +67,8 @@ SimpleP2p1::~SimpleP2p1 ()
 void
 SimpleP2p1::DoRun (void)
 {
+  // >>> Start of the part to be added to helper later >>>
+
   // Here, we will explicitly create all our nodes.
   NodeContainer users;
   users.Create (2);
@@ -103,6 +118,10 @@ SimpleP2p1::DoRun (void)
   // tables in the nodes.
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
+  // <<< End of the part to be added to helper later <<<
+
+  // >>> Start of actual test using Simple scenario >>>
+
   // Create the Cbr application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s, one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
@@ -133,6 +152,8 @@ SimpleP2p1::DoRun (void)
   // * Receiver got all all data sent
   NS_TEST_ASSERT_MSG_NE (sender->GetSent(), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx(), sender->GetSent(), "Packets were lost !");
+
+  // <<< End of actual test using Simple scenario <<<
 }
 
 // The TestSuite class names the TestSuite as sat-simple-p2p, identifies what type of TestSuite (SYSTEM),
