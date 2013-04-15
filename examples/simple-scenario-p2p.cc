@@ -129,6 +129,7 @@ main (int argc, char *argv[])
   uint16_t port = 9;   // Discard port (RFC 863)
   OnOffHelper onoff ("ns3::UdpSocketFactory", 
                      Address (InetSocketAddress (i3i4.GetAddress (1), port)));
+
   onoff.SetConstantRate (DataRate ("448kb/s"));
   ApplicationContainer apps = onoff.Install (Nodes.Get (0));
   apps.Start (Seconds (1.0));
@@ -136,7 +137,7 @@ main (int argc, char *argv[])
 
   // Create a packet sink to receive these packets
   PacketSinkHelper sink ("ns3::UdpSocketFactory",
-                         Address (InetSocketAddress (i0i1.GetAddress (0), port)));
+                         Address (InetSocketAddress (i3i4.GetAddress (1), port)));
   apps = sink.Install (Nodes.Get (1));
   apps.Start (Seconds (1.0));
   apps.Stop (Seconds (10.0));
@@ -157,7 +158,8 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Stop (Seconds (11));
 
-  AnimationInterface::SetNodeDescription (Nodes, "Nodes"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (0), "Node 2"); // Optional
+  AnimationInterface::SetNodeDescription (Nodes.Get (1), "Node 1"); // Optional
   AnimationInterface::SetNodeDescription (SB, "SB"); // Optional
   AnimationInterface::SetNodeDescription (UT, "UT"); // Optional
   AnimationInterface::SetNodeDescription (GW, "GW"); // Optional
