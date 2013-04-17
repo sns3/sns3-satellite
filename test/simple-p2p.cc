@@ -33,7 +33,7 @@
 #include "ns3/packet-sink.h"
 #include "ns3/cbr-helper.h"
 #include "ns3/cbr-application.h"
-#include "ns3/sat-net-dev-helper.h"
+#include "ns3/satellite-helper.h"
 #include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
@@ -86,75 +86,25 @@ SimpleP2p1::~SimpleP2p1 ()
 void
 SimpleP2p1::DoRun (void)
 {
-  // >>> Start of the part to be added to helper later >>>
-
-  // Here, we will explicitly create all our nodes.
-  NodeContainer users;
-  users.Create (2);
-  Ptr<Node> UT = CreateObject<Node> ();
-  Ptr<Node> SB = CreateObject<Node> ();
-  Ptr<Node> GW = CreateObject<Node> ();
-  NodeContainer all = NodeContainer (UT, SB, GW);
-
-  NodeContainer N0UT = NodeContainer (users.Get (0), UT);
-  NodeContainer UTSat = NodeContainer (UT, SB);
-  NodeContainer SatGW = NodeContainer (SB, GW);
-  NodeContainer GWN1 = NodeContainer (GW, users.Get (1));
-
-  InternetStackHelper internet;
-  internet.Install (all);
-  internet.Install (users);
-
-  // We create the channels and net devices first without any IP addressing information
-  CsmaHelper csma;
-  csma.SetChannelAttribute ("DataRate", DataRateValue (5000000));
-  csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-  NetDeviceContainer d1 = csma.Install (N0UT);
-  NetDeviceContainer d4 = csma.Install (GWN1);
-
-  SatNetDevHelper p2p;
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("50Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
-  NetDeviceContainer d2 = p2p.Install (UTSat);
-
-  NetDeviceContainer d3 = p2p.Install (SatGW);
-
-  // Now, we add IP addresses.
-  Ipv4AddressHelper ipv4;
-  ipv4.SetBase ("10.1.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer i0i1 = ipv4.Assign (d1);
-
-  ipv4.SetBase ("10.2.2.0", "255.255.255.0");
-  ipv4.Assign (d2);
-
-  ipv4.SetBase ("10.3.3.0", "255.255.255.0");
-  ipv4.Assign (d3);
-
-  ipv4.SetBase ("10.4.4.0", "255.255.255.0");
-  Ipv4InterfaceContainer i3i4 = ipv4.Assign (d4);
-
-  // Create router nodes, initialize routing database and set up the routing
-  // tables in the nodes.
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-
-  // <<< End of the part to be added to helper later <<<
+  // Create simple scenario
+  SatHelper helper(SatHelper::Simple);
 
   // >>> Start of actual test using Simple scenario >>>
 
   // Create the Cbr application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s, one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (i0i1.GetAddress (0), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (1), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
-  ApplicationContainer GwApps = cbr.Install (users.Get(1));
+  ApplicationContainer GwApps = cbr.Install (helper.GetUser(1));
   GwApps.Start (Seconds (1.0));
   GwApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (i0i1.GetAddress (0), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (1), port)));
 
-  ApplicationContainer UtApps = sink.Install (users.Get(0));
+  ApplicationContainer UtApps = sink.Install (helper.GetUser(0));
   UtApps.Start (Seconds (1.0));
   UtApps.Stop (Seconds (3.0));
 
