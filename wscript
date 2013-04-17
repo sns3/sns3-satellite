@@ -7,7 +7,7 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet'])
+    module = bld.create_ns3_module('satellite', ['internet', 'csma'])
     module.source = [
         'model/satellite.cc',
         'model/cbr-application.cc',
