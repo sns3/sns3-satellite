@@ -7,12 +7,17 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet'])
+    module = bld.create_ns3_module('satellite', ['core', 'network' ,'applications', 'internet', 'propagation'])
     module.source = [
         'model/satellite.cc',
         'model/cbr-application.cc',
-        'model/sat-channel.cc',
-        'model/sat-net-device.cc',       
+        'model/satellite-channel.cc',
+        'model/satellite-net-device.cc',
+        'model/satellite-phy.cc',
+        'model/satellite-phy-tx.cc',               
+        'model/satellite-phy-rx.cc',
+        'model/satellite-signal-parameters.cc',
+        'model/virtual-channel.cc',
         'helper/satellite-helper.cc',
         'helper/sat-net-dev-helper.cc',
         'helper/cbr-helper.cc',
@@ -30,8 +35,13 @@ def build(bld):
     headers.source = [
         'model/satellite.h',
         'model/cbr-application.h',
-        'model/sat-channel.h',
-        'model/sat-net-device.h',
+        'model/satellite-channel.h',
+        'model/satellite-net-device.h',
+        'model/satellite-phy.h',
+        'model/satellite-phy-tx.h',               
+        'model/satellite-phy-rx.h',
+        'model/satellite-signal-parameters.h',
+        'model/virtual-channel.h',
         'helper/satellite-helper.h',
         'helper/sat-net-dev-helper.h',
         'helper/cbr-helper.h',

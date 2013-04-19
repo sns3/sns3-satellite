@@ -122,8 +122,6 @@ main (int argc, char *argv[])
   AnimationInterface::SetConstantPosition (GW2, 70, 10); 
   AnimationInterface::SetConstantPosition (IPr, 100, 40); 
 
-
-
   InternetStackHelper internet;
   internet.Install (all1);
   internet.Install (Nodes);
@@ -152,20 +150,18 @@ main (int argc, char *argv[])
   NetDeviceContainer d15 = csma.Install (IPrN0);
 
   // Point to point connection
-  SatNetDevHelper p2p;
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("50Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
+  SatNetDevHelper sndh;
 
   // UT to Satellite beams
-  NetDeviceContainer d6 = p2p.Install (UT1Sat1);
-  NetDeviceContainer d7 = p2p.Install (UT2Sat1);
-  NetDeviceContainer d8 = p2p.Install (UT3Sat2);
-  NetDeviceContainer d9 = p2p.Install (UT4Sat3);
+  NetDeviceContainer d6 = sndh.Install (UT1Sat1);
+  NetDeviceContainer d7 = sndh.Install (UT2Sat1);
+  NetDeviceContainer d8 = sndh.Install (UT3Sat2);
+  NetDeviceContainer d9 = sndh.Install (UT4Sat3);
 
   // Satellite beams to GW
-  NetDeviceContainer d10 = p2p.Install (Sat1GW1);
-  NetDeviceContainer d11 = p2p.Install (Sat2GW1);
-  NetDeviceContainer d12 = p2p.Install (Sat3GW2);
+  NetDeviceContainer d10 = sndh.Install (Sat1GW1);
+  NetDeviceContainer d11 = sndh.Install (Sat2GW1);
+  NetDeviceContainer d12 = sndh.Install (Sat3GW2);
 
   // Add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");
@@ -259,7 +255,7 @@ ApplicationContainer apps5 = onoff.Install (Nodes.Get (5));
 
   AsciiTraceHelper ascii;
   Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream ("larger-scenario-p2p.tr");
-  p2p.EnableAsciiAll (stream);
+  sndh.EnableAsciiAll (stream);
   csma.EnableAsciiAll (stream);
 
   // Flow Monitor

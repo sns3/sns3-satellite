@@ -38,7 +38,6 @@
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/sat-net-dev-helper.h"
-//#include "ns3/point-to-point-helper.h"
 
 using namespace ns3;
 
@@ -94,21 +93,15 @@ main (int argc, char *argv[])
   NetDeviceContainer d1 = csma.Install (N0UT);
   NetDeviceContainer d4 = csma.Install (GWN1);
 
-
-  SatNetDevHelper p2p;
-  //PointToPointHelper p2p;
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("50Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
-  NetDeviceContainer d2 = p2p.Install (UTSat);
-
-  NetDeviceContainer d3 = p2p.Install (SatGW);
+  SatNetDevHelper sndh;
+  NetDeviceContainer d2 = sndh.Install (UTSat);
+  NetDeviceContainer d3 = sndh.Install (SatGW);
 
   // Later, we add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4;
   ipv4.SetBase ("10.1.1.0", "255.255.255.0");
   Ipv4InterfaceContainer i0i1 = ipv4.Assign (d1);
-
 
   ipv4.SetBase ("10.2.2.0", "255.255.255.0");
   ipv4.Assign (d2);
@@ -143,8 +136,8 @@ main (int argc, char *argv[])
   apps.Stop (Seconds (10.0));
 
   AsciiTraceHelper ascii;
-  p2p.EnableAsciiAll (ascii.CreateFileStream ("simple-scenario-p2p.tr"));
-  p2p.EnablePcapAll ("simple-scenario-p2p");
+  sndh.EnableAsciiAll (ascii.CreateFileStream ("simple-scenario-p2p.tr"));
+  sndh.EnablePcapAll ("simple-scenario-p2p");
 
   // Flow Monitor
   Ptr<FlowMonitor> flowmon;

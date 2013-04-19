@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2013 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,33 +15,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
-#ifndef SAT_NET_DEVICE_H
-#define SAT_NET_DEVICE_H
+
+#ifndef SATELLITE_NET_DEVICE_H
+#define SATELLITE_NET_DEVICE_H
 
 #include "ns3/net-device.h"
 #include "ns3/mac48-address.h"
-#include "ns3/data-rate.h"
 #include <stdint.h>
 #include <string>
 #include "ns3/traced-callback.h"
 
 namespace ns3 {
 
-class SatChannel;
+
+class SatPhy;
 class Node;
 class ErrorModel;
+class VirtualChannel;
 
 /**
- * \ingroup netdevice
+ * \defgroup satellite Satellite Models
  *
- * This device does not have a helper and assumes 48-bit mac addressing;
- * the default address assigned to each device is zero, so you must 
- * assign a real address to use it.  There is also the possibility to
- * add an ErrorModel if you want to force losses on the device.
- * 
- * \brief sat net device for satellite links
+ */
+
+
+/**
+ * \ingroup satellite
+ * SatNetDevice to be utilized in the UT, GW and satellite.
  */
 class SatNetDevice : public NetDevice
 {
@@ -49,16 +51,20 @@ public:
   static TypeId GetTypeId (void);
   SatNetDevice ();
 
-  void Receive (Ptr<Packet> packet, uint16_t protocol, Mac48Address to, Mac48Address from);
-  void SetChannel (Ptr<SatChannel> channel);
+  /*
+   * Receive the packet from the lower layers
+   * @param packet Pointer to the packet to be received.
+   */
+  void Receive (Ptr<Packet> packet);
+
+  /*
+   * Attach the SatPhy physical layer to this netdevice.
+   * @param phy SatPhy pointer to be added
+   */
+  void SetPhy (Ptr<SatPhy> phy);
 
   /**
    * Attach a receive ErrorModel to the SatNetDevice.
-   *
-   * The SatNetDevice may optionally include an ErrorModel in
-   * the packet receive chain.
-   *
-   * \see ErrorModel
    * \param em Ptr to the ErrorModel.
    */
   void SetReceiveErrorModel (Ptr<ErrorModel> em);
@@ -66,7 +72,7 @@ public:
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
-  virtual Ptr<Channel> GetChannel (void) const;
+  virtual Ptr<SatPhy> GetPhy (void) const;
   virtual void SetAddress (Address address);
   virtual Address GetAddress (void) const;
   virtual bool SetMtu (const uint16_t mtu);
@@ -85,24 +91,19 @@ public:
   virtual void SetNode (Ptr<Node> node);
   virtual bool NeedsArp (void) const;
   virtual void SetReceiveCallback (NetDevice::ReceiveCallback cb);
-
   virtual Address GetMulticast (Ipv6Address addr) const;
 
   virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
   virtual bool SupportsSendFrom (void) const;
 
+  virtual void SetVirtualChannel (Ptr<VirtualChannel>);
+  virtual Ptr<Channel> GetChannel (void) const;
+
 protected:
   virtual void DoDispose (void);
+
 private:
-
-  /**
-     * The data rate that the Net Device uses to simulate packet transmission
-     * timing.
-     * @see class DataRate
-     */
-  DataRate       m_bps;
-
-  Ptr<SatChannel> m_channel;
+  Ptr<SatPhy> m_phy;
   NetDevice::ReceiveCallback m_rxCallback;
   NetDevice::PromiscReceiveCallback m_promiscCallback;
   Ptr<Node> m_node;
@@ -110,6 +111,13 @@ private:
   uint32_t m_ifIndex;
   Mac48Address m_address;
   Ptr<ErrorModel> m_receiveErrorModel;
+
+  /*
+   * Virtual channel is used to virtually connect netdevices to each other.
+   * This allows the usage of global "automated" routing.
+   */
+  Ptr<VirtualChannel> m_virtualChannel;
+
   /**
    * The trace source fired when the phy layer drops a packet it has received
    * due to the error model being active.  Although SatNetDevice doesn't
@@ -119,9 +127,8 @@ private:
    * \see class CallBackTraceSource
    */
   TracedCallback<Ptr<const Packet> > m_phyRxDropTrace;
-  TracedCallback<Ptr<const Packet> > m_promiscSnifferTrace;
 };
 
 } // namespace ns3
 
-#endif /* SAT_NET_DEVICE_H */
+#endif /* SATELLITE_NET_DEVICE_H */
