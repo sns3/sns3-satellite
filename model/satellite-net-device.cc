@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2013 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,16 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
-#include "sat-net-device.h"
-#include "sat-channel.h"
+
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-channel.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include "ns3/log.h"
 #include "ns3/pointer.h"
 #include "ns3/error-model.h"
 #include "ns3/trace-source-accessor.h"
+#include "ns3/ipv4-header.h"
+#include <ns3/ipv4-l3-protocol.h>
+#include <ns3/channel.h>
+#include "ns3/virtual-channel.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -43,74 +49,36 @@ SatNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatNetDevice::m_receiveErrorModel),
                    MakePointerChecker<ErrorModel> ())
-     .AddAttribute ("DataRate",
-                    "The default data rate for point to point links",
-                    DataRateValue (DataRate ("32768b/s")),
-                    MakeDataRateAccessor (&SatNetDevice::m_bps),
-                    MakeDataRateChecker ())
     .AddTraceSource ("PhyRxDrop",
                      "Trace source indicating a packet has been dropped by the device during reception",
                      MakeTraceSourceAccessor (&SatNetDevice::m_phyRxDropTrace))
-    .AddTraceSource ("PromiscSniffer",
-                    "Trace source simulating a promiscuous packet sniffer attached to the device",
-                    MakeTraceSourceAccessor (&SatNetDevice::m_promiscSnifferTrace))
-
   ;
   return tid;
 }
 
 SatNetDevice::SatNetDevice ()
-  : m_channel (0),
+  : m_phy (0),
     m_node (0),
     m_mtu (0xffff),
     m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
+
+  LogComponentEnable ("SatNetDevice", LOG_LEVEL_INFO);
 }
 
 void
-SatNetDevice::Receive (Ptr<Packet> packet, uint16_t protocol,
-                          Mac48Address to, Mac48Address from)
+SatNetDevice::Receive (Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION (this << packet << protocol << to << from);
-  NetDevice::PacketType packetType;
-
-  if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
-    {
-      m_phyRxDropTrace (packet);
-      return;
-    }
-  m_promiscSnifferTrace (packet);
-
-  if (to == m_address)
-    {
-      packetType = NetDevice::PACKET_HOST;
-    }
-  else if (to.IsBroadcast ())
-    {
-      packetType = NetDevice::PACKET_HOST;
-    }
-  else if (to.IsGroup ())
-    {
-      packetType = NetDevice::PACKET_MULTICAST;
-    }
-  else 
-    {
-      packetType = NetDevice::PACKET_OTHERHOST;
-    }
-  m_rxCallback (this, packet, protocol, from);
-  if (!m_promiscCallback.IsNull ())
-    {
-      m_promiscCallback (this, packet, protocol, from, to, packetType);
-    }
+  NS_LOG_FUNCTION (this << packet);
+  m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
 
 void 
-SatNetDevice::SetChannel (Ptr<SatChannel> channel)
+SatNetDevice::SetPhy (Ptr<SatPhy> phy)
 {
-  NS_LOG_FUNCTION (this << channel);
-  m_channel = channel;
-  m_channel->Add (this);
+  NS_LOG_FUNCTION (this << phy);
+  m_phy = phy;
 }
 
 void
@@ -132,11 +100,11 @@ SatNetDevice::GetIfIndex (void) const
   NS_LOG_FUNCTION (this);
   return m_ifIndex;
 }
-Ptr<Channel> 
-SatNetDevice::GetChannel (void) const
+Ptr<SatPhy>
+SatNetDevice::GetPhy (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_channel;
+  return m_phy;
 }
 void
 SatNetDevice::SetAddress (Address address)
@@ -212,7 +180,6 @@ bool
 SatNetDevice::IsPointToPoint (void) const
 {
   NS_LOG_FUNCTION (this);
-
   return false;
 }
 
@@ -226,21 +193,24 @@ SatNetDevice::IsBridge (void) const
 bool 
 SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
+  // The duration should be specified by the TBTP or the GW/NCC scheduler
+  // - carrier
+  // - duration
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
-  Mac48Address to = Mac48Address::ConvertFrom (dest);
-  Time  txTime = Seconds (m_bps.CalculateTxTime (packet->GetSize ()));
-  m_channel->Send (packet, protocolNumber, to, m_address, this, txTime);
-  m_promiscSnifferTrace (packet);
+
+  Time duration (0.001);
+  m_phy->SendPdu (packet, duration);
+
   return true;
 }
 bool 
 SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
-  Mac48Address to = Mac48Address::ConvertFrom (dest);
-  Mac48Address from = Mac48Address::ConvertFrom (source);
-  Time  txTime = Seconds (m_bps.CalculateTxTime (packet->GetSize ()));
-  m_channel->Send (packet, protocolNumber, to, from, this, txTime);
+
+  Time duration (0.01);
+  m_phy->SendPdu (packet, duration);
+
   return true;
 }
 
@@ -273,7 +243,7 @@ void
 SatNetDevice::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
-  m_channel = 0;
+  m_phy = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
   NetDevice::DoDispose ();
@@ -293,5 +263,23 @@ SatNetDevice::SupportsSendFrom (void) const
   NS_LOG_FUNCTION (this);
   return true;
 }
+
+void
+SatNetDevice::SetVirtualChannel (Ptr<VirtualChannel> vChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_virtualChannel = vChannel;
+}
+
+
+Ptr<Channel>
+SatNetDevice::GetChannel (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_virtualChannel;
+}
+
 
 } // namespace ns3

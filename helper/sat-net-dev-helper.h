@@ -17,6 +17,7 @@
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
+
 #ifndef SAT_NET_DEV_HELPER_H
 #define SAT_NET_DEV_HELPER_H
 
@@ -176,9 +177,16 @@ private:
     Ptr<NetDevice> nd,
     bool explicitFilename);
 
-  ObjectFactory m_queueFactory;
-  ObjectFactory m_channelFactory;
-  ObjectFactory m_deviceFactory;
+    /*
+     * Beam id is now static and set by the helper for each PHY layer it creates.
+     * Note, that this needs to be changed to be read from the reference system
+     * configuration table.
+     */
+    unsigned int m_beamId;
+
+    ObjectFactory m_queueFactory;
+    ObjectFactory m_channelFactory;
+    ObjectFactory m_deviceFactory;
 };
 
 } // namespace ns3

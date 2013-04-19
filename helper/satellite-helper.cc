@@ -132,11 +132,9 @@ SatHelper::CreateSimpleScenario()
     NetDeviceContainer d1 = csma.Install (N0UT);
     NetDeviceContainer d4 = csma.Install (GWN1);
 
-    SatNetDevHelper p2p;
-    p2p.SetDeviceAttribute ("DataRate", StringValue ("50Mbps"));
-    p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
-    NetDeviceContainer d2 = p2p.Install (UTSat);
-    NetDeviceContainer d3 = p2p.Install (SatGW);
+    SatNetDevHelper sndh;
+    NetDeviceContainer d2 = sndh.Install (UTSat);
+    NetDeviceContainer d3 = sndh.Install (SatGW);
 
     // Now, we add IP addresses.
     Ipv4AddressHelper ipv4;

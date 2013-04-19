@@ -27,11 +27,16 @@
 #include "ns3/names.h"
 #include "ns3/mpi-interface.h"
 #include "ns3/mpi-receiver.h"
-#include "ns3/sat-net-device.h"
-#include "ns3/sat-channel.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-phy-rx.h"
+#include "ns3/virtual-channel.h"
+
 
 #include "ns3/trace-helper.h"
-#include "sat-net-dev-helper.h"
+#include "ns3/sat-net-dev-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevHelper");
 
@@ -42,6 +47,10 @@ SatNetDevHelper::SatNetDevHelper ()
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
+
+  LogComponentEnable ("SatNetDevHelper", LOG_LEVEL_INFO);
+
+  m_beamId = 1;
 }
 
 void 
@@ -97,9 +106,9 @@ SatNetDevHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool
       filename = pcapHelper.GetFilenameFromDevice (prefix, device);
     }
 
-  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out, 
-                                                     PcapHelper::DLT_PPP);
-  pcapHelper.HookDefaultSink<SatNetDevice> (device, "PromiscSniffer", file);
+  //Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
+  //                                                   PcapHelper::DLT_PPP);
+  //pcapHelper.HookDefaultSink<SatNetDevice> (device, "PromiscSniffer", file);
 }
 
 void 
@@ -115,6 +124,7 @@ SatNetDevHelper::EnableAsciiInternal (
   // the system.  We can only deal with devices of type SatNetDevice.
   //
   Ptr<SatNetDevice> device = nd->GetObject<SatNetDevice> ();
+//  Ptr<SimpleNetDevice> device = nd->GetObject<SimpleNetDevice> ();
   if (device == 0)
     {
       NS_LOG_INFO ("SatNetDevHelper::EnableAsciiInternal(): Device " << device <<
@@ -214,16 +224,59 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
 {
   NetDeviceContainer container;
 
-  Ptr<SatNetDevice> txDev = m_deviceFactory.Create<SatNetDevice> ();
-  Ptr<SatNetDevice> rxDev = m_deviceFactory.Create<SatNetDevice> ();
-  a->AddDevice (txDev);
-  b->AddDevice (rxDev);
-  Ptr<SatChannel> channel = m_channelFactory.Create<SatChannel> ();
-  rxDev->SetChannel (channel);
-  txDev->SetChannel (channel);
+  // Create SatNetDevices
+  Ptr<SatNetDevice> aDev = m_deviceFactory.Create<SatNetDevice> ();
+  Ptr<SatNetDevice> bDev = m_deviceFactory.Create<SatNetDevice> ();
+
+  // Create the SatPhyTx and SatPhyRx modules
+  Ptr<SatPhyTx> aPhyTx = CreateObject<SatPhyTx> ();
+  Ptr<SatPhyRx> aPhyRx = CreateObject<SatPhyRx> ();
+  Ptr<SatPhyTx> bPhyTx = CreateObject<SatPhyTx> ();
+  Ptr<SatPhyRx> bPhyRx = CreateObject<SatPhyRx> ();
+
+  // Create SatChannels
+  Ptr<SatChannel> abChannel = m_channelFactory.Create<SatChannel> ();
+  Ptr<SatChannel> baChannel = m_channelFactory.Create<SatChannel> ();
+
+  // Create VirtualChannel used for getting the global routing to work
+  Ptr<VirtualChannel> vChannel = Create<VirtualChannel> ();
+  vChannel->Add (aDev);
+  vChannel->Add (bDev);
+  aDev->SetVirtualChannel (vChannel);
+  bDev->SetVirtualChannel (vChannel);
+
+  // Set SatChannels to SatPhyTx/SatPhyRx
+  aPhyTx->SetChannel (abChannel);
+  aPhyRx->SetChannel (baChannel);
+  aPhyRx->SetDevice (aDev);
+
+  bPhyTx->SetChannel (baChannel);
+  bPhyRx->SetChannel (abChannel);
+  bPhyRx->SetDevice (bDev);
+
+  // Create SatPhy modules
+  Ptr<SatPhy> aPhy = CreateObject<SatPhy> ();
+  Ptr<SatPhy> bPhy = CreateObject<SatPhy> ();
+
+  // Attach SatPhyTx/SatPhyRx modules to SatPhy
+  aPhy->SetPhyTx (aPhyTx);
+  aPhy->SetPhyRx (aPhyRx);
+  aPhy->SetBeamId (m_beamId);
+  bPhy->SetPhyTx (bPhyTx);
+  bPhy->SetPhyRx (bPhyRx);
+  bPhy->SetBeamId (m_beamId);
+
+  // Attach the PHY layers to SatNetDevice
+  aDev->SetPhy (aPhy);
+  bDev->SetPhy (bPhy);
+
+  // Attach the SatNetDevices to nodes
+  a->AddDevice (aDev);
+  b->AddDevice (bDev);
+
   NetDeviceContainer d;
-  container.Add (txDev);
-  container.Add (rxDev);
+  container.Add (aDev);
+  container.Add (bDev);
 
   return container;
 }
