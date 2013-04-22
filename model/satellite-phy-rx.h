@@ -68,6 +68,19 @@ public:
   Ptr<SatNetDevice> GetDevice ();
 
   /**
+   * Get the SatPhy pointer
+   * @return a pointer to the SatPhy instance
+   */
+  Ptr<SatPhy> GetPhy ();
+
+  /**
+  * Set the SatPhy module
+  * @param phy PHY module
+  */
+
+  void SetPhy (Ptr<SatPhy> phy);
+
+  /**
    * Start packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
    */
@@ -92,6 +105,7 @@ private:
   Time m_firstRxStart;
   Time m_firstRxDuration;
   uint16_t m_beamId;
+  Ptr<SatPhy> m_phy;
 };
 
 

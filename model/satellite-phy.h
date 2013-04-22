@@ -32,7 +32,7 @@ namespace ns3 {
 class SatPhyTx;
 class SatPhyRx;
 class SatChannel;
-
+class SatMac;
 
 /**
  * \ingroup satellite
@@ -46,7 +46,9 @@ public:
   /**
    * Default constructor
    */
-  SatPhy ();
+  SatPhy (void);
+
+  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId);
 
   virtual ~SatPhy ();
 
@@ -68,6 +70,12 @@ public:
    Ptr<SatPhyRx> GetPhyRx ();
 
    /**
+    * Get the SatMac pointer
+    * @return a pointer to the SatMac instance
+    */
+   Ptr<SatMac> GetMac ();
+
+   /**
     * Set the SatPhyTx module
     * \param phyTx Transmitter PHY module
     */
@@ -78,6 +86,12 @@ public:
     * \param phyTx Receiver PHY module
     */
    void SetPhyRx (Ptr<SatPhyRx> phyRx);
+
+   /**
+    * Set the SatMac module
+    * @param mac pointer to SatMac module
+    */
+   void SetMac (Ptr<SatMac> mac);
 
    /**
     * Set the Tx satellite channel
@@ -117,11 +131,20 @@ public:
    */
   void SetBeamId (uint16_t beamId);
   
+
+  /**
+   * Receives packets from lower layer (phyRx)
+   *
+   * @param packet Pointer to received packet
+   */
+  void Receive (Ptr<Packet> packet);
+
 private:
 
   Ptr<SatPhyTx> m_phyTx;
   Ptr<SatPhyRx> m_phyRx;
   uint16_t m_beamId;
+  Ptr<SatMac> m_mac;
   double m_txPower;
 };
 

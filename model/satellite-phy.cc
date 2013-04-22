@@ -22,7 +22,7 @@
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-channel.h"
-#include <ns3/object-factory.h>
+#include "ns3/satellite-mac.h"
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 #include <ns3/double.h>
@@ -34,9 +34,24 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
-SatPhy::SatPhy ()
+SatPhy::SatPhy (void)
 {
   NS_LOG_FUNCTION (this);
+}
+
+SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId)
+  :
+  m_phyTx(phyTx),
+  m_phyRx(phyRx),
+  m_beamId(beamId)
+{
+  NS_LOG_FUNCTION (this << phyTx << phyRx << beamId);
+
+  phyTx->SetBeamId(beamId);
+  phyRx->SetBeamId(beamId);
+
+  phyTx->SetPhy(this);
+  phyRx->SetPhy(this);
 }
 
 
@@ -93,6 +108,18 @@ SatPhy::SetPhyRx (Ptr<SatPhyRx> phyRx)
   m_phyRx = phyRx;
 }
 
+Ptr<SatMac>
+SatPhy::GetMac ()
+{
+  return m_mac;
+}
+
+void
+SatPhy::SetMac (Ptr<SatMac> mac)
+{
+  m_mac = mac;
+}
+
 
 Ptr<SatChannel>
 SatPhy::GetTxChannel ()
@@ -131,6 +158,13 @@ SatPhy::SetBeamId (uint16_t beamId)
   m_beamId = beamId;
   m_phyTx->SetBeamId (beamId);
   m_phyRx->SetBeamId (beamId);
+}
+
+void
+SatPhy::Receive (Ptr<Packet> packet)
+{
+  NS_LOG_FUNCTION (this << packet);
+  m_mac->Receive( packet);
 }
 
 

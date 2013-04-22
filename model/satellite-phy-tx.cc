@@ -94,6 +94,18 @@ SatPhyTx::GetDevice ()
 }
 
 
+Ptr<SatPhy>
+SatPhyTx::GetPhy ()
+{
+  return m_phy;
+}
+
+void
+SatPhyTx::SetPhy (Ptr<SatPhy> phy)
+{
+  m_phy = phy;
+}
+
 Ptr<MobilityModel>
 SatPhyTx::GetMobility ()
 {

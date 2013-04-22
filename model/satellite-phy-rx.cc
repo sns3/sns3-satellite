@@ -19,6 +19,7 @@
  */
 
 #include "ns3/satellite-net-device.h"
+#include "ns3/satellite-phy.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-signal-parameters.h"
@@ -96,6 +97,17 @@ SatPhyRx::SetDevice (Ptr<SatNetDevice> d)
   m_device = d;
 }
 
+Ptr<SatPhy>
+SatPhyRx::GetPhy ()
+{
+  return m_phy;
+}
+
+void
+SatPhyRx::SetPhy (Ptr<SatPhy> phy)
+{
+  m_phy = phy;
+}
 
 Ptr<MobilityModel>
 SatPhyRx::GetMobility ()
@@ -178,7 +190,7 @@ SatPhyRx::EndRxData ()
   ChangeState (IDLE);
   
   // Send packet upwards
-  m_device->Receive ( m_packet );
+  m_phy->Receive ( m_packet );
 }
 
 

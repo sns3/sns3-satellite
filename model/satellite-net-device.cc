@@ -20,6 +20,7 @@
 
 #include "ns3/satellite-net-device.h"
 #include "ns3/satellite-phy.h"
+#include "ns3/satellite-mac.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
@@ -58,13 +59,14 @@ SatNetDevice::GetTypeId (void)
 
 SatNetDevice::SatNetDevice ()
   : m_phy (0),
+    m_mac (0),
     m_node (0),
     m_mtu (0xffff),
     m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
 
-  LogComponentEnable ("SatNetDevice", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatNetDevice", LOG_LEVEL_INFO);
 }
 
 void
@@ -82,7 +84,12 @@ SatNetDevice::SetPhy (Ptr<SatPhy> phy)
   NS_LOG_FUNCTION (this << phy);
   m_phy = phy;
 }
-
+void
+SatNetDevice::SetMac (Ptr<SatMac> mac)
+{
+  NS_LOG_FUNCTION (this << mac);
+  m_mac = mac;
+}
 void
 SatNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 {
@@ -107,6 +114,12 @@ SatNetDevice::GetPhy (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_phy;
+}
+Ptr<SatMac>
+SatNetDevice::GetMac (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_mac;
 }
 void
 SatNetDevice::SetAddress (Address address)
@@ -202,8 +215,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
   NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid());
 
-  Time duration (0.001);
-  m_phy->SendPdu (packet, duration);
+  m_mac->Send(packet);
 
   return true;
 }
@@ -212,8 +224,7 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
 
-  Time duration (0.01);
-  m_phy->SendPdu (packet, duration);
+  m_mac->Send(packet);
 
   return true;
 }
@@ -248,6 +259,7 @@ SatNetDevice::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
   m_phy = 0;
+  m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
   NetDevice::DoDispose ();

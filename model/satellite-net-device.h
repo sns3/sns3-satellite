@@ -31,6 +31,7 @@ namespace ns3 {
 
 
 class SatPhy;
+class SatMac;
 class Node;
 class ErrorModel;
 class VirtualChannel;
@@ -64,6 +65,26 @@ public:
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
+   * Get a copy of the attached Phy.
+   *
+   * \returns Ptr to the SatPhy object.
+   */
+  Ptr<SatPhy> GetPhy (void) const;
+
+  /*
+   * Attach the SatMac mac layer to this netdevice.
+   * @param mac SatMac pointer to be added
+   */
+   void SetMac (Ptr<SatMac> mac);
+
+   /**
+    * Get a copy of the attached Mac.
+    *
+    * \returns Ptr to the SatMac object.
+    */
+   Ptr<SatMac> GetMac (void) const;
+
+  /**
    * Attach a receive ErrorModel to the SatNetDevice.
    * \param em Ptr to the ErrorModel.
    */
@@ -72,7 +93,6 @@ public:
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
-  virtual Ptr<SatPhy> GetPhy (void) const;
   virtual void SetAddress (Address address);
   virtual Address GetAddress (void) const;
   virtual bool SetMtu (const uint16_t mtu);
@@ -104,6 +124,7 @@ protected:
 
 private:
   Ptr<SatPhy> m_phy;
+  Ptr<SatMac> m_mac;
   NetDevice::ReceiveCallback m_rxCallback;
   NetDevice::PromiscReceiveCallback m_promiscCallback;
   Ptr<Node> m_node;

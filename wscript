@@ -11,6 +11,7 @@ def build(bld):
     module.source = [
         'model/satellite.cc',
         'model/cbr-application.cc',
+        'model/satellite-mac.cc',       
         'model/satellite-channel.cc',
         'model/satellite-net-device.cc',
         'model/satellite-phy.cc',
@@ -35,6 +36,7 @@ def build(bld):
     headers.source = [
         'model/satellite.h',
         'model/cbr-application.h',
+        'model/satellite-mac.h',
         'model/satellite-channel.h',
         'model/satellite-net-device.h',
         'model/satellite-phy.h',

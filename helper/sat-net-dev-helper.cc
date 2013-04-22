@@ -28,6 +28,7 @@
 #include "ns3/mpi-interface.h"
 #include "ns3/mpi-receiver.h"
 #include "ns3/satellite-channel.h"
+#include "ns3/satellite-mac.h"
 #include "ns3/satellite-net-device.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-phy-tx.h"
@@ -49,7 +50,7 @@ SatNetDevHelper::SatNetDevHelper ()
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
-  LogComponentEnable ("SatNetDevHelper", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatNetDevHelper", LOG_LEVEL_INFO);
 
   m_beamId = 1;
 }
@@ -107,9 +108,8 @@ SatNetDevHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool
       filename = pcapHelper.GetFilenameFromDevice (prefix, device);
     }
 
-  //Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
-  //                                                   PcapHelper::DLT_PPP);
-  //pcapHelper.HookDefaultSink<SatNetDevice> (device, "PromiscSniffer", file);
+  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
+                                                     PcapHelper::DLT_RAW);
 }
 
 void 
@@ -264,27 +264,43 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   bPhyRx->SetChannel (abChannel);
   bPhyRx->SetDevice (bDev);
 
-  // Create SatPhy modules
-  Ptr<SatPhy> aPhy = CreateObject<SatPhy> ();
-  Ptr<SatPhy> bPhy = CreateObject<SatPhy> ();
+  Ptr<SatMac> aMac = CreateObject<SatMac> ();
+  Ptr<SatMac> bMac = CreateObject<SatMac> ();
 
-  // Attach SatPhyTx/SatPhyRx modules to SatPhy
-  aPhy->SetPhyTx (aPhyTx);
-  aPhy->SetPhyRx (aPhyRx);
-  aPhy->SetBeamId (m_beamId);
-  bPhy->SetPhyTx (bPhyTx);
-  bPhy->SetPhyRx (bPhyRx);
-  bPhy->SetBeamId (m_beamId);
+  // Create and set queues for Mac modules
+  Ptr<Queue> queueA = m_queueFactory.Create<Queue> ();
+  aMac->SetQueue (queueA);
+  Ptr<Queue> queueB = m_queueFactory.Create<Queue> ();
+  bMac->SetQueue (queueB);
+
+  // Create SatPhy modules
+  Ptr<SatPhy> aPhy = CreateObject<SatPhy> (aPhyTx, aPhyRx, m_beamId);
+  Ptr<SatPhy> bPhy = CreateObject<SatPhy> (bPhyTx, bPhyRx, m_beamId);
+
+  // Attach the Mac layers to Phys
+  aPhy->SetMac (aMac);
+  bPhy->SetMac (bMac);
 
   // Attach the PHY layers to SatNetDevice
   aDev->SetPhy (aPhy);
   bDev->SetPhy (bPhy);
 
+  // Attach the PHY layers to SatMac
+  aMac->SetPhy (aPhy);
+  bMac->SetPhy (bPhy);
+
+  // Attach the devices to Mac layers
+  aDev->SetMac(aMac);
+  bDev->SetMac(bMac);
+
+  // Attach the Mac layers to SatNetDevice
+  aMac->SetDevice (aDev);
+  bMac->SetDevice (bDev);
+
   // Attach the SatNetDevices to nodes
   a->AddDevice (aDev);
   b->AddDevice (bDev);
 
-  NetDeviceContainer d;
   container.Add (aDev);
   container.Add (bDev);
 

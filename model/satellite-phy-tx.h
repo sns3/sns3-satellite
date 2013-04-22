@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef LTE_SPECTRUM_PHY_H
-#define LTE_SPECTRUM_PHY_H
+#ifndef SATELLITE_PHY_TX_H
+#define SATELLITE_PHY_TX_H
 
 #include "ns3/satellite-signal-parameters.h"
 #include <ns3/mobility-model.h>
@@ -66,6 +66,18 @@ public:
   Ptr<NetDevice> GetDevice ();
   
   /**
+   * Get the SatPhy pointer
+   * @return a pointer to the SatPhy instance
+   */
+  Ptr<SatPhy> GetPhy ();
+
+  /**
+  * Set the SatPhy module
+  * @param phy PHY module
+  */
+  void SetPhy (Ptr<SatPhy> phy);
+
+  /**
   * Start packet transmission to the channel.
   * \param p Packet to be transmitted
   * \param duration Duration to transmit the packet
@@ -88,14 +100,10 @@ private:
 
   State m_state;
   uint16_t m_beamId;
-  
+  Ptr<SatPhy> m_phy;
 };
-
-
-
-
 
 
 }
 
-#endif /* LTE_SPECTRUM_PHY_H */
+#endif /* SATELLITE_PHY_TX_H */

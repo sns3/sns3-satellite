@@ -63,6 +63,9 @@ SatChannel::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatChannel")
     .SetParent<Channel> ()
     .AddConstructor<SatChannel> ()
+    .AddTraceSource ("TxRxPointToPoint",
+                     "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
+                     MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint))
   ;
   return tid;
 }
@@ -114,6 +117,10 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
       Ptr<SatNetDevice> netDev = (*rxPhyIterator)->GetDevice ();
       uint32_t dstNode =  netDev->GetNode ()->GetId ();
       Simulator::ScheduleWithContext (dstNode, delay, &SatChannel::StartRx, this, rxParams, *rxPhyIterator);
+
+      // Call the tx anim callback on the channel (check net devices from virtual channel)
+      Ptr<Channel> ch = netDev->GetChannel();
+      m_txrxPointToPoint(txParams->m_packet, ch->GetDevice(0), ch->GetDevice(1), Seconds(0), delay );
     }
 }
 
