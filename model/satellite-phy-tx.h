@@ -67,14 +67,14 @@ public:
   
   /**
   * Start packet transmission to the channel.
-  * @param p Packet to be transmitted
-  * @param duration Duration to transmit the packet
+  * \param p Packet to be transmitted
+  * \param duration Duration to transmit the packet
   */
   void StartTx (Ptr<Packet> p, Time duration);
   
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx
-   * \@param beamId the Beam Identifier
+   * \param beamId the Beam Identifier
    */
   void SetBeamId (uint16_t beamId);
 

@@ -51,20 +51,20 @@ public:
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
-   * @param delay Ptr to the propagation delay model to be used.
+   * \param delay Ptr to the propagation delay model to be used.
    */
   virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
 
   /**
    * Used by attached SatPhyTx instances to transmit signals to the channel
-   * @param params the parameters of the signals being transmitted
+   * \param params the parameters of the signals being transmitted
    */
   virtual void StartTx (Ptr<SatSignalParameters> params);
 
   /**
    * This method is used to attach the receiver entity SatPhyRx instance to a
    * SatChannel instance, so that the SatPhyRx can receive packets sent on that channel.
-   * @param phyRx the SatPhyRx instance to be added to the channel as
+   * \param phyRx the SatPhyRx instance to be added to the channel as
    * a receiver.
    */
   virtual void AddRx (Ptr<SatPhyRx> phyRx);
@@ -72,7 +72,7 @@ public:
   /**
    * This method is used to remove a SatPhyRx instance from a
    * SatChannel instance, e.g. due to a spot-beam handover
-   * @param phy the SatPhyRx instance to be removed from the channel.
+   * \param phy the SatPhyRx instance to be removed from the channel.
    */
   virtual void RemoveRx (Ptr<SatPhyRx> phyRx);
 
@@ -86,8 +86,8 @@ private:
   /**
    * Used internally to schedule the reception start after the propagation delay.
    *
-   * @param rxParams Parameters of the signal being received
-   * @param phyRx The receiver SatPhyRx entity
+   * \param rxParams Parameters of the signal being received
+   * \param phyRx The receiver SatPhyRx entity
    */
   void StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 

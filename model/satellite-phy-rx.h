@@ -69,13 +69,13 @@ public:
 
   /**
    * Start packet reception from the SatChannel
-   * @param rxParams The needed parameters for the received signal
+   * \param rxParams The needed parameters for the received signal
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx
-   * \@param beamId the Beam Identifier
+   * \param beamId the Beam Identifier
    */
   void SetBeamId (uint16_t beamId);
 

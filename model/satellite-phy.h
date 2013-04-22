@@ -57,63 +57,63 @@ public:
 
    /**
     * Get the SatPhyTx pointer
-    * @return a pointer to the SatPhyTx instance
+    * \return a pointer to the SatPhyTx instance
     */
    Ptr<SatPhyTx> GetPhyTx ();
 
    /**
     * Get the SatPhyRx pointer
-    * @return a pointer to the SatPhyRx instance
+    * \return a pointer to the SatPhyRx instance
     */
    Ptr<SatPhyRx> GetPhyRx ();
 
    /**
     * Set the SatPhyTx module
-    * @param phyTx Transmitter PHY module
+    * \param phyTx Transmitter PHY module
     */
    void SetPhyTx (Ptr<SatPhyTx> phyTx);
 
    /**
     * Set the SatPhyRx module
-    * @param phyTx Receiver PHY module
+    * \param phyTx Receiver PHY module
     */
    void SetPhyRx (Ptr<SatPhyRx> phyRx);
 
    /**
     * Set the Tx satellite channel
-    * @param c the Tx channel
+    * \param c the Tx channel
     */
    Ptr<SatChannel> GetTxChannel ();
 
   /**
    * Set the Tx power
-   * @param pw the transmission power in dBm
+   * \param pw the transmission power in dBm
    */
   void SetTxPower (double pow);
 
   /**
    * Get the Tx power
-   * @return the transmission power in dBm
+   * \return the transmission power in dBm
    */
   double GetTxPower () const;
 
   /**
    * Send Pdu to the PHY tx module
-   * @param p packet to be sent
-   * @param duration the packet transmission duration (from MAC layer)
+   * \param p packet to be sent
+   * \param duration the packet transmission duration (from MAC layer)
    */
   virtual void SendPdu (Ptr<Packet> p, Time duration);
 
   /**
    * Receive PHY PDU
-   * @param p Packet to be received
+   * \param p Packet to be received
    */
   void ReceivePdu (Ptr<Packet> p);
 
   /**
    * Set the beamId this PHY is connected with
    *
-   * @param beamId Satellite beam id
+   * \param beamId Satellite beam id
    */
   void SetBeamId (uint16_t beamId);
   

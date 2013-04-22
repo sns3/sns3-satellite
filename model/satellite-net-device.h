@@ -53,13 +53,13 @@ public:
 
   /*
    * Receive the packet from the lower layers
-   * @param packet Pointer to the packet to be received.
+   * \param packet Pointer to the packet to be received.
    */
   void Receive (Ptr<Packet> packet);
 
   /*
    * Attach the SatPhy physical layer to this netdevice.
-   * @param phy SatPhy pointer to be added
+   * \param phy SatPhy pointer to be added
    */
   void SetPhy (Ptr<SatPhy> phy);
 
