@@ -33,6 +33,7 @@
 #include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/virtual-channel.h"
+#include "ns3/propagation-delay-model.h"
 
 
 #include "ns3/trace-helper.h"
@@ -244,6 +245,15 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   vChannel->Add (bDev);
   aDev->SetVirtualChannel (vChannel);
   bDev->SetVirtualChannel (vChannel);
+
+  /*
+   * Average propagation delay between UT/GW and satellite in seconds
+   * \todo Change the propagation delay to be a parameter.
+   */
+  double pd = 0.13;
+  Ptr<ConstantPropagationDelayModel> pDelay = Create<ConstantPropagationDelayModel> (pd);
+  abChannel->SetPropagationDelayModel (pDelay);
+  baChannel->SetPropagationDelayModel (pDelay);
 
   // Set SatChannels to SatPhyTx/SatPhyRx
   aPhyTx->SetChannel (abChannel);

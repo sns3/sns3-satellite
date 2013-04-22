@@ -108,6 +108,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
       if (m_propagationDelay)
         {
           delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
+          NS_LOG_LOGIC("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
         }
 
       Ptr<SatNetDevice> netDev = (*rxPhyIterator)->GetDevice ();

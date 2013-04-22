@@ -71,6 +71,8 @@ void
 SatNetDevice::Receive (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
+  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid());
+
   m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
 
@@ -193,10 +195,12 @@ SatNetDevice::IsBridge (void) const
 bool 
 SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  // The duration should be specified by the TBTP or the GW/NCC scheduler
-  // - carrier
-  // - duration
+  /*
+   * \todo The duration should be specified by the TBTP or the GW/NCC scheduler
+   */
+
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
+  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid());
 
   Time duration (0.001);
   m_phy->SendPdu (packet, duration);
