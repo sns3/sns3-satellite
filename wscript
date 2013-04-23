@@ -10,6 +10,7 @@ def build(bld):
     module = bld.create_ns3_module('satellite', ['internet', 'csma'])
     module.source = [
         'model/satellite.cc',
+        'model/geo-coordinate.cc',        
         'model/cbr-application.cc',
         'model/satellite-mac.cc',       
         'model/satellite-channel.cc',
@@ -27,6 +28,7 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('satellite')
     module_test.source = [
         'test/satellite-test-suite.cc',
+        'test/geo-coordinate-test.cc',
         'test/simple-p2p.cc',
         'test/cbr-test.cc',
         ]
@@ -35,6 +37,7 @@ def build(bld):
     headers.module = 'satellite'
     headers.source = [
         'model/satellite.h',
+        'model/geo-coordinate.h',
         'model/cbr-application.h',
         'model/satellite-mac.h',
         'model/satellite-channel.h',
