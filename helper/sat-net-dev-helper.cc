@@ -229,6 +229,9 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<SatNetDevice> aDev = m_deviceFactory.Create<SatNetDevice> ();
   Ptr<SatNetDevice> bDev = m_deviceFactory.Create<SatNetDevice> ();
 
+  aDev->SetAddress (Mac48Address::Allocate ());
+  bDev->SetAddress (Mac48Address::Allocate ());
+
   // Create the SatPhyTx and SatPhyRx modules
   Ptr<SatPhyTx> aPhyTx = CreateObject<SatPhyTx> ();
   Ptr<SatPhyRx> aPhyRx = CreateObject<SatPhyRx> ();
@@ -240,11 +243,16 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<SatChannel> baChannel = m_channelFactory.Create<SatChannel> ();
 
   // Create VirtualChannel used for getting the global routing to work
+  // VirtualChannel is may be needed for
+  // - Global routing
+  // - NetAnim
+  /*
   Ptr<VirtualChannel> vChannel = Create<VirtualChannel> ();
   vChannel->Add (aDev);
   vChannel->Add (bDev);
   aDev->SetVirtualChannel (vChannel);
   bDev->SetVirtualChannel (vChannel);
+   */
 
   /*
    * Average propagation delay between UT/GW and satellite in seconds

@@ -38,6 +38,7 @@
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/sat-net-dev-helper.h"
+#include "ns3/ipv4-static-routing-helper.h"
 
 using namespace ns3;
 
@@ -103,18 +104,56 @@ main (int argc, char *argv[])
   ipv4.SetBase ("10.1.1.0", "255.255.255.0");
   Ipv4InterfaceContainer i0i1 = ipv4.Assign (d1);
 
-  ipv4.SetBase ("10.2.2.0", "255.255.255.0");
+  ipv4.SetBase ("10.1.2.0", "255.255.255.0");
   ipv4.Assign (d2);
 
-  ipv4.SetBase ("10.3.3.0", "255.255.255.0");
+  ipv4.SetBase ("10.1.3.0", "255.255.255.0");
   ipv4.Assign (d3);
 
-  ipv4.SetBase ("10.4.4.0", "255.255.255.0");
+  ipv4.SetBase ("10.1.4.0", "255.255.255.0");
   Ipv4InterfaceContainer i3i4 = ipv4.Assign (d4);
 
-  // Create router nodes, initialize routing database and set up the routing
-  // tables in the nodes.
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  // Get IPv4 protocol implementations
+  Ptr<Ipv4> ipv4N0 = Nodes.Get (0)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4UT = UT->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4SB = SB->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4GW = GW->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N1 = Nodes.Get (1)->GetObject<Ipv4> ();
+
+  // Add IPv4 static routing. Note, currently you need to know
+  // the netdevice indeces to attach the route to.
+  Ipv4StaticRoutingHelper ipv4RoutingHelper;
+
+  // N0: Default route towards satellite network
+  // IfIndex 1 = CSMA
+  Ptr<Ipv4StaticRouting> srN0 = ipv4RoutingHelper.GetStaticRouting (ipv4N0);
+  srN0->SetDefaultRoute (Ipv4Address ("10.1.1.2"), 1);
+
+  // UT: Default route towards satellite network
+  // IfIndex 1 = CSMA
+  // IfIndex 2 = Sat
+  Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
+  srUT->SetDefaultRoute (Ipv4Address ("10.1.2.2"), 2);
+
+  // SB: Default route towards GW
+  // IfIndex 1 = Sat -> UT
+  // IfIndex 2 = Sat -> GW
+  Ptr<Ipv4StaticRouting> srSB = ipv4RoutingHelper.GetStaticRouting (ipv4SB);
+  srSB->SetDefaultRoute (Ipv4Address ("10.1.3.2"), 2);
+  srSB->AddNetworkRouteTo (Ipv4Address ("10.1.1.0"), Ipv4Mask("255.255.255.0"), 1);
+
+  // GW: Default route towards Internet
+  // IfIndex 1 = Sat
+  // IfIndex 2 = CSMA
+  Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4GW);
+  srGW->SetDefaultRoute (Ipv4Address ("10.1.4.2"), 2);
+  srGW->AddNetworkRouteTo (Ipv4Address ("10.1.1.0"), Ipv4Mask("255.255.255.0"), 1);
+  srGW->AddNetworkRouteTo (Ipv4Address ("10.1.2.0"), Ipv4Mask("255.255.255.0"), 1);
+
+  // N1: Default route towards satellite network
+  // IfIndex 1 = CSMA
+  Ptr<Ipv4StaticRouting> srN1 = ipv4RoutingHelper.GetStaticRouting (ipv4N1);
+  srN1->SetDefaultRoute (Ipv4Address ("10.1.4.1"), 1);
 
   // Create the OnOff application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s

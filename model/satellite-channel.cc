@@ -119,8 +119,12 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
       Simulator::ScheduleWithContext (dstNode, delay, &SatChannel::StartRx, this, rxParams, *rxPhyIterator);
 
       // Call the tx anim callback on the channel (check net devices from virtual channel)
+      // Note: this is only needed for NetAnim. By default, the NetDevice does not have a channel
+      // pointer.
+      /*
       Ptr<Channel> ch = netDev->GetChannel();
       m_txrxPointToPoint(txParams->m_packet, ch->GetDevice(0), ch->GetDevice(1), Seconds(0), delay );
+      */
     }
 }
 
