@@ -297,13 +297,13 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   aMac->SetPhy (aPhy);
   bMac->SetPhy (bPhy);
 
-  // Attach the devices to Mac layers
+  // Attach the Mac layers to SatNetDevice
   aDev->SetMac(aMac);
   bDev->SetMac(bMac);
 
-  // Attach the Mac layers to SatNetDevice
-  aMac->SetDevice (aDev);
-  bMac->SetDevice (bDev);
+  // Attach the device receive callbacks to SatMac
+  aMac->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, aDev));
+  bMac->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, bDev));
 
   // Attach the SatNetDevices to nodes
   a->AddDevice (aDev);

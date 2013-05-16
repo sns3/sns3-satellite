@@ -89,26 +89,6 @@ public:
    * \param phy Ptr to the attached Net Device object.
    */
 
-  bool SetDevice (Ptr<SatNetDevice> phy);
-
-  /**
-   * Get a copy of the attached Net Device.
-   *
-   * \returns Ptr to the attached Net Device.
-   */
-  Ptr<SatNetDevice> GetDevice (void) const;
-
-  /**
-   * Attach a queue to the SatMac.
-   *
-   * The SatMac "owns" a queue that implements a queueing
-   * method such as DropTail or RED.
-   *
-   * @see Queue
-   * @see DropTailQueue
-   * @param queue Ptr to the new queue.
-   */
-
   void SetQueue (Ptr<Queue> queue);
 
   /**
@@ -143,22 +123,18 @@ public:
   bool Send (Ptr<Packet> packet);
 
   /**
-     * \param packet the packet received
-     * \param protocol the 16 bit protocol number associated with this packet.
-     *        This protocol number is expected to be the same protocol number
-     *        given to the Send method by the user on the sender side.
-     * \param sender the address of the sender
-     * \returns true if the callback could handle the packet successfully, false
-     *          otherwise.
-     */
-    typedef Callback<bool,Ptr<const Packet>,uint16_t,const Address &> ReceiveCallback;
+    * \param packet the packet received
+    * \returns true if the callback could handle the packet successfully, false
+    *          otherwise.
+    */
+  typedef Callback<void,Ptr<const Packet> > ReceiveCallback;
 
   /**
-     * \param cb callback to invoke whenever a packet has been received and must
-     *        be forwarded to the higher layers.
-     *
-     */
-    void SetReceiveCallback (ReceiveCallback cb);
+    * \param cb callback to invoke whenever a packet has been received and must
+    *        be forwarded to the higher layers.
+    *
+    */
+  void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
 private:
 

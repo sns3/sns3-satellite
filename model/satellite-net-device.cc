@@ -70,7 +70,7 @@ SatNetDevice::SatNetDevice ()
 }
 
 void
-SatNetDevice::Receive (Ptr<Packet> packet)
+SatNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid());

@@ -56,7 +56,7 @@ public:
    * Receive the packet from the lower layers
    * \param packet Pointer to the packet to be received.
    */
-  void Receive (Ptr<Packet> packet);
+  void Receive (Ptr<const Packet> packet);
 
   /*
    * Attach the SatPhy physical layer to this netdevice.

@@ -98,7 +98,6 @@ SatMac::SatMac ()
   :
     m_txMachineState (READY),
     m_phy(0),
-    m_device(0),
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
@@ -118,7 +117,6 @@ SatMac::DoDispose ()
   m_receiveErrorModel = 0;
   m_currentPkt = 0;
   m_phy = 0;
-  m_device = 0;
   Object::DoDispose ();
 }
 
@@ -186,21 +184,6 @@ SatMac::GetPhy (void) const
   return m_phy;
 }
 
-bool
-SatMac::SetDevice (Ptr<SatNetDevice> dev)
-{
-  NS_LOG_FUNCTION (this << &dev);
-  m_device = dev;
-  return true;
-}
-
-Ptr<SatNetDevice>
-SatMac::GetDevice (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_device;
-}
-
 void
 SatMac::SetQueue (Ptr<Queue> q)
 {
@@ -240,7 +223,7 @@ SatMac::Receive (Ptr<Packet> packet)
       //m_phyRxEndTrace (packet);
 
       m_macRxTrace (packet);
-      m_device->Receive(packet);
+      m_rxCallback (packet);
     }
 }
 
