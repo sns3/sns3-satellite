@@ -49,6 +49,7 @@ class SatGeoNetDevice : public NetDevice
 {
 public:
   static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
   SatGeoNetDevice ();
 
   /*
@@ -66,13 +67,18 @@ public:
   void ReceiveFeeder (Ptr<Packet> packet, uint16_t beamId);
 
   /*
-   * Attach the SatChannels for the beam
-   * \param ff feeder forward channel
-   * \param fr feeder return channel
-   * \param uf user forward channel
-   * \param uf user return channel
+   * Add the User Phy object for the beam
+   * \param phy user phy object to add.
+   * \param beamId the id of the beam to use phy for
    */
-  void AttachChannels (Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId );
+  void AddUserPhy (Ptr<SatPhy> phy, uint16_t beamId);
+
+  /*
+   * Add the Feeder Phy object for the beam
+   * \param phy feeder phy object to add.
+   * \param beamId the id of the beam to use phy for
+   */
+  void AddFeederPhy (Ptr<SatPhy> phy, uint16_t beamId);
 
   /**
    * Attach a receive ErrorModel to the SatGeoNetDevice.
@@ -117,6 +123,7 @@ private:
   Ptr<Node> m_node;
   uint16_t m_mtu;
   uint32_t m_ifIndex;
+  uint16_t m_phyCount;
   Mac48Address m_address;
   Ptr<ErrorModel> m_receiveErrorModel;
   std::vector<Ptr<SatPhy> > m_userPhy;

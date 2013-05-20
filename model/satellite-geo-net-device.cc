@@ -33,6 +33,7 @@
 #include "ns3/ipv4-header.h"
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoNetDevice");
 
@@ -46,6 +47,10 @@ SatGeoNetDevice::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGeoNetDevice")
     .SetParent<NetDevice> ()
     .AddConstructor<SatGeoNetDevice> ()
+    .AddAttribute ("PhyCount", "The maximum number of phy objects (for each, user and feeder).",
+                    UintegerValue (98),
+                    MakeUintegerAccessor (&SatGeoNetDevice::m_phyCount),
+                    MakeUintegerChecker<uint16_t> (1))
     .AddAttribute ("ReceiveErrorModel",
                    "The receiver error model used to simulate packet loss",
                    PointerValue (),
@@ -58,16 +63,25 @@ SatGeoNetDevice::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatGeoNetDevice::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
 SatGeoNetDevice::SatGeoNetDevice ()
   : m_node (0),
     m_mtu (0xffff),
     m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
-  m_feederPhy.reserve(98);
-  m_userPhy.reserve(98);
 
-  //LogComponentEnable ("SatGeoNetDevice", LOG_LEVEL_INFO);
+  // need to call to update member variables by attributes for constructor
+  // involves implementation of method GetInstanceTypeId
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
+
+  m_feederPhy.reserve(m_phyCount);
+  m_userPhy.reserve(m_phyCount);
 }
 
 void
@@ -262,34 +276,17 @@ SatGeoNetDevice::GetChannel (void) const
 }
 
 void
-SatGeoNetDevice::AttachChannels (Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId )
+SatGeoNetDevice::AddUserPhy (Ptr<SatPhy> phy, uint16_t beamId)
 {
-  NS_LOG_FUNCTION (this << ff << fr << uf << ur);
+  NS_LOG_FUNCTION (this << phy);
+  m_userPhy[beamId] = phy;
+}
 
-  // Create the first needed SatPhyTx and SatPhyRx modules
-  Ptr<SatPhyTx> uPhyTx = CreateObject<SatPhyTx> ();
-  Ptr<SatPhyRx> uPhyRx = CreateObject<SatPhyRx> ();
-  Ptr<SatPhyTx> fPhyTx = CreateObject<SatPhyTx> ();
-  Ptr<SatPhyRx> fPhyRx = CreateObject<SatPhyRx> ();
-
-  // Set SatChannels to SatPhyTx/SatPhyRx
-  uPhyTx->SetChannel (uf);
-  uPhyRx->SetChannel (ur);
-  uPhyRx->SetDevice (this);
-
-  fPhyTx->SetChannel (fr);
-  fPhyRx->SetChannel (ff);
-  fPhyRx->SetDevice (this);
-
-  SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, this);
-  SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, this);
-
-  // Create SatPhy modules
-  Ptr<SatPhy> uPhy = CreateObject<SatPhy> (uPhyTx, uPhyRx, beamId, uCb);
-  Ptr<SatPhy> fPhy = CreateObject<SatPhy> (fPhyTx, fPhyRx, beamId, fCb);
-
-  m_userPhy[beamId] = uPhy;
-  m_feederPhy[beamId] = fPhy;
+void
+SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint16_t beamId)
+{
+  NS_LOG_FUNCTION (this << phy);
+  m_feederPhy[beamId] = phy;
 }
 
 } // namespace ns3

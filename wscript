@@ -23,6 +23,7 @@ def build(bld):
         'model/virtual-channel.cc',
         'helper/satellite-helper.cc',
         'helper/sat-net-dev-helper.cc',
+        'helper/satellite-geo-helper.cc',
         'helper/cbr-helper.cc',
         ]
 
@@ -51,6 +52,7 @@ def build(bld):
         'model/virtual-channel.h',
         'helper/satellite-helper.h',
         'helper/sat-net-dev-helper.h',
+        'helper/satellite-geo-helper.h',
         'helper/cbr-helper.h',
         ]
 

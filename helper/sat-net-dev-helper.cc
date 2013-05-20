@@ -40,6 +40,7 @@
 
 #include "ns3/trace-helper.h"
 #include "ns3/sat-net-dev-helper.h"
+#include "ns3/satellite-geo-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevHelper");
 
@@ -194,7 +195,7 @@ SatNetDevHelper::EnableAsciiInternal (
   uint32_t deviceid = nd->GetIfIndex ();
   std::ostringstream oss;
 
-  oss << "/NodeList/" << nd->GetNode ()->GetId () << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/MacRx";
+  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/MacRx";
   Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultReceiveSinkWithContext, stream));
 
   oss.str ("");
@@ -225,16 +226,14 @@ NetDeviceContainer
 SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b, uint16_t beamId)
 {
   NetDeviceContainer container;
-  Ptr<Node> node = CreateObject<Node> (); //Todo:
 
   // Create SatNetDevices
   Ptr<SatNetDevice> aDev = m_deviceFactory.Create<SatNetDevice> ();
   Ptr<SatNetDevice> bDev = m_deviceFactory.Create<SatNetDevice> ();
-  Ptr<SatGeoNetDevice> satDev = CreateObject<SatGeoNetDevice> ();
+
 
   aDev->SetAddress (Mac48Address::Allocate ());
   bDev->SetAddress (Mac48Address::Allocate ());
-  satDev->SetAddress (Mac48Address::Allocate ());
 
   // Create the SatPhyTx and SatPhyRx modules
   Ptr<SatPhyTx> aPhyTx = CreateObject<SatPhyTx> ();
@@ -317,8 +316,14 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b, uint16_t beamId)
   a->AddDevice (aDev);
   b->AddDevice (bDev);
 
-  satDev->AttachChannels(dcChannel,cdChannel,baChannel,abChannel,beamId);
-  node->AddDevice(satDev);
+  //Todo: move these to beam helper.
+  SatGeoHelper geoHelper;
+  Ptr<Node> satNode = CreateObject<Node> ();
+
+  Ptr<SatGeoNetDevice> satDev = DynamicCast<SatGeoNetDevice>( geoHelper.Install(satNode, beamId));
+  satDev->SetAddress (Mac48Address::Allocate ());
+
+  geoHelper.AttachChannels(satDev, dcChannel,cdChannel,baChannel,abChannel,beamId);
 
   container.Add (aDev);
   container.Add (bDev);
