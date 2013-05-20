@@ -153,15 +153,15 @@ main (int argc, char *argv[])
   SatNetDevHelper sndh;
 
   // UT to Satellite beams
-  NetDeviceContainer d6 = sndh.Install (UT1Sat1);
-  NetDeviceContainer d7 = sndh.Install (UT2Sat1);
-  NetDeviceContainer d8 = sndh.Install (UT3Sat2);
-  NetDeviceContainer d9 = sndh.Install (UT4Sat3);
+  NetDeviceContainer d6 = sndh.Install (UT1Sat1, 0);
+  NetDeviceContainer d7 = sndh.Install (UT2Sat1, 0);
+  NetDeviceContainer d8 = sndh.Install (UT3Sat2, 0);
+  NetDeviceContainer d9 = sndh.Install (UT4Sat3, 0);
 
   // Satellite beams to GW
-  NetDeviceContainer d10 = sndh.Install (Sat1GW1);
-  NetDeviceContainer d11 = sndh.Install (Sat2GW1);
-  NetDeviceContainer d12 = sndh.Install (Sat3GW2);
+  NetDeviceContainer d10 = sndh.Install (Sat1GW1, 0);
+  NetDeviceContainer d11 = sndh.Install (Sat2GW1, 0);
+  NetDeviceContainer d12 = sndh.Install (Sat3GW2, 0);
 
   // Add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");

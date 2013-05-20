@@ -44,11 +44,17 @@ class SatPhy : public Object
 public:
 
   /**
+   * \param packet the packet received
+   * \param beamId the id of the beam where packet is from
+   */
+  typedef Callback<void,Ptr<Packet>, uint16_t> ReceiveCallback;
+
+  /**
    * Default constructor
    */
   SatPhy (void);
 
-  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId);
+  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId, SatPhy::ReceiveCallback cb);
 
   virtual ~SatPhy ();
 
@@ -57,23 +63,17 @@ public:
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
-   /**
-    * Get the SatPhyTx pointer
-    * \return a pointer to the SatPhyTx instance
-    */
-   Ptr<SatPhyTx> GetPhyTx ();
+  /**
+   * Get the SatPhyTx pointer
+   * \return a pointer to the SatPhyTx instance
+   */
+  Ptr<SatPhyTx> GetPhyTx ();
 
    /**
     * Get the SatPhyRx pointer
     * \return a pointer to the SatPhyRx instance
     */
    Ptr<SatPhyRx> GetPhyRx ();
-
-   /**
-    * Get the SatMac pointer
-    * @return a pointer to the SatMac instance
-    */
-   Ptr<SatMac> GetMac ();
 
    /**
     * Set the SatPhyTx module
@@ -86,12 +86,6 @@ public:
     * \param phyTx Receiver PHY module
     */
    void SetPhyRx (Ptr<SatPhyRx> phyRx);
-
-   /**
-    * Set the SatMac module
-    * @param mac pointer to SatMac module
-    */
-   void SetMac (Ptr<SatMac> mac);
 
    /**
     * Set the Tx satellite channel
@@ -144,8 +138,11 @@ private:
   Ptr<SatPhyTx> m_phyTx;
   Ptr<SatPhyRx> m_phyRx;
   uint16_t m_beamId;
-  Ptr<SatMac> m_mac;
   double m_txPower;
+  /**
+   * The upper layer package receive callback.
+   */
+  SatPhy::ReceiveCallback m_rxCallback;
 };
 
 

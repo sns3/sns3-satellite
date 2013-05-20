@@ -103,6 +103,7 @@ public:
 
   /**
    * \param c a set of nodes
+   * \param beamId  id of the beam
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatNetDevHelper::SetChannelAttribute,
@@ -111,39 +112,43 @@ public:
    * a queue for this ns3::NetDevice, and associate the resulting 
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c);
+  NetDeviceContainer Install (NodeContainer c, uint16_t beamId);
 
   /**
    * \param a first node
    * \param b second node
+   * \param beamId  id of the beam
    *
    * Saves you from having to construct a temporary NodeContainer. 
    */
-  NetDeviceContainer Install (Ptr<Node> a, Ptr<Node> b);
+  NetDeviceContainer Install (Ptr<Node> a, Ptr<Node> b, uint16_t beamId);
 
   /**
    * \param a first node
    * \param bName name of second node
+   * \param beamId  id of the beam
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  NetDeviceContainer Install (Ptr<Node> a, std::string bName);
+  NetDeviceContainer Install (Ptr<Node> a, std::string bName, uint16_t beamId);
 
   /**
    * \param aName Name of first node
    * \param b second node
+   * \param beamId  id of the beam
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  NetDeviceContainer Install (std::string aName, Ptr<Node> b);
+  NetDeviceContainer Install (std::string aName, Ptr<Node> b, uint16_t beamId);
 
   /**
    * \param aNode Name of first node
    * \param bNode Name of second node
+   * \param beamId  id of the beam
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  NetDeviceContainer Install (std::string aNode, std::string bNode);
+  NetDeviceContainer Install (std::string aNode, std::string bNode, uint16_t beamId);
 
 private:
   /**

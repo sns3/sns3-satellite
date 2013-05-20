@@ -114,7 +114,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
           NS_LOG_LOGIC("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
         }
 
-      Ptr<SatNetDevice> netDev = (*rxPhyIterator)->GetDevice ();
+      Ptr<NetDevice> netDev = (*rxPhyIterator)->GetDevice ();
       uint32_t dstNode =  netDev->GetNode ()->GetId ();
       Simulator::ScheduleWithContext (dstNode, delay, &SatChannel::StartRx, this, rxParams, *rxPhyIterator);
 
@@ -164,7 +164,7 @@ Ptr<NetDevice>
 SatChannel::GetDevice (uint32_t i) const
 {
   NS_LOG_FUNCTION (this << i);
-  return m_phyList.at (i)->GetDevice ()->GetObject<SatNetDevice> ();
+  return m_phyList.at (i)->GetDevice ()->GetObject<NetDevice> ();
 }
 
 } // namespace ns3

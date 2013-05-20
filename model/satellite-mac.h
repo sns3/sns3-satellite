@@ -107,10 +107,11 @@ public:
    * arrived at the device.
    *
    * @see SatChannel
-   * @param p Ptr to the received packet.
+   * /param p Ptr to the received packet.
+   * /param beamId the id of the beam where packet is from
    */
 
-  void Receive (Ptr<Packet> p);
+  void Receive (Ptr<Packet> p, uint16_t beamId);
 
   /**
     * \param packet packet sent from above down to SatMac
@@ -124,8 +125,6 @@ public:
 
   /**
     * \param packet the packet received
-    * \returns true if the callback could handle the packet successfully, false
-    *          otherwise.
     */
   typedef Callback<void,Ptr<const Packet> > ReceiveCallback;
 

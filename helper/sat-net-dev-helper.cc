@@ -30,6 +30,7 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-mac.h"
 #include "ns3/satellite-net-device.h"
+#include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-phy-rx.h"
@@ -214,23 +215,26 @@ SatNetDevHelper::EnableAsciiInternal (
 }
 
 NetDeviceContainer 
-SatNetDevHelper::Install (NodeContainer c)
+SatNetDevHelper::Install (NodeContainer c, uint16_t beamId)
 {
   NS_ASSERT (c.GetN () == 2);
-  return Install (c.Get (0), c.Get (1));
+  return Install (c.Get (0), c.Get (1), beamId);
 }
 
 NetDeviceContainer 
-SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
+SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b, uint16_t beamId)
 {
   NetDeviceContainer container;
+  Ptr<Node> node = CreateObject<Node> (); //Todo:
 
   // Create SatNetDevices
   Ptr<SatNetDevice> aDev = m_deviceFactory.Create<SatNetDevice> ();
   Ptr<SatNetDevice> bDev = m_deviceFactory.Create<SatNetDevice> ();
+  Ptr<SatGeoNetDevice> satDev = CreateObject<SatGeoNetDevice> ();
 
   aDev->SetAddress (Mac48Address::Allocate ());
   bDev->SetAddress (Mac48Address::Allocate ());
+  satDev->SetAddress (Mac48Address::Allocate ());
 
   // Create the SatPhyTx and SatPhyRx modules
   Ptr<SatPhyTx> aPhyTx = CreateObject<SatPhyTx> ();
@@ -238,9 +242,13 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<SatPhyTx> bPhyTx = CreateObject<SatPhyTx> ();
   Ptr<SatPhyRx> bPhyRx = CreateObject<SatPhyRx> ();
 
-  // Create SatChannels
+  // Create SatChannels user
   Ptr<SatChannel> abChannel = m_channelFactory.Create<SatChannel> ();
   Ptr<SatChannel> baChannel = m_channelFactory.Create<SatChannel> ();
+
+  // Create SatChannels feeder
+  Ptr<SatChannel> cdChannel = m_channelFactory.Create<SatChannel> ();
+  Ptr<SatChannel> dcChannel = m_channelFactory.Create<SatChannel> ();
 
   // Create VirtualChannel used for getting the global routing to work
   // VirtualChannel is may be needed for
@@ -268,8 +276,8 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   aPhyRx->SetChannel (baChannel);
   aPhyRx->SetDevice (aDev);
 
-  bPhyTx->SetChannel (baChannel);
-  bPhyRx->SetChannel (abChannel);
+  bPhyTx->SetChannel (dcChannel);
+  bPhyRx->SetChannel (cdChannel);
   bPhyRx->SetDevice (bDev);
 
   Ptr<SatMac> aMac = CreateObject<SatMac> ();
@@ -281,13 +289,13 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<Queue> queueB = m_queueFactory.Create<Queue> ();
   bMac->SetQueue (queueB);
 
-  // Create SatPhy modules
-  Ptr<SatPhy> aPhy = CreateObject<SatPhy> (aPhyTx, aPhyRx, m_beamId);
-  Ptr<SatPhy> bPhy = CreateObject<SatPhy> (bPhyTx, bPhyRx, m_beamId);
+  // Attach the Mac layers receivers to Phys
+  SatPhy::ReceiveCallback aCb = MakeCallback (&SatMac::Receive, aMac);
+  SatPhy::ReceiveCallback bCb = MakeCallback (&SatMac::Receive, bMac);
 
-  // Attach the Mac layers to Phys
-  aPhy->SetMac (aMac);
-  bPhy->SetMac (bMac);
+  // Create SatPhy modules
+  Ptr<SatPhy> aPhy = CreateObject<SatPhy> (aPhyTx, aPhyRx, beamId, aCb);
+  Ptr<SatPhy> bPhy = CreateObject<SatPhy> (bPhyTx, bPhyRx, beamId, bCb);
 
   // Attach the PHY layers to SatNetDevice
   aDev->SetPhy (aPhy);
@@ -309,6 +317,9 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
   a->AddDevice (aDev);
   b->AddDevice (bDev);
 
+  satDev->AttachChannels(dcChannel,cdChannel,baChannel,abChannel,beamId);
+  node->AddDevice(satDev);
+
   container.Add (aDev);
   container.Add (bDev);
 
@@ -316,25 +327,25 @@ SatNetDevHelper::Install (Ptr<Node> a, Ptr<Node> b)
 }
 
 NetDeviceContainer 
-SatNetDevHelper::Install (Ptr<Node> a, std::string bName)
+SatNetDevHelper::Install (Ptr<Node> a, std::string bName, uint16_t beamId)
 {
   Ptr<Node> b = Names::Find<Node> (bName);
-  return Install (a, b);
+  return Install (a, b, beamId);
 }
 
 NetDeviceContainer 
-SatNetDevHelper::Install (std::string aName, Ptr<Node> b)
+SatNetDevHelper::Install (std::string aName, Ptr<Node> b, uint16_t beamId)
 {
   Ptr<Node> a = Names::Find<Node> (aName);
-  return Install (a, b);
+  return Install (a, b, beamId);
 }
 
 NetDeviceContainer 
-SatNetDevHelper::Install (std::string aName, std::string bName)
+SatNetDevHelper::Install (std::string aName, std::string bName, uint16_t beamId)
 {
   Ptr<Node> a = Names::Find<Node> (aName);
   Ptr<Node> b = Names::Find<Node> (bName);
-  return Install (a, b);
+  return Install (a, b, beamId);
 }
 
 } // namespace ns3

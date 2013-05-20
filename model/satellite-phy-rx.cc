@@ -83,7 +83,7 @@ SatPhyRx::GetTypeId (void)
 }
 
 
-Ptr<SatNetDevice>
+Ptr<NetDevice>
 SatPhyRx::GetDevice ()
 {
   NS_LOG_FUNCTION (this);
@@ -91,7 +91,7 @@ SatPhyRx::GetDevice ()
 }
 
 void
-SatPhyRx::SetDevice (Ptr<SatNetDevice> d)
+SatPhyRx::SetDevice (Ptr<NetDevice> d)
 {
   NS_LOG_FUNCTION (this << d);
   m_device = d;
@@ -178,7 +178,6 @@ SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
       }
 
 }
-
 
 void
 SatPhyRx::EndRxData ()

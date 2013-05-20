@@ -199,7 +199,7 @@ SatMac::GetQueue (void) const
 }
 
 void
-SatMac::Receive (Ptr<Packet> packet)
+SatMac::Receive (Ptr<Packet> packet, uint16_t beamId)
 {
   NS_LOG_FUNCTION (this << packet);
 

@@ -95,8 +95,8 @@ main (int argc, char *argv[])
   NetDeviceContainer d4 = csma.Install (GWN1);
 
   SatNetDevHelper sndh;
-  NetDeviceContainer d2 = sndh.Install (UTSat);
-  NetDeviceContainer d3 = sndh.Install (SatGW);
+  NetDeviceContainer d2 = sndh.Install (UTSat, 0);
+  NetDeviceContainer d3 = sndh.Install (SatGW, 0);
 
   // Later, we add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");

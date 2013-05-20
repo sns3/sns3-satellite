@@ -63,9 +63,9 @@ public:
   Ptr<SatChannel> GetVirtualChannel ();
 
   void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<SatNetDevice> d);
+  void SetDevice (Ptr<NetDevice> d);
   Ptr<MobilityModel> GetMobility ();
-  Ptr<SatNetDevice> GetDevice ();
+  Ptr<NetDevice> GetDevice ();
 
   /**
    * Get the SatPhy pointer
@@ -98,7 +98,7 @@ private:
   void EndRxData ();
   
   Ptr<MobilityModel> m_mobility;
-  Ptr<SatNetDevice> m_device;
+  Ptr<NetDevice> m_device;
   Ptr<Packet> m_packet;
 
   State m_state;

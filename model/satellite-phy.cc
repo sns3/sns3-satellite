@@ -39,11 +39,12 @@ SatPhy::SatPhy (void)
   NS_LOG_FUNCTION (this);
 }
 
-SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId)
+SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId, SatPhy::ReceiveCallback cb)
   :
   m_phyTx(phyTx),
   m_phyRx(phyRx),
-  m_beamId(beamId)
+  m_beamId(beamId),
+  m_rxCallback(cb)
 {
   NS_LOG_FUNCTION (this << phyTx << phyRx << beamId);
 
@@ -108,19 +109,6 @@ SatPhy::SetPhyRx (Ptr<SatPhyRx> phyRx)
   m_phyRx = phyRx;
 }
 
-Ptr<SatMac>
-SatPhy::GetMac ()
-{
-  return m_mac;
-}
-
-void
-SatPhy::SetMac (Ptr<SatMac> mac)
-{
-  m_mac = mac;
-}
-
-
 Ptr<SatChannel>
 SatPhy::GetTxChannel ()
 {
@@ -164,7 +152,7 @@ void
 SatPhy::Receive (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  m_mac->Receive( packet);
+  m_rxCallback( packet, this->m_beamId);
 }
 
 
