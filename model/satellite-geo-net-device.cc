@@ -47,10 +47,6 @@ SatGeoNetDevice::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGeoNetDevice")
     .SetParent<NetDevice> ()
     .AddConstructor<SatGeoNetDevice> ()
-    .AddAttribute ("PhyCount", "The maximum number of phy objects (for each, user and feeder).",
-                    UintegerValue (98),
-                    MakeUintegerAccessor (&SatGeoNetDevice::m_phyCount),
-                    MakeUintegerChecker<uint16_t> (1))
     .AddAttribute ("ReceiveErrorModel",
                    "The receiver error model used to simulate packet loss",
                    PointerValue (),
@@ -63,25 +59,12 @@ SatGeoNetDevice::GetTypeId (void)
   return tid;
 }
 
-TypeId
-SatGeoNetDevice::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
 SatGeoNetDevice::SatGeoNetDevice ()
   : m_node (0),
     m_mtu (0xffff),
     m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
-
-  // need to call to update member variables by attributes for constructor
-  // involves implementation of method GetInstanceTypeId
-  ObjectBase::ConstructSelf (AttributeConstructionList ());
-
-  m_feederPhy.reserve(m_phyCount);
-  m_userPhy.reserve(m_phyCount);
 }
 
 void
@@ -279,14 +262,14 @@ void
 SatGeoNetDevice::AddUserPhy (Ptr<SatPhy> phy, uint16_t beamId)
 {
   NS_LOG_FUNCTION (this << phy);
-  m_userPhy[beamId] = phy;
+  m_userPhy.insert(std::pair<uint16_t, Ptr<SatPhy> >(beamId, phy));
 }
 
 void
 SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint16_t beamId)
 {
   NS_LOG_FUNCTION (this << phy);
-  m_feederPhy[beamId] = phy;
+  m_feederPhy.insert(std::pair<uint16_t, Ptr<SatPhy> >(beamId, phy));
 }
 
 } // namespace ns3

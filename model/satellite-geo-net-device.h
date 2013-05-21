@@ -25,6 +25,7 @@
 #include "ns3/mac48-address.h"
 #include <stdint.h>
 #include <string>
+#include <map>
 #include "ns3/traced-callback.h"
 
 namespace ns3 {
@@ -40,7 +41,6 @@ class SatChannel;
  *
  */
 
-
 /**
  * \ingroup satellite
  * SatGeoNetDevice to be utilized in the UT, GW and satellite.
@@ -49,7 +49,6 @@ class SatGeoNetDevice : public NetDevice
 {
 public:
   static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
   SatGeoNetDevice ();
 
   /*
@@ -126,8 +125,8 @@ private:
   uint16_t m_phyCount;
   Mac48Address m_address;
   Ptr<ErrorModel> m_receiveErrorModel;
-  std::vector<Ptr<SatPhy> > m_userPhy;
-  std::vector<Ptr<SatPhy> > m_feederPhy;
+  std::map<uint16_t, Ptr<SatPhy> > m_userPhy;
+  std::map<uint16_t, Ptr<SatPhy> > m_feederPhy;
 
   /**
    * The trace source fired when the phy layer drops a packet it has received
