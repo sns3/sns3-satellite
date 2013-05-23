@@ -23,7 +23,8 @@
 #include "ns3/names.h"
 #include "ns3/string.h"
 #include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/sat-net-dev-helper.h"
+#include "ns3/satellite-beam-helper.h"
+#include "ns3/satellite-ut-helper.h"
 #include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
@@ -110,74 +111,57 @@ SatHelper::GetUser(uint32_t i)
 void
 SatHelper::CreateSimpleScenario()
 {
-    m_users.Create (2);
-    Ptr<Node> UT = CreateObject<Node> ();
-    Ptr<Node> GW = CreateObject<Node> ();
-    NodeContainer SAT = NodeContainer (UT, GW);
+  m_users.Create (2);
+  Ptr<Node> UT = CreateObject<Node> ();
 
-    NodeContainer N0UT = NodeContainer (m_users.Get (0), UT);
-    NodeContainer GWN1 = NodeContainer (GW, m_users.Get (1));
+  InternetStackHelper internet;
+  internet.Install (UT);
+  internet.Install (m_users);
 
-    InternetStackHelper internet;
-    internet.Install (SAT);
-    internet.Install (m_users);
+  // We create the channels and net devices first without any IP addressing information
+  CsmaHelper csma;
+  csma.SetChannelAttribute ("DataRate", DataRateValue (5000000));
+  csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
-    // We create the channels and net devices first without any IP addressing information
-    CsmaHelper csma;
-    csma.SetChannelAttribute ("DataRate", DataRateValue (5000000));
-    csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-    NetDeviceContainer d1 = csma.Install (N0UT);
-    NetDeviceContainer d3 = csma.Install (GWN1);
+  NodeContainer N0UT = NodeContainer (UT, m_users.Get (0));
+  NetDeviceContainer d1 = csma.Install (N0UT);
+  Ipv4AddressHelper ipv4;
+  ipv4.SetBase ("10.2.1.0", "255.255.255.0");
+  Ipv4InterfaceContainer i0i1 = ipv4.Assign (d1);
+  m_userAddresses.Add(i0i1.Get(1));
 
-    SatNetDevHelper sndh;
-    NetDeviceContainer d2 = sndh.Install (SAT, 0);
+  SatBeamHelper beamHelper;
 
-    // Now, we add IP addresses.
-    Ipv4AddressHelper ipv4;
-    ipv4.SetBase ("10.1.1.0", "255.255.255.0");
-    Ipv4InterfaceContainer i0i1 = ipv4.Assign (d1);
+  beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  Ptr<Node> GW = beamHelper.Install(UT, 1, 1, 0, 0);
 
-    ipv4.SetBase ("10.1.2.0", "255.255.255.0");
-    ipv4.Assign (d2);
+  NodeContainer N1GW = NodeContainer (GW, m_users.Get (1));
+  NetDeviceContainer d3 = csma.Install (N1GW);
+  ipv4.SetBase ("10.3.3.0", "255.255.255.0");
+  Ipv4InterfaceContainer i3i4 = ipv4.Assign (d3);
+  m_userAddresses.Add(i3i4.Get(1));
 
-    ipv4.SetBase ("10.1.3.0", "255.255.255.0");
-    Ipv4InterfaceContainer i3i4 = ipv4.Assign (d3);
+  // after creating interfaces for GW set routes ( in this scenario this no needed but anyway)
+  beamHelper.SetRoutesForGws();
 
-    m_userAddresses.Add(i3i4.Get(1));
-    m_userAddresses.Add(i0i1.Get(0));
+  // Add IPv4 static routing for users. Note, currently you need to know
+  // the netdevice indexes to attach the route to.
+  Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
-    // Get IPv4 protocol implementations
-    Ptr<Ipv4> ipv4N0 = m_users.Get (0)->GetObject<Ipv4> ();
-    Ptr<Ipv4> ipv4UT = UT->GetObject<Ipv4> ();
-    Ptr<Ipv4> ipv4GW = GW->GetObject<Ipv4> ();
-    Ptr<Ipv4> ipv4N1 = m_users.Get (1)->GetObject<Ipv4> ();
+  // Get IPv4 protocol implementations
+  Ptr<Ipv4> ipv4N0 = m_users.Get (0)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N1 = m_users.Get (1)->GetObject<Ipv4> ();
 
-    // Add IPv4 static routing. Note, currently you need to know
-    // the netdevice indeces to attach the route to.
-    Ipv4StaticRoutingHelper ipv4RoutingHelper;
+  // N0: Default route towards satellite network
+  // IfIndex 1 = CSMA
+  Ptr<Ipv4StaticRouting> srN0 = ipv4RoutingHelper.GetStaticRouting (ipv4N0);
+  srN0->SetDefaultRoute (i0i1.GetAddress(0), 1);
 
-    // N0: Default route towards satellite network
-    // IfIndex 1 = CSMA
-    Ptr<Ipv4StaticRouting> srN0 = ipv4RoutingHelper.GetStaticRouting (ipv4N0);
-    srN0->SetDefaultRoute (Ipv4Address ("10.1.1.2"), 1);
+  // N1: Default route towards satellite network
+  // IfIndex 1 = CSMA
+  Ptr<Ipv4StaticRouting> srN1 = ipv4RoutingHelper.GetStaticRouting (ipv4N1);
+  srN1->SetDefaultRoute (i3i4.GetAddress(0), 1);
 
-    // UT: Default route towards satellite network
-    // IfIndex 1 = CSMA
-    // IfIndex 2 = Sat
-    Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
-    srUT->SetDefaultRoute (Ipv4Address ("10.1.2.2"), 2);
-
-    // GW: Default route towards Internet
-    // IfIndex 1 = Sat
-    // IfIndex 2 = CSMA
-    Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4GW);
-    srGW->SetDefaultRoute (Ipv4Address ("10.1.3.2"), 2);
-    srGW->AddNetworkRouteTo (Ipv4Address ("10.1.1.0"), Ipv4Mask("255.255.255.0"), 1);
-
-    // N1: Default route towards satellite network
-    // IfIndex 1 = CSMA
-    Ptr<Ipv4StaticRouting> srN1 = ipv4RoutingHelper.GetStaticRouting (ipv4N1);
-    srN1->SetDefaultRoute (Ipv4Address ("10.1.3.1"), 1);
 }
 
 } // namespace ns3

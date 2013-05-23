@@ -22,7 +22,9 @@ def build(bld):
         'model/satellite-signal-parameters.cc',
         'model/virtual-channel.cc',
         'helper/satellite-helper.cc',
-        'helper/sat-net-dev-helper.cc',
+        'helper/satellite-beam-helper.cc',
+        'helper/satellite-ut-helper.cc',
+        'helper/satellite-gw-helper.cc',
         'helper/satellite-geo-helper.cc',
         'helper/cbr-helper.cc',
         ]
@@ -51,7 +53,9 @@ def build(bld):
         'model/satellite-signal-parameters.h',
         'model/virtual-channel.h',
         'helper/satellite-helper.h',
-        'helper/sat-net-dev-helper.h',
+        'helper/satellite-beam-helper.h',
+        'helper/satellite-ut-helper.h',
+        'helper/satellite-gw-helper.h',
         'helper/satellite-geo-helper.h',
         'helper/cbr-helper.h',
         ]

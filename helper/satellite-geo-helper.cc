@@ -165,7 +165,7 @@ SatGeoHelper::EnableAsciiInternal (
 }
 
 NetDeviceContainer 
-SatGeoHelper::Install (NodeContainer c, uint16_t beamId)
+SatGeoHelper::Install (NodeContainer c)
 {
   // currently only one node supported by helper
   NS_ASSERT (c.GetN () == 1);
@@ -174,14 +174,14 @@ SatGeoHelper::Install (NodeContainer c, uint16_t beamId)
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add(Install(*i,beamId));
+    devs.Add(Install(*i));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatGeoHelper::Install (Ptr<Node> n, uint16_t beamId)
+SatGeoHelper::Install (Ptr<Node> n)
 {
   NS_ASSERT (m_deviceCount == 0);
 
@@ -196,16 +196,18 @@ SatGeoHelper::Install (Ptr<Node> n, uint16_t beamId)
 }
 
 Ptr<NetDevice>
-SatGeoHelper::Install (std::string nName, uint16_t beamId)
+SatGeoHelper::Install (std::string nName)
 {
   Ptr<Node> n = Names::Find<Node> (nName);
-  return Install (n, beamId);
+  return Install (n);
 }
 
 void
-SatGeoHelper::AttachChannels (Ptr<SatGeoNetDevice> dev, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId )
+SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId )
 {
   NS_LOG_FUNCTION (this << ff << fr << uf << ur);
+
+  Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
 
   // Create the first needed SatPhyTx and SatPhyRx modules
   Ptr<SatPhyTx> uPhyTx = CreateObject<SatPhyTx> ();

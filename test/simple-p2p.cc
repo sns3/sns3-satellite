@@ -94,7 +94,7 @@ SimpleP2p1::DoRun (void)
   // Create the Cbr application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s, one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (1), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (0), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
   ApplicationContainer GwApps = cbr.Install (helper.GetUser(1));
@@ -102,7 +102,7 @@ SimpleP2p1::DoRun (void)
   GwApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (1), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (0), port)));
 
   ApplicationContainer UtApps = sink.Install (helper.GetUser(0));
   UtApps.Start (Seconds (1.0));

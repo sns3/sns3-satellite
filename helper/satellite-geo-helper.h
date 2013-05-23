@@ -28,6 +28,7 @@
 #include "ns3/node-container.h"
 #include "ns3/deprecated.h"
 
+#include "ns3/satellite-channel.h"
 #include "ns3/trace-helper.h"
 
 namespace ns3 {
@@ -67,41 +68,38 @@ public:
 
   /**
    * \param c a set of nodes
-   * \param beamId  id of the beam
    *
    * This method creates a ns3::SatGeoNetDevices with the requested attributes
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
    */
-  NetDeviceContainer Install (NodeContainer c, uint16_t beamId);
+  NetDeviceContainer Install (NodeContainer c);
 
   /**
    * \param n a node
-   * \param beamId  id of the beam
    *
    * This method creates a ns3::SatGeoNetDevice with the requested attributes
    * and associate the resulting ns3::NetDevice with the ns3::Node.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint16_t beamId);
+  Ptr<NetDevice> Install (Ptr<Node> n);
 
   /**
    * \param nName name of a node
-   * \param beamId  id of the beam
    *
    * This method creates a ns3::SatGeoNetDevice with the requested attributes
    * and associate the resulting ns3::NetDevice with the ns3::Node.
    */
-  Ptr<NetDevice> Install (std::string nName, uint16_t beamId);
+  Ptr<NetDevice> Install (std::string nName);
 
   /*
    * Attach the SatChannels for the beam to NetDevice
-   * \param dev SatGeoNetDevice to attact channels
+   * \param dev NetDevice to attach channels
    * \param fr feeder return channel
    * \param uf user forward channel
    * \param uf user return channel
-   * \param beamId beam Id of the attachment
+   * \param beamId Id of the beam
    */
-  void AttachChannels ( Ptr<SatGeoNetDevice> dev, Ptr<SatChannel> ff, Ptr<SatChannel> fr,
-                        Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId );
+  void AttachChannels ( Ptr<NetDevice> dev, Ptr<SatChannel> ff, Ptr<SatChannel> fr,
+                        Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId);
 
 
 private:
