@@ -125,6 +125,90 @@ SimpleP2p1::DoRun (void)
   // <<< End of actual test using Simple scenario <<<
 }
 
+/**
+ * \brief 'Return Link Unicast, Simple' test case implementation, id: simple-p2p-4 / TN4.
+ *
+ * This case tests successful transmission of a single UDP packet from UT connected user
+ * to GW connected user in simple scenario.
+ *  1.  Simple test scenario set with helper
+ *  2.  A single packet is transmitted from Node-2 UDP application to Node-1 UDP receiver.
+ *
+ *  Expected result:
+ *    A single UDP packet sent by UT connected node-2 using CBR application is received by
+ *    GW connected node-1.
+ *
+ *  Notes: Current test case uses very first versions of the sat net devices and channels.
+ *         Sat helper implementation is missing and not used by this test case yet.
+ *
+ */
+class SimpleP2p4 : public TestCase
+{
+public:
+  SimpleP2p4 ();
+  virtual ~SimpleP2p4 ();
+
+private:
+  virtual void DoRun (void);
+};
+
+// Add some help text to this case to describe what it is intended to test
+SimpleP2p4::SimpleP2p4 ()
+  : TestCase ("'Return Link Unicast, Simple' case tests successful transmission of a single UDP packet from UT connected user to GW connected user in simple scenario.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SimpleP2p4::~SimpleP2p4 ()
+{
+}
+
+//
+// SimpleP2p1 TestCase implementation
+//
+void
+SimpleP2p4::DoRun (void)
+{
+  // Create simple scenario
+  SatHelper helper(SatHelper::Simple);
+
+  // >>> Start of actual test using Simple scenario >>>
+
+  // Create the Cbr application to send UDP datagrams of size
+  // 210 bytes at a rate of 448 Kb/s, one packet send (interval 1s)
+  uint16_t port = 9; // Discard port (RFC 863)
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (1), port)));
+  cbr.SetAttribute ("Interval", StringValue ("1s"));
+
+  ApplicationContainer UtApps = cbr.Install (helper.GetUser(0));
+  UtApps.Start (Seconds (1.0));
+  UtApps.Stop (Seconds (2.1));
+
+  // Create a packet sink to receive these packets
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (1), port)));
+
+  ApplicationContainer GwApps = sink.Install (helper.GetUser(1));
+  GwApps.Start (Seconds (1.0));
+  GwApps.Stop (Seconds (3.0));
+
+  Simulator::Stop (Seconds (11));
+  Simulator::Run ();
+
+  Simulator::Destroy ();
+
+  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (GwApps.Get (0));
+  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (UtApps.Get (0));
+
+  // here we check that results are as expected.
+  // * Sender has sent something
+  // * Receiver got all all data sent
+  NS_TEST_ASSERT_MSG_NE (sender->GetSent(), (uint32_t)0, "Nothing sent !");
+  NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx(), sender->GetSent(), "Packets were lost !");
+
+  // <<< End of actual test using Simple scenario <<<
+}
+
+
 // The TestSuite class names the TestSuite as sat-simple-p2p, identifies what type of TestSuite (SYSTEM),
 // and enables the TestCases to be run (SimpleP2p1).  Typically, only the constructor for
 // this class must be defined
@@ -140,6 +224,9 @@ SimpleP2pTestSuite::SimpleP2pTestSuite ()
 {
   // add simple-p2p-1 case to suite sat-simple-p2p
   AddTestCase (new SimpleP2p1);
+
+  // add simple-p2p-4 case to suite sat-simple-p2p
+  AddTestCase (new SimpleP2p4);
 }
 
 // Allocate an instance of this TestSuite
