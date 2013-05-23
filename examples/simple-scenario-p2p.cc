@@ -37,7 +37,7 @@
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
-#include "ns3/sat-net-dev-helper.h"
+#include "ns3/point-to-point-helper.h"
 #include "ns3/ipv4-static-routing-helper.h"
 
 using namespace ns3;
@@ -94,9 +94,9 @@ main (int argc, char *argv[])
   NetDeviceContainer d1 = csma.Install (N0UT);
   NetDeviceContainer d4 = csma.Install (GWN1);
 
-  SatNetDevHelper sndh;
-  NetDeviceContainer d2 = sndh.Install (UTSat, 0);
-  NetDeviceContainer d3 = sndh.Install (SatGW, 0);
+  PointToPointHelper sndh;
+  NetDeviceContainer d2 = sndh.Install (UTSat);
+  NetDeviceContainer d3 = sndh.Install (SatGW);
 
   // Later, we add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");

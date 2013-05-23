@@ -33,7 +33,7 @@
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/netanim-module.h"
 #include "ns3/mobility-module.h"
-#include "ns3/sat-net-dev-helper.h"
+#include "ns3/point-to-point-helper.h"
 
 using namespace ns3;
 
@@ -150,18 +150,18 @@ main (int argc, char *argv[])
   NetDeviceContainer d15 = csma.Install (IPrN0);
 
   // Point to point connection
-  SatNetDevHelper sndh;
+  PointToPointHelper sndh;
 
   // UT to Satellite beams
-  NetDeviceContainer d6 = sndh.Install (UT1Sat1, 0);
-  NetDeviceContainer d7 = sndh.Install (UT2Sat1, 0);
-  NetDeviceContainer d8 = sndh.Install (UT3Sat2, 0);
-  NetDeviceContainer d9 = sndh.Install (UT4Sat3, 0);
+  NetDeviceContainer d6 = sndh.Install (UT1Sat1);
+  NetDeviceContainer d7 = sndh.Install (UT2Sat1);
+  NetDeviceContainer d8 = sndh.Install (UT3Sat2);
+  NetDeviceContainer d9 = sndh.Install (UT4Sat3);
 
   // Satellite beams to GW
-  NetDeviceContainer d10 = sndh.Install (Sat1GW1, 0);
-  NetDeviceContainer d11 = sndh.Install (Sat2GW1, 0);
-  NetDeviceContainer d12 = sndh.Install (Sat3GW2, 0);
+  NetDeviceContainer d10 = sndh.Install (Sat1GW1);
+  NetDeviceContainer d11 = sndh.Install (Sat2GW1);
+  NetDeviceContainer d12 = sndh.Install (Sat3GW2);
 
   // Add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");
