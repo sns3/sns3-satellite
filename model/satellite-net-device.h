@@ -53,10 +53,10 @@ public:
   SatNetDevice ();
 
   /*
-   * Receive the packet from the lower layers
+   * Receive the packet from mac layer
    * \param packet Pointer to the packet to be received.
    */
-  void Receive (Ptr<const Packet> packet);
+  void ReceiveMac (Ptr<const Packet> packet);
 
   /*
    * Attach the SatPhy physical layer to this netdevice.

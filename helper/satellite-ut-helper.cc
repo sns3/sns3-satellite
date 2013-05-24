@@ -278,7 +278,7 @@ SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   dev->SetMac(mac);
 
   // Attach the device receive callback to SatMac
-  mac->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
+  mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));
 
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);
