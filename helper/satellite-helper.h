@@ -32,6 +32,7 @@
 #include "ns3/internet-stack-helper.h"
 #include "ns3/csma-helper.h"
 #include "ns3/satellite-ut-helper.h"
+#include "ns3/satellite-user-helper.h"
 #include "ns3/trace-helper.h"
 
 namespace ns3 {
@@ -77,62 +78,21 @@ public:
   virtual ~SatHelper () {}
 
   /**
-   * \param c a set of nodes
-   *
-   * This method creates a ns3::SatChannel with the
-   * attributes configured by SatHelper::SetChannelAttribute,
-   * then, for each node in the input container, we create a
-   * ns3::SatNetDevice with the requested attributes,
-   * a queue for this ns3::NetDevice, and associate the resulting
-   * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
-   */
-  NodeContainer Install (NodeContainer c);
-
-  /**
-   * \param a first node
-   * \param b second node
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  NodeContainer Install (Ptr<Node> a, Ptr<Node> b);
-
-  /**
-   * \param a first node
-   * \param bName name of second node
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  NodeContainer Install (Ptr<Node> a, std::string bName);
-
-  /**
-   * \param aName Name of first node
-   * \param b second node
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  NodeContainer Install (std::string aName, Ptr<Node> b);
-
-  /**
-   * \param aNode Name of first node
-   * \param bNode Name of second node
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  NodeContainer Install (std::string aNode, std::string bNode);
-
-  /**
-   * \param i Index of the user.
+   * \param  node pointer to user node.
    *
    * Returns address of the user.
    */
-  Ipv4Address GetUserAddress(uint32_t i);
+  Ipv4Address GetUserAddress(Ptr<Node> node);
 
   /**
-   * \param i Index of the user.
-   *
-   * Returns pointer to user node.
+   * Returns container having UT users
    */
-  Ptr<Node>  GetUser(uint32_t i);
+  NodeContainer  GetUtUsers();
+
+  /**
+   * Returns container having GW users.
+   */
+  NodeContainer  GetGwUsers();
 
 private:
 
@@ -142,15 +102,15 @@ private:
   void CreateSimpleScenario();
 
   /**
-   * Container having users.
-   */
-  NodeContainer m_users;
+    * Creates satellite objects according to larger scenario.
+    */
+  void CreateLargerScenario();
 
   /**
-   * Container having user addresses.
+   * User helper;
    */
-  Ipv4InterfaceContainer m_userAddresses;
-
+  SatUserHelper m_userHelper;
+  NodeContainer m_gwUser;
 };
 
 } // namespace ns3

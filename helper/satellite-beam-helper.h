@@ -68,17 +68,6 @@ public:
   void SetDeviceAttribute (std::string name, const AttributeValue &value);
 
   /**
-   * \param ut a set of UT nodes
-   * \param gwId id of the GW
-   * \param beamId  id of the beam
-   * \param ulFreqId id of the user link frequency
-   * \param flFreqId id of the feeder link frequency
-   *
-   * This method creates a beam  with the requested attributes
-   * and associate the resulting ns3::NetDevices with the ns3::Nodes.
-   */
-
-  /**
    * Set an attribute value to be propagated to each Channel created by the
    * helper.
    *
@@ -102,9 +91,27 @@ public:
   */
   void SetBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
 
-
+  /**
+   * \param ut a set of UT nodes
+   * \param gwId id of the GW
+   * \param beamId  id of the beam
+   * \param ulFreqId id of the user link frequency
+   * \param flFreqId id of the feeder link frequency
+   *
+   * This method creates a beam  with the requested attributes
+   * and associate the resulting ns3::NetDevices with the ns3::Nodes.
+   * \returns node GW node of the beam.
+   */
   Ptr<Node> Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16_t ulFreqId, uint16_t flFreqId );
+
+  /**
+   * returns A container having all GW nodes in satellite network.
+   */
   NodeContainer GetGwNodes();
+
+  /**
+   * Sets routes to internet for GWs installed to satellite network.
+   */
   void SetRoutesForGws();
 
 private:
