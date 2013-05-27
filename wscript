@@ -56,6 +56,7 @@ def build(bld):
         'helper/satellite-helper.h',
         'helper/satellite-beam-helper.h',
 		'helper/satellite-user-helper.h',
+		'helper/satellite-ut-helper.h',
         'helper/satellite-gw-helper.h',
         'helper/satellite-geo-helper.h',
         'helper/cbr-helper.h',
