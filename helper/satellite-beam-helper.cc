@@ -27,6 +27,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/internet-module.h"
+#include "ns3/propagation-delay-model.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-phy-tx.h"
@@ -106,6 +107,15 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
       satLink.first = ulForwardCh;
       satLink.second = ulReturnCh;
 
+      /*
+       * Average propagation delay between UT/GW and satellite in seconds
+       * \todo Change the propagation delay to be a parameter.
+      */
+      double pd = 0.13;
+      Ptr<ConstantPropagationDelayModel> pDelay = Create<ConstantPropagationDelayModel> (pd);
+      ulForwardCh->SetPropagationDelayModel (pDelay);
+      ulReturnCh->SetPropagationDelayModel (pDelay);
+
       m_ulChannels.insert(std::pair<uint16_t, SatLink >(ulFreqId, satLink));
     }
   else
@@ -115,8 +125,8 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
       ulReturnCh =  satLink.second;
     }
 
-  // next it is found user link channels and if not found channels are created
-  std::map<uint16_t, SatLink >::iterator fl_it = m_flChannels.find(ulFreqId);
+  // next it is found feeder link channels and if not found channels are created
+  std::map<uint16_t, SatLink >::iterator fl_it = m_flChannels.find(flFreqId);
   Ptr<SatChannel> flForwardCh;
   Ptr<SatChannel> flReturnCh;
 
@@ -129,7 +139,16 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
       satLink.first = flForwardCh;
       satLink.second = flReturnCh;
 
-      m_flChannels.insert(std::pair<uint16_t, SatLink >(ulFreqId, satLink));
+      /*
+       * Average propagation delay between UT/GW and satellite in seconds
+       * \todo Change the propagation delay to be a parameter.
+      */
+      double pd = 0.13;
+      Ptr<ConstantPropagationDelayModel> pDelay = Create<ConstantPropagationDelayModel> (pd);
+      flForwardCh->SetPropagationDelayModel (pDelay);
+      flReturnCh->SetPropagationDelayModel (pDelay);
+
+      m_flChannels.insert(std::pair<uint16_t, SatLink >(flFreqId, satLink));
     }
   else
     {
@@ -160,20 +179,20 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
 
       uint32_t count = ipv4UT->GetNInterfaces();
 
-      for (uint32_t i = 1; i < count; i++)
+      for (uint32_t j = 1; j < count; j++)
         {
-          std::string devName = ipv4UT->GetNetDevice(i)->GetInstanceTypeId().GetName();
+          std::string devName = ipv4UT->GetNetDevice(j)->GetInstanceTypeId().GetName();
 
           // If SatNetDevice interface, add default route to towards GW of the beam on UTs
           if ( devName == "ns3::SatNetDevice" )
             {
               Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
-              srUT->SetDefaultRoute (aC.GetAddress(0), i);
+              srUT->SetDefaultRoute (aC.GetAddress(0), j);
             }
           else  // add other interface route to GW's Satellite interface
             {
-              Ipv4Address address = ipv4UT->GetAddress(i, 0).GetLocal();
-              Ipv4Mask mask = ipv4UT->GetAddress(i, 0).GetMask();
+              Ipv4Address address = ipv4UT->GetAddress(j, 0).GetLocal();
+              Ipv4Mask mask = ipv4UT->GetAddress(j, 0).GetMask();
 
               srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, gwNd->GetIfIndex());
             }

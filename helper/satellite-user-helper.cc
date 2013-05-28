@@ -84,10 +84,10 @@ SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
       Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
       // Set default route toward satellite (UTs address).
-      for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
+      for (NodeContainer::Iterator j = users.Begin (); j != users.End (); j++)
         {
           // Get IPv4 protocol implementations
-          Ptr<Ipv4> ipv4 = (*i)->GetObject<Ipv4> ();
+          Ptr<Ipv4> ipv4 = (*j)->GetObject<Ipv4> ();
           Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
           routing->SetDefaultRoute (addresses.GetAddress(0), 1);
         }
@@ -113,7 +113,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint16_t userCount )
     }
   else
     {
-      router = Create<Node>();
+      router = CreateObject<Node>();
       internet.Install(router);
 
       for (NodeContainer::Iterator i = gw.Begin (); i != gw.End (); i++)
@@ -131,7 +131,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint16_t userCount )
           routingGw->SetDefaultRoute (addresses.GetAddress(1), lastGwIf);
 
           // Get IPv4 protocol implementations
-          Ptr<Ipv4> ipv4Router = (*i)->GetObject<Ipv4> ();
+          Ptr<Ipv4> ipv4Router = router->GetObject<Ipv4> ();
           uint32_t lastRouterIf = ipv4Router->GetNInterfaces() - 1;
           Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
           Ipv4Mask mask = ipv4Router->GetAddress(lastRouterIf, 0).GetMask();
