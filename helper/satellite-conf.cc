@@ -141,13 +141,12 @@ std::vector <uint32_t> SatConf::GetBeamConfiguration (uint32_t beamId) const
     NS_ASSERT(beamId == 0);
 
     std::vector <uint32_t> beamConf;
+    beamConf.push_back (m_conf[beamId][0]);
     beamConf.push_back (m_conf[beamId][1]);
     beamConf.push_back (m_conf[beamId][2]);
     beamConf.push_back (m_conf[beamId][3]);
-    beamConf.push_back (m_conf[beamId][4]);
     return beamConf;
   }
-
 
 } // namespace ns3
 
