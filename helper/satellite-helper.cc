@@ -103,7 +103,25 @@ SatHelper::CreateSimpleScenario()
 void
 SatHelper::CreateLargerScenario()
 {
+  NodeContainer UTs;
+  UTs.Create(2);
 
+  InternetStackHelper internet;
+  internet.Install(UTs);
+
+  m_userHelper.SetGwBaseAddress("10.2.1.0", "255.255.255.0");
+  m_userHelper.SetUtBaseAddress("10.3.1.0", "255.255.255.0");
+  m_userHelper.SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
+  m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+
+  m_userHelper.InstallUt(UTs, 1);
+
+  SatBeamHelper beamHelper;
+
+  beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  beamHelper.Install(UTs, 1, 1, 0, 0);
+
+  m_userHelper.InstallGw(beamHelper.GetGwNodes(), 1);
 }
 
 

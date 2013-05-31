@@ -179,6 +179,8 @@ private:
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
+
+    uint32_t m_next;
 };
 
 } // namespace ns3

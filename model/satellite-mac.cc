@@ -36,6 +36,67 @@ NS_LOG_COMPONENT_DEFINE ("SatMac");
 
 namespace ns3 {
 
+MacUnitIdTag::MacUnitIdTag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+MacUnitIdTag::SetId (uint32_t id)
+{
+  NS_LOG_FUNCTION (this << id);
+  m_id = id;
+}
+
+uint32_t
+MacUnitIdTag::GetId (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_id;
+}
+
+NS_OBJECT_ENSURE_REGISTERED (MacUnitIdTag);
+
+TypeId
+MacUnitIdTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::MacUnitIdTag")
+    .SetParent<Tag> ()
+    .AddConstructor<MacUnitIdTag> ()
+  ;
+  return tid;
+}
+TypeId
+MacUnitIdTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+MacUnitIdTag::GetSerializedSize (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return 4;
+}
+void
+MacUnitIdTag::Serialize (TagBuffer i) const
+{
+  NS_LOG_FUNCTION (this << &i);
+  i.WriteU32(m_id);
+}
+void
+MacUnitIdTag::Deserialize (TagBuffer i)
+{
+  NS_LOG_FUNCTION (this << &i);
+  m_id = i.ReadU32 ();
+}
+void
+MacUnitIdTag::Print (std::ostream &os) const
+{
+  NS_LOG_FUNCTION (this << &os);
+  os << "Id=" << m_id;
+}
+
 NS_OBJECT_ENSURE_REGISTERED (SatMac);
 
 TypeId 
@@ -98,7 +159,8 @@ SatMac::SatMac ()
   :
     m_txMachineState (READY),
     m_phy(0),
-    m_currentPkt (0)
+    m_currentPkt (0),
+    m_id(0xffffffff)
 {
   NS_LOG_FUNCTION (this);
 
@@ -118,6 +180,11 @@ SatMac::DoDispose ()
   m_currentPkt = 0;
   m_phy = 0;
   Object::DoDispose ();
+}
+
+void SatMac::SetId( uint32_t id )
+{
+  m_id = id;
 }
 
 bool
@@ -162,6 +229,12 @@ SatMac::TransmitReady (void)
       if ( m_queue->GetNPackets() != 0 )
           {
             Ptr<Packet> p = m_queue->Dequeue();
+
+            // TODO: dirty hack in this phase to add just hard coded receiver
+            MacUnitIdTag tag;
+            tag.SetId(1);
+            p->AddPacketTag (tag);
+
             TransmitStart(p);
           }
 
@@ -223,7 +296,19 @@ SatMac::Receive (Ptr<Packet> packet, uint16_t beamId)
       //m_phyRxEndTrace (packet);
 
       m_macRxTrace (packet);
-      m_rxCallback (packet);
+
+      uint32_t receiverId = m_id;
+      MacUnitIdTag tag;
+
+      if (packet->RemovePacketTag (tag) && receiverId != 0xffffffff)
+        {
+          receiverId = tag.GetId ();
+        }
+
+      if ( receiverId == m_id )
+        {
+          m_rxCallback (packet);
+        }
     }
 }
 

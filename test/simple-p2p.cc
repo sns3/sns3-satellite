@@ -128,6 +128,91 @@ SimpleP2p1::DoRun (void)
 }
 
 /**
+ * \brief 'Forward Link Unicast, Larger' test case implementation, id: simple-p2p-2 / TN4.
+ *
+ * This case tests successful transmission of a single UDP packet from GW connected user
+ * to UT connected users in larger scenario.
+ *  1.  Larger test scenario set with helper
+ *  2.  A single packet is transmitted from Node-1 UDP application to Node-2 and Node-6 UDP receivers.
+ *
+ *  Expected result:
+ *    A single UDP packet sent by GW connected node-1 using CBR application is received by
+ *    UT connected node-2 and Node-6 .
+ *
+ *  Notes: Current test case uses very first versions of the sat net devices and channels.
+ *         Sat helper implementation is missing and not used by this test case yet.
+ *
+ */
+class SimpleP2p2 : public TestCase
+{
+public:
+  SimpleP2p2 ();
+  virtual ~SimpleP2p2 ();
+
+private:
+  virtual void DoRun (void);
+};
+
+// Add some help text to this case to describe what it is intended to test
+SimpleP2p2::SimpleP2p2 ()
+  : TestCase ("'Forward Link Unicast, Larger' case tests successful transmission of a single UDP packet from GW connected user to UT connected users in larger scenario.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SimpleP2p2::~SimpleP2p2 ()
+{
+}
+
+//
+// SimpleP2p1 TestCase implementation
+//
+void
+SimpleP2p2::DoRun (void)
+{
+  // Create simple scenario
+  SatHelper helper(SatHelper::Larger);
+
+  NodeContainer utUsers = helper.GetUtUsers();
+
+  // >>> Start of actual test using Simple scenario >>>
+
+  // Create the Cbr application to send UDP datagrams of size
+  // 210 bytes at a rate of 448 Kb/s, one packet send (interval 1s)
+  uint16_t port = 9; // Discard port (RFC 863)
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  cbr.SetAttribute ("Interval", StringValue ("1s"));
+
+  ApplicationContainer GwApps = cbr.Install (helper.GetGwUsers());
+  GwApps.Start (Seconds (1.0));
+  GwApps.Stop (Seconds (2.1));
+
+  // Create a packet sink to receive these packets
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+
+  ApplicationContainer UtApps = sink.Install (utUsers);
+  UtApps.Start (Seconds (1.0));
+  UtApps.Stop (Seconds (3.0));
+
+  Simulator::Stop (Seconds (11));
+  Simulator::Run ();
+
+  Simulator::Destroy ();
+
+  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (UtApps.Get (0));
+  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (GwApps.Get (0));
+
+  // here we check that results are as expected.
+  // * Sender has sent something
+  // * Receiver got all all data sent
+  NS_TEST_ASSERT_MSG_NE (sender->GetSent(), (uint32_t)0, "Nothing sent !");
+  NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx(), sender->GetSent(), "Packets were lost !");
+
+  // <<< End of actual test using Simple scenario <<<
+}
+
+/**
  * \brief 'Return Link Unicast, Simple' test case implementation, id: simple-p2p-4 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from UT connected user
@@ -228,6 +313,10 @@ SimpleP2pTestSuite::SimpleP2pTestSuite ()
 {
   // add simple-p2p-1 case to suite sat-simple-p2p
   AddTestCase (new SimpleP2p1);
+
+  // add simple-p2p-1 case to suite sat-simple-p2p
+  // TODO: this test can be enabled after unit ID allocation is implemented.
+  //AddTestCase (new SimpleP2p2);
 
   // add simple-p2p-4 case to suite sat-simple-p2p
   AddTestCase (new SimpleP2p4);

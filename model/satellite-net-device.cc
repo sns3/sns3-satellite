@@ -65,8 +65,6 @@ SatNetDevice::SatNetDevice ()
     m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
-
-  //LogComponentEnable ("SatNetDevice", LOG_LEVEL_INFO);
 }
 
 void

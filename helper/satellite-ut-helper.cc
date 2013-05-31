@@ -53,6 +53,7 @@ SatUtHelper::SatUtHelper ()
   //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 
   m_beamId = 1;
+  m_next = 1;
 }
 
 void 
@@ -271,6 +272,9 @@ SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);
+
+  // needed to set when we have ID allocation ok or this not needed if Mac Address is used.
+  //mac->SetId(m_next++);
 
   return DynamicCast <NetDevice> (dev);
 }

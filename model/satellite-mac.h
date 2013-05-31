@@ -39,6 +39,27 @@ class ErrorModel;
 class SatNetDevice;
 
 /**
+ * \brief This class implements a tag that carries the satellite unit-specific ID of a packet
+ */
+class MacUnitIdTag : public Tag
+{
+public:
+  MacUnitIdTag ();
+  void SetId (uint32_t id);
+  uint32_t GetId (void) const;
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (TagBuffer i) const;
+  virtual void Deserialize (TagBuffer i);
+  virtual void Print (std::ostream &os) const;
+
+private:
+  uint32_t m_id;
+};
+
+/**
  * \ingroup satellite
   * \brief Base Mac class for Sat Net Devices.
  *
@@ -135,6 +156,8 @@ public:
     */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
+  void SetId(uint32_t id);
+
 private:
 
   SatMac& operator = (const SatMac &);
@@ -215,6 +238,11 @@ private:
    * Error model for receive packet events
    */
   Ptr<ErrorModel> m_receiveErrorModel;
+
+  /**
+   * Unit id of the this mac
+   */
+  uint32_t m_id;
 
   /**
    * The trace source fired when packets come into the "top" of the device
