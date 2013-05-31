@@ -27,6 +27,7 @@ def build(bld):
         'helper/satellite-ut-helper.cc',
         'helper/satellite-gw-helper.cc',
         'helper/satellite-geo-helper.cc',
+        'helper/satellite-conf.cc',
         'helper/cbr-helper.cc',
         ]
 
@@ -59,6 +60,7 @@ def build(bld):
 		'helper/satellite-ut-helper.h',
         'helper/satellite-gw-helper.h',
         'helper/satellite-geo-helper.h',
+        'helper/satellite-conf.h',
         'helper/cbr-helper.h',
         ]
 
