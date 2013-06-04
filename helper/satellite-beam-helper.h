@@ -109,11 +109,6 @@ public:
    */
   NodeContainer GetGwNodes();
 
-  /**
-   * Sets routes to internet for GWs installed to satellite network.
-   */
-  void SetRoutesForGws();
-
 private:
 
     ObjectFactory     m_channelFactory;

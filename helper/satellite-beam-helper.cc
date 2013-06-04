@@ -188,6 +188,7 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
             {
               Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
               srUT->SetDefaultRoute (aC.GetAddress(0), j);
+              NS_LOG_INFO ("SatBeamHelper::Install, UT default route: " << aC.GetAddress(0));
             }
           else  // add other interface route to GW's Satellite interface
             {
@@ -195,6 +196,7 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
               Ipv4Mask mask = ipv4UT->GetAddress(j, 0).GetMask();
 
               srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, gwNd->GetIfIndex());
+              NS_LOG_INFO ("SatBeamHelper::Install, GW Network route:  " << address.CombineMask(mask) << ", " << mask << ", " << gwNd->GetIfIndex());
             }
         }
     }
@@ -208,45 +210,6 @@ NodeContainer
 SatBeamHelper::GetGwNodes()
 {
   return m_gwNodeList;
-}
-
-void
-SatBeamHelper::SetRoutesForGws()
-{
-  Ipv4StaticRoutingHelper ipv4RoutingHelper;
-  bool defaultRouteSet = false;
-
-  for (NodeContainer::Iterator i = m_gwNodeList.Begin (); i != m_gwNodeList.End (); i++)
-    {
-      Ptr<Ipv4> ipv4Gw = (*i)->GetObject<Ipv4> ();
-      uint32_t count = ipv4Gw->GetNInterfaces();
-
-      for (uint32_t i = 1; i < count; i++)
-        {
-          Ptr<NetDevice> device = ipv4Gw->GetNetDevice(i);
-          std::string devName = device->GetInstanceTypeId().GetName();
-
-          // set routes only for non satellite networks.
-          if ( devName != "ns3::SatNetDevice" )
-            {
-              Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
-
-              Ipv4Address address = ipv4Gw->GetAddress(i, 0).GetLocal();
-              Ipv4Mask mask = ipv4Gw->GetAddress(i, 0).GetMask();
-
-              // set first non satellite interface as default route, if already set just add network route
-              if (defaultRouteSet)
-                {
-                  srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, device->GetIfIndex());
-                }
-              else
-                {
-                  srGW->SetDefaultRoute(address.CombineMask(mask), device->GetIfIndex());
-                  defaultRouteSet = true;
-                }
-            }
-        }
-    }
 }
 
 } // namespace ns3
