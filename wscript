@@ -19,6 +19,7 @@ def build(bld):
         'model/satellite-phy.cc',
         'model/satellite-phy-tx.cc',               
         'model/satellite-phy-rx.cc',
+        'model/satellite-look-up-table.cc',
         'model/satellite-signal-parameters.cc',
         'model/virtual-channel.cc',
         'helper/satellite-helper.cc',
@@ -37,6 +38,7 @@ def build(bld):
         'test/geo-coordinate-test.cc',
         'test/simple-p2p.cc',
         'test/cbr-test.cc',
+        'test/link-result-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -52,6 +54,7 @@ def build(bld):
         'model/satellite-phy.h',
         'model/satellite-phy-tx.h',               
         'model/satellite-phy-rx.h',
+        'model/satellite-look-up-table.h',
         'model/satellite-signal-parameters.h',
         'model/virtual-channel.h',
         'helper/satellite-helper.h',
