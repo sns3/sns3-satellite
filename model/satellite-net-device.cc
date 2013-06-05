@@ -243,7 +243,7 @@ bool
 SatNetDevice::NeedsArp (void) const
 {
   NS_LOG_FUNCTION (this);
-  return false;
+  return true;
 }
 void 
 SatNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)

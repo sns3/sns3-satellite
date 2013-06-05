@@ -39,6 +39,7 @@ namespace ns3 {
 
 class NetDevice;
 class Node;
+class ArpCache;
 
 /**
  * \brief Build a set Satellite beams with needed objects and configuration
@@ -114,6 +115,8 @@ public:
    */
   void SetRoutesForGws();
 
+  void SetArpCacheForGws();
+
 private:
 
     ObjectFactory     m_channelFactory;
@@ -121,7 +124,7 @@ private:
     SatGwHelper       m_gwHelper;
     SatUtHelper       m_utHelper;
     Ipv4AddressHelper m_ipv4Helper;
-
+    Ptr<ArpCache>     m_arpCache;
     NodeContainer     m_gwNodeList;
     Ptr<Node> m_geoNode;
     std::set<uint16_t> m_beam;
