@@ -38,7 +38,7 @@ def build(bld):
         'test/geo-coordinate-test.cc',
         'test/simple-p2p.cc',
         'test/cbr-test.cc',
-        'test/link-result-test.cc',
+        'test/link-results-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
