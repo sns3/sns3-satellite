@@ -162,16 +162,19 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
   m_geoHelper.AttachChannels(m_geoNode->GetDevice(0), flForwardCh, flReturnCh, ulForwardCh, ulReturnCh, beamId );
 
   // next is created GW
-  Ptr<NetDevice>  gwNd = m_gwHelper.Install(gwNode, beamId, flForwardCh, flReturnCh);
-  Ipv4InterfaceContainer aC = m_ipv4Helper.Assign(gwNd);
+  Ptr<NetDevice> gwNd = m_gwHelper.Install(gwNode, beamId, flForwardCh, flReturnCh);
+  Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign(gwNd);
 
   // finally is created UTs and set default route to them
-  NetDeviceContainer  utNd = m_utHelper.Install(ut, beamId, ulForwardCh, ulReturnCh);
-  m_ipv4Helper.Assign(utNd);
+  NetDeviceContainer utNd = m_utHelper.Install(ut, beamId, ulForwardCh, ulReturnCh);
+  Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign(utNd);
+
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4> ipv4GW = gwNode->GetObject<Ipv4> ();
   Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4GW);
+
+  uint32_t utAddIndex = 0;
 
   for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
     {
@@ -187,18 +190,20 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
           if ( devName == "ns3::SatNetDevice" )
             {
               Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
-              srUT->SetDefaultRoute (aC.GetAddress(0), j);
-              NS_LOG_INFO ("SatBeamHelper::Install, UT default route: " << aC.GetAddress(0));
+              srUT->SetDefaultRoute (gwAddress.GetAddress(0), j);
+              NS_LOG_INFO ("SatBeamHelper::Install, UT default route: " << gwAddress.GetAddress(0));
             }
           else  // add other interface route to GW's Satellite interface
             {
               Ipv4Address address = ipv4UT->GetAddress(j, 0).GetLocal();
               Ipv4Mask mask = ipv4UT->GetAddress(j, 0).GetMask();
 
-              srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, gwNd->GetIfIndex());
-              NS_LOG_INFO ("SatBeamHelper::Install, GW Network route:  " << address.CombineMask(mask) << ", " << mask << ", " << gwNd->GetIfIndex());
+              srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, utAddress.GetAddress(utAddIndex) ,gwNd->GetIfIndex());
+              NS_LOG_INFO ("SatBeamHelper::Install, GW Network route:  " << address.CombineMask(mask) << ", " << mask << ", " << utAddress.GetAddress(utAddIndex));
             }
         }
+
+      utAddIndex++;
     }
 
   m_ipv4Helper.NewNetwork();
