@@ -34,6 +34,7 @@
 #include "ns3/satellite-ut-helper.h"
 #include "ns3/satellite-user-helper.h"
 #include "ns3/trace-helper.h"
+#include "satellite-conf.h"
 
 namespace ns3 {
 
@@ -110,7 +111,17 @@ private:
    * User helper;
    */
   SatUserHelper m_userHelper;
+
+  /**
+   * Gateway container
+   */
   NodeContainer m_gwUser;
+
+  /**
+   * Configuration for satellite network.
+   */
+  SatConf satConf;
+
 };
 
 } // namespace ns3

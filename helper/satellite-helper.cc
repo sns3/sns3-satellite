@@ -95,7 +95,9 @@ SatHelper::CreateSimpleScenario()
   SatBeamHelper beamHelper;
 
   beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
-  beamHelper.Install(UT, 1, 1, 0, 0);
+  std::vector<uint32_t> conf = satConf.GetBeamConfiguration(8);
+
+  beamHelper.Install(UT, conf[2], conf[0], conf[1], conf[3]);
 
   m_userHelper.InstallGw(beamHelper.GetGwNodes(), 1);
 }
@@ -137,10 +139,17 @@ SatHelper::CreateLargerScenario()
   beam1Uts.Add(Ut1);
   beam1Uts.Add(Uts.Get(0));
 
-  // install UT1 and UT2 to beam 1, UT3 to beam 2 and UT4 to beam 3
-  beamHelper.Install(beam1Uts, 1, 1, 0, 0);
-  beamHelper.Install(Uts.Get(1), 1, 2, 0, 1);
-  beamHelper.Install(Uts.Get(2), 2, 3, 0, 0);
+  // install UT1 and UT2 beam 3
+  std::vector<uint32_t> conf = satConf.GetBeamConfiguration(3);
+  beamHelper.Install(beam1Uts, conf[2], conf[0], conf[1], conf[3]);
+
+  // install UT3 to beam 11
+  conf = satConf.GetBeamConfiguration(11);
+  beamHelper.Install(Uts.Get(1), conf[2], conf[0], conf[1], conf[3]);
+
+  // installUT4 to beam 22
+  conf = satConf.GetBeamConfiguration(22);
+  beamHelper.Install(Uts.Get(2), conf[2], conf[0], conf[1], conf[3]);
 
   // finally install GWs to satellite network
   m_userHelper.InstallGw(beamHelper.GetGwNodes(), 1);

@@ -138,7 +138,7 @@ SatConf::SatConf()
 
 std::vector <uint32_t> SatConf::GetBeamConfiguration (uint32_t beamId) const
   {
-    NS_ASSERT(beamId == 0);
+    NS_ASSERT(beamId != 0);
 
     std::vector <uint32_t> beamConf;
     beamConf.push_back (m_conf[beamId][0]);
