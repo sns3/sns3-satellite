@@ -103,9 +103,14 @@ private:
   void CreateSimpleScenario();
 
   /**
-    * Creates satellite objects according to larger scenario.
-    */
+   * Creates satellite objects according to larger scenario.
+   */
   void CreateLargerScenario();
+
+  /**
+   * Creates satellite objects according to full scenario.
+   */
+  void CreateFullScenario();
 
   /**
    * User helper;
