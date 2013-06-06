@@ -26,10 +26,14 @@ NS_LOG_COMPONENT_DEFINE ("SatConf");
 
 namespace ns3 {
 
+static const uint32_t beamCount = 98;
+static const uint32_t beamElemCount = 4;
+
 /*
  * Beam id, User frequency id, GW id, Feeder frequency id
  */
-const uint32_t SatConf::m_conf[99][4] = {{0, 0, 0, 0,},
+const uint32_t SatConf::m_conf[beamCount+1][beamElemCount] = {
+                                        {0, 0, 0, 0,},
                                         {1, 1, 4, 1,},
                                         {2, 2, 6, 1,},
                                         {3, 4, 6, 2,},
@@ -134,6 +138,11 @@ SatConf::SatConf()
   {
 
   }
+
+uint32_t SatConf::GetBeamCount() const
+{
+  return beamCount;
+}
 
 
 std::vector <uint32_t> SatConf::GetBeamConfiguration (uint32_t beamId) const

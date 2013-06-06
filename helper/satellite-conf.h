@@ -42,6 +42,14 @@ public:
    *
    * \param beam id
    */
+   uint32_t GetBeamCount () const;
+
+
+  /**
+   * Get the configuration vector for a given satellite beam id
+   *
+   * \param beam id
+   */
    std::vector <uint32_t> GetBeamConfiguration (uint32_t beamId) const;
 
 private:

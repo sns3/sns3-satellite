@@ -160,7 +160,10 @@ void
 SatHelper::CreateFullScenario()
 {
   NodeContainer Uts;
-  Uts.Create(98);
+  uint32_t utsInBeam = 3; // TODO: add interface for setting this or attribute
+  uint32_t usersPerUt = 3; // TODO: add interface for setting this or attribute
+  uint32_t beamCount =  satConf.GetBeamCount();
+  Uts.Create(beamCount * utsInBeam);
 
   InternetStackHelper internet;
   internet.Install(Uts);
@@ -175,8 +178,8 @@ SatHelper::CreateFullScenario()
   m_userHelper.SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
   m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
-  // install one user for every UTs
-  m_userHelper.InstallUt(Uts, 1);
+  // install user(s) for every UTs
+  m_userHelper.InstallUt(Uts, usersPerUt);
 
   SatBeamHelper beamHelper;
 
@@ -184,10 +187,17 @@ SatHelper::CreateFullScenario()
   beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
 
   // install UTs to satellite network
-  for ( uint32_t i = 0; i < 98; i++ )
+  for ( uint32_t i = 0; i < beamCount; i ++ )
     {
+      NodeContainer ut;
+
+      for (uint32_t j= 0; j < utsInBeam; j++)
+        {
+          ut.Add(Uts.Get(i*utsInBeam+j));
+        }
+
       std::vector<uint32_t> conf = satConf.GetBeamConfiguration(i + 1);
-      beamHelper.Install(Uts.Get(i), conf[2], conf[0], conf[1], conf[3]);
+      beamHelper.Install(ut, conf[2], conf[0], conf[1], conf[3]);
     }
 
   // finally install GWs to satellite network
