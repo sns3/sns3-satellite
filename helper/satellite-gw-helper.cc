@@ -234,8 +234,6 @@ SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create SatNetDevice
   Ptr<SatNetDevice> dev = m_deviceFactory.Create<SatNetDevice> ();
 
-  dev->SetAddress (Mac48Address::Allocate ());
-
   // Create the SatPhyTx and SatPhyRx modules
   Ptr<SatPhyTx> phyTx = CreateObject<SatPhyTx> ();
   Ptr<SatPhyRx> phyRx = CreateObject<SatPhyRx> ();
@@ -265,6 +263,9 @@ SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Attach the Mac layer to SatNetDevice
   dev->SetMac(mac);
+
+  // Set the device address and pass it to MAC as well
+  dev->SetAddress (Mac48Address::Allocate ());
 
   // Attach the device receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));

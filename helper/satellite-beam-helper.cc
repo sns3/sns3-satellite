@@ -44,7 +44,7 @@ namespace ns3 {
 SatBeamHelper::SatBeamHelper ()
 {
   m_channelFactory.SetTypeId ("ns3::SatChannel");
-  m_arpCache = CreateObject<ArpCache>();
+  m_gwArpCache = CreateObject<ArpCache>();
   m_geoNode = CreateObject<Node>();
   m_geoHelper.Install(m_geoNode);
 }
@@ -171,10 +171,16 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
   NetDeviceContainer utNd = m_utHelper.Install(ut, beamId, ulForwardCh, ulReturnCh);
   Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign(utNd);
 
-
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4> ipv4GW = gwNode->GetObject<Ipv4> ();
   Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4GW);
+
+  // Create an ARP entry of the default GW for the UTs in this beam
+  Ipv4Address ipv4AddressGw = gwAddress.GetAddress (0);
+  Address macAddressGw = gwNd->GetAddress ();
+  Ptr<ArpCache> utArpCache = CreateObject<ArpCache> ();
+  utArpCache->Add (ipv4AddressGw, macAddressGw);
+  NS_LOG_INFO ("SatBeamHelper::Install, UT arp entry:  " << ipv4AddressGw << " - " << macAddressGw );
 
   uint32_t utAddIndex = 0;
 
@@ -187,12 +193,13 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
       NS_ASSERT (utAddress.GetN() == utNd.GetN());
       Ptr<NetDevice> nd = utNd.Get (i);
       Ipv4Address ipv4Addr = utAddress.GetAddress (i);
-      m_arpCache->Add (ipv4Addr, nd->GetAddress ());
+      m_gwArpCache->Add (ipv4Addr, nd->GetAddress ());
+      NS_LOG_INFO ("SatBeamHelper::Install, GW arp entry:  " << ipv4Addr << " - " << nd->GetAddress ());
     }
 
   for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
     {
-      Ptr<Ipv4> ipv4UT = (*i)->GetObject<Ipv4> ();
+      Ptr<Ipv4L3Protocol> ipv4UT = (*i)->GetObject<Ipv4L3Protocol> ();
 
       uint32_t count = ipv4UT->GetNInterfaces();
 
@@ -206,6 +213,11 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
               Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
               srUT->SetDefaultRoute (gwAddress.GetAddress(0), j);
               NS_LOG_INFO ("SatBeamHelper::Install, UT default route: " << gwAddress.GetAddress(0));
+
+              // Set the ARP cache (including the ARP entry for the default GW) to the UT
+              ipv4UT->GetInterface (j)->SetArpCache (utArpCache);
+              NS_LOG_INFO ("SatBeamHelper::Install, add the ARP cache to UT " << (*i)->GetId() );
+
             }
           else  // add other interface route to GW's Satellite interface
             {
@@ -240,15 +252,16 @@ SatBeamHelper::SetArpCacheForGws()
       Ptr<Ipv4L3Protocol> ipv4Gw = (*i)->GetObject<Ipv4L3Protocol> ();
       uint32_t count = ipv4Gw->GetNInterfaces();
 
-      for (uint32_t i = 1; i < count; i++)
+      for (uint32_t j = 1; j < count; j++)
         {
-          Ptr<NetDevice> device = ipv4Gw->GetNetDevice(i);
+          Ptr<NetDevice> device = ipv4Gw->GetNetDevice(j);
           std::string devName = device->GetInstanceTypeId().GetName();
 
           // Set ARP only for all satellite networks.
           if ( devName == "ns3::SatNetDevice" )
             {
-              ipv4Gw->GetInterface (i)->SetArpCache (m_arpCache);
+              NS_LOG_INFO ("SatBeamHelper::SetArpCacheForGws, add the ARP cache to GW " << (*i)->GetId() );
+              ipv4Gw->GetInterface (j)->SetArpCache (m_gwArpCache);
             }
         }
     }

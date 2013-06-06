@@ -124,6 +124,9 @@ SatNetDevice::SetAddress (Address address)
 {
   NS_LOG_FUNCTION (this << address);
   m_address = Mac48Address::ConvertFrom (address);
+
+  NS_ASSERT( m_mac );
+  m_mac->SetAddress (m_address);
 }
 Address 
 SatNetDevice::GetAddress (void) const
@@ -213,7 +216,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
   NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid() << ", dest: " << dest);
 
-  m_mac->Send(packet);
+  m_mac->Send (packet, dest);
 
   return true;
 }
@@ -222,7 +225,7 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
 
-  m_mac->Send(packet);
+  m_mac->Send (packet, dest);
 
   return true;
 }

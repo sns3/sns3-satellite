@@ -38,15 +38,16 @@ class SatPhy;
 class ErrorModel;
 class SatNetDevice;
 
+
 /**
  * \brief This class implements a tag that carries the satellite unit-specific ID of a packet
  */
-class MacUnitIdTag : public Tag
+class MacAddressTag : public Tag
 {
 public:
-  MacUnitIdTag ();
-  void SetId (uint32_t id);
-  uint32_t GetId (void) const;
+  MacAddressTag ();
+  void SetAddress (Address dest);
+  Address GetAddress (void) const;
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -56,7 +57,7 @@ public:
   virtual void Print (std::ostream &os) const;
 
 private:
-  uint32_t m_id;
+  Address m_macAddress;
 };
 
 /**
@@ -142,7 +143,7 @@ public:
     *
     * \return whether the Send operation succeeded
     */
-  bool Send (Ptr<Packet> packet);
+  bool Send (Ptr<Packet> packet, Address dest);
 
   /**
     * \param packet the packet received
@@ -156,7 +157,7 @@ public:
     */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
-  void SetId(uint32_t id);
+  void SetAddress (Mac48Address macAddress);
 
 private:
 
@@ -240,9 +241,9 @@ private:
   Ptr<ErrorModel> m_receiveErrorModel;
 
   /**
-   * Unit id of the this mac
+   * MAC address of the this mac instance
    */
-  uint32_t m_id;
+  Mac48Address m_macAddress;
 
   /**
    * The trace source fired when packets come into the "top" of the device
