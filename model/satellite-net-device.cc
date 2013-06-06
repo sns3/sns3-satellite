@@ -211,7 +211,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
    */
 
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
-  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid());
+  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid() << ", dest: " << dest);
 
   m_mac->Send(packet);
 

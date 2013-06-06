@@ -164,26 +164,29 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
   m_geoHelper.AttachChannels(m_geoNode->GetDevice(0), flForwardCh, flReturnCh, ulForwardCh, ulReturnCh, beamId );
 
   // next is created GW
-  Ptr<NetDevice>  gwNd = m_gwHelper.Install(gwNode, beamId, flForwardCh, flReturnCh);
-  Ipv4InterfaceContainer aC = m_ipv4Helper.Assign(gwNd);
+  Ptr<NetDevice> gwNd = m_gwHelper.Install(gwNode, beamId, flForwardCh, flReturnCh);
+  Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign(gwNd);
 
   // finally is created UTs and set default route to them
-  NetDeviceContainer  utNd = m_utHelper.Install(ut, beamId, ulForwardCh, ulReturnCh);
-  Ipv4InterfaceContainer ic = m_ipv4Helper.Assign(utNd);
+  NetDeviceContainer utNd = m_utHelper.Install(ut, beamId, ulForwardCh, ulReturnCh);
+  Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign(utNd);
+
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4> ipv4GW = gwNode->GetObject<Ipv4> ();
   Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4GW);
 
+  uint32_t utAddIndex = 0;
+
   // Add the ARP entries of all the UTs: MAC address vs. IPv4 address
   // Note, that we use a "global" ARP in the beginning, which means that
   // all the GWs hold the ARP information from the whole network, not just from
   // one individual link.
-  for (uint32_t i = 0; i < ic.GetN (); ++i)
+  for (uint32_t i = 0; i < utAddress.GetN (); ++i)
     {
-      NS_ASSERT (ic.GetN() == utNd.GetN());
+      NS_ASSERT (utAddress.GetN() == utNd.GetN());
       Ptr<NetDevice> nd = utNd.Get (i);
-      Ipv4Address ipv4Addr = ic.GetAddress (i);
+      Ipv4Address ipv4Addr = utAddress.GetAddress (i);
       m_arpCache->Add (ipv4Addr, nd->GetAddress ());
     }
 
@@ -201,16 +204,20 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
           if ( devName == "ns3::SatNetDevice" )
             {
               Ptr<Ipv4StaticRouting> srUT = ipv4RoutingHelper.GetStaticRouting (ipv4UT);
-              srUT->SetDefaultRoute (aC.GetAddress(0), j);
+              srUT->SetDefaultRoute (gwAddress.GetAddress(0), j);
+              NS_LOG_INFO ("SatBeamHelper::Install, UT default route: " << gwAddress.GetAddress(0));
             }
           else  // add other interface route to GW's Satellite interface
             {
               Ipv4Address address = ipv4UT->GetAddress(j, 0).GetLocal();
               Ipv4Mask mask = ipv4UT->GetAddress(j, 0).GetMask();
 
-              srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, gwNd->GetIfIndex());
+              srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, utAddress.GetAddress(utAddIndex) ,gwNd->GetIfIndex());
+              NS_LOG_INFO ("SatBeamHelper::Install, GW Network route:  " << address.CombineMask(mask) << ", " << mask << ", " << utAddress.GetAddress(utAddIndex));
             }
         }
+
+      utAddIndex++;
     }
 
   SetArpCacheForGws();
@@ -224,46 +231,6 @@ SatBeamHelper::GetGwNodes()
 {
   return m_gwNodeList;
 }
-
-void
-SatBeamHelper::SetRoutesForGws()
-{
-  Ipv4StaticRoutingHelper ipv4RoutingHelper;
-  bool defaultRouteSet = false;
-
-  for (NodeContainer::Iterator i = m_gwNodeList.Begin (); i != m_gwNodeList.End (); i++)
-    {
-      Ptr<Ipv4> ipv4Gw = (*i)->GetObject<Ipv4> ();
-      uint32_t count = ipv4Gw->GetNInterfaces();
-
-      for (uint32_t i = 1; i < count; i++)
-        {
-          Ptr<NetDevice> device = ipv4Gw->GetNetDevice(i);
-          std::string devName = device->GetInstanceTypeId().GetName();
-
-          // set routes only for non satellite networks.
-          if ( devName != "ns3::SatNetDevice" )
-            {
-              Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
-
-              Ipv4Address address = ipv4Gw->GetAddress(i, 0).GetLocal();
-              Ipv4Mask mask = ipv4Gw->GetAddress(i, 0).GetMask();
-
-              // set first non satellite interface as default route, if already set just add network route
-              if (defaultRouteSet)
-                {
-                  srGW->AddNetworkRouteTo (address.CombineMask(mask), mask, device->GetIfIndex());
-                }
-              else
-                {
-                  srGW->SetDefaultRoute(address.CombineMask(mask), device->GetIfIndex());
-                  defaultRouteSet = true;
-                }
-            }
-        }
-    }
-}
-
 
 void
 SatBeamHelper::SetArpCacheForGws()
