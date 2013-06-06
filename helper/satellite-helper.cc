@@ -191,7 +191,7 @@ SatHelper::CreateFullScenario()
     }
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(beamHelper.GetGwNodes(), 1);
+  m_userHelper.InstallGw(beamHelper.GetGwNodes(), 5);
 }
 
 } // namespace ns3
