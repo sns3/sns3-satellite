@@ -654,7 +654,6 @@ SimpleP2pTestSuite::SimpleP2pTestSuite ()
   AddTestCase (new SimpleP2p1);
 
   // add simple-p2p-2 case to suite sat-simple-p2p
-  // TODO: this test can be enabled after unit ID allocation is implemented.
   AddTestCase (new SimpleP2p2);
 
   // add simple-p2p-3 case to suite sat-simple-p2p
