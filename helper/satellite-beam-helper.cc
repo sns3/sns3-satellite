@@ -32,7 +32,7 @@
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-phy-rx.h"
-#include "ns3/arp-cache.h"
+#include "ns3/satellite-arp-cache.h"
 #include "ns3/trace-helper.h"
 #include "satellite-beam-helper.h"
 #include "satellite-geo-helper.h"
@@ -44,7 +44,7 @@ namespace ns3 {
 SatBeamHelper::SatBeamHelper ()
 {
   m_channelFactory.SetTypeId ("ns3::SatChannel");
-  m_gwArpCache = CreateObject<ArpCache>();
+  m_gwArpCache = CreateObject<SatArpCache>();
   m_geoNode = CreateObject<Node>();
   m_geoHelper.Install(m_geoNode);
 }
@@ -178,7 +178,7 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
   // Create an ARP entry of the default GW for the UTs in this beam
   Ipv4Address ipv4AddressGw = gwAddress.GetAddress (0);
   Address macAddressGw = gwNd->GetAddress ();
-  Ptr<ArpCache> utArpCache = CreateObject<ArpCache> ();
+  Ptr<SatArpCache> utArpCache = CreateObject<SatArpCache> ();
   utArpCache->Add (ipv4AddressGw, macAddressGw);
   NS_LOG_INFO ("SatBeamHelper::Install, UT arp entry:  " << ipv4AddressGw << " - " << macAddressGw );
 
