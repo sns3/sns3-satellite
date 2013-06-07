@@ -30,16 +30,17 @@
 #include "ns3/deprecated.h"
 #include "ns3/trace-helper.h"
 #include "ns3/ipv4-address-helper.h"
+#include "ns3/satellite-arp-cache.h"
 
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
 
+
 namespace ns3 {
 
 class NetDevice;
 class Node;
-class SatArpCache;
 
 /**
  * \brief Build a set Satellite beams with needed objects and configuration
