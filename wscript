@@ -38,6 +38,7 @@ def build(bld):
         'test/satellite-test-suite.cc',
         'test/geo-coordinate-test.cc',
         'test/simple-p2p.cc',
+        'test/scenario-creation.cc',
         'test/cbr-test.cc',
         'test/link-results-test.cc',
         ]

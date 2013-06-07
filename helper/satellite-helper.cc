@@ -161,7 +161,8 @@ SatHelper::CreateFullScenario()
 {
   NodeContainer Uts;
   uint32_t utsInBeam = 3; // TODO: add interface for setting this or attribute
-  uint32_t usersPerUt = 3; // TODO: add interface for setting this or attribute
+  uint32_t utUsers = 3; // TODO: add interface for setting this or attribute
+  uint32_t gwUsers = 5; // TODO: add interface for setting this or attribute
   uint32_t beamCount =  satConf.GetBeamCount();
   Uts.Create(beamCount * utsInBeam);
 
@@ -179,7 +180,7 @@ SatHelper::CreateFullScenario()
   m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
   // install user(s) for every UTs
-  m_userHelper.InstallUt(Uts, usersPerUt);
+  m_userHelper.InstallUt(Uts, utUsers);
 
   SatBeamHelper beamHelper;
 
@@ -201,7 +202,7 @@ SatHelper::CreateFullScenario()
     }
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(beamHelper.GetGwNodes(), 5);
+  m_userHelper.InstallGw(beamHelper.GetGwNodes(), gwUsers);
 }
 
 } // namespace ns3

@@ -10,6 +10,7 @@
 # See test.py for more information.
 cpp_examples = [
     ("cbr-example", "True", "True"),
+    ("scenario-creation", "True", "True"),
     ("simple-scenario-p2p", "True", "True"),
     ("larger-scenario-p2p", "True", "True"),
 ]
