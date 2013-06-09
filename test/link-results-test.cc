@@ -80,9 +80,9 @@ static class LinkResultTestSuite : public TestSuite
 public:
   LinkResultTestSuite () : TestSuite ("link-results", TestSuite::UNIT)
   {
-    LogComponentEnable ("SatLookUpTable", LOG_LEVEL_ALL);
-    LogComponentEnable ("SatLookUpTable", LOG_PREFIX_TIME);
-    LogComponentEnable ("SatLookUpTable", LOG_PREFIX_FUNC);
+    //LogComponentEnable ("SatLookUpTable", LOG_LEVEL_ALL);
+    //LogComponentEnable ("SatLookUpTable", LOG_PREFIX_TIME);
+    //LogComponentEnable ("SatLookUpTable", LOG_PREFIX_FUNC);
 
     Ptr<SatLookUpTable> table;
     std::string basePath = "src/satellite/data/linkresults/";
