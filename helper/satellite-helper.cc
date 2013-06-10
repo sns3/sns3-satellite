@@ -26,6 +26,7 @@
 #include "ns3/satellite-user-helper.h"
 #include "ns3/satellite-beam-helper.h"
 #include "ns3/satellite-ut-helper.h"
+#include "ns3/core-module.h"
 #include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
@@ -34,11 +35,31 @@ NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatHelper);
+
+TypeId
+SatHelper::GetTypeId (void)
+{
+    static TypeId tid = TypeId ("ns3::SatHelper")
+      .SetParent<Object> ()
+      .AddConstructor<SatHelper> ()
+      .AddTraceSource ("Creation", "Creation traces",
+                       MakeTraceSourceAccessor (&SatHelper::m_creation))
+    ;
+    return tid;
+}
+
+TypeId
+SatHelper::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
+
 SatHelper::SatHelper ()
 {
 }
 
-SatHelper::SatHelper (PREDEFINED_SCENARIO scenario)
+void SatHelper::CreateScenario(PREDEFINED_SCENARIO scenario)
 {
   switch(scenario)
   {
@@ -58,6 +79,25 @@ SatHelper::SatHelper (PREDEFINED_SCENARIO scenario)
       break;
   }
 
+}
+
+void SatHelper::EnableCreationTraces(std::string filename)
+{
+  AsciiTraceHelper asciiTraceHelper;
+  std::string outputFile = "creation.log";
+
+  if (!filename.empty())
+    {
+      outputFile = filename;
+    }
+
+  Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream (outputFile);
+  CallbackBase creationCb = MakeBoundCallback (&SatHelper::DefaultCreationSink, stream);
+
+  TraceConnect("Creation", "SatHelper", creationCb);
+
+  m_userHelper.EnableCreationTraces(stream, creationCb);
+  m_beamHelper.EnableCreationTraces(stream, creationCb);
 }
 
 Ipv4Address
@@ -82,6 +122,8 @@ SatHelper::GetGwUsers()
 void
 SatHelper::CreateSimpleScenario()
 {
+  m_creation("Simple Scenario Creation:");
+
   Ptr<Node> UT = CreateObject<Node> ();
   InternetStackHelper internet;
   internet.Install(UT);
@@ -93,19 +135,19 @@ SatHelper::CreateSimpleScenario()
 
   m_userHelper.InstallUt(UT, 1);
 
-  SatBeamHelper beamHelper;
-
-  beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
   std::vector<uint32_t> conf = satConf.GetBeamConfiguration(8);
 
-  beamHelper.Install(UT, conf[2], conf[0], conf[1], conf[3]);
+  m_beamHelper.Install(UT, conf[2], conf[0], conf[1], conf[3]);
 
-  m_userHelper.InstallGw(beamHelper.GetGwNodes(), 1);
+  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
 }
 
 void
 SatHelper::CreateLargerScenario()
 {
+  m_creation("Larger Scenario Creation:");
+
   NodeContainer Ut1;
   Ut1.Create(1);
 
@@ -130,10 +172,8 @@ SatHelper::CreateLargerScenario()
   m_userHelper.InstallUt(Ut1, 2);
   m_userHelper.InstallUt(Uts, 1);
 
-  SatBeamHelper beamHelper;
-
   // set address base for satellite network
-  beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
 
   // initialize beam 1 UT container with UT1 and UT2
   NodeContainer beam1Uts;
@@ -142,23 +182,25 @@ SatHelper::CreateLargerScenario()
 
   // install UT1 and UT2 beam 3
   std::vector<uint32_t> conf = satConf.GetBeamConfiguration(3);
-  beamHelper.Install(beam1Uts, conf[2], conf[0], conf[1], conf[3]);
+  m_beamHelper.Install(beam1Uts, conf[2], conf[0], conf[1], conf[3]);
 
   // install UT3 to beam 11
   conf = satConf.GetBeamConfiguration(11);
-  beamHelper.Install(Uts.Get(1), conf[2], conf[0], conf[1], conf[3]);
+  m_beamHelper.Install(Uts.Get(1), conf[2], conf[0], conf[1], conf[3]);
 
   // installUT4 to beam 22
   conf = satConf.GetBeamConfiguration(22);
-  beamHelper.Install(Uts.Get(2), conf[2], conf[0], conf[1], conf[3]);
+  m_beamHelper.Install(Uts.Get(2), conf[2], conf[0], conf[1], conf[3]);
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(beamHelper.GetGwNodes(), 1);
+  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
 }
 
 void
 SatHelper::CreateFullScenario()
 {
+  m_creation("Full Scenario Creation:");
+
   NodeContainer Uts;
   uint32_t utsInBeam = 3; // TODO: add interface for setting this or attribute
   uint32_t utUsers = 3; // TODO: add interface for setting this or attribute
@@ -182,10 +224,8 @@ SatHelper::CreateFullScenario()
   // install user(s) for every UTs
   m_userHelper.InstallUt(Uts, utUsers);
 
-  SatBeamHelper beamHelper;
-
   // set address base for satellite network
-  beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
 
   // install UTs to satellite network
   for ( uint32_t i = 0; i < beamCount; i ++ )
@@ -198,11 +238,17 @@ SatHelper::CreateFullScenario()
         }
 
       std::vector<uint32_t> conf = satConf.GetBeamConfiguration(i + 1);
-      beamHelper.Install(ut, conf[2], conf[0], conf[1], conf[3]);
+      m_beamHelper.Install(ut, conf[2], conf[0], conf[1], conf[3]);
     }
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(beamHelper.GetGwNodes(), gwUsers);
+  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), gwUsers);
+}
+
+void
+SatHelper::DefaultCreationSink(Ptr<OutputStreamWrapper> stream, std::string context, std::string info)
+{
+  *stream->GetStream () << context << ", " << info << std::endl;
 }
 
 } // namespace ns3

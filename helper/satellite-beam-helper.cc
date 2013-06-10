@@ -21,11 +21,11 @@
 #include "ns3/abort.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "ns3/config.h"
 #include "ns3/packet.h"
 #include "ns3/names.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/core-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/satellite-channel.h"
@@ -42,6 +42,26 @@
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 
 namespace ns3 {
+
+NS_OBJECT_ENSURE_REGISTERED (SatBeamHelper);
+
+TypeId
+SatBeamHelper::GetTypeId (void)
+{
+    static TypeId tid = TypeId ("ns3::SatBeamHelper")
+      .SetParent<Object> ()
+      .AddConstructor<SatBeamHelper> ()
+      .AddTraceSource ("Creation", "Creation traces",
+                       MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
+    ;
+    return tid;
+}
+
+TypeId
+SatBeamHelper::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
 
 SatBeamHelper::SatBeamHelper ()
 {
@@ -71,6 +91,8 @@ void SatBeamHelper::SetBaseAddress ( const Ipv4Address network, const Ipv4Mask m
 Ptr<Node>
 SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16_t ulFreqId, uint16_t flFreqId )
 {
+  m_creation("Install");
+
   // add beamId to beam set. In case it's there already, assertion failure is caused
   std::pair<std::set<uint16_t>::iterator, bool> beam = m_beam.insert(beamId);
   NS_ASSERT(beam.second == true);
@@ -269,5 +291,13 @@ SatBeamHelper::SetArpCacheForGws()
     }
 }
 
+void
+SatBeamHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+{
+  TraceConnect("Creation", "SatBeamHelper", cb);
+  m_geoHelper.EnableCreationTraces(stream, cb);
+  m_gwHelper.EnableCreationTraces(stream, cb);
+  m_utHelper.EnableCreationTraces(stream, cb);
+}
 
 } // namespace ns3

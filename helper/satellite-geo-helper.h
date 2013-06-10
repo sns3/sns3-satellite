@@ -40,13 +40,12 @@ class SatGeoNetDevice;
 /**
  * \brief Build a set SatGeoNetDevice object and configuring it
  *
- * Normally we eschew multiple inheritance, however, the classes 
- * PcapUserHelperForDevice and AsciiTraceUserHelperForDevice are
- * "mixins".
  */
-class SatGeoHelper : public PcapHelperForDevice, public AsciiTraceHelperForDevice
+class SatGeoHelper : public Object
 {
 public:
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
   /**
    * Create a SatGeoHelper to make life easier when creating Satellite point to
    * point network connections.
@@ -101,43 +100,24 @@ public:
   void AttachChannels ( Ptr<NetDevice> dev, Ptr<SatChannel> ff, Ptr<SatChannel> fr,
                         Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId);
 
+  /**
+   * Enables creation traces to be written in given file
+   * /param stream  stream for creation trace outputs
+   * /param cb  callback to connect traces
+   */
+  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+
 
 private:
-  /**
-   * \brief Enable pcap output the indicated net device.
-   *
-   * NetDevice-specific implementation mechanism for hooking the trace and
-   * writing to the trace file.
-   *
-   * \param prefix Filename prefix to use for pcap files.
-   * \param nd Net device for which you want to enable tracing.
-   * \param promiscuous If true capture all possible packets available at the device.
-   * \param explicitFilename Treat the prefix as an explicit filename if true
-   */
-  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
-
-  /**
-   * \brief Enable ascii trace output on the indicated net device.
-   * \internal
-   *
-   * NetDevice-specific implementation mechanism for hooking the trace and
-   * writing to the trace file.
-   *
-   * \param stream The output stream object to use when logging ascii traces.
-   * \param prefix Filename prefix to use for ascii trace files.
-   * \param nd Net device for which you want to enable tracing.
-   * \param explicitFilename Treat the prefix as an explicit filename if true
-   */
-  virtual void EnableAsciiInternal (
-    Ptr<OutputStreamWrapper> stream,
-    std::string prefix,
-    Ptr<NetDevice> nd,
-    bool explicitFilename);
-
     // count for devices. Currently only one device supported by helper.
     uint16_t m_deviceCount;
 
     ObjectFactory m_deviceFactory;
+
+    /**
+     * Trace callback for creation traces
+     */
+    TracedCallback<std::string> m_creation;
 };
 
 } // namespace ns3

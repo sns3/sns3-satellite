@@ -46,11 +46,13 @@ class Node;
  * \brief Build a set Satellite beams with needed objects and configuration
  *
  */
-class SatBeamHelper
+class SatBeamHelper : public Object
 {
 public:
   typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> > SatLink;
 
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
   /**
    * Create a SatBeamHelper to make life easier when creating Satellite beams.
    */
@@ -113,6 +115,13 @@ public:
 
   void SetArpCacheForGws();
 
+  /**
+   * Enables creation traces to be written in given file
+   * /param stream  stream for creation trace outputs
+   * /param cb  callback to connect traces
+   */
+  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+
 private:
 
     ObjectFactory     m_channelFactory;
@@ -128,6 +137,11 @@ private:
     std::map<uint16_t, Ptr<Node> > m_gwNode;
     std::map<uint16_t, SatLink > m_ulChannels;  //first forward and second return
     std::map<uint16_t, SatLink > m_flChannels;  //first forward and second return
+
+    /**
+     * Trace callback for creation traces
+     */
+    TracedCallback<std::string> m_creation;
 };
 
 } // namespace ns3

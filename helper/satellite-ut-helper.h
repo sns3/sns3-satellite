@@ -44,9 +44,11 @@ class SatChannel;
  * PcapUserHelperForDevice and AsciiTraceUserHelperForDevice are
  * "mixins".
  */
-class SatUtHelper : public PcapHelperForDevice, public AsciiTraceHelperForDevice
+class SatUtHelper : public Object
 {
 public:
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
   /**
    * Create a SatNetDevHelper to make life easier when creating Satellite point to
    * point network connections.
@@ -137,50 +139,22 @@ public:
    */
   Ptr<NetDevice> Install (std::string aName, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh );
 
+  /**
+   * Enables creation traces to be written in given file
+   * /param stream  stream for creation trace outputs
+   * /param cb  callback to connect traces
+   */
+  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+
 private:
-  /**
-   * \brief Enable pcap output the indicated net device.
-   *
-   * NetDevice-specific implementation mechanism for hooking the trace and
-   * writing to the trace file.
-   *
-   * \param prefix Filename prefix to use for pcap files.
-   * \param nd Net device for which you want to enable tracing.
-   * \param promiscuous If true capture all possible packets available at the device.
-   * \param explicitFilename Treat the prefix as an explicit filename if true
-   */
-  virtual void EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename);
-
-  /**
-   * \brief Enable ascii trace output on the indicated net device.
-   * \internal
-   *
-   * NetDevice-specific implementation mechanism for hooking the trace and
-   * writing to the trace file.
-   *
-   * \param stream The output stream object to use when logging ascii traces.
-   * \param prefix Filename prefix to use for ascii trace files.
-   * \param nd Net device for which you want to enable tracing.
-   * \param explicitFilename Treat the prefix as an explicit filename if true
-   */
-  virtual void EnableAsciiInternal (
-    Ptr<OutputStreamWrapper> stream,
-    std::string prefix,
-    Ptr<NetDevice> nd,
-    bool explicitFilename);
-
-    /*
-     * Beam id is now static and set by the helper for each PHY layer it creates.
-     * Note, that this needs to be changed to be read from the reference system
-     * configuration table.
-     */
-    unsigned int m_beamId;
-
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
 
-    uint32_t m_next;
+    /**
+     * Trace callback for creation traces
+     */
+    TracedCallback<std::string> m_creation;
 };
 
 } // namespace ns3

@@ -44,9 +44,12 @@ class Node;
  * \brief Build a set of user nodes and links channels between user nodes and satellite nodes.
  *
  */
-class SatUserHelper
+class SatUserHelper : public Object
 {
 public:
+  typedef TracedCallback<std::string> CreationCallback;
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
   /**
    * Create a SatUserHelper to make life easier when creating Users and their connections to satellite network.
    */
@@ -133,6 +136,13 @@ public:
    */
   NodeContainer GetUtUsers();
 
+  /**
+   * Enables creation traces to be written in given file
+   * /param stream  stream for creation trace outputs
+   * /param cb  callback to connect traces
+   */
+  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+
 private:
 
     CsmaHelper        m_csma;
@@ -141,6 +151,11 @@ private:
 
     NodeContainer     m_gwUsers;
     NodeContainer     m_utUsers;
+
+    /**
+     * Trace callback for creation traces
+     */
+    TracedCallback<std::string> m_creation;
 };
 
 } // namespace ns3

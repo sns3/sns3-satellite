@@ -39,6 +39,26 @@ NS_LOG_COMPONENT_DEFINE ("SatGeoHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatGeoHelper);
+
+TypeId
+SatGeoHelper::GetTypeId (void)
+{
+    static TypeId tid = TypeId ("ns3::SatGeoHelper")
+      .SetParent<Object> ()
+      .AddConstructor<SatGeoHelper> ()
+      .AddTraceSource ("Creation", "Creation traces",
+                       MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
+    ;
+    return tid;
+}
+
+TypeId
+SatGeoHelper::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
+
 SatGeoHelper::SatGeoHelper ()
   :m_deviceCount(0)
 {
@@ -49,119 +69,6 @@ void
 SatGeoHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
   m_deviceFactory.Set (n1, v1);
-}
-
-void 
-SatGeoHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename)
-{
-  //
-  // All of the Pcap enable functions vector through here including the ones
-  // that are wandering through all of devices on perhaps all of the nodes in
-  // the system.  We can only deal with devices of type SatGeoNetDevice.
-  //
-  Ptr<SatGeoNetDevice> device = nd->GetObject<SatGeoNetDevice> ();
-  if (device == 0)
-    {
-      NS_LOG_INFO ("SatGeoHelper::EnablePcapInternal(): Device " << device << " not of type ns3::SatGeoNetDevice");
-      return;
-    }
-
-  PcapHelper pcapHelper;
-
-  std::string filename;
-  if (explicitFilename)
-    {
-      filename = prefix;
-    }
-  else
-    {
-      filename = pcapHelper.GetFilenameFromDevice (prefix, device);
-    }
-
-  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
-                                                     PcapHelper::DLT_RAW);
-}
-
-void 
-SatGeoHelper::EnableAsciiInternal (
-  Ptr<OutputStreamWrapper> stream, 
-  std::string prefix, 
-  Ptr<NetDevice> nd,
-  bool explicitFilename)
-{
-  //
-  // All of the ascii enable functions vector through here including the ones
-  // that are wandering through all of devices on perhaps all of the nodes in
-  // the system.  We can only deal with devices of type SatGeoNetDevice.
-  //
-
-  Ptr<SatGeoNetDevice> device = nd->GetObject<SatGeoNetDevice> ();
-  if (device == 0)
-    {
-      NS_LOG_INFO ("SatGeoHelper::EnableAsciiInternal(): Device " << device <<
-                   " not of type ns3::SatGeoNetDevice");
-      return;
-    }
-
-  //
-  // Our default trace sinks are going to use packet printing, so we have to 
-  // make sure that is turned on.
-  //
-  Packet::EnablePrinting ();
-
-  //
-  // If we are not provided an OutputStreamWrapper, we are expected to create 
-  // one using the usual trace filename conventions and do a Hook*WithoutContext
-  // since there will be one file per context and therefore the context would
-  // be redundant.
-  //
-  if (stream == 0)
-    {
-      //
-      // Set up an output stream object to deal with private ofstream copy 
-      // constructor and lifetime issues.  Let the helper decide the actual
-      // name of the file given the prefix.
-      //
-      AsciiTraceHelper asciiTraceHelper;
-
-      std::string filename;
-      if (explicitFilename)
-        {
-          filename = prefix;
-        }
-      else
-        {
-          filename = asciiTraceHelper.GetFilenameFromDevice (prefix, device);
-        }
-
-      Ptr<OutputStreamWrapper> theStream = asciiTraceHelper.CreateFileStream (filename);
-
-      //
-      // The MacRx trace source provides our "r" event.
-      //
-      asciiTraceHelper.HookDefaultReceiveSinkWithoutContext<SatGeoNetDevice> (device, "MacRx", theStream);
-
-      return;
-    }
-
-  //
-  // If we are provided an OutputStreamWrapper, we are expected to use it, and
-  // to providd a context.  We are free to come up with our own context if we
-  // want, and use the AsciiTraceHelper Hook*WithContext functions, but for 
-  // compatibility and simplicity, we just use Config::Connect and let it deal
-  // with the context.
-  //
-  // Note that we are going to use the default trace sinks provided by the 
-  // ascii trace helper.  There is actually no AsciiTraceHelper in sight here,
-  // but the default trace sinks are actually publicly available static 
-  // functions that are always there waiting for just such a case.
-  //
-  uint32_t nodeid = nd->GetNode ()->GetId ();
-  uint32_t deviceid = nd->GetIfIndex ();
-  std::ostringstream oss;
-
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatGeoNetDevice/MacRx";
-  Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultReceiveSinkWithContext, stream));
 }
 
 NetDeviceContainer 
@@ -184,6 +91,7 @@ Ptr<NetDevice>
 SatGeoHelper::Install (Ptr<Node> n)
 {
   NS_ASSERT (m_deviceCount == 0);
+  m_creation("Install");
 
   // Create SatGeoNetDevice
   Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice> ();
@@ -233,6 +141,12 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   dev->AddUserPhy(uPhy, beamId);
   dev->AddFeederPhy(fPhy, beamId);
+}
+
+void
+SatGeoHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+{
+  TraceConnect("Creation", "SatGeoHelper",  cb);
 }
 
 } // namespace ns3

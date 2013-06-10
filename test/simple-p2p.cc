@@ -87,7 +87,8 @@ void
 SimpleP2p1::DoRun (void)
 {
   // Create simple scenario
-  SatHelper helper(SatHelper::Simple);
+  SatHelper helper;
+  helper.CreateScenario(SatHelper::Simple);
 
   NodeContainer utUsers = helper.GetUtUsers();
 
@@ -171,7 +172,8 @@ void
 SimpleP2p2::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper(SatHelper::Larger);
+  SatHelper helper;
+  helper.CreateScenario(SatHelper::Larger);
 
   NodeContainer utUsers = helper.GetUtUsers();
 
@@ -277,7 +279,8 @@ void
 SimpleP2p3::DoRun (void)
 {
   // Create full scenario
-  SatHelper helper(SatHelper::Full);
+  SatHelper helper;
+  helper.CreateScenario(SatHelper::Full);
 
   NodeContainer utUsers = helper.GetUtUsers();
   NodeContainer gwUsers = helper.GetGwUsers();
@@ -388,7 +391,8 @@ void
 SimpleP2p4::DoRun (void)
 {
   // Create simple scenario
-  SatHelper helper(SatHelper::Simple);
+  SatHelper helper;
+  helper.CreateScenario(SatHelper::Simple);
 
   // >>> Start of actual test using Simple scenario >>>
 
@@ -473,7 +477,8 @@ void
 SimpleP2p5::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper(SatHelper::Larger);
+  SatHelper helper;
+  helper.CreateScenario(SatHelper::Larger);
 
   // >>> Start of actual test using Larger scenario >>>
 
@@ -567,7 +572,8 @@ void
 SimpleP2p6::DoRun (void)
 {
   // Create full scenario
-  SatHelper helper(SatHelper::Full);
+  SatHelper helper;
+  helper.CreateScenario(SatHelper::Full);
 
   // >>> Start of actual test using Full scenario >>>
 

@@ -44,6 +44,26 @@ NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatUtHelper);
+
+TypeId
+SatUtHelper::GetTypeId (void)
+{
+    static TypeId tid = TypeId ("ns3::SatUtHelper")
+      .SetParent<Object> ()
+      .AddConstructor<SatUtHelper> ()
+      .AddTraceSource ("Creation", "Creation traces",
+                       MakeTraceSourceAccessor (&SatUtHelper::m_creation))
+    ;
+    return tid;
+}
+
+TypeId
+SatUtHelper::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
+
 SatUtHelper::SatUtHelper ()
 {
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
@@ -51,9 +71,6 @@ SatUtHelper::SatUtHelper ()
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
   //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
-
-  m_beamId = 1;
-  m_next = 1;
 }
 
 void 
@@ -82,138 +99,6 @@ SatUtHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
   m_channelFactory.Set (n1, v1);
 }
 
-void 
-SatUtHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool promiscuous, bool explicitFilename)
-{
-  //
-  // All of the Pcap enable functions vector through here including the ones
-  // that are wandering through all of devices on perhaps all of the nodes in
-  // the system.  We can only deal with devices of type SatNetDevice.
-  //
-  Ptr<SatNetDevice> device = nd->GetObject<SatNetDevice> ();
-  if (device == 0)
-    {
-      NS_LOG_INFO ("SatUtHelper::EnablePcapInternal(): Device " << device << " not of type ns3::SatNetDevice");
-      return;
-    }
-
-  PcapHelper pcapHelper;
-
-  std::string filename;
-  if (explicitFilename)
-    {
-      filename = prefix;
-    }
-  else
-    {
-      filename = pcapHelper.GetFilenameFromDevice (prefix, device);
-    }
-
-  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out,
-                                                     PcapHelper::DLT_RAW);
-}
-
-void 
-SatUtHelper::EnableAsciiInternal (
-  Ptr<OutputStreamWrapper> stream, 
-  std::string prefix, 
-  Ptr<NetDevice> nd,
-  bool explicitFilename)
-{
-  //
-  // All of the ascii enable functions vector through here including the ones
-  // that are wandering through all of devices on perhaps all of the nodes in
-  // the system.  We can only deal with devices of type SatNetDevice.
-  //
-  Ptr<SatNetDevice> device = nd->GetObject<SatNetDevice> ();
-//  Ptr<SimpleNetDevice> device = nd->GetObject<SimpleNetDevice> ();
-  if (device == 0)
-    {
-      NS_LOG_INFO ("SatUtHelper::EnableAsciiInternal(): Device " << device <<
-                   " not of type ns3::SatNetDevice");
-      return;
-    }
-
-  //
-  // Our default trace sinks are going to use packet printing, so we have to 
-  // make sure that is turned on.
-  //
-  Packet::EnablePrinting ();
-
-  //
-  // If we are not provided an OutputStreamWrapper, we are expected to create 
-  // one using the usual trace filename conventions and do a Hook*WithoutContext
-  // since there will be one file per context and therefore the context would
-  // be redundant.
-  //
-  if (stream == 0)
-    {
-      //
-      // Set up an output stream object to deal with private ofstream copy 
-      // constructor and lifetime issues.  Let the helper decide the actual
-      // name of the file given the prefix.
-      //
-      AsciiTraceHelper asciiTraceHelper;
-
-      std::string filename;
-      if (explicitFilename)
-        {
-          filename = prefix;
-        }
-      else
-        {
-          filename = asciiTraceHelper.GetFilenameFromDevice (prefix, device);
-        }
-
-      Ptr<OutputStreamWrapper> theStream = asciiTraceHelper.CreateFileStream (filename);
-
-      //
-      // The MacRx trace source provides our "r" event.
-      //
-      asciiTraceHelper.HookDefaultReceiveSinkWithoutContext<SatNetDevice> (device, "MacRx", theStream);
-
-      // PhyRxDrop trace source for "d" event
-      asciiTraceHelper.HookDefaultDropSinkWithoutContext<SatNetDevice> (device, "PhyRxDrop", theStream);
-
-      return;
-    }
-
-  //
-  // If we are provided an OutputStreamWrapper, we are expected to use it, and
-  // to providd a context.  We are free to come up with our own context if we
-  // want, and use the AsciiTraceHelper Hook*WithContext functions, but for 
-  // compatibility and simplicity, we just use Config::Connect and let it deal
-  // with the context.
-  //
-  // Note that we are going to use the default trace sinks provided by the 
-  // ascii trace helper.  There is actually no AsciiTraceHelper in sight here,
-  // but the default trace sinks are actually publicly available static 
-  // functions that are always there waiting for just such a case.
-  //
-  uint32_t nodeid = nd->GetNode ()->GetId ();
-  uint32_t deviceid = nd->GetIfIndex ();
-  std::ostringstream oss;
-
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/MacRx";
-  Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultReceiveSinkWithContext, stream));
-
-  oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/TxQueue/Enqueue";
-  Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultEnqueueSinkWithContext, stream));
-
-  oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/TxQueue/Dequeue";
-  Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultDequeueSinkWithContext, stream));
-
-  oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/TxQueue/Drop";
-  Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultDropSinkWithContext, stream));
-
-  oss.str ("");
-  oss << "/NodeList/" << nodeid << "/DeviceList/" << deviceid << "/$ns3::SatNetDevice/PhyRxDrop";
-  Config::Connect (oss.str (), MakeBoundCallback (&AsciiTraceHelper::DefaultDropSinkWithContext, stream));
-}
-
 NetDeviceContainer 
 SatUtHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
@@ -230,6 +115,7 @@ SatUtHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr
 Ptr<NetDevice>
 SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
+  m_creation("Install");
   NetDeviceContainer container;
 
   // Create SatNetDevice
@@ -282,6 +168,12 @@ SatUtHelper::Install (std::string aName, uint16_t beamId, Ptr<SatChannel> fCh, P
 {
   Ptr<Node> a = Names::Find<Node> (aName);
   return Install (a, beamId, fCh, rCh);
+}
+
+void
+SatUtHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+{
+  TraceConnect("Creation", "SatUtHelper", cb);
 }
 
 } // namespace ns3

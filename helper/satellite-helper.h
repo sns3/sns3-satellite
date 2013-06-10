@@ -31,8 +31,8 @@
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/csma-helper.h"
-#include "ns3/satellite-ut-helper.h"
 #include "ns3/satellite-user-helper.h"
+#include "ns3/satellite-beam-helper.h"
 #include "ns3/trace-helper.h"
 #include "satellite-conf.h"
 
@@ -48,7 +48,7 @@ class Ipv4Address;
  * \brief Build a set of SatNetDevice objects
  *
  */
-class SatHelper
+class SatHelper : public Object
 {
 public:
   /**
@@ -67,6 +67,9 @@ public:
       Full
     };
 
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
+
   /**
    * \brief Create a base SatHelper for creating customized Satellite topologies.
    */
@@ -75,7 +78,7 @@ public:
   /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
    */
-  SatHelper (PREDEFINED_SCENARIO scenario);
+  void CreateScenario (PREDEFINED_SCENARIO scenario);
   virtual ~SatHelper () {}
 
   /**
@@ -95,8 +98,21 @@ public:
    */
   NodeContainer  GetGwUsers();
 
+  /**
+   * Enables creation traces to be written in given file
+   * /param filename  name to the file for trace writing
+   */
+  void EnableCreationTraces(std::string filename);
+
 private:
 
+  /**
+   * Default sink for creation traces
+   * /param stream stream for traces
+   * /param context context for traces
+   * /param info creation info
+   */
+  static void DefaultCreationSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
   /**
    * Creates satellite objects according to simple scenario.
    */
@@ -113,9 +129,14 @@ private:
   void CreateFullScenario();
 
   /**
-   * User helper;
+   * User helper
    */
   SatUserHelper m_userHelper;
+
+  /**
+   * Beam helper
+   */
+  SatBeamHelper m_beamHelper;
 
   /**
    * Gateway container
@@ -126,6 +147,11 @@ private:
    * Configuration for satellite network.
    */
   SatConf satConf;
+
+  /**
+   * Trace callback for creation traces
+   */
+  TracedCallback<std::string> m_creation;
 
 };
 

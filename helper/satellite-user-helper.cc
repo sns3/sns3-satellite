@@ -21,14 +21,12 @@
 #include "ns3/abort.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "ns3/config.h"
 #include "ns3/packet.h"
 #include "ns3/names.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/internet-module.h"
 #include "ns3/csma-module.h"
-
 #include "ns3/trace-helper.h"
 #include "satellite-user-helper.h"
 #include "satellite-geo-helper.h"
@@ -36,6 +34,26 @@
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
 
 namespace ns3 {
+
+NS_OBJECT_ENSURE_REGISTERED (SatUserHelper);
+
+TypeId
+SatUserHelper::GetTypeId (void)
+{
+    static TypeId tid = TypeId ("ns3::SatUserHelper")
+      .SetParent<Object> ()
+      .AddConstructor<SatUserHelper> ()
+      .AddTraceSource ("Creation", "Creation traces",
+                       MakeTraceSourceAccessor (&SatUserHelper::m_creation))
+    ;
+    return tid;
+}
+
+TypeId
+SatUserHelper::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
 
 SatUserHelper::SatUserHelper ()
 {
@@ -67,6 +85,8 @@ void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask
 NodeContainer
 SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
 {
+  m_creation("InstallUt");
+
   InternetStackHelper internet;
 
   // We create the channels and net devices
@@ -104,6 +124,8 @@ SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
 NodeContainer
 SatUserHelper::InstallGw (NodeContainer gw, uint16_t userCount )
 {
+  m_creation("InstallGw");
+
   InternetStackHelper internet;
   Ptr<Node> router;
   // We create the channels and net devices
@@ -197,6 +219,11 @@ NodeContainer
 SatUserHelper::GetUtUsers()
 {
   return m_utUsers;
+}
+
+void SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+{
+  TraceConnect("Creation", "SatUserHelper", cb);
 }
 
 } // namespace ns3

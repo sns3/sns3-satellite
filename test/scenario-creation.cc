@@ -85,7 +85,9 @@ void
 ScenarioCreation1::DoRun (void)
 {
   // Create simple scenario
-  SatHelper helper(SatHelper::Simple);
+  SatHelper helper;
+  helper.EnableCreationTraces("simple-scenario-creation.log");
+  helper.CreateScenario(SatHelper::Simple);
 
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper.GetGwUsers().GetN(), 1, "GW User count is not what expected!");
@@ -136,7 +138,9 @@ void
 ScenarioCreation2::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper(SatHelper::Larger);
+  SatHelper helper;
+  helper.EnableCreationTraces("larger-scenario-creation.log");
+  helper.CreateScenario(SatHelper::Larger);
 
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper.GetGwUsers().GetN(), 1, "GW User count is not what expected!");
@@ -187,7 +191,9 @@ void
 ScenarioCreation3::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper(SatHelper::Full);
+  SatHelper helper;
+  helper.EnableCreationTraces("full-scenario-creation.log");
+  helper.CreateScenario(SatHelper::Full);
 
   // check results what can be done at this level. More checking done in module level with traces
   // reference system includes 98 beams and we create three UTs with three users per UT in full scenario
