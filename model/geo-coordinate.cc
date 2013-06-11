@@ -1,9 +1,13 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-#include "geo-coordinate.h"
-#include "ns3/fatal-error.h"
-#include "ns3/log.h"
+
 #include <cmath>
 #include <sstream>
+
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
+
+#include "geo-coordinate.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("geo-coordinate");
 

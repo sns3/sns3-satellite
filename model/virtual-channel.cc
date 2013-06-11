@@ -17,12 +17,15 @@
  *
  * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
  */
-#include "virtual-channel.h"
-#include "satellite-net-device.h"
+
 #include "ns3/simulator.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/log.h"
+
+#include "virtual-channel.h"
+#include "satellite-net-device.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("VirtualChannel");
 

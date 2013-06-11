@@ -131,6 +131,12 @@ SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->SetChannel (rCh);
   phyRx->SetDevice (dev);
 
+  // Configure the SatPhyRxCarrier instances
+  // Note, that these have to be changed so that they match the real frame configuration.
+  // Now we survive with one SatPhyRxCarrier, because we do not have a NCC scheduler.
+  uint16_t RETURN_CARRIERS(1);
+  phyRx->ConfigurePhyRxCarriers (RETURN_CARRIERS);
+
   Ptr<SatMac> mac = CreateObject<SatMac> ();
 
   // Create and set queues for Mac modules

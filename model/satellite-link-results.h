@@ -22,10 +22,11 @@
 #ifndef SATELLITE_LINK_RESULTS_H
 #define SATELLITE_LINK_RESULTS_H
 
+#include <vector>
+
 #include <ns3/object.h>
 #include <ns3/ptr.h>
 #include <ns3/satellite-look-up-table.h>
-#include <vector>
 
 namespace ns3 {
 

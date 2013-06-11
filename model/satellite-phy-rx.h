@@ -21,16 +21,18 @@
 #ifndef SATELLITE_PHY_RX_H
 #define SATELLITE_PHY_RX_H
 
-#include <ns3/mobility-model.h>
-#include <ns3/packet.h>
-#include <ns3/nstime.h>
-#include <ns3/satellite-net-device.h>
-#include "ns3/satellite-signal-parameters.h"
+#include "ns3/mobility-model.h"
+#include "ns3/packet.h"
+#include "ns3/nstime.h"
+
+#include "satellite-net-device.h"
+#include "satellite-signal-parameters.h"
 
 
 namespace ns3 {
 
 class SatChannel;
+class SatPhyRxCarrier;
 
 /**
  * \ingroup satellite
@@ -44,14 +46,6 @@ class SatPhyRx : public Object
 public:
   SatPhyRx ();
   virtual ~SatPhyRx ();
-
-  /**
-   *  PHY states
-   */
-  enum State
-  {
-    IDLE, RX
-  };
 
   // inherited from Object
   static TypeId GetTypeId (void);
@@ -68,23 +62,10 @@ public:
   Ptr<NetDevice> GetDevice ();
 
   /**
-   * Get the SatPhy pointer
-   * @return a pointer to the SatPhy instance
-   */
-  Ptr<SatPhy> GetPhy ();
-
-  /**
   * Set the SatPhy module
   * @param phy PHY module
   */
-
   void SetPhy (Ptr<SatPhy> phy);
-
-  /**
-   * Start packet reception from the SatChannel
-   * \param rxParams The needed parameters for the received signal
-   */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx
@@ -92,20 +73,26 @@ public:
    */
   void SetBeamId (uint16_t beamId);
 
+  /**
+   * Create a sufficient amount of SatPhyRxCarrier instances; one for
+   * each carrier in either forward or return links.
+   * \param maxRxCarriers Maximum supported SatPhyRxCarrier instances (carriers)
+   */
+  void ConfigurePhyRxCarriers (uint16_t maxRxCarriers);
+
+  /**
+   * Start packet reception from the SatChannel
+   * \param rxParams The needed parameters for the received signal
+   */
+  void StartRx (Ptr<SatSignalParameters> rxParams);
 
 private:
-  void ChangeState (State newState);
-  void EndRxData ();
-  
+
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;
-  Ptr<Packet> m_packet;
 
-  State m_state;
-  Time m_firstRxStart;
-  Time m_firstRxDuration;
-  uint16_t m_beamId;
-  Ptr<SatPhy> m_phy;
+  // A SatPhyRxCarrier object for receiving packets from each carrier
+  std::vector< Ptr<SatPhyRxCarrier> > m_rxCarriers;
 };
 
 

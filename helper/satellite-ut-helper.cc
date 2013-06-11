@@ -129,6 +129,10 @@ SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->SetChannel (fCh);
   phyRx->SetDevice (dev);
 
+  // By default, there is one carrier in the forward link
+  uint16_t FEEDER_CARRIERS(1);
+  phyRx->ConfigurePhyRxCarriers (FEEDER_CARRIERS);
+
   Ptr<SatMac> mac = CreateObject<SatMac> ();
 
   // Create and set queues for Mac modules

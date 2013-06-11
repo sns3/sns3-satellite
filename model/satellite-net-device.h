@@ -21,10 +21,11 @@
 #ifndef SATELLITE_NET_DEVICE_H
 #define SATELLITE_NET_DEVICE_H
 
-#include "ns3/net-device.h"
-#include "ns3/mac48-address.h"
 #include <stdint.h>
 #include <string>
+
+#include "ns3/net-device.h"
+#include "ns3/mac48-address.h"
 #include "ns3/traced-callback.h"
 
 namespace ns3 {

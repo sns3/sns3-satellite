@@ -20,10 +20,11 @@
 #ifndef GEO_COORDINATE_H
 #define GEO_COORDINATE_H
 
+#include <cmath>
+
 #include "ns3/attribute.h"
 #include "ns3/attribute-helper.h"
 #include "ns3/vector.h"
-#include <cmath>
 
 namespace ns3 {
 

@@ -27,10 +27,12 @@
 #include "ns3/uinteger.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
+
 #include "satellite-mac.h"
 #include "satellite-phy.h"
 #include "satellite-net-device.h"
 #include "satellite-channel.h"
+#include "satellite-signal-parameters.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatMac");
 
@@ -69,6 +71,8 @@ MacAddressTag::GetTypeId (void)
 TypeId
 MacAddressTag::GetInstanceTypeId (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return GetTypeId ();
 }
 
@@ -158,8 +162,7 @@ SatMac::GetTypeId (void)
 }
 
 SatMac::SatMac ()
-  :
-    m_txMachineState (READY),
+  : m_txMachineState (READY),
     m_phy(0),
     m_currentPkt (0)
 {
@@ -170,13 +173,13 @@ SatMac::SatMac ()
 
 SatMac::~SatMac ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 }
 
 void
 SatMac::DoDispose ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   m_receiveErrorModel = 0;
   m_currentPkt = 0;
   m_phy = 0;
@@ -193,7 +196,7 @@ bool
 SatMac::TransmitStart (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-  NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
+  NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
 
   //
   // This function is called to start the process of transmitting a packet.
@@ -204,16 +207,22 @@ SatMac::TransmitStart (Ptr<Packet> p)
   //m_txMachineState = BUSY;
   //m_currentPkt = p;
 
-  m_phy->SendPdu(p, Seconds(0));
-
+  /* \todo Now we are using only one carrierId and a static (time slot) duration
+   * for packet transmissions and receptions.
+   * The carrier Id and (time slot) durations for packet transmissions should be coming from:
+   * - TBTP in return link
+   * - GW scheduler in the forward link
+   */
+  uint16_t CARRIER_ID (0);
+  Time DURATION (MicroSeconds(20));
+  m_phy->SendPdu (p, CARRIER_ID, DURATION);
   return true;
 }
 
 void
 SatMac::TransmitReady (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   //
   // This function is called to when we're all done transmitting a packet.
   // We try and pull another packet off of the transmit queue.  If the queue
@@ -241,7 +250,7 @@ SatMac::TransmitReady (void)
 bool
 SatMac::SetPhy (Ptr<SatPhy> phy)
 {
-  NS_LOG_FUNCTION (this << &phy);
+  NS_LOG_FUNCTION (this << phy);
   m_phy = phy;
   return true;
 }
@@ -263,16 +272,16 @@ SatMac::SetQueue (Ptr<Queue> q)
 Ptr<Queue>
 SatMac::GetQueue (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_queue;
 }
 
 void
-SatMac::Receive (Ptr<Packet> packet, uint16_t beamId)
+SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) ) 
+  if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
     {
       // 
       // If we have an error model and it indicates that it is time to lose a
@@ -329,7 +338,7 @@ SatMac::Receive (Ptr<Packet> packet, uint16_t beamId)
 bool
 SatMac::Send ( Ptr<Packet> packet, Address dest )
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << packet << dest);
   NS_LOG_LOGIC ("p=" << packet );
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
@@ -359,6 +368,7 @@ SatMac::Send ( Ptr<Packet> packet, Address dest )
 void
 SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)
 {
+  NS_LOG_FUNCTION (this << &cb);
   m_rxCallback = cb;
 }
 

@@ -18,14 +18,16 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-phy-rx.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-mac.h"
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/double.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/double.h"
+
+#include "satellite-phy.h"
+#include "satellite-phy-rx.h"
+#include "satellite-phy-tx.h"
+#include "satellite-channel.h"
+#include "satellite-mac.h"
+#include "satellite-signal-parameters.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhy");
@@ -58,7 +60,7 @@ SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId, SatPh
 
 SatPhy::~SatPhy ()
 {
-
+  NS_LOG_FUNCTION (this);
 }
 
 void
@@ -88,24 +90,28 @@ SatPhy::DoStart ()
 Ptr<SatPhyTx>
 SatPhy::GetPhyTx ()
 {
+  NS_LOG_FUNCTION (this);
   return m_phyTx;
 }
 
 Ptr<SatPhyRx>
 SatPhy::GetPhyRx ()
 {
+  NS_LOG_FUNCTION (this);
   return m_phyRx;
 }
 
 void
 SatPhy::SetPhyTx (Ptr<SatPhyTx> phyTx)
 {
+  NS_LOG_FUNCTION (this << phyTx);
   m_phyTx = phyTx;
 }
 
 void
 SatPhy::SetPhyRx (Ptr<SatPhyRx> phyRx)
 {
+  NS_LOG_FUNCTION (this << phyRx);
   m_phyRx = phyRx;
 }
 
@@ -133,26 +139,45 @@ SatPhy::GetTxPower () const
 }
 
 void
-SatPhy::SendPdu (Ptr<Packet> p, Time duration )
+SatPhy::SendPdu (Ptr<Packet> p, uint16_t carrierId, Time duration )
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << p << carrierId << duration);
+  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
-  m_phyTx->StartTx (p, duration);
+  // Create a new SatSignalParameters related to this packet transmission
+  Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
+  txParams->m_duration = duration;
+  txParams->m_phyTx = m_phyTx;
+  txParams->m_packet = p;
+  txParams->m_beamId = m_beamId;
+  txParams->m_carrierId = carrierId;
+
+  m_phyTx->StartTx (p, txParams);
+}
+
+void
+SatPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
+{
+  NS_LOG_FUNCTION (this << p << txParams);
+  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
+
+  m_phyTx->StartTx (p, txParams);
 }
 
 void
 SatPhy::SetBeamId (uint16_t beamId)
 {
+  NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;
   m_phyTx->SetBeamId (beamId);
   m_phyRx->SetBeamId (beamId);
 }
 
 void
-SatPhy::Receive (Ptr<Packet> packet)
+SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packet);
-  m_rxCallback( packet, this->m_beamId);
+  NS_LOG_FUNCTION (this << rxParams);
+  m_rxCallback( rxParams->m_packet, rxParams);
 }
 
 

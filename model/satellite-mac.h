@@ -22,6 +22,7 @@
 #define SAT_MAC_H
 
 #include <cstring>
+
 #include "ns3/address.h"
 #include "ns3/ptr.h"
 #include "ns3/node.h"
@@ -30,6 +31,9 @@
 #include "ns3/traced-callback.h"
 #include "ns3/nstime.h"
 #include "ns3/mac48-address.h"
+
+#include "satellite-signal-parameters.h"
+
 
 namespace ns3 {
 
@@ -133,7 +137,7 @@ public:
    * /param beamId the id of the beam where packet is from
    */
 
-  void Receive (Ptr<Packet> p, uint16_t beamId);
+  void Receive (Ptr<Packet> p, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
     * \param packet packet sent from above down to SatMac

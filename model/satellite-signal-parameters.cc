@@ -18,10 +18,11 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/satellite-signal-parameters.h"
-#include "ns3/satellite-phy-tx.h"
-#include <ns3/log.h>
-#include <ns3/ptr.h>
+#include "ns3/log.h"
+#include "ns3/ptr.h"
+
+#include "satellite-signal-parameters.h"
+#include "satellite-phy-tx.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
@@ -35,9 +36,9 @@ SatSignalParameters::SatSignalParameters ()
 
 SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
 {
-  NS_LOG_FUNCTION (this);
   m_packet = p.m_packet->Copy();
   m_beamId = p.m_beamId;
+  m_carrierId = p.m_carrierId;
   m_duration = p.m_duration;
   m_phyTx = p.m_phyTx;
 }

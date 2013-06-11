@@ -127,9 +127,19 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyRx->SetChannel (ur);
   uPhyRx->SetDevice (dev);
 
+  // Configure the SatPhyRxCarrier instances
+  // Note, that these have to be changed so that they match the real frame configuration.
+  // Now we survive with one SatPhyRxCarrier, because we do not have a NCC scheduler.
+  uint16_t RETURN_CARRIERS(1);
+  uPhyRx->ConfigurePhyRxCarriers (RETURN_CARRIERS);
+
   fPhyTx->SetChannel (fr);
   fPhyRx->SetChannel (ff);
   fPhyRx->SetDevice (dev);
+
+  // By default, there is one carrier in the forward link
+  uint16_t FORWARD_CARRIERS(1);
+  fPhyRx->ConfigurePhyRxCarriers (FORWARD_CARRIERS);
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

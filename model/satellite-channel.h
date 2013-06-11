@@ -22,11 +22,12 @@
 #ifndef SATELLITE_CHANNEL_H
 #define SATELLITE_CHANNEL_H
 
-#include "ns3/satellite-signal-parameters.h"
-#include <ns3/object.h>
-#include <ns3/nstime.h>
-#include <ns3/channel.h>
+#include "ns3/object.h"
+#include "ns3/nstime.h"
+#include "ns3/channel.h"
 #include "ns3/traced-callback.h"
+
+#include "satellite-signal-parameters.h"
 
 namespace ns3 {
 

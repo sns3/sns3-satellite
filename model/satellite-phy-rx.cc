@@ -18,16 +18,16 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/satellite-net-device.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-phy-rx.h"
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-signal-parameters.h"
-#include <ns3/object-factory.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/antenna-model.h>
+#include "ns3/log.h"
+#include "ns3/antenna-model.h"
+#include "ns3/object-factory.h"
 
+#include "satellite-net-device.h"
+#include "satellite-phy.h"
+#include "satellite-phy-rx.h"
+#include "satellite-phy-rx-carrier.h"
+#include "satellite-channel.h"
+#include "satellite-signal-parameters.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRx");
 
@@ -37,7 +37,6 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRx);
 
 SatPhyRx::SatPhyRx ()
-  : m_state (IDLE)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -56,23 +55,6 @@ void SatPhyRx::DoDispose ()
   Object::DoDispose ();
 } 
 
-std::ostream& operator<< (std::ostream& os, SatPhyRx::State s)
-{
-  switch (s)
-    {
-    case SatPhyRx::IDLE:
-      os << "IDLE";
-      break;
-    case SatPhyRx::RX:
-      os << "RX";
-      break;
-    default:
-      os << "UNKNOWN";
-      break;
-    }
-  return os;
-}
-
 TypeId
 SatPhyRx::GetTypeId (void)
 {
@@ -81,7 +63,6 @@ SatPhyRx::GetTypeId (void)
   ;
   return tid;
 }
-
 
 Ptr<NetDevice>
 SatPhyRx::GetDevice ()
@@ -97,16 +78,18 @@ SatPhyRx::SetDevice (Ptr<NetDevice> d)
   m_device = d;
 }
 
-Ptr<SatPhy>
-SatPhyRx::GetPhy ()
-{
-  return m_phy;
-}
-
 void
 SatPhyRx::SetPhy (Ptr<SatPhy> phy)
 {
-  m_phy = phy;
+  NS_LOG_FUNCTION (this << phy);
+  NS_ASSERT (!m_rxCarriers.empty ());
+
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
+      it != m_rxCarriers.end();
+      ++it)
+    {
+      (*it)->SetPhy (phy);
+    }
 }
 
 Ptr<MobilityModel>
@@ -134,69 +117,42 @@ SatPhyRx::SetChannel (Ptr<SatChannel> c)
 
 
 void
-SatPhyRx::ChangeState (State newState)
+SatPhyRx::ConfigurePhyRxCarriers (uint16_t maxRxCarriers)
 {
-  NS_LOG_LOGIC (this << " state: " << m_state << " -> " << newState);
-  m_state = newState;
+    NS_LOG_FUNCTION (this << maxRxCarriers);
+    NS_ASSERT (maxRxCarriers > 0);
+    NS_ASSERT (m_rxCarriers.empty());
+
+    for ( uint16_t i = 0; i < maxRxCarriers; ++i )
+      {
+        NS_LOG_LOGIC(this << " Create carrier: " << i);
+        Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i);
+        m_rxCarriers.push_back (rxc);
+      }
 }
 
+void
+SatPhyRx::SetBeamId (uint16_t beamId)
+{
+    NS_LOG_FUNCTION (this << beamId);
+    NS_ASSERT (beamId >= 0);
+    NS_ASSERT (!m_rxCarriers.empty());
+
+    for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin(); it != m_rxCarriers.end(); ++it)
+      {
+        (*it)->SetBeamId (beamId);
+      }
+}
 
 void
 SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << rxParams);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+    NS_LOG_FUNCTION (this << rxParams);
 
-  switch (m_state)
-    {
-      case IDLE:
-      case RX:
-        {
-          // Check whether the packet is sent to our beam. In addition we should check
-          // that whether the packet was intended for this specific receiver.
-          if (rxParams->m_beamId == m_beamId)
-            {
-              NS_ASSERT (m_state == IDLE);
-              // first transmission, i.e., we're IDLE and we
-              // start RX
-              m_firstRxStart = Simulator::Now ();
-              m_firstRxDuration = rxParams->m_duration;
+    uint16_t cId = rxParams->m_carrierId;
+    NS_ASSERT (cId < m_rxCarriers.size());
 
-              m_packet = rxParams->m_packet->Copy();
-
-              NS_LOG_LOGIC (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
-              Simulator::Schedule (rxParams->m_duration, &SatPhyRx::EndRxData, this);
-
-              ChangeState (RX);
-            }
-        }
-        break;
-        
-        default:
-          NS_FATAL_ERROR ("unknown state");
-          break;
-      }
-
-}
-
-void
-SatPhyRx::EndRxData ()
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC (this << " state: " << m_state);
-
-  NS_ASSERT (m_state == RX);
-  ChangeState (IDLE);
-  
-  // Send packet upwards
-  m_phy->Receive ( m_packet );
-}
-
-
-void 
-SatPhyRx::SetBeamId (uint16_t beamId)
-{
-  m_beamId = beamId;
+    m_rxCarriers[cId]->StartRx (rxParams);
 }
 
 

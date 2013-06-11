@@ -18,10 +18,6 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/satellite-net-device.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-mac.h"
-#include "ns3/satellite-channel.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include "ns3/log.h"
@@ -29,9 +25,15 @@
 #include "ns3/error-model.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/ipv4-header.h"
-#include <ns3/ipv4-l3-protocol.h>
-#include <ns3/channel.h>
+#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/channel.h"
 #include "ns3/virtual-channel.h"
+
+#include "satellite-net-device.h"
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-channel.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 

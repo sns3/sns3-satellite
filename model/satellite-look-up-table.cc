@@ -19,9 +19,10 @@
  *
  */
 
+#include "ns3/log.h"
+#include "ns3/fatal-error.h"
+
 #include "satellite-look-up-table.h"
-#include <ns3/log.h>
-#include <ns3/fatal-error.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatLookUpTable");
 
@@ -124,8 +125,7 @@ SatLookUpTable::GetBler (double sinrDb) const
 
 
 double
-SatLookUpTable::Interpolate (double x, double x0, double x1, double y0,
-                             double y1)
+SatLookUpTable::Interpolate (double x, double x0, double x1, double y0, double y1)
 {
   NS_LOG_FUNCTION (x << x0 << x1 << y0 << y1);
 
@@ -140,6 +140,8 @@ SatLookUpTable::Interpolate (double x, double x0, double x1, double y0,
 void
 SatLookUpTable::Load (std::string linkResultPath)
 {
+  NS_LOG_FUNCTION (this << linkResultPath);
+
   // READ FROM THE SPECIFIED INPUT FILE
 
   m_ifs = new std::ifstream (linkResultPath.c_str (), std::ifstream::in);

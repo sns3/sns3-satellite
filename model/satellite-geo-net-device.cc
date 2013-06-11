@@ -18,12 +18,6 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "satellite-geo-net-device.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-phy-rx.h"
-#include "ns3/satellite-mac.h"
-#include "ns3/satellite-channel.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include "ns3/log.h"
@@ -31,9 +25,17 @@
 #include "ns3/error-model.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/ipv4-header.h"
-#include <ns3/ipv4-l3-protocol.h>
-#include <ns3/channel.h>
+#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/channel.h"
 #include "ns3/uinteger.h"
+
+#include "satellite-geo-net-device.h"
+#include "satellite-phy.h"
+#include "satellite-phy-tx.h"
+#include "satellite-phy-rx.h"
+#include "satellite-mac.h"
+#include "satellite-channel.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoNetDevice");
 
@@ -68,17 +70,19 @@ SatGeoNetDevice::SatGeoNetDevice ()
 }
 
 void
-SatGeoNetDevice::ReceiveUser (Ptr<Packet> packet, uint16_t beamId)
+SatGeoNetDevice::ReceiveUser (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packet);
-  m_feederPhy[beamId]->SendPdu(packet, Seconds(0));
+  NS_LOG_FUNCTION (this << packet << rxParams);
+  NS_LOG_LOGIC (this << " receiving a packet at the satellite from user link");
+  m_feederPhy[rxParams->m_beamId]->SendPdu (packet, rxParams);
 }
 
 void
-SatGeoNetDevice::ReceiveFeeder (Ptr<Packet> packet, uint16_t beamId)
+SatGeoNetDevice::ReceiveFeeder (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packet);
-  m_userPhy[beamId]->SendPdu(packet, Seconds(0));
+  NS_LOG_FUNCTION (this << packet << rxParams);
+  NS_LOG_LOGIC (this << " receiving a packet at the satellite from feeder link");
+  m_userPhy[rxParams->m_beamId]->SendPdu (packet, rxParams);
 }
 
 void
@@ -254,21 +258,20 @@ Ptr<Channel>
 SatGeoNetDevice::GetChannel (void) const
 {
   NS_LOG_FUNCTION (this);
-
   return NULL;
 }
 
 void
 SatGeoNetDevice::AddUserPhy (Ptr<SatPhy> phy, uint16_t beamId)
 {
-  NS_LOG_FUNCTION (this << phy);
+  NS_LOG_FUNCTION (this << phy << beamId);
   m_userPhy.insert(std::pair<uint16_t, Ptr<SatPhy> >(beamId, phy));
 }
 
 void
 SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint16_t beamId)
 {
-  NS_LOG_FUNCTION (this << phy);
+  NS_LOG_FUNCTION (this << phy << beamId);
   m_feederPhy.insert(std::pair<uint16_t, Ptr<SatPhy> >(beamId, phy));
 }
 

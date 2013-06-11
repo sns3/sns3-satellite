@@ -22,9 +22,9 @@
 #ifndef VIRTUAL_CHANNEL_H
 #define VIRTUAL_CHANNEL_H
 
-#include <ns3/object.h>
-#include <ns3/nstime.h>
-#include <ns3/channel.h>
+#include "ns3/object.h"
+#include "ns3/nstime.h"
+#include "ns3/channel.h"
 
 namespace ns3 {
 

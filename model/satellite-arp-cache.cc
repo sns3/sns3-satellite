@@ -18,9 +18,11 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "satellite-arp-cache.h"
 #include "ns3/log.h"
 #include "ns3/assert.h"
+
+#include "satellite-arp-cache.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatArpCache");
 
@@ -52,7 +54,7 @@ SatArpCache::~SatArpCache ()
 ArpCache::Entry *
 SatArpCache::Add (Ipv4Address to, Address macAddress)
 {
-  NS_LOG_FUNCTION (this << to);
+  NS_LOG_FUNCTION (this << to << macAddress);
 
   // Add a new entry
   ArpCache::Entry *entry = ArpCache::Add (to);

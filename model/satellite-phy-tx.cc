@@ -18,16 +18,19 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-signal-parameters.h"
-#include "ns3/satellite-channel.h"
-#include <ns3/object-factory.h>
-#include <ns3/log.h>
 #include <cmath>
-#include <ns3/simulator.h>
-#include <ns3/boolean.h>
-#include <ns3/double.h>
+
+#include "ns3/simulator.h"
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/object-factory.h"
+#include "ns3/log.h"
+
+#include "satellite-phy.h"
+#include "satellite-phy-tx.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-channel.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyTx");
 
@@ -97,12 +100,14 @@ SatPhyTx::GetDevice ()
 Ptr<SatPhy>
 SatPhyTx::GetPhy ()
 {
+  NS_LOG_FUNCTION (this);
   return m_phy;
 }
 
 void
 SatPhyTx::SetPhy (Ptr<SatPhy> phy)
 {
+  NS_LOG_FUNCTION (this << phy);
   m_phy = phy;
 }
 
@@ -139,15 +144,16 @@ SatPhyTx::GetChannel ()
 void
 SatPhyTx::ChangeState (State newState)
 {
+  NS_LOG_FUNCTION (this << newState);
   NS_LOG_LOGIC (this << " state: " << m_state << " -> " << newState);
   m_state = newState;
 }
 
 
 void
-SatPhyTx::StartTx (Ptr<Packet> p, Time duration)
+SatPhyTx::StartTx (Ptr<Packet> p, Ptr<SatSignalParameters> txParams)
 {
-  NS_LOG_FUNCTION (this << p);
+  NS_LOG_FUNCTION (this << p << txParams);
   NS_LOG_LOGIC (this << " state: " << m_state);
   
   switch (m_state)
@@ -158,18 +164,10 @@ SatPhyTx::StartTx (Ptr<Packet> p, Time duration)
       
     case IDLE:
     {
-
-      // we need to convey some PHY meta information to the receiver
-      // to be used for simulation purposes (e.g., the BeamId).
       NS_ASSERT (m_channel);
       ChangeState (TX);
-      Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
-      txParams->m_duration = duration;
-      txParams->m_phyTx = this;
-      txParams->m_packet = p;
-      txParams->m_beamId = m_beamId;
       m_channel->StartTx (txParams);
-      Simulator::Schedule (duration, &SatPhyTx::EndTx, this);
+      Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
     }
     break;
     
@@ -184,7 +182,6 @@ SatPhyTx::EndTx ()
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC (this << " state: " << m_state);
-
   NS_ASSERT (m_state == TX);
 
   ChangeState (IDLE);
@@ -194,6 +191,7 @@ SatPhyTx::EndTx ()
 void 
 SatPhyTx::SetBeamId (uint16_t beamId)
 {
+  NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;
 }
 

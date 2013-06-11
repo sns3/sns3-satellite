@@ -18,17 +18,20 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-phy-rx.h"
-#include "ns3/satellite-phy-tx.h"
-#include <ns3/object.h>
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-#include <ns3/packet.h>
-#include <ns3/net-device.h>
-#include <ns3/node.h>
-#include <ns3/propagation-delay-model.h>
+
 #include <algorithm>
+
+#include "ns3/object.h"
+#include "ns3/simulator.h"
+#include "ns3/log.h"
+#include "ns3/packet.h"
+#include "ns3/net-device.h"
+#include "ns3/node.h"
+#include "ns3/propagation-delay-model.h"
+
+#include "satellite-channel.h"
+#include "satellite-phy-rx.h"
+#include "satellite-phy-tx.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
@@ -59,7 +62,6 @@ SatChannel::DoDispose ()
 TypeId
 SatChannel::GetTypeId (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
   static TypeId tid = TypeId ("ns3::SatChannel")
     .SetParent<Channel> ()
     .AddConstructor<SatChannel> ()
@@ -93,7 +95,7 @@ SatChannel::RemoveRx (Ptr<SatPhyRx> phyRx)
 void
 SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
 {
-  NS_LOG_FUNCTION (this << txParams->m_duration << txParams->m_phyTx);
+  NS_LOG_FUNCTION (this << txParams);
   NS_ASSERT_MSG (txParams->m_phyTx, "NULL phyTx");
 
   Ptr<MobilityModel> senderMobility = txParams->m_phyTx->GetMobility ();
@@ -102,7 +104,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
        rxPhyIterator != m_phyList.end ();
        ++rxPhyIterator)
     {
-      Time delay = MicroSeconds (0);
+      Time delay = Seconds (0);
 
       Ptr<MobilityModel> receiverMobility = (*rxPhyIterator)->GetMobility ();
       NS_LOG_LOGIC ("copying signal parameters " << txParams);
@@ -132,7 +134,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
 void
 SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
-  NS_LOG_FUNCTION (this << rxParams);
+  NS_LOG_FUNCTION (this);
 
   /*
    * Here we should calculate the received signal strength for this specific

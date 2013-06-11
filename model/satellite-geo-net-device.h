@@ -21,12 +21,15 @@
 #ifndef SATELLITE_GEO_NET_DEVICE_H
 #define SATELLITE_GEO_NET_DEVICE_H
 
-#include "ns3/net-device.h"
-#include "ns3/mac48-address.h"
+#include <map>
 #include <stdint.h>
 #include <string>
-#include <map>
+
+#include "ns3/net-device.h"
+#include "ns3/mac48-address.h"
 #include "ns3/traced-callback.h"
+
+#include "satellite-signal-parameters.h"
 
 namespace ns3 {
 
@@ -54,16 +57,16 @@ public:
   /*
    * Receive the packet from the lower layers
    * \param packet Pointer to the packet to be received.
-   * \param beamId the id of the beam where packet is from
+   * \param rxParams Packet transmission parameters
    */
-  void ReceiveUser (Ptr<Packet> packet, uint16_t beamId);
+  void ReceiveUser (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams);
 
   /*
    * Receive the packet from the lower layers
    * \param packet Pointer to the packet to be received.
    * \param beamId the id of the beam where packet is from
    */
-  void ReceiveFeeder (Ptr<Packet> packet, uint16_t beamId);
+  void ReceiveFeeder (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams);
 
   /*
    * Add the User Phy object for the beam

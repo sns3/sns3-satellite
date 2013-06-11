@@ -18,95 +18,78 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_PHY_TX_H
-#define SATELLITE_PHY_TX_H
 
-#include <map>
+#ifndef SATELLITE_PHY_RX_CARRIER_H
+#define SATELLITE_PHY_RX_CARRIER_H
 
-#include "ns3/mobility-model.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
-#include "ns3/satellite-net-device.h"
-#include "ns3/mac48-address.h"
+#include "ns3/object.h"
 
+#include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
-
 namespace ns3 {
-
-class SatChannel;
 
 /**
  * \ingroup satellite
  *
- * The SatellitePhyTx models the physical layer transmitter of satellite system
+ * The SatPhyRxCarrier models the physical layer receiver of satellite system. There
+ * are one SatPhyRxCarrier receiver for each carrier in both forward and return links.
  *
  */
-class SatPhyTx : public Object
-{
 
+class SatPhyRxCarrier : public Object
+{
 public:
-  SatPhyTx ();
-  virtual ~SatPhyTx ();
+  SatPhyRxCarrier (uint16_t carrierId);
+  virtual ~SatPhyRxCarrier ();
 
   /**
    *  PHY states
    */
   enum State
   {
-    IDLE, TX
+    IDLE, RX
   };
 
   // inherited from Object
   static TypeId GetTypeId (void);
+
   virtual void DoDispose ();
-
-  void SetChannel (Ptr<SatChannel> c);
-  Ptr<SatChannel> GetChannel ();
-
-  void SetMobility (Ptr<MobilityModel> m);
-  Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice ();
-  
-  /**
-   * Get the SatPhy pointer
-   * @return a pointer to the SatPhy instance
-   */
-  Ptr<SatPhy> GetPhy ();
 
   /**
   * Set the SatPhy module
   * @param phy PHY module
   */
+
   void SetPhy (Ptr<SatPhy> phy);
 
+
   /**
-  * Start packet transmission to the channel.
-  * \param p Packet to be transmitted
-  * \param txParams Transmission parameters for a packet
-  */
-  void StartTx (Ptr<Packet> p, Ptr<SatSignalParameters> txParams);
-  
-  /** 
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
   void SetBeamId (uint16_t beamId);
 
+  /**
+   * Start packet reception from the SatChannel
+   * \param rxParams The needed parameters for the received signal
+   */
+  void StartRx (Ptr<SatSignalParameters> rxParams);
+
+
 private:
   void ChangeState (State newState);
-  void EndTx ();
+  void EndRxData ();
 
-  Ptr<MobilityModel> m_mobility;
-  Ptr<SatNetDevice> m_device;
-  Ptr<SatChannel> m_channel;
+  Ptr<SatPhy> m_phy;
 
   State m_state;
+  Ptr<SatSignalParameters> m_rxParams;
   uint16_t m_beamId;
-  Ptr<SatPhy> m_phy;
-};
+  uint16_t m_carrierId;
 
+};
 
 }
 
-#endif /* SATELLITE_PHY_TX_H */
+#endif /* SATELLITE_PHY_RX_CARRIER_H */

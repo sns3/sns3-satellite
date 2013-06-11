@@ -21,11 +21,12 @@
 #ifndef SATELLITE_PHY_H
 #define SATELLITE_PHY_H
 
-#include <ns3/ptr.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/ptr.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
+#include "satellite-signal-parameters.h"
 
 namespace ns3 {
 
@@ -45,9 +46,9 @@ public:
 
   /**
    * \param packet the packet received
-   * \param beamId the id of the beam where packet is from
+   * \param  the id of the beam where packet is from
    */
-  typedef Callback<void,Ptr<Packet>, uint16_t> ReceiveCallback;
+  typedef Callback<void, Ptr<Packet>, Ptr<SatSignalParameters> > ReceiveCallback;
 
   /**
    * Default constructor
@@ -106,17 +107,19 @@ public:
   double GetTxPower () const;
 
   /**
-   * Send Pdu to the PHY tx module
+   * Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
    * \param p packet to be sent
+   * \param carrierId Carrier id for the packet transmission
    * \param duration the packet transmission duration (from MAC layer)
    */
-  virtual void SendPdu (Ptr<Packet> p, Time duration);
+  virtual void SendPdu (Ptr<Packet> p, uint16_t carrierId, Time duration);
 
   /**
-   * Receive PHY PDU
-   * \param p Packet to be received
+   * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+   * \param p packet to be sent
+   * \param rxParams Transmission parameters
    */
-  void ReceivePdu (Ptr<Packet> p);
+  virtual void SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> rxParams);
 
   /**
    * Set the beamId this PHY is connected with
@@ -124,14 +127,13 @@ public:
    * \param beamId Satellite beam id
    */
   void SetBeamId (uint16_t beamId);
-  
 
   /**
    * Receives packets from lower layer (phyRx)
    *
-   * @param packet Pointer to received packet
+   * @param rxParams Packet reception parameters
    */
-  void Receive (Ptr<Packet> packet);
+  void Receive (Ptr<SatSignalParameters> rxParams);
 
 private:
 
