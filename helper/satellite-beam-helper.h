@@ -30,7 +30,6 @@
 #include "ns3/deprecated.h"
 #include "ns3/trace-helper.h"
 #include "ns3/ipv4-address-helper.h"
-#include "ns3/satellite-arp-cache.h"
 
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
@@ -113,8 +112,6 @@ public:
    */
   NodeContainer GetGwNodes();
 
-  void SetArpCacheForGws();
-
   /**
    * Enables creation traces to be written in given file
    * /param stream  stream for creation trace outputs
@@ -129,7 +126,6 @@ private:
     SatGwHelper       m_gwHelper;
     SatUtHelper       m_utHelper;
     Ipv4AddressHelper m_ipv4Helper;
-    Ptr<SatArpCache>  m_gwArpCache;
     NodeContainer     m_gwNodeList;
     Ptr<Node> m_geoNode;
     std::set<uint16_t> m_beam;

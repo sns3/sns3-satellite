@@ -66,7 +66,6 @@ SatBeamHelper::GetInstanceTypeId (void) const
 SatBeamHelper::SatBeamHelper ()
 {
   m_channelFactory.SetTypeId ("ns3::SatChannel");
-  m_gwArpCache = CreateObject<SatArpCache>();
   m_geoNode = CreateObject<Node>();
   m_geoHelper.Install(m_geoNode);
 }
@@ -196,7 +195,7 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
   Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign(utNd);
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
-  Ptr<Ipv4> ipv4GW = gwNode->GetObject<Ipv4> ();
+  Ptr<Ipv4L3Protocol> ipv4GW = gwNode->GetObject<Ipv4L3Protocol> ();
   Ptr<Ipv4StaticRouting> srGW = ipv4RoutingHelper.GetStaticRouting (ipv4GW);
 
   // Create an ARP entry of the default GW for the UTs in this beam
@@ -208,18 +207,22 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
 
   uint32_t utAddIndex = 0;
 
-  // Add the ARP entries of all the UTs: MAC address vs. IPv4 address
-  // Note, that we use a "global" ARP in the beginning, which means that
-  // all the GWs hold the ARP information from the whole network, not just from
-  // one individual link.
+  // Add the ARP entries of all the UTs in this beam
+  // - MAC address vs. IPv4 address
+  Ptr<SatArpCache> gwArpCache = CreateObject<SatArpCache> ();
   for (uint32_t i = 0; i < utAddress.GetN (); ++i)
     {
       NS_ASSERT (utAddress.GetN() == utNd.GetN());
       Ptr<NetDevice> nd = utNd.Get (i);
       Ipv4Address ipv4Addr = utAddress.GetAddress (i);
-      m_gwArpCache->Add (ipv4Addr, nd->GetAddress ());
+      gwArpCache->Add (ipv4Addr, nd->GetAddress ());
       NS_LOG_INFO ("SatBeamHelper::Install, GW arp entry:  " << ipv4Addr << " - " << nd->GetAddress ());
     }
+
+  // Set the ARP cache to the proper GW IPv4Interface (the one for satellite
+  // link). ARP cache contains the entries for all UTs within this spot-beam.
+  ipv4GW->GetInterface (gwNd->GetIfIndex ())->SetArpCache (gwArpCache);
+  NS_LOG_INFO ("SatBeamHelper::Install, Add ARP cache to GW: " << gwNode->GetId() );
 
   for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
     {
@@ -256,7 +259,6 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
       utAddIndex++;
     }
 
-  SetArpCacheForGws();
   m_ipv4Helper.NewNetwork();
 
   return gwNode;
@@ -268,28 +270,6 @@ SatBeamHelper::GetGwNodes()
   return m_gwNodeList;
 }
 
-void
-SatBeamHelper::SetArpCacheForGws()
-{
-  for (NodeContainer::Iterator i = m_gwNodeList.Begin (); i != m_gwNodeList.End (); i++)
-    {
-      Ptr<Ipv4L3Protocol> ipv4Gw = (*i)->GetObject<Ipv4L3Protocol> ();
-      uint32_t count = ipv4Gw->GetNInterfaces();
-
-      for (uint32_t j = 1; j < count; j++)
-        {
-          Ptr<NetDevice> device = ipv4Gw->GetNetDevice(j);
-          std::string devName = device->GetInstanceTypeId().GetName();
-
-          // Set ARP only for all satellite networks.
-          if ( devName == "ns3::SatNetDevice" )
-            {
-              NS_LOG_INFO ("SatBeamHelper::SetArpCacheForGws, add the ARP cache to GW " << (*i)->GetId() );
-              ipv4Gw->GetInterface (j)->SetArpCache (m_gwArpCache);
-            }
-        }
-    }
-}
 
 void
 SatBeamHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
