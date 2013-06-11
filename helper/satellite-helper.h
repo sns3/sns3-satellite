@@ -101,23 +101,30 @@ public:
   /**
    * Enables creation traces to be written in given file
    * /param filename  name to the file for trace writing
+   * /param details true means that lower layer details are printed also,
+   *                false means that only creation summary is printed
    */
-  void EnableCreationTraces(std::string filename);
+  void EnableCreationTraces(std::string filename, bool details);
 
 private:
 
   /**
-   * Default sink for creation traces
+   * Sink for creation details traces
    * /param stream stream for traces
    * /param context context for traces
    * /param info creation info
    */
-  static void DefaultCreationSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
+  static void CreationDetailsSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
+  /**
+     * Sink for creation summary traces
+     * /param stream stream for traces
+     * /param info creation info
+     */
+  static void CreationSummarySink (Ptr<OutputStreamWrapper> stream, std::string info);
   /**
    * Creates satellite objects according to simple scenario.
    */
   void CreateSimpleScenario();
-
   /**
    * Creates satellite objects according to larger scenario.
    */
@@ -127,6 +134,13 @@ private:
    * Creates satellite objects according to full scenario.
    */
   void CreateFullScenario();
+
+  /**
+   * Creates trace summary starting with give title.
+   * /param title title for summary
+   * /returns std::string as summary
+   */
+  std::string CreateCreationSummary(std::string title);
 
   /**
    * User helper
@@ -149,10 +163,14 @@ private:
   SatConf m_satConf;
 
   /**
-   * Trace callback for creation traces
+   * Trace callback for creation traces (details)
    */
   TracedCallback<std::string> m_creation;
 
+  /**
+   * Trace callback for creation traces (summary)
+   */
+  TracedCallback<std::string> m_creationSummary;
 };
 
 } // namespace ns3

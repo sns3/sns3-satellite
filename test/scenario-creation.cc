@@ -86,7 +86,7 @@ ScenarioCreation1::DoRun (void)
 {
   // Create simple scenario
   SatHelper helper;
-  helper.EnableCreationTraces("simple-scenario-creation.log");
+  helper.EnableCreationTraces("simple-scenario-creation.log", false);
   helper.CreateScenario(SatHelper::Simple);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -139,7 +139,7 @@ ScenarioCreation2::DoRun (void)
 {
   // Create larger scenario
   SatHelper helper;
-  helper.EnableCreationTraces("larger-scenario-creation.log");
+  helper.EnableCreationTraces("larger-scenario-creation.log", false);
   helper.CreateScenario(SatHelper::Larger);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -192,7 +192,7 @@ ScenarioCreation3::DoRun (void)
 {
   // Create larger scenario
   SatHelper helper;
-  helper.EnableCreationTraces("full-scenario-creation.log");
+  helper.EnableCreationTraces("full-scenario-creation.log", false );
   helper.CreateScenario(SatHelper::Full);
 
   // check results what can be done at this level. More checking done in module level with traces

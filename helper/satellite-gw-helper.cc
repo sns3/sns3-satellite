@@ -117,8 +117,6 @@ SatGwHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr
 Ptr<NetDevice>
 SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
-  m_creation("Install");
-
   NetDeviceContainer container;
 
   // Create SatNetDevice

@@ -85,8 +85,6 @@ void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask
 NodeContainer
 SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
 {
-  m_creation("InstallUt");
-
   InternetStackHelper internet;
 
   // We create the channels and net devices
@@ -124,8 +122,6 @@ SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
 NodeContainer
 SatUserHelper::InstallGw (NodeContainer gw, uint16_t userCount )
 {
-  m_creation("InstallGw");
-
   InternetStackHelper internet;
   Ptr<Node> router;
   // We create the channels and net devices
@@ -219,6 +215,18 @@ NodeContainer
 SatUserHelper::GetUtUsers()
 {
   return m_utUsers;
+}
+
+uint32_t
+SatUserHelper::GetGwUserN()
+{
+  return m_gwUsers.GetN();
+}
+
+uint32_t
+SatUserHelper::GetUtUserN()
+{
+  return m_utUsers.GetN();
 }
 
 void SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)

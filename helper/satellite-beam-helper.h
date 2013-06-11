@@ -49,6 +49,7 @@ class SatBeamHelper : public Object
 {
 public:
   typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> > SatLink;
+  typedef std::pair<uint16_t, uint16_t > BeamFreqs;
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -119,6 +120,11 @@ public:
    */
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
+  /**
+   * /returns info of created beams as std::string.
+   */
+  std::string GetBeamInfo();
+
 private:
 
     ObjectFactory     m_channelFactory;
@@ -127,17 +133,24 @@ private:
     SatUtHelper       m_utHelper;
     Ipv4AddressHelper m_ipv4Helper;
     NodeContainer     m_gwNodeList;
-    Ptr<Node> m_geoNode;
-    std::set<uint16_t> m_beam;
-    std::set<std::pair<uint16_t, uint16_t> > m_gwLink;
-    std::map<uint16_t, Ptr<Node> > m_gwNode;
-    std::map<uint16_t, SatLink > m_ulChannels;  //first forward and second return
-    std::map<uint16_t, SatLink > m_flChannels;  //first forward and second return
+    Ptr<Node>         m_geoNode;
+    std::set<std::pair<uint16_t, uint16_t> >  m_beam;        // first beam ID, second GW ID
+    std::set<std::pair<uint16_t, uint16_t> >  m_gwLink;      // first GW ID, second feeder link frequency id
+    std::map<uint16_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node Ptr
+    std::map<uint16_t, SatLink >              m_ulChannels;  // first forward, second return
+    std::map<uint16_t, SatLink >              m_flChannels;  // first forward, second return
+    std::map<uint16_t, BeamFreqs >            m_beamLink;    // first beam ID, second pair (first user, second feeder)
 
     /**
      * Trace callback for creation traces
      */
     TracedCallback<std::string> m_creation;
+
+    /**
+     * Creates info of the beama.
+     * /returns info for beams as std::string.
+     */
+    std::string CreateBeamInfo();
 };
 
 } // namespace ns3

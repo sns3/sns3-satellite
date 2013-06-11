@@ -45,6 +45,9 @@ SatHelper::GetTypeId (void)
       .AddConstructor<SatHelper> ()
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatHelper::m_creation))
+      .AddTraceSource ("CreationSummary", "Creation traces",
+                       MakeTraceSourceAccessor (&SatHelper::m_creationSummary))
+
     ;
     return tid;
 }
@@ -81,7 +84,7 @@ void SatHelper::CreateScenario(PREDEFINED_SCENARIO scenario)
 
 }
 
-void SatHelper::EnableCreationTraces(std::string filename)
+void SatHelper::EnableCreationTraces(std::string filename, bool details)
 {
   AsciiTraceHelper asciiTraceHelper;
   std::string outputFile = "creation.log";
@@ -92,12 +95,18 @@ void SatHelper::EnableCreationTraces(std::string filename)
     }
 
   Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream (outputFile);
-  CallbackBase creationCb = MakeBoundCallback (&SatHelper::DefaultCreationSink, stream);
 
-  TraceConnect("Creation", "SatHelper", creationCb);
+  CallbackBase creationSummaryCb = MakeBoundCallback (&SatHelper::CreationSummarySink, stream);
+  TraceConnectWithoutContext("CreationSummary", creationSummaryCb);
 
-  m_userHelper.EnableCreationTraces(stream, creationCb);
-  m_beamHelper.EnableCreationTraces(stream, creationCb);
+  if ( details)
+    {
+      CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, stream);
+      TraceConnect("Creation", "SatHelper", creationCb);
+
+      m_userHelper.EnableCreationTraces(stream, creationCb);
+      m_beamHelper.EnableCreationTraces(stream, creationCb);
+    }
 }
 
 Ipv4Address
@@ -122,8 +131,6 @@ SatHelper::GetGwUsers()
 void
 SatHelper::CreateSimpleScenario()
 {
-  m_creation("Simple Scenario Creation:");
-
   Ptr<Node> ut = CreateObject<Node> ();
   InternetStackHelper internet;
   internet.Install(ut);
@@ -141,13 +148,13 @@ SatHelper::CreateSimpleScenario()
   m_beamHelper.Install(ut, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
   m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
+
+  m_creationSummary(CreateCreationSummary("*** Simple Scenario Creation Summary ***"));
 }
 
 void
 SatHelper::CreateLargerScenario()
 {
-  m_creation("Larger Scenario Creation:");
-
   NodeContainer ut1;
   ut1.Create(1);
 
@@ -194,13 +201,13 @@ SatHelper::CreateLargerScenario()
 
   // finally install GWs to satellite network
   m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
+
+  m_creationSummary(CreateCreationSummary("*** Larger Scenario Creation Summary ***"));
 }
 
 void
 SatHelper::CreateFullScenario()
 {
-  m_creation("Full Scenario Creation:");
-
   NodeContainer uts;
   uint32_t utsInBeam = 3; // TODO: add interface for setting this or attribute
   uint32_t utUsers = 3; // TODO: add interface for setting this or attribute
@@ -243,12 +250,30 @@ SatHelper::CreateFullScenario()
 
   // finally install GWs to satellite network
   m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), gwUsers);
+
+  m_creationSummary(CreateCreationSummary("*** Full Scenario Creation Summary ***"));
 }
 
 void
-SatHelper::DefaultCreationSink(Ptr<OutputStreamWrapper> stream, std::string context, std::string info)
+SatHelper::CreationDetailsSink(Ptr<OutputStreamWrapper> stream, std::string context, std::string info)
 {
   *stream->GetStream () << context << ", " << info << std::endl;
+}
+
+void
+SatHelper::CreationSummarySink(Ptr<OutputStreamWrapper> stream, std::string info)
+{
+  *stream->GetStream () << info;
+}
+
+std::string SatHelper::CreateCreationSummary(std::string title)
+{
+  std::ostringstream oss;
+  oss << std::endl << std::endl << title << std::endl << std::endl;
+  oss << "--- User Info ---" << std::endl << std::endl;
+  oss << "Created GW users: " << m_userHelper.GetGwUserN() << ", " << "Created UT users: " << m_userHelper.GetUtUserN() << std::endl << std::endl;
+  oss << m_beamHelper.GetBeamInfo() << std::endl;
+  return oss.str();
 }
 
 } // namespace ns3

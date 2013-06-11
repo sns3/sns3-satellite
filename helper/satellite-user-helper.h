@@ -137,6 +137,16 @@ public:
   NodeContainer GetUtUsers();
 
   /**
+   * returns number of GW users in satellite network.
+   */
+  uint32_t GetGwUserN();
+
+  /**
+   * returns number of UT users in satellite network.
+   */
+  uint32_t GetUtUserN();
+
+  /**
    * Enables creation traces to be written in given file
    * /param stream  stream for creation trace outputs
    * /param cb  callback to connect traces

@@ -90,10 +90,8 @@ void SatBeamHelper::SetBaseAddress ( const Ipv4Address network, const Ipv4Mask m
 Ptr<Node>
 SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16_t ulFreqId, uint16_t flFreqId )
 {
-  m_creation("Install");
-
-  // add beamId to beam set. In case it's there already, assertion failure is caused
-  std::pair<std::set<uint16_t>::iterator, bool> beam = m_beam.insert(beamId);
+  // add beamId and gwId pair to beam set. In case it's there already, assertion failure is caused
+  std::pair<std::set<std::pair<uint16_t,uint16_t> >::iterator, bool> beam = m_beam.insert(std::pair<uint16_t,uint16_t>(beamId, gwId));
   NS_ASSERT(beam.second == true);
 
   // add gwId and flFreqId pair to GW link set. In case it's there already, assertion failure is caused
@@ -121,6 +119,10 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
   std::map<uint16_t, SatLink >::iterator ul_it = m_ulChannels.find(ulFreqId);
   Ptr<SatChannel> ulForwardCh;
   Ptr<SatChannel> ulReturnCh;
+  BeamFreqs freqPair;
+  freqPair.first = ulFreqId;
+  freqPair.second = flFreqId;
+  m_beamLink.insert(std::pair<uint16_t, BeamFreqs >(beamId, freqPair));
 
   if ( ul_it == m_ulChannels.end())
     {
@@ -133,10 +135,10 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
 
       /*
        * Average propagation delay between UT/GW and satellite in seconds
-       * \todo Change the propagation delay to be a parameter.
+       * TODO: Change the propagation delay to be a parameter.
       */
       double pd = 0.13;
-      Ptr<ConstantPropagationDelayModel> pDelay = Create<ConstantPropagationDelayModel> (pd);
+      Ptr<ConstantPropagationDelayModel> pDelay = CreateObject<ConstantPropagationDelayModel> (pd);
       ulForwardCh->SetPropagationDelayModel (pDelay);
       ulReturnCh->SetPropagationDelayModel (pDelay);
 
@@ -165,11 +167,11 @@ SatBeamHelper::Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16
 
       /*
        * Average propagation delay between UT/GW and satellite in seconds
-       * \todo Change the propagation delay to be a parameter.
+       * TODO: Change the propagation delay to be a parameter.
       */
       double pd = 0.13;
 
-      Ptr<ConstantPropagationDelayModel> pDelay = Create<ConstantPropagationDelayModel> (pd);
+      Ptr<ConstantPropagationDelayModel> pDelay = CreateObject<ConstantPropagationDelayModel> (pd);
       flForwardCh->SetPropagationDelayModel (pDelay);
       flReturnCh->SetPropagationDelayModel (pDelay);
 
@@ -278,6 +280,50 @@ SatBeamHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBas
   m_geoHelper.EnableCreationTraces(stream, cb);
   m_gwHelper.EnableCreationTraces(stream, cb);
   m_utHelper.EnableCreationTraces(stream, cb);
+}
+
+std::string
+SatBeamHelper::GetBeamInfo()
+{
+  std::ostringstream oss;
+  oss << "--- Beam Info, "  << "number of created beams: " << m_beam.size() << " ---" << std::endl;
+
+  if ( m_beam.size() > 0 )
+    {
+      oss << CreateBeamInfo();
+    }
+
+  return oss.str();
+}
+
+std::string
+SatBeamHelper::CreateBeamInfo()
+{
+  std::ostringstream oss;
+
+  for (std::set<std::pair<uint16_t, uint16_t> >::iterator i = m_beam.begin(); i != m_beam.end (); i++)
+    {
+      oss << std::endl << "Beam ID: " << (*i).first << " ";
+
+      std::map<uint16_t, BeamFreqs >::iterator freqIds = m_beamLink.find((*i).first);
+
+      if ( freqIds != m_beamLink.end())
+        {
+          oss << "forward link frequency ID: " << (*freqIds).second.first << ", ";
+          oss << "return link frequency ID: " << (*freqIds).second.second;
+        }
+      oss << ", GWs (IDs): ";
+
+      for (std::set<std::pair<uint16_t, uint16_t> >::iterator j = m_beam.begin(); j != m_beam.end (); j++)
+        {
+            if ( (*i).first == (*j).first )
+              {
+                 oss << (*j).second << " ";
+              }
+        }
+    }
+
+  return oss.str();
 }
 
 } // namespace ns3

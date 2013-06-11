@@ -91,7 +91,6 @@ Ptr<NetDevice>
 SatGeoHelper::Install (Ptr<Node> n)
 {
   NS_ASSERT (m_deviceCount == 0);
-  m_creation("Install");
 
   // Create SatGeoNetDevice
   Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice> ();
