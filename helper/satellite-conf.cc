@@ -26,14 +26,10 @@ NS_LOG_COMPONENT_DEFINE ("SatConf");
 
 namespace ns3 {
 
-static const uint32_t beamCount = 98;
-static const uint32_t beamElemCount = 4;
-
 /*
  * Beam id, User frequency id, GW id, Feeder frequency id
  */
-const uint32_t SatConf::m_conf[beamCount+1][beamElemCount] = {
-                                        {0, 0, 0, 0,},
+static const uint32_t default_conf[SatConf::DEFAULT_BEAM_COUNT][SatConf::BEAM_ELEM_COUNT] = {
                                         {1, 1, 4, 1,},
                                         {2, 2, 6, 1,},
                                         {3, 4, 6, 2,},
@@ -135,27 +131,33 @@ const uint32_t SatConf::m_conf[beamCount+1][beamElemCount] = {
 
 
 SatConf::SatConf()
-  {
+  :m_beamCount(DEFAULT_BEAM_COUNT)
+{
+  for (uint32_t i = 0; i < DEFAULT_BEAM_COUNT; i++)
+    {
+      std::vector <uint32_t> beamConf;
 
-  }
+      beamConf.push_back (default_conf[i][BEAM_ID_INDEX]);
+      beamConf.push_back (default_conf[i][U_FREQ_ID_INDEX]);
+      beamConf.push_back (default_conf[i][GW_ID_INDEX]);
+      beamConf.push_back (default_conf[i][F_FREQ_ID_INDEX]);
+
+      m_conf.push_back(beamConf);
+    }
+}
 
 uint32_t SatConf::GetBeamCount() const
 {
-  return beamCount;
+  return m_beamCount;
 }
 
 
 std::vector <uint32_t> SatConf::GetBeamConfiguration (uint32_t beamId) const
-  {
-    NS_ASSERT(beamId != 0);
+{
+    NS_ASSERT((beamId > 0) && (beamId <=  m_beamCount));
 
-    std::vector <uint32_t> beamConf;
-    beamConf.push_back (m_conf[beamId][0]);
-    beamConf.push_back (m_conf[beamId][1]);
-    beamConf.push_back (m_conf[beamId][2]);
-    beamConf.push_back (m_conf[beamId][3]);
-    return beamConf;
-  }
+    return m_conf[beamId - 1];
+}
 
 } // namespace ns3
 

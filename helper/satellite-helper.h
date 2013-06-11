@@ -146,7 +146,7 @@ private:
   /**
    * Configuration for satellite network.
    */
-  SatConf satConf;
+  SatConf m_satConf;
 
   /**
    * Trace callback for creation traces

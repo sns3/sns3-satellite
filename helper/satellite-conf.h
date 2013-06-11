@@ -52,6 +52,28 @@ public:
    */
    std::vector <uint32_t> GetBeamConfiguration (uint32_t beamId) const;
 
+   /**
+    * Definition for beam ID index (column) in m_conf
+    */
+   static const uint32_t BEAM_ID_INDEX = 0;
+
+   /**
+    * Definition for user frequency ID index (column) in m_conf
+    */
+   static const uint32_t U_FREQ_ID_INDEX = 1;
+
+   /**
+    * Definition for GW ID index (column) in m_conf
+    */
+   static const uint32_t GW_ID_INDEX = 2;
+
+   /**
+    * Definition for feeder frequency ID index (column) in m_conf
+    */
+   static const uint32_t F_FREQ_ID_INDEX = 3;
+   static const uint32_t DEFAULT_BEAM_COUNT = 98;
+   static const uint32_t BEAM_ELEM_COUNT = 4;
+
 private:
 
   /*
@@ -61,7 +83,12 @@ private:
    *  3. GW id
    *  4. Feeder frequency id
    */
-   static const uint32_t m_conf[99][4];
+   std::vector <std::vector <uint32_t> > m_conf;
+
+   /**
+    * Beam count.
+    */
+   uint32_t m_beamCount;
 
 };
 
