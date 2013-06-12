@@ -13,3 +13,5 @@ def build(bld):
     obj = bld.create_ns3_program('larger-scenario-p2p', ['satellite', 'netanim', 'flow-monitor'])
     obj.source = 'larger-scenario-p2p.cc'
 
+    obj = bld.create_ns3_program('satellite-link-results-out', ['satellite', 'tools'])
+    obj.source = 'satellite-link-results-out.cc'

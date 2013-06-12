@@ -19,5 +19,263 @@
  *
  */
 
+#include "satellite-link-results.h"
+#include <ns3/log.h>
+#include <ns3/string.h>
+
+NS_LOG_COMPONENT_DEFINE ("SatLinkResults");
+
+namespace ns3 {
 
 
+/*
+ * SATLINKRESULTS PARENT ABSTRACT CLASS
+ */
+
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResults);
+
+
+SatLinkResults::SatLinkResults ()
+  : m_isInitialized (false)
+{
+}
+
+
+TypeId
+SatLinkResults::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResults")
+    .SetParent<Object> ()
+    .AddAttribute ("InputPath",
+                   "The path relative to ns-3 project directory "
+                   "where the link results file can be found",
+                   StringValue ("src/satellite/data/linkresults/"),
+                   MakeStringAccessor (&SatLinkResults::m_inputPath),
+                   MakeStringChecker ())
+  ;
+  return tid;
+}
+
+
+void
+SatLinkResults::Initialize ()
+{
+  NS_LOG_FUNCTION (this);
+  DoInitialize ();
+  m_isInitialized = true;
+}
+
+
+double
+SatLinkResults::GetBler (SatLinkResults::SatModcod_e modcod,
+                         uint16_t burstLength, double sinrDb) const
+{
+  NS_LOG_FUNCTION (this << modcod << burstLength << sinrDb);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  uint8_t i = DoGetTableIndex (modcod, burstLength);
+  return m_table[i]->GetBler (sinrDb);
+}
+
+
+
+/*
+ * SATLINKRESULTSDVBRCS2 CHILD CLASS
+ */
+
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbRcs2);
+
+
+TypeId
+SatLinkResultsDvbRcs2::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbRcs2")
+    .SetParent<SatLinkResults> ()
+  ;
+  return tid;
+}
+
+
+void
+SatLinkResultsDvbRcs2::DoInitialize ()
+{
+
+} // end of void SatLinkResultsDvbRcs2::DoInitialize
+
+
+uint8_t
+SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
+                                        int16_t burstLength) const
+{
+  return 0;
+} // end of uint8_t SatLinkResultsDvbRcs2::DoGetTableIndex
+
+
+
+/*
+ * SATLINKRESULTSDVBS2 CHILD CLASS
+ */
+
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
+
+
+TypeId
+SatLinkResultsDvbS2::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+    .SetParent<SatLinkResults> ()
+  ;
+  return tid;
+}
+
+
+void
+SatLinkResultsDvbS2::DoInitialize ()
+{
+  m_table.resize (24);
+
+  // QPSK
+
+  m_table[0] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
+  m_table[1] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_2_to_3.txt");
+  m_table[2] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_3_to_4.txt");
+  m_table[3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_3_to_5.txt");
+  m_table[4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_4_to_5.txt");
+  m_table[5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_5_to_6.txt");
+  m_table[6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_8_to_9.txt");
+  m_table[7] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_9_to_10.txt");
+
+  // 8PSK
+
+  m_table[8] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_2_to_3.txt");
+  m_table[9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_3_to_4.txt");
+  m_table[10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_3_to_5.txt");
+  m_table[11] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_5_to_6.txt");
+  m_table[12] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_8_to_9.txt");
+  m_table[13] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_9_to_10.txt");
+
+  // 16APSK
+
+  m_table[14] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_2_to_3.txt");
+  m_table[15] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_3_to_4.txt");
+  m_table[16] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_4_to_5.txt");
+  m_table[17] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_5_to_6.txt");
+  m_table[18] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_8_to_9.txt");
+  m_table[19] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_9_to_10.txt");
+
+  // 32APSK
+
+  m_table[20] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_3_to_4.txt");
+  m_table[21] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
+  m_table[22] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
+  m_table[23] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_8_to_9.txt");
+
+} // end of void SatLinkResultsDvbS2::DoInitialize
+
+
+uint8_t
+SatLinkResultsDvbS2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
+                                      uint16_t burstLength) const
+{
+  uint8_t ret = 0;
+  switch (modcod)
+  {
+    // QPSK
+
+    case SAT_MODCOD_QPSK_1_TO_2:
+      ret = 0;
+      break;
+    case SAT_MODCOD_QPSK_2_TO_3:
+      ret = 1;
+      break;
+    case SAT_MODCOD_QPSK_3_TO_4:
+      ret = 2;
+      break;
+    case SAT_MODCOD_QPSK_3_TO_5:
+      ret = 3;
+      break;
+    case SAT_MODCOD_QPSK_4_TO_5:
+      ret = 4;
+      break;
+    case SAT_MODCOD_QPSK_5_TO_6:
+      ret = 5;
+      break;
+    case SAT_MODCOD_QPSK_8_TO_9:
+      ret = 6;
+      break;
+    case SAT_MODCOD_QPSK_9_TO_10:
+      ret = 7;
+      break;
+
+    // 8PSK
+
+    case SAT_MODCOD_8PSK_2_TO_3:
+      ret = 8;
+      break;
+    case SAT_MODCOD_8PSK_3_TO_4:
+      ret = 9;
+      break;
+    case SAT_MODCOD_8PSK_3_TO_5:
+      ret = 10;
+      break;
+    case SAT_MODCOD_8PSK_5_TO_6:
+      ret = 11;
+      break;
+    case SAT_MODCOD_8PSK_8_TO_9:
+      ret = 12;
+      break;
+    case SAT_MODCOD_8PSK_9_TO_10:
+      ret = 13;
+      break;
+
+    // 16APSK
+
+    case SAT_MODCOD_16APSK_2_TO_3:
+      ret = 14;
+      break;
+    case SAT_MODCOD_16APSK_3_TO_4:
+      ret = 15;
+      break;
+    case SAT_MODCOD_16APSK_4_TO_5:
+      ret = 16;
+      break;
+    case SAT_MODCOD_16APSK_5_TO_6:
+      ret = 17;
+      break;
+    case SAT_MODCOD_16APSK_8_TO_9:
+      ret = 18;
+      break;
+    case SAT_MODCOD_16APSK_9_TO_10:
+      ret = 19;
+      break;
+
+    // 32APSK
+
+    case SAT_MODCOD_32APSK_3_TO_4:
+      ret = 19;
+      break;
+    case SAT_MODCOD_32APSK_4_TO_5:
+      ret = 19;
+      break;
+    case SAT_MODCOD_32APSK_5_TO_6:
+      ret = 19;
+      break;
+    case SAT_MODCOD_32APSK_8_TO_9:
+      ret = 19;
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Invalid Modcod for DVB-S2: " << modcod);
+      break;
+  }
+
+  return ret;
+
+} // end of uint8_t SatLinkResultsDvbS2::DoGetTableIndex
+
+
+} // end of namespace ns3
