@@ -28,17 +28,8 @@
  */
 
 #include "ns3/string.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/cbr-application.h"
 #include "ns3/satellite-helper.h"
-#include "ns3/csma-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/test.h"
-#include "ns3/log.h"
 #include "ns3/simulator.h"
 
 using namespace ns3;
@@ -85,13 +76,13 @@ void
 ScenarioCreation1::DoRun (void)
 {
   // Create simple scenario
-  SatHelper helper;
-  helper.EnableCreationTraces("simple-scenario-creation.log", false);
-  helper.CreateScenario(SatHelper::Simple);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->EnableCreationTraces("simple-scenario-creation.log", false);
+  helper->CreateScenario(SatHelper::Simple);
 
   // check results what can be done at this level. More checking done in module level with traces
-  NS_TEST_ASSERT_MSG_EQ (helper.GetGwUsers().GetN(), 1, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper.GetUtUsers().GetN(), 1, "UT User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 1, "UT User count is not what expected!");
 
   Simulator::Destroy();
 }
@@ -138,13 +129,13 @@ void
 ScenarioCreation2::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper;
-  helper.EnableCreationTraces("larger-scenario-creation.log", false);
-  helper.CreateScenario(SatHelper::Larger);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->EnableCreationTraces("larger-scenario-creation.log", false);
+  helper->CreateScenario(SatHelper::Larger);
 
   // check results what can be done at this level. More checking done in module level with traces
-  NS_TEST_ASSERT_MSG_EQ (helper.GetGwUsers().GetN(), 1, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper.GetUtUsers().GetN(), 5, "UT User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
 
   Simulator::Destroy();
 }
@@ -191,15 +182,15 @@ void
 ScenarioCreation3::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper;
-  helper.EnableCreationTraces("full-scenario-creation.log", false );
-  helper.CreateScenario(SatHelper::Full);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->EnableCreationTraces("full-scenario-creation.log", false );
+  helper->CreateScenario(SatHelper::Full);
 
   // check results what can be done at this level. More checking done in module level with traces
   // reference system includes 98 beams and we create three UTs with three users per UT in full scenario
   // and five GW users
-  NS_TEST_ASSERT_MSG_EQ (helper.GetGwUsers().GetN(), 5, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper.GetUtUsers().GetN(), 98*3*3, "UT User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what expected!");
 
   Simulator::Destroy();
 }

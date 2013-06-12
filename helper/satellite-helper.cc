@@ -18,18 +18,16 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "satellite-helper.h"
 #include "ns3/log.h"
 #include "ns3/names.h"
 #include "ns3/string.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/satellite-user-helper.h"
-#include "ns3/satellite-beam-helper.h"
-#include "ns3/satellite-ut-helper.h"
-#include "ns3/core-module.h"
+#include "ns3/type-id.h"
 #include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "satellite-user-helper.h"
+#include "satellite-beam-helper.h"
+#include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -43,9 +41,21 @@ SatHelper::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatHelper")
       .SetParent<Object> ()
       .AddConstructor<SatHelper> ()
+      .AddAttribute ("UtCount", "The count of created UTs in beam (full or user-defined scenario)",
+                     UintegerValue (DEFAULT_UTS_IN_BEAM),
+                     MakeUintegerAccessor (&SatHelper::m_utsInBeam),
+                     MakeUintegerChecker<uint32_t> (MIN_UTS_IN_BEAM))
+      .AddAttribute ("GwUsers", "The number of created GW users (full or user-defined scenario)",
+                     UintegerValue (DEFAULT_GW_USERS),
+                     MakeUintegerAccessor (&SatHelper::m_gwUsers),
+                     MakeUintegerChecker<uint32_t> (MIN_GW_USERS))
+      .AddAttribute ("UtUsers", "The number of created UT users per UT (full or user-defined scenario)",
+                     UintegerValue (DEFAULT_UT_USERS),
+                     MakeUintegerAccessor (&SatHelper::m_utUsers),
+                     MakeUintegerChecker<uint32_t> (MIN_UT_USERS))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatHelper::m_creation))
-      .AddTraceSource ("CreationSummary", "Creation traces",
+      .AddTraceSource ("CreationSummary", "Creation summary traces",
                        MakeTraceSourceAccessor (&SatHelper::m_creationSummary))
 
     ;
@@ -60,6 +70,8 @@ SatHelper::GetInstanceTypeId (void) const
 
 SatHelper::SatHelper ()
 {
+  // uncomment next line, if attributes are needed already in construction phase
+  //ObjectBase::ConstructSelf(AttributeConstructionList ());
 }
 
 void SatHelper::CreateScenario(PREDEFINED_SCENARIO scenario)
@@ -94,18 +106,17 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
       outputFile = filename;
     }
 
-  Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream (outputFile);
+  m_creationTraceStream = asciiTraceHelper.CreateFileStream (outputFile);
 
-  CallbackBase creationSummaryCb = MakeBoundCallback (&SatHelper::CreationSummarySink, stream);
-  TraceConnectWithoutContext("CreationSummary", creationSummaryCb);
+  TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 
-  if ( details)
+  if ( details )
     {
-      CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, stream);
+      CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, m_creationTraceStream);
       TraceConnect("Creation", "SatHelper", creationCb);
 
-      m_userHelper.EnableCreationTraces(stream, creationCb);
-      m_beamHelper.EnableCreationTraces(stream, creationCb);
+      m_userHelper.EnableCreationTraces(m_creationTraceStream, creationCb);
+      m_beamHelper.EnableCreationTraces(m_creationTraceStream, creationCb);
     }
 }
 
@@ -149,7 +160,7 @@ SatHelper::CreateSimpleScenario()
 
   m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
 
-  m_creationSummary(CreateCreationSummary("*** Simple Scenario Creation Summary ***"));
+  m_creationSummary("*** Simple Scenario Creation Summary ***");
 }
 
 void
@@ -191,8 +202,8 @@ SatHelper::CreateLargerScenario()
   std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(3);
   m_beamHelper.Install(beam1Uts, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
-  // install UT3 to beam 11
-  conf = m_satConf.GetBeamConfiguration(11);
+  // install UT3 to beam 12
+  conf = m_satConf.GetBeamConfiguration(12);
   m_beamHelper.Install(uts.Get(1), conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
   // installUT4 to beam 22
@@ -202,18 +213,15 @@ SatHelper::CreateLargerScenario()
   // finally install GWs to satellite network
   m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
 
-  m_creationSummary(CreateCreationSummary("*** Larger Scenario Creation Summary ***"));
+  m_creationSummary("*** Larger Scenario Creation Summary ***");
 }
 
 void
 SatHelper::CreateFullScenario()
 {
   NodeContainer uts;
-  uint32_t utsInBeam = 3; // TODO: add interface for setting this or attribute
-  uint32_t utUsers = 3; // TODO: add interface for setting this or attribute
-  uint32_t gwUsers = 5; // TODO: add interface for setting this or attribute
   uint32_t beamCount =  m_satConf.GetBeamCount();
-  uts.Create(beamCount * utsInBeam);
+  uts.Create(beamCount * m_utsInBeam);
 
   InternetStackHelper internet;
   internet.Install(uts);
@@ -229,7 +237,7 @@ SatHelper::CreateFullScenario()
   m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
   // install user(s) for every UTs
-  m_userHelper.InstallUt(uts, utUsers);
+  m_userHelper.InstallUt(uts, m_utUsers);
 
   // set address base for satellite network
   m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
@@ -239,9 +247,9 @@ SatHelper::CreateFullScenario()
     {
       NodeContainer ut;
 
-      for (uint32_t j= 0; j < utsInBeam; j++)
+      for (uint32_t j= 0; j < m_utsInBeam; j++)
         {
-          ut.Add(uts.Get(i*utsInBeam+j));
+          ut.Add(uts.Get(i * m_utsInBeam + j));
         }
 
       std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(i + 1);
@@ -249,9 +257,9 @@ SatHelper::CreateFullScenario()
     }
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), gwUsers);
+  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), m_gwUsers);
 
-  m_creationSummary(CreateCreationSummary("*** Full Scenario Creation Summary ***"));
+  m_creationSummary("*** Full Scenario Creation Summary ***");
 }
 
 void
@@ -261,18 +269,22 @@ SatHelper::CreationDetailsSink(Ptr<OutputStreamWrapper> stream, std::string cont
 }
 
 void
-SatHelper::CreationSummarySink(Ptr<OutputStreamWrapper> stream, std::string info)
+SatHelper::CreationSummarySink(std::string title)
 {
-  *stream->GetStream () << info;
+  *m_creationTraceStream->GetStream () << CreateCreationSummary(title);
 }
 
-std::string SatHelper::CreateCreationSummary(std::string title)
+std::string
+SatHelper::CreateCreationSummary(std::string title)
 {
   std::ostringstream oss;
+
   oss << std::endl << std::endl << title << std::endl << std::endl;
   oss << "--- User Info ---" << std::endl << std::endl;
-  oss << "Created GW users: " << m_userHelper.GetGwUserN() << ", " << "Created UT users: " << m_userHelper.GetUtUserN() << std::endl << std::endl;
+  oss << "Created GW users: " << m_userHelper.GetGwUserN() << ", ";
+  oss << "Created UT users: " << m_userHelper.GetUtUserN() << std::endl << std::endl;
   oss << m_beamHelper.GetBeamInfo() << std::endl;
+
   return oss.str();
 }
 

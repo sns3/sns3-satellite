@@ -28,18 +28,17 @@
  */
 
 #include "ns3/string.h"
-#include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/cbr-application.h"
-#include "ns3/satellite-helper.h"
-#include "ns3/csma-module.h"
+//#include "ns3/csma-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/test.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "../helper/cbr-helper.h"
+#include "../model/cbr-application.h"
+#include "../helper/satellite-helper.h"
 
 using namespace ns3;
 
@@ -87,25 +86,25 @@ void
 SimpleP2p1::DoRun (void)
 {
   // Create simple scenario
-  SatHelper helper;
-  helper.CreateScenario(SatHelper::Simple);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(SatHelper::Simple);
 
-  NodeContainer utUsers = helper.GetUtUsers();
+  NodeContainer utUsers = helper->GetUtUsers();
 
   // >>> Start of actual test using Simple scenario >>>
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
-  ApplicationContainer GwApps = cbr.Install (helper.GetGwUsers());
+  ApplicationContainer GwApps = cbr.Install (helper->GetGwUsers());
   GwApps.Start (Seconds (1.0));
   GwApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
 
   ApplicationContainer UtApps = sink.Install (utUsers);
   UtApps.Start (Seconds (1.0));
@@ -172,10 +171,10 @@ void
 SimpleP2p2::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper;
-  helper.CreateScenario(SatHelper::Larger);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(SatHelper::Larger);
 
-  NodeContainer utUsers = helper.GetUtUsers();
+  NodeContainer utUsers = helper->GetUtUsers();
 
   // >>> Start of actual test using Larger scenario >>>
 
@@ -186,13 +185,13 @@ SimpleP2p2::DoRun (void)
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
 
   // app to send receiver 1
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
-  ApplicationContainer GwApps = cbr.Install (helper.GetGwUsers());
+  ApplicationContainer GwApps = cbr.Install (helper->GetGwUsers());
 
   // app to send receiver 2
-  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(4)), port))));
-  GwApps.Add(cbr.Install (helper.GetGwUsers()));
+  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(4)), port))));
+  GwApps.Add(cbr.Install (helper->GetGwUsers()));
 
   GwApps.Start (Seconds (1.0));
   GwApps.Stop (Seconds (2.1));
@@ -200,11 +199,11 @@ SimpleP2p2::DoRun (void)
   // Create a packet sinks to receive these packets
 
   // receiver 1
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
   ApplicationContainer UtApps = sink.Install (utUsers.Get(0));
 
   // receiver 2
-  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(4)), port))));
+  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(4)), port))));
   UtApps.Add(sink.Install (utUsers.Get(4)));
 
   UtApps.Start (Seconds (1.0));
@@ -279,11 +278,11 @@ void
 SimpleP2p3::DoRun (void)
 {
   // Create full scenario
-  SatHelper helper;
-  helper.CreateScenario(SatHelper::Full);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(SatHelper::Full);
 
-  NodeContainer utUsers = helper.GetUtUsers();
-  NodeContainer gwUsers = helper.GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers();
+  NodeContainer gwUsers = helper->GetGwUsers();
 
   // >>> Start of actual test using Full scenario >>>
 
@@ -293,10 +292,10 @@ SimpleP2p3::DoRun (void)
   // Create the Cbr applications to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 0.5s)
   Time cbrInterval = Seconds(0.5);
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", TimeValue(cbrInterval));
 
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
 
   // initialized time values for simulation
   uint32_t maxReceivers = utUsers.GetN();
@@ -311,8 +310,8 @@ SimpleP2p3::DoRun (void)
   // Cbr and Sink applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(i)), port))));
-      sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper.GetUserAddress (utUsers.Get(i)), port))));
+      cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port))));
+      sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port))));
 
       GwApps.Add(cbr.Install (gwUsers.Get(4)));
       UtApps.Add(sink.Install (utUsers.Get(i)));
@@ -391,25 +390,25 @@ void
 SimpleP2p4::DoRun (void)
 {
   // Create simple scenario
-  SatHelper helper;
-  helper.CreateScenario(SatHelper::Simple);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(SatHelper::Simple);
 
   // >>> Start of actual test using Simple scenario >>>
 
-  NodeContainer gwUsers = helper.GetGwUsers();
+  NodeContainer gwUsers = helper->GetGwUsers();
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (gwUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
-  ApplicationContainer UtApps = cbr.Install (helper.GetUtUsers());
+  ApplicationContainer UtApps = cbr.Install (helper->GetUtUsers());
   UtApps.Start (Seconds (1.0));
   UtApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (gwUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
 
   ApplicationContainer GwApps = sink.Install (gwUsers);
   GwApps.Start (Seconds (1.0));
@@ -477,13 +476,13 @@ void
 SimpleP2p5::DoRun (void)
 {
   // Create larger scenario
-  SatHelper helper;
-  helper.CreateScenario(SatHelper::Larger);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(SatHelper::Larger);
 
   // >>> Start of actual test using Larger scenario >>>
 
-  NodeContainer gwUsers = helper.GetGwUsers();
-  NodeContainer utUsers = helper.GetUtUsers();
+  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -492,7 +491,7 @@ SimpleP2p5::DoRun (void)
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
 
   // sender 1
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (gwUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
   ApplicationContainer UtApps = cbr.Install (utUsers.Get(0));
 
@@ -503,7 +502,7 @@ SimpleP2p5::DoRun (void)
   UtApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (gwUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
 
   ApplicationContainer GwApps = sink.Install (gwUsers);
   GwApps.Start (Seconds (1.0));
@@ -572,13 +571,13 @@ void
 SimpleP2p6::DoRun (void)
 {
   // Create full scenario
-  SatHelper helper;
-  helper.CreateScenario(SatHelper::Full);
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(SatHelper::Full);
 
   // >>> Start of actual test using Full scenario >>>
 
-  NodeContainer gwUsers = helper.GetGwUsers();
-  NodeContainer utUsers = helper.GetUtUsers();
+  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers();
 
   // >>> Start of actual test using Full scenario >>>
 
@@ -586,12 +585,12 @@ SimpleP2p6::DoRun (void)
   uint16_t port = 9; // Discard port (RFC 863)
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (gwUsers.Get(3)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(3)), port)));
 
   // Create the Cbr applications to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 0.5s)
   Time cbrInterval = Seconds(0.5);
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper.GetUserAddress (gwUsers.Get(3)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(3)), port)));
   cbr.SetAttribute ("Interval", TimeValue(cbrInterval));
 
   // initialized time values for simulation

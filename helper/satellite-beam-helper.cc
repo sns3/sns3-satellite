@@ -309,8 +309,8 @@ SatBeamHelper::CreateBeamInfo()
 
       if ( freqIds != m_beamLink.end())
         {
-          oss << "forward link frequency ID: " << (*freqIds).second.first << ", ";
-          oss << "return link frequency ID: " << (*freqIds).second.second;
+          oss << "user link frequency ID: " << (*freqIds).second.first << ", ";
+          oss << "feeder link frequency ID: " << (*freqIds).second.second;
         }
       oss << ", GWs (IDs): ";
 

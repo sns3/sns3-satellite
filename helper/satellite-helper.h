@@ -20,32 +20,21 @@
 #ifndef __SATELLITE_HELPER_H__
 #define __SATELLITE_HELPER_H__
 
-#include "ns3/satellite.h"
 #include <string>
 
-#include "ns3/object-factory.h"
-#include "ns3/net-device-container.h"
+#include "ns3/object.h"
+#include "ns3/output-stream-wrapper.h"
 #include "ns3/node-container.h"
-#include "ns3/deprecated.h"
 #include "ns3/ipv4-address-helper.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/internet-stack-helper.h"
 #include "ns3/csma-helper.h"
-#include "ns3/satellite-user-helper.h"
-#include "ns3/satellite-beam-helper.h"
-#include "ns3/trace-helper.h"
+#include "satellite-user-helper.h"
+#include "satellite-beam-helper.h"
 #include "satellite-conf.h"
 
 namespace ns3 {
 
-class Queue;
-class NetDevice;
-class Node;
-class Propagation;
-class Ipv4Address;
-
 /**
- * \brief Build a set of SatNetDevice objects
+ * \brief Build a satellite network set with needed objects and configuration
  *
  */
 class SatHelper : public Object
@@ -116,11 +105,10 @@ private:
    */
   static void CreationDetailsSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
   /**
-     * Sink for creation summary traces
-     * /param stream stream for traces
-     * /param info creation info
-     */
-  static void CreationSummarySink (Ptr<OutputStreamWrapper> stream, std::string info);
+   * Sink for creation summary traces
+   * /param title creation summary title
+   */
+  void CreationSummarySink (std::string title);
   /**
    * Creates satellite objects according to simple scenario.
    */
@@ -170,7 +158,58 @@ private:
   /**
    * Trace callback for creation traces (summary)
    */
+
   TracedCallback<std::string> m_creationSummary;
+
+  /**
+   * Stream wrapper used for creation traces
+   */
+  Ptr<OutputStreamWrapper> m_creationTraceStream;
+
+  /**
+   * Number of UTs created per Beam in full or user-defined scenario
+   */
+  uint32_t m_utsInBeam;
+
+  /**
+   * Number of users created in public network (behind GWs) in full or user-defined scenario
+   */
+  uint32_t m_gwUsers;
+
+  /**
+   * Number of users created in end user network (behind every UT) in full or user-defined scenario
+   */
+  uint32_t m_utUsers;
+
+  /**
+   * Default value for variable m_utsInBeam
+   */
+  static const uint32_t DEFAULT_UTS_IN_BEAM = 3;
+
+  /**
+   * Minimum value for variable m_utsInBeam
+   */
+  static const uint32_t MIN_UTS_IN_BEAM = 1;
+
+  /**
+   * Default value for variable m_gwUsers
+   */
+  static const uint32_t DEFAULT_GW_USERS = 5;
+
+  /**
+   * Minimum value for variable m_gwUsers
+   */
+  static const uint32_t MIN_GW_USERS = 1;
+  /**
+   * Default value for variable m_utUsers
+   */
+  static const uint32_t DEFAULT_UT_USERS = 3;
+
+  /**
+   * Minimum value for variable m_utUsers
+   */
+  static const uint32_t MIN_UT_USERS = 1;
+
 };
 
 } // namespace ns3
