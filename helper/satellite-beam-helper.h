@@ -127,13 +127,14 @@ public:
 
 private:
 
-    ObjectFactory     m_channelFactory;
-    SatGeoHelper      m_geoHelper;
-    SatGwHelper       m_gwHelper;
-    SatUtHelper       m_utHelper;
-    Ipv4AddressHelper m_ipv4Helper;
-    NodeContainer     m_gwNodeList;
-    Ptr<Node>         m_geoNode;
+    ObjectFactory         m_channelFactory;
+    Ptr<SatGeoHelper>     m_geoHelper;
+    Ptr<SatGwHelper>      m_gwHelper;
+    Ptr<SatUtHelper>      m_utHelper;
+    Ipv4AddressHelper     m_ipv4Helper;
+    NodeContainer         m_gwNodeList;
+    Ptr<Node>             m_geoNode;
+
     std::set<std::pair<uint16_t, uint16_t> >  m_beam;        // first beam ID, second GW ID
     std::set<std::pair<uint16_t, uint16_t> >  m_gwLink;      // first GW ID, second feeder link frequency id
     std::map<uint16_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node Ptr
