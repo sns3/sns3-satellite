@@ -28,31 +28,26 @@ using namespace ns3;
 
 
 /**
- * Calling this program without arguments will produce no effect. The possible
- * arguments are:
- *  - ``--gnuplot=true``
- *  - ``--testwriter=tests.txt``
+ * This example will produce several Gnuplot files (.plt) as output. These files
+ * can be converted to PNG, for example by this command::
  *
- * For example:
- * \code
- *   ./waf --run="src/satellite/examples/satellite-link-results-out --gnuplot=true"
- * \endcode
+ *   gnuplot s2-32apsk.plt
+ *
+ * which will produce `s2-32apsk.png` file.
  */
 int main (int argc, char *argv[]);
 
 
-class SatLinkResultsOut : public Object
+class SatLinkResultsPlot : public Object
 {
 public:
-  SatLinkResultsOut (int argc, char *argv[]);
+  SatLinkResultsPlot ();
   void Run ();
 
 private:
   Gnuplot2dDataset GetGnuplotDataset (Ptr<SatLookUpTable> table,
                                       std::string title);
-
-  bool m_isGnuplotEnabled;
-  bool m_isTestWriterEnabled;
+  Gnuplot GetGnuplot (std::string outputName, std::string title);
 
   double m_resolutionDb;
   double m_minSinrDb;
@@ -61,14 +56,14 @@ private:
 }; // end of class SatLinkResultsPlot
 
 
-NS_LOG_COMPONENT_DEFINE ("SatLinkResultsOut");
-NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsOut);
+NS_LOG_COMPONENT_DEFINE ("SatLinkResultsPlot");
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsPlot);
 
 
 int
 main (int argc, char *argv[])
 {
-  Ptr<SatLinkResultsOut> stub = CreateObject<SatLinkResultsOut> (argc, argv);
+  Ptr<SatLinkResultsPlot> stub = CreateObject<SatLinkResultsPlot> ();
   Config::RegisterRootNamespaceObject (stub);
   stub->Run ();
 
@@ -76,24 +71,8 @@ main (int argc, char *argv[])
 }
 
 
-SatLinkResultsOut::SatLinkResultsOut (int argc, char *argv[])
+SatLinkResultsPlot::SatLinkResultsPlot ()
 {
-  // DEFAULT VALUES FOR ARGUMENTS
-
-  m_isGnuplotEnabled = false;
-  m_isTestWriterEnabled = false;
-
-  // REPLACING DEFAULT VALUES WITH COMMAND LINE ARGUMENTS
-
-  CommandLine commandLine;
-  commandLine.AddValue<bool> ("gnuplot", "", m_isGnuplotEnabled);
-  commandLine.AddValue<bool> ("testwriter", "", m_isTestWriterEnabled);
-  commandLine.AddValue<double> ("resolution", "", m_resolutionDb);
-  commandLine.AddValue<double> ("resolution", "", m_resolutionDb);
-  commandLine.Parse (argc, argv);
-
-  // LESS IMPORTANT VARIABLE
-
   m_resolutionDb = 0.01;
   m_minSinrDb = 0.0;
   m_maxSinrDb = 20.0;
@@ -102,38 +81,26 @@ SatLinkResultsOut::SatLinkResultsOut (int argc, char *argv[])
 
 
 void
-SatLinkResultsOut::Run ()
+SatLinkResultsPlot::Run ()
 {
-  Ptr<SatLookUpTable> table;
+  Ptr<SatLookUpTable> table1 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_3_to_4.txt");;
+  Ptr<SatLookUpTable> table2 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
+  Ptr<SatLookUpTable> table3 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
+  Ptr<SatLookUpTable> table4 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_8_to_9.txt");
 
-  table = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_3_to_4.txt");
-  Gnuplot2dDataset dataset1 = GetGnuplotDataset (table, "S2 32APSK 3/4");
+  Gnuplot2dDataset dataset1 = GetGnuplotDataset (table1, "S2 32APSK 3/4");
+  Gnuplot2dDataset dataset2 = GetGnuplotDataset (table2, "S2 32APSK 4/5");
+  Gnuplot2dDataset dataset3 = GetGnuplotDataset (table3, "S2 32APSK 5/6");
+  Gnuplot2dDataset dataset4 = GetGnuplotDataset (table4, "S2 32APSK 8/9");
 
-  table = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
-  Gnuplot2dDataset dataset2 = GetGnuplotDataset (table, "S2 32APSK 4/5");
-
-  table = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
-  Gnuplot2dDataset dataset3 = GetGnuplotDataset (table, "S2 32APSK 5/6");
-
-  table = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_8_to_9.txt");
-  Gnuplot2dDataset dataset4 = GetGnuplotDataset (table, "S2 32APSK 8/9");
-
-  std::string outputName = "s2_32apsk";
-  Gnuplot plot (outputName + ".png");
-  plot.SetTitle ("Link Results for DVB-S2 with 32APSK");
-  plot.SetTerminal ("png");
-  plot.SetLegend ("SINR (in dB)", "BLER");
+  Gnuplot plot = GetGnuplot ("s2_32apsk",
+                             "Link Results for DVB-S2 with 32APSK");
   plot.AddDataset (dataset1);
   plot.AddDataset (dataset2);
   plot.AddDataset (dataset3);
   plot.AddDataset (dataset4);
-  plot.AppendExtra ("set key bottom left");
-  plot.AppendExtra ("set logscale y 10");
-  plot.AppendExtra ("set ytics 10");
-  plot.AppendExtra ("set mxtics 5");
-  plot.AppendExtra ("set grid xtics mxtics ytics");
 
-  std::string plotFileName = outputName + ".plt";
+  std::string plotFileName = "s2_32apsk.plt";
   std::ofstream plotFile (plotFileName.c_str ());
   plot.GenerateOutput (plotFile);
   plotFile.close ();
@@ -142,7 +109,7 @@ SatLinkResultsOut::Run ()
 
 
 Gnuplot2dDataset
-SatLinkResultsOut::GetGnuplotDataset (Ptr<SatLookUpTable> table,
+SatLinkResultsPlot::GetGnuplotDataset (Ptr<SatLookUpTable> table,
                                       std::string title)
 {
   Gnuplot2dDataset ret;
@@ -185,3 +152,19 @@ SatLinkResultsOut::GetGnuplotDataset (Ptr<SatLookUpTable> table,
   return ret;
 
 } // end of GetGnuplotDataset
+
+
+Gnuplot
+SatLinkResultsPlot::GetGnuplot (std::string outputName, std::string title)
+{
+  Gnuplot ret (outputName + ".png");
+  ret.SetTitle (title);
+  ret.SetTerminal ("png");
+  ret.SetLegend ("SINR (in dB)", "BLER");
+  ret.AppendExtra ("set key bottom left");
+  ret.AppendExtra ("set logscale y 10");
+  ret.AppendExtra ("set ytics 10");
+  ret.AppendExtra ("set mxtics 5");
+  ret.AppendExtra ("set grid xtics mxtics ytics");
+  return ret;
+}
