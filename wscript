@@ -9,7 +9,6 @@
 def build(bld):
     module = bld.create_ns3_module('satellite', ['internet', 'csma', 'propagation'])
     module.source = [
-        'model/satellite.cc',
         'model/geo-coordinate.cc',
         'model/cbr-application.cc',
         'model/satellite-arp-cache.cc',
@@ -37,7 +36,6 @@ def build(bld):
 
     module_test = bld.create_ns3_module_test_library('satellite')
     module_test.source = [
-        'test/satellite-test-suite.cc',
         'test/geo-coordinate-test.cc',
         'test/simple-p2p.cc',
         'test/scenario-creation.cc',
@@ -48,7 +46,6 @@ def build(bld):
     headers = bld.new_task_gen(features=['ns3header'])
     headers.module = 'satellite'
     headers.source = [
-        'model/satellite.h',
         'model/geo-coordinate.h',
         'model/cbr-application.h',
         'model/satellite-arp-cache.h',
