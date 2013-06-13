@@ -27,17 +27,22 @@
 using namespace ns3;
 
 
-/**
- * This example will produce several Gnuplot files (.plt) as output. These files
- * can be converted to PNG, for example by this command::
- *
- *   gnuplot s2-32apsk.plt
- *
- * which will produce `s2-32apsk.png` file.
- */
+// forward declaration
 int main (int argc, char *argv[]);
 
 
+/**
+ * This example will generate several Gnuplot files (.plt) as output. Each of
+ * these files can be converted to PNG, for example by this command:
+ *
+ *     gnuplot s2-32apsk.plt
+ *
+ * which will produce `s2-32apsk.png` file. To convert all the Gnuplot files in
+ * the directory, the command below can be used:
+ *
+ *     gnuplot *.plt
+ *
+ */
 class SatLinkResultsPlot : public Object
 {
 public:
@@ -45,6 +50,14 @@ public:
   void Run ();
 
 private:
+  void RunDvbRcs2Qpsk ();
+  void RunDvbRcs2Psk8 ();
+  void RunDvbRcs2Qam16 ();
+  void RunDvbS2Qpsk ();
+  void RunDvbS2Psk8 ();
+  void RunDvbS2Apsk16 ();
+  void RunDvbS2Apsk32 ();
+
   Gnuplot2dDataset GetGnuplotDataset (Ptr<SatLookUpTable> table,
                                       std::string title);
   Gnuplot GetGnuplot (std::string outputName, std::string title);
@@ -83,6 +96,89 @@ SatLinkResultsPlot::SatLinkResultsPlot ()
 void
 SatLinkResultsPlot::Run ()
 {
+  RunDvbRcs2Qpsk ();
+  RunDvbRcs2Psk8 ();
+  RunDvbRcs2Qam16 ();
+  RunDvbS2Qpsk ();
+  RunDvbS2Psk8 ();
+  RunDvbS2Apsk16 ();
+  RunDvbS2Apsk32 ();
+}
+
+
+void
+SatLinkResultsPlot::RunDvbRcs2Qpsk ()
+{
+  // TODO
+}
+
+
+void
+SatLinkResultsPlot::RunDvbRcs2Psk8 ()
+{
+  // TODO
+}
+
+
+void
+SatLinkResultsPlot::RunDvbRcs2Qam16 ()
+{
+  // TODO
+}
+
+
+void
+SatLinkResultsPlot::RunDvbS2Qpsk ()
+{
+  // TODO
+}
+
+
+void
+SatLinkResultsPlot::RunDvbS2Psk8 ()
+{
+  // TODO
+}
+
+
+void
+SatLinkResultsPlot::RunDvbS2Apsk16 ()
+{
+  Ptr<SatLookUpTable> table1 = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_2_to_3.txt");;
+  Ptr<SatLookUpTable> table2 = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_3_to_4.txt");
+  Ptr<SatLookUpTable> table3 = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_4_to_5.txt");
+  Ptr<SatLookUpTable> table4 = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_5_to_6.txt");
+  Ptr<SatLookUpTable> table5 = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_8_to_9.txt");
+  Ptr<SatLookUpTable> table6 = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_9_to_10.txt");
+
+  Gnuplot2dDataset dataset1 = GetGnuplotDataset (table1, "S2 16APSK 2/3");
+  Gnuplot2dDataset dataset2 = GetGnuplotDataset (table2, "S2 16APSK 3/4");
+  Gnuplot2dDataset dataset3 = GetGnuplotDataset (table3, "S2 16APSK 4/5");
+  Gnuplot2dDataset dataset4 = GetGnuplotDataset (table4, "S2 16APSK 5/6");
+  Gnuplot2dDataset dataset5 = GetGnuplotDataset (table5, "S2 16APSK 8/9");
+  Gnuplot2dDataset dataset6 = GetGnuplotDataset (table6, "S2 16APSK 9/10");
+
+  Gnuplot plot = GetGnuplot ("s2_16apsk",
+                             "Link Results for DVB-S2 with 16APSK");
+  plot.AddDataset (dataset1);
+  plot.AddDataset (dataset2);
+  plot.AddDataset (dataset3);
+  plot.AddDataset (dataset4);
+  plot.AddDataset (dataset5);
+  plot.AddDataset (dataset6);
+
+  std::string plotFileName = "s2_16apsk.plt";
+  std::ofstream plotFile (plotFileName.c_str ());
+  plot.GenerateOutput (plotFile);
+  plotFile.close ();
+
+  std::cout << "Output file written: " << plotFileName << std::endl;
+}
+
+
+void
+SatLinkResultsPlot::RunDvbS2Apsk32 ()
+{
   Ptr<SatLookUpTable> table1 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_3_to_4.txt");;
   Ptr<SatLookUpTable> table2 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
   Ptr<SatLookUpTable> table3 = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
@@ -104,6 +200,8 @@ SatLinkResultsPlot::Run ()
   std::ofstream plotFile (plotFileName.c_str ());
   plot.GenerateOutput (plotFile);
   plotFile.close ();
+
+  std::cout << "Output file written: " << plotFileName << std::endl;
 
 }
 
