@@ -133,12 +133,12 @@ private:
   /**
    * User helper
    */
-  SatUserHelper m_userHelper;
+  Ptr<SatUserHelper> m_userHelper;
 
   /**
    * Beam helper
    */
-  SatBeamHelper m_beamHelper;
+  Ptr<SatBeamHelper> m_beamHelper;
 
   /**
    * Gateway container
@@ -165,6 +165,11 @@ private:
    * Stream wrapper used for creation traces
    */
   Ptr<OutputStreamWrapper> m_creationTraceStream;
+
+  /**
+   * flag to check if sceanrio is alreay created.
+   */
+  bool m_scenarioCreated;
 
   /**
    * Number of UTs created per Beam in full or user-defined scenario

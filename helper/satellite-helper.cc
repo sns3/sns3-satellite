@@ -69,6 +69,7 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
+ :m_scenarioCreated(false)
 {
   // uncomment next line, if attributes are needed already in construction phase
   //ObjectBase::ConstructSelf(AttributeConstructionList ());
@@ -76,6 +77,11 @@ SatHelper::SatHelper ()
 
 void SatHelper::CreateScenario(PREDEFINED_SCENARIO scenario)
 {
+  NS_ASSERT(m_scenarioCreated == false);
+
+  m_beamHelper = CreateObject<SatBeamHelper>();
+  m_userHelper = CreateObject<SatUserHelper>();
+
   switch(scenario)
   {
     case Simple:
@@ -115,8 +121,8 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
       CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, m_creationTraceStream);
       TraceConnect("Creation", "SatHelper", creationCb);
 
-      m_userHelper.EnableCreationTraces(m_creationTraceStream, creationCb);
-      m_beamHelper.EnableCreationTraces(m_creationTraceStream, creationCb);
+      m_userHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
+      m_beamHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
     }
 }
 
@@ -130,13 +136,13 @@ SatHelper::GetUserAddress(Ptr<Node> node)
 NodeContainer
 SatHelper::GetUtUsers()
 {
-  return m_userHelper.GetUtUsers();
+  return m_userHelper->GetUtUsers();
 }
 
 NodeContainer
 SatHelper::GetGwUsers()
 {
-  return m_userHelper.GetGwUsers();
+  return m_userHelper->GetGwUsers();
 }
 
 void
@@ -146,19 +152,19 @@ SatHelper::CreateSimpleScenario()
   InternetStackHelper internet;
   internet.Install(ut);
 
-  m_userHelper.SetGwBaseAddress("10.2.1.0", "255.255.255.0");
-  m_userHelper.SetUtBaseAddress("10.3.1.0", "255.255.255.0");
-  m_userHelper.SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
-  m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
+  m_userHelper->SetUtBaseAddress("10.3.1.0", "255.255.255.0");
+  m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
+  m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
-  m_userHelper.InstallUt(ut, 1);
+  m_userHelper->InstallUt(ut, 1);
 
-  m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  m_beamHelper->SetBaseAddress("10.1.1.0", "255.255.255.0");
   std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(8);
 
-  m_beamHelper.Install(ut, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+  m_beamHelper->Install(ut, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
-  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
+  m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), 1);
 
   m_creationSummary("*** Simple Scenario Creation Summary ***");
 }
@@ -177,21 +183,21 @@ SatHelper::CreateLargerScenario()
   internet.Install(uts);
 
   // set address base for GW user networks
-  m_userHelper.SetGwBaseAddress("10.2.1.0", "255.255.255.0");
+  m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
 
   // set address base for UT user networks
-  m_userHelper.SetUtBaseAddress("10.3.1.0", "255.255.255.0");
+  m_userHelper->SetUtBaseAddress("10.3.1.0", "255.255.255.0");
 
   // set Csma channel attributes
-  m_userHelper.SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
-  m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
+  m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
   // install two users for UT1 and one for UT2, UT3 and UT4
-  m_userHelper.InstallUt(ut1, 2);
-  m_userHelper.InstallUt(uts, 1);
+  m_userHelper->InstallUt(ut1, 2);
+  m_userHelper->InstallUt(uts, 1);
 
   // set address base for satellite network
-  m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  m_beamHelper->SetBaseAddress("10.1.1.0", "255.255.255.0");
 
   // initialize beam 1 UT container with UT1 and UT2
   NodeContainer beam1Uts;
@@ -200,18 +206,18 @@ SatHelper::CreateLargerScenario()
 
   // install UT1 and UT2 beam 3
   std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(3);
-  m_beamHelper.Install(beam1Uts, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+  m_beamHelper->Install(beam1Uts, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
   // install UT3 to beam 12
   conf = m_satConf.GetBeamConfiguration(12);
-  m_beamHelper.Install(uts.Get(1), conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+  m_beamHelper->Install(uts.Get(1), conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
   // installUT4 to beam 22
   conf = m_satConf.GetBeamConfiguration(22);
-  m_beamHelper.Install(uts.Get(2), conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+  m_beamHelper->Install(uts.Get(2), conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), 1);
+  m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), 1);
 
   m_creationSummary("*** Larger Scenario Creation Summary ***");
 }
@@ -227,20 +233,20 @@ SatHelper::CreateFullScenario()
   internet.Install(uts);
 
   // set address base for GW user networks
-  m_userHelper.SetGwBaseAddress("10.2.1.0", "255.255.255.0");
+  m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
 
   // set address base for UT user networks
-  m_userHelper.SetUtBaseAddress("10.3.1.0", "255.255.255.0");
+  m_userHelper->SetUtBaseAddress("10.3.1.0", "255.255.255.0");
 
   // set Csma channel attributes
-  m_userHelper.SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
-  m_userHelper.SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
+  m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
   // install user(s) for every UTs
-  m_userHelper.InstallUt(uts, m_utUsers);
+  m_userHelper->InstallUt(uts, m_utUsers);
 
   // set address base for satellite network
-  m_beamHelper.SetBaseAddress("10.1.1.0", "255.255.255.0");
+  m_beamHelper->SetBaseAddress("10.1.1.0", "255.255.255.0");
 
   // install UTs to satellite network
   for ( uint32_t i = 0; i < beamCount; i ++ )
@@ -253,11 +259,11 @@ SatHelper::CreateFullScenario()
         }
 
       std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(i + 1);
-      m_beamHelper.Install(ut, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+      m_beamHelper->Install(ut, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
     }
 
   // finally install GWs to satellite network
-  m_userHelper.InstallGw(m_beamHelper.GetGwNodes(), m_gwUsers);
+  m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), m_gwUsers);
 
   m_creationSummary("*** Full Scenario Creation Summary ***");
 }
@@ -281,9 +287,9 @@ SatHelper::CreateCreationSummary(std::string title)
 
   oss << std::endl << std::endl << title << std::endl << std::endl;
   oss << "--- User Info ---" << std::endl << std::endl;
-  oss << "Created GW users: " << m_userHelper.GetGwUserN() << ", ";
-  oss << "Created UT users: " << m_userHelper.GetUtUserN() << std::endl << std::endl;
-  oss << m_beamHelper.GetBeamInfo() << std::endl;
+  oss << "Created GW users: " << m_userHelper->GetGwUserN() << ", ";
+  oss << "Created UT users: " << m_userHelper->GetUtUserN() << std::endl << std::endl;
+  oss << m_beamHelper->GetBeamInfo() << std::endl;
 
   return oss.str();
 }
