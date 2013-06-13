@@ -247,13 +247,11 @@ public:
 //    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_8_to_9.txt");
 //    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_9_to_10.txt");
 
-    Ptr<SatLinkResultsDvbS2> linkResultsDvbS2 =
-      CreateObject<SatLinkResultsDvbS2> ();
+    Ptr<SatLinkResultsDvbS2> linkResultsDvbS2 = CreateObject<SatLinkResultsDvbS2> ();
     linkResultsDvbS2->Initialize ();
-    AddTestCase (
-      new SatLinkResultsDvbS2TestCase (linkResultsDvbS2,
-                                       SatLinkResults::SAT_MODCOD_16APSK_2_TO_3,
-                                       626, 0.0, 1.0));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 626, 8.800000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 626, 8.900000, 2.628144e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 626, 9.000000, 0.000000e+00));
 
     // TODO: write a class for plotting
     // TODO: write a class for printing test cases
