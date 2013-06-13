@@ -25,19 +25,23 @@
 #include <stdint.h>
 #include <string>
 
+#include "ns3/error-model.h"
+#include "ns3/output-stream-wrapper.h"
 #include "ns3/net-device.h"
 #include "ns3/mac48-address.h"
 #include "ns3/traced-callback.h"
 
+#include "satellite-phy.h"
+#include "satellite-channel.h"
 #include "satellite-signal-parameters.h"
 
 namespace ns3 {
 
 
-class SatPhy;
+/*class SatPhy;
 class Node;
 class ErrorModel;
-class SatChannel;
+class SatChannel;*/
 
 /**
  * \defgroup satellite Satellite Models

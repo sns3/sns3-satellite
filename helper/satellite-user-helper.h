@@ -27,13 +27,8 @@
 #include <stdint.h>
 
 #include "ns3/node-container.h"
-#include "ns3/deprecated.h"
-#include "ns3/trace-helper.h"
 #include "ns3/ipv4-address-helper.h"
-
-#include "satellite-geo-helper.h"
-#include "satellite-gw-helper.h"
-#include "satellite-ut-helper.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -47,7 +42,6 @@ class Node;
 class SatUserHelper : public Object
 {
 public:
-  typedef TracedCallback<std::string> CreationCallback;
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
   /**

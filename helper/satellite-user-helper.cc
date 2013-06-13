@@ -18,18 +18,14 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/abort.h"
 #include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/packet.h"
-#include "ns3/names.h"
-#include "ns3/uinteger.h"
+//#include "ns3/names.h"
+//#include "ns3/uinteger.h"
 #include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/internet-module.h"
-#include "ns3/csma-module.h"
-#include "ns3/trace-helper.h"
+#include "ns3/ipv4-routing-table-entry.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/csma-helper.h"
 #include "satellite-user-helper.h"
-#include "satellite-geo-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
 

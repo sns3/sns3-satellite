@@ -18,26 +18,17 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/abort.h"
 #include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/packet.h"
-#include "ns3/names.h"
-#include "ns3/uinteger.h"
 #include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/core-module.h"
-#include "ns3/internet-module.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-interface.h"
 #include "ns3/propagation-delay-model.h"
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-phy-rx.h"
-#include "ns3/trace-helper.h"
-#include "ns3/satellite-arp-cache.h"
+#include "../model/satellite-channel.h"
+#include "../model/satellite-phy.h"
+#include "../model/satellite-phy-tx.h"
+#include "../model/satellite-phy-rx.h"
+#include "../model/satellite-arp-cache.h"
 #include "satellite-beam-helper.h"
-#include "satellite-geo-helper.h"
-
-
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 

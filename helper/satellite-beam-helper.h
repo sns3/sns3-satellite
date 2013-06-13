@@ -27,8 +27,6 @@
 #include <stdint.h>
 
 #include "ns3/node-container.h"
-#include "ns3/deprecated.h"
-#include "ns3/trace-helper.h"
 #include "ns3/ipv4-address-helper.h"
 
 #include "satellite-geo-helper.h"
@@ -37,9 +35,6 @@
 
 
 namespace ns3 {
-
-class NetDevice;
-class Node;
 
 /**
  * \brief Build a set Satellite beams with needed objects and configuration

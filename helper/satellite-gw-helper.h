@@ -26,16 +26,10 @@
 #include "ns3/object-factory.h"
 #include "ns3/net-device-container.h"
 #include "ns3/node-container.h"
-#include "ns3/deprecated.h"
-
-#include "ns3/trace-helper.h"
+#include "ns3/traced-callback.h"
+#include "ns3/satellite-channel.h"
 
 namespace ns3 {
-
-class Queue;
-class NetDevice;
-class Node;
-class SatChannel;
 
 /**
  * \brief Build a set of SatNetDevice objects

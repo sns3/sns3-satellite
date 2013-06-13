@@ -24,18 +24,14 @@
 #include <string>
 
 #include "ns3/object-factory.h"
+#include "ns3/output-stream-wrapper.h"
+#include "ns3/error-model.h"
 #include "ns3/net-device-container.h"
 #include "ns3/node-container.h"
-#include "ns3/deprecated.h"
-
+#include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
-#include "ns3/trace-helper.h"
 
 namespace ns3 {
-
-class NetDevice;
-class Node;
-class SatGeoNetDevice;
 
 /**
  * \brief Build a set SatGeoNetDevice object and configuring it

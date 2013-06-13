@@ -36,7 +36,6 @@
 #include "satellite-mac.h"
 #include "satellite-channel.h"
 
-
 NS_LOG_COMPONENT_DEFINE ("SatGeoNetDevice");
 
 namespace ns3 {

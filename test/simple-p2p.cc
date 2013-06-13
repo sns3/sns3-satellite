@@ -30,14 +30,11 @@
 #include "ns3/string.h"
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
-//#include "ns3/csma-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/test.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "../helper/cbr-helper.h"
 #include "../model/cbr-application.h"
+#include "../helper/cbr-helper.h"
 #include "../helper/satellite-helper.h"
 
 using namespace ns3;

@@ -28,9 +28,9 @@
  */
 
 #include "ns3/string.h"
-#include "ns3/satellite-helper.h"
 #include "ns3/test.h"
 #include "ns3/simulator.h"
+#include "../helper/satellite-helper.h"
 
 using namespace ns3;
 

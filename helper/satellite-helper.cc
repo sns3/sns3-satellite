@@ -23,10 +23,8 @@
 #include "ns3/string.h"
 #include "ns3/type-id.h"
 #include "ns3/csma-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "satellite-user-helper.h"
-#include "satellite-beam-helper.h"
+#include "ns3/internet-stack-helper.h"
+
 #include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");

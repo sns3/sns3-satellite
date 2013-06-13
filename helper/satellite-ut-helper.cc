@@ -18,27 +18,16 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/abort.h"
 #include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/queue.h"
-#include "ns3/config.h"
-#include "ns3/packet.h"
 #include "ns3/names.h"
-#include "ns3/mpi-interface.h"
-#include "ns3/mpi-receiver.h"
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-mac.h"
-#include "ns3/satellite-net-device.h"
-#include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-phy-rx.h"
-#include "ns3/virtual-channel.h"
+#include "../model/satellite-channel.h"
+#include "../model/satellite-mac.h"
+#include "../model/satellite-net-device.h"
+#include "../model/satellite-phy.h"
+#include "../model/satellite-phy-tx.h"
+#include "../model/satellite-phy-rx.h"
 
-#include "ns3/trace-helper.h"
-#include "ns3/satellite-ut-helper.h"
-#include "ns3/satellite-geo-helper.h"
+#include "satellite-ut-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 

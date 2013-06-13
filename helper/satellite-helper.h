@@ -23,6 +23,7 @@
 #include <string>
 
 #include "ns3/object.h"
+#include "ns3/trace-helper.h"
 #include "ns3/output-stream-wrapper.h"
 #include "ns3/node-container.h"
 #include "ns3/ipv4-address-helper.h"
