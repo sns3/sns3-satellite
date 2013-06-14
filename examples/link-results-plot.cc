@@ -127,12 +127,11 @@ SatLinkResultsPlot::RunDvbRcs2Qpsk ()
   Ptr<SatLookUpTable> table4 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat5.txt");
   Ptr<SatLookUpTable> table5 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat6.txt");
   Ptr<SatLookUpTable> table6 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat7.txt");
-  Ptr<SatLookUpTable> table7 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat12.txt");
-  Ptr<SatLookUpTable> table8 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat13.txt");
-  Ptr<SatLookUpTable> table9 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat14.txt");
-  Ptr<SatLookUpTable> table10 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat15.txt");
-  Ptr<SatLookUpTable> table11 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat16.txt");
-  Ptr<SatLookUpTable> table12 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat17.txt");
+  Ptr<SatLookUpTable> table7 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat13.txt");
+  Ptr<SatLookUpTable> table8 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat14.txt");
+  Ptr<SatLookUpTable> table9 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat15.txt");
+  Ptr<SatLookUpTable> table10 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat16.txt");
+  Ptr<SatLookUpTable> table11 = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat17.txt");
 
   Gnuplot2dDataset dataset1 = GetGnuplotDataset (table1, "Waveform 2: 112 bits, QPSK 1/3");
   Gnuplot2dDataset dataset2 = GetGnuplotDataset (table2, "Waveform 3: 304 bits, QPSK 1/3");
@@ -140,12 +139,11 @@ SatLinkResultsPlot::RunDvbRcs2Qpsk ()
   Gnuplot2dDataset dataset4 = GetGnuplotDataset (table4, "Waveform 5: 680 bits, QPSK 2/3");
   Gnuplot2dDataset dataset5 = GetGnuplotDataset (table5, "Waveform 6: 768 bits, QPSK 3/4");
   Gnuplot2dDataset dataset6 = GetGnuplotDataset (table6, "Waveform 7: 864 bits, QPSK 5/6");
-  Gnuplot2dDataset dataset7 = GetGnuplotDataset (table7, "Waveform 12: ? bits, QPSK 1/3"); // not in pptm
-  Gnuplot2dDataset dataset8 = GetGnuplotDataset (table8, "Waveform 13: 984 bits, QPSK 1/3");
-  Gnuplot2dDataset dataset9 = GetGnuplotDataset (table9, "Waveform 14: 1504 bits, QPSK 1/2");
-  Gnuplot2dDataset dataset10 = GetGnuplotDataset (table10, "Waveform 15: 2112 bits, QPSK 2/3");
-  Gnuplot2dDataset dataset11 = GetGnuplotDataset (table11, "Waveform 16: 2384 bits, QPSK 3/4");
-  Gnuplot2dDataset dataset12 = GetGnuplotDataset (table12, "Waveform 17: 2664 bits, QPSK 5/6");
+  Gnuplot2dDataset dataset7 = GetGnuplotDataset (table7, "Waveform 13: 984 bits, QPSK 1/3");
+  Gnuplot2dDataset dataset8 = GetGnuplotDataset (table8, "Waveform 14: 1504 bits, QPSK 1/2");
+  Gnuplot2dDataset dataset9 = GetGnuplotDataset (table9, "Waveform 15: 2112 bits, QPSK 2/3");
+  Gnuplot2dDataset dataset10 = GetGnuplotDataset (table10, "Waveform 16: 2384 bits, QPSK 3/4");
+  Gnuplot2dDataset dataset11 = GetGnuplotDataset (table11, "Waveform 17: 2664 bits, QPSK 5/6");
 
   Gnuplot plot = GetGnuplot ("rcs2_qpsk",
                              "Link Results for DVB-RCS2 with QPSK");
@@ -160,7 +158,6 @@ SatLinkResultsPlot::RunDvbRcs2Qpsk ()
   plot.AddDataset (dataset9);
   plot.AddDataset (dataset10);
   plot.AddDataset (dataset11);
-  plot.AddDataset (dataset12);
 
   std::string plotFileName = "rcs2_qpsk.plt";
   std::ofstream plotFile (plotFileName.c_str ());
@@ -408,7 +405,7 @@ SatLinkResultsPlot::GetGnuplotDataset (Ptr<SatLookUpTable> table,
         }
       else
         {
-          if (bler < 10e-15)
+          if (bler < 1e-10)
             {
               // close enough to 0% error rate
               writeFlag = false; // stop writing the plot
