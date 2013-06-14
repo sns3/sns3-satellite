@@ -20,9 +20,10 @@
 
 #include "ns3/log.h"
 #include "ns3/names.h"
+#include "ns3/queue.h"
 #include "ns3/string.h"
 #include "ns3/type-id.h"
-#include "ns3/csma-module.h"
+#include "ns3/csma-helper.h"
 #include "ns3/internet-stack-helper.h"
 
 #include "satellite-helper.h"

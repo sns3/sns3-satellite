@@ -18,15 +18,8 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/abort.h"
 #include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/queue.h"
-#include "ns3/config.h"
-#include "ns3/packet.h"
 #include "ns3/names.h"
-#include "ns3/mpi-interface.h"
-#include "ns3/mpi-receiver.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mac.h"
 #include "../model/satellite-net-device.h"
@@ -100,7 +93,7 @@ SatGwHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatGwHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
     NetDeviceContainer devs;
 
@@ -113,7 +106,7 @@ SatGwHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
   NetDeviceContainer container;
 
@@ -132,7 +125,7 @@ SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Configure the SatPhyRxCarrier instances
   // Note, that these have to be changed so that they match the real frame configuration.
   // Now we survive with one SatPhyRxCarrier, because we do not have a NCC scheduler.
-  uint16_t RETURN_CARRIERS(1);
+  uint32_t RETURN_CARRIERS(1);
   phyRx->ConfigurePhyRxCarriers (RETURN_CARRIERS);
 
   Ptr<SatMac> mac = CreateObject<SatMac> ();
@@ -169,7 +162,7 @@ SatGwHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (std::string aName, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatGwHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
   Ptr<Node> a = Names::Find<Node> (aName);
   return Install (a, beamId, fCh, rCh);

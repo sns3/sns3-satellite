@@ -33,7 +33,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 
-SatPhyRxCarrier::SatPhyRxCarrier (uint16_t carrierId)
+SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId)
   :m_state (IDLE)
   ,m_carrierId (carrierId)
 {
@@ -143,7 +143,7 @@ SatPhyRxCarrier::EndRxData ()
 }
 
 void
-SatPhyRxCarrier::SetBeamId (uint16_t beamId)
+SatPhyRxCarrier::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;

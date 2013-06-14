@@ -55,7 +55,7 @@ public:
    */
   SatPhy (void);
 
-  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId, SatPhy::ReceiveCallback cb);
+  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback cb);
 
   virtual ~SatPhy ();
 
@@ -112,7 +112,7 @@ public:
    * \param carrierId Carrier id for the packet transmission
    * \param duration the packet transmission duration (from MAC layer)
    */
-  virtual void SendPdu (Ptr<Packet> p, uint16_t carrierId, Time duration);
+  virtual void SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration);
 
   /**
    * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
@@ -126,7 +126,7 @@ public:
    *
    * \param beamId Satellite beam id
    */
-  void SetBeamId (uint16_t beamId);
+  void SetBeamId (uint32_t beamId);
 
   /**
    * Receives packets from lower layer (phyRx)
@@ -139,7 +139,7 @@ private:
 
   Ptr<SatPhyTx> m_phyTx;
   Ptr<SatPhyRx> m_phyRx;
-  uint16_t m_beamId;
+  uint32_t m_beamId;
   double m_txPower;
   /**
    * The upper layer package receive callback.

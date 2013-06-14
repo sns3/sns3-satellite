@@ -105,7 +105,7 @@ public:
    * to satellite network and add csma netdevice on them and csma channel between UTs/GW and their users.
    *
    */
-  NodeContainer InstallUt (NodeContainer ut, uint16_t users );
+  NodeContainer InstallUt (NodeContainer ut, uint32_t users );
 
   /**
    * \param gw a set of GW nodes
@@ -118,7 +118,7 @@ public:
    * between router and users.
    *
    */
-  NodeContainer InstallGw (NodeContainer gw , uint16_t users);
+  NodeContainer InstallGw (NodeContainer gw , uint32_t users);
 
   /**
    * returns A container having all GW user nodes in satellite network.

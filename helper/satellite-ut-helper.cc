@@ -89,7 +89,7 @@ SatUtHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatUtHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
     NetDeviceContainer devs;
 
@@ -102,7 +102,7 @@ SatUtHelper::Install (NodeContainer c, uint16_t beamId, Ptr<SatChannel> fCh, Ptr
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
   NetDeviceContainer container;
 
@@ -119,7 +119,7 @@ SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->SetDevice (dev);
 
   // By default, there is one carrier in the forward link
-  uint16_t FEEDER_CARRIERS(1);
+  uint32_t FEEDER_CARRIERS(1);
   phyRx->ConfigurePhyRxCarriers (FEEDER_CARRIERS);
 
   Ptr<SatMac> mac = CreateObject<SatMac> ();
@@ -156,7 +156,7 @@ SatUtHelper::Install (Ptr<Node> n, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (std::string aName, uint16_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
   Ptr<Node> a = Names::Find<Node> (aName);
   return Install (a, beamId, fCh, rCh);

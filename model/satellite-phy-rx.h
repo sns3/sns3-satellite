@@ -71,14 +71,14 @@ public:
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
-  void SetBeamId (uint16_t beamId);
+  void SetBeamId (uint32_t beamId);
 
   /**
    * Create a sufficient amount of SatPhyRxCarrier instances; one for
    * each carrier in either forward or return links.
    * \param maxRxCarriers Maximum supported SatPhyRxCarrier instances (carriers)
    */
-  void ConfigurePhyRxCarriers (uint16_t maxRxCarriers);
+  void ConfigurePhyRxCarriers (uint32_t maxRxCarriers);
 
   /**
    * Start packet reception from the SatChannel

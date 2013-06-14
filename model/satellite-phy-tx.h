@@ -91,7 +91,7 @@ public:
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
-  void SetBeamId (uint16_t beamId);
+  void SetBeamId (uint32_t beamId);
 
 private:
   void ChangeState (State newState);
@@ -102,7 +102,7 @@ private:
   Ptr<SatChannel> m_channel;
 
   State m_state;
-  uint16_t m_beamId;
+  uint32_t m_beamId;
   Ptr<SatPhy> m_phy;
 };
 

@@ -261,17 +261,17 @@ SatGeoNetDevice::GetChannel (void) const
 }
 
 void
-SatGeoNetDevice::AddUserPhy (Ptr<SatPhy> phy, uint16_t beamId)
+SatGeoNetDevice::AddUserPhy (Ptr<SatPhy> phy, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << phy << beamId);
-  m_userPhy.insert(std::pair<uint16_t, Ptr<SatPhy> >(beamId, phy));
+  m_userPhy.insert(std::pair<uint32_t, Ptr<SatPhy> >(beamId, phy));
 }
 
 void
-SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint16_t beamId)
+SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << phy << beamId);
-  m_feederPhy.insert(std::pair<uint16_t, Ptr<SatPhy> >(beamId, phy));
+  m_feederPhy.insert(std::pair<uint32_t, Ptr<SatPhy> >(beamId, phy));
 }
 
 } // namespace ns3

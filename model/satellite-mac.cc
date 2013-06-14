@@ -213,7 +213,7 @@ SatMac::TransmitStart (Ptr<Packet> p)
    * - TBTP in return link
    * - GW scheduler in the forward link
    */
-  uint16_t CARRIER_ID (0);
+  uint32_t CARRIER_ID (0);
   Time DURATION (MicroSeconds(20));
   m_phy->SendPdu (p, CARRIER_ID, DURATION);
   return true;

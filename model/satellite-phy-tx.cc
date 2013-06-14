@@ -189,7 +189,7 @@ SatPhyTx::EndTx ()
 
 
 void 
-SatPhyTx::SetBeamId (uint16_t beamId)
+SatPhyTx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;

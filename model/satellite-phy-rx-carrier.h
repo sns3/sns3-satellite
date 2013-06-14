@@ -40,7 +40,7 @@ namespace ns3 {
 class SatPhyRxCarrier : public Object
 {
 public:
-  SatPhyRxCarrier (uint16_t carrierId);
+  SatPhyRxCarrier (uint32_t carrierId);
   virtual ~SatPhyRxCarrier ();
 
   /**
@@ -68,7 +68,7 @@ public:
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
-  void SetBeamId (uint16_t beamId);
+  void SetBeamId (uint32_t beamId);
 
   /**
    * Start packet reception from the SatChannel
@@ -85,8 +85,8 @@ private:
 
   State m_state;
   Ptr<SatSignalParameters> m_rxParams;
-  uint16_t m_beamId;
-  uint16_t m_carrierId;
+  uint32_t m_beamId;
+  uint32_t m_carrierId;
 
 };
 

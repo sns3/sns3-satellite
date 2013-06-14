@@ -94,7 +94,7 @@ public:
    * \param beamId Id of the beam
    */
   void AttachChannels ( Ptr<NetDevice> dev, Ptr<SatChannel> ff, Ptr<SatChannel> fr,
-                        Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint16_t beamId);
+                        Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint32_t beamId);
 
   /**
    * Enables creation traces to be written in given file

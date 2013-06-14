@@ -43,8 +43,9 @@ namespace ns3 {
 class SatBeamHelper : public Object
 {
 public:
-  typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> > SatLink;
-  typedef std::pair<uint16_t, uint16_t > BeamFreqs;
+  typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> >  ChannelPair;    //forward = first, return  = second
+  typedef std::pair<uint32_t, uint32_t >                FrequencyPair;  // user = first, feeder = second
+  typedef std::pair<uint32_t, uint32_t>                 GwLink;         // first GW ID, second feeder link frequency id
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -101,7 +102,7 @@ public:
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
    * \returns node GW node of the beam.
    */
-  Ptr<Node> Install (NodeContainer ut, uint16_t gwId, uint16_t beamId, uint16_t ulFreqId, uint16_t flFreqId );
+  Ptr<Node> Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
 
   /**
    * returns A container having all GW nodes in satellite network.
@@ -130,12 +131,12 @@ private:
     NodeContainer         m_gwNodeList;
     Ptr<Node>             m_geoNode;
 
-    std::set<std::pair<uint16_t, uint16_t> >  m_beam;        // first beam ID, second GW ID
-    std::set<std::pair<uint16_t, uint16_t> >  m_gwLink;      // first GW ID, second feeder link frequency id
-    std::map<uint16_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node Ptr
-    std::map<uint16_t, SatLink >              m_ulChannels;  // first forward, second return
-    std::map<uint16_t, SatLink >              m_flChannels;  // first forward, second return
-    std::map<uint16_t, BeamFreqs >            m_beamLink;    // first beam ID, second pair (first user, second feeder)
+    std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
+    std::set<GwLink >                         m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
+    std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
+    std::map<uint32_t, ChannelPair >          m_ulChannels;  // user link ID, channel pointers pair
+    std::map<uint32_t, ChannelPair >          m_flChannels;  // feeder link ID, channel pointers pair
+    std::map<uint32_t, FrequencyPair >        m_beamFreqs;   // first beam ID, channel frequency IDs pair
 
     /**
      * Trace callback for creation traces
@@ -143,10 +144,38 @@ private:
     TracedCallback<std::string> m_creation;
 
     /**
-     * Creates info of the beama.
+     * Creates info of the beam.
      * /returns info for beams as std::string.
      */
     std::string CreateBeamInfo();
+
+    /**
+     * Gets satellite channel pair from requested map.
+     * In case that channel pair is not found, new is created and returned.
+     * /param chPairMap map where channel pair is get
+     * /param frequencyId ID of the frequency
+     */
+    ChannelPair GetChannelPair(std::map<uint32_t, ChannelPair > chPairMap, uint32_t frequencyId);
+
+    /**
+     * Gets GW node according to given id from map where GWs are stored.
+     * In case that GW is not found, new node is created and returned.
+     * /param id ID of the GW
+     */
+    Ptr<Node> GetGw(uint32_t id);
+
+    /**
+     * Set needed routings of satellite network and fill ARC cache for the network.
+     * /param ut    container having UTs of the beam
+     * /param utNd  container having UT netdevices of the beam
+     * /param gw    pointer to gateway node
+     * /param gw    pointer to gateway netdevice
+     * /param gwAddr address of the gateway
+     * /param utIfs container having UT ipv2 interfaces (for addresses)
+     */
+    void PopulateRoutings(NodeContainer ut, NetDeviceContainer utNd,
+                           Ptr<Node> gw, Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
+
 };
 
 } // namespace ns3

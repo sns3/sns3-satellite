@@ -60,12 +60,12 @@ public:
   /**
   * The beam for the packet transmission
   */
-  uint16_t m_beamId;
+  uint32_t m_beamId;
 
   /**
     * The carrier for the packet transmission
     */
-  uint16_t m_carrierId;
+  uint32_t m_carrierId;
 
   /**
    * The duration of the packet transmission.

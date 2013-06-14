@@ -19,8 +19,6 @@
  */
 
 #include "ns3/log.h"
-//#include "ns3/names.h"
-//#include "ns3/uinteger.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/ipv4-routing-table-entry.h"
 #include "ns3/internet-stack-helper.h"
@@ -79,7 +77,7 @@ void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask
 }
 
 NodeContainer
-SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
+SatUserHelper::InstallUt (NodeContainer ut, uint32_t userCount )
 {
   InternetStackHelper internet;
 
@@ -116,7 +114,7 @@ SatUserHelper::InstallUt (NodeContainer ut, uint16_t userCount )
   }
 
 NodeContainer
-SatUserHelper::InstallGw (NodeContainer gw, uint16_t userCount )
+SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 {
   InternetStackHelper internet;
   Ptr<Node> router;

@@ -77,14 +77,14 @@ public:
    * \param phy user phy object to add.
    * \param beamId the id of the beam to use phy for
    */
-  void AddUserPhy (Ptr<SatPhy> phy, uint16_t beamId);
+  void AddUserPhy (Ptr<SatPhy> phy, uint32_t beamId);
 
   /*
    * Add the Feeder Phy object for the beam
    * \param phy feeder phy object to add.
    * \param beamId the id of the beam to use phy for
    */
-  void AddFeederPhy (Ptr<SatPhy> phy, uint16_t beamId);
+  void AddFeederPhy (Ptr<SatPhy> phy, uint32_t beamId);
 
   /**
    * Attach a receive ErrorModel to the SatGeoNetDevice.
@@ -132,8 +132,8 @@ private:
   uint16_t m_phyCount;
   Mac48Address m_address;
   Ptr<ErrorModel> m_receiveErrorModel;
-  std::map<uint16_t, Ptr<SatPhy> > m_userPhy;
-  std::map<uint16_t, Ptr<SatPhy> > m_feederPhy;
+  std::map<uint32_t, Ptr<SatPhy> > m_userPhy;
+  std::map<uint32_t, Ptr<SatPhy> > m_feederPhy;
 
   /**
    * The trace source fired when the phy layer drops a packet it has received

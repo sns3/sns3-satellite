@@ -117,13 +117,13 @@ SatPhyRx::SetChannel (Ptr<SatChannel> c)
 
 
 void
-SatPhyRx::ConfigurePhyRxCarriers (uint16_t maxRxCarriers)
+SatPhyRx::ConfigurePhyRxCarriers (uint32_t maxRxCarriers)
 {
     NS_LOG_FUNCTION (this << maxRxCarriers);
     NS_ASSERT (maxRxCarriers > 0);
     NS_ASSERT (m_rxCarriers.empty());
 
-    for ( uint16_t i = 0; i < maxRxCarriers; ++i )
+    for ( uint32_t i = 0; i < maxRxCarriers; ++i )
       {
         NS_LOG_LOGIC(this << " Create carrier: " << i);
         Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i);
@@ -132,7 +132,7 @@ SatPhyRx::ConfigurePhyRxCarriers (uint16_t maxRxCarriers)
 }
 
 void
-SatPhyRx::SetBeamId (uint16_t beamId)
+SatPhyRx::SetBeamId (uint32_t beamId)
 {
     NS_LOG_FUNCTION (this << beamId);
     NS_ASSERT (beamId >= 0);
@@ -149,7 +149,7 @@ SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION (this << rxParams);
 
-    uint16_t cId = rxParams->m_carrierId;
+    uint32_t cId = rxParams->m_carrierId;
     NS_ASSERT (cId < m_rxCarriers.size());
 
     m_rxCarriers[cId]->StartRx (rxParams);

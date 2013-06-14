@@ -41,7 +41,7 @@ SatPhy::SatPhy (void)
   NS_LOG_FUNCTION (this);
 }
 
-SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint16_t beamId, SatPhy::ReceiveCallback cb)
+SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback cb)
   :
   m_phyTx(phyTx),
   m_phyRx(phyRx),
@@ -139,7 +139,7 @@ SatPhy::GetTxPower () const
 }
 
 void
-SatPhy::SendPdu (Ptr<Packet> p, uint16_t carrierId, Time duration )
+SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
 {
   NS_LOG_FUNCTION (this << p << carrierId << duration);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
@@ -165,7 +165,7 @@ SatPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
 }
 
 void
-SatPhy::SetBeamId (uint16_t beamId)
+SatPhy::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;
