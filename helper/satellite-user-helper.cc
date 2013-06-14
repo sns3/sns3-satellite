@@ -81,8 +81,7 @@ SatUserHelper::InstallUt (NodeContainer ut, uint32_t userCount )
 {
   InternetStackHelper internet;
 
-  // We create the channels and net devices
-
+  // create users and csma links between UTs and users and add IP routes
   for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
     {
       NodeContainer users;
@@ -118,7 +117,6 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 {
   InternetStackHelper internet;
   Ptr<Node> router;
-  // We create the channels and net devices
 
   if (gw.GetN() == 1)
     {
@@ -128,45 +126,10 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
     {
       router = CreateObject<Node>();
       internet.Install(router);
-
-      for (NodeContainer::Iterator i = gw.Begin (); i != gw.End (); i++)
-        {
-          NodeContainer gwRouter = NodeContainer((*i), router);
-
-          NetDeviceContainer nd = m_csma.Install (gwRouter);
-          Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
-          Ipv4StaticRoutingHelper ipv4RoutingHelper;
-
-          // Get IPv4 protocol implementations
-          Ptr<Ipv4> ipv4Gw = (*i)->GetObject<Ipv4> ();
-          uint32_t lastGwIf = ipv4Gw->GetNInterfaces() - 1;
-          Ptr<Ipv4StaticRouting> routingGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
-          routingGw->SetDefaultRoute (addresses.GetAddress(1), lastGwIf);
-          NS_LOG_INFO ("SatUserHelper::InstallGw  GW default route: " << addresses.GetAddress(1) );
-
-          for (uint32_t  routeIndex = 0; routeIndex < routingGw->GetNRoutes(); routeIndex++)
-            {
-              // Get IPv4 protocol implementations
-              Ptr<Ipv4> ipv4Router = router->GetObject<Ipv4> ();
-              uint32_t lastRouterIf = ipv4Router->GetNInterfaces() - 1;
-              Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
-
-              Ipv4RoutingTableEntry route = routingGw->GetRoute(routeIndex);
-              uint32_t interface = route.GetInterface();
-
-              // set only routes for interfaces created earlier (and not for local delivery index 0)
-              if ((interface != 0) && (interface != lastGwIf))
-                {
-                  routingRouter->AddNetworkRouteTo (route.GetDest(), route.GetDestNetworkMask(), addresses.GetAddress(0), lastRouterIf);
-                  NS_LOG_INFO ("SatUserHelper::InstallGw, Router network route:" << route.GetDest()
-                               << ", " << route.GetDestNetworkMask() << ", " << addresses.GetAddress(0));
-                }
-            }
-
-          m_ipv4Gw.NewNetwork();
-        }
+      InstallRouter(gw, router);
     }
 
+  // create users and csma links between Router and users and add IP routes
   NodeContainer users;
   users.Create(userCount);
   NodeContainer routerUsers = NodeContainer(router, users);
@@ -223,9 +186,51 @@ SatUserHelper::GetUtUserN()
   return m_utUsers.GetN();
 }
 
-void SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+void
+SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
   TraceConnect("Creation", "SatUserHelper", cb);
+}
+
+void
+SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
+{
+  for (NodeContainer::Iterator i = gw.Begin (); i != gw.End (); i++)
+  {
+    NodeContainer gwRouter = NodeContainer((*i), router);
+
+    NetDeviceContainer nd = m_csma.Install (gwRouter);
+    Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
+    Ipv4StaticRoutingHelper ipv4RoutingHelper;
+
+    // Get IPv4 protocol implementations
+    Ptr<Ipv4> ipv4Gw = (*i)->GetObject<Ipv4> ();
+    uint32_t lastGwIf = ipv4Gw->GetNInterfaces() - 1;
+    Ptr<Ipv4StaticRouting> routingGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
+    routingGw->SetDefaultRoute (addresses.GetAddress(1), lastGwIf);
+    NS_LOG_INFO ("SatUserHelper::InstallRouter  GW default route: " << addresses.GetAddress(1) );
+
+    for (uint32_t  routeIndex = 0; routeIndex < routingGw->GetNRoutes(); routeIndex++)
+      {
+        // Get IPv4 protocol implementations
+        Ptr<Ipv4> ipv4Router = router->GetObject<Ipv4> ();
+        uint32_t lastRouterIf = ipv4Router->GetNInterfaces() - 1;
+        Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
+
+        Ipv4RoutingTableEntry route = routingGw->GetRoute(routeIndex);
+        uint32_t interface = route.GetInterface();
+
+        // set only routes for interfaces created earlier (and not for local delivery index 0)
+        if ((interface != 0) && (interface != lastGwIf))
+          {
+            routingRouter->AddNetworkRouteTo (route.GetDest(), route.GetDestNetworkMask(), addresses.GetAddress(0), lastRouterIf);
+            NS_LOG_INFO ("SatUserHelper::InstallRouter, Router network route:" << route.GetDest()
+                         << ", " << route.GetDestNetworkMask() << ", " << addresses.GetAddress(0));
+          }
+      }
+
+    m_ipv4Gw.NewNetwork();
+  }
 }
 
 } // namespace ns3

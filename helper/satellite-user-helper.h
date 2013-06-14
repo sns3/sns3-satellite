@@ -142,6 +142,7 @@ public:
 
   /**
    * Enables creation traces to be written in given file
+   *
    * /param stream  stream for creation trace outputs
    * /param cb  callback to connect traces
    */
@@ -160,6 +161,14 @@ private:
      * Trace callback for creation traces
      */
     TracedCallback<std::string> m_creation;
+
+    /**
+     * Install IP router to to Gateways. Creates csma link between gateways and router.
+     *
+     * /param gw      container having GWs
+     * /param router  pointer to IP router
+     */
+    void InstallRouter(NodeContainer gw, Ptr<Node> router);
 };
 
 } // namespace ns3
