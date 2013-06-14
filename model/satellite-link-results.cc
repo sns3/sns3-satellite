@@ -137,7 +137,7 @@ SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
   uint8_t waveformId = 0;
 
   switch (burstLength)
-  {
+    {
     case 262:
       if (modcod == SAT_MODCOD_QPSK_1_TO_3)
         {
@@ -147,7 +147,7 @@ SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
 
     case 536:
       switch (modcod)
-      {
+        {
         case SAT_MODCOD_QPSK_1_TO_3:
           waveformId = 3;
           break;
@@ -181,13 +181,13 @@ SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
         default:
           NS_FATAL_ERROR ("Invalid Modcod for DVB-RCS2: " << modcod);
           break;
-      } // end of switch (modcod)
+        } // end of switch (modcod)
 
       break; // end of case 536
 
     case 1616:
       switch (modcod)
-      {
+        {
         case SAT_MODCOD_QPSK_1_TO_3:
           waveformId = 13;
           break;
@@ -221,7 +221,7 @@ SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
         default:
           NS_FATAL_ERROR ("Invalid Modcod for DVB-RCS2: " << modcod);
           break;
-      } // end of switch (modcod)
+        } // end of switch (modcod)
 
       break; // end of case 1616
 
@@ -229,7 +229,7 @@ SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
       NS_FATAL_ERROR ("Invalid burst length for DVB-RCS2: " << burstLength);
       break;
 
-  } // end of switch (burstLength)
+    } // end of switch (burstLength)
 
   if (waveformId == 0)
     {
@@ -311,7 +311,7 @@ SatLinkResultsDvbS2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
   uint8_t ret = 255;
 
   switch (modcod)
-  {
+    {
     // QPSK
 
     case SAT_MODCOD_QPSK_1_TO_2:
@@ -400,7 +400,7 @@ SatLinkResultsDvbS2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
       NS_FATAL_ERROR ("Invalid Modcod for DVB-S2: " << modcod);
       break;
 
-  } // end of switch (modcod)
+    } // end of switch (modcod)
 
   return ret;
 

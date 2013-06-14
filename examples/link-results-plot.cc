@@ -24,21 +24,26 @@
 #include <ns3/gnuplot.h>
 #include <fstream>
 
-using namespace ns3;
+
+NS_LOG_COMPONENT_DEFINE ("SatLinkResultsPlot");
 
 
-// forward declaration
-int main (int argc, char *argv[]);
-
+namespace ns3 {
 
 /**
- * This example will generate several Gnuplot files (.plt) as output. Each of
- * these files can be converted to PNG, for example by this command:
+ * \brief Example for plotting satellite link results data.
+ *
+ * This example can be run as it is, without any argument, i.e.:
+ *
+ *     ./waf --run="src/satellite/examples/link-results-plot"
+ *
+ * Several Gnuplot files (.plt) will be generated as output. Each of these
+ * files can be converted to a PNG file, for example by this command:
  *
  *     gnuplot s2-32apsk.plt
  *
- * which will produce `s2-32apsk.png` file. To convert all the Gnuplot files in
- * the directory, the command below can be used:
+ * which will produce `s2-32apsk.png` file in the same directory. To convert all
+ * the Gnuplot files in the directory, the command below can be used:
  *
  *     gnuplot *.plt
  *
@@ -70,19 +75,7 @@ private:
 }; // end of class SatLinkResultsPlot
 
 
-NS_LOG_COMPONENT_DEFINE ("SatLinkResultsPlot");
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsPlot);
-
-
-int
-main (int argc, char *argv[])
-{
-  Ptr<SatLinkResultsPlot> stub = CreateObject<SatLinkResultsPlot> ();
-  Config::RegisterRootNamespaceObject (stub);
-  stub->Run ();
-
-  return 0;
-}
 
 
 SatLinkResultsPlot::SatLinkResultsPlot ()
@@ -436,5 +429,22 @@ SatLinkResultsPlot::GetGnuplot (std::string outputName, std::string title)
   ret.AppendExtra ("set ytics 10");
   ret.AppendExtra ("set mxtics 5");
   ret.AppendExtra ("set grid xtics mxtics ytics");
+  // TODO probably better if the X axis and its labels are on top
+  // TODO and maybe emphasize major grid lines more than minor ones
   return ret;
+}
+
+
+} // end of namespace ns3
+
+
+int
+main (int argc, char *argv[])
+{
+  ns3::Ptr<ns3::SatLinkResultsPlot> stub;
+  stub = ns3::CreateObject<ns3::SatLinkResultsPlot> ();
+  ns3::Config::RegisterRootNamespaceObject (stub);
+  stub->Run ();
+
+  return 0;
 }

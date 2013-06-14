@@ -35,17 +35,44 @@ namespace ns3 {
  * \ingroup satellite
  *
  * \brief Abstract class for storing link results.
-
+ *
+ * This class cannot be instantiated. Use the child classes instead.
+ *
  * The child class is expected to load and handle multiple SatLookUpTable, and
- * provide query service on it. Two purely virtual functions must be
- * overridden by the child class: DoStart and DoGetTableIndex.
+ * provide query service on it. Two purely virtual functions must be overriden
+ * by the child class: SatLinkResults::DoStart and
+ * SatLinkResults::DoGetTableIndex.
+ *
+ * Usage example:
+ *
+ *     Ptr<SatLinkResultsDvbRcs2> linkDvbRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
+ *     Ptr<SatLinkResultsDvbS2> linkDvbS2 = CreateObject<SatLinkResultsDvbRcs2> ();
+ *     linkDvbRcs2->Initialize ();
+ *     linkDvbS2->Initialize ();
+ *
+ * The above initialization steps will load link results data from text files in
+ * `src/satellite/test/reference` directory. After that, BLER can be retrieved
+ * by the following call:
+ *
+ *      linkDvbRcs2->GetBler (SatLinkResults::SAT_MODCOD_QPSK_1_TO_3,
+ *                            536, 0.9);
+ *
+ * In this example, the object will consult the link results data for DVB-RCS2
+ * using QPSK 1/3 Modcod and 536 burst length, and then compute the BLER for
+ * SINR of 0.9 dB.
+ *
+ * Modcod is a mix of modulation scheme and coding rate, which is defined in
+ * SatLinkResults::SatModcod_e.
+ *
+ * \sa SatLinkResultsDvbRcs2, SatLinkResultsDvbS2
  */
 class SatLinkResults : public Object
 {
 public:
-
   /**
-   * Modulation scheme and coding rate for Satellite module
+   * \enum SatModcod_e
+   *
+   * \brief Modulation scheme and coding rate for Satellite module.
    */
   enum SatModcod_e
   {
@@ -86,20 +113,21 @@ public:
   /**
    * \brief Initialize look up tables.
    *
-   * Simply calls DoInitialize.
+   * Must be called before any SatLinkResults::GetBler can be invoked.
+   *
+   * Simply calls SatLinkResults::DoInitialize.
    */
   void Initialize ();
 
   /**
-   * \brief Get a BLER or BLEP value from link results
-   * \param modcod type of modulation scheme and coding rate for DVB-S2 and
-   *               DVB-RCS2
-   * \param burstLength burst length for DVB-RCS2, typically 262, 536, 664, or
-   *                    1616
-   * \param sinrDb the received SINR in dB
-   * \return BLER or BLEP value, which is a ``double`` ranging between [0..1]
+   * \brief Get a BLER (or BLEP, FER) value from link results.
    *
-   * Must be run after Initialize is called.
+   * \param modcod type of modulation scheme and coding rate
+   * \param burstLength burst length, typically 262, 536, 664, or 1616
+   * \param sinrDb the received SINR in dB
+   * \return BLER value, which is a `double` ranging between [0..1]
+   *
+   * Must be run after SatLinkResults::Initialize is called.
    *
    * The function is not expected to support all possible combinations of Modcod
    * and burst length. When an invalid combination is given, the function will
@@ -109,38 +137,50 @@ public:
                   double sinrDb) const;
 
 protected:
-
   /**
    * \brief Initialize look up tables.
    *
-   * Child classes must implement this function to initialize the m_table
-   * variable. This is typically done by loading pre-defined input files from
-   * the file system. In case of failure, the function should throw an error by
-   * calling ``NS_FATAL_ERROR``.
+   * Child classes must implement this function to initialize
+   * SatLinkResults::m_table member variable. This is typically done by loading
+   * pre-defined input files from the file system. In case of failure, the
+   * function should throw an error by calling `NS_FATAL_ERROR`.
    */
   virtual void DoInitialize () = 0;
 
   /**
    * \brief Convert a combination of Modcod and burst length to an index of
-   *        the m_table vector.
+   *        the SatLinkResults::m_table vector.
    *
-   * Child classes must implement this function to indicate how the right look
+   * \param modcod type of modulation scheme and coding rate
+   * \param burstLength burst length, typically 262, 536, 664, or 1616
+   * \return an unsigned integer, representing an index in
+   *         SatLinkResults::m_table
+   *
+   * Child classes must implement this function to indicate how the correct look
    * up table can be found.
    *
    * When an invalid Modcod and burst length combination is given, the function
-   * should throw an error (i.e. by calling ``NS_FATAL_ERROR``).
+   * should throw an error (i.e. by calling `NS_FATAL_ERROR`).
    */
   virtual uint8_t DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
                                    uint16_t burstLength) const = 0;
 
   /**
-   * \brief Linear one-dimensional array of satellite link result look up
-   *        tables.
+   * \brief Array of satellite link result look up tables.
+   *
+   * \sa SatLookUpTable
    */
   std::vector<Ptr<SatLookUpTable> > m_table;
 
+  /**
+   * \brief Linked to the attribute *InputPath*, the base path where the text
+   *        files containing link results data can be found.
+   */
   std::string m_inputPath;
 
+  /**
+   * \brief Indicates if SatLinkResults::Initialize has been called.
+   */
   bool m_isInitialized;
 };
 
@@ -152,13 +192,27 @@ protected:
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * burst length and modulation and coding scheme.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
  */
 class SatLinkResultsDvbRcs2 : public SatLinkResults
 {
 public:
   static TypeId GetTypeId ();
 protected:
+  /**
+   * \brief Initialize by loading DVB-RCS2 look up tables.
+   */
   void DoInitialize ();
+
+  /**
+   * \brief Convert Modcod to an index of the SatLinkResults::m_table vector.
+   *
+   * \param modcod type of modulation scheme and coding rate
+   * \param burstLength burst length, either 262, 536, or 1616
+   * \return an unsigned integer, representing an index in
+   *         SatLinkResults::m_table
+   */
   uint8_t DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
                            uint16_t burstLength) const;
 };
@@ -171,13 +225,27 @@ protected:
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * modulation and coding scheme.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
  */
 class SatLinkResultsDvbS2 : public SatLinkResults
 {
 public:
   static TypeId GetTypeId ();
 protected:
+  /**
+   * \brief Initialize by loading DVB-S2 look up tables.
+   */
   void DoInitialize ();
+
+  /**
+   * \brief Convert Modcod to an index of the SatLinkResults::m_table vector.
+   *
+   * \param modcod type of modulation scheme and coding rate
+   * \param burstLength burst length, ignored because it is not used in DVB-S2
+   * \return an unsigned integer, representing an index in
+   *         SatLinkResults::m_table
+   */
   uint8_t DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
                            uint16_t burstLength) const;
 };
