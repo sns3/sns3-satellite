@@ -21,6 +21,7 @@
 
 #include "ns3/log.h"
 #include "ns3/fatal-error.h"
+#include <cmath>
 
 #include "satellite-look-up-table.h"
 
@@ -115,8 +116,10 @@ SatLookUpTable::GetBler (double sinrDb) const
       // normal case
       NS_ASSERT (i > 0);
       NS_ASSERT (i < n);
-      double bler = Interpolate (sinrDb, m_sinrDb[i - 1], m_sinrDb[i],
-                                m_bler[i - 1], m_bler[i]);
+      double sinr = pow (10, 0.1 * sinrDb);
+      double sinr0 = pow (10, 0.1 * m_sinrDb[i - 1]);
+      double sinr1 = pow (10, 0.1 * m_sinrDb[i]);
+      double bler = Interpolate (sinr, sinr0, sinr1, m_bler[i - 1], m_bler[i]);
       NS_LOG_LOGIC (this << " Interpolate to BLER = " << bler);
       return bler;
     }
