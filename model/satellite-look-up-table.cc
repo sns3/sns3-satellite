@@ -124,7 +124,7 @@ SatLookUpTable::GetBler (double sinrDb) const
       return bler;
     }
 
-}
+} // end of double SatLookUpTable::GetBler (double sinrDb) const
 
 
 double

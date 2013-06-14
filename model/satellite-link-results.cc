@@ -105,34 +105,34 @@ SatLinkResultsDvbRcs2::DoInitialize ()
 {
   m_table.resize (21);
 
-  m_table[0] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat2.txt");
-  m_table[1] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat3.txt");
-  m_table[2] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat4.txt");
-  m_table[3] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat5.txt");
-  m_table[4] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat6.txt");
-  m_table[5] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat7.txt");
-  m_table[6] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat8.txt");
-  m_table[7] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat9.txt");
-  m_table[8] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat10.txt");
-  m_table[9] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat11.txt");
-  m_table[10] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat12.txt");
-  m_table[11] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat13.txt");
-  m_table[12] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat14.txt");
-  m_table[13] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat15.txt");
-  m_table[14] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat16.txt");
-  m_table[15] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat17.txt");
-  m_table[16] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat18.txt");
-  m_table[17] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat19.txt");
-  m_table[18] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat20.txt");
-  m_table[19] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat21.txt");
-  m_table[20] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_wafeformat22.txt");
+  m_table[0] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat2.txt");
+  m_table[1] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat3.txt");
+  m_table[2] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat4.txt");
+  m_table[3] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat5.txt");
+  m_table[4] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat6.txt");
+  m_table[5] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat7.txt");
+  m_table[6] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat8.txt");
+  m_table[7] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat9.txt");
+  m_table[8] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat10.txt");
+  m_table[9] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat11.txt");
+  m_table[10] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat12.txt");
+  m_table[11] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat13.txt");
+  m_table[12] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat14.txt");
+  m_table[13] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat15.txt");
+  m_table[14] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat16.txt");
+  m_table[15] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat17.txt");
+  m_table[16] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat18.txt");
+  m_table[17] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat19.txt");
+  m_table[18] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat20.txt");
+  m_table[19] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat21.txt");
+  m_table[20] = CreateObject<SatLookUpTable> (m_inputPath + "rcs2_waveformat22.txt");
 
 } // end of void SatLinkResultsDvbRcs2::DoInitialize
 
 
 uint8_t
 SatLinkResultsDvbRcs2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
-                                        int16_t burstLength) const
+                                        uint16_t burstLength) const
 {
   uint8_t waveformId = 0;
 
@@ -309,6 +309,7 @@ SatLinkResultsDvbS2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
                                       uint16_t burstLength) const
 {
   uint8_t ret = 255;
+
   switch (modcod)
   {
     // QPSK
@@ -383,16 +384,16 @@ SatLinkResultsDvbS2::DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
     // 32APSK
 
     case SAT_MODCOD_32APSK_3_TO_4:
-      ret = 19;
+      ret = 20;
       break;
     case SAT_MODCOD_32APSK_4_TO_5:
-      ret = 19;
+      ret = 21;
       break;
     case SAT_MODCOD_32APSK_5_TO_6:
-      ret = 19;
+      ret = 22;
       break;
     case SAT_MODCOD_32APSK_8_TO_9:
-      ret = 19;
+      ret = 23;
       break;
 
     default:

@@ -160,7 +160,7 @@ public:
 protected:
   void DoInitialize ();
   uint8_t DoGetTableIndex (SatLinkResults::SatModcod_e modcod,
-                           int16_t burstLength) const;
+                           uint16_t burstLength) const;
 };
 
 
