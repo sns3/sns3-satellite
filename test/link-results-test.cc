@@ -27,52 +27,15 @@
 
 NS_LOG_COMPONENT_DEFINE("TestLinkResult");
 
-#define SAT_LINK_RESULTS_TOLERANCE 0.000001
+#define SAT_LINK_RESULTS_PRECISION 0.00011
+
+// TODO precision loss occurs somewhere, causing the test to fail if this is set to 0.00010
 
 namespace ns3 {
 
 
 /*
- * TEST CASE 1
- */
-
-
-class SatLookUpTableTestCase : public TestCase
-{
-public:
-  SatLookUpTableTestCase (Ptr<SatLookUpTable> table, double sinrDb,
-                          double bler);
-private:
-  virtual void DoRun ();
-  Ptr<SatLookUpTable> m_table;
-  double m_sinrDb;
-  double m_bler;
-};
-
-
-SatLookUpTableTestCase::SatLookUpTableTestCase (Ptr<SatLookUpTable> table,
-                                                double sinrDb, double bler)
-  : TestCase ("Simple value comparison test of SatLookUpTable"),
-    m_table (table),
-    m_sinrDb (sinrDb),
-    m_bler (bler)
-{
-}
-
-
-void
-SatLookUpTableTestCase::DoRun ()
-{
-  NS_LOG_FUNCTION (this << m_sinrDb << m_bler);
-  double actualBler = m_table->GetBler (m_sinrDb);
-  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_TOLERANCE,
-                            "BLER outside tolerable range");
-}
-
-
-
-/*
- * TEST CASE 2
+ * DVB-RCS2 TEST CASE
  */
 
 
@@ -96,7 +59,7 @@ private:
 SatLinkResultsDvbRcs2TestCase::SatLinkResultsDvbRcs2TestCase (
   Ptr<SatLinkResultsDvbRcs2> linkResults, SatLinkResults::SatModcod_e modcod,
   uint16_t burstLength, double sinrDb, double bler)
-  : TestCase ("Simple value comparison test of SatLinkResults"),
+  : TestCase ("Comparing SatLinkResults for DVB-RCS2 with reference link results"),
     m_linkResults (linkResults),
     m_modcod (modcod),
     m_burstLength (burstLength),
@@ -112,14 +75,16 @@ SatLinkResultsDvbRcs2TestCase::DoRun ()
   NS_LOG_FUNCTION (this << m_modcod << m_burstLength << m_sinrDb << m_bler);
   double actualBler = m_linkResults->GetBler (m_modcod, m_burstLength,
                                               m_sinrDb);
-  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_TOLERANCE,
-                            "BLER outside tolerable range");
+  NS_LOG_DEBUG (this << " actualBler=" << actualBler);
+  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
+                            "Difference of " << (actualBler - m_bler)
+                                             << " from reference BLER" );
 }
 
 
 
 /*
- * TEST CASE 3
+ * DVB-S2 TEST CASE
  */
 
 
@@ -143,7 +108,7 @@ private:
 SatLinkResultsDvbS2TestCase::SatLinkResultsDvbS2TestCase (
   Ptr<SatLinkResultsDvbS2> linkResults, SatLinkResults::SatModcod_e modcod,
   uint16_t burstLength, double sinrDb, double bler)
-  : TestCase ("Simple value comparison test of SatLinkResults"),
+  : TestCase ("Comparing SatLinkResults for DVB-S2 with reference link results"),
     m_linkResults (linkResults),
     m_modcod (modcod),
     m_burstLength (burstLength),
@@ -159,8 +124,10 @@ SatLinkResultsDvbS2TestCase::DoRun ()
   NS_LOG_FUNCTION (this << m_modcod << m_burstLength << m_sinrDb << m_bler);
   double actualBler = m_linkResults->GetBler (m_modcod, m_burstLength,
                                               m_sinrDb);
-  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_TOLERANCE,
-                            "BLER outside tolerable range");
+  NS_LOG_DEBUG (this << " actualBler=" << actualBler);
+  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
+                            "Difference of " << (actualBler - m_bler)
+                                             << " from reference BLER" );
 }
 
 
@@ -175,88 +142,602 @@ static class LinkResultTestSuite : public TestSuite
 public:
   LinkResultTestSuite () : TestSuite ("link-results", TestSuite::UNIT)
   {
-    //LogComponentEnable ("SatLookUpTable", LOG_LEVEL_ALL);
-    //LogComponentEnable ("SatLookUpTable", LOG_PREFIX_TIME);
-    //LogComponentEnable ("SatLookUpTable", LOG_PREFIX_FUNC);
+    //LogComponentEnable ("TestLinkResult", LOG_DEBUG);
+    //LogComponentEnable ("TestLinkResult", LOG_FUNCTION);
 
-//    Ptr<SatLookUpTable> table;
-//    std::string basePath = "src/satellite/data/linkresults/";
-//
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat10.txt");
-//    // arguments: table, sinrDb, expectedBler
-//    AddTestCase (new SatLookUpTableTestCase (table, 0.0, 1.0));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.0, 1.0));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.00134, 1.0));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.00134770889488, 1.0));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.3989218328841, 0.576405635790883));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.6010781671159, 0.309205403018096));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.80323450134771, 0.113061825886482));
-//    AddTestCase (new SatLookUpTableTestCase (table, 5.99865229110512, 0.0358068560118245));
-//    AddTestCase (new SatLookUpTableTestCase (table, 6.20080862533693, 0.0073681796810957));
-//    AddTestCase (new SatLookUpTableTestCase (table, 6.39622641509434, 0.00159059813221707));
-//    AddTestCase (new SatLookUpTableTestCase (table, 6.59838274932615, 0.000138179027765088));
-//    AddTestCase (new SatLookUpTableTestCase (table, 6.80053908355795, 1.52529907364512e-05));
-//    AddTestCase (new SatLookUpTableTestCase (table, 7.00269541778976, 2.92105451302717e-06));
-//    AddTestCase (new SatLookUpTableTestCase (table, 7.19811320754717, 7.63774033777321e-07));
-//    AddTestCase (new SatLookUpTableTestCase (table, 7.40026954177898, 2.7927612512804e-07));
-//    AddTestCase (new SatLookUpTableTestCase (table, 7.60242587601078, 9.73411536314302e-08));
-//    AddTestCase (new SatLookUpTableTestCase (table, 7.60243, 0.0));
+    /*
+     * The following lines of test cases are automatically generated by a
+     * supplementary Octave script. Run it from the command line as below:
+     *
+     *     cd src/satellite/test/reference
+     *     ./generate_test_data_sat_link_results.m > link-results-test-cases.txt
+     *
+     * Then copy the content of link-results-test-cases.txt here.
+     *
+     * IMPORTANT: not to add the link-results-test-cases.txt into the commit.
+     *
+     * The Octave script covers test cases for all possible Modcod and burst
+     * length combination, for both DVB-RCS2 and DVB-S2.
+     */
 
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat11.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat12.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat13.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat14.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat15.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat16.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat17.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat18.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat19.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat20.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat21.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat22.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat2.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat3.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat4.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat5.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat6.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat7.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat8.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "rcs2_waveformat9.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_16apsk_2_to_3.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_16apsk_3_to_4.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_16apsk_4_to_5.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_16apsk_5_to_6.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_16apsk_8_to_9.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_16apsk_9_to_10.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_32apsk_3_to_4.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_32apsk_4_to_5.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_32apsk_5_to_6.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_32apsk_8_to_9.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_8psk_2_to_3.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_8psk_3_to_4.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_8psk_3_to_5.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_8psk_5_to_6.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_8psk_8_to_9.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_8psk_9_to_10.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_1_to_2.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_2_to_3.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_3_to_4.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_3_to_5.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_4_to_5.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_5_to_6.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_8_to_9.txt");
-//    table = CreateObject<SatLookUpTable> (basePath + "s2_qpsk_9_to_10.txt");
+    Ptr<SatLinkResultsDvbRcs2> linkResultsDvbRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
+    linkResultsDvbRcs2->Initialize ();
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.000000, 6.911498e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.100000, 6.301240e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.200000, 5.676766e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.300000, 5.087709e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.400000, 4.499176e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.500000, 3.902893e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.600000, 3.429265e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.700000, 2.944605e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.800000, 2.487311e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 0.900000, 2.054542e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.000000, 1.613223e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.100000, 1.306533e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.200000, 9.926992e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.300000, 7.397400e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.400000, 5.513365e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.500000, 3.641270e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.600000, 2.737544e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.700000, 1.812767e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.800000, 1.162355e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 1.900000, 7.548766e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.000000, 3.450744e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.100000, 2.614216e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.200000, 1.758204e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.300000, 1.122122e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.400000, 7.087955e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.500000, 2.858414e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.600000, 1.924945e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.700000, 1.006418e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.800000, 4.419801e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 2.900000, 2.866194e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 3.000000, 1.314923e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 3.100000, 9.174612e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 3.200000, 5.107415e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 3.300000, 2.631533e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 3.400000, 1.698704e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 262, 3.500000, 7.441453e-07));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.000000, 7.817144e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.100000, 6.804638e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.200000, 5.768548e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.300000, 4.870494e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.400000, 3.997756e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.500000, 3.114879e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.600000, 2.444927e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.700000, 1.759369e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.800000, 1.218130e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 0.900000, 8.101488e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.000000, 3.957823e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.100000, 2.669867e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.200000, 1.351911e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.300000, 5.729408e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.400000, 3.644206e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.500000, 1.510434e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.600000, 9.371071e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.700000, 3.856039e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.800000, 7.096823e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 1.900000, 4.198006e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.000000, 1.285485e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.100000, 8.258597e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.200000, 3.555283e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.300000, 9.837440e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.400000, 5.721571e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.500000, 1.509832e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.600000, 1.072372e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.700000, 6.665731e-08));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 536, 2.800000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.300000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.400000, 9.995092e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.500000, 8.820860e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.600000, 7.620998e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.700000, 6.665916e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.800000, 5.688586e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 0.900000, 4.688492e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.000000, 3.686002e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.100000, 2.675470e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.200000, 1.932570e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.300000, 1.172366e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.400000, 6.772614e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.500000, 4.215132e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.600000, 1.598078e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.700000, 1.039493e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.800000, 5.976856e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 1.900000, 3.046386e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.000000, 1.649798e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.100000, 2.206785e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.200000, 1.237751e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.300000, 4.536339e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.400000, 7.236288e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.500000, 4.023787e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.600000, 7.364581e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.700000, 4.171003e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.800000, 2.405347e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 536, 2.900000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.100000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.200000, 9.277389e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.300000, 8.444347e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.400000, 7.591900e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.500000, 6.719598e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.600000, 5.826977e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.700000, 4.913564e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.800000, 3.774604e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 1.900000, 2.605107e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.000000, 1.691997e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.100000, 1.087568e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.200000, 4.799368e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.300000, 3.202717e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.400000, 1.568875e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.500000, 5.279165e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.600000, 2.971025e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.700000, 6.091228e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.800000, 3.721815e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 2.900000, 1.485287e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.000000, 2.412545e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.100000, 1.329510e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.200000, 2.212466e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.300000, 1.146765e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.400000, 4.912253e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.500000, 1.415885e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.600000, 8.615527e-08));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 536, 3.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 1.800000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 1.900000, 7.828014e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.000000, 6.887895e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.100000, 5.758240e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.200000, 4.602272e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.300000, 3.512016e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.400000, 2.488114e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.500000, 1.440363e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.600000, 1.030401e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.700000, 6.180473e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.800000, 3.300433e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 2.900000, 1.859605e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.000000, 3.852160e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.100000, 2.119556e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.200000, 9.430212e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.300000, 2.301830e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.400000, 1.282638e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.500000, 2.397061e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.600000, 1.579169e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.700000, 7.422253e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.800000, 2.574431e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 3.900000, 1.619554e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 4.000000, 6.424339e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 4.100000, 4.382398e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 4.200000, 2.556503e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 536, 4.300000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 2.600000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 2.700000, 7.110925e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 2.800000, 5.369842e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 2.900000, 4.242421e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.000000, 3.088739e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.100000, 2.145333e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.200000, 1.407014e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.300000, 6.514974e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.400000, 4.705403e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.500000, 2.866374e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.600000, 1.583691e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.700000, 9.224452e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.800000, 2.457973e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 3.900000, 1.439824e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.000000, 6.071216e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.100000, 1.203871e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.200000, 7.346460e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.300000, 2.544917e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.400000, 1.538457e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.500000, 7.857375e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.600000, 3.412636e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.700000, 2.258889e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.800000, 1.078267e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 4.900000, 7.390543e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 5.000000, 4.128674e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 536, 5.100000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.300000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.400000, 9.970814e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.500000, 8.753414e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.600000, 7.507658e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.700000, 6.232884e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.800000, 4.936624e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 3.900000, 3.772996e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.000000, 2.593720e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.100000, 1.805342e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.200000, 1.001120e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.300000, 6.485165e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.400000, 2.876999e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.500000, 1.698721e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.600000, 5.347996e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.700000, 2.835669e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.800000, 6.533437e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 4.900000, 3.699109e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 5.000000, 7.987600e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 5.100000, 4.106050e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 5.200000, 4.905862e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 5.300000, 1.947714e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 536, 5.400000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.100000, 9.982312e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.200000, 8.875682e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.300000, 7.743276e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.400000, 6.584493e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.500000, 5.398718e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.600000, 4.186739e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.700000, 2.993412e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.800000, 1.777859e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 4.900000, 1.225071e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.000000, 6.594075e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.100000, 4.036868e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.200000, 1.464747e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.300000, 8.283890e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.400000, 2.556332e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.500000, 1.445995e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.600000, 3.097940e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.700000, 1.680249e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.800000, 3.420918e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 5.900000, 1.700964e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 6.000000, 3.457957e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 6.100000, 1.502421e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 6.200000, 1.879169e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 6.300000, 1.295527e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 536, 6.400000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.100000, 8.984802e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.200000, 7.931927e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.300000, 6.854529e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.400000, 5.750133e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.500000, 4.443602e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.600000, 3.106637e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.700000, 2.143663e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.800000, 1.162725e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 5.900000, 7.524173e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.000000, 3.562161e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.100000, 2.171507e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.200000, 7.484592e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.300000, 4.468050e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.400000, 1.564101e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.500000, 8.534693e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.600000, 1.372182e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.700000, 7.710343e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.800000, 1.558846e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 6.900000, 9.257401e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.000000, 3.089285e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.100000, 1.859010e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.200000, 7.593555e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.300000, 5.224060e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.400000, 2.799373e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.500000, 1.905798e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.600000, 9.957496e-08));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 536, 7.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.100000, 8.450667e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.200000, 6.865245e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.300000, 5.202239e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.400000, 3.508950e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.500000, 2.433514e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.600000, 1.333028e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.700000, 8.403137e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.800000, 3.361230e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 5.900000, 1.897232e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.000000, 4.682039e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.100000, 2.552204e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.200000, 3.727594e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.300000, 1.946723e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.400000, 1.243711e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.500000, 5.406748e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.600000, 7.337872e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.700000, 3.916098e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.800000, 1.679675e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 6.900000, 1.641384e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 536, 7.000000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.100000, 5.862816e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.200000, 4.247427e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.300000, 2.756030e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.400000, 1.714297e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.500000, 9.313072e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.600000, 4.143877e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.700000, 2.073605e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.800000, 7.650565e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 6.900000, 2.681112e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.000000, 1.254394e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.100000, 4.036568e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.200000, 5.810529e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.300000, 2.114010e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.400000, 5.192016e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.500000, 2.266676e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.600000, 1.340118e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.700000, 6.627473e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.800000, 2.511102e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 536, 7.900000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.000000, 7.441453e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.100000, 6.486097e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.200000, 5.508488e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.300000, 4.289396e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.400000, 2.914490e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.500000, 1.824937e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.600000, 7.151758e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.700000, 3.989725e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.800000, 7.788337e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 0.900000, 4.341978e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.000000, 8.153431e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.100000, 3.188557e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.200000, 2.762133e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.300000, 1.436354e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.400000, 9.943140e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.500000, 6.055816e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_3, 1616, 1.600000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.300000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.400000, 9.996358e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.500000, 9.125069e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.600000, 8.233486e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.700000, 7.321134e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.800000, 6.085286e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 0.900000, 4.318476e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.000000, 2.510511e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.100000, 1.342404e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.200000, 8.576830e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.300000, 3.616710e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.400000, 6.512359e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.500000, 1.349486e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.600000, 3.536372e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.700000, 2.233509e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.800000, 9.911833e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 1.900000, 5.223388e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 2.000000, 2.429502e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 1616, 2.100000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.100000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.200000, 9.991230e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.300000, 9.291707e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.400000, 8.575891e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.500000, 7.843401e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.600000, 6.549796e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.700000, 4.582296e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.800000, 2.568968e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 1.900000, 1.069552e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.000000, 2.962950e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.100000, 1.183493e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.200000, 2.896994e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.300000, 4.514209e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.400000, 8.858101e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.500000, 5.088282e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.600000, 5.519314e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.700000, 7.066998e-08));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 1616, 2.800000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 1.800000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 1.900000, 9.262816e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.000000, 8.376648e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.100000, 6.467328e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.200000, 4.513534e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.300000, 2.514230e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.400000, 1.293592e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.500000, 4.664465e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.600000, 8.278395e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.700000, 3.192061e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.800000, 5.686275e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 2.900000, 4.165378e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 3.000000, 1.528707e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 3.100000, 1.719897e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 3.200000, 8.562879e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 3.300000, 5.409060e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 1616, 3.400000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 2.600000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 2.700000, 7.577172e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 2.800000, 5.821003e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 2.900000, 3.839968e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.000000, 2.326324e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.100000, 1.121501e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.200000, 3.277871e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.300000, 1.434408e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.400000, 4.247975e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.500000, 6.147593e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.600000, 1.444939e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.700000, 1.827141e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.800000, 5.280745e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 3.900000, 2.591382e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 1616, 4.000000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 3.400000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 3.500000, 9.802508e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 3.600000, 8.452648e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 3.700000, 7.098131e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 3.800000, 5.318539e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 3.900000, 3.016479e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.000000, 1.531048e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.100000, 5.795117e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.200000, 1.825057e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.300000, 7.173032e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.400000, 7.311789e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.500000, 5.630949e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.600000, 1.380428e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.700000, 5.151866e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 1616, 4.800000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.100000, 9.988070e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.200000, 9.241702e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.300000, 8.477948e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.400000, 7.696404e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.500000, 5.536078e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.600000, 3.655547e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.700000, 2.086119e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.800000, 1.039355e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 4.900000, 3.601899e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 5.000000, 8.110302e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 5.100000, 2.802954e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 5.200000, 1.952944e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 5.300000, 1.726153e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 5.400000, 3.009858e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 1616, 5.500000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.100000, 9.455728e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.200000, 8.891257e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.300000, 7.354406e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.400000, 5.743308e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.500000, 3.796334e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.600000, 1.804009e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.700000, 9.639798e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.800000, 1.452323e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 5.900000, 7.720030e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.000000, 8.477862e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.100000, 4.371598e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.200000, 1.696866e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.300000, 7.138615e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.400000, 5.443126e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.500000, 1.873142e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.600000, 6.654839e-08));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 1616, 6.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.100000, 8.870657e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.200000, 7.233135e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.300000, 5.028237e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.400000, 2.845778e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.500000, 1.229611e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.600000, 2.535820e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.700000, 9.661498e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.800000, 1.340154e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 5.900000, 3.738657e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 6.000000, 1.317024e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_3_TO_4, 1616, 6.100000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 5.900000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.000000, 8.439346e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.100000, 6.111121e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.200000, 4.173033e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.300000, 2.651801e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.400000, 1.095134e-01));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.500000, 2.040965e-02));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.600000, 2.204401e-03));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.700000, 6.183752e-04));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.800000, 3.080224e-05));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 6.900000, 1.514687e-06));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 7.000000, 8.866457e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 7.100000, 5.042134e-07));
+    AddTestCase (new SatLinkResultsDvbRcs2TestCase (linkResultsDvbRcs2, SatLinkResults::SAT_MODCOD_16QAM_5_TO_6, 1616, 7.200000, 0.000000e+00));
 
     Ptr<SatLinkResultsDvbS2> linkResultsDvbS2 = CreateObject<SatLinkResultsDvbS2> ();
     linkResultsDvbS2->Initialize ();
-    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 626, 8.800000, 1.000000e+00));
-    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 626, 8.900000, 2.628144e-04));
-    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 626, 9.000000, 0.000000e+00));
 
-    // TODO: write a class for plotting
-    // TODO: write a class for printing test cases
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 0, 8.800000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 0, 8.900000, 2.638059e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_2_TO_3, 0, 9.000000, 0.000000e+00));
 
-  }
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_3_TO_4, 0, 10.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_3_TO_4, 0, 10.100000, 5.924581e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_3_TO_4, 0, 10.200000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_4_TO_5, 0, 10.900000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_4_TO_5, 0, 11.000000, 4.376682e-05));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_4_TO_5, 0, 11.100000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_5_TO_6, 0, 11.400000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_5_TO_6, 0, 11.500000, 1.872229e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_5_TO_6, 0, 11.600000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_8_TO_9, 0, 12.700000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_8_TO_9, 0, 12.800000, 5.164393e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_8_TO_9, 0, 12.900000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_9_TO_10, 0, 13.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_16APSK_9_TO_10, 0, 13.100000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_3_TO_4, 0, 12.500000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_3_TO_4, 0, 12.600000, 7.748605e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_3_TO_4, 0, 12.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_4_TO_5, 0, 13.500000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_4_TO_5, 0, 13.600000, 8.435280e-05));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_4_TO_5, 0, 13.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_5_TO_6, 0, 14.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_5_TO_6, 0, 14.100000, 4.465460e-02));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_5_TO_6, 0, 14.200000, 1.006806e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_5_TO_6, 0, 14.300000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_8_TO_9, 0, 15.500000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_8_TO_9, 0, 15.600000, 3.965820e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_32APSK_8_TO_9, 0, 15.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 0, 6.400000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 0, 6.500000, 2.259589e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 0, 6.600000, 1.166365e-06));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_2_TO_3, 0, 6.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 0, 7.700000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 0, 7.800000, 2.823614e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_4, 0, 7.900000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_5, 0, 5.300000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_5, 0, 5.400000, 3.215188e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_3_TO_5, 0, 5.500000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 0, 9.200000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 0, 9.300000, 2.113781e-05));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_5_TO_6, 0, 9.400000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_8_TO_9, 0, 10.500000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_8_TO_9, 0, 10.600000, 1.701436e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_8_TO_9, 0, 10.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_9_TO_10, 0, 10.800000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_9_TO_10, 0, 10.900000, 6.079920e-05));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_8PSK_9_TO_10, 0, 11.000000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 0, 0.800000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 0, 0.900000, 3.430041e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_1_TO_2, 0, 1.000000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 0, 2.900000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 0, 3.000000, 2.043307e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 0, 3.100000, 1.277366e-06));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_2_TO_3, 0, 3.200000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 0, 3.900000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 0, 4.000000, 9.741215e-06));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_4, 0, 4.100000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_5, 0, 2.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_5, 0, 2.100000, 3.479216e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_3_TO_5, 0, 2.200000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_4_TO_5, 0, 4.500000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_4_TO_5, 0, 4.600000, 4.265127e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_4_TO_5, 0, 4.700000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 0, 5.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 0, 5.100000, 9.569327e-04));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_5_TO_6, 0, 5.200000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_8_TO_9, 0, 6.000000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_8_TO_9, 0, 6.100000, 3.659751e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_8_TO_9, 0, 6.200000, 0.000000e+00));
+
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_9_TO_10, 0, 6.200000, 1.000000e+00));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_9_TO_10, 0, 6.300000, 5.545440e-03));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_9_TO_10, 0, 6.400000, 2.495907e-06));
+    AddTestCase (new SatLinkResultsDvbS2TestCase (linkResultsDvbS2, SatLinkResults::SAT_MODCOD_QPSK_9_TO_10, 0, 6.500000, 0.000000e+00));
+
+    // END OF AUTO-GENERATED TEST CASES
+
+  } // end of LinkResultTestSuite ()
+
 } g_linkResultTestSuite;
 // end of static class LinkResultTestSuite
 
