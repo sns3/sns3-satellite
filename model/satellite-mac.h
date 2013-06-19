@@ -132,7 +132,7 @@ public:
    *
    * @see SatChannel
    * /param p Ptr to the received packet.
-   * /param beamId the id of the beam where packet is from
+   * /param rxParams RX parameters
    */
 
   void Receive (Ptr<Packet> p, Ptr<SatSignalParameters> /*rxParams*/);
@@ -161,27 +161,30 @@ public:
 
   void SetAddress (Mac48Address macAddress);
 
-private:
+protected:
+  /**
+    * Start Sending a Packet Down the Wire.
+    *
+    * The TransmitStart method is the method that is used internally in the
+    * SatMac to begin the process of sending a packet out on
+    * the phy layer.
+    *
+    * \param p a reference to the packet to send
+    * \returns true if success, false on failure
+    */
+   bool TransmitStart (Ptr<Packet> p);
 
+   inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
+   inline Ptr<Packet> GetPacketFromQueue() { return m_queue->Dequeue();}
+   inline bool PacketHasError(Ptr<Packet> packet) { return (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet));}
+   inline Time GetInterval() { return m_tInterval;}
+private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
 
   void DoDispose (void);
 
 private:
-
-  /**
-   * Start Sending a Packet Down the Wire.
-   *
-   * The TransmitStart method is the method that is used internally in the
-   * SatMac to begin the process of sending a packet out on
-   * the phy layer.
-   *
-   * \param p a reference to the packet to send
-   * \returns true if success, false on failure
-   */
-  bool TransmitStart (Ptr<Packet> p);
-
   /**
    * Start new sending if there is packet in queue, otherwise schedules next send moment.
    *

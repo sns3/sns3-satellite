@@ -70,6 +70,8 @@ SatBeamHelper::SatBeamHelper ()
   // create Geo Node and install net device on it already here because it is not scenario dependent
   m_geoNode = CreateObject<Node>();
   m_geoHelper->Install(m_geoNode);
+
+  m_ncc = CreateObject<SatNcc>();
 }
 
 void 
@@ -131,6 +133,15 @@ SatBeamHelper::Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32
 
   // set needed routings and fill ARP cache
   PopulateRoutings(ut, utNd, gwNode, gwNd, gwAddress.GetAddress(0), utAddress );
+
+  // add beam to NCC
+  m_ncc->AddBeam(beamId, MakeCallback(&NetDevice::Send, gwNd));
+
+  // add UTs to NCC
+  for ( NetDeviceContainer::Iterator i = utNd.Begin();  i != utNd.End(); i++ )
+    {
+      m_ncc->AddUt((*i)->GetAddress(), beamId);
+    }
 
   m_ipv4Helper.NewNetwork();
 

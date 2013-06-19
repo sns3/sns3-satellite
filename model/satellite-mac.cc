@@ -237,7 +237,7 @@ SatMac::TransmitReady (void)
 
   if ( m_tInterval.GetDouble() > 0)
     {
-      if ( m_queue->GetNPackets() != 0 )
+      if ( PacketInQueue() )
           {
             Ptr<Packet> p = m_queue->Dequeue();
             TransmitStart(p);
@@ -281,7 +281,7 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
+  if ( PacketHasError(packet) )
     {
       // 
       // If we have an error model and it indicates that it is time to lose a
@@ -312,8 +312,8 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 
           // If the packet is intended for this receiver
           Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
-          if ( addr == m_macAddress ||
-              addr.IsBroadcast() )
+
+          if ( addr == m_macAddress ||  addr.IsBroadcast() )
             {
               m_rxCallback (packet);
             }

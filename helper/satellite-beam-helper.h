@@ -29,6 +29,7 @@
 #include "ns3/node-container.h"
 #include "ns3/ipv4-address-helper.h"
 
+#include "ns3/satellite-ncc.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -130,6 +131,7 @@ private:
     Ipv4AddressHelper     m_ipv4Helper;
     NodeContainer         m_gwNodeList;
     Ptr<Node>             m_geoNode;
+    Ptr<SatNcc>           m_ncc;
 
     std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
     std::set<GwLink >                         m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).

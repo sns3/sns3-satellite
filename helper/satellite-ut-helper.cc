@@ -21,7 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/names.h"
 #include "../model/satellite-channel.h"
-#include "../model/satellite-mac.h"
+#include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -122,14 +122,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   uint32_t FEEDER_CARRIERS(1);
   phyRx->ConfigurePhyRxCarriers (FEEDER_CARRIERS);
 
-  Ptr<SatMac> mac = CreateObject<SatMac> ();
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> ();
 
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   mac->SetQueue (queue);
 
   // Attach the Mac layer receiver to Phy
-  SatPhy::ReceiveCallback cb = MakeCallback (&SatMac::Receive, mac);
+  SatPhy::ReceiveCallback cb = MakeCallback (&SatUtMac::Receive, mac);
 
   // Create SatPhy modules
   Ptr<SatPhy> phy = CreateObject<SatPhy> (phyTx, phyRx, beamId, cb);
