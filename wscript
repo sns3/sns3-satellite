@@ -39,6 +39,7 @@ def build(bld):
         'test/geo-coordinate-test.cc',
         'test/simple-p2p.cc',
         'test/scenario-creation.cc',
+        'test/performance-memory-test.cc',
         'test/cbr-test.cc',
         'test/link-results-test.cc',
         ]

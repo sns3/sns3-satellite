@@ -96,24 +96,24 @@ SimpleP2p1::DoRun (void)
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
-  ApplicationContainer GwApps = cbr.Install (helper->GetGwUsers());
-  GwApps.Start (Seconds (1.0));
-  GwApps.Stop (Seconds (2.1));
+  ApplicationContainer gwApps = cbr.Install (helper->GetGwUsers());
+  gwApps.Start (Seconds (1.0));
+  gwApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
 
-  ApplicationContainer UtApps = sink.Install (utUsers);
-  UtApps.Start (Seconds (1.0));
-  UtApps.Stop (Seconds (3.0));
+  ApplicationContainer utApps = sink.Install (utUsers);
+  utApps.Start (Seconds (1.0));
+  utApps.Stop (Seconds (3.0));
 
   Simulator::Stop (Seconds (11));
   Simulator::Run ();
 
   Simulator::Destroy ();
 
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (UtApps.Get (0));
-  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (GwApps.Get (0));
+  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (utApps.Get (0));
+  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (gwApps.Get (0));
 
   // here we check that results are as expected.
   // * Sender has sent something
@@ -184,38 +184,38 @@ SimpleP2p2::DoRun (void)
   // app to send receiver 1
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
-  ApplicationContainer GwApps = cbr.Install (helper->GetGwUsers());
+  ApplicationContainer gwApps = cbr.Install (helper->GetGwUsers());
 
   // app to send receiver 2
   cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(4)), port))));
-  GwApps.Add(cbr.Install (helper->GetGwUsers()));
+  gwApps.Add(cbr.Install (helper->GetGwUsers()));
 
-  GwApps.Start (Seconds (1.0));
-  GwApps.Stop (Seconds (2.1));
+  gwApps.Start (Seconds (1.0));
+  gwApps.Stop (Seconds (2.1));
 
   // Create a packet sinks to receive these packets
 
   // receiver 1
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
-  ApplicationContainer UtApps = sink.Install (utUsers.Get(0));
+  ApplicationContainer utApps = sink.Install (utUsers.Get(0));
 
   // receiver 2
   sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(4)), port))));
-  UtApps.Add(sink.Install (utUsers.Get(4)));
+  utApps.Add(sink.Install (utUsers.Get(4)));
 
-  UtApps.Start (Seconds (1.0));
-  UtApps.Stop (Seconds (3.0));
+  utApps.Start (Seconds (1.0));
+  utApps.Stop (Seconds (3.0));
 
   Simulator::Stop (Seconds (11));
   Simulator::Run ();
 
   Simulator::Destroy ();
 
-  Ptr<PacketSink> receiver1 = DynamicCast<PacketSink> (UtApps.Get (0));
-  Ptr<CbrApplication> sender1 = DynamicCast<CbrApplication> (GwApps.Get (0));
+  Ptr<PacketSink> receiver1 = DynamicCast<PacketSink> (utApps.Get (0));
+  Ptr<CbrApplication> sender1 = DynamicCast<CbrApplication> (gwApps.Get (0));
 
-  Ptr<PacketSink> receiver2 = DynamicCast<PacketSink> (UtApps.Get (1));
-  Ptr<CbrApplication> sender2 = DynamicCast<CbrApplication> (GwApps.Get (1));
+  Ptr<PacketSink> receiver2 = DynamicCast<PacketSink> (utApps.Get (1));
+  Ptr<CbrApplication> sender2 = DynamicCast<CbrApplication> (gwApps.Get (1));
 
   // here we check that results are as expected.
   // * Senders have sent something
@@ -301,8 +301,8 @@ SimpleP2p3::DoRun (void)
   Time cbrStopBaseValue = cbrStartBaseValue + cbrInterval + cbrStartDelay;
   Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrStopBaseValue + Seconds(0.5);
 
-  ApplicationContainer GwApps;
-  ApplicationContainer UtApps;
+  ApplicationContainer gwApps;
+  ApplicationContainer utApps;
 
   // Cbr and Sink applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
@@ -310,17 +310,17 @@ SimpleP2p3::DoRun (void)
       cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port))));
       sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port))));
 
-      GwApps.Add(cbr.Install (gwUsers.Get(4)));
-      UtApps.Add(sink.Install (utUsers.Get(i)));
+      gwApps.Add(cbr.Install (gwUsers.Get(4)));
+      utApps.Add(sink.Install (utUsers.Get(i)));
 
       Time startStopDelta = Seconds(i * cbrStartDelay.GetSeconds());
 
-      GwApps.Get(i)->SetStartTime(startStopDelta + cbrStartBaseValue);
-      GwApps.Get(i)->SetStopTime(startStopDelta + cbrStopBaseValue);
+      gwApps.Get(i)->SetStartTime(startStopDelta + cbrStartBaseValue);
+      gwApps.Get(i)->SetStopTime(startStopDelta + cbrStopBaseValue);
     }
 
-  UtApps.Start (cbrStartBaseValue);
-  UtApps.Stop (stopTime);
+  utApps.Start (cbrStartBaseValue);
+  utApps.Stop (stopTime);
 
   Simulator::Stop (stopTime);
   Simulator::Run ();
@@ -333,8 +333,8 @@ SimpleP2p3::DoRun (void)
 
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      Ptr<PacketSink> receiver = DynamicCast<PacketSink> (UtApps.Get (i));
-      Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (GwApps.Get (i));
+      Ptr<PacketSink> receiver = DynamicCast<PacketSink> (utApps.Get (i));
+      Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (gwApps.Get (i));
 
       NS_TEST_ASSERT_MSG_NE (sender->GetSent(), (uint32_t)0, "Nothing sent by sender" << i << "!");
       NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx(), sender->GetSent(), "Packets were lost between sender and receiver" << i << "!");
@@ -400,24 +400,24 @@ SimpleP2p4::DoRun (void)
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
-  ApplicationContainer UtApps = cbr.Install (helper->GetUtUsers());
-  UtApps.Start (Seconds (1.0));
-  UtApps.Stop (Seconds (2.1));
+  ApplicationContainer utApps = cbr.Install (helper->GetUtUsers());
+  utApps.Start (Seconds (1.0));
+  utApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
 
-  ApplicationContainer GwApps = sink.Install (gwUsers);
-  GwApps.Start (Seconds (1.0));
-  GwApps.Stop (Seconds (3.0));
+  ApplicationContainer gwApps = sink.Install (gwUsers);
+  gwApps.Start (Seconds (1.0));
+  gwApps.Stop (Seconds (3.0));
 
   Simulator::Stop (Seconds (11));
   Simulator::Run ();
 
   Simulator::Destroy ();
 
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (GwApps.Get (0));
-  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (UtApps.Get (0));
+  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (gwApps.Get (0));
+  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (utApps.Get (0));
 
   // here we check that results are as expected.
   // * Sender has sent something
@@ -490,29 +490,29 @@ SimpleP2p5::DoRun (void)
   // sender 1
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
-  ApplicationContainer UtApps = cbr.Install (utUsers.Get(0));
+  ApplicationContainer utApps = cbr.Install (utUsers.Get(0));
 
   // sender 2
-  UtApps.Add(cbr.Install(utUsers.Get(4)));
+  utApps.Add(cbr.Install(utUsers.Get(4)));
 
-  UtApps.Start (Seconds (1.0));
-  UtApps.Stop (Seconds (2.1));
+  utApps.Start (Seconds (1.0));
+  utApps.Stop (Seconds (2.1));
 
   // Create a packet sink to receive these packets
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
 
-  ApplicationContainer GwApps = sink.Install (gwUsers);
-  GwApps.Start (Seconds (1.0));
-  GwApps.Stop (Seconds (3.0));
+  ApplicationContainer gwApps = sink.Install (gwUsers);
+  gwApps.Start (Seconds (1.0));
+  gwApps.Stop (Seconds (3.0));
 
   Simulator::Stop (Seconds (11));
   Simulator::Run ();
 
   Simulator::Destroy ();
 
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (GwApps.Get (0));
-  Ptr<CbrApplication> sender1 = DynamicCast<CbrApplication> (UtApps.Get (0));
-  Ptr<CbrApplication> sender2 = DynamicCast<CbrApplication> (UtApps.Get (1));
+  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (gwApps.Get (0));
+  Ptr<CbrApplication> sender1 = DynamicCast<CbrApplication> (utApps.Get (0));
+  Ptr<CbrApplication> sender2 = DynamicCast<CbrApplication> (utApps.Get (1));
 
   // here we check that results are as expected.
   // * Senders have sent something
@@ -597,22 +597,22 @@ SimpleP2p6::DoRun (void)
   Time cbrStopBaseValue = cbrStartBaseValue + cbrInterval + cbrStartDelay;
   Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrStopBaseValue + Seconds(0.5);
 
-  ApplicationContainer UtApps;
+  ApplicationContainer utApps;
 
   // Cbr applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      UtApps.Add(cbr.Install (utUsers.Get(i)));
+      utApps.Add(cbr.Install (utUsers.Get(i)));
 
       Time startStopDelta = Seconds(i * cbrStartDelay.GetSeconds());
 
-      UtApps.Get(i)->SetStartTime(startStopDelta + cbrStartBaseValue);
-      UtApps.Get(i)->SetStopTime(startStopDelta + cbrStopBaseValue);
+      utApps.Get(i)->SetStartTime(startStopDelta + cbrStartBaseValue);
+      utApps.Get(i)->SetStopTime(startStopDelta + cbrStopBaseValue);
     }
 
-  ApplicationContainer GwApps = sink.Install (gwUsers.Get(3));
-  GwApps.Start (cbrStartBaseValue);
-  GwApps.Stop (stopTime);
+  ApplicationContainer gwApps = sink.Install (gwUsers.Get(3));
+  gwApps.Start (cbrStartBaseValue);
+  gwApps.Stop (stopTime);
 
   Simulator::Stop (stopTime);
   Simulator::Run ();
@@ -624,11 +624,11 @@ SimpleP2p6::DoRun (void)
   // * Receiver got all all data sent
 
   uint32_t totalTxBytes = 0;
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (GwApps.Get (0));
+  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (gwApps.Get (0));
 
   for (uint32_t i = 0; i < maxReceivers; i++)
     {
-      Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (UtApps.Get (i));
+      Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (utApps.Get (i));
 
       NS_TEST_ASSERT_MSG_NE (sender->GetSent(), (uint32_t)0, "Nothing sent by sender " << i+1);
       totalTxBytes += sender->GetSent();
