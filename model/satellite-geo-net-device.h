@@ -37,12 +37,6 @@
 
 namespace ns3 {
 
-
-/*class SatPhy;
-class Node;
-class ErrorModel;
-class SatChannel;*/
-
 /**
  * \defgroup satellite Satellite Models
  *

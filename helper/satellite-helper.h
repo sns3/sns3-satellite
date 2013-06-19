@@ -45,17 +45,19 @@ public:
        * \enum values for pre-defined scenarios to be used by helper when building
                satellite network topology base.
 
-       *  - Simple: Simple scenario used as base.
-       *  - Larger: Larger scenario used as base.
-       *  - Full:   Full scenario used as base.
+       *  - NONE:         Not used.
+       *  - SIMPLE:       Simple scenario used as base.
+       *  - LARGER:       Larger scenario used as base.
+       *  - FULL:         Full scenario used as base.
+       *  - USER_DEFINED: TODO: User defined scenario implemented later.
        */
-    enum PREDEFINED_SCENARIO
+    typedef enum
     {
-      None,
-      Simple,
-      Larger,
-      Full
-    };
+      NONE,
+      SIMPLE,
+      LARGER,
+      FULL
+    }PreDefinedScenario;
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -68,7 +70,7 @@ public:
   /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
    */
-  void CreateScenario (PREDEFINED_SCENARIO scenario);
+  void CreateScenario (PreDefinedScenario scenario);
   virtual ~SatHelper () {}
 
   /**

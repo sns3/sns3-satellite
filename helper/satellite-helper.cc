@@ -74,7 +74,7 @@ SatHelper::SatHelper ()
   //ObjectBase::ConstructSelf(AttributeConstructionList ());
 }
 
-void SatHelper::CreateScenario(PREDEFINED_SCENARIO scenario)
+void SatHelper::CreateScenario(PreDefinedScenario scenario)
 {
   NS_ASSERT(m_scenarioCreated == false);
 
@@ -83,15 +83,15 @@ void SatHelper::CreateScenario(PREDEFINED_SCENARIO scenario)
 
   switch(scenario)
   {
-    case Simple:
+    case SIMPLE:
       CreateSimpleScenario();
       break;
 
-    case Larger:
+    case LARGER:
       CreateLargerScenario();
       break;
 
-    case Full:
+    case FULL:
       CreateFullScenario();
       break;
 

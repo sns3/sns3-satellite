@@ -76,7 +76,6 @@ private:
   Ptr<Socket>     m_socket;       // Associated socket
   Address         m_peer;         // Peer address
   Time            m_interval;     // Time interval for cbr sending
-  DataRate        m_cbrRate;      // Rate that data is generated
   uint32_t        m_pktSize;      // Size of packets
   Time            m_lastStartTime; // Time last packet sent
   uint32_t        m_totTxBytes;   // Total bytes sent so far

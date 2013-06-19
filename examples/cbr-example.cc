@@ -3,11 +3,27 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/applications-module.h"
 #include "ns3/satellite-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/cbr-helper.h"
+
 
 using namespace ns3;
+
+/**
+* \ingroup satellite
+*
+* \brief  Cbr example application to use satellite network.
+*         Interval, packet size and test scenario can be given
+*         in command line as user argument.
+*         To see help for user arguments:
+*         execute command -> ./waf --run "cbr-example --PrintHelp"
+*
+*         Cbr example application sends first packets from GW connected user
+*         to UT connected users and after that from UT connected user to GW connected
+*         user.
+*
+*/
 
 NS_LOG_COMPONENT_DEFINE ("cbr-example");
 
@@ -15,51 +31,77 @@ int
 main (int argc, char *argv[])
 {
   uint32_t packetSize = 512;
+  std::string interval = "1s";
+  std::string scenario = "simple";
+  SatHelper::PreDefinedScenario satScenario = SatHelper::SIMPLE;
 
+  // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("packetSize", "Size of constant packet", packetSize);
+  cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
   cmd.Parse (argc, argv);
 
+  if ( scenario == "larger")
+    {
+      satScenario = SatHelper::LARGER;
+    }
+  else if ( scenario == "full")
+    {
+      satScenario = SatHelper::FULL;
+    }
+
+  // enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  LogComponentEnable ("cbr-example", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
-  NodeContainer nodes;
-  nodes.Create (2);
+  // create satellite helper with given scenario default=simple
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  helper->CreateScenario(satScenario);
 
-  PointToPointHelper pointToPoint;
-
-  NetDeviceContainer devices;
-  devices = pointToPoint.Install (nodes);
-
-  InternetStackHelper stack;
-  stack.Install (nodes);
-
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.0");
-
-  Ipv4InterfaceContainer interfaces = address.Assign (devices);
+  // get users
+  NodeContainer utUsers = helper->GetUtUsers();
+  NodeContainer gwUsers = helper->GetGwUsers();
 
   uint16_t port = 9;
-  Address serverAddress (InetSocketAddress (interfaces.GetAddress (1), port));
-  Address clientAddress (InetSocketAddress (interfaces.GetAddress (0), port));
 
-  PacketSinkHelper sinkServer ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), port));
+  // create application on GW user
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
+  cbrHelper.SetAttribute("Interval", StringValue (interval));
+  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
 
-  ApplicationContainer serverApps = sinkServer.Install (nodes.Get (1));
-  serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (10.0));
+  ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
+  gwSink.Start (Seconds (1.0));
+  gwSink.Stop (Seconds (10.0));
 
-  CbrHelper cbrClient ("ns3::UdpSocketFactory", serverAddress);
-  cbrClient.SetAttribute("Interval", StringValue ("1s"));
-  cbrClient.SetAttribute("PacketSize", UintegerValue (packetSize) );
+  ApplicationContainer gwCbr = cbrHelper.Install (gwUsers.Get (0));
+  gwCbr.Start (Seconds (3.0));
+  gwCbr.Stop (Seconds (5.1));
 
-  ApplicationContainer clientApps = cbrClient.Install (nodes.Get (0));
-  clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (8.0));
+  // create application on UT user
+  sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
+  cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
 
+  ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
+  utSink.Start (Seconds (1.0));
+  utSink.Stop (Seconds (10.0));
+
+  ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
+  utCbr.Start (Seconds (7.0));
+  utCbr.Stop (Seconds (9.1));
+
+  NS_LOG_INFO("--- Cbr-example ---");
+  NS_LOG_INFO("  Scenario used: " << scenario);
+  NS_LOG_INFO("  PacketSize: " << packetSize);
+  NS_LOG_INFO("  Interval: " << interval);
+  NS_LOG_INFO("  ");
+
+  Simulator::Stop (Seconds(11));
   Simulator::Run ();
   Simulator::Destroy ();
 

@@ -50,10 +50,6 @@ CbrApplication::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::CbrApplication")
     .SetParent<Application> ()
     .AddConstructor<CbrApplication> ()
-    .AddAttribute ("DataRate", "The data rate for constant sending.",
-                   DataRateValue (DataRate ("500kb/s")),
-                   MakeDataRateAccessor (&CbrApplication::m_cbrRate),
-                   MakeDataRateChecker ())
     .AddAttribute ("PacketSize", "The size of constant packets sent.",
                    UintegerValue (512),
                    MakeUintegerAccessor (&CbrApplication::m_pktSize),
@@ -156,19 +152,7 @@ void CbrApplication::ScheduleNextTx ()
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t bits = m_pktSize * 8;
-  NS_LOG_LOGIC ("bits = " << bits);
-  Time nextTime (Seconds (bits / static_cast<double>(m_cbrRate.GetBitRate ()))); // Time till next packet
-
-  // use interval for next sending in case that time for sending of packet doesn't last longer than interval
-  if ( nextTime < m_interval )
-    {
-      nextTime = m_interval;
-    }
-
-  NS_LOG_LOGIC ("nextTime = " << nextTime);
-
-  m_sendEvent = Simulator::Schedule (nextTime, &CbrApplication::SendPacket, this);
+  m_sendEvent = Simulator::Schedule (m_interval, &CbrApplication::SendPacket, this);
 }
 
 void CbrApplication::SendPacket ()

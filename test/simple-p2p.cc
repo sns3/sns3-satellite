@@ -84,7 +84,7 @@ SimpleP2p1::DoRun (void)
 {
   // Create simple scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
-  helper->CreateScenario(SatHelper::Simple);
+  helper->CreateScenario(SatHelper::SIMPLE);
 
   NodeContainer utUsers = helper->GetUtUsers();
 
@@ -169,7 +169,7 @@ SimpleP2p2::DoRun (void)
 {
   // Create larger scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
-  helper->CreateScenario(SatHelper::Larger);
+  helper->CreateScenario(SatHelper::LARGER);
 
   NodeContainer utUsers = helper->GetUtUsers();
 
@@ -225,7 +225,7 @@ SimpleP2p2::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ (receiver1->GetTotalRx(), sender1->GetSent(), "Packets were lost between sender 1 and receiver 1!");
 
   NS_TEST_ASSERT_MSG_NE (sender2->GetSent(), (uint32_t)0, "Nothing sent !");
-  NS_TEST_ASSERT_MSG_EQ (receiver2->GetTotalRx(), sender2->GetSent(), "Packets were lost between sender 2 and receiver 2");
+  NS_TEST_ASSERT_MSG_EQ (receiver2->GetTotalRx(), sender2->GetSent(), "Packets were lost between sender 2 and receiver 2!");
 
   // <<< End of actual test using Larger scenario <<<
 }
@@ -276,7 +276,7 @@ SimpleP2p3::DoRun (void)
 {
   // Create full scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
-  helper->CreateScenario(SatHelper::Full);
+  helper->CreateScenario(SatHelper::FULL);
 
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
@@ -388,7 +388,7 @@ SimpleP2p4::DoRun (void)
 {
   // Create simple scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
-  helper->CreateScenario(SatHelper::Simple);
+  helper->CreateScenario(SatHelper::SIMPLE);
 
   // >>> Start of actual test using Simple scenario >>>
 
@@ -474,7 +474,7 @@ SimpleP2p5::DoRun (void)
 {
   // Create larger scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
-  helper->CreateScenario(SatHelper::Larger);
+  helper->CreateScenario(SatHelper::LARGER);
 
   // >>> Start of actual test using Larger scenario >>>
 
@@ -569,7 +569,7 @@ SimpleP2p6::DoRun (void)
 {
   // Create full scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
-  helper->CreateScenario(SatHelper::Full);
+  helper->CreateScenario(SatHelper::FULL);
 
   // >>> Start of actual test using Full scenario >>>
 
