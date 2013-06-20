@@ -22,13 +22,28 @@
 #define SAT_CTRL_HEADER_H
 
 #include "ns3/header.h"
-
-#include <list>
+#include "ns3/nstime.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3 {
 
+//TODO: these messages are under work not working ones yet
+
 /**
- * \ingroup lte
+ * \ingroup satellite
+ * \brief The packet data for the Control messages used by lower layer of
+ * satellite network components. This is just used as interface.
+ */
+
+class SatCtrlData : public SimpleRefCount<SatCtrlData>
+{
+public:
+  SatCtrlData() {}
+  ~SatCtrlData() {}
+};
+
+/**
+ * \ingroup satellite
  * \brief The packet header for the Control messages used by lower layer of
  * satellite network components.
  */
@@ -38,7 +53,8 @@ public:
 
   typedef enum {
     UNDEFINED_MSG = 0,
-    TBTP_MSG   = 1,
+    TBTP_MSG = 1,
+    CR_MSG = 2,
   } MsgType;
 
   /**
@@ -51,9 +67,11 @@ public:
 
   void SetMsgType (MsgType type);
   void SetSequenceNumber (uint32_t sequenceNumber);
+  void SetMsgData(double data);
 
-  MsgType GetMsgType () const;
-  uint32_t GetSequenceNumber () const;
+  MsgType GetMsgType (void) const;
+  uint32_t GetSequenceNumber (void) const;
+  double GetMsgData(void) const;
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -63,9 +81,70 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-  MsgType   m_msgType;
-  uint32_t  m_sequenceNumber;
+  MsgType               m_msgType;
+  uint32_t              m_sequenceNumber;
+  double                m_data;
 };
+
+class SatCapacityReqData : public SatCtrlData
+{
+public:
+  typedef enum
+  {
+    UNDEFINED = 0,
+    RBDC = 1,
+    VBDC = 2
+  } RequestType;
+
+  /**
+   * \brief Constructor
+   *
+   * Creates a null request data
+   */
+  SatCapacityReqData (){ m_reqType = SatCapacityReqData::UNDEFINED;}
+
+  ~SatCapacityReqData () {}
+
+  inline RequestType GetReqType () const {return m_reqType;}
+  inline void SetReqType(RequestType type) {m_reqType = type;}
+
+  uint32_t GetRequestedRate () const {return m_requestedRate;}
+  void SetRequestedRate(uint32_t rate) {m_requestedRate = rate;}
+
+
+private:
+  /**
+   * Type of the SatCapacityReqData
+   */
+  RequestType   m_reqType;
+  uint32_t      m_requestedRate;
+
+};
+
+class SatTbtpRepData : public SatCtrlData
+{
+public:
+  /**
+   * \brief Constructor
+   *
+   * Creates a null request data
+   */
+  SatTbtpRepData () {}
+
+  ~SatTbtpRepData (){}
+
+  inline double GetInterval () {return m_interval;}
+  void SetInterval(double interval) {m_interval = interval;}
+
+
+private:
+  /**
+   * TODO: needed to change, now just inform time to schedule next sending in UT
+   */
+  double    m_interval;
+
+};
+
 
 } // namespace ns3
 

@@ -52,6 +52,12 @@ SatCtrlHeader::SetSequenceNumber (uint32_t sequenceNumber)
   m_sequenceNumber = sequenceNumber;
 }
 
+void
+SatCtrlHeader::SetMsgData (double data)
+{
+  m_data = data;
+}
+
 SatCtrlHeader::MsgType
 SatCtrlHeader::GetMsgType () const
 {
@@ -64,6 +70,11 @@ SatCtrlHeader::GetSequenceNumber () const
   return m_sequenceNumber;
 }
 
+double
+SatCtrlHeader::GetMsgData () const
+{
+  return m_data;
+}
 
 TypeId
 SatCtrlHeader::GetTypeId (void)
@@ -89,23 +100,30 @@ void SatCtrlHeader::Print (std::ostream &os)  const
 
 uint32_t SatCtrlHeader::GetSerializedSize (void) const
 {
-  return (sizeof(uint32_t) * 2);
+  return (sizeof(uint32_t) * 2 + sizeof(double));
 }
 
 void SatCtrlHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
+  uint8_t buff[sizeof(double)];
+  std::memcpy(buff, &m_data, sizeof(double));
 
   i.WriteU32( m_msgType );
   i.WriteU32 ( m_sequenceNumber );
+  i.Write(buff, sizeof(double));
 }
 
 uint32_t SatCtrlHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
+  uint8_t buff[sizeof(double)];
 
   m_msgType = (MsgType) i.ReadU32();
   m_sequenceNumber = i.ReadU32();
+  i.Read(buff, sizeof(double));
+
+  std::memcpy( &m_data, buff, sizeof(double));
 
   return GetSerializedSize ();
 }

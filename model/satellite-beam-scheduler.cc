@@ -20,6 +20,7 @@
 
 #include "ns3/log.h"
 #include "ns3/ipv4-l3-protocol.h"
+#include "satellite-dama-entry.h"
 #include "satellite-control-header.h"
 #include "satellite-beam-scheduler.h"
 
@@ -97,6 +98,7 @@ SatBeamScheduler::Schedule ()
   Ptr<Packet> packet = Create<Packet> ();
   SatCtrlHeader header;
 
+  header.SetMsgData(0.1);
   header.SetMsgType(SatCtrlHeader::TBTP_MSG);
   packet->AddHeader (header);
 

@@ -99,18 +99,21 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 
               if (header.GetMsgType() == SatCtrlHeader::TBTP_MSG)
                 {
+                  double time = header.GetMsgData();
+
                   packet->RemovePacketTag (tag);
-                  Simulator::Schedule (GetInterval(), &SatUtMac::TransmitReady, this);
+                  Simulator::Schedule (Seconds(time), &SatUtMac::TransmitReady, this);
                   deliverUp = false;
                 }
             }
-
-          if (deliverUp)
-            {
-              SatMac::Receive(packet,rxParams);
-            }
         }
-     }
+
+        // deliver packet to parent SatMac, if not UT specific packet
+        if (deliverUp)
+          {
+            SatMac::Receive(packet,rxParams);
+          }
+    }
 }
 
 } // namespace ns3
