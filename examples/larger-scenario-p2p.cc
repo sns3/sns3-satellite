@@ -198,12 +198,12 @@ main (int argc, char *argv[])
   Ipv4InterfaceContainer id15 = ipv4.Assign (d15);
 
   // Get IPv4 protocol implementations
-  Ptr<Ipv4> ipv4N1 = Nodes.Get (0)->GetObject<Ipv4> ();
-  Ptr<Ipv4> ipv4N2 = Nodes.Get (1)->GetObject<Ipv4> ();
-  Ptr<Ipv4> ipv4N3 = Nodes.Get (2)->GetObject<Ipv4> ();
-  Ptr<Ipv4> ipv4N4 = Nodes.Get (3)->GetObject<Ipv4> ();
-  Ptr<Ipv4> ipv4N5 = Nodes.Get (4)->GetObject<Ipv4> ();
-  Ptr<Ipv4> ipv4N6 = Nodes.Get (5)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N0 = Nodes.Get (0)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N1 = Nodes.Get (1)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N2 = Nodes.Get (2)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N3 = Nodes.Get (3)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N4 = Nodes.Get (4)->GetObject<Ipv4> ();
+  Ptr<Ipv4> ipv4N5 = Nodes.Get (5)->GetObject<Ipv4> ();
   Ptr<Ipv4> ipv4UT1 = UT1->GetObject<Ipv4> ();
   Ptr<Ipv4> ipv4UT2 = UT2->GetObject<Ipv4> ();
   Ptr<Ipv4> ipv4UT3 = UT3->GetObject<Ipv4> ();
@@ -235,7 +235,7 @@ main (int argc, char *argv[])
   // UTs
   // - default route towards GW
   Ptr<Ipv4StaticRouting> srUT1 = ipv4RoutingHelper.GetStaticRouting (ipv4UT1);
-  srUT1->SetDefaultRoute (Ipv4Address ("10.1.6.2"), 2);
+  srUT1->SetDefaultRoute (Ipv4Address ("10.1.6.2"), 3);
   Ptr<Ipv4StaticRouting> srUT2 = ipv4RoutingHelper.GetStaticRouting (ipv4UT2);
   srUT2->SetDefaultRoute (Ipv4Address ("10.1.7.2"), 2);
   Ptr<Ipv4StaticRouting> srUT3 = ipv4RoutingHelper.GetStaticRouting (ipv4UT3);
@@ -249,7 +249,7 @@ main (int argc, char *argv[])
   // Note that these routes are artificial since in our reference system
   // the satellite does not have IP layer at all.
   Ptr<Ipv4StaticRouting> srSB1 = ipv4RoutingHelper.GetStaticRouting (ipv4SB1);
-  srSB1->SetDefaultRoute (Ipv4Address ("10.1.10.2"), 2);
+  srSB1->SetDefaultRoute (Ipv4Address ("10.1.10.2"), 3);
   srSB1->AddNetworkRouteTo (Ipv4Address ("10.1.1.0"), Ipv4Mask("255.255.255.0"), 1);
   srSB1->AddNetworkRouteTo (Ipv4Address ("10.1.2.0"), Ipv4Mask("255.255.255.0"), 1);
   srSB1->AddNetworkRouteTo (Ipv4Address ("10.1.3.0"), Ipv4Mask("255.255.255.0"), 2);
@@ -266,19 +266,19 @@ main (int argc, char *argv[])
   // Note that the satellite routes are artificial since in our reference system
   // the satellite does not have IP layer at all.
   Ptr<Ipv4StaticRouting> srGW1 = ipv4RoutingHelper.GetStaticRouting (ipv4GW1);
-  srGW1->SetDefaultRoute (Ipv4Address ("10.1.13.1"), 3);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.1.0"), Ipv4Mask("255.255.255.0"), 1);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.2.0"), Ipv4Mask("255.255.255.0"), 1);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.3.0"), Ipv4Mask("255.255.255.0"), 1);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.6.0"), Ipv4Mask("255.255.255.0"), 1);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.7.0"), Ipv4Mask("255.255.255.0"), 1);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.4.0"), Ipv4Mask("255.255.255.0"), 2);
-  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.8.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW1->SetDefaultRoute (Ipv4Address ("10.1.13.1"), 1);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.1.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.2.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.3.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.6.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.7.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.4.0"), Ipv4Mask("255.255.255.0"), 3);
+  srGW1->AddNetworkRouteTo (Ipv4Address ("10.1.8.0"), Ipv4Mask("255.255.255.0"), 3);
 
   Ptr<Ipv4StaticRouting> srGW2 = ipv4RoutingHelper.GetStaticRouting (ipv4GW2);
-  srGW2->SetDefaultRoute (Ipv4Address ("10.1.14.1"), 2);
-  srGW2->AddNetworkRouteTo (Ipv4Address ("10.1.5.0"), Ipv4Mask("255.255.255.0"), 1);
-  srGW2->AddNetworkRouteTo (Ipv4Address ("10.1.9.0"), Ipv4Mask("255.255.255.0"), 1);
+  srGW2->SetDefaultRoute (Ipv4Address ("10.1.14.1"), 1);
+  srGW2->AddNetworkRouteTo (Ipv4Address ("10.1.5.0"), Ipv4Mask("255.255.255.0"), 2);
+  srGW2->AddNetworkRouteTo (Ipv4Address ("10.1.9.0"), Ipv4Mask("255.255.255.0"), 2);
 
   // IP router
   Ptr<Ipv4StaticRouting> srIPr = ipv4RoutingHelper.GetStaticRouting (ipv4IPr);
@@ -294,12 +294,12 @@ main (int argc, char *argv[])
   srIPr->AddNetworkRouteTo (Ipv4Address ("10.1.11.0"), Ipv4Mask("255.255.255.0"), 1);
   srIPr->AddNetworkRouteTo (Ipv4Address ("10.1.5.0"), Ipv4Mask("255.255.255.0"), 2);
   srIPr->AddNetworkRouteTo (Ipv4Address ("10.1.9.0"), Ipv4Mask("255.255.255.0"), 2);
-  srIPr->AddNetworkRouteTo (Ipv4Address ("10.1.11.0"), Ipv4Mask("255.255.255.0"), 2);
+  srIPr->AddNetworkRouteTo (Ipv4Address ("10.1.12.0"), Ipv4Mask("255.255.255.0"), 2);
 
   // End node attached to IP router
   // - default route towards the IPR
-  Ptr<Ipv4StaticRouting> srN6 = ipv4RoutingHelper.GetStaticRouting (ipv4N6);
-  srN6->SetDefaultRoute (Ipv4Address ("10.1.15.1"), 1);
+  Ptr<Ipv4StaticRouting> srN0 = ipv4RoutingHelper.GetStaticRouting (ipv4N0);
+  srN0->SetDefaultRoute (Ipv4Address ("10.1.15.1"), 1);
 
   // Create the OnOff application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s
