@@ -38,8 +38,8 @@ GeoCoordinate::GeoCoordinate (double longitude, double latitude, double altitude
   NS_LOG_FUNCTION (this << longitude << latitude << altitude);
 
   NS_ASSERT(IsValidLongtitude(longitude));
-  NS_ASSERT(IsValidLongtitude(latitude));
-  NS_ASSERT(IsValidLongtitude(altitude));
+  NS_ASSERT(IsValidLatitude(latitude));
+  NS_ASSERT(IsValidAltitude(altitude));
 
   m_longitude = longitude;
   m_latitude = latitude;
@@ -126,11 +126,23 @@ void GeoCoordinate::FromVector(const Vector &v)
 
   if ( radial > 0 )
     {
-      m_latitude = RadToDeg(std::asin(v.z/radial));
+      m_latitude = RadToDeg(std::atan(v.z/(std::sqrt( v.x * v.x + v.y * v.y ))));
 
       if ( v.x != 0 || v.y != 0 )
         {
-          m_longitude = RadToDeg(std::atan2(v.y , v.x ));
+          m_longitude = RadToDeg(std::atan(v.y/v.x ));
+
+          if ( v.x < 0 )
+            {
+              if ( v.y < 0)
+                {
+                  m_longitude = m_longitude - 180;
+                }
+              else
+                {
+                  m_longitude = 180 + m_longitude;
+                }
+            }
         }
     }
 }
