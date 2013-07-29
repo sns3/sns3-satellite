@@ -67,19 +67,37 @@ public:
    *
    * \returns longitude
    */
-  double GetLongitude();
+  double GetLongitude() const;
   /**
      * Gets latitude value of coordinate.
      *
      * \returns latitude
      */
-  double GetLatitude();
+  double GetLatitude() const;
   /**
    * Gets altitude value of coordinate.
    *
    * \returns altitude
    */
-  double GetAltitude();
+  double GetAltitude() const;
+  /**
+   * Sets longitude value of coordinate.
+   *
+   * \param longitude longitude to set
+   */
+  void SetLongitude(double longitude);
+  /**
+   * Sets latitude value of coordinate.
+   *
+   * \param latitude longitude to set
+   */
+  void SetLatitude(double latitude);
+  /**
+   * Sets altitude value of coordinate.
+   *
+   * \param altitude longitude to set
+   */
+  void SetAltitude(double altitude);
   /**
    * Converts Geodetic coordinates to Cartesian coordinates
    * \returns Vector containing Cartesian coordinates
@@ -147,6 +165,17 @@ private:
    */
   double m_altitude;
 };
+
+/**
+ * \class ns3::GeoCoordinateValue
+ * \brief hold objects of type ns3::GeoCoordinate
+ */
+ATTRIBUTE_HELPER_HEADER (GeoCoordinate);
+
+std::ostream &operator << (std::ostream &os, const GeoCoordinate &coordinate);
+std::istream &operator >> (std::istream &is, GeoCoordinate &coordinate);
+
+Ptr<const AttributeChecker> MakeGeoCoordinateChecker (void);
 
 } // namespace ns3
 
