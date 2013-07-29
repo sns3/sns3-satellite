@@ -116,11 +116,13 @@ SatLookUpTable::GetBler (double sinrDb) const
       // normal case
       NS_ASSERT (i > 0);
       NS_ASSERT (i < n);
-      double sinr = pow (10, 0.1 * sinrDb);
-      double sinr0 = pow (10, 0.1 * m_sinrDb[i - 1]);
-      double sinr1 = pow (10, 0.1 * m_sinrDb[i]);
+
+      double sinr = sinrDb;
+      double sinr0 = m_sinrDb[i - 1];
+      double sinr1 = m_sinrDb[i];
       double bler = Interpolate (sinr, sinr0, sinr1, m_bler[i - 1], m_bler[i]);
-      NS_LOG_LOGIC (this << " Interpolate to BLER = " << bler);
+      NS_LOG_LOGIC (this << " Interpolate: " << sinr << " to BLER = " << bler << "(sinr0: " << sinr0 << ", sinr1: " << sinr1 << ", bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ")");
+
       return bler;
     }
 
