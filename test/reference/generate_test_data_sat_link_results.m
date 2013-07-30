@@ -36,17 +36,15 @@ function print_test_case (link_results_path, dvb_type, modcod, burst_length)
   
   link_results = load (strcat ("../../data/linkresults/", link_results_path));
   sinr_list_db = link_results(:, 1);
-  sinr_list = 10 .^ (0.1 .* sinr_list_db);
   bler_list = link_results(:, 2);
   sinr_min = floor (sinr_list_db(1) / g_step_db) * g_step_db;
   sinr_max = ceil (sinr_list_db(end) / g_step_db) * g_step_db;
   
   for sinr_db = [sinr_min : g_step_db : sinr_max]
-    sinr = 10 .^ (0.1 .* sinr_db);
     printf ("AddTestCase (new SatLinkResults%sTestCase ", dvb_type);
     printf ("(linkResults%s, ", dvb_type);
     printf ("SatLinkResults::SAT_MODCOD_%s, %d, ", modcod, burst_length);
-    printf ("%f, %e)", sinr_db, get_bler (sinr_list, bler_list, sinr));
+    printf ("%f, %e)", sinr_db, get_bler (sinr_list_db, bler_list, sinr_db));
     printf (");\n");    
   endfor
 
