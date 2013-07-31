@@ -103,7 +103,6 @@ private:
 
   State m_state;
   uint32_t m_beamId;
-  Ptr<SatPhy> m_phy;
 };
 
 

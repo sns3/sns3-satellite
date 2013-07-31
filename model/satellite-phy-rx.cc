@@ -52,6 +52,7 @@ void SatPhyRx::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_mobility = 0;
   m_device = 0;
+  m_rxCarriers.clear();
   Object::DoDispose ();
 } 
 
@@ -79,16 +80,16 @@ SatPhyRx::SetDevice (Ptr<NetDevice> d)
 }
 
 void
-SatPhyRx::SetPhy (Ptr<SatPhy> phy)
+SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
 {
-  NS_LOG_FUNCTION (this << phy);
+  NS_LOG_FUNCTION (this);
   NS_ASSERT (!m_rxCarriers.empty ());
 
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
       it != m_rxCarriers.end();
       ++it)
     {
-      (*it)->SetPhy (phy);
+      (*it)->SetCb(cb);
     }
 }
 

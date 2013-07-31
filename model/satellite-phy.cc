@@ -53,8 +53,7 @@ SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPh
   phyTx->SetBeamId(beamId);
   phyRx->SetBeamId(beamId);
 
-  phyTx->SetPhy(this);
-  phyRx->SetPhy(this);
+  phyRx->SetReceiveCallback( MakeCallback (&SatPhy::Receive, this) );
 }
 
 
@@ -67,6 +66,12 @@ void
 SatPhy::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+  m_phyTx->DoDispose();
+  m_phyTx = 0;
+  m_phyRx->DoDispose();
+  m_phyRx = 0;
+
+
   Object::DoDispose ();
 }
 

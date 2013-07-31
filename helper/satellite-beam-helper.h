@@ -122,6 +122,8 @@ public:
    */
   std::string GetBeamInfo();
 
+  virtual void DoDispose();
+
 private:
 
     ObjectFactory         m_channelFactory;

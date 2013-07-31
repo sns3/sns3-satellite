@@ -96,21 +96,6 @@ SatPhyTx::GetDevice ()
   return m_device;
 }
 
-
-Ptr<SatPhy>
-SatPhyTx::GetPhy ()
-{
-  NS_LOG_FUNCTION (this);
-  return m_phy;
-}
-
-void
-SatPhyTx::SetPhy (Ptr<SatPhy> phy)
-{
-  NS_LOG_FUNCTION (this << phy);
-  m_phy = phy;
-}
-
 Ptr<MobilityModel>
 SatPhyTx::GetMobility ()
 {
@@ -155,7 +140,7 @@ SatPhyTx::StartTx (Ptr<Packet> p, Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this << p << txParams);
   NS_LOG_LOGIC (this << " state: " << m_state);
-  
+
   switch (m_state)
   {
     case TX:

@@ -74,6 +74,18 @@ SatBeamHelper::SatBeamHelper ()
   m_ncc = CreateObject<SatNcc>();
 }
 
+void
+SatBeamHelper::DoDispose()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_beam.clear();
+  m_gwNode.clear();
+  m_ulChannels.clear();
+  m_flChannels.clear();
+  m_beamFreqs.clear();
+}
+
 void 
 SatBeamHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
@@ -88,6 +100,8 @@ SatBeamHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 
 void SatBeamHelper::SetBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
 {
+  NS_LOG_FUNCTION (this << network << mask << address);
+
   m_ipv4Helper.SetBase(network, mask, address);
 }
 
@@ -119,9 +133,9 @@ SatBeamHelper::Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32
                                userLink.first, userLink.second, beamId );
 
   // GW installation, create node if not exist and install net device on node
-
   // get GW node
   Ptr<Node> gwNode = GetGw(gwId);
+
 
   //install GW
   Ptr<NetDevice> gwNd = m_gwHelper->Install(gwNode, beamId, feederLink.first, feederLink.second);

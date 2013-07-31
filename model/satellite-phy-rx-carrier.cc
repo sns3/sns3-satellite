@@ -80,10 +80,10 @@ std::ostream& operator<< (std::ostream& os, SatPhyRxCarrier::State s)
 }
 
 void
-SatPhyRxCarrier::SetPhy (Ptr<SatPhy> phy)
+SatPhyRxCarrier::SetCb (SatPhyRx::ReceiveCallback cb)
 {
-  NS_LOG_FUNCTION (this << phy);
-  m_phy = phy;
+  NS_LOG_FUNCTION (this);
+  m_rxCallback = cb;
 }
 
 void
@@ -139,7 +139,7 @@ SatPhyRxCarrier::EndRxData ()
   ChangeState (IDLE);
 
   // Send packet upwards
-  m_phy->Receive (m_rxParams);
+  m_rxCallback (m_rxParams);
 }
 
 void

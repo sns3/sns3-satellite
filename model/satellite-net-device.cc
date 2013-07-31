@@ -262,6 +262,7 @@ SatNetDevice::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
   m_phy = 0;
+  m_mac->Dispose();
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;

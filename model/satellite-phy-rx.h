@@ -61,12 +61,6 @@ public:
   Ptr<MobilityModel> GetMobility ();
   Ptr<NetDevice> GetDevice ();
 
-  /**
-  * Set the SatPhy module
-  * @param phy PHY module
-  */
-  void SetPhy (Ptr<SatPhy> phy);
-
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
@@ -85,6 +79,17 @@ public:
    * \param rxParams The needed parameters for the received signal
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * \param packet the packet received
+   */
+  typedef Callback<void,Ptr<SatSignalParameters> > ReceiveCallback;
+
+  /**
+    * Set the upper layer receive callback
+    * \param cb receive callback funtion pointer
+    */
+    void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
 
 private:
 

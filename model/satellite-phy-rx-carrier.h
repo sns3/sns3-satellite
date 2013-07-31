@@ -25,6 +25,7 @@
 #include "ns3/object.h"
 
 #include "satellite-phy.h"
+#include "satellite-phy-rx.h"
 #include "satellite-signal-parameters.h"
 
 namespace ns3 {
@@ -75,18 +76,22 @@ public:
    * \param rxParams The needed parameters for the received signal
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
+  void SetCb(SatPhyRx::ReceiveCallback cb);
 
 
 private:
   void ChangeState (State newState);
   void EndRxData ();
 
-  Ptr<SatPhy> m_phy;
-
   State m_state;
   Ptr<SatSignalParameters> m_rxParams;
   uint32_t m_beamId;
   uint32_t m_carrierId;
+
+  /**
+    * The upper layer package receive callback.
+    */
+  SatPhyRx::ReceiveCallback m_rxCallback;
 
 };
 
