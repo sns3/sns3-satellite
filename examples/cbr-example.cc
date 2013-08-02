@@ -33,6 +33,7 @@ main (int argc, char *argv[])
   uint32_t packetSize = 512;
   std::string interval = "1s";
   std::string scenario = "simple";
+  std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario satScenario = SatHelper::SIMPLE;
 
   // read command line parameters given by user
@@ -40,6 +41,7 @@ main (int argc, char *argv[])
   cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
   if ( scenario == "larger")
@@ -61,6 +63,12 @@ main (int argc, char *argv[])
 
   // create satellite helper with given scenario default=simple
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  if ( scenarioLogFile != "" )
+    {
+      helper->EnableCreationTraces(scenarioLogFile, false);
+    }
+
   helper->CreateScenario(satScenario);
 
   // get users
@@ -99,6 +107,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);
+  NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
 
   Simulator::Stop (Seconds(11));
