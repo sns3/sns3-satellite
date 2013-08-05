@@ -68,7 +68,8 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
- :m_scenarioCreated(false)
+ : m_scenarioCreated(false),
+   m_detailedCreationTraces(false)
 {
   // uncomment next line, if attributes are needed already in construction phase
   //ObjectBase::ConstructSelf(AttributeConstructionList ());
@@ -80,6 +81,11 @@ void SatHelper::CreateScenario(PreDefinedScenario scenario)
 
   m_beamHelper = CreateObject<SatBeamHelper>();
   m_userHelper = CreateObject<SatUserHelper>();
+
+  if ( m_detailedCreationTraces )
+    {
+      EnableDetailedCreationTraces();
+    }
 
   switch(scenario)
   {
@@ -115,14 +121,16 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
 
   TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 
-  if ( details )
-    {
-      CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, m_creationTraceStream);
-      TraceConnect("Creation", "SatHelper", creationCb);
+  m_detailedCreationTraces = details;
+}
 
-      m_userHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
-      m_beamHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
-    }
+void SatHelper::EnableDetailedCreationTraces()
+{
+  CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, m_creationTraceStream);
+  TraceConnect("Creation", "SatHelper", creationCb);
+
+  m_userHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
+  m_beamHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
 }
 
 Ipv4Address

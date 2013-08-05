@@ -101,6 +101,10 @@ public:
 private:
 
   /**
+   * Enables creation traces in sub-helpers.
+   */
+  void EnableDetailedCreationTraces();
+  /**
    * Sink for creation details traces
    * /param stream stream for traces
    * /param context context for traces
@@ -170,9 +174,14 @@ private:
   Ptr<OutputStreamWrapper> m_creationTraceStream;
 
   /**
-   * flag to check if sceanrio is alreay created.
+   * flag to check if scenario is alreay created.
    */
   bool m_scenarioCreated;
+
+  /**
+   * flag to indicate if detailed trace should be enables before scenario creation.
+   */
+  bool m_detailedCreationTraces;
 
   /**
    * Number of UTs created per Beam in full or user-defined scenario
