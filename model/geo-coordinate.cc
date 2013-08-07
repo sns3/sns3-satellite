@@ -54,9 +54,9 @@ GeoCoordinate::GeoCoordinate (Vector vector)
 }
 
 GeoCoordinate::GeoCoordinate ()
-  : m_longitude (0.0),
-    m_latitude (0.0),
-    m_altitude (0.0)
+  : m_longitude (NAN),
+    m_latitude (NAN),
+    m_altitude (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -67,13 +67,9 @@ Vector GeoCoordinate::ToVector()
 
   Vector cartesian;
 
-  double radial = m_altitude + EARTH_RADIUS;
-  double latitude = DegToRad(m_latitude);
-  double longitude = DegToRad(m_longitude);
-
-  cartesian.x = radial * std::cos (latitude) * std::cos (longitude);
-  cartesian.y = radial * std::cos (latitude) * std::sin (longitude);
-  cartesian.z = radial * std::sin (latitude);
+  cartesian.x = (N(DegToRad(m_latitude))+ m_altitude) * std::cos (DegToRad(m_latitude)) * std::cos (DegToRad(m_longitude));
+  cartesian.y = (N(DegToRad(m_latitude))+ m_altitude) * std::cos (DegToRad(m_latitude)) * std::sin (DegToRad(m_longitude));
+  cartesian.z = (N(DegToRad(m_latitude))*(1 - e2Param) + m_altitude) * std::sin (DegToRad(m_latitude));
 
   return cartesian;
 }
@@ -118,33 +114,64 @@ void GeoCoordinate::FromVector(const Vector &v)
 {
   NS_LOG_FUNCTION (this << v);
 
-  double radial = std::sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
+  // distance from the position point (P) to earth center point (origin O)
+  double op = std::sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
 
-  m_altitude = radial - EARTH_RADIUS;
-
-  NS_ASSERT(radial > 0);
-
-  if ( radial > 0 )
+  if ( op > 0 )
     {
-      m_latitude = RadToDeg(std::atan(v.z/(std::sqrt( v.x * v.x + v.y * v.y ))));
+      // longitude calculation
+      double lon = std::atan(v.y/v.x);
 
+      // scale longitude between - PI and PI (-180 and 180 in degrees)
       if ( v.x != 0 || v.y != 0 )
         {
           m_longitude = RadToDeg(std::atan(v.y/v.x ));
 
           if ( v.x < 0 )
             {
-              if ( v.y < 0)
+              if ( v.y > 0)
                 {
                   m_longitude = m_longitude - 180;
+                  lon = lon - M_PI;
                 }
               else
                 {
                   m_longitude = 180 + m_longitude;
+                  lon = M_PI + lon;
                 }
             }
         }
+
+      // Geocentric latitude
+      double latG = std::atan(v.z/(std::sqrt( v.x * v.x + v.y * v.y )));
+
+      // Geodetic latitude (of point Q, Q is intersection point of segment OP and reference ellipsoid)
+      double latQ = std::atan(v.z/( (1 - e2Param ) * (std::sqrt( v.x * v.x + v.y * v.y ))) );
+
+      // calculate N
+      double n = N(latQ);
+
+      // x, y, z of point Q
+      double xQ = n * std::cos(latQ) * std::cos(lon);
+      double yQ = n * std::cos(latQ) * std::sin(lon);
+      double zQ = n * (1 - e2Param) * std::sin(latQ);
+
+      // distance OQ
+      double oq = std::sqrt( xQ * xQ + yQ * yQ + zQ * zQ );
+
+      // distance PQ is OP - OQ
+      double pq = op - oq;
+
+      // length of the normal segment from point P of line (PO) to point T.
+      // T is intersection point of linen the PO normal and ellipsoid normal from point Q.
+      double tp = pq * std::sin(latG - latQ);
+
+      m_latitude = RadToDeg(latQ + tp/op * std::cos(latQ - latG));
+
+      m_altitude = pq * std::cos(latQ - latG);
+
     }
+
 }
 
 std::ostream &operator << (std::ostream &os, const GeoCoordinate &coordinate)

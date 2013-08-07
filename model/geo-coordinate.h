@@ -32,7 +32,7 @@ namespace ns3 {
  * \brief GeoCoordinate class is used to store and operate with geodetic coordinates.
  * Latitude is in the degree range (-90, 90) with negative values -> south
  * Longitude is in the degree range (-180, 180) with negative values -> west
- * Altitude is in kilometers.
+ * Altitude is in meters.
  */
 class GeoCoordinate
 {
@@ -104,11 +104,19 @@ public:
    */
   Vector ToVector ();
   /**
-   * Volume metric mean radius of the earth in kilometers.
+   * Used Earth Ellipsoid Parameters (WGS 84)
+   *
+   * Semi-major axis A, m:
+   * Semi-minor axis B, m:
    */
-  static const double EARTH_RADIUS = 6371.0;
+
+  // First eccentricity squared
+  static const double e2Param = 0.00669437999014;  // First eccentricity squared
+  static const double aParam = 6378137;            // Semi-major axis A, m:
+  static const double bParam = 6356752.3142;       // Semi-minor axis B, m:
 
 private:
+  static inline double N(double latitude) {return ( aParam / std::sqrt(1 - e2Param * std::sin(latitude)*std::sin(latitude)));}
   /**
    * Converts radians to degrees
    *
@@ -136,15 +144,15 @@ private:
    * \param latitude to check
    * \return bool true latitude valid, false invalid
    */
-  static inline bool IsValidLatitude(double latitude) {return (latitude >= -90 || latitude <= 90);}
+  static inline bool IsValidLatitude(double latitude) {return (latitude >= -90 && latitude <= 90);}
   /**
    * Checks if altitude is in valid range
    *
    * \param altitude to check
-   * \return bool true altitude valid, false invalid
+   * \return bool true altitude valid, false invalid.
    *
    */
-  static inline bool IsValidAltitude(double altitude) {return ( (EARTH_RADIUS + altitude) >= 0 );}
+  static inline bool IsValidAltitude(double altitude) {return ( (bParam + altitude) >= 0 );}
   /**
    * Creates Geodetic coordinates from given Cartesian coordinates.
    *
