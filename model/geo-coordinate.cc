@@ -131,12 +131,12 @@ void GeoCoordinate::FromVector(const Vector &v)
             {
               if ( v.y > 0)
                 {
-                  m_longitude = m_longitude - 180;
+                  m_longitude = 180 + m_longitude;
                   lon = lon - M_PI;
                 }
               else
                 {
-                  m_longitude = 180 + m_longitude;
+                  m_longitude = -180 + m_longitude;
                   lon = M_PI + lon;
                 }
             }
