@@ -31,16 +31,16 @@ GeoCoordinateTestCase::~GeoCoordinateTestCase ()
 void
 GeoCoordinateTestCase::DoRun (void)
 {
-  GeoCoordinate position1 = GeoCoordinate(50, -50, 0.100);
+  GeoCoordinate position1 = GeoCoordinate(50, -50, 35000000);
   GeoCoordinate position2 = GeoCoordinate( position1.ToVector() );
 
   double alt_diff = std::abs(position1.GetAltitude() - position2.GetAltitude());
   double lon_diff = std::abs(position1.GetLongitude() - position2.GetLongitude());
   double lat_diff = std::abs(position1.GetLatitude() - position2.GetLatitude());
 
-  NS_TEST_ASSERT_MSG_LT(alt_diff, 0.0000000001, "Altitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(lon_diff, 0.0000000001, "Longitudes difference too big!");
-  NS_TEST_ASSERT_MSG_LT(lat_diff, 0.0000000001, "Latitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT(alt_diff, 250, "Altitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT(lon_diff, 0.0003, "Longitudes difference too big!");
+  NS_TEST_ASSERT_MSG_LT(lat_diff, 0.0003, "Latitude difference too big!");
 
   //TODO: more test criteria needed to add when finalizing implementation.
 }
