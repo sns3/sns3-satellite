@@ -1,6 +1,28 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2013 Magister Solutions Ltd
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ */
 
-// Include a header file from your module to test.
+/**
+ * \file geo-coordinate-test.cc
+ * \brief Test cases to unit test GeoCoordinate class.
+ *
+ */
 #include "ns3/log.h"
 #include "ns3/geo-coordinate.h"
 #include "ns3/test.h"
@@ -8,7 +30,9 @@
 
 using namespace ns3;
 
-static void SatCourseChange (GeoCoordinate pos)
+// #define PRINT_POSITION_INFO // uncomment to see info while executing test
+#ifdef PRINT_POSITION_INFO
+static void PrintPositionInfo (GeoCoordinate pos)
 {
   Vector pos2 = pos.ToVector();
 
@@ -18,8 +42,11 @@ static void SatCourseChange (GeoCoordinate pos)
                                  << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude()
                                  << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude()  << std::endl;
 }
+#endif
 
-// Test case to test correctness of GeoCoordinate class
+/**
+ * \brief Test case to unit test that GeoCoordinate with valid values.
+ */
 class GeoCoordinateTestCase : public TestCase
 {
 public:
@@ -45,8 +72,10 @@ GeoCoordinateTestCase::DoRun (void)
   GeoCoordinate position1 = GeoCoordinate(50, -50, 35000000);
   GeoCoordinate position2 = GeoCoordinate( position1.ToVector() );
 
-  SatCourseChange(position1);
-  SatCourseChange(position2);
+#ifdef PRINT_POSITION_INFO
+  PrintPositionInfo(position1);
+  PrintPositionInfo(position2);
+#endif
 
   double altDiff = std::abs(position1.GetAltitude() - position2.GetAltitude());
   double lonDiff = std::abs(position1.GetLongitude() - position2.GetLongitude());
@@ -69,8 +98,10 @@ GeoCoordinateTestCase::DoRun (void)
   position1 = GeoCoordinate(50, -50, 1000);
   position2 = GeoCoordinate( position1.ToVector() );
 
-  SatCourseChange(position1);
-  SatCourseChange(position2);
+#ifdef PRINT_POSITION_INFO
+  PrintPositionInfo(position1);
+  PrintPositionInfo(position2);
+#endif
 
   altDiff = std::abs(position1.GetAltitude() - position2.GetAltitude());
   lonDiff = std::abs(position1.GetLongitude() - position2.GetLongitude());
@@ -94,8 +125,10 @@ GeoCoordinateTestCase::DoRun (void)
       position1 = GeoCoordinate(i, i/2, i*30);
       position2 = GeoCoordinate( position1.ToVector() );
 
-      SatCourseChange(position1);
-      SatCourseChange(position2);
+#ifdef PRINT_POSITION_INFO
+      PrintPositionInfo(position1);
+      PrintPositionInfo(position2);
+#endif
 
       altDiff = std::abs(position1.GetAltitude() - position2.GetAltitude());
       lonDiff = std::abs(position1.GetLongitude() - position2.GetLongitude());
@@ -117,9 +150,9 @@ GeoCoordinateTestCase::DoRun (void)
 
 }
 
-// The GeoCoordinateTestSuite for GeoCoordinate test cases
-//
-//
+/**
+ * \brief Test suite for GeoCoordinate unit test cases.
+ */
 class GeoCoordinateTestSuite : public TestSuite
 {
 public:

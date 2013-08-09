@@ -49,6 +49,7 @@ def build(bld):
         'test/performance-memory-test.cc',
         'test/cbr-test.cc',
         'test/link-results-test.cc',
+        'test/sat-mobility-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])

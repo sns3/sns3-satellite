@@ -1,7 +1,7 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    obj = bld.create_ns3_program('cbr-example', ['satellite', 'point-to-point'])
+    obj = bld.create_ns3_program('cbr-example', ['satellite'])
     obj.source = 'cbr-example.cc'
     
     obj = bld.create_ns3_program('simple-scenario-p2p', ['satellite', 'netanim', 'flow-monitor'])
@@ -12,3 +12,4 @@ def build(bld):
 
     obj = bld.create_ns3_program('link-results-plot', ['satellite', 'tools'])
     obj.source = 'link-results-plot.cc'
+    

@@ -49,6 +49,14 @@ public:
 
   virtual Vector GetNext (void) const;
   virtual int64_t AssignStreams (int64_t stream);
+
+private:
+  // this is the flag for indicating that when calling method GetNext (defined by class PositionAlocator)
+  // is returned Vector filled by longitude (in x), latitude (in y) and altitude (in z)
+  // this enables using ns-3 mobility helper without to convert geo coordinates first to Cartesian
+  // but if for some reason used model needs Cartesian coordinates then this flag can be turned off
+  // through attribute 'AsGeoCoordinates'.
+  bool m_GetAsGeoCoordinates;
 };
 
 /**
@@ -76,7 +84,7 @@ private:
 
 /**
  * \ingroup satellite
- * \brief Allocate random positions within a rectangle according to a pair of random variables.
+ * \brief Allocate random positions within a 3D box according to a set of three random variables (longitude, latitude, altitude).
  */
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {

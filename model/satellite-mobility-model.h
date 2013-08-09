@@ -40,6 +40,7 @@ class SatMobilityModel : public MobilityModel
 {
 public:
   static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
   SatMobilityModel ();
   virtual ~SatMobilityModel () = 0;
 
@@ -126,6 +127,13 @@ private:
 
   // flag to indicated if position in Cartesian format is out of date.
   mutable bool m_cartesianPositionOutdated;
+
+  // this is the flag for indicating that when calling method DoSetPosition (defined by class Mobility Model)
+  // is taking Vector filled by longitude (in x), latitude (in y) and altitude (in z)
+  // this enables using ns-3 mobility helper without to convert geo coordinates first to Cartesian
+  // but if for some reason used model needs Cartesian coordinates then this flag can be turned off
+  // through attribute 'AsGeoCoordinates'.
+  bool m_GetAsGeoCoordinates;
 };
 
 } // namespace ns3

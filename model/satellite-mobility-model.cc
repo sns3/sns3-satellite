@@ -20,6 +20,7 @@
 
 #include <cmath>
 
+#include "ns3/boolean.h"
 #include "satellite-mobility-model.h"
 #include "ns3/trace-source-accessor.h"
 
@@ -43,6 +44,11 @@ SatMobilityModel::GetTypeId (void)
                    GeoCoordinateValue (GeoCoordinate (0.0, 0.0, 0.0)), // ignored initial value.
                    MakeGeoCoordinateAccessor (&SatMobilityModel::GetGeoVelocity),
                    MakeGeoCoordinateChecker ())
+    .AddAttribute ("AsGeoCoordinates",
+                    "SetPosition method takes Geodetic coordinates in given Vector, x=longitude, y=latitude, z=altitude",
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&SatMobilityModel::m_GetAsGeoCoordinates),
+                    MakeBooleanChecker ())
     .AddTraceSource ("SatCourseChange",
                      "The value of the position and/or velocity coordinate changed",
                      MakeTraceSourceAccessor (&SatMobilityModel::m_satCourseChangeTrace))
@@ -50,8 +56,16 @@ SatMobilityModel::GetTypeId (void)
   return tid;
 }
 
-SatMobilityModel::SatMobilityModel ()
+TypeId
+SatMobilityModel::GetInstanceTypeId (void) const
 {
+  return GetTypeId();
+}
+
+SatMobilityModel::SatMobilityModel ()
+  :m_GetAsGeoCoordinates(true)
+{
+
 }
 
 SatMobilityModel::~SatMobilityModel ()
@@ -98,9 +112,18 @@ SatMobilityModel::DoGetPosition (void) const
 void
 SatMobilityModel::DoSetPosition (const Vector &position)
 {
-  m_cartesianPositionOutdated = false;
-  m_cartesianPosition = position;
-  DoSetGeoPosition( GeoCoordinate(position) );
+  if ( m_GetAsGeoCoordinates )
+    {
+      m_cartesianPositionOutdated = true;
+      DoSetGeoPosition( GeoCoordinate(position.x, position.y, position.z) );
+    }
+  else
+    {
+      m_cartesianPositionOutdated = false;
+      m_cartesianPosition = position;
+      DoSetGeoPosition( GeoCoordinate(position) );
+    }
+
 }
 
 Vector

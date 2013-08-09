@@ -20,6 +20,7 @@
 
 #include "ns3/double.h"
 #include "ns3/string.h"
+#include "ns3/boolean.h"
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/enum.h"
@@ -37,11 +38,17 @@ TypeId
 SatPositionAllocator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPositionAllocator")
-    .SetParent<PositionAllocator> ();
+    .SetParent<PositionAllocator> ()
+    .AddAttribute ("AsGeoCoordinates",
+                   "GetNext method returns Geodetic coordinates in returned Vector, x=longitude, y=latitude, z=altitude",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatPositionAllocator::m_GetAsGeoCoordinates),
+                   MakeBooleanChecker ());
   return tid;
 }
 
 SatPositionAllocator::SatPositionAllocator ()
+ :m_GetAsGeoCoordinates(true)
 {
 }
 
@@ -52,7 +59,16 @@ SatPositionAllocator::~SatPositionAllocator ()
 Vector
 SatPositionAllocator::GetNext(void) const
 {
-  return GetNextGeo().ToVector();
+  GeoCoordinate pos = GetNextGeo();
+
+  if ( m_GetAsGeoCoordinates )
+    {
+       return Vector(pos.GetLongitude(), pos.GetLatitude(), pos.GetAltitude());
+    }
+  else
+    {
+      return pos.ToVector();
+    }
 }
 
 int64_t
