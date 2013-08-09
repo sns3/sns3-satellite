@@ -92,15 +92,15 @@ SatMobilityRandomTestCase::DoRun (void)
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (c);
 
-  for ( uint32_t i; i < c.GetN(); i++ )
+  for ( uint32_t i=0; i < c.GetN(); i++ )
     {
       Ptr<SatMobilityModel> model = c.Get(i)->GetObject<SatMobilityModel>();
       GeoCoordinate pos = model->GetGeoPosition();
 
       // check that position is in limit
-      NS_TEST_ASSERT_MSG_LT( pos.GetLongitude(), 179.9, "Longitude is too big.");
-      NS_TEST_ASSERT_MSG_LT( pos.GetLatitude(), 79.9, "Latitude is too big.");
-      NS_TEST_ASSERT_MSG_LT( pos.GetAltitude(), 99.9, "Altitude is too big.");
+      NS_TEST_ASSERT_MSG_LT( pos.GetLongitude(), 180.1, "Longitude is too big.");
+      NS_TEST_ASSERT_MSG_LT( pos.GetLatitude(), 80.1, "Latitude is too big.");
+      NS_TEST_ASSERT_MSG_LT( pos.GetAltitude(), 100.1, "Altitude is too big.");
 
       NS_TEST_ASSERT_MSG_GT( pos.GetLongitude(), -10.1, "Longitude is too small.");
       NS_TEST_ASSERT_MSG_GT( pos.GetLatitude(), -45.1, "Latitude is too small.");
