@@ -129,6 +129,13 @@ SatPerPacketInterferenceTestCase::SatPerPacketInterferenceTestCase ()
 {
   m_interference = CreateObject<SatPerPacketInterference>();
   m_rxIndex = 0;
+
+  for (int i = 0; i < 4; i++)
+    {
+      finalPower[i] = 0;
+      firstPower[i] = 0;
+      m_rxEvent[i] = NULL;
+    }
 }
 
 SatPerPacketInterferenceTestCase::~SatPerPacketInterferenceTestCase ()
@@ -239,7 +246,7 @@ SatTracedInterferenceTestCase::DoRun (void)
 
   interference->NotifyRxStart(event);
 
-  double finalPower;
+  double finalPower = 0;
   double firstPower = interference->Calculate(event, &finalPower);
 
   NS_TEST_ASSERT_MSG_EQ( firstPower, 0, "First power incorrect");

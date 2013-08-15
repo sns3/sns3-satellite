@@ -45,7 +45,8 @@ SatConstantInterference::GetInstanceTypeId (void) const
 }
 
 SatConstantInterference::SatConstantInterference ()
-  : m_power (0.0)
+  : m_power (0.0),
+    m_rxing (false)
 {
 }
 SatConstantInterference::~SatConstantInterference ()
