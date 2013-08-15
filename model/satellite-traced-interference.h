@@ -15,33 +15,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SATELLITE_PER_PACKET_INTERFERENCE_H
-#define SATELLITE_PER_PACKET_INTERFERENCE_H
+#ifndef SATELLITE_TRACED_INTERFERENCE_H
+#define SATELLITE_TRACED_INTERFERENCE_H
 
-#include <map>
-#include <set>
 #include "satellite-interference.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Packet by packet interference. Interference is calculated packet
+ * \brief Satellite traced interference. Interference values is based on trace file.
  */
-class SatPerPacketInterference : public SatInterference
+class SatTracedInterference : public SatInterference
 {
 public:
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
-  SatPerPacketInterference ();
-  ~SatPerPacketInterference ();
+  SatTracedInterference ();
+  ~SatTracedInterference ();
 
 private:
   /**
    * Adds interference power to interference object.
+   * No effect in this implementation.
    *
    * \param rxDuration Duration of the receiving.
    * \param rxPower Receiving power.
@@ -49,10 +48,12 @@ private:
    * \return the pointer to interference event as a reference of the addition
    */
   virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower);
-
   /**
    * Calculates interference power for the given reference
    * Sets final power at end time to finalPower.
+   *
+   * Just return next value from trace input.
+   * finalPower is set to returned value.
    *
    * \param event Reference event which for interference is calculated.
    * \param finalPower Pointer to variable to store calculated power value at end of receiving
@@ -69,40 +70,23 @@ private:
   /**
    * Notifies that RX is started by a receiver.
    *
-   * \param event Interference reference event of receiver
+   * \param event Interference reference event of receiver (ignored in this implementation)
    */
   virtual void DoNotifyRxStart (Ptr<SatInterference::Event> event);
 
   /**
    * Notifies that RX is ended by a receiver.
    *
-   * \param event Interference reference event of receiver
+   * \param event Interference reference event of receiver (ignored in this implementation)
    */
   virtual void DoNotifyRxEnd (Ptr<SatInterference::Event> event);
 
-  typedef std::pair <uint32_t, double > InterferenceChange;
-  typedef std::multimap <Time, InterferenceChange > InterferenceChanges;
+  SatTracedInterference (const SatTracedInterference &o);
+  SatTracedInterference &operator = (const SatTracedInterference &o);
 
-  SatPerPacketInterference (const SatPerPacketInterference &o);
-  SatPerPacketInterference &operator = (const SatPerPacketInterference &o);
-
-  // interference change list
-  InterferenceChanges m_changes;
-
-  // notified interference event IDs
-  std::set <uint32_t> m_events;
-
-  // first power value for interference
-  // sum of negative values in list m_changes, which positive value is not in list
-  double m_firstPower;
-
-  // flag to indicate that at least one receiving is on
   bool m_rxing;
-
-  // event id for Events
-  uint32_t m_nextEventId;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_PER_PACKET_INTERFERENCE_H */
+#endif /* SATELLITE_TRACED_INTERFERENCE_H */

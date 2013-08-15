@@ -15,33 +15,40 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SATELLITE_PER_PACKET_INTERFERENCE_H
-#define SATELLITE_PER_PACKET_INTERFERENCE_H
+#ifndef SATELLITE_CONSTANT_INTERFERENCE_H
+#define SATELLITE_CONSTANT_INTERFERENCE_H
 
-#include <map>
-#include <set>
 #include "satellite-interference.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Packet by packet interference. Interference is calculated packet
+ * \brief Ssatellite constant interference.
+ *        Interference is constant until set again by Set method.
  */
-class SatPerPacketInterference : public SatInterference
+class SatConstantInterference : public SatInterference
 {
 public:
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
-  SatPerPacketInterference ();
-  ~SatPerPacketInterference ();
+  SatConstantInterference ();
+  ~SatConstantInterference ();
+
+  /**
+   * Sets constant interference power to constant interference object.
+   *
+   * \param power value of power to set.
+   */
+  virtual void Set(double power);
 
 private:
   /**
    * Adds interference power to interference object.
+   * No effect in this implementation.
    *
    * \param rxDuration Duration of the receiving.
    * \param rxPower Receiving power.
@@ -49,10 +56,12 @@ private:
    * \return the pointer to interference event as a reference of the addition
    */
   virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower);
-
   /**
    * Calculates interference power for the given reference
    * Sets final power at end time to finalPower.
+   *
+   * Just return constant value set by Set method in this implementation.
+   * finalPower is set to returned value.
    *
    * \param event Reference event which for interference is calculated.
    * \param finalPower Pointer to variable to store calculated power value at end of receiving
@@ -69,40 +78,24 @@ private:
   /**
    * Notifies that RX is started by a receiver.
    *
-   * \param event Interference reference event of receiver
+   * \param event Interference reference event of receiver (ignored in this implementation)
    */
   virtual void DoNotifyRxStart (Ptr<SatInterference::Event> event);
 
   /**
    * Notifies that RX is ended by a receiver.
    *
-   * \param event Interference reference event of receiver
+   * \param event Interference reference event of receiver (ignored in this implementation)
    */
   virtual void DoNotifyRxEnd (Ptr<SatInterference::Event> event);
 
-  typedef std::pair <uint32_t, double > InterferenceChange;
-  typedef std::multimap <Time, InterferenceChange > InterferenceChanges;
+  SatConstantInterference (const SatConstantInterference &o);
+  SatConstantInterference &operator = (const SatConstantInterference &o);
 
-  SatPerPacketInterference (const SatPerPacketInterference &o);
-  SatPerPacketInterference &operator = (const SatPerPacketInterference &o);
-
-  // interference change list
-  InterferenceChanges m_changes;
-
-  // notified interference event IDs
-  std::set <uint32_t> m_events;
-
-  // first power value for interference
-  // sum of negative values in list m_changes, which positive value is not in list
-  double m_firstPower;
-
-  // flag to indicate that at least one receiving is on
+  double m_power;
   bool m_rxing;
-
-  // event id for Events
-  uint32_t m_nextEventId;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_PER_PACKET_INTERFERENCE_H */
+#endif /* SATELLITE_CONSTANT_INTERFERENCE_H */

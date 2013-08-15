@@ -31,6 +31,10 @@ def build(bld):
         'model/satellite-mobility-model.cc',
         'model/satellite-constant-position-mobility-model.cc',
         'model/satellite-position-allocator.cc',
+        'model/satellite-interference.cc',
+        'model/satellite-per-packet-interference.cc',
+        'model/satellite-constant-interference.cc',
+        'model/satellite-traced-interference.cc',
         'helper/satellite-helper.cc',
         'helper/satellite-beam-helper.cc',
         'helper/satellite-user-helper.cc',
@@ -50,6 +54,7 @@ def build(bld):
         'test/cbr-test.cc',
         'test/link-results-test.cc',
         'test/sat-mobility-test.cc',
+        'test/sat-interference-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -77,6 +82,10 @@ def build(bld):
         'model/satellite-mobility-model.h',
         'model/satellite-constant-position-mobility-model.h',
         'model/satellite-position-allocator.h',
+        'model/satellite-interference.h',
+        'model/satellite-per-packet-interference.h',
+        'model/satellite-constant-interference.h',
+        'model/satellite-traced-interference.h',       
         'helper/satellite-helper.h',
         'helper/satellite-beam-helper.h',
 		'helper/satellite-user-helper.h',
