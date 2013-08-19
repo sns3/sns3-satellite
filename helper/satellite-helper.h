@@ -30,6 +30,7 @@
 #include "ns3/csma-helper.h"
 #include "satellite-user-helper.h"
 #include "satellite-beam-helper.h"
+#include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
 
 namespace ns3 {
@@ -41,22 +42,23 @@ namespace ns3 {
 class SatHelper : public Object
 {
 public:
-  /**
-       * \enum values for pre-defined scenarios to be used by helper when building
+    /**
+     * \enum values for pre-defined scenarios to be used by helper when building
                satellite network topology base.
-
-       *  - NONE:         Not used.
-       *  - SIMPLE:       Simple scenario used as base.
-       *  - LARGER:       Larger scenario used as base.
-       *  - FULL:         Full scenario used as base.
-       *  - USER_DEFINED: TODO: User defined scenario implemented later.
-       */
+     *
+     *  - NONE:         Not used.
+     *  - SIMPLE:       Simple scenario used as base.
+     *  - LARGER:       Larger scenario used as base.
+     *  - FULL:         Full scenario used as base.
+     *  - USER_DEFINED: User defined scenario as base.
+     */
     typedef enum
     {
       NONE,
       SIMPLE,
       LARGER,
-      FULL
+      FULL,
+      USER_DEFINED
     }PreDefinedScenario;
 
   static TypeId GetTypeId (void);
@@ -74,19 +76,40 @@ public:
   virtual ~SatHelper () {}
 
   /**
+   * Sets beam info for sceanrio creation.
+   * Only in user defined scenario beam Ids have effect to number of beams to be creates.
+   * In other scenarios only UT count and their user count have meaning. So for this default
+   * count can be overidden.
+   *
+   * \param info information of the users in beams (for user defined scenario defines beams to create)
+   */
+  void SetBeamUserInfo(std::map<uint32_t, SatBeamUserInfo> info);
+
+  /**
+   * Sets beam info for sceanrio creation.
+   * Only in user defined scenario beamId  have effect to number of beams to be creates.
+   * In other scenarios only UT count and their user count have meaning. So for this default
+   * count can be overidden.
+   *
+   * \param beamId id of the beam which info is set (for user defined scenario defines beam to create)
+   * \param info information of the user in beam
+   */
+  void SetBeamUserInfo(uint32_t beamId, SatBeamUserInfo info);
+
+  /**
    * \param  node pointer to user node.
    *
-   * Returns address of the user.
+   * \return address of the user.
    */
   Ipv4Address GetUserAddress(Ptr<Node> node);
 
   /**
-   * Returns container having UT users
+   * \return container having UT users
    */
   NodeContainer  GetUtUsers();
 
   /**
-   * Returns container having GW users.
+   * \return container having GW users.
    */
   NodeContainer  GetGwUsers();
 
@@ -99,6 +122,10 @@ public:
   void EnableCreationTraces(std::string filename, bool details);
 
 private:
+  /**
+     * definition for beam map key and value.
+     */
+  typedef std::map<uint32_t, SatBeamUserInfo > BeamMap;
 
   /**
    * Enables creation traces in sub-helpers.
@@ -124,11 +151,22 @@ private:
    * Creates satellite objects according to larger scenario.
    */
   void CreateLargerScenario();
-
   /**
    * Creates satellite objects according to full scenario.
    */
   void CreateFullScenario();
+  /**
+   * Creates satellite objects according to user defined scenario.
+   * Beams to create with number of the UTs are set by method SetBeamUserInfo.
+   */
+  void CreateUserDefinedScenario();
+
+  /**
+   * Creates satellite objects according to given beam info.
+   * /param beamInfo information of the beam to create (and beams which are given in map)
+   * /param gwUsers number of the users in GW(s) side
+   */
+  void CreateScenario(BeamMap beamInfo, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -197,6 +235,15 @@ private:
    * Number of users created in end user network (behind every UT) in full or user-defined scenario
    */
   uint32_t m_utUsers;
+
+  /**
+   * Info for beam creation in user defined scenario.
+   * first is ID of the beam and second is number of beam created in beam.
+   * If second is zero then default number of UTs is created (number set by attribute UtCount)
+   *
+   * Info is set by attribute BeamInfo
+   */
+  BeamMap m_beamInfo;
 
   /**
    * Default value for variable m_utsInBeam

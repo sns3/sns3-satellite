@@ -47,33 +47,33 @@ using namespace ns3;
  *    • User Node-1 is attached to GW node and User Node-2 attached to UT node.
  *
  */
-class ScenarioCreation1 : public TestCase
+class ScenarioCreationSimple : public TestCase
 {
 public:
-  ScenarioCreation1 ();
-  virtual ~ScenarioCreation1 ();
+  ScenarioCreationSimple ();
+  virtual ~ScenarioCreationSimple ();
 
 private:
   virtual void DoRun (void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreation1::ScenarioCreation1 ()
+ScenarioCreationSimple::ScenarioCreationSimple ()
   : TestCase ("'Scenario Creation, Simple' case tests successful creation of Simple test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreation1::~ScenarioCreation1 ()
+ScenarioCreationSimple::~ScenarioCreationSimple ()
 {
 }
 
 //
-// ScenarioCreation1 TestCase implementation
+// ScenarioCreationSimple TestCase implementation
 //
 void
-ScenarioCreation1::DoRun (void)
+ScenarioCreationSimple::DoRun (void)
 {
   // Create simple scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
@@ -100,33 +100,33 @@ ScenarioCreation1::DoRun (void)
  *    • User Node-1 is attached to GW node and User Node-2 to Node-6 attached to UT nodes.
  *
  */
-class ScenarioCreation2 : public TestCase
+class ScenarioCreationLarger : public TestCase
 {
 public:
-  ScenarioCreation2 ();
-  virtual ~ScenarioCreation2 ();
+  ScenarioCreationLarger ();
+  virtual ~ScenarioCreationLarger ();
 
 private:
   virtual void DoRun (void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreation2::ScenarioCreation2 ()
-  : TestCase ("'Scenario Creation, Simple' case tests successful creation of Simple test scenario")
+ScenarioCreationLarger::ScenarioCreationLarger ()
+  : TestCase ("'Scenario Creation, Larger' case tests successful creation of Larger test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreation2::~ScenarioCreation2 ()
+ScenarioCreationLarger::~ScenarioCreationLarger ()
 {
 }
 
 //
-// ScenarioCreation2 TestCase implementation
+// ScenarioCreationLarger TestCase implementation
 //
 void
-ScenarioCreation2::DoRun (void)
+ScenarioCreationLarger::DoRun (void)
 {
   // Create larger scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
@@ -147,41 +147,41 @@ ScenarioCreation2::DoRun (void)
  *  1.  Full test scenario created with helper
  *
  *  Expected result:
- *    • Satellite, seven GWs, defined number (98) UTs and defined number of the user nodes created.
+ *    • Satellite, seven GWs, defined number (3*98) UTs and defined number of the user nodes created.
  *    • User return/forward and feeder return/forward channels created according to configuration.
  *    • Satellite connected to GWs with feeder channels and to UTs with user channels.
  *    • User nodes attached to GW and UT .
  *
  */
-class ScenarioCreation3 : public TestCase
+class ScenarioCreationFull : public TestCase
 {
 public:
-  ScenarioCreation3 ();
-  virtual ~ScenarioCreation3 ();
+  ScenarioCreationFull ();
+  virtual ~ScenarioCreationFull ();
 
 private:
   virtual void DoRun (void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreation3::ScenarioCreation3 ()
-  : TestCase ("'Scenario Creation, Simple' case tests successful creation of Simple test scenario")
+ScenarioCreationFull::ScenarioCreationFull ()
+  : TestCase ("'Scenario Creation, Full' case tests successful creation of Full test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreation3::~ScenarioCreation3 ()
+ScenarioCreationFull::~ScenarioCreationFull ()
 {
 }
 
 //
-// ScenarioCreation3 TestCase implementation
+// ScenarioCreationFull TestCase implementation
 //
 void
-ScenarioCreation3::DoRun (void)
+ScenarioCreationFull::DoRun (void)
 {
-  // Create larger scenario
+  // Create full scenario
   Ptr<SatHelper> helper = CreateObject<SatHelper>();
   helper->EnableCreationTraces("full-scenario-creation.log", false );
   helper->CreateScenario(SatHelper::FULL);
@@ -195,6 +195,68 @@ ScenarioCreation3::DoRun (void)
   Simulator::Destroy();
 }
 
+/**
+ * \brief 'Scenario Creation, User Defined' test case implementation, id: tbd / TN4.
+ *
+ * This case tests successful creation of the user defined scenario creation of the reference system.
+ *  1. Set beam info attibute(s) to satellite helper
+ *  2. User defined scenario created with helper
+ *
+ *  Expected result:
+ *    • Satellite, needed GWs, defined number UTs and defined number of the user nodes created.
+ *    • User return/forward and feeder return/forward channels created according to configuration.
+ *    • Satellite connected to GWs with feeder channels and to UTs with user channels.
+ *    • User nodes attached to GW and UT .
+ *
+ */
+class ScenarioCreationUser : public TestCase
+{
+public:
+  ScenarioCreationUser ();
+  virtual ~ScenarioCreationUser ();
+
+private:
+  virtual void DoRun (void);
+};
+
+// Add some help text to this case to describe what it is intended to test
+ScenarioCreationUser::ScenarioCreationUser ()
+  : TestCase ("'Scenario Creation, User defined' case tests successful creation of User defined test scenario")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+ScenarioCreationUser::~ScenarioCreationUser ()
+{
+}
+
+//
+// ScenarioCreationUser TestCase implementation
+//
+void
+ScenarioCreationUser::DoRun (void)
+{
+  // Create user scenario
+  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+  SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
+  std::map<uint32_t, SatBeamUserInfo > beamMap;
+  beamMap[8] = beamInfo;
+  beamMap[3] = beamInfo;
+  beamInfo.AddUt(2);
+  beamMap[2] = beamInfo;
+  helper->SetBeamUserInfo(beamMap);
+
+  helper->EnableCreationTraces("user-scenario-creation.log", false );
+
+  helper->CreateScenario(SatHelper::USER_DEFINED);
+
+  // check results what can be done at this level. More checking done in module level with traces
+  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
+
+  Simulator::Destroy();
+}
 
 // The TestSuite class names the TestSuite as sat-scenario-creation, identifies what type of TestSuite (SYSTEM),
 // and enables the TestCases to be run. Typically, only the constructor for
@@ -209,14 +271,17 @@ public:
 ScenarioCreationTestSuite::ScenarioCreationTestSuite ()
   : TestSuite ("sat-scenario-creation", SYSTEM)
 {
-  // add ScenarioCreation1 case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreation1);
+  // add ScenarioCreationSimple case to suite sat-scenario-creation
+  AddTestCase (new ScenarioCreationSimple);
 
-  // add ScenarioCreation2 case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreation2);
+  // add ScenarioCreationLarger case to suite sat-scenario-creation
+  AddTestCase (new ScenarioCreationLarger);
 
-  // add ScenarioCreation3 case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreation3);
+  // add ScenarioCreationFull case to suite sat-scenario-creation
+  AddTestCase (new ScenarioCreationFull);
+
+  // add ScenarioCreationUser case to suite sat-scenario-creation
+  AddTestCase (new ScenarioCreationUser);
 
 }
 
