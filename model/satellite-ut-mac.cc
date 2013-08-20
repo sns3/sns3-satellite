@@ -81,38 +81,35 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 
   bool deliverUp = true;
 
-  if ( SatMac::PacketHasError(packet) == false )
+  MacAddressTag tag;
+
+  // Fetch the packet tag
+  if (packet->PeekPacketTag (tag))
     {
-      MacAddressTag tag;
+      // If the packet is intended for this receiver
+      Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
 
-      // Fetch the packet tag
-      if (packet->PeekPacketTag (tag))
+      if ( addr.IsBroadcast() )
         {
-          // If the packet is intended for this receiver
-          Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
+          SatCtrlHeader header;
 
-          if ( addr.IsBroadcast() )
+          packet->RemoveHeader(header);
+
+          if (header.GetMsgType() == SatCtrlHeader::TBTP_MSG)
             {
-              SatCtrlHeader header;
+              double time = header.GetMsgData();
 
-              packet->RemoveHeader(header);
-
-              if (header.GetMsgType() == SatCtrlHeader::TBTP_MSG)
-                {
-                  double time = header.GetMsgData();
-
-                  packet->RemovePacketTag (tag);
-                  Simulator::Schedule (Seconds(time), &SatUtMac::TransmitReady, this);
-                  deliverUp = false;
-                }
+              packet->RemovePacketTag (tag);
+              Simulator::Schedule (Seconds(time), &SatUtMac::TransmitReady, this);
+              deliverUp = false;
             }
         }
+    }
 
-        // deliver packet to parent SatMac, if not UT specific packet
-        if (deliverUp)
-          {
-            SatMac::Receive(packet,rxParams);
-          }
+  // deliver packet to parent SatMac, if not UT specific packet
+  if (deliverUp)
+    {
+      SatMac::Receive(packet,rxParams);
     }
 }
 

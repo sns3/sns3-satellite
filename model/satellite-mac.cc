@@ -111,11 +111,6 @@ SatMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatMac")
     .SetParent<Object> ()
     .AddConstructor<SatMac> ()
-    .AddAttribute ("ReceiveErrorModel", 
-                   "The receiver error model used to simulate packet loss",
-                   PointerValue (),
-                   MakePointerAccessor (&SatMac::m_receiveErrorModel),
-                   MakePointerChecker<ErrorModel> ())
     .AddAttribute ("Interval",
                    "The time to wait between packet (frame) transmissions",
                    TimeValue (Seconds (0.001)),
@@ -162,9 +157,7 @@ SatMac::GetTypeId (void)
 }
 
 SatMac::SatMac ()
-  : m_txMachineState (READY),
-    m_phy(0),
-    m_currentPkt (0)
+  : m_phy(0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -180,8 +173,6 @@ void
 SatMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_receiveErrorModel = 0;
-  m_currentPkt = 0;
   m_phy = 0;
   m_queue->DequeueAll();
   m_queue = 0;
@@ -199,15 +190,6 @@ SatMac::TransmitStart (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
   NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
-
-  //
-  // This function is called to start the process of transmitting a packet.
-  // We need to tell the channel that we've started wiggling the wire and
-  // schedule an event that will be executed when the transmission is complete.
-  //
-  //NS_ASSERT_MSG (m_txMachineState == READY, "Must be READY to transmit");
-  //m_txMachineState = BUSY;
-  //m_currentPkt = p;
 
   /* \todo Now we are using only one carrierId and a static (time slot) duration
    * for packet transmissions and receptions.
@@ -230,20 +212,14 @@ SatMac::TransmitReady (void)
   // We try and pull another packet off of the transmit queue.  If the queue
   // is empty, we are done, otherwise we need to start transmitting the
   // next packet.
-  //
-  //NS_ASSERT_MSG (m_txMachineState == BUSY, "Must be BUSY if transmitting");
-  //m_txMachineState = READY;
-
-  //NS_ASSERT_MSG (m_currentPkt != 0, "SatMac::TransmitReady(): m_currentPkt zero");
-  //m_currentPkt = 0;
 
   if ( m_tInterval.GetDouble() > 0)
     {
       if ( PacketInQueue() )
-          {
-            Ptr<Packet> p = m_queue->Dequeue();
-            TransmitStart(p);
-          }
+        {
+          Ptr<Packet> p = m_queue->Dequeue();
+          TransmitStart(p);
+        }
 
       Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this);
     }
@@ -283,51 +259,39 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  if ( PacketHasError(packet) )
+  //
+  // Hit the trace hooks.  All of these hooks are in the same place in this
+  // device because it is so simple, but this is not usually the case in
+  // more complicated devices.
+  //
+  m_snifferTrace (packet);
+  m_promiscSnifferTrace (packet);
+
+  m_macRxTrace (packet);
+
+  MacAddressTag tag;
+
+  // Fetch the packet tag
+  if (packet->RemovePacketTag (tag))
     {
-      // 
-      // If we have an error model and it indicates that it is time to lose a
-      // corrupted packet, don't forward this packet up, let it go.
-      //
-      //m_phyRxDropTrace (packet);
-    }
-  else 
-    {
-      // 
-      // Hit the trace hooks.  All of these hooks are in the same place in this 
-      // device becuase it is so simple, but this is not usually the case in 
-      // more complicated devices.
-      //
-      m_snifferTrace (packet);
-      m_promiscSnifferTrace (packet);
-      //m_phyRxEndTrace (packet);
+      NS_LOG_LOGIC("Packet to " << tag.GetAddress());
+      NS_LOG_LOGIC("Receiver " << m_macAddress );
 
-      m_macRxTrace (packet);
+      // If the packet is intended for this receiver
+      Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
 
-      MacAddressTag tag;
-
-      // Fetch the packet tag
-      if (packet->RemovePacketTag (tag))
+      if ( addr == m_macAddress ||  addr.IsBroadcast() )
         {
-          NS_LOG_LOGIC("Packet to " << tag.GetAddress());
-          NS_LOG_LOGIC("Receiver " << m_macAddress );
-
-          // If the packet is intended for this receiver
-          Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
-
-          if ( addr == m_macAddress ||  addr.IsBroadcast() )
-            {
-              m_rxCallback (packet);
-            }
-          else
-            {
-              NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
-            }
+          m_rxCallback (packet);
         }
       else
         {
-           NS_ASSERT( "SatMac::Receive(): Packet received with no tag information!");
+          NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
         }
+    }
+  else
+    {
+       NS_ASSERT( "SatMac::Receive(): Packet received with no tag information!");
     }
 }
 

@@ -176,7 +176,6 @@ protected:
 
    inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
    inline Ptr<Packet> GetPacketFromQueue() { return m_queue->Dequeue();}
-   inline bool PacketHasError(Ptr<Packet> packet) { return (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet));}
    inline Time GetInterval() { return m_tInterval;}
 private:
   SatMac& operator = (const SatMac &);
@@ -191,20 +190,6 @@ private:
    * The TransmitReady method is used internally to schedule sending of a packet out on the phy.
    */
   void TransmitReady (void);
-
-  /**
-   * Enumeration of the states of the transmit machine of the net device.
-   */
-  enum TxMachineState
-  {
-    READY,   /**< The transmitter is ready to begin transmission of a packet */
-    BUSY     /**< The transmitter is busy transmitting a packet */
-  };
-  /**
-   * The state of the Net Device transmit state machine.
-   * @see TxMachineState
-   */
-  TxMachineState m_txMachineState;
 
   /**
    * The interval that the Mac uses to throttle packet transmission
@@ -234,16 +219,6 @@ private:
    * The upper layer package receive callback.
    */
   SatMac::ReceiveCallback m_rxCallback;
-
-  /**
-   * The packet currently in transmission.
-   */
-  Ptr<Packet> m_currentPkt;
-
-  /**
-   * Error model for receive packet events
-   */
-  Ptr<ErrorModel> m_receiveErrorModel;
 
   /**
    * MAC address of the this mac instance
