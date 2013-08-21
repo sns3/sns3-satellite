@@ -51,49 +51,51 @@ public:
   virtual ~SatUserHelper () {}
 
   /**
-     * Set an attribute value to be propagated to each CsmaNetDevice created by the
-     * helper.
-     *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
-     *
-     * Set these attributes on each ns3::SatNetDevice created
-     * by SatBeamHelper::Install
-     */
-    void SetCsmaDeviceAttribute (std::string name, const AttributeValue &value);
+   * Set an attribute value to be propagated to each CsmaNetDevice created by the
+   * helper.
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   *
+   * Set these attributes on each ns3::SatNetDevice created
+   * by SatBeamHelper::Install
+   */
+  void SetCsmaDeviceAttribute (std::string name, const AttributeValue &value);
 
-    /**
-     * Set an attribute value to be propagated to each Csma
-     *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
-     *
-     * Set these attribute on each ns3::SatChannel created
-     * by SatNetDevHelper::Install
-     */
-    void SetCsmaChannelAttribute (std::string name, const AttributeValue &value);
+  /**
+   * Set an attribute value to be propagated to each Csma
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   *
+   * Set these attribute on each ns3::SatChannel created
+   * by SatNetDevHelper::Install
+   */
+  void SetCsmaChannelAttribute (std::string name, const AttributeValue &value);
 
   /**
   * \param network The Ipv4Address containing the initial network number to
   * use for satellite network allocation. The bits outside the network mask are not used.
+  *
   * \param mask The Ipv4Mask containing one bits in each bit position of the
   * network number.
+  *
   * \param base An optional Ipv4Address containing the initial address used for
   * IP address allocation.  Will be combined (ORed) with the network number to
   * generate the first IP address.  Defaults to 0.0.0.1.
-  * \returns Nothing.
   */
   void SetUtBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
 
   /**
   * \param network The Ipv4Address containing the initial network number to
   * use for satellite network allocation. The bits outside the network mask are not used.
+  *
   * \param mask The Ipv4Mask containing one bits in each bit position of the
   * network number.
+  *
   * \param base An optional Ipv4Address containing the initial address used for
   * IP address allocation.  Will be combined (ORed) with the network number to
   * generate the first IP address.  Defaults to 0.0.0.1.
-  * \returns Nothing.
   */
   void SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
 
@@ -104,8 +106,22 @@ public:
    * This method creates users with the requested attributes
    * to satellite network and add csma netdevice on them and csma channel between UTs/GW and their users.
    *
+   * \return  node container of created users for the UT.
+   *
    */
   NodeContainer InstallUt (NodeContainer ut, uint32_t users );
+
+  /**
+   * \param ut a UT node
+   * \param users number of users to install for the UT
+   *
+   * This method creates users with the requested attributes
+   * to satellite network and add csma netdevice on them and csma channel between UT/GW and their users.
+   *
+   * \return  node container of created users for the UTs.
+   *
+   */
+  NodeContainer InstallUt (Ptr<Node> ut, uint32_t users );
 
   /**
    * \param gw a set of GW nodes
@@ -117,26 +133,28 @@ public:
    * GW and their users. In case of more than one GW channel is created between GW and router and
    * between router and users.
    *
+   * \return  node container of created users for the GWs (and router).
+   *
    */
   NodeContainer InstallGw (NodeContainer gw , uint32_t users);
 
   /**
-   * returns A container having all GW user nodes in satellite network.
+   * /return A container having all GW user nodes in satellite network.
    */
   NodeContainer GetGwUsers();
 
   /**
-   * returns A container having all UT nodes in satellite network.
+   * /return A container having all UT nodes in satellite network.
    */
   NodeContainer GetUtUsers();
 
   /**
-   * returns number of GW users in satellite network.
+   * /return number of GW users in satellite network.
    */
   uint32_t GetGwUserN();
 
   /**
-   * returns number of UT users in satellite network.
+   * /return number of UT users in satellite network.
    */
   uint32_t GetUtUserN();
 

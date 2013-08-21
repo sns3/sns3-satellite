@@ -176,6 +176,17 @@ private:
   std::string CreateCreationSummary(std::string title);
 
   /**
+   * Sets positions to created GW nodes (by BeamHelper).
+   */
+  void SetGwPositions(void);
+
+  /**
+   * Sets position to created Sat Geo node (by BeamHelper).
+   */
+  void SetGeoSatPosition(void);
+
+
+  /**
    * User helper
    */
   Ptr<SatUserHelper> m_userHelper;
@@ -210,6 +221,11 @@ private:
    * Stream wrapper used for creation traces
    */
   Ptr<OutputStreamWrapper> m_creationTraceStream;
+
+  /**
+   * Stream wrapper used for UT position traces
+   */
+  Ptr<OutputStreamWrapper>m_utPosTraceStream;
 
   /**
    * flag to check if scenario is alreay created.

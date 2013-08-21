@@ -29,7 +29,7 @@ namespace ns3 {
 /*
  * Beam id, User frequency id, GW id, Feeder frequency id
  */
-static const uint32_t default_conf[SatConf::DEFAULT_BEAM_COUNT][SatConf::BEAM_ELEM_COUNT] = {
+static const uint32_t g_DefaultConf[SatConf::DEFAULT_BEAM_COUNT][SatConf::BEAM_ELEM_COUNT] = {
                                         {1, 1, 4, 1,},
                                         {2, 2, 6, 1,},
                                         {3, 4, 6, 2,},
@@ -129,26 +129,50 @@ static const uint32_t default_conf[SatConf::DEFAULT_BEAM_COUNT][SatConf::BEAM_EL
                                         {97, 3, 7, 11,},
                                         {98, 4, 7, 12,} };
 
+static const GeoCoordinate g_defaultGwPos[SatConf::DEFAULT_GW_COUNT] = {
+                                          GeoCoordinate(54.689444, 25.28, 0.00),      // GW id: 1; Vilna, Lithuania; Position: 54.41.22 N / 25.16.48 E
+                                          GeoCoordinate(49.447778, 11.068056, 0.00),  // GW id: 2; Nurnberg, Germany; Position: 49.26.52 N / 11.4.5 E
+                                          GeoCoordinate(52.25, -0.883333, 0.00),      // GW id: 3; Northampton, Great Britain; Position: 52.15.0 N / 0.53.0 W
+                                          GeoCoordinate(41.9, 12.483333, 0.00),       // GW id: 4; Roma, Italy; Position: 41.54.0 N / 12.29.0 E
+                                          GeoCoordinate(37.883333, -4.766667, 0.00),  // GW id: 5; Coroba, Spain; Position: 37.53.0 N / 4.46.0 W
+                                          GeoCoordinate(39.927222, 32.864167, 0.00),  // GW id: 6; Ankara, Turkey; Position: 39.55.38 N / 32.51.51 E
+                                          GeoCoordinate(63.183333, 14.65, 0.00) };    // GW id: 7; Östersund, Sweden; Position: 63.11.0 N / 14.39.0 E
+
+
+static const GeoCoordinate g_defaultGeoSatPos = GeoCoordinate(33.0, 0, 35786);
 
 SatConf::SatConf()
-  :m_beamCount(DEFAULT_BEAM_COUNT)
+  :m_beamCount(DEFAULT_BEAM_COUNT),
+   m_gwCount(SatConf::DEFAULT_GW_COUNT)
 {
   for (uint32_t i = 0; i < DEFAULT_BEAM_COUNT; i++)
     {
       std::vector <uint32_t> beamConf;
 
-      beamConf.push_back (default_conf[i][BEAM_ID_INDEX]);
-      beamConf.push_back (default_conf[i][U_FREQ_ID_INDEX]);
-      beamConf.push_back (default_conf[i][GW_ID_INDEX]);
-      beamConf.push_back (default_conf[i][F_FREQ_ID_INDEX]);
+      beamConf.push_back (g_DefaultConf[i][BEAM_ID_INDEX]);
+      beamConf.push_back (g_DefaultConf[i][U_FREQ_ID_INDEX]);
+      beamConf.push_back (g_DefaultConf[i][GW_ID_INDEX]);
+      beamConf.push_back (g_DefaultConf[i][F_FREQ_ID_INDEX]);
 
       m_conf.push_back(beamConf);
     }
+
+  for ( uint32_t j = 0; j < DEFAULT_GW_COUNT; j++ )
+    {
+      m_gwPositions.push_back(g_defaultGwPos[j]);
+    }
+
+  m_geoSatPosition = g_defaultGeoSatPos;
 }
 
 uint32_t SatConf::GetBeamCount() const
 {
   return m_beamCount;
+}
+
+uint32_t SatConf::GetGwCount() const
+{
+  return m_gwCount;
 }
 
 
@@ -157,6 +181,18 @@ std::vector <uint32_t> SatConf::GetBeamConfiguration (uint32_t beamId) const
     NS_ASSERT((beamId > 0) && (beamId <=  m_beamCount));
 
     return m_conf[beamId - 1];
+}
+
+GeoCoordinate SatConf::GetGwPosition (uint32_t gwId) const
+{
+    NS_ASSERT((gwId > 0) && (gwId <=  m_gwCount));
+
+    return m_gwPositions[gwId - 1];
+}
+
+GeoCoordinate SatConf::GetGeoSatPosition () const
+{
+    return m_geoSatPosition;
 }
 
 } // namespace ns3

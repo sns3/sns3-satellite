@@ -25,7 +25,8 @@
 #include "ns3/type-id.h"
 #include "ns3/csma-helper.h"
 #include "ns3/internet-stack-helper.h"
-
+#include "ns3/mobility-helper.h"
+#include "../model/satellite-position-allocator.h"
 #include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
@@ -135,6 +136,7 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
     }
 
   m_creationTraceStream = asciiTraceHelper.CreateFileStream (outputFile);
+  m_utPosTraceStream = asciiTraceHelper.CreateFileStream ("ut-pos-" + outputFile);
 
   TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 
@@ -258,19 +260,15 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 
   for ( BeamMap::iterator info = beamInfo.begin(); info != beamInfo.end(); info++)
     {
-      // create UTs of the beam and intall to internet
+      // create UTs of the beam and install to internet
       NodeContainer uts;
       uts.Create(info->second.GetUtN());
       internet.Install(uts);
 
       for ( uint32_t i = 0; i < info->second.GetUtN(); i++ )
         {
-          // get current UT
-          NodeContainer ut;
-          ut.Add(uts.Get(i));
-
           // create and install needed users
-          m_userHelper->InstallUt(ut, info->second.GetUtUserN(i));
+          m_userHelper->InstallUt(uts.Get(i), info->second.GetUtUserN(i));
         }
 
       std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(info->first);
@@ -278,8 +276,48 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
     }
 
   m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), gwUsers);
+
+  // finally set positions of the GWs and Geo Satellite node
+  SetGwPositions();
+  SetGeoSatPosition();
 }
 
+void
+SatHelper::SetGwPositions(void)
+{
+  MobilityHelper mobility;
+  NodeContainer gwNodes;
+
+  Ptr<SatListPositionAllocator> gwPosAllocator = CreateObject<SatListPositionAllocator> ();
+
+  for (uint32_t i = 1; i <= m_satConf.GetGwCount(); i++)
+    {
+      Ptr<Node> gwNode = m_beamHelper->GetGwNode(i);
+
+      if ( gwNode != NULL )
+        {
+          gwNodes.Add(gwNode);
+          gwPosAllocator->Add(m_satConf.GetGwPosition(i));
+        }
+    }
+
+  mobility.SetPositionAllocator (gwPosAllocator);
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (gwNodes);
+}
+
+void
+SatHelper::SetGeoSatPosition(void)
+{
+  MobilityHelper mobility;
+
+  Ptr<SatListPositionAllocator> geoSatPosAllocator = CreateObject<SatListPositionAllocator> ();
+  geoSatPosAllocator->Add(m_satConf.GetGeoSatPosition());
+
+  mobility.SetPositionAllocator (geoSatPosAllocator);
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (m_beamHelper->GetGeoSatNode());
+}
 
 void
 SatHelper::CreationDetailsSink(Ptr<OutputStreamWrapper> stream, std::string context, std::string info)
@@ -291,6 +329,7 @@ void
 SatHelper::CreationSummarySink(std::string title)
 {
   *m_creationTraceStream->GetStream () << CreateCreationSummary(title);
+  *m_utPosTraceStream->GetStream() << m_beamHelper->GetUtPositionInfo(false);
 }
 
 std::string

@@ -79,38 +79,49 @@ void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask
 NodeContainer
 SatUserHelper::InstallUt (NodeContainer ut, uint32_t userCount )
 {
-  InternetStackHelper internet;
+  NodeContainer createdUsers;
 
   // create users and csma links between UTs and users and add IP routes
   for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
     {
-      NodeContainer users;
-      users.Create(userCount);
-      NodeContainer utUsers = NodeContainer((*i), users);
-
-      internet.Install (users);
-
-      NetDeviceContainer nd = m_csma.Install (utUsers);
-      Ipv4InterfaceContainer addresses = m_ipv4Ut.Assign (nd);
-      Ipv4StaticRoutingHelper ipv4RoutingHelper;
-
-      // Set default route for users toward satellite (UTs address).
-      for (NodeContainer::Iterator j = users.Begin (); j != users.End (); j++)
-        {
-          // Get IPv4 protocol implementations
-          Ptr<Ipv4> ipv4 = (*j)->GetObject<Ipv4> ();
-          Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
-          routing->SetDefaultRoute (addresses.GetAddress(0), 1);
-          NS_LOG_INFO ("SatUserHelper::InstallUt, User default route: " << addresses.GetAddress(0) );
-        }
-
-      m_utUsers.Add(users);
-
-      m_ipv4Ut.NewNetwork();
+      createdUsers.Add(InstallUt(*i, userCount));
     }
 
-  return m_utUsers;
-  }
+  return createdUsers;
+}
+
+NodeContainer
+SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
+{
+  NS_ASSERT(userCount > 0);
+
+  InternetStackHelper internet;
+
+  NodeContainer users;
+  users.Create(userCount);
+  NodeContainer utUsers = NodeContainer(ut, users);
+
+  internet.Install (users);
+
+  NetDeviceContainer nd = m_csma.Install (utUsers);
+  Ipv4InterfaceContainer addresses = m_ipv4Ut.Assign (nd);
+  Ipv4StaticRoutingHelper ipv4RoutingHelper;
+
+  // Set default route for users toward satellite (UTs address).
+  for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
+    {
+      // Get IPv4 protocol implementations
+      Ptr<Ipv4> ipv4 = (*i)->GetObject<Ipv4> ();
+      Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
+      routing->SetDefaultRoute (addresses.GetAddress(0), 1);
+      NS_LOG_INFO ("SatUserHelper::InstallUt, User default route: " << addresses.GetAddress(0) );
+    }
+
+  m_ipv4Ut.NewNetwork();
+  m_utUsers.Add(users);
+
+  return users;
+}
 
 NodeContainer
 SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
