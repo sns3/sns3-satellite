@@ -20,6 +20,7 @@
 
 #include "ns3/log.h"
 #include "ns3/names.h"
+#include "ns3/enum.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mac.h"
 #include "../model/satellite-net-device.h"
@@ -28,7 +29,8 @@
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/virtual-channel.h"
-
+#include "../model/satellite-phy-rx-carrier-conf.h"
+#include "../model/satellite-link-results.h"
 #include "ns3/satellite-gw-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
@@ -43,6 +45,19 @@ SatGwHelper::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatGwHelper")
       .SetParent<Object> ()
       .AddConstructor<SatGwHelper> ()
+      .AddAttribute ("RtnLinkErrorModel",
+                     "Return link error model",
+                     EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                     MakeEnumAccessor (&SatGwHelper::m_errorModel),
+                     MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                      SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::EM_AVI, "AVI"))
+      .AddAttribute ("RtnLinkInterferenceModel",
+                     "Return link interference model",
+                     EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
+                     MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
+                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGwHelper::m_creation))
     ;
@@ -64,6 +79,19 @@ SatGwHelper::SatGwHelper ()
   //LogComponentEnable ("SatGwHelper", LOG_LEVEL_INFO);
 
   m_beamId = 1;
+}
+
+void
+SatGwHelper::Initialize ()
+{
+  /*
+   * Return channel link results (DVB-RCS2) are created for GWs.
+   */
+  if (m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+    {
+      m_linkResults = CreateObject<SatLinkResultsDvbRcs2> ();
+      m_linkResults->Initialize ();
+    }
 }
 
 void 
@@ -123,10 +151,22 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->SetDevice (dev);
 
   // Configure the SatPhyRxCarrier instances
-  // Note, that these have to be changed so that they match the real frame configuration.
-  // Now we survive with one SatPhyRxCarrier, because we do not have a NCC scheduler.
-  uint32_t RETURN_CARRIERS(1);
-  phyRx->ConfigurePhyRxCarriers (RETURN_CARRIERS);
+  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
+  // instead of just the number of carriers, since it should hold information about
+  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
+  uint32_t rtnLinkNumCarriers = 1;
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
+                                                                            m_errorModel,
+                                                                            m_interferenceModel);
+
+  // If the link results are created, we pass those
+  // to SatPhyRxCarrier for error modeling
+  if (m_linkResults)
+    {
+      carrierConf->SetLinkResults (m_linkResults);
+    }
+
+  phyRx->ConfigurePhyRxCarriers (carrierConf);
 
   Ptr<SatMac> mac = CreateObject<SatMac> ();
 

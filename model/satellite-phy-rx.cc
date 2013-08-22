@@ -26,6 +26,7 @@
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-rx-carrier.h"
+#include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-channel.h"
 #include "satellite-signal-parameters.h"
 
@@ -118,16 +119,15 @@ SatPhyRx::SetChannel (Ptr<SatChannel> c)
 
 
 void
-SatPhyRx::ConfigurePhyRxCarriers (uint32_t maxRxCarriers)
+SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
 {
-    NS_LOG_FUNCTION (this << maxRxCarriers);
-    NS_ASSERT (maxRxCarriers > 0);
     NS_ASSERT (m_rxCarriers.empty());
 
-    for ( uint32_t i = 0; i < maxRxCarriers; ++i )
+    for ( uint32_t i = 0; i < carrierConf->GetCarriersN(); ++i )
       {
         NS_LOG_LOGIC(this << " Create carrier: " << i);
-        Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i);
+
+        Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf);
         m_rxCarriers.push_back (rxc);
       }
 }

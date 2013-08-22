@@ -24,7 +24,10 @@
 
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-signal-parameters.h"
-
+#include "satellite-interference.h"
+#include "satellite-constant-interference.h"
+#include "satellite-per-packet-interference.h"
+#include "satellite-traced-interference.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -33,11 +36,40 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 
-SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId)
+SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf)
   :m_state (IDLE)
   ,m_carrierId (carrierId)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << carrierId);
+
+  // Create proper interference object for carrier i
+  switch ( carrierConf->GetInterferenceModel () )
+  {
+    case SatPhyRxCarrierConf::IF_CONSTANT:
+      NS_LOG_LOGIC(this << " Constant interference model created for carrier: " << carrierId);
+      m_satInterference = CreateObject<SatConstantInterference> ();
+      break;
+
+    case SatPhyRxCarrierConf::IF_PER_PACKET:
+      NS_LOG_LOGIC(this << " Per packet interference model created for carrier: " << carrierId);
+      m_satInterference = CreateObject<SatPerPacketInterference> ();
+      break;
+
+    case SatPhyRxCarrierConf::IF_TRACE:
+      NS_LOG_LOGIC(this << " Traced interference model created for carrier: " << carrierId);
+      m_satInterference = CreateObject<SatTracedInterference> ();
+      break;
+
+    default:
+      NS_LOG_ERROR (this << " Not a valid interference model!");
+      break;
+  }
+
+  if (carrierConf->GetErrorModel() == SatPhyRxCarrierConf::EM_AVI)
+    {
+      NS_LOG_LOGIC(this << " link results in use in carrier: " << carrierId);
+      m_linkResults = carrierConf->GetLinkResults ();
+    }
 }
 
 

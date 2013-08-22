@@ -71,6 +71,9 @@ SatBeamHelper::SatBeamHelper ()
   m_gwHelper = CreateObject<SatGwHelper>();
   m_utHelper = CreateObject<SatUtHelper>();
 
+  m_gwHelper->Initialize ();
+  m_utHelper->Initialize ();
+
   // create Geo Node and install net device on it already here because it is not scenario dependent
   m_geoNode = CreateObject<Node>();
   m_geoHelper->Install(m_geoNode);

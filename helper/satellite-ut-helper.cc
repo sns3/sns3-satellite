@@ -20,12 +20,14 @@
 
 #include "ns3/log.h"
 #include "ns3/names.h"
+#include "ns3/enum.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
+#include "../model/satellite-phy-rx-carrier-conf.h"
 
 #include "satellite-ut-helper.h"
 
@@ -41,6 +43,19 @@ SatUtHelper::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatUtHelper")
       .SetParent<Object> ()
       .AddConstructor<SatUtHelper> ()
+      .AddAttribute ("FwdLinkErrorModel",
+                     "Forward link error model",
+                     EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                     MakeEnumAccessor (&SatUtHelper::m_errorModel),
+                     MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                      SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::EM_AVI, "AVI"))
+      .AddAttribute ("FwdLinkInterferenceModel",
+                     "Forward link interference model",
+                     EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
+                     MakeEnumAccessor (&SatUtHelper::m_interferenceModel),
+                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
@@ -61,6 +76,20 @@ SatUtHelper::SatUtHelper ()
 
   //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
+
+void
+SatUtHelper::Initialize ()
+{
+  /*
+   * Forward channel link results (DVB-S2) are created for UTs.
+   */
+  if (m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+    {
+      m_linkResults = CreateObject<SatLinkResultsDvbS2> ();
+      m_linkResults->Initialize ();
+    }
+}
+
 
 void 
 SatUtHelper::SetQueue (std::string type,
@@ -118,9 +147,24 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->SetChannel (fCh);
   phyRx->SetDevice (dev);
 
-  // By default, there is one carrier in the forward link
-  uint32_t FEEDER_CARRIERS(1);
-  phyRx->ConfigurePhyRxCarriers (FEEDER_CARRIERS);
+  // Configure the SatPhyRxCarrier instances
+  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
+  // instead of just the number of carriers, since it should hold information about
+  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
+  uint32_t fwdLinkNumCarriers = 1;
+  Ptr<SatPhyRxCarrierConf> carrierConf =
+        CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
+                                           m_errorModel,
+                                           m_interferenceModel);
+
+  // If the link results are created, we pass those
+  // to SatPhyRxCarrier for error modeling.
+  if (m_linkResults)
+    {
+      carrierConf->SetLinkResults (m_linkResults);
+    }
+
+  phyRx->ConfigurePhyRxCarriers (carrierConf);
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> ();
 

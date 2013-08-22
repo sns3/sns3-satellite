@@ -30,6 +30,7 @@
 #include "ns3/node-container.h"
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
+#include "ns3/satellite-link-results.h"
 
 namespace ns3 {
 
@@ -48,6 +49,11 @@ public:
    */
   SatUtHelper ();
   virtual ~SatUtHelper () {}
+
+  /*
+   * Initializes the UT helper based on attributes
+   */
+  void Initialize ();
 
   /**
    * Each point to point net device must have a queue to pass packets through.
@@ -143,6 +149,23 @@ private:
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
+
+    /*
+     * Configured interference model for the forward link. Set as an attribute.
+     */
+    SatPhyRxCarrierConf::InterferenceModel m_interferenceModel;
+
+    /*
+     * Configured error model for the forward link. Set as an attribute.
+     */
+    SatPhyRxCarrierConf::ErrorModel m_errorModel;
+
+    /*
+     * Forward channel link results (DVB-S2) are created if ErrorModel
+     * is configured to be AVI. Note, that only one instance of the
+     * link results is needed for all UTs.
+     */
+    Ptr<SatLinkResults> m_linkResults;
 
     /**
      * Trace callback for creation traces

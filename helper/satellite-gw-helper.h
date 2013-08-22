@@ -28,6 +28,8 @@
 #include "ns3/node-container.h"
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
+#include "ns3/satellite-link-results.h"
+
 
 namespace ns3 {
 
@@ -46,6 +48,11 @@ public:
    */
   SatGwHelper ();
   virtual ~SatGwHelper () {}
+
+  /*
+   * Initializes the GW helper based on attributes
+   */
+  void Initialize ();
 
   /**
    * Each point to point net device must have a queue to pass packets through.
@@ -148,6 +155,23 @@ private:
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
+
+    /*
+     * Configured interference model for the return link. Set as an attribute.
+     */
+    SatPhyRxCarrierConf::InterferenceModel m_interferenceModel;
+
+    /*
+     * Configured error model for the return link. Set as an attribute.
+     */
+    SatPhyRxCarrierConf::ErrorModel m_errorModel;
+
+    /*
+     * Return channel link results (DVB-RCS2) are created if ErrorModel
+     * is configured to be AVI. Note, that only one instance of the
+     * link results is needed for all GWs.
+     */
+    Ptr<SatLinkResults> m_linkResults;
 
     /**
      * Trace callback for creation traces

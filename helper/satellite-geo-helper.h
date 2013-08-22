@@ -30,6 +30,7 @@
 #include "ns3/node-container.h"
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
 
 namespace ns3 {
 
@@ -109,6 +110,16 @@ private:
     uint16_t m_deviceCount;
 
     ObjectFactory m_deviceFactory;
+
+    /*
+     * Configured forward link interference model
+     */
+    SatPhyRxCarrierConf::InterferenceModel m_fwdLinkInterferenceModel;
+
+    /*
+     * Configured return link interference model
+     */
+    SatPhyRxCarrierConf::InterferenceModel m_rtnLinkInterferenceModel;
 
     /**
      * Trace callback for creation traces

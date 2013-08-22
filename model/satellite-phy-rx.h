@@ -33,6 +33,7 @@ namespace ns3 {
 
 class SatChannel;
 class SatPhyRxCarrier;
+class SatPhyRxCarrierConf;
 
 /**
  * \ingroup satellite
@@ -68,11 +69,9 @@ public:
   void SetBeamId (uint32_t beamId);
 
   /**
-   * Create a sufficient amount of SatPhyRxCarrier instances; one for
-   * each carrier in either forward or return links.
-   * \param maxRxCarriers Maximum supported SatPhyRxCarrier instances (carriers)
+   * \param carrierConf Carrier configuration class
    */
-  void ConfigurePhyRxCarriers (uint32_t maxRxCarriers);
+  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf);
 
   /**
    * Start packet reception from the SatChannel

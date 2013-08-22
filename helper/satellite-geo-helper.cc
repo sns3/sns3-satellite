@@ -22,10 +22,12 @@
 #include "ns3/packet.h"
 #include "ns3/names.h"
 #include "ns3/uinteger.h"
+#include "ns3/enum.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
+#include "../model/satellite-phy-rx-carrier-conf.h"
 
 #include "satellite-geo-helper.h"
 
@@ -41,6 +43,18 @@ SatGeoHelper::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatGeoHelper")
       .SetParent<Object> ()
       .AddConstructor<SatGeoHelper> ()
+      .AddAttribute ("FwdLinkInterferenceModel",
+                     "Forward link interference model",
+                     EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
+                     MakeEnumAccessor (&SatGeoHelper::m_fwdLinkInterferenceModel),
+                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+      .AddAttribute ("RtnLinkInterferenceModel",
+                     "Return link interference model",
+                     EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
+                     MakeEnumAccessor (&SatGeoHelper::m_rtnLinkInterferenceModel),
+                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
     ;
@@ -122,18 +136,34 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyRx->SetDevice (dev);
 
   // Configure the SatPhyRxCarrier instances
-  // Note, that these have to be changed so that they match the real frame configuration.
-  // Now we survive with one SatPhyRxCarrier, because we do not have a NCC scheduler.
-  uint32_t RETURN_CARRIERS(1);
-  uPhyRx->ConfigurePhyRxCarriers (RETURN_CARRIERS);
+  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
+  // instead of just the number of carriers, since it should hold information about
+  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
+  // Note, that in GEO satellite, there is no need for error modeling.
+  uint32_t rtnLinkNumCarriers = 1;
+  Ptr<SatPhyRxCarrierConf> rtnCarrierConf =
+        CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
+                                           SatPhyRxCarrierConf::EM_NONE,
+                                           m_rtnLinkInterferenceModel);
+
+  uPhyRx->ConfigurePhyRxCarriers (rtnCarrierConf);
 
   fPhyTx->SetChannel (fr);
   fPhyRx->SetChannel (ff);
   fPhyRx->SetDevice (dev);
 
-  // By default, there is one carrier in the forward link
-  uint32_t FORWARD_CARRIERS(1);
-  fPhyRx->ConfigurePhyRxCarriers (FORWARD_CARRIERS);
+  // Configure the SatPhyRxCarrier instances
+  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
+  // instead of just the number of carriers, since it should hold information about
+  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
+  // Note, that in GEO satellite, there is no need for error modeling.
+  uint32_t fwdLinkNumCarriers = 1;
+  Ptr<SatPhyRxCarrierConf> fwdCarrierConf =
+        CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
+                                           SatPhyRxCarrierConf::EM_NONE,
+                                           m_fwdLinkInterferenceModel);
+
+  fPhyRx->ConfigurePhyRxCarriers (fwdCarrierConf);
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

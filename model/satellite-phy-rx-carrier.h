@@ -27,6 +27,8 @@
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-interference.h"
+#include "satellite-phy-rx-carrier-conf.h"
 
 namespace ns3 {
 
@@ -41,7 +43,7 @@ namespace ns3 {
 class SatPhyRxCarrier : public Object
 {
 public:
-  SatPhyRxCarrier (uint32_t carrierId);
+  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf);
   virtual ~SatPhyRxCarrier ();
 
   /**
@@ -78,7 +80,6 @@ public:
   void StartRx (Ptr<SatSignalParameters> rxParams);
   void SetCb(SatPhyRx::ReceiveCallback cb);
 
-
 private:
   void ChangeState (State newState);
   void EndRxData ();
@@ -87,6 +88,19 @@ private:
   Ptr<SatSignalParameters> m_rxParams;
   uint32_t m_beamId;
   uint32_t m_carrierId;
+
+  /*
+   * Interference model:
+   * - Constant
+   * - Per-packet
+   * - Traced
+   */
+  Ptr<SatInterference> m_satInterference;
+
+  /*
+   * Link results used for error modeling
+   */
+  Ptr<SatLinkResults> m_linkResults;
 
   /**
     * The upper layer package receive callback.
