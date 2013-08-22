@@ -121,6 +121,10 @@ public:
    */
   void EnableCreationTraces(std::string filename, bool details);
 
+  NodeContainer GwNodes() {return m_beamHelper->GetGwNodes();}
+  NodeContainer UtNodes() {return m_beamHelper->GetUtNodes();}
+  Ptr<Node> GeoSatNode() {return m_beamHelper->GetGeoSatNode();}
+
 private:
   /**
      * definition for beam map key and value.
