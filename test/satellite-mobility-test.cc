@@ -19,7 +19,7 @@
  */
 
 /**
- * \file sat-mobility-test.cc
+ * \file satellite-mobility-test.cc
  * \brief Test cases to unit test Satellite Mobility.
  */
 

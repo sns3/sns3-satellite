@@ -37,6 +37,7 @@ def build(bld):
         'model/satellite-per-packet-interference.cc',
         'model/satellite-constant-interference.cc',
         'model/satellite-traced-interference.cc',
+        'model/satellite-free-space-loss.cc',
         'helper/satellite-helper.cc',
         'helper/satellite-beam-helper.cc',
         'helper/satellite-user-helper.cc',
@@ -51,13 +52,14 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('satellite')
     module_test.source = [
         'test/geo-coordinate-test.cc',
-        'test/simple-p2p.cc',
-        'test/scenario-creation.cc',
         'test/performance-memory-test.cc',
         'test/cbr-test.cc',
         'test/link-results-test.cc',
-        'test/sat-mobility-test.cc',
-        'test/sat-interference-test.cc',
+        'test/satellite-simple-p2p.cc',
+        'test/satellite-scenario-creation.cc',
+        'test/satellite-mobility-test.cc',
+        'test/satellite-interference-test.cc',
+        'test/satellite-fsl-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -90,7 +92,8 @@ def build(bld):
         'model/satellite-interference.h',
         'model/satellite-per-packet-interference.h',
         'model/satellite-constant-interference.h',
-        'model/satellite-traced-interference.h',       
+        'model/satellite-traced-interference.h',
+        'model/satellite-free-space-loss.h',       
         'helper/satellite-helper.h',
         'helper/satellite-beam-helper.h',
 		'helper/satellite-user-helper.h',

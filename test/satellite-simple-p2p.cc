@@ -19,7 +19,7 @@
  */
 
 /**
- * \file simple-p2p.cc
+ * \file satellite-simple-p2p.cc
  * \brief 'Simple Point-to-Point Test Cases' implementation of TN4.
  *
  * In this module are implemented all 'Simple Point-to-Point' Test Cases
