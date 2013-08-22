@@ -153,7 +153,15 @@ SatLookUpTable::Load (std::string linkResultPath)
 
   if (!m_ifs->is_open ())
     {
-      NS_FATAL_ERROR ("The file " << linkResultPath << " is not found.");
+      // script might be launched by test.py, try a different base path
+      delete m_ifs;
+      linkResultPath = "../../" + linkResultPath;
+      m_ifs = new std::ifstream (linkResultPath.c_str (), std::ifstream::in);
+
+      if (!m_ifs->is_open ())
+        {
+          NS_FATAL_ERROR ("The file " << linkResultPath << " is not found.");
+        }
     }
 
   double lastSinrDb = -100.0; // very low value
