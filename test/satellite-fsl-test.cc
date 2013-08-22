@@ -84,15 +84,15 @@ SatFreeSpaceLossTestCase::DoRun (void)
   double fsl_W = fsl.GetFslW(utMob, geoMob, frequency);
   double fsl_dB = fsl.GetFsldB(utMob, geoMob, frequency);
 
-  NS_TEST_ASSERT_MSG_EQ( fsl_W, 754499619980809076736.0, "FSL (UT-GEO) in Watts incorrect");
-  NS_TEST_ASSERT_MSG_EQ( fsl_dB, 208.77659025370352, "FSL (UT-GEO) in dBs incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_W, 754499619980809076736.0, 1,"FSL (UT-GEO) in Watts incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 208.77659025370352, 0.1, "FSL (UT-GEO) in dBs incorrect");
 
   // test fsl calculation in path GW - Geo Satellite
   fsl_W = fsl.GetFslW(gwMob, geoMob, frequency);
   fsl_dB = fsl.GetFsldB(gwMob, geoMob, frequency);
 
-  NS_TEST_ASSERT_MSG_EQ( fsl_W, 768992545596229681152.0, "FSL (GW-GEO) in Watts incorrect");
-  NS_TEST_ASSERT_MSG_EQ( fsl_dB, 208.8592212988971, "FSL (GW-GEO) in dBs incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_W, 768992545596229681152.0, 1, "FSL (GW-GEO) in Watts incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 208.8592212988971, 0.1, "FSL (GW-GEO) in dBs incorrect");
 
   Simulator::Destroy ();
 }
