@@ -139,7 +139,7 @@ static const GeoCoordinate g_defaultGwPos[SatConf::DEFAULT_GW_COUNT] = {
                                           GeoCoordinate(63.183333, 14.65, 0.00) };    // GW id: 7; Östersund, Sweden; Position: 63.11.0 N / 14.39.0 E
 
 
-static const GeoCoordinate g_defaultGeoSatPos = GeoCoordinate(33.0, 0, 35786);
+static const GeoCoordinate g_defaultGeoSatPos = GeoCoordinate(33.0, 0, 35786000);
 
 SatConf::SatConf()
   :m_beamCount(DEFAULT_BEAM_COUNT),
