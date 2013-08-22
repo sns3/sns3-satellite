@@ -229,6 +229,19 @@ SatBeamHelper::GetGwNodes()
   return gwNodes;
 }
 
+NodeContainer
+SatBeamHelper::GetUtNodes()
+{
+  NodeContainer utNodes;
+
+  for (std::map<uint32_t, Ptr<Node> >::iterator i = m_utNode.begin(); i != m_utNode.end(); i++)
+    {
+      utNodes.Add(i->second);
+    }
+
+  return utNodes;
+}
+
 void
 SatBeamHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {

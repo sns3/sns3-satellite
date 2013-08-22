@@ -110,6 +110,11 @@ public:
   NodeContainer GetGwNodes();
 
   /**
+   * /return A container having all UT nodes in satellite network.
+   */
+  NodeContainer GetUtNodes();
+
+  /**
    * Enables creation traces to be written in given file
    * /param stream  stream for creation trace outputs
    * /param cb  callback to connect traces
