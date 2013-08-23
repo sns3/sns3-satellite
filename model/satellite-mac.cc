@@ -191,7 +191,7 @@ SatMac::TransmitStart (Ptr<Packet> p)
   NS_LOG_FUNCTION (this << p);
   NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
 
-  /* \todo Now we are using only one carrierId and a static (time slot) duration
+  /* TODO: Now we are using only one carrierId and a static (time slot) duration
    * for packet transmissions and receptions.
    * The carrier Id and (time slot) durations for packet transmissions should be coming from:
    * - TBTP in return link
@@ -255,7 +255,7 @@ SatMac::GetQueue (void) const
 }
 
 void
-SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
+SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << packet);
 

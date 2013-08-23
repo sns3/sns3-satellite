@@ -180,15 +180,26 @@ private:
   std::string CreateCreationSummary(std::string title);
 
   /**
-   * Sets positions to created GW nodes (by BeamHelper).
+   * Sets mobilities to created GW nodes.
+   *
+   * /param gws node container of UTs to set mobility
    */
-  void SetGwPositions(void);
+  void SetGwMobility(NodeContainer gws);
 
   /**
-   * Sets position to created Sat Geo node (by BeamHelper).
+   * Sets mobility to created Sat Geo node.
+   *
+   * /param geoSat node pointer of Geo Satellite to set mobility
    */
-  void SetGeoSatPosition(void);
+  void SetGeoSatMobility(Ptr<Node> geoSat);
 
+  /**
+   * Sets mobility to created UT nodes.
+   *
+   * /param uts node container of UTs to set mobility
+   *
+   */
+  void SetUtMobility(NodeContainer uts);
 
   /**
    * User helper

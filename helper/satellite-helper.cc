@@ -93,14 +93,6 @@ void SatHelper::CreateScenario(PreDefinedScenario scenario)
 {
   NS_ASSERT(m_scenarioCreated == false);
 
-  m_beamHelper = CreateObject<SatBeamHelper>();
-  m_userHelper = CreateObject<SatUserHelper>();
-
-  if ( m_detailedCreationTraces )
-    {
-      EnableDetailedCreationTraces();
-    }
-
   switch(scenario)
   {
     case SIMPLE:
@@ -245,6 +237,18 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 {
   InternetStackHelper internet;
 
+  // create Geo Satellite node, set mobility to it
+  Ptr<Node> geoSatNode = CreateObject<Node>();
+  SetGwMobility(geoSatNode);
+
+  m_beamHelper = CreateObject<SatBeamHelper>(geoSatNode);
+  m_userHelper = CreateObject<SatUserHelper>();
+
+  if ( m_detailedCreationTraces )
+    {
+      EnableDetailedCreationTraces();
+    }
+
   // set address base for GW user networks
   m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
 
@@ -258,11 +262,18 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
   m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
   m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
+  // create all possible GW nodes, set mobility to them and install to interner
+  NodeContainer gwNodes;
+  gwNodes.Create(m_satConf.GetGwCount());
+  SetGwMobility(gwNodes);
+  internet.Install(gwNodes);
+
   for ( BeamMap::iterator info = beamInfo.begin(); info != beamInfo.end(); info++)
     {
-      // create UTs of the beam and install to internet
+      // create UTs of the beam, set mobility to them and install to internet
       NodeContainer uts;
       uts.Create(info->second.GetUtN());
+      SetUtMobility(uts);
       internet.Install(uts);
 
       for ( uint32_t i = 0; i < info->second.GetUtN(); i++ )
@@ -272,33 +283,26 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
         }
 
       std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(info->first);
-      m_beamHelper->Install(uts, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+
+      // gw index starts from 1 and we have stored them starting from 0
+      Ptr<Node> gwNode = gwNodes.Get(conf[SatConf::GW_ID_INDEX]-1);
+      m_beamHelper->Install(uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
     }
 
   m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), gwUsers);
-
-  // finally set positions of the GWs and Geo Satellite node
-  SetGwPositions();
-  SetGeoSatPosition();
 }
 
 void
-SatHelper::SetGwPositions(void)
+SatHelper::SetGwMobility(NodeContainer gwNodes)
 {
   MobilityHelper mobility;
-  NodeContainer gwNodes;
 
   Ptr<SatListPositionAllocator> gwPosAllocator = CreateObject<SatListPositionAllocator> ();
 
-  for (uint32_t i = 1; i <= m_satConf.GetGwCount(); i++)
+  for (uint32_t i = 0; i < gwNodes.GetN(); i++)
     {
-      Ptr<Node> gwNode = m_beamHelper->GetGwNode(i);
-
-      if ( gwNode != NULL )
-        {
-          gwNodes.Add(gwNode);
-          gwPosAllocator->Add(m_satConf.GetGwPosition(i));
-        }
+      // GW id start from 1
+      gwPosAllocator->Add(m_satConf.GetGwPosition(i + 1));
     }
 
   mobility.SetPositionAllocator (gwPosAllocator);
@@ -307,7 +311,20 @@ SatHelper::SetGwPositions(void)
 }
 
 void
-SatHelper::SetGeoSatPosition(void)
+SatHelper::SetUtMobility(NodeContainer uts)
+{
+  MobilityHelper mobility;
+  mobility.SetPositionAllocator ("ns3::SatRandomBoxPositionAllocator",
+                                   "Longitude",StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=40.0]"),
+                                   "Latitude", StringValue ("ns3::UniformRandomVariable[Min=35.0|Max=65.0]"),
+                                   "Altitude", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"));
+
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (uts);
+}
+
+void
+SatHelper::SetGeoSatMobility(Ptr<Node>)
 {
   MobilityHelper mobility;
 

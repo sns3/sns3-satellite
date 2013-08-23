@@ -42,7 +42,6 @@ SatPhyRx::SatPhyRx ()
   NS_LOG_FUNCTION (this);
 }
 
-
 SatPhyRx::~SatPhyRx ()
 {
   NS_LOG_FUNCTION (this);
@@ -101,7 +100,6 @@ SatPhyRx::GetMobility ()
   return m_mobility;
 }
 
-
 void
 SatPhyRx::SetMobility (Ptr<MobilityModel> m)
 {
@@ -109,14 +107,12 @@ SatPhyRx::SetMobility (Ptr<MobilityModel> m)
   m_mobility = m;
 }
 
-
 void
 SatPhyRx::SetChannel (Ptr<SatChannel> c)
 {
   NS_LOG_FUNCTION (this << c);
   c->AddRx (this);
 }
-
 
 void
 SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
@@ -155,6 +151,5 @@ SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 
     m_rxCarriers[cId]->StartRx (rxParams);
 }
-
 
 } // namespace ns3

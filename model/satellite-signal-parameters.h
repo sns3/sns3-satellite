@@ -58,20 +58,38 @@ public:
   Ptr<Packet> m_packet;
 
   /**
-  * The beam for the packet transmission
-  */
+   * The beam for the packet transmission
+   */
   uint32_t m_beamId;
 
   /**
-    * The carrier for the packet transmission
-    */
+   * The carrier for the packet transmission
+   */
   uint32_t m_carrierId;
+
+  /**
+   * The frequency of the carrier.
+   *
+   */
+  double m_frequency;
 
   /**
    * The duration of the packet transmission.
    *
    */
   Time m_duration;
+
+  /**
+   * The TX power in Watts. Equivalent Isotropically Radiated Power (EIRP).
+   *
+   */
+  double m_txPowerW;
+
+  /**
+   * The RX power in Watts.
+   *
+   */
+  double m_rxPowerW;
 
   /**
    * The SatPhyTx instance that is making the transmission

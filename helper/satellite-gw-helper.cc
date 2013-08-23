@@ -149,6 +149,8 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyTx->SetChannel (fCh);
   phyRx->SetChannel (rCh);
   phyRx->SetDevice (dev);
+  phyRx->SetMobility(n->GetObject<MobilityModel>());
+  phyTx->SetMobility(n->GetObject<MobilityModel>());
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,

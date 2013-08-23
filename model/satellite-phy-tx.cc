@@ -58,7 +58,6 @@ void SatPhyTx::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_channel = 0;
   m_mobility = 0;
-  m_device = 0;
   Object::DoDispose ();
 } 
 
@@ -86,14 +85,6 @@ SatPhyTx::GetTypeId (void)
     .SetParent<Object> ()
   ;
   return tid;
-}
-
-
-Ptr<NetDevice>
-SatPhyTx::GetDevice ()
-{
-  NS_LOG_FUNCTION (this);
-  return m_device;
 }
 
 Ptr<MobilityModel>

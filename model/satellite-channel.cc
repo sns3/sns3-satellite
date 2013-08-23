@@ -28,10 +28,10 @@
 #include "ns3/net-device.h"
 #include "ns3/node.h"
 #include "ns3/propagation-delay-model.h"
-
-#include "satellite-channel.h"
-#include "satellite-phy-rx.h"
+#include "ns3/mobility-model.h"
 #include "satellite-phy-tx.h"
+#include "satellite-channel.h"
+
 
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
@@ -130,7 +130,6 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
     }
 }
 
-
 void
 SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
@@ -141,9 +140,15 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
    * transmitter/receiver pair at this time moment.
    */
 
+  Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility();
+  Ptr<MobilityModel> rxMobility = phyRx->GetMobility();
+
+  // get (calculate) free space loss and RX power and set it to RX params
+  double rxPowerW = rxParams->m_txPowerW / m_freeSpaceLoss->GetFslW(txMobility, rxMobility, rxParams->m_frequency );
+  rxParams->m_rxPowerW = rxPowerW;
+
   phyRx->StartRx (rxParams);
 }
-
 
 void
 SatChannel::SetPropagationDelayModel (Ptr<PropagationDelayModel> delay)
@@ -153,6 +158,13 @@ SatChannel::SetPropagationDelayModel (Ptr<PropagationDelayModel> delay)
   m_propagationDelay = delay;
 }
 
+void
+SatChannel::SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> loss)
+{
+  NS_LOG_FUNCTION (this << loss);
+  NS_ASSERT (m_freeSpaceLoss == 0);
+  m_freeSpaceLoss = loss;
+}
 
 uint32_t
 SatChannel::GetNDevices (void) const
@@ -160,7 +172,6 @@ SatChannel::GetNDevices (void) const
   NS_LOG_FUNCTION (this);
   return m_phyList.size ();
 }
-
 
 Ptr<NetDevice>
 SatChannel::GetDevice (uint32_t i) const

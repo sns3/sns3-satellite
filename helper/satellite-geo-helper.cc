@@ -123,6 +123,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   NS_LOG_FUNCTION (this << ff << fr << uf << ur);
 
   Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
+  Ptr<MobilityModel> mobility = dev->GetNode()->GetObject<MobilityModel>();
 
   // Create the first needed SatPhyTx and SatPhyRx modules
   Ptr<SatPhyTx> uPhyTx = CreateObject<SatPhyTx> ();
@@ -134,6 +135,9 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyTx->SetChannel (uf);
   uPhyRx->SetChannel (ur);
   uPhyRx->SetDevice (dev);
+  uPhyTx->SetMobility(mobility);
+  uPhyRx->SetMobility(mobility);
+
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
@@ -151,6 +155,9 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   fPhyTx->SetChannel (fr);
   fPhyRx->SetChannel (ff);
   fPhyRx->SetDevice (dev);
+  fPhyTx->SetMobility(mobility);
+  fPhyRx->SetMobility(mobility);
+
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,

@@ -26,12 +26,13 @@
 #include "ns3/nstime.h"
 #include "ns3/channel.h"
 #include "ns3/traced-callback.h"
-
+#include "ns3/propagation-delay-model.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-free-space-loss.h"
+#include "satellite-phy-rx.h"
 
 namespace ns3 {
 
-class PropagationDelayModel;
 class SatPhyRx;
 
 /**
@@ -56,6 +57,12 @@ public:
    * \param delay Ptr to the propagation delay model to be used.
    */
   virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
+
+  /**
+   * Set the  propagation delay model to be used in the SatChannel
+   * \param delay Ptr to the propagation delay model to be used.
+   */
+  virtual void SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> delay);
 
   /**
    * Used by attached SatPhyTx instances to transmit signals to the channel
@@ -105,23 +112,27 @@ private:
   Ptr<PropagationDelayModel> m_propagationDelay;
 
   /**
-     * The trace source for the packet transmission animation events that the
-     * device can fire.
-     * Arguments to the callback are the packet, transmitting
-     * net device, receiving net device, transmission time and
-     * packet receipt time.
-     *
-     * @see class CallBackTraceSource
-     */
-    TracedCallback<Ptr<const Packet>, // Packet being transmitted
-                   Ptr<NetDevice>,    // Transmitting NetDevice
-                   Ptr<NetDevice>,    // Receiving NetDevice
-                   Time,              // Amount of time to transmit the pkt
-                   Time               // Last bit receive time (relative to now)
-                   > m_txrxPointToPoint;
+   * Free space loss model to be used with this channel.
+   */
+  Ptr<SatFreeSpaceLoss> m_freeSpaceLoss;
+
+  /**
+   * The trace source for the packet transmission animation events that the
+   * device can fire.
+   * Arguments to the callback are the packet, transmitting
+   * net device, receiving net device, transmission time and
+   * packet receipt time.
+   *
+   * @see class CallBackTraceSource
+   */
+  TracedCallback<Ptr<const Packet>, // Packet being transmitted
+                 Ptr<NetDevice>,    // Transmitting NetDevice
+                 Ptr<NetDevice>,    // Receiving NetDevice
+                 Time,              // Amount of time to transmit the pkt
+                 Time               // Last bit receive time (relative to now)
+                > m_txrxPointToPoint;
 
 };
-
 
 }
 

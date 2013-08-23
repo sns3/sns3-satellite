@@ -66,7 +66,6 @@ public:
 
   void SetMobility (Ptr<MobilityModel> m);
   Ptr<MobilityModel> GetMobility ();
-  Ptr<NetDevice> GetDevice ();
   
   /**
    * Get the SatPhy pointer
@@ -98,7 +97,6 @@ private:
   void EndTx ();
 
   Ptr<MobilityModel> m_mobility;
-  Ptr<SatNetDevice> m_device;
   Ptr<SatChannel> m_channel;
 
   State m_state;

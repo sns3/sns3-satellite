@@ -45,7 +45,7 @@ SatBeamHelper::GetTypeId (void)
 {
     static TypeId tid = TypeId ("ns3::SatBeamHelper")
       .SetParent<Object> ()
-      .AddConstructor<SatBeamHelper> ()
+      .AddConstructor<SatBeamHelper>()
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
     ;
@@ -59,6 +59,12 @@ SatBeamHelper::GetInstanceTypeId (void) const
 }
 
 SatBeamHelper::SatBeamHelper ()
+{
+  // this default constructor should not be called...
+  NS_ASSERT(false);
+}
+
+SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode)
 {
   // uncomment next code line, if attributes are needed already in construction phase.
   // E.g attributes set by object factory affecting object creation
@@ -74,8 +80,7 @@ SatBeamHelper::SatBeamHelper ()
   m_gwHelper->Initialize ();
   m_utHelper->Initialize ();
 
-  // create Geo Node and install net device on it already here because it is not scenario dependent
-  m_geoNode = CreateObject<Node>();
+  m_geoNode = geoNode;
   m_geoHelper->Install(m_geoNode);
 
   m_ncc = CreateObject<SatNcc>();
@@ -113,7 +118,7 @@ void SatBeamHelper::SetBaseAddress ( const Ipv4Address network, const Ipv4Mask m
 }
 
 Ptr<Node>
-SatBeamHelper::Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId )
+SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId )
 {
   // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
   std::pair<std::map<uint32_t,uint32_t >::iterator, bool> beam = m_beam.insert(std::make_pair(beamId, gwId));
@@ -139,14 +144,8 @@ SatBeamHelper::Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32
   m_geoHelper->AttachChannels( m_geoNode->GetDevice(0), feederLink.first, feederLink.second,
                                userLink.first, userLink.second, beamId );
 
-  // GW installation, create node if not exist and install net device on node
-  // get GW node
-  Ptr<Node> gwNode = GetGwNode(gwId);
-
-  if ( gwNode == NULL )
-    {
-      gwNode = CreateGwNode(gwId);
-    }
+  // store GW node
+  NS_ASSERT( StoreGwNode(gwId, gwNode) );
 
   //install GW
   Ptr<NetDevice> gwNd = m_gwHelper->Install(gwNode, beamId, feederLink.first, feederLink.second);
@@ -170,9 +169,6 @@ SatBeamHelper::Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32
 
   m_ipv4Helper.NewNetwork();
 
-  // finally set postions to UTs
-  SetUtPositions(ut);
-
   //save UT node pointers to multimap
   for ( NodeContainer::Iterator i = ut.Begin();  i != ut.End(); i++ )
     {
@@ -194,20 +190,6 @@ SatBeamHelper::GetGwNode(uint32_t id)
     }
 
   return node;
-}
-
-void
-SatBeamHelper::SetUtPositions(NodeContainer uts)
-{
-  // TODO: UT mobility model needed to set with some method or with attribute later
-  MobilityHelper mobility;
-  mobility.SetPositionAllocator ("ns3::SatRandomBoxPositionAllocator",
-                                   "Longitude",StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=40.0]"),
-                                   "Latitude", StringValue ("ns3::UniformRandomVariable[Min=35.0|Max=65.0]"),
-                                   "Altitude", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"));
-
-  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
-  mobility.Install (uts);
 }
 
 Ptr<Node>
@@ -367,6 +349,10 @@ SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > chPairMap, uint
         forwardCh->SetPropagationDelayModel (pDelay);
         returnCh->SetPropagationDelayModel (pDelay);
 
+        Ptr<SatFreeSpaceLoss> pFsl =  CreateObject<SatFreeSpaceLoss> ();
+        forwardCh->SetFreeSpaceLoss(pFsl);
+        returnCh->SetFreeSpaceLoss(pFsl);
+
         channelPair.first = forwardCh;
         channelPair.second = returnCh;
 
@@ -380,15 +366,27 @@ SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > chPairMap, uint
   return channelPair;
 }
 
-Ptr<Node>
-SatBeamHelper::CreateGwNode(uint32_t id)
+bool
+SatBeamHelper::StoreGwNode(uint32_t id, Ptr<Node> node)
 {
-  Ptr<Node> node = CreateObject<Node> ();
-  m_gwNode.insert(std::pair<uint32_t,Ptr<Node> >(id, node));
-  InternetStackHelper internet;
-  internet.Install(node);
+  bool storingSuccess = false;
 
-  return node;
+  Ptr<Node> storedNode = GetGwNode(id);
+
+  if ( storedNode != NULL ) // nGW node with id already stored
+    {
+      if ( storedNode == node ) // check that node is same
+        {
+          storingSuccess = true;
+        }
+    }
+  else  // try to store if not stored
+    {
+      std::pair<std::map<uint32_t, Ptr<Node> >::iterator, bool> result = m_gwNode.insert(std::make_pair(id, node));
+      storingSuccess = result.second;
+    }
+
+  return storingSuccess;
 }
 
 void

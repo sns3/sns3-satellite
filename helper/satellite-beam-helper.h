@@ -54,6 +54,7 @@ public:
    * Create a SatBeamHelper to make life easier when creating Satellite beams.
    */
   SatBeamHelper ();
+  SatBeamHelper (Ptr<Node> geoNode);
   virtual ~SatBeamHelper () {}
 
   /**
@@ -93,6 +94,7 @@ public:
 
   /**
    * \param ut a set of UT nodes
+   * \param node pointer of GW node
    * \param gwId id of the GW
    * \param beamId  id of the beam
    * \param ulFreqId id of the user link frequency
@@ -102,7 +104,7 @@ public:
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
    * \return node GW node of the beam.
    */
-  Ptr<Node> Install (NodeContainer ut, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
+  Ptr<Node> Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
 
   /**
    * /return A container having all GW nodes in satellite network.
@@ -149,14 +151,6 @@ public:
    */
   Ptr<Node> GetGeoSatNode();
 
-  /**
-   * Sets postions to UTs.
-   *
-   * /param uts container of UTs to set positions
-   *
-   */
-  void SetUtPositions(NodeContainer uts);
-
   virtual void DoDispose();
 
 private:
@@ -200,9 +194,11 @@ private:
      * Creates GW node according to given id and stores GW to map.
      *
      * /param id ID of the GW
-     * /return pointer to created GW node
+     * /param node pointer to the GW
+     *
+     * /return result of storing
      */
-    Ptr<Node> CreateGwNode(uint32_t id);
+    bool StoreGwNode(uint32_t id, Ptr<Node> node);
 
     /**
      * Set needed routings of satellite network and fill ARC cache for the network.

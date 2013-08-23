@@ -41,6 +41,8 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_carrierId = p.m_carrierId;
   m_duration = p.m_duration;
   m_phyTx = p.m_phyTx;
+  m_frequency = p.m_frequency;
+  m_txPowerW = p.m_txPowerW;
 }
 
 Ptr<SatSignalParameters>
