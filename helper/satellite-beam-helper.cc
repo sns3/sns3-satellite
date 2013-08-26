@@ -145,7 +145,8 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
                                userLink.first, userLink.second, beamId );
 
   // store GW node
-  NS_ASSERT( StoreGwNode(gwId, gwNode) );
+  bool storedOk = StoreGwNode(gwId, gwNode);
+  NS_ASSERT( storedOk );
 
   //install GW
   Ptr<NetDevice> gwNd = m_gwHelper->Install(gwNode, beamId, feederLink.first, feederLink.second);
