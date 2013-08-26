@@ -255,7 +255,7 @@ SatMac::GetQueue (void) const
 }
 
 void
-SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
+SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packet);
 
