@@ -46,13 +46,13 @@ SatFreeSpaceLoss::GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double f
 {
   double fsl;
 
-  fsl = 10.0 * log10( GetFslW(a,b, frequency) );
+  fsl = 10.0 * log10( GetFsl(a,b, frequency) );
 
   return fsl;
 }
 
 double
-SatFreeSpaceLoss::GetFslW (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const
+SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const
 {
   double fsl;
   double distance = a->GetDistanceFrom(b);

@@ -144,7 +144,7 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   Ptr<MobilityModel> rxMobility = phyRx->GetMobility();
 
   // get (calculate) free space loss and RX power and set it to RX params
-  double rxPowerW = rxParams->m_txPowerW / m_freeSpaceLoss->GetFslW(txMobility, rxMobility, rxParams->m_frequency );
+  double rxPowerW = rxParams->m_txPowerW / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, rxParams->m_frequency );
   rxParams->m_rxPowerW = rxPowerW;
 
   phyRx->StartRx (rxParams);

@@ -39,9 +39,9 @@ public:
   ~SatFreeSpaceLoss () {}
 
   /**
-   * \return the free space loss as Watts.
+   * \return the free space loss as ratio.
    */
-  virtual double GetFslW (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const;
+  virtual double GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const;
 
   /**
    * \return the free space loss as dBs.
