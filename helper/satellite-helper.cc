@@ -186,7 +186,7 @@ SatHelper::CreateLargerScenario()
   beamMap[22] = beamInfo;
 
   // install two users for UT1 and one for UT2 in beam 3
-  beamInfo.SetUtUserN(0,2);
+  beamInfo.SetUtUserCount(0,2);
   beamInfo.AddUt(1);
 
   beamMap[3] = beamInfo;
@@ -272,14 +272,14 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
     {
       // create UTs of the beam, set mobility to them and install to internet
       NodeContainer uts;
-      uts.Create(info->second.GetUtN());
+      uts.Create(info->second.GetUtCount());
       SetUtMobility(uts);
       internet.Install(uts);
 
-      for ( uint32_t i = 0; i < info->second.GetUtN(); i++ )
+      for ( uint32_t i = 0; i < info->second.GetUtCount(); i++ )
         {
           // create and install needed users
-          m_userHelper->InstallUt(uts.Get(i), info->second.GetUtUserN(i));
+          m_userHelper->InstallUt(uts.Get(i), info->second.GetUtUserCount(i));
         }
 
       std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(info->first);
@@ -356,8 +356,8 @@ SatHelper::CreateCreationSummary(std::string title)
 
   oss << std::endl << std::endl << title << std::endl << std::endl;
   oss << "--- User Info ---" << std::endl << std::endl;
-  oss << "Created GW users: " << m_userHelper->GetGwUserN() << ", ";
-  oss << "Created UT users: " << m_userHelper->GetUtUserN() << std::endl << std::endl;
+  oss << "Created GW users: " << m_userHelper->GetGwUserCount() << ", ";
+  oss << "Created UT users: " << m_userHelper->GetUtUserCount() << std::endl << std::endl;
   oss << m_beamHelper->GetBeamInfo() << std::endl;
 
   return oss.str();

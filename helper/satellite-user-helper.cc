@@ -186,13 +186,13 @@ SatUserHelper::GetUtUsers()
 }
 
 uint32_t
-SatUserHelper::GetGwUserN()
+SatUserHelper::GetGwUserCount()
 {
   return m_gwUsers.GetN();
 }
 
 uint32_t
-SatUserHelper::GetUtUserN()
+SatUserHelper::GetUtUserCount()
 {
   return m_utUsers.GetN();
 }

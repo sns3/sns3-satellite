@@ -43,20 +43,20 @@ SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCount)
 }
 
 uint32_t
-SatBeamUserInfo::GetUtN ()
+SatBeamUserInfo::GetUtCount ()
 {
   return m_userCount.size();
 }
 
 uint32_t
-SatBeamUserInfo::GetUtUserN (uint32_t utIndex)
+SatBeamUserInfo::GetUtUserCount (uint32_t utIndex)
 {
   NS_ASSERT(utIndex < m_userCount.size());
 
   return m_userCount[utIndex];
 }
 
-void SatBeamUserInfo::SetUtUserN (uint32_t utIndex, uint32_t userCount)
+void SatBeamUserInfo::SetUtUserCount (uint32_t utIndex, uint32_t userCount)
 {
   NS_ASSERT(utIndex < m_userCount.size());
 

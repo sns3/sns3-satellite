@@ -151,12 +151,12 @@ public:
   /**
    * /return number of GW users in satellite network.
    */
-  uint32_t GetGwUserN();
+  uint32_t GetGwUserCount();
 
   /**
    * /return number of UT users in satellite network.
    */
-  uint32_t GetUtUserN();
+  uint32_t GetUtUserCount();
 
   /**
    * Enables creation traces to be written in given file

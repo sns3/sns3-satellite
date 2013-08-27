@@ -53,14 +53,14 @@ public:
   /**
    * return number of UTs in beam.
    */
-  uint32_t GetUtN();
+  uint32_t GetUtCount();
 
   /**
    * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtN
    *
    * return number of users in a UT.
    */
-  uint32_t GetUtUserN(uint32_t utIndex);
+  uint32_t GetUtUserCount(uint32_t utIndex);
 
   /*
    * Sets user count for UT.
@@ -70,7 +70,7 @@ public:
    *                  value (1) is used for the UT.
    *
    */
-  void SetUtUserN(uint32_t utIndex, uint32_t userCount);
+  void SetUtUserCount(uint32_t utIndex, uint32_t userCount);
 
   /*
    * Adds new UT to end of list with given user count.
