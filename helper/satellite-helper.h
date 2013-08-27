@@ -189,9 +189,9 @@ private:
   /**
    * Sets mobility to created Sat Geo node.
    *
-   * /param geoSat node pointer of Geo Satellite to set mobility
+   * /param node node pointer of Geo Satellite to set mobility
    */
-  void SetGeoSatMobility(Ptr<Node> geoSat);
+  void SetGeoSatMobility(Ptr<Node> node);
 
   /**
    * Sets mobility to created UT nodes.

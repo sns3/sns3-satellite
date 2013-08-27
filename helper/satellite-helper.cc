@@ -239,7 +239,7 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 
   // create Geo Satellite node, set mobility to it
   Ptr<Node> geoSatNode = CreateObject<Node>();
-  SetGwMobility(geoSatNode);
+  SetGeoSatMobility(geoSatNode);
 
   m_beamHelper = CreateObject<SatBeamHelper>(geoSatNode);
   m_userHelper = CreateObject<SatUserHelper>();
@@ -324,7 +324,7 @@ SatHelper::SetUtMobility(NodeContainer uts)
 }
 
 void
-SatHelper::SetGeoSatMobility(Ptr<Node>)
+SatHelper::SetGeoSatMobility(Ptr<Node> node)
 {
   MobilityHelper mobility;
 
@@ -333,7 +333,7 @@ SatHelper::SetGeoSatMobility(Ptr<Node>)
 
   mobility.SetPositionAllocator (geoSatPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
-  mobility.Install (m_beamHelper->GetGeoSatNode());
+  mobility.Install (node);
 }
 
 void
