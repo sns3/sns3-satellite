@@ -64,7 +64,7 @@ SatGeoHelper::GetTypeId (void)
       .AddAttribute( "RtnLinkRxTemperature",
                      "The return link RX noise temperature in Geo satellite.",
                      DoubleValue(490.94),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkRxTemperature_K),
+                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkRxTemperature_K),
                      MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
