@@ -28,6 +28,7 @@
 #include "satellite-constant-interference.h"
 #include "satellite-per-packet-interference.h"
 #include "satellite-traced-interference.h"
+#include "satellite-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -38,7 +39,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf)
   :m_state (IDLE),
-   m_carrierId (carrierId)
+   m_carrierId (carrierId),
+   m_ownAddress(Mac48Address::GetBroadcast()) // broadcast address means that only beam ID is checked in RX
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -141,11 +143,42 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-          // Check whether the packet is sent to our beam. In addition we should check
-          // that whether the packet was intended for this specific receiver.
-          if (rxParams->m_beamId == m_beamId)
+          // Check whether the packet is sent to our beam. In addition check
+          // that whether the packet was intended for this specific receiver
+          // or if own receiver is broadcast address.
+          bool rxPacket = false;
+
+          if (rxParams->m_beamId == m_beamId )
+            {
+              if ( m_ownAddress.IsBroadcast() )
+                {
+                  rxPacket = true;
+                }
+              else
+              {
+                MacAddressTag tag;
+
+                // just check tag here, tag is removed by Mac
+                if (rxParams->m_packet->PeekPacketTag(tag))
+                   {
+                    // If the packet is intended for this receiver
+                    Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
+
+                    if ( addr == m_ownAddress ||  addr.IsBroadcast() )
+                       {
+                        rxPacket = true;
+                       }
+                   }
+              }
+            }
+
+          m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_txPower_W);
+
+          if (rxPacket )
             {
               NS_ASSERT (m_state == IDLE);
+
+              m_satInterference->NotifyRxStart(m_interferenceEvent);
 
               m_rxParams = rxParams->Copy ();
 
@@ -173,6 +206,12 @@ SatPhyRxCarrier::EndRxData ()
   NS_ASSERT (m_state == RX);
   ChangeState (IDLE);
 
+  double iPower = 0.0;
+  m_satInterference->Calculate(m_interferenceEvent, &iPower);
+
+  m_rxParams->m_sinr = CalculateSinr(m_rxParams->m_rxPower_W, iPower);
+  m_satInterference->NotifyRxEnd(m_interferenceEvent);
+
   // Send packet upwards
   m_rxCallback (m_rxParams);
 }
@@ -184,5 +223,20 @@ SatPhyRxCarrier::SetBeamId (uint32_t beamId)
   m_beamId = beamId;
 }
 
+void
+SatPhyRxCarrier::SetAddress (Mac48Address ownAddress)
+{
+  m_ownAddress = ownAddress;
+}
+
+double
+SatPhyRxCarrier::CalculateSinr(double rxPower_W, double iPower_W)
+{
+  // calculate noise
+  double noisePower = BoltzmannConstant * m_rxTemperature_K * m_rxBandwidth_Hz;
+
+  return (rxPower_W / (iPower_W + noisePower));
+
+}
 
 }

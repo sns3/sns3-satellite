@@ -80,6 +80,19 @@ SatPhyRx::SetDevice (Ptr<NetDevice> d)
 }
 
 void
+SatPhyRx::SetAddress (Mac48Address ownAddress)
+{
+  NS_ASSERT (!m_rxCarriers.empty ());
+
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
+        it != m_rxCarriers.end();
+        ++it)
+      {
+        (*it)->SetAddress(ownAddress);
+      }
+}
+
+void
 SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this);

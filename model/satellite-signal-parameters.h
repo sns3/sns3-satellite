@@ -96,6 +96,11 @@ public:
    */
   Ptr<SatPhyTx> m_phyTx;
 
+  /**
+   * Calculated SINR.
+   */
+  double m_sinr;
+
 };
 
 

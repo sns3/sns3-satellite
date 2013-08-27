@@ -38,6 +38,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemper
   m_numCarriers = numCarriers;
   m_errorModel = errorModel;
   m_ifModel = ifModel;
+  m_rxBandwidth_Hz = rxBandwidth_Hz;
+  m_rxTemperature_K = rxTemperature_K;
 }
 
 TypeId
@@ -80,7 +82,7 @@ Ptr<SatLinkResults> SatPhyRxCarrierConf::GetLinkResults () const
 
 double SatPhyRxCarrierConf::GetBandwidth_Hz () const
 {
-  return m_bandwidth_Hz;
+  return m_rxBandwidth_Hz;
 }
 
 double SatPhyRxCarrierConf::GetRxTemperature_K () const

@@ -201,6 +201,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Set the device address and pass it to MAC as well
   dev->SetAddress (Mac48Address::Allocate ());
+  phyRx->SetAddress(Mac48Address::ConvertFrom(dev->GetAddress()));
 
   // Attach the device receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));

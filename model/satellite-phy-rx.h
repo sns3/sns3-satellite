@@ -85,10 +85,16 @@ public:
   typedef Callback<void,Ptr<SatSignalParameters> > ReceiveCallback;
 
   /**
-    * Set the upper layer receive callback
-    * \param cb receive callback funtion pointer
-    */
-    void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
+   * Set the upper layer receive callback
+   * \param cb receive callback funtion pointer
+   */
+   void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
+
+  /**
+   * Set the device address owning this object
+   * \param ownAddress address of the device owning this object
+   */
+   void SetAddress (Mac48Address ownAddress);
 
 private:
 

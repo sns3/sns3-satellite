@@ -124,7 +124,7 @@ private:
   ErrorModel m_errorModel;
   Ptr<SatLinkResults> m_linkResults;
   double m_rxTemperature_K;
-  double m_bandwidth_Hz;
+  double m_rxBandwidth_Hz;
 
  };
 

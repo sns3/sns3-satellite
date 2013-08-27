@@ -66,7 +66,6 @@ public:
 
   void SetPhy (Ptr<SatPhy> phy);
 
-
   /**
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
@@ -74,8 +73,15 @@ public:
   void SetBeamId (uint32_t beamId);
 
   /**
+   * Set the own device MAC address
+   * \param ownAddress address of the device owning this object
+   */
+  void SetAddress (Mac48Address ownAddress);
+
+  /**
    * Start packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
+   *
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
   void SetCb(SatPhyRx::ReceiveCallback cb);
@@ -85,6 +91,8 @@ private:
 
   void ChangeState (State newState);
   void EndRxData ();
+
+  double CalculateSinr(double rxPower_W, double iPower_W);
 
   State m_state;
   Ptr<SatSignalParameters> m_rxParams;
@@ -98,6 +106,11 @@ private:
    * - Traced
    */
   Ptr<SatInterference> m_satInterference;
+
+  /*
+   *
+   */
+  Ptr<SatInterference::Event> m_interferenceEvent;
 
   /*
    * Link results used for error modeling
@@ -118,6 +131,11 @@ private:
     * The upper layer package receive callback.
     */
   SatPhyRx::ReceiveCallback m_rxCallback;
+
+  /**
+   * Address of the device owning this object.
+   */
+  Mac48Address m_ownAddress;
 
 };
 
