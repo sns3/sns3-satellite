@@ -42,17 +42,17 @@ SatHelper::GetTypeId (void)
       .SetParent<Object> ()
       .AddConstructor<SatHelper> ()
       .AddAttribute ("UtCount", "The count of created UTs in beam (full or user-defined scenario)",
-                     UintegerValue (DEFAULT_UTS_IN_BEAM),
+                     UintegerValue (3),
                      MakeUintegerAccessor (&SatHelper::m_utsInBeam),
-                     MakeUintegerChecker<uint32_t> (MIN_UTS_IN_BEAM))
+                     MakeUintegerChecker<uint32_t> (1))
       .AddAttribute ("GwUsers", "The number of created GW users (full or user-defined scenario)",
-                     UintegerValue (DEFAULT_GW_USERS),
+                     UintegerValue (5),
                      MakeUintegerAccessor (&SatHelper::m_gwUsers),
-                     MakeUintegerChecker<uint32_t> (MIN_GW_USERS))
+                     MakeUintegerChecker<uint32_t> (1))
       .AddAttribute ("UtUsers", "The number of created UT users per UT (full or user-defined scenario)",
-                     UintegerValue (DEFAULT_UT_USERS),
+                     UintegerValue (3),
                      MakeUintegerAccessor (&SatHelper::m_utUsers),
-                     MakeUintegerChecker<uint32_t> (MIN_UT_USERS))
+                     MakeUintegerChecker<uint32_t> (1))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatHelper::m_creation))
       .AddTraceSource ("CreationSummary", "Creation summary traces",

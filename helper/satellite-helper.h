@@ -276,35 +276,6 @@ private:
    */
   BeamMap m_beamInfo;
 
-  /**
-   * Default value for variable m_utsInBeam
-   */
-  static const uint32_t DEFAULT_UTS_IN_BEAM = 3;
-
-  /**
-   * Minimum value for variable m_utsInBeam
-   */
-  static const uint32_t MIN_UTS_IN_BEAM = 1;
-
-  /**
-   * Default value for variable m_gwUsers
-   */
-  static const uint32_t DEFAULT_GW_USERS = 5;
-
-  /**
-   * Minimum value for variable m_gwUsers
-   */
-  static const uint32_t MIN_GW_USERS = 1;
-  /**
-   * Default value for variable m_utUsers
-   */
-  static const uint32_t DEFAULT_UT_USERS = 3;
-
-  /**
-   * Minimum value for variable m_utUsers
-   */
-  static const uint32_t MIN_UT_USERS = 1;
-
 };
 
 } // namespace ns3
