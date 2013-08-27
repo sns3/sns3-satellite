@@ -81,6 +81,8 @@ public:
   void SetCb(SatPhyRx::ReceiveCallback cb);
 
 private:
+  static const double BoltzmannConstant = 1.3803e-23;
+
   void ChangeState (State newState);
   void EndRxData ();
 
@@ -101,6 +103,16 @@ private:
    * Link results used for error modeling
    */
   Ptr<SatLinkResults> m_linkResults;
+
+  /*
+   * RX noise temperature in Kelvins
+   */
+  double m_rxTemperature_K;
+
+  /*
+   * RX Bandwidth in Hz
+   */
+  double m_rxBandwidth_Hz;
 
   /**
     * The upper layer package receive callback.

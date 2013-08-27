@@ -23,6 +23,7 @@
 #include "ns3/names.h"
 #include "ns3/uinteger.h"
 #include "ns3/enum.h"
+#include "ns3/double.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -55,6 +56,16 @@ SatGeoHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatGeoHelper::m_rtnLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+      .AddAttribute( "FwdLinkRxTemperature",
+                     "The forward link RX noise temperature in Geo satellite.",
+                     DoubleValue(482.87),
+                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkRxTemperature_K),
+                     MakeDoubleChecker<double>())
+      .AddAttribute( "RtnLinkRxTemperature",
+                     "The return link RX noise temperature in Geo satellite.",
+                     DoubleValue(490.94),
+                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkRxTemperature_K),
+                     MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
     ;
@@ -145,8 +156,12 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   // Note, that in GEO satellite, there is no need for error modeling.
   uint32_t rtnLinkNumCarriers = 1;
+  double rtnLinkRxBandwidth = 5e-6;
+
   Ptr<SatPhyRxCarrierConf> rtnCarrierConf =
         CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
+                                           m_rtnLinkRxTemperature_K,
+                                           rtnLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
                                            m_rtnLinkInterferenceModel);
 
@@ -165,8 +180,12 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   // Note, that in GEO satellite, there is no need for error modeling.
   uint32_t fwdLinkNumCarriers = 1;
+  double fwdLinkRxBandwidth = 5e-6;
+
   Ptr<SatPhyRxCarrierConf> fwdCarrierConf =
         CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
+                                           m_fwdLinkRxTemperature_K,
+                                           fwdLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
                                            m_fwdLinkInterferenceModel);
 

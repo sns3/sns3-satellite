@@ -121,6 +121,16 @@ private:
      */
     SatPhyRxCarrierConf::InterferenceModel m_rtnLinkInterferenceModel;
 
+    /*
+     * Configured RX noise temperature (in Kelvins) for return link.
+     */
+    double m_rtnLinkRxTemperature_K;
+
+    /*
+     * Configured RX noise temperature (in Kelvins) for forward link.
+     */
+    double m_fwdLinkRxTemperature_K;
+
     /**
      * Trace callback for creation traces
      */

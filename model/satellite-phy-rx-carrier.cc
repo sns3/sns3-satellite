@@ -37,8 +37,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf)
-  :m_state (IDLE)
-  ,m_carrierId (carrierId)
+  :m_state (IDLE),
+   m_carrierId (carrierId)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -70,6 +70,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       NS_LOG_LOGIC(this << " link results in use in carrier: " << carrierId);
       m_linkResults = carrierConf->GetLinkResults ();
     }
+
+  m_rxBandwidth_Hz = carrierConf->GetBandwidth_Hz();
+  m_rxTemperature_K = carrierConf->GetRxTemperature_K();
 }
 
 

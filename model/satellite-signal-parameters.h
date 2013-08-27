@@ -68,10 +68,10 @@ public:
   uint32_t m_carrierId;
 
   /**
-   * The frequency of the carrier.
+   * The center frequency of the carrier in Hertz.
    *
    */
-  double m_frequency;
+  double m_frequency_Hz;
 
   /**
    * The duration of the packet transmission.
@@ -80,16 +80,16 @@ public:
   Time m_duration;
 
   /**
-   * The TX power in Watts. Equivalent Isotropically Radiated Power (EIRP).
+   * The TX power in Watt. Equivalent Isotropically Radiated Power (EIRP).
    *
    */
-  double m_txPowerW;
+  double m_txPower_W;
 
   /**
-   * The RX power in Watts.
+   * The RX power in Watt.
    *
    */
-  double m_rxPowerW;
+  double m_rxPower_W;
 
   /**
    * The SatPhyTx instance that is making the transmission

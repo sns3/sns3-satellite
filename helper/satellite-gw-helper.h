@@ -150,7 +150,7 @@ private:
      * Note, that this needs to be changed to be read from the reference system
      * configuration table.
      */
-    unsigned int m_beamId;
+    uint32_t m_beamId;
 
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
@@ -160,6 +160,11 @@ private:
      * Configured interference model for the return link. Set as an attribute.
      */
     SatPhyRxCarrierConf::InterferenceModel m_interferenceModel;
+
+    /*
+     * Configured RX noise temperature.
+     */
+    double m_rxTemperature_K;
 
     /*
      * Configured error model for the return link. Set as an attribute.

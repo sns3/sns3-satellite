@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/names.h"
 #include "ns3/enum.h"
+#include "ns3/double.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mac.h"
 #include "../model/satellite-net-device.h"
@@ -58,6 +59,11 @@ SatGwHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+      .AddAttribute( "RxTemperature",
+                      "RX noise temperature in GW satellite.",
+                      DoubleValue(293.00),
+                      MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_K),
+                      MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGwHelper::m_creation))
     ;
@@ -153,11 +159,15 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyTx->SetMobility(n->GetObject<MobilityModel>());
 
   // Configure the SatPhyRxCarrier instances
-  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
+  // TODO: We should pass the whole carrier configuration to the SatPhyRxCarrier,
   // instead of just the number of carriers, since it should hold information about
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   uint32_t rtnLinkNumCarriers = 1;
+  double rxBandwidth = 5e-6;
+
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
+                                                                            m_rxTemperature_K,
+                                                                            rxBandwidth,
                                                                             m_errorModel,
                                                                             m_interferenceModel);
 

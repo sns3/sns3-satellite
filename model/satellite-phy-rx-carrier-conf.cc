@@ -32,7 +32,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf()
   m_ifModel = IF_CONSTANT;
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf (uint32_t numCarriers, ErrorModel errorModel, InterferenceModel ifModel)
+SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_K,
+                                           double rxBandwidth_Hz, ErrorModel errorModel, InterferenceModel ifModel)
 {
   m_numCarriers = numCarriers;
   m_errorModel = errorModel;
@@ -75,6 +76,16 @@ SatPhyRxCarrierConf::InterferenceModel SatPhyRxCarrierConf::GetInterferenceModel
 Ptr<SatLinkResults> SatPhyRxCarrierConf::GetLinkResults () const
 {
   return m_linkResults;
+}
+
+double SatPhyRxCarrierConf::GetBandwidth_Hz () const
+{
+  return m_bandwidth_Hz;
+}
+
+double SatPhyRxCarrierConf::GetRxTemperature_K () const
+{
+  return m_rxTemperature_K;
 }
 
 } // namespace ns3

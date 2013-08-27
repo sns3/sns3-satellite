@@ -60,9 +60,12 @@ public:
   /**
    * Constructor for SatPhyRxCarrierConf.
    * \param numCarriers Number of configured carriers
+   * \param rxTemperature_K RX noise temperature in Kelvins
+   * \param rxBandwidth_Hz RX bandwidth in Hz
    * \param ifModel Used interference model
    */
-  SatPhyRxCarrierConf (uint32_t numCarriers, ErrorModel errorModel, InterferenceModel ifModel);
+  SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_K,
+                        double rxBandwidth_Hz, ErrorModel errorModel, InterferenceModel ifModel);
 
   /**
    * Destructor for SatPhyRxCarrierConf.
@@ -98,6 +101,16 @@ public:
    */
   Ptr<SatLinkResults> GetLinkResults () const;
 
+  /*
+   * Get configured bandwidth
+   */
+  double GetBandwidth_Hz () const;
+
+  /*
+   * Get configured RX noise temperature
+   */
+  double GetRxTemperature_K () const;
+
 private:
 
   /*
@@ -110,6 +123,8 @@ private:
   InterferenceModel m_ifModel;
   ErrorModel m_errorModel;
   Ptr<SatLinkResults> m_linkResults;
+  double m_rxTemperature_K;
+  double m_bandwidth_Hz;
 
  };
 

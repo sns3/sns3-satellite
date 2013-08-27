@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/names.h"
 #include "ns3/enum.h"
+#include "ns3/double.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
@@ -56,6 +57,11 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatUtHelper::m_interferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+      .AddAttribute( "RxTemperature",
+                      "The forward link RX noise temperature in Geo satellite.",
+                      DoubleValue (293.00),
+                      MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_K),
+                      MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
@@ -154,8 +160,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // instead of just the number of carriers, since it should hold information about
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   uint32_t fwdLinkNumCarriers = 1;
+  double rxBandwidth = 5e-6;
+
   Ptr<SatPhyRxCarrierConf> carrierConf =
         CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
+                                           m_rxTemperature_K,
+                                           rxBandwidth,
                                            m_errorModel,
                                            m_interferenceModel);
 

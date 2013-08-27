@@ -146,6 +146,7 @@ public:
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
+
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
@@ -154,6 +155,11 @@ private:
      * Configured interference model for the forward link. Set as an attribute.
      */
     SatPhyRxCarrierConf::InterferenceModel m_interferenceModel;
+
+    /*
+     * Configured RX noise temperature.
+     */
+    double m_rxTemperature_K;
 
     /*
      * Configured error model for the forward link. Set as an attribute.
