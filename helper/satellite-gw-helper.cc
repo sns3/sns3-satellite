@@ -60,9 +60,14 @@ SatGwHelper::GetTypeId (void)
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute( "RxTemperature",
-                      "RX noise temperature in GW satellite.",
+                      "RX noise temperature in GW.",
                       DoubleValue(293.00),
                       MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_K),
+                      MakeDoubleChecker<double>())
+      .AddAttribute( "RxOtherSysNoise",
+                      "Other system noise of RX in GW.",
+                      DoubleValue(0),
+                      MakeDoubleAccessor(&SatGwHelper::m_otherSysNoise_W),
                       MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGwHelper::m_creation))
@@ -163,13 +168,15 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // instead of just the number of carriers, since it should hold information about
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   uint32_t rtnLinkNumCarriers = 1;
-  double rxBandwidth = 5e-6;
+  double rxBandwidth = 5e6;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
                                                                             m_rxTemperature_K,
+                                                                            m_otherSysNoise_W,
                                                                             rxBandwidth,
                                                                             m_errorModel,
-                                                                            m_interferenceModel);
+                                                                            m_interferenceModel,
+                                                                            SatPhyRxCarrierConf::NORMAL);
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling

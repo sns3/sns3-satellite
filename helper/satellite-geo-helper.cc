@@ -66,6 +66,17 @@ SatGeoHelper::GetTypeId (void)
                      DoubleValue(490.94),
                      MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkRxTemperature_K),
                      MakeDoubleChecker<double>())
+      .AddAttribute( "FwdLinkOtherSysNoise",
+                     "Other system noise of the forward link in Geo satellite.",
+                     DoubleValue(0),
+                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkOtherSysNoise_W),
+                     MakeDoubleChecker<double>())
+      .AddAttribute( "RtnLinkOtherSysNoise",
+                     "Other system noise of the return link in Geo satellite.",
+                     DoubleValue(0),
+                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkOtherSysNoise_W),
+                     MakeDoubleChecker<double>())
+
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
     ;
@@ -156,14 +167,16 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   // Note, that in GEO satellite, there is no need for error modeling.
   uint32_t rtnLinkNumCarriers = 1;
-  double rtnLinkRxBandwidth = 5e-6;
+  double rtnLinkRxBandwidth = 5e6;
 
   Ptr<SatPhyRxCarrierConf> rtnCarrierConf =
         CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
                                            m_rtnLinkRxTemperature_K,
+                                           m_rtnLinkOtherSysNoise_W,
                                            rtnLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
-                                           m_rtnLinkInterferenceModel);
+                                           m_rtnLinkInterferenceModel,
+                                           SatPhyRxCarrierConf::TRANSPARENT);
 
   uPhyRx->ConfigurePhyRxCarriers (rtnCarrierConf);
 
@@ -180,14 +193,16 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   // Note, that in GEO satellite, there is no need for error modeling.
   uint32_t fwdLinkNumCarriers = 1;
-  double fwdLinkRxBandwidth = 5e-6;
+  double fwdLinkRxBandwidth = 5e6;
 
   Ptr<SatPhyRxCarrierConf> fwdCarrierConf =
         CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
                                            m_fwdLinkRxTemperature_K,
+                                           m_fwdLinkOtherSysNoise_W,
                                            fwdLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
-                                           m_fwdLinkInterferenceModel);
+                                           m_fwdLinkInterferenceModel,
+                                           SatPhyRxCarrierConf::TRANSPARENT);
 
   fPhyRx->ConfigurePhyRxCarriers (fwdCarrierConf);
 

@@ -58,9 +58,14 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute( "RxTemperature",
-                      "The forward link RX noise temperature in Geo satellite.",
+                      "The forward link RX noise temperature in UT.",
                       DoubleValue (293.00),
                       MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_K),
+                      MakeDoubleChecker<double>())
+      .AddAttribute( "RxOtherSysNoise",
+                      "Other system noise of RX in UT.",
+                      DoubleValue(0),
+                      MakeDoubleAccessor(&SatUtHelper::m_otherSysNoise_W),
                       MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
@@ -160,14 +165,16 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // instead of just the number of carriers, since it should hold information about
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   uint32_t fwdLinkNumCarriers = 1;
-  double rxBandwidth = 5e-6;
+  double rxBandwidth = 5e6;
 
   Ptr<SatPhyRxCarrierConf> carrierConf =
         CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
                                            m_rxTemperature_K,
+                                           m_otherSysNoise_W,
                                            rxBandwidth,
                                            m_errorModel,
-                                           m_interferenceModel);
+                                           m_interferenceModel,
+                                           SatPhyRxCarrierConf::NORMAL);
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling.

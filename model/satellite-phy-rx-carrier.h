@@ -43,6 +43,7 @@ namespace ns3 {
 class SatPhyRxCarrier : public Object
 {
 public:
+
   SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf);
   virtual ~SatPhyRxCarrier ();
 
@@ -87,7 +88,7 @@ public:
   void SetCb(SatPhyRx::ReceiveCallback cb);
 
 private:
-  static const double BoltzmannConstant = 1.3803e-23;
+  static const double BoltzmannConstant = 1.3806488e-23;
 
   void ChangeState (State newState);
   void EndRxData ();
@@ -108,7 +109,7 @@ private:
   Ptr<SatInterference> m_satInterference;
 
   /*
-   *
+   * Interference event
    */
   Ptr<SatInterference::Event> m_interferenceEvent;
 
@@ -127,6 +128,16 @@ private:
    */
   double m_rxBandwidth_Hz;
 
+  /*
+   * Other system RX noise
+   */
+  double m_rxOtherSysNoise_W;
+
+  /*
+   * RX noise
+   */
+  double m_rxNoise_W;
+
   /**
     * The upper layer package receive callback.
     */
@@ -136,6 +147,12 @@ private:
    * Address of the device owning this object.
    */
   Mac48Address m_ownAddress;
+
+  /**
+   * Receiving mode.
+   */
+  SatPhyRxCarrierConf::RxMode m_rxMode;
+
 
 };
 

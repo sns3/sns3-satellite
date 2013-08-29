@@ -131,6 +131,16 @@ private:
      */
     double m_fwdLinkRxTemperature_K;
 
+    /*
+     * Configured other system noise (in Watt) for return link.
+     */
+    double m_rtnLinkOtherSysNoise_W;
+
+    /*
+     * Configured other system noise (in Watt) for forward link.
+     */
+    double m_fwdLinkOtherSysNoise_W;
+
     /**
      * Trace callback for creation traces
      */

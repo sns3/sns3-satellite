@@ -37,6 +37,17 @@ class SatPhyRxCarrierConf : public Object
 public:
 
   /**
+   *  RX mode.
+   *
+   *  TRANSPARENT   Only beam Id is checked for receiving
+   *  NORMAL        Beam Id and valid address (own or broadcast) is checked for receiving
+  */
+  enum RxMode
+  {
+    TRANSPARENT, NORMAL
+  };
+
+  /**
    * Used error model
    */
   enum ErrorModel
@@ -61,11 +72,16 @@ public:
    * Constructor for SatPhyRxCarrierConf.
    * \param numCarriers Number of configured carriers
    * \param rxTemperature_K RX noise temperature in Kelvins
+   * \param rxOtherSysNoise_W other system noise in Watts
    * \param rxBandwidth_Hz RX bandwidth in Hz
+   * \param errorModel Used error model
    * \param ifModel Used interference model
+   * \param rxMode RX mode used in carrier
    */
   SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_K,
-                        double rxBandwidth_Hz, ErrorModel errorModel, InterferenceModel ifModel);
+                        double rxOtherSysNoise_W, double rxBandwidth_Hz,
+                        ErrorModel errorModel, InterferenceModel ifModel,
+                        RxMode rxMode);
 
   /**
    * Destructor for SatPhyRxCarrierConf.
@@ -111,6 +127,16 @@ public:
    */
   double GetRxTemperature_K () const;
 
+  /*
+   * Get other system RX noise
+   */
+  double GetRxOtherSystemNoise_W () const;
+
+  /*
+   * Get configured RX mode
+   */
+  RxMode GetRxMode () const;
+
 private:
 
   /*
@@ -125,6 +151,8 @@ private:
   Ptr<SatLinkResults> m_linkResults;
   double m_rxTemperature_K;
   double m_rxBandwidth_Hz;
+  double m_rxOtherSysNoise_W;
+  RxMode m_rxMode;
 
  };
 

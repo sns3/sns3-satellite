@@ -39,8 +39,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf)
   :m_state (IDLE),
-   m_carrierId (carrierId),
-   m_ownAddress(Mac48Address::GetBroadcast()) // broadcast address means that only beam ID is checked in RX
+   m_carrierId (carrierId)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -67,6 +66,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       break;
   }
 
+  m_rxMode = carrierConf->GetRxMode();
+  m_rxOtherSysNoise_W = carrierConf->GetRxOtherSystemNoise_W();
+
   if (carrierConf->GetErrorModel() == SatPhyRxCarrierConf::EM_AVI)
     {
       NS_LOG_LOGIC(this << " link results in use in carrier: " << carrierId);
@@ -75,6 +77,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   m_rxBandwidth_Hz = carrierConf->GetBandwidth_Hz();
   m_rxTemperature_K = carrierConf->GetRxTemperature_K();
+
+  // calculate RX noise
+  m_rxNoise_W = BoltzmannConstant * m_rxTemperature_K * m_rxBandwidth_Hz;
 }
 
 
@@ -143,38 +148,39 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-          // Check whether the packet is sent to our beam. In addition check
-          // that whether the packet was intended for this specific receiver
-          // or if own receiver is broadcast address.
-          bool rxPacket = false;
+          // Check whether the packet is sent to our beam.
+          // In case that RX mode is something else than transparent
+          // additionally check that whether the packet was intended for this specific receiver
+          bool receivePacket = false;
 
           if (rxParams->m_beamId == m_beamId )
             {
-              if ( m_ownAddress.IsBroadcast() )
+              if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
                 {
-                  rxPacket = true;
+                  receivePacket = true;
                 }
               else
-              {
-                MacAddressTag tag;
+                {
+                  MacAddressTag tag;
 
-                // just check tag here, tag is removed by Mac
-                if (rxParams->m_packet->PeekPacketTag(tag))
-                   {
-                    // If the packet is intended for this receiver
-                    Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
+                  // just check tag here, upper layer (MAC) is repsonsible for removing tag
+                  if (rxParams->m_packet->PeekPacketTag(tag))
+                    {
+                      // If the packet is intended for this receiver
+                      Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
 
-                    if ( addr == m_ownAddress ||  addr.IsBroadcast() )
-                       {
-                        rxPacket = true;
-                       }
-                   }
-              }
+                      if ( addr == m_ownAddress ||  addr.IsBroadcast() )
+                        {
+                          receivePacket = true;
+                        }
+                    }
+                }
             }
 
-          m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_txPower_W);
+          // add interference in any case
+          m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W);
 
-          if (rxPacket )
+          if ( receivePacket )
             {
               NS_ASSERT (m_state == IDLE);
 
@@ -209,7 +215,19 @@ SatPhyRxCarrier::EndRxData ()
   double iPower = 0.0;
   m_satInterference->Calculate(m_interferenceEvent, &iPower);
 
-  m_rxParams->m_sinr = CalculateSinr(m_rxParams->m_rxPower_W, iPower);
+  double sinr = CalculateSinr(m_rxParams->m_rxPower_W, iPower);
+
+  if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
+    {
+      // calculate composite SINR
+      // TODO: just calculated now, needed to check against link results later
+      sinr = 1 / ( (1 / sinr) + (1 / m_rxParams->m_sinr) );
+    }
+  else
+    {
+      m_rxParams->m_sinr = sinr;
+    }
+
   m_satInterference->NotifyRxEnd(m_interferenceEvent);
 
   // Send packet upwards
@@ -232,11 +250,7 @@ SatPhyRxCarrier::SetAddress (Mac48Address ownAddress)
 double
 SatPhyRxCarrier::CalculateSinr(double rxPower_W, double iPower_W)
 {
-  // calculate noise
-  double noisePower = BoltzmannConstant * m_rxTemperature_K * m_rxBandwidth_Hz;
-
-  return (rxPower_W / (iPower_W + noisePower));
-
+  return (rxPower_W / (iPower_W + m_rxNoise_W + m_rxOtherSysNoise_W));
 }
 
 }

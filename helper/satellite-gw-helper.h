@@ -167,6 +167,11 @@ private:
     double m_rxTemperature_K;
 
     /*
+     * Configured other system noise.
+     */
+    double m_otherSysNoise_W;
+
+    /*
      * Configured error model for the return link. Set as an attribute.
      */
     SatPhyRxCarrierConf::ErrorModel m_errorModel;

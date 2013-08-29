@@ -33,13 +33,18 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf()
 }
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_K,
-                                           double rxBandwidth_Hz, ErrorModel errorModel, InterferenceModel ifModel)
+                                           double rxOtherSysNoise_W, double rxBandwidth_Hz,
+                                           ErrorModel errorModel, InterferenceModel ifModel,
+                                           RxMode rxMode)
 {
   m_numCarriers = numCarriers;
   m_errorModel = errorModel;
   m_ifModel = ifModel;
   m_rxBandwidth_Hz = rxBandwidth_Hz;
   m_rxTemperature_K = rxTemperature_K;
+  m_rxMode = rxMode;
+  m_rxOtherSysNoise_W = rxOtherSysNoise_W;
+
 }
 
 TypeId
@@ -88,6 +93,16 @@ double SatPhyRxCarrierConf::GetBandwidth_Hz () const
 double SatPhyRxCarrierConf::GetRxTemperature_K () const
 {
   return m_rxTemperature_K;
+}
+
+double SatPhyRxCarrierConf::GetRxOtherSystemNoise_W () const
+{
+  return m_rxOtherSysNoise_W;
+}
+
+SatPhyRxCarrierConf::RxMode SatPhyRxCarrierConf::GetRxMode () const
+{
+  return m_rxMode;
 }
 
 } // namespace ns3

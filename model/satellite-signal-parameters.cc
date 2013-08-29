@@ -44,6 +44,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_frequency_Hz = p.m_frequency_Hz;
   m_txPower_W = p.m_txPower_W;
   m_rxPower_W = p.m_rxPower_W;
+  m_sinr = p.m_sinr;
 }
 
 Ptr<SatSignalParameters>
