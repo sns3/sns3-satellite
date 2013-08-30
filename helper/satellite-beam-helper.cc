@@ -331,7 +331,7 @@ SatBeamHelper::CreateBeamInfo()
 }
 
 SatBeamHelper::ChannelPair_t
-SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > chPairMap, uint32_t frequencyId)
+SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > & chPairMap, uint32_t frequencyId)
 {
   ChannelPair_t channelPair;
   std::map<uint32_t, ChannelPair_t >::iterator mapIterator = chPairMap.find(frequencyId);

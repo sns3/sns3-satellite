@@ -188,7 +188,7 @@ private:
      * /param chPairMap map where channel pair is get
      * /param frequencyId ID of the frequency
      */
-    ChannelPair_t GetChannelPair(std::map<uint32_t, ChannelPair_t > chPairMap, uint32_t frequencyId);
+    ChannelPair_t GetChannelPair(std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId);
 
     /**
      * Creates GW node according to given id and stores GW to map.
