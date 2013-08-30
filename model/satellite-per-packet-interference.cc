@@ -91,9 +91,6 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event, double
   bool calcReady = false;
   bool increaseFirstPower = true;
 
-  std::set<uint32_t>::iterator item = m_events.find(event->GetId());
-
-  NS_ASSERT (item != m_events.end());
   NS_ASSERT (m_rxing);
 
   *finalPower = 0;
