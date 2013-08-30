@@ -19,10 +19,12 @@
  */
 
 #include "ns3/log.h"
+#include "ns3/enum.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/ipv4-routing-table-entry.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/csma-helper.h"
+#include "../model/ideal-net-device.h"
 #include "satellite-user-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
@@ -37,6 +39,18 @@ SatUserHelper::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatUserHelper")
       .SetParent<Object> ()
       .AddConstructor<SatUserHelper> ()
+      .AddAttribute ("BackboneNetworkType",
+                     "Network used between GW and Router, and between Router and Users in operator network",
+                      EnumValue (SatUserHelper::NETWORK_TYPE_IDEAL),
+                      MakeEnumAccessor (&SatUserHelper::m_backboneNetworkType),
+                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
+                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma network"))
+      .AddAttribute ("SubscriberNetworkType",
+                     "Network used between UTs and Users in subscriber network",
+                      EnumValue (SatUserHelper::NETWORK_TYPE_CSMA),
+                      MakeEnumAccessor (&SatUserHelper::m_subscriberNetworkType),
+                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
+                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma network"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUserHelper::m_creation))
     ;
@@ -103,7 +117,7 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
 
   internet.Install (users);
 
-  NetDeviceContainer nd = m_csma.Install (utUsers);
+  NetDeviceContainer nd = InstallSubscriberNetwork (utUsers);
   Ipv4InterfaceContainer addresses = m_ipv4Ut.Assign (nd);
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
@@ -147,7 +161,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 
   internet.Install (users);
 
-  NetDeviceContainer nd = m_csma.Install (routerUsers);
+  NetDeviceContainer nd = InstallBackboneNetwork(routerUsers);
   Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
@@ -210,7 +224,7 @@ SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
   {
     NodeContainer gwRouter = NodeContainer((*i), router);
 
-    NetDeviceContainer nd = m_csma.Install (gwRouter);
+    NetDeviceContainer nd = InstallBackboneNetwork(gwRouter);
     Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
     Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
@@ -243,5 +257,70 @@ SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
     m_ipv4Gw.NewNetwork();
   }
 }
+
+NetDeviceContainer
+SatUserHelper::InstallSubscriberNetwork (const NodeContainer &c ) const
+{
+  NetDeviceContainer devs;
+
+  switch (m_subscriberNetworkType)
+  {
+    case NETWORK_TYPE_IDEAL:
+      devs =  InstallIdealNetwork(c);
+      break;
+
+    case NETWORK_TYPE_CSMA:
+      devs = m_csma.Install (c);
+      break;
+
+    default:
+      NS_ASSERT(false);
+      break;
+  }
+
+  return devs;
+}
+
+NetDeviceContainer
+SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
+{
+  NetDeviceContainer devs;
+
+  switch (m_backboneNetworkType)
+  {
+    case NETWORK_TYPE_IDEAL:
+      devs =  InstallIdealNetwork(c);
+      break;
+
+    case NETWORK_TYPE_CSMA:
+      devs = m_csma.Install (c);
+      break;
+
+    default:
+      NS_ASSERT(false);
+      break;
+  }
+
+  return devs;
+}
+
+NetDeviceContainer
+SatUserHelper::InstallIdealNetwork (const NodeContainer &c ) const
+{
+  NetDeviceContainer devs;
+  Ptr<SimpleChannel> channel = CreateObject<SimpleChannel>();
+
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+    {
+      Ptr<IdealNetDevice> device = CreateObject<IdealNetDevice> ();
+      device->SetAddress (Mac48Address::Allocate ());
+      (*i)->AddDevice (device);
+      device->SetChannel(channel);
+      devs.Add (device);
+    }
+
+  return devs;
+}
+
 
 } // namespace ns3

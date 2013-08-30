@@ -42,6 +42,14 @@ class Node;
 class SatUserHelper : public Object
 {
 public:
+  /**
+   * Network types in user networks (subscriber or backbone)
+   */
+  enum NetworkType
+   {
+     NETWORK_TYPE_IDEAL, NETWORK_TYPE_CSMA
+   };
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
   /**
@@ -168,25 +176,49 @@ public:
 
 private:
 
-    CsmaHelper        m_csma;
-    Ipv4AddressHelper m_ipv4Ut;
-    Ipv4AddressHelper m_ipv4Gw;
+  /**
+   * Install network between UT and its users
+   *
+   * /param c nodecontainer having UT and its users
+   */
+  NetDeviceContainer InstallSubscriberNetwork (const NodeContainer &c ) const;
 
-    NodeContainer     m_gwUsers;
-    NodeContainer     m_utUsers;
+  /**
+   * Install network between GW and Router (or users) or Router and its users.
+   *
+   * /param c nodecontainer having UT and its users
+   */
+  NetDeviceContainer InstallBackboneNetwork (const NodeContainer &c ) const;
 
-    /**
-     * Trace callback for creation traces
-     */
-    TracedCallback<std::string> m_creation;
+  /**
+   * Install ideal network.
+   *
+   * /param c nodecontainer having UT and its users
+   */
+  NetDeviceContainer InstallIdealNetwork (const NodeContainer &c ) const;
 
-    /**
-     * Install IP router to to Gateways. Creates csma link between gateways and router.
-     *
-     * /param gw      container having GWs
-     * /param router  pointer to IP router
-     */
-    void InstallRouter(NodeContainer gw, Ptr<Node> router);
+  CsmaHelper        m_csma;
+  Ipv4AddressHelper m_ipv4Ut;
+  Ipv4AddressHelper m_ipv4Gw;
+
+  NodeContainer     m_gwUsers;
+  NodeContainer     m_utUsers;
+
+  NetworkType       m_backboneNetworkType;
+  NetworkType       m_subscriberNetworkType;
+
+  /**
+   * Trace callback for creation traces
+   */
+  TracedCallback<std::string> m_creation;
+
+  /**
+   * Install IP router to to Gateways. Creates csma link between gateways and router.
+   *
+   * /param gw      container having GWs
+   * /param router  pointer to IP router
+   */
+  void InstallRouter(NodeContainer gw, Ptr<Node> router);
 };
 
 } // namespace ns3
