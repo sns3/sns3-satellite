@@ -83,7 +83,14 @@ void
 SimpleP2p1::DoRun (void)
 {
   // Create simple scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreateScenario(SatHelper::SIMPLE);
 
   NodeContainer utUsers = helper->GetUtUsers();
@@ -168,7 +175,14 @@ void
 SimpleP2p2::DoRun (void)
 {
   // Create larger scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreateScenario(SatHelper::LARGER);
 
   NodeContainer utUsers = helper->GetUtUsers();
@@ -275,7 +289,14 @@ void
 SimpleP2p3::DoRun (void)
 {
   // Create full scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreateScenario(SatHelper::FULL);
 
   NodeContainer utUsers = helper->GetUtUsers();
@@ -387,7 +408,14 @@ void
 SimpleP2p4::DoRun (void)
 {
   // Create simple scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreateScenario(SatHelper::SIMPLE);
 
   // >>> Start of actual test using Simple scenario >>>
@@ -473,7 +501,14 @@ void
 SimpleP2p5::DoRun (void)
 {
   // Create larger scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreateScenario(SatHelper::LARGER);
 
   // >>> Start of actual test using Larger scenario >>>
@@ -568,7 +603,14 @@ void
 SimpleP2p6::DoRun (void)
 {
   // Create full scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreateScenario(SatHelper::FULL);
 
   // >>> Start of actual test using Full scenario >>>

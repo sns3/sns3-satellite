@@ -65,9 +65,14 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * \brief Create a base SatHelper for creating customized Satellite topologies.
+   * \brief Default constructor
    */
   SatHelper ();
+
+  /**
+   * \brief Create a base SatHelper for creating customized Satellite topologies.
+   */
+  SatHelper (std::string scenarioName);
 
   /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.

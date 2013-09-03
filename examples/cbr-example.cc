@@ -62,7 +62,14 @@ main (int argc, char *argv[])
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
   // create satellite helper with given scenario default=simple
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   if ( scenarioLogFile != "" )
     {

@@ -22,6 +22,7 @@
 #define SAT_CONF_H
 
 #include <vector>
+#include <fstream>
 #include "ns3/uinteger.h"
 #include "ns3/geo-coordinate.h"
 
@@ -37,6 +38,31 @@ public:
 
   SatConf ();
   virtual ~SatConf () {}
+
+  /**
+   * Initialize the configuration
+   */
+  void Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos);
+
+  /**
+   * Try to open a file from a given path
+   */
+  std::ifstream* OpenFile (std::string filePathName);
+
+  /**
+   * Load satellite configuration from a file
+   */
+  void LoadSatConf (std::string filePathName);
+
+  /**
+   * Load GW positions from a file
+   */
+  void LoadGwPos (std::string filePathName);
+
+  /**
+   * Load satellite position from a file
+   */
+  void LoadGeoSatPos (std::string filePathName);
 
   /**
    * Get count of the beams (configurations).
@@ -92,13 +118,7 @@ public:
     * Definition for feeder frequency ID index (column) in m_conf
     */
    static const uint32_t F_FREQ_ID_INDEX = 3;
-   static const uint32_t DEFAULT_BEAM_COUNT = 98;
    static const uint32_t BEAM_ELEM_COUNT = 4;
-
-   /**
-    * Definition for GW positions.
-    */
-   static const uint32_t DEFAULT_GW_COUNT = 7;
 
 private:
 

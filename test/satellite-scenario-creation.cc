@@ -76,7 +76,14 @@ void
 ScenarioCreationSimple::DoRun (void)
 {
   // Create simple scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("simple-scenario-creation.log", false);
   helper->CreateScenario(SatHelper::SIMPLE);
 
@@ -129,7 +136,14 @@ void
 ScenarioCreationLarger::DoRun (void)
 {
   // Create larger scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("larger-scenario-creation.log", false);
   helper->CreateScenario(SatHelper::LARGER);
 
@@ -182,15 +196,24 @@ void
 ScenarioCreationFull::DoRun (void)
 {
   // Create full scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("full-scenario-creation.log", false );
   helper->CreateScenario(SatHelper::FULL);
 
   // check results what can be done at this level. More checking done in module level with traces
   // reference system includes 98 beams and we create three UTs with three users per UT in full scenario
   // and five GW users
+
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what expected!");
+  //NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what expected!");
+  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 72*3*3, "UT User count is not what expected!");
 
   Simulator::Destroy();
 }
@@ -238,7 +261,14 @@ void
 ScenarioCreationUser::DoRun (void)
 {
   // Create user scenario
-  Ptr<SatHelper> helper = CreateObject<SatHelper>();
+
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
+
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[8] = beamInfo;

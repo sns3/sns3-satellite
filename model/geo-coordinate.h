@@ -38,20 +38,20 @@ class GeoCoordinate
 {
 public:
   /**
-   * \param longitude longitude of position
    * \param latitude latitude of position
+   * \param longitude longitude of position
    * \param altitute altitute of position
    *
-   * Creates GeoCoordinate from given longitude, latitude and altitude decimal degree values
+   * Creates GeoCoordinate from given latitude, longitude and altitude decimal degree values
    *
    * Accepted values:
    *
-   * Longitude:     -180 ... 180 degrees
    * Latitude:       -90 ... 90 degrees
+   * Longitude:     -180 ... 180 degrees
    * Altitude:      >= -EARTH_RADIUS
    *
    */
-  GeoCoordinate (double longitude, double latitude, double altitude);
+  GeoCoordinate (double latitude, double longitude, double altitude);
   /**
    * \param vector, coordinates as Vector (x,y,z) (Cartesian)
    *
@@ -161,13 +161,13 @@ private:
   void FromVector(const Vector &vector);
 
   /**
-   * longitude of coordinate
-   */
-  double m_longitude;
-  /**
    * latitude of coordinate
    */
   double m_latitude;
+  /**
+   * longitude of coordinate
+   */
+  double m_longitude;
   /**
    * altitude of coordinate
    */

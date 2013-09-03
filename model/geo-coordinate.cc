@@ -33,16 +33,16 @@ namespace ns3 {
 
 ATTRIBUTE_HELPER_CPP (GeoCoordinate);
 
-GeoCoordinate::GeoCoordinate (double longitude, double latitude, double altitude)
+GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude)
 {
-  NS_LOG_FUNCTION (this << longitude << latitude << altitude);
+  NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
-  NS_ASSERT(IsValidLongtitude(longitude));
   NS_ASSERT(IsValidLatitude(latitude));
+  NS_ASSERT(IsValidLongtitude(longitude));
   NS_ASSERT(IsValidAltitude(altitude));
 
-  m_longitude = longitude;
   m_latitude = latitude;
+  m_longitude = longitude;
   m_altitude = altitude;
 }
 
@@ -54,8 +54,8 @@ GeoCoordinate::GeoCoordinate (Vector vector)
 }
 
 GeoCoordinate::GeoCoordinate ()
-  : m_longitude (NAN),
-    m_latitude (NAN),
+  : m_latitude (NAN),
+    m_longitude (NAN),
     m_altitude (NAN)
 {
   NS_LOG_FUNCTION (this);

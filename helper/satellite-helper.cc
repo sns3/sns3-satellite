@@ -69,11 +69,25 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
+{
+  // Do nothing here
+  NS_ASSERT (true);
+}
+
+SatHelper::SatHelper (std::string scenarioName)
  : m_scenarioCreated(false),
    m_detailedCreationTraces(false)
 {
   // uncomment next line, if attributes are needed already in construction phase
   //ObjectBase::ConstructSelf(AttributeConstructionList ());
+
+  std::string path = "src/satellite/data/";
+
+  std::string satConf = scenarioName + "Conf.txt";
+  std::string gwPos = scenarioName + "GwPos.txt";
+  std::string satPos = scenarioName + "GeoPos.txt";
+
+  m_satConf.Initialize (path, satConf, gwPos, satPos);
 }
 
 void

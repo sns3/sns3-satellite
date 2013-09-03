@@ -63,7 +63,7 @@ SatPositionAllocator::GetNext(void) const
 
   if ( m_GetAsGeoCoordinates )
     {
-       return Vector(pos.GetLongitude(), pos.GetLatitude(), pos.GetAltitude());
+       return Vector(pos.GetLatitude(), pos.GetLongitude(), pos.GetAltitude());
     }
   else
     {
