@@ -92,14 +92,14 @@ SatFreeSpaceLossTestCase::DoRun (void)
   double fsl_ratio = fsl.GetFsl(utMob, geoMob, frequency);
   double fsl_dB = fsl.GetFsldB(utMob, geoMob, frequency);
 
-  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 883122910318077150000.0, 1,"FSL (UT-GEO) ratio incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 883122910318077150000.0, 1.1,"FSL (UT-GEO) ratio incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 209.460211515483, 0.1, "FSL (UT-GEO) in dBs incorrect");
 
   // test fsl calculation in path GW - Geo Satellite
   fsl_ratio = fsl.GetFsl(gwMob, geoMob, frequency);
   fsl_dB = fsl.GetFsldB(gwMob, geoMob, frequency);
 
-  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 769159080122215960000.0, 1, "FSL (GW-GEO) ratio incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 769159080122215960000.0, 1.1, "FSL (GW-GEO) ratio incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 208.86016171367487, 0.1, "FSL (GW-GEO) in dBs incorrect");
 
   Simulator::Destroy ();
