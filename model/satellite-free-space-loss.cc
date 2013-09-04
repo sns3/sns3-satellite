@@ -57,7 +57,7 @@ SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double fre
   double fsl;
   double distance = a->GetDistanceFrom(b);
 
-  fsl = std::pow( ( (4 * M_PI * distance * frequency ) / C ), 2 );
+  fsl = std::pow( ( (4.0 * M_PI * distance * frequency ) / C ), 2.0 );
 
   return fsl;
 }
