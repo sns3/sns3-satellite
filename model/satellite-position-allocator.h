@@ -93,15 +93,15 @@ public:
   SatRandomBoxPositionAllocator ();
   virtual ~SatRandomBoxPositionAllocator ();
 
-  void SetLongitude (Ptr<RandomVariableStream> longitude);
   void SetLatitude (Ptr<RandomVariableStream> latitude);
+  void SetLongitude (Ptr<RandomVariableStream> longitude);
   void SetAltitude (Ptr<RandomVariableStream> altitude);
 
   virtual GeoCoordinate GetNextGeo (void) const;
   virtual int64_t AssignStreams (int64_t stream);
 private:
-  Ptr<RandomVariableStream> m_longitude;
   Ptr<RandomVariableStream> m_latitude;
+  Ptr<RandomVariableStream> m_longitude;
   Ptr<RandomVariableStream> m_altitude;
 };
 

@@ -24,6 +24,7 @@
  */
 
 // Include a header file from your module to test.
+#include <iostream>
 #include "ns3/log.h"
 #include "ns3/test.h"
 #include "ns3/simulator.h"
@@ -44,7 +45,7 @@ SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
 
    // sets number of decimal places
 
-  std::cout << std::cout.precision(15) << std::cout.setf(std::ios::fixed, std::ios::floatfield) << Simulator::Now () << ", pos=" << pos << ", x=" << pos2.x << ", y=" << pos2.y
+  std::cout << std::cout.precision(15) << std::cout.setf(std::ios::fixed, std::ios::floatfield) << Simulator::Now () << ", x=" << pos2.x << ", y=" << pos2.y
                                  << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude()
                                  << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude()  << std::endl;
 }
@@ -81,8 +82,8 @@ SatMobilityRandomTestCase::DoRun (void)
 
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::SatRandomBoxPositionAllocator",
-                                 "Longitude",StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=180.0]"),
                                  "Latitude", StringValue ("ns3::UniformRandomVariable[Min=-45.0|Max=80.0]"),
+                                 "Longitude",StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=180.0]"),
                                  "Altitude", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=100.0]"));
 
 
@@ -98,12 +99,12 @@ SatMobilityRandomTestCase::DoRun (void)
       GeoCoordinate pos = model->GetGeoPosition();
 
       // check that position is in limit
-      NS_TEST_ASSERT_MSG_LT( pos.GetLongitude(), 180.1, "Longitude is too big.");
       NS_TEST_ASSERT_MSG_LT( pos.GetLatitude(), 80.1, "Latitude is too big.");
+      NS_TEST_ASSERT_MSG_LT( pos.GetLongitude(), 180.1, "Longitude is too big.");
       NS_TEST_ASSERT_MSG_LT( pos.GetAltitude(), 100.1, "Altitude is too big.");
 
-      NS_TEST_ASSERT_MSG_GT( pos.GetLongitude(), -10.1, "Longitude is too small.");
       NS_TEST_ASSERT_MSG_GT( pos.GetLatitude(), -45.1, "Latitude is too small.");
+      NS_TEST_ASSERT_MSG_GT( pos.GetLongitude(), -10.1, "Longitude is too small.");
       NS_TEST_ASSERT_MSG_GT( pos.GetAltitude(), -0.1, "Altitude is too small.");
     }
 }
@@ -143,7 +144,7 @@ SatMobilityList1TestCase::DoRun (void)
     int j=0;
     for (int i = -180; i <= 180; i += 30)
       {
-        positionAlloc->Add(GeoCoordinate(i, i/2, i*30));
+        positionAlloc->Add(GeoCoordinate(i/2, i, i*30));
         j++;
       }
 
@@ -169,8 +170,8 @@ SatMobilityList1TestCase::DoRun (void)
         double altitude = longitude*30;
 
         // check that position is equal with set one
-        NS_TEST_ASSERT_MSG_EQ( pos.GetLongitude(), longitude, "Longitude is different.");
         NS_TEST_ASSERT_MSG_EQ( pos.GetLatitude(), latitude, "Latitude is different.");
+        NS_TEST_ASSERT_MSG_EQ( pos.GetLongitude(), longitude, "Longitude is different.");
         NS_TEST_ASSERT_MSG_EQ( pos.GetAltitude(), altitude, "Altitude is different.");
       }
 }
@@ -229,15 +230,10 @@ SatMobilityList2TestCase::DoRun (void)
   Ptr<SatMobilityModel> model = c.Get(0)->GetObject<SatMobilityModel>();
   GeoCoordinate pos = model->GetGeoPosition();
 
-   // check that position is exactly equal with set one
-  NS_TEST_ASSERT_MSG_NE( pos.GetLongitude(), 30, "Longitude is not  different.");
-  NS_TEST_ASSERT_MSG_NE( pos.GetLatitude(), 45, "Latitude is not different.");
-  NS_TEST_ASSERT_MSG_NE( pos.GetAltitude(), 1000, "Altitude is not different.");
-
-  // anyway it should close enough
-  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLongitude() - 30), 0.000001, "Longitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLatitude() - 45), 0.000001, "Latitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetAltitude()- 1000), 0.000001, "Altitude difference too big!");
+  // check that position is close enough
+  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLatitude() - 30), 0.000001, "Latitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLongitude() - 45), 0.000001, "Longitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetAltitude() - 1000), 0.000001, "Altitude difference too big!");
 }
 
 /**

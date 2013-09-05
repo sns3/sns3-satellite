@@ -168,7 +168,7 @@ SatRandomBoxPositionAllocator::GetNextGeo (void) const
   double latitude = m_latitude->GetValue ();
   double altitude = m_altitude->GetValue ();
 
-  return GeoCoordinate (longitude, latitude, altitude);
+  return GeoCoordinate (latitude, longitude, altitude);
 }
 
 int64_t
