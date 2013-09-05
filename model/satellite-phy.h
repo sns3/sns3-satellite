@@ -61,6 +61,7 @@ public:
 
   // inherited from Object
   static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
@@ -70,41 +71,35 @@ public:
    */
   Ptr<SatPhyTx> GetPhyTx () const;
 
-   /**
-    * Get the SatPhyRx pointer
-    * \return a pointer to the SatPhyRx instance
-    */
-   Ptr<SatPhyRx> GetPhyRx () const;
-
-   /**
-    * Set the SatPhyTx module
-    * \param phyTx Transmitter PHY module
-    */
-   void SetPhyTx (Ptr<SatPhyTx> phyTx);
-
-   /**
-    * Set the SatPhyRx module
-    * \param phyTx Receiver PHY module
-    */
-   void SetPhyRx (Ptr<SatPhyRx> phyRx);
-
-   /**
-    * Set the Tx satellite channel
-    * \param c the Tx channel
-    */
-   Ptr<SatChannel> GetTxChannel ();
-
   /**
-   * Set the Tx power
-   * \param pw the transmission power in dBm
+   * Get the SatPhyRx pointer
+   * \return a pointer to the SatPhyRx instance
    */
-  void SetTxPower (double pow);
+  Ptr<SatPhyRx> GetPhyRx () const;
 
   /**
-   * Get the Tx power
+   * Set the SatPhyTx module
+   * \param phyTx Transmitter PHY module
+   */
+  void SetPhyTx (Ptr<SatPhyTx> phyTx);
+
+  /**
+   * Set the SatPhyRx module
+   * \param phyTx Receiver PHY module
+   */
+  void SetPhyRx (Ptr<SatPhyRx> phyRx);
+
+  /**
+   * Set the Tx satellite channel
+   * \param c the Tx channel
+   */
+  Ptr<SatChannel> GetTxChannel ();
+
+  /**
+   * Get the TXx power
    * \return the transmission power in dBm
    */
-  double GetTxPower () const;
+  double GetTxPower_W () const;
 
   /**
    * Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
@@ -140,7 +135,42 @@ private:
   Ptr<SatPhyTx> m_phyTx;
   Ptr<SatPhyRx> m_phyRx;
   uint32_t m_beamId;
-  double m_txPower;
+
+  /**
+   * Calculated EIRP without gain in Watts
+   */
+  double m_eirpWoGain_W;
+
+  /**
+   * Configured maximum RX gain in Dbs
+   */
+  double m_maxGain_Db;
+
+  /**
+   * Configured maximum TX power in Dbs
+   */
+  double m_maxPower_Db;
+
+  /**
+   * Configured output loss in Dbs
+   */
+  double m_outputLoss_Db;
+
+  /**
+   * Configured pointing loss in Dbs
+   */
+  double m_pointingLoss_Db;
+
+  /**
+   * Configured OBO loss in Dbs
+   */
+  double m_oboLoss_Db;
+
+  /**
+   * Configured antenna loss in Dbs
+   */
+  double m_antennaLoss_Db;
+
   /**
    * The upper layer package receive callback.
    */

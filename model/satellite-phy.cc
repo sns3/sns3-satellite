@@ -51,6 +51,14 @@ SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPh
 {
   NS_LOG_FUNCTION (this << phyTx << phyRx << beamId);
 
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
+
+  // calculate EIRP without Gain (maximum)
+  double eirpWoGain_Db = m_maxPower_Db - m_outputLoss_Db - m_pointingLoss_Db - m_oboLoss_Db - m_antennaLoss_Db;
+
+  // TODO: needed to have 'utils'  library to make these kind of conversions
+  m_eirpWoGain_W = std::pow( 10.0, eirpWoGain_Db / 10.0 );
+
   phyTx->SetBeamId(beamId);
   phyRx->SetBeamId(beamId);
 
@@ -72,8 +80,13 @@ SatPhy::DoDispose ()
   m_phyRx->DoDispose();
   m_phyRx = 0;
 
-
   Object::DoDispose ();
+}
+
+TypeId
+SatPhy::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
 }
 
 TypeId
@@ -83,10 +96,35 @@ SatPhy::GetTypeId (void)
     .SetParent<Object> ()
     .AddConstructor<SatPhy> ()
     .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatPhy::GetPhyRx,
-                                         &SatPhy::SetPhyRx),
-                    MakePointerChecker<SatPhyRx> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatPhy::GetPhyRx,
+                                        &SatPhy::SetPhyRx),
+                   MakePointerChecker<SatPhyRx> ())
+    .AddAttribute("MaxGainDb", "Maximum RX gain in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_maxGain_Db),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute("MaxPowerDb", "Maximum TX power in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_maxPower_Db),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute("OutputLossDb", "TX Output loss in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_outputLoss_Db),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute("PointingLossDb", "TX Pointing loss in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_pointingLoss_Db),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute("OboLossDb", "TX OBO loss in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_oboLoss_Db),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute("AntennaLossDb", "TX Antenna loss in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_antennaLoss_Db),
+                   MakeDoubleChecker<double> ())
+
   ;
   return tid;
 }
@@ -135,18 +173,11 @@ SatPhy::GetTxChannel ()
   return m_phyTx->GetChannel ();
 }
 
-void
-SatPhy::SetTxPower (double pow)
-{
-  NS_LOG_FUNCTION (this << pow);
-  m_txPower = pow;
-}
-
 double
-SatPhy::GetTxPower () const
+SatPhy::GetTxPower_W () const
 {
   NS_LOG_FUNCTION (this);
-  return m_txPower;
+  return m_eirpWoGain_W;
 }
 
 void
@@ -163,11 +194,10 @@ SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
 
-  // TODO: frequency and TX power initialized according to carrier config
+  // TODO: frequency initialized according to carrier config
   double FREQUENCY (17.9 * std::pow(10.0, 9));
-  double TX_POWER(88);
   txParams->m_frequency_Hz = FREQUENCY;
-  txParams->m_txPower_W = TX_POWER;
+  txParams->m_txPower_W = m_eirpWoGain_W;
 
   m_phyTx->StartTx (p, txParams);
 }
