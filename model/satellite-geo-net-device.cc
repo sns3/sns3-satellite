@@ -22,6 +22,7 @@
 #include "ns3/packet.h"
 #include "ns3/log.h"
 #include "ns3/pointer.h"
+#include "ns3/object-map.h"
 #include "ns3/error-model.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/ipv4-header.h"
@@ -53,6 +54,14 @@ SatGeoNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatGeoNetDevice::m_receiveErrorModel),
                    MakePointerChecker<ErrorModel> ())
+    .AddAttribute ("UserPhy", "The User Phy objects attached to this device.",
+                    ObjectMapValue (),
+                    MakeObjectMapAccessor (&SatGeoNetDevice::m_userPhy),
+                    MakeObjectMapChecker<SatPhy> ())
+    .AddAttribute ("FeederPhy", "The Feeder Phy objects attached to this device.",
+                    ObjectMapValue (),
+                    MakeObjectMapAccessor (&SatGeoNetDevice::m_feederPhy),
+                    MakeObjectMapChecker<SatPhy> ())
     .AddTraceSource ("PhyRxDrop",
                      "Trace source indicating a packet has been dropped by the device during reception",
                      MakeTraceSourceAccessor (&SatGeoNetDevice::m_phyRxDropTrace))

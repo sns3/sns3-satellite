@@ -68,13 +68,13 @@ public:
    * Get the SatPhyTx pointer
    * \return a pointer to the SatPhyTx instance
    */
-  Ptr<SatPhyTx> GetPhyTx ();
+  Ptr<SatPhyTx> GetPhyTx () const;
 
    /**
     * Get the SatPhyRx pointer
     * \return a pointer to the SatPhyRx instance
     */
-   Ptr<SatPhyRx> GetPhyRx ();
+   Ptr<SatPhyRx> GetPhyRx () const;
 
    /**
     * Set the SatPhyTx module

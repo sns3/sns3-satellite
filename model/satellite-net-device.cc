@@ -55,6 +55,16 @@ SatNetDevice::GetTypeId (void)
     .AddTraceSource ("PhyRxDrop",
                      "Trace source indicating a packet has been dropped by the device during reception",
                      MakeTraceSourceAccessor (&SatNetDevice::m_phyRxDropTrace))
+    .AddAttribute ("Mac", "The MAC layer attached to this device.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatNetDevice::GetMac,
+                                         &SatNetDevice::SetMac),
+                    MakePointerChecker<SatMac> ())
+    .AddAttribute ("Phy", "The Phy layer attached to this device.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatNetDevice::GetPhy,
+                                         &SatNetDevice::SetPhy),
+                    MakePointerChecker<SatPhy> ())
   ;
   return tid;
 }

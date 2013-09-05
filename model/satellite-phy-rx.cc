@@ -19,6 +19,7 @@
  */
 
 #include "ns3/log.h"
+#include "ns3/object-vector.h"
 #include "ns3/antenna-model.h"
 #include "ns3/object-factory.h"
 
@@ -61,6 +62,10 @@ SatPhyRx::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRx")
     .SetParent<Object> ()
+    .AddAttribute ("RxCarrierList", "The list of sockets associated to this protocol.",
+                    ObjectVectorValue (),
+                    MakeObjectVectorAccessor (&SatPhyRx::m_rxCarriers),
+                    MakeObjectVectorChecker<SatPhyRxCarrier> ())
   ;
   return tid;
 }

@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/double.h"
+#include "ns3/pointer.h"
 
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
@@ -81,6 +82,11 @@ SatPhy::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatPhy")
     .SetParent<Object> ()
     .AddConstructor<SatPhy> ()
+    .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatPhy::GetPhyRx,
+                                         &SatPhy::SetPhyRx),
+                    MakePointerChecker<SatPhyRx> ())
   ;
   return tid;
 }
@@ -93,14 +99,14 @@ SatPhy::DoStart ()
 }
 
 Ptr<SatPhyTx>
-SatPhy::GetPhyTx ()
+SatPhy::GetPhyTx () const
 {
   NS_LOG_FUNCTION (this);
   return m_phyTx;
 }
 
 Ptr<SatPhyRx>
-SatPhy::GetPhyRx ()
+SatPhy::GetPhyRx () const
 {
   NS_LOG_FUNCTION (this);
   return m_phyRx;
