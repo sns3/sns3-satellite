@@ -93,6 +93,20 @@ SatPhyRxCarrier::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrier")
     .SetParent<Object> ()
+    .AddTraceSource ("InterferenceResult",
+                      "The trace for calculated interferencies of the received packets",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_interferenceResultTrace))
+    .AddTraceSource ("InterferenceAddition",
+                     "The trace for added interferencies",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_interferenceAdditionTrace))
+    .AddTraceSource ("SinrResult",
+                      "The trace for calculated sinr of the received packets",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrResultTrace))
+    .AddTraceSource ("CompositeSinrResult",
+                      "The trace for calculated composite sinr of the received packets",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_cSinrResultTrace))
+
+
   ;
   return tid;
 }
@@ -179,6 +193,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
           // add interference in any case
           m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W);
+          m_interferenceAdditionTrace(m_ownAddress, m_beamId, rxParams->m_beamId, rxParams->m_rxPower_W);
 
           if ( receivePacket )
             {
@@ -214,14 +229,17 @@ SatPhyRxCarrier::EndRxData ()
 
   double iPower = 0.0;
   m_satInterference->Calculate(m_interferenceEvent, &iPower);
+  m_interferenceResultTrace(m_ownAddress, m_beamId, iPower);
 
   double sinr = CalculateSinr(m_rxParams->m_rxPower_W, iPower);
+  m_sinrResultTrace(m_ownAddress, m_beamId, sinr);
 
   if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
     {
       // calculate composite SINR
       // TODO: just calculated now, needed to check against link results later
       sinr = 1 / ( (1 / sinr) + (1 / m_rxParams->m_sinr) );
+      m_cSinrResultTrace(m_ownAddress, m_beamId, sinr);
     }
   else
     {
