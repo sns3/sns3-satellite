@@ -161,12 +161,20 @@ SatMac::SatMac ()
 {
   NS_LOG_FUNCTION (this);
 
-  Simulator::Schedule (Seconds(0.01), &SatMac::TransmitReady, this);
+
 }
 
 SatMac::~SatMac ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void SatMac::StartScheduling()
+{
+  if ( m_tInterval.GetDouble() )
+    {
+      Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this);
+    }
 }
 
 void
@@ -213,14 +221,14 @@ SatMac::TransmitReady (void)
   // is empty, we are done, otherwise we need to start transmitting the
   // next packet.
 
+  if ( PacketInQueue() )
+    {
+      Ptr<Packet> p = m_queue->Dequeue();
+      TransmitStart(p);
+    }
+
   if ( m_tInterval.GetDouble() > 0)
     {
-      if ( PacketInQueue() )
-        {
-          Ptr<Packet> p = m_queue->Dequeue();
-          TransmitStart(p);
-        }
-
       Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this);
     }
 }
@@ -294,12 +302,6 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
        NS_ASSERT( "SatMac::Receive(): Packet received with no tag information!");
     }
 }
-
-//
-// This is a point-to-point device, so we really don't need any kind of address
-// information.  However, the base class NetDevice wants us to define the
-// methods to get and set the address.  Rather than be rude and assert, we let
-// clients get and set the address, but simply ignore them.
 
 bool
 SatMac::Send ( Ptr<Packet> packet, Address dest )

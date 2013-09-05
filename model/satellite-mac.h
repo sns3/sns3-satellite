@@ -94,6 +94,11 @@ public:
   ~SatMac ();
 
   /**
+   * Starts scheduling of the sending.
+   */
+  void StartScheduling();
+
+  /**
    * Attach the Phy object to SatMac.
    *
    * \param phy Ptr to the attached phy object.
@@ -175,26 +180,25 @@ protected:
    bool TransmitStart (Ptr<Packet> p);
 
    inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
-   inline Ptr<Packet> GetPacketFromQueue() { return m_queue->Dequeue();}
-   inline Time GetInterval() { return m_tInterval;}
+
+protected:
+   /**
+    * The interval that the Mac uses to throttle packet transmission
+    */
+   Time m_tInterval;
+
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
 
   void DoDispose (void);
 
-private:
   /**
    * Start new sending if there is packet in queue, otherwise schedules next send moment.
    *
    * The TransmitReady method is used internally to schedule sending of a packet out on the phy.
    */
   void TransmitReady (void);
-
-  /**
-   * The interval that the Mac uses to throttle packet transmission
-   */
-  Time m_tInterval;
 
   /**
    * The Phy obejct to which this SatMac has been attached.

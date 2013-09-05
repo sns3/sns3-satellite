@@ -98,13 +98,12 @@ SatBeamScheduler::Schedule ()
   Ptr<Packet> packet = Create<Packet> ();
   SatCtrlHeader header;
 
-  header.SetMsgData(0.1);
+  header.SetMsgData(0.001);
   header.SetMsgType(SatCtrlHeader::TBTP_MSG);
   packet->AddHeader (header);
 
+  // TODO: TBTP send only once. Needed change in future scheduler implementation.
   Send(packet);
-
-  Simulator::Schedule (Seconds(0.3), &SatBeamScheduler::Schedule, this);
 }
 
 } // namespace ns3

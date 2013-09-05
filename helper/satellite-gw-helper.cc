@@ -218,6 +218,8 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);
 
+  mac->StartScheduling();
+
   return DynamicCast <NetDevice> (dev);
 }
 

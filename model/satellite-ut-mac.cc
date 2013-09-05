@@ -18,11 +18,13 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include "ns3/string.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "ns3/uinteger.h"
 #include "ns3/boolean.h"
+#include "ns3/double.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
@@ -63,18 +65,6 @@ SatUtMac::~SatUtMac ()
 }
 
 void
-SatUtMac::TransmitReady (void)
-{
-  NS_LOG_FUNCTION (this);
-
-  if ( SatMac::PacketInQueue() )
-    {
-       Ptr<Packet> p = SatMac::GetPacketFromQueue();
-       TransmitStart(p);
-    }
-}
-
-void
 SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << packet);
@@ -98,10 +88,13 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
           if (header.GetMsgType() == SatCtrlHeader::TBTP_MSG)
             {
               double time = header.GetMsgData();
+              m_tInterval = Time::FromDouble(time, Time::S);
 
               packet->RemovePacketTag (tag);
-              Simulator::Schedule (Seconds(time), &SatUtMac::TransmitReady, this);
+
               deliverUp = false;
+
+              StartScheduling();
             }
         }
     }
@@ -109,7 +102,7 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
   // deliver packet to parent SatMac, if not UT specific packet
   if (deliverUp)
     {
-      SatMac::Receive(packet,rxParams);
+      SatMac::Receive(packet, rxParams);
     }
 }
 

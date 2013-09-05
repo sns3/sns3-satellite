@@ -53,9 +53,7 @@ public:
    */
   ~SatUtMac ();
 
-  // overriden from SatMac
   void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
-  void TransmitReady (void);
 
 private:
 
