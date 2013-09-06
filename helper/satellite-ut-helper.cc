@@ -18,10 +18,14 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include "ns3/config.h"
 #include "ns3/log.h"
 #include "ns3/names.h"
 #include "ns3/enum.h"
 #include "ns3/double.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
+#include "ns3/callback.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
@@ -84,6 +88,15 @@ SatUtHelper::SatUtHelper ()
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
+  m_phyFactory.SetTypeId ("ns3::SatPhy");
+
+  m_phyFactory.Set("RxMaxGainDb", DoubleValue(44.60));
+  m_phyFactory.Set("TxMaxGainDb", DoubleValue(45.20));
+  m_phyFactory.Set("TxMaxPowerDb", DoubleValue(4.00));
+  m_phyFactory.Set("TxOutputLossDb", DoubleValue(0.50));
+  m_phyFactory.Set("TxPointingLossDb", DoubleValue(1.00));
+  m_phyFactory.Set("TxOboLossDb", DoubleValue(0.50));
+  m_phyFactory.Set("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
@@ -100,7 +113,6 @@ SatUtHelper::Initialize ()
       m_linkResults->Initialize ();
     }
 }
-
 
 void 
 SatUtHelper::SetQueue (std::string type,
@@ -195,7 +207,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatPhy::ReceiveCallback cb = MakeCallback (&SatUtMac::Receive, mac);
 
   // Create SatPhy modules
-  Ptr<SatPhy> phy = CreateObject<SatPhy> (phyTx, phyRx, beamId, cb);
+  m_phyFactory.Set ("PhyRx", PointerValue(phyRx));
+  m_phyFactory.Set ("PhyTx", PointerValue(phyTx));
+  m_phyFactory.Set ("BeamId",UintegerValue(beamId));
+  m_phyFactory.Set ("ReceiveCb", CallbackValue(cb));
+
+  Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy>();
+  phy->Initialize();
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);

@@ -22,6 +22,8 @@
 #include "ns3/names.h"
 #include "ns3/enum.h"
 #include "ns3/double.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mac.h"
 #include "../model/satellite-net-device.h"
@@ -86,6 +88,15 @@ SatGwHelper::SatGwHelper ()
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
+  m_phyFactory.SetTypeId ("ns3::SatPhy");
+
+  m_phyFactory.Set("RxMaxGainDb", DoubleValue(61.50));
+  m_phyFactory.Set("TxMaxGainDb", DoubleValue(65.20));
+  m_phyFactory.Set("TxMaxPowerDb", DoubleValue(8.97));
+  m_phyFactory.Set("TxOutputLossDb", DoubleValue(2.00));
+  m_phyFactory.Set("TxPointingLossDb", DoubleValue(1.10));
+  m_phyFactory.Set("TxOboLossDb", DoubleValue(6.00));
+  m_phyFactory.Set("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatGwHelper", LOG_LEVEL_INFO);
 
@@ -196,8 +207,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback cb = MakeCallback (&SatMac::Receive, mac);
 
-  // Create SatPhy modules
-  Ptr<SatPhy> phy = CreateObject<SatPhy> (phyTx, phyRx, beamId, cb);
+  m_phyFactory.Set ("PhyRx", PointerValue(phyRx));
+  m_phyFactory.Set ("PhyTx", PointerValue(phyTx));
+  m_phyFactory.Set ("BeamId",UintegerValue(beamId));
+  m_phyFactory.Set ("ReceiveCb", CallbackValue(cb));
+
+  Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy>();
+  phy->Initialize();
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);

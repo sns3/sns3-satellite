@@ -24,6 +24,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/enum.h"
 #include "ns3/double.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -93,6 +95,25 @@ SatGeoHelper::SatGeoHelper ()
   :m_deviceCount(0)
 {
   m_deviceFactory.SetTypeId ("ns3::SatGeoNetDevice");
+
+  m_userPhyFactory.SetTypeId ("ns3::SatPhy");
+  m_feederPhyFactory.SetTypeId ("ns3::SatPhy");
+
+  m_userPhyFactory.Set("RxMaxGainDb", DoubleValue(0.00));
+  m_userPhyFactory.Set("TxMaxGainDb", DoubleValue(0.00));
+  m_userPhyFactory.Set("TxMaxPowerDb", DoubleValue(15.00));
+  m_userPhyFactory.Set("TxOutputLossDb", DoubleValue(2.85));
+  m_userPhyFactory.Set("TxPointingLossDb", DoubleValue(0.00));
+  m_userPhyFactory.Set("TxOboLossDb", DoubleValue(0.00));
+  m_userPhyFactory.Set("TxAntennaLossDb", DoubleValue(1.00));
+
+  m_feederPhyFactory.Set("RxMaxGainDb", DoubleValue(51.51)); // T = 490.94 G/T = 24.60
+  m_feederPhyFactory.Set("TxMaxGainDb", DoubleValue(54.00));
+  m_feederPhyFactory.Set("TxMaxPowerDb", DoubleValue(-4.38));
+  m_feederPhyFactory.Set("TxOutputLossDb", DoubleValue(1.75));
+  m_feederPhyFactory.Set("TxPointingLossDb", DoubleValue(0.00));
+  m_feederPhyFactory.Set("TxOboLossDb", DoubleValue(4.00));
+  m_feederPhyFactory.Set("TxAntennaLossDb", DoubleValue(1.00));
 }
 
 void 
@@ -129,6 +150,12 @@ SatGeoHelper::Install (Ptr<Node> n)
   n->AddDevice(satDev);
   m_deviceCount++;
 
+  SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, satDev);
+  m_userPhyFactory.Set("ReceiveCb", CallbackValue(uCb));
+
+  SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, satDev);
+  m_feederPhyFactory.Set("ReceiveCb", CallbackValue(fCb));
+
   return satDev;
 }
 
@@ -159,7 +186,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyRx->SetDevice (dev);
   uPhyTx->SetMobility(mobility);
   uPhyRx->SetMobility(mobility);
-
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
@@ -206,12 +232,19 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   fPhyRx->ConfigurePhyRxCarriers (fwdCarrierConf);
 
-  SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
-  SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);
-
   // Create SatPhy modules
-  Ptr<SatPhy> uPhy = CreateObject<SatPhy> (uPhyTx, uPhyRx, beamId, uCb);
-  Ptr<SatPhy> fPhy = CreateObject<SatPhy> (fPhyTx, fPhyRx, beamId, fCb);
+  m_userPhyFactory.Set ("PhyRx", PointerValue(uPhyRx));
+  m_userPhyFactory.Set ("PhyTx", PointerValue(uPhyTx));
+  m_userPhyFactory.Set ("BeamId",UintegerValue(beamId));
+
+  m_feederPhyFactory.Set ("PhyRx", PointerValue(fPhyRx));
+  m_feederPhyFactory.Set ("PhyTx", PointerValue(fPhyTx));
+  m_feederPhyFactory.Set ("BeamId",UintegerValue(beamId));
+
+  Ptr<SatPhy> uPhy = m_userPhyFactory.Create<SatPhy> ();
+  Ptr<SatPhy> fPhy = m_feederPhyFactory.Create<SatPhy> ();
+  uPhy->Initialize();
+  fPhy->Initialize();
 
   dev->AddUserPhy(uPhy, beamId);
   dev->AddFeederPhy(fPhy, beamId);

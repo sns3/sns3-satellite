@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/double.h"
+#include "ns3/uinteger.h"
 #include "ns3/pointer.h"
 
 #include "satellite-phy.h"
@@ -43,28 +44,33 @@ SatPhy::SatPhy (void)
 }
 
 SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback cb)
-  :
-  m_phyTx(phyTx),
-  m_phyRx(phyRx),
-  m_beamId(beamId),
-  m_rxCallback(cb)
 {
   NS_LOG_FUNCTION (this << phyTx << phyRx << beamId);
-
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
-  // calculate EIRP without Gain (maximum)
-  double eirpWoGain_Db = m_maxPower_Db - m_outputLoss_Db - m_pointingLoss_Db - m_oboLoss_Db - m_antennaLoss_Db;
+  m_phyTx = phyTx;
+  m_phyRx = phyRx;
+  m_beamId = beamId;
+  m_rxCallback = cb;
+
+  Initialize();
+
+}
+
+void
+SatPhy::Initialize()
+{
+ // calculate EIRP without Gain (maximum)
+  double eirpWoGain_Db = m_txMaxPower_Db - m_txOutputLoss_Db - m_txPointingLoss_Db - m_txOboLoss_Db - m_txAntennaLoss_Db;
 
   // TODO: needed to have 'utils'  library to make these kind of conversions
   m_eirpWoGain_W = std::pow( 10.0, eirpWoGain_Db / 10.0 );
 
-  phyTx->SetBeamId(beamId);
-  phyRx->SetBeamId(beamId);
+  m_phyTx->SetBeamId(m_beamId);
+  m_phyRx->SetBeamId(m_beamId);
 
-  phyRx->SetReceiveCallback( MakeCallback (&SatPhy::Receive, this) );
+  m_phyRx->SetReceiveCallback( MakeCallback (&SatPhy::Receive, this) );
 }
-
 
 SatPhy::~SatPhy ()
 {
@@ -100,29 +106,46 @@ SatPhy::GetTypeId (void)
                    MakePointerAccessor (&SatPhy::GetPhyRx,
                                         &SatPhy::SetPhyRx),
                    MakePointerChecker<SatPhyRx> ())
-    .AddAttribute("MaxGainDb", "Maximum RX gain in Dbs",
+    .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatPhy::GetPhyTx,
+                                        &SatPhy::SetPhyTx),
+                   MakePointerChecker<SatPhyTx> ())
+    .AddAttribute ("BeamId", "The beam ID of this phy.",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&SatPhy::m_beamId),
+                   MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute ("ReceiveCb", "The receive callback for this phy.",
+                   CallbackValue (),
+                   MakeCallbackAccessor (&SatPhy::m_rxCallback),
+                   MakeCallbackChecker ())
+    .AddAttribute("RxMaxGainDb", "Maximum RX gain in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_maxGain_Db),
+                   MakeDoubleAccessor(&SatPhy::m_rxMaxGain_Db),
+                   MakeDoubleChecker<double_t> ())
+    .AddAttribute("TxMaxGainDb", "Maximum TX gain in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_txMaxGain_Db),
+                   MakeDoubleChecker<double_t> ())
+    .AddAttribute("TxMaxPowerDb", "Maximum TX power in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_txMaxPower_Db),
                    MakeDoubleChecker<double> ())
-    .AddAttribute("MaxPowerDb", "Maximum TX power in Dbs",
+    .AddAttribute("TxOutputLossDb", "TX Output loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_maxPower_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txOutputLoss_Db),
                    MakeDoubleChecker<double> ())
-    .AddAttribute("OutputLossDb", "TX Output loss in Dbs",
+    .AddAttribute("TxPointingLossDb", "TX Pointing loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_outputLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txPointingLoss_Db),
                    MakeDoubleChecker<double> ())
-    .AddAttribute("PointingLossDb", "TX Pointing loss in Dbs",
+    .AddAttribute("TxOboLossDb", "TX OBO loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_pointingLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txOboLoss_Db),
                    MakeDoubleChecker<double> ())
-    .AddAttribute("OboLossDb", "TX OBO loss in Dbs",
+    .AddAttribute("TxAntennaLossDb", "TX Antenna loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_oboLoss_Db),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute("AntennaLossDb", "TX Antenna loss in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_antennaLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txAntennaLoss_Db),
                    MakeDoubleChecker<double> ())
 
   ;

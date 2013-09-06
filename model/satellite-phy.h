@@ -66,6 +66,11 @@ public:
   virtual void DoDispose (void);
 
   /**
+   * Initialize phy.
+   */
+  void Initialize();
+
+  /**
    * Get the SatPhyTx pointer
    * \return a pointer to the SatPhyTx instance
    */
@@ -144,32 +149,37 @@ private:
   /**
    * Configured maximum RX gain in Dbs
    */
-  double m_maxGain_Db;
+  double m_rxMaxGain_Db;
+
+  /**
+   * Configured maximum TX gain in Dbs
+   */
+  double m_txMaxGain_Db;
 
   /**
    * Configured maximum TX power in Dbs
    */
-  double m_maxPower_Db;
+  double m_txMaxPower_Db;
 
   /**
    * Configured output loss in Dbs
    */
-  double m_outputLoss_Db;
+  double m_txOutputLoss_Db;
 
   /**
    * Configured pointing loss in Dbs
    */
-  double m_pointingLoss_Db;
+  double m_txPointingLoss_Db;
 
   /**
    * Configured OBO loss in Dbs
    */
-  double m_oboLoss_Db;
+  double m_txOboLoss_Db;
 
   /**
    * Configured antenna loss in Dbs
    */
-  double m_antennaLoss_Db;
+  double m_txAntennaLoss_Db;
 
   /**
    * The upper layer package receive callback.

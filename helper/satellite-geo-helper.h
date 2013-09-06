@@ -110,6 +110,8 @@ private:
     uint16_t m_deviceCount;
 
     ObjectFactory m_deviceFactory;
+    ObjectFactory m_userPhyFactory;
+    ObjectFactory m_feederPhyFactory;
 
     /*
      * Configured forward link interference model
