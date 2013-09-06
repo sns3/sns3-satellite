@@ -40,8 +40,8 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
-
 SatChannel::SatChannel ()
+ :m_channelType(UNKNOWN_CH)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -148,6 +148,13 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   rxParams->m_rxPower_W = rxPower;
 
   phyRx->StartRx (rxParams);
+}
+
+void
+SatChannel::SetChannelType (SatChannel::ChannelType chType)
+{
+  NS_ASSERT (chType != UNKNOWN_CH);
+  m_channelType = chType;
 }
 
 void

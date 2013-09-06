@@ -187,8 +187,9 @@ private:
      * In case that channel pair is not found, new is created and returned.
      * /param chPairMap map where channel pair is get
      * /param frequencyId ID of the frequency
+     * /param isUserLink flag indicating if link user link is requested (otherwise feeder link).
      */
-    ChannelPair_t GetChannelPair(std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId);
+    ChannelPair_t GetChannelPair(std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
 
     /**
      * Creates GW node according to given id and stores GW to map.

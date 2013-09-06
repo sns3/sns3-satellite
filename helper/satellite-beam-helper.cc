@@ -133,10 +133,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   m_beamFreqs.insert(std::pair<uint32_t, FrequencyPair_t >(beamId, freqPair));
 
   // next it is found user link channels and if not found channels are created and saved to map
-  ChannelPair_t userLink = GetChannelPair(m_ulChannels, ulFreqId);
+  ChannelPair_t userLink = GetChannelPair(m_ulChannels, ulFreqId, true);
 
   // next it is found feeder link channels and if not found channels are created nd saved to map
-  ChannelPair_t feederLink = GetChannelPair(m_flChannels, flFreqId);
+  ChannelPair_t feederLink = GetChannelPair(m_flChannels, flFreqId, false);
 
   NS_ASSERT(m_geoNode != NULL);
 
@@ -331,7 +331,7 @@ SatBeamHelper::CreateBeamInfo()
 }
 
 SatBeamHelper::ChannelPair_t
-SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > & chPairMap, uint32_t frequencyId)
+SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > & chPairMap, uint32_t frequencyId, bool isUserLink)
 {
   ChannelPair_t channelPair;
   std::map<uint32_t, ChannelPair_t >::iterator mapIterator = chPairMap.find(frequencyId);
@@ -341,6 +341,16 @@ SatBeamHelper::GetChannelPair(std::map<uint32_t, ChannelPair_t > & chPairMap, ui
         Ptr<SatChannel> forwardCh = m_channelFactory.Create<SatChannel> ();
         Ptr<SatChannel> returnCh = m_channelFactory.Create<SatChannel> ();
 
+        if ( isUserLink )
+          {
+            forwardCh->SetChannelType(SatChannel::FORWARD_USER_CH);
+            returnCh->SetChannelType(SatChannel::RETURN_USER_CH);
+          }
+        else
+          {
+            forwardCh->SetChannelType(SatChannel::FORWARD_FEEDER_CH);
+            returnCh->SetChannelType(SatChannel::RETURN_FEEDER_CH);
+          }
         /*
          * Average propagation delay between UT/GW and satellite in seconds
          * TODO: Change the propagation delay to be a parameter.

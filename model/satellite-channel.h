@@ -46,6 +46,14 @@ class SatChannel : public Channel
 {
 public:
 
+  /**
+   * Possible types of channel.
+   */
+  enum ChannelType
+  {
+    UNKNOWN_CH, FORWARD_USER_CH, FORWARD_FEEDER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
+  };
+
   SatChannel ();
   virtual ~SatChannel ();
   static TypeId GetTypeId (void);
@@ -57,6 +65,12 @@ public:
    * \param delay Ptr to the propagation delay model to be used.
    */
   virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
+
+  /**
+   * Set the  propagation delay model to be used in the SatChannel
+   * \param chType Type of the channel.
+   */
+  virtual void SetChannelType (SatChannel::ChannelType chType);
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
@@ -106,6 +120,10 @@ private:
    */
   PhyList m_phyList;
 
+  /**
+   * Type of the channel
+   */
+  ChannelType m_channelType;
   /**
    * propagation delay model to be used with this channel
    */
