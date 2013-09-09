@@ -23,13 +23,14 @@
 #include "ns3/log.h"
 #include "satellite-antenna-gain-pattern.h"
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE ("SatAntennaGainPattern");
 
+namespace ns3 {
 
 const std::string SatAntennaGainPattern::m_nanStringArray[4] = {"nan", "NaN", "Nan", "NAN"};
 
-
 NS_OBJECT_ENSURE_REGISTERED (SatAntennaGainPattern);
+
 
 TypeId
 SatAntennaGainPattern::GetTypeId (void)
@@ -54,6 +55,8 @@ SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
 
 void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName)
 {
+  NS_LOG_FUNCTION (this << filePathName);
+
   // READ FROM THE SPECIFIED INPUT FILE
   std::ifstream *ifs = new std::ifstream (filePathName.c_str (), std::ifstream::in);
 
@@ -178,6 +181,8 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 
 double SatAntennaGainPattern::GetAntennaGain (GeoCoordinate coord) const
 {
+  NS_LOG_FUNCTION (this << coord.GetLatitude() << coord.GetLongitude());
+
   // Get the requested position {latitude, longitude}
   double latitude = coord.GetLatitude ();
   double longitude = coord.GetLongitude ();
