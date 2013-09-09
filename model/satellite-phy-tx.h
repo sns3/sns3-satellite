@@ -68,16 +68,18 @@ public:
   Ptr<MobilityModel> GetMobility ();
   
   /**
-   * Get the SatPhy pointer
-   * @return a pointer to the SatPhy instance
+   * Set the maximum Antenna gain in Db
+   * /param gain_Db maximum antenna gain in Dbs
    */
-  Ptr<SatPhy> GetPhy ();
+  void SetMaxAntennaGain_Db (double gain_Db);
 
   /**
-  * Set the SatPhy module
-  * @param phy PHY module
-  */
-  void SetPhy (Ptr<SatPhy> phy);
+   * Get antenna gain based on position
+   * or in case that antenna pattern is not configured, maximum configured gain is return
+   *
+   * /param mobility  Mobility used to get gain from antenna pattern
+   */
+  double GetAntennaGain_W (Ptr<MobilityModel> mobility);
 
   /**
   * Start packet transmission to the channel.
@@ -98,6 +100,11 @@ private:
 
   Ptr<MobilityModel> m_mobility;
   Ptr<SatChannel> m_channel;
+
+  /**
+   * Configured maximum antenna gain in Dbs
+   */
+  double m_maxAntennaGain_Db;
 
   State m_state;
   uint32_t m_beamId;

@@ -99,17 +99,17 @@ SatGeoHelper::SatGeoHelper ()
   m_userPhyFactory.SetTypeId ("ns3::SatPhy");
   m_feederPhyFactory.SetTypeId ("ns3::SatPhy");
 
-  m_userPhyFactory.Set("RxMaxGainDb", DoubleValue(0.00));
-  m_userPhyFactory.Set("TxMaxGainDb", DoubleValue(0.00));
-  m_userPhyFactory.Set("TxMaxPowerDb", DoubleValue(15.00));
+  m_userPhyFactory.Set("RxMaxAntennaGainDb", DoubleValue(51.51));
+  m_userPhyFactory.Set("TxMaxAntennaGainDb", DoubleValue(54.00));
+  m_userPhyFactory.Set("TxMaxPowerDbW", DoubleValue(15.00));
   m_userPhyFactory.Set("TxOutputLossDb", DoubleValue(2.85));
   m_userPhyFactory.Set("TxPointingLossDb", DoubleValue(0.00));
   m_userPhyFactory.Set("TxOboLossDb", DoubleValue(0.00));
   m_userPhyFactory.Set("TxAntennaLossDb", DoubleValue(1.00));
 
-  m_feederPhyFactory.Set("RxMaxGainDb", DoubleValue(51.51)); // T = 490.94 G/T = 24.60
-  m_feederPhyFactory.Set("TxMaxGainDb", DoubleValue(54.00));
-  m_feederPhyFactory.Set("TxMaxPowerDb", DoubleValue(-4.38));
+  m_feederPhyFactory.Set("RxMaxAntennaGainDb", DoubleValue(51.51)); // T = 490.94 G/T = 24.60
+  m_feederPhyFactory.Set("TxMaxAntennaGainDb", DoubleValue(54.00));
+  m_feederPhyFactory.Set("TxMaxPowerDbW", DoubleValue(-4.38));
   m_feederPhyFactory.Set("TxOutputLossDb", DoubleValue(1.75));
   m_feederPhyFactory.Set("TxPointingLossDb", DoubleValue(0.00));
   m_feederPhyFactory.Set("TxOboLossDb", DoubleValue(4.00));

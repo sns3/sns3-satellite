@@ -145,13 +145,6 @@ public:
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
-    /*
-     * Beam id is now static and set by the helper for each PHY layer it creates.
-     * Note, that this needs to be changed to be read from the reference system
-     * configuration table.
-     */
-    uint32_t m_beamId;
-
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;

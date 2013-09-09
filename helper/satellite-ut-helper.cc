@@ -62,15 +62,15 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute( "RxTemperature",
-                      "The forward link RX noise temperature in UT.",
-                      DoubleValue (293.00),
-                      MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_K),
-                      MakeDoubleChecker<double>())
+                     "The forward link RX noise temperature in UT.",
+                     DoubleValue (293.00),
+                     MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_K),
+                     MakeDoubleChecker<double>())
       .AddAttribute( "RxOtherSysNoise",
-                      "Other system noise of RX in UT.",
-                      DoubleValue(0),
-                      MakeDoubleAccessor(&SatUtHelper::m_otherSysNoise_W),
-                      MakeDoubleChecker<double>())
+                     "Other system noise of RX in UT.",
+                     DoubleValue(0),
+                     MakeDoubleAccessor(&SatUtHelper::m_otherSysNoise_W),
+                     MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
@@ -90,9 +90,9 @@ SatUtHelper::SatUtHelper ()
   m_channelFactory.SetTypeId ("ns3::SatChannel");
   m_phyFactory.SetTypeId ("ns3::SatPhy");
 
-  m_phyFactory.Set("RxMaxGainDb", DoubleValue(44.60));
-  m_phyFactory.Set("TxMaxGainDb", DoubleValue(45.20));
-  m_phyFactory.Set("TxMaxPowerDb", DoubleValue(4.00));
+  m_phyFactory.Set("RxMaxAntennaGainDb", DoubleValue(44.60));
+  m_phyFactory.Set("TxMaxAntennaGainDb", DoubleValue(45.20));
+  m_phyFactory.Set("TxMaxPowerDbW", DoubleValue(4.00));
   m_phyFactory.Set("TxOutputLossDb", DoubleValue(0.50));
   m_phyFactory.Set("TxPointingLossDb", DoubleValue(1.00));
   m_phyFactory.Set("TxOboLossDb", DoubleValue(0.50));

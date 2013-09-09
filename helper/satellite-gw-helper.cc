@@ -90,17 +90,15 @@ SatGwHelper::SatGwHelper ()
   m_channelFactory.SetTypeId ("ns3::SatChannel");
   m_phyFactory.SetTypeId ("ns3::SatPhy");
 
-  m_phyFactory.Set("RxMaxGainDb", DoubleValue(61.50));
-  m_phyFactory.Set("TxMaxGainDb", DoubleValue(65.20));
-  m_phyFactory.Set("TxMaxPowerDb", DoubleValue(8.97));
+  m_phyFactory.Set("RxMaxAntennaGainDb", DoubleValue(61.50));
+  m_phyFactory.Set("TxMaxAntennaGainDb", DoubleValue(65.20));
+  m_phyFactory.Set("TxMaxPowerDbW", DoubleValue(8.97));
   m_phyFactory.Set("TxOutputLossDb", DoubleValue(2.00));
   m_phyFactory.Set("TxPointingLossDb", DoubleValue(1.10));
   m_phyFactory.Set("TxOboLossDb", DoubleValue(6.00));
   m_phyFactory.Set("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatGwHelper", LOG_LEVEL_INFO);
-
-  m_beamId = 1;
 }
 
 void

@@ -62,6 +62,20 @@ public:
   Ptr<MobilityModel> GetMobility ();
   Ptr<NetDevice> GetDevice ();
 
+  /**
+   * Set the maximum Antenna gain in Db
+   * /param gain_Db maximum antenna gain in Dbs
+   */
+  void SetMaxAntennaGain_Db (double gain_Db);
+
+  /**
+   * Get antenna gain based on position
+   * or in case that antenna pattern is not configured, maximum configured gain is return
+   *
+   * /param mobility  Mobility used to get gain from antenna pattern
+   */
+  double GetAntennaGain_W (Ptr<MobilityModel> mobility);
+
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
@@ -100,6 +114,11 @@ private:
 
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;
+
+  /**
+   * Configured maximum antenna gain in Dbs
+   */
+  double m_maxAntennaGain_Db;
 
   // A SatPhyRxCarrier object for receiving packets from each carrier
   std::vector< Ptr<SatPhyRxCarrier> > m_rxCarriers;

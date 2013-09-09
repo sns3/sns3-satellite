@@ -29,6 +29,7 @@
 #include "ns3/node.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/mobility-model.h"
+#include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
 
@@ -135,17 +136,42 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   NS_LOG_FUNCTION (this);
 
-  /*
-   * Here we should calculate the received signal strength for this specific
-   * transmitter/receiver pair at this time moment.
-   */
-
   Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility();
   Ptr<MobilityModel> rxMobility = phyRx->GetMobility();
 
+  double txAntennaGain_W = 0.0;
+  double rxAntennaGain_W = 0.0;
+
+  switch ( m_channelType )
+  {
+    case FORWARD_USER_CH:
+      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (rxMobility);
+      rxAntennaGain_W = phyRx->GetAntennaGain_W (rxMobility);
+      break;
+
+    case RETURN_USER_CH:
+      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (txMobility);
+      rxAntennaGain_W = phyRx->GetAntennaGain_W (txMobility);
+      break;
+
+    case FORWARD_FEEDER_CH:
+      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (txMobility);
+      rxAntennaGain_W = phyRx->GetAntennaGain_W (txMobility);
+      break;
+
+    case RETURN_FEEDER_CH:
+      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (rxMobility);
+      rxAntennaGain_W = phyRx->GetAntennaGain_W (rxMobility);
+      break;
+
+    default:
+      NS_ASSERT(false);
+      break;
+  }
+
   // get (calculate) free space loss and RX power and set it to RX params
-  double rxPower = rxParams->m_txPower_W / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, rxParams->m_frequency_Hz );
-  rxParams->m_rxPower_W = rxPower;
+  double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, rxParams->m_frequency_Hz );
+  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W;
 
   phyRx->StartRx (rxParams);
 }

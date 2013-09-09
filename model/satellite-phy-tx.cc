@@ -52,7 +52,6 @@ SatPhyTx::~SatPhyTx ()
   NS_LOG_FUNCTION (this);
 }
 
-
 void SatPhyTx::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
@@ -87,6 +86,24 @@ SatPhyTx::GetTypeId (void)
   return tid;
 }
 
+void
+SatPhyTx::SetMaxAntennaGain_Db(double gain_Db)
+{
+  NS_LOG_FUNCTION (this);
+  m_maxAntennaGain_Db = gain_Db;
+}
+
+double
+SatPhyTx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
+{
+  NS_LOG_FUNCTION (this);
+
+  // TODO: when adding antenna pattern to phyTx object, gain is received according to antenna pattern
+  double antGain_W = std::pow( 10.0, m_maxAntennaGain_Db / 10.0 );
+
+  return antGain_W;
+}
+
 Ptr<MobilityModel>
 SatPhyTx::GetMobility ()
 {
@@ -94,14 +111,12 @@ SatPhyTx::GetMobility ()
   return m_mobility;
 }
 
-
 void
 SatPhyTx::SetMobility (Ptr<MobilityModel> m)
 {
   NS_LOG_FUNCTION (this << m);
   m_mobility = m;
 }
-
 
 void
 SatPhyTx::SetChannel (Ptr<SatChannel> c)
@@ -124,7 +139,6 @@ SatPhyTx::ChangeState (State newState)
   NS_LOG_LOGIC (this << " state: " << m_state << " -> " << newState);
   m_state = newState;
 }
-
 
 void
 SatPhyTx::StartTx (Ptr<Packet> p, Ptr<SatSignalParameters> txParams)
@@ -163,15 +177,11 @@ SatPhyTx::EndTx ()
   ChangeState (IDLE);
 }
 
-
 void 
 SatPhyTx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;
 }
-
-
-
 
 } // namespace ns3

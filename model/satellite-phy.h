@@ -101,12 +101,6 @@ public:
   Ptr<SatChannel> GetTxChannel ();
 
   /**
-   * Get the TXx power
-   * \return the transmission power in dBm
-   */
-  double GetTxPower_W () const;
-
-  /**
    * Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
    * \param p packet to be sent
    * \param carrierId Carrier id for the packet transmission
@@ -147,19 +141,19 @@ private:
   double m_eirpWoGain_W;
 
   /**
-   * Configured maximum RX gain in Dbs
+   * Configured maximum RX antenna gain in Dbs
    */
-  double m_rxMaxGain_Db;
+  double m_rxMaxAntennaGain_Db;
 
   /**
-   * Configured maximum TX gain in Dbs
+   * Configured maximum TX antenna gain in Dbs
    */
-  double m_txMaxGain_Db;
+  double m_txMaxAntennaGain_Db;
 
   /**
-   * Configured maximum TX power in Dbs
+   * Configured maximum TX power in DbWs
    */
-  double m_txMaxPower_Db;
+  double m_txMaxPower_DbW;
 
   /**
    * Configured output loss in Dbs

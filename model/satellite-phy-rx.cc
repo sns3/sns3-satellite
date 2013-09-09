@@ -85,6 +85,24 @@ SatPhyRx::SetDevice (Ptr<NetDevice> d)
 }
 
 void
+SatPhyRx::SetMaxAntennaGain_Db(double gain_Db)
+{
+  NS_LOG_FUNCTION (this);
+  m_maxAntennaGain_Db = gain_Db;
+}
+
+double
+SatPhyRx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
+{
+  NS_LOG_FUNCTION (this);
+
+  // TODO: when adding antenna pattern to phyRx object, gain is received according to antenna pattern
+  double antGain_W = std::pow( 10.0, m_maxAntennaGain_Db / 10.0 );
+
+  return antGain_W;
+}
+
+void
 SatPhyRx::SetAddress (Mac48Address ownAddress)
 {
   NS_ASSERT (!m_rxCarriers.empty ());
@@ -135,39 +153,39 @@ SatPhyRx::SetChannel (Ptr<SatChannel> c)
 void
 SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
 {
-    NS_ASSERT (m_rxCarriers.empty());
+  NS_ASSERT (m_rxCarriers.empty());
 
-    for ( uint32_t i = 0; i < carrierConf->GetCarriersN(); ++i )
-      {
-        NS_LOG_LOGIC(this << " Create carrier: " << i);
+  for ( uint32_t i = 0; i < carrierConf->GetCarriersN(); ++i )
+    {
+      NS_LOG_LOGIC(this << " Create carrier: " << i);
 
-        Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf);
-        m_rxCarriers.push_back (rxc);
-      }
+      Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf);
+      m_rxCarriers.push_back (rxc);
+    }
 }
 
 void
 SatPhyRx::SetBeamId (uint32_t beamId)
 {
-    NS_LOG_FUNCTION (this << beamId);
-    NS_ASSERT (beamId >= 0);
-    NS_ASSERT (!m_rxCarriers.empty());
+  NS_LOG_FUNCTION (this << beamId);
+  NS_ASSERT (beamId >= 0);
+  NS_ASSERT (!m_rxCarriers.empty());
 
-    for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin(); it != m_rxCarriers.end(); ++it)
-      {
-        (*it)->SetBeamId (beamId);
-      }
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin(); it != m_rxCarriers.end(); ++it)
+    {
+      (*it)->SetBeamId (beamId);
+    }
 }
 
 void
 SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 {
-    NS_LOG_FUNCTION (this << rxParams);
+  NS_LOG_FUNCTION (this << rxParams);
 
-    uint32_t cId = rxParams->m_carrierId;
-    NS_ASSERT (cId < m_rxCarriers.size());
+  uint32_t cId = rxParams->m_carrierId;
+  NS_ASSERT (cId < m_rxCarriers.size());
 
-    m_rxCarriers[cId]->StartRx (rxParams);
+  m_rxCarriers[cId]->StartRx (rxParams);
 }
 
 } // namespace ns3

@@ -61,15 +61,18 @@ void
 SatPhy::Initialize()
 {
  // calculate EIRP without Gain (maximum)
-  double eirpWoGain_Db = m_txMaxPower_Db - m_txOutputLoss_Db - m_txPointingLoss_Db - m_txOboLoss_Db - m_txAntennaLoss_Db;
+  double eirpWoGain_DbW = m_txMaxPower_DbW - m_txOutputLoss_Db - m_txPointingLoss_Db - m_txOboLoss_Db - m_txAntennaLoss_Db;
 
   // TODO: needed to have 'utils'  library to make these kind of conversions
-  m_eirpWoGain_W = std::pow( 10.0, eirpWoGain_Db / 10.0 );
+  m_eirpWoGain_W = std::pow( 10.0, eirpWoGain_DbW / 10.0 );
 
   m_phyTx->SetBeamId(m_beamId);
   m_phyRx->SetBeamId(m_beamId);
 
   m_phyRx->SetReceiveCallback( MakeCallback (&SatPhy::Receive, this) );
+
+  m_phyTx->SetMaxAntennaGain_Db(m_txMaxAntennaGain_Db);
+  m_phyRx->SetMaxAntennaGain_Db(m_rxMaxAntennaGain_Db);
 }
 
 SatPhy::~SatPhy ()
@@ -119,17 +122,17 @@ SatPhy::GetTypeId (void)
                    CallbackValue (),
                    MakeCallbackAccessor (&SatPhy::m_rxCallback),
                    MakeCallbackChecker ())
-    .AddAttribute("RxMaxGainDb", "Maximum RX gain in Dbs",
+    .AddAttribute("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_rxMaxGain_Db),
+                   MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_Db),
                    MakeDoubleChecker<double_t> ())
-    .AddAttribute("TxMaxGainDb", "Maximum TX gain in Dbs",
+    .AddAttribute("TxMaxAntennaGainDb", "Maximum TX gain in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txMaxGain_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txMaxAntennaGain_Db),
                    MakeDoubleChecker<double_t> ())
-    .AddAttribute("TxMaxPowerDb", "Maximum TX power in Dbs",
+    .AddAttribute("TxMaxPowerDbW", "Maximum TX power in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txMaxPower_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txMaxPower_DbW),
                    MakeDoubleChecker<double> ())
     .AddAttribute("TxOutputLossDb", "TX Output loss in Dbs",
                    DoubleValue(0.00),
@@ -194,13 +197,6 @@ SatPhy::GetTxChannel ()
   NS_ASSERT (m_phyTx);
 
   return m_phyTx->GetChannel ();
-}
-
-double
-SatPhy::GetTxPower_W () const
-{
-  NS_LOG_FUNCTION (this);
-  return m_eirpWoGain_W;
 }
 
 void
