@@ -11,6 +11,7 @@ def build(bld):
     module.source = [
         'model/geo-coordinate.cc',
         'model/cbr-application.cc',
+        'model/satellite-antenna-gain-pattern.cc',
         'model/satellite-arp-cache.cc',
         'model/satellite-mac.cc',
         'model/satellite-channel.cc',
@@ -61,6 +62,7 @@ def build(bld):
         'test/satellite-mobility-test.cc',
         'test/satellite-interference-test.cc',
         'test/satellite-fsl-test.cc',
+        'test/satellite-antenna-pattern-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -68,6 +70,7 @@ def build(bld):
     headers.source = [
         'model/geo-coordinate.h',
         'model/cbr-application.h',
+        'model/satellite-antenna-gain-pattern.h',
         'model/satellite-arp-cache.h',
         'model/satellite-mac.h',
         'model/satellite-channel.h',
