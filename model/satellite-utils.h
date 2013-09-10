@@ -34,7 +34,7 @@ class SatUtils
 {
 public:
   // the speed of light in m/s
-  static const double C = 299792458.0;
+  static const double SPEED_OF_LIGHT = 299792458.0;
 
   /**
    * Converts radians to degrees
