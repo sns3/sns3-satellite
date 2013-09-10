@@ -24,6 +24,7 @@
 #include "ns3/fatal-error.h"
 #include "ns3/log.h"
 
+#include "satellite-utils.h"
 #include "geo-coordinate.h"
 
 
@@ -66,10 +67,12 @@ Vector GeoCoordinate::ToVector()
   NS_LOG_FUNCTION (this);
 
   Vector cartesian;
+  double latRads = SatUtils::DegreesToRadians(m_latitude);
+  double lonRads = SatUtils::DegreesToRadians(m_longitude);
 
-  cartesian.x = (N(DegToRad(m_latitude))+ m_altitude) * std::cos (DegToRad(m_latitude)) * std::cos (DegToRad(m_longitude));
-  cartesian.y = (N(DegToRad(m_latitude))+ m_altitude) * std::cos (DegToRad(m_latitude)) * std::sin (DegToRad(m_longitude));
-  cartesian.z = (N(DegToRad(m_latitude))*(1 - e2Param) + m_altitude) * std::sin (DegToRad(m_latitude));
+  cartesian.x = (N(latRads)+ m_altitude) * std::cos (latRads) * std::cos (lonRads);
+  cartesian.y = (N(latRads)+ m_altitude) * std::cos (latRads) * std::sin (lonRads);
+  cartesian.z = (N(latRads)*(1 - e2Param) + m_altitude) * std::sin (latRads);
 
   return cartesian;
 }
@@ -125,7 +128,7 @@ void GeoCoordinate::FromVector(const Vector &v)
       // scale longitude between - PI and PI (-180 and 180 in degrees)
       if ( v.x != 0 || v.y != 0 )
         {
-          m_longitude = RadToDeg(std::atan(v.y/v.x ));
+          m_longitude = SatUtils::RadiansToDegrees(std::atan(v.y/v.x ));
 
           if ( v.x < 0 )
             {
@@ -166,7 +169,7 @@ void GeoCoordinate::FromVector(const Vector &v)
       // T is intersection point of linen the PO normal and ellipsoid normal from point Q.
       double tp = pq * std::sin(latG - latQ);
 
-      m_latitude = RadToDeg(latQ + tp/op * std::cos(latQ - latG));
+      m_latitude = SatUtils::RadiansToDegrees(latQ + tp/op * std::cos(latQ - latG));
 
       m_altitude = pq * std::cos(latQ - latG);
 

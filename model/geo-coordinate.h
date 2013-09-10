@@ -116,21 +116,12 @@ public:
   static const double bParam = 6356752.3142;       // Semi-minor axis B, m:
 
 private:
+  /**
+   * Gets the radius of curvature in the prime vertical (N)
+   * \param latitude latitude in radians for to get N
+   * \return value of the N (meters)
+   */
   static inline double N(double latitude) {return ( aParam / std::sqrt(1 - e2Param * std::sin(latitude)*std::sin(latitude)));}
-  /**
-   * Converts radians to degrees
-   *
-   * \param x value to convert as radians
-   * \returns degrees converted from radians
-   */
-  static inline double RadToDeg(double x) {return ((x) * 180/M_PI);}
-  /**
-   * Converts degrees to radians
-   *
-   * \param x value to convert as degrees
-   * \returns radians converted from degrees
-   */
-  static inline double DegToRad(double x) {return ((x) * M_PI/180);}
   /**
    * Checks if longtitude is in valid range
    *
