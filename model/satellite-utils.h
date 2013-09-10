@@ -27,30 +27,32 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * 
- * \brief SatUtils class is for general conversions and contants used in satellite module.
+ * \brief SatUtils class is for general conversions and constants used in satellite module.
  * This class is not planned to instantiate or inherted.
  */
 class SatUtils
 {
 public:
-  // the speed of light in m/s
+  /**
+   * Constant definition for the speed of light in m/s
+   */
   static const double SPEED_OF_LIGHT = 299792458.0;
 
   /**
    * Converts radians to degrees
    *
-   * \param x value to convert as radians
+   * \param radians value to convert as radians
    * \return degrees converted from radians
    */
-  static inline double RadiansToDegrees (double x) { return (double) ( (x) * ( 180.0 / M_PI ) ); }
+  static inline double RadiansToDegrees ( double radian ) { return (double) ( ( radian ) * ( 180.0 / M_PI ) ); }
 
   /**
    * Converts degrees to radians
    *
-   * \param x value to convert as degrees
+   * \param degrees value to convert as degrees
    * \return radians converted from degrees
    */
-  static inline double DegreesToRadians (double x) { return (double) ( (x) * ( M_PI / 180.0 ) ); }
+  static inline double DegreesToRadians ( double degree ) { return (double) ( ( degree ) * ( M_PI / 180.0 ) ); }
 
   /**
    * Converts Decibel Watts to Watts
@@ -58,15 +60,15 @@ public:
    * \param dBW value in Decibel Watts to convert
    * \return Watts converted from Decibel Watts
    */
-  static inline double DbWToW (double dBW) { return DbToLinear(dBW); }
+  static inline double DbWToW ( double dBW ) { return DbToLinear( dBW ); }
 
   /**
-   * Converts Decibel Watts to Watts
+   * Converts Watts to Decibel Watts
    *
    * \param W value in Watts to convert
    * \return Decibel Watts converted from Watts
    */
-  static inline double WToDbW (double W) { return LinearToDb ( W ); }
+  static inline double WToDbW ( double W ) { return LinearToDb ( W ); }
 
   /**
    * Converts Decibels to linear
@@ -74,7 +76,7 @@ public:
    * \param dB value in Decibels to convert
    * \return linear converted from Decibels
    */
-  static inline double DbToLinear (double dB) { return std::pow (10.0, dB / 10.0); }
+  static inline double DbToLinear ( double dB ) { return std::pow ( 10.0, dB / 10.0 ); }
 
   /**
    * Converts linear to Decibels
@@ -82,7 +84,7 @@ public:
    * \param linear value in linear to convert
    * \return Decibels converted from linear
    */
-  static inline double LinearToDb (double linear) { return (double) (10.0 * std::log10 (linear));}
+  static inline double LinearToDb ( double linear ) { return (double) ( 10.0 * std::log10 ( linear ) );}
 
   /**
    * Converts Decibel milli Watts to Watts
@@ -90,7 +92,7 @@ public:
    * \param dBm value in Decibel milli Watts to convert
    * \return Watts converted from Decibel milli Watts
    */
-  static inline double DbmToW (double dBmW) { return ( DbWToW (dBmW) / 1000); }
+  static inline double DbmToW ( double dBmW ) { return ( DbWToW ( dBmW ) / 1000 ); }
 
   /**
    * Converts Watts to Decibel milli Watts
@@ -98,7 +100,7 @@ public:
    * \param W value in Watts to convert
    * \return Decibel milli Watts converted from Watts
    */
-  static inline double WToDbm (double W) { return (double) ( WToDbW(W * 1000.0) ); }
+  static inline double WToDbm ( double W ) { return (double) ( WToDbW ( W * 1000.0 ) ); }
 
 private:
   /**
