@@ -142,26 +142,19 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   double txAntennaGain_W = 0.0;
   double rxAntennaGain_W = 0.0;
 
+  // use always UT's or GW's position when getting antenna gain
   switch ( m_channelType )
   {
+    case RETURN_FEEDER_CH:
     case FORWARD_USER_CH:
       txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (rxMobility);
       rxAntennaGain_W = phyRx->GetAntennaGain_W (rxMobility);
       break;
 
     case RETURN_USER_CH:
-      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (txMobility);
-      rxAntennaGain_W = phyRx->GetAntennaGain_W (txMobility);
-      break;
-
     case FORWARD_FEEDER_CH:
       txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (txMobility);
       rxAntennaGain_W = phyRx->GetAntennaGain_W (txMobility);
-      break;
-
-    case RETURN_FEEDER_CH:
-      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (rxMobility);
-      rxAntennaGain_W = phyRx->GetAntennaGain_W (rxMobility);
       break;
 
     default:
