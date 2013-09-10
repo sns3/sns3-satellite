@@ -24,6 +24,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/pointer.h"
 
+#include "satellite-utils.h"
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
@@ -63,16 +64,15 @@ SatPhy::Initialize()
  // calculate EIRP without Gain (maximum)
   double eirpWoGain_DbW = m_txMaxPower_DbW - m_txOutputLoss_Db - m_txPointingLoss_Db - m_txOboLoss_Db - m_txAntennaLoss_Db;
 
-  // TODO: needed to have 'utils'  library to make these kind of conversions
-  m_eirpWoGain_W = std::pow( 10.0, eirpWoGain_DbW / 10.0 );
+  m_eirpWoGain_W = SatUtils::DbWToW ( eirpWoGain_DbW );
 
-  m_phyTx->SetBeamId(m_beamId);
-  m_phyRx->SetBeamId(m_beamId);
+  m_phyTx->SetBeamId (m_beamId);
+  m_phyRx->SetBeamId (m_beamId);
 
-  m_phyRx->SetReceiveCallback( MakeCallback (&SatPhy::Receive, this) );
+  m_phyRx->SetReceiveCallback ( MakeCallback (&SatPhy::Receive, this) );
 
-  m_phyTx->SetMaxAntennaGain_Db(m_txMaxAntennaGain_Db);
-  m_phyRx->SetMaxAntennaGain_Db(m_rxMaxAntennaGain_Db);
+  m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_Db);
+  m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_Db);
 }
 
 SatPhy::~SatPhy ()
@@ -84,9 +84,9 @@ void
 SatPhy::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_phyTx->DoDispose();
+  m_phyTx->DoDispose ();
   m_phyTx = 0;
-  m_phyRx->DoDispose();
+  m_phyRx->DoDispose ();
   m_phyRx = 0;
 
   Object::DoDispose ();
@@ -95,7 +95,7 @@ SatPhy::DoDispose ()
 TypeId
 SatPhy::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 TypeId

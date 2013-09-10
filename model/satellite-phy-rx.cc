@@ -23,6 +23,7 @@
 #include "ns3/antenna-model.h"
 #include "ns3/object-factory.h"
 
+#include "satellite-utils.h"
 #include "satellite-net-device.h"
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
@@ -97,7 +98,7 @@ SatPhyRx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
   NS_LOG_FUNCTION (this);
 
   // TODO: when adding antenna pattern to phyRx object, gain is received according to antenna pattern
-  double antGain_W = std::pow( 10.0, m_maxAntennaGain_Db / 10.0 );
+  double antGain_W = SatUtils::DbWToW( m_maxAntennaGain_Db );
 
   return antGain_W;
 }

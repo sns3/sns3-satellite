@@ -26,6 +26,7 @@
 #include "ns3/object-factory.h"
 #include "ns3/log.h"
 
+#include "satellite-utils.h"
 #include "satellite-phy.h"
 #include "satellite-phy-tx.h"
 #include "satellite-signal-parameters.h"
@@ -99,7 +100,7 @@ SatPhyTx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
   NS_LOG_FUNCTION (this);
 
   // TODO: when adding antenna pattern to phyTx object, gain is received according to antenna pattern
-  double antGain_W = std::pow( 10.0, m_maxAntennaGain_Db / 10.0 );
+  double antGain_W = SatUtils::DbWToW( m_maxAntennaGain_Db );
 
   return antGain_W;
 }
