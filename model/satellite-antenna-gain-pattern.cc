@@ -18,10 +18,10 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <math.h>
 #include <algorithm>
 #include <stdlib.h>
 #include "ns3/log.h"
+#include "satellite-utils.h"
 #include "satellite-antenna-gain-pattern.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatAntennaGainPattern");
@@ -205,10 +205,10 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   double lowerLonShare = (longitude - m_longitudes[minLonIndex]) / m_lonInterval;
 
   // Change the gains to linear values , because the interpolation is done in linear domain.
-  double G11 = pow(10, (m_antennaPattern[minLatIndex][minLonIndex]/10.0));
-  double G12 = pow(10, (m_antennaPattern[minLatIndex][minLonIndex+1]/10.0));
-  double G21 = pow(10, (m_antennaPattern[minLatIndex+1][minLonIndex]/10.0));
-  double G22 = pow(10, (m_antennaPattern[minLatIndex+1][minLonIndex+1]/10.0));
+  double G11 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex][minLonIndex] );
+  double G12 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex][minLonIndex+1] );
+  double G21 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex+1][minLonIndex] );
+  double G22 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex+1][minLonIndex+1] );
 
   // Longitude direction with latitude minLatIndex
   double valLatLower = upperLonShare * G11 + lowerLonShare * G12;
