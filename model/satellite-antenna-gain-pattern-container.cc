@@ -82,7 +82,7 @@ uint32_t SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) con
 
   for (uint32_t i = 1; i <= NUMBER_OF_BEAMS; ++i)
     {
-      double gain = m_antennaPatternMap.at(i)->GetAntennaGain (coord);
+      double gain = m_antennaPatternMap.at(i)->GetAntennaGain_lin (coord);
       if (gain > bestGain)
         {
           bestGain = gain;

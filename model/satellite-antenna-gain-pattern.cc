@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <algorithm>
+#include <stdlib.h>
 #include "ns3/log.h"
 #include "satellite-antenna-gain-pattern.h"
 
@@ -77,7 +78,6 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
   std::vector<double> rowVector;
 
   // Start conditions
-  bool lonIntervalDefined, latIntervalDefined = false;
   double lat, lon, gainDouble;
   std::string gainString;
 
@@ -107,6 +107,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
         {
           if (m_latitudes.back() != lat)
             {
+              m_latInterval = lat - m_latitudes.back();
               m_latitudes.push_back (lat);
             }
         }
@@ -120,6 +121,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
         {
           if (m_longitudes.back() != lon)
             {
+              m_lonInterval = lon - m_longitudes.back();
               m_longitudes.push_back (lon);
             }
         }
@@ -138,13 +140,6 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
       // We are still in the same row (= latitude)
       else if (lat == m_maxLat)
         {
-          // Define the m_lonInterval
-          if  (!lonIntervalDefined)
-            {
-              NS_ASSERT (lon > m_maxLon);
-              m_lonInterval = lon - m_maxLon;
-              lonIntervalDefined = true;
-            }
           rowVector.push_back (gainDouble);
         }
       // Latitude changed
@@ -153,13 +148,6 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
       // - Start from another row
       else
         {
-          // Define the m_latInterval
-          if (!latIntervalDefined)
-             {
-              NS_ASSERT (lat > m_maxLat);
-              m_latInterval = lat - m_maxLat;
-              latIntervalDefined = true;
-             }
           m_antennaPattern.push_back (rowVector);
           rowVector.clear ();
           rowVector.push_back (gainDouble);
@@ -179,7 +167,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 
 
 
-double SatAntennaGainPattern::GetAntennaGain (GeoCoordinate coord) const
+double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude() << coord.GetLongitude());
 
@@ -194,8 +182,8 @@ double SatAntennaGainPattern::GetAntennaGain (GeoCoordinate coord) const
   NS_ASSERT (longitude <= m_maxLon);
 
   // Calculate the minimum grid point {minLatIndex, minLonIndex} for the given {latitude, longitude} point
-  uint32_t minLatIndex = (uint32_t)(std::floor((float)((latitude - m_minLat) / m_latInterval)));
-  uint32_t minLonIndex = (uint32_t)(std::floor((float)((longitude - m_minLon) / m_lonInterval)));
+  uint32_t minLatIndex = (uint32_t)(std::floor(std::abs(latitude - m_minLat) / m_latInterval));
+  uint32_t minLonIndex = (uint32_t)(std::floor(std::abs(longitude - m_minLon) / m_lonInterval));
 
   // All the values within the grid box has to be valid! If UT is placed (or
   // is moving outside) the valid simulation area, the simulation will crash
@@ -232,10 +220,12 @@ double SatAntennaGainPattern::GetAntennaGain (GeoCoordinate coord) const
   double gain = ((m_latitudes[minLatIndex+1] - latitude) / m_latInterval) * valLatLower +
       ((latitude - m_latitudes[minLatIndex]) / m_latInterval) * valLatUpper;
 
-  double gain_dB = 10.0*log10(gain);
-
   /*
-  std::cout << "x1 = " << m_longitudes[minLonIndex] <<
+  std::cout << "minLonIndex = " << minLonIndex <<
+      ", minLatIndex = " << minLatIndex <<
+      ", m_lonInterval = " << m_lonInterval <<
+      ", m_LatInterval = " << m_latInterval <<
+      ", x1 = " << m_longitudes[minLonIndex] <<
       ", y1 = " << m_latitudes[minLatIndex] <<
       ", x2 = " << m_longitudes[minLonIndex+1] <<
       ", y2 = " << m_latitudes[minLatIndex+1] <<
@@ -245,10 +235,9 @@ double SatAntennaGainPattern::GetAntennaGain (GeoCoordinate coord) const
       ", G(x2,y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex+1] <<
       ", x = " << longitude <<
       ", y = " << latitude <<
-      ", interpolated gain: " << gain_dB << std::endl;
+      ", interpolated gain: " << gain << std::endl;
   */
-
-  return gain_dB;
+  return gain;
 }
 
 

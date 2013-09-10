@@ -47,7 +47,7 @@ public:
    * \param filePathName Path and file name of the antenna pattern file
    * \return The gain value
    */
-  double GetAntennaGain (GeoCoordinate coord) const;
+  double GetAntennaGain_lin (GeoCoordinate coord) const;
 
 private:
 

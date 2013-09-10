@@ -100,9 +100,12 @@ SatAntennaPatternTestCase::DoRun (void)
   uint32_t bestBeamId (0);
   for ( uint32_t i = 0; i < coordinates.size (); ++i)
     {
-      gain = gainPattern->GetAntennaGain (coordinates[i]);
+      gain = gainPattern->GetAntennaGain_lin (coordinates[i]);
+      double gain_dB = 10.0 * log10 (gain);
+
       bestBeamId = gpContainer.GetBestBeamId (coordinates[i]);
-      NS_TEST_ASSERT_MSG_EQ_TOL( gain, expectedGains[i], 0.001, "Expected gain not within tolerance");
+
+      NS_TEST_ASSERT_MSG_EQ_TOL( gain_dB, expectedGains[i], 0.001, "Expected gain not within tolerance");
       NS_TEST_ASSERT_MSG_EQ( bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
     }
 }
