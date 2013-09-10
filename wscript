@@ -69,6 +69,7 @@ def build(bld):
     headers = bld.new_task_gen(features=['ns3header'])
     headers.module = 'satellite'
     headers.source = [
+    	'model/satellite-utils.h',
         'model/geo-coordinate.h',
         'model/cbr-application.h',
         'model/satellite-antenna-gain-pattern.h',

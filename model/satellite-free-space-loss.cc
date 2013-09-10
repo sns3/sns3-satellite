@@ -18,7 +18,7 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <cmath>
+#include "satellite-utils.h"
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "satellite-free-space-loss.h"
@@ -46,7 +46,7 @@ SatFreeSpaceLoss::GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double f
 {
   double fsl;
 
-  fsl = 10.0 * log10( GetFsl(a,b, frequency) );
+  fsl = SatUtils::LinearToDb( GetFsl(a,b, frequency) );
 
   return fsl;
 }
@@ -57,7 +57,7 @@ SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double fre
   double fsl;
   double distance = a->GetDistanceFrom(b);
 
-  fsl = std::pow( ( (4.0 * M_PI * distance * frequency ) / C ), 2.0 );
+  fsl = std::pow( ( (4.0 * M_PI * distance * frequency ) / SatUtils::C ), 2.0 );
 
   return fsl;
 }
