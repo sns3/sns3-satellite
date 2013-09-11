@@ -13,3 +13,12 @@ def build(bld):
     obj = bld.create_ns3_program('link-results-plot', ['satellite', 'tools'])
     obj.source = 'link-results-plot.cc'
     
+    obj = bld.create_ns3_program('markov-example', ['satellite'])
+    obj.source = 'markov-example.cc'
+
+    obj = bld.create_ns3_program('rayleigh-example', ['satellite'])
+    obj.source = 'rayleigh-example.cc'
+
+    obj = bld.create_ns3_program('loo-example', ['satellite'])
+    obj.source = 'loo-example.cc'
+    
