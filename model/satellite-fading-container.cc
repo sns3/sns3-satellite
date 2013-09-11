@@ -38,6 +38,7 @@ SatFadingContainer::GetTypeId (void)
 
 SatFadingContainer::SatFadingContainer ()
   : m_numOfStates (),
+    m_numOfSets (),
     m_currentElevation (),
     m_setId (),
     m_cooldownPeriodLength (),
@@ -50,6 +51,7 @@ SatFadingContainer::SatFadingContainer ()
     m_latestCalculationTime_down (),
     m_dopplerFrequencyHz (),
     m_numOfOscillators (),
+    m_enableSetLock (false),
     m_enableStateLock (false),
     m_lockedState ()
 {
@@ -62,6 +64,7 @@ SatFadingContainer::SatFadingContainer ()
 
 SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordinate currentPosition)
   : m_numOfStates(markovConf->GetStateCount ()),
+    m_numOfSets(markovConf->GetNumOfSets ()),
     m_currentElevation(30),
     m_cooldownPeriodLength (markovConf->GetCooldownPeriod ()),
     m_minimumPositionChangeInMeters (markovConf->GetMinimumPositionChange ()),
@@ -73,6 +76,7 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordi
     m_latestCalculationTime_down (Now()),
     m_dopplerFrequencyHz (markovConf->GetDopplerFrequency ()),
     m_numOfOscillators (markovConf->GetNumOfOscillators ()),
+    m_enableSetLock (false),
     m_enableStateLock (false),
     m_lockedState (0)
 {
@@ -106,12 +110,7 @@ SatFadingContainer::GetFading (SatChannel::ChannelType channeltype)
   if (HasCooldownPeriodPassed (channeltype))
     {
       NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
-
-      if (!m_enableStateLock)
-        {
-          EvaluateStateChange ();
-        }
-
+      EvaluateStateChange ();
       return CalculateFading (channeltype);
     }
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period in effect, using old fading value");
@@ -147,17 +146,26 @@ SatFadingContainer::EvaluateStateChange ()
 {
   if (HasPositionChanged ())
     {
-      uint32_t newSetId = m_markovConf->GetProbabilitySetID (m_currentElevation);
+      uint32_t newSetId;
 
-      if (m_setId != newSetId)
+      if (!m_enableSetLock)
         {
-          NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation  << ", set ID [old,new]: [" << m_setId << "," << newSetId << "]");
+          newSetId = m_markovConf->GetProbabilitySetID (m_currentElevation);
 
-          m_setId = newSetId;
-          UpdateProbabilities (m_setId);
-          UpdateLooParameters (m_setId);
+          if (m_setId != newSetId)
+            {
+              NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation  << ", set ID [old,new]: [" << m_setId << "," << newSetId << "]");
+
+              m_setId = newSetId;
+              UpdateProbabilities (m_setId);
+              UpdateLooParameters (m_setId);
+            }
         }
-      m_markovModel->DoTransition ();
+
+      if (!m_enableStateLock)
+        {
+          m_markovModel->DoTransition ();
+        }
     }
 }
 
@@ -281,7 +289,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType channeltype)
     case SatChannel::FORWARD_FEEDER_CH:
       {
         m_looModel_up->UpdateParameters (m_looParameters[state][0], m_looParameters[state][1], m_looParameters[state][2]);
-        m_latestCalculatedFadingValue_up = m_looModel_up->GetChannelGainDb ();
+        m_latestCalculatedFadingValue_up = m_looModel_up->GetChannelGain ();
         NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
         m_latestCalculationTime_up = Now ();
         return m_latestCalculatedFadingValue_up;
@@ -290,7 +298,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType channeltype)
     case SatChannel::RETURN_FEEDER_CH:
       {
         m_looModel_down->UpdateParameters (m_looParameters[state][0], m_looParameters[state][1], m_looParameters[state][2]);
-        m_latestCalculatedFadingValue_down = m_looModel_down->GetChannelGainDb ();
+        m_latestCalculatedFadingValue_down = m_looModel_down->GetChannelGain ();
         NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
         m_latestCalculationTime_down = Now ();
         return m_latestCalculatedFadingValue_down;
@@ -305,23 +313,45 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType channeltype)
 }
 
 void
-SatFadingContainer::LockToState (uint32_t state)
+SatFadingContainer::LockToSetAndState (uint32_t setId, uint32_t stateId)
 {
-  NS_ASSERT( (state >= 0) && (state < m_numOfStates));
-  m_lockedState = state;
+  NS_ASSERT( (stateId >= 0) && (stateId < m_numOfStates));
+  NS_ASSERT( (setId >= 0) && (setId < m_numOfSets));
+
+  m_setId = setId;
+  m_lockedState = stateId;
+
+  UpdateProbabilities (m_setId);
+  UpdateLooParameters (m_setId);
+
+  m_enableSetLock = true;
   m_enableStateLock = true;
 }
 
 void
-SatFadingContainer::LockToRandomState ()
+SatFadingContainer::LockToSet (uint32_t setId)
 {
-  LockToState (rand() % (m_numOfStates-1));
+  NS_ASSERT( (setId >= 0) && (setId < m_numOfSets));
+
+  m_setId = setId;
+
+  UpdateProbabilities (m_setId);
+  UpdateLooParameters (m_setId);
+
+  m_enableSetLock = true;
+  m_enableStateLock = false;
 }
 
 void
-SatFadingContainer::UnlockState ()
+SatFadingContainer::LockToRandomSetAndState ()
 {
-  m_lockedState = 0;
+  LockToSetAndState ((rand() % (m_numOfSets-1)),(rand() % (m_numOfStates-1)));
+}
+
+void
+SatFadingContainer::UnlockSetAndState ()
+{
+  m_enableSetLock = false;
   m_enableStateLock = false;
 }
 

@@ -52,11 +52,13 @@ public:
 
   void SetElevation (double newElevation);
 
-  void UnlockState ();
+  void UnlockSetAndState ();
 
-  void LockToState (uint32_t state);
+  void LockToSetAndState (uint32_t setId, uint32_t stateId);
 
-  void LockToRandomState ();
+  void LockToSet (uint32_t setId);
+
+  void LockToRandomSetAndState ();
 
 private:
 
@@ -66,6 +68,7 @@ private:
   Ptr<SatLooModel> m_looModel_down;
 
   uint32_t m_numOfStates;
+  uint32_t m_numOfSets;
   double m_currentElevation;
   uint32_t m_setId;
   Time m_cooldownPeriodLength;
@@ -78,6 +81,7 @@ private:
   Time m_latestCalculationTime_down;
   double m_dopplerFrequencyHz;
   uint32_t m_numOfOscillators;
+  bool m_enableSetLock;
   bool m_enableStateLock;
   uint32_t m_lockedState;
 

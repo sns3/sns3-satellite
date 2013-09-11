@@ -52,6 +52,7 @@ public:
   double GetMinimumPositionChange ();
   uint32_t GetNumOfOscillators ();
   double GetDopplerFrequency ();
+  uint32_t GetNumOfSets ();
 
 private:
   uint32_t m_elevationCount;

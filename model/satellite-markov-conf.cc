@@ -201,5 +201,11 @@ SatMarkovConf::GetNumOfOscillators ()
   return m_numOfOscillators;
 }
 
+uint32_t
+SatMarkovConf::GetNumOfSets ()
+{
+  return m_markovElevations.size();
+}
+
 } // namespace ns3
 
