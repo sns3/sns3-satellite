@@ -175,36 +175,6 @@ private:
                   double                    // composite SINR
                   >
      m_packetTrace;
-
-  /**
-   * The trace source fired for calculated interferencies of the received packets
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Mac48Address, uint32_t, double > m_interferenceResultTrace;
-
-  /**
-   * The trace source fired for caluculated SINR
-   *
-   * \see class CallBackTraceSource
-   */
-
-  TracedCallback<Mac48Address, uint32_t, double > m_sinrResultTrace;
-
-  /**
-   * The trace source fired for calculated composite SINR
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Mac48Address, uint32_t, double > m_cSinrResultTrace;
-
-  /**
-   * The trace source fired for calculated RX power (C)
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Mac48Address, uint32_t, double > m_rxPowerResultTrace;
-
 };
 
 }

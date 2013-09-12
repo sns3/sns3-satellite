@@ -208,22 +208,19 @@ SatPhyRxCarrier::EndRxData ()
   m_satInterference->Calculate ( m_interferenceEvent, &iPower );
 
   double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, iPower );
-
-  m_rxPowerResultTrace ( m_ownAddress, m_beamId, m_rxParams->m_rxPower_W );
-  m_sinrResultTrace ( m_ownAddress, m_beamId, sinr );
-
-  m_rxParams->m_sinr = sinr;
+  double cSinr = sinr;
 
   if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
     {
       // calculate composite SINR
       // TODO: just calculated now, needed to check against link results later
-      sinr = 1 / ( (1 / sinr) + (1 / m_rxParams->m_sinr) );
-      m_cSinrResultTrace ( m_ownAddress, m_beamId, sinr );
+      cSinr = 1 / ( (1 / sinr) + (1 / m_rxParams->m_sinr) );
     }
 
+  m_rxParams->m_sinr = sinr;
+
   m_packetTrace ( m_rxParams->m_channel->GetChannelType(), m_ownAddress, m_destAddress, m_beamId,
-                  iPower, m_rxParams->m_rxPower_W, m_rxParams->m_sinr, sinr);
+                  iPower, m_rxParams->m_rxPower_W, sinr, cSinr);
 
   m_satInterference->NotifyRxEnd ( m_interferenceEvent );
 
