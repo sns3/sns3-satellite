@@ -63,7 +63,7 @@ SatPhyRx::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRx")
     .SetParent<Object> ()
-    .AddAttribute ("RxCarrierList", "The list of sockets associated to this protocol.",
+    .AddAttribute ("RxCarrierList", "The list of RX carriers associated to this Phy RX.",
                     ObjectVectorValue (),
                     MakeObjectVectorAccessor (&SatPhyRx::m_rxCarriers),
                     MakeObjectVectorChecker<SatPhyRxCarrier> ())
