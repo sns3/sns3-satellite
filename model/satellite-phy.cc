@@ -227,6 +227,10 @@ SatPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
   NS_LOG_FUNCTION (this << p << txParams);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
+  // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
+  // and antenna gain getting at receiver (UT or GW)
+
+  txParams->m_phyTx = m_phyTx;
   m_phyTx->StartTx (p, txParams);
 }
 
