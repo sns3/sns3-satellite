@@ -24,6 +24,7 @@
 
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel.h"
 #include "satellite-interference.h"
 #include "satellite-constant-interference.h"
 #include "satellite-per-packet-interference.h"
@@ -93,20 +94,9 @@ SatPhyRxCarrier::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrier")
     .SetParent<Object> ()
-    .AddTraceSource ("InterferenceResult",
-                      "The trace for calculated interferencies of the received packets",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_interferenceResultTrace))
-    .AddTraceSource ("InterferenceAddition",
-                     "The trace for added interferencies",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_interferenceAdditionTrace))
-    .AddTraceSource ("SinrResult",
-                      "The trace for calculated sinr of the received packets",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrResultTrace))
-    .AddTraceSource ("CompositeSinrResult",
-                      "The trace for calculated composite sinr of the received packets",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_cSinrResultTrace))
-
-
+    .AddTraceSource ("PacketTrace",
+                     "The trace for calculated interferencies of the received packets",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
   ;
   return tid;
 }
@@ -162,40 +152,27 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-          // Check whether the packet is sent to our beam.
-          // In case that RX mode is something else than transparent
-          // additionally check that whether the packet was intended for this specific receiver
-          bool receivePacket = false;
-
-          if (rxParams->m_beamId == m_beamId )
-            {
-              if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
-                {
-                  receivePacket = true;
-                }
-              else
-                {
-                  MacAddressTag tag;
-
-                  // just check tag here, upper layer (MAC) is repsonsible for removing tag
-                  if (rxParams->m_packet->PeekPacketTag(tag))
-                    {
-                      // If the packet is intended for this receiver
-                      Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
-
-                      if ( addr == m_ownAddress ||  addr.IsBroadcast() )
-                        {
-                          receivePacket = true;
-                        }
-                    }
-                }
-            }
 
           // add interference in any case
           m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W);
-          m_interferenceAdditionTrace(m_ownAddress, m_beamId, rxParams->m_beamId, rxParams->m_rxPower_W);
 
-          if ( receivePacket )
+          MacAddressTag tag;
+          m_destAddress = Mac48Address();
+
+          // Get MacAddressTag tag from packet by peeking, upper layer (MAC) is repsonsible for removing tag
+          if (rxParams->m_packet->PeekPacketTag(tag))
+            {
+              m_destAddress = Mac48Address::ConvertFrom (tag.GetAddress());
+            }
+
+          // Check whether the packet is sent to our beam.
+          // In case that RX mode is something else than transparent
+          // additionally check that whether the packet was intended for this specific receiver
+
+          if ( ( rxParams->m_beamId == m_beamId ) &&
+               ( ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT ) ||
+                 ( m_destAddress == m_ownAddress ) ||
+                 ( m_destAddress.IsBroadcast() ) ) )
             {
               NS_ASSERT (m_state == IDLE);
 
@@ -228,28 +205,30 @@ SatPhyRxCarrier::EndRxData ()
   ChangeState (IDLE);
 
   double iPower = 0.0;
-  m_satInterference->Calculate(m_interferenceEvent, &iPower);
-  m_interferenceResultTrace(m_ownAddress, m_beamId, iPower);
+  m_satInterference->Calculate ( m_interferenceEvent, &iPower );
 
-  double sinr = CalculateSinr(m_rxParams->m_rxPower_W, iPower);
-  m_sinrResultTrace(m_ownAddress, m_beamId, sinr);
+  double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, iPower );
+
+  m_rxPowerResultTrace ( m_ownAddress, m_beamId, m_rxParams->m_rxPower_W );
+  m_sinrResultTrace ( m_ownAddress, m_beamId, sinr );
+
+  m_rxParams->m_sinr = sinr;
 
   if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
     {
       // calculate composite SINR
       // TODO: just calculated now, needed to check against link results later
       sinr = 1 / ( (1 / sinr) + (1 / m_rxParams->m_sinr) );
-      m_cSinrResultTrace(m_ownAddress, m_beamId, sinr);
-    }
-  else
-    {
-      m_rxParams->m_sinr = sinr;
+      m_cSinrResultTrace ( m_ownAddress, m_beamId, sinr );
     }
 
-  m_satInterference->NotifyRxEnd(m_interferenceEvent);
+  m_packetTrace ( m_rxParams->m_channel->GetChannelType(), m_ownAddress, m_destAddress, m_beamId,
+                  iPower, m_rxParams->m_rxPower_W, m_rxParams->m_sinr, sinr);
+
+  m_satInterference->NotifyRxEnd ( m_interferenceEvent );
 
   // Send packet upwards
-  m_rxCallback (m_rxParams);
+  m_rxCallback ( m_rxParams );
 }
 
 void

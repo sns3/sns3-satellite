@@ -34,7 +34,6 @@
 #include "satellite-channel.h"
 
 
-
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 
 namespace ns3 {
@@ -162,6 +161,8 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
       break;
   }
 
+  rxParams->m_channel = this;
+
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, rxParams->m_frequency_Hz );
   rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W;
@@ -174,6 +175,12 @@ SatChannel::SetChannelType (SatChannel::ChannelType chType)
 {
   NS_ASSERT (chType != UNKNOWN_CH);
   m_channelType = chType;
+}
+
+SatChannel::ChannelType
+SatChannel::GetChannelType ()
+{
+  return m_channelType;
 }
 
 void

@@ -27,6 +27,7 @@
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel.h"
 #include "satellite-interference.h"
 #include "satellite-phy-rx-carrier-conf.h"
 
@@ -149,6 +150,11 @@ private:
   Mac48Address m_ownAddress;
 
   /**
+   * Destination address of the packet in m_rxParams.
+   */
+  Mac48Address m_destAddress;
+
+  /**
    * Receiving mode.
    */
   SatPhyRxCarrierConf::RxMode m_rxMode;
@@ -159,7 +165,16 @@ private:
    * \see class CallBackTraceSource
    */
 
-  TracedCallback<Mac48Address, uint32_t, uint32_t, double > m_interferenceAdditionTrace;
+  TracedCallback< SatChannel::ChannelType,  // Type of the RX channel (link)
+                  Mac48Address,             // receiver address
+                  Mac48Address,             // packet destination address
+                  uint32_t,                 // destination beam
+                  double,                   // interference power
+                  double,                   // TX power (C)
+                  double,                   // SINR
+                  double                    // composite SINR
+                  >
+     m_packetTrace;
 
   /**
    * The trace source fired for calculated interferencies of the received packets
@@ -183,7 +198,12 @@ private:
    */
   TracedCallback<Mac48Address, uint32_t, double > m_cSinrResultTrace;
 
-
+  /**
+   * The trace source fired for calculated RX power (C)
+   *
+   * \see class CallBackTraceSource
+   */
+  TracedCallback<Mac48Address, uint32_t, double > m_rxPowerResultTrace;
 
 };
 

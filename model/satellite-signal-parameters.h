@@ -26,9 +26,11 @@
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 
+
 namespace ns3 {
 
 class SatPhyTx;
+class SatChannel;
 
 /**
 * \ingroup satellite
@@ -100,6 +102,11 @@ public:
    * Calculated SINR.
    */
   double m_sinr;
+
+  /**
+   * The SatChannel instance received the packet.
+   */
+  Ptr<SatChannel> m_channel;
 
 };
 

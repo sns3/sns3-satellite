@@ -23,6 +23,7 @@
 
 #include "satellite-signal-parameters.h"
 #include "satellite-phy-tx.h"
+#include "satellite-channel.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
@@ -45,6 +46,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_txPower_W = p.m_txPower_W;
   m_rxPower_W = p.m_rxPower_W;
   m_sinr = p.m_sinr;
+  m_channel = p.m_channel;
 }
 
 Ptr<SatSignalParameters>

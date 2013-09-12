@@ -51,7 +51,7 @@ public:
    */
   enum ChannelType
   {
-    UNKNOWN_CH, FORWARD_USER_CH, FORWARD_FEEDER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
+    UNKNOWN_CH, FORWARD_FEEDER_CH, FORWARD_USER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
   };
 
   SatChannel ();
@@ -67,10 +67,17 @@ public:
   virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
 
   /**
-   * Set the  propagation delay model to be used in the SatChannel
+   * Set the type of the channel.
+   *
    * \param chType Type of the channel.
    */
   virtual void SetChannelType (SatChannel::ChannelType chType);
+
+  /**
+   * Get the type of the channel.
+   * \return Type of the channel.
+   */
+  virtual SatChannel::ChannelType GetChannelType ();
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
