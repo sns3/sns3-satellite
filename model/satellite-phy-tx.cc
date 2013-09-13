@@ -88,10 +88,10 @@ SatPhyTx::GetTypeId (void)
 }
 
 void
-SatPhyTx::SetMaxAntennaGain_Db(double gain_Db)
+SatPhyTx::SetMaxAntennaGain_Db(double gain_db)
 {
   NS_LOG_FUNCTION (this);
-  m_maxAntennaGain_Db = gain_Db;
+  m_maxAntennaGain = SatUtils::DbToLinear (gain_db);
 }
 
 double
@@ -100,9 +100,8 @@ SatPhyTx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
   NS_LOG_FUNCTION (this);
 
   // TODO: when adding antenna pattern to phyTx object, gain is received according to antenna pattern
-  double antGain_W = SatUtils::DbWToW( m_maxAntennaGain_Db );
 
-  return antGain_W;
+  return m_maxAntennaGain;
 }
 
 Ptr<MobilityModel>

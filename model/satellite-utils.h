@@ -21,6 +21,8 @@
 #define SATELLITE_UTILS_H
 
 #include <cmath>
+#include <limits>
+#include "ns3/assert.h"
 
 namespace ns3 {
 
@@ -33,6 +35,8 @@ namespace ns3 {
 class SatUtils
 {
 public:
+
+
   /**
    * Constant definition for the speed of light in m/s
    */
@@ -44,7 +48,8 @@ public:
    * \param radians value to convert as radians
    * \return degrees converted from radians
    */
-  static inline double RadiansToDegrees ( double radian ) { return (double) ( ( radian ) * ( 180.0 / M_PI ) ); }
+  template <typename T>
+  static inline T RadiansToDegrees ( T radian ) { return (T) ( ( radian ) * ( 180.0 / M_PI ) ); }
 
   /**
    * Converts degrees to radians
@@ -52,31 +57,73 @@ public:
    * \param degrees value to convert as degrees
    * \return radians converted from degrees
    */
-  static inline double DegreesToRadians ( double degree ) { return (double) ( ( degree ) * ( M_PI / 180.0 ) ); }
+  template <typename T>
+  static inline T DegreesToRadians ( T degree ) { return (T) ( ( degree ) * ( M_PI / 180.0 ) ); }
+
+  /**
+   * Get minimum value for linear
+   *
+   * \return minimum linear value
+   */
+  template <typename T>
+  static inline T MinLin () { return (T) ( std::numeric_limits<T>::min () * 10.0 ); }
+
+  /**
+   * Get maximum value for linear
+   *
+   * \return maximum linear value
+   */
+  template <typename T>
+  static inline T MaxLin () { return (T) ( std::numeric_limits<T>::max () ); }
+
+  /**
+   * Get minimum value for Decibel
+   *
+   * \return minimum Decibel value
+   */
+  template <typename T>
+  static inline T MinDb () { return (T) ( 10.0 * std::log (MinLin<T>()) ); }
+
+  /**
+   * Get maximum value for Decibel
+   *
+   * \return maximum Decibel value
+   */
+  template <typename T>
+  static inline T MaxDb () { return (T) ( 10.0 * std::log (MaxLin<T>()) ); }
 
   /**
    * Converts Decibel Watts to Watts
    *
-   * \param dBW value in Decibel Watts to convert
+   * \param dbw value in Decibel Watts to convert
    * \return Watts converted from Decibel Watts
    */
-  static inline double DbWToW ( double dBW ) { return DbToLinear( dBW ); }
+  template <typename T>
+  static inline T DbWToW ( T dbw ) { return (T) DbToLinear<T> (dbw); }
 
   /**
    * Converts Watts to Decibel Watts
    *
-   * \param W value in Watts to convert
+   * \param w value in Watts to convert
    * \return Decibel Watts converted from Watts
    */
-  static inline double WToDbW ( double W ) { return LinearToDb ( W ); }
+  template <typename T>
+  static inline T WToDbW ( T w ) { return (T) LinearToDb<T> (w); }
 
   /**
    * Converts Decibels to linear
    *
-   * \param dB value in Decibels to convert
+   * \param db value in Decibels to convert, NAN means 0 Watt
+   *
    * \return linear converted from Decibels
    */
-  static inline double DbToLinear ( double dB ) { return std::pow ( 10.0, dB / 10.0 ); }
+  template <typename T>
+  static inline T DbToLinear ( T db )
+  {
+    NS_ASSERT( db >= MinDb<T> () && db <= MaxDb<T> ()  );
+
+    return (T) std::pow ( 10.0, db / 10.0 );
+  }
 
   /**
    * Converts linear to Decibels
@@ -84,23 +131,31 @@ public:
    * \param linear value in linear to convert
    * \return Decibels converted from linear
    */
-  static inline double LinearToDb ( double linear ) { return (double) ( 10.0 * std::log10 ( linear ) );}
+  template <typename T>
+  static inline T LinearToDb ( T linear )
+  {
+    NS_ASSERT( ( linear >= MinLin<T> () && linear <= MaxLin<T> () ) || linear == 0  );
+
+    return (T) (10.0 * std::log10 ( linear ));
+  }
 
   /**
    * Converts Decibel milli Watts to Watts
    *
-   * \param dBm value in Decibel milli Watts to convert
+   * \param dbm value in Decibel milli Watts to convert
    * \return Watts converted from Decibel milli Watts
    */
-  static inline double DbmToW ( double dBmW ) { return ( DbWToW ( dBmW ) / 1000 ); }
+  template <typename T>
+  static inline T DbmToW ( T dbm ) { return ( DbWToW<T> ( dbm ) / 1000 ); }
 
   /**
    * Converts Watts to Decibel milli Watts
    *
-   * \param W value in Watts to convert
+   * \param w value in Watts to convert
    * \return Decibel milli Watts converted from Watts
    */
-  static inline double WToDbm ( double W ) { return (double) ( WToDbW ( W * 1000.0 ) ); }
+  template <typename T>
+  static inline T WToDbm ( T w ) { return (T) ( WToDbW<T> ( w * 1000.0 ) ); }
 
 private:
   /**

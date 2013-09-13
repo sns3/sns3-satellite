@@ -126,22 +126,22 @@ private:
     /*
      * Configured RX noise temperature (in Kelvins) for return link.
      */
-    double m_rtnLinkRxTemperature_K;
+    double m_rtnLinkRxTemperature_dbK;
 
     /*
      * Configured RX noise temperature (in Kelvins) for forward link.
      */
-    double m_fwdLinkRxTemperature_K;
+    double m_fwdLinkRxTemperature_dbK;
 
     /*
      * Configured other system noise (in Watt) for return link.
      */
-    double m_rtnLinkOtherSysNoise_W;
+    double m_rtnLinkOtherSysNoise_dbW;
 
     /*
      * Configured other system noise (in Watt) for forward link.
      */
-    double m_fwdLinkOtherSysNoise_W;
+    double m_fwdLinkOtherSysNoise_dbW;
 
     /**
      * Trace callback for creation traces

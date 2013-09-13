@@ -22,6 +22,7 @@
 #include "ns3/object.h"
 #include "ns3/simulator.h"
 
+#include "satellite-utils.h"
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel.h"
@@ -79,7 +80,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_rxBandwidth_Hz = carrierConf->GetBandwidth_Hz();
   m_rxTemperature_K = carrierConf->GetRxTemperature_K();
 
-  // calculate RX noise
+  // calculate RX noise including other sys noise
   m_rxNoise_W = BoltzmannConstant * m_rxTemperature_K * m_rxBandwidth_Hz;
 }
 
@@ -204,28 +205,33 @@ SatPhyRxCarrier::EndRxData ()
   NS_ASSERT (m_state == RX);
   ChangeState (IDLE);
 
-  double iPower = 0.0;
-  m_satInterference->Calculate ( m_interferenceEvent, &iPower );
+  double ifPower = 0.0;
+  m_satInterference->Calculate ( m_interferenceEvent, &ifPower );
 
-  double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, iPower );
+  double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, ifPower );
   double cSinr = sinr;
+
+  NS_ASSERT( ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && m_rxParams->m_sinr == 0  ) ||
+             ( m_rxMode == SatPhyRxCarrierConf::NORMAL && m_rxParams->m_sinr != 0  ) );
 
   if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
     {
       // calculate composite SINR
       // TODO: just calculated now, needed to check against link results later
-      cSinr = 1 / ( (1 / sinr) + (1 / m_rxParams->m_sinr) );
+      cSinr = CalculateCompositeSinr(sinr, m_rxParams->m_sinr);
     }
 
   m_rxParams->m_sinr = sinr;
 
   m_packetTrace ( m_rxParams->m_channel->GetChannelType(), m_ownAddress, m_destAddress, m_beamId,
-                  iPower, m_rxParams->m_rxPower_W, sinr, cSinr);
+                  ifPower, m_rxParams->m_rxPower_W, sinr, cSinr);
 
   m_satInterference->NotifyRxEnd ( m_interferenceEvent );
 
   // Send packet upwards
   m_rxCallback ( m_rxParams );
+
+
 }
 
 void
@@ -242,9 +248,20 @@ SatPhyRxCarrier::SetAddress (Mac48Address ownAddress)
 }
 
 double
-SatPhyRxCarrier::CalculateSinr(double rxPower_W, double iPower_W)
+SatPhyRxCarrier::CalculateSinr (double rxPower_W, double ifPower_W)
 {
-  return (rxPower_W / (iPower_W + m_rxNoise_W + m_rxOtherSysNoise_W));
+  NS_ASSERT( m_rxNoise_W >= SatUtils::MinLin<double> () );
+
+  return (rxPower_W / (ifPower_W + m_rxNoise_W + m_rxOtherSysNoise_W));
+}
+
+double
+SatPhyRxCarrier::CalculateCompositeSinr (double sinr1_W, double sinr2_W)
+{
+  NS_ASSERT (sinr1_W);
+  NS_ASSERT (sinr2_W);
+
+  return 1 / ( (1 / sinr1_W) + (1 / sinr2_W) );
 }
 
 }

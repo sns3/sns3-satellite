@@ -143,37 +143,37 @@ private:
   /**
    * Configured maximum RX antenna gain in Dbs
    */
-  double m_rxMaxAntennaGain_Db;
+  double m_rxMaxAntennaGain_db;
 
   /**
    * Configured maximum TX antenna gain in Dbs
    */
-  double m_txMaxAntennaGain_Db;
+  double m_txMaxAntennaGain_db;
 
   /**
    * Configured maximum TX power in DbWs
    */
-  double m_txMaxPower_DbW;
+  double m_txMaxPower_dbW;
 
   /**
    * Configured output loss in Dbs
    */
-  double m_txOutputLoss_Db;
+  double m_txOutputLoss_db;
 
   /**
    * Configured pointing loss in Dbs
    */
-  double m_txPointingLoss_Db;
+  double m_txPointingLoss_db;
 
   /**
    * Configured OBO loss in Dbs
    */
-  double m_txOboLoss_Db;
+  double m_txOboLoss_db;
 
   /**
    * Configured antenna loss in Dbs
    */
-  double m_txAntennaLoss_Db;
+  double m_txAntennaLoss_db;
 
   /**
    * The upper layer package receive callback.

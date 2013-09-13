@@ -116,9 +116,9 @@ private:
   Ptr<NetDevice> m_device;
 
   /**
-   * Configured maximum antenna gain in Dbs
+   * Configured maximum antenna gain in linear
    */
-  double m_maxAntennaGain_Db;
+  double m_maxAntennaGain;
 
   // A SatPhyRxCarrier object for receiving packets from each carrier
   std::vector< Ptr<SatPhyRxCarrier> > m_rxCarriers;

@@ -62,7 +62,7 @@ void
 SatPhy::Initialize()
 {
  // calculate EIRP without Gain (maximum)
-  double eirpWoGain_DbW = m_txMaxPower_DbW - m_txOutputLoss_Db - m_txPointingLoss_Db - m_txOboLoss_Db - m_txAntennaLoss_Db;
+  double eirpWoGain_DbW = m_txMaxPower_dbW - m_txOutputLoss_db - m_txPointingLoss_db - m_txOboLoss_db - m_txAntennaLoss_db;
 
   m_eirpWoGain_W = SatUtils::DbWToW ( eirpWoGain_DbW );
 
@@ -71,8 +71,8 @@ SatPhy::Initialize()
 
   m_phyRx->SetReceiveCallback ( MakeCallback (&SatPhy::Receive, this) );
 
-  m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_Db);
-  m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_Db);
+  m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_db);
+  m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_db);
 }
 
 SatPhy::~SatPhy ()
@@ -124,31 +124,31 @@ SatPhy::GetTypeId (void)
                    MakeCallbackChecker ())
     .AddAttribute("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_Db),
+                   MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_db),
                    MakeDoubleChecker<double_t> ())
     .AddAttribute("TxMaxAntennaGainDb", "Maximum TX gain in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txMaxAntennaGain_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txMaxAntennaGain_db),
                    MakeDoubleChecker<double_t> ())
     .AddAttribute("TxMaxPowerDbW", "Maximum TX power in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txMaxPower_DbW),
+                   MakeDoubleAccessor(&SatPhy::m_txMaxPower_dbW),
                    MakeDoubleChecker<double> ())
     .AddAttribute("TxOutputLossDb", "TX Output loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txOutputLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txOutputLoss_db),
                    MakeDoubleChecker<double> ())
     .AddAttribute("TxPointingLossDb", "TX Pointing loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txPointingLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txPointingLoss_db),
                    MakeDoubleChecker<double> ())
     .AddAttribute("TxOboLossDb", "TX OBO loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txOboLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txOboLoss_db),
                    MakeDoubleChecker<double> ())
     .AddAttribute("TxAntennaLossDb", "TX Antenna loss in Dbs",
                    DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txAntennaLoss_Db),
+                   MakeDoubleAccessor(&SatPhy::m_txAntennaLoss_db),
                    MakeDoubleChecker<double> ())
 
   ;
@@ -212,6 +212,7 @@ SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
   txParams->m_packet = p;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
+  txParams->m_sinr = 0;
 
   // TODO: frequency initialized according to carrier config
   double FREQUENCY (17.9 * std::pow(10.0, 9));

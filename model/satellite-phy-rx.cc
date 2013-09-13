@@ -89,7 +89,7 @@ void
 SatPhyRx::SetMaxAntennaGain_Db(double gain_Db)
 {
   NS_LOG_FUNCTION (this);
-  m_maxAntennaGain_Db = gain_Db;
+  m_maxAntennaGain = SatUtils::DbWToW (gain_Db);
 }
 
 double
@@ -98,9 +98,8 @@ SatPhyRx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
   NS_LOG_FUNCTION (this);
 
   // TODO: when adding antenna pattern to phyRx object, gain is received according to antenna pattern
-  double antGain_W = SatUtils::DbWToW( m_maxAntennaGain_Db );
 
-  return antGain_W;
+  return m_maxAntennaGain;
 }
 
 void

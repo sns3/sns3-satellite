@@ -26,6 +26,7 @@
 #include "ns3/double.h"
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
+#include "../model/satellite-utils.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -58,26 +59,26 @@ SatGeoHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatGeoHelper::m_rtnLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute( "FwdLinkRxTemperature",
+      .AddAttribute( "FwdLinkRxTemperatureDbK",
                      "The forward link RX noise temperature in Geo satellite.",
-                     DoubleValue(482.87),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkRxTemperature_K),
+                     DoubleValue(28.4),
+                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkRxTemperature_dbK),
                      MakeDoubleChecker<double>())
-      .AddAttribute( "RtnLinkRxTemperature",
+      .AddAttribute( "RtnLinkRxTemperatureDbK",
                      "The return link RX noise temperature in Geo satellite.",
-                     DoubleValue(490.94),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkRxTemperature_K),
+                     DoubleValue(28.4),
+                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkRxTemperature_dbK),
                      MakeDoubleChecker<double>())
-      .AddAttribute( "FwdLinkOtherSysNoise",
+      .AddAttribute( "FwdLinkOtherSysNoiseDbW",
                      "Other system noise of the forward link in Geo satellite.",
-                     DoubleValue(0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkOtherSysNoise_W),
+                     DoubleValue (SatUtils::MinDb<double> ()),
+                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkOtherSysNoise_dbW),
                      MakeDoubleChecker<double>())
-      .AddAttribute( "RtnLinkOtherSysNoise",
+      .AddAttribute( "RtnLinkOtherSysNoiseDbW",
                      "Other system noise of the return link in Geo satellite.",
-                     DoubleValue(0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkOtherSysNoise_W),
-                     MakeDoubleChecker<double>())
+                     DoubleValue (SatUtils::MinDb<double> ()),
+                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkOtherSysNoise_dbW),
+                     MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
 
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
@@ -99,7 +100,7 @@ SatGeoHelper::SatGeoHelper ()
   m_userPhyFactory.SetTypeId ("ns3::SatPhy");
   m_feederPhyFactory.SetTypeId ("ns3::SatPhy");
 
-  m_userPhyFactory.Set("RxMaxAntennaGainDb", DoubleValue(51.51));
+  m_userPhyFactory.Set("RxMaxAntennaGainDb", DoubleValue(54.00));
   m_userPhyFactory.Set("TxMaxAntennaGainDb", DoubleValue(54.00));
   m_userPhyFactory.Set("TxMaxPowerDbW", DoubleValue(15.00));
   m_userPhyFactory.Set("TxOutputLossDb", DoubleValue(2.85));
@@ -107,7 +108,7 @@ SatGeoHelper::SatGeoHelper ()
   m_userPhyFactory.Set("TxOboLossDb", DoubleValue(0.00));
   m_userPhyFactory.Set("TxAntennaLossDb", DoubleValue(1.00));
 
-  m_feederPhyFactory.Set("RxMaxAntennaGainDb", DoubleValue(51.51)); // T = 490.94 G/T = 24.60
+  m_feederPhyFactory.Set("RxMaxAntennaGainDb", DoubleValue(54.00));
   m_feederPhyFactory.Set("TxMaxAntennaGainDb", DoubleValue(54.00));
   m_feederPhyFactory.Set("TxMaxPowerDbW", DoubleValue(-4.38));
   m_feederPhyFactory.Set("TxOutputLossDb", DoubleValue(1.75));
@@ -197,8 +198,8 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   Ptr<SatPhyRxCarrierConf> rtnCarrierConf =
         CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
-                                           m_rtnLinkRxTemperature_K,
-                                           m_rtnLinkOtherSysNoise_W,
+                                           m_rtnLinkRxTemperature_dbK,
+                                           m_rtnLinkOtherSysNoise_dbW,
                                            rtnLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
                                            m_rtnLinkInterferenceModel,
@@ -223,8 +224,8 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   Ptr<SatPhyRxCarrierConf> fwdCarrierConf =
         CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
-                                           m_fwdLinkRxTemperature_K,
-                                           m_fwdLinkOtherSysNoise_W,
+                                           m_fwdLinkRxTemperature_dbK,
+                                           m_fwdLinkOtherSysNoise_dbW,
                                            fwdLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
                                            m_fwdLinkInterferenceModel,

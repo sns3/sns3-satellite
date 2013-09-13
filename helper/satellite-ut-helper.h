@@ -160,12 +160,12 @@ private:
     /*
      * Configured RX noise temperature.
      */
-    double m_rxTemperature_K;
+    double m_rxTemperature_dbK;
 
     /*
      * Configured other system noise.
     */
-    double m_otherSysNoise_W;
+    double m_otherSysNoise_dbW;
 
     /*
      * Configured error model for the forward link. Set as an attribute.

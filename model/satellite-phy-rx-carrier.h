@@ -95,6 +95,7 @@ private:
   void EndRxData ();
 
   double CalculateSinr(double rxPower_W, double iPower_W);
+  double CalculateCompositeSinr(double sinr1_W, double sinr2_W);
 
   State m_state;
   Ptr<SatSignalParameters> m_rxParams;

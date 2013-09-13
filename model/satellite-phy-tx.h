@@ -71,7 +71,7 @@ public:
    * Set the maximum Antenna gain in Db
    * /param gain_Db maximum antenna gain in Dbs
    */
-  void SetMaxAntennaGain_Db (double gain_Db);
+  void SetMaxAntennaGain_Db (double gain_db);
 
   /**
    * Get antenna gain based on position
@@ -102,9 +102,9 @@ private:
   Ptr<SatChannel> m_channel;
 
   /**
-   * Configured maximum antenna gain in Dbs
+   * Configured maximum antenna gain in linear
    */
-  double m_maxAntennaGain_Db;
+  double m_maxAntennaGain;
 
   State m_state;
   uint32_t m_beamId;

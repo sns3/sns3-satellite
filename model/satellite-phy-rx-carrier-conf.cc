@@ -18,8 +18,9 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "satellite-phy-rx-carrier-conf.h"
 #include "ns3/log.h"
+#include "satellite-utils.h"
+#include "satellite-phy-rx-carrier-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierConf");
 
@@ -32,8 +33,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf()
   m_ifModel = IF_CONSTANT;
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_K,
-                                           double rxOtherSysNoise_W, double rxBandwidth_Hz,
+SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_dBK,
+                                           double rxOtherSysNoise_dBW, double rxBandwidth_Hz,
                                            ErrorModel errorModel, InterferenceModel ifModel,
                                            RxMode rxMode)
 {
@@ -41,9 +42,9 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemper
   m_errorModel = errorModel;
   m_ifModel = ifModel;
   m_rxBandwidth_Hz = rxBandwidth_Hz;
-  m_rxTemperature_K = rxTemperature_K;
+  m_rxTemperature_K = SatUtils::DbToLinear (rxTemperature_dBK);
   m_rxMode = rxMode;
-  m_rxOtherSysNoise_W = rxOtherSysNoise_W;
+  m_rxOtherSysNoise_W = SatUtils::DbWToW<double> (rxOtherSysNoise_dBW);
 
 }
 

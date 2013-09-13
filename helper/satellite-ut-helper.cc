@@ -26,6 +26,7 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/callback.h"
+#include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
@@ -61,16 +62,16 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatUtHelper::m_interferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute( "RxTemperature",
+      .AddAttribute( "RxTemperatureDbK",
                      "The forward link RX noise temperature in UT.",
-                     DoubleValue (293.00),
-                     MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_K),
+                     DoubleValue(24.62),  // ~290K
+                     MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_dbK),
                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxOtherSysNoise",
+      .AddAttribute( "RxOtherSysNoiseDbW",
                      "Other system noise of RX in UT.",
-                     DoubleValue(0),
-                     MakeDoubleAccessor(&SatUtHelper::m_otherSysNoise_W),
-                     MakeDoubleChecker<double>())
+                     DoubleValue (SatUtils::MinDb<double> ()),
+                     MakeDoubleAccessor(&SatUtHelper::m_otherSysNoise_dbW),
+                     MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
@@ -181,8 +182,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   Ptr<SatPhyRxCarrierConf> carrierConf =
         CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
-                                           m_rxTemperature_K,
-                                           m_otherSysNoise_W,
+                                           m_rxTemperature_dbK,
+                                           m_otherSysNoise_dbW,
                                            rxBandwidth,
                                            m_errorModel,
                                            m_interferenceModel,
