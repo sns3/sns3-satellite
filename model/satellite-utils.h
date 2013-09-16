@@ -61,12 +61,12 @@ public:
   static inline T DegreesToRadians ( T degree ) { return (T) ( ( degree ) * ( M_PI / 180.0 ) ); }
 
   /**
-   * Get minimum value for linear
+   * Get minimum value for linear. (The smallest value greater than zero)
    *
    * \return minimum linear value
    */
   template <typename T>
-  static inline T MinLin () { return (T) ( std::numeric_limits<T>::min () * 10.0 ); }
+  static inline T MinLin () { return (T) ( std::numeric_limits<T>::min () ); }
 
   /**
    * Get maximum value for linear
@@ -82,7 +82,7 @@ public:
    * \return minimum Decibel value
    */
   template <typename T>
-  static inline T MinDb () { return (T) ( 10.0 * std::log (MinLin<T>()) ); }
+  static inline T MinDb () { return (T) LinearToDb ( MinLin<T>() ); }
 
   /**
    * Get maximum value for Decibel
@@ -90,7 +90,7 @@ public:
    * \return maximum Decibel value
    */
   template <typename T>
-  static inline T MaxDb () { return (T) ( 10.0 * std::log (MaxLin<T>()) ); }
+  static inline T MaxDb () { return (T) LinearToDb ( MaxLin<T>() ); }
 
   /**
    * Converts Decibel Watts to Watts
@@ -112,6 +112,8 @@ public:
 
   /**
    * Converts Decibels to linear
+   * Accepted values for conversion are between minimum decibel value and
+   * maximum decibel value. Zero is also accepted and it converts to -inf.
    *
    * \param db value in Decibels to convert, NAN means 0 Watt
    *
@@ -120,15 +122,18 @@ public:
   template <typename T>
   static inline T DbToLinear ( T db )
   {
-    NS_ASSERT( db >= MinDb<T> () && db <= MaxDb<T> ()  );
+    NS_ASSERT( ( db >= MinDb<T> () && db <= MaxDb<T> () ) || -isinf(db)  );
 
     return (T) std::pow ( 10.0, db / 10.0 );
   }
 
   /**
-   * Converts linear to Decibels
+   * Converts linear to Decibels.
+   * Accepted values for conversion are between minimum linear value (greater than zero and
+   * maximum linear value. -inf is also accepted and it converts to 0.
    *
    * \param linear value in linear to convert
+   *
    * \return Decibels converted from linear
    */
   template <typename T>
@@ -159,7 +164,7 @@ public:
 
 private:
   /**
-   * Desctructor
+   * Destructor
    *
    * Made Pure Virtual because the class is not planned be instantiated or inherited
    *
