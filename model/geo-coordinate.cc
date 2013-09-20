@@ -183,7 +183,7 @@ std::ostream &operator << (std::ostream &os, const GeoCoordinate &coordinate)
   double latitude = coordinate.GetLatitude();
   double altitude = coordinate.GetAltitude();
 
-  os << longitude << ":" << latitude << ":" << altitude;
+  os << latitude << "," << longitude << "," << altitude;
 
   return os;
 }
@@ -196,13 +196,13 @@ std::istream &operator >> (std::istream &is, GeoCoordinate &coordinate)
   char c1;
   char c2;
 
-  is >> longitude >> c1 >> latitude >> c2 >> altitude;
+  is >> latitude >> c1 >> longitude >> c2 >> altitude;
 
   coordinate.SetLongitude(longitude);
   coordinate.SetLatitude(latitude);
   coordinate.SetAltitude(altitude);
 
-  if (c1 != ':' || c2 != ':')
+  if (c1 != ',' || c2 != ',')
     {
       is.setstate (std::ios_base::failbit);
     }
