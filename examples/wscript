@@ -21,4 +21,7 @@ def build(bld):
 
     obj = bld.create_ns3_program('loo-example', ['satellite'])
     obj.source = 'loo-example.cc'
+
+    obj = bld.create_ns3_program('fading-trace-example', ['satellite'])
+    obj.source = 'fading-trace-example.cc'
     

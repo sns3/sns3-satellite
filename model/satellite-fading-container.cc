@@ -32,7 +32,11 @@ SatFadingContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingContainer")
     .SetParent<Object> ()
-    .AddConstructor<SatFadingContainer> ();
+    .AddConstructor<SatFadingContainer> ()
+    .AddTraceSource ("FadingTrace",
+                     "The trace for fading values",
+                     MakeTraceSourceAccessor (&SatFadingContainer::m_fadingTrace));
+
   return tid;
 }
 
@@ -86,6 +90,17 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordi
   m_looModel_up = CreateObject<SatLooModel> (0.5,0.5,-8.0,m_dopplerFrequencyHz,m_numOfOscillators);
   m_looModel_down = CreateObject<SatLooModel> (0.5,0.5,-8.0,m_dopplerFrequencyHz,m_numOfOscillators);
 
+  for (uint32_t j = 0; j < SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT; j++)
+    {
+      std::vector<double> parameters;
+
+      for (uint32_t k = 0; k < m_numOfStates; k++)
+        {
+          parameters.push_back (0.0);
+        }
+      m_looParameters.push_back (parameters);
+    }
+
   UpdateProbabilities (m_setId);
   UpdateLooParameters (m_setId);
 
@@ -105,16 +120,25 @@ SatFadingContainer::~SatFadingContainer ()
 double
 SatFadingContainer::GetFading (SatChannel::ChannelType channeltype)
 {
+  double fadingValue;
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Getting fading");
 
   if (HasCooldownPeriodPassed (channeltype))
     {
       NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
       EvaluateStateChange ();
-      return CalculateFading (channeltype);
+      fadingValue = CalculateFading (channeltype);
     }
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period in effect, using old fading value");
-  return GetCachedFadingValue (channeltype);
+  else
+    {
+      NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period in effect, using old fading value");
+      fadingValue = GetCachedFadingValue (channeltype);
+    }
+
+  m_fadingTrace ( Now ().GetSeconds (), channeltype, fadingValue);
+
+  return fadingValue;
 }
 
 double
@@ -242,13 +266,12 @@ SatFadingContainer::UpdateLooParameters (uint32_t setId)
 
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Updating Loo parameters...");
 
-  for (uint32_t i = 0; i < m_numOfStates; ++i)
+  for (uint32_t i = 0; i < SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT; ++i)
     {
-    for (uint32_t j = 0; j < SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT; ++j)
+    for (uint32_t j = 0; j < m_numOfStates; ++j)
       {
         m_looParameters[i][j] = looParameters[i][j];
       }
-    NS_LOG_INFO("------");
     }
 }
 

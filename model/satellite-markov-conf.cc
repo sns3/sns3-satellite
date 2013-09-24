@@ -111,7 +111,7 @@ SatMarkovConf::SatMarkovConf () :
 
   m_markovElevations.insert (elevation);
 
-  m_cooldownPeriodLength = Seconds (0.05);
+  m_cooldownPeriodLength = Seconds (0.0005);
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {

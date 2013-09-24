@@ -87,6 +87,12 @@ private:
 
   std::vector <std::vector <double> > m_looParameters;
 
+  TracedCallback< double,                   // time
+                  SatChannel::ChannelType,  // channel type
+                  double                    // fading value
+                  >
+     m_fadingTrace;
+
   void UpdateProbabilities (uint32_t setId);
   void UpdateLooParameters (uint32_t setId);
   void EvaluateStateChange ();
