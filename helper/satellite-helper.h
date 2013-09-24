@@ -28,10 +28,12 @@
 #include "ns3/node-container.h"
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/csma-helper.h"
+#include "ns3/satellite-antenna-gain-pattern-container.h"
 #include "satellite-user-helper.h"
 #include "satellite-beam-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
+
 
 namespace ns3 {
 
@@ -202,9 +204,10 @@ private:
    * Sets mobility to created UT nodes.
    *
    * /param uts node container of UTs to set mobility
+   * /param the spot-beam id, where the UTs should be placed
    *
    */
-  void SetUtMobility(NodeContainer uts);
+  void SetUtMobility(NodeContainer uts, uint32_t beamId);
 
   /**
    * User helper
@@ -281,6 +284,10 @@ private:
    */
   BeamMap m_beamInfo;
 
+  /**
+   * Antenna gain patterns for all spot-beams. Used for beam selection.
+   */
+  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 };
 
 } // namespace ns3

@@ -43,6 +43,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
   std::string path = "src/satellite/data/antennapatterns/";
   std::string fileName = "SatAntennaGain72Beams_";
 
+  // Note, that the beam ids start from 1
   for (uint32_t i = 1; i <= NUMBER_OF_BEAMS; ++i)
     {
       std::ostringstream ss;
@@ -77,20 +78,25 @@ uint32_t SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) con
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude() << coord.GetLongitude());
 
-  double bestGain = -100.0;
-  uint32_t bestId = 0;
+  double bestGain (-100.0);
+  uint32_t bestId (0);
 
   for (uint32_t i = 1; i <= NUMBER_OF_BEAMS; ++i)
     {
       double gain = m_antennaPatternMap.at(i)->GetAntennaGain_lin (coord);
-      if (gain > bestGain)
+
+      // The antenna pattern has returned a NAN gain. This means
+      // that this position is not valid. Return 0, which is not a valid beam id.
+      if (isnan(gain))
+        {
+          NS_FATAL_ERROR (this << " returned a NAN antenna gain value!");
+        }
+      else if (gain > bestGain)
         {
           bestGain = gain;
           bestId = i;
         }
     }
-
-  NS_ASSERT (bestId > 0);
 
   return bestId;
 }

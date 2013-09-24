@@ -51,6 +51,8 @@ SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
  :m_nanStrings(m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
 {
   ReadAntennaPatternFromFile (filePathName);
+
+  m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
 }
 
 
@@ -80,6 +82,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
   // Start conditions
   double lat, lon, gainDouble;
   std::string gainString;
+  bool firstRowDone (false);
 
   // Read a row
   *ifs >> lat >> lon >> gainString;
@@ -100,6 +103,12 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
       else
         {
           gainDouble = atof(gainString.c_str());
+
+          // Add the
+          if ( gainDouble >= MIN_ACCEPTABLE_ANTENNA_GAIN )
+            {
+              m_validPositions.push_back (std::make_pair(lat, lon));
+            }
         }
 
       // Collect the valid latitude values
@@ -107,6 +116,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
         {
           if (m_latitudes.back() != lat)
             {
+              firstRowDone = true;
               m_latInterval = lat - m_latitudes.back();
               m_latitudes.push_back (lat);
             }
@@ -119,7 +129,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
       // Collect the valid longitude values
       if (!m_longitudes.empty() )
         {
-          if (m_longitudes.back() != lon)
+          if (!firstRowDone && m_longitudes.back() != lon)
             {
               m_lonInterval = lon - m_longitudes.back();
               m_longitudes.push_back (lon);
@@ -161,10 +171,70 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
       *ifs >> lat >> lon >> gainString;
     }
 
+  // At this point, the last row should not be stored, since the storing
+  // happens every time the row changes. I.e. the last row is stored here!
+  NS_ASSERT( rowVector.size () == m_longitudes.size ());
+
+  m_antennaPattern.push_back (rowVector);
+  rowVector.clear();
+
   ifs->close ();
   delete ifs;
 }
 
+
+GeoCoordinate SatAntennaGainPattern::GetValidPosition () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t numPosGridPoints = m_validPositions.size ();
+  uint32_t ind (0);
+  std::pair<double, double> lowerLeftCoord;
+
+  while (1)
+    {
+      // Get random position (=lower left corner of a grid) from the valid ones
+      ind = m_uniformRandomVariable->GetInteger (0, numPosGridPoints-1);
+      lowerLeftCoord = m_validPositions[ind];
+
+      // Test if the three other corners for interpolation are found.
+      // If they do not, loop again to find another position.
+
+      std::pair<double, double> testPos;
+
+      // Upper left corner
+      testPos.first = lowerLeftCoord.first + m_latInterval;
+      testPos.second = lowerLeftCoord.second;
+      if (find (m_validPositions.begin (), m_validPositions.end (), testPos) == m_validPositions.end ())
+        {
+          continue;
+        }
+
+      // Upper right corner
+      testPos.second = lowerLeftCoord.second + m_lonInterval;
+      if (find (m_validPositions.begin (), m_validPositions.end (), testPos) == m_validPositions.end ())
+        {
+          continue;
+        }
+
+      // Lower right corner
+      testPos.first = lowerLeftCoord.first;
+      if (find (m_validPositions.begin (), m_validPositions.end (), testPos) == m_validPositions.end ())
+        {
+          continue;
+        }
+
+      // None of the previous checks triggered, thus we have a valid position.
+      break;
+    }
+
+  // Pick a random position within a grid square
+  double latOffset = m_uniformRandomVariable->GetValue (0.0, m_latInterval - 0.001);
+  double lonOffset = m_uniformRandomVariable->GetValue (0.0, m_lonInterval - 0.001);
+  GeoCoordinate coord (lowerLeftCoord.first+latOffset, lowerLeftCoord.second+lonOffset, 0.0);
+
+  return coord;
+}
 
 
 double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
@@ -175,11 +245,14 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   double latitude = coord.GetLatitude ();
   double longitude = coord.GetLongitude ();
 
-  // Given {latitud, longitude} has to be inside the min/max latitude/longitude values
-  NS_ASSERT (m_minLat <= latitude);
-  NS_ASSERT (latitude <= m_maxLat);
-  NS_ASSERT (m_minLon <= longitude);
-  NS_ASSERT (longitude <= m_maxLon);
+  // Given {latitude, longitude} has to be inside the min/max latitude/longitude values
+  if (m_minLat > latitude ||
+      latitude > m_maxLat ||
+      m_minLon > longitude ||
+      longitude > m_maxLon)
+    {
+      NS_FATAL_ERROR (this << " given latitude and longitude out of range!");
+    }
 
   // Calculate the minimum grid point {minLatIndex, minLonIndex} for the given {latitude, longitude} point
   uint32_t minLatIndex = (uint32_t)(std::floor(std::abs(latitude - m_minLat) / m_latInterval));
@@ -188,10 +261,13 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   // All the values within the grid box has to be valid! If UT is placed (or
   // is moving outside) the valid simulation area, the simulation will crash
   // to assert.
-  NS_ASSERT (!isnan(m_antennaPattern[minLatIndex][minLonIndex]));
-  NS_ASSERT (!isnan(m_antennaPattern[minLatIndex][minLonIndex+1]));
-  NS_ASSERT (!isnan(m_antennaPattern[minLatIndex+1][minLonIndex]));
-  NS_ASSERT (!isnan(m_antennaPattern[minLatIndex+1][minLonIndex+1]));
+  if (isnan(m_antennaPattern[minLatIndex][minLonIndex]) ||
+      isnan(m_antennaPattern[minLatIndex][minLonIndex+1]) ||
+      isnan(m_antennaPattern[minLatIndex+1][minLonIndex]) ||
+      isnan(m_antennaPattern[minLatIndex+1][minLonIndex+1]))
+    {
+      NS_FATAL_ERROR (this << ", some value(s) of the interpolated grid point(s) is/are NAN!");
+    }
 
   /**
    * 4-point bilinear interpolation
@@ -236,9 +312,10 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
       ", x = " << longitude <<
       ", y = " << latitude <<
       ", interpolated gain: " << gain << std::endl;
-  */
+   */
   return gain;
 }
+
 
 
 } // namespace ns3

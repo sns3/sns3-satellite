@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <fstream>
+#include "ns3/random-variable-stream.h"
 #include "ns3/object.h"
 #include "geo-coordinate.h"
 
@@ -49,8 +50,13 @@ public:
    */
   double GetAntennaGain_lin (GeoCoordinate coord) const;
 
-private:
+  /**
+   * Get a valid position under this spot-beam coverage.
+   * \return GeoCoordinate
+   */
+  GeoCoordinate GetValidPosition () const;
 
+private:
   /**
    * Read the antenna gain pattern from a file
    * \param filePathName Path and file name of the antenna pattern file
@@ -63,6 +69,24 @@ private:
    * - Inner vector holds gain values for all longitudes for a certain latitude
    */
   std::vector< std::vector <double> > m_antennaPattern;
+
+  /**
+   * Container for valid positions
+   * - Latitude
+   * - Longitude
+   */
+  std::vector< std::pair<double, double> > m_validPositions;
+
+  /**
+   * Minimum acceptable antenna gain for a serving spot-beam. Used
+   * for beam selection.
+   */
+  static const double MIN_ACCEPTABLE_ANTENNA_GAIN = 40.0;
+
+  /**
+   * Uniform random variable used for beam selection.
+   */
+  Ptr<UniformRandomVariable> m_uniformRandomVariable;
 
   /**
    * All valid latitudes from the file
@@ -109,7 +133,6 @@ private:
    */
   static const std::string m_nanStringArray[4];
   std::vector<std::string> m_nanStrings;
-
 };
 
 

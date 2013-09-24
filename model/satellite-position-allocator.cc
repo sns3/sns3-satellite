@@ -18,6 +18,7 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include <limits>
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/boolean.h"
@@ -27,6 +28,8 @@
 #include "ns3/log.h"
 #include <cmath>
 #include "satellite-position-allocator.h"
+#include "satellite-antenna-gain-pattern-container.h"
+#include "satellite-utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPositionAllocator");
 
@@ -34,7 +37,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatPositionAllocator);
 
-TypeId 
+TypeId
 SatPositionAllocator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPositionAllocator")
@@ -51,6 +54,7 @@ SatPositionAllocator::SatPositionAllocator ()
  :m_GetAsGeoCoordinates(true)
 {
 }
+
 
 SatPositionAllocator::~SatPositionAllocator ()
 {
@@ -140,6 +144,8 @@ SatRandomBoxPositionAllocator::GetTypeId (void)
 SatRandomBoxPositionAllocator::SatRandomBoxPositionAllocator ()
 {
 }
+
+
 SatRandomBoxPositionAllocator::~SatRandomBoxPositionAllocator ()
 {
 }
@@ -164,11 +170,11 @@ SatRandomBoxPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 GeoCoordinate
 SatRandomBoxPositionAllocator::GetNextGeo (void) const
 {
-  double longitude = m_longitude->GetValue ();
-  double latitude = m_latitude->GetValue ();
-  double altitude = m_altitude->GetValue ();
+    double longitude = m_longitude->GetValue ();
+    double latitude = m_latitude->GetValue ();
+    double altitude = m_altitude->GetValue ();
 
-  return GeoCoordinate (latitude, longitude, altitude);
+    return GeoCoordinate (latitude, longitude, altitude);
 }
 
 int64_t
@@ -181,4 +187,82 @@ SatRandomBoxPositionAllocator::AssignStreams (int64_t stream)
 }
 
 
-} // namespace ns3 
+NS_OBJECT_ENSURE_REGISTERED (SatSpotBeamPositionAllocator);
+
+TypeId
+SatSpotBeamPositionAllocator::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatSpotBeamPositionAllocator")
+    .SetParent<SatPositionAllocator> ()
+    .SetGroupName ("Mobility")
+    .AddConstructor<SatSpotBeamPositionAllocator> ()
+    .AddAttribute ("Altitude",
+                   "A random variable which represents the altitude coordinate of a position in a random box.",
+                   StringValue ("ns3::UniformRandomVariable[Min=0.0]"),
+                   MakePointerAccessor (&SatSpotBeamPositionAllocator::m_altitude),
+                   MakePointerChecker<RandomVariableStream> ());
+  return tid;
+}
+
+SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator ()
+{
+
+}
+
+SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patterns)
+ :m_targetBeamId (beamId),
+  m_antennaGainPatterns (patterns)
+{
+}
+
+
+SatSpotBeamPositionAllocator::~SatSpotBeamPositionAllocator ()
+{
+}
+
+void
+SatSpotBeamPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
+{
+  m_altitude = altitude;
+}
+
+GeoCoordinate
+SatSpotBeamPositionAllocator::GetNextGeo (void) const
+{
+  uint32_t bestBeamId (std::numeric_limits<uint32_t>::max());
+  Ptr<SatAntennaGainPattern> agp = m_antennaGainPatterns->GetAntennaGainPattern (m_targetBeamId);
+  uint32_t tries (0);
+  GeoCoordinate pos;
+
+  // Try until we have a valid position or the MAX_TRIES have been exceeded.
+  while (bestBeamId != m_targetBeamId && tries < MAX_TRIES)
+    {
+      pos = agp->GetValidPosition ();
+      bestBeamId = m_antennaGainPatterns->GetBestBeamId (pos);
+      ++tries;
+    }
+
+  // If the positioning fails
+  if (tries >= MAX_TRIES)
+    {
+      NS_FATAL_ERROR (this << " max number of tries for spot-beam allocation exceeded!");
+    }
+
+  // Set a random altitude
+  pos.SetAltitude (m_altitude->GetValue ());
+
+  NS_ASSERT (pos.GetLatitude() >= -90.0 && pos.GetLatitude() <= 90.0);
+  NS_ASSERT (pos.GetLongitude() >= -180.0 && pos.GetLongitude() <= 180.0);
+
+  return pos;
+}
+
+int64_t
+SatSpotBeamPositionAllocator::AssignStreams (int64_t stream)
+{
+  m_altitude->SetStream (stream + 2);
+  return 3;
+}
+
+
+} // namespace ns3

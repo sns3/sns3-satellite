@@ -25,6 +25,7 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/position-allocator.h"
 #include "geo-coordinate.h"
+#include "satellite-antenna-gain-pattern-container.h"
 
 namespace ns3 {
 
@@ -39,6 +40,7 @@ class SatPositionAllocator : public PositionAllocator
 public:
   static TypeId GetTypeId (void);
   SatPositionAllocator ();
+
   virtual ~SatPositionAllocator ();
   /**
    * \return the next chosen position.
@@ -82,6 +84,7 @@ private:
   mutable std::vector<GeoCoordinate>::const_iterator m_current;
 };
 
+
 /**
  * \ingroup satellite
  * \brief Allocate random positions within a 3D box according to a set of three random variables (longitude, latitude, altitude).
@@ -89,21 +92,70 @@ private:
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {
 public:
-  static TypeId GetTypeId (void);
-  SatRandomBoxPositionAllocator ();
-  virtual ~SatRandomBoxPositionAllocator ();
+   static TypeId GetTypeId (void);
+   SatRandomBoxPositionAllocator ();
+   virtual ~SatRandomBoxPositionAllocator ();
 
-  void SetLatitude (Ptr<RandomVariableStream> latitude);
-  void SetLongitude (Ptr<RandomVariableStream> longitude);
+   void SetLatitude (Ptr<RandomVariableStream> latitude);
+   void SetLongitude (Ptr<RandomVariableStream> longitude);
+   void SetAltitude (Ptr<RandomVariableStream> altitude);
+
+   virtual GeoCoordinate GetNextGeo (void) const;
+   virtual int64_t AssignStreams (int64_t stream);
+
+ private:
+   Ptr<RandomVariableStream> m_latitude;
+   Ptr<RandomVariableStream> m_longitude;
+   Ptr<RandomVariableStream> m_altitude;
+};
+
+/**
+ * \ingroup satellite
+ * \brief Allocate random positions within the area of a certain spot-beam.
+ */
+class SatSpotBeamPositionAllocator : public SatPositionAllocator
+{
+public:
+  static TypeId GetTypeId (void);
+  SatSpotBeamPositionAllocator ();
+  SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patternContainer);
+  virtual ~SatSpotBeamPositionAllocator ();
+
   void SetAltitude (Ptr<RandomVariableStream> altitude);
 
   virtual GeoCoordinate GetNextGeo (void) const;
   virtual int64_t AssignStreams (int64_t stream);
 private:
-  Ptr<RandomVariableStream> m_latitude;
-  Ptr<RandomVariableStream> m_longitude;
+
+  /**
+   * Max number of tries to pick a random position for a UT.
+   */
+  static const uint32_t MAX_TRIES = 100;
+
+  /**
+   * Minimum accepted antenna gain for a UT.
+   */
+  static const double MIN_ANTENNA_GAIN = 40.0;
+
+  /**
+   * Target beam id to which the UT is tried to be placed.
+   */
+  uint32_t m_targetBeamId;
+
+  /**
+   * Antenna pattern used to check that the give position is valid based on
+   * antenna gains. I.e. UT should be placed into a position where the m_targetBeamId
+   * has the best antenna gain.
+   */
+  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
+
+  /**
+   * A random variable stream for altitude.
+   */
   Ptr<RandomVariableStream> m_altitude;
 };
+
+
 
 } // namespace ns3
 

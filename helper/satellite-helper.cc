@@ -18,6 +18,7 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include "ns3/double.h"
 #include "ns3/log.h"
 #include "ns3/names.h"
 #include "ns3/queue.h"
@@ -88,6 +89,9 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string satPos = scenarioName + "GeoPos.txt";
 
   m_satConf.Initialize (path, satConf, gwPos, satPos);
+
+  // Create antenna gain patterns
+  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
 }
 
 void
@@ -287,7 +291,7 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
       // create UTs of the beam, set mobility to them and install to internet
       NodeContainer uts;
       uts.Create(info->second.GetUtCount());
-      SetUtMobility(uts);
+      SetUtMobility(uts, info->first);
       internet.Install(uts);
 
       for ( uint32_t i = 0; i < info->second.GetUtCount(); i++ )
@@ -325,16 +329,25 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
 }
 
 void
-SatHelper::SetUtMobility(NodeContainer uts)
+SatHelper::SetUtMobility(NodeContainer uts, uint32_t beamId)
 {
   MobilityHelper mobility;
-  mobility.SetPositionAllocator ("ns3::SatRandomBoxPositionAllocator",
-                                   "Longitude",StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=40.0]"),
-                                   "Latitude", StringValue ("ns3::UniformRandomVariable[Min=35.0|Max=65.0]"),
-                                   "Altitude", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=200.0]"));
 
-  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
-  mobility.Install (uts);
+  // Create new position allocator
+  Ptr<SatSpotBeamPositionAllocator> allocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns);
+
+  Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
+  altRnd->SetAttribute ("Min", DoubleValue (0.0));
+  altRnd->SetAttribute ("Max", DoubleValue (500.0));
+  allocator->SetAltitude (altRnd);
+
+  mobility.SetPositionAllocator (allocator);
+
+  for ( NodeContainer::Iterator i = uts.Begin();  i != uts.End(); i++ )
+    {
+      mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+      mobility.Install (uts);
+    }
 }
 
 void
