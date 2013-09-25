@@ -273,12 +273,12 @@ SatBeamHelper::GetUtPositionInfo(bool printMacAddress)
             }
 
           oss << i->first << " " << devAddress << " " <<  i->second->GetId() << " "
-              << pos.GetLongitude() << " " << pos.GetLatitude() << " " << pos.GetAltitude() << std::endl;
+        		  << pos.GetLatitude() << " " << pos.GetLongitude() << " " << pos.GetAltitude() << std::endl;
         }
       else
         {
           oss << i->first << " " <<  i->second->GetId() << " "
-              << pos.GetLongitude() << " " << pos.GetLatitude() << " " << pos.GetAltitude() << std::endl;
+        		  << pos.GetLatitude() << " " << pos.GetLongitude() << " " << pos.GetAltitude() << std::endl;
         }
 
     }
@@ -317,15 +317,16 @@ SatBeamHelper::CreateBeamInfo()
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
       GeoCoordinate pos = model->GetGeoPosition();
-      oss << "GW " << i->first << ": longitude=" << pos.GetLongitude()
-          << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude() << std::endl;
+      oss << "GW " << i->first << ": latitude=" << pos.GetLatitude()
+    		  << ", longitude=" << pos.GetLongitude()
+    		  << ", altitude=" << pos.GetAltitude() << std::endl;
     }
 
   oss << std::endl << " -- Geo Satellite position --" << std::endl;
 
   Ptr<SatMobilityModel> model = m_geoNode->GetObject<SatMobilityModel> ();
   GeoCoordinate pos = model->GetGeoPosition();
-  oss << "longitude=" << pos.GetLongitude() << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude() << std::endl;
+  oss << "latitude=" << pos.GetLatitude() << ", longitude=" << pos.GetLongitude() << ", altitude=" << pos.GetAltitude() << std::endl;
 
   return oss.str();
 }
