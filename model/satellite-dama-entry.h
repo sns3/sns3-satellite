@@ -21,19 +21,9 @@
 #ifndef SAT_DAMA_ENTRY_H
 #define SAT_DAMA_ENTRY_H
 
-#include <vector>
 #include <map>
 
-/*
-#include "ns3/object.h"
-#include "ns3/ptr.h"
-#include "ns3/callback.h"
-#include "ns3/packet.h"
-#include "ns3/traced-callback.h"
-#include "ns3/mac48-address.h"
-*/
-
-#include "satellite-control-header.h"
+#include "satellite-control-message.h"
 
 namespace ns3 {
 
@@ -80,7 +70,7 @@ private:
   /**
    * Dynamic SRs
    */
-  std::map<Rc_t, Ptr<SatCapacityReqData> > m_capacityRequests;
+  std::map<Rc_t, Ptr<SatCapacityReqHeader> > m_capacityRequests;
 
   /**
    * Throughput in this superframe

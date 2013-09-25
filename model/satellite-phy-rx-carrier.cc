@@ -30,6 +30,7 @@
 #include "satellite-constant-interference.h"
 #include "satellite-per-packet-interference.h"
 #include "satellite-traced-interference.h"
+#include "satellite-mac-tag.h"
 #include "satellite-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
@@ -153,18 +154,13 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-
           // add interference in any case
           m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W);
 
-          MacAddressTag tag;
-          m_destAddress = Mac48Address();
+          SatMacTag tag;
+          rxParams->m_packet->PeekPacketTag (tag);
 
-          // Get MacAddressTag tag from packet by peeking, upper layer (MAC) is repsonsible for removing tag
-          if (rxParams->m_packet->PeekPacketTag(tag))
-            {
-              m_destAddress = Mac48Address::ConvertFrom (tag.GetAddress());
-            }
+          m_destAddress = Mac48Address::ConvertFrom (tag.GetAddress());
 
           // Check whether the packet is sent to our beam.
           // In case that RX mode is something else than transparent

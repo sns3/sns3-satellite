@@ -28,6 +28,7 @@
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 
+#include "satellite-mac-tag.h"
 #include "satellite-mac.h"
 #include "satellite-phy.h"
 #include "satellite-net-device.h"
@@ -37,71 +38,6 @@
 NS_LOG_COMPONENT_DEFINE ("SatMac");
 
 namespace ns3 {
-
-MacAddressTag::MacAddressTag ()
-{
-  NS_LOG_FUNCTION (this);
-}
-
-void
-MacAddressTag::SetAddress (Address dest)
-{
-  NS_LOG_FUNCTION (this << dest);
-  m_macAddress = dest;
-}
-
-Address
-MacAddressTag::GetAddress (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_macAddress;
-}
-
-NS_OBJECT_ENSURE_REGISTERED (MacAddressTag);
-
-TypeId
-MacAddressTag::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::MacAddressTag")
-    .SetParent<Tag> ()
-    .AddConstructor<MacAddressTag> ()
-  ;
-  return tid;
-}
-TypeId
-MacAddressTag::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
-}
-
-uint32_t
-MacAddressTag::GetSerializedSize (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_macAddress.GetSerializedSize();
-}
-void
-MacAddressTag::Serialize (TagBuffer i) const
-{
-  NS_LOG_FUNCTION (this << &i);
-  m_macAddress.Serialize (i);
-}
-
-void
-MacAddressTag::Deserialize (TagBuffer i)
-{
-  NS_LOG_FUNCTION (this << &i);
-  m_macAddress.Deserialize (i);
-}
-
-void
-MacAddressTag::Print (std::ostream &os) const
-{
-  NS_LOG_FUNCTION (this << &os);
-  os << "MacAddress=" << m_macAddress;
-}
 
 NS_OBJECT_ENSURE_REGISTERED (SatMac);
 
@@ -160,8 +96,6 @@ SatMac::SatMac ()
   : m_phy(0)
 {
   NS_LOG_FUNCTION (this);
-
-
 }
 
 SatMac::~SatMac ()
@@ -173,8 +107,13 @@ void SatMac::StartScheduling()
 {
   if ( m_tInterval.GetDouble() )
     {
-      Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this);
+      ScheduleTransmit (m_tInterval);
     }
+}
+
+void SatMac::ScheduleTransmit(Time transmitTime)
+{
+  Simulator::Schedule (transmitTime, &SatMac::TransmitReady, this);
 }
 
 void
@@ -277,29 +216,22 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 
   m_macRxTrace (packet);
 
-  MacAddressTag tag;
+  SatMacTag msgTag;
+  packet->RemovePacketTag (msgTag);
 
-  // Fetch the packet tag
-  if (packet->RemovePacketTag (tag))
+  NS_LOG_LOGIC("Packet to " << msgTag.GetAddress());
+  NS_LOG_LOGIC("Receiver " << m_macAddress );
+
+  // If the packet is intended for this receiver
+  Mac48Address addr = Mac48Address::ConvertFrom (msgTag.GetAddress());
+
+  if ( addr == m_macAddress ||  addr.IsBroadcast() )
     {
-      NS_LOG_LOGIC("Packet to " << tag.GetAddress());
-      NS_LOG_LOGIC("Receiver " << m_macAddress );
-
-      // If the packet is intended for this receiver
-      Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
-
-      if ( addr == m_macAddress ||  addr.IsBroadcast() )
-        {
-          m_rxCallback (packet);
-        }
-      else
-        {
-          NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
-        }
+      m_rxCallback (packet);
     }
   else
     {
-       NS_ASSERT( "SatMac::Receive(): Packet received with no tag information!");
+      NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
     }
 }
 
@@ -312,7 +244,7 @@ SatMac::Send ( Ptr<Packet> packet, Address dest )
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
   // Add destination MAC address to the packet as a tag.
-  MacAddressTag tag;
+  SatMacTag tag;
   tag.SetAddress (dest);
   packet->AddPacketTag (tag);
 
@@ -331,7 +263,6 @@ SatMac::Send ( Ptr<Packet> packet, Address dest )
 
   return true;
 }
-
 
 void
 SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)

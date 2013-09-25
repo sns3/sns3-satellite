@@ -317,10 +317,9 @@ SimpleP2p3::DoRun (void)
 
   // initialized time values for simulation
   uint32_t maxReceivers = utUsers.GetN();
-  Time cbrStartDelay = Seconds(0.01);
-  Time cbrStartBaseValue = Seconds(1.0);
-  Time cbrStopBaseValue = cbrStartBaseValue + cbrInterval + cbrStartDelay;
-  Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrStopBaseValue + Seconds(0.5);
+  Time cbrStartDelay = Seconds(0.00001);
+  Time cbrStopDelay = Seconds(0.1);
+  Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrInterval + cbrInterval;
 
   ApplicationContainer gwApps;
   ApplicationContainer utApps;
@@ -334,13 +333,13 @@ SimpleP2p3::DoRun (void)
       gwApps.Add(cbr.Install (gwUsers.Get(4)));
       utApps.Add(sink.Install (utUsers.Get(i)));
 
-      Time startStopDelta = Seconds(i * cbrStartDelay.GetSeconds());
+      cbrStartDelay += Seconds(0.00001);
 
-      gwApps.Get(i)->SetStartTime(startStopDelta + cbrStartBaseValue);
-      gwApps.Get(i)->SetStopTime(startStopDelta + cbrStopBaseValue);
+      gwApps.Get(i)->SetStartTime(cbrStartDelay);
+      gwApps.Get(i)->SetStopTime(cbrStartDelay + cbrInterval + cbrStopDelay);
     }
 
-  utApps.Start (cbrStartBaseValue);
+  utApps.Start (Seconds(0.00001));
   utApps.Stop (stopTime);
 
   Simulator::Stop (stopTime);
@@ -628,32 +627,31 @@ SimpleP2p6::DoRun (void)
 
   // Create the Cbr applications to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 0.5s)
-  Time cbrInterval = Seconds(0.5);
+  Time cbrInterval = Seconds(0.01);
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(3)), port)));
   cbr.SetAttribute ("Interval", TimeValue(cbrInterval));
 
   // initialized time values for simulation
   uint32_t maxReceivers = utUsers.GetN();
-  Time cbrStartDelay = Seconds(0.01);
-  Time cbrStartBaseValue = Seconds(1.0);
-  Time cbrStopBaseValue = cbrStartBaseValue + cbrInterval + cbrStartDelay;
-  Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrStopBaseValue + Seconds(0.5);
+  Time cbrStartDelay = Seconds(1.0);
+  Time cbrStopDelay = Seconds(0.005);
+  Time stopTime = Seconds (maxReceivers * 0.004) + cbrStartDelay + cbrInterval + cbrStopDelay;
 
   ApplicationContainer utApps;
 
   // Cbr applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      utApps.Add(cbr.Install (utUsers.Get(i)));
+      utApps.Add (cbr.Install (utUsers.Get(i)));
 
-      Time startStopDelta = Seconds(i * cbrStartDelay.GetSeconds());
+      cbrStartDelay += Seconds (0.003);
 
-      utApps.Get(i)->SetStartTime(startStopDelta + cbrStartBaseValue);
-      utApps.Get(i)->SetStopTime(startStopDelta + cbrStopBaseValue);
+      utApps.Get(i)->SetStartTime (cbrStartDelay);
+      utApps.Get(i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);
     }
 
   ApplicationContainer gwApps = sink.Install (gwUsers.Get(3));
-  gwApps.Start (cbrStartBaseValue);
+  gwApps.Start (Seconds(0.001));
   gwApps.Stop (stopTime);
 
   Simulator::Stop (stopTime);

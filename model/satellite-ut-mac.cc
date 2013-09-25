@@ -20,6 +20,8 @@
 
 #include "ns3/string.h"
 #include "ns3/log.h"
+#include "ns3/ptr.h"
+#include "ns3/random-variable.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "ns3/uinteger.h"
@@ -29,7 +31,7 @@
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
 
-#include "satellite-control-header.h"
+#include "satellite-control-message.h"
 #include "satellite-ut-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -71,30 +73,34 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 
   bool deliverUp = true;
 
-  MacAddressTag tag;
+  SatMacTag macTag;
+  packet->PeekPacketTag (macTag);
 
-  // Fetch the packet tag
-  if (packet->PeekPacketTag (tag))
+  SatControlMsgTag ctrlTag;
+  packet->RemovePacketTag (ctrlTag);
+
+  // If the packet is intended for this receiver
+  Mac48Address addr = Mac48Address::ConvertFrom (macTag.GetAddress());
+
+  if ( addr.IsBroadcast() && ctrlTag.GetMsgType() == SatControlMsgTag::SAT_TBTP_CTRL_MSG )
     {
-      // If the packet is intended for this receiver
-      Mac48Address addr = Mac48Address::ConvertFrom (tag.GetAddress());
+      SatTbtpHeader tbtp;
 
-      if ( addr.IsBroadcast() )
+      if ( packet->RemoveHeader(tbtp) > 0 )
         {
-          SatCtrlHeader header;
+          std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots = tbtp.GetTimeslots (m_macAddress);
 
-          packet->RemoveHeader(header);
+          deliverUp = false;
 
-          if (header.GetMsgType() == SatCtrlHeader::TBTP_MSG)
+          // TODO: now just put UT in line with random delay
+          // start time to be read from frame configurations
+          UniformVariable randomDelay(0.001, 0.005);
+          double startTime = 0.001 * (double) slots[0]->GetTimeSlotId();
+          startTime += randomDelay.GetValue();
+
+          if ( !slots.empty() )
             {
-              double time = header.GetMsgData();
-              m_tInterval = Time::FromDouble(time, Time::S);
-
-              packet->RemovePacketTag (tag);
-
-              deliverUp = false;
-
-              StartScheduling();
+              ScheduleTransmit ( Time::FromDouble (startTime, Time::S));
             }
         }
     }

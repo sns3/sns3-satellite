@@ -41,26 +41,7 @@
 namespace ns3 {
 
 
-/**
- * \brief This class implements a tag that carries the satellite unit-specific ID of a packet
- */
-class MacAddressTag : public Tag
-{
-public:
-  MacAddressTag ();
-  void SetAddress (Address dest);
-  Address GetAddress (void) const;
 
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual void Print (std::ostream &os) const;
-
-private:
-  Address m_macAddress;
-};
 
 /**
  * \ingroup satellite
@@ -94,9 +75,15 @@ public:
   ~SatMac ();
 
   /**
-   * Starts scheduling of the sending.
+   * Starts scheduling of the sending. Called when MAC is wanted to take care of scheduling.
    */
   void StartScheduling();
+
+  /**
+   * Schdules one sending opportunity. Called for every sending opportunity scheduler.
+   * /param Time transmitTime time when transmit possibility starts
+   */
+  void ScheduleTransmit ( Time transmitTime );
 
   /**
    * Attach the Phy object to SatMac.
@@ -187,6 +174,11 @@ protected:
     */
    Time m_tInterval;
 
+   /**
+    * MAC address of the this mac instance
+    */
+   Mac48Address m_macAddress;
+
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
@@ -223,11 +215,6 @@ private:
    * The upper layer package receive callback.
    */
   SatMac::ReceiveCallback m_rxCallback;
-
-  /**
-   * MAC address of the this mac instance
-   */
-  Mac48Address m_macAddress;
 
   /**
    * The trace source fired when packets come into the "top" of the device

@@ -20,8 +20,8 @@
 
 #include "ns3/log.h"
 #include "ns3/ipv4-l3-protocol.h"
-#include "satellite-dama-entry.h"
-#include "satellite-control-header.h"
+//#include "satellite-dama-entry.h"
+#include "satellite-control-message.h"
 #include "satellite-beam-scheduler.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
@@ -94,16 +94,34 @@ SatBeamScheduler::AddUt (Address utId)
 void
 SatBeamScheduler::Schedule ()
 {
-  // add header
   Ptr<Packet> packet = Create<Packet> ();
-  SatCtrlHeader header;
 
-  header.SetMsgData(0.001);
-  header.SetMsgType(SatCtrlHeader::TBTP_MSG);
+  // add TBTP tag to message
+  SatControlMsgTag tag;
+  tag.SetMsgType(SatControlMsgTag::SAT_TBTP_CTRL_MSG);
+  packet->AddPacketTag (tag);
+
+  // add TBTP specific header to message
+  SatTbtpHeader header;
+
+  // TODO: more realistic scheduling implemented later
+  // now just set different some time slot ID for every UTs
+  // and frame ID to 0
+
+  uint16_t timeSlotId = 1;
+
+  for ( std::set<Address>::iterator it = m_uts.begin(); it != m_uts.end(); it++ )
+    {
+      Ptr<SatTbtpHeader::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpHeader::TbtpTimeSlotInfo> (0, timeSlotId++ );
+      header.SetTimeslot(Mac48Address::ConvertFrom(*it), timeSlotInfo);
+    }
+
   packet->AddHeader (header);
 
-  // TODO: TBTP send only once. Needed change in future scheduler implementation.
-  Send(packet);
+  Send (packet);
+
+  // re-schedule next TBTP sending (call of this function)
+  Simulator::Schedule (Seconds(0.1), &SatBeamScheduler::Schedule, this);
 }
 
 } // namespace ns3
