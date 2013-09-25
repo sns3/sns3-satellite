@@ -38,6 +38,7 @@ class SatAntennaGainPattern : public Object
 {
 public:
   static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
 
   SatAntennaGainPattern ();
   SatAntennaGainPattern (std::string filePathName);
@@ -81,7 +82,7 @@ private:
    * Minimum acceptable antenna gain for a serving spot-beam. Used
    * for beam selection.
    */
-  static const double MIN_ACCEPTABLE_ANTENNA_GAIN = 40.0;
+  double m_minAcceptableAntennaGainInDb;
 
   /**
    * Uniform random variable used for beam selection.

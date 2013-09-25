@@ -49,7 +49,7 @@ public:
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
 
   static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
+  virtual TypeId GetInstanceTypeId (void) const;
   /**
    * Create a SatBeamHelper to make life easier when creating Satellite beams.
    */

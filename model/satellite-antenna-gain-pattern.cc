@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <stdlib.h>
+#include "ns3/double.h"
 #include "ns3/log.h"
 #include "satellite-utils.h"
 #include "satellite-antenna-gain-pattern.h"
@@ -30,6 +31,7 @@ namespace ns3 {
 
 const std::string SatAntennaGainPattern::m_nanStringArray[4] = {"nan", "NaN", "Nan", "NAN"};
 
+
 NS_OBJECT_ENSURE_REGISTERED (SatAntennaGainPattern);
 
 
@@ -38,9 +40,21 @@ SatAntennaGainPattern::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatAntennaGainPattern")
     .SetParent<Object> ()
-    .AddConstructor<SatAntennaGainPattern> ();
+    .AddConstructor<SatAntennaGainPattern> ()
+    .AddAttribute("MinAcceptableAntennaGainDb", "Minimum acceptable antenna gain in dBs",
+                   DoubleValue(40.0),
+                   MakeDoubleAccessor(&SatAntennaGainPattern::m_minAcceptableAntennaGainInDb),
+                   MakeDoubleChecker<double> ())
+                   ;
   return tid;
 }
+
+TypeId
+SatAntennaGainPattern::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
+
 
 SatAntennaGainPattern::SatAntennaGainPattern ()
 {
@@ -50,8 +64,12 @@ SatAntennaGainPattern::SatAntennaGainPattern ()
 SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
  :m_nanStrings(m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
 {
-  ReadAntennaPatternFromFile (filePathName);
+  // Attributes are needed already in construction phase:
+  // - ConstructSelf call in constructor
+  // - GetInstanceTypeId is needed to be implemented
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  ReadAntennaPatternFromFile (filePathName);
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
 }
 
@@ -104,8 +122,9 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
         {
           gainDouble = atof(gainString.c_str());
 
-          // Add the
-          if ( gainDouble >= MIN_ACCEPTABLE_ANTENNA_GAIN )
+          // Add the position to valid positions vector if the gain is
+          // above a specified threshold.
+          if ( gainDouble >= m_minAcceptableAntennaGainInDb )
             {
               m_validPositions.push_back (std::make_pair(lat, lon));
             }
