@@ -25,6 +25,7 @@
 #include "ns3/double.h"
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
+#include "ns3/string.h"
 #include "ns3/callback.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
@@ -199,6 +200,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->ConfigurePhyRxCarriers (carrierConf);
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> ();
+  mac->SetAttribute("Interval", StringValue("0s"));
 
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();

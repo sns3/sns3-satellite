@@ -95,7 +95,7 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
           // TODO: now just put UT in line with random delay
           // start time to be read from frame configurations
           UniformVariable randomDelay(0.001, 0.005);
-          double startTime = 0.001 * (double) slots[0]->GetTimeSlotId();
+          double startTime = 0.01 * (double) slots[0]->GetTimeSlotId();
           startTime += randomDelay.GetValue();
 
           if ( !slots.empty() )
