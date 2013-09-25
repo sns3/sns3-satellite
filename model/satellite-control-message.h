@@ -18,8 +18,8 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SAT_CTRL_HEADER_H
-#define SAT_CTRL_HEADER_H
+#ifndef SATELLITE_CONTROL_MESSAGE_H
+#define SATELLITE_CONTROL_MESSAGE_H
 
 #include <vector>
 #include <map>
@@ -273,4 +273,4 @@ private:
 
 } // namespace ns3
 
-#endif // SAT_CTRL_HEADER_H
+#endif // SATELLITE_CONTROL_MESSAGE_H
