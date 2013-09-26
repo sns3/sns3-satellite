@@ -55,6 +55,9 @@ def build(bld):
         'helper/satellite-gw-helper.cc',
         'helper/satellite-geo-helper.cc',
         'helper/satellite-conf.cc',
+        'helper/satellite-frame-conf.cc',
+		'helper/satellite-carrier-conf.cc',
+        'helper/satellite-wave-form-conf.cc',
         'helper/satellite-beam-user-info.cc',
         'helper/cbr-helper.cc',
         ]
@@ -123,6 +126,9 @@ def build(bld):
         'helper/satellite-gw-helper.h',
         'helper/satellite-geo-helper.h',
         'helper/satellite-conf.h',
+        'helper/satellite-frame-conf.h',
+        'helper/satellite-carrier-conf.h',
+        'helper/satellite-wave-form-conf.h',
         'helper/satellite-beam-user-info.h',
         'helper/cbr-helper.h',
         ]
