@@ -31,6 +31,7 @@
 #include "../model/satellite-arp-cache.h"
 #include "../model/satellite-mobility-model.h"
 #include "../model/satellite-propagation-delay-model.h"
+#include "../model/satellite-antenna-gain-pattern-container.h"
 #include "satellite-beam-helper.h"
 
 
@@ -99,6 +100,12 @@ SatBeamHelper::DoDispose()
 }
 
 void 
+SatBeamHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaPatterns)
+{
+  m_antennaGainPatterns = antennaPatterns;
+}
+
+void
 SatBeamHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
 
@@ -141,8 +148,13 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   NS_ASSERT(m_geoNode != NULL);
 
   // attach channels to geo satellite device
-  m_geoHelper->AttachChannels( m_geoNode->GetDevice(0), feederLink.first, feederLink.second,
-                               userLink.first, userLink.second, beamId );
+  m_geoHelper->AttachChannels( m_geoNode->GetDevice(0),
+                               feederLink.first,
+                               feederLink.second,
+                               userLink.first,
+                               userLink.second,
+                               m_antennaGainPatterns->GetAntennaGainPattern (beamId),
+                               beamId );
 
   // store GW node
   bool storedOk = StoreGwNode(gwId, gwNode);

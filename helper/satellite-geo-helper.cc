@@ -168,7 +168,7 @@ SatGeoHelper::Install (std::string nName)
 }
 
 void
-SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint32_t beamId )
+SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, Ptr<SatAntennaGainPattern> agp, uint32_t beamId )
 {
   NS_LOG_FUNCTION (this << ff << fr << uf << ur);
 
@@ -187,6 +187,13 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyRx->SetDevice (dev);
   uPhyTx->SetMobility(mobility);
   uPhyRx->SetMobility(mobility);
+
+  // Note, that currently we have only one set of antenna patterns,
+  // which are utilized in both user return (Rx gain) and user forward
+  // (Tx gain) links. Antenna gain patterns are not utilized in feeder
+  // link at all.
+  uPhyTx->SetAntennaGainPattern (agp);
+  uPhyRx->SetAntennaGainPattern (agp);
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,

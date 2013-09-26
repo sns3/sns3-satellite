@@ -27,7 +27,8 @@
 
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
-
+#include "satellite-antenna-gain-pattern.h"
+#include "satellite-mobility-model.h"
 
 namespace ns3 {
 
@@ -58,8 +59,14 @@ public:
   Ptr<SatChannel> GetVirtualChannel ();
 
   void SetMobility (Ptr<MobilityModel> m);
-  void SetDevice (Ptr<NetDevice> d);
   Ptr<MobilityModel> GetMobility ();
+
+  /*
+   * Set the receive antenna gain pattern.
+   */
+  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+
+  void SetDevice (Ptr<NetDevice> d);
   Ptr<NetDevice> GetDevice ();
 
   /**
@@ -114,6 +121,11 @@ private:
 
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;
+
+  /*
+   * Receive antenna gain pattern
+   */
+  Ptr<SatAntennaGainPattern> m_antennaGainPattern;
 
   /**
    * Configured maximum antenna gain in linear

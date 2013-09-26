@@ -92,10 +92,16 @@ public:
    * \param fr feeder return channel
    * \param uf user forward channel
    * \param uf user return channel
+   * \param agp antenna gain pattern
    * \param beamId Id of the beam
    */
-  void AttachChannels ( Ptr<NetDevice> dev, Ptr<SatChannel> ff, Ptr<SatChannel> fr,
-                        Ptr<SatChannel> uf, Ptr<SatChannel> ur, uint32_t beamId);
+  void AttachChannels ( Ptr<NetDevice> dev,
+                        Ptr<SatChannel> ff,
+                        Ptr<SatChannel> fr,
+                        Ptr<SatChannel> uf,
+                        Ptr<SatChannel> ur,
+                        Ptr<SatAntennaGainPattern> agp,
+                        uint32_t beamId);
 
   /**
    * Enables creation traces to be written in given file

@@ -31,6 +31,7 @@
 #include "satellite-phy-tx.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel.h"
+#include "satellite-antenna-gain-pattern.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyTx");
@@ -95,13 +96,21 @@ SatPhyTx::SetMaxAntennaGain_Db(double gain_db)
 }
 
 double
-SatPhyTx::GetAntennaGain_W (Ptr<MobilityModel> /*mobility*/)
+SatPhyTx::GetAntennaGain_W (Ptr<MobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO: when adding antenna pattern to phyTx object, gain is received according to antenna pattern
+  double gain_W (m_maxAntennaGain);
 
-  return m_maxAntennaGain;
+  // Get the transmit antenna gain at the receiver position.
+  // E.g. GEO satellite transmits to the UT receiver.
+  if (m_antennaGainPattern)
+    {
+      Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel> (mobility);
+      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition ());
+    }
+
+  return gain_W;
 }
 
 Ptr<MobilityModel>
@@ -116,6 +125,12 @@ SatPhyTx::SetMobility (Ptr<MobilityModel> m)
 {
   NS_LOG_FUNCTION (this << m);
   m_mobility = m;
+}
+
+void
+SatPhyTx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+{
+  m_antennaGainPattern = agp;
 }
 
 void

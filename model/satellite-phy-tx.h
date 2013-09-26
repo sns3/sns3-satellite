@@ -28,8 +28,9 @@
 #include "ns3/nstime.h"
 #include "ns3/satellite-net-device.h"
 #include "ns3/mac48-address.h"
-
 #include "satellite-signal-parameters.h"
+#include "satellite-antenna-gain-pattern.h"
+#include "satellite-mobility-model.h"
 
 
 namespace ns3 {
@@ -67,6 +68,11 @@ public:
   void SetMobility (Ptr<MobilityModel> m);
   Ptr<MobilityModel> GetMobility ();
   
+  /*
+   * Set the transmit antenna gain pattern.
+   */
+  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+
   /**
    * Set the maximum Antenna gain in Db
    * /param gain_Db maximum antenna gain in Dbs
@@ -100,6 +106,11 @@ private:
 
   Ptr<MobilityModel> m_mobility;
   Ptr<SatChannel> m_channel;
+
+  /*
+   * Transmit antenna gain pattern
+   */
+  Ptr<SatAntennaGainPattern> m_antennaGainPattern;
 
   /**
    * Configured maximum antenna gain in linear

@@ -280,6 +280,9 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
   m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
   m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
 
+  // Set the antenna patterns to beam helper
+  m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
+
   // create all possible GW nodes, set mobility to them and install to interner
   NodeContainer gwNodes;
   gwNodes.Create(m_satConf.GetGwCount());

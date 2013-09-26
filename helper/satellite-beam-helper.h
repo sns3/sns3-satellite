@@ -30,6 +30,7 @@
 #include "ns3/ipv4-address-helper.h"
 
 #include "ns3/satellite-ncc.h"
+#include "ns3/satellite-antenna-gain-pattern-container.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -56,6 +57,17 @@ public:
   SatBeamHelper ();
   SatBeamHelper (Ptr<Node> geoNode);
   virtual ~SatBeamHelper () {}
+
+  /**
+   * Set the antenna gain patterns to be used when configuring the beams
+   * to the GEO satellite. Note, that currently we have only one set of
+   * antenna patterns, which are utilized in both user return (Rx gain)
+   * and user forward (Tx gain) links. Antenna gain patterns are not utilized
+   * in feeder link at all.
+   *
+   * \param pointer to antenna gain pattern container
+   */
+  void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaPatterns);
 
   /**
    * Set an attribute value to be propagated to each NetDevice created by the
@@ -162,6 +174,8 @@ private:
     Ipv4AddressHelper     m_ipv4Helper;
     Ptr<Node>             m_geoNode;
     Ptr<SatNcc>           m_ncc;
+
+    Ptr<SatAntennaGainPatternContainer>       m_antennaGainPatterns;
 
     std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
     std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
