@@ -19,6 +19,7 @@
  */
 
 #include "satellite-loo-model.h"
+#include "satellite-utils.h"
 
 namespace ns3 {
 
@@ -158,7 +159,7 @@ SatLooModel::GetLogNormalComplexGain ()
 double
 SatLooModel::GetChannelGainDb ()
 {
-  double tempChannelGainDb = pow2db(GetChannelGain ());
+  double tempChannelGainDb = SatUtils::LinearToDb(GetChannelGain ());
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
   return tempChannelGainDb;
 }
@@ -172,7 +173,7 @@ SatLooModel::GetChannelGain ()
   double tempUniformChannelGain = ((std::pow (uniformComplexGain.real (), 2) + std::pow (uniformComplexGain.imag (), 2)) / 2);
   double tempLogNormalChannelGain = ((std::pow (logNormalComplexGain.real (), 2) + std::pow (logNormalComplexGain.imag (), 2)) / 2);
 
-  double tempTotalChannelGain = tempUniformChannelGain + (db2pow (m_multipathPower) * tempLogNormalChannelGain);
+  double tempTotalChannelGain = tempUniformChannelGain + (SatUtils::DbToLinear(m_multipathPower) * tempLogNormalChannelGain);
 
   //NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempUniformChannelGain << " " << tempLogNormalChannelGain << " " << tempTotalChannelGain);
 
@@ -188,18 +189,6 @@ SatLooModel::UpdateParameters (double mean, double stdDev, double multipathPower
 
   m_logNormalVariable->SetAttribute ("Mu", DoubleValue (m_mu));
   m_logNormalVariable->SetAttribute ("Sigma", DoubleValue (m_sigma));
-}
-
-double
-SatLooModel::pow2db (double power)
-{
-  return (10 * log10(power));
-}
-
-double
-SatLooModel::db2pow (double decibels)
-{
-  return pow((decibels / 10),10);
 }
 
 } // namespace ns3

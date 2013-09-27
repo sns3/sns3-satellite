@@ -20,6 +20,7 @@
 
 #include "satellite-fading-container.h"
 #include "satellite-channel.h"
+#include "satellite-utils.h"
 
 namespace ns3 {
 
@@ -136,9 +137,9 @@ SatFadingContainer::GetFading (SatChannel::ChannelType channeltype)
       fadingValue = GetCachedFadingValue (channeltype);
     }
 
-  m_fadingTrace ( Now ().GetSeconds (), channeltype, fadingValue);
+  m_fadingTrace ( Now ().GetSeconds (), channeltype, SatUtils::LinearToDb(fadingValue));
 
-  return fadingValue;
+  return -fadingValue;
 }
 
 double
