@@ -159,7 +159,14 @@ SatTbtpHeader::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
 
 NS_OBJECT_ENSURE_REGISTERED (SatTbtpHeader);
 
-SatTbtpHeader::SatTbtpHeader ()
+SatTbtpHeader::SatTbtpHeader ( )
+  : m_superFrameSeqId (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatTbtpHeader::SatTbtpHeader ( uint8_t seqId )
+ : m_superFrameSeqId (seqId)
 {
   NS_LOG_FUNCTION (this);
 
