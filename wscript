@@ -7,7 +7,7 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet', 'csma', 'propagation'])
+    module = bld.create_ns3_module('satellite', ['internet', 'network', 'propagation', 'antenna', 'csma'])
     module.source = [
         'model/geo-coordinate.cc',
         'model/cbr-application.cc',
