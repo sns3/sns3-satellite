@@ -227,14 +227,40 @@ public:
   };
 
   /**
-   * Constructor for SatTbtpHeader
+   * Default constructor for SatTbtpHeader. Set sequency id to 0.
    */
   SatTbtpHeader ();
+
+  /**
+   * Constructor for SatTbtpHeader to construct TBTP with given sequency id.
+   */
+  SatTbtpHeader ( uint8_t seqId );
 
   /**
    * Destructor for SatTbtpHeader
    */
   ~SatTbtpHeader ();
+
+  /**
+   * Set counter of the superframe in this TBTP message.
+   *
+   * \param counter The superframe counter.
+   */
+  inline void SetSuperFrameCounter (uint8_t counter) { m_superFrameCounter = counter; }
+
+  /**
+   * Get sequence id of the superframe in this TBTP message.
+   *
+   * \return The superframe sequency id.
+   */
+  inline uint8_t GetSuperFrameId () {return m_superFrameSeqId;}
+
+  /**
+   * Get counter of the superframe in this TBTP message.
+   *
+   * \return The superframe counter.
+   */
+  inline uint8_t GetSuperFrameCounter () {return m_superFrameCounter;}
 
   /**
    * Get the information of the time slots
@@ -266,6 +292,7 @@ private:
   typedef std::multimap<Address, Ptr<TbtpTimeSlotInfo> > TimeSlotMap_t;
 
   TimeSlotMap_t m_timeSlots;
+  uint32_t      m_superFrameCounter;
   uint8_t       m_superFrameSeqId;
   uint32_t      m_timeSlotMapItemSerializedSize;
 };
