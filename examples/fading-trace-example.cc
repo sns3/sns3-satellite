@@ -18,7 +18,7 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("fading-trace-example");
 
-static void FadingTraceCb ( std::string context, double time, SatChannel::ChannelType chType, double fadingValue)
+static void FadingTraceCb ( std::string context, double time, SatChannel::ChannelType_t chType, double fadingValue)
 {
   std::cout << time << " " << chType << " " << fadingValue << std::endl;
 }

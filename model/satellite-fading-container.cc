@@ -118,7 +118,7 @@ SatFadingContainer::~SatFadingContainer ()
 }
 
 double
-SatFadingContainer::GetFading (SatChannel::ChannelType channeltype)
+SatFadingContainer::GetFading (SatChannel::ChannelType_t channeltype)
 {
   double fadingValue;
 
@@ -142,7 +142,7 @@ SatFadingContainer::GetFading (SatChannel::ChannelType channeltype)
 }
 
 double
-SatFadingContainer::GetCachedFadingValue (SatChannel::ChannelType channeltype)
+SatFadingContainer::GetCachedFadingValue (SatChannel::ChannelType_t channeltype)
 {
   switch (channeltype)
   {
@@ -194,7 +194,7 @@ SatFadingContainer::EvaluateStateChange ()
 }
 
 bool
-SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType channeltype)
+SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channeltype)
 {
   switch (channeltype)
   {
@@ -290,7 +290,7 @@ SatFadingContainer::SetElevation (double newElevation)
 
 
 double
-SatFadingContainer::CalculateFading (SatChannel::ChannelType channeltype)
+SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channeltype)
 {
   uint32_t state;
   if (m_enableStateLock)

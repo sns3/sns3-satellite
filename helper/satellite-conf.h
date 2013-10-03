@@ -22,9 +22,13 @@
 #define SAT_CONF_H
 
 #include <vector>
+#include <set>
 #include <fstream>
+#include "ns3/object.h"
 #include "ns3/uinteger.h"
 #include "ns3/geo-coordinate.h"
+#include "ns3/satellite-channel.h"
+#include "satellite-frame-conf.h"
 
 namespace ns3 {
 
@@ -32,12 +36,15 @@ namespace ns3 {
  * \brief A configuration class for the 98-beam GEO satellite reference system
  *
  */
-class SatConf
+class SatConf : public Object
 {
 public:
 
   SatConf ();
   virtual ~SatConf () {}
+
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
 
   /**
    * Initialize the configuration
@@ -79,6 +86,17 @@ public:
    std::vector <uint32_t> GetBeamConfiguration (uint32_t beamId) const;
 
    /**
+    * \return The number of the carriers in return link.
+    */
+   uint32_t GetRtnLinkCarrierCount () const;
+
+
+   /**
+    * \return The number of the carriers in return link.
+    */
+   uint32_t GetFwdLinkCarrierCount () const;
+
+   /**
     * Get count of the GWs (positions).
     *
     * \return GW count
@@ -89,15 +107,48 @@ public:
     * Get the position of the GW for a given GW id
     *
     * \param gwid id of the GW
+    *
+    * \return Requested GW's position.
     */
    GeoCoordinate GetGwPosition (uint32_t gwId) const;
 
    /**
     * Get the position of the Geo Satellite
     *
-    * \param gwid id of the GW
+    * \return Geo satellite position.
     */
    GeoCoordinate GetGeoSatPosition () const;
+
+   /**
+    * Get the number of the user frequencies.
+    *
+    * \return The number of the user frequencies.
+    */
+   uint32_t GetUserFreqCount() const;
+
+   /**
+    * Get the number of the feeder frequencies.
+    *
+    * \return The number of the feeder frequencies.
+    */
+   uint32_t GetFeederFreqCount() const;
+
+   /**
+    * Convert carrier id, sequency id and frequency id to real frequency value.
+    *
+    * \param chType    Type of channel.
+    * \param freqId    Id of the frequency.
+    * \param carrierId Id of the carrier.
+    */
+   double GetCarrierFrequency( SatChannel::ChannelType_t chType, uint32_t freqId, uint32_t carrierId );
+
+   /**
+    * Convert carrier id and sequency id to to bandwidth value.
+    *
+    * \param chType    Type of channel.
+    * \param carrierId Id of the carrier.
+    */
+   double GetCarrierBandwidth( SatChannel::ChannelType_t chType, uint32_t carrierId );
 
    /**
     * Definition for beam ID index (column) in m_conf
@@ -122,13 +173,35 @@ public:
 
 private:
 
-  /*
-   *  Columns:
-   *  1. Beam id
-   *  2. User frequency id
-   *  3. GW id
-   *  4. Feeder frequency id
-   */
+   /**
+    * Configures itself with default values. Creates configuration storages as needed.
+    */
+   void Configure();
+
+   /**
+    * \param carrierId  Global carrier ID across all seperframe sequncies.
+    * \param seqId      Pointer to variable to store seqId of the super frame sequence
+    *                   where globl id belongs to
+    *
+    * \return Carrier id relative to the superframe
+    */
+   uint32_t GetSuperFrameCarrierId (uint32_t carrierId, uint32_t * seqId);
+
+   /**
+    * \param seqId      Sequence of the superframe.
+    * \param carrierId  Carrier ID inseide requested superframe.
+    *
+    * \return Global carrier id  across all seperframe sequncies.
+    */
+    uint32_t GetGlobalCarrierId (uint32_t seqId, uint32_t carrierId );
+
+   /*
+    *  Columns:
+    *  1. Beam id
+    *  2. User frequency id
+    *  3. GW id
+    *  4. Feeder frequency id
+    */
    std::vector <std::vector <uint32_t> > m_conf;
 
    /**
@@ -136,7 +209,7 @@ private:
     */
    uint32_t m_beamCount;
 
-   /*
+   /**
     * Geodetic positions of the GWs
     */
    std::vector <GeoCoordinate> m_gwPositions;
@@ -146,10 +219,77 @@ private:
     */
    uint32_t m_gwCount;
 
-   /*
+   /**
     * Geodetic positions of the Geo Satellite
     */
    GeoCoordinate m_geoSatPosition;
+
+   /**
+    * Superframe composition table (SCT)
+    *
+    * Table includes superframe configurations for return link.
+    * Item index of the list means superframe sequency (SFS).
+    */
+   std::vector< Ptr<SatSuperFrameConf> > m_sctTable;
+
+   /**
+    * Forward link carrier configuration.
+    *
+    * Item index of the list means carrier configuration sequency.
+    * Currently only one sequency used and only one carrier inside carrier conf.
+    */
+   std::vector<uint32_t>  m_forwardLinkCarrierConf;
+
+   /**
+    *  Base frequency of forward feeder link.
+    */
+   double m_fwdFeederLinkFreq_hz;
+
+   /**
+    *  Bandwidth of forward feeder link.
+    */
+   double m_fwdFeederLinkBandwidth_hz;
+
+   /**
+    *  Base frequency of forward user link.
+    */
+   double m_fwdUserLinkFreq_hz;
+
+   /**
+    *  Bandwidth of forward user link.
+    */
+   double m_fwdUserLinkBandwidth_hz;
+
+   /**
+    *  Base frequency of return feeder link.
+    */
+   double m_rtnFeederLinkFreq_hz;
+
+   /**
+    *  Bandwidth of return feeder link.
+    */
+   double m_rtnFeederLinkBandwidth_hz;
+
+   /**
+    *  Base frequency of return user link.
+    */
+   double m_rtnUserLinkFreq_hz;
+
+   /**
+    *  Bandwidth of return user link.
+    */
+   double m_rtnUserLinkBandwidth_hz;
+
+   /**
+    *  The number of the channels in user link.
+    */
+   uint32_t m_userLinkChannelCount;
+
+   /**
+    *  The number of the channels in user link.
+    */
+   uint32_t m_feederLinkChannelCount;
+
 };
 
 

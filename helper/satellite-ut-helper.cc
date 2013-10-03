@@ -87,6 +87,14 @@ SatUtHelper::GetInstanceTypeId (void) const
 
 SatUtHelper::SatUtHelper ()
 {
+  // this default constructor should be never called
+  NS_ASSERT (false);
+}
+
+SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount)
+ : m_carrierBandwidthConverter (carrierBandwidthConverter),
+   m_fwdLinkCarrierCount (fwdLinkCarrierCount)
+{
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
@@ -178,17 +186,16 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
   // instead of just the number of carriers, since it should hold information about
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
-  uint32_t fwdLinkNumCarriers = 1;
-  double rxBandwidth = 5e6;
-
   Ptr<SatPhyRxCarrierConf> carrierConf =
-        CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
-                                           m_rxTemperature_dbK,
+        CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
                                            m_otherSysNoise_dbW,
-                                           rxBandwidth,
                                            m_errorModel,
                                            m_interferenceModel,
                                            SatPhyRxCarrierConf::NORMAL);
+
+  carrierConf->SetAttribute("ChannelType", EnumValue(SatChannel::FORWARD_USER_CH));
+  carrierConf->SetAttribute("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
+  carrierConf->SetAttribute("CarrierCount", UintegerValue(m_fwdLinkCarrierCount));
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling.

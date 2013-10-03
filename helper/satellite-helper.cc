@@ -43,21 +43,21 @@ SatHelper::GetTypeId (void)
       .SetParent<Object> ()
       .AddConstructor<SatHelper> ()
       .AddAttribute ("UtCount", "The count of created UTs in beam (full or user-defined scenario)",
-                     UintegerValue (3),
-                     MakeUintegerAccessor (&SatHelper::m_utsInBeam),
-                     MakeUintegerChecker<uint32_t> (1))
+                      UintegerValue (3),
+                      MakeUintegerAccessor (&SatHelper::m_utsInBeam),
+                      MakeUintegerChecker<uint32_t> (1))
       .AddAttribute ("GwUsers", "The number of created GW users (full or user-defined scenario)",
-                     UintegerValue (5),
-                     MakeUintegerAccessor (&SatHelper::m_gwUsers),
-                     MakeUintegerChecker<uint32_t> (1))
+                      UintegerValue (5),
+                      MakeUintegerAccessor (&SatHelper::m_gwUsers),
+                      MakeUintegerChecker<uint32_t> (1))
       .AddAttribute ("UtUsers", "The number of created UT users per UT (full or user-defined scenario)",
-                     UintegerValue (3),
-                     MakeUintegerAccessor (&SatHelper::m_utUsers),
-                     MakeUintegerChecker<uint32_t> (1))
+                      UintegerValue (3),
+                      MakeUintegerAccessor (&SatHelper::m_utUsers),
+                      MakeUintegerChecker<uint32_t> (1))
       .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatHelper::m_creation))
+                        MakeTraceSourceAccessor (&SatHelper::m_creation))
       .AddTraceSource ("CreationSummary", "Creation summary traces",
-                       MakeTraceSourceAccessor (&SatHelper::m_creationSummary))
+                        MakeTraceSourceAccessor (&SatHelper::m_creationSummary))
 
     ;
     return tid;
@@ -88,7 +88,9 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string gwPos = scenarioName + "GwPos.txt";
   std::string satPos = scenarioName + "GeoPos.txt";
 
-  m_satConf.Initialize (path, satConf, gwPos, satPos);
+  m_satConf = CreateObject<SatConf> ();
+
+  m_satConf->Initialize (path, satConf, gwPos, satPos);
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
@@ -217,7 +219,7 @@ SatHelper::CreateLargerScenario()
 void
 SatHelper::CreateFullScenario()
 {
-  uint32_t beamCount =  m_satConf.GetBeamCount();
+  uint32_t beamCount =  m_satConf->GetBeamCount();
   BeamMap beamMap;
 
   for ( uint32_t i = 1; i < (beamCount + 1); i ++ )
@@ -259,8 +261,15 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
   Ptr<Node> geoSatNode = CreateObject<Node>();
   SetGeoSatMobility(geoSatNode);
 
-  m_beamHelper = CreateObject<SatBeamHelper>(geoSatNode);
-  m_userHelper = CreateObject<SatUserHelper>();
+  m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
+                                              MakeCallback (&SatConf::GetCarrierBandwidth, m_satConf),
+                                              m_satConf->GetRtnLinkCarrierCount(),
+                                              m_satConf->GetFwdLinkCarrierCount());
+
+  SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequency, m_satConf);
+  m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );
+
+  m_userHelper = CreateObject<SatUserHelper> ();
 
   if ( m_detailedCreationTraces )
     {
@@ -285,7 +294,7 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 
   // create all possible GW nodes, set mobility to them and install to interner
   NodeContainer gwNodes;
-  gwNodes.Create(m_satConf.GetGwCount());
+  gwNodes.Create(m_satConf->GetGwCount());
   SetGwMobility(gwNodes);
   internet.Install(gwNodes);
 
@@ -303,7 +312,7 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
           m_userHelper->InstallUt(uts.Get(i), info->second.GetUtUserCount(i));
         }
 
-      std::vector<uint32_t> conf = m_satConf.GetBeamConfiguration(info->first);
+      std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration(info->first);
 
       // gw index starts from 1 and we have stored them starting from 0
       Ptr<Node> gwNode = gwNodes.Get(conf[SatConf::GW_ID_INDEX]-1);
@@ -323,7 +332,7 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
   for (uint32_t i = 0; i < gwNodes.GetN(); i++)
     {
       // GW id start from 1
-      gwPosAllocator->Add(m_satConf.GetGwPosition(i + 1));
+      gwPosAllocator->Add(m_satConf->GetGwPosition(i + 1));
     }
 
   mobility.SetPositionAllocator (gwPosAllocator);
@@ -359,7 +368,7 @@ SatHelper::SetGeoSatMobility(Ptr<Node> node)
   MobilityHelper mobility;
 
   Ptr<SatListPositionAllocator> geoSatPosAllocator = CreateObject<SatListPositionAllocator> ();
-  geoSatPosAllocator->Add(m_satConf.GetGeoSatPosition());
+  geoSatPosAllocator->Add(m_satConf->GetGeoSatPosition());
 
   mobility.SetPositionAllocator (geoSatPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");

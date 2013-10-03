@@ -30,7 +30,6 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-link-results.h"
 
-
 namespace ns3 {
 
 /**
@@ -40,13 +39,18 @@ namespace ns3 {
 class SatGwHelper : public Object
 {
 public:
+  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+
+  SatGwHelper ();
   /**
    * Create a SatNetDevHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGwHelper ();
+  SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount);
+
   virtual ~SatGwHelper () {}
 
   /*
@@ -145,6 +149,9 @@ public:
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
+    CarrierBandwidthConverter  m_carrierBandwidthConverter;
+    int32_t m_rtnLinkCarrierCount;
+
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;

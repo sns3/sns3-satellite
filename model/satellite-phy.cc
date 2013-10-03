@@ -213,10 +213,6 @@ SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_sinr = 0;
-
-  // TODO: frequency initialized according to carrier config
-  double FREQUENCY (17.9 * std::pow(10.0, 9));
-  txParams->m_frequency_Hz = FREQUENCY;
   txParams->m_txPower_W = m_eirpWoGain_W;
 
   m_phyTx->StartTx (p, txParams);

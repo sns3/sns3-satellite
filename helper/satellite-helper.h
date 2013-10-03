@@ -227,7 +227,7 @@ private:
   /**
    * Configuration for satellite network.
    */
-  SatConf m_satConf;
+  Ptr<SatConf> m_satConf;
 
   /**
    * Trace callback for creation traces (details)
@@ -288,6 +288,7 @@ private:
    * Antenna gain patterns for all spot-beams. Used for beam selection.
    */
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
+
 };
 
 } // namespace ns3

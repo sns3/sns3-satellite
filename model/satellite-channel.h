@@ -49,16 +49,25 @@ public:
   /**
    * Possible types of channel.
    */
-  enum ChannelType
+  typedef enum
   {
     UNKNOWN_CH, FORWARD_FEEDER_CH, FORWARD_USER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
-  };
+  } ChannelType_t;
 
   SatChannel ();
   virtual ~SatChannel ();
   static TypeId GetTypeId (void);
 
   typedef std::vector<Ptr<SatPhyRx> > PhyList;
+
+  /**
+   * \param channelType     The type of channel
+   * \param freqId          The id of the carrier
+   * \param carrierId       The id of the carrier
+   *
+   * \return The center frequency of the carrier.
+   */
+  typedef Callback<double, ChannelType_t, uint32_t, uint32_t  > CarrierFreqConverter;
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
@@ -71,13 +80,27 @@ public:
    *
    * \param chType Type of the channel.
    */
-  virtual void SetChannelType (SatChannel::ChannelType chType);
+  virtual void SetChannelType (SatChannel::ChannelType_t chType);
+
+  /**
+   * Set the frequency id of the channel.
+   *
+   * \param frequencyId The frequency id of the channel.
+   */
+  virtual void SetFrequencyId (uint32_t freqId);
+
+  /**
+   * Set the frequency converter callback.
+   *
+   * \param converter The frequency converter callback.
+   */
+  virtual void SetFrequencyConverter (CarrierFreqConverter converter);
 
   /**
    * Get the type of the channel.
    * \return Type of the channel.
    */
-  virtual SatChannel::ChannelType GetChannelType ();
+  virtual SatChannel::ChannelType_t GetChannelType ();
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
@@ -130,7 +153,18 @@ private:
   /**
    * Type of the channel
    */
-  ChannelType m_channelType;
+  ChannelType_t m_channelType;
+
+  /**
+   * Frequency coverter callback.
+   */
+  CarrierFreqConverter m_carrierFreqConverter;
+
+  /**
+   * Freequency id of the channel
+   */
+  uint32_t m_freqId;
+
   /**
    * propagation delay model to be used with this channel
    */

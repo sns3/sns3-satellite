@@ -170,7 +170,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
 {
   NS_ASSERT (m_rxCarriers.empty());
 
-  for ( uint32_t i = 0; i < carrierConf->GetCarriersN(); ++i )
+  for ( uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i )
     {
       NS_LOG_LOGIC(this << " Create carrier: " << i);
 

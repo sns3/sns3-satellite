@@ -70,12 +70,6 @@ public:
   uint32_t m_carrierId;
 
   /**
-   * The center frequency of the carrier in Hertz.
-   *
-   */
-  double m_frequency_Hz;
-
-  /**
    * The duration of the packet transmission.
    *
    */

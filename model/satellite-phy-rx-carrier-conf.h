@@ -23,6 +23,7 @@
 
 #include "ns3/object.h"
 
+#include "satellite-channel.h"
 #include "satellite-link-results.h"
 
 namespace ns3 {
@@ -35,6 +36,14 @@ namespace ns3 {
 class SatPhyRxCarrierConf : public Object
 {
 public:
+
+  /**
+     * \param channelType     The type of the channel
+     * \param carrierId       The id of the carrier
+     *
+     * \return The bandwidth of the carrier.
+     */
+  typedef Callback<double, SatChannel::ChannelType_t, uint32_t > CarrierBandwidthConverter;
 
   /**
    *  RX mode.
@@ -70,16 +79,13 @@ public:
 
   /**
    * Constructor for SatPhyRxCarrierConf.
-   * \param numCarriers Number of configured carriers
    * \param rxTemperature_K RX noise temperature in Kelvins
    * \param rxOtherSysNoise_W other system noise in Watts
-   * \param rxBandwidth_Hz RX bandwidth in Hz
    * \param errorModel Used error model
    * \param ifModel Used interference model
    * \param rxMode RX mode used in carrier
    */
-  SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_K,
-                        double rxOtherSysNoise_W, double rxBandwidth_Hz,
+  SatPhyRxCarrierConf ( double rxTemperature_K, double rxOtherSysNoise_W,
                         ErrorModel errorModel, InterferenceModel ifModel,
                         RxMode rxMode);
 
@@ -100,7 +106,7 @@ public:
   /*
    * Get the number of configured carriers
    */
-  uint32_t GetCarriersN () const;
+  uint32_t GetCarrierCount () const;
 
   /*
    * Get configured error model
@@ -119,8 +125,12 @@ public:
 
   /*
    * Get configured bandwidth
+   *
+   * \param carrierId   Id of the carrier
+   *
+   * \return Bandwidth of the requested carrier.
    */
-  double GetBandwidth_Hz () const;
+  double GetCarrierBandwidth_Hz ( uint32_t carrierId ) const;
 
   /*
    * Get configured RX noise temperature
@@ -145,7 +155,6 @@ private:
    * we can pass the bandwidth information for each carrier. The bandwidth may be needed
    * for at least noise and C/No calculation.
    */
-  uint32_t m_numCarriers;
   InterferenceModel m_ifModel;
   ErrorModel m_errorModel;
   Ptr<SatLinkResults> m_linkResults;
@@ -154,6 +163,9 @@ private:
   double m_rxOtherSysNoise_W;
   RxMode m_rxMode;
 
+  uint32_t m_carrierCount;
+  CarrierBandwidthConverter m_carrierBandwidthConverter;
+  SatChannel::ChannelType_t m_channelType;
  };
 
 } // namespace ns3

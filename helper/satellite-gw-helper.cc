@@ -86,6 +86,14 @@ SatGwHelper::GetInstanceTypeId (void) const
 
 SatGwHelper::SatGwHelper ()
 {
+  // this default constructor should be never called
+  NS_ASSERT (false);
+}
+
+SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount)
+ : m_carrierBandwidthConverter (carrierBandwidthConverter),
+   m_rtnLinkCarrierCount (rtnLinkCarrierCount)
+{
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
@@ -170,23 +178,19 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyTx->SetChannel (fCh);
   phyRx->SetChannel (rCh);
   phyRx->SetDevice (dev);
-  phyRx->SetMobility(n->GetObject<MobilityModel>());
-  phyTx->SetMobility(n->GetObject<MobilityModel>());
+  phyRx->SetMobility (n->GetObject<MobilityModel>());
+  phyTx->SetMobility (n->GetObject<MobilityModel>());
 
   // Configure the SatPhyRxCarrier instances
-  // TODO: We should pass the whole carrier configuration to the SatPhyRxCarrier,
-  // instead of just the number of carriers, since it should hold information about
-  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
-  uint32_t rtnLinkNumCarriers = 1;
-  double rxBandwidth = 5e6;
-
-  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
-                                                                            m_rxTemperature_dbK,
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
                                                                             m_otherSysNoise_dbW,
-                                                                            rxBandwidth,
                                                                             m_errorModel,
                                                                             m_interferenceModel,
                                                                             SatPhyRxCarrierConf::NORMAL);
+
+  carrierConf->SetAttribute("ChannelType", EnumValue(SatChannel::RETURN_FEEDER_CH));
+  carrierConf->SetAttribute("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
+  carrierConf->SetAttribute("CarrierCount", UintegerValue(m_rtnLinkCarrierCount));
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling

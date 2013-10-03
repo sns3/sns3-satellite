@@ -19,6 +19,8 @@
  */
 
 #include "ns3/log.h"
+#include "ns3/enum.h"
+#include "ns3/uinteger.h"
 #include "satellite-utils.h"
 #include "satellite-phy-rx-carrier-conf.h"
 
@@ -28,20 +30,16 @@ namespace ns3 {
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf()
 {
-  m_numCarriers = 1;
   m_errorModel = EM_CONSTANT;
   m_ifModel = IF_CONSTANT;
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf ( uint32_t numCarriers, double rxTemperature_dBK,
-                                           double rxOtherSysNoise_dBW, double rxBandwidth_Hz,
+SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperature_dBK, double rxOtherSysNoise_dBW,
                                            ErrorModel errorModel, InterferenceModel ifModel,
                                            RxMode rxMode)
 {
-  m_numCarriers = numCarriers;
   m_errorModel = errorModel;
   m_ifModel = ifModel;
-  m_rxBandwidth_Hz = rxBandwidth_Hz;
   m_rxTemperature_K = SatUtils::DbToLinear (rxTemperature_dBK);
   m_rxMode = rxMode;
   m_rxOtherSysNoise_W = SatUtils::DbWToW<double> (rxOtherSysNoise_dBW);
@@ -53,6 +51,21 @@ SatPhyRxCarrierConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
     .SetParent<Object> ()
+    .AddAttribute("ChannelType", "The type of the channel where this object is asscociated.",
+                   EnumValue (SatChannel::UNKNOWN_CH),
+                   MakeEnumAccessor (&SatPhyRxCarrierConf::m_channelType),
+                   MakeEnumChecker (SatChannel::FORWARD_FEEDER_CH, "Forward feeder channel",
+                                    SatChannel::FORWARD_USER_CH, "Forward user channel",
+                                    SatChannel::RETURN_FEEDER_CH, "Return feeder channel",
+                                    SatChannel::RETURN_USER_CH, "Return user channel"))
+    .AddAttribute ("CarrierBandwidhtConverter", "Callback to convert carrier id to bandwidth.",
+                    CallbackValue (),
+                    MakeCallbackAccessor (&SatPhyRxCarrierConf::m_carrierBandwidthConverter),
+                    MakeCallbackChecker ())
+    .AddAttribute ("CarrierCount", "The count of carriers to create in installation",
+                    UintegerValue (1),
+                    MakeUintegerAccessor (&SatPhyRxCarrierConf::m_carrierCount),
+                    MakeUintegerChecker<uint32_t> (1))
     .AddConstructor<SatPhyRxCarrierConf> ()
   ;
   return tid;
@@ -65,9 +78,9 @@ SatPhyRxCarrierConf::SetLinkResults (Ptr<SatLinkResults> linkResults)
   m_linkResults = linkResults;
 }
 
-uint32_t SatPhyRxCarrierConf::GetCarriersN () const
+uint32_t SatPhyRxCarrierConf::GetCarrierCount () const
 {
-  return m_numCarriers;
+  return m_carrierCount;
 }
 
 
@@ -86,9 +99,9 @@ Ptr<SatLinkResults> SatPhyRxCarrierConf::GetLinkResults () const
   return m_linkResults;
 }
 
-double SatPhyRxCarrierConf::GetBandwidth_Hz () const
+double SatPhyRxCarrierConf::GetCarrierBandwidth_Hz ( uint32_t carrierId ) const
 {
-  return m_rxBandwidth_Hz;
+  return m_carrierBandwidthConverter( m_channelType, carrierId );
 }
 
 double SatPhyRxCarrierConf::GetRxTemperature_K () const

@@ -41,13 +41,17 @@ namespace ns3 {
 class SatGeoHelper : public Object
 {
 public:
+  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+
+  SatGeoHelper ();
   /**
    * Create a SatGeoHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGeoHelper ();
+  SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount);
   virtual ~SatGeoHelper () {}
 
   /**
@@ -112,6 +116,10 @@ public:
 
 
 private:
+    CarrierBandwidthConverter m_carrierBandwidthConverter;
+    uint32_t m_fwdLinkCarrierCount;
+    uint32_t m_rtnLinkCarrierCount;
+
     // count for devices. Currently only one device supported by helper.
     uint16_t m_deviceCount;
 

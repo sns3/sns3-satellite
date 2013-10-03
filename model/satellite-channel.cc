@@ -48,6 +48,7 @@ SatChannel::SatChannel ()
 
 SatChannel::~SatChannel ()
 {
+  NS_LOG_FUNCTION (this);
 }
 
 void
@@ -133,7 +134,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
 void
 SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << rxParams << phyRx);
 
   Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility();
   Ptr<MobilityModel> rxMobility = phyRx->GetMobility();
@@ -163,23 +164,45 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 
   rxParams->m_channel = this;
 
+  double frequency_hz = m_carrierFreqConverter( m_channelType, m_freqId, rxParams->m_carrierId);
+
   // get (calculate) free space loss and RX power and set it to RX params
-  double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, rxParams->m_frequency_Hz );
+  double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, frequency_hz );
   rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W;
 
   phyRx->StartRx (rxParams);
 }
 
 void
-SatChannel::SetChannelType (SatChannel::ChannelType chType)
+SatChannel::SetChannelType (SatChannel::ChannelType_t chType)
 {
+  NS_LOG_FUNCTION (this << chType);
   NS_ASSERT (chType != UNKNOWN_CH);
+
   m_channelType = chType;
 }
 
-SatChannel::ChannelType
+void
+SatChannel::SetFrequencyId (uint32_t fregId)
+{
+  NS_LOG_FUNCTION (this << fregId);
+
+  m_freqId = fregId;
+}
+
+void
+SatChannel::SetFrequencyConverter (CarrierFreqConverter converter)
+{
+  NS_LOG_FUNCTION (this << &converter);
+
+  m_carrierFreqConverter = converter;
+}
+
+SatChannel::ChannelType_t
 SatChannel::GetChannelType ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_channelType;
 }
 

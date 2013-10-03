@@ -166,7 +166,7 @@ private:
    * \see class CallBackTraceSource
    */
 
-  TracedCallback< SatChannel::ChannelType,  // Type of the RX channel (link)
+  TracedCallback< SatChannel::ChannelType_t,  // Type of the RX channel (link)
                   Mac48Address,             // receiver address
                   Mac48Address,             // packet destination address
                   uint32_t,                 // destination beam

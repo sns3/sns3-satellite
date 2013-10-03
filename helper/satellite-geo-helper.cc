@@ -79,7 +79,6 @@ SatGeoHelper::GetTypeId (void)
                      DoubleValue (SatUtils::MinDb<double> ()),
                      MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkOtherSysNoise_dbW),
                      MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
-
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
     ;
@@ -92,8 +91,17 @@ SatGeoHelper::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatGeoHelper::SatGeoHelper ()
-  :m_deviceCount(0)
+SatGeoHelper::SatGeoHelper()
+{
+  // this default constructor should be never called
+  NS_ASSERT (false);
+}
+
+SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount)
+  : m_carrierBandwidthConverter (bandwidthConverterCb),
+    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+    m_deviceCount(0)
 {
   m_deviceFactory.SetTypeId ("ns3::SatGeoNetDevice");
 
@@ -200,17 +208,17 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // instead of just the number of carriers, since it should hold information about
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   // Note, that in GEO satellite, there is no need for error modeling.
-  uint32_t rtnLinkNumCarriers = 1;
-  double rtnLinkRxBandwidth = 5e6;
 
   Ptr<SatPhyRxCarrierConf> rtnCarrierConf =
-        CreateObject<SatPhyRxCarrierConf> (rtnLinkNumCarriers,
-                                           m_rtnLinkRxTemperature_dbK,
+        CreateObject<SatPhyRxCarrierConf> (m_rtnLinkRxTemperature_dbK,
                                            m_rtnLinkOtherSysNoise_dbW,
-                                           rtnLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
                                            m_rtnLinkInterferenceModel,
                                            SatPhyRxCarrierConf::TRANSPARENT);
+
+  rtnCarrierConf->SetAttribute("ChannelType", EnumValue(SatChannel::RETURN_USER_CH));
+  rtnCarrierConf->SetAttribute("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
+  rtnCarrierConf->SetAttribute("CarrierCount", UintegerValue(m_rtnLinkCarrierCount));
 
   uPhyRx->ConfigurePhyRxCarriers (rtnCarrierConf);
 
@@ -222,21 +230,19 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
 
   // Configure the SatPhyRxCarrier instances
-  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
-  // instead of just the number of carriers, since it should hold information about
-  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   // Note, that in GEO satellite, there is no need for error modeling.
-  uint32_t fwdLinkNumCarriers = 1;
-  double fwdLinkRxBandwidth = 5e6;
 
   Ptr<SatPhyRxCarrierConf> fwdCarrierConf =
-        CreateObject<SatPhyRxCarrierConf> (fwdLinkNumCarriers,
-                                           m_fwdLinkRxTemperature_dbK,
+        CreateObject<SatPhyRxCarrierConf> (m_fwdLinkRxTemperature_dbK,
                                            m_fwdLinkOtherSysNoise_dbW,
-                                           fwdLinkRxBandwidth,
                                            SatPhyRxCarrierConf::EM_NONE,
                                            m_fwdLinkInterferenceModel,
                                            SatPhyRxCarrierConf::TRANSPARENT);
+
+
+  fwdCarrierConf->SetAttribute("ChannelType", EnumValue(SatChannel::FORWARD_FEEDER_CH));
+  fwdCarrierConf->SetAttribute("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
+  fwdCarrierConf->SetAttribute("CarrierCount", UintegerValue(m_fwdLinkCarrierCount));
 
   fPhyRx->ConfigurePhyRxCarriers (fwdCarrierConf);
 

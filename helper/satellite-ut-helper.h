@@ -41,13 +41,17 @@ namespace ns3 {
 class SatUtHelper : public Object
 {
 public:
+  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+
+  SatUtHelper ();
   /**
    * Create a SatNetDevHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatUtHelper ();
+  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount);
   virtual ~SatUtHelper () {}
 
   /*
@@ -146,6 +150,8 @@ public:
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
+    CarrierBandwidthConverter m_carrierBandwidthConverter;
+    uint32_t m_fwdLinkCarrierCount;
 
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;

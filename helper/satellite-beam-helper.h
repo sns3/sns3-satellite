@@ -18,8 +18,8 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SAT_BEAM_HELPER_H
-#define SAT_BEAM_HELPER_H
+#ifndef SATELLITE_BEAM_HELPER_H
+#define SATELLITE_BEAM_HELPER_H
 
 #include <string>
 #include <set>
@@ -31,6 +31,7 @@
 
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-antenna-gain-pattern-container.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -45,6 +46,9 @@ namespace ns3 {
 class SatBeamHelper : public Object
 {
 public:
+  typedef SatChannel::CarrierFreqConverter CarrierFreqConverter;
+  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+
   typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> >  ChannelPair_t;    //forward = first, return  = second
   typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
@@ -55,7 +59,8 @@ public:
    * Create a SatBeamHelper to make life easier when creating Satellite beams.
    */
   SatBeamHelper ();
-  SatBeamHelper (Ptr<Node> geoNode);
+  SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandwidthConverterCb,
+                 uint32_t fwdLinkCarrierCount, uint32_t rtnLinkCarrierCount );
   virtual ~SatBeamHelper () {}
 
   /**
@@ -102,7 +107,7 @@ public:
   * IP address allocation.  Will be combined (ORed) with the network number to
   * generate the first IP address.  Defaults to 0.0.0.1.
   */
-  void SetBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
+  void SetBaseAddress (const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
 
   /**
    * \param ut a set of UT nodes
@@ -121,31 +126,31 @@ public:
   /**
    * /return A container having all GW nodes in satellite network.
    */
-  NodeContainer GetGwNodes();
+  NodeContainer GetGwNodes ();
 
   /**
    * /return A container having all UT nodes in satellite network.
    */
-  NodeContainer GetUtNodes();
+  NodeContainer GetUtNodes ();
 
   /**
    * Enables creation traces to be written in given file
    * /param stream  stream for creation trace outputs
    * /param cb  callback to connect traces
    */
-  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+  void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
   /**
    * /return info of created beams as std::string.
    */
-  std::string GetBeamInfo();
+  std::string GetBeamInfo ();
 
   /**
    * /param printMacAddress flag to indicated, if mac addresses of the UTs is wanted to print.
    *
    * /return info of UT positions
    */
-  std::string GetUtPositionInfo(bool printMacAddress);
+  std::string GetUtPositionInfo (bool printMacAddress);
 
   /**
    * Gets GW node according to given id.
@@ -154,81 +159,82 @@ public:
    * /param id ID of the GW
    * /return pointer to found GW node or NULL.
    */
-  Ptr<Node> GetGwNode(uint32_t id);
+  Ptr<Node> GetGwNode (uint32_t id);
 
   /**
    * Gets Geo Satellite node.
    *
    * /return pointer to Geo Satellite node.
    */
-  Ptr<Node> GetGeoSatNode();
+  Ptr<Node> GetGeoSatNode ();
 
-  virtual void DoDispose();
+  virtual void DoDispose ();
 
 private:
+  CarrierFreqConverter m_carrierFreqConverter;
 
-    ObjectFactory         m_channelFactory;
-    Ptr<SatGeoHelper>     m_geoHelper;
-    Ptr<SatGwHelper>      m_gwHelper;
-    Ptr<SatUtHelper>      m_utHelper;
-    Ipv4AddressHelper     m_ipv4Helper;
-    Ptr<Node>             m_geoNode;
-    Ptr<SatNcc>           m_ncc;
+  ObjectFactory         m_channelFactory;
+  Ptr<SatGeoHelper>     m_geoHelper;
+  Ptr<SatGwHelper>      m_gwHelper;
+  Ptr<SatUtHelper>      m_utHelper;
+  Ipv4AddressHelper     m_ipv4Helper;
+  Ptr<Node>             m_geoNode;
+  Ptr<SatNcc>           m_ncc;
 
-    Ptr<SatAntennaGainPatternContainer>       m_antennaGainPatterns;
+  Ptr<SatAntennaGainPatternContainer>   m_antennaGainPatterns;
 
-    std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
-    std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
-    std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
-    std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
-    std::map<uint32_t, ChannelPair_t >        m_ulChannels;  // user link ID, channel pointers pair
-    std::map<uint32_t, ChannelPair_t >        m_flChannels;  // feeder link ID, channel pointers pair
-    std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
+  std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
+  std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
+  std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
+  std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
+  std::map<uint32_t, ChannelPair_t >        m_ulChannels;  // user link ID, channel pointers pair
+  std::map<uint32_t, ChannelPair_t >        m_flChannels;  // feeder link ID, channel pointers pair
+  std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
 
-    /**
-     * Trace callback for creation traces
-     */
-    TracedCallback<std::string> m_creation;
+  /**
+   * Trace callback for creation traces
+   */
+  TracedCallback<std::string> m_creation;
 
-    /**
-     * Creates info of the beam.
-     * /returns info for beams as std::string.
-     */
-    std::string CreateBeamInfo();
+  /**
+   * Creates info of the beam.
+   * /returns info for beams as std::string.
+   */
+  std::string CreateBeamInfo ();
 
-    /**
-     * Gets satellite channel pair from requested map.
-     * In case that channel pair is not found, new is created and returned.
-     * /param chPairMap map where channel pair is get
-     * /param frequencyId ID of the frequency
-     * /param isUserLink flag indicating if link user link is requested (otherwise feeder link).
-     */
-    ChannelPair_t GetChannelPair(std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
+  /**
+   * Gets satellite channel pair from requested map.
+   * In case that channel pair is not found, new is created and returned.
+   * /param chPairMap map where channel pair is get
+   * /param frequencyId ID of the frequency
+   * /param isUserLink flag indicating if link user link is requested (otherwise feeder link).
+   */
+  ChannelPair_t GetChannelPair (std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
 
-    /**
-     * Creates GW node according to given id and stores GW to map.
-     *
-     * /param id ID of the GW
-     * /param node pointer to the GW
-     *
-     * /return result of storing
-     */
-    bool StoreGwNode(uint32_t id, Ptr<Node> node);
+  /**
+   * Creates GW node according to given id and stores GW to map.
+   *
+   * /param id ID of the GW
+   * /param node pointer to the GW
+   *
+   * /return result of storing
+   */
+  bool StoreGwNode (uint32_t id, Ptr<Node> node);
 
-    /**
-     * Set needed routings of satellite network and fill ARC cache for the network.
-     * /param ut    container having UTs of the beam
-     * /param utNd  container having UT netdevices of the beam
-     * /param gw    pointer to gateway node
-     * /param gw    pointer to gateway netdevice
-     * /param gwAddr address of the gateway
-     * /param utIfs container having UT ipv2 interfaces (for addresses)
-     */
-    void PopulateRoutings(NodeContainer ut, NetDeviceContainer utNd,
-                           Ptr<Node> gw, Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
+  /**
+   * Set needed routings of satellite network and fill ARC cache for the network.
+   * /param ut    container having UTs of the beam
+   * /param utNd  container having UT netdevices of the beam
+   * /param gw    pointer to gateway node
+   * /param gw    pointer to gateway netdevice
+   * /param gwAddr address of the gateway
+   * /param utIfs container having UT ipv2 interfaces (for addresses)
+   */
+  void PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<Node> gw,
+                         Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
 
 };
 
 } // namespace ns3
 
-#endif /* SAT_BEAM_HELPER_H */
+#endif /* SATELLITE_BEAM_HELPER_H */

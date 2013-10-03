@@ -174,12 +174,28 @@ public:
   SatFrameConf ( double bandwidth_hz, double duration_s, Ptr<SatBtuConf> btu,
                  std::vector<Ptr<SatTimelSlotConf> > * timeSlots );
 
+  void AddTimeSlotConf ( Ptr<SatTimelSlotConf> conf);
+
   /**
    * Get bandwidth of the frame.
    *
    * \return The bandwidth of frame in Hertz.
    */
   inline double GetBandwidth_hz () { return m_bandwidth_hz; }
+
+  /**
+   * Get duration of frame.
+   *
+   * \return The duration of frame in seconds.
+   */
+  inline double GetDuration_s() { return m_duration_s; }
+
+  /**
+   * Get carrier bandwidth in frame.
+   *
+   * \return The carrier bandwidth in frame in Hertz.
+   */
+  inline double GetCarrierBandwidth_hz() { return m_btu->GetBandwidth_hz(); }
 
   /**
    * Get BTU conf of the frame.
@@ -235,12 +251,11 @@ public:
   /**
    * Constructor for SatSuperFrameConf. Timeslot must be in acsending order by time
    *
-   * \param frequency_hz      Center frequency of the frame in Hertz
    * \param bandwidth_hz      Bandwidth of the frame in Hertz
    * \param duration_s        Duration of the frame in seconds
    * \param m_frames          Frames of the super frame
    */
-  SatSuperFrameConf ( double frequency_hz, double bandwidth_hz, double duration_s,
+  SatSuperFrameConf ( double bandwidth_hz, double duration_s,
                       std::vector<Ptr<SatFrameConf> > * m_frames );
 
   /**
@@ -248,12 +263,7 @@ public:
    */
   ~SatSuperFrameConf ();
 
-  /**
-   * Get center frequency of the frame.
-   *
-   * \return The center frequency of frame in Hertz.
-   */
-  inline double GetFrequency_hz() { return m_frequency_hz; }
+  void AddFrameConf (Ptr<SatFrameConf> conf);
 
   /**
    * Get bandwidth of the frame.
@@ -281,14 +291,38 @@ public:
    * Get carrier id of the super frame. Converts frame specific id to super frame specific id.
    *
    * \param frameId         Id of the frame requested.
-   * \param frameCarrierId  Id of the carrier ID inside frame requested.
+   * \param frameCarrierId  Id of the carrier inside frame requested.
    *
    * \return The requested carrier id of the super frame.
    */
-  uint32_t GetCarriedId( uint8_t frameId, uint16_t frameCarrierId );
+  uint32_t GetCarrierId( uint8_t frameId, uint16_t frameCarrierId ) const;
+
+  /**
+   * Get carrier count in the super frame.
+   *
+   * \return The super frame carrier count.
+   */
+  uint32_t GetCarrierCount () const;
+
+  /**
+   * Get the center frequency of the requested carrier.
+   *
+   * \param carrierId  Id of the carrier inside superframe which center frequency is requested.
+   *
+   * \return The center frequency of the requested carrier.
+   */
+  double GetCarrierFrequency (uint32_t carrierId);
+
+  /**
+   * Get the bandwidth of the requested carrier.
+   *
+   * \param carrierId  Id of the carrier inside superframe which bandwidth is requested.
+   *
+   * \return The bandwidth of the requested carrier.
+   */
+  double GetCarrierBandwidth (uint32_t carrierId);
 
 private:
-  double m_frequency_hz;   // center frequency
   double m_bandwidth_hz;
   double m_duration_s;
   std::vector<Ptr<SatFrameConf> > m_frames;

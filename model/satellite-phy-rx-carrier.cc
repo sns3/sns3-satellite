@@ -78,7 +78,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       m_linkResults = carrierConf->GetLinkResults ();
     }
 
-  m_rxBandwidth_Hz = carrierConf->GetBandwidth_Hz();
+  m_rxBandwidth_Hz = carrierConf->GetCarrierBandwidth_Hz(carrierId);
   m_rxTemperature_K = carrierConf->GetRxTemperature_K();
 
   // calculate RX noise including other sys noise

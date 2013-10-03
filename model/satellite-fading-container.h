@@ -46,7 +46,7 @@ public:
 
   ~SatFadingContainer ();
 
-  double GetFading (SatChannel::ChannelType channeltype);
+  double GetFading (SatChannel::ChannelType_t channeltype);
 
   void SetPosition (GeoCoordinate newPosition);
 
@@ -87,20 +87,20 @@ private:
 
   std::vector <std::vector <double> > m_looParameters;
 
-  TracedCallback< double,                   // time
-                  SatChannel::ChannelType,  // channel type
-                  double                    // fading value
+  TracedCallback< double,                     // time
+                  SatChannel::ChannelType_t,  // channel type
+                  double                      // fading value
                   >
      m_fadingTrace;
 
   void UpdateProbabilities (uint32_t setId);
   void UpdateLooParameters (uint32_t setId);
   void EvaluateStateChange ();
-  double CalculateFading (SatChannel::ChannelType channeltype);
+  double CalculateFading (SatChannel::ChannelType_t channeltype);
   double CalculateElevation ();
   bool HasPositionChanged ();
-  bool HasCooldownPeriodPassed (SatChannel::ChannelType channeltype);
-  double GetCachedFadingValue (SatChannel::ChannelType channeltype);
+  bool HasCooldownPeriodPassed (SatChannel::ChannelType_t channeltype);
+  double GetCachedFadingValue (SatChannel::ChannelType_t channeltype);
 };
 
 } // namespace ns3
