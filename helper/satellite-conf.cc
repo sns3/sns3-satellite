@@ -141,6 +141,9 @@ SatConf::GetCarrierFrequency( SatChannel::ChannelType_t chType, uint32_t freqId,
   double channelBandwidth = 0.0;
   double carrierBandwidth = 0.0;
 
+  uint32_t seqId = 0;
+  uint32_t superFrameCarrierId = 0;
+
   switch (chType)
   {
     case SatChannel::FORWARD_FEEDER_CH:
@@ -160,13 +163,15 @@ SatConf::GetCarrierFrequency( SatChannel::ChannelType_t chType, uint32_t freqId,
     case SatChannel::RETURN_FEEDER_CH:
       channelBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
       baseFreq_hz = m_rtnFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + m_sctTable[0]->GetCarrierFrequency (carrierId);
+      superFrameCarrierId = GetSuperFrameCarrierId(carrierId, &seqId );
+      centerFrequency_hz = baseFreq_hz + m_sctTable[seqId]->GetCarrierFrequency (superFrameCarrierId);
       break;
 
     case SatChannel::RETURN_USER_CH:
       channelBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
       baseFreq_hz = m_rtnUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + m_sctTable[0]->GetCarrierFrequency (carrierId);
+      superFrameCarrierId = GetSuperFrameCarrierId(carrierId, &seqId );
+      centerFrequency_hz = baseFreq_hz + m_sctTable[seqId]->GetCarrierFrequency (superFrameCarrierId);
       break;
 
     default:
