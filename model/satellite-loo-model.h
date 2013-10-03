@@ -76,10 +76,6 @@ private:
   void ConstructUniformOscillators ();
   std::complex<double> GetUniformComplexGain ();
   std::complex<double> GetLogNormalComplexGain ();
-
-  double db2pow (double decibels);
-  double pow2db (double power);
-
 };
 
 } // namespace ns3

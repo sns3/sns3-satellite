@@ -35,7 +35,7 @@ namespace ns3 {
 class SatMarkovConf : public Object
 {
 public:
-  static const uint32_t DEFAULT_ELEVATION_COUNT = 3;
+  static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
   static const uint32_t DEFAULT_STATE_COUNT = 3;
   static const uint32_t DEFAULT_LOO_PARAMETER_COUNT = 5;
 
