@@ -16,6 +16,8 @@ def build(bld):
         'model/satellite-arp-cache.cc',
         'model/satellite-mac.cc',
         'model/satellite-channel.cc',
+        'model/satellite-channel-fading-trace.cc',
+        'model/satellite-channel-fading-trace-container.cc',
         'model/satellite-net-device.cc',
         'model/ideal-net-device.cc',
         'model/satellite-geo-net-device.cc',
@@ -64,6 +66,7 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('satellite')
     module_test.source = [
         'test/geo-coordinate-test.cc',
+        'test/satellite-fading-trace-test.cc',
         'test/performance-memory-test.cc',
         'test/cbr-test.cc',
         'test/link-results-test.cc',
@@ -86,6 +89,8 @@ def build(bld):
         'model/satellite-arp-cache.h',
         'model/satellite-mac.h',
         'model/satellite-channel.h',
+        'model/satellite-channel-fading-trace.h',
+        'model/satellite-channel-fading-trace-container.h',
         'model/satellite-net-device.h',
         'model/ideal-net-device.h',
         'model/satellite-geo-net-device.h',
