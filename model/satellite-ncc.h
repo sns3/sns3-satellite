@@ -30,6 +30,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
 #include "satellite-beam-scheduler.h"
+#include "ns3/satellite-superframe-sequence.h"
 
 namespace ns3 {
 
@@ -80,7 +81,7 @@ public:
     * \param cb callback to invoke whenever a TBTP is ready for sending and must
     *        be forwarded to the Beam UTs.
     */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq);
 
   /**
     * \param utId ID (mac address) of the UT to be added

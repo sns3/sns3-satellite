@@ -31,7 +31,6 @@
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
 
-#include "satellite-control-message.h"
 #include "satellite-ut-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -47,6 +46,10 @@ SatUtMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtMac")
     .SetParent<SatMac> ()
     .AddConstructor<SatUtMac> ()
+    .AddAttribute ("SuperframeSequence", "Superframe sequence containing information of superframes.",
+                    PointerValue(),
+                    MakePointerAccessor(&SatUtMac::m_superframeSeq),
+                    MakePointerChecker<SatSuperframeSeq> ())
   ;
   return tid;
 }
@@ -59,11 +62,38 @@ SatUtMac::GetInstanceTypeId (void) const
 
 SatUtMac::SatUtMac ()
 {
+  NS_LOG_FUNCTION (this);
+  
+  // default constructor should not be used
+  NS_ASSERT (false);
+}
+
+SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq)
+ : m_superframeSeq (seq)
+{
+	NS_LOG_FUNCTION (this);
 }
 
 SatUtMac::~SatUtMac ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatUtMac::ScheduleTimeSlots(std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots)
+{
+  for ( std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > >::iterator it = slots.begin ();
+      it != slots.end (); it++ )
+    {
+      Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
+      Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf ((*it)->GetFrameId ());
+
+      Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( (*it)->GetTimeSlotId() );
+
+      uint32_t carrierId = m_superframeSeq->GetCarrierId(0, (*it)->GetFrameId (), timeSlotConf->GetCarrierId() );
+
+      ScheduleTransmit ( Seconds(timeSlotConf->GetStartTime_s()), carrierId);
+    }
 }
 
 void
@@ -92,15 +122,14 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
 
           deliverUp = false;
 
-          // TODO: now just put UT in line with random delay
-          // start time to be read from frame configurations
-          UniformVariable randomDelay(0.001, 0.005);
-          double startTime = 0.01 * (double) slots[0]->GetTimeSlotId();
-          startTime += randomDelay.GetValue();
+          // TODO: start time must be calculated using reference or global clock
+          double superframeDuration = m_superframeSeq->GetDuration_s (tbtp.GetSuperframeId ());
+
+          double startTime = superframeDuration * tbtp.GetSuperframeCounter();
 
           if ( !slots.empty() )
             {
-              ScheduleTransmit ( Time::FromDouble (startTime, Time::S));
+              Simulator::Schedule (Seconds (startTime), &SatUtMac::ScheduleTimeSlots, this, slots);
             }
         }
     }

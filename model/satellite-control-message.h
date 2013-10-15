@@ -213,7 +213,7 @@ public:
      *
      * \return time slot id
      */
-    inline uint8_t GetTimeSlotId() { return m_timeSlotId; }
+    inline uint16_t GetTimeSlotId() { return m_timeSlotId; }
 
     // methods derived from base classes
     void Print (std::ostream &os) const;
@@ -246,21 +246,21 @@ public:
    *
    * \param counter The superframe counter.
    */
-  inline void SetSuperFrameCounter (uint8_t counter) { m_superFrameCounter = counter; }
+  inline void SetSuperframeCounter (uint32_t counter) { m_superframeCounter = counter; }
 
   /**
    * Get sequence id of the superframe in this TBTP message.
    *
    * \return The superframe sequency id.
    */
-  inline uint8_t GetSuperFrameId () {return m_superFrameSeqId;}
+  inline uint8_t GetSuperframeId () {return m_superframeSeqId;}
 
   /**
    * Get counter of the superframe in this TBTP message.
    *
    * \return The superframe counter.
    */
-  inline uint8_t GetSuperFrameCounter () {return m_superFrameCounter;}
+  inline uint32_t GetSuperframeCounter () {return m_superframeCounter;}
 
   /**
    * Get the information of the time slots
@@ -292,9 +292,8 @@ private:
   typedef std::multimap<Address, Ptr<TbtpTimeSlotInfo> > TimeSlotMap_t;
 
   TimeSlotMap_t m_timeSlots;
-  uint32_t      m_superFrameCounter;
-  uint8_t       m_superFrameSeqId;
-  uint32_t      m_timeSlotMapItemSerializedSize;
+  uint32_t      m_superframeCounter;
+  uint8_t       m_superframeSeqId;
 };
 
 

@@ -18,10 +18,12 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SAT_UT_MAC_H
-#define SAT_UT_MAC_H
+#ifndef SATELLITE_UT_MAC_H
+#define SATELLITE_UT_MAC_H
 
 #include "satellite-mac.h"
+#include "ns3/satellite-superframe-sequence.h"
+#include "satellite-control-message.h"
 
 namespace ns3 {
 
@@ -38,13 +40,15 @@ class SatUtMac : public SatMac
 public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
+
+  SatUtMac ();
   /**
    * Construct a SatUtMac
    *
    * This is the constructor for the SatUtMac
    *
    */
-  SatUtMac ();
+  SatUtMac (Ptr<SatSuperframeSeq> seq);
 
   /**
    * Destroy a SatUtMac
@@ -55,13 +59,17 @@ public:
 
   void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
 
+  void ScheduleTimeSlots (std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots);
+
 private:
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
 
+  Ptr<SatSuperframeSeq> m_superframeSeq;
+
 };
 
 } // namespace ns3
 
-#endif /* SAT_UT_MAC_H */
+#endif /* SATELLITE_UT_MAC_H */

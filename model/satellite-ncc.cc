@@ -72,7 +72,7 @@ SatNcc::Receive (Ptr<Packet> packet, uint32_t beamId)
 }
 
 void
-SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb)
+SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq)
 {
   NS_LOG_FUNCTION (this << &cb);
 
@@ -81,7 +81,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb)
   NS_ASSERT(iterator == m_beamSchedulers.end());
 
   scheduler = CreateObject<SatBeamScheduler>();
-  scheduler->Initialize(beamId, cb);
+  scheduler->Initialize(beamId, cb, seq);
 
   m_beamSchedulers.insert(std::make_pair(beamId, scheduler));
 }

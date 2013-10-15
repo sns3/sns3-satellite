@@ -91,9 +91,10 @@ SatUtHelper::SatUtHelper ()
   NS_ASSERT (false);
 }
 
-SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount)
+SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
-   m_fwdLinkCarrierCount (fwdLinkCarrierCount)
+   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+   m_superframeSeq (seq)
 {
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
@@ -206,7 +207,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   phyRx->ConfigurePhyRxCarriers (carrierConf);
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> ();
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
   mac->SetAttribute("Interval", StringValue("0s"));
 
   // Create and set queues for Mac modules

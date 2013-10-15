@@ -635,7 +635,7 @@ SimpleP2p6::DoRun (void)
   uint32_t maxReceivers = utUsers.GetN();
   Time cbrStartDelay = Seconds(1.0);
   Time cbrStopDelay = Seconds(0.005);
-  Time stopTime = Seconds (maxReceivers * 0.004) + cbrStartDelay + cbrInterval + cbrStopDelay;
+  Time stopTime = Seconds (maxReceivers * 0.04) + cbrStartDelay + cbrInterval + cbrStopDelay;
 
   ApplicationContainer utApps;
 
@@ -644,7 +644,7 @@ SimpleP2p6::DoRun (void)
     {
       utApps.Add (cbr.Install (utUsers.Get(i)));
 
-      cbrStartDelay += Seconds (0.003);
+      cbrStartDelay += Seconds (0.03);
 
       utApps.Get(i)->SetStartTime (cbrStartDelay);
       utApps.Get(i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);

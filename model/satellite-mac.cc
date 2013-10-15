@@ -105,15 +105,15 @@ SatMac::~SatMac ()
 
 void SatMac::StartScheduling()
 {
-  if ( m_tInterval.GetDouble() )
+  if ( m_tInterval.GetDouble() > 0 )
     {
-      ScheduleTransmit (m_tInterval);
+      ScheduleTransmit (m_tInterval, 0);
     }
 }
 
-void SatMac::ScheduleTransmit(Time transmitTime)
+void SatMac::ScheduleTransmit(Time transmitTime, uint32_t carrierId)
 {
-  Simulator::Schedule (transmitTime, &SatMac::TransmitReady, this);
+  Simulator::Schedule (transmitTime, &SatMac::TransmitReady, this, carrierId);
 }
 
 void
@@ -133,25 +133,25 @@ void SatMac::SetAddress( Mac48Address macAddress )
 }
 
 bool
-SatMac::TransmitStart (Ptr<Packet> p)
+SatMac::TransmitStart (Ptr<Packet> p, uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this << p);
   NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
 
-  /* TODO: Now we are using only one carrierId and a static (time slot) duration
+  /* TODO: Now we are using only a static (time slot) duration
    * for packet transmissions and receptions.
-   * The carrier Id and (time slot) durations for packet transmissions should be coming from:
+   * The (time slot) durations for packet transmissions should be coming from:
    * - TBTP in return link
    * - GW scheduler in the forward link
    */
-  uint32_t CARRIER_ID (0);
   Time DURATION (MicroSeconds(20));
-  m_phy->SendPdu (p, CARRIER_ID, DURATION);
+  m_phy->SendPdu (p, carrierId, DURATION);
+
   return true;
 }
 
 void
-SatMac::TransmitReady (void)
+SatMac::TransmitReady (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
   //
@@ -163,12 +163,12 @@ SatMac::TransmitReady (void)
   if ( PacketInQueue() )
     {
       Ptr<Packet> p = m_queue->Dequeue();
-      TransmitStart(p);
+      TransmitStart(p, carrierId);
     }
 
   if ( m_tInterval.GetDouble() > 0)
     {
-      Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this);
+      Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this, 0);
     }
 }
 

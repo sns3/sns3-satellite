@@ -70,7 +70,8 @@ SatBeamHelper::SatBeamHelper ()
 }
 
 SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandwidthConverterCb,
-                              uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount )
+                              uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
+  : m_superframeSeq (seq)
 {
   // uncomment next code line, if attributes are needed already in construction phase.
   // E.g attributes set by object factory affecting object creation
@@ -79,9 +80,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandw
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
   // create needed low level satellite helpers
-  m_geoHelper = CreateObject<SatGeoHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, rtnLinkCarrierCount);
+  m_geoHelper = CreateObject<SatGeoHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount);
   m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount);
-  m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount);
+  m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, seq );
 
   m_gwHelper->Initialize ();
   m_utHelper->Initialize ();
@@ -177,7 +178,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   PopulateRoutings (ut, utNd, gwNode, gwNd, gwAddress.GetAddress (0), utAddress );
 
   // add beam to NCC
-  m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd) );
+  m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd), m_superframeSeq );
 
   // add UTs to NCC
   for ( NetDeviceContainer::Iterator i = utNd.Begin ();  i != utNd.End (); i++ )

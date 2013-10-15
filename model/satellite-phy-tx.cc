@@ -23,6 +23,7 @@
 #include "ns3/simulator.h"
 #include "ns3/boolean.h"
 #include "ns3/double.h"
+#include "ns3/enum.h"
 #include "ns3/object-factory.h"
 #include "ns3/log.h"
 
@@ -84,6 +85,11 @@ SatPhyTx::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyTx")
     .SetParent<Object> ()
+    .AddAttribute("TxMode", "Tx mode of this Phy Tx.",
+                  EnumValue(SatPhyTx::NORMAL),
+                  MakeEnumAccessor(&SatPhyTx::m_txMode),
+                  MakeEnumChecker(SatPhyTx::NORMAL, "Normal Tx mode",
+                                  SatPhyTx::TRANSPARENT, "Transparent Tx mode"))
   ;
   return tid;
 }
@@ -172,7 +178,19 @@ SatPhyTx::StartTx (Ptr<Packet> p, Ptr<SatSignalParameters> txParams)
       NS_ASSERT (m_channel);
       ChangeState (TX);
       m_channel->StartTx (txParams);
-      Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
+
+      // TODO: Currently transparent mode enables concurrent sending
+      // through different carriers (TX is ended already here without waiting transmission end time).
+      // This functionality is needed in geo satellite. Another option is to use multiple phy TXs.
+      // It's needed to consider which of these option is better in long term
+      if ( m_txMode == TRANSPARENT )
+        {
+          EndTx();
+        }
+      else
+        {
+          Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
+        }
     }
     break;
     

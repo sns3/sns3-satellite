@@ -160,20 +160,15 @@ SatTbtpHeader::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
 NS_OBJECT_ENSURE_REGISTERED (SatTbtpHeader);
 
 SatTbtpHeader::SatTbtpHeader ( )
-  : m_superFrameSeqId (0)
+  : m_superframeSeqId (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatTbtpHeader::SatTbtpHeader ( uint8_t seqId )
- : m_superFrameSeqId (seqId)
+ : m_superframeSeqId (seqId)
 {
   NS_LOG_FUNCTION (this);
-
-  uint32_t addressSerializedSize = Address (Mac48Address ()).GetLength () * sizeof(uint8_t);
-  uint32_t timeSlotItemSerializedSize = TbtpTimeSlotInfo().GetSerializedSize();
-
-  m_timeSlotMapItemSerializedSize = addressSerializedSize + timeSlotItemSerializedSize;
 }
 
 SatTbtpHeader::~SatTbtpHeader ()
@@ -223,32 +218,43 @@ SatTbtpHeader::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
 
 void SatTbtpHeader::Print (std::ostream &os)  const
 {
-  os << "TBTP header, Super Frame Seq ID= " << m_superFrameSeqId;
+  os << "TBTP header, Super Frame Seq ID= " << m_superframeSeqId;
 }
 
 uint32_t SatTbtpHeader::GetSerializedSize (void) const
 {
+  uint32_t timeSlotSerializedSize = Address (Mac48Address ()).GetLength () * sizeof(uint8_t);
+  timeSlotSerializedSize += TbtpTimeSlotInfo().GetSerializedSize();
+
   // time slot map items (address + time slot info) + number of items in map
-  return ( ( m_timeSlots.size() * m_timeSlotMapItemSerializedSize ) + sizeof(uint32_t));
+  return ( ( m_timeSlots.size() * timeSlotSerializedSize ) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint8_t));
 }
 
 void
 SatTbtpHeader::Serialize (Buffer::Iterator start) const
 {
+  start.WriteU32 ( m_superframeCounter );
+  start.WriteU8 ( m_superframeSeqId );
+
   // write number of time slot info
   start.WriteU32 ( m_timeSlots.size() );
 
   // write time slots
   for (TimeSlotMap_t::const_iterator it = m_timeSlots.begin(); it != m_timeSlots.end(); it++)
     {
-      WriteTo (start, it->first);
+      WriteTo (start, Mac48Address::ConvertFrom(it->first));
+
       it->second->Serialize(start);
+      start.Next( it->second->GetSerializedSize() );
     }
 }
 
 uint32_t
 SatTbtpHeader::Deserialize (Buffer::Iterator start)
 {
+  m_superframeCounter = start.ReadU32 ();
+  m_superframeSeqId = start.ReadU8 ();
+
   uint32_t count = start.ReadU32();
 
   while (count)
@@ -258,6 +264,7 @@ SatTbtpHeader::Deserialize (Buffer::Iterator start)
 
       Ptr<TbtpTimeSlotInfo> timeSlotInfo = Create<SatTbtpHeader::TbtpTimeSlotInfo> ();
       timeSlotInfo->Deserialize (start);
+      start.Next( timeSlotInfo->GetSerializedSize() );
 
       m_timeSlots.insert (std::make_pair (address, timeSlotInfo) );
       count--;

@@ -83,7 +83,7 @@ public:
    * Schdules one sending opportunity. Called for every sending opportunity scheduler.
    * /param Time transmitTime time when transmit possibility starts
    */
-  void ScheduleTransmit ( Time transmitTime );
+  void ScheduleTransmit ( Time transmitTime, uint32_t carrierId );
 
   /**
    * Attach the Phy object to SatMac.
@@ -158,13 +158,13 @@ protected:
     * Start Sending a Packet Down the Wire.
     *
     * The TransmitStart method is the method that is used internally in the
-    * SatMac to begin the process of sending a packet out on
-    * the phy layer.
+    * SatMac to begin the process of sending a packet out on the phy layer.'
     *
     * \param p a reference to the packet to send
+    * \param carrierId id of the carrier.
     * \returns true if success, false on failure
     */
-   bool TransmitStart (Ptr<Packet> p);
+   bool TransmitStart (Ptr<Packet> p,  uint32_t carrierId);
 
    inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
 
@@ -190,7 +190,7 @@ private:
    *
    * The TransmitReady method is used internally to schedule sending of a packet out on the phy.
    */
-  void TransmitReady (void);
+  void TransmitReady (uint32_t carrierId);
 
   /**
    * The Phy obejct to which this SatMac has been attached.

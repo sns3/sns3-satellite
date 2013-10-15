@@ -36,13 +36,13 @@ SatConf::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatConf")
       .SetParent<Object> ()
       .AddConstructor<SatConf> ()
+      .AddAttribute ("FwdLinkBandwidth", "Bandwidth of the forward link.",
+                      DoubleValue (2.0e9),
+                      MakeDoubleAccessor (&SatConf::m_fwdFeederLinkBandwidth_hz),
+                      MakeDoubleChecker<double> ())
       .AddAttribute ("FwdFeederLinkBaseFrequency", "Base frequency of the forward feeder link band.",
                       DoubleValue (27.5e9),
                       MakeDoubleAccessor (&SatConf::m_fwdFeederLinkFreq_hz),
-                      MakeDoubleChecker<double> ())
-      .AddAttribute ("FwdFeederLinkBandwidth", "Bandwidth of the forward feeder link band.",
-                      DoubleValue (2.0e9),
-                      MakeDoubleAccessor (&SatConf::m_fwdFeederLinkBandwidth_hz),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("RtnFeederLinkBaseFrequency", "Base frequency of the return feeder link band.",
                       DoubleValue (17.7e9),
@@ -111,25 +111,39 @@ SatConf::Configure()
 {
   //TODO: Now we just create some carriers with one frame, needed to do proper configuration later
 
-  Ptr<SatBtuConf> btuConf = Create<SatBtuConf> (125.0e6/100.0, 0.100/10.0, 7.69e6);
+  double rtnFeederLinkBandwidth = m_fwdFeederLinkBandwidth_hz / this->m_feederLinkChannelCount;
+  double rtnUserLinkBandwidth = m_fwdUserLinkBandwidth_hz / this->m_userLinkChannelCount;
 
-  Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (125.0e6, btuConf->GetLength_s()*10, btuConf, (std::vector<Ptr<SatTimelSlotConf> > *) NULL);
+  // bandwidths of the feeder and user links is expected to be equal
+  NS_ASSERT ( rtnFeederLinkBandwidth == rtnUserLinkBandwidth );
 
+  // Create BTU conf using frame/superframe with 100 ms durations
+  Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( rtnUserLinkBandwidth / 100.0, 0.1 / 10.0, 7.69e6);
+
+  // Created one frame to be used utilizating earlier created BTU
+  Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth, btuConf->GetLength_s() * 10, btuConf, (SatFrameConf::SatTimeSlotConfList *) NULL);
+
+  // Created two time slots for every carrier and add them to frame configuration
   for (uint32_t i = 0; i < frameConf->GetCarrierCount(); i++)
     {
-      Ptr<SatTimelSlotConf> timeSlot = Create<SatTimelSlotConf> (0, btuConf->GetLength_s()*5, 0, i);
-      frameConf->AddTimeSlotConf(timeSlot);
+      Ptr<SatTimeSlotConf> timeSlot1 = Create<SatTimeSlotConf> (0, btuConf->GetLength_s()*5, 0, i);
+      frameConf->AddTimeSlotConf (timeSlot1);
 
-      timeSlot = Create<SatTimelSlotConf> (btuConf->GetLength_s()*5, btuConf->GetLength_s()*5, 0, i);
-      frameConf->AddTimeSlotConf(timeSlot);
+      Ptr<SatTimeSlotConf> timeSlot2 = Create<SatTimeSlotConf> (btuConf->GetLength_s()*5, btuConf->GetLength_s()*5, 0, i);
+      frameConf->AddTimeSlotConf (timeSlot2);
     }
 
-  Ptr<SatSuperFrameConf> superframeConf = Create<SatSuperFrameConf> (frameConf->GetBandwidth_hz(), frameConf->GetDuration_s(), (std::vector<Ptr<SatFrameConf> > *) NULL);
+  // Create superframe configuration without frame first
+  Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> (frameConf->GetBandwidth_hz(), frameConf->GetDuration_s(), (SatSuperframeConf::SatFrameConfList *) NULL);
 
+  // Add earlier created frame to superframe configuration
   superframeConf->AddFrameConf (frameConf);
 
-  m_sctTable.push_back (superframeConf);
+  // Create superframe sequence anf add earlier created superframe configuration to it
+  m_superframeSeq = CreateObject<SatSuperframeSeq> ();
+  m_superframeSeq->AddSuperframe ( superframeConf );
 
+  // use only one carrier in forward link.
   m_forwardLinkCarrierConf.push_back(1);
 }
 
@@ -140,9 +154,6 @@ SatConf::GetCarrierFrequency( SatChannel::ChannelType_t chType, uint32_t freqId,
   double baseFreq_hz = 0.0;
   double channelBandwidth = 0.0;
   double carrierBandwidth = 0.0;
-
-  uint32_t seqId = 0;
-  uint32_t superFrameCarrierId = 0;
 
   switch (chType)
   {
@@ -163,15 +174,13 @@ SatConf::GetCarrierFrequency( SatChannel::ChannelType_t chType, uint32_t freqId,
     case SatChannel::RETURN_FEEDER_CH:
       channelBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
       baseFreq_hz = m_rtnFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      superFrameCarrierId = GetSuperFrameCarrierId(carrierId, &seqId );
-      centerFrequency_hz = baseFreq_hz + m_sctTable[seqId]->GetCarrierFrequency (superFrameCarrierId);
+      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequency_hz ( carrierId);
       break;
 
     case SatChannel::RETURN_USER_CH:
       channelBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
       baseFreq_hz = m_rtnUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      superFrameCarrierId = GetSuperFrameCarrierId(carrierId, &seqId );
-      centerFrequency_hz = baseFreq_hz + m_sctTable[seqId]->GetCarrierFrequency (superFrameCarrierId);
+      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequency_hz ( carrierId);
       break;
 
     default:
@@ -188,9 +197,6 @@ SatConf::GetCarrierBandwidth( SatChannel::ChannelType_t chType, uint32_t carrier
   double channelBandwidth = 0.0;
   double carrierBandwidth = 0.0;
 
-  uint32_t seqId = 0;
-  uint32_t superFrameCarrierId = 0;
-
   switch (chType)
   {
     case SatChannel::FORWARD_FEEDER_CH:
@@ -205,14 +211,12 @@ SatConf::GetCarrierBandwidth( SatChannel::ChannelType_t chType, uint32_t carrier
 
     case SatChannel::RETURN_FEEDER_CH:
       channelBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-      superFrameCarrierId = GetSuperFrameCarrierId(carrierId, &seqId );
-      carrierBandwidth = m_sctTable[seqId]->GetCarrierBandwidth (superFrameCarrierId);
+      carrierBandwidth = m_superframeSeq->GetCarrierBandwidth_hz( carrierId );
       break;
 
     case SatChannel::RETURN_USER_CH:
       channelBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
-      superFrameCarrierId = GetSuperFrameCarrierId(carrierId, &seqId );
-      carrierBandwidth = m_sctTable[seqId]->GetCarrierBandwidth (superFrameCarrierId);
+      carrierBandwidth = m_superframeSeq->GetCarrierBandwidth_hz( carrierId );
       break;
 
     default:
@@ -369,14 +373,7 @@ SatConf::GetRtnLinkCarrierCount () const
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t carrierCount = 0;
-
-  for (std::vector< Ptr<SatSuperFrameConf> >::const_iterator it = m_sctTable.begin(); it != m_sctTable.end(); it++ )
-    {
-      carrierCount += (*it)->GetCarrierCount();
-    }
-
-  return carrierCount;
+  return m_superframeSeq->GetCarrierCount();
 }
 
 uint32_t
@@ -402,40 +399,6 @@ SatConf::GetGeoSatPosition () const
   NS_LOG_FUNCTION (this);
 
   return m_geoSatPosition;
-}
-
-uint32_t
-SatConf::GetSuperFrameCarrierId (uint32_t carrierId, uint32_t * seqId)
-{
-  uint32_t superFrameId = carrierId;
-  uint32_t superFrameSeq = 0;
-  uint32_t lastIdInSuperFrame = m_sctTable[0]->GetCarrierCount() - 1;
-
-  while ( carrierId > lastIdInSuperFrame)
-    {
-      superFrameId -= m_sctTable[superFrameSeq]->GetCarrierCount();
-      superFrameSeq++;
-      lastIdInSuperFrame += m_sctTable[superFrameSeq]->GetCarrierCount();
-    }
-
-  *seqId = superFrameSeq;
-
-  return superFrameId;
-}
-
-uint32_t
-SatConf::GetGlobalCarrierId (uint32_t seqId, uint32_t carrierId)
-{
-  uint32_t globalCarrierId = carrierId;
-
-  for ( uint32_t i = 0; i < seqId; i++)
-    {
-      NS_ASSERT ( i < m_sctTable.size());
-
-      globalCarrierId += m_sctTable[i]->GetCarrierCount();
-    }
-
-  return globalCarrierId;
 }
 
 } // namespace ns3

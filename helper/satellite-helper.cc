@@ -264,7 +264,8 @@ SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
   m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
                                               MakeCallback (&SatConf::GetCarrierBandwidth, m_satConf),
                                               m_satConf->GetRtnLinkCarrierCount(),
-                                              m_satConf->GetFwdLinkCarrierCount());
+                                              m_satConf->GetFwdLinkCarrierCount(),
+                                              m_satConf->GetSuperframeSeq());
 
   SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequency, m_satConf);
   m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );

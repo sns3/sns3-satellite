@@ -191,6 +191,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   // Set SatChannels to SatPhyTx/SatPhyRx
   uPhyTx->SetChannel (uf);
+  uPhyTx->SetAttribute("TxMode", EnumValue(SatPhyTx::TRANSPARENT));
   uPhyRx->SetChannel (ur);
   uPhyRx->SetDevice (dev);
   uPhyTx->SetMobility(mobility);
@@ -223,7 +224,9 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyRx->ConfigurePhyRxCarriers (rtnCarrierConf);
 
   fPhyTx->SetChannel (fr);
+
   fPhyRx->SetChannel (ff);
+  fPhyTx->SetAttribute("TxMode", EnumValue(SatPhyTx::TRANSPARENT));
   fPhyRx->SetDevice (dev);
   fPhyTx->SetMobility(mobility);
   fPhyRx->SetMobility(mobility);

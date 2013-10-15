@@ -35,6 +35,7 @@
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
+#include "satellite-superframe-sequence.h"
 
 
 namespace ns3 {
@@ -56,11 +57,26 @@ public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
   /**
-   * Create a SatBeamHelper to make life easier when creating Satellite beams.
+   * Default constructor for SatBeamHelper (should not be used).
    */
   SatBeamHelper ();
+
+
+  /**
+   * Constructor for SatBeamHelper.
+   *
+   * \param geoNode               Pointer to Geo Satellite node
+   * \param bandwidthConverterCb  Callback to convert bandwidth
+   * \param fwdLinkCarrierCount   Number of carriers used in forward link
+   * \param rtnLinkCarrierCount   Number of carriers used in return link
+   * \param seq                   Pointer to used superframe sequence configuration (containing superframe configurations).
+   */
   SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandwidthConverterCb,
-                 uint32_t fwdLinkCarrierCount, uint32_t rtnLinkCarrierCount );
+                 uint32_t fwdLinkCarrierCount, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
+
+  /**
+   * Destructor for SatBeamHelper.
+   */
   virtual ~SatBeamHelper () {}
 
   /**
@@ -172,6 +188,7 @@ public:
 
 private:
   CarrierFreqConverter m_carrierFreqConverter;
+  Ptr<SatSuperframeSeq> m_superframeSeq;
 
   ObjectFactory         m_channelFactory;
   Ptr<SatGeoHelper>     m_geoHelper;

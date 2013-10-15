@@ -28,7 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/geo-coordinate.h"
 #include "ns3/satellite-channel.h"
-#include "satellite-frame-conf.h"
+#include "satellite-superframe-sequence.h"
 
 namespace ns3 {
 
@@ -45,6 +45,8 @@ public:
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+
+  inline Ptr<SatSuperframeSeq> GetSuperframeSeq () {return m_superframeSeq;}
 
   /**
    * Initialize the configuration
@@ -185,7 +187,7 @@ private:
     *
     * \return Carrier id relative to the superframe
     */
-   uint32_t GetSuperFrameCarrierId (uint32_t carrierId, uint32_t * seqId);
+   uint32_t GetSuperframeCarrierId (uint32_t carrierId, uint32_t * seqId);
 
    /**
     * \param seqId      Sequence of the superframe.
@@ -225,12 +227,12 @@ private:
    GeoCoordinate m_geoSatPosition;
 
    /**
-    * Superframe composition table (SCT)
+    * Superframe sequence configuration
     *
     * Table includes superframe configurations for return link.
     * Item index of the list means superframe sequency (SFS).
     */
-   std::vector< Ptr<SatSuperFrameConf> > m_sctTable;
+   Ptr<SatSuperframeSeq> m_superframeSeq;
 
    /**
     * Forward link carrier configuration.

@@ -29,6 +29,7 @@
 #include "ns3/packet.h"
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
+#include "ns3/satellite-superframe-sequence.h"
 
 namespace ns3 {
 
@@ -83,7 +84,7 @@ public:
     * \param cb callback to invoke whenever a TBTP is ready for sending and must
     *        be forwarded to the Beam UTs.
     */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb, Ptr<SatSuperframeSeq> seq);
 
   /**
     * \param utId ID (mac address) of the UT to be added
@@ -99,6 +100,9 @@ private:
   bool Send ( Ptr<Packet> packet );
   void Schedule ();
 
+  Ptr<SatSuperframeSeq> m_superframeSeq;
+  uint32_t m_superFrameCounter;
+
   /**
    * The TBTP send callback.
    */
@@ -108,6 +112,7 @@ private:
    * Set to store UTs in beam.
    */
   std::set<Address> m_uts;
+  Address m_currentUtAddress;
 
   /**
    * ID of the beam

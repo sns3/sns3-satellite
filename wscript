@@ -58,6 +58,7 @@ def build(bld):
         'helper/satellite-frame-conf.cc',
         'helper/satellite-wave-form-conf.cc',
         'helper/satellite-beam-user-info.cc',
+        'helper/satellite-superframe-sequence.cc',
         'helper/cbr-helper.cc',
         ]
 
@@ -128,6 +129,7 @@ def build(bld):
         'helper/satellite-frame-conf.h',
         'helper/satellite-wave-form-conf.h',
         'helper/satellite-beam-user-info.h',
+        'helper/satellite-superframe-sequence.h',
         'helper/cbr-helper.h',
         ]
 

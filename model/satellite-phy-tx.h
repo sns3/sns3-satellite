@@ -47,6 +47,12 @@ class SatPhyTx : public Object
 {
 
 public:
+  typedef enum
+  {
+    NORMAL,
+    TRANSPARENT
+  } SatPhyTxMode_t;
+
   SatPhyTx ();
   virtual ~SatPhyTx ();
 
@@ -119,6 +125,7 @@ private:
 
   State m_state;
   uint32_t m_beamId;
+  SatPhyTxMode_t m_txMode;
 };
 
 

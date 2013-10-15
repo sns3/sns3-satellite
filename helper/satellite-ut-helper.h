@@ -31,6 +31,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-link-results.h"
+#include "satellite-superframe-sequence.h"
 
 namespace ns3 {
 
@@ -51,7 +52,7 @@ public:
    * Create a SatNetDevHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount);
+  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
   virtual ~SatUtHelper () {}
 
   /*
@@ -152,6 +153,7 @@ public:
 private:
     CarrierBandwidthConverter m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
+    Ptr<SatSuperframeSeq> m_superframeSeq;
 
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
