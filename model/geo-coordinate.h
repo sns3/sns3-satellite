@@ -108,19 +108,19 @@ public:
   /**
    * Gets longitude value of coordinate.
    *
-   * \returns longitude
+   * \return longitude
    */
   double GetLongitude () const;
   /**
      * Gets latitude value of coordinate.
      *
-     * \returns latitude
+     * \return latitude
      */
   double GetLatitude () const;
   /**
    * Gets altitude value of coordinate.
    *
-   * \returns altitude
+   * \return altitude
    */
   double GetAltitude () const;
   /**
@@ -143,26 +143,18 @@ public:
   void SetAltitude (double altitude);
   /**
    * Converts Geodetic coordinates to Cartesian coordinates
-   * \returns Vector containing Cartesian coordinates
+   * \return Vector containing Cartesian coordinates
    */
   Vector ToVector ();
 
-  /**
-   * Defintions for reference Earth Ellipsoid Parameters
-   * Sphere, WGS84 and GRS80  reference ellipsoides supported.
-   *
-   * Semi-major axis A, m:
-   * Semi-minor axis B, m:
-   */
-
-  // First eccentricity squared
-  //static const double e2Param = 0;//0.00669437999014;  // First eccentricity squared
+  // Definitions for reference Earth Ellipsoid parameters.
+  // Sphere, WGS84 and GRS80 reference ellipsoides supported.
 
   // length (in meters) for semi-minor axis A. (same for all reference ellipsoides)
-  static const double equatorRadius = 6378137;            // Semi-major axis A, m:
+  static const double equatorRadius = 6378137.0;
 
-  // length (in meters) for semi-minor axis B of the different reference ellipsoides
-  static const double polarRadius_sphere = 6378137;           // Sphere
+  // length (in meters) for semi-minor axis B
+  static const double polarRadius_sphere = 6378137.0;         // Sphere
   static const double polarRadius_wgs84 = 6356752.314245;     // WGS84 ellipsoide
   static const double polarRadius_grs80 = 6356752.314103;     // GRS80 ellipsoide
 
