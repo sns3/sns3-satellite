@@ -37,10 +37,35 @@ namespace ns3 {
 class GeoCoordinate
 {
 public:
+  typedef enum
+  {
+    SPHERE,
+    WGS84,
+    GRS80
+  } ReferenceEllipsoide_t;
+
   /**
    * \param latitude latitude of position
    * \param longitude longitude of position
    * \param altitute altitute of position
+   *
+   * Creates GeoCoordinate from given latitude, longitude and altitude decimal degree values.
+   * Reference ellipsoide to be used is sphere.
+   *
+   * Accepted values:
+   *
+   * Latitude:       -90 ... 90 degrees
+   * Longitude:     -180 ... 180 degrees
+   * Altitude:      >= -EARTH_RADIUS
+   *
+   */
+  GeoCoordinate (double latitude, double longitude, double altitude);
+
+  /**
+   * \param latitude latitude of position
+   * \param longitude longitude of position
+   * \param altitute altitute of position
+   * \param refEllipsoide Reference ellipsoide to be used
    *
    * Creates GeoCoordinate from given latitude, longitude and altitude decimal degree values
    *
@@ -51,91 +76,117 @@ public:
    * Altitude:      >= -EARTH_RADIUS
    *
    */
-  GeoCoordinate (double latitude, double longitude, double altitude);
+  GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoide_t refEllipsoide);
+
   /**
    * \param vector, coordinates as Vector (x,y,z) (Cartesian)
    *
-   * Creates GeoCoordinate from given vector (x,y,z)
+   * Creates GeoCoordinate from given vector (x,y,z). Reference ellipsoide to be used is sphere.
    */
   GeoCoordinate (Vector vector);
+
   /**
-   * Creates GeoCoordinate with zero values of longitude, latitude and altitude
+   * \param vector, coordinates as Vector (x,y,z) (Cartesian)
+   * \param refEllipsoide Reference ellipsoide to be used
+   *
+   * Creates GeoCoordinate from given vector (x,y,z)
+   */
+  GeoCoordinate (Vector vector, ReferenceEllipsoide_t refEllipsoide);
+
+  /**
+   * Creates GeoCoordinate with zero values of longitude, latitude and altitude. Reference ellipsoide to be used is sphere.
    */
   GeoCoordinate ();
+
+  /**
+   * Gets reference ellipsoide used b GeoCoordinate object.
+   *
+   * \return  reference ellipsoide.
+   */
+  ReferenceEllipsoide_t GetRefEllipsoide () { return m_refEllipsoide; }
+
   /**
    * Gets longitude value of coordinate.
    *
    * \returns longitude
    */
-  double GetLongitude() const;
+  double GetLongitude () const;
   /**
      * Gets latitude value of coordinate.
      *
      * \returns latitude
      */
-  double GetLatitude() const;
+  double GetLatitude () const;
   /**
    * Gets altitude value of coordinate.
    *
    * \returns altitude
    */
-  double GetAltitude() const;
+  double GetAltitude () const;
   /**
    * Sets longitude value of coordinate.
    *
    * \param longitude longitude to set
    */
-  void SetLongitude(double longitude);
+  void SetLongitude (double longitude);
   /**
    * Sets latitude value of coordinate.
    *
    * \param latitude longitude to set
    */
-  void SetLatitude(double latitude);
+  void SetLatitude (double latitude);
   /**
    * Sets altitude value of coordinate.
    *
    * \param altitude longitude to set
    */
-  void SetAltitude(double altitude);
+  void SetAltitude (double altitude);
   /**
    * Converts Geodetic coordinates to Cartesian coordinates
    * \returns Vector containing Cartesian coordinates
    */
   Vector ToVector ();
+
   /**
-   * Used Earth Ellipsoid Parameters (WGS 84)
+   * Defintions for reference Earth Ellipsoid Parameters
+   * Sphere, WGS84 and GRS80  reference ellipsoides supported.
    *
    * Semi-major axis A, m:
    * Semi-minor axis B, m:
    */
 
   // First eccentricity squared
-  static const double e2Param = 0.00669437999014;  // First eccentricity squared
-  static const double aParam = 6378137;            // Semi-major axis A, m:
-  static const double bParam = 6356752.3142;       // Semi-minor axis B, m:
+  //static const double e2Param = 0;//0.00669437999014;  // First eccentricity squared
+
+  // length (in meters) for semi-minor axis A. (same for all reference ellipsoides)
+  static const double equatorRadius = 6378137;            // Semi-major axis A, m:
+
+  // length (in meters) for semi-minor axis B of the different reference ellipsoides
+  static const double polarRadius_sphere = 6378137;           // Sphere
+  static const double polarRadius_wgs84 = 6356752.314245;     // WGS84 ellipsoide
+  static const double polarRadius_grs80 = 6356752.314103;     // GRS80 ellipsoide
 
 private:
   /**
-   * Gets the radius of curvature in the prime vertical (N)
-   * \param latitude latitude in radians for to get N
-   * \return value of the N (meters)
+   * Gets the radius of curvature in the prime vertical
+   * \param latitude latitude in radians at to get the radius of curvature.
+   * \return value of the radius of curvature (meters)
    */
-  static inline double N(double latitude) {return ( aParam / std::sqrt(1 - e2Param * std::sin(latitude)*std::sin(latitude)));}
+  double GetRadiusCurvature (double latitude);
   /**
    * Checks if longtitude is in valid range
    *
    * \param longtitude to check
    * \return bool true longitude valid, false invalid
    */
-  static inline bool IsValidLongtitude(double longtitude) {return (longtitude >= -180 && longtitude <= 180);}
+  static inline bool IsValidLongtitude (double longtitude) {return (longtitude >= -180 && longtitude <= 180);}
   /**
    * Checks if latitude is in valid range
    *
    * \param latitude to check
    * \return bool true latitude valid, false invalid
    */
-  static inline bool IsValidLatitude(double latitude) {return (latitude >= -90 && latitude <= 90);}
+  static inline bool IsValidLatitude (double latitude) {return (latitude >= -90 && latitude <= 90);}
   /**
    * Checks if altitude is in valid range
    *
@@ -143,13 +194,35 @@ private:
    * \return bool true altitude valid, false invalid.
    *
    */
-  static inline bool IsValidAltitude(double altitude) {return ( (bParam + altitude) >= 0 );}
+  static inline bool IsValidAltitude (double altitude, ReferenceEllipsoide_t refEllipsoide);
   /**
    * Creates Geodetic coordinates from given Cartesian coordinates.
    *
    * \param vector reference to vector containing Cartesian coordinates for creation.
    */
-  void FromVector(const Vector &vector);
+  void ConstructFromVector (const Vector &vector);
+
+  /**
+   * \param latitude latitude of position
+   * \param longitude longitude of position
+   * \param altitute altitute of position
+   *
+   * Helper for cnstructor to create GeoCoordinate from given latitude, longitude and altitude decimal degree values.
+   *
+   * Accepted values:
+   *
+   * Latitude:       -90 ... 90 degrees
+   * Longitude:     -180 ... 180 degrees
+   * Altitude:      >= -EARTH_RADIUS
+   *
+   */
+  void Construct (double latitude, double longitude, double altitude);
+
+  /**
+   * This method is called to initialize needed parameters according to used reference ellipsoide.
+   *
+   */
+  void Initialize ();
 
   /**
    * latitude of coordinate
@@ -163,6 +236,11 @@ private:
    * altitude of coordinate
    */
   double m_altitude;
+
+  ReferenceEllipsoide_t m_refEllipsoide;
+  double m_e2Param;           // First eccentricity squared
+  double m_equatorRadius;     // Semi-major axis A, meters
+  double m_polarRadius;       // Semi-major axis B, meters
 };
 
 /**
