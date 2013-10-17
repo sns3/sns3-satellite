@@ -41,7 +41,7 @@ public:
    * Constructor for SatBeamUserInfo.
    *
    * \param utCount UT count of the beam (can be added later by method AddUt)
-   * \param userCount user count of the UTs (can be changed by method SetUtUserN)
+   * \param userCount user count of the UTs (can be changed by method SetUtUserCount)
    */
   SatBeamUserInfo (uint32_t utCount, uint32_t userCount);
 
@@ -56,7 +56,7 @@ public:
   uint32_t GetUtCount();
 
   /**
-   * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtN
+   * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
    *
    * return number of users in a UT.
    */
@@ -65,7 +65,7 @@ public:
   /*
    * Sets user count for UT.
    *
-   * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtN.
+   * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
    * \param userCount Number of user under a UT. Minimum value is 1. If this not called for the UT then default
    *                  value (1) is used for the UT.
    *
