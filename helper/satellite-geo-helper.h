@@ -61,10 +61,32 @@ public:
    * \param name the name of the attribute to set
    * \param value the value of the attribute to set
    *
-   * Set these attributes on each ns3::SatNetDevice created
+   * Set these attributes on each ns3::SatGeoNetDevice created
    * by SatGeoHelper::Install
    */
   void SetDeviceAttribute (std::string name, const AttributeValue &value);
+
+  /**
+   * Set an attribute value to be propagated to each User Phy created by the helper.
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   *
+   * Set these attributes on each ns3::SatPhy (user) created
+   * by SatGeoHelper::Install
+   */
+  void SetUserPhyAttribute (std::string name, const AttributeValue &value);
+
+  /**
+   * Set an attribute value to be propagated to each Feeder Phy created by the helper.
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   *
+   * Set these attributes on each ns3::SatPhy (feeder) created
+   * by SatGeoHelper::Install
+   */
+  void SetFeederPhyAttribute (std::string name, const AttributeValue &value);
 
   /**
    * \param c a set of nodes

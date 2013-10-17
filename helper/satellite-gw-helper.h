@@ -74,7 +74,7 @@ public:
    * \param v4 the value of the attribute to set on the queue
    *
    * Set the type of queue to create and associated to each
-   * SatNetDevice created through SatNetDevHelper::Install.
+   * SatGwHelper created through SatNetDevHelper::Install.
    */
   void SetQueue (std::string type,
                  std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
@@ -90,7 +90,7 @@ public:
    * \param value the value of the attribute to set
    *
    * Set these attributes on each ns3::SatNetDevice created
-   * by SatNetDevHelper::Install
+   * by SatGwHelper::Install
    */
   void SetDeviceAttribute (std::string name, const AttributeValue &value);
 
@@ -102,9 +102,20 @@ public:
    * \param value the value of the attribute to set
    *
    * Set these attribute on each ns3::SatChannel created
-   * by SatNetDevHelper::Install
+   * by SatGwHelper::Install
    */
   void SetChannelAttribute (std::string name, const AttributeValue &value);
+
+  /**
+   * Set an attribute value to be propagated to each Phy created by the helper.
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   *
+   * Set these attributes on each ns3::SatNetDevice created
+   * by SatGwHelper::Install
+   */
+  void SetPhyAttribute (std::string name, const AttributeValue &value);
 
   /**
    * \param c a set of nodes

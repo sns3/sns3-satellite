@@ -90,7 +90,7 @@ public:
    *
    * \param info information of the users in beams (for user defined scenario defines beams to create)
    */
-  void SetBeamUserInfo(std::map<uint32_t, SatBeamUserInfo> info);
+  void SetBeamUserInfo (std::map<uint32_t, SatBeamUserInfo> info);
 
   /**
    * Sets beam info for sceanrio creation.
@@ -101,24 +101,29 @@ public:
    * \param beamId id of the beam which info is set (for user defined scenario defines beam to create)
    * \param info information of the user in beam
    */
-  void SetBeamUserInfo(uint32_t beamId, SatBeamUserInfo info);
+  void SetBeamUserInfo (uint32_t beamId, SatBeamUserInfo info);
 
   /**
    * \param  node pointer to user node.
    *
    * \return address of the user.
    */
-  Ipv4Address GetUserAddress(Ptr<Node> node);
+  Ipv4Address GetUserAddress (Ptr<Node> node);
 
   /**
    * \return container having UT users
    */
-  NodeContainer  GetUtUsers();
+  NodeContainer  GetUtUsers ();
 
   /**
    * \return container having GW users.
    */
-  NodeContainer  GetGwUsers();
+  NodeContainer  GetGwUsers ();
+
+  /**
+   * \return pointer to beam helper.
+   */
+  Ptr<SatBeamHelper>  GetBeamHelper () { return m_beamHelper;}
 
   /**
    * Enables creation traces to be written in given file
@@ -128,9 +133,9 @@ public:
    */
   void EnableCreationTraces(std::string filename, bool details);
 
-  NodeContainer GwNodes() {return m_beamHelper->GetGwNodes();}
-  NodeContainer UtNodes() {return m_beamHelper->GetUtNodes();}
-  Ptr<Node> GeoSatNode() {return m_beamHelper->GetGeoSatNode();}
+  inline NodeContainer GwNodes () { return m_beamHelper->GetGwNodes(); }
+  inline NodeContainer UtNodes () { return m_beamHelper->GetUtNodes(); }
+  inline Ptr<Node> GeoSatNode () { return m_beamHelper->GetGeoSatNode(); }
 
 private:
   /**
@@ -141,7 +146,7 @@ private:
   /**
    * Enables creation traces in sub-helpers.
    */
-  void EnableDetailedCreationTraces();
+  void EnableDetailedCreationTraces ();
   /**
    * Sink for creation details traces
    * /param stream stream for traces
@@ -157,27 +162,27 @@ private:
   /**
    * Creates satellite objects according to simple scenario.
    */
-  void CreateSimpleScenario();
+  void CreateSimpleScenario ();
   /**
    * Creates satellite objects according to larger scenario.
    */
-  void CreateLargerScenario();
+  void CreateLargerScenario ();
   /**
    * Creates satellite objects according to full scenario.
    */
-  void CreateFullScenario();
+  void CreateFullScenario ();
   /**
    * Creates satellite objects according to user defined scenario.
    * Beams to create with number of the UTs are set by method SetBeamUserInfo.
    */
-  void CreateUserDefinedScenario();
+  void CreateUserDefinedScenario ();
 
   /**
    * Creates satellite objects according to given beam info.
    * /param beamInfo information of the beam to create (and beams which are given in map)
    * /param gwUsers number of the users in GW(s) side
    */
-  void CreateScenario(BeamMap beamInfo, uint32_t gwUsers);
+  void CreateScenario (BeamMap beamInfo, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -191,7 +196,7 @@ private:
    *
    * /param gws node container of UTs to set mobility
    */
-  void SetGwMobility(NodeContainer gws);
+  void SetGwMobility (NodeContainer gws);
 
   /**
    * Sets mobility to created Sat Geo node.
@@ -207,7 +212,7 @@ private:
    * /param the spot-beam id, where the UTs should be placed
    *
    */
-  void SetUtMobility(NodeContainer uts, uint32_t beamId);
+  void SetUtMobility (NodeContainer uts, uint32_t beamId);
 
   /**
    * User helper

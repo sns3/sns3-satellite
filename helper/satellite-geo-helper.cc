@@ -131,6 +131,18 @@ SatGeoHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
   m_deviceFactory.Set (n1, v1);
 }
 
+void
+SatGeoHelper::SetUserPhyAttribute (std::string n1, const AttributeValue &v1)
+{
+  m_userPhyFactory.Set (n1, v1);
+}
+
+void
+SatGeoHelper::SetFeederPhyAttribute (std::string n1, const AttributeValue &v1)
+{
+  m_feederPhyFactory.Set (n1, v1);
+}
+
 NetDeviceContainer 
 SatGeoHelper::Install (NodeContainer c)
 {

@@ -184,6 +184,21 @@ public:
    */
   Ptr<Node> GetGeoSatNode ();
 
+  /**
+   * \return pointer to UT helper.
+   */
+  Ptr<SatUtHelper>  GetUtHelper () { return m_utHelper;}
+
+  /**
+   * \return pointer to GW helper.
+   */
+  Ptr<SatGwHelper>  GetGwHelper () { return m_gwHelper;}
+
+  /**
+   * \return pointer to UT helper.
+   */
+  Ptr<SatGeoHelper>  GetGeoHelper () { return m_geoHelper;}
+
   virtual void DoDispose ();
 
 private:

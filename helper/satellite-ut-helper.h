@@ -92,7 +92,7 @@ public:
    * \param value the value of the attribute to set
    *
    * Set these attributes on each ns3::SatNetDevice created
-   * by SatNetDevHelper::Install
+   * by SatUtHelper::Install
    */
   void SetDeviceAttribute (std::string name, const AttributeValue &value);
 
@@ -104,9 +104,20 @@ public:
    * \param value the value of the attribute to set
    *
    * Set these attribute on each ns3::SatChannel created
-   * by SatNetDevHelper::Install
+   * by SatUtHelper::Install
    */
   void SetChannelAttribute (std::string name, const AttributeValue &value);
+
+  /**
+   * Set an attribute value to be propagated to each Phy created by the helper.
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   *
+   * Set these attributes on each ns3::SatNetDevice created
+   * by SatUtHelper::Install
+   */
+  void SetPhyAttribute (std::string name, const AttributeValue &value);
 
   /**
    * \param c a set of nodes

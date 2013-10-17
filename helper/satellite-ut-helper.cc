@@ -151,6 +151,12 @@ SatUtHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
   m_channelFactory.Set (n1, v1);
 }
 
+void
+SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
+{
+  m_phyFactory.Set (n1, v1);
+}
+
 NetDeviceContainer 
 SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
