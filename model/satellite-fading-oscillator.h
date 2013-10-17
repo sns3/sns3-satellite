@@ -44,15 +44,23 @@ public:
   /// Initiate oscillator with complex amplitude, initial phase and rotation speed
   SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega);
 
+  /// Initiate oscillator with amplitude, initial phase and rotation speed
+  SatFadingOscillator (double amplitude, double initialPhase, double omega);
+
   ~SatFadingOscillator ();
 
   // Get the complex amplitude at moment \param t
-  std::complex<double> GetValueAt (Time t) const;
+  std::complex<double> GetComplexValueAt (Time t) const;
+
+  // Get the complex amplitude at moment \param t
+  double GetValueAt (Time t) const;
 
 private:
 
   /// Complex number \f[Re=\cos(\psi_n), Im = i\sin(\psi_n)]
-  std::complex<double> m_amplitude;
+  std::complex<double> m_complexAmplitude;
+
+  double m_amplitude;
 
   /// Phase \f[\phi_n] of the oscillator
   double m_phase;

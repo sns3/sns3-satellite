@@ -52,24 +52,24 @@ static const double g_MarkovElevationStateChangeProbabilities[SatMarkovConf::DEF
 static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT] =
     {
      /* Elevation 40 */
-     {{0.1,0.37,-22.0,10,1},
-      {-1.0,0.5,-22.0,10,1},
-      {-2.25,0.13,-21.2,10,1}},
+     {{-0.1,0.37,-22.0},
+      {-1.0,0.5,-22.0},
+      {-2.25,0.13,-21.2}},
 
      /* Elevation 60 */
-     {{0.0,0.12,-24.9,10,1},
-      {-0.7,0.12,-26.1,10,1},
-      {-1.4,0.25,-23.1,10,1}},
+     {{0.0,0.12,-24.9},
+      {-0.7,0.12,-26.1},
+      {-1.4,0.25,-23.1}},
 
      /* Elevation 70 */
-     {{-0.1,0.25,-22.5,10,1},
-      {-0.5,0.28,-24.5,10,1},
-      {-0.75,0.37,-23.24,10,1}},
+     {{-0.1,0.25,-22.5},
+      {-0.5,0.28,-24.5},
+      {-0.75,0.37,-23.24}},
 
      /* Elevation 80 */
-     {{0.1,0.16,-22.4,10,1},
-      {-0.4,0.15,-23.5,10,1},
-      {-0.72,0.27,-22.0,10,1}}
+     {{0.1,0.16,-22.4},
+      {-0.4,0.15,-23.5},
+      {-0.72,0.27,-22.0}}
     };
 
 TypeId
@@ -83,8 +83,8 @@ SatMarkovConf::SatMarkovConf () :
     m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT),
     m_minimumPositionChangeInMeters (20.0),
-    m_numOfOscillators (1),
-    m_dopplerFrequencyHz (10)
+    m_numOfOscillators (4),
+    m_dopplerFrequencyHz (1)
 {
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
   for (uint32_t i = 0; i < m_elevationCount; i++)
@@ -106,18 +106,23 @@ SatMarkovConf::SatMarkovConf () :
 
   std::pair<double, uint32_t> elevation;
 
-  elevation.first = 0.0;
+  elevation.first = 40.0;
   elevation.second = 0;
 
   m_markovElevations.insert (elevation);
 
-  elevation.first = 30.0;
+  elevation.first = 60.0;
   elevation.second = 1;
 
   m_markovElevations.insert (elevation);
 
-  elevation.first = 60.0;
+  elevation.first = 70.0;
   elevation.second = 2;
+
+  m_markovElevations.insert (elevation);
+
+  elevation.first = 80.0;
+  elevation.second = 3;
 
   m_markovElevations.insert (elevation);
 
@@ -127,11 +132,11 @@ SatMarkovConf::SatMarkovConf () :
     {
       std::vector<std::vector<double> > states;
 
-      for (uint32_t j = 0; j < SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT; j++)
+      for (uint32_t j = 0; j < m_stateCount; j++)
         {
           std::vector<double> parameters;
 
-          for (uint32_t k = 0; k < m_stateCount; k++)
+          for (uint32_t k = 0; k < SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT; k++)
             {
               parameters.push_back (g_LooParameters[i][j][k]);
             }

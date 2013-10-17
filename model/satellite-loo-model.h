@@ -21,7 +21,9 @@
 #define SATELLITE_LOO_MODEL_H
 
 #include "ns3/vector.h"
+#include "satellite-fader.h"
 #include "satellite-fading-oscillator.h"
+#include "satellite-loo-conf.h"
 #include "ns3/random-variable-stream.h"
 
 namespace ns3 {
@@ -31,7 +33,7 @@ namespace ns3 {
  *
  * \brief Loo model
  */
-class SatLooModel : public Object
+class SatLooModel : public SatFader
 {
 public:
   static const double PI;
@@ -41,7 +43,7 @@ public:
   /** Create Loo model. */
   SatLooModel ();
 
-  SatLooModel (double mean, double stdDev, double multipathPower, double dopplerFrequencyHz, uint32_t numOfOscillators);
+  SatLooModel (Ptr<SatLooConf> looConf, uint32_t set, uint32_t state);
 
   /** Destroy the Loo model. */
   ~SatLooModel ();
@@ -50,32 +52,55 @@ public:
 
   double GetChannelGain ();
 
-  void UpdateParameters (double mean, double stdDev, double multipathPower);
+  void UpdateParameters (uint32_t set, uint32_t state);
 
 private:
-  double m_mean;
-  double m_stdDev;
-  double m_multipathPower;
+  uint32_t m_setId;
+  uint32_t m_stateId;
+  double m_mean;                     // mean in dB
+  double m_stdDev;                   // std in dB
+  double m_multipathPower;           // rms squared value of diffuse multipath dB
+  double m_sigma;                    // convert multipath to linear units
+  //double m_angleOfArrival;           // angle of arrival of direct signal
+  //double m_carrierFrequency;         // carrier frequency (Hz)
+  //double m_lcorr;                    // correlation distance for slow variations (m)
+  //double m_velocity;                 // speed (m/s)
+  //double m_lambdac;                  // wavelength (m)
+  //double m_kc;                       // wave number
+  //double m_fm;                       // max Doppler
+  //double m_ts;                       // sampling spacing (s)
+  //double m_fs;                       // sampling freq. (Hz)
+  //uint32_t m_fractionOfWavelength;   // sampling: fraction of wavelength
 
-  // Log standard deviation
-  double m_sigma;
-  //
-  double m_mu;
+  double m_slowFadingOmegaDopplerMax;
+  double m_slowFadingFrequencyOmegaDopplerMax;
+  double m_fastFadingOmegaDopplerMax;
 
-  double m_omegaDopplerMax;
-  uint32_t m_nOscillators;
+  uint32_t m_nFastOscillators;
+  uint32_t m_nSlowOscillators;
+
+  Ptr<SatLooConf> m_looConf;
+  std::vector<std::vector<double> > m_looParameters;
+
+  Ptr<NormalRandomVariable> m_normalRandomVariable;
+  Ptr<UniformRandomVariable> m_uniformVariable;
 
   /// Vector of oscillators:
-  std::vector< Ptr<SatFadingOscillator> > m_uniformOscillators;
-  std::vector< Ptr<SatFadingOscillator> > m_logNormalOscillators;
+  std::vector< Ptr<SatFadingOscillator> > m_slowFadingOscillators;
+  std::vector< Ptr<SatFadingOscillator> > m_slowFadingFrequencyOscillators;
+  std::vector< Ptr<SatFadingOscillator> > m_fastFadingOscillators;
 
-  Ptr<UniformRandomVariable> m_uniformVariable;
-  Ptr<LogNormalRandomVariable> m_logNormalVariable;
+  void ConstructSlowFadingOscillators ();
+  void ConstructSlowFadingFrequencyOscillators ();
+  void ConstructFastFadingOscillators ();
 
-  void ConstructLogNormalOscillators ();
-  void ConstructUniformOscillators ();
-  std::complex<double> GetUniformComplexGain ();
-  std::complex<double> GetLogNormalComplexGain ();
+  void ConstructGaussianOscillators (uint32_t numOfOscillators, double dopplerMax, std::vector< Ptr<SatFadingOscillator> > oscillators);
+
+  double GetOscillatorSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
+  std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
+
+  void ChangeState (uint32_t state);
+  void ChangeSet (uint32_t set);
 };
 
 } // namespace ns3

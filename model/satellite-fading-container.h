@@ -20,8 +20,8 @@
 #ifndef SATELLITE_FADING_CONTAINER_H
 #define SATELLITE_FADING_CONTAINER_H
 
-#include "satellite-rayleigh-model.h"
 #include "satellite-loo-model.h"
+#include "satellite-loo-conf.h"
 #include "satellite-markov-model.h"
 #include "satellite-markov-conf.h"
 #include "geo-coordinate.h"
@@ -42,7 +42,7 @@ public:
 
   SatFadingContainer ();
 
-  SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordinate currentPosition);
+  SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition);
 
   ~SatFadingContainer ();
 
@@ -64,13 +64,15 @@ private:
 
   Ptr<SatMarkovModel> m_markovModel;
   Ptr<SatMarkovConf> m_markovConf;
-  Ptr<SatLooModel> m_looModel_up;
-  Ptr<SatLooModel> m_looModel_down;
+  Ptr<SatLooConf> m_looConf;
+  Ptr<SatFader> m_fader_up;
+  Ptr<SatFader> m_fader_down;
 
   uint32_t m_numOfStates;
   uint32_t m_numOfSets;
   double m_currentElevation;
   uint32_t m_setId;
+  uint32_t m_stateId;
   Time m_cooldownPeriodLength;
   double m_minimumPositionChangeInMeters;
   GeoCoordinate m_currentPosition;
@@ -83,9 +85,6 @@ private:
   uint32_t m_numOfOscillators;
   bool m_enableSetLock;
   bool m_enableStateLock;
-  uint32_t m_lockedState;
-
-  std::vector <std::vector <double> > m_looParameters;
 
   TracedCallback< double,                     // time
                   SatChannel::ChannelType_t,  // channel type
@@ -94,7 +93,6 @@ private:
      m_fadingTrace;
 
   void UpdateProbabilities (uint32_t setId);
-  void UpdateLooParameters (uint32_t setId);
   void EvaluateStateChange ();
   double CalculateFading (SatChannel::ChannelType_t channeltype);
   double CalculateElevation ();

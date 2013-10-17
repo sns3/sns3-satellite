@@ -100,6 +100,7 @@ uint32_t SatMarkovModel::DoTransition ()
         }
     }
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovModel - Transition done, new state: " << m_numOfStates - 1);
+  m_currentState = m_numOfStates - 1;
   return m_numOfStates - 1;
 }
 

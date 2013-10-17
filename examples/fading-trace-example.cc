@@ -5,7 +5,6 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/satellite-channel.h"
 
 using namespace ns3;
 
@@ -29,11 +28,12 @@ main (int argc, char *argv[])
 
   // create default Markov configuration
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
+  Ptr<SatLooConf> looConf = CreateObject<SatLooConf>();
 
   GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
 
   // create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,currentPosition);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,looConf,currentPosition);
 
   markovContainer->TraceConnect("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 
@@ -42,6 +42,12 @@ main (int argc, char *argv[])
     {
       Simulator::Schedule( MilliSeconds(1 * i), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
     }
+
+  Simulator::Schedule( MilliSeconds(0), &SatFadingContainer::LockToSetAndState, markovContainer, 0,0);
+  Simulator::Schedule( MilliSeconds(20000), &SatFadingContainer::LockToSetAndState, markovContainer, 0,1);
+  Simulator::Schedule( MilliSeconds(40000), &SatFadingContainer::LockToSetAndState, markovContainer, 0,2);
+  Simulator::Schedule( MilliSeconds(60000), &SatFadingContainer::LockToSetAndState, markovContainer, 0,0);
+  Simulator::Schedule( MilliSeconds(80000), &SatFadingContainer::LockToSetAndState, markovContainer, 0,1);
 
   Simulator::Run ();
   Simulator::Destroy ();

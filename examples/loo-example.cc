@@ -24,9 +24,11 @@ main (int argc, char *argv[])
   LogComponentEnable ("loo-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatLooModel", LOG_LEVEL_INFO);
 
-  Ptr<SatLooModel> looFaderLineOfSight = CreateObject<SatLooModel> (0.5,0.5,-8.0,10,1);
-  Ptr<SatLooModel> looFaderLightShadowing = CreateObject<SatLooModel> (0.5,0.5,-8.0,10,1);
-  Ptr<SatLooModel> looFaderHeavyShadowing = CreateObject<SatLooModel> (-17.0,3.5,-12.0,10,1);
+  Ptr<SatLooConf> looConf = CreateObject<SatLooConf> ();
+
+  Ptr<SatLooModel> looFaderLineOfSight = CreateObject<SatLooModel> (looConf,0,0);
+  Ptr<SatLooModel> looFaderLightShadowing = CreateObject<SatLooModel> (looConf,0,1);
+  Ptr<SatLooModel> looFaderHeavyShadowing = CreateObject<SatLooModel> (looConf,0,2);
 
   for (uint32_t i = 0; i < 1000; i++)
     {

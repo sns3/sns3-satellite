@@ -5,7 +5,6 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/satellite-channel.h"
 
 using namespace ns3;
 
@@ -29,11 +28,12 @@ main (int argc, char *argv[])
 
   // create default Markov configuration
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
+  Ptr<SatLooConf> looConf = CreateObject<SatLooConf>();
 
   GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
 
   // create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,currentPosition);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,looConf,currentPosition);
 
   // Run Markov chain
 

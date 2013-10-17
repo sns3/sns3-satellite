@@ -21,174 +21,255 @@
 #include "satellite-loo-model.h"
 #include "satellite-utils.h"
 
+NS_LOG_COMPONENT_DEFINE ("SatLooModel");
+
 namespace ns3 {
 
 const double SatLooModel::PI = 3.14159265358979323846;
 
 NS_OBJECT_ENSURE_REGISTERED (SatLooModel);
-NS_LOG_COMPONENT_DEFINE ("SatLooModel");
 
 TypeId SatLooModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLooModel")
-      .SetParent<Object> ()
+      .SetParent<SatFader> ()
       .AddConstructor<SatLooModel> ();
   return tid;
 }
 
 SatLooModel::SatLooModel () :
+  m_setId (0),
+  m_stateId (0),
   m_mean (0),
   m_stdDev (0),
   m_multipathPower (0),
-  m_sigma (0),
-  m_mu (0),
-  m_omegaDopplerMax (0),
-  m_nOscillators (0)
+  m_sigma (0)
 {
   NS_ASSERT(0);
 }
 
-SatLooModel::SatLooModel (double mean, double stdDev, double multipathPower, double dopplerFrequencyHz, uint32_t numOfOscillators) :
-    m_mean(mean),
-    m_stdDev(stdDev),
-    m_multipathPower(multipathPower),
-    m_omegaDopplerMax (2.0 * dopplerFrequencyHz * SatLooModel::PI),
-    m_nOscillators (numOfOscillators)
+SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t set, uint32_t state) :
+    m_setId (set),
+    m_stateId (state)
 {
-  NS_ASSERT (m_nOscillators != 0);
-  NS_ASSERT (m_omegaDopplerMax != 0);
 
-  m_sigma = sqrt( log( 1 + (m_stdDev / pow(m_mean,2))));
+  m_looConf = looConf;
 
-  //m_sigma = sqrt(pow(((m_multipathPower / 10.0) / 2.0),10.0));
+  // initialize parameters for this set and state
+  ChangeSet (m_setId);
+  ChangeState (m_stateId);
 
-  m_mu = log(  pow(m_mean,2) / sqrt(m_stdDev + pow(m_mean,2)));
+  // === TESTING === TODO: remove these, make parameters
+  //m_mean = -8.0;
+  //m_stdDev = 3.0;
+  //m_multipathPower = -10.0;
+  //m_sigma = sqrt(0.5 * pow(10,(m_multipathPower / 10)));
+
+  //m_nFastOscillators = 4;
+  //m_nSlowOscillators = 4;
+
+  //m_slowFadingOmegaDopplerMax = 0.15;
+  //m_slowFadingFrequencyOmegaDopplerMax = 0.15;
+  //m_fastFadingOmegaDopplerMax = 100;
+  // === TESTING ===
+
+  m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
 
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
   m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
   m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
 
-  m_logNormalVariable = CreateObject<LogNormalRandomVariable> ();
-  m_logNormalVariable->SetAttribute ("Mu", DoubleValue (m_mu));
-  m_logNormalVariable->SetAttribute ("Sigma", DoubleValue (m_sigma));
-
-  ConstructUniformOscillators ();
-  ConstructLogNormalOscillators ();
+  ConstructSlowFadingOscillators ();
+  ConstructFastFadingOscillators ();
+  ConstructSlowFadingFrequencyOscillators ();
 }
 
 SatLooModel::~SatLooModel ()
 {
-  m_uniformOscillators.clear ();
-  m_logNormalOscillators.clear ();
-  m_uniformVariable = 0;
-  m_logNormalVariable = 0;
 }
 
 void
-SatLooModel::ConstructUniformOscillators ()
+SatLooModel::ConstructSlowFadingOscillators ()
 {
   // Initial phase is common for all oscillators:
-  double phi = m_uniformVariable->GetValue ();
+  double phi = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
   // Theta is common for all oscillators:
-  double theta = m_uniformVariable->GetValue ();
-  for (uint32_t i = 0; i < m_nOscillators; i++)
+  double theta = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+  for (uint32_t i = 0; i < m_nSlowOscillators; i++)
     {
       uint32_t n = i + 1;
       /// 1. Rotation speed
       /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-      double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_nOscillators);
+      double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_nSlowOscillators);
       /// 1b. Initiate rotation speed:
-      double omega = m_omegaDopplerMax * std::cos (alpha);
+      double omega = m_slowFadingOmegaDopplerMax * std::cos (alpha);
       /// 2. Initiate complex amplitude:
-      double psi = m_uniformVariable->GetValue ();
-      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_nOscillators);
+      double psi = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_nSlowOscillators);
       /// 3. Construct oscillator:
-      m_uniformOscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
+      m_slowFadingOscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
     }
 }
 
 void
-SatLooModel::ConstructLogNormalOscillators ()
+SatLooModel::ConstructSlowFadingFrequencyOscillators ()
 {
   // Initial phase is common for all oscillators:
-  double phi = m_logNormalVariable->GetValue ();
+  double phi = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
   // Theta is common for all oscillators:
-  double theta = m_logNormalVariable->GetValue ();
-  for (uint32_t i = 0; i < m_nOscillators; i++)
+  double theta = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+  for (uint32_t i = 0; i < m_nSlowOscillators; i++)
     {
       uint32_t n = i + 1;
       /// 1. Rotation speed
       /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-      double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_nOscillators);
+      double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_nSlowOscillators);
       /// 1b. Initiate rotation speed:
-      double omega = m_omegaDopplerMax * std::cos (alpha);
+      double omega = m_slowFadingFrequencyOmegaDopplerMax * std::cos (alpha);
       /// 2. Initiate complex amplitude:
-      double psi = m_logNormalVariable->GetValue ();
-      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_nOscillators);
+      double psi = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_nSlowOscillators);
       /// 3. Construct oscillator:
-      m_logNormalOscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
+      m_slowFadingFrequencyOscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
     }
 }
 
-std::complex<double>
-SatLooModel::GetUniformComplexGain ()
+void
+SatLooModel::ConstructFastFadingOscillators ()
 {
-  std::complex<double> sumUniformAmplitude = std::complex<double> (0, 0);
-
-  for (uint32_t i = 0; i < m_uniformOscillators.size (); i++)
+  // Initial phase is common for all oscillators:
+  double phi = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+  // Theta is common for all oscillators:
+  double theta = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+  for (uint32_t i = 0; i < m_nFastOscillators; i++)
     {
-      sumUniformAmplitude += m_uniformOscillators[i]->GetValueAt (Now ());
+      uint32_t n = i + 1;
+      /// 1. Rotation speed
+      /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
+      double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_nFastOscillators);
+      /// 1b. Initiate rotation speed:
+      double omega = m_fastFadingOmegaDopplerMax * std::cos (alpha);
+      /// 2. Initiate complex amplitude:
+      double psi = m_normalRandomVariable->GetValue (m_mean, m_stdDev);
+      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_nFastOscillators);
+      /// 3. Construct oscillator:
+      m_fastFadingOscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
     }
-
-  return sumUniformAmplitude;
 }
 
-std::complex<double>
-SatLooModel::GetLogNormalComplexGain ()
-{
-  std::complex<double> sumLogNormalAmplitude = std::complex<double> (0, 0);
-
-  for (uint32_t i = 0; i < m_logNormalOscillators.size (); i++)
-    {
-      sumLogNormalAmplitude += m_logNormalOscillators[i]->GetValueAt (Now ());
-    }
-
-  return sumLogNormalAmplitude;
-}
 
 double
 SatLooModel::GetChannelGainDb ()
 {
-  double tempChannelGainDb = SatUtils::LinearToDb(GetChannelGain ());
+  double tempChannelGainDb = 10.0 * std::log10 (GetChannelGain ());
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
   return tempChannelGainDb;
 }
 
 double
-SatLooModel::GetChannelGain ()
+SatLooModel::GetChannelGain () // TODO: check validity
 {
-  std::complex<double> uniformComplexGain = GetUniformComplexGain ();
-  std::complex<double> logNormalComplexGain = GetLogNormalComplexGain ();
+  //// Direct signal
+  std::complex<double> slowComplexGain = GetOscillatorComplexSum (m_slowFadingOscillators);
+  std::complex<double> slowComplexFrequency = GetOscillatorComplexSum (m_slowFadingFrequencyOscillators);
 
-  double tempUniformChannelGain = ((std::pow (uniformComplexGain.real (), 2) + std::pow (uniformComplexGain.imag (), 2)) / 2);
-  double tempLogNormalChannelGain = ((std::pow (logNormalComplexGain.real (), 2) + std::pow (logNormalComplexGain.imag (), 2)) / 2);
+  // check the / 2, should it be sqrt?
+  double slowGain = ((pow (slowComplexGain.real (), 2) + pow (slowComplexGain.imag (), 2)) / 2);
 
-  double tempTotalChannelGain = tempUniformChannelGain + (SatUtils::DbToLinear(m_multipathPower) * tempLogNormalChannelGain);
+  // check the / 2, should it be sqrt?
+  double slowFrequency = ((pow (slowComplexFrequency.real (), 2) + pow (slowComplexFrequency.imag (), 2)) / 2);
 
-  //NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempUniformChannelGain << " " << tempLogNormalChannelGain << " " << tempTotalChannelGain);
+  // Verify this! Does it require normalization? Add stdDev!
+  double slowFading = m_mean + slowGain + std::cos (Now ().GetSeconds () * 2.0 * SatLooModel::PI * m_slowFadingOmegaDopplerMax + slowFrequency);
 
-  return tempTotalChannelGain;
+  //// Multipath
+  std::complex<double> fastComplexGain = GetOscillatorComplexSum (m_fastFadingOscillators);
+  fastComplexGain = fastComplexGain * m_sigma;
+
+  // check the sqrt, should it be / 2 instead!!
+  double fastFading = sqrt((pow (fastComplexGain.real (), 2) + pow (fastComplexGain.imag (), 2)));
+  fastFading = 10 * log10(fastFading);
+
+  // TESTING BEGINS
+
+  //double direct = m_normalRandomVariable->GetValue(m_mean,m_stdDev);
+
+  //std::complex<double> rayleighGain = (m_normalRandomVariable->GetValue(), m_normalRandomVariable->GetValue());
+  //rayleighGain = rayleighGain * m_sigma;
+  //double rayleighFading = sqrt(pow (rayleighGain.real (), 2) + pow (rayleighGain.imag (), 2));
+  //rayleighFading = 20 * log10(rayleighFading);
+
+  return (slowFading + fastFading) / 2; // is divide by 2 correct?
+  //return slowFading;
+  //return fastFading;
+
+}
+
+double
+SatLooModel::GetOscillatorSum (std::vector< Ptr<SatFadingOscillator> > oscillator)
+{
+  double sum = 0;
+
+  for (uint32_t i = 0; i < oscillator.size (); i++)
+    {
+      sum += oscillator[i]->GetValueAt (Now ());
+    }
+
+  return sum;
+}
+
+std::complex<double>
+SatLooModel::GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator)
+{
+  std::complex<double> complexSum = std::complex<double> (0, 0);
+
+  for (uint32_t i = 0; i < oscillator.size (); i++)
+    {
+      complexSum += oscillator[i]->GetComplexValueAt (Now ());
+    }
+
+  return complexSum;
 }
 
 void
-SatLooModel::UpdateParameters (double mean, double stdDev, double multipathPower)
+SatLooModel::UpdateParameters (uint32_t set, uint32_t state)
 {
-  m_sigma = sqrt( log( 1 + (m_stdDev / pow(m_mean,2))));
-  m_mu = log(  pow(m_mean,2) / sqrt(m_stdDev + pow(m_mean,2)));
-  m_multipathPower = multipathPower;
+  if (m_setId != set)
+    {
+      ChangeSet (set);
+      ChangeState (state);
+    }
 
-  m_logNormalVariable->SetAttribute ("Mu", DoubleValue (m_mu));
-  m_logNormalVariable->SetAttribute ("Sigma", DoubleValue (m_sigma));
+  if (m_setId == set && m_stateId != state)
+    {
+      ChangeState (state);
+    }
+}
+
+void
+SatLooModel::ChangeSet (uint32_t set)
+{
+  m_looParameters.clear();
+  m_looParameters = m_looConf->GetLooParameters (set);
+  m_setId = set;
+}
+
+void
+SatLooModel::ChangeState (uint32_t state)
+{
+  m_mean = m_looParameters[state][0];
+  m_stdDev = m_looParameters[state][1];
+  m_multipathPower = m_looParameters[state][2];
+
+  m_nFastOscillators = m_looParameters[state][3];
+  m_nSlowOscillators = m_looParameters[state][4];
+
+  m_slowFadingOmegaDopplerMax = m_looParameters[state][5];
+  m_slowFadingFrequencyOmegaDopplerMax = m_looParameters[state][6];
+  m_fastFadingOmegaDopplerMax = m_looParameters[state][7];
+
+  m_sigma = sqrt(pow(((m_multipathPower / 10.0) / 2.0),10.0));
+  m_stateId = state;
 }
 
 } // namespace ns3

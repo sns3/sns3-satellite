@@ -33,7 +33,8 @@ TypeId SatFadingOscillator::GetTypeId (void)
 
 //// Default constructor
 SatFadingOscillator::SatFadingOscillator () :
-  m_amplitude (0,0),
+  m_complexAmplitude (0,0),
+  m_amplitude (0),
   m_phase (0),
   m_omega (0)
 {
@@ -42,12 +43,26 @@ SatFadingOscillator::SatFadingOscillator () :
 
 /// Represents a single oscillator
 SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega) :
+  m_complexAmplitude (amplitude),
+  m_amplitude (0),
+  m_phase (initialPhase),
+  m_omega (omega)
+{}
+
+SatFadingOscillator::SatFadingOscillator (double amplitude, double initialPhase, double omega) :
+  m_complexAmplitude (0,0),
   m_amplitude (amplitude),
   m_phase (initialPhase),
   m_omega (omega)
 {}
 
 std::complex<double>
+SatFadingOscillator::GetComplexValueAt (Time at) const
+{
+  return (m_complexAmplitude * std::cos (at.GetSeconds () * m_omega + m_phase));
+}
+
+double
 SatFadingOscillator::GetValueAt (Time at) const
 {
   return (m_amplitude * std::cos (at.GetSeconds () * m_omega + m_phase));
