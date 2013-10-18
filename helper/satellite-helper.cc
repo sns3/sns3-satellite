@@ -94,6 +94,42 @@ SatHelper::SatHelper (std::string scenarioName)
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
+
+  // create Geo Satellite node, set mobility to it
+  Ptr<Node> geoSatNode = CreateObject<Node>();
+  SetGeoSatMobility(geoSatNode);
+
+  m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
+                                              MakeCallback (&SatConf::GetCarrierBandwidth, m_satConf),
+                                              m_satConf->GetRtnLinkCarrierCount(),
+                                              m_satConf->GetFwdLinkCarrierCount(),
+                                              m_satConf->GetSuperframeSeq());
+
+  SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequency, m_satConf);
+  m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );
+
+  m_userHelper = CreateObject<SatUserHelper> ();
+
+  if ( m_detailedCreationTraces )
+    {
+      EnableDetailedCreationTraces();
+    }
+
+  // set address base for GW user networks
+  m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
+
+  // set address base for UT user networks
+  m_userHelper->SetUtBaseAddress("10.3.1.0", "255.255.255.0");
+
+  // set address base for satellite network
+  m_beamHelper->SetBaseAddress("10.1.1.0", "255.255.255.0");
+
+  // set Csma channel attributes
+  m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
+  m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+
+  // Set the antenna patterns to beam helper
+  m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 }
 
 void
@@ -256,42 +292,6 @@ void
 SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 {
   InternetStackHelper internet;
-
-  // create Geo Satellite node, set mobility to it
-  Ptr<Node> geoSatNode = CreateObject<Node>();
-  SetGeoSatMobility(geoSatNode);
-
-  m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
-                                              MakeCallback (&SatConf::GetCarrierBandwidth, m_satConf),
-                                              m_satConf->GetRtnLinkCarrierCount(),
-                                              m_satConf->GetFwdLinkCarrierCount(),
-                                              m_satConf->GetSuperframeSeq());
-
-  SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequency, m_satConf);
-  m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );
-
-  m_userHelper = CreateObject<SatUserHelper> ();
-
-  if ( m_detailedCreationTraces )
-    {
-      EnableDetailedCreationTraces();
-    }
-
-  // set address base for GW user networks
-  m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
-
-  // set address base for UT user networks
-  m_userHelper->SetUtBaseAddress("10.3.1.0", "255.255.255.0");
-
-  // set address base for satellite network
-  m_beamHelper->SetBaseAddress("10.1.1.0", "255.255.255.0");
-
-  // set Csma channel attributes
-  m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
-  m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-
-  // Set the antenna patterns to beam helper
-  m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 
   // create all possible GW nodes, set mobility to them and install to interner
   NodeContainer gwNodes;
