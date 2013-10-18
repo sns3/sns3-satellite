@@ -25,3 +25,6 @@ def build(bld):
     obj = bld.create_ns3_program('fading-trace-example', ['satellite'])
     obj.source = 'fading-trace-example.cc'
     
+    obj = bld.create_ns3_program('sat-link-budget-example', ['satellite'])
+    obj.source = 'sat-link-budget-example.cc'
+    
