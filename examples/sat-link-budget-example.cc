@@ -37,16 +37,16 @@ static void PacketTraceCb ( std::string context, Ptr<SatSignalParameters> params
   // print only unicast message to prevent printing control messages like TBTP messages
   if ( !destAdd.IsBroadcast() )
     {
-      SatChannel::ChannelType_t chType = params->m_channel->GetChannelType ();
-      uint32_t beamId = params->m_beamId;
-      double centerFreq = params->m_carrierFreq_hz;
-      double rxPower_dbW = SatUtils::WToDbW ( params->m_rxPower_W );
-      double ifPower_dbW = SatUtils::WToDbW (ifPower);
-      double sinr_db = SatUtils::WToDbW ( params->m_sinr );
-      double cSinr_db = SatUtils::WToDbW(cSinr);
-
-      NS_LOG_INFO ( Simulator::Now() << " " << chType << " " << ownAdd << " " << destAdd << " " << beamId << " "
-                    << centerFreq << " " << ifPower_dbW << " " << rxPower_dbW << " " << sinr_db << " " << cSinr_db );
+      NS_LOG_INFO ( Simulator::Now() << " "
+                    << params->m_channel->GetChannelType () << " "
+                    << ownAdd << " "
+                    << destAdd << " "
+                    << params->m_beamId << " "
+                    << params->m_carrierFreq_hz << " "
+                    << SatUtils::WToDbW (ifPower) << " "
+                    << SatUtils::WToDbW ( params->m_rxPower_W ) << " "
+                    << SatUtils::WToDbW ( params->m_sinr ) << " "
+                    << SatUtils::WToDbW(cSinr) );
     }
 }
 
