@@ -226,8 +226,10 @@ SatPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
 
   // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
   // and antenna gain getting at receiver (UT or GW)
+  // copy on tx power too.
 
   txParams->m_phyTx = m_phyTx;
+  txParams->m_txPower_W = m_eirpWoGain_W;
   m_phyTx->StartTx (p, txParams);
 }
 
