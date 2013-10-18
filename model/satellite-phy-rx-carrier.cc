@@ -218,9 +218,8 @@ SatPhyRxCarrier::EndRxData ()
     }
 
   m_rxParams->m_sinr = sinr;
-
-  m_packetTrace ( m_rxParams->m_channel->GetChannelType(), m_ownAddress, m_destAddress, m_beamId,
-                  ifPower, m_rxParams->m_rxPower_W, sinr, cSinr);
+  
+  m_packetTrace ( m_rxParams, m_ownAddress, m_destAddress, ifPower, cSinr);
 
   m_satInterference->NotifyRxEnd ( m_interferenceEvent );
 

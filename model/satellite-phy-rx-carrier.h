@@ -166,13 +166,10 @@ private:
    * \see class CallBackTraceSource
    */
 
-  TracedCallback< SatChannel::ChannelType_t,  // Type of the RX channel (link)
+  TracedCallback< Ptr<SatSignalParameters>, // RX signalling parameters
                   Mac48Address,             // receiver address
                   Mac48Address,             // packet destination address
-                  uint32_t,                 // destination beam
                   double,                   // interference power
-                  double,                   // TX power (C)
-                  double,                   // SINR
                   double                    // composite SINR
                   >
      m_packetTrace;

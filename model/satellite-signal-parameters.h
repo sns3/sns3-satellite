@@ -70,6 +70,11 @@ public:
   uint32_t m_carrierId;
 
   /**
+   * The carrier center frequency for the packet transmission
+   */
+  double m_carrierFreq_hz;
+
+  /**
    * The duration of the packet transmission.
    *
    */

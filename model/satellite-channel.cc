@@ -165,6 +165,7 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   rxParams->m_channel = this;
 
   double frequency_hz = m_carrierFreqConverter( m_channelType, m_freqId, rxParams->m_carrierId);
+  rxParams->m_carrierFreq_hz = frequency_hz;
 
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, frequency_hz );
