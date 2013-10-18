@@ -67,7 +67,7 @@ SatGwHelper::GetTypeId (void)
                      DoubleValue(24.62),  // ~290K
                      MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_dbK),
                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxOtherSysNoiseDb",
+      .AddAttribute( "RxOtherSysNoiseDbW",
                       "Other system noise of RX in GW.",
                       DoubleValue (SatUtils::MinDb<double> ()),
                       MakeDoubleAccessor(&SatGwHelper::m_otherSysNoise_dbW),
