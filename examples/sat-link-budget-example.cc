@@ -168,7 +168,7 @@ main (int argc, char *argv[])
   geoHelper->SetFeederPhyAttribute ("TxOutputLossDb", DoubleValue (geoFeederTxOutputLossDb));
   geoHelper->SetFeederPhyAttribute ("TxPointingLossDb", DoubleValue (geoFeederTxPointingLossDb));
   geoHelper->SetFeederPhyAttribute ("TxOboLossDb", DoubleValue (geoFeederTxOboLossDb));
-  geoHelper->SetFeederPhyAttribute ("TxAntennaLossDb", DoubleValue (geoUserTxAntennaLossDb));
+  geoHelper->SetFeederPhyAttribute ("TxAntennaLossDb", DoubleValue (geoFeederTxAntennaLossDb));
 
   // create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
