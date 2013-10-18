@@ -19,7 +19,6 @@
  */
 
 #include "satellite-fading-container.h"
-#include "satellite-channel.h"
 #include "satellite-utils.h"
 
 namespace ns3 {
@@ -32,7 +31,7 @@ TypeId
 SatFadingContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingContainer")
-    .SetParent<Object> ()
+    .SetParent<SatFading> ()
     .AddConstructor<SatFadingContainer> ()
     .AddTraceSource ("FadingTrace",
                      "The trace for fading values",

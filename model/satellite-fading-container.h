@@ -26,7 +26,7 @@
 #include "satellite-markov-conf.h"
 #include "geo-coordinate.h"
 #include "ns3/vector.h"
-#include "satellite-channel.h"
+#include "satellite-fading.h"
 
 namespace ns3 {
 
@@ -35,7 +35,7 @@ namespace ns3 {
  *
  * \brief Fading model container
  */
-class SatFadingContainer : public Object
+class SatFadingContainer : public SatFading
 {
 public:
   static TypeId GetTypeId (void);
