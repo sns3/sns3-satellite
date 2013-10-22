@@ -61,7 +61,7 @@ public:
       LARGER,
       FULL,
       USER_DEFINED
-    }PreDefinedScenario;
+    } PreDefinedScenario_t;
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -79,7 +79,7 @@ public:
   /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
    */
-  void CreateScenario (PreDefinedScenario scenario);
+  void CreateScenario (PreDefinedScenario_t scenario);
   virtual ~SatHelper () {}
 
   /**
@@ -182,7 +182,7 @@ private:
    * /param beamInfo information of the beam to create (and beams which are given in map)
    * /param gwUsers number of the users in GW(s) side
    */
-  void CreateScenario (BeamMap beamInfo, uint32_t gwUsers);
+  void DoCreateScenario (BeamMap beamInfo, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.

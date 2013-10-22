@@ -145,7 +145,7 @@ SatHelper::SetBeamUserInfo(uint32_t beamId, SatBeamUserInfo info)
   NS_ASSERT(result.second == true);
 }
 
-void SatHelper::CreateScenario(PreDefinedScenario scenario)
+void SatHelper::CreateScenario(PreDefinedScenario_t scenario)
 {
   NS_ASSERT(m_scenarioCreated == false);
 
@@ -226,7 +226,7 @@ SatHelper::CreateSimpleScenario()
   BeamMap beamMap;
   beamMap[8] = beamInfo;
 
-  CreateScenario(beamMap, 1);
+  DoCreateScenario(beamMap, 1);
 
   m_creationSummary("*** Simple Scenario Creation Summary ***");
 }
@@ -247,7 +247,7 @@ SatHelper::CreateLargerScenario()
 
   beamMap[3] = beamInfo;
 
-  CreateScenario(beamMap, 1);
+  DoCreateScenario(beamMap, 1);
 
   m_creationSummary("*** Larger Scenario Creation Summary ***");
 }
@@ -275,7 +275,7 @@ SatHelper::CreateFullScenario()
       beamMap[i] = info;
     }
 
-  CreateScenario(beamMap, m_gwUsers);
+  DoCreateScenario(beamMap, m_gwUsers);
 
   m_creationSummary("*** Full Scenario Creation Summary ***");
 }
@@ -283,13 +283,13 @@ void
 SatHelper::CreateUserDefinedScenario()
 {
   // create as user wants
-  CreateScenario(m_beamInfo, m_gwUsers);
+  DoCreateScenario(m_beamInfo, m_gwUsers);
 
   m_creationSummary("*** User Defined Scenario Creation Summary ***");
 }
 
 void
-SatHelper::CreateScenario(BeamMap beamInfo, uint32_t gwUsers)
+SatHelper::DoCreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 {
   InternetStackHelper internet;
 

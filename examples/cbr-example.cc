@@ -34,7 +34,7 @@ main (int argc, char *argv[])
   std::string interval = "1s";
   std::string scenario = "simple";
   std::string scenarioLogFile = "";
-  SatHelper::PreDefinedScenario satScenario = SatHelper::SIMPLE;
+  SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   // read command line parameters given by user
   CommandLine cmd;
