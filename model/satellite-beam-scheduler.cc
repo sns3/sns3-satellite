@@ -136,7 +136,7 @@ SatBeamScheduler::Schedule ()
       Ptr<UniformRandomVariable> randTimeSlotId = CreateObject<UniformRandomVariable> ();
 
       // allocate timeslot until there at least two free timeslots left and UTs left
-      while ( ( reservedTimeSlot.size() <= (maxTimeSlotId - 1) ) && !utsScheduled )
+      while ( ( ( reservedTimeSlot.size() + 1 ) <= maxTimeSlotId ) && !utsScheduled )
         {
           uint16_t timeSlotId1;
           uint16_t timeSlotId2;
