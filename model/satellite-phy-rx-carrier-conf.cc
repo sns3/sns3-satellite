@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
+#include "ns3/double.h"
 #include "satellite-utils.h"
 #include "satellite-phy-rx-carrier-conf.h"
 
@@ -66,6 +67,26 @@ SatPhyRxCarrierConf::GetTypeId (void)
                     UintegerValue (1),
                     MakeUintegerAccessor (&SatPhyRxCarrierConf::m_carrierCount),
                     MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute( "RxOtherSysIfDb",
+                   "Other system interference.",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxOtherSysInterference_db),
+                    MakeDoubleChecker<double>())
+    .AddAttribute( "RxImIfDb",
+                   "Intermodultation interference.",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxImInterference_db),
+                    MakeDoubleChecker<double>())
+    .AddAttribute( "RxAciIfDb",
+                   "Adjacent channel interference.",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxAciInterference_db),
+                    MakeDoubleChecker<double>())
+    .AddAttribute( "RxAciIfWrtNoise",
+                   "Adjacent channel interference wrt noise in percents.",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxAciIfWrtNoise),
+                    MakeDoubleChecker<double>())
     .AddConstructor<SatPhyRxCarrierConf> ()
   ;
   return tid;
@@ -112,6 +133,26 @@ double SatPhyRxCarrierConf::GetRxTemperature_K () const
 double SatPhyRxCarrierConf::GetRxOtherSystemNoise_W () const
 {
   return m_rxOtherSysNoise_W;
+}
+
+double SatPhyRxCarrierConf::GetRxOtherSystemInterference_dB () const
+{
+  return m_rxOtherSysInterference_db;
+}
+
+double SatPhyRxCarrierConf::GetRxImInterference_dB () const
+{
+  return m_rxImInterference_db;
+}
+
+double SatPhyRxCarrierConf::GetRxAciInterference_dB () const
+{
+  return m_rxAciInterference_db;
+}
+
+double SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoise () const
+{
+  return m_rxAciIfWrtNoise;
 }
 
 SatPhyRxCarrierConf::RxMode SatPhyRxCarrierConf::GetRxMode () const

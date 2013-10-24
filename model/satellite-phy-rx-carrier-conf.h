@@ -143,6 +143,26 @@ public:
   double GetRxOtherSystemNoise_W () const;
 
   /*
+   * Get Other system interference (C over I)
+   */
+  double GetRxOtherSystemInterference_dB () const;
+
+  /*
+   * Get Intermodulation interference (C over I)
+   */
+  double GetRxImInterference_dB () const;
+
+  /*
+   * Get adjacent channel interference (signal over interference)
+   */
+  double GetRxAciInterference_dB () const;
+
+  /*
+   * Get adjacent channel interference wrt noise (percent)
+   */
+  double GetRxAciInterferenceWrtNoise () const;
+
+  /*
    * Get configured RX mode
    */
   RxMode GetRxMode () const;
@@ -161,6 +181,10 @@ private:
   double m_rxTemperature_K;
   double m_rxBandwidth_Hz;
   double m_rxOtherSysNoise_W;
+  double m_rxOtherSysInterference_db;
+  double m_rxImInterference_db;
+  double m_rxAciInterference_db;
+  double m_rxAciIfWrtNoise;
   RxMode m_rxMode;
 
   uint32_t m_carrierCount;

@@ -184,7 +184,27 @@ private:
     /*
      * Configured other system noise.
     */
-    double m_otherSysNoise_dbW;
+    double m_otherSysNoise_dbHz;
+
+    /*
+     * Other system interference (signal over interference).
+     */
+    double m_otherSysInterference_db;
+
+    /*
+     * Intermodulation interference (signal over interference).
+     */
+    double m_imInterference_db;
+
+    /*
+     * Adjacent channel interference (signal over interference).
+     */
+    double m_aciInterference_db;
+
+    /*
+     *  Adjacent channel interference wrt noise (percent).
+     */
+    double m_aciIfWrtNoise;
 
     /*
      * Configured error model for the forward link. Set as an attribute.

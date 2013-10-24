@@ -66,13 +66,33 @@ SatUtHelper::GetTypeId (void)
       .AddAttribute( "RxTemperatureDbK",
                      "The forward link RX noise temperature in UT.",
                      DoubleValue(24.62),  // ~290K
-                     MakeDoubleAccessor(&SatUtHelper::m_rxTemperature_dbK),
-                     MakeDoubleChecker<double>())
-      .AddAttribute( "RxOtherSysNoiseDbW",
+                     MakeDoubleAccessor (&SatUtHelper::m_rxTemperature_dbK),
+                     MakeDoubleChecker<double> ())
+      .AddAttribute( "RxOtherSysNoiseDbHz",
                      "Other system noise of RX in UT.",
                      DoubleValue (SatUtils::MinDb<double> ()),
-                     MakeDoubleAccessor(&SatUtHelper::m_otherSysNoise_dbW),
-                     MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
+                     MakeDoubleAccessor (&SatUtHelper::m_otherSysNoise_dbHz),
+                     MakeDoubleChecker<double> (SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
+      .AddAttribute( "RxOtherSysIfDb",
+                     "Other system interference of RX in UT.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor (&SatUtHelper::m_otherSysInterference_db),
+                      MakeDoubleChecker<double> ())
+      .AddAttribute( "RxImIfDb",
+                     "Intermodultation interference of RX in UT.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatUtHelper::m_imInterference_db),
+                      MakeDoubleChecker<double> ())
+      .AddAttribute( "RxAciIfDb",
+                     "Adjacent channel interference of RX in UT.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatUtHelper::m_aciInterference_db),
+                      MakeDoubleChecker<double> ())
+      .AddAttribute( "RxAciIfWrtNoise",
+                     "Adjacent channel interference wrt noise in percents.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatUtHelper::m_aciIfWrtNoise),
+                      MakeDoubleChecker<double> ())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
@@ -82,11 +102,15 @@ SatUtHelper::GetTypeId (void)
 TypeId
 SatUtHelper::GetInstanceTypeId (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return GetTypeId();
 }
 
 SatUtHelper::SatUtHelper ()
 {
+  NS_LOG_FUNCTION (this);
+
   // this default constructor should be never called
   NS_ASSERT (false);
 }
@@ -96,18 +120,20 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
    m_superframeSeq (seq)
 {
+  NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
+
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
   m_phyFactory.SetTypeId ("ns3::SatPhy");
 
-  m_phyFactory.Set("RxMaxAntennaGainDb", DoubleValue(44.60));
-  m_phyFactory.Set("TxMaxAntennaGainDb", DoubleValue(45.20));
-  m_phyFactory.Set("TxMaxPowerDbW", DoubleValue(4.00));
-  m_phyFactory.Set("TxOutputLossDb", DoubleValue(0.50));
-  m_phyFactory.Set("TxPointingLossDb", DoubleValue(1.00));
-  m_phyFactory.Set("TxOboLossDb", DoubleValue(0.50));
-  m_phyFactory.Set("TxAntennaLossDb", DoubleValue(0.00));
+  m_phyFactory.Set ("RxMaxAntennaGainDb", DoubleValue(44.60));
+  m_phyFactory.Set ("TxMaxAntennaGainDb", DoubleValue(45.20));
+  m_phyFactory.Set ("TxMaxPowerDbW", DoubleValue(4.00));
+  m_phyFactory.Set ("TxOutputLossDb", DoubleValue(0.50));
+  m_phyFactory.Set ("TxPointingLossDb", DoubleValue(1.00));
+  m_phyFactory.Set ("TxOboLossDb", DoubleValue(0.50));
+  m_phyFactory.Set ("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
@@ -115,6 +141,7 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
 void
 SatUtHelper::Initialize ()
 {
+  NS_LOG_FUNCTION (this);
   /*
    * Forward channel link results (DVB-S2) are created for UTs.
    */
@@ -132,6 +159,8 @@ SatUtHelper::SetQueue (std::string type,
                               std::string n3, const AttributeValue &v3,
                               std::string n4, const AttributeValue &v4)
 {
+  NS_LOG_FUNCTION (this << type << n1 << n2 << n3 << n4 );
+
   m_queueFactory.SetTypeId (type);
   m_queueFactory.Set (n1, v1);
   m_queueFactory.Set (n2, v2);
@@ -142,37 +171,47 @@ SatUtHelper::SetQueue (std::string type,
 void 
 SatUtHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this << n1 );
+
   m_deviceFactory.Set (n1, v1);
 }
 
 void 
 SatUtHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this << n1 );
+
   m_channelFactory.Set (n1, v1);
 }
 
 void
 SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this << n1 );
+
   m_phyFactory.Set (n1, v1);
 }
 
 NetDeviceContainer 
 SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
-    NetDeviceContainer devs;
+  NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-    {
-      devs.Add(Install(*i, beamId, fCh, rCh));
-    }
+  NetDeviceContainer devs;
 
-    return devs;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+  {
+    devs.Add (Install (*i, beamId, fCh, rCh));
+  }
+
+  return devs;
 }
 
 Ptr<NetDevice>
 SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
+  NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
+
   NetDeviceContainer container;
 
   // Create SatNetDevice
@@ -186,8 +225,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyTx->SetChannel (rCh);
   phyRx->SetChannel (fCh);
   phyRx->SetDevice (dev);
-  phyRx->SetMobility(n->GetObject<MobilityModel>());
-  phyTx->SetMobility(n->GetObject<MobilityModel>());
+  phyRx->SetMobility (n->GetObject<MobilityModel> ());
+  phyTx->SetMobility (n->GetObject<MobilityModel> ());
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
@@ -195,14 +234,18 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   Ptr<SatPhyRxCarrierConf> carrierConf =
         CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
-                                           m_otherSysNoise_dbW,
+                                           m_otherSysNoise_dbHz,
                                            m_errorModel,
                                            m_interferenceModel,
                                            SatPhyRxCarrierConf::NORMAL);
 
-  carrierConf->SetAttribute("ChannelType", EnumValue(SatChannel::FORWARD_USER_CH));
-  carrierConf->SetAttribute("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
-  carrierConf->SetAttribute("CarrierCount", UintegerValue(m_fwdLinkCarrierCount));
+  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterference_db) );
+  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
+  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
+  carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
+  carrierConf->SetAttribute ("ChannelType", EnumValue(SatChannel::FORWARD_USER_CH));
+  carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
+  carrierConf->SetAttribute ("CarrierCount", UintegerValue(m_fwdLinkCarrierCount));
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling.
@@ -214,7 +257,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->ConfigurePhyRxCarriers (carrierConf);
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
-  mac->SetAttribute("Interval", StringValue("0s"));
+  mac->SetAttribute ("Interval", StringValue ("0s"));
 
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
@@ -239,11 +282,11 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
-  dev->SetMac(mac);
+  dev->SetMac (mac);
 
   // Set the device address and pass it to MAC as well
   dev->SetAddress (Mac48Address::Allocate ());
-  phyRx->SetAddress(Mac48Address::ConvertFrom(dev->GetAddress()));
+  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
   // Attach the device receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));
@@ -257,13 +300,18 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 Ptr<NetDevice>
 SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
+  NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
+
   Ptr<Node> a = Names::Find<Node> (aName);
+
   return Install (a, beamId, fCh, rCh);
 }
 
 void
 SatUtHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
+  NS_LOG_FUNCTION (this);
+
   TraceConnect("Creation", "SatUtHelper", cb);
 }
 

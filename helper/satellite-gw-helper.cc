@@ -51,29 +51,49 @@ SatGwHelper::GetTypeId (void)
       .AddConstructor<SatGwHelper> ()
       .AddAttribute ("RtnLinkErrorModel",
                      "Return link error model",
-                     EnumValue (SatPhyRxCarrierConf::EM_AVI),
-                     MakeEnumAccessor (&SatGwHelper::m_errorModel),
-                     MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                      EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                      MakeEnumAccessor (&SatGwHelper::m_errorModel),
+                      MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
                                       SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::EM_AVI, "AVI"))
       .AddAttribute ("RtnLinkInterferenceModel",
                      "Return link interference model",
-                     EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
-                     MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
-                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                      EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
+                      MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
+                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute( "RxTemperatureDbK",
                      "RX noise temperature in GW.",
-                     DoubleValue(24.62),  // ~290K
-                     MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_dbK),
-                     MakeDoubleChecker<double>())
-      .AddAttribute( "RxOtherSysNoiseDbW",
-                      "Other system noise of RX in GW.",
+                      DoubleValue(24.62),  // ~290K
+                      MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_dbK),
+                      MakeDoubleChecker<double>())
+      .AddAttribute( "RxOtherSysNoiseDbHz",
+                     "Other system noise of RX in GW.",
                       DoubleValue (SatUtils::MinDb<double> ()),
-                      MakeDoubleAccessor(&SatGwHelper::m_otherSysNoise_dbW),
+                      MakeDoubleAccessor(&SatGwHelper::m_otherSysNoise_dbHz),
                       MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
+      .AddAttribute( "RxOtherSysIfDb",
+                     "Other system interference of RX in GW.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatGwHelper::m_otherSysInterference_db),
+                      MakeDoubleChecker<double>())
+      .AddAttribute( "RxImIfDb",
+                     "Intermodultation interference of RX in GW.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatGwHelper::m_imInterference_db),
+                      MakeDoubleChecker<double>())
+      .AddAttribute( "RxAciIfDb",
+                     "Adjacent channel interference of RX in GW.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatGwHelper::m_aciInterference_db),
+                      MakeDoubleChecker<double>())
+      .AddAttribute( "RxAciIfWrtNoise",
+                     "Adjacent channel interference wrt noise in percents.",
+                      DoubleValue (0.0),
+                      MakeDoubleAccessor(&SatGwHelper::m_aciIfWrtNoise),
+                      MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatGwHelper::m_creation))
+                        MakeTraceSourceAccessor (&SatGwHelper::m_creation))
     ;
     return tid;
 }
@@ -94,18 +114,20 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_rtnLinkCarrierCount (rtnLinkCarrierCount)
 {
+  NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
+
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
   m_phyFactory.SetTypeId ("ns3::SatPhy");
 
-  m_phyFactory.Set("RxMaxAntennaGainDb", DoubleValue(61.50));
-  m_phyFactory.Set("TxMaxAntennaGainDb", DoubleValue(65.20));
-  m_phyFactory.Set("TxMaxPowerDbW", DoubleValue(8.97));
-  m_phyFactory.Set("TxOutputLossDb", DoubleValue(2.00));
-  m_phyFactory.Set("TxPointingLossDb", DoubleValue(1.10));
-  m_phyFactory.Set("TxOboLossDb", DoubleValue(6.00));
-  m_phyFactory.Set("TxAntennaLossDb", DoubleValue(0.00));
+  m_phyFactory.Set ("RxMaxAntennaGainDb", DoubleValue(61.50));
+  m_phyFactory.Set ("TxMaxAntennaGainDb", DoubleValue(65.20));
+  m_phyFactory.Set ("TxMaxPowerDbW", DoubleValue(8.97));
+  m_phyFactory.Set ("TxOutputLossDb", DoubleValue(2.00));
+  m_phyFactory.Set ("TxPointingLossDb", DoubleValue(1.10));
+  m_phyFactory.Set ("TxOboLossDb", DoubleValue(6.00));
+  m_phyFactory.Set ("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatGwHelper", LOG_LEVEL_INFO);
 }
@@ -113,6 +135,8 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
 void
 SatGwHelper::Initialize ()
 {
+  NS_LOG_FUNCTION (this );
+
   /*
    * Return channel link results (DVB-RCS2) are created for GWs.
    */
@@ -130,6 +154,8 @@ SatGwHelper::SetQueue (std::string type,
                               std::string n3, const AttributeValue &v3,
                               std::string n4, const AttributeValue &v4)
 {
+  NS_LOG_FUNCTION (this << type << n1 << n2 << n3 <<  n4  );
+
   m_queueFactory.SetTypeId (type);
   m_queueFactory.Set (n1, v1);
   m_queueFactory.Set (n2, v2);
@@ -140,37 +166,47 @@ SatGwHelper::SetQueue (std::string type,
 void 
 SatGwHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this << n1 );
+
   m_deviceFactory.Set (n1, v1);
 }
 
 void 
 SatGwHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this << n1 );
+
   m_channelFactory.Set (n1, v1);
 }
 
 void
 SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this << n1 );
+
   m_phyFactory.Set (n1, v1);
 }
 
 NetDeviceContainer 
 SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
-    NetDeviceContainer devs;
+  NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-    {
-      devs.Add(Install(*i, beamId, fCh, rCh));
-    }
+  NetDeviceContainer devs;
 
-    return devs;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+  {
+    devs.Add (Install (*i, beamId, fCh, rCh));
+  }
+
+  return devs;
 }
 
 Ptr<NetDevice>
 SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
+  NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
+
   NetDeviceContainer container;
 
   // Create SatNetDevice
@@ -184,19 +220,23 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyTx->SetChannel (fCh);
   phyRx->SetChannel (rCh);
   phyRx->SetDevice (dev);
-  phyRx->SetMobility (n->GetObject<MobilityModel>());
-  phyTx->SetMobility (n->GetObject<MobilityModel>());
+  phyRx->SetMobility (n->GetObject<MobilityModel> ());
+  phyTx->SetMobility (n->GetObject<MobilityModel> ());
 
   // Configure the SatPhyRxCarrier instances
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
-                                                                            m_otherSysNoise_dbW,
+                                                                            m_otherSysNoise_dbHz,
                                                                             m_errorModel,
                                                                             m_interferenceModel,
                                                                             SatPhyRxCarrierConf::NORMAL);
 
-  carrierConf->SetAttribute("ChannelType", EnumValue(SatChannel::RETURN_FEEDER_CH));
-  carrierConf->SetAttribute("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
-  carrierConf->SetAttribute("CarrierCount", UintegerValue(m_rtnLinkCarrierCount));
+  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterference_db) );
+  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
+  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
+  carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
+  carrierConf->SetAttribute ("ChannelType", EnumValue (SatChannel::RETURN_FEEDER_CH));
+  carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue (m_carrierBandwidthConverter));
+  carrierConf->SetAttribute ("CarrierCount", UintegerValue (m_rtnLinkCarrierCount));
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling
@@ -231,11 +271,11 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
-  dev->SetMac(mac);
+  dev->SetMac (mac);
 
   // Set the device address and pass it to MAC as well
   dev->SetAddress (Mac48Address::Allocate ());
-  phyRx->SetAddress(Mac48Address::ConvertFrom(dev->GetAddress()));
+  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
   // Attach the device receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));
@@ -243,7 +283,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);
 
-  mac->StartScheduling();
+  mac->StartScheduling ();
 
   return DynamicCast <NetDevice> (dev);
 }
@@ -251,14 +291,19 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 Ptr<NetDevice>
 SatGwHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
 {
+  NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
+
   Ptr<Node> a = Names::Find<Node> (aName);
+
   return Install (a, beamId, fCh, rCh);
 }
 
 void
 SatGwHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
-  TraceConnect("Creation", "SatGwHelper", cb);
+  NS_LOG_FUNCTION (this );
+
+  TraceConnect ("Creation", "SatGwHelper", cb);
 }
 
 } // namespace ns3

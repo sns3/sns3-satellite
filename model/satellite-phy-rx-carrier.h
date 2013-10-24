@@ -95,7 +95,7 @@ private:
   void EndRxData ();
 
   double CalculateSinr(double rxPower_W, double iPower_W);
-  double CalculateCompositeSinr(double sinr1_W, double sinr2_W);
+  double CalculateCompositeSinr(double sinr1, double sinr2);
 
   State m_state;
   Ptr<SatSignalParameters> m_rxParams;
@@ -139,6 +139,26 @@ private:
    * RX noise
    */
   double m_rxNoise_W;
+
+  /*
+   * RX Adjacent channel interference
+   */
+  double m_rxAciIf_W;
+
+  /*
+   * RX Other system interference (C over I in linear)
+  */
+  double m_rxOtherSysInterference;
+
+  /*
+   * RX Intermodulation interference (C over I in linear)
+  */
+  double m_rxImInterference;
+
+  /*
+   * RX Adjacent channel interference (C over I in linear)
+  */
+  double m_rxAciInterference; 
 
   /**
     * The upper layer package receive callback.

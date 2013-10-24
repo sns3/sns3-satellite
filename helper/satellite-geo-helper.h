@@ -105,12 +105,12 @@ public:
   Ptr<NetDevice> Install (Ptr<Node> n);
 
   /**
-   * \param nName name of a node
+   * \param aName name of a node
    *
    * This method creates a ns3::SatGeoNetDevice with the requested attributes
    * and associate the resulting ns3::NetDevice with the ns3::Node.
    */
-  Ptr<NetDevice> Install (std::string nName);
+  Ptr<NetDevice> Install (std::string aName);
 
   /*
    * Attach the SatChannels for the beam to NetDevice
@@ -170,14 +170,54 @@ private:
     double m_fwdLinkRxTemperature_dbK;
 
     /*
-     * Configured other system noise (in Watt) for return link.
+     * Configured other system noise for return link.
      */
-    double m_rtnLinkOtherSysNoise_dbW;
+    double m_rtnLinkOtherSysNoise_dbHz;
 
     /*
-     * Configured other system noise (in Watt) for forward link.
+     * Configured other system noise for forward link.
      */
-    double m_fwdLinkOtherSysNoise_dbW;
+    double m_fwdLinkOtherSysNoise_dbHz;
+
+    /*
+     * Other system interference (signal over interference) for forward link.
+     */
+    double m_fwdOtherSysInterference_db;
+
+    /*
+     * Other system interference (signal over interference) for return link.
+     */
+    double m_rtnOtherSysInterference_db;
+
+    /*
+     * Intermodulation interference (signal over interference) for forward link.
+     */
+    double m_fwdImInterference_db;
+
+    /*
+     * Intermodulation interference (signal over interference) for return link.
+     */
+    double m_rtnImInterference_db;
+
+    /*
+     * Adjacent channel interference (signal over interference) for forward link..
+     */
+    double m_fwdAciInterference_db;
+
+    /*
+     * Adjacent channel interference (signal over interference) for forward link..
+     */
+    double m_rtnAciInterference_db;
+
+    /*
+     * Adjacent channel interference wrt noise for forward link.
+     */
+    double m_fwdAciIfWrtNoise;
+
+    /*
+     * Adjacent channel interference wrt noise for return link.
+     */
+    double m_rtnAciIfWrtNoise;
 
     /**
      * Trace callback for creation traces
