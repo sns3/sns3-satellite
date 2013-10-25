@@ -91,7 +91,7 @@ public:
    *
    * /param mobility  Mobility used to get gain from antenna pattern
    */
-  double GetAntennaGain_W (Ptr<MobilityModel> mobility);
+  double GetAntennaGain (Ptr<MobilityModel> mobility);
 
   /**
   * Start packet transmission to the channel.

@@ -87,14 +87,14 @@ SatPhyRx::SetDevice (Ptr<NetDevice> d)
 }
 
 void
-SatPhyRx::SetMaxAntennaGain_Db(double gain_Db)
+SatPhyRx::SetMaxAntennaGain_Db (double gain_Db)
 {
   NS_LOG_FUNCTION (this);
   m_maxAntennaGain = SatUtils::DbWToW (gain_Db);
 }
 
 double
-SatPhyRx::GetAntennaGain_W (Ptr<MobilityModel> mobility)
+SatPhyRx::GetAntennaGain (Ptr<MobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this);
 
@@ -109,6 +109,22 @@ SatPhyRx::GetAntennaGain_W (Ptr<MobilityModel> mobility)
     }
 
   return gain_W;
+}
+
+void
+SatPhyRx::SetAntennaLoss_Db (double gain_Db)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_antennaLoss = SatUtils::DbToLinear (gain_Db);
+}
+
+double
+SatPhyRx::GetLosses ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_antennaLoss;
 }
 
 void

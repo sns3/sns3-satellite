@@ -73,6 +73,8 @@ SatPhy::Initialize()
 
   m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_db);
   m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_db);
+
+  m_phyRx->SetAntennaLoss_Db (m_rxAntennaLoss_db);
 }
 
 SatPhy::~SatPhy ()
@@ -149,6 +151,10 @@ SatPhy::GetTypeId (void)
     .AddAttribute("TxAntennaLossDb", "TX Antenna loss in Dbs",
                    DoubleValue(0.00),
                    MakeDoubleAccessor(&SatPhy::m_txAntennaLoss_db),
+                   MakeDoubleChecker<double> ())
+   .AddAttribute("RxAntennaLossDb", "RX Antenna loss in Dbs",
+                   DoubleValue(0.00),
+                   MakeDoubleAccessor(&SatPhy::m_rxAntennaLoss_db),
                    MakeDoubleChecker<double> ())
 
   ;

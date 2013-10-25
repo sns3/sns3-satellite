@@ -171,9 +171,14 @@ private:
   double m_txOboLoss_db;
 
   /**
-   * Configured antenna loss in Dbs
+   * Configured TX antenna loss in Dbs
    */
   double m_txAntennaLoss_db;
+
+  /**
+   * Configured RX antenna loss in Dbs
+   */
+  double m_rxAntennaLoss_db;
 
   /**
    * The upper layer package receive callback.

@@ -147,14 +147,14 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   {
     case RETURN_FEEDER_CH:
     case FORWARD_USER_CH:
-      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (rxMobility);
-      rxAntennaGain_W = phyRx->GetAntennaGain_W (rxMobility);
+      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (rxMobility);
+      rxAntennaGain_W = phyRx->GetAntennaGain (rxMobility);
       break;
 
     case RETURN_USER_CH:
     case FORWARD_FEEDER_CH:
-      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain_W (txMobility);
-      rxAntennaGain_W = phyRx->GetAntennaGain_W (txMobility);
+      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (txMobility);
+      rxAntennaGain_W = phyRx->GetAntennaGain (txMobility);
       break;
 
     default:
@@ -169,7 +169,7 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, frequency_hz );
-  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W;
+  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses();
 
   phyRx->StartRx (rxParams);
 }

@@ -81,7 +81,20 @@ public:
    *
    * /param mobility  Mobility used to get gain from antenna pattern
    */
-  double GetAntennaGain_W (Ptr<MobilityModel> mobility);
+  double GetAntennaGain (Ptr<MobilityModel> mobility);
+
+  /**
+   * Set the Antenna loss in Db
+   * /param loss_Db antenna loss in Dbs
+   */
+  void SetAntennaLoss_Db (double loss_Db);
+
+  /**
+   * Get configures RX losses, currently only antenna loss used.
+   *
+   * /return  Antenna loss in linear
+   */
+  double GetLosses ();
 
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx
@@ -131,6 +144,11 @@ private:
    * Configured maximum antenna gain in linear
    */
   double m_maxAntennaGain;
+
+  /**
+   * Configured antenna loss in linear
+   */
+  double m_antennaLoss;
 
   // A SatPhyRxCarrier object for receiving packets from each carrier
   std::vector< Ptr<SatPhyRxCarrier> > m_rxCarriers;

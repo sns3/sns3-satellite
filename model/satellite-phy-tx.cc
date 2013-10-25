@@ -102,7 +102,7 @@ SatPhyTx::SetMaxAntennaGain_Db(double gain_db)
 }
 
 double
-SatPhyTx::GetAntennaGain_W (Ptr<MobilityModel> mobility)
+SatPhyTx::GetAntennaGain (Ptr<MobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this);
 

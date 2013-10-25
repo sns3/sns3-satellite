@@ -88,6 +88,7 @@ main (int argc, char *argv[])
   double geoFwdTemperatureDbK = 28.40;
 
   double utRxMaxAntennaGainDb = 41.70;
+  double utRxAntennaLossDb = 0.00;
   double utTxMaxAntennaGainDb = 45.20;
   double utTxMaxPowerDbW = 4.00;
   double utTxOutputLossDb = 0.50;
@@ -96,6 +97,7 @@ main (int argc, char *argv[])
   double utTxAntennaLossDb = 0.00;
 
   double gwRxMaxAntennaGainDb = 61.50;
+  double gwRxAntennaLossDb = 0.00;
   double gwTxMaxAntennaGainDb = 65.20;
   double gwTxMaxPowerDbW = 8.97;
   double gwTxOutputLossDb = 2.00;
@@ -104,6 +106,7 @@ main (int argc, char *argv[])
   double gwTxAntennaLossDb = 0.00;
 
   double geoUserRxMaxAntennaGainDb = 54.00;
+  double geoUserRxAntennaLossDb = 1.00;
   double geoUserTxMaxAntennaGainDb = 54.00;
   double geoUserTxMaxPowerDbW = 15.00;
   double geoUserTxOutputLossDb = 2.85;
@@ -112,6 +115,7 @@ main (int argc, char *argv[])
   double geoUserTxAntennaLossDb = 1.00;
 
   double geoFeederRxMaxAntennaGainDb = 54.00;
+  double geoFeederRxAntennaLossDb = 1.00;
   double geoFeederTxMaxAntennaGainDb = 54.00;
   double geoFeederTxMaxPowerDbW = -10.40;
   double geoFeederTxOutputLossDb = 1.75;
@@ -171,6 +175,7 @@ main (int argc, char *argv[])
   geoHelper->SetAttribute("FwdLinkRxTemperatureDbK", DoubleValue (geoFwdTemperatureDbK));
 
   utHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (utRxMaxAntennaGainDb));
+  utHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (utRxAntennaLossDb));
   utHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (utTxMaxAntennaGainDb));
   utHelper->SetPhyAttribute ("TxMaxPowerDbW", DoubleValue (utTxMaxPowerDbW));
   utHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (utTxOutputLossDb));
@@ -179,6 +184,7 @@ main (int argc, char *argv[])
   utHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (utTxAntennaLossDb));
 
   gwHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (gwRxMaxAntennaGainDb));
+  gwHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (gwRxAntennaLossDb));
   gwHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (gwTxMaxAntennaGainDb));
   gwHelper->SetPhyAttribute ("TxMaxPowerDbW", DoubleValue (gwTxMaxPowerDbW));
   gwHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (gwTxOutputLossDb));
@@ -187,6 +193,7 @@ main (int argc, char *argv[])
   gwHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (gwTxAntennaLossDb));
 
   geoHelper->SetUserPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (geoUserRxMaxAntennaGainDb));
+  geoHelper->SetUserPhyAttribute ("RxAntennaLossDb", DoubleValue (geoUserRxAntennaLossDb));
   geoHelper->SetUserPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (geoUserTxMaxAntennaGainDb));
   geoHelper->SetUserPhyAttribute ("TxMaxPowerDbW", DoubleValue (geoUserTxMaxPowerDbW));
   geoHelper->SetUserPhyAttribute ("TxOutputLossDb", DoubleValue (geoUserTxOutputLossDb));
@@ -195,6 +202,7 @@ main (int argc, char *argv[])
   geoHelper->SetUserPhyAttribute ("TxAntennaLossDb", DoubleValue (geoUserTxAntennaLossDb));
 
   geoHelper->SetFeederPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (geoFeederRxMaxAntennaGainDb));
+  geoHelper->SetFeederPhyAttribute ("RxAntennaLossDb", DoubleValue (geoFeederRxAntennaLossDb));
   geoHelper->SetFeederPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (geoFeederTxMaxAntennaGainDb));
   geoHelper->SetFeederPhyAttribute ("TxMaxPowerDbW", DoubleValue (geoFeederTxMaxPowerDbW));
   geoHelper->SetFeederPhyAttribute ("TxOutputLossDb", DoubleValue (geoFeederTxOutputLossDb));
@@ -270,31 +278,31 @@ main (int argc, char *argv[])
   NS_LOG_INFO (" GW position: " << gwMob->GetGeoPosition());
   NS_LOG_INFO (" UT position: " << utMob->GetGeoPosition());
   NS_LOG_INFO ("  ");
-  NS_LOG_INFO ( "Link params (Rx Antenna gain, Tx Antenna gain, TxPower, TxOutputLoss, TxPointingLoss, TxOboLoss, TxAntennaLoss, ");
+  NS_LOG_INFO ( "Link params (Rx Antenna gain, RxAntennaLoss, Tx Antenna gain, TxPower, TxOutputLoss, TxPointingLoss, TxOboLoss, TxAntennaLoss, ");
   NS_LOG_INFO ( "             OtherSysNoise, OtherSysIf, ImIf, AciIf, AciIfWrtNoise, RxTemp) :");
 
-  NS_LOG_INFO (" GEO feeder: " << geoFeederRxMaxAntennaGainDb << " " << geoFeederTxMaxAntennaGainDb << " "
+  NS_LOG_INFO (" GEO feeder: " << geoFeederRxMaxAntennaGainDb << " " << geoFeederRxAntennaLossDb << " " << geoFeederTxMaxAntennaGainDb << " "
                                << geoFeederTxMaxPowerDbW << " " << geoFeederTxOutputLossDb << " " << geoFeederTxPointingLossDb << " "
                                << geoFeederTxOboLossDb << " " << geoFeederTxAntennaLossDb << " "
                                << geoFwdOtherSysNoiseDbW << " " << geoFwdOtherSysIfDb << " "
                                << geoFwdImIfDb << " " << geoFwdAciIfDb << " "
                                << geoFwdAciIfWrtNoise << " " << geoFwdTemperatureDbK);
 
-  NS_LOG_INFO (" UT: " << utRxMaxAntennaGainDb << " " << utTxMaxAntennaGainDb << " "
+  NS_LOG_INFO (" UT: " << utRxMaxAntennaGainDb << " " << utRxAntennaLossDb << " " << utTxMaxAntennaGainDb << " "
                        << utTxMaxPowerDbW << " " << utTxOutputLossDb << " " << utTxPointingLossDb << " "
                        << utTxOboLossDb << " " << utTxAntennaLossDb << " "
                        << utOtherSysNoiseDbW << " " << utOtherSysIfDb << " "
                        << utImIfDb << " " << utAciIfDb << " "
                        << utAciIfWrtNoise << " " << utTemperatureDbK );
 
-  NS_LOG_INFO (" GEO user: " << geoUserRxMaxAntennaGainDb << " " << geoUserTxMaxAntennaGainDb << " "
+  NS_LOG_INFO (" GEO user: " << geoUserRxMaxAntennaGainDb << " " << geoUserRxAntennaLossDb << " " << geoUserTxMaxAntennaGainDb << " "
                              << geoUserTxMaxPowerDbW << " " << geoUserTxOutputLossDb << " " << geoUserTxPointingLossDb << " "
                              << geoUserTxOboLossDb << " " << geoUserTxAntennaLossDb << " "
                              << geoRtnOtherSysNoiseDbW << " " << geoRtnOtherSysIfDb << " "
                              << geoRtnImIfDb << " " << geoRtnAciIfDb << " "
                              << geoRtnAciIfWrtNoise << " " << geoRtnTemperatureDbK );
 
-  NS_LOG_INFO (" GW: " << gwRxMaxAntennaGainDb << " " << gwTxMaxAntennaGainDb << " "
+  NS_LOG_INFO (" GW: " << gwRxMaxAntennaGainDb << " " << gwRxAntennaLossDb << " " << gwTxMaxAntennaGainDb << " "
                        << gwTxMaxPowerDbW << " " <<  gwTxOutputLossDb << " " << gwTxPointingLossDb << " "
                        << gwTxOboLossDb << " " << gwTxAntennaLossDb << " "
                        << gwOtherSysNoiseDbW << " " << gwOtherSysIfDb << " "
