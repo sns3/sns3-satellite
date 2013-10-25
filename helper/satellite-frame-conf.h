@@ -225,7 +225,7 @@ public:
    * \param index Id of the time slot requested.
    * \return      The requested time slot conf of frame.
    */
-  inline uint32_t GetTimeSlotrCount () const { return m_timeSlots.size(); }
+  inline uint32_t GetTimeSlotCount () const { return m_timeSlots.size(); }
 
   /**
    * Get time slot conf of the frame. Possible values for id are from 0 to 2047.

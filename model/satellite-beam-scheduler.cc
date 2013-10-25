@@ -117,7 +117,7 @@ SatBeamScheduler::Schedule ()
 
   if ( m_uts.size () > 0 )
     {
-      uint16_t maxTimeSlotId = m_superframeSeq->GetSuperframeConf(0)->GetFrameConf(0)->GetTimeSlotrCount() - 1;
+      uint16_t maxTimeSlotCount = m_superframeSeq->GetSuperframeConf(0)->GetFrameConf(0)->GetTimeSlotCount();
 
       std::set<uint16_t> reservedTimeSlot;
       std::set<Address>::iterator startIterator;
@@ -136,8 +136,9 @@ SatBeamScheduler::Schedule ()
       Ptr<UniformRandomVariable> randTimeSlotId = CreateObject<UniformRandomVariable> ();
 
       // allocate timeslot until there at least two free timeslots left and UTs left
-      while ( ( ( reservedTimeSlot.size() + 1 ) <= maxTimeSlotId ) && !utsScheduled )
+      while ( ( ( maxTimeSlotCount - reservedTimeSlot.size() ) >= 2 )  && !utsScheduled )
         {
+          uint16_t maxTimeSlotId = maxTimeSlotCount - 1;
           uint16_t timeSlotId1;
           uint16_t timeSlotId2;
 
