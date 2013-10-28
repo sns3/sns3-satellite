@@ -62,10 +62,11 @@ SatFadingOscillator::GetComplexValueAt (Time at) const
   return (m_complexAmplitude * std::cos (at.GetSeconds () * m_omega + m_phase));
 }
 
-double
-SatFadingOscillator::GetValueAt (Time at) const
+std::complex<double>
+SatFadingOscillator::GetCosineWaveValueAt (Time at) const
 {
-  return (m_amplitude * std::cos (at.GetSeconds () * m_omega + m_phase));
+  std::complex<double> complexPhase = ( std::cos (at.GetSeconds () * m_omega + m_phase), std::sin (at.GetSeconds () * m_omega + m_phase) );
+  return ( m_amplitude * std::exp(complexPhase));
 }
 
 SatFadingOscillator::~SatFadingOscillator ()

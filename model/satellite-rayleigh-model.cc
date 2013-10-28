@@ -91,7 +91,7 @@ SatRayleighModel::GetComplexGain () const
   std::complex<double> sumAmplitude = std::complex<double> (0, 0);
   for (uint32_t i = 0; i < m_oscillators.size (); i++)
     {
-      sumAmplitude += m_oscillators[i]->GetValueAt (Now ());
+      sumAmplitude += m_oscillators[i]->GetComplexValueAt (Now ());
     }
   return sumAmplitude;
 }

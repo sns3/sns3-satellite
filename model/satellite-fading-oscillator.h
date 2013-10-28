@@ -53,7 +53,7 @@ public:
   std::complex<double> GetComplexValueAt (Time t) const;
 
   // Get the complex amplitude at moment \param t
-  double GetValueAt (Time t) const;
+  std::complex<double> GetCosineWaveValueAt (Time t) const;
 
 private:
 

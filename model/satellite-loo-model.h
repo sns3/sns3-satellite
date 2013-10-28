@@ -61,19 +61,7 @@ private:
   double m_stdDev;                   // std in dB
   double m_multipathPower;           // rms squared value of diffuse multipath dB
   double m_sigma;                    // convert multipath to linear units
-  //double m_angleOfArrival;           // angle of arrival of direct signal
-  //double m_carrierFrequency;         // carrier frequency (Hz)
-  //double m_lcorr;                    // correlation distance for slow variations (m)
-  //double m_velocity;                 // speed (m/s)
-  //double m_lambdac;                  // wavelength (m)
-  //double m_kc;                       // wave number
-  //double m_fm;                       // max Doppler
-  //double m_ts;                       // sampling spacing (s)
-  //double m_fs;                       // sampling freq. (Hz)
-  //uint32_t m_fractionOfWavelength;   // sampling: fraction of wavelength
-
   double m_slowFadingOmegaDopplerMax;
-  double m_slowFadingFrequencyOmegaDopplerMax;
   double m_fastFadingOmegaDopplerMax;
 
   uint32_t m_nFastOscillators;
@@ -87,16 +75,12 @@ private:
 
   /// Vector of oscillators:
   std::vector< Ptr<SatFadingOscillator> > m_slowFadingOscillators;
-  std::vector< Ptr<SatFadingOscillator> > m_slowFadingFrequencyOscillators;
   std::vector< Ptr<SatFadingOscillator> > m_fastFadingOscillators;
 
   void ConstructSlowFadingOscillators ();
-  void ConstructSlowFadingFrequencyOscillators ();
   void ConstructFastFadingOscillators ();
 
-  void ConstructGaussianOscillators (uint32_t numOfOscillators, double dopplerMax, std::vector< Ptr<SatFadingOscillator> > oscillators);
-
-  double GetOscillatorSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
+  std::complex<double> GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
   std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
 
   void ChangeState (uint32_t state);

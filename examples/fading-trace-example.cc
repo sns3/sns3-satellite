@@ -19,7 +19,7 @@ NS_LOG_COMPONENT_DEFINE ("fading-trace-example");
 
 static void FadingTraceCb ( std::string context, double time, SatChannel::ChannelType_t chType, double fadingValue)
 {
-  std::cout << time << " " << chType << " " << fadingValue << std::endl;
+  std::cout << time << " " << chType << " " << 20 * log10(fadingValue) << std::endl;
 }
 
 int
