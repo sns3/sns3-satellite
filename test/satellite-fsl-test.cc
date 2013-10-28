@@ -19,7 +19,7 @@
  */
 
 /**
- * \file satellite-fsl-test.cc
+ * \ingroup satellite-fsl-test.cc
  * \brief Test cases to unit test Satellite Free Space Loss model.
  */
 
@@ -127,5 +127,5 @@ SatFreeSpaceLossTestSuite::SatFreeSpaceLossTestSuite ()
 }
 
 // Do allocate an instance of this TestSuite
-static SatFreeSpaceLossTestSuite satSatInterferenceTestSuite;
+static SatFreeSpaceLossTestSuite satFslTestSuite;
 
