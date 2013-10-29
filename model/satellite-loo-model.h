@@ -57,10 +57,10 @@ public:
 private:
   uint32_t m_setId;
   uint32_t m_stateId;
-  double m_mean;                     // mean in dB
-  double m_stdDev;                   // std in dB
-  double m_multipathPower;           // rms squared value of diffuse multipath dB
-  double m_sigma;                    // convert multipath to linear units
+  double m_mean;                       // mean in dB
+  double m_stdDev;                     // std in dB
+  double m_multipathPower;             // rms squared value of diffuse multipath dB
+  double m_sigma;                      // convert multipath to linear units
   double m_slowFadingOmegaDopplerMax;
   double m_fastFadingOmegaDopplerMax;
 
@@ -73,7 +73,7 @@ private:
   Ptr<NormalRandomVariable> m_normalRandomVariable;
   Ptr<UniformRandomVariable> m_uniformVariable;
 
-  /// Vector of oscillators:
+  /// Vectors of oscillators:
   std::vector< Ptr<SatFadingOscillator> > m_slowFadingOscillators;
   std::vector< Ptr<SatFadingOscillator> > m_fastFadingOscillators;
 

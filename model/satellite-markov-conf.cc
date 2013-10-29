@@ -49,29 +49,6 @@ static const double g_MarkovElevationStateChangeProbabilities[SatMarkovConf::DEF
        {0.0111, 0.0397, 0.9492}}
     };
 
-static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT] =
-    {
-     /* Elevation 40 */
-     {{-0.1,0.37,-22.0},
-      {-1.0,0.5,-22.0},
-      {-2.25,0.13,-21.2}},
-
-     /* Elevation 60 */
-     {{0.0,0.12,-24.9},
-      {-0.7,0.12,-26.1},
-      {-1.4,0.25,-23.1}},
-
-     /* Elevation 70 */
-     {{-0.1,0.25,-22.5},
-      {-0.5,0.28,-24.5},
-      {-0.75,0.37,-23.24}},
-
-     /* Elevation 80 */
-     {{0.1,0.16,-22.4},
-      {-0.4,0.15,-23.5},
-      {-0.72,0.27,-22.0}}
-    };
-
 TypeId
 SatMarkovConf::GetTypeId (void)
 {
@@ -82,9 +59,7 @@ SatMarkovConf::GetTypeId (void)
 SatMarkovConf::SatMarkovConf () :
     m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT),
-    m_minimumPositionChangeInMeters (20.0),
-    m_numOfOscillators (4),
-    m_dopplerFrequencyHz (1)
+    m_minimumPositionChangeInMeters (20.0)
 {
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
   for (uint32_t i = 0; i < m_elevationCount; i++)
@@ -127,23 +102,6 @@ SatMarkovConf::SatMarkovConf () :
   m_markovElevations.insert (elevation);
 
   m_cooldownPeriodLength = Seconds (0.0005);
-
-  for (uint32_t i = 0; i < m_elevationCount; i++)
-    {
-      std::vector<std::vector<double> > states;
-
-      for (uint32_t j = 0; j < m_stateCount; j++)
-        {
-          std::vector<double> parameters;
-
-          for (uint32_t k = 0; k < SatMarkovConf::DEFAULT_LOO_PARAMETER_COUNT; k++)
-            {
-              parameters.push_back (g_LooParameters[i][j][k]);
-            }
-          states.push_back (parameters);
-        }
-      m_looParameters.push_back (states);
-    }
 }
 
 std::vector<std::vector<double> >
@@ -152,14 +110,6 @@ SatMarkovConf::GetElevationProbabilities (uint32_t setId)
   NS_ASSERT( (setId >= 0) && (setId < m_elevationCount));
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << setId);
   return m_markovProbabilities[setId];
-}
-
-std::vector<std::vector<double> >
-SatMarkovConf::GetLooParameters (uint32_t setId)
-{
-  NS_ASSERT( (setId >= 0) && (setId < m_elevationCount));
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting Loo parameters for set ID " << setId);
-  return m_looParameters[setId];
 }
 
 uint32_t
@@ -202,18 +152,6 @@ double
 SatMarkovConf::GetMinimumPositionChange ()
 {
   return m_minimumPositionChangeInMeters;
-}
-
-double
-SatMarkovConf::GetDopplerFrequency ()
-{
-  return m_dopplerFrequencyHz;
-}
-
-uint32_t
-SatMarkovConf::GetNumOfOscillators ()
-{
-  return m_numOfOscillators;
 }
 
 uint32_t

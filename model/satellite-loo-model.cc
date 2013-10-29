@@ -43,28 +43,44 @@ SatLooModel::SatLooModel () :
   m_mean (0),
   m_stdDev (0),
   m_multipathPower (0),
-  m_sigma (0)
+  m_sigma (0),
+  m_slowFadingOmegaDopplerMax (0),
+  m_fastFadingOmegaDopplerMax (0),
+  m_nFastOscillators (1),
+  m_nSlowOscillators (1),
+  m_looConf (NULL),
+  m_normalRandomVariable (NULL),
+  m_uniformVariable (NULL)
 {
   NS_ASSERT(0);
 }
 
 SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t set, uint32_t state) :
-    m_setId (set),
-    m_stateId (state)
+  m_setId (set),
+  m_stateId (state),
+  m_mean (0),
+  m_stdDev (0),
+  m_multipathPower (0),
+  m_sigma (0),
+  m_slowFadingOmegaDopplerMax (0),
+  m_fastFadingOmegaDopplerMax (0),
+  m_nFastOscillators (1),
+  m_nSlowOscillators (1),
+  m_looConf (looConf),
+  m_normalRandomVariable (NULL),
+  m_uniformVariable (NULL)
 {
-
-  m_looConf = looConf;
-
   // initialize parameters for this set and state
   ChangeSet (m_setId);
   ChangeState (m_stateId);
 
+  // initialize random number generators
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
-
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
   m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
   m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
 
+  // construct oscillators
   ConstructSlowFadingOscillators ();
   ConstructFastFadingOscillators ();
 }
@@ -120,7 +136,6 @@ SatLooModel::ConstructFastFadingOscillators ()
       m_fastFadingOscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
     }
 }
-
 
 double
 SatLooModel::GetChannelGainDb ()
@@ -218,30 +233,13 @@ SatLooModel::ChangeState (uint32_t state)
   m_mean = m_looParameters[state][0];
   m_stdDev = m_looParameters[state][1];
   m_multipathPower = m_looParameters[state][2];
-
   m_nFastOscillators = m_looParameters[state][3];
   m_nSlowOscillators = m_looParameters[state][4];
-
-  m_slowFadingOmegaDopplerMax = m_looParameters[state][5];
-  m_fastFadingOmegaDopplerMax = m_looParameters[state][6];
+  m_slowFadingOmegaDopplerMax = 2 * SatLooModel::PI * m_looParameters[state][5];
+  m_fastFadingOmegaDopplerMax = 2 * SatLooModel::PI * m_looParameters[state][6];
 
   m_sigma = sqrt(0.5 * pow(10,(m_multipathPower / 10)));
-
   m_stateId = state;
-
-  // === TESTING ===
-  //m_mean = -8.0;
-  //m_stdDev = 3.0;
-  //m_multipathPower = -10.0;
-
-  //m_nFastOscillators = 10;
-  //m_nSlowOscillators = 10;
-
-  //m_slowFadingOmegaDopplerMax = 10;
-  //m_fastFadingOmegaDopplerMax = 200;
-
-  //m_sigma = sqrt(0.5 * pow(10,(m_multipathPower / 10)));
-  // === TESTING ===
 }
 
 } // namespace ns3

@@ -41,7 +41,11 @@ SatFadingContainer::GetTypeId (void)
 }
 
 SatFadingContainer::SatFadingContainer ()
-  : m_numOfStates (),
+  : m_markovConf (NULL),
+    m_looConf (NULL),
+    m_fader_up (NULL),
+    m_fader_down (NULL),
+    m_numOfStates (),
     m_numOfSets (),
     m_currentElevation (),
     m_setId (),
@@ -54,22 +58,20 @@ SatFadingContainer::SatFadingContainer ()
     m_latestCalculatedFadingValue_down (),
     m_latestCalculationTime_up (),
     m_latestCalculationTime_down (),
-    m_dopplerFrequencyHz (),
-    m_numOfOscillators (),
     m_enableSetLock (false),
     m_enableStateLock (false)
 {
-  m_markovConf = NULL;
-  m_markovModel = NULL;
-  m_fader_up = NULL;
-  m_fader_down = NULL;
   NS_ASSERT(0);
 }
 
 SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition)
-  : m_numOfStates(markovConf->GetStateCount ()),
+  : m_markovConf (markovConf),
+    m_looConf (looConf),
+    m_fader_up (NULL),
+    m_fader_down (NULL),
+    m_numOfStates(markovConf->GetStateCount ()),
     m_numOfSets(markovConf->GetNumOfSets ()),
-    m_currentElevation(45),
+    m_currentElevation (45),
     m_stateId (0),
     m_cooldownPeriodLength (markovConf->GetCooldownPeriod ()),
     m_minimumPositionChangeInMeters (markovConf->GetMinimumPositionChange ()),
@@ -79,13 +81,9 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLo
     m_latestCalculatedFadingValue_down (0.0),
     m_latestCalculationTime_up (Now()),
     m_latestCalculationTime_down (Now()),
-    m_dopplerFrequencyHz (markovConf->GetDopplerFrequency ()),
-    m_numOfOscillators (markovConf->GetNumOfOscillators ()),
     m_enableSetLock (false),
     m_enableStateLock (false)
 {
-  m_markovConf = markovConf;
-  m_looConf = looConf;
   m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates);
   m_setId = m_markovConf->GetProbabilitySetID (m_currentElevation);
 

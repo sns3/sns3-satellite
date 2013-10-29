@@ -81,8 +81,6 @@ private:
   double m_latestCalculatedFadingValue_down;
   Time m_latestCalculationTime_up;
   Time m_latestCalculationTime_down;
-  double m_dopplerFrequencyHz;
-  uint32_t m_numOfOscillators;
   bool m_enableSetLock;
   bool m_enableStateLock;
 
