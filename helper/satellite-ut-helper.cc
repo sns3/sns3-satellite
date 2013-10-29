@@ -128,6 +128,7 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
   m_phyFactory.SetTypeId ("ns3::SatPhy");
 
   m_phyFactory.Set ("RxMaxAntennaGainDb", DoubleValue(44.60));
+  m_phyFactory.Set ("RxAntennaLossDb", DoubleValue(0.00));
   m_phyFactory.Set ("TxMaxAntennaGainDb", DoubleValue(45.20));
   m_phyFactory.Set ("TxMaxPowerDbW", DoubleValue(4.00));
   m_phyFactory.Set ("TxOutputLossDb", DoubleValue(0.50));

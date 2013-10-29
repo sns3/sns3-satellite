@@ -30,10 +30,6 @@ NS_LOG_COMPONENT_DEFINE ("sat-link-budget-example");
 static void PacketTraceCb ( std::string context, Ptr<SatSignalParameters> params, Mac48Address ownAdd , Mac48Address destAdd,
                           double ifPower, double cSinr)
 {
-  // uncomment to set number of decimal places
-  //std::cout.setf(std::ios::fixed, std::ios::floatfield);
-  //std::cout.precision(20);
-
   // print only unicast message to prevent printing control messages like TBTP messages
   if ( !destAdd.IsBroadcast() )
     {
@@ -125,10 +121,10 @@ main (int argc, char *argv[])
 
   // read command line parameters can be given by user
   CommandLine cmd;
-  cmd.AddValue("beam", "Beam to use for testing. (1 - 72)", beamId);
-  cmd.AddValue("latitude", "Latitude of UT position (-90 ... 90.0)", latitude);
-  cmd.AddValue("longitude", "Longitude of UT position (-180 ... 180)", longitude);
-  cmd.AddValue("altitude", "Altitude of UT position (meters)", altitude);
+  cmd.AddValue ("beam", "Beam to use for testing. (1 - 72)", beamId);
+  cmd.AddValue ("latitude", "Latitude of UT position (-90 ... 90.0)", latitude);
+  cmd.AddValue ("longitude", "Longitude of UT position (-180 ... 180)", longitude);
+  cmd.AddValue ("altitude", "Altitude of UT position (meters)", altitude);
   cmd.Parse (argc, argv);
 
   // enable info logs
@@ -211,10 +207,10 @@ main (int argc, char *argv[])
   geoHelper->SetFeederPhyAttribute ("TxAntennaLossDb", DoubleValue (geoFeederTxAntennaLossDb));
 
   // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
-  helper->SetBeamUserInfo(beamMap);
+  helper->SetBeamUserInfo (beamMap);
 
   helper->CreateScenario (SatHelper::USER_DEFINED);
 
@@ -229,9 +225,9 @@ main (int argc, char *argv[])
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
                                  MakeCallback (&PacketTraceCb));
   // Set UT position
-  NodeContainer ut = helper->UtNodes();
-  Ptr<SatMobilityModel> utMob = ut.Get(0)->GetObject<SatMobilityModel> ();
-  utMob->SetGeoPosition(GeoCoordinate(latitude, longitude, altitude));
+  NodeContainer ut = helper->UtNodes ();
+  Ptr<SatMobilityModel> utMob = ut.Get (0)->GetObject<SatMobilityModel> ();
+  utMob->SetGeoPosition (GeoCoordinate (latitude, longitude, altitude));
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
@@ -242,8 +238,8 @@ main (int argc, char *argv[])
   // create application on GW user
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
-  cbrHelper.SetAttribute("Interval", StringValue ("0.1s"));
-  cbrHelper.SetAttribute("PacketSize", UintegerValue (512) );
+  cbrHelper.SetAttribute ("Interval", StringValue ("0.1s"));
+  cbrHelper.SetAttribute ("PacketSize", UintegerValue (512) );
 
   ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
   gwSink.Start (Seconds (0.1));
@@ -254,8 +250,8 @@ main (int argc, char *argv[])
   gwCbr.Stop (Seconds (0.25));
 
   // create application on UT user
-  sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
-  cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
 
   ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
   utSink.Start (Seconds (0.1));
@@ -265,21 +261,24 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (0.1));
   utCbr.Stop (Seconds (0.25));
 
-  NodeContainer gw = helper->GwNodes();
-  Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel> ();
+  NodeContainer gw = helper->GwNodes ();
+  Ptr<SatMobilityModel> gwMob = gw.Get (0)->GetObject<SatMobilityModel> ();
 
-  Ptr<Node> geo = helper->GeoSatNode();
+  Ptr<Node> geo = helper->GeoSatNode ();
   Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel> ();
 
   // print used parameters usign log info
   NS_LOG_INFO ("--- Satellite link budget ---");
   NS_LOG_INFO (" Beam ID: " << beamId);
-  NS_LOG_INFO (" Geo position: " << geoMob->GetGeoPosition());
-  NS_LOG_INFO (" GW position: " << gwMob->GetGeoPosition());
-  NS_LOG_INFO (" UT position: " << utMob->GetGeoPosition());
+  NS_LOG_INFO (" Geo position: " << geoMob->GetGeoPosition () << " " << geoMob->GetPosition () );
+  NS_LOG_INFO (" GW position: " << gwMob->GetGeoPosition () << " " << gwMob->GetPosition () );
+  NS_LOG_INFO (" UT position: " << utMob->GetGeoPosition () << " " << utMob->GetPosition ());
   NS_LOG_INFO ("  ");
   NS_LOG_INFO ( "Link params (Rx Antenna gain, RxAntennaLoss, Tx Antenna gain, TxPower, TxOutputLoss, TxPointingLoss, TxOboLoss, TxAntennaLoss, ");
-  NS_LOG_INFO ( "             OtherSysNoise, OtherSysIf, ImIf, AciIf, AciIfWrtNoise, RxTemp) :");
+  NS_LOG_INFO ( "             OtherSysNoise, OtherSysIf, ImIf, AciIf, AciIfWrtNoise, RxTemp) : " <<
+                              "NOTE! Antenna gains might be overridden by values from Antenna patterns.");
+  NS_LOG_INFO ("  ");
+
 
   NS_LOG_INFO (" GEO feeder: " << geoFeederRxMaxAntennaGainDb << " " << geoFeederRxAntennaLossDb << " " << geoFeederTxMaxAntennaGainDb << " "
                                << geoFeederTxMaxPowerDbW << " " << geoFeederTxOutputLossDb << " " << geoFeederTxPointingLossDb << " "
@@ -313,7 +312,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Link results (Time, Channel type, Own address, Dest. address, Beam ID, Carrier Center freq, IF Power, RX Power, SINR, Composite SINR) :");
   // results are printed out in callback (PacketTraceCb)
 
-  Simulator::Stop (Seconds(1.1));
+  Simulator::Stop (Seconds (1.1));
   Simulator::Run ();
   Simulator::Destroy ();
 
