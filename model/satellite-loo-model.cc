@@ -70,19 +70,14 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t set, uint32_t state)
   m_normalRandomVariable (NULL),
   m_uniformVariable (NULL)
 {
-  // initialize parameters for this set and state
-  ChangeSet (m_setId);
-  ChangeState (m_stateId);
-
   // initialize random number generators
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
   m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
   m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
 
-  // construct oscillators
-  ConstructSlowFadingOscillators ();
-  ConstructFastFadingOscillators ();
+  // initialize parameters for this set and state, construct oscillators
+  ChangeSet (m_setId, m_stateId);
 }
 
 SatLooModel::~SatLooModel ()
@@ -209,8 +204,7 @@ SatLooModel::UpdateParameters (uint32_t set, uint32_t state)
 {
   if (m_setId != set)
     {
-      ChangeSet (set);
-      ChangeState (state);
+      ChangeSet (set, state);
     }
 
   if (m_setId == set && m_stateId != state)
@@ -220,11 +214,13 @@ SatLooModel::UpdateParameters (uint32_t set, uint32_t state)
 }
 
 void
-SatLooModel::ChangeSet (uint32_t set)
+SatLooModel::ChangeSet (uint32_t set, uint32_t state)
 {
   m_looParameters.clear();
   m_looParameters = m_looConf->GetLooParameters (set);
   m_setId = set;
+
+  ChangeState (state);
 }
 
 void
@@ -240,6 +236,12 @@ SatLooModel::ChangeState (uint32_t state)
 
   m_sigma = sqrt(0.5 * pow(10,(m_multipathPower / 10)));
   m_stateId = state;
+
+  m_slowFadingOscillators.clear();
+  m_fastFadingOscillators.clear();
+
+  ConstructSlowFadingOscillators ();
+  ConstructFastFadingOscillators ();
 }
 
 } // namespace ns3

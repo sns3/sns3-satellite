@@ -84,7 +84,7 @@ private:
   std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
 
   void ChangeState (uint32_t state);
-  void ChangeSet (uint32_t set);
+  void ChangeSet (uint32_t set, uint32_t state);
 };
 
 } // namespace ns3

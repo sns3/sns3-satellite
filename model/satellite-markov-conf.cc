@@ -117,23 +117,24 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
 {
   NS_ASSERT( (elevation >= 0.0) && (elevation <= 90.0));
 
-  uint32_t index = 0;
+  uint32_t smallestDifferenceIndex = 0;
+  double smallestDifference = 360; // elevation angle can never be this large
+  double difference = 0;
+
   std::map<double, uint32_t>::iterator iter;
 
   for (iter = m_markovElevations.begin (); iter != m_markovElevations.end (); ++iter)
     {
-      if (elevation >= iter->first)
+      difference = fabs(iter->first - elevation);
+      if (difference < smallestDifference)
         {
-          index = iter->second;
-        }
-      else
-        {
-          break;
+          smallestDifference = difference;
+          smallestDifferenceIndex = iter->second;
         }
     }
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - New ID for elevation " << elevation << " is " << index);
+  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
 
-  return index;
+  return smallestDifferenceIndex;
 }
 
 uint32_t
