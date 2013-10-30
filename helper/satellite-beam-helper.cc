@@ -380,8 +380,7 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
          * Average propagation delay between UT/GW and satellite in seconds
          * TODO: Change the propagation delay to be a parameter.
         */
-        double pd = 0.13;
-        Ptr<SatConstantPropagationDelayModel> pDelay = CreateObject<SatConstantPropagationDelayModel> (pd);
+        Ptr<SatConstantPropagationDelayModel> pDelay = CreateObject<SatConstantPropagationDelayModel> ();
         forwardCh->SetPropagationDelayModel (pDelay);
         returnCh->SetPropagationDelayModel (pDelay);
 

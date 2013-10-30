@@ -45,12 +45,6 @@ SatConstantPropagationDelayModel::SatConstantPropagationDelayModel ()
 {
 }
 
-SatConstantPropagationDelayModel::SatConstantPropagationDelayModel ( double delay )
-:m_delay (delay)
-{
-
-}
-
 Time
 SatConstantPropagationDelayModel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
 {

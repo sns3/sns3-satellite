@@ -37,7 +37,6 @@ public:
   static TypeId GetTypeId (void);
 
   SatConstantPropagationDelayModel ();
-  SatConstantPropagationDelayModel ( double delay );
 
   /**
    * \returns the propagation delay (s).
