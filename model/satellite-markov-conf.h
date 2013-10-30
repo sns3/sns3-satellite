@@ -49,14 +49,18 @@ public:
   Time GetCooldownPeriod ();
   double GetMinimumPositionChange ();
   uint32_t GetNumOfSets ();
+  double GetInitialElevation ();
+  uint32_t GetInitialState ();
 
 private:
   uint32_t m_elevationCount;
   uint32_t m_stateCount;
   std::vector<std::vector<std::vector<double> > > m_markovProbabilities;
   std::map<double, uint32_t> m_markovElevations;
-  Time m_cooldownPeriodLength;
   double m_minimumPositionChangeInMeters;
+  uint32_t m_initialState;
+  double m_initialElevation;
+  Time m_cooldownPeriodLength;
 };
 
 } // namespace ns3

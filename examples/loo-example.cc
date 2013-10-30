@@ -26,9 +26,9 @@ main (int argc, char *argv[])
 
   Ptr<SatLooConf> looConf = CreateObject<SatLooConf> ();
 
-  Ptr<SatLooModel> looFaderLineOfSight = CreateObject<SatLooModel> (looConf,0,0);
-  Ptr<SatLooModel> looFaderLightShadowing = CreateObject<SatLooModel> (looConf,0,1);
-  Ptr<SatLooModel> looFaderHeavyShadowing = CreateObject<SatLooModel> (looConf,0,2);
+  Ptr<SatLooModel> looFaderLineOfSight = CreateObject<SatLooModel> (looConf,3,0,0);
+  Ptr<SatLooModel> looFaderLightShadowing = CreateObject<SatLooModel> (looConf,3,0,1);
+  Ptr<SatLooModel> looFaderHeavyShadowing = CreateObject<SatLooModel> (looConf,3,0,2);
 
   for (uint32_t i = 0; i < 1000; i++)
     {

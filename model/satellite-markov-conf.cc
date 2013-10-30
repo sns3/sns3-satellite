@@ -52,14 +52,19 @@ static const double g_MarkovElevationStateChangeProbabilities[SatMarkovConf::DEF
 TypeId
 SatMarkovConf::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatMarkovConf").SetParent<Object> ().AddConstructor<SatMarkovConf> ();
+  static TypeId tid = TypeId ("ns3::SatMarkovConf")
+      .SetParent<Object> ()
+      .AddConstructor<SatMarkovConf> ();
   return tid;
 }
 
 SatMarkovConf::SatMarkovConf () :
     m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT),
-    m_minimumPositionChangeInMeters (20.0)
+    m_minimumPositionChangeInMeters (20.0),
+    m_initialState (0),
+    m_initialElevation (45),
+    m_cooldownPeriodLength (Seconds (0.0005))
 {
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
   for (uint32_t i = 0; i < m_elevationCount; i++)
@@ -83,25 +88,19 @@ SatMarkovConf::SatMarkovConf () :
 
   elevation.first = 40.0;
   elevation.second = 0;
-
   m_markovElevations.insert (elevation);
 
   elevation.first = 60.0;
   elevation.second = 1;
-
   m_markovElevations.insert (elevation);
 
   elevation.first = 70.0;
   elevation.second = 2;
-
   m_markovElevations.insert (elevation);
 
   elevation.first = 80.0;
   elevation.second = 3;
-
   m_markovElevations.insert (elevation);
-
-  m_cooldownPeriodLength = Seconds (0.0005);
 }
 
 std::vector<std::vector<double> >
@@ -159,6 +158,18 @@ uint32_t
 SatMarkovConf::GetNumOfSets ()
 {
   return m_markovElevations.size();
+}
+
+uint32_t
+SatMarkovConf::GetInitialState ()
+{
+  return m_initialState;
+}
+
+double
+SatMarkovConf::GetInitialElevation ()
+{
+  return m_initialElevation;
 }
 
 } // namespace ns3

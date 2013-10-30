@@ -43,7 +43,7 @@ public:
   /** Create Loo model. */
   SatLooModel ();
 
-  SatLooModel (Ptr<SatLooConf> looConf, uint32_t set, uint32_t state);
+  SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState);
 
   /** Destroy the Loo model. */
   ~SatLooModel ();
@@ -55,17 +55,10 @@ public:
   void UpdateParameters (uint32_t set, uint32_t state);
 
 private:
-  uint32_t m_setId;
-  uint32_t m_stateId;
-  double m_mean;                       // mean in dB
-  double m_stdDev;                     // std in dB
-  double m_multipathPower;             // rms squared value of diffuse multipath dB
-  double m_sigma;                      // convert multipath to linear units
-  double m_slowFadingOmegaDopplerMax;
-  double m_fastFadingOmegaDopplerMax;
-
-  uint32_t m_nFastOscillators;
-  uint32_t m_nSlowOscillators;
+  uint32_t m_numOfStates;              // number of Markov states
+  uint32_t m_currentSet;               // current set
+  uint32_t m_currentState;             // current state
+  double m_sigma;                      // multipath power converted to linear units
 
   Ptr<SatLooConf> m_looConf;
   std::vector<std::vector<double> > m_looParameters;
@@ -74,8 +67,8 @@ private:
   Ptr<UniformRandomVariable> m_uniformVariable;
 
   /// Vectors of oscillators:
-  std::vector< Ptr<SatFadingOscillator> > m_slowFadingOscillators;
-  std::vector< Ptr<SatFadingOscillator> > m_fastFadingOscillators;
+  std::vector< std::vector< Ptr<SatFadingOscillator> > > m_slowFadingOscillators;
+  std::vector< std::vector< Ptr<SatFadingOscillator> > > m_fastFadingOscillators;
 
   void ConstructSlowFadingOscillators ();
   void ConstructFastFadingOscillators ();

@@ -40,16 +40,17 @@ SatFadingContainer::GetTypeId (void)
   return tid;
 }
 
-SatFadingContainer::SatFadingContainer ()
-  : m_markovConf (NULL),
+SatFadingContainer::SatFadingContainer () :
+    m_markovModel (NULL),
+    m_markovConf (NULL),
     m_looConf (NULL),
     m_fader_up (NULL),
     m_fader_down (NULL),
     m_numOfStates (),
     m_numOfSets (),
     m_currentElevation (),
-    m_setId (),
-    m_stateId (),
+    m_currentSet (),
+    m_currentState (),
     m_cooldownPeriodLength (),
     m_minimumPositionChangeInMeters (),
     m_currentPosition (),
@@ -64,15 +65,16 @@ SatFadingContainer::SatFadingContainer ()
   NS_ASSERT(0);
 }
 
-SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition)
-  : m_markovConf (markovConf),
+SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition) :
+    m_markovModel (NULL),
+    m_markovConf (markovConf),
     m_looConf (looConf),
     m_fader_up (NULL),
     m_fader_down (NULL),
     m_numOfStates(markovConf->GetStateCount ()),
     m_numOfSets(markovConf->GetNumOfSets ()),
-    m_currentElevation (45),
-    m_stateId (0),
+    m_currentElevation (markovConf->GetInitialElevation()),
+    m_currentState (markovConf->GetInitialState()),
     m_cooldownPeriodLength (markovConf->GetCooldownPeriod ()),
     m_minimumPositionChangeInMeters (markovConf->GetMinimumPositionChange ()),
     m_currentPosition (currentPosition),
@@ -85,17 +87,20 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLo
     m_enableStateLock (false)
 {
   m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates);
-  m_setId = m_markovConf->GetProbabilitySetID (m_currentElevation);
 
-  UpdateProbabilities (m_setId);
+  m_currentSet = m_markovConf->GetProbabilitySetID (m_currentElevation);
 
-  m_fader_up = CreateObject<SatLooModel> (m_looConf,m_setId,0);
-  m_fader_down = CreateObject<SatLooModel> (m_looConf,m_setId,0);
+  UpdateProbabilities (m_currentSet);
+
+  m_markovModel->DoTransition ();
+
+  m_fader_up = CreateObject<SatLooModel> (m_looConf,m_numOfStates,m_currentSet,m_currentState);
+  m_fader_down = CreateObject<SatLooModel> (m_looConf,m_numOfStates,m_currentSet,m_currentState);
 
   NS_LOG_INFO("Time " << Now ().GetSeconds ()
               << " SatFadingContainer - Creating SatFadingContainer, States: " << m_numOfStates
               << " Elevation: " << m_currentElevation
-              << " Initial Set ID: " << m_setId
+              << " Current Set ID: " << m_currentSet
               << " Cooldown Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
               << " Minimum Position Change In Meters: " << m_minimumPositionChangeInMeters
   );
@@ -164,12 +169,12 @@ SatFadingContainer::EvaluateStateChange ()
         {
           newSetId = m_markovConf->GetProbabilitySetID (m_currentElevation);
 
-          if (m_setId != newSetId)
+          if (m_currentSet != newSetId)
             {
-              NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation  << ", set ID [old,new]: [" << m_setId << "," << newSetId << "]");
+              NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation  << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
 
-              m_setId = newSetId;
-              UpdateProbabilities (m_setId);
+              m_currentSet = newSetId;
+              UpdateProbabilities (m_currentSet);
             }
         }
 
@@ -265,10 +270,10 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channeltype)
 {
   if (!m_enableStateLock)
     {
-      m_stateId = m_markovModel->GetState ();
+      m_currentState = m_markovModel->GetState ();
     }
 
-  NS_ASSERT( (m_stateId >= 0) && (m_stateId < m_numOfStates));
+  NS_ASSERT( (m_currentState >= 0) && (m_currentState < m_numOfStates));
 
   m_latestCalculationPosition = m_currentPosition;
 
@@ -277,7 +282,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channeltype)
     case SatChannel::RETURN_USER_CH:
     case SatChannel::FORWARD_FEEDER_CH:
       {
-        m_fader_up->UpdateParameters (m_setId, m_stateId);
+        m_fader_up->UpdateParameters (m_currentSet, m_currentState);
         m_latestCalculatedFadingValue_up = m_fader_up->GetChannelGain ();
         NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
         m_latestCalculationTime_up = Now ();
@@ -286,7 +291,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channeltype)
     case SatChannel::FORWARD_USER_CH:
     case SatChannel::RETURN_FEEDER_CH:
       {
-        m_fader_down->UpdateParameters (m_setId, m_stateId);
+        m_fader_down->UpdateParameters (m_currentSet, m_currentState);
         m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGain ();
         NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
         m_latestCalculationTime_down = Now ();
@@ -302,15 +307,15 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channeltype)
 }
 
 void
-SatFadingContainer::LockToSetAndState (uint32_t setId, uint32_t stateId)
+SatFadingContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
 {
-  NS_ASSERT( (stateId >= 0) && (stateId < m_numOfStates));
-  NS_ASSERT( (setId >= 0) && (setId < m_numOfSets));
+  NS_ASSERT( (newState >= 0) && (newState < m_numOfStates));
+  NS_ASSERT( (newSet >= 0) && (newSet < m_numOfSets));
 
-  m_setId = setId;
-  m_stateId = stateId;
+  m_currentSet = newSet;
+  m_currentState = newState;
 
-  UpdateProbabilities (m_setId);
+  UpdateProbabilities (m_currentSet);
 
   m_enableSetLock = true;
   m_enableStateLock = true;
@@ -321,9 +326,9 @@ SatFadingContainer::LockToSet (uint32_t setId)
 {
   NS_ASSERT( (setId >= 0) && (setId < m_numOfSets));
 
-  m_setId = setId;
+  m_currentSet = setId;
 
-  UpdateProbabilities (m_setId);
+  UpdateProbabilities (m_currentSet);
 
   m_enableSetLock = true;
   m_enableStateLock = false;

@@ -71,8 +71,8 @@ private:
   uint32_t m_numOfStates;
   uint32_t m_numOfSets;
   double m_currentElevation;
-  uint32_t m_setId;
-  uint32_t m_stateId;
+  uint32_t m_currentSet;
+  uint32_t m_currentState;
   Time m_cooldownPeriodLength;
   double m_minimumPositionChangeInMeters;
   GeoCoordinate m_currentPosition;
