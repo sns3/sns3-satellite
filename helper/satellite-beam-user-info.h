@@ -26,7 +26,7 @@
 namespace ns3 {
 
 /**
- * \brief Information of beam users liken UTs and their users.
+ * @brief Information of beam users liken UTs and their users.
  * Used e.g. when creating beams.
  *
  */
@@ -40,10 +40,10 @@ public:
   /**
    * Constructor for SatBeamUserInfo.
    *
-   * \param utCount UT count of the beam (can be added later by method AddUt)
-   * \param userCount user count of the UTs (can be changed by method SetUtUserCount)
+   * @param utCount UT count of the beam (can be added later by method AddUt)
+   * @param userCountPerUt User count of the UTs (can be changed for the specific UT by method SetUtUserCount)
    */
-  SatBeamUserInfo (uint32_t utCount, uint32_t userCount);
+  SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt);
 
   /**
    * Destructor for SatBeamUserInfo.
@@ -51,35 +51,36 @@ public:
   virtual ~SatBeamUserInfo () {}
 
   /**
-   * return number of UTs in beam.
+   * @return number of UTs in beam.
    */
-  uint32_t GetUtCount();
+  uint32_t GetUtCount ();
 
   /**
-   * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
+   * @param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
    *
-   * return number of users in a UT.
+   * @return number of users in a UT.
    */
-  uint32_t GetUtUserCount(uint32_t utIndex);
+  uint32_t GetUtUserCount (uint32_t utIndex);
 
-  /*
-   * Sets user count for UT.
+  /**
+   * Sets user count for the UT with given uIndex.
    *
-   * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
-   * \param userCount Number of user under a UT. Minimum value is 1. If this not called for the UT then default
-   *                  value (1) is used for the UT.
+   * @param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
+   * @param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
+   *                  If this is not called for the UT then default value (1) is used for the UT.
    *
    */
-  void SetUtUserCount(uint32_t utIndex, uint32_t userCount);
+  void SetUtUserCount (uint32_t utIndex, uint32_t userCount);
 
-  /*
-   * Adds new UT to end of list with given user count.
+  /**
+   * Adds new UT to end of the list with given user count for the added UT.
    *
-   * \param userCount Number of user under added UT. Minimum value is 1.
+   * @param userCountPerUt Number of users under the added UT. Minimum value is 1.
    */
-  void AddUt (uint32_t userCount);
+  void AddUt (uint32_t userCountPerUt);
 
 private:
+  // vector to store users per UT
   std::vector<uint32_t> m_userCount;
  };
 

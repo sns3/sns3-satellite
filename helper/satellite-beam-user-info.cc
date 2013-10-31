@@ -31,14 +31,14 @@ SatBeamUserInfo::SatBeamUserInfo()
 
 }
 
-SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCount)
+SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt)
 {
-  NS_ASSERT(utCount > 0);
-  NS_ASSERT(userCount > 0);
+  NS_ASSERT (utCount > 0);
+  NS_ASSERT (userCountPerUt > 0);
 
   for (uint32_t i = 0; i < utCount; i++)
     {
-      m_userCount.push_back(userCount);
+      m_userCount.push_back (userCountPerUt);
     }
 }
 
@@ -58,16 +58,16 @@ SatBeamUserInfo::GetUtUserCount (uint32_t utIndex)
 
 void SatBeamUserInfo::SetUtUserCount (uint32_t utIndex, uint32_t userCount)
 {
-  NS_ASSERT(utIndex < m_userCount.size());
+  NS_ASSERT (utIndex < m_userCount.size ());
 
   m_userCount[utIndex] = userCount;
 }
 
-void SatBeamUserInfo::AddUt (uint32_t userCount)
+void SatBeamUserInfo::AddUt (uint32_t userCountPerUt)
 {
-  NS_ASSERT(userCount > 0);
+  NS_ASSERT (userCountPerUt > 0);
 
-  m_userCount.push_back(userCount);
+  m_userCount.push_back (userCountPerUt);
 }
 
 } // namespace ns3
