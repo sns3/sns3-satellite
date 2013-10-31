@@ -110,7 +110,7 @@ public:
    * \param value the value of the attribute to set
    *
    * Set these attribute on each ns3::SatChannel created
-   * by SatNetDevHelper::Install
+   * by SatBeamHelper::Install
    */
   void SetChannelAttribute (std::string name, const AttributeValue &value);
 

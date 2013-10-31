@@ -49,7 +49,7 @@ public:
 
   SatUtHelper ();
   /**
-   * Create a SatNetDevHelper to make life easier when creating Satellite point to
+   * Create a SatUtHelper to make life easier when creating Satellite point to
    * point network connections.
    */
   SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
@@ -76,7 +76,7 @@ public:
    * \param v4 the value of the attribute to set on the queue
    *
    * Set the type of queue to create and associated to each
-   * SatNetDevice created through SatNetDevHelper::Install.
+   * SatNetDevice created through SatUtHelper::Install.
    */
   void SetQueue (std::string type,
                  std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
@@ -126,7 +126,7 @@ public:
    * \param rCh return channel
    *
    * This method creates a ns3::SatChannel with the
-   * attributes configured by SatNetDevHelper::SetChannelAttribute,
+   * attributes configured by SatUtHelper::SetChannelAttribute,
    * then, for each node in the input container, we create a 
    * ns3::SatNetDevice with the requested attributes,
    * a queue for this ns3::NetDevice, and associate the resulting 

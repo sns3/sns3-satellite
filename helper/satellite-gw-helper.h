@@ -46,7 +46,7 @@ public:
 
   SatGwHelper ();
   /**
-   * Create a SatNetDevHelper to make life easier when creating Satellite point to
+   * Create a SatGwHelper to make life easier when creating Satellite point to
    * point network connections.
    */
   SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount);
@@ -74,7 +74,7 @@ public:
    * \param v4 the value of the attribute to set on the queue
    *
    * Set the type of queue to create and associated to each
-   * SatGwHelper created through SatNetDevHelper::Install.
+   * SatNetDevice created through SatGwHelper::Install.
    */
   void SetQueue (std::string type,
                  std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
@@ -124,11 +124,11 @@ public:
    * \param rCh return channel
    *
    * This method creates a ns3::SatChannel with the
-   * attributes configured by SatNetDevHelper::SetChannelAttribute,
+   * attributes configured by SatGwHelper::SetChannelAttribute,
    * then, for each node in the input container, we create a 
    * ns3::SatNetDevice with the requested attributes,
-   * a queue for this ns3::NetDevice, and associate the resulting 
-   * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
+   * a queue for this ns3::SatNetDevice, and associate the resulting
+   * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
    */
   NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh );
 

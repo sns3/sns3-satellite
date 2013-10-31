@@ -77,7 +77,7 @@ public:
    * \param value the value of the attribute to set
    *
    * Set these attribute on each ns3::SatChannel created
-   * by SatNetDevHelper::Install
+   * by SatUserHelper::Install
    */
   void SetCsmaChannelAttribute (std::string name, const AttributeValue &value);
 
