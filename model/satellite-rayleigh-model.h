@@ -36,64 +36,76 @@ class SatRayleighModel : public Object
 public:
 
   /**
-   *
+   * \brief Value for PI
    */
   static const double PI;
 
   /**
-   *
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatRayleighModel ();
 
   /**
-   *
-   * \param omegaDopplerMax
-   * \param numOfOscillators
+   * \brief Constructor
+   * \param omegaDopplerMax maximum Doppler
+   * \param numOfOscillators number of oscillators
    */
   SatRayleighModel (double omegaDopplerMax, uint32_t numOfOscillators);
 
   /**
-   *
+   * \brief Destructor
    */
   ~SatRayleighModel ();
 
   /**
-   *
-   * \return
+   * \brief Function for calculating the oscillator complex gain
+   * \return complex gain
    */
   std::complex<double> GetComplexGain () const;
 
   /**
-   *
-   * \return
+   * \brief Function for returning the channel gain in dB
+   * \return channel gain in dB
    */
   double GetChannelGainDb () const;
 
   /**
-   *
-   * \return
+   * \brief Function for returning the channel gain
+   * \return channel gain
    */
   double GetChannelGain () const;
 
 private:
 
   /**
-   *
+   * \brief Function for constructing the oscillators
    */
   void ConstructOscillators ();
 
   /**
-   *
+   * \brief Vector of oscillators
    */
   std::vector< Ptr<SatFadingOscillator> > m_oscillators;
+
+  /**
+   * \brief Maximum omega Doppler
+   */
   double m_omegaDopplerMax;
+
+  /**
+   * \brief Number of oscillators
+   */
   uint32_t m_nOscillators;
+
+  /**
+   * \brief Uniform distribution random variable
+   */
   Ptr<UniformRandomVariable> m_uniformVariable;
 };
 

@@ -28,7 +28,7 @@ NS_LOG_COMPONENT_DEFINE ("SatLooConf");
 
 static const double g_LooParameters[SatLooConf::DEFAULT_ELEVATION_COUNT][SatLooConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
     {
-     /* Elevation 40 */
+     /* Elevation 40 */  // TODO: add Ka-band parameters
      {{-0.1,0.37,-22.0,10,10,2,30},
       {-1.0,0.5,-22.0,10,10,2,30},
       {-2.25,0.13,-21.2,10,10,2,30}},

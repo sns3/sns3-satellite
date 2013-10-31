@@ -35,62 +35,70 @@ class SatMarkovModel : public Object
 public:
 
   /**
-   *
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatMarkovModel ();
 
   /**
-   *
-   * \param numOfStates
+   * \brief Constructor
+   * \param numOfStates number of states
    */
   SatMarkovModel (uint32_t numOfStates);
 
   /**
-   *
+   * \brief Destructor
    */
   ~SatMarkovModel ();
 
   /**
-   *
-   * \param from
-   * \param to
-   * \param probability
+   * \brief Function for setting the probability values
+   * \param from start state
+   * \param to end state
+   * \param probability change probability
    */
   void SetProbability (uint32_t from,
                        uint32_t to,
                        double probability);
 
   /**
-   *
-   * \return
+   * \brief Function for evaluating the state change
+   * \return new state
    */
   uint32_t DoTransition ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the current state
+   * \return current state
    */
   uint32_t GetState () const;
 
   /**
-   *
-   * \param newState
+   * \brief Function for setting the state
+   * \param newState new state
    */
   void SetState (uint32_t newState);
 
 private:
 
   /**
-   *
+   * \brief Markov state change probabilities
    */
   double* m_probabilities;
+
+  /**
+   * \brief Number of states
+   */
   uint32_t m_numOfStates;
+
+  /**
+   * \brief Current state
+   */
   uint32_t m_currentState;
 
 };

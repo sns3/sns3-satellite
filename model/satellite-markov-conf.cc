@@ -28,7 +28,7 @@ NS_LOG_COMPONENT_DEFINE ("SatMarkovConf");
 
 static const double g_MarkovElevationStateChangeProbabilities[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT] =
     {
-      /* Elevation 40 */
+      /* Elevation 40 */ // TODO: add Ka-band parameters
       {{0.9530, 0.0431, 0.0039},
        {0.0515, 0.9347, 0.0138},
        {0.0334, 0.0238, 0.9428}},

@@ -39,89 +39,121 @@ class SatMarkovConf : public Object
 public:
 
   /**
-   *
+   * \brief Default elevation count
    */
   static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
+
+  /**
+   * \brief Default state count
+   */
   static const uint32_t DEFAULT_STATE_COUNT = 3;
 
   /**
-   *
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatMarkovConf ();
 
   /**
-   *
+   * \brief Destructor
    */
   virtual ~SatMarkovConf () {}
 
   /**
-   *
-   * \param elevation
-   * \return
+   * \brief Function for returning the parameter set
+   * \param elevation elevation
+   * \return parameter set
    */
   uint32_t GetProbabilitySetID (double elevation);
 
   /**
-   *
-   * \param setId
-   * \return
+   * \brief Function for returning the probabilities
+   * \param set parameter set
+   * \return probabilities
    */
   std::vector<std::vector<double> > GetElevationProbabilities (uint32_t set);
 
   /**
-   *
-   * \return
+   * \brief Function for returning the number of states
+   * \return number of states
    */
   uint32_t GetStateCount ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the cooldown period
+   * \return cooldown period
    */
   Time GetCooldownPeriod ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the minimum position change distance
+   * \return minimum position change distance value
    */
   double GetMinimumPositionChange ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the number of parameter sets
+   * \return number of parameter sets
    */
   uint32_t GetNumOfSets ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the initial elevation value
+   * \return initial elevation value
    */
   double GetInitialElevation ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the initial state
+   * \return initial state
    */
   uint32_t GetInitialState ();
 
 private:
 
   /**
-   *
+   * \brief Number of parameter sets
    */
   uint32_t m_elevationCount;
+
+  /**
+   * \brief Number of states
+   */
   uint32_t m_stateCount;
+
+  /**
+   * \brief Markov probabilities
+   */
   std::vector<std::vector<std::vector<double> > > m_markovProbabilities;
+
+  /**
+   * \brief Markov elevations
+   */
   std::map<double, uint32_t> m_markovElevations;
+
+  /**
+   * \brief Minimum position change in meters
+   */
   double m_minimumPositionChangeInMeters;
+
+  /**
+   * \brief Initial state
+   */
   uint32_t m_initialState;
+
+  /**
+   * \brief Initial elevation in degrees
+   */
   double m_initialElevation;
+
+  /**
+   * \brief Cooldown period lengthin seconds
+   */
   Time m_cooldownPeriodLength;
 };
 

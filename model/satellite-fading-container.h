@@ -40,99 +40,175 @@ class SatFadingContainer : public SatFading
 public:
 
   /**
-   *
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatFadingContainer ();
 
   /**
-   *
-   * \param markovConf
-   * \param looConf
-   * \param currentPosition
+   * \brief Constructor
+   * \param markovConf Markov configuration object
+   * \param looConf Loo configuration object
+   * \param currentPosition current position
    */
   SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition);
 
   /**
-   *
+   * \brief Destructor
    */
   ~SatFadingContainer ();
 
   /**
-   *
-   * \param channeltype
-   * \return
+   * \brief Function for getting the fading
+   * \param channeltype channel type
+   * \return fading value
    */
   double GetFading (SatChannel::ChannelType_t channeltype);
 
   /**
-   *
-   * \param newPosition
+   * \brief Function for setting the position
+   * \param newPosition new position
    */
   void SetPosition (GeoCoordinate newPosition);
 
   /**
-   *
-   * \param newElevation
+   * \brief Function for setting the elevation
+   * \param newElevation new elevation
    */
   void SetElevation (double newElevation);
 
   /**
-   *
+   * \brief Function for unlocking the parameter set and state
    */
   void UnlockSetAndState ();
 
   /**
-   *
-   * \param newSet
-   * \param newState
+   * \brief Function for locking the parameter set and state
+   * \param newSet new set
+   * \param newState new state
    */
   void LockToSetAndState (uint32_t newSet, uint32_t newState);
 
   /**
-   *
-   * \param newSet
+   * \brief Function for locking the parameter set
+   * \param newSet new set
    */
   void LockToSet (uint32_t newSet);
 
   /**
-   *
+   * \brief Function for locking the parameter set and state to random values
    */
   void LockToRandomSetAndState ();
 
 private:
 
   /**
-   * Variables
+   * \brief Markov model object
    */
   Ptr<SatMarkovModel> m_markovModel;
+
+  /**
+   * \brief Markoc model configuration
+   */
   Ptr<SatMarkovConf> m_markovConf;
+
+  /**
+   * \brief Loo configuration
+   */
   Ptr<SatLooConf> m_looConf;
+
+  /**
+   * \brief Uplink fader
+   */
   Ptr<SatFader> m_fader_up;
+
+  /**
+   * \brief Downlink fader
+   */
   Ptr<SatFader> m_fader_down;
+
+  /**
+   * \brief Number of states available
+   */
   uint32_t m_numOfStates;
+
+  /**
+   * \brief Number of parameter sets available
+   */
   uint32_t m_numOfSets;
+
+  /**
+   * \brief Current elevation value
+   */
   double m_currentElevation;
+
+  /**
+   * \brief Current parameter set
+   */
   uint32_t m_currentSet;
+
+  /**
+   * \brief Current state
+   */
   uint32_t m_currentState;
+
+  /**
+   * \brief Cooldown period length in time
+   */
   Time m_cooldownPeriodLength;
+
+  /**
+   * \brief Minimum state change distance in meters
+   */
   double m_minimumPositionChangeInMeters;
+
+  /**
+   * \brief Current position
+   */
   GeoCoordinate m_currentPosition;
+
+  /**
+   * \brief Latest position where calculations were done
+   */
   GeoCoordinate m_latestCalculationPosition;
+
+  /**
+   * \brief Latest calculated uplink fading value
+   */
   double m_latestCalculatedFadingValue_up;
+
+  /**
+   * \brief Latest calculated downlink fading value
+   */
   double m_latestCalculatedFadingValue_down;
+
+  /**
+   * \brief Latest calculation time for uplink fading value
+   */
   Time m_latestCalculationTime_up;
+
+  /**
+   * \brief Latest calculation time for downlink fading value
+   */
   Time m_latestCalculationTime_down;
+
+  /**
+   * \brief Variable for disabling the parameter set change
+   */
   bool m_enableSetLock;
+
+  /**
+   * \brief Variable for disabling state changes
+   */
   bool m_enableStateLock;
 
   /**
-   *
+   * \brief Fading trace function
    */
   TracedCallback< double,                     // time
                   SatChannel::ChannelType_t,  // channel type
@@ -141,46 +217,46 @@ private:
      m_fadingTrace;
 
   /**
-   *
-   * \param set
+   * \brief Function for updating the state change probabilities
+   * \param set parameter set
    */
   void UpdateProbabilities (uint32_t set);
 
   /**
-   *
+   * \brief Function for evaluating state change
    */
   void EvaluateStateChange ();
 
   /**
-   *
-   * \param channelType
-   * \return
+   * \brief Function for calculating the fadign value
+   * \param channelType channel type
+   * \return fading value
    */
   double CalculateFading (SatChannel::ChannelType_t channelType);
 
   /**
-   *
-   * \return
+   * \brief Function for calculating the elevation
+   * \return elevation value
    */
   double CalculateElevation ();
 
   /**
-   *
-   * \return
+   * \brief Function for checking the position change
+   * \return has position changed more that the defined parameter value
    */
   bool HasPositionChanged ();
 
   /**
-   *
-   * \param channelType
-   * \return
+   * \brief Function for checking whether the cooldown period has passed
+   * \param channelType channel type
+   * \return has cooldown period passed
    */
   bool HasCooldownPeriodPassed (SatChannel::ChannelType_t channelType);
 
   /**
-   *
-   * \param channelType
-   * \return
+   * \brief Function for getting the cached fadign values
+   * \param channelType channel type
+   * \return cached fading value
    */
   double GetCachedFadingValue (SatChannel::ChannelType_t channelType);
 };

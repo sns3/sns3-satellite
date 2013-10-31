@@ -31,31 +31,31 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief
+ * \brief Base class for fading
  */
 class SatFading : public Object
 {
 public:
   /**
-   *
+   * \brief Constructor
    */
   SatFading ();
 
   /**
-   *
+   * \brief Destructor
    */
   virtual ~SatFading ();
 
   /**
-   *
-   * \return
+   * \brief NS-3 type id function
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
-   * \param channelType
-   * \return
+   * \brief Function for getting the fading value
+   * \param channelType channel type
+   * \return fading value
    */
   virtual double GetFading (SatChannel::ChannelType_t channelType) = 0;
 

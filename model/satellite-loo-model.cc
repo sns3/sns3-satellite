@@ -78,7 +78,7 @@ SatLooModel::~SatLooModel ()
 }
 
 void
-SatLooModel::ConstructSlowFadingOscillators ()
+SatLooModel::ConstructDirectSignalOscillators ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -106,12 +106,12 @@ SatLooModel::ConstructSlowFadingOscillators ()
           /// 3. Construct oscillator:
           oscillators.push_back (CreateObject<SatFadingOscillator> ( amplitude, phi, omega));
         }
-      m_slowFadingOscillators.push_back (oscillators);
+      m_directSignalOscillators.push_back (oscillators);
     }
 }
 
 void
-SatLooModel::ConstructFastFadingOscillators ()
+SatLooModel::ConstructMultipathOscillators ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -137,7 +137,7 @@ SatLooModel::ConstructFastFadingOscillators ()
           /// 3. Construct oscillator:
           oscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
         }
-      m_fastFadingOscillators.push_back (oscillators);
+      m_multipathOscillators.push_back (oscillators);
     }
 }
 
@@ -157,14 +157,14 @@ SatLooModel::GetChannelGain ()
   NS_LOG_FUNCTION (this);
 
   /// Direct signal
-  std::complex<double> slowComplexGain = GetOscillatorCosineWaveSum (m_slowFadingOscillators[m_currentState]);
+  std::complex<double> directComplexGain = GetOscillatorCosineWaveSum (m_directSignalOscillators[m_currentState]);
 
   /// Multipath
-  std::complex<double> fastComplexGain = GetOscillatorComplexSum (m_fastFadingOscillators[m_currentState]);
-  fastComplexGain = fastComplexGain * m_sigma;
+  std::complex<double> multipathComplexGain = GetOscillatorComplexSum (m_multipathOscillators[m_currentState]);
+  multipathComplexGain = multipathComplexGain * m_sigma;
 
   /// Combining
-  std::complex<double> fadingGain = slowComplexGain + fastComplexGain;
+  std::complex<double> fadingGain = directComplexGain + multipathComplexGain;
   double fading = sqrt((pow (fadingGain.real (), 2) + pow (fadingGain.imag (), 2)));
 
   // === DIRECT SIGNAL TESTING BEGINS ===
@@ -243,11 +243,11 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
 
   ChangeState (newState);
 
-  m_slowFadingOscillators.clear();
-  m_fastFadingOscillators.clear();
+  m_directSignalOscillators.clear();
+  m_multipathOscillators.clear();
 
-  ConstructSlowFadingOscillators ();
-  ConstructFastFadingOscillators ();
+  ConstructDirectSignalOscillators ();
+  ConstructMultipathOscillators ();
 }
 
 void

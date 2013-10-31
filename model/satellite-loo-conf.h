@@ -37,42 +37,58 @@ class SatLooConf : public Object
 public:
 
   /**
-   *
+   * \brief Default elevation count
    */
   static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
+
+  /**
+   * \brief Default state count
+   */
   static const uint32_t DEFAULT_STATE_COUNT = 3;
+
+  /**
+   * \brief Default Loo parameter count
+   */
   static const uint32_t DEFAULT_LOO_PARAMETER_COUNT = 7;
 
   /**
-   *
+   * \brief NS-3 function for type id
    * \return
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatLooConf ();
 
   /**
-   *
+   * \brief Destructor
    */
   virtual ~SatLooConf () {}
 
   /**
-   *
-   * \param setId
-   * \return
+   * \brief Function for getting the Loo parameters
+   * \param set parameter set
+   * \return Loo parameter values
    */
   std::vector<std::vector<double> > GetLooParameters (uint32_t set);
 
 private:
 
   /**
-   *
+   * \brief Number of parameters sets
    */
   uint32_t m_elevationCount;
+
+  /**
+   * \brief Number of states
+   */
   uint32_t m_stateCount;
+
+  /**
+   * \brief Loo's model parameters
+   */
   std::vector<std::vector<std::vector<double> > > m_looParameters;
 };
 

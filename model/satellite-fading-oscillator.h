@@ -31,61 +31,78 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief
+ * \brief Oscillator class for faders
  */
 class SatFadingOscillator : public Object
 {
 public:
+
+  /**
+   * \brief NS-3 function for type id
+   * @return type id
+   */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatFadingOscillator ();
 
   /**
-   *
-   * \param amplitude
-   * \param initialPhase
-   * \param omega
+   * \brief Constructor
+   * \param amplitude amplitude
+   * \param initialPhase intial phase
+   * \param omega rotation speed
    */
   SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega);
 
   /**
-   *
-   * \param amplitude
-   * \param initialPhase
-   * \param omega
+   * \brief Constructor
+   * \param amplitude amplitude
+   * \param initialPhase initial phase
+   * \param omega rotation speed
    */
   SatFadingOscillator (double amplitude, double initialPhase, double omega);
 
   /**
-   *
+   * \brief Destructor
    */
   ~SatFadingOscillator ();
 
   /**
-   *
-   * \param t
-   * \return
+   * \brief Returns complex value at time t
+   * \param t time
+   * \return complex value
    */
   std::complex<double> GetComplexValueAt (Time t) const;
 
   /**
-   *
-   * \param t
-   * \return
+   * \brief Returns cosine wave complex value at time t
+   * \param t time
+   * \return complex value
    */
   std::complex<double> GetCosineWaveValueAt (Time t) const;
 
 private:
 
   /**
-   *
+   * \brief Complex amplitude
    */
   std::complex<double> m_complexAmplitude;
+
+  /**
+   * \brief Amplitude
+   */
   double m_amplitude;
+
+  /**
+   * \brief Initial phase
+   */
   double m_phase;
+
+  /**
+   * \brief Rotation speed
+   */
   double m_omega;
 
 };

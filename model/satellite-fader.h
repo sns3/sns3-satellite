@@ -30,43 +30,43 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief
+ * \brief Base class for Markov model faders
  */
 class SatFader : public Object
 {
 public:
   /**
-   *
+   * \brief Constructor
    */
   SatFader ();
 
   /**
-   *
+   * \brief Destructor
    */
   virtual ~SatFader ();
 
   /**
-   *
-   * \return
+   * \brief NS-3 type id function
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
-   * \return
+   * \brief Returns channel gain in dB
+   * \return channel gain in dB
    */
   virtual double GetChannelGainDb (void) = 0;
 
   /**
-   *
-   * \return
+   * \brief Returns channel gain
+   * \return channel gain
    */
   virtual double GetChannelGain (void) = 0;
 
   /**
-   *
-   * \param newSet
-   * \param newState
+   * \brief Function for updating the fader angle set and state
+   * \param newSet new angle set
+   * \param newState new state
    */
   virtual void UpdateParameters (uint32_t newSet, uint32_t newState) = 0;
 

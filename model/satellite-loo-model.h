@@ -36,109 +36,144 @@ namespace ns3 {
 class SatLooModel : public SatFader
 {
 public:
+
+  /**
+   * \brief Value for PI
+   */
   static const double PI;
 
   /**
-   *
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
+   * \brief Constructor
    */
   SatLooModel ();
 
   /**
-   *
-   * \param looConf
-   * \param numOfStates
-   * \param initialSet
-   * \param initialState
+   * \brief Constructor
+   * \param looConf Loo's model configuration
+   * \param numOfStates number of states
+   * \param initialSet initial parameter set
+   * \param initialState initial state
    */
   SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState);
 
   /**
-   *
+   * \brief Destructor
    */
   ~SatLooModel ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the channel gain in dB
+   * \return channel gain in dB
    */
   double GetChannelGainDb ();
 
   /**
-   *
-   * \return
+   * \brief Function for returning the channel gain
+   * \return channel gain
    */
   double GetChannelGain ();
 
   /**
-   *
-   * \param set
-   * \param state
+   * \brief Function for updating the parameter set and state
+   * \param set parameter set
+   * \param state state
    */
   void UpdateParameters (uint32_t set, uint32_t state);
 
 private:
-  uint32_t m_numOfStates;              // number of Markov states
-  uint32_t m_currentSet;               // current set
-  uint32_t m_currentState;             // current state
-  double m_sigma;                      // multipath power converted to linear units
 
+  /**
+   * \brief Number of states
+   */
+  uint32_t m_numOfStates;
+
+  /**
+   * \brief Current parameter set
+   */
+  uint32_t m_currentSet;
+
+  /**
+   * \brief Current state
+   */
+  uint32_t m_currentState;
+
+  /**
+   * \brief Multipath power converted to linear units
+   */
+  double m_sigma;
+
+  /**
+   * \brief Loo's model configuration object
+   */
   Ptr<SatLooConf> m_looConf;
+
+  /**
+   * \brief Loo's model parameters
+   */
   std::vector<std::vector<double> > m_looParameters;
 
   /**
-   *
+   * \brief Normal distribution random variable
    */
   Ptr<NormalRandomVariable> m_normalRandomVariable;
+
+  /**
+   * \brief Uniform distribution random variable
+   */
   Ptr<UniformRandomVariable> m_uniformVariable;
 
   /**
-   *
+   * \brief Direct signal oscillators
    */
-  std::vector< std::vector< Ptr<SatFadingOscillator> > > m_slowFadingOscillators;
-  std::vector< std::vector< Ptr<SatFadingOscillator> > > m_fastFadingOscillators;
+  std::vector< std::vector< Ptr<SatFadingOscillator> > > m_directSignalOscillators;
 
   /**
-   *
+   * \brief Multipath oscillators
    */
-  void ConstructSlowFadingOscillators ();
+  std::vector< std::vector< Ptr<SatFadingOscillator> > > m_multipathOscillators;
 
   /**
-   *
+   * \brief Function for constructing direct signal oscillators
    */
-  void ConstructFastFadingOscillators ();
+  void ConstructDirectSignalOscillators ();
 
   /**
-   *
+   * \brief Function for constructing multipath oscillators
+   */
+  void ConstructMultipathOscillators ();
+
+  /**
+   * \brief Function for calculating cosine wave oscillator complex sum
    * \param oscillator
    * \return
    */
   std::complex<double> GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
 
   /**
-   *
+   * \brief Function for calculating oscillator complex sum
    * \param oscillator
    * \return
    */
   std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
 
   /**
-   *
-   * \param state
+   * \brief Function for setting the state
+   * \param newState new state
    */
-  void ChangeState (uint32_t state);
+  void ChangeState (uint32_t newState);
 
   /**
-   *
-   * \param set
-   * \param state
+   * \brief Function for setting the parameter set and state
+   * \param newSet new set
+   * \param newState new state
    */
-  void ChangeSet (uint32_t set, uint32_t state);
+  void ChangeSet (uint32_t newSet, uint32_t newState);
 };
 
 } // namespace ns3
