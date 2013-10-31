@@ -39,6 +39,8 @@ SatFadingOscillator::SatFadingOscillator () :
   m_phase (0),
   m_omega (0)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT(0);
 }
 
@@ -47,30 +49,39 @@ SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double
   m_amplitude (0),
   m_phase (initialPhase),
   m_omega (omega)
-{}
+{
+  NS_LOG_FUNCTION (this << amplitude << " " << initialPhase << " " << omega);
+}
 
 SatFadingOscillator::SatFadingOscillator (double amplitude, double initialPhase, double omega) :
   m_complexAmplitude (0,0),
   m_amplitude (amplitude),
   m_phase (initialPhase),
   m_omega (omega)
-{}
+{
+  NS_LOG_FUNCTION (this << amplitude << " " << initialPhase << " " << omega);
+}
 
 std::complex<double>
 SatFadingOscillator::GetComplexValueAt (Time at) const
 {
+  NS_LOG_FUNCTION (this << at);
+
   return (m_complexAmplitude * std::cos (at.GetSeconds () * m_omega + m_phase));
 }
 
 std::complex<double>
 SatFadingOscillator::GetCosineWaveValueAt (Time at) const
 {
+  NS_LOG_FUNCTION (this << at);
+
   std::complex<double> complexPhase = ( std::cos (at.GetSeconds () * m_omega + m_phase), std::sin (at.GetSeconds () * m_omega + m_phase) );
   return ( m_amplitude * std::exp(complexPhase));
 }
 
 SatFadingOscillator::~SatFadingOscillator ()
 {
+  NS_LOG_FUNCTION (this);
 }
 
 } // namespace ns3

@@ -64,8 +64,10 @@ SatMarkovConf::SatMarkovConf () :
     m_minimumPositionChangeInMeters (20.0),
     m_initialState (0),
     m_initialElevation (45),
-    m_cooldownPeriodLength (Seconds (0.0005))
+    m_cooldownPeriodLength (Seconds (0.00005))
 {
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -106,6 +108,8 @@ SatMarkovConf::SatMarkovConf () :
 std::vector<std::vector<double> >
 SatMarkovConf::GetElevationProbabilities (uint32_t set)
 {
+  NS_LOG_FUNCTION (this << set);
+
   NS_ASSERT( (set >= 0) && (set < m_elevationCount));
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << set);
   return m_markovProbabilities[set];
@@ -114,6 +118,8 @@ SatMarkovConf::GetElevationProbabilities (uint32_t set)
 uint32_t
 SatMarkovConf::GetProbabilitySetID (double elevation)
 {
+  NS_LOG_FUNCTION (this << elevation);
+
   NS_ASSERT( (elevation >= 0.0) && (elevation <= 90.0));
 
   uint32_t smallestDifferenceIndex = 0;
@@ -139,38 +145,49 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
 uint32_t
 SatMarkovConf::GetStateCount ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_stateCount;
 }
 
 Time
 SatMarkovConf::GetCooldownPeriod ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_cooldownPeriodLength;
 }
 
 double
 SatMarkovConf::GetMinimumPositionChange ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_minimumPositionChangeInMeters;
 }
 
 uint32_t
 SatMarkovConf::GetNumOfSets ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_markovElevations.size();
 }
 
 uint32_t
 SatMarkovConf::GetInitialState ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_initialState;
 }
 
 double
 SatMarkovConf::GetInitialElevation ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_initialElevation;
 }
 
 } // namespace ns3
-

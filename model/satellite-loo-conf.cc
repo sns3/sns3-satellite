@@ -62,6 +62,8 @@ SatLooConf::SatLooConf () :
     m_elevationCount (SatLooConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatLooConf::DEFAULT_STATE_COUNT)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatLooConf - Creating SatLooConf...");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
@@ -85,6 +87,8 @@ SatLooConf::SatLooConf () :
 std::vector<std::vector<double> >
 SatLooConf::GetLooParameters (uint32_t set)
 {
+  NS_LOG_FUNCTION (this << set);
+
   NS_ASSERT( (set >= 0) && (set < m_elevationCount));
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatLooConf - Getting Loo parameters for set ID " << set);
   return m_looParameters[set];
