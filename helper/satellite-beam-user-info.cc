@@ -28,11 +28,13 @@ namespace ns3 {
 
 SatBeamUserInfo::SatBeamUserInfo()
 {
-
+  NS_LOG_FUNCTION (this);
 }
 
 SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt)
 {
+  NS_LOG_FUNCTION (this << utCount << userCountPerUt);
+
   NS_ASSERT (utCount > 0);
   NS_ASSERT (userCountPerUt > 0);
 
@@ -45,12 +47,16 @@ SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt)
 uint32_t
 SatBeamUserInfo::GetUtCount ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_userCount.size();
 }
 
 uint32_t
 SatBeamUserInfo::GetUtUserCount (uint32_t utIndex)
 {
+  NS_LOG_FUNCTION (this << utIndex);
+
   NS_ASSERT(utIndex < m_userCount.size());
 
   return m_userCount[utIndex];
@@ -58,6 +64,8 @@ SatBeamUserInfo::GetUtUserCount (uint32_t utIndex)
 
 void SatBeamUserInfo::SetUtUserCount (uint32_t utIndex, uint32_t userCount)
 {
+  NS_LOG_FUNCTION (this << utIndex << userCount);
+
   NS_ASSERT (utIndex < m_userCount.size ());
 
   m_userCount[utIndex] = userCount;
@@ -65,6 +73,8 @@ void SatBeamUserInfo::SetUtUserCount (uint32_t utIndex, uint32_t userCount)
 
 void SatBeamUserInfo::AppendUt (uint32_t userCount)
 {
+  NS_LOG_FUNCTION (this << userCount);
+
   NS_ASSERT (userCount > 0);
 
   m_userCount.push_back (userCount);

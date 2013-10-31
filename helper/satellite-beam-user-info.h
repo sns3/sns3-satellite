@@ -26,19 +26,27 @@
 namespace ns3 {
 
 /**
- * @brief Information of beam users liken UTs and their users.
- * Used e.g. when creating beams.
+ * @brief Class that holds information for each beam regarding UTs and their users camped in each beam.
+ *
+ * Default constructor enables creating an empty information structure.
+ * The developer needs to Append individual UTs with individual number of users in each UT by
+ * calling the method @AppendUt.
+ *
+ * The second constructor allows creating a group of UT information
+ * structures with each UT having the same number of users.
  *
  */
 class SatBeamUserInfo
 {
 public:
   /**
-   * Default constructor for SatBeamUserInfo. Should not be used.
+   * Default constructor for SatBeamUserInfo enables creating an empty information structure.
    */
   SatBeamUserInfo ();
+
   /**
-   * Constructor for SatBeamUserInfo.
+   * Constructor for SatBeamUserInfo which allows creating a group of UT information
+   * structures with each UT having the same number of users.
    *
    * @param utCount UT count of the beam (can be added later by method AddUt)
    * @param userCountPerUt User count of the UTs (can be changed for the specific UT by method SetUtUserCount)
