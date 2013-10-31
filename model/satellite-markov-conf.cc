@@ -50,11 +50,35 @@ static const double g_MarkovElevationStateChangeProbabilities[SatMarkovConf::DEF
     };
 
 TypeId
-SatMarkovConf::GetTypeId (void)
+SatMarkovConf::GetTypeId (void) //TODO: add attribute for m_markovElevations and m_markovProbabilities
 {
   static TypeId tid = TypeId ("ns3::SatMarkovConf")
       .SetParent<Object> ()
-      .AddConstructor<SatMarkovConf> ();
+      .AddConstructor<SatMarkovConf> ()
+      .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
+                     UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+                     MakeUintegerAccessor (&SatMarkovConf::m_elevationCount),
+                     MakeUintegerChecker<uint32_t> ())
+      .AddAttribute ("StateCount", "Number of states in the Markov model.",
+                     UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
+                     MakeUintegerAccessor (&SatMarkovConf::m_stateCount),
+                     MakeUintegerChecker<uint32_t> ())
+      .AddAttribute( "MinimumPositionChangeInMeters", "Minimum position change in meters for Markov model state change cooldown.",
+                     DoubleValue (20.0),
+                     MakeDoubleAccessor(&SatMarkovConf::m_minimumPositionChangeInMeters),
+                     MakeDoubleChecker<double>())
+      .AddAttribute ("InitialState", "The initial state of the Markov model.",
+                     UintegerValue (0),
+                     MakeUintegerAccessor (&SatMarkovConf::m_initialState),
+                     MakeUintegerChecker<uint32_t> ())
+      .AddAttribute( "InitialElevation", "Initial elevation value.",
+                     DoubleValue (45),
+                     MakeDoubleAccessor(&SatMarkovConf::m_initialElevation),
+                     MakeDoubleChecker<double>())
+      .AddAttribute( "CooldownPeriodLength", "Cooldown period length for state change.",
+                     TimeValue (Seconds (0.00005)),
+                     MakeTimeAccessor(&SatMarkovConf::m_cooldownPeriodLength),
+                     MakeTimeChecker());
   return tid;
 }
 
