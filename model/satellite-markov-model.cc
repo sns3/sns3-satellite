@@ -40,6 +40,8 @@ SatMarkovModel::SatMarkovModel () :
     m_numOfStates (3),
     m_currentState (0)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT(0);
 }
 
@@ -48,6 +50,8 @@ SatMarkovModel::SatMarkovModel (uint32_t numOfStates) :
     m_numOfStates (numOfStates),
     m_currentState (0)
 {
+  NS_LOG_FUNCTION (this << numOfStates);
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovModel - Creating Markov model for " << numOfStates << " states, initial state: " << m_currentState);
 
   for (uint32_t i = 0; i < m_numOfStates; ++i)
@@ -61,22 +65,30 @@ SatMarkovModel::SatMarkovModel (uint32_t numOfStates) :
 
 SatMarkovModel::~SatMarkovModel ()
 {
+  NS_LOG_FUNCTION (this);
+
   delete[] m_probabilities;
 }
 
 uint32_t SatMarkovModel::GetState () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_currentState;
 }
 
 void SatMarkovModel::SetState (uint32_t newState)
 {
+  NS_LOG_FUNCTION (this << newState);
+
   NS_ASSERT((newState >= 0 ) && (newState < m_numOfStates));
   m_currentState = newState;
 }
 
 uint32_t SatMarkovModel::DoTransition ()
 {
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovModel - Doing transition, current state: " << m_currentState);
 
   double total = 0;
@@ -114,6 +126,8 @@ void SatMarkovModel::SetProbability (uint32_t from,
                                      uint32_t to,
                                      double probability)
 {
+  NS_LOG_FUNCTION (this << from << " " << to << " " << probability);
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovModel - Setting probability, from: " << from << " to: " << to << " probability: " << probability);
   m_probabilities[from * m_numOfStates + to] = probability;
 }

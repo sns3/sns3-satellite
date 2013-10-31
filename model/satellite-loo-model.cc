@@ -46,6 +46,8 @@ SatLooModel::SatLooModel () :
   m_normalRandomVariable (NULL),
   m_uniformVariable (NULL)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT(0);
 }
 
@@ -58,6 +60,8 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
   m_normalRandomVariable (NULL),
   m_uniformVariable (NULL)
 {
+  NS_LOG_FUNCTION (this << numOfStates << " " << initialSet << " " << initialState);
+
   /// initialize random number generators
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
@@ -70,11 +74,14 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
 
 SatLooModel::~SatLooModel ()
 {
+  NS_LOG_FUNCTION (this);
 }
 
 void
 SatLooModel::ConstructSlowFadingOscillators ()
 {
+  NS_LOG_FUNCTION (this);
+
   for (uint32_t i = 0; i < m_numOfStates; i++)
     {
       std::vector< Ptr<SatFadingOscillator> > oscillators;
@@ -106,6 +113,8 @@ SatLooModel::ConstructSlowFadingOscillators ()
 void
 SatLooModel::ConstructFastFadingOscillators ()
 {
+  NS_LOG_FUNCTION (this);
+
   for (uint32_t i = 0; i < m_numOfStates; i++)
     {
       std::vector< Ptr<SatFadingOscillator> > oscillators;
@@ -135,6 +144,8 @@ SatLooModel::ConstructFastFadingOscillators ()
 double
 SatLooModel::GetChannelGainDb ()
 {
+  NS_LOG_FUNCTION (this);
+
   double tempChannelGainDb = 20.0 * std::log10 (GetChannelGain ());
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
   return tempChannelGainDb;
@@ -143,6 +154,8 @@ SatLooModel::GetChannelGainDb ()
 double
 SatLooModel::GetChannelGain ()
 {
+  NS_LOG_FUNCTION (this);
+
   /// Direct signal
   std::complex<double> slowComplexGain = GetOscillatorCosineWaveSum (m_slowFadingOscillators[m_currentState]);
 
@@ -176,6 +189,8 @@ SatLooModel::GetChannelGain ()
 std::complex<double>
 SatLooModel::GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator)
 {
+  NS_LOG_FUNCTION (this);
+
   std::complex<double> complexSum = std::complex<double> (0, 0);
 
   for (uint32_t i = 0; i < oscillator.size (); i++)
@@ -189,6 +204,8 @@ SatLooModel::GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> >
 std::complex<double>
 SatLooModel::GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator)
 {
+  NS_LOG_FUNCTION (this);
+
   std::complex<double> complexSum = std::complex<double> (0, 0);
 
   for (uint32_t i = 0; i < oscillator.size (); i++)
@@ -202,6 +219,8 @@ SatLooModel::GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > os
 void
 SatLooModel::UpdateParameters (uint32_t newSet, uint32_t newState)
 {
+  NS_LOG_FUNCTION (this << newSet << " " << newState);
+
   if (m_currentSet != newSet)
     {
       ChangeSet (newSet, newState);
@@ -216,6 +235,8 @@ SatLooModel::UpdateParameters (uint32_t newSet, uint32_t newState)
 void
 SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
 {
+  NS_LOG_FUNCTION (this << newSet << " " << newState);
+
   m_looParameters.clear();
   m_looParameters = m_looConf->GetLooParameters (newSet);
   m_currentSet = newSet;
@@ -232,6 +253,8 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
 void
 SatLooModel::ChangeState (uint32_t newState)
 {
+  NS_LOG_FUNCTION (this << newState);
+
   m_sigma = sqrt(0.5 * pow(10,(m_looParameters[newState][2] / 10)));
   m_currentState = newState;
 }

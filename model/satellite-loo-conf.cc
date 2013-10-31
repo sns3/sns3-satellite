@@ -50,11 +50,19 @@ static const double g_LooParameters[SatLooConf::DEFAULT_ELEVATION_COUNT][SatLooC
     };
 
 TypeId
-SatLooConf::GetTypeId (void)
+SatLooConf::GetTypeId (void) //TODO: add attribute m_looParameters
 {
   static TypeId tid = TypeId ("ns3::SatLooConf")
       .SetParent<Object> ()
-      .AddConstructor<SatLooConf> ();
+      .AddConstructor<SatLooConf> ()
+      .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
+                     UintegerValue (SatLooConf::DEFAULT_ELEVATION_COUNT),
+                     MakeUintegerAccessor (&SatLooConf::m_elevationCount),
+                     MakeUintegerChecker<uint32_t> ())
+      .AddAttribute ("StateCount", "Number of states in the Markov model.",
+                     UintegerValue (SatLooConf::DEFAULT_STATE_COUNT),
+                     MakeUintegerAccessor (&SatLooConf::m_stateCount),
+                     MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
@@ -62,6 +70,8 @@ SatLooConf::SatLooConf () :
     m_elevationCount (SatLooConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatLooConf::DEFAULT_STATE_COUNT)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatLooConf - Creating SatLooConf...");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
@@ -85,6 +95,8 @@ SatLooConf::SatLooConf () :
 std::vector<std::vector<double> >
 SatLooConf::GetLooParameters (uint32_t set)
 {
+  NS_LOG_FUNCTION (this << set);
+
   NS_ASSERT( (set >= 0) && (set < m_elevationCount));
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatLooConf - Getting Loo parameters for set ID " << set);
   return m_looParameters[set];

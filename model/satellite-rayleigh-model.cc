@@ -39,6 +39,8 @@ SatRayleighModel::SatRayleighModel () :
   m_omegaDopplerMax (0),
   m_nOscillators (0)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT(0);
 }
 
@@ -46,6 +48,8 @@ SatRayleighModel::SatRayleighModel (double dopplerFrequencyHz, uint32_t numOfOsc
   m_omegaDopplerMax (2.0 * dopplerFrequencyHz * SatRayleighModel::PI),
   m_nOscillators (numOfOscillators)
 {
+  NS_LOG_FUNCTION (this << dopplerFrequencyHz << " " << numOfOscillators);
+
   NS_ASSERT (m_nOscillators != 0);
   NS_ASSERT (m_omegaDopplerMax != 0);
 
@@ -58,6 +62,8 @@ SatRayleighModel::SatRayleighModel (double dopplerFrequencyHz, uint32_t numOfOsc
 
 SatRayleighModel::~SatRayleighModel()
 {
+  NS_LOG_FUNCTION (this);
+
   m_oscillators.clear ();
   m_uniformVariable = 0;
 }
@@ -65,6 +71,8 @@ SatRayleighModel::~SatRayleighModel()
 void
 SatRayleighModel::ConstructOscillators ()
 {
+  NS_LOG_FUNCTION (this);
+
   ///Initial phase is common for all oscillators:
   double phi = m_uniformVariable->GetValue ();
   /// Theta is common for all oscillators:
@@ -88,6 +96,8 @@ SatRayleighModel::ConstructOscillators ()
 std::complex<double>
 SatRayleighModel::GetComplexGain () const
 {
+  NS_LOG_FUNCTION (this);
+
   std::complex<double> sumAmplitude = std::complex<double> (0, 0);
   for (uint32_t i = 0; i < m_oscillators.size (); i++)
     {
@@ -99,6 +109,8 @@ SatRayleighModel::GetComplexGain () const
 double
 SatRayleighModel::GetChannelGainDb () const
 {
+  NS_LOG_FUNCTION (this);
+
   std::complex<double> complexGain = GetComplexGain ();
   double tempChannelGainDb = (10 * std::log10 ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2));
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
@@ -108,6 +120,8 @@ SatRayleighModel::GetChannelGainDb () const
 double
 SatRayleighModel::GetChannelGain () const
 {
+  NS_LOG_FUNCTION (this);
+
   std::complex<double> complexGain = GetComplexGain ();
 
   double tempChannelGain = ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2);
