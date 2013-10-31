@@ -53,6 +53,7 @@ def build(bld):
         'model/satellite-loo-model.cc',
         'model/satellite-rayleigh-model.cc',
         'model/satellite-fading-oscillator.cc',
+        'model/satellite-mobility-observer.cc',
         'helper/satellite-helper.cc',
         'helper/satellite-beam-helper.cc',
         'helper/satellite-user-helper.cc',
@@ -80,6 +81,7 @@ def build(bld):
         'test/satellite-interference-test.cc',
         'test/satellite-fsl-test.cc',
         'test/satellite-antenna-pattern-test.cc',
+        'test/satellite-mobility-observer-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -130,6 +132,7 @@ def build(bld):
         'model/satellite-loo-model.h',
         'model/satellite-rayleigh-model.h',
         'model/satellite-fading-oscillator.h',
+        'model/satellite-mobility-observer.h',
         'helper/satellite-helper.h',
         'helper/satellite-beam-helper.h',
 		'helper/satellite-user-helper.h',
