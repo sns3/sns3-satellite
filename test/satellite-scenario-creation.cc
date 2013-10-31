@@ -273,7 +273,7 @@ ScenarioCreationUser::DoRun (void)
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[8] = beamInfo;
   beamMap[3] = beamInfo;
-  beamInfo.AddUt(2);
+  beamInfo.AppendUt(2);
   beamMap[2] = beamInfo;
   helper->SetBeamUserInfo(beamMap);
 

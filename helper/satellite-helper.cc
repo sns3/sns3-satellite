@@ -243,7 +243,7 @@ SatHelper::CreateLargerScenario()
 
   // install two users for UT1 and one for UT2 in beam 3
   beamInfo.SetUtUserCount(0,2);
-  beamInfo.AddUt(1);
+  beamInfo.AppendUt(1);
 
   beamMap[3] = beamInfo;
 

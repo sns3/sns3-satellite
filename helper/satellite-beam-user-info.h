@@ -73,11 +73,11 @@ public:
   void SetUtUserCount (uint32_t utIndex, uint32_t userCount);
 
   /**
-   * Adds new UT to end of the list with given user count for the added UT.
+   * Appends new UT to end of the list with given user count for the appended UT.
    *
-   * @param userCountPerUt Number of users under the added UT. Minimum value is 1.
+   * @param userCount Number of users under the appended UT. Minimum value is 1.
    */
-  void AddUt (uint32_t userCountPerUt);
+  void AppendUt (uint32_t userCount);
 
 private:
   // vector to store users per UT
