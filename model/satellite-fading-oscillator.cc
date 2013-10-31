@@ -27,11 +27,12 @@ NS_LOG_COMPONENT_DEFINE ("SatFadingOscillator");
 
 TypeId SatFadingOscillator::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatFadingOscillator").SetParent<Object> ().AddConstructor<SatFadingOscillator> ();
+  static TypeId tid = TypeId ("ns3::SatFadingOscillator")
+      .SetParent<Object> ()
+      .AddConstructor<SatFadingOscillator> ();
   return tid;
 }
 
-//// Default constructor
 SatFadingOscillator::SatFadingOscillator () :
   m_complexAmplitude (0,0),
   m_amplitude (0),
@@ -41,7 +42,6 @@ SatFadingOscillator::SatFadingOscillator () :
   NS_ASSERT(0);
 }
 
-/// Represents a single oscillator
 SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega) :
   m_complexAmplitude (amplitude),
   m_amplitude (0),

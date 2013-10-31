@@ -36,12 +36,31 @@ namespace ns3 {
 class SatFading : public Object
 {
 public:
+  /**
+   *
+   */
   SatFading ();
+
+  /**
+   *
+   */
   virtual ~SatFading ();
+
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
-  virtual double GetFading (SatChannel::ChannelType_t channeltype) = 0;
+
+  /**
+   *
+   * \param channelType
+   * \return
+   */
+  virtual double GetFading (SatChannel::ChannelType_t channelType) = 0;
 
 private:
+
 };
 
 } // namespace ns3

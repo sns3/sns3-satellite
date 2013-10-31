@@ -52,7 +52,9 @@ static const double g_LooParameters[SatLooConf::DEFAULT_ELEVATION_COUNT][SatLooC
 TypeId
 SatLooConf::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatLooConf").SetParent<Object> ().AddConstructor<SatLooConf> ();
+  static TypeId tid = TypeId ("ns3::SatLooConf")
+      .SetParent<Object> ()
+      .AddConstructor<SatLooConf> ();
   return tid;
 }
 
@@ -81,11 +83,11 @@ SatLooConf::SatLooConf () :
 }
 
 std::vector<std::vector<double> >
-SatLooConf::GetLooParameters (uint32_t setId)
+SatLooConf::GetLooParameters (uint32_t set)
 {
-  NS_ASSERT( (setId >= 0) && (setId < m_elevationCount));
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatLooConf - Getting Loo parameters for set ID " << setId);
-  return m_looParameters[setId];
+  NS_ASSERT( (set >= 0) && (set < m_elevationCount));
+  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatLooConf - Getting Loo parameters for set ID " << set);
+  return m_looParameters[set];
 }
 
 } // namespace ns3

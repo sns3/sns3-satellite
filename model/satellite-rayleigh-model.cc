@@ -65,9 +65,9 @@ SatRayleighModel::~SatRayleighModel()
 void
 SatRayleighModel::ConstructOscillators ()
 {
-  // Initial phase is common for all oscillators:
+  ///Initial phase is common for all oscillators:
   double phi = m_uniformVariable->GetValue ();
-  // Theta is common for all oscillators:
+  /// Theta is common for all oscillators:
   double theta = m_uniformVariable->GetValue ();
   for (uint32_t i = 0; i < m_nOscillators; i++)
     {

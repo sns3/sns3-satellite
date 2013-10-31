@@ -58,13 +58,13 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
   m_normalRandomVariable (NULL),
   m_uniformVariable (NULL)
 {
-  // initialize random number generators
+  /// initialize random number generators
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
   m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
   m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
 
-  // initialize parameters for this set and state, construct oscillators
+  /// initialize parameters for this set and state, construct oscillators
   ChangeSet (m_currentSet, m_currentState);
 }
 
@@ -79,9 +79,9 @@ SatLooModel::ConstructSlowFadingOscillators ()
     {
       std::vector< Ptr<SatFadingOscillator> > oscillators;
 
-      // Initial phase is common for all oscillators:
+      /// Initial phase is common for all oscillators:
       double phi = m_uniformVariable->GetValue ();
-      // Theta is common for all oscillators:
+      /// Theta is common for all oscillators:
       double theta = m_uniformVariable->GetValue ();
       for (uint32_t j = 0; j < m_looParameters[i][4]; j++)
         {
@@ -110,9 +110,9 @@ SatLooModel::ConstructFastFadingOscillators ()
     {
       std::vector< Ptr<SatFadingOscillator> > oscillators;
 
-      // Initial phase is common for all oscillators:
+      /// Initial phase is common for all oscillators:
       double phi = m_uniformVariable->GetValue ();
-      // Theta is common for all oscillators:
+      /// Theta is common for all oscillators:
       double theta = m_uniformVariable->GetValue ();
       for (uint32_t j = 0; j < m_looParameters[i][3]; j++)
         {
@@ -143,14 +143,14 @@ SatLooModel::GetChannelGainDb ()
 double
 SatLooModel::GetChannelGain ()
 {
-  // Direct signal
+  /// Direct signal
   std::complex<double> slowComplexGain = GetOscillatorCosineWaveSum (m_slowFadingOscillators[m_currentState]);
 
-  // Multipath
+  /// Multipath
   std::complex<double> fastComplexGain = GetOscillatorComplexSum (m_fastFadingOscillators[m_currentState]);
   fastComplexGain = fastComplexGain * m_sigma;
 
-  // Combining
+  /// Combining
   std::complex<double> fadingGain = slowComplexGain + fastComplexGain;
   double fading = sqrt((pow (fadingGain.real (), 2) + pow (fadingGain.imag (), 2)));
 

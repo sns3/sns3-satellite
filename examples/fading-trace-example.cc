@@ -26,18 +26,19 @@ int
 main (int argc, char *argv[])
 {
 
-  // create default Markov configuration
+  /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
   Ptr<SatLooConf> looConf = CreateObject<SatLooConf>();
 
+  /// set position
   GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
 
-  // create fading container based on default configuration
+  /// create fading container based on default configuration
   Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,looConf,currentPosition);
 
   markovContainer->TraceConnect("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 
-  // Run Markov chain
+  /// run simulation
   for (uint32_t i = 0; i < 100000; i++)
     {
       Simulator::Schedule( MilliSeconds(1 * i), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);

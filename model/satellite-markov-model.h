@@ -33,39 +33,64 @@ namespace ns3 {
 class SatMarkovModel : public Object
 {
 public:
+
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   */
   SatMarkovModel ();
 
-  /** Create a new Markov process with nstates states. */
+  /**
+   *
+   * \param numOfStates
+   */
   SatMarkovModel (uint32_t numOfStates);
 
-  /** Destroy the Markov process. */
+  /**
+   *
+   */
   ~SatMarkovModel ();
 
-  /** Set the probability of transition from one state to another. */
+  /**
+   *
+   * \param from
+   * \param to
+   * \param probability
+   */
   void SetProbability (uint32_t from,
                        uint32_t to,
-                       double prob);
+                       double probability);
 
-  /** Go to next (nondeterministic) state. */
+  /**
+   *
+   * \return
+   */
   uint32_t DoTransition ();
 
-  /** Get the current state. */
+  /**
+   *
+   * \return
+   */
   uint32_t GetState () const;
 
-  /** Set the current state. */
+  /**
+   *
+   * \param newState
+   */
   void SetState (uint32_t newState);
 
 private:
 
-  /** Probability matrix. */
+  /**
+   *
+   */
   double* m_probabilities;
-
-  /** Number of states. */
   uint32_t m_numOfStates;
-
-  /** Current state. */
   uint32_t m_currentState;
 
 };

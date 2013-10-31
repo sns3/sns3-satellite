@@ -104,11 +104,11 @@ SatMarkovConf::SatMarkovConf () :
 }
 
 std::vector<std::vector<double> >
-SatMarkovConf::GetElevationProbabilities (uint32_t setId)
+SatMarkovConf::GetElevationProbabilities (uint32_t set)
 {
-  NS_ASSERT( (setId >= 0) && (setId < m_elevationCount));
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << setId);
-  return m_markovProbabilities[setId];
+  NS_ASSERT( (set >= 0) && (set < m_elevationCount));
+  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << set);
+  return m_markovProbabilities[set];
 }
 
 uint32_t
@@ -117,7 +117,7 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
   NS_ASSERT( (elevation >= 0.0) && (elevation <= 90.0));
 
   uint32_t smallestDifferenceIndex = 0;
-  double smallestDifference = 360; // elevation angle can never be this large
+  double smallestDifference = 360; /// elevation angle can never be this large
   double difference = 0;
 
   std::map<double, uint32_t>::iterator iter;

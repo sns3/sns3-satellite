@@ -29,17 +29,7 @@ TypeId
 SatFader::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFader")
-    .SetParent<Object> ()
-    .AddAttribute ("Set Id", "The set id of this fader.",
-                   TypeId::ATTR_GET,
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&SatFader::m_setId),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("State Id", "The state id of this fader.",
-                   TypeId::ATTR_GET,
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&SatFader::m_stateId),
-                   MakeUintegerChecker<uint32_t> ());
+    .SetParent<Object> ();
   return tid;
 }
 

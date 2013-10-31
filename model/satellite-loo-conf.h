@@ -35,18 +35,42 @@ namespace ns3 {
 class SatLooConf : public Object
 {
 public:
+
+  /**
+   *
+   */
   static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
   static const uint32_t DEFAULT_STATE_COUNT = 3;
   static const uint32_t DEFAULT_LOO_PARAMETER_COUNT = 7;
 
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   *
+   */
   SatLooConf ();
-  virtual ~SatLooConf ()
-  {
-  }
-  std::vector<std::vector<double> > GetLooParameters (uint32_t setId);
+
+  /**
+   *
+   */
+  virtual ~SatLooConf () {}
+
+  /**
+   *
+   * \param setId
+   * \return
+   */
+  std::vector<std::vector<double> > GetLooParameters (uint32_t set);
 
 private:
+
+  /**
+   *
+   */
   uint32_t m_elevationCount;
   uint32_t m_stateCount;
   std::vector<std::vector<std::vector<double> > > m_looParameters;

@@ -35,16 +35,43 @@ namespace ns3 {
 class SatFader : public Object
 {
 public:
+  /**
+   *
+   */
   SatFader ();
+
+  /**
+   *
+   */
   virtual ~SatFader ();
+
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   *
+   * \return
+   */
   virtual double GetChannelGainDb (void) = 0;
+
+  /**
+   *
+   * \return
+   */
   virtual double GetChannelGain (void) = 0;
-  virtual void UpdateParameters (uint32_t set, uint32_t state) = 0;
+
+  /**
+   *
+   * \param newSet
+   * \param newState
+   */
+  virtual void UpdateParameters (uint32_t newSet, uint32_t newState) = 0;
 
 private:
-  uint32_t m_setId;   // Set id for this fader
-  uint32_t m_stateId; // State id for this fader
+
 };
 
 } // namespace ns3

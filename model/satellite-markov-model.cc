@@ -29,18 +29,24 @@ NS_LOG_COMPONENT_DEFINE ("SatMarkovModel");
 
 TypeId SatMarkovModel::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatMarkovModel").SetParent<Object> ().AddConstructor<SatMarkovModel> ();
+  static TypeId tid = TypeId ("ns3::SatMarkovModel")
+      .SetParent<Object> ()
+      .AddConstructor<SatMarkovModel> ();
   return tid;
 }
 
 SatMarkovModel::SatMarkovModel () :
-    m_probabilities (new double[3 * 3]), m_numOfStates (3), m_currentState (0)
+    m_probabilities (new double[3 * 3]),
+    m_numOfStates (3),
+    m_currentState (0)
 {
   NS_ASSERT(0);
 }
 
 SatMarkovModel::SatMarkovModel (uint32_t numOfStates) :
-    m_probabilities (new double[numOfStates * numOfStates]), m_numOfStates (numOfStates), m_currentState (0)
+    m_probabilities (new double[numOfStates * numOfStates]),
+    m_numOfStates (numOfStates),
+    m_currentState (0)
 {
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovModel - Creating Markov model for " << numOfStates << " states, initial state: " << m_currentState);
 

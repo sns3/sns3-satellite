@@ -20,16 +20,19 @@ NS_LOG_COMPONENT_DEFINE ("loo-example");
 int
 main (int argc, char *argv[])
 {
-  // enable info logs
+  /// enable info logs
   LogComponentEnable ("loo-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatLooModel", LOG_LEVEL_INFO);
 
+  /// load default configuration
   Ptr<SatLooConf> looConf = CreateObject<SatLooConf> ();
 
+  /// create faders
   Ptr<SatLooModel> looFaderLineOfSight = CreateObject<SatLooModel> (looConf,3,0,0);
   Ptr<SatLooModel> looFaderLightShadowing = CreateObject<SatLooModel> (looConf,3,0,1);
   Ptr<SatLooModel> looFaderHeavyShadowing = CreateObject<SatLooModel> (looConf,3,0,2);
 
+  /// run simulation
   for (uint32_t i = 0; i < 1000; i++)
     {
       Simulator::Schedule(Time(300000 + i*500000), &SatLooModel::GetChannelGainDb, looFaderLineOfSight);

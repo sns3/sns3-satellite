@@ -35,33 +35,65 @@ class SatRayleighModel : public Object
 {
 public:
 
+  /**
+   *
+   */
   static const double PI;
 
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   */
   SatRayleighModel ();
 
+  /**
+   *
+   * \param omegaDopplerMax
+   * \param numOfOscillators
+   */
   SatRayleighModel (double omegaDopplerMax, uint32_t numOfOscillators);
 
+  /**
+   *
+   */
   ~SatRayleighModel ();
 
+  /**
+   *
+   * \return
+   */
   std::complex<double> GetComplexGain () const;
 
+  /**
+   *
+   * \return
+   */
   double GetChannelGainDb () const;
 
+  /**
+   *
+   * \return
+   */
   double GetChannelGain () const;
 
 private:
 
+  /**
+   *
+   */
   void ConstructOscillators ();
 
-  /// Vector of oscillators:
+  /**
+   *
+   */
   std::vector< Ptr<SatFadingOscillator> > m_oscillators;
-
   double m_omegaDopplerMax;
-
   uint32_t m_nOscillators;
-
   Ptr<UniformRandomVariable> m_uniformVariable;
 };
 

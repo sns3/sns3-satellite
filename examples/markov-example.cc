@@ -14,33 +14,33 @@ using namespace ns3;
 * \brief
 *
 */
-
 NS_LOG_COMPONENT_DEFINE ("markov-example");
 
 int
 main (int argc, char *argv[])
 {
-  // enable info logs
+  /// enable info logs
   LogComponentEnable ("markov-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatFadingContainer", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovModel", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovConf", LOG_LEVEL_INFO);
 
-  // create default Markov configuration
+  /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
   Ptr<SatLooConf> looConf = CreateObject<SatLooConf>();
 
+  /// set position
   GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
 
-  // create fading container based on default configuration
+  /// create fading container based on default configuration
   Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,looConf,currentPosition);
 
-  // Run Markov chain
-
+  /// set alternate positions
   GeoCoordinate position1 = GeoCoordinate(50, -50, 35000000);
   GeoCoordinate position2 = GeoCoordinate(10, -10, 35000000);
   GeoCoordinate position3 = GeoCoordinate(30, -30, 35000000);
 
+  /// run simulation
   Simulator::Schedule(Time("5ms"), &SatFadingContainer::SetPosition, markovContainer, position1);
   Simulator::Schedule(Time("10ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
   Simulator::Schedule(Time("30ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);

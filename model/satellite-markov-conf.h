@@ -35,24 +35,84 @@ namespace ns3 {
 class SatMarkovConf : public Object
 {
 public:
+
+  /**
+   *
+   */
   static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
   static const uint32_t DEFAULT_STATE_COUNT = 3;
 
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   *
+   */
   SatMarkovConf ();
-  virtual ~SatMarkovConf ()
-  {
-  }
+
+  /**
+   *
+   */
+  virtual ~SatMarkovConf () {}
+
+  /**
+   *
+   * \param elevation
+   * \return
+   */
   uint32_t GetProbabilitySetID (double elevation);
-  std::vector<std::vector<double> > GetElevationProbabilities (uint32_t setId);
+
+  /**
+   *
+   * \param setId
+   * \return
+   */
+  std::vector<std::vector<double> > GetElevationProbabilities (uint32_t set);
+
+  /**
+   *
+   * \return
+   */
   uint32_t GetStateCount ();
+
+  /**
+   *
+   * \return
+   */
   Time GetCooldownPeriod ();
+
+  /**
+   *
+   * \return
+   */
   double GetMinimumPositionChange ();
+
+  /**
+   *
+   * \return
+   */
   uint32_t GetNumOfSets ();
+
+  /**
+   *
+   * \return
+   */
   double GetInitialElevation ();
+
+  /**
+   *
+   * \return
+   */
   uint32_t GetInitialState ();
 
 private:
+
+  /**
+   *
+   */
   uint32_t m_elevationCount;
   uint32_t m_stateCount;
   std::vector<std::vector<std::vector<double> > > m_markovProbabilities;

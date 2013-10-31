@@ -38,34 +38,54 @@ class SatFadingOscillator : public Object
 public:
   static TypeId GetTypeId (void);
 
-  //// Default constructor
+  /**
+   *
+   */
   SatFadingOscillator ();
 
-  /// Initiate oscillator with complex amplitude, initial phase and rotation speed
+  /**
+   *
+   * \param amplitude
+   * \param initialPhase
+   * \param omega
+   */
   SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega);
 
-  /// Initiate oscillator with amplitude, initial phase and rotation speed
+  /**
+   *
+   * \param amplitude
+   * \param initialPhase
+   * \param omega
+   */
   SatFadingOscillator (double amplitude, double initialPhase, double omega);
 
+  /**
+   *
+   */
   ~SatFadingOscillator ();
 
-  // Get the complex amplitude at moment \param t
+  /**
+   *
+   * \param t
+   * \return
+   */
   std::complex<double> GetComplexValueAt (Time t) const;
 
-  // Get the complex amplitude at moment \param t
+  /**
+   *
+   * \param t
+   * \return
+   */
   std::complex<double> GetCosineWaveValueAt (Time t) const;
 
 private:
 
-  /// Complex number \f[Re=\cos(\psi_n), Im = i\sin(\psi_n)]
+  /**
+   *
+   */
   std::complex<double> m_complexAmplitude;
-
   double m_amplitude;
-
-  /// Phase \f[\phi_n] of the oscillator
   double m_phase;
-
-  /// Rotation speed of the oscillator \f[\omega_d \cos(\alpha_n)]
   double m_omega;
 
 };

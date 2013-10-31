@@ -235,9 +235,9 @@ SatFadingContainer::HasPositionChanged ()
 }
 
 void
-SatFadingContainer::UpdateProbabilities (uint32_t setId)
+SatFadingContainer::UpdateProbabilities (uint32_t set)
 {
-  std::vector <std::vector <double> > probabilities = m_markovConf->GetElevationProbabilities (setId);
+  std::vector <std::vector <double> > probabilities = m_markovConf->GetElevationProbabilities (set);
 
   NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Updating probabilities...");
 
@@ -283,18 +283,26 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channeltype)
     case SatChannel::FORWARD_FEEDER_CH:
       {
         m_fader_up->UpdateParameters (m_currentSet, m_currentState);
+
         m_latestCalculatedFadingValue_up = m_fader_up->GetChannelGain ();
+
         NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
+
         m_latestCalculationTime_up = Now ();
+
         return m_latestCalculatedFadingValue_up;
       }
     case SatChannel::FORWARD_USER_CH:
     case SatChannel::RETURN_FEEDER_CH:
       {
         m_fader_down->UpdateParameters (m_currentSet, m_currentState);
+
         m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGain ();
+
         NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
+
         m_latestCalculationTime_down = Now ();
+
         return m_latestCalculatedFadingValue_down;
       }
     default :
@@ -322,11 +330,11 @@ SatFadingContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
 }
 
 void
-SatFadingContainer::LockToSet (uint32_t setId)
+SatFadingContainer::LockToSet (uint32_t newSet)
 {
-  NS_ASSERT( (setId >= 0) && (setId < m_numOfSets));
+  NS_ASSERT( (newSet >= 0) && (newSet < m_numOfSets));
 
-  m_currentSet = setId;
+  m_currentSet = newSet;
 
   UpdateProbabilities (m_currentSet);
 

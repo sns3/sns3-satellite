@@ -38,20 +38,48 @@ class SatLooModel : public SatFader
 public:
   static const double PI;
 
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
 
-  /** Create Loo model. */
+  /**
+   *
+   */
   SatLooModel ();
 
+  /**
+   *
+   * \param looConf
+   * \param numOfStates
+   * \param initialSet
+   * \param initialState
+   */
   SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState);
 
-  /** Destroy the Loo model. */
+  /**
+   *
+   */
   ~SatLooModel ();
 
+  /**
+   *
+   * \return
+   */
   double GetChannelGainDb ();
 
+  /**
+   *
+   * \return
+   */
   double GetChannelGain ();
 
+  /**
+   *
+   * \param set
+   * \param state
+   */
   void UpdateParameters (uint32_t set, uint32_t state);
 
 private:
@@ -63,20 +91,53 @@ private:
   Ptr<SatLooConf> m_looConf;
   std::vector<std::vector<double> > m_looParameters;
 
+  /**
+   *
+   */
   Ptr<NormalRandomVariable> m_normalRandomVariable;
   Ptr<UniformRandomVariable> m_uniformVariable;
 
-  /// Vectors of oscillators:
+  /**
+   *
+   */
   std::vector< std::vector< Ptr<SatFadingOscillator> > > m_slowFadingOscillators;
   std::vector< std::vector< Ptr<SatFadingOscillator> > > m_fastFadingOscillators;
 
+  /**
+   *
+   */
   void ConstructSlowFadingOscillators ();
+
+  /**
+   *
+   */
   void ConstructFastFadingOscillators ();
 
+  /**
+   *
+   * \param oscillator
+   * \return
+   */
   std::complex<double> GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
+
+  /**
+   *
+   * \param oscillator
+   * \return
+   */
   std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
 
+  /**
+   *
+   * \param state
+   */
   void ChangeState (uint32_t state);
+
+  /**
+   *
+   * \param set
+   * \param state
+   */
   void ChangeSet (uint32_t set, uint32_t state);
 };
 

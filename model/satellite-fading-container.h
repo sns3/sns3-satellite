@@ -38,36 +38,83 @@ namespace ns3 {
 class SatFadingContainer : public SatFading
 {
 public:
+
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   */
   SatFadingContainer ();
 
+  /**
+   *
+   * \param markovConf
+   * \param looConf
+   * \param currentPosition
+   */
   SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition);
 
+  /**
+   *
+   */
   ~SatFadingContainer ();
 
+  /**
+   *
+   * \param channeltype
+   * \return
+   */
   double GetFading (SatChannel::ChannelType_t channeltype);
 
+  /**
+   *
+   * \param newPosition
+   */
   void SetPosition (GeoCoordinate newPosition);
 
+  /**
+   *
+   * \param newElevation
+   */
   void SetElevation (double newElevation);
 
+  /**
+   *
+   */
   void UnlockSetAndState ();
 
-  void LockToSetAndState (uint32_t setId, uint32_t stateId);
+  /**
+   *
+   * \param newSet
+   * \param newState
+   */
+  void LockToSetAndState (uint32_t newSet, uint32_t newState);
 
-  void LockToSet (uint32_t setId);
+  /**
+   *
+   * \param newSet
+   */
+  void LockToSet (uint32_t newSet);
 
+  /**
+   *
+   */
   void LockToRandomSetAndState ();
 
 private:
 
+  /**
+   * Variables
+   */
   Ptr<SatMarkovModel> m_markovModel;
   Ptr<SatMarkovConf> m_markovConf;
   Ptr<SatLooConf> m_looConf;
   Ptr<SatFader> m_fader_up;
   Ptr<SatFader> m_fader_down;
-
   uint32_t m_numOfStates;
   uint32_t m_numOfSets;
   double m_currentElevation;
@@ -84,19 +131,58 @@ private:
   bool m_enableSetLock;
   bool m_enableStateLock;
 
+  /**
+   *
+   */
   TracedCallback< double,                     // time
                   SatChannel::ChannelType_t,  // channel type
                   double                      // fading value
                   >
      m_fadingTrace;
 
-  void UpdateProbabilities (uint32_t setId);
+  /**
+   *
+   * \param set
+   */
+  void UpdateProbabilities (uint32_t set);
+
+  /**
+   *
+   */
   void EvaluateStateChange ();
-  double CalculateFading (SatChannel::ChannelType_t channeltype);
+
+  /**
+   *
+   * \param channelType
+   * \return
+   */
+  double CalculateFading (SatChannel::ChannelType_t channelType);
+
+  /**
+   *
+   * \return
+   */
   double CalculateElevation ();
+
+  /**
+   *
+   * \return
+   */
   bool HasPositionChanged ();
-  bool HasCooldownPeriodPassed (SatChannel::ChannelType_t channeltype);
-  double GetCachedFadingValue (SatChannel::ChannelType_t channeltype);
+
+  /**
+   *
+   * \param channelType
+   * \return
+   */
+  bool HasCooldownPeriodPassed (SatChannel::ChannelType_t channelType);
+
+  /**
+   *
+   * \param channelType
+   * \return
+   */
+  double GetCachedFadingValue (SatChannel::ChannelType_t channelType);
 };
 
 } // namespace ns3
