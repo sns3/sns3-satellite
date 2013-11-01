@@ -80,6 +80,13 @@ SatUtMac::~SatUtMac ()
 }
 
 void
+SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_timingAdvanceCb = cb;
+}
+
+void
 SatUtMac::ScheduleTimeSlots(std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots)
 {
   for ( std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > >::iterator it = slots.begin ();

@@ -76,6 +76,12 @@ public:
   virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay);
 
   /**
+   * Get the  propagation delay model to be used in the SatChannel
+   * \param Ptr to the propagation delay model to be used.
+   */
+  virtual Ptr<PropagationDelayModel> GetPropagationDelayModel ();
+
+  /**
    * Set the type of the channel.
    *
    * \param chType Type of the channel.

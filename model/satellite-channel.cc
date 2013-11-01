@@ -215,6 +215,14 @@ SatChannel::SetPropagationDelayModel (Ptr<PropagationDelayModel> delay)
   m_propagationDelay = delay;
 }
 
+Ptr<PropagationDelayModel>
+SatChannel::GetPropagationDelayModel ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_propagationDelay;
+}
+
 void
 SatChannel::SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> loss)
 {

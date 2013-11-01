@@ -29,6 +29,7 @@
 #include "ns3/callback.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
+#include "../model/satellite-mobility-observer.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-phy.h"
@@ -263,6 +264,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   mac->SetQueue (queue);
+
+  // Set timing advance callback to mac.
+  Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
+  NS_ASSERT (observer != NULL);
+  SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
+  mac->SetTimingAdvanceCallback (timingCb);
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback cb = MakeCallback (&SatUtMac::Receive, mac);

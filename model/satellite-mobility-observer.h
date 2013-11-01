@@ -127,6 +127,7 @@ private:
   Ptr<PropagationDelayModel> m_ownProgDelayModel;
   Ptr<PropagationDelayModel> m_anotherProgDelayModel;
 
+  bool m_initialized;  // flag for GetElevationAngle
   bool m_updateElevationAngle;  // flag for GetElevationAngle
   bool m_updateTimingAdvance;   // flag for GetTimingAdvance
   double m_minAltitude;
