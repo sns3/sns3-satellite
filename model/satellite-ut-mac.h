@@ -47,6 +47,8 @@ public:
    *
    * This is the constructor for the SatUtMac
    *
+   * \param seq Pointer to superframe sequence.
+   *
    */
   SatUtMac (Ptr<SatSuperframeSeq> seq);
 
@@ -57,9 +59,31 @@ public:
    */
   ~SatUtMac ();
 
+  /**
+   * Receive packet from lower layer.
+   *
+   * \param packet Pointer to packet received.
+   * \param
+   */
   void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
 
+  /**
+   *  Schedules time slots according to received TBTP message.
+   *
+   * \param slots Information of the time slots to be scheduled.
+   */
   void ScheduleTimeSlots (std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots);
+
+  /**
+   * \return Timing advance as Time object.
+   */
+  typedef Callback<Time> TimingAdvanceCallback;
+
+  /**
+   * \param cb callback to invoke whenever a timing advance is needed by SatUtMac object.
+   *
+   */
+  void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
 private:
 
@@ -67,6 +91,7 @@ private:
   SatUtMac (const SatUtMac &);
 
   Ptr<SatSuperframeSeq> m_superframeSeq;
+  TimingAdvanceCallback m_timingAdvanceCb;
 
 };
 

@@ -32,6 +32,7 @@
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-antenna-gain-pattern-container.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-mobility-observer.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -151,8 +152,8 @@ public:
 
   /**
    * Enables creation traces to be written in given file
-   * /param stream  stream for creation trace outputs
-   * /param cb  callback to connect traces
+   * \param stream  stream for creation trace outputs
+   * \param cb  callback to connect traces
    */
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
@@ -162,7 +163,7 @@ public:
   std::string GetBeamInfo ();
 
   /**
-   * /param printMacAddress flag to indicated, if mac addresses of the UTs is wanted to print.
+   * \param printMacAddress flag to indicated, if mac addresses of the UTs is wanted to print.
    *
    * /return info of UT positions
    */
@@ -172,7 +173,7 @@ public:
    * Gets GW node according to given id.
    * In case that GW is not found NULL is returned.
    *
-   * /param id ID of the GW
+   * \param id ID of the GW
    * /return pointer to found GW node or NULL.
    */
   Ptr<Node> GetGwNode (uint32_t id);
@@ -237,17 +238,17 @@ private:
   /**
    * Gets satellite channel pair from requested map.
    * In case that channel pair is not found, new is created and returned.
-   * /param chPairMap map where channel pair is get
-   * /param frequencyId ID of the frequency
-   * /param isUserLink flag indicating if link user link is requested (otherwise feeder link).
+   * \param chPairMap map where channel pair is get
+   * \param frequencyId ID of the frequency
+   * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
    */
   ChannelPair_t GetChannelPair (std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
 
   /**
    * Creates GW node according to given id and stores GW to map.
    *
-   * /param id ID of the GW
-   * /param node pointer to the GW
+   * \param id ID of the GW
+   * \param node pointer to the GW
    *
    * /return result of storing
    */
@@ -255,15 +256,23 @@ private:
 
   /**
    * Set needed routings of satellite network and fill ARC cache for the network.
-   * /param ut    container having UTs of the beam
-   * /param utNd  container having UT netdevices of the beam
-   * /param gw    pointer to gateway node
-   * /param gw    pointer to gateway netdevice
-   * /param gwAddr address of the gateway
-   * /param utIfs container having UT ipv2 interfaces (for addresses)
+   * \param ut    container having UTs of the beam
+   * \param utNd  container having UT netdevices of the beam
+   * \param gw    pointer to gateway node
+   * \param gw    pointer to gateway netdevice
+   * \param gwAddr address of the gateway
+   * \param utIfs container having UT ipv2 interfaces (for addresses)
    */
   void PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<Node> gw,
                          Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
+
+  /**
+   * Install Satellite Mobility Observer to node, if observer doesn't exist already in node
+   *
+   * \param node Pointer to node
+   * \return Pointer to mobility observer
+   */
+  Ptr<SatMobilityObserver>  InstallMobilityObserver (Ptr<Node> node) const;
 
 };
 

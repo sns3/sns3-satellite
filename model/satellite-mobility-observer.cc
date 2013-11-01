@@ -90,12 +90,10 @@ SatMobilityObserver::SatMobilityObserver ()
 
 SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility)
  : m_ownMobility (ownMobility),
-   m_geoSatMobility (geoSatMobility)
+   m_geoSatMobility (geoSatMobility),
+   m_initialized (false)
 {
   NS_LOG_FUNCTION (this << ownMobility << geoSatMobility);
-
-  m_ownMobility->TraceConnect ("SatCourseChange", "Own", MakeCallback (&SatMobilityObserver::PositionChanged, this));
-  m_geoSatMobility->TraceConnect ("SatCourseChange", "Satellite", MakeCallback( &SatMobilityObserver::PositionChanged, this));
 
   GeoCoordinate satellitePosition = m_geoSatMobility->GetGeoPosition ();
   GeoCoordinate ownPosition = m_ownMobility->GetGeoPosition ();
@@ -115,6 +113,11 @@ SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr
   m_updateElevationAngle = true;
   m_updateTimingAdvance = true;
   m_timingAdvance_s = Seconds (0);
+
+  m_geoSatMobility->TraceConnect ("SatCourseChange", "Satellite", MakeCallback( &SatMobilityObserver::PositionChanged, this));
+  m_ownMobility->TraceConnect ("SatCourseChange", "Own", MakeCallback (&SatMobilityObserver::PositionChanged, this));
+
+  m_initialized = true;
 }
 
 SatMobilityObserver::~SatMobilityObserver ()
@@ -161,7 +164,7 @@ SatMobilityObserver::GetElevationAngle (void)
 }
 
 Time
-SatMobilityObserver::GetTimingAdvance_s (void)
+SatMobilityObserver::GetTimingAdvance (void)
 {
   NS_LOG_FUNCTION (this);
 
@@ -189,7 +192,10 @@ SatMobilityObserver::NotifyPropertyChange (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  m_propertyChangeTrace (this);
+  if ( m_initialized )
+    {
+      m_propertyChangeTrace (this);
+    }
 }
 
 void
