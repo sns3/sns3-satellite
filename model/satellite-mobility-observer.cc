@@ -161,7 +161,7 @@ SatMobilityObserver::GetElevationAngle (void)
 }
 
 Time
-SatMobilityObserver::GetTimingAdvance_s (void)
+SatMobilityObserver::GetTimingAdvance (void)
 {
   NS_LOG_FUNCTION (this);
 

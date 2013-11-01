@@ -163,7 +163,7 @@ SatMobilityObserverTestCase::DoRun (void)
   Ptr<SatMobilityObserver> gwObserver = CreateObject<SatMobilityObserver> (gwMob, geoMob);
 
   utObserver->ObserveTimingAdvance (utProgDelay, gwProgDelay, gwMob);
-  double timingAdvance = utObserver->GetTimingAdvance_s ().GetSeconds();
+  double timingAdvance = utObserver->GetTimingAdvance ().GetSeconds();
 
   // check that we use correct earth radius
   NS_TEST_ASSERT_MSG_EQ ( earthRadius, 6378137, "Earth radius is not what expected");

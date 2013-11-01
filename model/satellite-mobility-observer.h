@@ -84,7 +84,7 @@ public:
    *
    * @return the current timing advance.
    */
-  Time GetTimingAdvance_s (void);
+  Time GetTimingAdvance (void);
 
 private:
 
