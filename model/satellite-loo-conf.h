@@ -26,22 +26,12 @@
 namespace ns3 {
 
 /**
- * \brief A configuration class for Loo model
+ * \brief A configuration class for Loo's model
  *
  */
 class SatLooConf : public SatFaderConf
 {
 public:
-
-  /**
-   * \brief Default elevation count
-   */
-  static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
-
-  /**
-   * \brief Default state count
-   */
-  static const uint32_t DEFAULT_STATE_COUNT = 3;
 
   /**
    * \brief Default Loo parameter count

@@ -19,6 +19,7 @@
  */
 
 #include "satellite-loo-conf.h"
+#include "satellite-markov-conf.h"
 #include <map>
 
 namespace ns3 {
@@ -26,7 +27,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatLooConf);
 NS_LOG_COMPONENT_DEFINE ("SatLooConf");
 
-static const double g_LooParameters[SatLooConf::DEFAULT_ELEVATION_COUNT][SatLooConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
+static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
     {
      /* Elevation 40 */  // TODO: add Ka-band parameters
      {{-0.1,0.37,-22.0,10,10,2,30},
@@ -56,19 +57,19 @@ SatLooConf::GetTypeId (void) //TODO: add attribute m_looParameters
       .SetParent<SatFaderConf> ()
       .AddConstructor<SatLooConf> ()
       .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
-                     UintegerValue (SatLooConf::DEFAULT_ELEVATION_COUNT),
+                     UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
                      MakeUintegerAccessor (&SatLooConf::m_elevationCount),
                      MakeUintegerChecker<uint32_t> ())
       .AddAttribute ("StateCount", "Number of states in the Markov model.",
-                     UintegerValue (SatLooConf::DEFAULT_STATE_COUNT),
+                     UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
                      MakeUintegerAccessor (&SatLooConf::m_stateCount),
                      MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
 SatLooConf::SatLooConf () :
-    m_elevationCount (SatLooConf::DEFAULT_ELEVATION_COUNT),
-    m_stateCount (SatLooConf::DEFAULT_STATE_COUNT)
+    m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+    m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
 
