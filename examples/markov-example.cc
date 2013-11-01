@@ -27,13 +27,12 @@ main (int argc, char *argv[])
 
   /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
-  Ptr<SatLooConf> looConf = CreateObject<SatLooConf>();
 
   /// set position
   GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
 
   /// create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,looConf,currentPosition);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,currentPosition);
 
   /// set alternate positions
   GeoCoordinate position1 = GeoCoordinate(50, -50, 35000000);

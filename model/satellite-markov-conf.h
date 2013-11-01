@@ -27,6 +27,7 @@
 #include "ns3/nstime.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "satellite-loo-conf.h"
 
 namespace ns3 {
 
@@ -37,6 +38,14 @@ namespace ns3 {
 class SatMarkovConf : public Object
 {
 public:
+
+  /**
+   * Possible types of Markov state faders
+   */
+  typedef enum
+  {
+    LOO_FADER
+  } MarkovFaderType_t;
 
   /**
    * \brief Default elevation count
@@ -114,6 +123,18 @@ public:
    */
   uint32_t GetInitialState ();
 
+  /**
+   * \brief Function for returning the Loo's model configuration
+   * @return Loo's model configuration
+   */
+  Ptr<SatLooConf> GetLooConf ();
+
+  /**
+   * \brief Function for returning the selected fader type
+   * @return selected fader type
+   */
+  SatMarkovConf::MarkovFaderType_t GetFaderType ();
+
 private:
 
   /**
@@ -155,6 +176,16 @@ private:
    * \brief Cooldown period lengthin seconds
    */
   Time m_cooldownPeriodLength;
+
+  /**
+   * \brief Loo configuration
+   */
+  Ptr<SatLooConf> m_looConf;
+
+  /**
+   * \brief Selected fader type
+   */
+  SatMarkovConf::MarkovFaderType_t m_faderType;
 };
 
 } // namespace ns3

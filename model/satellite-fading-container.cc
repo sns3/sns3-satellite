@@ -43,7 +43,6 @@ SatFadingContainer::GetTypeId (void)
 SatFadingContainer::SatFadingContainer () :
     m_markovModel (NULL),
     m_markovConf (NULL),
-    m_looConf (NULL),
     m_fader_up (NULL),
     m_fader_down (NULL),
     m_numOfStates (),
@@ -66,10 +65,9 @@ SatFadingContainer::SatFadingContainer () :
   NS_ASSERT(0);
 }
 
-SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition) :
+SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordinate currentPosition) :
     m_markovModel (NULL),
     m_markovConf (markovConf),
-    m_looConf (looConf),
     m_fader_up (NULL),
     m_fader_down (NULL),
     m_numOfStates(markovConf->GetStateCount ()),
@@ -98,8 +96,7 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLo
   m_markovModel->DoTransition ();
 
   /// create faders
-  m_fader_up = CreateObject<SatLooModel> (m_looConf,m_numOfStates,m_currentSet,m_currentState);
-  m_fader_down = CreateObject<SatLooModel> (m_looConf,m_numOfStates,m_currentSet,m_currentState);
+  CreateFaders (m_markovConf->GetFaderType ());
 
   /// initialize fading values
   CalculateFading(SatChannel::RETURN_USER_CH);
@@ -117,6 +114,26 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLo
 SatFadingContainer::~SatFadingContainer ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatFadingContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
+{
+  NS_LOG_FUNCTION (this << faderType);
+
+  switch (faderType)
+  {
+    case SatMarkovConf::LOO_FADER:
+      {
+        m_fader_up = CreateObject<SatLooModel> (m_markovConf->GetLooConf(),m_numOfStates,m_currentSet,m_currentState);
+        m_fader_down = CreateObject<SatLooModel> (m_markovConf->GetLooConf(),m_numOfStates,m_currentSet,m_currentState);
+        break;
+      }
+    default :
+      {
+        NS_ASSERT(0);
+      }
+  }
 }
 
 double

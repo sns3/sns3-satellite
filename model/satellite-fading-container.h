@@ -21,7 +21,6 @@
 #define SATELLITE_FADING_CONTAINER_H
 
 #include "satellite-loo-model.h"
-#include "satellite-loo-conf.h"
 #include "satellite-markov-model.h"
 #include "satellite-markov-conf.h"
 #include "geo-coordinate.h"
@@ -56,7 +55,7 @@ public:
    * \param looConf Loo configuration object
    * \param currentPosition current position
    */
-  SatFadingContainer (Ptr<SatMarkovConf> markovConf, Ptr<SatLooConf> looConf, GeoCoordinate currentPosition);
+  SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordinate currentPosition);
 
   /**
    * \brief Destructor
@@ -116,11 +115,6 @@ private:
    * \brief Markoc model configuration
    */
   Ptr<SatMarkovConf> m_markovConf;
-
-  /**
-   * \brief Loo configuration
-   */
-  Ptr<SatLooConf> m_looConf;
 
   /**
    * \brief Uplink fader
@@ -259,6 +253,12 @@ private:
    * \return cached fading value
    */
   double GetCachedFadingValue (SatChannel::ChannelType_t channelType);
+
+  /**
+   * \brief Function for creating the Markov state faders
+   */
+  void CreateFaders (SatMarkovConf::MarkovFaderType_t faderType);
+
 };
 
 } // namespace ns3

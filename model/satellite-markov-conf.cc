@@ -88,7 +88,9 @@ SatMarkovConf::SatMarkovConf () :
     m_minimumPositionChangeInMeters (20.0),
     m_initialState (0),
     m_initialElevation (45),
-    m_cooldownPeriodLength (Seconds (0.00005))
+    m_cooldownPeriodLength (Seconds (0.00005)),
+    m_looConf (NULL),
+    m_faderType (SatMarkovConf::LOO_FADER)
 {
   NS_LOG_FUNCTION (this);
 
@@ -127,6 +129,8 @@ SatMarkovConf::SatMarkovConf () :
   elevation.first = 80.0;
   elevation.second = 3;
   m_markovElevations.insert (elevation);
+
+  m_looConf = CreateObject<SatLooConf>();
 }
 
 std::vector<std::vector<double> >
@@ -212,6 +216,20 @@ SatMarkovConf::GetInitialElevation ()
   NS_LOG_FUNCTION (this);
 
   return m_initialElevation;
+}
+
+Ptr<SatLooConf>
+SatMarkovConf::GetLooConf ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_looConf;
+}
+
+SatMarkovConf::MarkovFaderType_t
+SatMarkovConf::GetFaderType ()
+{
+  return m_faderType;
 }
 
 } // namespace ns3

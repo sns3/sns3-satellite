@@ -53,7 +53,7 @@ TypeId
 SatLooConf::GetTypeId (void) //TODO: add attribute m_looParameters
 {
   static TypeId tid = TypeId ("ns3::SatLooConf")
-      .SetParent<Object> ()
+      .SetParent<SatFaderConf> ()
       .AddConstructor<SatLooConf> ()
       .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
                      UintegerValue (SatLooConf::DEFAULT_ELEVATION_COUNT),
@@ -93,7 +93,7 @@ SatLooConf::SatLooConf () :
 }
 
 std::vector<std::vector<double> >
-SatLooConf::GetLooParameters (uint32_t set)
+SatLooConf::GetParameters (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 

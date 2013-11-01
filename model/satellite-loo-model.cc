@@ -41,7 +41,6 @@ SatLooModel::SatLooModel () :
   m_numOfStates (0),
   m_currentSet (0),
   m_currentState (0),
-  m_sigma (0),
   m_looConf (NULL),
   m_normalRandomVariable (NULL),
   m_uniformVariable (NULL)
@@ -55,7 +54,6 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
   m_numOfStates (numOfStates),
   m_currentSet (initialSet),
   m_currentState (initialState),
-  m_sigma (0),
   m_looConf (looConf),
   m_normalRandomVariable (NULL),
   m_uniformVariable (NULL)
@@ -161,29 +159,11 @@ SatLooModel::GetChannelGain ()
 
   /// Multipath
   std::complex<double> multipathComplexGain = GetOscillatorComplexSum (m_multipathOscillators[m_currentState]);
-  multipathComplexGain = multipathComplexGain * m_sigma;
+  multipathComplexGain = multipathComplexGain * m_sigma[m_currentState];
 
   /// Combining
   std::complex<double> fadingGain = directComplexGain + multipathComplexGain;
-  double fading = sqrt((pow (fadingGain.real (), 2) + pow (fadingGain.imag (), 2)));
-
-  // === DIRECT SIGNAL TESTING BEGINS ===
-  //double slowFading = sqrt((pow (slowComplexGain.real (), 2) + pow (slowComplexGain.imag (), 2)));
-  //slowFading = 20 * log10(slowFading); // slowFading value is in dB after this point
-  //fading = slowFading;
-  // === DIRECT SIGNAL TESTING ENDS ===
-
-  // === MULTIPATH TESTING BEGINS ===
-  //double fastFading = sqrt((pow (fastComplexGain.real (), 2) + pow (fastComplexGain.imag (), 2)));
-  //fastFading = 20 * log10(fastFading); // fastFading value is in dB after this point
-  //fading = fastFading;
-  // === MULTIPATH TESTING ENDS ===
-
-  // === COMBINING TESTING BEGINS ===
-  //   fading = 20 * log10(fading);
-  // === COMBINING TESTING ENDS ===
-
-  return fading;
+  return sqrt((pow (fadingGain.real (), 2) + pow (fadingGain.imag (), 2)));
 }
 
 std::complex<double>
@@ -237,17 +217,19 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newSet << " " << newState);
 
-  m_looParameters.clear();
-  m_looParameters = m_looConf->GetLooParameters (newSet);
+  m_looParameters.clear ();
+  m_looParameters = m_looConf->GetParameters (newSet);
   m_currentSet = newSet;
 
   ChangeState (newState);
 
-  m_directSignalOscillators.clear();
-  m_multipathOscillators.clear();
+  m_directSignalOscillators.clear ();
+  m_multipathOscillators.clear ();
+  m_sigma.clear ();
 
   ConstructDirectSignalOscillators ();
   ConstructMultipathOscillators ();
+  CalculateSigma ();
 }
 
 void
@@ -255,8 +237,16 @@ SatLooModel::ChangeState (uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newState);
 
-  m_sigma = sqrt(0.5 * pow(10,(m_looParameters[newState][2] / 10)));
   m_currentState = newState;
+}
+
+void
+SatLooModel::CalculateSigma()
+{
+  for (uint32_t i = 0; i < m_numOfStates; i++)
+    {
+      m_sigma.push_back (sqrt(0.5 * pow(10,(m_looParameters[i][2] / 10))));
+    }
 }
 
 } // namespace ns3

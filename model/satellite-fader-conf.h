@@ -17,14 +17,13 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_FADING_H
-#define SATELLITE_FADING_H
+#ifndef SATELLITE_FADER_CONF_H
+#define SATELLITE_FADER_CONF_H
 
 #include "ns3/object.h"
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "satellite-channel.h"
 
 namespace ns3 {
 
@@ -33,18 +32,18 @@ namespace ns3 {
  *
  * \brief Base class for fading
  */
-class SatFading : public Object
+class SatFaderConf : public Object
 {
 public:
   /**
    * \brief Constructor
    */
-  SatFading ();
+  SatFaderConf ();
 
   /**
    * \brief Destructor
    */
-  virtual ~SatFading ();
+  virtual ~SatFaderConf ();
 
   /**
    * \brief NS-3 type id function
@@ -57,19 +56,7 @@ public:
    * \param channelType channel type
    * \return fading value
    */
-  virtual double GetFading (SatChannel::ChannelType_t channelType) = 0;
-
-  /**
-   * \brief Function for setting the position
-   * \param newPosition new position
-   */
-  virtual void SetPosition (GeoCoordinate newPosition) = 0;
-
-  /**
-   * \brief Function for setting the elevation
-   * \param newElevation new elevation
-   */
-  virtual void SetElevation (double newElevation) = 0;
+  virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;
 
 private:
 
@@ -77,4 +64,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_FADING_H */
+#endif /* SATELLITE_FADER_CONF_H */

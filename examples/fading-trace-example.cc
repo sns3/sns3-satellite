@@ -28,13 +28,12 @@ main (int argc, char *argv[])
 
   /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
-  Ptr<SatLooConf> looConf = CreateObject<SatLooConf>();
 
   /// set position
   GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
 
   /// create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,looConf,currentPosition);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,currentPosition);
 
   markovContainer->TraceConnect("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 

@@ -21,10 +21,7 @@
 #ifndef SAT_LOO_CONF_H
 #define SAT_LOO_CONF_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include "satellite-fader-conf.h"
 
 namespace ns3 {
 
@@ -32,7 +29,7 @@ namespace ns3 {
  * \brief A configuration class for Loo model
  *
  */
-class SatLooConf : public Object
+class SatLooConf : public SatFaderConf
 {
 public:
 
@@ -72,7 +69,7 @@ public:
    * \param set parameter set
    * \return Loo parameter values
    */
-  std::vector<std::vector<double> > GetLooParameters (uint32_t set);
+  std::vector<std::vector<double> > GetParameters (uint32_t set);
 
 private:
 

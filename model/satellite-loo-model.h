@@ -106,7 +106,7 @@ private:
   /**
    * \brief Multipath power converted to linear units
    */
-  double m_sigma;
+  std::vector<double> m_sigma;
 
   /**
    * \brief Loo's model configuration object
@@ -174,6 +174,11 @@ private:
    * \param newState new state
    */
   void ChangeSet (uint32_t newSet, uint32_t newState);
+
+  /**
+   * \brief Function for calculating sigma for different states
+   */
+  void CalculateSigma();
 };
 
 } // namespace ns3
