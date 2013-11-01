@@ -178,7 +178,7 @@ private:
   /**
    * \brief Function for calculating sigma for different states
    */
-  void CalculateSigma();
+  void CalculateSigma ();
 };
 
 } // namespace ns3

@@ -25,7 +25,8 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatRayleighModel", LOG_LEVEL_INFO);
 
   /// create fader
-  Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel> (10,1);
+  Ptr<SatRayleighConf> rayleighConf = CreateObject<SatRayleighConf> ();
+  Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel> (rayleighConf,0,0);
 
   /// run simulation
   for (uint32_t i = 0; i < 1000; i++)

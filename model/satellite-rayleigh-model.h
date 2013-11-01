@@ -22,7 +22,9 @@
 
 #include "ns3/vector.h"
 #include "satellite-fading-oscillator.h"
+#include "satellite-fader.h"
 #include "ns3/random-variable-stream.h"
+#include "satellite-rayleigh-conf.h"
 
 namespace ns3 {
 
@@ -31,7 +33,7 @@ namespace ns3 {
  *
  * \brief
  */
-class SatRayleighModel : public Object
+class SatRayleighModel : public SatFader
 {
 public:
 
@@ -56,7 +58,7 @@ public:
    * \param omegaDopplerMax maximum Doppler
    * \param numOfOscillators number of oscillators
    */
-  SatRayleighModel (double omegaDopplerMax, uint32_t numOfOscillators);
+  SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState);
 
   /**
    * \brief Destructor
@@ -67,19 +69,26 @@ public:
    * \brief Function for calculating the oscillator complex gain
    * \return complex gain
    */
-  std::complex<double> GetComplexGain () const;
+  std::complex<double> GetComplexGain ();
 
   /**
    * \brief Function for returning the channel gain in dB
    * \return channel gain in dB
    */
-  double GetChannelGainDb () const;
+  double GetChannelGainDb ();
 
   /**
    * \brief Function for returning the channel gain
    * \return channel gain
    */
-  double GetChannelGain () const;
+  double GetChannelGain ();
+
+  /**
+   * \brief Function for updating the parameter set and state
+   * \param set parameter set
+   * \param state state
+   */
+  void UpdateParameters (uint32_t set, uint32_t state);
 
 private:
 
@@ -94,19 +103,29 @@ private:
   std::vector< Ptr<SatFadingOscillator> > m_oscillators;
 
   /**
-   * \brief Maximum omega Doppler
+   * \brief Current parameter set
    */
-  double m_omegaDopplerMax;
+  uint32_t m_currentSet;
 
   /**
-   * \brief Number of oscillators
+   * \brief Current state
    */
-  uint32_t m_nOscillators;
+  uint32_t m_currentState;
 
   /**
    * \brief Uniform distribution random variable
    */
   Ptr<UniformRandomVariable> m_uniformVariable;
+
+  /**
+   * \brief Rayleigh configuration object
+   */
+  Ptr<SatRayleighConf> m_rayleighConf;
+
+  /**
+   * \brief Rayleigh model parameters
+   */
+  std::vector<std::vector<double> > m_rayleighParameters;
 };
 
 } // namespace ns3

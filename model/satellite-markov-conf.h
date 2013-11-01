@@ -28,6 +28,7 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "satellite-loo-conf.h"
+#include "satellite-rayleigh-conf.h"
 
 namespace ns3 {
 
@@ -44,7 +45,7 @@ public:
    */
   typedef enum
   {
-    LOO_FADER
+    LOO_FADER, RAYLEIGH_FADER
   } MarkovFaderType_t;
 
   /**
@@ -130,6 +131,12 @@ public:
   Ptr<SatLooConf> GetLooConf ();
 
   /**
+   * \brief Function for returning the Loo's model configuration
+   * @return Loo's model configuration
+   */
+  Ptr<SatRayleighConf> GetRayleighConf ();
+
+  /**
    * \brief Function for returning the selected fader type
    * @return selected fader type
    */
@@ -181,6 +188,11 @@ private:
    * \brief Loo configuration
    */
   Ptr<SatLooConf> m_looConf;
+
+  /**
+   * \brief Rayleigh configuration
+   */
+  Ptr<SatRayleighConf> m_rayleighConf;
 
   /**
    * \brief Selected fader type

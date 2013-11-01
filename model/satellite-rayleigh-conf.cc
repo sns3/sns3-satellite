@@ -18,62 +18,62 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-loo-conf.h"
+#include "satellite-rayleigh-conf.h"
 #include "satellite-markov-conf.h"
 #include <map>
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatLooConf);
-NS_LOG_COMPONENT_DEFINE ("SatLooConf");
+NS_OBJECT_ENSURE_REGISTERED (SatRayleighConf);
+NS_LOG_COMPONENT_DEFINE ("SatRayleighConf");
 
-static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
+static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT] =
     {
      /* Elevation 40 */  // TODO: add Ka-band parameters
-     {{-0.1,0.37,-22.0,10,10,2,30},
-      {-1.0,0.5,-22.0,10,10,2,30},
-      {-2.25,0.13,-21.2,10,10,2,30}},
+     {{10,10},
+      {10,10},
+      {10,10}},
 
      /* Elevation 60 */
-     {{0.0,0.12,-24.9,10,10,2,30},
-      {-0.7,0.12,-26.1,10,10,2,30},
-      {-1.4,0.25,-23.1,10,10,2,30}},
+     {{10,10},
+      {10,10},
+      {10,10}},
 
      /* Elevation 70 */
-     {{-0.1,0.25,-22.5,10,10,2,30},
-      {-0.5,0.28,-24.5,10,10,2,30},
-      {-0.75,0.37,-23.24,10,10,2,30}},
+     {{10,10},
+      {10,10},
+      {10,10}},
 
      /* Elevation 80 */
-     {{0.1,0.16,-22.4,10,10,2,30},
-      {-0.4,0.15,-23.5,10,10,2,30},
-      {-0.72,0.27,-22.0,10,10,2,30}}
+     {{10,10},
+      {10,10},
+      {10,10}}
     };
 
 TypeId
-SatLooConf::GetTypeId (void) //TODO: add attribute m_looParameters
+SatRayleighConf::GetTypeId (void) //TODO: add attribute m_rayleighParameters
 {
-  static TypeId tid = TypeId ("ns3::SatLooConf")
+  static TypeId tid = TypeId ("ns3::SatRayleighConf")
       .SetParent<SatFaderConf> ()
-      .AddConstructor<SatLooConf> ()
+      .AddConstructor<SatRayleighConf> ()
       .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
                      UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-                     MakeUintegerAccessor (&SatLooConf::m_elevationCount),
+                     MakeUintegerAccessor (&SatRayleighConf::m_elevationCount),
                      MakeUintegerChecker<uint32_t> ())
       .AddAttribute ("StateCount", "Number of states in the Markov model.",
                      UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
-                     MakeUintegerAccessor (&SatLooConf::m_stateCount),
+                     MakeUintegerAccessor (&SatRayleighConf::m_stateCount),
                      MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
-SatLooConf::SatLooConf () :
+SatRayleighConf::SatRayleighConf () :
     m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatLooConf - Creating SatLooConf...");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf - Creating SatRayleighConf...");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -83,25 +83,24 @@ SatLooConf::SatLooConf () :
         {
           std::vector<double> parameters;
 
-          for (uint32_t k = 0; k < SatLooConf::DEFAULT_LOO_PARAMETER_COUNT; k++)
+          for (uint32_t k = 0; k < SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT; k++)
             {
-              parameters.push_back (g_LooParameters[i][j][k]);
+              parameters.push_back (g_RayleighParameters[i][j][k]);
             }
           states.push_back (parameters);
         }
-      m_looParameters.push_back (states);
+      m_rayleighParameters.push_back (states);
     }
 }
 
 std::vector<std::vector<double> >
-SatLooConf::GetParameters (uint32_t set)
+SatRayleighConf::GetParameters (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
   NS_ASSERT ( (set >= 0) && (set < m_elevationCount));
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatLooConf - Getting Loo parameters for set ID " << set);
-  return m_looParameters[set];
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf - Getting Rayleigh parameters for set ID " << set);
+  return m_rayleighParameters[set];
 }
 
 } // namespace ns3
-

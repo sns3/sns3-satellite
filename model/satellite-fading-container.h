@@ -20,12 +20,13 @@
 #ifndef SATELLITE_FADING_CONTAINER_H
 #define SATELLITE_FADING_CONTAINER_H
 
-#include "satellite-loo-model.h"
 #include "satellite-markov-model.h"
 #include "satellite-markov-conf.h"
 #include "geo-coordinate.h"
 #include "ns3/vector.h"
 #include "satellite-fading.h"
+#include "satellite-loo-model.h"
+#include "satellite-rayleigh-model.h"
 
 namespace ns3 {
 

@@ -65,20 +65,20 @@ SatMarkovConf::GetTypeId (void) //TODO: add attribute for m_markovElevations and
                      MakeUintegerChecker<uint32_t> ())
       .AddAttribute( "MinimumPositionChangeInMeters", "Minimum position change in meters for Markov model state change cooldown.",
                      DoubleValue (20.0),
-                     MakeDoubleAccessor(&SatMarkovConf::m_minimumPositionChangeInMeters),
-                     MakeDoubleChecker<double>())
+                     MakeDoubleAccessor (&SatMarkovConf::m_minimumPositionChangeInMeters),
+                     MakeDoubleChecker<double> ())
       .AddAttribute ("InitialState", "The initial state of the Markov model.",
                      UintegerValue (0),
                      MakeUintegerAccessor (&SatMarkovConf::m_initialState),
                      MakeUintegerChecker<uint32_t> ())
       .AddAttribute( "InitialElevation", "Initial elevation value.",
                      DoubleValue (45),
-                     MakeDoubleAccessor(&SatMarkovConf::m_initialElevation),
-                     MakeDoubleChecker<double>())
+                     MakeDoubleAccessor (&SatMarkovConf::m_initialElevation),
+                     MakeDoubleChecker<double> ())
       .AddAttribute( "CooldownPeriodLength", "Cooldown period length for state change.",
                      TimeValue (Seconds (0.00005)),
-                     MakeTimeAccessor(&SatMarkovConf::m_cooldownPeriodLength),
-                     MakeTimeChecker());
+                     MakeTimeAccessor (&SatMarkovConf::m_cooldownPeriodLength),
+                     MakeTimeChecker ());
   return tid;
 }
 
@@ -90,11 +90,12 @@ SatMarkovConf::SatMarkovConf () :
     m_initialElevation (45),
     m_cooldownPeriodLength (Seconds (0.00005)),
     m_looConf (NULL),
+    m_rayleighConf (NULL),
     m_faderType (SatMarkovConf::LOO_FADER)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
       std::vector<std::vector<double> > states;
@@ -130,7 +131,8 @@ SatMarkovConf::SatMarkovConf () :
   elevation.second = 3;
   m_markovElevations.insert (elevation);
 
-  m_looConf = CreateObject<SatLooConf>();
+  m_looConf = CreateObject<SatLooConf> ();
+  m_rayleighConf = CreateObject<SatRayleighConf> ();
 }
 
 std::vector<std::vector<double> >
@@ -138,8 +140,8 @@ SatMarkovConf::GetElevationProbabilities (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
-  NS_ASSERT( (set >= 0) && (set < m_elevationCount));
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << set);
+  NS_ASSERT ( (set >= 0) && (set < m_elevationCount));
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << set);
   return m_markovProbabilities[set];
 }
 
@@ -148,7 +150,7 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
 {
   NS_LOG_FUNCTION (this << elevation);
 
-  NS_ASSERT( (elevation >= 0.0) && (elevation <= 90.0));
+  NS_ASSERT ((elevation >= 0.0) && (elevation <= 90.0));
 
   uint32_t smallestDifferenceIndex = 0;
   double smallestDifference = 360; /// elevation angle can never be this large
@@ -158,14 +160,14 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
 
   for (iter = m_markovElevations.begin (); iter != m_markovElevations.end (); ++iter)
     {
-      difference = fabs(iter->first - elevation);
+      difference = fabs (iter->first - elevation);
       if (difference < smallestDifference)
         {
           smallestDifference = difference;
           smallestDifferenceIndex = iter->second;
         }
     }
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatMarkovConf - New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
 
   return smallestDifferenceIndex;
 }
@@ -224,6 +226,14 @@ SatMarkovConf::GetLooConf ()
   NS_LOG_FUNCTION (this);
 
   return m_looConf;
+}
+
+Ptr<SatRayleighConf>
+SatMarkovConf::GetRayleighConf ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_rayleighConf;
 }
 
 SatMarkovConf::MarkovFaderType_t

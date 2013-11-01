@@ -30,37 +30,35 @@ NS_LOG_COMPONENT_DEFINE ("SatRayleighModel");
 TypeId SatRayleighModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRayleighModel")
-      .SetParent<Object> ()
+      .SetParent<SatFader> ()
       .AddConstructor<SatRayleighModel> ();
   return tid;
 }
 
-SatRayleighModel::SatRayleighModel () :
-  m_omegaDopplerMax (0),
-  m_nOscillators (0)
+SatRayleighModel::SatRayleighModel ()
 {
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT(0);
 }
 
-SatRayleighModel::SatRayleighModel (double dopplerFrequencyHz, uint32_t numOfOscillators) :
-  m_omegaDopplerMax (2.0 * dopplerFrequencyHz * SatRayleighModel::PI),
-  m_nOscillators (numOfOscillators)
+SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState) :
+  m_currentSet (initialSet),
+  m_currentState (initialState),
+  m_rayleighConf (rayleighConf)
 {
-  NS_LOG_FUNCTION (this << dopplerFrequencyHz << " " << numOfOscillators);
-
-  NS_ASSERT (m_nOscillators != 0);
-  NS_ASSERT (m_omegaDopplerMax != 0);
+  NS_LOG_FUNCTION (this);
 
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
   m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
   m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
 
+  m_rayleighParameters = m_rayleighConf->GetParameters (0);
+
   ConstructOscillators ();
 }
 
-SatRayleighModel::~SatRayleighModel()
+SatRayleighModel::~SatRayleighModel ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -77,28 +75,28 @@ SatRayleighModel::ConstructOscillators ()
   double phi = m_uniformVariable->GetValue ();
   /// Theta is common for all oscillators:
   double theta = m_uniformVariable->GetValue ();
-  for (uint32_t i = 0; i < m_nOscillators; i++)
+  for (uint32_t i = 0; i < m_rayleighParameters[0][1]; i++)
     {
       uint32_t n = i + 1;
       /// 1. Rotation speed
       /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-      double alpha = (2.0 * SatRayleighModel::PI * n - SatRayleighModel::PI + theta) / (4.0 * m_nOscillators);
+      double alpha = (2.0 * SatRayleighModel::PI * n - SatRayleighModel::PI + theta) / (4.0 * m_rayleighParameters[0][1]);
       /// 1b. Initiate rotation speed:
-      double omega = m_omegaDopplerMax * std::cos (alpha);
+      double omega = 2.0 * m_rayleighParameters[0][0] * SatRayleighModel::PI * std::cos (alpha);
       /// 2. Initiate complex amplitude:
       double psi = m_uniformVariable->GetValue ();
-      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_nOscillators);
+      std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_rayleighParameters[0][1]);
       /// 3. Construct oscillator:
       m_oscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
     }
 }
 
 std::complex<double>
-SatRayleighModel::GetComplexGain () const
+SatRayleighModel::GetComplexGain ()
 {
   NS_LOG_FUNCTION (this);
 
-  std::complex<double> sumAmplitude = std::complex<double> (0, 0);
+  std::complex<double> sumAmplitude = std::complex<double> (0,0);
   for (uint32_t i = 0; i < m_oscillators.size (); i++)
     {
       sumAmplitude += m_oscillators[i]->GetComplexValueAt (Now ());
@@ -107,26 +105,34 @@ SatRayleighModel::GetComplexGain () const
 }
 
 double
-SatRayleighModel::GetChannelGainDb () const
+SatRayleighModel::GetChannelGainDb ()
 {
   NS_LOG_FUNCTION (this);
 
   std::complex<double> complexGain = GetComplexGain ();
   double tempChannelGainDb = (10 * std::log10 ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2));
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
   return tempChannelGainDb;
 }
 
 double
-SatRayleighModel::GetChannelGain () const
+SatRayleighModel::GetChannelGain ()
 {
   NS_LOG_FUNCTION (this);
 
   std::complex<double> complexGain = GetComplexGain ();
 
   double tempChannelGain = ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2);
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " " << tempChannelGain);
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGain);
   return tempChannelGain;
+}
+
+void
+SatRayleighModel::UpdateParameters (uint32_t newSet, uint32_t newState)
+{
+  NS_LOG_FUNCTION (this << newSet << " " << newState);
+  m_currentSet = newSet;
+  m_currentState = newState;
 }
 
 } // namespace ns3

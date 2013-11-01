@@ -70,18 +70,18 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordi
     m_markovConf (markovConf),
     m_fader_up (NULL),
     m_fader_down (NULL),
-    m_numOfStates(markovConf->GetStateCount ()),
-    m_numOfSets(markovConf->GetNumOfSets ()),
+    m_numOfStates (markovConf->GetStateCount ()),
+    m_numOfSets (markovConf->GetNumOfSets ()),
     m_currentElevation (markovConf->GetInitialElevation()),
-    m_currentState (markovConf->GetInitialState()),
+    m_currentState (markovConf->GetInitialState ()),
     m_cooldownPeriodLength (markovConf->GetCooldownPeriod ()),
     m_minimumPositionChangeInMeters (markovConf->GetMinimumPositionChange ()),
     m_currentPosition (currentPosition),
     m_latestCalculationPosition (currentPosition),
     m_latestCalculatedFadingValue_up (0.0),
     m_latestCalculatedFadingValue_down (0.0),
-    m_latestCalculationTime_up (Now()),
-    m_latestCalculationTime_down (Now()),
+    m_latestCalculationTime_up (Now ()),
+    m_latestCalculationTime_down (Now ()),
     m_enableSetLock (false),
     m_enableStateLock (false)
 {
@@ -99,10 +99,10 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordi
   CreateFaders (m_markovConf->GetFaderType ());
 
   /// initialize fading values
-  CalculateFading(SatChannel::RETURN_USER_CH);
-  CalculateFading(SatChannel::FORWARD_USER_CH);
+  CalculateFading (SatChannel::RETURN_USER_CH);
+  CalculateFading (SatChannel::FORWARD_USER_CH);
 
-  NS_LOG_INFO("Time " << Now ().GetSeconds ()
+  NS_LOG_INFO ("Time " << Now ().GetSeconds ()
               << " SatFadingContainer - Creating SatFadingContainer, States: " << m_numOfStates
               << " Elevation: " << m_currentElevation
               << " Current Set ID: " << m_currentSet
@@ -125,8 +125,14 @@ SatFadingContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
   {
     case SatMarkovConf::LOO_FADER:
       {
-        m_fader_up = CreateObject<SatLooModel> (m_markovConf->GetLooConf(),m_numOfStates,m_currentSet,m_currentState);
-        m_fader_down = CreateObject<SatLooModel> (m_markovConf->GetLooConf(),m_numOfStates,m_currentSet,m_currentState);
+        m_fader_up = CreateObject<SatLooModel> (m_markovConf->GetLooConf (),m_numOfStates,m_currentSet,m_currentState);
+        m_fader_down = CreateObject<SatLooModel> (m_markovConf->GetLooConf (),m_numOfStates,m_currentSet,m_currentState);
+        break;
+      }
+    case SatMarkovConf::RAYLEIGH_FADER:
+      {
+        m_fader_up = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (),m_currentSet,m_currentState);
+        m_fader_down = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (),m_currentSet,m_currentState);
         break;
       }
     default :
@@ -143,17 +149,17 @@ SatFadingContainer::GetFading (SatChannel::ChannelType_t channelType)
 
   double fadingValue;
 
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Getting fading");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Getting fading");
 
   if (HasCooldownPeriodPassed (channelType))
     {
-      NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
+      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
       EvaluateStateChange ();
       fadingValue = CalculateFading (channelType);
     }
   else
     {
-      NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period in effect, using old fading value");
+      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period in effect, using old fading value");
       fadingValue = GetCachedFadingValue (channelType);
     }
 
@@ -181,10 +187,10 @@ SatFadingContainer::GetCachedFadingValue (SatChannel::ChannelType_t channelType)
       }
     default :
       {
-        NS_ASSERT(0);
+        NS_ASSERT (0);
       }
   }
-  NS_ASSERT(0);
+  NS_ASSERT (0);
   return -1;
 }
 
@@ -227,7 +233,7 @@ SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelTy
     case SatChannel::RETURN_USER_CH:
     case SatChannel::FORWARD_FEEDER_CH:
       {
-        if ( (Now().GetSeconds() - m_latestCalculationTime_up.GetSeconds ()) > m_cooldownPeriodLength.GetSeconds () )
+        if ( (Now ().GetSeconds () - m_latestCalculationTime_up.GetSeconds ()) > m_cooldownPeriodLength.GetSeconds () )
           {
             return true;
           }
@@ -236,7 +242,7 @@ SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelTy
     case SatChannel::FORWARD_USER_CH:
     case SatChannel::RETURN_FEEDER_CH:
       {
-        if ( (Now().GetSeconds() - m_latestCalculationTime_down.GetSeconds ()) > m_cooldownPeriodLength.GetSeconds () )
+        if ( (Now ().GetSeconds () - m_latestCalculationTime_down.GetSeconds ()) > m_cooldownPeriodLength.GetSeconds () )
           {
             return true;
           }
@@ -244,7 +250,7 @@ SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelTy
       }
     default :
       {
-        NS_ASSERT(0);
+        NS_ASSERT (0);
       }
   }
   return false;
@@ -277,7 +283,7 @@ SatFadingContainer::UpdateProbabilities (uint32_t set)
 
   std::vector <std::vector <double> > probabilities = m_markovConf->GetElevationProbabilities (set);
 
-  NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Updating probabilities...");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Updating probabilities...");
 
   for (uint32_t i = 0; i < m_numOfStates; ++i)
     {
@@ -292,7 +298,7 @@ SatFadingContainer::UpdateProbabilities (uint32_t set)
 void
 SatFadingContainer::SetPosition (GeoCoordinate newPosition)
 {
-  NS_LOG_FUNCTION (this << newPosition.GetLatitude() << "," << newPosition.GetLongitude() << "," << newPosition.GetAltitude());
+  NS_LOG_FUNCTION (this << newPosition.GetLatitude () << "," << newPosition.GetLongitude () << "," << newPosition.GetAltitude ());
 
   m_currentPosition = newPosition;
 }
@@ -302,7 +308,7 @@ SatFadingContainer::SetElevation (double newElevation)
 {
   NS_LOG_FUNCTION (this << newElevation);
 
-  NS_ASSERT( (newElevation >= 0.0) && (newElevation <= 90.0));
+  NS_ASSERT ( (newElevation >= 0.0) && (newElevation <= 90.0));
   m_currentElevation = newElevation;
 }
 
@@ -317,7 +323,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
       m_currentState = m_markovModel->GetState ();
     }
 
-  NS_ASSERT( (m_currentState >= 0) && (m_currentState < m_numOfStates));
+  NS_ASSERT ( (m_currentState >= 0) && (m_currentState < m_numOfStates));
 
   m_latestCalculationPosition = m_currentPosition;
 
@@ -330,7 +336,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
 
         m_latestCalculatedFadingValue_up = m_fader_up->GetChannelGain ();
 
-        NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
+        NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
 
         m_latestCalculationTime_up = Now ();
 
@@ -343,7 +349,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
 
         m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGain ();
 
-        NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
+        NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
 
         m_latestCalculationTime_down = Now ();
 
@@ -351,10 +357,10 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
       }
     default :
       {
-        NS_ASSERT(0);
+        NS_ASSERT (0);
       }
   }
-  NS_ASSERT(0);
+  NS_ASSERT (0);
   return -1;
 }
 
@@ -380,7 +386,7 @@ SatFadingContainer::LockToSet (uint32_t newSet)
 {
   NS_LOG_FUNCTION (this << newSet);
 
-  NS_ASSERT( (newSet >= 0) && (newSet < m_numOfSets));
+  NS_ASSERT ( (newSet >= 0) && (newSet < m_numOfSets));
 
   m_currentSet = newSet;
 

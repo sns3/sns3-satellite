@@ -76,7 +76,7 @@ SatFadingOscillator::GetCosineWaveValueAt (Time at) const
   NS_LOG_FUNCTION (this << at);
 
   std::complex<double> complexPhase = ( std::cos (at.GetSeconds () * m_omega + m_phase), std::sin (at.GetSeconds () * m_omega + m_phase) );
-  return ( m_amplitude * std::exp(complexPhase));
+  return ( m_amplitude * std::exp (complexPhase));
 }
 
 SatFadingOscillator::~SatFadingOscillator ()
