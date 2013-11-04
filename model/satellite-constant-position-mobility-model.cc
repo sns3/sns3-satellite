@@ -18,7 +18,10 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include "ns3/log.h"
 #include "satellite-constant-position-mobility-model.h"
+
+NS_LOG_COMPONENT_DEFINE ("SatConstMobilityModel");
 
 namespace ns3 {
 
@@ -36,27 +39,35 @@ SatConstantPositionMobilityModel::GetTypeId (void)
 
 SatConstantPositionMobilityModel::SatConstantPositionMobilityModel ()
 {
+  NS_LOG_FUNCTION (this);
 }
 SatConstantPositionMobilityModel::~SatConstantPositionMobilityModel ()
 {
+  NS_LOG_FUNCTION (this);
 }
 
 GeoCoordinate
 SatConstantPositionMobilityModel::DoGetGeoPosition (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_geoPosition;
 }
 void
 SatConstantPositionMobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
 {
+  NS_LOG_FUNCTION (this << position);
+
   m_geoPosition = position;
   NotifyGeoCourseChange ();
 }
 
-GeoCoordinate
-SatConstantPositionMobilityModel::DoGetGeoVelocity (void) const
+Vector
+SatConstantPositionMobilityModel::DoGetVelocity (void) const
 {
-  return GeoCoordinate (0.0, 0.0, 0.0);
+  NS_LOG_FUNCTION (this);
+
+  return Vector (0.0, 0.0, 0.0);
 }
 
 } // namespace ns3

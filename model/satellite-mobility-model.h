@@ -52,10 +52,6 @@ public:
    * \param position the satellite position to set.
    */
   void SetGeoPosition (const GeoCoordinate &position);
-  /**
-   * \return the current satellite velocity.
-   */
-  GeoCoordinate GetGeoVelocity (void) const;
 
   void NotifyGeoCourseChange (void) const;
 
@@ -74,14 +70,6 @@ private:
    * implement this method.
    */
   virtual void DoSetGeoPosition (const GeoCoordinate &position) = 0;
-  /**
-   * \return the current velocity.
-   *
-   * Concrete subclasses of this base class must 
-   * implement this method.
-   */
-  virtual GeoCoordinate DoGetGeoVelocity (void) const = 0;
-
   /**
    * This method is used to force update of cartesian position.
    * Cartesian position is updated when position is set by method DoSetPosition.
@@ -106,13 +94,6 @@ private:
    * Implementation for method defined by MobilityModel
    */
   virtual void DoSetPosition (const Vector &position);
-
-  /**
-   * \return Cartesian format velocity as vector
-   *
-   * Implementation for method defined by MobilityModel
-   */
-  virtual Vector DoGetVelocity (void) const;
 
   /**
    * Used to alert subscribers that a change in direction, velocity,

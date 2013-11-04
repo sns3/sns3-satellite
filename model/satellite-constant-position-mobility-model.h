@@ -41,10 +41,10 @@ public:
   virtual ~SatConstantPositionMobilityModel ();
 
 private:
+  Vector DoGetVelocity (void) const;
 
   virtual GeoCoordinate DoGetGeoPosition (void) const;
   virtual void DoSetGeoPosition (const GeoCoordinate &position);
-  virtual GeoCoordinate DoGetGeoVelocity (void) const;
 
   mutable GeoCoordinate m_geoPosition;
 };

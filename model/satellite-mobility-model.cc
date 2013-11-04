@@ -39,11 +39,6 @@ SatMobilityModel::GetTypeId (void)
                    MakeGeoCoordinateAccessor (&SatMobilityModel::SetGeoPosition,
                                               &SatMobilityModel::GetGeoPosition),
                    MakeGeoCoordinateChecker ())
-    .AddAttribute ("SatVelocity", "The current velocity of the mobility model.",
-                   TypeId::ATTR_GET,
-                   GeoCoordinateValue (GeoCoordinate (0.0, 0.0, 0.0)), // ignored initial value.
-                   MakeGeoCoordinateAccessor (&SatMobilityModel::GetGeoVelocity),
-                   MakeGeoCoordinateChecker ())
     .AddAttribute ("AsGeoCoordinates",
                     "SetPosition method takes Geodetic coordinates in given Vector, x=longitude, y=latitude, z=altitude",
                     BooleanValue (true),
@@ -76,11 +71,6 @@ GeoCoordinate
 SatMobilityModel::GetGeoPosition (void) const
 {
   return DoGetGeoPosition ();
-}
-GeoCoordinate
-SatMobilityModel::GetGeoVelocity (void) const
-{
-  return DoGetGeoVelocity ();
 }
 
 void
@@ -124,12 +114,6 @@ SatMobilityModel::DoSetPosition (const Vector &position)
       DoSetGeoPosition( GeoCoordinate(position) );
     }
 
-}
-
-Vector
-SatMobilityModel::DoGetVelocity (void) const
-{
-  return Vector (0.0, 0.0, 0.0);
 }
 
 void
