@@ -68,13 +68,6 @@ public:
   void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
-   *  Schedules time slots according to received TBTP message.
-   *
-   * \param slots Information of the time slots to be scheduled.
-   */
-  void ScheduleTimeSlots (std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots);
-
-  /**
    * \return Timing advance as Time object.
    */
   typedef Callback<Time> TimingAdvanceCallback;
@@ -86,6 +79,12 @@ public:
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
 private:
+  /**
+   *  Schedules time slots according to received TBTP message.
+   *
+   * \param tbtp Pointer to TBTP message.
+   */
+  void ScheduleTimeSlots (SatTbtpHeader * tbtp);
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
