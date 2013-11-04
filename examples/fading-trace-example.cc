@@ -22,6 +22,13 @@ static void FadingTraceCb ( std::string context, double time, SatChannel::Channe
   std::cout << time << " " << chType << " " << 20 * log10(fadingValue) << std::endl;
 }
 
+static double g_elevation = 45;
+
+static double GetElevation ()
+{
+   return g_elevation;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -29,11 +36,10 @@ main (int argc, char *argv[])
   /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
-  /// set position
-  GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
+  SatFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
 
   /// create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,currentPosition);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,elevationCb,0);
 
   markovContainer->TraceConnect("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 

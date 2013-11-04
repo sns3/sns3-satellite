@@ -56,7 +56,7 @@ public:
    * \param looConf Loo configuration object
    * \param currentPosition current position
    */
-  SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordinate currentPosition);
+  SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, double velocity);
 
   /**
    * \brief Destructor
@@ -69,18 +69,6 @@ public:
    * \return fading value
    */
   double GetFading (SatChannel::ChannelType_t channeltype);
-
-  /**
-   * \brief Function for setting the position
-   * \param newPosition new position
-   */
-  void SetPosition (GeoCoordinate newPosition);
-
-  /**
-   * \brief Function for setting the elevation
-   * \param newElevation new elevation
-   */
-  void SetElevation (double newElevation);
 
   /**
    * \brief Function for unlocking the parameter set and state
@@ -138,11 +126,6 @@ private:
   uint32_t m_numOfSets;
 
   /**
-   * \brief Current elevation value
-   */
-  double m_currentElevation;
-
-  /**
    * \brief Current parameter set
    */
   uint32_t m_currentSet;
@@ -161,16 +144,6 @@ private:
    * \brief Minimum state change distance in meters
    */
   double m_minimumPositionChangeInMeters;
-
-  /**
-   * \brief Current position
-   */
-  GeoCoordinate m_currentPosition;
-
-  /**
-   * \brief Latest position where calculations were done
-   */
-  GeoCoordinate m_latestCalculationPosition;
 
   /**
    * \brief Latest calculated uplink fading value
@@ -203,6 +176,21 @@ private:
   bool m_enableStateLock;
 
   /**
+   * \brief Node movement velocity
+   */
+  double m_velocity;
+
+  /**
+   * \brief Latest calculation time for state change
+   */
+  Time m_latestStateChangeTime;
+
+  /**
+   * \brief Current elevation value
+   */
+  ElevationCallback m_currentElevation;
+
+  /**
    * \brief Fading trace function
    */
   TracedCallback< double,                     // time
@@ -220,7 +208,7 @@ private:
   /**
    * \brief Function for evaluating state change
    */
-  void EvaluateStateChange ();
+  void EvaluateStateChange (SatChannel::ChannelType_t channelType);
 
   /**
    * \brief Function for calculating the fadign value
@@ -234,12 +222,6 @@ private:
    * \return elevation value
    */
   double CalculateElevation ();
-
-  /**
-   * \brief Function for checking the position change
-   * \return has position changed more that the defined parameter value
-   */
-  bool HasPositionChanged ();
 
   /**
    * \brief Function for checking whether the cooldown period has passed
@@ -259,6 +241,12 @@ private:
    * \brief Function for creating the Markov state faders
    */
   void CreateFaders (SatMarkovConf::MarkovFaderType_t faderType);
+
+  /**
+   * \brief Function for calculating the distance since latest state change position
+   * @return distance
+   */
+  double CalculateDistanceSinceLastStateChange ();
 
 };
 

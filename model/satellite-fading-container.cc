@@ -47,43 +47,42 @@ SatFadingContainer::SatFadingContainer () :
     m_fader_down (NULL),
     m_numOfStates (),
     m_numOfSets (),
-    m_currentElevation (),
     m_currentSet (),
     m_currentState (),
     m_cooldownPeriodLength (),
     m_minimumPositionChangeInMeters (),
-    m_currentPosition (),
-    m_latestCalculationPosition (),
     m_latestCalculatedFadingValue_up (),
     m_latestCalculatedFadingValue_down (),
     m_latestCalculationTime_up (),
     m_latestCalculationTime_down (),
     m_enableSetLock (false),
-    m_enableStateLock (false)
+    m_enableStateLock (false),
+    m_velocity (),
+    m_latestStateChangeTime ()
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT(0);
 }
 
-SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordinate currentPosition) :
+SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, double velocity) :
     m_markovModel (NULL),
     m_markovConf (markovConf),
     m_fader_up (NULL),
     m_fader_down (NULL),
     m_numOfStates (markovConf->GetStateCount ()),
     m_numOfSets (markovConf->GetNumOfSets ()),
-    m_currentElevation (markovConf->GetInitialElevation()),
     m_currentState (markovConf->GetInitialState ()),
     m_cooldownPeriodLength (markovConf->GetCooldownPeriod ()),
     m_minimumPositionChangeInMeters (markovConf->GetMinimumPositionChange ()),
-    m_currentPosition (currentPosition),
-    m_latestCalculationPosition (currentPosition),
     m_latestCalculatedFadingValue_up (0.0),
     m_latestCalculatedFadingValue_down (0.0),
     m_latestCalculationTime_up (Now ()),
     m_latestCalculationTime_down (Now ()),
     m_enableSetLock (false),
-    m_enableStateLock (false)
+    m_enableStateLock (false),
+    m_velocity (velocity),
+    m_latestStateChangeTime (Now ()),
+    m_currentElevation (elevation)
 {
   NS_LOG_FUNCTION (this);
 
@@ -91,7 +90,7 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordi
   m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates);
 
   /// initialize Markov model
-  m_currentSet = m_markovConf->GetProbabilitySetID (m_currentElevation);
+  m_currentSet = m_markovConf->GetProbabilitySetID (m_currentElevation ());
   UpdateProbabilities (m_currentSet);
   m_markovModel->DoTransition ();
 
@@ -104,7 +103,7 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, GeoCoordi
 
   NS_LOG_INFO ("Time " << Now ().GetSeconds ()
               << " SatFadingContainer - Creating SatFadingContainer, States: " << m_numOfStates
-              << " Elevation: " << m_currentElevation
+              << " Elevation: " << m_currentElevation ()
               << " Current Set ID: " << m_currentSet
               << " Cooldown Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
               << " Minimum Position Change In Meters: " << m_minimumPositionChangeInMeters
@@ -154,7 +153,11 @@ SatFadingContainer::GetFading (SatChannel::ChannelType_t channelType)
   if (HasCooldownPeriodPassed (channelType))
     {
       NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
-      EvaluateStateChange ();
+
+      if (m_velocity > 0)
+        {
+          EvaluateStateChange (channelType);
+        }
       fadingValue = CalculateFading (channelType);
     }
   else
@@ -195,21 +198,21 @@ SatFadingContainer::GetCachedFadingValue (SatChannel::ChannelType_t channelType)
 }
 
 void
-SatFadingContainer::EvaluateStateChange ()
+SatFadingContainer::EvaluateStateChange (SatChannel::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this);
 
-  if (HasPositionChanged ())
+  if (CalculateDistanceSinceLastStateChange () > m_minimumPositionChangeInMeters)
     {
       uint32_t newSetId;
 
       if (!m_enableSetLock)
         {
-          newSetId = m_markovConf->GetProbabilitySetID (m_currentElevation);
+          newSetId = m_markovConf->GetProbabilitySetID (m_currentElevation ());
 
           if (m_currentSet != newSetId)
             {
-              NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation  << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
+              NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation () << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
 
               m_currentSet = newSetId;
               UpdateProbabilities (m_currentSet);
@@ -218,6 +221,7 @@ SatFadingContainer::EvaluateStateChange ()
 
       if (!m_enableStateLock)
         {
+          m_latestStateChangeTime = Now ();
           m_markovModel->DoTransition ();
         }
     }
@@ -256,26 +260,6 @@ SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelTy
   return false;
 }
 
-bool
-SatFadingContainer::HasPositionChanged ()
-{
-  NS_LOG_FUNCTION (this);
-
-  ns3::Vector3D a = m_currentPosition.ToVector ();
-  ns3::Vector3D b = m_latestCalculationPosition.ToVector ();
-
-  double dx = b.x - a.x;
-  double dy = b.y - a.y;
-  double dz = b.z - a.z;
-  double distance = std::sqrt (dx * dx + dy * dy + dz * dz);
-
-  if (distance > m_minimumPositionChangeInMeters)
-    {
-      return true;
-    }
-  return false;
-}
-
 void
 SatFadingContainer::UpdateProbabilities (uint32_t set)
 {
@@ -295,24 +279,6 @@ SatFadingContainer::UpdateProbabilities (uint32_t set)
     }
 }
 
-void
-SatFadingContainer::SetPosition (GeoCoordinate newPosition)
-{
-  NS_LOG_FUNCTION (this << newPosition.GetLatitude () << "," << newPosition.GetLongitude () << "," << newPosition.GetAltitude ());
-
-  m_currentPosition = newPosition;
-}
-
-void
-SatFadingContainer::SetElevation (double newElevation)
-{
-  NS_LOG_FUNCTION (this << newElevation);
-
-  NS_ASSERT ( (newElevation >= 0.0) && (newElevation <= 90.0));
-  m_currentElevation = newElevation;
-}
-
-
 double
 SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
 {
@@ -324,8 +290,6 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
     }
 
   NS_ASSERT ( (m_currentState >= 0) && (m_currentState < m_numOfStates));
-
-  m_latestCalculationPosition = m_currentPosition;
 
   switch (channelType)
   {
@@ -411,6 +375,12 @@ SatFadingContainer::UnlockSetAndState ()
 
   m_enableSetLock = false;
   m_enableStateLock = false;
+}
+
+double
+SatFadingContainer::CalculateDistanceSinceLastStateChange ()
+{
+  return (Now ().GetSeconds () - m_latestStateChangeTime.GetSeconds()) * m_velocity;
 }
 
 } // namespace ns3

@@ -16,6 +16,18 @@ using namespace ns3;
 */
 NS_LOG_COMPONENT_DEFINE ("markov-example");
 
+static double g_elevation = 45;
+
+static double GetElevation ()
+{
+   return g_elevation;
+}
+
+static void SetElevation (double elevation)
+{
+   g_elevation = elevation;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -28,30 +40,21 @@ main (int argc, char *argv[])
   /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
-  /// set position
-  GeoCoordinate currentPosition = GeoCoordinate(20, -20, 35000000);
+  SatFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
 
   /// create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,currentPosition);
-
-  /// set alternate positions
-  GeoCoordinate position1 = GeoCoordinate(50, -50, 35000000);
-  GeoCoordinate position2 = GeoCoordinate(10, -10, 35000000);
-  GeoCoordinate position3 = GeoCoordinate(30, -30, 35000000);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,elevationCb,0);
 
   /// run simulation
-  Simulator::Schedule(Time("5ms"), &SatFadingContainer::SetPosition, markovContainer, position1);
   Simulator::Schedule(Time("10ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
   Simulator::Schedule(Time("30ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
-  Simulator::Schedule(Time("45ms"), &SatFadingContainer::SetElevation, markovContainer, 70);
+  Simulator::Schedule(Time("45ms"), &SetElevation, 55);
   Simulator::Schedule(Time("50ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
   Simulator::Schedule(Time("60ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
-  Simulator::Schedule(Time("65ms"), &SatFadingContainer::SetPosition, markovContainer, position2);
-  Simulator::Schedule(Time("65ms"), &SatFadingContainer::SetElevation, markovContainer, 10);
   Simulator::Schedule(Time("90ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
+  Simulator::Schedule(Time("95ms"), &SetElevation, 75);
   Simulator::Schedule(Time("100ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
   Simulator::Schedule(Time("130ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
-  Simulator::Schedule(Time("140ms"), &SatFadingContainer::SetPosition, markovContainer, position3);
   Simulator::Schedule(Time("200ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
 
   Simulator::Run ();

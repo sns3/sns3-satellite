@@ -37,6 +37,11 @@ class SatFading : public Object
 {
 public:
   /**
+   * \brief Gets elevation angle in degrees
+   */
+  typedef Callback<double> ElevationCallback;
+
+  /**
    * \brief Constructor
    */
   SatFading ();
@@ -58,18 +63,6 @@ public:
    * \return fading value
    */
   virtual double GetFading (SatChannel::ChannelType_t channelType) = 0;
-
-  /**
-   * \brief Function for setting the position
-   * \param newPosition new position
-   */
-  virtual void SetPosition (GeoCoordinate newPosition) = 0;
-
-  /**
-   * \brief Function for setting the elevation
-   * \param newElevation new elevation
-   */
-  virtual void SetElevation (double newElevation) = 0;
 
 private:
 
