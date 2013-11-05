@@ -23,10 +23,16 @@ static void FadingTraceCb ( std::string context, double time, SatChannel::Channe
 }
 
 static double g_elevation = 45;
+static double g_velocity = 0;
 
 static double GetElevation ()
 {
    return g_elevation;
+}
+
+static double GetVelocity ()
+{
+   return g_velocity;
 }
 
 int
@@ -37,9 +43,10 @@ main (int argc, char *argv[])
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
   SatFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
+  SatFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
 
   /// create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,elevationCb,0);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,elevationCb,velocityCb);
 
   markovContainer->TraceConnect("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 

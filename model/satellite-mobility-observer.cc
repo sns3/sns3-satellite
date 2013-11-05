@@ -117,6 +117,8 @@ SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr
   m_geoSatMobility->TraceConnect ("SatCourseChange", "Satellite", MakeCallback( &SatMobilityObserver::PositionChanged, this));
   m_ownMobility->TraceConnect ("SatCourseChange", "Own", MakeCallback (&SatMobilityObserver::PositionChanged, this));
 
+  m_velocity = 0.0;
+
   m_initialized = true;
 }
 
@@ -161,6 +163,14 @@ SatMobilityObserver::GetElevationAngle (void)
     }
 
   return m_elevationAngle;
+}
+
+double
+SatMobilityObserver::GetVelocity (void)
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_velocity;
 }
 
 Time

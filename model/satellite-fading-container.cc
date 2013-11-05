@@ -64,7 +64,7 @@ SatFadingContainer::SatFadingContainer () :
   NS_ASSERT(0);
 }
 
-SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, double velocity) :
+SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity) :
     m_markovModel (NULL),
     m_markovConf (markovConf),
     m_fader_up (NULL),
@@ -154,7 +154,7 @@ SatFadingContainer::GetFading (SatChannel::ChannelType_t channelType)
     {
       NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
 
-      if (m_velocity > 0)
+      if (m_velocity () > 0)
         {
           EvaluateStateChange (channelType);
         }
@@ -380,7 +380,7 @@ SatFadingContainer::UnlockSetAndState ()
 double
 SatFadingContainer::CalculateDistanceSinceLastStateChange ()
 {
-  return (Now ().GetSeconds () - m_latestStateChangeTime.GetSeconds()) * m_velocity;
+  return (Now ().GetSeconds () - m_latestStateChangeTime.GetSeconds()) * m_velocity ();
 }
 
 } // namespace ns3

@@ -42,6 +42,11 @@ public:
   typedef Callback<double> ElevationCallback;
 
   /**
+   * \brief Gets velocity in m/s
+   */
+  typedef Callback<double> VelocityCallback;
+
+  /**
    * \brief Constructor
    */
   SatFading ();

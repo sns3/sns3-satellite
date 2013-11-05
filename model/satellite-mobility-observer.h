@@ -80,6 +80,13 @@ public:
   double GetElevationAngle (void);
 
   /**
+   * Get elevation angle.
+   *
+   * @return the current elevation angle as degrees.
+   */
+  double GetVelocity (void);
+
+  /**
    * Get timing advance.
    *
    * @return the current timing advance.
@@ -137,6 +144,7 @@ private:
   double m_radiusRatio;
   double m_maxDistanceToSatellite;
   Time m_timingAdvance_s;
+  double m_velocity;
 };
 
 } // namespace ns3

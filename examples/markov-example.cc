@@ -17,6 +17,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("markov-example");
 
 static double g_elevation = 45;
+static double g_velocity = 0;
 
 static double GetElevation ()
 {
@@ -26,6 +27,16 @@ static double GetElevation ()
 static void SetElevation (double elevation)
 {
    g_elevation = elevation;
+}
+
+static double GetVelocity ()
+{
+   return g_velocity;
+}
+
+static void SetVelocity (double velocity)
+{
+   g_velocity = velocity;
 }
 
 int
@@ -41,11 +52,13 @@ main (int argc, char *argv[])
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
   SatFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
+  SatFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
 
   /// create fading container based on default configuration
-  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,elevationCb,0);
+  Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer>(markovConf,elevationCb,velocityCb);
 
   /// run simulation
+  Simulator::Schedule(Time("5ms"), &SetVelocity, 0);
   Simulator::Schedule(Time("10ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
   Simulator::Schedule(Time("30ms"), &SatFadingContainer::GetFading, markovContainer, SatChannel::FORWARD_USER_CH);
   Simulator::Schedule(Time("45ms"), &SetElevation, 55);

@@ -56,7 +56,7 @@ public:
    * \param looConf Loo configuration object
    * \param currentPosition current position
    */
-  SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, double velocity);
+  SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity);
 
   /**
    * \brief Destructor
@@ -178,7 +178,7 @@ private:
   /**
    * \brief Node movement velocity
    */
-  double m_velocity;
+  VelocityCallback m_velocity;
 
   /**
    * \brief Latest calculation time for state change

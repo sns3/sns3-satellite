@@ -563,9 +563,10 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
       Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
       SatFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle, observer);
+      SatFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity, observer);
 
       /// create fading container based on default configuration
-      Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer> (markovConf, elevationCb, 0);
+      Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer> (markovConf, elevationCb, velocityCb);
 
       node->AggregateObject (markovContainer);
     }
