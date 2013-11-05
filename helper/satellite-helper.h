@@ -44,24 +44,29 @@ namespace ns3 {
 class SatHelper : public Object
 {
 public:
-    /**
-     * \enum values for pre-defined scenarios to be used by helper when building
-               satellite network topology base.
-     *
-     *  - NONE:         Not used.
-     *  - SIMPLE:       Simple scenario used as base.
-     *  - LARGER:       Larger scenario used as base.
-     *  - FULL:         Full scenario used as base.
-     *  - USER_DEFINED: User defined scenario as base.
-     */
-    typedef enum
-    {
-      NONE,
-      SIMPLE,
-      LARGER,
-      FULL,
-      USER_DEFINED
-    } PreDefinedScenario_t;
+  /**
+   * definition for beam map key and value.
+   */
+  typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
+
+  /**
+   * \enum values for pre-defined scenarios to be used by helper when building
+             satellite network topology base.
+   *
+   *  - NONE:         Not used.
+   *  - SIMPLE:       Simple scenario used as base.
+   *  - LARGER:       Larger scenario used as base.
+   *  - FULL:         Full scenario used as base.
+   *  - USER_DEFINED: User defined scenario as base.
+   */
+  typedef enum
+  {
+    NONE,
+    SIMPLE,
+    LARGER,
+    FULL,
+    USER_DEFINED
+  } PreDefinedScenario_t;
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -90,7 +95,7 @@ public:
    *
    * \param info information of the users in beams (for user defined scenario defines beams to create)
    */
-  void SetBeamUserInfo (std::map<uint32_t, SatBeamUserInfo> info);
+  void SetBeamUserInfo (BeamUserInfoMap_t info);
 
   /**
    * Sets beam info for sceanrio creation.
@@ -139,11 +144,6 @@ public:
 
 private:
   /**
-     * definition for beam map key and value.
-     */
-  typedef std::map<uint32_t, SatBeamUserInfo > BeamMap;
-
-  /**
    * Enables creation traces in sub-helpers.
    */
   void EnableDetailedCreationTraces ();
@@ -179,10 +179,10 @@ private:
 
   /**
    * Creates satellite objects according to given beam info.
-   * /param beamInfo information of the beam to create (and beams which are given in map)
+   * /param beamInfos information of the beam to create (and beams which are given in map)
    * /param gwUsers number of the users in GW(s) side
    */
-  void DoCreateScenario (BeamMap beamInfo, uint32_t gwUsers);
+  void DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -213,6 +213,13 @@ private:
    *
    */
   void SetUtMobility (NodeContainer uts, uint32_t beamId);
+
+  /**
+   * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node
+   *
+   * \param nodes Nodecontainer of nodes to install mobility observer.
+   */
+  void  InstallMobilityObserver (NodeContainer nodes) const;
 
   /**
    * User helper
@@ -287,7 +294,7 @@ private:
    *
    * Info is set by attribute BeamInfo
    */
-  BeamMap m_beamInfo;
+  BeamUserInfoMap_t m_beamUserInfos;
 
   /**
    * Antenna gain patterns for all spot-beams. Used for beam selection.

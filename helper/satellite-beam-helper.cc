@@ -178,22 +178,24 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   bool storedOk = StoreGwNode (gwId, gwNode);
   NS_ASSERT ( storedOk );
 
-  // install mobility observer to GW
-  InstallMobilityObserver (gwNode);
+  // install fading container to GW
+  InstallFadingContainer (gwNode);
 
-  // install mobility observer to UTs
+  Ptr<SatMobilityModel> gwMobility = gwNode->GetObject<SatMobilityModel> ();
+  NS_ASSERT (gwMobility != NULL);
+
+  // enable timing advance in observers of the UTs
   for ( NodeContainer::Iterator i = ut.Begin ();  i != ut.End (); i++ )
     {
-      Ptr<SatMobilityObserver> observer = InstallMobilityObserver (*i);
-
       // enable timing advance observing in nodes.
 
-      Ptr<SatMobilityModel> gwMobility = gwNode->GetObject<SatMobilityModel> ();
+      Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
+      NS_ASSERT (observer != NULL);
 
-      NS_ASSERT (gwMobility != NULL);
       observer->ObserveTimingAdvance (userLink.second->GetPropagationDelayModel(),
                                       feederLink.second->GetPropagationDelayModel(), gwMobility);
 
+      InstallFadingContainer (*i);
     }
 
   //install GW
@@ -545,29 +547,31 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
     }
 }
 
-Ptr<SatMobilityObserver>
-SatBeamHelper::InstallMobilityObserver (Ptr<Node> node) const
+Ptr<SatFadingContainer>
+SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
 {
   NS_LOG_FUNCTION (this << node);
 
-  Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
+  Ptr<SatFadingContainer> markovContainer = node->GetObject<SatFadingContainer> ();
 
-  if (observer == 0)
+  if (markovContainer == 0)
     {
+      Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
+      NS_ASSERT (observer != NULL);
 
-      Ptr<SatMobilityModel> ownMobility = node->GetObject<SatMobilityModel> ();
-      Ptr<SatMobilityModel> satMobility = m_geoNode->GetObject<SatMobilityModel> ();
+      /// create default Markov & Loo configurations
+      Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
-      NS_ASSERT (ownMobility != NULL);
-      NS_ASSERT (satMobility != NULL);
+      SatFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle, observer);
 
-      observer = CreateObject<SatMobilityObserver> (ownMobility, satMobility);
+      /// create fading container based on default configuration
+      Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer> (markovConf, elevationCb, 0);
 
-      node->AggregateObject (observer);
-
+      node->AggregateObject (markovContainer);
     }
 
-  return observer;
+  return markovContainer;
 }
+
 
 } // namespace ns3

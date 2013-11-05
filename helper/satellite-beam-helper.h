@@ -33,6 +33,7 @@
 #include "ns3/satellite-antenna-gain-pattern-container.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-mobility-observer.h"
+#include "ns3/satellite-fading-container.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -267,12 +268,12 @@ private:
                          Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
 
   /**
-   * Install Satellite Mobility Observer to node, if observer doesn't exist already in node
+   * Install fading model to node, if fading model doesn't exist already in node
    *
    * \param node Pointer to node
-   * \return Pointer to mobility observer
+   * \return Pointer to fading container
    */
-  Ptr<SatMobilityObserver>  InstallMobilityObserver (Ptr<Node> node) const;
+  Ptr<SatFadingContainer>  InstallFadingContainer (Ptr<Node> node) const;
 
 };
 

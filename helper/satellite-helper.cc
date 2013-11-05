@@ -66,11 +66,15 @@ SatHelper::GetTypeId (void)
 TypeId
 SatHelper::GetInstanceTypeId (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return GetTypeId();
 }
 
 SatHelper::SatHelper ()
 {
+  NS_LOG_FUNCTION (this);
+
   // Do nothing here
   NS_ASSERT (true);
 }
@@ -79,6 +83,8 @@ SatHelper::SatHelper (std::string scenarioName)
  : m_scenarioCreated(false),
    m_detailedCreationTraces(false)
 {
+  NS_LOG_FUNCTION (this);
+
   // uncomment next line, if attributes are needed already in construction phase
   //ObjectBase::ConstructSelf(AttributeConstructionList ());
 
@@ -133,20 +139,26 @@ SatHelper::SatHelper (std::string scenarioName)
 }
 
 void
-SatHelper::SetBeamUserInfo(std::map<uint32_t, SatBeamUserInfo> info)
+SatHelper::SetBeamUserInfo(BeamUserInfoMap_t infos)
 {
-  m_beamInfo = info;
+  NS_LOG_FUNCTION (this);
+
+  m_beamUserInfos = infos;
 }
 
 void
 SatHelper::SetBeamUserInfo(uint32_t beamId, SatBeamUserInfo info)
 {
-  std::pair<BeamMap::iterator, bool> result = m_beamInfo.insert(std::make_pair(beamId, info));
+  NS_LOG_FUNCTION (this);
+
+  std::pair<BeamUserInfoMap_t::iterator, bool> result = m_beamUserInfos.insert(std::make_pair(beamId, info));
   NS_ASSERT(result.second == true);
 }
 
 void SatHelper::CreateScenario(PreDefinedScenario_t scenario)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT(m_scenarioCreated == false);
 
   switch(scenario)
@@ -175,6 +187,8 @@ void SatHelper::CreateScenario(PreDefinedScenario_t scenario)
 
 void SatHelper::EnableCreationTraces(std::string filename, bool details)
 {
+  NS_LOG_FUNCTION (this);
+
   AsciiTraceHelper asciiTraceHelper;
   std::string outputFile = "creation.log";
 
@@ -193,6 +207,8 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
 
 void SatHelper::EnableDetailedCreationTraces()
 {
+  NS_LOG_FUNCTION (this);
+
   CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, m_creationTraceStream);
   TraceConnect("Creation", "SatHelper", creationCb);
 
@@ -203,6 +219,8 @@ void SatHelper::EnableDetailedCreationTraces()
 Ipv4Address
 SatHelper::GetUserAddress(Ptr<Node> node)
 {
+  NS_LOG_FUNCTION (this);
+
   Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> (); // Get Ipv4 instance of the node
   return ipv4->GetAddress (1, 0).GetLocal(); // Get Ipv4InterfaceAddress of interface csma interface.
 }
@@ -210,23 +228,29 @@ SatHelper::GetUserAddress(Ptr<Node> node)
 NodeContainer
 SatHelper::GetUtUsers()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_userHelper->GetUtUsers();
 }
 
 NodeContainer
 SatHelper::GetGwUsers()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_userHelper->GetGwUsers();
 }
 
 void
 SatHelper::CreateSimpleScenario()
 {
-  SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
-  BeamMap beamMap;
-  beamMap[8] = beamInfo;
+  NS_LOG_FUNCTION (this);
 
-  DoCreateScenario(beamMap, 1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
+  BeamUserInfoMap_t beamUserInfos;
+  beamUserInfos[8] = beamInfo;
+
+  DoCreateScenario(beamUserInfos, 1);
 
   m_creationSummary("*** Simple Scenario Creation Summary ***");
 }
@@ -234,20 +258,22 @@ SatHelper::CreateSimpleScenario()
 void
 SatHelper::CreateLargerScenario()
 {
+  NS_LOG_FUNCTION (this);
+
   // install one user for UTs in beams 12 and 22
   SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
-  BeamMap beamMap;
+  BeamUserInfoMap_t beamUserInfos;
 
-  beamMap[12] = beamInfo;
-  beamMap[22] = beamInfo;
+  beamUserInfos[12] = beamInfo;
+  beamUserInfos[22] = beamInfo;
 
   // install two users for UT1 and one for UT2 in beam 3
   beamInfo.SetUtUserCount(0,2);
   beamInfo.AppendUt(1);
 
-  beamMap[3] = beamInfo;
+  beamUserInfos[3] = beamInfo;
 
-  DoCreateScenario(beamMap, 1);
+  DoCreateScenario(beamUserInfos, 1);
 
   m_creationSummary("*** Larger Scenario Creation Summary ***");
 }
@@ -255,15 +281,17 @@ SatHelper::CreateLargerScenario()
 void
 SatHelper::CreateFullScenario()
 {
+  NS_LOG_FUNCTION (this);
+
   uint32_t beamCount =  m_satConf->GetBeamCount();
-  BeamMap beamMap;
+  BeamUserInfoMap_t beamUserInfos;
 
   for ( uint32_t i = 1; i < (beamCount + 1); i ++ )
     {
-      BeamMap::iterator beamInfo = m_beamInfo.find(i);
+      BeamUserInfoMap_t::iterator beamInfo = m_beamUserInfos.find(i);
       SatBeamUserInfo info;
 
-      if ( beamInfo != m_beamInfo.end())
+      if ( beamInfo != m_beamUserInfos.end())
         {
           info = beamInfo->second;
         }
@@ -272,25 +300,29 @@ SatHelper::CreateFullScenario()
           info = SatBeamUserInfo(m_utsInBeam, this->m_utUsers );
         }
 
-      beamMap[i] = info;
+      beamUserInfos[i] = info;
     }
 
-  DoCreateScenario(beamMap, m_gwUsers);
+  DoCreateScenario(beamUserInfos, m_gwUsers);
 
   m_creationSummary("*** Full Scenario Creation Summary ***");
 }
 void
 SatHelper::CreateUserDefinedScenario()
 {
+  NS_LOG_FUNCTION (this);
+
   // create as user wants
-  DoCreateScenario(m_beamInfo, m_gwUsers);
+  DoCreateScenario(m_beamUserInfos, m_gwUsers);
 
   m_creationSummary("*** User Defined Scenario Creation Summary ***");
 }
 
 void
-SatHelper::DoCreateScenario(BeamMap beamInfo, uint32_t gwUsers)
+SatHelper::DoCreateScenario(BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
 {
+  NS_LOG_FUNCTION (this);
+
   InternetStackHelper internet;
 
   // create all possible GW nodes, set mobility to them and install to interner
@@ -299,7 +331,7 @@ SatHelper::DoCreateScenario(BeamMap beamInfo, uint32_t gwUsers)
   SetGwMobility(gwNodes);
   internet.Install(gwNodes);
 
-  for ( BeamMap::iterator info = beamInfo.begin(); info != beamInfo.end(); info++)
+  for ( BeamUserInfoMap_t::iterator info = beamInfos.begin(); info != beamInfos.end(); info++)
     {
       // create UTs of the beam, set mobility to them and install to internet
       NodeContainer uts;
@@ -326,6 +358,8 @@ SatHelper::DoCreateScenario(BeamMap beamInfo, uint32_t gwUsers)
 void
 SatHelper::SetGwMobility(NodeContainer gwNodes)
 {
+  NS_LOG_FUNCTION (this);
+
   MobilityHelper mobility;
 
   Ptr<SatListPositionAllocator> gwPosAllocator = CreateObject<SatListPositionAllocator> ();
@@ -339,11 +373,15 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
   mobility.SetPositionAllocator (gwPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (gwNodes);
+
+  InstallMobilityObserver (gwNodes);
 }
 
 void
 SatHelper::SetUtMobility(NodeContainer uts, uint32_t beamId)
 {
+  NS_LOG_FUNCTION (this);
+
   MobilityHelper mobility;
 
   // Create new position allocator
@@ -355,17 +393,17 @@ SatHelper::SetUtMobility(NodeContainer uts, uint32_t beamId)
   allocator->SetAltitude (altRnd);
 
   mobility.SetPositionAllocator (allocator);
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (uts);
 
-  for ( NodeContainer::Iterator i = uts.Begin();  i != uts.End(); i++ )
-    {
-      mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
-      mobility.Install (uts);
-    }
+  InstallMobilityObserver (uts);
 }
 
 void
 SatHelper::SetGeoSatMobility(Ptr<Node> node)
 {
+  NS_LOG_FUNCTION (this);
+
   MobilityHelper mobility;
 
   Ptr<SatListPositionAllocator> geoSatPosAllocator = CreateObject<SatListPositionAllocator> ();
@@ -374,6 +412,31 @@ SatHelper::SetGeoSatMobility(Ptr<Node> node)
   mobility.SetPositionAllocator (geoSatPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (node);
+}
+
+void
+SatHelper::InstallMobilityObserver (NodeContainer nodes) const
+{
+  NS_LOG_FUNCTION (this);
+
+  for ( NodeContainer::Iterator i = nodes.Begin();  i != nodes.End(); i++ )
+    {
+
+      Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
+
+      if (observer == 0)
+        {
+          Ptr<SatMobilityModel> ownMobility = (*i)->GetObject<SatMobilityModel> ();
+          Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNode()->GetObject<SatMobilityModel> ();
+
+          NS_ASSERT (ownMobility != NULL);
+          NS_ASSERT (satMobility != NULL);
+
+          observer = CreateObject<SatMobilityObserver> (ownMobility, satMobility);
+
+          (*i)->AggregateObject (observer);
+        }
+    }
 }
 
 void
