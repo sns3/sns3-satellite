@@ -24,6 +24,7 @@
 #include "ns3/internet-stack-helper.h"
 #include "ns3/ipv4-interface.h"
 #include "ns3/mobility-helper.h"
+#include "ns3/enum.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -51,6 +52,12 @@ SatBeamHelper::GetTypeId (void)
                       CallbackValue (),
                       MakeCallbackAccessor (&SatBeamHelper::m_carrierFreqConverter),
                       MakeCallbackChecker ())
+      .AddAttribute ("FadingModel",
+                     "Fading model",
+                      EnumValue (SatBeamHelper::FADING_MARKOV),
+                      MakeEnumAccessor (&SatBeamHelper::m_fadingModel),
+                      MakeEnumChecker (SatBeamHelper::FADING_OFF, "FadingOff",
+                                       SatBeamHelper::FADING_MARKOV, "FadingMarkov"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
     ;
@@ -179,7 +186,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   NS_ASSERT ( storedOk );
 
   // install fading container to GW
-  InstallFadingContainer (gwNode);
+  if (m_fadingModel != SatBeamHelper::FADING_OFF)
+    {
+      InstallFadingContainer (gwNode);
+    }
 
   Ptr<SatMobilityModel> gwMobility = gwNode->GetObject<SatMobilityModel> ();
   NS_ASSERT (gwMobility != NULL);
@@ -195,7 +205,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
       observer->ObserveTimingAdvance (userLink.second->GetPropagationDelayModel(),
                                       feederLink.second->GetPropagationDelayModel(), gwMobility);
 
-      InstallFadingContainer (*i);
+      if (m_fadingModel != SatBeamHelper::FADING_OFF)
+        {
+          InstallFadingContainer (*i);
+        }
     }
 
   //install GW
@@ -412,13 +425,13 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
 
         if ( isUserLink )
           {
-            forwardCh->SetChannelType (SatChannel::FORWARD_USER_CH);
-            returnCh->SetChannelType (SatChannel::RETURN_USER_CH);
+            forwardCh->SetChannelType (SatEnums::FORWARD_USER_CH);
+            returnCh->SetChannelType (SatEnums::RETURN_USER_CH);
           }
         else
           {
-            forwardCh->SetChannelType (SatChannel::FORWARD_FEEDER_CH);
-            returnCh->SetChannelType (SatChannel::RETURN_FEEDER_CH);
+            forwardCh->SetChannelType (SatEnums::FORWARD_FEEDER_CH);
+            returnCh->SetChannelType (SatEnums::RETURN_FEEDER_CH);
           }
 
         forwardCh->SetFrequencyConverter (m_carrierFreqConverter);
@@ -547,31 +560,48 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
     }
 }
 
-Ptr<SatFadingContainer>
+Ptr<SatFading>
 SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
 {
   NS_LOG_FUNCTION (this << node);
 
-  Ptr<SatFadingContainer> markovContainer = node->GetObject<SatFadingContainer> ();
+  Ptr<SatFading> fadingContainer = node->GetObject<SatFading> ();
 
-  if (markovContainer == 0)
+  if (fadingContainer == 0)
     {
-      Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
-      NS_ASSERT (observer != NULL);
+      switch (m_fadingModel)
+        {
+        case SatBeamHelper::FADING_MARKOV:
+          {
+            Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
+            NS_ASSERT(observer != NULL);
 
-      /// create default Markov & Loo configurations
-      Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
+            /// create default Markov & Loo configurations
+            Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 
-      SatFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle, observer);
-      SatFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity, observer);
+            SatFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle,
+                                                                     observer);
+            SatFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity,
+                                                                   observer);
 
-      /// create fading container based on default configuration
-      Ptr<SatFadingContainer> markovContainer = CreateObject<SatFadingContainer> (markovConf, elevationCb, velocityCb);
+            /// create fading container based on default configuration
+            fadingContainer = CreateObject<SatMarkovContainer> (markovConf,
+                                                                elevationCb,
+                                                                velocityCb);
 
-      node->AggregateObject (markovContainer);
+            node->AggregateObject (fadingContainer);
+            break;
+          }
+
+        /// FADING_OFF option should never get to InstallFadingContainer
+        case SatBeamHelper::FADING_OFF:
+        default:
+          {
+            NS_ASSERT(0);
+          }
+        }
     }
-
-  return markovContainer;
+  return fadingContainer;
 }
 
 

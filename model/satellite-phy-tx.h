@@ -31,7 +31,7 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
-
+#include "satellite-fading.h"
 
 namespace ns3 {
 
@@ -94,6 +94,25 @@ public:
   double GetAntennaGain (Ptr<MobilityModel> mobility);
 
   /**
+   * \brief Function for setting the default fading value
+   * \param fadingValue default fading value
+   */
+  void SetDefaultFadingValue (double fadingValue);
+
+  /**
+   * \brief Get fading value
+   * \param channelType channel type
+   * \return
+   */
+  double GetFadingValue (SatEnums::ChannelType_t channelType);
+
+  /**
+   * \brief Set fading container
+   * \param fadingContainer fading container
+   */
+  void SetFadingContainer (Ptr<SatFading> fadingContainer);
+
+  /**
   * Start packet transmission to the channel.
   * \param p Packet to be transmitted
   * \param txParams Transmission parameters for a packet
@@ -126,6 +145,16 @@ private:
   State m_state;
   uint32_t m_beamId;
   SatPhyTxMode_t m_txMode;
+
+  /**
+   * \brief Fading container for fading model
+   */
+  Ptr<SatFading> m_fadingContainer;
+
+  /**
+   * \brief Default fading value
+   */
+  double m_defaultFadingValue;
 };
 
 

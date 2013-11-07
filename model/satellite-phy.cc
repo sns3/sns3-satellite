@@ -74,6 +74,9 @@ SatPhy::Initialize()
   m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_db);
   m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_db);
 
+  m_phyTx->SetDefaultFadingValue (m_defaultFadingValue);
+  m_phyRx->SetDefaultFadingValue (m_defaultFadingValue);
+
   m_phyRx->SetAntennaLoss_Db (m_rxAntennaLoss_db);
 }
 
@@ -156,6 +159,10 @@ SatPhy::GetTypeId (void)
                    DoubleValue(0.00),
                    MakeDoubleAccessor(&SatPhy::m_rxAntennaLoss_db),
                    MakeDoubleChecker<double> ())
+   .AddAttribute("DefaultFadingValue", "Default value for fading",
+                   DoubleValue(1.00),
+                   MakeDoubleAccessor(&SatPhy::m_defaultFadingValue),
+                   MakeDoubleChecker<double_t> ())
 
   ;
   return tid;

@@ -30,6 +30,7 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-free-space-loss.h"
 #include "satellite-phy-rx.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -46,14 +47,6 @@ class SatChannel : public Channel
 {
 public:
 
-  /**
-   * Possible types of channel.
-   */
-  typedef enum
-  {
-    UNKNOWN_CH, FORWARD_FEEDER_CH, FORWARD_USER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
-  } ChannelType_t;
-
   SatChannel ();
   virtual ~SatChannel ();
   static TypeId GetTypeId (void);
@@ -67,7 +60,7 @@ public:
    *
    * \return The center frequency of the carrier.
    */
-  typedef Callback<double, ChannelType_t, uint32_t, uint32_t  > CarrierFreqConverter;
+  typedef Callback<double, SatEnums::ChannelType_t, uint32_t, uint32_t  > CarrierFreqConverter;
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
@@ -86,7 +79,7 @@ public:
    *
    * \param chType Type of the channel.
    */
-  virtual void SetChannelType (SatChannel::ChannelType_t chType);
+  virtual void SetChannelType (SatEnums::ChannelType_t chType);
 
   /**
    * Set the frequency id of the channel.
@@ -106,7 +99,7 @@ public:
    * Get the type of the channel.
    * \return Type of the channel.
    */
-  virtual SatChannel::ChannelType_t GetChannelType ();
+  virtual SatEnums::ChannelType_t GetChannelType ();
 
   /**
    * Set the  propagation delay model to be used in the SatChannel
@@ -159,7 +152,7 @@ private:
   /**
    * Type of the channel
    */
-  ChannelType_t m_channelType;
+  SatEnums::ChannelType_t m_channelType;
 
   /**
    * Frequency coverter callback.

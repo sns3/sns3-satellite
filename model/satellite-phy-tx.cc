@@ -34,7 +34,6 @@
 #include "satellite-channel.h"
 #include "satellite-antenna-gain-pattern.h"
 
-
 NS_LOG_COMPONENT_DEFINE ("SatPhyTx");
 
 namespace ns3 {
@@ -117,6 +116,36 @@ SatPhyTx::GetAntennaGain (Ptr<MobilityModel> mobility)
     }
 
   return gain_W;
+}
+
+void
+SatPhyTx::SetDefaultFadingValue (double fadingValue)
+{
+  NS_LOG_FUNCTION (this);
+  m_defaultFadingValue = fadingValue;
+}
+
+double
+SatPhyTx::GetFadingValue (SatEnums::ChannelType_t channelType)
+{
+  NS_LOG_FUNCTION (this);
+
+  double fadingValue (m_defaultFadingValue);
+
+  if (m_fadingContainer)
+    {
+      fadingValue = m_fadingContainer->GetFading (channelType);
+    }
+  // Returns value 1 if fading is not set, as fading value is used as multiplier
+  return fadingValue;
+}
+
+void
+SatPhyTx::SetFadingContainer (Ptr<SatFading> fadingContainer)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_fadingContainer = fadingContainer;
 }
 
 Ptr<MobilityModel>

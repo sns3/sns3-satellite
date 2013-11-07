@@ -142,7 +142,7 @@ public:
     * \param freqId    Id of the frequency.
     * \param carrierId Id of the carrier.
     */
-   double GetCarrierFrequency( SatChannel::ChannelType_t chType, uint32_t freqId, uint32_t carrierId );
+   double GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, uint32_t carrierId );
 
    /**
     * Convert carrier id and sequency id to to bandwidth value.
@@ -150,7 +150,7 @@ public:
     * \param chType    Type of channel.
     * \param carrierId Id of the carrier.
     */
-   double GetCarrierBandwidth( SatChannel::ChannelType_t chType, uint32_t carrierId );
+   double GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId );
 
    /**
     * Definition for beam ID index (column) in m_conf

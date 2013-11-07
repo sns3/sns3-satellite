@@ -108,7 +108,7 @@ void SatChannelFadingTraceContainer::CreateGwFadingTraces (uint32_t numGws)
 
 
 Ptr<SatChannelFadingTrace>
-SatChannelFadingTraceContainer::GetFadingTrace (uint32_t nodeId, SatChannel::ChannelType_t channelType) const
+SatChannelFadingTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const
 {
   NS_LOG_FUNCTION (this << nodeId);
   NS_ASSERT (!m_utFadingMap.empty ());
@@ -117,18 +117,18 @@ SatChannelFadingTraceContainer::GetFadingTrace (uint32_t nodeId, SatChannel::Cha
   Ptr<SatChannelFadingTrace> ft;
   switch (channelType)
   {
-    case SatChannel::FORWARD_USER_CH:
+    case SatEnums::FORWARD_USER_CH:
       ft = m_utFadingMap.at(nodeId).second;
       break;
-    case SatChannel::RETURN_USER_CH:
+    case SatEnums::RETURN_USER_CH:
       ft = m_utFadingMap.at(nodeId).first;
       break;
 
-    case SatChannel::FORWARD_FEEDER_CH:
+    case SatEnums::FORWARD_FEEDER_CH:
       ft = m_gwFadingMap.at(nodeId).second;
       break;
 
-    case SatChannel::RETURN_FEEDER_CH:
+    case SatEnums::RETURN_FEEDER_CH:
       ft = m_gwFadingMap.at(nodeId).first;
       break;
 

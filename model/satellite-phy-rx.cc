@@ -112,6 +112,36 @@ SatPhyRx::GetAntennaGain (Ptr<MobilityModel> mobility)
 }
 
 void
+SatPhyRx::SetDefaultFadingValue (double fadingValue)
+{
+  NS_LOG_FUNCTION (this);
+  m_defaultFadingValue = fadingValue;
+}
+
+double
+SatPhyRx::GetFadingValue (SatEnums::ChannelType_t channelType)
+{
+  NS_LOG_FUNCTION (this);
+
+  double fadingValue (m_defaultFadingValue);
+
+  if (m_fadingContainer)
+    {
+      fadingValue = m_fadingContainer->GetFading (channelType);
+    }
+  // Returns value 1 if fading is not set, as fading value is used as multiplier
+  return fadingValue;
+}
+
+void
+SatPhyRx::SetFadingContainer (Ptr<SatFading> fadingContainer)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_fadingContainer = fadingContainer;
+}
+
+void
 SatPhyRx::SetAntennaLoss_Db (double gain_Db)
 {
   NS_LOG_FUNCTION (this);

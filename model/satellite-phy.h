@@ -184,6 +184,11 @@ private:
    * The upper layer package receive callback.
    */
   SatPhy::ReceiveCallback m_rxCallback;
+
+  /**
+   * \brief Default fading value
+   */
+  double m_defaultFadingValue;
 };
 
 

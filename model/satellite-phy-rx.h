@@ -24,11 +24,11 @@
 #include "ns3/mobility-model.h"
 #include "ns3/packet.h"
 #include "ns3/nstime.h"
-
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
+#include "satellite-fading.h"
 
 namespace ns3 {
 
@@ -82,6 +82,25 @@ public:
    * /param mobility  Mobility used to get gain from antenna pattern
    */
   double GetAntennaGain (Ptr<MobilityModel> mobility);
+
+  /**
+   * \brief Function for setting the default fading value
+   * \param fadingValue default fading value
+   */
+  void SetDefaultFadingValue (double fadingValue);
+
+  /**
+   * \brief Get fading value
+   * \param channelType channel type
+   * \return
+   */
+  double GetFadingValue (SatEnums::ChannelType_t channelType);
+
+  /**
+   * \brief Set fading container
+   * \param fadingContainer fading container
+   */
+  void SetFadingContainer (Ptr<SatFading> fadingContainer);
 
   /**
    * Set the Antenna loss in Db
@@ -152,6 +171,16 @@ private:
 
   // A SatPhyRxCarrier object for receiving packets from each carrier
   std::vector< Ptr<SatPhyRxCarrier> > m_rxCarriers;
+
+  /**
+   * \brief Fading container for fading model
+   */
+  Ptr<SatFading> m_fadingContainer;
+
+  /**
+   * \brief Default fading value
+   */
+  double m_defaultFadingValue;
 };
 
 

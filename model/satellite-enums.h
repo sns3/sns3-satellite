@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2013 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -17,36 +17,44 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-fading.h"
+#ifndef SATELLITE_ENUMS_H
+#define SATELLITE_ENUMS_H
 
-NS_LOG_COMPONENT_DEFINE ("SatFading");
+#include "ns3/object.h"
+#include "ns3/uinteger.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFading);
-
-TypeId 
-SatFading::GetTypeId (void)
+/**
+ * \ingroup satellite
+ * 
+ * \brief SatEnums class is for general enumerators used in satellite module.
+ */
+class SatEnums
 {
-  static TypeId tid = TypeId ("ns3::SatFading")
-    .SetParent<Object> ();
-  return tid;
-}
+public:
 
-SatFading::SatFading ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  /**
+   * Possible types of channel.
+   */
+  typedef enum
+  {
+    UNKNOWN_CH, FORWARD_FEEDER_CH, FORWARD_USER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
+  } ChannelType_t;
 
-SatFading::~SatFading ()
-{
-  NS_LOG_FUNCTION (this);
-}
+private:
 
-double
-SatFading::GetFading (SatEnums::ChannelType_t channelType)
-{
-  return DoGetFading (channelType);
-}
+  /**
+   * Destructor
+   *
+   * Made Pure Virtual because the class is not planned be instantiated or inherited
+   *
+   */
+  virtual ~SatEnums() = 0;
+};
 
 } // namespace ns3
+
+#endif /* SATELLITE_ENUMS_H */

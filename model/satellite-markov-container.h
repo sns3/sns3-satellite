@@ -17,8 +17,8 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_FADING_CONTAINER_H
-#define SATELLITE_FADING_CONTAINER_H
+#ifndef SATELLITE_MARKOV_CONTAINER_H
+#define SATELLITE_MARKOV_CONTAINER_H
 
 #include "satellite-markov-model.h"
 #include "satellite-markov-conf.h"
@@ -27,15 +27,16 @@
 #include "satellite-fading.h"
 #include "satellite-loo-model.h"
 #include "satellite-rayleigh-model.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
  *
- * \brief Fading model container
+ * \brief Markov fading model container
  */
-class SatFadingContainer : public SatFading
+class SatMarkovContainer : public SatFading
 {
 public:
 
@@ -48,7 +49,7 @@ public:
   /**
    * \brief Constructor
    */
-  SatFadingContainer ();
+  SatMarkovContainer ();
 
   /**
    * \brief Constructor
@@ -56,19 +57,19 @@ public:
    * \param looConf Loo configuration object
    * \param currentPosition current position
    */
-  SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity);
+  SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity);
 
   /**
    * \brief Destructor
    */
-  ~SatFadingContainer ();
+  ~SatMarkovContainer ();
 
   /**
    * \brief Function for getting the fading
    * \param channeltype channel type
    * \return fading value
    */
-  double GetFading (SatChannel::ChannelType_t channeltype);
+  double DoGetFading (SatEnums::ChannelType_t channeltype);
 
   /**
    * \brief Function for unlocking the parameter set and state
@@ -194,7 +195,7 @@ private:
    * \brief Fading trace function
    */
   TracedCallback< double,                     // time
-                  SatChannel::ChannelType_t,  // channel type
+                  SatEnums::ChannelType_t,    // channel type
                   double                      // fading value
                   >
      m_fadingTrace;
@@ -208,14 +209,14 @@ private:
   /**
    * \brief Function for evaluating state change
    */
-  void EvaluateStateChange (SatChannel::ChannelType_t channelType);
+  void EvaluateStateChange (SatEnums::ChannelType_t channelType);
 
   /**
    * \brief Function for calculating the fadign value
    * \param channelType channel type
    * \return fading value
    */
-  double CalculateFading (SatChannel::ChannelType_t channelType);
+  double CalculateFading (SatEnums::ChannelType_t channelType);
 
   /**
    * \brief Function for calculating the elevation
@@ -228,14 +229,14 @@ private:
    * \param channelType channel type
    * \return has cooldown period passed
    */
-  bool HasCooldownPeriodPassed (SatChannel::ChannelType_t channelType);
+  bool HasCooldownPeriodPassed (SatEnums::ChannelType_t channelType);
 
   /**
    * \brief Function for getting the cached fadign values
    * \param channelType channel type
    * \return cached fading value
    */
-  double GetCachedFadingValue (SatChannel::ChannelType_t channelType);
+  double GetCachedFadingValue (SatEnums::ChannelType_t channelType);
 
   /**
    * \brief Function for creating the Markov state faders
@@ -244,7 +245,7 @@ private:
 
   /**
    * \brief Function for calculating the distance since latest state change position
-   * @return distance
+   * \return distance
    */
   double CalculateDistanceSinceLastStateChange ();
 
@@ -252,4 +253,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_FADING_CONTAINER_H */
+#endif /* SATELLITE_MARKOV_CONTAINER_H */

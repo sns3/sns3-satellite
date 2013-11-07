@@ -50,7 +50,7 @@ def build(bld):
         'model/satellite-markov-conf.cc',
         'model/satellite-rayleigh-conf.cc',
         'model/satellite-loo-conf.cc',
-        'model/satellite-fading-container.cc',
+        'model/satellite-markov-container.cc',
         'model/satellite-markov-model.cc',
         'model/satellite-loo-model.cc',
         'model/satellite-rayleigh-model.cc',
@@ -90,6 +90,7 @@ def build(bld):
     headers.module = 'satellite'
     headers.source = [
     	'model/satellite-utils.h',
+        'model/satellite-enums.h',
         'model/geo-coordinate.h',
         'model/cbr-application.h',
         'model/satellite-antenna-gain-pattern.h',
@@ -131,7 +132,7 @@ def build(bld):
         'model/satellite-markov-conf.h',
         'model/satellite-rayleigh-conf.h',
         'model/satellite-loo-conf.h',
-        'model/satellite-fading-container.h',
+        'model/satellite-markov-container.h',
         'model/satellite-markov-model.h',
         'model/satellite-loo-model.h',
         'model/satellite-rayleigh-model.h',

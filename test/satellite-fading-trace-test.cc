@@ -44,7 +44,7 @@ public:
   SatFadingTraceTestCase ();
   virtual ~SatFadingTraceTestCase ();
 
-  void TestGetFading (uint32_t nodeId, SatChannel::ChannelType_t channelType);
+  void TestGetFading (uint32_t nodeId, SatEnums::ChannelType_t channelType);
 
 private:
   virtual void DoRun (void);
@@ -63,7 +63,7 @@ SatFadingTraceTestCase::~SatFadingTraceTestCase ()
 {
 }
 
-void SatFadingTraceTestCase::TestGetFading (uint32_t nodeId, SatChannel::ChannelType_t channelType)
+void SatFadingTraceTestCase::TestGetFading (uint32_t nodeId, SatEnums::ChannelType_t channelType)
 {
   Ptr<SatChannelFadingTrace> trace = m_fadingTraceContainer->GetFadingTrace (nodeId, channelType);
   double fading = trace->GetFading ();
@@ -88,10 +88,10 @@ SatFadingTraceTestCase::DoRun (void)
   double time [4] = {1.434, 40.923, 80.503, 140.3};
   double preCalcRes [4] = {1.06879, 1.03526, 1.03093, 1.00159};
 
-  Simulator::Schedule(Seconds(time[0]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatChannel::RETURN_USER_CH);
-  Simulator::Schedule(Seconds(time[1]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatChannel::RETURN_FEEDER_CH);
-  Simulator::Schedule(Seconds(time[2]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatChannel::FORWARD_USER_CH);
-  Simulator::Schedule(Seconds(time[3]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatChannel::FORWARD_FEEDER_CH);
+  Simulator::Schedule(Seconds(time[0]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
+  Simulator::Schedule(Seconds(time[1]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
+  Simulator::Schedule(Seconds(time[2]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule(Seconds(time[3]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatEnums::FORWARD_FEEDER_CH);
 
   Simulator::Run ();
 

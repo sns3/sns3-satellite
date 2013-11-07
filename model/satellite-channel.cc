@@ -41,7 +41,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
- :m_channelType(UNKNOWN_CH)
+ :m_channelType(SatEnums::UNKNOWN_CH)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -141,20 +141,23 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 
   double txAntennaGain_W = 0.0;
   double rxAntennaGain_W = 0.0;
+  double fading = 0.0;
 
   // use always UT's or GW's position when getting antenna gain
   switch ( m_channelType )
   {
-    case RETURN_FEEDER_CH:
-    case FORWARD_USER_CH:
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
       txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (rxMobility);
       rxAntennaGain_W = phyRx->GetAntennaGain (rxMobility);
+      fading = phyRx->GetFadingValue (m_channelType);
       break;
 
-    case RETURN_USER_CH:
-    case FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+    case SatEnums::FORWARD_FEEDER_CH:
       txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (txMobility);
       rxAntennaGain_W = phyRx->GetAntennaGain (txMobility);
+      fading = rxParams->m_phyTx->GetFadingValue (m_channelType);
       break;
 
     default:
@@ -169,16 +172,16 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, frequency_hz );
-  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses();
+  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses() * fading;
 
   phyRx->StartRx (rxParams);
 }
 
 void
-SatChannel::SetChannelType (SatChannel::ChannelType_t chType)
+SatChannel::SetChannelType (SatEnums::ChannelType_t chType)
 {
   NS_LOG_FUNCTION (this << chType);
-  NS_ASSERT (chType != UNKNOWN_CH);
+  NS_ASSERT (chType != SatEnums::UNKNOWN_CH);
 
   m_channelType = chType;
 }
@@ -199,7 +202,7 @@ SatChannel::SetFrequencyConverter (CarrierFreqConverter converter)
   m_carrierFreqConverter = converter;
 }
 
-SatChannel::ChannelType_t
+SatEnums::ChannelType_t
 SatChannel::GetChannelType ()
 {
   NS_LOG_FUNCTION (this);

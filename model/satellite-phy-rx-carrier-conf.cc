@@ -52,13 +52,13 @@ SatPhyRxCarrierConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
     .SetParent<Object> ()
-    .AddAttribute("ChannelType", "The type of the channel where this object is asscociated.",
-                   EnumValue (SatChannel::UNKNOWN_CH),
+    .AddAttribute("ChannelType", "The type of the channel where this object is associated.",
+                   EnumValue (SatEnums::UNKNOWN_CH),
                    MakeEnumAccessor (&SatPhyRxCarrierConf::m_channelType),
-                   MakeEnumChecker (SatChannel::FORWARD_FEEDER_CH, "Forward feeder channel",
-                                    SatChannel::FORWARD_USER_CH, "Forward user channel",
-                                    SatChannel::RETURN_FEEDER_CH, "Return feeder channel",
-                                    SatChannel::RETURN_USER_CH, "Return user channel"))
+                   MakeEnumChecker (SatEnums::FORWARD_FEEDER_CH, "Forward feeder channel",
+                                    SatEnums::FORWARD_USER_CH, "Forward user channel",
+                                    SatEnums::RETURN_FEEDER_CH, "Return feeder channel",
+                                    SatEnums::RETURN_USER_CH, "Return user channel"))
     .AddAttribute ("CarrierBandwidhtConverter", "Callback to convert carrier id to bandwidth.",
                     CallbackValue (),
                     MakeCallbackAccessor (&SatPhyRxCarrierConf::m_carrierBandwidthConverter),

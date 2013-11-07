@@ -24,7 +24,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "satellite-channel.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -67,7 +67,14 @@ public:
    * \param channelType channel type
    * \return fading value
    */
-  virtual double GetFading (SatChannel::ChannelType_t channelType) = 0;
+  double GetFading (SatEnums::ChannelType_t channelType);
+
+  /**
+   * \brief Function for getting the fading value
+   * \param channelType channel type
+   * \return fading value
+   */
+  virtual double DoGetFading (SatEnums::ChannelType_t channelType) = 0;
 
 private:
 

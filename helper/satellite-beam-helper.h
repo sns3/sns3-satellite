@@ -33,7 +33,7 @@
 #include "ns3/satellite-antenna-gain-pattern-container.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-mobility-observer.h"
-#include "ns3/satellite-fading-container.h"
+#include "ns3/satellite-markov-container.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -58,6 +58,15 @@ public:
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Used fading model
+   */
+  enum FadingModel
+  {
+    FADING_OFF, FADING_MARKOV
+  };
+
   /**
    * Default constructor for SatBeamHelper (should not be used).
    */
@@ -231,6 +240,11 @@ private:
   TracedCallback<std::string> m_creation;
 
   /**
+   * Configured fading model. Set as an attribute.
+   */
+  SatBeamHelper::FadingModel m_fadingModel;
+
+  /**
    * Creates info of the beam.
    * /returns info for beams as std::string.
    */
@@ -273,7 +287,7 @@ private:
    * \param node Pointer to node
    * \return Pointer to fading container
    */
-  Ptr<SatFadingContainer>  InstallFadingContainer (Ptr<Node> node) const;
+  Ptr<SatFading>  InstallFadingContainer (Ptr<Node> node) const;
 
 };
 

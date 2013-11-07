@@ -235,7 +235,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
   carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
   carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
-  carrierConf->SetAttribute ("ChannelType", EnumValue (SatChannel::RETURN_FEEDER_CH));
+  carrierConf->SetAttribute ("ChannelType", EnumValue (SatEnums::RETURN_FEEDER_CH));
   carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue (m_carrierBandwidthConverter));
   carrierConf->SetAttribute ("CarrierCount", UintegerValue (m_rtnLinkCarrierCount));
 
@@ -247,6 +247,10 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
     }
 
   phyRx->ConfigurePhyRxCarriers (carrierConf);
+
+  // Set fading
+  phyTx->SetFadingContainer (n->GetObject<SatFading> ());
+  phyRx->SetFadingContainer (n->GetObject<SatFading> ());
 
   Ptr<SatMac> mac = CreateObject<SatMac> ();
 

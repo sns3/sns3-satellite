@@ -295,7 +295,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   rtnCarrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_rtnImInterference_db) );
   rtnCarrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_rtnAciInterference_db) );
   rtnCarrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_rtnAciIfWrtNoise) );
-  rtnCarrierConf->SetAttribute ("ChannelType", EnumValue(SatChannel::RETURN_USER_CH));
+  rtnCarrierConf->SetAttribute ("ChannelType", EnumValue(SatEnums::RETURN_USER_CH));
   rtnCarrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
   rtnCarrierConf->SetAttribute ("CarrierCount", UintegerValue(m_rtnLinkCarrierCount));
 
@@ -325,7 +325,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   fwdCarrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_fwdImInterference_db) );
   fwdCarrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_fwdAciInterference_db) );
   fwdCarrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_fwdAciIfWrtNoise) );
-  fwdCarrierConf->SetAttribute ("ChannelType", EnumValue(SatChannel::FORWARD_FEEDER_CH));
+  fwdCarrierConf->SetAttribute ("ChannelType", EnumValue(SatEnums::FORWARD_FEEDER_CH));
   fwdCarrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
   fwdCarrierConf->SetAttribute ("CarrierCount", UintegerValue(m_fwdLinkCarrierCount));
 

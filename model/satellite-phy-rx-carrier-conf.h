@@ -43,7 +43,7 @@ public:
      *
      * \return The bandwidth of the carrier.
      */
-  typedef Callback<double, SatChannel::ChannelType_t, uint32_t > CarrierBandwidthConverter;
+  typedef Callback<double, SatEnums::ChannelType_t, uint32_t > CarrierBandwidthConverter;
 
   /**
    *  RX mode.
@@ -189,7 +189,7 @@ private:
 
   uint32_t m_carrierCount;
   CarrierBandwidthConverter m_carrierBandwidthConverter;
-  SatChannel::ChannelType_t m_channelType;
+  SatEnums::ChannelType_t m_channelType;
  };
 
 } // namespace ns3

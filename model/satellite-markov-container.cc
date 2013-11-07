@@ -18,29 +18,28 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-fading-container.h"
+#include "satellite-markov-container.h"
 #include "satellite-utils.h"
 
 namespace ns3 {
 
 
-NS_OBJECT_ENSURE_REGISTERED (SatFadingContainer);
-NS_LOG_COMPONENT_DEFINE ("SatFadingContainer");
+NS_OBJECT_ENSURE_REGISTERED (SatMarkovContainer);
+NS_LOG_COMPONENT_DEFINE ("SatMarkovContainer");
 
 TypeId
-SatFadingContainer::GetTypeId (void)
+SatMarkovContainer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatFadingContainer")
+  static TypeId tid = TypeId ("ns3::SatMarkovContainer")
     .SetParent<SatFading> ()
-    .AddConstructor<SatFadingContainer> ()
+    .AddConstructor<SatMarkovContainer> ()
     .AddTraceSource ("FadingTrace",
                      "The trace for fading values",
-                     MakeTraceSourceAccessor (&SatFadingContainer::m_fadingTrace));
-
+                     MakeTraceSourceAccessor (&SatMarkovContainer::m_fadingTrace));
   return tid;
 }
 
-SatFadingContainer::SatFadingContainer () :
+SatMarkovContainer::SatMarkovContainer () :
     m_markovModel (NULL),
     m_markovConf (NULL),
     m_fader_up (NULL),
@@ -64,7 +63,7 @@ SatFadingContainer::SatFadingContainer () :
   NS_ASSERT(0);
 }
 
-SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity) :
+SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity) :
     m_markovModel (NULL),
     m_markovConf (markovConf),
     m_fader_up (NULL),
@@ -98,11 +97,11 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading
   CreateFaders (m_markovConf->GetFaderType ());
 
   /// initialize fading values
-  CalculateFading (SatChannel::RETURN_USER_CH);
-  CalculateFading (SatChannel::FORWARD_USER_CH);
+  CalculateFading (SatEnums::RETURN_USER_CH);
+  CalculateFading (SatEnums::FORWARD_USER_CH);
 
   NS_LOG_INFO ("Time " << Now ().GetSeconds ()
-              << " SatFadingContainer - Creating SatFadingContainer, States: " << m_numOfStates
+              << " SatMarkovContainer - Creating SatMarkovContainer, States: " << m_numOfStates
               << " Elevation: " << m_currentElevation ()
               << " Current Set ID: " << m_currentSet
               << " Cooldown Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
@@ -110,13 +109,13 @@ SatFadingContainer::SatFadingContainer (Ptr<SatMarkovConf> markovConf, SatFading
   );
 }
 
-SatFadingContainer::~SatFadingContainer ()
+SatMarkovContainer::~SatMarkovContainer ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-SatFadingContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
+SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
 {
   NS_LOG_FUNCTION (this << faderType);
 
@@ -142,17 +141,17 @@ SatFadingContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
 }
 
 double
-SatFadingContainer::GetFading (SatChannel::ChannelType_t channelType)
+SatMarkovContainer::DoGetFading (SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << channelType);
 
   double fadingValue;
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Getting fading");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Getting fading");
 
   if (HasCooldownPeriodPassed (channelType))
     {
-      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period has passed, calculating new fading value");
+      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Cooldown period has passed, calculating new fading value");
 
       if (m_velocity () > 0)
         {
@@ -162,29 +161,29 @@ SatFadingContainer::GetFading (SatChannel::ChannelType_t channelType)
     }
   else
     {
-      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Cooldown period in effect, using old fading value");
+      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Cooldown period in effect, using old fading value");
       fadingValue = GetCachedFadingValue (channelType);
     }
 
-  m_fadingTrace ( Now ().GetSeconds (), channelType, fadingValue);
+  m_fadingTrace (Now ().GetSeconds (), channelType, fadingValue);
 
   return fadingValue;
 }
 
 double
-SatFadingContainer::GetCachedFadingValue (SatChannel::ChannelType_t channelType)
+SatMarkovContainer::GetCachedFadingValue (SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << channelType);
 
   switch (channelType)
   {
-    case SatChannel::RETURN_USER_CH:
-    case SatChannel::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+    case SatEnums::FORWARD_FEEDER_CH:
       {
         return m_latestCalculatedFadingValue_up;
       }
-    case SatChannel::FORWARD_USER_CH:
-    case SatChannel::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+    case SatEnums::RETURN_FEEDER_CH:
       {
         return m_latestCalculatedFadingValue_down;
       }
@@ -194,11 +193,11 @@ SatFadingContainer::GetCachedFadingValue (SatChannel::ChannelType_t channelType)
       }
   }
   NS_ASSERT (0);
-  return -1;
+  return 0;
 }
 
 void
-SatFadingContainer::EvaluateStateChange (SatChannel::ChannelType_t channelType)
+SatMarkovContainer::EvaluateStateChange (SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this);
 
@@ -212,7 +211,9 @@ SatFadingContainer::EvaluateStateChange (SatChannel::ChannelType_t channelType)
 
           if (m_currentSet != newSetId)
             {
-              NS_LOG_INFO("Time " << Now ().GetSeconds () << " SatFadingContainer - elevation: " << m_currentElevation () << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
+              NS_LOG_INFO("Time " << Now ().GetSeconds ()
+                          << " SatMarkovContainer - elevation: " << m_currentElevation ()
+                          << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
 
               m_currentSet = newSetId;
               UpdateProbabilities (m_currentSet);
@@ -228,14 +229,14 @@ SatFadingContainer::EvaluateStateChange (SatChannel::ChannelType_t channelType)
 }
 
 bool
-SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelType)
+SatMarkovContainer::HasCooldownPeriodPassed (SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << channelType);
 
   switch (channelType)
   {
-    case SatChannel::RETURN_USER_CH:
-    case SatChannel::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+    case SatEnums::FORWARD_FEEDER_CH:
       {
         if ( (Now ().GetSeconds () - m_latestCalculationTime_up.GetSeconds ()) > m_cooldownPeriodLength.GetSeconds () )
           {
@@ -243,8 +244,8 @@ SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelTy
           }
         break;
       }
-    case SatChannel::FORWARD_USER_CH:
-    case SatChannel::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+    case SatEnums::RETURN_FEEDER_CH:
       {
         if ( (Now ().GetSeconds () - m_latestCalculationTime_down.GetSeconds ()) > m_cooldownPeriodLength.GetSeconds () )
           {
@@ -261,13 +262,13 @@ SatFadingContainer::HasCooldownPeriodPassed (SatChannel::ChannelType_t channelTy
 }
 
 void
-SatFadingContainer::UpdateProbabilities (uint32_t set)
+SatMarkovContainer::UpdateProbabilities (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
   std::vector <std::vector <double> > probabilities = m_markovConf->GetElevationProbabilities (set);
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Updating probabilities...");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Updating probabilities...");
 
   for (uint32_t i = 0; i < m_numOfStates; ++i)
     {
@@ -280,7 +281,7 @@ SatFadingContainer::UpdateProbabilities (uint32_t set)
 }
 
 double
-SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
+SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << channelType);
 
@@ -293,27 +294,27 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
 
   switch (channelType)
   {
-    case SatChannel::RETURN_USER_CH:
-    case SatChannel::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+    case SatEnums::FORWARD_FEEDER_CH:
       {
         m_fader_up->UpdateParameters (m_currentSet, m_currentState);
 
         m_latestCalculatedFadingValue_up = m_fader_up->GetChannelGain ();
 
-        NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
+        NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
 
         m_latestCalculationTime_up = Now ();
 
         return m_latestCalculatedFadingValue_up;
       }
-    case SatChannel::FORWARD_USER_CH:
-    case SatChannel::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+    case SatEnums::RETURN_FEEDER_CH:
       {
         m_fader_down->UpdateParameters (m_currentSet, m_currentState);
 
         m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGain ();
 
-        NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatFadingContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
+        NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
 
         m_latestCalculationTime_down = Now ();
 
@@ -329,7 +330,7 @@ SatFadingContainer::CalculateFading (SatChannel::ChannelType_t channelType)
 }
 
 void
-SatFadingContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
+SatMarkovContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newSet << " " << newState);
 
@@ -346,7 +347,7 @@ SatFadingContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
 }
 
 void
-SatFadingContainer::LockToSet (uint32_t newSet)
+SatMarkovContainer::LockToSet (uint32_t newSet)
 {
   NS_LOG_FUNCTION (this << newSet);
 
@@ -361,7 +362,7 @@ SatFadingContainer::LockToSet (uint32_t newSet)
 }
 
 void
-SatFadingContainer::LockToRandomSetAndState ()
+SatMarkovContainer::LockToRandomSetAndState ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -369,7 +370,7 @@ SatFadingContainer::LockToRandomSetAndState ()
 }
 
 void
-SatFadingContainer::UnlockSetAndState ()
+SatMarkovContainer::UnlockSetAndState ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -378,8 +379,10 @@ SatFadingContainer::UnlockSetAndState ()
 }
 
 double
-SatFadingContainer::CalculateDistanceSinceLastStateChange ()
+SatMarkovContainer::CalculateDistanceSinceLastStateChange ()
 {
+  NS_LOG_FUNCTION (this);
+
   return (Now ().GetSeconds () - m_latestStateChangeTime.GetSeconds()) * m_velocity ();
 }
 

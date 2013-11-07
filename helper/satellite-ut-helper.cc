@@ -245,9 +245,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
   carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
   carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
-  carrierConf->SetAttribute ("ChannelType", EnumValue(SatChannel::FORWARD_USER_CH));
-  carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue(m_carrierBandwidthConverter));
-  carrierConf->SetAttribute ("CarrierCount", UintegerValue(m_fwdLinkCarrierCount));
+  carrierConf->SetAttribute ("ChannelType", EnumValue (SatEnums::FORWARD_USER_CH));
+  carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue (m_carrierBandwidthConverter));
+  carrierConf->SetAttribute ("CarrierCount", UintegerValue (m_fwdLinkCarrierCount));
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling.
@@ -257,6 +257,10 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
     }
 
   phyRx->ConfigurePhyRxCarriers (carrierConf);
+
+  // Set fading
+  phyTx->SetFadingContainer (n->GetObject<SatFading> ());
+  phyRx->SetFadingContainer (n->GetObject<SatFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
   mac->SetAttribute ("Interval", StringValue ("0s"));

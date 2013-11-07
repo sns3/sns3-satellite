@@ -50,7 +50,7 @@ public:
    * Get method for getting a proper fading trace
    * \return Channel fading trace for a certain node and channel.
    */
-  Ptr<SatChannelFadingTrace> GetFadingTrace (uint32_t nodeId, SatChannel::ChannelType_t channelType) const;
+  Ptr<SatChannelFadingTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const;
 
   /**
    * A method to test that the fading traces are according to
