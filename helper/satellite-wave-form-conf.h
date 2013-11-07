@@ -22,64 +22,187 @@
 #define SATELLITE_WAVE_FORM_CONF_H
 
 #include <vector>
-#include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
+#include "ns3/object.h"
+#include "ns3/satellite-link-results.h"
 
 namespace ns3 {
 
+
 /**
  * \ingroup satellite
- * \brief This class implements configuration for Bandwidth Time Units (BTUs)
+ * \brief This class implements the usable waveform configurations of DVB-RCS2
  */
 
-class SatWaveFormConf : public SimpleRefCount<SatWaveFormConf>
+
+class SatWaveform : public SimpleRefCount<SatWaveform>
 {
 public:
+  /**
+   * Default constructor for SatWaveform
+   */
+  SatWaveform ();
 
   /**
-   * Default constructor for SatWaveFormConf
+   * Constructor for SatWaveform
+   * \param modulated bits
+   * \param coding rate
+   * \param payload in bytes
+   * \param duration in symbols
    */
-  SatWaveFormConf ();
+  SatWaveform (uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols);
+
 
   /**
-   * Constructor for SatWaveFormConf
-   *
-   * \param codingRate            Coding rate of the wave form
-   * \param payloadLength_byte    Payload length of the wave form in bytes
-   * \param burstLength_sym       Burst lenght of the wave form in symbols
+   * Get burst lenght of the waveform in symbols
+   * \return burst length
    */
-  SatWaveFormConf (double codingRate, uint32_t payloadLength_byte, uint32_t burstLength_sym);
+  uint32_t GetBurstLengthInSymbols () const;
 
   /**
-   * Destructor for SatWaveFormConf
+   * Get/calculate the burst duration of a waveform based on symbol rate
+   * \param symbol rate
+   * \return burst duration in seconds
    */
-  ~SatWaveFormConf ();
+  double GetBurstDurationInSeconds (double symbolRateInBaud) const;
 
   /**
-   * Get coding rate of the wave form.
-   *
-   * \return The coding rate of the wave form.
+   * Get/calculate the spectral efficiency of a waveform
+   * \return spectral efficiency in bits/s/Hz
    */
-  inline double GetCodingRate() { return m_codingRate; }
+  double GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
   /**
-   * Get paylod length of the wave form.
-   *
-   * \return The paylod length of the wave form in bytes.
+   * Get/calculate the throughput of a waveform based on symbol rate
+   * \return throughput in bits per second
    */
-  inline double GetPayloadLength() { return m_payloadLength_byte; }
+  double GetThroughputInBitsPerSecond (double symbolRateBaud) const;
 
   /**
-   * Get burst length of the wave form.
-   *
-   * \return The burst length of the wave form in symbols.
+   * Get the C/No threshold of the waveform in linear domain
+   * \return C/No threshold
    */
-  inline double GetBurstLength() { return m_burstLength_sym; }
+  double GetCNoThreshold (double symbolRateInBaud) const;
+
+  /**
+   * Set the EsNo threshold of the waveform  in linear domain
+   * based on the used link results
+   * \param EsNo threshold
+   */
+  void SetEsNoThreshold (double esnoThreshold);
+
+  /**
+   * Dump the contents of the waveform. For spectral efficiency calculation,
+   * the total carrier bandwidth and symbol rate are needed.
+   * \param carrierBandwidthInHz Total carrier bandwidth including e.g. guard band.
+   * \param symbolRateInBaud Effective symbol rate where guard band and roll-off has been deduced.
+   */
+  void Dump (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
 private:
+
+  /**
+   * Modulated bits
+   * QPSK = 2
+   * 8PSK = 3
+   * 16QAM = 4
+   */
+  uint32_t m_modulatedBits;
+
+  /**
+   * Coding rate
+   */
   double m_codingRate;
-  uint32_t m_payloadLength_byte;
-  uint32_t m_burstLength_sym;
+
+  /**
+   * Payload in bytes
+   */
+  uint32_t m_payloadBytes;
+
+  /**
+   * Length of the burst in symbols
+   */
+  uint32_t m_lengthInSymbols;
+
+  /**
+   * Es/No threshold calculated with a certain BLER target
+   * from the link results
+   */
+  double m_esnoThreshold;
+};
+
+
+class SatWaveformConf : public Object
+{
+public:
+  /**
+   * Default constructor, which is not to be used
+   */
+  SatWaveformConf ();
+
+  /**
+   * Constructor
+   */
+  SatWaveformConf (std::string filePathName);
+
+  /**
+   * Destructor for SatWaveformConf
+   */
+  virtual ~SatWaveformConf ();
+
+  static TypeId GetTypeId (void);
+
+  /**
+   * Initialize the Es/No requirements of the waveforms based on
+   * the used DVB-RCS2 link results.
+   * \param Pointer to DVB-RCS2 link results
+   */
+  void InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
+
+  /**
+   * Get the best waveform id based on UT's C/No and C/No thresholds
+   * JPU: Note, that this algorithm is not final, but just a skeleton which shall be enhanced
+   * when implementing the actual NCC RTN link burst scheduler algorithm!
+   * \param cno UTs estimated C/No
+   * \param symbolRateInBaud Frame's symbol rate used for waveform C/No requirement calculation
+   * \param wfId Waveform id variable used for passing the best waveform id to the client
+   * \param burstLength Requested burst length in symbols
+   * \return boolean value presenting whether or not a suitable waveform was found.
+   */
+  bool GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength = SHORT_BURST_LENGTH) const;
+
+  /**
+   * Dump the contents of the waveform. For spectral efficiency calculation,
+   * the total carrier bandwidth and symbol rate are needed.
+   * \param carrierBandwidthInHz Total carrier bandwidth including e.g. guard band.
+   * \param symbolRateInBaud Effective symbol rate where guard band and roll-off has been deduced.
+   */
+  void Dump (double carrierBandwidthInHz, double symbolRateInBaud) const;
+
+  /**
+   * Static variables defining the available burst lengths
+   */
+  static const uint32_t SHORT_BURST_LENGTH = 536;
+  static const uint32_t LONG_BURST_LENGTH = 1616;
+
+private:
+
+  /**
+   * Read the waveform table from a file
+   * \param path and file name
+   */
+  void ReadFromFile (std::string filePathName);
+
+  /**
+   * Container of the waveforms
+   */
+  std::map< uint32_t, Ptr<SatWaveform> > m_waveforms;
+
+  /**
+   * Packet error rate target for the waveforms. Default value
+   * set as an attribute to 10^(-5).
+   */
+  double m_perTarget;
 };
 
 } // namespace ns3

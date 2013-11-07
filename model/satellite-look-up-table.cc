@@ -50,7 +50,7 @@ SatLookUpTable::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_sinrDb.clear ();
+  m_esNoDb.clear ();
   m_bler.clear ();
 
   if (m_ifs != 0)
@@ -78,17 +78,18 @@ SatLookUpTable::GetTypeId ()
 }
 
 
-double
-SatLookUpTable::GetBler (double sinrDb) const
-{
-  NS_LOG_FUNCTION (this << sinrDb);
 
-  uint16_t n = m_sinrDb.size ();
+double
+SatLookUpTable::GetBler (double esNoDb) const
+{
+  NS_LOG_FUNCTION (this << esNoDb);
+
+  uint16_t n = m_esNoDb.size ();
 
   NS_ASSERT (n > 0);
   NS_ASSERT (m_bler.size () == n);
 
-  if (sinrDb < m_sinrDb[0])
+  if (esNoDb < m_esNoDb[0])
     {
       // edge case: very low SINR, return maximum BLER (100% error rate)
       NS_LOG_LOGIC (this << " Very low SINR -> BLER = 1.0");
@@ -97,12 +98,12 @@ SatLookUpTable::GetBler (double sinrDb) const
 
   uint16_t i = 1;
 
-  while ((i < n) && (sinrDb > m_sinrDb[i]))
+  while ((i < n) && (esNoDb > m_esNoDb[i]))
     {
       i++;
     }
 
-  NS_LOG_DEBUG (this << " i=" << i << " sinr[i]=" << m_sinrDb[i]
+  NS_LOG_DEBUG (this << " i=" << i << " esno[i]=" << m_esNoDb[i]
                      << " bler[i]=" << m_bler[i]);
 
   if (i >= n)
@@ -111,22 +112,62 @@ SatLookUpTable::GetBler (double sinrDb) const
       NS_LOG_LOGIC (this << " Very high SINR -> BLER = 0.0");
       return 0.0;
     }
-  else // sinrDb <= m_sinrDb[i]
+  else // sinrDb <= m_esNoDb[i]
     {
       // normal case
       NS_ASSERT (i > 0);
       NS_ASSERT (i < n);
 
-      double sinr = sinrDb;
-      double sinr0 = m_sinrDb[i - 1];
-      double sinr1 = m_sinrDb[i];
-      double bler = Interpolate (sinr, sinr0, sinr1, m_bler[i - 1], m_bler[i]);
-      NS_LOG_LOGIC (this << " Interpolate: " << sinr << " to BLER = " << bler << "(sinr0: " << sinr0 << ", sinr1: " << sinr1 << ", bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ")");
+      double esno = esNoDb;
+      double esno0 = m_esNoDb[i - 1];
+      double esno1 = m_esNoDb[i];
+      double bler = Interpolate (esno, esno0, esno1, m_bler[i - 1], m_bler[i]);
+      NS_LOG_LOGIC (this << " Interpolate: " << esno << " to BLER = " << bler << "(sinr0: " << esno0 << ", sinr1: " << esno1 << ", bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ")");
 
       return bler;
     }
 
 } // end of double SatLookUpTable::GetBler (double sinrDb) const
+
+
+double
+SatLookUpTable::GetEsNoDb (double blerTarget) const
+{
+  NS_LOG_FUNCTION (this << blerTarget);
+
+  uint16_t n = m_bler.size ();
+
+  NS_ASSERT (n > 0);
+  NS_ASSERT (m_esNoDb.size () == n);
+
+  // If the requested BLER is smaller than the smallest BLER entry
+  // in the look-up-table
+  if (blerTarget < m_bler[n-1])
+    {
+      return m_esNoDb[n-1];
+    }
+
+  // The requested BLER is higher than the highest BLER entry
+  // in the look-up-table
+  if (blerTarget > m_bler[1])
+    {
+      NS_FATAL_ERROR ("The BLER target is set to be too high!");
+    }
+
+  double sinr = 0.0;
+  // Go through the list from end to beginning
+  for (uint32_t i = 0; i < n; ++i)
+    {
+      if (blerTarget >= m_bler[i])
+        {
+          sinr = Interpolate (blerTarget, m_bler[i-1], m_bler[i], m_esNoDb[i-1], m_esNoDb[i]);
+          NS_LOG_LOGIC (this << " Interpolate: " << blerTarget << " to SINR = " << sinr << "(bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ", sinr0: " << m_esNoDb[i-1] << ", sinr1: " << m_esNoDb[i] << ")");
+          return sinr;
+        }
+    }
+
+  return sinr;
+} // end of double SatLookUpTable::GetSinr (double bler) const
 
 
 double
@@ -164,30 +205,30 @@ SatLookUpTable::Load (std::string linkResultPath)
         }
     }
 
-  double lastSinrDb = -100.0; // very low value
+  double lastEsNoDb = -100.0; // very low value
   double lastBler = 1.0; // maximum value
 
-  double sinrDb, bler;
-  *m_ifs >> sinrDb >> bler;
+  double esNoDb, bler;
+  *m_ifs >> esNoDb >> bler;
 
   while (m_ifs->good ())
     {
-      NS_LOG_DEBUG (this << " sinrDb=" << sinrDb << ", bler=" << bler);
+      NS_LOG_DEBUG (this << " sinrDb=" << esNoDb << ", bler=" << bler);
 
       // SANITY CHECK PART I
-      if ((sinrDb <= lastSinrDb) || (bler > lastBler))
+      if ((esNoDb <= lastEsNoDb) || (bler > lastBler))
         {
           NS_FATAL_ERROR ("The file " << linkResultPath << " is not properly sorted.");
         }
 
       // record the values
-      m_sinrDb.push_back (sinrDb);
+      m_esNoDb.push_back (esNoDb);
       m_bler.push_back (bler);
-      lastSinrDb = sinrDb;
+      lastEsNoDb = esNoDb;
       lastBler = bler;
 
       // get next row
-      *m_ifs >> sinrDb >> bler;
+      *m_ifs >> esNoDb >> bler;
     }
 
   m_ifs->close ();
@@ -197,13 +238,13 @@ SatLookUpTable::Load (std::string linkResultPath)
   // SANITY CHECK PART II
 
   // at least contains one row
-  if (m_sinrDb.empty ())
+  if (m_esNoDb.empty ())
     {
       NS_FATAL_ERROR ("Error reading data from file " << linkResultPath << ".");
     }
 
   // SINR and BLER have same size
-  NS_ASSERT (m_sinrDb.size () == m_bler.size ());
+  NS_ASSERT (m_esNoDb.size () == m_bler.size ());
 
 } // end of void Load (std::string linkResultPath)
 

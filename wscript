@@ -84,6 +84,7 @@ def build(bld):
         'test/satellite-fsl-test.cc',
         'test/satellite-antenna-pattern-test.cc',
         'test/satellite-mobility-observer-test.cc',
+        'test/satellite-waveform-table-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -107,7 +108,7 @@ def build(bld):
         'model/satellite-phy-tx.h',               
         'model/satellite-phy-rx.h',
         'model/satellite-phy-rx-carrier.h',
-		'model/satellite-phy-rx-carrier-conf.h',
+	'model/satellite-phy-rx-carrier-conf.h',
         'model/satellite-link-results.h',
         'model/satellite-look-up-table.h',
         'model/satellite-signal-parameters.h',
@@ -140,8 +141,8 @@ def build(bld):
         'model/satellite-mobility-observer.h',
         'helper/satellite-helper.h',
         'helper/satellite-beam-helper.h',
-		'helper/satellite-user-helper.h',
-		'helper/satellite-ut-helper.h',
+        'helper/satellite-user-helper.h',
+	'helper/satellite-ut-helper.h',
         'helper/satellite-gw-helper.h',
         'helper/satellite-geo-helper.h',
         'helper/satellite-conf.h',

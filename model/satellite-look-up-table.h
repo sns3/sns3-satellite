@@ -44,6 +44,8 @@ public:
 
   double GetBler (double sinrDb) const;
 
+  double GetEsNoDb (double blerTarget) const;
+
 private:
   virtual void DoDispose ();
   void Load (std::string linkResultPath);
@@ -56,7 +58,7 @@ private:
    */
   static double Interpolate (double x, double x0, double x1, double y0, double y1);
 
-  std::vector<double> m_sinrDb;
+  std::vector<double> m_esNoDb;
   std::vector<double> m_bler;
   std::ifstream *m_ifs;
 };
