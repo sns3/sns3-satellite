@@ -29,22 +29,14 @@ NS_LOG_COMPONENT_DEFINE ("SatRayleighConf");
 
 static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT] =
     {
-     /* Elevation 40 */  // TODO: add Ka-band parameters
-     {{10,10},
-      {10,10},
-      {10,10}},
+     /**
+      * Parameters
+      * State 1 {{number of oscillators, Doppler in Hz}
+      * State 2  {number of oscillators, Doppler in Hz}
+      * State 3  {number of oscillators, Doppler in Hz}}
+      */
 
-     /* Elevation 60 */
-     {{10,10},
-      {10,10},
-      {10,10}},
-
-     /* Elevation 70 */
-     {{10,10},
-      {10,10},
-      {10,10}},
-
-     /* Elevation 80 */
+     /* Elevation 30 degrees */
      {{10,10},
       {10,10},
       {10,10}}

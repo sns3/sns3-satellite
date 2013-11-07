@@ -45,10 +45,10 @@ SatMarkovModel::SatMarkovModel () :
   NS_ASSERT(0);
 }
 
-SatMarkovModel::SatMarkovModel (uint32_t numOfStates) :
+SatMarkovModel::SatMarkovModel (uint32_t numOfStates, uint32_t initialState) :
     m_probabilities (new double[numOfStates * numOfStates]),
     m_numOfStates (numOfStates),
-    m_currentState (0)
+    m_currentState (initialState)
 {
   NS_LOG_FUNCTION (this << numOfStates);
 

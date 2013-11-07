@@ -88,7 +88,7 @@ SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading
   NS_LOG_FUNCTION (this);
 
   /// create Markov model
-  m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates);
+  m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates,m_currentState);
 
   /// initialize Markov model
   m_currentSet = m_markovConf->GetProbabilitySetID (m_currentElevation ());

@@ -53,7 +53,7 @@ SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t 
   m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
   m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
 
-  m_rayleighParameters = m_rayleighConf->GetParameters (0);
+  m_rayleighParameters = m_rayleighConf->GetParameters (m_currentSet);
 
   ConstructOscillators ();
 }

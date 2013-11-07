@@ -88,19 +88,19 @@ SatLooModel::ConstructDirectSignalOscillators ()
       double phi = m_uniformVariable->GetValue ();
       /// Theta is common for all oscillators:
       double theta = m_uniformVariable->GetValue ();
-      for (uint32_t j = 0; j < m_looParameters[i][4]; j++)
+      for (uint32_t j = 0; j < m_looParameters[i][3]; j++)
         {
           uint32_t n = j + 1;
           /// 1. Rotation speed
           /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-          double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_looParameters[i][4]);
+          double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_looParameters[i][3]);
           /// 1b. Initiate rotation speed:
           double omega = 2.0 * SatLooModel::PI * m_looParameters[i][5] * std::cos (alpha);
           /// 2. Initiate amplitude:
           double psi = m_normalRandomVariable->GetValue ();
           double amplitude = (m_looParameters[i][0] + (m_looParameters[i][1] * psi));
           amplitude = pow (10,amplitude / 20);
-          amplitude = amplitude / m_looParameters[i][4];
+          amplitude = amplitude / m_looParameters[i][3];
           /// 3. Construct oscillator:
           oscillators.push_back (CreateObject<SatFadingOscillator> ( amplitude, phi, omega));
         }
@@ -121,17 +121,17 @@ SatLooModel::ConstructMultipathOscillators ()
       double phi = m_uniformVariable->GetValue ();
       /// Theta is common for all oscillators:
       double theta = m_uniformVariable->GetValue ();
-      for (uint32_t j = 0; j < m_looParameters[i][3]; j++)
+      for (uint32_t j = 0; j < m_looParameters[i][4]; j++)
         {
           uint32_t n = j + 1;
           /// 1. Rotation speed
           /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-          double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_looParameters[i][3]);
+          double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_looParameters[i][4]);
           /// 1b. Initiate rotation speed:
           double omega = 2.0 * SatLooModel::PI * m_looParameters[i][6] * std::cos (alpha);
           /// 2. Initiate complex amplitude:
           double psi = m_normalRandomVariable->GetValue ();
-          std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_looParameters[i][3]);
+          std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_looParameters[i][4]);
           /// 3. Construct oscillator:
           oscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
         }

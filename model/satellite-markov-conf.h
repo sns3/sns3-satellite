@@ -52,7 +52,7 @@ public:
   /**
    * \brief Default elevation count
    */
-  static const uint32_t DEFAULT_ELEVATION_COUNT = 4;
+  static const uint32_t DEFAULT_ELEVATION_COUNT = 1;
 
   /**
    * \brief Default state count
@@ -114,12 +114,6 @@ public:
   uint32_t GetNumOfSets ();
 
   /**
-   * \brief Function for returning the initial elevation value
-   * \return initial elevation value
-   */
-  double GetInitialElevation ();
-
-  /**
    * \brief Function for returning the initial state
    * \return initial state
    */
@@ -162,9 +156,14 @@ private:
   uint32_t m_stateCount;
 
   /**
-   * \brief Markov probabilities
+   * \brief Markov state change probabilities
    */
   std::vector<std::vector<std::vector<double> > > m_markovProbabilities;
+
+  /**
+   * \brief Initial Markov state probabilities
+   */
+  std::vector<double> m_initialProbabilities;
 
   /**
    * \brief Markov elevations
@@ -175,16 +174,6 @@ private:
    * \brief Minimum position change in meters
    */
   double m_minimumPositionChangeInMeters;
-
-  /**
-   * \brief Initial state
-   */
-  uint32_t m_initialState;
-
-  /**
-   * \brief Initial elevation in degrees
-   */
-  double m_initialElevation;
 
   /**
    * \brief Cooldown period lengthin seconds

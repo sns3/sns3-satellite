@@ -49,7 +49,7 @@ public:
    * \brief Constructor
    * \param numOfStates number of states
    */
-  SatMarkovModel (uint32_t numOfStates);
+  SatMarkovModel (uint32_t numOfStates, uint32_t initialState);
 
   /**
    * \brief Destructor

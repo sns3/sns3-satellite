@@ -29,25 +29,17 @@ NS_LOG_COMPONENT_DEFINE ("SatLooConf");
 
 static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
     {
-     /* Elevation 40 */  // TODO: add Ka-band parameters
-     {{-0.1,0.37,-22.0,10,10,2,30},
-      {-1.0,0.5,-22.0,10,10,2,30},
-      {-2.25,0.13,-21.2,10,10,2,30}},
+     /**
+      * Parameters
+      * {State 1 {mean in dB, std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
+      *  State 2 {mean in dB, std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
+      *  State 3 {mean in dB, std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
+      */
 
-     /* Elevation 60 */
-     {{0.0,0.12,-24.9,10,10,2,30},
-      {-0.7,0.12,-26.1,10,10,2,30},
-      {-1.4,0.25,-23.1,10,10,2,30}},
-
-     /* Elevation 70 */
-     {{-0.1,0.25,-22.5,10,10,2,30},
-      {-0.5,0.28,-24.5,10,10,2,30},
-      {-0.75,0.37,-23.24,10,10,2,30}},
-
-     /* Elevation 80 */
-     {{0.1,0.16,-22.4,10,10,2,30},
-      {-0.4,0.15,-23.5,10,10,2,30},
-      {-0.72,0.27,-22.0,10,10,2,30}}
+     /* Elevation 30 degrees */
+     {{  0.0, 0.5, -25.0, 10, 10, 2, 30},
+      {-10.0, 3.0, -25.0, 10, 10, 2, 30},
+      {-21.0, 4.0, -25.0, 10, 10, 2, 30}}
     };
 
 TypeId

@@ -28,25 +28,30 @@ NS_LOG_COMPONENT_DEFINE ("SatMarkovConf");
 
 static const double g_MarkovElevationStateChangeProbabilities[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT] =
     {
-      /* Elevation 40 */ // TODO: add Ka-band parameters
-      {{0.9530, 0.0431, 0.0039},
-       {0.0515, 0.9347, 0.0138},
-       {0.0334, 0.0238, 0.9428}},
+     /**
+      * Parameters
+      * from state X to state Y transition probabilities
+      *
+      * State 1 {{State 1, State 2, State 3}
+      * State 2  {State 1, State 2, State 3}
+      * State 3  {State 1, State 2, State 3}}
+      */
 
-      /* Elevation 60 */
-      {{0.9643, 0.0255, 0.0102},
-       {0.0628, 0.9171, 0.0201},
-       {0.0447, 0.0062, 0.9491}},
+      /* Elevation 30 degrees */
+      {{0.9684, 0.0316, 0.0000},
+       {0.4155, 0.5845, 0.0000},
+       {0.0000, 0.0000, 0.0000}}
+    };
 
-      /* Elevation 70 */
-      {{0.9538, 0.0393, 0.0069},
-       {0.0523, 0.9309, 0.0168},
-       {0.0342, 0.0200, 0.9458}},
-
-      /* Elevation 80 */
-      {{0.9307, 0.0590, 0.0103},
-       {0.0292, 0.9506, 0.0202},
-       {0.0111, 0.0397, 0.9492}}
+static const double g_MarkovInitialStateProbabilities[SatMarkovConf::DEFAULT_STATE_COUNT] =
+    {
+     /**
+      * Parameters
+      * initial state probabilities
+      *
+      * State 1, State 2, State 3
+      */
+      0.9293, 0.0707, 0.0000
     };
 
 TypeId
@@ -64,19 +69,11 @@ SatMarkovConf::GetTypeId (void) //TODO: add attribute for m_markovElevations and
                      MakeUintegerAccessor (&SatMarkovConf::m_stateCount),
                      MakeUintegerChecker<uint32_t> ())
       .AddAttribute( "MinimumPositionChangeInMeters", "Minimum position change in meters for Markov model state change cooldown.",
-                     DoubleValue (20.0),
+                     DoubleValue (100.0),
                      MakeDoubleAccessor (&SatMarkovConf::m_minimumPositionChangeInMeters),
                      MakeDoubleChecker<double> ())
-      .AddAttribute ("InitialState", "The initial state of the Markov model.",
-                     UintegerValue (0),
-                     MakeUintegerAccessor (&SatMarkovConf::m_initialState),
-                     MakeUintegerChecker<uint32_t> ())
-      .AddAttribute( "InitialElevation", "Initial elevation value.",
-                     DoubleValue (45),
-                     MakeDoubleAccessor (&SatMarkovConf::m_initialElevation),
-                     MakeDoubleChecker<double> ())
       .AddAttribute( "CooldownPeriodLength", "Cooldown period length for state change.",
-                     TimeValue (Seconds (0.00005)),
+                     TimeValue (Seconds (0.0001)),
                      MakeTimeAccessor (&SatMarkovConf::m_cooldownPeriodLength),
                      MakeTimeChecker ())
       .AddAttribute( "UseDecibels", "Defines whether the fading value should be in decibels or not.",
@@ -89,9 +86,7 @@ SatMarkovConf::GetTypeId (void) //TODO: add attribute for m_markovElevations and
 SatMarkovConf::SatMarkovConf () :
     m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT),
-    m_minimumPositionChangeInMeters (20.0),
-    m_initialState (0),
-    m_initialElevation (45),
+    m_minimumPositionChangeInMeters (1000.0),
     m_cooldownPeriodLength (Seconds (0.00005)),
     m_useDecibels (false),
     m_looConf (NULL),
@@ -101,6 +96,7 @@ SatMarkovConf::SatMarkovConf () :
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
+
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
       std::vector<std::vector<double> > states;
@@ -118,26 +114,21 @@ SatMarkovConf::SatMarkovConf () :
       m_markovProbabilities.push_back (states);
     }
 
+  for (uint32_t i = 0; i < m_stateCount; i++)
+    {
+      m_initialProbabilities.push_back (g_MarkovInitialStateProbabilities[i]);
+    }
+
   std::pair<double, uint32_t> elevation;
 
-  elevation.first = 40.0;
+  elevation.first = 30.0;
   elevation.second = 0;
-  m_markovElevations.insert (elevation);
-
-  elevation.first = 60.0;
-  elevation.second = 1;
-  m_markovElevations.insert (elevation);
-
-  elevation.first = 70.0;
-  elevation.second = 2;
-  m_markovElevations.insert (elevation);
-
-  elevation.first = 80.0;
-  elevation.second = 3;
   m_markovElevations.insert (elevation);
 
   m_looConf = CreateObject<SatLooConf> ();
   m_rayleighConf = CreateObject<SatRayleighConf> ();
+
+  NS_ASSERT (m_markovElevations.size() == m_elevationCount);
 }
 
 std::vector<std::vector<double> >
@@ -214,15 +205,29 @@ SatMarkovConf::GetInitialState ()
 {
   NS_LOG_FUNCTION (this);
 
-  return m_initialState;
-}
+  double total = 0;
 
-double
-SatMarkovConf::GetInitialElevation ()
-{
-  NS_LOG_FUNCTION (this);
+  for (uint32_t i = 0; i < m_stateCount; ++i)
+    {
+      total += m_initialProbabilities[i];
+    }
 
-  return m_initialElevation;
+  NS_ASSERT(total == 1);
+
+  double r = total * (std::rand () / double (RAND_MAX));
+  double acc = 0.0;
+
+  for (uint32_t i = 0; i < m_stateCount; ++i)
+    {
+      acc += m_initialProbabilities[i];
+
+      if (r <= acc)
+        {
+          return i;
+        }
+    }
+
+  return m_stateCount - 1;
 }
 
 Ptr<SatLooConf>
