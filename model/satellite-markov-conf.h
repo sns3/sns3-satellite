@@ -24,6 +24,7 @@
 #include "ns3/object.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
+#include "ns3/boolean.h"
 #include "ns3/nstime.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -126,21 +127,27 @@ public:
 
   /**
    * \brief Function for returning the Loo's model configuration
-   * @return Loo's model configuration
+   * \return Loo's model configuration
    */
   Ptr<SatLooConf> GetLooConf ();
 
   /**
    * \brief Function for returning the Loo's model configuration
-   * @return Loo's model configuration
+   * \return Loo's model configuration
    */
   Ptr<SatRayleighConf> GetRayleighConf ();
 
   /**
    * \brief Function for returning the selected fader type
-   * @return selected fader type
+   * \return selected fader type
    */
   SatMarkovConf::MarkovFaderType_t GetFaderType ();
+
+  /**
+   * \brief Function for getting whether the calculations should return the fading value in decibels or not
+   * \return are decibels used or not
+   */
+  bool AreDecibelsUsed ();
 
 private:
 
@@ -183,6 +190,11 @@ private:
    * \brief Cooldown period lengthin seconds
    */
   Time m_cooldownPeriodLength;
+
+  /**
+   * \brief Defines whether the calculations should return the fading value in decibels or not
+   */
+  bool m_useDecibels;
 
   /**
    * \brief Loo configuration

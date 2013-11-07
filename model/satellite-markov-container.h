@@ -192,6 +192,11 @@ private:
   ElevationCallback m_currentElevation;
 
   /**
+   * \brief Defines whether the calculations should return the fading value in decibels or not
+   */
+  bool m_useDecibels;
+
+  /**
    * \brief Fading trace function
    */
   TracedCallback< double,                     // time
@@ -212,7 +217,7 @@ private:
   void EvaluateStateChange (SatEnums::ChannelType_t channelType);
 
   /**
-   * \brief Function for calculating the fadign value
+   * \brief Function for calculating the fading value
    * \param channelType channel type
    * \return fading value
    */
@@ -232,7 +237,7 @@ private:
   bool HasCooldownPeriodPassed (SatEnums::ChannelType_t channelType);
 
   /**
-   * \brief Function for getting the cached fadign values
+   * \brief Function for getting the cached fading values
    * \param channelType channel type
    * \return cached fading value
    */

@@ -78,7 +78,11 @@ SatMarkovConf::GetTypeId (void) //TODO: add attribute for m_markovElevations and
       .AddAttribute( "CooldownPeriodLength", "Cooldown period length for state change.",
                      TimeValue (Seconds (0.00005)),
                      MakeTimeAccessor (&SatMarkovConf::m_cooldownPeriodLength),
-                     MakeTimeChecker ());
+                     MakeTimeChecker ())
+      .AddAttribute( "UseDecibels", "Defines whether the fading value should be in decibels or not.",
+                     BooleanValue (false),
+                     MakeBooleanAccessor (&SatMarkovConf::m_useDecibels),
+                     MakeBooleanChecker ());
   return tid;
 }
 
@@ -89,6 +93,7 @@ SatMarkovConf::SatMarkovConf () :
     m_initialState (0),
     m_initialElevation (45),
     m_cooldownPeriodLength (Seconds (0.00005)),
+    m_useDecibels (false),
     m_looConf (NULL),
     m_rayleighConf (NULL),
     m_faderType (SatMarkovConf::LOO_FADER)
@@ -240,6 +245,12 @@ SatMarkovConf::MarkovFaderType_t
 SatMarkovConf::GetFaderType ()
 {
   return m_faderType;
+}
+
+bool
+SatMarkovConf::AreDecibelsUsed ()
+{
+  return m_useDecibels;
 }
 
 } // namespace ns3

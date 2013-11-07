@@ -57,7 +57,8 @@ SatMarkovContainer::SatMarkovContainer () :
     m_enableSetLock (false),
     m_enableStateLock (false),
     m_velocity (),
-    m_latestStateChangeTime ()
+    m_latestStateChangeTime (),
+    m_useDecibels (false)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT(0);
@@ -81,7 +82,8 @@ SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading
     m_enableStateLock (false),
     m_velocity (velocity),
     m_latestStateChangeTime (Now ()),
-    m_currentElevation (elevation)
+    m_currentElevation (elevation),
+    m_useDecibels (markovConf->AreDecibelsUsed ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -299,7 +301,14 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
       {
         m_fader_up->UpdateParameters (m_currentSet, m_currentState);
 
-        m_latestCalculatedFadingValue_up = m_fader_up->GetChannelGain ();
+        if (m_useDecibels)
+          {
+            m_latestCalculatedFadingValue_up = m_fader_down->GetChannelGainDb ();
+          }
+        else
+          {
+            m_latestCalculatedFadingValue_up = m_fader_down->GetChannelGain ();
+          }
 
         NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Calculated feeder fading value " << m_latestCalculatedFadingValue_up);
 
@@ -312,7 +321,14 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
       {
         m_fader_down->UpdateParameters (m_currentSet, m_currentState);
 
-        m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGain ();
+        if (m_useDecibels)
+          {
+            m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGainDb ();
+          }
+        else
+          {
+            m_latestCalculatedFadingValue_down = m_fader_down->GetChannelGain ();
+          }
 
         NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Calculated return fading value " << m_latestCalculatedFadingValue_down);
 
