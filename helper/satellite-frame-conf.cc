@@ -34,12 +34,18 @@ SatBtuConf::SatBtuConf ()
   NS_ASSERT (false);
 }
 
-SatBtuConf::SatBtuConf (double bandwidth_hz, double length_s, double symbolRate_baud)
-  : m_bandwidth_hz (bandwidth_hz),
-    m_length_s (length_s),
-    m_symbolRate_baud (symbolRate_baud)
+SatBtuConf::SatBtuConf (double bandwidth_hz, double rollOff, double spacing)
+  : m_allocatedBandwidth_hz (bandwidth_hz)
 {
   NS_LOG_FUNCTION (this);
+
+  NS_ASSERT ( (spacing >= 0.00 ) && ( spacing < 1.00 ) );
+  NS_ASSERT ( (rollOff >= 0.00 ) && ( rollOff < 1.00 ) );
+
+  m_occupiedBandwidth_hz = m_allocatedBandwidth_hz / (rollOff + 1.00);
+  m_effectiveBandwidth_hz = m_occupiedBandwidth_hz / (rollOff + spacing + 1.00);
+
+  m_length_s = 1 / m_effectiveBandwidth_hz;
 }
 
 SatBtuConf::~SatBtuConf ()
@@ -85,7 +91,7 @@ SatFrameConf::SatFrameConf ( double bandwidth_hz, double duration_s,
 {
   NS_LOG_FUNCTION (this);
 
-  m_carrierCount = bandwidth_hz / btu->GetBandwidth_hz();
+  m_carrierCount = bandwidth_hz / btu->GetAllocatedBandwidth_hz();
 
   if ( timeSlots != NULL )
     m_timeSlots = *timeSlots;
@@ -101,7 +107,7 @@ SatFrameConf::GetCarrierFrequency_hz (uint32_t carrierId) const
 {
   NS_ASSERT (carrierId < m_carrierCount);
 
-  double carrierBandwidth_hz = m_btu->GetBandwidth_hz();
+  double carrierBandwidth_hz = m_btu->GetAllocatedBandwidth_hz();
 
   return ( (carrierBandwidth_hz * carrierId) + ( carrierBandwidth_hz / 2.0 ) );
 }

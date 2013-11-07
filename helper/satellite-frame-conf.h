@@ -44,11 +44,11 @@ public:
   /**
    * Constructor for SatBtuConf
    *
-   * \param bandwidth_hz      Bandwidth of BTU in Hertz
-   * \param length_s          Length of BTU in seconds
-   * \param symbolRate_baud   Symbol rate in bauds
+   * \param bandwidth_hz      Allocated bandwidth of BTU in Hertz
+   * \param rollOff           Roll-off factor
+   * \param spacing           Spacing factor
    */
-  SatBtuConf (double bandwidth_hz, double length_s, double symbolRate_baud);
+  SatBtuConf (double bandwidth_hz, double rollOff, double spacing);
 
   /**
    * Destructor for SatBtuConf
@@ -60,26 +60,34 @@ public:
    *
    * \return The bandwidth of BTU in Hertz.
    */
-  inline double GetBandwidth_hz () const { return m_bandwidth_hz; }
+  inline double GetAllocatedBandwidth_hz () const { return m_allocatedBandwidth_hz; }
 
   /**
-   * Get length of BTU.
+   * Get occupied bandwidth of BTU.
    *
-   * \return The length of BTU in seconds.
+   * \return The occupied bandwidth of BTU in Hertz.
    */
-  inline double GetLength_s () const { return m_length_s; }
+  inline double GetOccupiedBandwidth_hz () const { return m_occupiedBandwidth_hz; }
+
+  /**
+   * Get occupied bandwidth of BTU.
+   *
+   * \return The occupied bandwidth of BTU in Hertz.
+   */
+  inline double GetEffectiveBandwidth_hz () const { return m_effectiveBandwidth_hz; }
 
   /**
    * Get symbol rate of BTU.
    *
    * \return The symbol rate of BTU in bauds.
    */
-  inline double GetSymbolRate_baud () const { return m_symbolRate_baud; }
+  inline double GetSymbolRate_baud () const { return GetEffectiveBandwidth_hz ();}
 
 private:
-  double m_bandwidth_hz;
-  double m_length_s;
-  double m_symbolRate_baud;
+  double m_allocatedBandwidth_hz;
+  double m_occupiedBandwidth_hz;
+  double m_effectiveBandwidth_hz;  // i.e. symbol rate
+  double m_length_s;               // length field reserved, but not used currenly
 };
 
 /**
@@ -203,7 +211,7 @@ public:
    *
    * \return The carrier bandwidth in frame in Hertz.
    */
-  inline double GetCarrierBandwidth_hz() const { return m_btu->GetBandwidth_hz(); }
+  inline double GetCarrierBandwidth_hz() const { return m_btu->GetAllocatedBandwidth_hz(); }
 
   /**
    * Get BTU conf of the frame.

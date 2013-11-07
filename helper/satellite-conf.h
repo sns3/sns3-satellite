@@ -33,12 +33,19 @@
 namespace ns3 {
 
 /**
- * \brief A configuration class for the 98-beam GEO satellite reference system
+ * \brief A configuration class for the GEO satellite reference system
  *
  */
 class SatConf : public Object
 {
 public:
+  typedef enum
+  {
+    STATIC_CONFIG_0,
+    STATIC_CONFIG_1,
+    STATIC_CONFIG_2,
+    STATIC_CONFIG_3,
+  } StaticFrameConfiguration_t;
 
   SatConf ();
   virtual ~SatConf () {}
@@ -237,8 +244,8 @@ private:
    /**
     * Forward link carrier configuration.
     *
-    * Item index of the list means carrier configuration sequency.
-    * Currently only one sequency used and only one carrier inside carrier conf.
+    * Item index of the list means carrier configuration sequence.
+    * Currently only one sequence used and only one carrier inside carrier conf.
     */
    std::vector<uint32_t>  m_forwardLinkCarrierConf;
 
@@ -291,6 +298,36 @@ private:
     *  The number of the channels in user link.
     */
    uint32_t m_feederLinkChannelCount;
+
+   /**
+    * The configured static frame configuration to be used.
+    */
+   StaticFrameConfiguration_t m_staticFrameConfig;
+
+   /**
+    * The configured superframe target duration for static configurations.
+    */
+   double m_frameConfTargetDuration;
+
+   /**
+    * The configured allocated carrier bandwidth for static configurations.
+    */
+   double m_frameConfAllocatedBandwidth;
+
+   /**
+    * The configured carriee roll-off factor for static configurations.
+    */
+   double m_frameConfRollOffFactor;
+
+   /**
+    * The configured carrier spacing factor for static configurations.
+    */
+   double m_frameConfSpacingFactor;
+
+   /**
+    * The configured default wave form ID for static configurations.
+    */
+   uint8_t m_frameConfWaveFormId;
 
 };
 
