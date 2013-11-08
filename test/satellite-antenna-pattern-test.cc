@@ -59,10 +59,6 @@ SatAntennaPatternTestCase::DoRun (void)
   // Create antenna gain container
   SatAntennaGainPatternContainer gpContainer;
 
-  // Get one example spot-beam pattern = beam 3
-  uint32_t beamId (3);
-  Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern (beamId);
-
   // Test positions (= GW positions from 72 spot-beam reference system)
   std::vector<GeoCoordinate> coordinates;
   GeoCoordinate g1 = GeoCoordinate(51.50, -0.13, 0.0);
@@ -76,34 +72,39 @@ SatAntennaPatternTestCase::DoRun (void)
   GeoCoordinate g5 = GeoCoordinate(37.98, 23.73, 0.0);
   coordinates.push_back (g5);
 
+  /* Reference results
+  GW: 1, Lat: 51.5, Lon: -0.13, bestBeamId: 12, gain: 48.9788
+  GW: 2, Lat: 59.91, Lon: 10.75, bestBeamId: 6, gain: 49.2983
+  GW: 3, Lat: 40.42, Lon: -3.7, bestBeamId: 22, gain: 49.1886
+  GW: 4, Lat: 41.9, Lon: 12.48, bestBeamId: 46, gain: 48.8911
+  GW: 5, Lat: 37.98, Lon: 23.73, bestBeamId: 58, gain: 51.0815
+  */
+
   // Expected spot-beam gains from beam 3
-  std::vector<double> expectedGains;
-  expectedGains.push_back (36.8857);
-  expectedGains.push_back (19.3728);
-  expectedGains.push_back (2.06321);
-  expectedGains.push_back (9.26611);
-  expectedGains.push_back (10.7818);
+  double expectedGains[5] = { 48.9788, 49.2983, 49.1886, 48.8911, 51.0815 };
 
   // Expected best spot-beams
-  std::vector<uint32_t> expectedBeamIds;
-  expectedBeamIds.push_back (12);
-  expectedBeamIds.push_back (6);
-  expectedBeamIds.push_back (22);
-  expectedBeamIds.push_back (46);
-  expectedBeamIds.push_back (58);
-
-  NS_ASSERT (coordinates.size () == expectedGains.size());
-  NS_ASSERT (coordinates.size () == expectedBeamIds.size());
+  uint32_t expectedBeamIds[5] = {12, 6, 22, 46, 58};
 
   // Check that the gains and best beam IDs are as expected
   double gain (0.0);
   uint32_t bestBeamId (0);
   for ( uint32_t i = 0; i < coordinates.size (); ++i)
     {
+      bestBeamId = gpContainer.GetBestBeamId (coordinates[i]);
+
+      Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern (bestBeamId);
+
       gain = gainPattern->GetAntennaGain_lin (coordinates[i]);
       double gain_dB = 10.0 * log10 (gain);
 
-      bestBeamId = gpContainer.GetBestBeamId (coordinates[i]);
+      /*
+      std::cout << "GW: " << i+1 <<
+          ", Lat: " << coordinates[i].GetLatitude () <<
+          ", Lon: " << coordinates[i].GetLongitude () <<
+          ", bestBeamId: " << bestBeamId <<
+          ", gain: " << gain_dB << std::endl;
+      */
 
       NS_TEST_ASSERT_MSG_EQ_TOL( gain_dB, expectedGains[i], 0.001, "Expected gain not within tolerance");
       NS_TEST_ASSERT_MSG_EQ( bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
