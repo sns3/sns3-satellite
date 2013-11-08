@@ -60,11 +60,14 @@ SatArpCache::Add (Ipv4Address to, Address macAddress)
   ArpCache::Entry *entry = ArpCache::Add (to);
   entry->MarkWaitReply (0);
   entry->MarkAlive (macAddress);
+  ArpCache::SetAliveTimeout (Seconds (9e9)); /// \todo Temporary hack.
 
   NS_LOG_LOGIC( "IP: " << to << ", MAC: " << macAddress );
 
   return entry;
 }
+
+
 
 } // namespace ns3
 
