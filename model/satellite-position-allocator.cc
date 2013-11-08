@@ -30,6 +30,8 @@
 #include "satellite-position-allocator.h"
 #include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-utils.h"
+#include "satellite-constant-position-mobility-model.h"
+#include "satellite-mobility-observer.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPositionAllocator");
 
@@ -200,7 +202,13 @@ SatSpotBeamPositionAllocator::GetTypeId (void)
                    "A random variable which represents the altitude coordinate of a position in a random box.",
                    StringValue ("ns3::UniformRandomVariable[Min=0.0]"),
                    MakePointerAccessor (&SatSpotBeamPositionAllocator::m_altitude),
-                   MakePointerChecker<RandomVariableStream> ());
+                   MakePointerChecker<RandomVariableStream> ())
+    .AddAttribute("MinElevationAngleInDegForUT",
+                  "Minimum accepted elevation angle in degrees for UTs",
+                  DoubleValue(5.00),
+                  MakeDoubleAccessor(&SatSpotBeamPositionAllocator::m_minElevationAngleInDeg),
+                  MakeDoubleChecker<double> ())
+                 ;
   return tid;
 }
 
@@ -209,9 +217,10 @@ SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator ()
 
 }
 
-SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patterns)
+SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patterns, GeoCoordinate geoPos)
  :m_targetBeamId (beamId),
-  m_antennaGainPatterns (patterns)
+  m_antennaGainPatterns (patterns),
+  m_geoPos (geoPos)
 {
 }
 
@@ -234,11 +243,30 @@ SatSpotBeamPositionAllocator::GetNextGeo (void) const
   uint32_t tries (0);
   GeoCoordinate pos;
 
-  // Try until we have a valid position or the MAX_TRIES have been exceeded.
-  while (bestBeamId != m_targetBeamId && tries < MAX_TRIES)
+  Ptr<SatConstantPositionMobilityModel> utMob = CreateObject<SatConstantPositionMobilityModel> ();
+  Ptr<SatConstantPositionMobilityModel> geoMob = CreateObject<SatConstantPositionMobilityModel> ();
+  utMob->SetGeoPosition (GeoCoordinate (0.00, 0.00, 0.00));
+  geoMob->SetGeoPosition (m_geoPos);
+  Ptr<SatMobilityObserver> utObserver = CreateObject<SatMobilityObserver> (utMob, geoMob);
+
+  double elevation (std::numeric_limits<double>::max());
+
+  // Try until
+  // - we have a valid position
+  // - the MAX_TRIES have been exceeded
+  // - elevation is NOT NaN
+  // - elevation is not higher than threshold
+  while ( ( bestBeamId != m_targetBeamId || isnan(elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
     {
       pos = agp->GetValidPosition ();
       bestBeamId = m_antennaGainPatterns->GetBestBeamId (pos);
+
+      // Set the new position to the UT mobility
+      utMob->SetGeoPosition (pos);
+
+      // Calculate the elevation angle
+      elevation = utObserver->GetElevationAngle();
+
       ++tries;
     }
 
@@ -253,6 +281,7 @@ SatSpotBeamPositionAllocator::GetNextGeo (void) const
 
   NS_ASSERT (pos.GetLatitude() >= -90.0 && pos.GetLatitude() <= 90.0);
   NS_ASSERT (pos.GetLongitude() >= -180.0 && pos.GetLongitude() <= 180.0);
+  NS_ASSERT (elevation >= m_minElevationAngleInDeg && elevation <= 90.0);
 
   return pos;
 }

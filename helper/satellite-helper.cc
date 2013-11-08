@@ -385,7 +385,7 @@ SatHelper::SetUtMobility(NodeContainer uts, uint32_t beamId)
   MobilityHelper mobility;
 
   // Create new position allocator
-  Ptr<SatSpotBeamPositionAllocator> allocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns);
+  Ptr<SatSpotBeamPositionAllocator> allocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition());
 
   Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
   altRnd->SetAttribute ("Min", DoubleValue (0.0));

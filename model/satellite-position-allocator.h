@@ -118,7 +118,14 @@ class SatSpotBeamPositionAllocator : public SatPositionAllocator
 public:
   static TypeId GetTypeId (void);
   SatSpotBeamPositionAllocator ();
-  SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patternContainer);
+
+  /**
+   * SatSpotBeamPositionAllocator constructor
+   * \param beamId Beam id to which we are placing an UT
+   * \param patternContainer Container holding the antenna patterns
+   * \param geoPos GEO coordinate of the satellite for elevation angle calculations
+   */
+  SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patternContainer, GeoCoordinate geoPos);
   virtual ~SatSpotBeamPositionAllocator ();
 
   void SetAltitude (Ptr<RandomVariableStream> altitude);
@@ -143,11 +150,24 @@ private:
   uint32_t m_targetBeamId;
 
   /**
+   * Minimum accepted elevation angle in degrees for UTs. This
+   * is placed to guarantee that UTs are not positioned into too
+   * low elevation angles (high latitudes, longitudes far from
+   * GEO satellite latitude).
+   */
+  double m_minElevationAngleInDeg;
+
+  /**
    * Antenna pattern used to check that the give position is valid based on
    * antenna gains. I.e. UT should be placed into a position where the m_targetBeamId
    * has the best antenna gain.
    */
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
+
+  /**
+   * Position of the GEO satellite
+   */
+  GeoCoordinate m_geoPos;
 
   /**
    * A random variable stream for altitude.
