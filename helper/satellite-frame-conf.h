@@ -162,7 +162,7 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
-  typedef std::vector<Ptr<SatTimeSlotConf> > SatTimeSlotConfList;
+  typedef std::map<uint16_t, Ptr<SatTimeSlotConf> > SatTimeSlotConfList;
 
   static const uint16_t maxTimeSlotCount = 2048;
   static const uint16_t maxTimeSlotIndex = maxTimeSlotCount - 1;
@@ -178,12 +178,18 @@ public:
    * \param bandwidth_hz      Bandwidth of the frame in Hertz
    * \param duration_s        Duration of the frame in seconds
    * \param btu               BTU conf of the frame
-   * \param timeSlots         Time slot of the frame. (Timeslots must be in acsending order according to start time).
+   * \param timeSlots         Time slot of the frame.
    */
   SatFrameConf ( double bandwidth_hz, double duration_s, Ptr<SatBtuConf> btu,
                  SatTimeSlotConfList * timeSlots );
 
-  void AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
+  /**
+   * Add time slot.
+   *
+   * \param conf  Time slot conf added.
+   * \return Id of the time slot added.
+   */
+  uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
 
   /**
    * Get bandwidth of the frame.
@@ -252,6 +258,7 @@ private:
   double    m_bandwidth_hz;
   double    m_duration_s;
   uint32_t  m_carrierCount;
+  uint16_t  m_nextTimeSlotId;
 
   Ptr<SatBtuConf> m_btu;
   SatTimeSlotConfList m_timeSlots;
@@ -280,8 +287,7 @@ public:
    * \param duration_s        Duration of the frame in seconds
    * \param frames            Frames of the super frame. (In acsending order according to frequency inside superframe).
    */
-  SatSuperframeConf ( double bandwidth_hz, double duration_s,
-                      SatFrameConfList * frames );
+  SatSuperframeConf ( double bandwidth_hz, double duration_s, SatFrameConfList * frames );
 
   /**
    * Destructor for SatSuperframeConf

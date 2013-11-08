@@ -84,9 +84,10 @@ SatFrameConf::SatFrameConf ()
 }
 
 SatFrameConf::SatFrameConf ( double bandwidth_hz, double duration_s,
-                             Ptr<SatBtuConf> btu, std::vector<Ptr<SatTimeSlotConf> > * timeSlots)
+                             Ptr<SatBtuConf> btu, SatTimeSlotConfList * timeSlots)
   : m_bandwidth_hz (bandwidth_hz),
     m_duration_s (duration_s),
+    m_nextTimeSlotId (0),
     m_btu (btu)
 {
   NS_LOG_FUNCTION (this);
@@ -94,7 +95,15 @@ SatFrameConf::SatFrameConf ( double bandwidth_hz, double duration_s,
   m_carrierCount = bandwidth_hz / btu->GetAllocatedBandwidth_hz();
 
   if ( timeSlots != NULL )
-    m_timeSlots = *timeSlots;
+    {
+      m_timeSlots = *timeSlots;
+
+      if ( m_timeSlots.empty() != false )
+        {
+          SatTimeSlotConfList::iterator lastSlot = m_timeSlots.end()--;
+          m_nextTimeSlotId = lastSlot->first + 1;
+        }
+    }
 }
 
 SatFrameConf::~SatFrameConf ()
@@ -117,17 +126,25 @@ SatFrameConf::GetTimeSlotConf (uint16_t index) const
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT ( index < m_timeSlots.size() );
+  SatTimeSlotConfList::const_iterator foundTimeSlot = m_timeSlots.find(index);
 
-  return m_timeSlots[index];
+  NS_ASSERT (foundTimeSlot != m_timeSlots.end() );
+
+  return foundTimeSlot->second;
 }
 
-void
-SatFrameConf::AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf)
+uint16_t
+SatFrameConf::AddTimeSlotConf (Ptr<SatTimeSlotConf> conf)
 {
   NS_LOG_FUNCTION (this);
 
-  m_timeSlots.push_back(conf);
+  std::pair< SatTimeSlotConfList::const_iterator, bool> result = m_timeSlots.insert(std::make_pair (m_nextTimeSlotId, conf) );
+  NS_ASSERT (result.second == true);
+
+  m_nextTimeSlotId++;
+
+  // return time slot id of added configuration (key value of the map)
+  return result.first->first;
 }
 
 // Super frame conf
@@ -138,8 +155,7 @@ SatSuperframeConf::SatSuperframeConf ()
   NS_ASSERT (false);
 }
 
-SatSuperframeConf::SatSuperframeConf ( double bandwidth_hz, double duration_s,
-                                       std::vector<Ptr<SatFrameConf> > * frames)
+SatSuperframeConf::SatSuperframeConf ( double bandwidth_hz, double duration_s, SatFrameConfList * frames)
   : m_bandwidth_hz (bandwidth_hz),
     m_duration_s (duration_s)
 
