@@ -225,7 +225,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Set SatChannels to SatPhyTx/SatPhyRx
   phyTx->SetChannel (rCh);
-  phyRx->SetChannel (fCh);
+  fCh->AddRx (phyRx);
   phyRx->SetDevice (dev);
   phyRx->SetMobility (n->GetObject<MobilityModel> ());
   phyTx->SetMobility (n->GetObject<MobilityModel> ());

@@ -32,7 +32,6 @@
 
 namespace ns3 {
 
-class SatChannel;
 class SatPhyRxCarrier;
 class SatPhyRxCarrierConf;
 
@@ -52,11 +51,6 @@ public:
   // inherited from Object
   static TypeId GetTypeId (void);
   virtual void DoDispose ();
-
-  void SetChannel (Ptr<SatChannel> c);
-
-  void SetVirtualChannel (Ptr<SatChannel> c);
-  Ptr<SatChannel> GetVirtualChannel ();
 
   void SetMobility (Ptr<MobilityModel> m);
   Ptr<MobilityModel> GetMobility ();

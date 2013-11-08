@@ -29,7 +29,6 @@
 #include "satellite-phy-rx.h"
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-phy-rx-carrier-conf.h"
-#include "satellite-channel.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 
@@ -202,13 +201,6 @@ void
 SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 {
   m_antennaGainPattern = agp;
-}
-
-void
-SatPhyRx::SetChannel (Ptr<SatChannel> c)
-{
-  NS_LOG_FUNCTION (this << c);
-  c->AddRx (this);
 }
 
 void
