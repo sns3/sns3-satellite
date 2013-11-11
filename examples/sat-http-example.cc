@@ -125,6 +125,8 @@ HttpCalculator::Print ()
                     << std::setw (9) << static_cast<double> (sumRxBytes) / n
                     << std::setw (9) << static_cast<double> (throughput) / n);
   NS_LOG_INFO (this << " ---------------------------------");
+
+  NS_UNUSED (throughput);
 }
 
 void
