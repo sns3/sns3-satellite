@@ -112,7 +112,7 @@ private:
    * Set to store UTs in beam.
    */
   std::set<Address> m_uts;
-  Address m_currentUtAddress;
+  std::set<Address>::iterator m_currentUt;
 
   /**
    * ID of the beam

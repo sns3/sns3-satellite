@@ -45,6 +45,7 @@ SatBeamScheduler::GetTypeId (void)
 SatBeamScheduler::SatBeamScheduler ()
 {
   NS_LOG_FUNCTION (this);
+  m_currentUt = m_uts.begin();
 }
 
 SatBeamScheduler::~SatBeamScheduler ()
@@ -71,7 +72,7 @@ SatBeamScheduler::Send (Ptr<Packet> packet)
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_LOGIC ("p=" << packet );
 
-  m_txCallback(packet, Mac48Address::GetBroadcast(), Ipv4L3Protocol::PROT_NUMBER);
+  m_txCallback(packet, Mac48Address::GetBroadcast (), Ipv4L3Protocol::PROT_NUMBER);
 
   return true;
 }
@@ -85,14 +86,14 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
   m_superframeSeq = seq;
   m_superFrameCounter = 0;
 
-  Simulator::Schedule (Seconds(0.1), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule (Seconds (0.1), &SatBeamScheduler::Schedule, this);
 }
 
 void
 SatBeamScheduler::AddUt (Address utId)
 {
   NS_LOG_FUNCTION (this << utId);
-  m_uts.insert(utId);
+  m_uts.insert (utId);
 }
 
 void
@@ -104,12 +105,12 @@ SatBeamScheduler::Schedule ()
 
   // add TBTP tag to message
   SatControlMsgTag tag;
-  tag.SetMsgType(SatControlMsgTag::SAT_TBTP_CTRL_MSG);
+  tag.SetMsgType (SatControlMsgTag::SAT_TBTP_CTRL_MSG);
   packet->AddPacketTag (tag);
 
   // add TBTP specific header to message
   SatTbtpHeader header;
-  header.SetSuperframeCounter( m_superFrameCounter++ );
+  header.SetSuperframeCounter (m_superFrameCounter++);
 
   // TODO: more realistic scheduling implemented later
   // now just set two random time slot IDs for every UT assuming that there is two slots in every carrier.
@@ -117,80 +118,83 @@ SatBeamScheduler::Schedule ()
 
   if ( m_uts.size () > 0 )
     {
-      uint16_t maxTimeSlotCount = m_superframeSeq->GetSuperframeConf(0)->GetFrameConf(0)->GetTimeSlotCount();
+      Ptr<SatFrameConf> frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
+      uint16_t totalSlotLeft = frameConf->GetTimeSlotCount ();
+      uint32_t carrierCount = frameConf->GetCarrierCount ();
 
-      std::set<uint16_t> reservedTimeSlot;
-      std::set<Address>::iterator startIterator;
+      uint16_t slotsPerUt = totalSlotLeft / carrierCount;
 
-      if ( m_currentUtAddress.IsInvalid () )
+      if ( carrierCount < m_uts.size () )
         {
-          startIterator = m_uts.begin ();
-          m_currentUtAddress = *startIterator;
-        }
-      else
-        {
-          startIterator = m_uts.find (m_currentUtAddress);
+          slotsPerUt = totalSlotLeft / m_uts.size ();
+
+          if ( (totalSlotLeft %  m_uts.size ()) != 0 )
+            {
+              slotsPerUt++;
+            }
         }
 
       bool utsScheduled = false;
-      Ptr<UniformRandomVariable> randTimeSlotId = CreateObject<UniformRandomVariable> ();
+      std::vector<uint32_t> carrierIds = frameConf->GetCarrierIds (true);
+      uint32_t carrierIndex = 0;
+      uint32_t carrierId = carrierIds[carrierIndex];
+      uint32_t slotsLeftForUt = 0;
 
-      // allocate timeslot until there at least two free timeslots left and UTs left
-      while ( ( ( maxTimeSlotCount - reservedTimeSlot.size() ) >= 2 )  && !utsScheduled )
+      SatFrameConf::SatTimeSlotIdList_t timeSlots = frameConf->GetTimeSlotIds (carrierId);
+      SatFrameConf::SatTimeSlotIdList_t::iterator currentSlot = timeSlots.begin ();
+
+      // allocate timeslot until there are timeslots and UTs left
+      while ( !utsScheduled && (totalSlotLeft > 0) )
         {
-          uint16_t maxTimeSlotId = maxTimeSlotCount - 1;
-          uint16_t timeSlotId1;
-          uint16_t timeSlotId2;
+          // check how much there is slots left for the current UT
+          if ( totalSlotLeft > slotsPerUt )
+            {
+              slotsLeftForUt = slotsPerUt;
+            }
+          else
+            {
+              slotsLeftForUt = totalSlotLeft;
+            }
 
-          std::set<uint16_t>::iterator foundSlot;
+          totalSlotLeft -= slotsLeftForUt;
 
-          // get free random slot (first in carrier)
-          do
-          {
-            timeSlotId1 = randTimeSlotId->GetInteger(0, maxTimeSlotId);
+          if ( m_currentUt == m_uts.end () )
+            {
+              m_currentUt = m_uts.begin ();
+            }
 
-            if ( timeSlotId1 % 2 )
-              {
-                timeSlotId1--;
-              }
+          std::set<Address>::iterator startIterator = m_currentUt;
 
-            foundSlot = reservedTimeSlot.find (timeSlotId1);
-          } while (foundSlot != reservedTimeSlot.end ());
+          while ( slotsLeftForUt )
+            {
+              if ( currentSlot == timeSlots.end () )
+                {
+                  carrierIndex++;
+                  carrierId = carrierIds[carrierIndex];
+                  timeSlots = frameConf->GetTimeSlotIds (carrierId);
+                  currentSlot = timeSlots.begin ();
+                }
 
-          // get free random slot (second in carrier)
-          do
-          {
-            timeSlotId2 = randTimeSlotId->GetInteger(0, maxTimeSlotId);
+              slotsLeftForUt--;
 
-            if ( !(timeSlotId2 % 2) )
-              {
-                timeSlotId2++;
-              }
+              // add timeslot to TBTP message header
 
-            foundSlot = reservedTimeSlot.find (timeSlotId2);
-          } while (foundSlot != reservedTimeSlot.end ());
+              Ptr<SatTbtpHeader::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpHeader::TbtpTimeSlotInfo> (0, *currentSlot );
+              header.SetTimeslot (Mac48Address::ConvertFrom (*m_currentUt), timeSlotInfo);
 
-          // reserve timeslots
-          reservedTimeSlot.insert (timeSlotId1);
-          reservedTimeSlot.insert (timeSlotId2);
+              currentSlot++;
+            }
 
-          // add timeslot to TBTP message header
-          Ptr<SatTbtpHeader::TbtpTimeSlotInfo > timeSlotInfo1 = Create<SatTbtpHeader::TbtpTimeSlotInfo> (0, timeSlotId1 );
-          header.SetTimeslot(Mac48Address::ConvertFrom(*startIterator), timeSlotInfo1);
-
-          Ptr<SatTbtpHeader::TbtpTimeSlotInfo > timeSlotInfo2 = Create<SatTbtpHeader::TbtpTimeSlotInfo> (0, timeSlotId2 );
-          header.SetTimeslot(Mac48Address::ConvertFrom(*startIterator), timeSlotInfo2);
-
-          startIterator++;
+          m_currentUt++;
 
           // check if we have reached end of the UT list
-          if ( startIterator == m_uts.end() )
+          if ( m_currentUt == m_uts.end () )
             {
-              startIterator = m_uts.begin();
+              m_currentUt = m_uts.begin ();
             }
 
           // check if we have reached the UT where we started
-          if ( *startIterator == m_currentUtAddress )
+          if ( startIterator == m_currentUt )
             {
               utsScheduled = true;
             }
@@ -203,7 +207,7 @@ SatBeamScheduler::Schedule ()
     }
 
   // re-schedule next TBTP sending (call of this function)
-  Simulator::Schedule (Seconds(0.1), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule (Seconds (0.1), &SatBeamScheduler::Schedule, this);
 }
 
 } // namespace ns3

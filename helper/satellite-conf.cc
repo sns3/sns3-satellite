@@ -173,7 +173,7 @@ SatConf::Configure (std::string wfConf)
         Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameConfAllocatedBandwidth, m_frameConfRollOffFactor, m_frameConfSpacingFactor );
 
         // Created one frame to be used utilizating earlier created BTU
-        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth, m_frameConfTargetDuration, btuConf, (SatFrameConf::SatTimeSlotConfList *) NULL);
+        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth, m_frameConfTargetDuration, btuConf, (SatFrameConf::SatTimeSlotConfList_t *) NULL);
 
         //TODO: time slot duration to be taken from wave form configuration
         double timeSlotDuration = m_frameConfTargetDuration / 2;
@@ -189,7 +189,8 @@ SatConf::Configure (std::string wfConf)
           }
 
         // Create superframe configuration without frame first
-        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> (frameConf->GetBandwidth_hz(), frameConf->GetDuration_s(), (SatSuperframeConf::SatFrameConfList *) NULL);
+        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> ( frameConf->GetBandwidth_hz(), frameConf->GetDuration_s(),
+                                                                            (SatSuperframeConf::SatFrameConfList_t *) NULL);
 
         // Add earlier created frame to superframe configuration
         superframeConf->AddFrameConf (frameConf);

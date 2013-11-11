@@ -24,6 +24,7 @@
 #include <vector>
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 
@@ -162,7 +163,8 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
-  typedef std::map<uint16_t, Ptr<SatTimeSlotConf> > SatTimeSlotConfList;
+  typedef std::map<uint16_t, Ptr<SatTimeSlotConf> > SatTimeSlotConfList_t;
+  typedef std::vector<uint16_t> SatTimeSlotIdList_t;
 
   static const uint16_t maxTimeSlotCount = 2048;
   static const uint16_t maxTimeSlotIndex = maxTimeSlotCount - 1;
@@ -181,13 +183,13 @@ public:
    * \param timeSlots         Time slot of the frame.
    */
   SatFrameConf ( double bandwidth_hz, double duration_s, Ptr<SatBtuConf> btu,
-                 SatTimeSlotConfList * timeSlots );
+                 SatTimeSlotConfList_t * timeSlots );
 
   /**
    * Add time slot.
    *
    * \param conf  Time slot conf added.
-   * \return Id of the time slot added.
+   * \return ID of the added timeslot.
    */
   uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
 
@@ -231,7 +233,7 @@ public:
    *
    * \return The carrier count of the frame.
    */
-  inline uint32_t GetCarrierCount () { return m_carrierCount; }
+  inline uint32_t GetCarrierCount () { return m_carrierIds.size(); }
 
   /**
    * Get time slot count of the frame.
@@ -239,7 +241,7 @@ public:
    * \param index Id of the time slot requested.
    * \return      The requested time slot conf of frame.
    */
-  inline uint32_t GetTimeSlotCount () const { return m_timeSlots.size(); }
+  inline uint32_t GetTimeSlotCount () const { return m_timeSlotConfs.size(); }
 
   /**
    * Get time slot conf of the frame. Possible values for id are from 0 to 2047.
@@ -250,18 +252,37 @@ public:
   Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t id) const;
 
   /**
+   * Get time slot ids of the specific carrier.
+   *
+   * \param carrierId Id of the carrier which time slots are requested.
+   * \return  List (map) containing timeslots.
+   */
+  SatTimeSlotIdList_t GetTimeSlotIds (uint32_t carrierId) const;
+
+  /**
+   * Get time slots of the specific carrier.
+   *
+   * \param shuffle Flag indicating, if id in list should be in random order.
+   * \return  List (vector) containing carrier ids.
+   */
+  std::vector<uint32_t> GetCarrierIds (bool shuffle) const;
+
+  /**
    * Destructor for SatFrameConf
    */
   ~SatFrameConf ();
 
 private:
+  typedef std::multimap<uint32_t, uint16_t> SatCarrierTimeSlotId_t;
+
   double    m_bandwidth_hz;
   double    m_duration_s;
-  uint32_t  m_carrierCount;
   uint16_t  m_nextTimeSlotId;
 
   Ptr<SatBtuConf> m_btu;
-  SatTimeSlotConfList m_timeSlots;
+  std::vector<uint32_t>  m_carrierIds;
+  SatTimeSlotConfList_t  m_timeSlotConfs;
+  SatCarrierTimeSlotId_t m_carrierTimeSlotIds;
 };
 
 /**
@@ -271,7 +292,7 @@ private:
 class SatSuperframeConf : public SimpleRefCount<SatSuperframeConf>
 {
 public:
-  typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList;
+  typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
   static const uint16_t maxFrameCount = 256;
 
@@ -287,7 +308,7 @@ public:
    * \param duration_s        Duration of the frame in seconds
    * \param frames            Frames of the super frame. (In acsending order according to frequency inside superframe).
    */
-  SatSuperframeConf ( double bandwidth_hz, double duration_s, SatFrameConfList * frames );
+  SatSuperframeConf ( double bandwidth_hz, double duration_s, SatFrameConfList_t * frames );
 
   /**
    * Destructor for SatSuperframeConf
@@ -356,7 +377,7 @@ public:
 private:
   double m_bandwidth_hz;
   double m_duration_s;
-  SatFrameConfList m_frames;
+  SatFrameConfList_t m_frames;
 };
 
 } // namespace ns3
