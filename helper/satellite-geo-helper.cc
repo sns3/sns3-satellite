@@ -250,9 +250,9 @@ SatGeoHelper::Install (std::string aName)
 }
 
 void
-SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, Ptr<SatAntennaGainPattern> agp, uint32_t beamId )
+SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, Ptr<SatAntennaGainPattern> userAgp, Ptr<SatAntennaGainPattern> feederAgp, uint32_t userBeamId )
 {
-  NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << agp << beamId);
+  NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << userAgp << feederAgp << userBeamId);
 
   Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
   Ptr<MobilityModel> mobility = dev->GetNode()->GetObject<MobilityModel>();
@@ -272,11 +272,10 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   uPhyRx->SetMobility(mobility);
 
   // Note, that currently we have only one set of antenna patterns,
-  // which are utilized in both user return (Rx gain) and user forward
-  // (Tx gain) links. Antenna gain patterns are not utilized in feeder
-  // link at all.
-  uPhyTx->SetAntennaGainPattern (agp);
-  uPhyRx->SetAntennaGainPattern (agp);
+  // which are utilized in both in user link and feeder link, and
+  // in both uplink and downlink directions.
+  uPhyTx->SetAntennaGainPattern (userAgp);
+  uPhyRx->SetAntennaGainPattern (userAgp);
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
@@ -308,6 +307,11 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   fPhyTx->SetMobility(mobility);
   fPhyRx->SetMobility(mobility);
 
+  // Note, that currently we have only one set of antenna patterns,
+  // which are utilized in both in user link and feeder link, and
+  // in both uplink and downlink directions.
+  fPhyTx->SetAntennaGainPattern (feederAgp);
+  fPhyRx->SetAntennaGainPattern (feederAgp);
 
   // Configure the SatPhyRxCarrier instances
   // Note, that in GEO satellite, there is no need for error modeling.
@@ -333,19 +337,19 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // Create SatPhy modules
   m_userPhyFactory.Set ("PhyRx", PointerValue (uPhyRx));
   m_userPhyFactory.Set ("PhyTx", PointerValue (uPhyTx));
-  m_userPhyFactory.Set ("BeamId",UintegerValue (beamId));
+  m_userPhyFactory.Set ("BeamId",UintegerValue (userBeamId));
 
   m_feederPhyFactory.Set ("PhyRx", PointerValue (fPhyRx));
   m_feederPhyFactory.Set ("PhyTx", PointerValue (fPhyTx));
-  m_feederPhyFactory.Set ("BeamId",UintegerValue (beamId));
+  m_feederPhyFactory.Set ("BeamId",UintegerValue (userBeamId));
 
   Ptr<SatPhy> uPhy = m_userPhyFactory.Create<SatPhy> ();
   Ptr<SatPhy> fPhy = m_feederPhyFactory.Create<SatPhy> ();
   uPhy->Initialize ();
   fPhy->Initialize ();
 
-  dev->AddUserPhy(uPhy, beamId);
-  dev->AddFeederPhy(fPhy, beamId);
+  dev->AddUserPhy(uPhy, userBeamId);
+  dev->AddFeederPhy(fPhy, userBeamId);
 }
 
 void
