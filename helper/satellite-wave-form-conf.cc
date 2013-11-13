@@ -252,13 +252,13 @@ SatWaveformConf::GetWaveform (uint32_t wfId) const
   return m_waveforms.at(wfId);
 }
 
-Ptr<SatWaveform>
+uint32_t
 SatWaveformConf::GetDefaultWaveform () const
 {
   NS_LOG_FUNCTION (this << m_defaultWfId);
   NS_ASSERT(m_minWfId <= m_defaultWfId && m_defaultWfId <= m_maxWfId);
 
-  return m_waveforms.at(m_defaultWfId);
+  return m_defaultWfId;
 }
 
 bool

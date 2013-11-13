@@ -173,9 +173,9 @@ public:
 
   /**
    * Get the details of default waveform
-   * \return SatWaveform holding all the details of the default wf
+   * \return SatWaveform id of the confg holding all the details of the default wf
    */
-  Ptr<SatWaveform> GetDefaultWaveform () const;
+  uint32_t GetDefaultWaveform () const;
 
   /**
    * Get the best waveform id based on UT's C/No and C/No thresholds
