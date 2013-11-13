@@ -112,7 +112,7 @@ public:
    * \param waveFormId  Wave form id of time slot
    * \param carrierId   Carrier id of time slot
    */
-  SatTimeSlotConf (double startTime_s, double duration_s, uint8_t waveFormId, uint32_t carrierId);
+  SatTimeSlotConf (double startTime_s, double duration_s, uint32_t waveFormId, uint32_t carrierId);
 
   /**
    * Destructor for SatTimeSlotConf
