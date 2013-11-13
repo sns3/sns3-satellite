@@ -138,7 +138,7 @@ public:
    *
    * \return The wave form id of time slot.
    */
-  inline double GetWaveFormId () const { return m_waveFormId; }
+  inline uint32_t GetWaveFormId () const { return m_waveFormId; }
 
   /**
    * Get carrier id of time slot (inside frame).
@@ -150,7 +150,7 @@ public:
 private:
   double  m_startTime_s;
   double  m_duration_s;
-  uint8_t m_waveFormId;
+  uint32_t m_waveFormId;
   uint32_t m_frameCarrierId;
 };
 
