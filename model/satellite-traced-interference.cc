@@ -44,9 +44,11 @@ SatTracedInterference::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatTracedInterference::SatTracedInterference ()
+SatTracedInterference::SatTracedInterference () :
+    m_rxing (false)
 {
 }
+
 SatTracedInterference::~SatTracedInterference ()
 {
   Reset ();
@@ -82,5 +84,6 @@ SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 {
   m_rxing = false;
 }
+
 }
 // namespace ns3

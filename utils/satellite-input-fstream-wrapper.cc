@@ -18,61 +18,54 @@
  * Modified by: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-output-stream-wrapper.h"
+#include "satellite-input-fstream-wrapper.h"
 #include "ns3/log.h"
-#include "ns3/fatal-impl.h"
 #include "ns3/abort.h"
 #include <fstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatOutputStreamWrapper");
+NS_LOG_COMPONENT_DEFINE ("SatInputFileStreamWrapper");
 
 namespace ns3 {
 
-SatOutputStreamWrapper::SatOutputStreamWrapper (std::string filename, std::ios::openmode filemode)
+SatInputFileStreamWrapper::SatInputFileStreamWrapper (std::string filename, std::ios::openmode filemode)
   : m_destroyable (true)
 {
   NS_LOG_FUNCTION (this << filename << filemode);
 
-  std::ofstream* os = new std::ofstream ();
-  os->open (filename.c_str (), filemode);
-  m_ostream = os;
+  std::ifstream* ifs = new std::ifstream (filename.c_str (), filemode);
 
-  FatalImpl::RegisterStream (m_ostream);
+  if (!ifs->is_open ())
+    {
+      // script might be launched by test.py, try a different base path
+      delete ifs;
+      filename = "../../" + filename;
+      ifs = new std::ifstream (filename.c_str (), filemode);
 
-  NS_ABORT_MSG_UNLESS (os->is_open (), "SatOutputStreamWrapper::OutputStreamWrapper():  " <<
-                       "Unable to Open " << filename << " for mode " << filemode);
+      NS_ABORT_MSG_UNLESS (ifs->is_open (), "SatOutputStreamWrapper::OutputStreamWrapper():  " <<
+                           "Unable to Open " << filename << " for mode " << filemode);
+    }
+
+  m_ifstream = ifs;
 }
 
-SatOutputStreamWrapper::SatOutputStreamWrapper (std::ostream* os)
-  : m_ostream (os), m_destroyable (false)
-{
-  NS_LOG_FUNCTION (this << os);
-
-  FatalImpl::RegisterStream (m_ostream);
-
-  NS_ABORT_MSG_UNLESS (m_ostream->good (), "Output stream is not valid for writing.");
-}
-
-SatOutputStreamWrapper::~SatOutputStreamWrapper ()
+SatInputFileStreamWrapper::~SatInputFileStreamWrapper ()
 {
   NS_LOG_FUNCTION (this);
-
-  FatalImpl::UnregisterStream (m_ostream);
 
   if (m_destroyable)
     {
-      delete m_ostream;
+      delete m_ifstream;
     }
 
-  m_ostream = 0;
+  m_ifstream = 0;
 }
 
-std::ostream *
-SatOutputStreamWrapper::GetStream (void)
+std::ifstream *
+SatInputFileStreamWrapper::GetStream (void)
 {
   NS_LOG_FUNCTION (this);
 
-  return m_ostream;
+  return m_ifstream;
 }
 
 } // namespace ns3

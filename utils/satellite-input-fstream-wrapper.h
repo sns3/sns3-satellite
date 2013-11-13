@@ -18,8 +18,8 @@
  * Modified by: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#ifndef SAT_OUTPUT_STREAM_WRAPPER_H
-#define SAT_OUTPUT_STREAM_WRAPPER_H
+#ifndef SAT_INPUT_FSTREAM_WRAPPER_H
+#define SAT_INPUT_FSTREAM_WRAPPER_H
 
 #include <fstream>
 #include "ns3/object.h"
@@ -29,49 +29,44 @@
 namespace ns3 {
 
 /*
- * @brief A class encapsulating an STL output stream.
+ * @brief A class encapsulating an STL input stream.
  *
- * This class wraps a pointer to a C++ std::ostream and provides
+ * This class wraps a pointer to a C++ std::ifstream and provides
  * reference counting of the object.
  *
  * This class uses a basic ns-3 reference counting base class but is not 
  * an ns3::Object with attributes, TypeId, or aggregation.
  */
-class SatOutputStreamWrapper : public SimpleRefCount<SatOutputStreamWrapper>
+class SatInputFileStreamWrapper : public SimpleRefCount<SatInputFileStreamWrapper>
 {
 public:
+
   /**
    *
    * @param filename
    * @param filemode
    */
-  SatOutputStreamWrapper (std::string filename, std::ios::openmode filemode);
-
-  /**
-   *
-   * @param os
-   */
-  SatOutputStreamWrapper (std::ostream* os);
+  SatInputFileStreamWrapper (std::string filename, std::ios::openmode filemode);
 
   /**
    *
    */
-  ~SatOutputStreamWrapper ();
+  ~SatInputFileStreamWrapper ();
 
   /**
-   * Return a pointer to an ostream previously set in the wrapper.
+   * Return a pointer to an ifstream previously set in the wrapper.
    *
    * \see SetStream
    *
-   * \returns a pointer to the encapsulated std::ostream
+   * \returns a pointer to the encapsulated std::ifstream
    */
-  std::ostream *GetStream (void);
+  std::ifstream *GetStream (void);
 
 private:
   /**
    *
    */
-  std::ostream *m_ostream;
+  std::ifstream *m_ifstream;
 
   /**
    *
@@ -81,4 +76,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SAT_OUTPUT_STREAM_WRAPPER_H */
+#endif /* SAT_INPUT_FfSTREAM_WRAPPER_H */

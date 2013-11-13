@@ -18,54 +18,49 @@
  * Modified by: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-input-stream-wrapper.h"
+#include "satellite-output-fstream-wrapper.h"
 #include "ns3/log.h"
+#include "ns3/fatal-impl.h"
 #include "ns3/abort.h"
 #include <fstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatInputStreamWrapper");
+NS_LOG_COMPONENT_DEFINE ("SatOutputFileStreamWrapper");
 
 namespace ns3 {
 
-SatInputStreamWrapper::SatInputStreamWrapper (std::string filename, std::ios::openmode filemode)
+SatOutputFileStreamWrapper::SatOutputFileStreamWrapper (std::string filename, std::ios::openmode filemode)
   : m_destroyable (true)
 {
   NS_LOG_FUNCTION (this << filename << filemode);
 
-  std::ifstream* is = new std::ifstream ();
-  is->open (filename.c_str (), filemode);
-  m_istream = is;
+  m_ofstream = new std::ofstream (filename.c_str (), filemode);
 
-  NS_ABORT_MSG_UNLESS (is->is_open (), "SatOutputStreamWrapper::OutputStreamWrapper():  " <<
+  NS_ABORT_MSG_UNLESS (m_ofstream->is_open (), "SatOutputFileStreamWrapper::SatOutputFileStreamWrapper():  " <<
                        "Unable to Open " << filename << " for mode " << filemode);
+
+  FatalImpl::RegisterStream (m_ofstream);
 }
 
-SatInputStreamWrapper::SatInputStreamWrapper (std::istream* is)
-  : m_istream (is), m_destroyable (false)
-{
-  NS_LOG_FUNCTION (this << is);
-
-  NS_ABORT_MSG_UNLESS (m_istream->good (), "Input stream is not valid for reading.");
-}
-
-SatInputStreamWrapper::~SatInputStreamWrapper ()
+SatOutputFileStreamWrapper::~SatOutputFileStreamWrapper ()
 {
   NS_LOG_FUNCTION (this);
+
+  FatalImpl::UnregisterStream (m_ofstream);
 
   if (m_destroyable)
     {
-      delete m_istream;
+      delete m_ofstream;
     }
 
-  m_istream = 0;
+  m_ofstream = 0;
 }
 
-std::istream *
-SatInputStreamWrapper::GetStream (void)
+std::ofstream *
+SatOutputFileStreamWrapper::GetStream (void)
 {
   NS_LOG_FUNCTION (this);
 
-  return m_istream;
+  return m_ofstream;
 }
 
 } // namespace ns3
