@@ -52,6 +52,11 @@ public:
    */
   SatWaveform (uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols);
 
+  /**
+   * Get payload of a waveform in bits
+   * \return payload in bits
+   */
+  uint32_t GetPayloadInBits () const;
 
   /**
    * Get burst lenght of the waveform in symbols
@@ -160,6 +165,19 @@ public:
   void InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
 
   /**
+   * Get the details of a certain waveform
+   * \param wfId Waveform id
+   * \return SatWaveform holding all the details of a certain wf
+   */
+  Ptr<SatWaveform> GetWaveform (uint32_t wfId) const;
+
+  /**
+   * Get the details of default waveform
+   * \return SatWaveform holding all the details of the default wf
+   */
+  Ptr<SatWaveform> GetDefaultWaveform () const;
+
+  /**
    * Get the best waveform id based on UT's C/No and C/No thresholds
    * JPU: Note, that this algorithm is not final, but just a skeleton which shall be enhanced
    * when implementing the actual NCC RTN link burst scheduler algorithm!
@@ -199,10 +217,22 @@ private:
   std::map< uint32_t, Ptr<SatWaveform> > m_waveforms;
 
   /**
+   * Default waveform id
+   */
+  uint32_t m_defaultWfId;
+
+  /**
    * Packet error rate target for the waveforms. Default value
    * set as an attribute to 10^(-5).
    */
   double m_perTarget;
+
+  /**
+   * Minimum and maximum waveform ids. Note, that currently it is
+   * assumed that all the wfs between min and max are valid!
+   */
+  uint32_t m_minWfId;
+  uint32_t m_maxWfId;
 };
 
 } // namespace ns3

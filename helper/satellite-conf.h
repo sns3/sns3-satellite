@@ -58,7 +58,7 @@ public:
   /**
    * Initialize the configuration
    */
-  void Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos);
+  void Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos, std::string wfConf);
 
   /**
    * Try to open a file from a given path
@@ -184,8 +184,9 @@ private:
 
    /**
     * Configures itself with default values. Creates configuration storages as needed.
+    * \param wfConf path+filename of the waveform configuration
     */
-   void Configure();
+   void Configure(std::string wfConf);
 
    /**
     * \param carrierId  Global carrier ID across all seperframe sequncies.

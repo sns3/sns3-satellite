@@ -25,6 +25,7 @@
 #include "ns3/ptr.h"
 #include "ns3/object.h"
 #include "satellite-frame-conf.h"
+#include "satellite-wave-form-conf.h"
 
 namespace ns3 {
 
@@ -55,6 +56,18 @@ public:
    * Destructor for SatSuperframeSeq.
    */
   ~SatSuperframeSeq ();
+
+  /**
+   * Add waveform configuration class instance to this superframe sequence
+   * \param wfConf Waveform conf to add
+   */
+  void AddWaveformConf (Ptr<SatWaveformConf> wfConf);
+
+  /**
+   * Get waveform configuration
+   * \return SatWaveformConf Waveform configuration class instance
+   */
+  Ptr<SatWaveformConf> GetWaveformConf () const;
 
   /**
    * Add superframe (configuration) to superframe sequence
@@ -132,6 +145,12 @@ private:
     * Item index of the list means superframe sequency (SFS).
     */
   SatSuperframeConfList m_superframe;
+
+  /**
+   * Waveform configurations
+   */
+  Ptr<SatWaveformConf> m_wfConf;
+
 };
 
 } // namespace ns3

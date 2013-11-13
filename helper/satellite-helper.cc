@@ -93,10 +93,11 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string satConf = scenarioName + "Conf.txt";
   std::string gwPos = scenarioName + "GwPos.txt";
   std::string satPos = scenarioName + "GeoPos.txt";
+  std::string wfConf = "dvbRcs2Waveforms.txt";
 
   m_satConf = CreateObject<SatConf> ();
 
-  m_satConf->Initialize (path, satConf, gwPos, satPos);
+  m_satConf->Initialize (path, satConf, gwPos, satPos, wfConf);
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();

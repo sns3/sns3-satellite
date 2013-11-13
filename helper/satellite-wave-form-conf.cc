@@ -21,9 +21,11 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 #include "ns3/log.h"
 #include "ns3/ptr.h"
 #include "ns3/double.h"
+#include "ns3/uinteger.h"
 #include "satellite-wave-form-conf.h"
 #include "../model/satellite-link-results.h"
 #include "../model/satellite-utils.h"
@@ -48,44 +50,64 @@ SatWaveform::SatWaveform (uint32_t modulatedBits, double codingRate, uint32_t pa
 }
 
 uint32_t
+SatWaveform::GetPayloadInBits () const
+{
+  return 8 * m_payloadBytes;
+}
+
+uint32_t
 SatWaveform::GetBurstLengthInSymbols () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_lengthInSymbols;
 }
 
 double
 SatWaveform::GetBurstDurationInSeconds (double symbolRateInBaud) const
 {
+  NS_LOG_FUNCTION (this << symbolRateInBaud);
+
   return m_lengthInSymbols / symbolRateInBaud;
 }
 
 double
 SatWaveform::GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRateInBaud) const
 {
+  NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
+
   return ( 8.0 * m_payloadBytes ) / (m_lengthInSymbols / symbolRateInBaud) / carrierBandwidthInHz;
 }
 
 double
 SatWaveform::GetThroughputInBitsPerSecond (double symbolRateInBaud) const
 {
+  NS_LOG_FUNCTION (this << symbolRateInBaud);
+
   return 8.0 * m_payloadBytes / ( m_lengthInSymbols / symbolRateInBaud );
 }
 
 double
 SatWaveform::GetCNoThreshold (double symbolRateInBaud) const
 {
+  NS_LOG_FUNCTION (this << symbolRateInBaud);
+
   return m_esnoThreshold * symbolRateInBaud * m_modulatedBits;
 }
 
 void
 SatWaveform::SetEsNoThreshold (double esnoThreshold)
 {
+  NS_LOG_FUNCTION (this << esnoThreshold);
+
   m_esnoThreshold = esnoThreshold;
 }
 
 void
 SatWaveform::Dump (double carrierBandwidthInHz, double symbolRateInBaud) const
 {
+  NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
+
   std::cout << "ModulatedBits: " << m_modulatedBits << ", CodingRate: " << m_codingRate <<
       ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
       ", EsNoThreshold: " << SatUtils::LinearToDb (m_esnoThreshold) <<
@@ -120,6 +142,11 @@ SatWaveformConf::GetTypeId (void)
                     DoubleValue (0.00001),
                     MakeDoubleAccessor(&SatWaveformConf::m_perTarget),
                     MakeDoubleChecker<double>())
+    .AddAttribute( "DefaultWfId",
+                   "Default waveform id",
+                   UintegerValue (3),
+                   MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
+                   MakeUintegerChecker<uint32_t> ())
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
@@ -133,6 +160,10 @@ SatWaveformConf::~SatWaveformConf ()
 void
 SatWaveformConf::ReadFromFile (std::string filePathName)
 {
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector<uint32_t> wfIds;
+
   // READ FROM THE SPECIFIED INPUT FILE
   std::ifstream *ifs = new std::ifstream (filePathName.c_str (), std::ifstream::in);
 
@@ -161,6 +192,9 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
 
   while (ifs->good())
     {
+      // Store temporarily all wfIds
+      wfIds.push_back(wfIndex);
+
       // Convert the coding rate fraction into double
       std::istringstream ss(sCodingRate);
       std::string token;
@@ -189,11 +223,17 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
 
   ifs->close ();
   delete ifs;
+
+  // Note, currently we assume that the waveform ids are consecutive!
+  m_minWfId = *std::min_element(wfIds.begin (), wfIds.end ());
+  m_maxWfId = *std::max_element(wfIds.begin (), wfIds.end ());
 }
 
 
 void SatWaveformConf::InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults )
 {
+  NS_LOG_FUNCTION (this);
+
   for ( std::map< uint32_t, Ptr<SatWaveform> >::iterator it = m_waveforms.begin ();
       it != m_waveforms.end ();
       ++it )
@@ -203,10 +243,29 @@ void SatWaveformConf::InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> lin
     }
 }
 
+Ptr<SatWaveform>
+SatWaveformConf::GetWaveform (uint32_t wfId) const
+{
+  NS_LOG_FUNCTION (this << wfId);
+  NS_ASSERT(m_minWfId <= wfId && wfId <= m_maxWfId);
+
+  return m_waveforms.at(wfId);
+}
+
+Ptr<SatWaveform>
+SatWaveformConf::GetDefaultWaveform () const
+{
+  NS_LOG_FUNCTION (this << m_defaultWfId);
+  NS_ASSERT(m_minWfId <= m_defaultWfId && m_defaultWfId <= m_maxWfId);
+
+  return m_waveforms.at(m_defaultWfId);
+}
 
 bool
 SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength) const
 {
+  NS_LOG_FUNCTION (this << cno << symbolRateInBaud << wfId << burstLength);
+
   bool success (false);
 
   // Return the waveform with best spectral efficiency
@@ -237,6 +296,8 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
 void
 SatWaveformConf::Dump (double carrierBandwidthInHz, double symbolRateInBaud) const
 {
+  NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
+
   for ( std::map< uint32_t, Ptr<SatWaveform> >::const_iterator it = m_waveforms.begin ();
       it != m_waveforms.end ();
       ++it )

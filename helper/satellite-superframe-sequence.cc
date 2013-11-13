@@ -51,6 +51,20 @@ SatSuperframeSeq::~SatSuperframeSeq ()
 }
 
 void
+SatSuperframeSeq::AddWaveformConf (Ptr<SatWaveformConf> wfConf)
+{
+  NS_LOG_FUNCTION (this);
+  m_wfConf = wfConf;
+}
+
+Ptr<SatWaveformConf>
+SatSuperframeSeq::GetWaveformConf () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_wfConf;
+}
+
+void
 SatSuperframeSeq::AddSuperframe (Ptr<SatSuperframeConf> conf)
 {
   NS_LOG_FUNCTION (this);

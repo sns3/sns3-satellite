@@ -23,6 +23,7 @@
 #include "ns3/enum.h"
 #include "ns3/simulator.h"
 #include "satellite-conf.h"
+#include "satellite-wave-form-conf.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatConf");
@@ -130,7 +131,7 @@ SatConf::SatConf()
 }
 
 
-void SatConf::Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos)
+void SatConf::Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos, std::string wfConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -143,11 +144,11 @@ void SatConf::Initialize (std::string path, std::string satConf, std::string gwP
   // Load satellite position
   LoadGeoSatPos (path + satPos);
 
-  Configure ();
+  Configure (path + wfConf);
 }
 
 void
-SatConf::Configure()
+SatConf::Configure (std::string wfConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -209,6 +210,10 @@ SatConf::Configure()
       NS_ASSERT (false);
       break;
   }
+
+  // Create a waveform configuration instance and add it to superframe sequence
+  Ptr<SatWaveformConf> wfc = CreateObject<SatWaveformConf> (wfConf);
+  m_superframeSeq->AddWaveformConf (wfc);
 }
 
 double
