@@ -88,7 +88,7 @@ SatConf::GetTypeId (void)
                                        SatConf::STATIC_CONFIG_3, "Configuration 3"))
       .AddAttribute ("StaticConfTargetDuration",
                      "Target duration of the superframe for static configuration [s].",
-                     DoubleValue (0.100),
+                     DoubleValue (0.010),
                      MakeDoubleAccessor (&SatConf::m_frameConfTargetDuration),
                      MakeDoubleChecker<double> ())
       .AddAttribute ("StaticConfAllocatedBandwidth",
@@ -157,7 +157,7 @@ SatConf::Configure (std::string wfConf)
   // currently only one carrier in forward link is used.
   m_forwardLinkCarrierConf.push_back (1);
 
-  //TODO: Now we just create some carriers with one frame, needed to do proper configuration later
+  // *** configure return link ***
 
   double rtnFeederLinkBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
   double rtnUserLinkBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
@@ -169,41 +169,58 @@ SatConf::Configure (std::string wfConf)
   {
     case STATIC_CONFIG_0:
       {
+        // Create superframe sequence and add later needed elements to it
+        m_superframeSeq = CreateObject<SatSuperframeSeq> ();
+
         // Create BTU conf according to given attributes
         Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameConfAllocatedBandwidth, m_frameConfRollOffFactor, m_frameConfSpacingFactor );
 
-        // Created one frame to be used utilizating earlier created BTU
-        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth, m_frameConfTargetDuration, btuConf, (SatFrameConf::SatTimeSlotConfList_t *) NULL);
+        // Create a waveform configuration
+        Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
 
-        //TODO: time slot duration to be taken from wave form configuration
-        double timeSlotDuration = m_frameConfTargetDuration / 2;
+        // get default waveform
+        uint32_t defaultWaveFormId = waveFormConf->GetDefaultWaveform ();
+        Ptr<SatWaveform> defaultWaveForm = waveFormConf->GetWaveform (defaultWaveFormId);
 
-        // Created two time slots for every carrier and add them to frame configuration
-        for (uint32_t i = 0; i < frameConf->GetCarrierCount(); i++)
+        double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRate_baud ());
+        uint32_t slotCount = m_frameConfTargetDuration / timeSlotDuration;
+
+        if ( slotCount == 0 )
           {
-            Ptr<SatTimeSlotConf> timeSlot1 = Create<SatTimeSlotConf> (0, timeSlotDuration, 0, i);
-            frameConf->AddTimeSlotConf (timeSlot1);
+            slotCount = 1;
+          }
 
-            Ptr<SatTimeSlotConf> timeSlot2 = Create<SatTimeSlotConf> (timeSlotDuration, timeSlotDuration, 0, i);
-            frameConf->AddTimeSlotConf (timeSlot2);
+        // Created one frame to be used utilizating earlier created BTU
+        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth, slotCount * timeSlotDuration,
+                                                            btuConf, (SatFrameConf::SatTimeSlotConfList_t *) NULL);
+
+        // Created time slots for every carrier and add them to frame configuration
+        for (uint32_t i = 0; i < frameConf->GetCarrierCount (); i++)
+          {
+            for (uint32_t j = 0; j < slotCount; j++)
+              {
+                Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (j * timeSlotDuration, timeSlotDuration, defaultWaveFormId, i);
+                frameConf->AddTimeSlotConf (timeSlot);
+              }
           }
 
         // Create superframe configuration without frame first
-        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> ( frameConf->GetBandwidth_hz(), frameConf->GetDuration_s(),
+        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> ( frameConf->GetBandwidth_hz (), frameConf->GetDuration_s (),
                                                                             (SatSuperframeConf::SatFrameConfList_t *) NULL);
 
         // Add earlier created frame to superframe configuration
         superframeConf->AddFrameConf (frameConf);
 
-        // Create superframe sequence anf add earlier created superframe configuration to it
-        m_superframeSeq = CreateObject<SatSuperframeSeq> ();
-        m_superframeSeq->AddSuperframe ( superframeConf );
+        // Add earlier created superframe and wave form configurations to it
+        m_superframeSeq->AddWaveformConf (waveFormConf);
+        m_superframeSeq->AddSuperframe (superframeConf);
       }
       break;
 
     case STATIC_CONFIG_1:
     case STATIC_CONFIG_2:
     case STATIC_CONFIG_3:
+      // TODO: Add other static configuration..
       NS_ASSERT (false); // these are not supported yet
       break;
 
@@ -212,9 +229,6 @@ SatConf::Configure (std::string wfConf)
       break;
   }
 
-  // Create a waveform configuration instance and add it to superframe sequence
-  Ptr<SatWaveformConf> wfc = CreateObject<SatWaveformConf> (wfConf);
-  m_superframeSeq->AddWaveformConf (wfc);
 }
 
 double

@@ -99,7 +99,7 @@ SatFrameConf::SatFrameConf ( double bandwidth_hz, double duration_s,
     {
       m_timeSlotConfs = *timeSlots;
 
-      if ( m_timeSlotConfs.empty () != false )
+      if ( m_timeSlotConfs.empty () == false )
         {
           SatTimeSlotConfList_t::iterator lastSlot = m_timeSlotConfs.end ()--;
           m_nextTimeSlotId = lastSlot->first + 1;

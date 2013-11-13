@@ -117,7 +117,9 @@ SatTbtpHeader::TbtpTimeSlotInfo::TbtpTimeSlotInfo (uint8_t frameId, uint16_t tim
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (timeSlotId <= maximumTimeSlotId);
+  //TODO: maximum Time Slot id should taken into account when creating confs
+  // now check commented
+  //NS_ASSERT (timeSlotId <= maximumTimeSlotId);
 
   m_timeSlotId = timeSlotId;
 }
