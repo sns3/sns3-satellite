@@ -27,17 +27,6 @@ NS_LOG_COMPONENT_DEFINE ("SatFrameConf");
 
 namespace ns3 {
 
-static Ptr<UniformRandomVariable> m_randomCarrier = CreateObject<UniformRandomVariable> ();
-
-static int RandomCarrierId ( int max )
-{
-  NS_ASSERT ( max > 0 );
-
-  uint32_t maxCarrierId = max - 1;
-
-  return m_randomCarrier->GetInteger (0, maxCarrierId);
-}
-
 // BTU conf
 
 SatBtuConf::SatBtuConf ()
@@ -104,12 +93,7 @@ SatFrameConf::SatFrameConf ( double bandwidth_hz, double duration_s,
 {
   NS_LOG_FUNCTION (this);
 
-  double carrierCount = bandwidth_hz / btu->GetAllocatedBandwidth_hz ();
-
-  for ( uint32_t i = 0; i < carrierCount; i++ )
-    {
-      m_carrierIds.push_back (i);
-    }
+  m_carrierCount = bandwidth_hz / btu->GetAllocatedBandwidth_hz ();
 
   if ( timeSlots != NULL )
     {
@@ -131,7 +115,7 @@ SatFrameConf::~SatFrameConf ()
 double
 SatFrameConf::GetCarrierFrequency_hz (uint32_t carrierId) const
 {
-  NS_ASSERT (carrierId < m_carrierIds.size () );
+  NS_ASSERT (carrierId < m_carrierCount );
 
   double carrierBandwidth_hz = m_btu->GetAllocatedBandwidth_hz ();
 
@@ -167,21 +151,6 @@ SatFrameConf::GetTimeSlotIds (uint32_t carrierId) const
     }
 
   return timeSlots;
-}
-
-std::vector<uint32_t>
-SatFrameConf::GetCarrierIds (bool shuffle) const
-{
-  NS_LOG_FUNCTION (this);
-
-  std::vector<uint32_t> carrierIds = m_carrierIds;
-
-  if ( shuffle )
-    {
-      std::random_shuffle (carrierIds.begin (), carrierIds.end (), RandomCarrierId );
-    }
-
-  return carrierIds;
 }
 
 uint16_t

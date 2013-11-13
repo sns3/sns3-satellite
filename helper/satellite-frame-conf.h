@@ -233,7 +233,7 @@ public:
    *
    * \return The carrier count of the frame.
    */
-  inline uint32_t GetCarrierCount () { return m_carrierIds.size(); }
+  inline uint32_t GetCarrierCount () { return m_carrierCount; }
 
   /**
    * Get time slot count of the frame.
@@ -260,14 +260,6 @@ public:
   SatTimeSlotIdList_t GetTimeSlotIds (uint32_t carrierId) const;
 
   /**
-   * Get time slots of the specific carrier.
-   *
-   * \param shuffle Flag indicating, if id in list should be in random order.
-   * \return  List (vector) containing carrier ids.
-   */
-  std::vector<uint32_t> GetCarrierIds (bool shuffle) const;
-
-  /**
    * Destructor for SatFrameConf
    */
   ~SatFrameConf ();
@@ -280,7 +272,7 @@ private:
   uint16_t  m_nextTimeSlotId;
 
   Ptr<SatBtuConf> m_btu;
-  std::vector<uint32_t>  m_carrierIds;
+  uint32_t m_carrierCount;
   SatTimeSlotConfList_t  m_timeSlotConfs;
   SatCarrierTimeSlotId_t m_carrierTimeSlotIds;
 };

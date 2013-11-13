@@ -30,6 +30,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
 #include "ns3/satellite-superframe-sequence.h"
+#include "satellite-control-message.h"
 
 namespace ns3 {
 
@@ -92,7 +93,6 @@ public:
   void AddUt (Address utId);
 
 private:
-
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);
 
@@ -100,7 +100,24 @@ private:
   bool Send ( Ptr<Packet> packet );
   void Schedule ();
 
+  void InitializeScheduling ();
+  void ScheduleUts (SatTbtpHeader& header);
+  uint32_t AddUtTimeSlots (SatTbtpHeader& header);
+  uint16_t GetNextTimeSlot ();
+
+  /**
+   * ID of the beam
+   */
+  uint32_t m_beamId;
+
+  /**
+   * Pointer to superframe sequence.
+   */
   Ptr<SatSuperframeSeq> m_superframeSeq;
+
+  /**
+   * Counter for superframe sequence.
+   */
   uint32_t m_superFrameCounter;
 
   /**
@@ -112,12 +129,51 @@ private:
    * Set to store UTs in beam.
    */
   std::set<Address> m_uts;
+
+  /**
+   * Iterator of the current UT to schedule
+   */
   std::set<Address>::iterator m_currentUt;
 
   /**
-   * ID of the beam
+   * Iterator of the UT scheduled first
    */
-  uint32_t m_beamId;
+  std::set<Address>::iterator m_firstUt;
+
+  /**
+   * Shuffled list of carrier ids.
+   */
+  std::vector<uint32_t> m_carrierIds;
+
+  /**
+   * Iterator of the currently used carrier id from shuffled list.
+   */
+  std::vector<uint32_t>::iterator m_currentCarrier;
+
+  /**
+   * Time slot ids of the currently used carrier.
+   */
+  SatFrameConf::SatTimeSlotIdList_t m_timeSlots;
+
+  /**
+   * Iterator of the currently used time slot id for time slot id list.
+   */
+  SatFrameConf::SatTimeSlotIdList_t::iterator m_currentSlot;
+
+  /**
+   * Counter for total time slots left for scheduling
+   */
+  uint32_t m_totalSlotLeft;
+
+  /**
+   * Counter for time slots left when there is even number of slots available for UTs
+   */
+  uint32_t m_additionalSlots;
+
+  /**
+   * Number of time slots reserved per every UTs
+   */
+  uint32_t m_slotsPerUt;
 };
 
 } // namespace ns3
