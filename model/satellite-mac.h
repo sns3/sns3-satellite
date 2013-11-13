@@ -151,6 +151,19 @@ public:
     */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
+  /**
+   * \param uint32_t payload size in bytes
+   * \return packet Packet to be transmitted to PHY
+   */
+  typedef Callback< Ptr<Packet>, uint32_t > TxOpportunityCallback;
+
+  /**
+    * \param cb callback to invoke whenever a packet has been received and must
+    *        be forwarded to the higher layers.
+    *
+    */
+  void SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb);
+
   void SetAddress (Mac48Address macAddress);
 
 protected:
@@ -215,6 +228,13 @@ private:
    * The upper layer package receive callback.
    */
   SatMac::ReceiveCallback m_rxCallback;
+
+  /**
+   * Callback to notify the txOpportunity to upper layer
+   * Returns a packet
+   * Attributes: payload in bytes
+   */
+  Callback<Ptr<Packet>, uint32_t> m_txOpportunityCallback;
 
   /**
    * The trace source fired when packets come into the "top" of the device
