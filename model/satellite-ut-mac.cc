@@ -30,7 +30,6 @@
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
-
 #include "satellite-ut-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -50,7 +49,12 @@ SatUtMac::GetTypeId (void)
                     PointerValue (),
                     MakePointerAccessor (&SatUtMac::m_superframeSeq),
                     MakePointerChecker<SatSuperframeSeq> ())
-  ;
+    .AddAttribute ("Interval",
+                   "The time to wait between packet (frame) transmissions",
+                   TimeValue (Seconds (0.001)),
+                   MakeTimeAccessor (&SatUtMac::m_tInterval),
+                   MakeTimeChecker ())
+                   ;
   return tid;
 }
 
@@ -79,6 +83,28 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq)
 SatUtMac::~SatUtMac ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatUtMac::DoDispose (void)
+{
+  NS_LOG_FUNCTION (this);
+  SatMac::DoDispose ();
+}
+
+void
+SatUtMac::StartScheduling()
+{
+  if ( m_tInterval.GetDouble() > 0 )
+    {
+      ScheduleTransmit (m_tInterval, 0);
+    }
+}
+
+void
+SatUtMac::ScheduleTransmit(Time transmitTime, uint32_t carrierId)
+{
+  Simulator::Schedule (transmitTime, &SatUtMac::TransmitReady, this, carrierId);
 }
 
 void
@@ -117,6 +143,47 @@ SatUtMac::ScheduleTimeSlots (SatTbtpHeader * tbtp)
         }
     }
 }
+
+bool
+SatUtMac::TransmitStart (Ptr<Packet> p, uint32_t carrierId)
+{
+  NS_LOG_FUNCTION (this << p);
+  NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
+
+  /* TODO: Now we are using only a static (time slot) duration
+   * for packet transmissions and receptions.
+   * The (time slot) durations for packet transmissions should be coming from:
+   * - TBTP in return link
+   * - GW scheduler in the forward link
+   */
+  Time DURATION (MicroSeconds(20));
+  m_phy->SendPdu (p, carrierId, DURATION);
+
+  return true;
+}
+
+void
+SatUtMac::TransmitReady (uint32_t carrierId)
+{
+  NS_LOG_FUNCTION (this);
+  //
+  // This function is called to when we're all done transmitting a packet.
+  // We try and pull another packet off of the transmit queue.  If the queue
+  // is empty, we are done, otherwise we need to start transmitting the
+  // next packet.
+
+  if ( PacketInQueue() )
+    {
+      Ptr<Packet> p = m_queue->Dequeue();
+      TransmitStart(p, carrierId);
+    }
+
+  if ( m_tInterval.GetDouble() > 0)
+    {
+      Simulator::Schedule (m_tInterval, &SatUtMac::TransmitReady, this, 0);
+    }
+}
+
 
 void
 SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)

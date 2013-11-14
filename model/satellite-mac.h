@@ -25,31 +25,19 @@
 
 #include "ns3/address.h"
 #include "ns3/ptr.h"
-#include "ns3/node.h"
 #include "ns3/queue.h"
-#include "ns3/error-model.h"
 #include "ns3/callback.h"
-#include "ns3/packet.h"
 #include "ns3/traced-callback.h"
-#include "ns3/nstime.h"
 #include "ns3/mac48-address.h"
-
 #include "satellite-phy.h"
-#include "satellite-net-device.h"
-#include "satellite-signal-parameters.h"
 
 namespace ns3 {
-
-
-
 
 /**
  * \ingroup satellite
   * \brief Base Mac class for Sat Net Devices.
  *
  * This SatMac class specializes the Mac base class.
- * Key parameters or objects that can be specified for this object
- * include a queue and interval for periodic scheduling.
  *
  * Classed derived from this base class can add more realistic schedulers and
  * add more needed queues.
@@ -75,17 +63,6 @@ public:
   ~SatMac ();
 
   /**
-   * Starts scheduling of the sending. Called when MAC is wanted to take care of scheduling.
-   */
-  void StartScheduling();
-
-  /**
-   * Schdules one sending opportunity. Called for every sending opportunity scheduler.
-   * /param Time transmitTime time when transmit possibility starts
-   */
-  void ScheduleTransmit ( Time transmitTime, uint32_t carrierId );
-
-  /**
    * Attach the Phy object to SatMac.
    *
    * \param phy Ptr to the attached phy object.
@@ -104,7 +81,6 @@ public:
    *
    * \param phy Ptr to the attached Net Device object.
    */
-
   void SetQueue (Ptr<Queue> queue);
 
   /**
@@ -114,21 +90,6 @@ public:
    */
   Ptr<Queue> GetQueue (void) const;
 
-   /**
-   * Receive a packet from a connected Phy object.
-   *
-   * The SatMac receives packets from its connected phy object
-   * and forwards them up the protocol stack.  This is the public method
-   * used by the phy  object to indicate that the last bit of a packet has
-   * arrived at the device.
-   *
-   * @see SatChannel
-   * /param p Ptr to the received packet.
-   * /param rxParams RX parameters
-   */
-
-  void Receive (Ptr<Packet> p, Ptr<SatSignalParameters> /*rxParams*/);
-
   /**
     * \param packet packet sent from above down to SatMac
     *
@@ -137,7 +98,15 @@ public:
     *
     * \return whether the Send operation succeeded
     */
-  bool Send (Ptr<Packet> packet, Address dest);
+  virtual bool Send (Ptr<Packet> packet, Address dest);
+
+  /**
+   * Receive packet from lower layer.
+   *
+   * \param packet Pointer to packet received.
+   * \param
+   */
+  virtual void Receive (Ptr<Packet> p, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
     * \param packet the packet received
@@ -164,65 +133,42 @@ public:
     */
   void SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb);
 
+  /**
+   * Set the address of this MAC
+   */
   void SetAddress (Mac48Address macAddress);
 
-protected:
   /**
-    * Start Sending a Packet Down the Wire.
-    *
-    * The TransmitStart method is the method that is used internally in the
-    * SatMac to begin the process of sending a packet out on the phy layer.'
-    *
-    * \param p a reference to the packet to send
-    * \param carrierId id of the carrier.
-    * \returns true if success, false on failure
-    */
-   bool TransmitStart (Ptr<Packet> p,  uint32_t carrierId);
-
-   inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
-
-protected:
-   /**
-    * The interval that the Mac uses to throttle packet transmission
-    */
-   Time m_tInterval;
-
-   /**
-    * MAC address of the this mac instance
-    */
-   Mac48Address m_macAddress;
+   * Inline function to check whether there are packets in a queue
+   * \return boolean identifying whether there was packets in a queue
+   */
+  inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
 
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
 
+
+protected:
+
   void DoDispose (void);
 
   /**
-   * Start new sending if there is packet in queue, otherwise schedules next send moment.
-   *
-   * The TransmitReady method is used internally to schedule sending of a packet out on the phy.
-   */
-  void TransmitReady (uint32_t carrierId);
-
-  /**
-   * The Phy obejct to which this SatMac has been attached.
+   * The Phy object to which this SatMac has been attached.
    */
   Ptr<SatPhy> m_phy;
 
   /**
    * The Queue which this SatMac uses as a packet source.
-   * Management of this Queue has been delegated to the SatMac
-   * and it has the responsibility for deletion.
    * @see class Queue
    * @see class DropTailQueue
    */
   Ptr<Queue> m_queue;
 
-  /**
-   * The Net Device which owns this SatMac is attached to.
-   */
-  Ptr<SatNetDevice> m_device;
+   /**
+    * MAC address of the this mac instance
+    */
+   Mac48Address m_macAddress;
 
   /**
    * The upper layer package receive callback.

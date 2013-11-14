@@ -60,12 +60,33 @@ public:
   ~SatUtMac ();
 
   /**
+   * Starts scheduling of the sending. Called when MAC is wanted to take care of scheduling.
+   */
+  void StartScheduling();
+
+  /**
+   * Schdules one sending opportunity. Called for every sending opportunity scheduler.
+   * /param Time transmitTime time when transmit possibility starts
+   */
+  void ScheduleTransmit ( Time transmitTime, uint32_t carrierId );
+
+  /**
    * Receive packet from lower layer.
    *
    * \param packet Pointer to packet received.
    * \param
    */
-  void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
+  virtual void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
+
+  /**
+    * \param packet packet sent from above down to SatGwMac
+    *
+    *  Called from higher layer to send packet into Mac layer
+    *  to the specified destination Address
+    *
+    * \return whether the Send operation succeeded
+    */
+  //bool Send (Ptr<Packet> packet, Address dest);
 
   /**
    * \return Timing advance as Time object.
@@ -78,7 +99,32 @@ public:
    */
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
+
+protected:
+
+   void DoDispose (void);
+
 private:
+
+   /**
+     * Start Sending a Packet Down the Wire.
+     *
+     * The TransmitStart method is the method that is used internally in the
+     * SatGwMac to begin the process of sending a packet out on the phy layer.'
+     *
+     * \param p a reference to the packet to send
+     * \param carrierId id of the carrier.
+     * \returns true if success, false on failure
+     */
+    bool TransmitStart (Ptr<Packet> p,  uint32_t carrierId);
+
+   /**
+    * Start new sending if there is packet in queue, otherwise schedules next send moment.
+    *
+    * The TransmitReady method is used internally to schedule sending of a packet out on the phy.
+    */
+   void TransmitReady (uint32_t carrierId);
+
   /**
    *  Schedules time slots according to received TBTP message.
    *
@@ -89,9 +135,20 @@ private:
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
 
+  /**
+   * Used superframe sequence for the return link
+   */
   Ptr<SatSuperframeSeq> m_superframeSeq;
+
+  /**
+   * Callback for getting the timing advance information
+   */
   TimingAdvanceCallback m_timingAdvanceCb;
 
+  /**
+   * The interval that the Mac uses to throttle packet transmission
+   */
+  Time m_tInterval;
 };
 
 } // namespace ns3

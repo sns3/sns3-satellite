@@ -80,7 +80,7 @@ SatUtHelper::GetTypeId (void)
                       MakeDoubleAccessor (&SatUtHelper::m_otherSysInterference_db),
                       MakeDoubleChecker<double> ())
       .AddAttribute( "RxImIfDb",
-                     "Intermodultation interference of RX in UT.",
+                     "Intermodulation interference of RX in UT.",
                       DoubleValue (0.0),
                       MakeDoubleAccessor(&SatUtHelper::m_imInterference_db),
                       MakeDoubleChecker<double> ())

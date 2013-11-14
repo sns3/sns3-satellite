@@ -22,18 +22,13 @@
 #include "ns3/queue.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
-#include "ns3/error-model.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/uinteger.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
-
-#include "satellite-mac-tag.h"
 #include "satellite-mac.h"
 #include "satellite-phy.h"
-#include "satellite-net-device.h"
-#include "satellite-channel.h"
-#include "satellite-signal-parameters.h"
+#include "satellite-mac-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatMac");
 
@@ -47,22 +42,11 @@ SatMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatMac")
     .SetParent<Object> ()
     .AddConstructor<SatMac> ()
-    .AddAttribute ("Interval",
-                   "The time to wait between packet (frame) transmissions",
-                   TimeValue (Seconds (0.001)),
-                   MakeTimeAccessor (&SatMac::m_tInterval),
-                   MakeTimeChecker ())
-
-    //
-    // Transmit queueing discipline for the device which includes its own set
-    // of trace hooks.
-    //
-    .AddAttribute ("TxQueue", 
+    .AddAttribute ("TxQueue",
                    "A queue to use as the transmit queue in the device.",
                    PointerValue (),
                    MakePointerAccessor (&SatMac::m_queue),
                    MakePointerChecker<Queue> ())
-
     //
     // Trace sources at the "top" of the net device, where packets transition
     // to/from higher layers.
@@ -103,19 +87,6 @@ SatMac::~SatMac ()
   NS_LOG_FUNCTION (this);
 }
 
-void SatMac::StartScheduling()
-{
-  if ( m_tInterval.GetDouble() > 0 )
-    {
-      ScheduleTransmit (m_tInterval, 0);
-    }
-}
-
-void SatMac::ScheduleTransmit(Time transmitTime, uint32_t carrierId)
-{
-  Simulator::Schedule (transmitTime, &SatMac::TransmitReady, this, carrierId);
-}
-
 void
 SatMac::DoDispose ()
 {
@@ -130,46 +101,6 @@ void SatMac::SetAddress( Mac48Address macAddress )
 {
   NS_LOG_FUNCTION (this << macAddress);
   m_macAddress = macAddress;
-}
-
-bool
-SatMac::TransmitStart (Ptr<Packet> p, uint32_t carrierId)
-{
-  NS_LOG_FUNCTION (this << p);
-  NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
-
-  /* TODO: Now we are using only a static (time slot) duration
-   * for packet transmissions and receptions.
-   * The (time slot) durations for packet transmissions should be coming from:
-   * - TBTP in return link
-   * - GW scheduler in the forward link
-   */
-  Time DURATION (MicroSeconds(20));
-  m_phy->SendPdu (p, carrierId, DURATION);
-
-  return true;
-}
-
-void
-SatMac::TransmitReady (uint32_t carrierId)
-{
-  NS_LOG_FUNCTION (this);
-  //
-  // This function is called to when we're all done transmitting a packet.
-  // We try and pull another packet off of the transmit queue.  If the queue
-  // is empty, we are done, otherwise we need to start transmitting the
-  // next packet.
-
-  if ( PacketInQueue() )
-    {
-      Ptr<Packet> p = m_queue->Dequeue();
-      TransmitStart(p, carrierId);
-    }
-
-  if ( m_tInterval.GetDouble() > 0)
-    {
-      Simulator::Schedule (m_tInterval, &SatMac::TransmitReady, this, 0);
-    }
 }
 
 bool
@@ -188,10 +119,10 @@ SatMac::GetPhy (void) const
 }
 
 void
-SatMac::SetQueue (Ptr<Queue> q)
+SatMac::SetQueue (Ptr<Queue> queue)
 {
-  NS_LOG_FUNCTION (this << q);
-  m_queue = q;
+  NS_LOG_FUNCTION (this << queue);
+  m_queue = queue;
 }
 
 Ptr<Queue>
@@ -199,40 +130,6 @@ SatMac::GetQueue (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_queue;
-}
-
-void
-SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
-{
-  NS_LOG_FUNCTION (this << packet);
-
-  //
-  // Hit the trace hooks.  All of these hooks are in the same place in this
-  // device because it is so simple, but this is not usually the case in
-  // more complicated devices.
-  //
-  m_snifferTrace (packet);
-  m_promiscSnifferTrace (packet);
-
-  m_macRxTrace (packet);
-
-  SatMacTag msgTag;
-  packet->RemovePacketTag (msgTag);
-
-  NS_LOG_LOGIC("Packet to " << msgTag.GetAddress());
-  NS_LOG_LOGIC("Receiver " << m_macAddress );
-
-  // If the packet is intended for this receiver
-  Mac48Address addr = Mac48Address::ConvertFrom (msgTag.GetAddress());
-
-  if ( addr == m_macAddress ||  addr.IsBroadcast() )
-    {
-      m_rxCallback (packet);
-    }
-  else
-    {
-      NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
-    }
 }
 
 bool
@@ -262,6 +159,40 @@ SatMac::Send ( Ptr<Packet> packet, Address dest )
     }
 
   return true;
+}
+
+void
+SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
+{
+  NS_LOG_FUNCTION (this << packet);
+
+  //
+  // Hit the trace hooks.  All of these hooks are in the same place in this
+  // device because it is so simple, but this is not usually the case in
+  // more complicated devices.
+  //
+  m_snifferTrace (packet);
+  m_promiscSnifferTrace (packet);
+
+  m_macRxTrace (packet);
+
+  SatMacTag msgTag;
+  packet->RemovePacketTag (msgTag);
+
+  NS_LOG_LOGIC("Packet to " << msgTag.GetAddress());
+  NS_LOG_LOGIC("Receiver " << m_macAddress );
+
+  // If the packet is intended for this receiver
+  Mac48Address addr = Mac48Address::ConvertFrom (msgTag.GetAddress());
+
+  if ( addr == m_macAddress || addr.IsBroadcast() )
+    {
+      m_rxCallback (packet);
+    }
+  else
+    {
+      NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
+    }
 }
 
 void

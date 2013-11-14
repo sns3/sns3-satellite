@@ -26,7 +26,7 @@
 #include "ns3/uinteger.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
-#include "../model/satellite-mac.h"
+#include "../model/satellite-gw-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-phy.h"
@@ -252,14 +252,14 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyTx->SetFadingContainer (n->GetObject<SatFading> ());
   phyRx->SetFadingContainer (n->GetObject<SatFading> ());
 
-  Ptr<SatMac> mac = CreateObject<SatMac> ();
+  Ptr<SatGwMac> mac = CreateObject<SatGwMac> ();
 
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   mac->SetQueue (queue);
 
   // Attach the Mac layer receiver to Phy
-  SatPhy::ReceiveCallback cb = MakeCallback (&SatMac::Receive, mac);
+  SatPhy::ReceiveCallback cb = MakeCallback (&SatGwMac::Receive, mac);
 
   m_phyFactory.Set ("PhyRx", PointerValue(phyRx));
   m_phyFactory.Set ("PhyTx", PointerValue(phyTx));
