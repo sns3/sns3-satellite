@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Modified by: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
 #ifndef SAT_OUTPUT_FSTREAM_WRAPPER_H
@@ -23,7 +23,6 @@
 
 #include <fstream>
 #include "ns3/object.h"
-#include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 
 namespace ns3 {
@@ -41,34 +40,31 @@ class SatOutputFileStreamWrapper : public SimpleRefCount<SatOutputFileStreamWrap
 {
 public:
   /**
-   *
-   * @param filename
-   * @param filemode
+   * \brief
+   * \param filename
+   * \param filemode
    */
   SatOutputFileStreamWrapper (std::string filename, std::ios::openmode filemode);
 
   /**
-   *
+   * \brief
    */
   ~SatOutputFileStreamWrapper ();
 
   /**
-   * Return a pointer to an ofstream previously set in the wrapper.
-   *
-   * \see SetStream
-   *
-   * \returns a pointer to the encapsulated std::ofstream
+   * \brief Return a pointer to an ofstream previously set in the wrapper.
+   * \return a pointer to the encapsulated std::ofstream
    */
   std::ofstream *GetStream (void);
 
 private:
   /**
-   *
+   * \brief
    */
   std::ofstream *m_ofstream;
 
   /**
-   *
+   * \brief
    */
   bool m_destroyable;
 };

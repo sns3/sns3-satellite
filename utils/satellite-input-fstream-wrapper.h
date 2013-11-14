@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Modified by: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
 #ifndef SAT_INPUT_FSTREAM_WRAPPER_H
@@ -23,7 +23,6 @@
 
 #include <fstream>
 #include "ns3/object.h"
-#include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 
 namespace ns3 {
@@ -42,38 +41,35 @@ class SatInputFileStreamWrapper : public SimpleRefCount<SatInputFileStreamWrappe
 public:
 
   /**
-   *
-   * @param filename
-   * @param filemode
+   * \brief
+   * \param filename
+   * \param filemode
    */
   SatInputFileStreamWrapper (std::string filename, std::ios::openmode filemode);
 
   /**
-   *
+   * \brief
    */
   ~SatInputFileStreamWrapper ();
 
   /**
-   * Return a pointer to an ifstream previously set in the wrapper.
-   *
-   * \see SetStream
-   *
-   * \returns a pointer to the encapsulated std::ifstream
+   * \brief Return a pointer to an ifstream previously set in the wrapper.
+   * \return a pointer to the encapsulated std::ifstream
    */
   std::ifstream *GetStream (void);
 
 private:
   /**
-   *
+   * \brief
    */
   std::ifstream *m_ifstream;
 
   /**
-   *
+   * \brief
    */
   bool m_destroyable;
 };
 
 } // namespace ns3
 
-#endif /* SAT_INPUT_FfSTREAM_WRAPPER_H */
+#endif /* SAT_INPUT_FSTREAM_WRAPPER_H */

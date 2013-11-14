@@ -93,7 +93,7 @@ SatInputFileStreamDoubleContainer::UpdateContainer (std::string filename, std::i
         for( uint32_t i = 0; i < m_valuesInRow; i++ )
           {
             *m_inputFileStream >> tempString;
-            tempValue = atof (tempString.c_str());
+            tempValue = atof (tempString.c_str ());
             tempVector.push_back (tempValue);
           }
         m_container.push_back (tempVector);
@@ -118,9 +118,9 @@ SatInputFileStreamDoubleContainer::ProceedToLastSmallerThanAndReturnIt (double c
 
   uint32_t lastValidPosition = 0;
 
-  for (uint32_t i = 0; i < m_container.size(); i++)
+  for (uint32_t i = 0; i < m_container.size (); i++)
     {
-      if (m_container[i].at(column) > comparisonValue)
+      if (m_container[i].at (column) > comparisonValue)
         {
           lastValidPosition = i - 1;
         }
@@ -164,7 +164,7 @@ SatInputFileStreamDoubleContainer::ClearContainer ()
     {
       m_container[i].clear ();
     }
-  m_container.clear();
+  m_container.clear ();
 
   m_valuesInRow = 0;
 }

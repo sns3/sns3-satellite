@@ -31,44 +31,91 @@ class SatInputFileStreamDoubleContainer : public Object
 {
 public:
 
+  /**
+   * \brief
+   * \return
+   */
   static TypeId GetTypeId (void);
 
   /**
-   *
-   * @param filename
-   * @param filemode
+   * \brief
+   * \param filename
+   * \param filemode
+   * \param valuesInRow
    */
   SatInputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
+  /**
+   * \brief
+   */
   SatInputFileStreamDoubleContainer ();
 
   /**
-   *
+   * \brief
    */
   ~SatInputFileStreamDoubleContainer ();
 
+  /**
+   * \brief
+   * \param filename
+   * \param filemode
+   * \param valuesInRow
+   */
   void UpdateContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
+  /**
+   * \brief
+   * \param comparisonValue
+   * \param column
+   * \return
+   */
   std::vector<double> ProceedToLastSmallerThanAndReturnIt (double comparisonValue, uint32_t column);
 
 private:
 
+  /**
+   * \brief
+   */
   void Reset ();
 
+  /**
+   * \brief
+   */
   void ResetStream ();
 
+  /**
+   * \brief
+   */
   void ClearContainer ();
 
+  /**
+   * \brief
+   */
   SatInputFileStreamWrapper* m_inputFileStreamWrapper;
 
+  /**
+   * \brief
+   */
   std::ifstream* m_inputFileStream;
 
+  /**
+   * \brief
+   */
   std::vector<std::vector<double> > m_container;
 
+  /**
+   * \brief
+   */
   std::string m_fileName;
 
+  /**
+   * \brief
+   */
   std::ios::openmode m_fileMode;
 
+  /**
+   * \brief
+   */
   uint32_t m_valuesInRow;
 };
 
