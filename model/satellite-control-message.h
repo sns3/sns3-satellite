@@ -43,9 +43,10 @@ public:
    */
   typedef enum
     {
-      SAT_UNKNOWN_CTRL_MSG,
+      SAT_NON_CTRL_MSG,
       SAT_TBTP_CTRL_MSG,
-      SAT_CR_CTRL_MSG
+      SAT_CR_CTRL_MSG,
+      SAT_RA_CTRL_MSG
     }SatControlMsgType_t;
 
   /*

@@ -198,18 +198,11 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
   SatControlMsgTag ctrlTag;
   packet->RemovePacketTag (ctrlTag);
 
-  // If the packet is intended for this receiver
-  Mac48Address addr = Mac48Address::ConvertFrom (macTag.GetAddress ());
-
-  if ( addr.IsBroadcast () && ctrlTag.GetMsgType () == SatControlMsgTag::SAT_TBTP_CTRL_MSG )
+  SatControlMsgTag::SatControlMsgType_t cType = ctrlTag.GetMsgType ();
+  if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
     {
-      SatTbtpHeader tbtp;
-
-      if ( packet->RemoveHeader (tbtp) > 0 )
-        {
-          ScheduleTimeSlots (&tbtp);
-          deliverUp = false;
-        }
+      ReceiveSignalingPacket (packet, cType);
+      deliverUp = false;
     }
 
   // deliver packet to parent SatMac, if not UT specific packet
@@ -217,6 +210,34 @@ SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
     {
       SatMac::Receive (packet, rxParams);
     }
+}
+
+void
+SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType)
+{
+  switch (cType)
+  {
+    case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
+      {
+        SatTbtpHeader tbtp;
+        if ( packet->RemoveHeader (tbtp) > 0 )
+          {
+            ScheduleTimeSlots (&tbtp);
+          }
+        break;
+      }
+    case SatControlMsgTag::SAT_RA_CTRL_MSG:
+    case SatControlMsgTag::SAT_CR_CTRL_MSG:
+      {
+        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        break;
+      }
+  }
 }
 
 } // namespace ns3

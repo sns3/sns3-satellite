@@ -132,6 +132,15 @@ private:
    */
   void ScheduleTimeSlots (SatTbtpHeader * tbtp);
 
+  /**
+   * Signaling packet receiver, which handles all the signaling packet
+   * receptions.
+   * \param packet Received signaling packet
+   * \param cType Control message type
+   *
+   */
+  void ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType);
+
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
 

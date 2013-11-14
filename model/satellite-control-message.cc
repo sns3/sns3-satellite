@@ -32,7 +32,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatControlMsgTag);
 
 
 SatControlMsgTag::SatControlMsgTag ()
- :m_msgType (SAT_UNKNOWN_CTRL_MSG)
+ :m_msgType (SAT_NON_CTRL_MSG)
 {
   NS_LOG_FUNCTION (this);
 }
