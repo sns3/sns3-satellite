@@ -106,11 +106,6 @@ SatConf::GetTypeId (void)
                      DoubleValue (0.30),
                      MakeDoubleAccessor (&SatConf::m_frameConfSpacingFactor),
                      MakeDoubleChecker<double> (0.00, 1.00))
-      .AddAttribute ("StaticConfWaveFormId",
-                     "The default wave form id for static configuration.",
-                     UintegerValue (0),
-                     MakeDoubleAccessor (&SatConf::m_frameConfWaveFormId),
-                     MakeDoubleChecker<uint8_t> ())
     ;
     return tid;
 }

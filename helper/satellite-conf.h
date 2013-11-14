@@ -324,12 +324,6 @@ private:
     * The configured carrier spacing factor for static configurations.
     */
    double m_frameConfSpacingFactor;
-
-   /**
-    * The configured default wave form ID for static configurations.
-    */
-   uint8_t m_frameConfWaveFormId;
-
 };
 
 
