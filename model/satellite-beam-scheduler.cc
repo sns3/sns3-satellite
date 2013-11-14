@@ -29,17 +29,6 @@ NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
 
 namespace ns3 {
 
-static Ptr<UniformRandomVariable> m_randomCarrier = CreateObject<UniformRandomVariable> ();
-
-static int RandomCarrierId ( int max )
-{
-  NS_ASSERT ( max > 0 );
-
-  uint32_t maxCarrierId = max - 1;
-
-  return m_randomCarrier->GetInteger (0, maxCarrierId);
-}
-
 NS_OBJECT_ENSURE_REGISTERED (SatBeamScheduler);
 
 TypeId 
@@ -270,7 +259,7 @@ void SatBeamScheduler::InitializeScheduling ()
           m_additionalSlots = 0;
         }
 
-      std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end (), RandomCarrierId );
+      std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end () );
 
       m_currentSlot = m_timeSlots.end ();
       m_currentCarrier = m_carrierIds.begin ();
