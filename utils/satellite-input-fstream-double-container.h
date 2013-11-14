@@ -38,7 +38,7 @@ public:
    * @param filename
    * @param filemode
    */
-  SatInputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode);
+  SatInputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
   SatInputFileStreamDoubleContainer ();
 
@@ -47,17 +47,29 @@ public:
    */
   ~SatInputFileStreamDoubleContainer ();
 
-  void UpdateContainer (std::string filename, std::ios::openmode filemode);
+  void UpdateContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
+
+  std::vector<double> ProceedToLastSmallerThanAndReturnIt (double comparisonValue, uint32_t column);
 
 private:
 
   void Reset ();
 
+  void ResetStream ();
+
+  void ClearContainer ();
+
   SatInputFileStreamWrapper* m_inputFileStreamWrapper;
 
   std::ifstream* m_inputFileStream;
 
-  double** m_container;
+  std::vector<std::vector<double> > m_container;
+
+  std::string m_fileName;
+
+  std::ios::openmode m_fileMode;
+
+  uint32_t m_valuesInRow;
 };
 
 } // namespace ns3
