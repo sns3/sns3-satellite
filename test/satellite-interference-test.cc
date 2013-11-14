@@ -77,11 +77,9 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   interference->NotifyRxStart(event);
 
-  double finalPower;
-  double firstPower = interference->Calculate(event, &finalPower);
+  double power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower, 100, "First power incorrect");
-  NS_TEST_ASSERT_MSG_EQ( firstPower, finalPower, "First power and final power not equal");
+  NS_TEST_ASSERT_MSG_EQ( 100, power, "Calculated power not correct");
 
   interference->NotifyRxEnd(event);
 
@@ -90,10 +88,9 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   interference->NotifyRxStart(event);
 
-  firstPower = interference->Calculate(event, &finalPower);
+  power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower, 50, "First power incorrect");
-  NS_TEST_ASSERT_MSG_EQ( firstPower, finalPower, "First power and final power not equal");
+  NS_TEST_ASSERT_MSG_EQ( 50, power, "Calculated power not correct");
 }
 
 /**
@@ -121,7 +118,6 @@ private:
   Ptr<SatInterference::Event> m_rxEvent[4];
   uint32_t  m_rxIndex;
   double finalPower[4];
-  double firstPower[4];
 };
 
 SatPerPacketInterferenceTestCase::SatPerPacketInterferenceTestCase ()
@@ -133,7 +129,6 @@ SatPerPacketInterferenceTestCase::SatPerPacketInterferenceTestCase ()
   for (int i = 0; i < 4; i++)
     {
       finalPower[i] = 0;
-      firstPower[i] = 0;
       m_rxEvent[i] = NULL;
     }
 }
@@ -166,7 +161,7 @@ SatPerPacketInterferenceTestCase::StartReceiver (Time duration, double power)
 void
 SatPerPacketInterferenceTestCase::Receive (uint32_t rxIndex)
 {
-  firstPower[rxIndex] = m_interference->Calculate(m_rxEvent[rxIndex], &finalPower[rxIndex]);
+  finalPower[rxIndex] = m_interference->Calculate (m_rxEvent[rxIndex]);
   m_interference->NotifyRxEnd(m_rxEvent[rxIndex]);
 }
 
@@ -190,25 +185,21 @@ SatPerPacketInterferenceTestCase::DoRun (void)
   // check first receiver
   double finalDiff = std::abs((double)995/(double)9 - finalPower[0]);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower[0], 130, "First power incorrect");
   NS_TEST_ASSERT_MSG_LT( finalDiff, 0.0000000000001, "Final power incorrect");
 
   // check second receiver
   finalDiff = std::abs((double)196 - finalPower[1]);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower[1], 180, "First power incorrect");
   NS_TEST_ASSERT_MSG_LT( finalDiff, 0.0000000000001, "Final power incorrect");
 
   // check third receiver
   finalDiff = std::abs((double)850/(double)6 - finalPower[2]);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower[2], 195, "First power incorrect");
   NS_TEST_ASSERT_MSG_LT( finalDiff, 0.0000000000001, "Final power incorrect");
 
   // check fourth receiver
   finalDiff = std::abs((double)145 - finalPower[3]);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower[3], 175, "First power incorrect");
   NS_TEST_ASSERT_MSG_LT( finalDiff, 0.00000000000001, "Final power incorrect");
 
   Simulator::Destroy ();
@@ -246,11 +237,9 @@ SatTracedInterferenceTestCase::DoRun (void)
 
   interference->NotifyRxStart(event);
 
-  double finalPower = 0;
-  double firstPower = interference->Calculate(event, &finalPower);
+  double power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ( firstPower, 0, "First power incorrect");
-  NS_TEST_ASSERT_MSG_EQ( firstPower, finalPower, "First power and final power not equal");
+  NS_TEST_ASSERT_MSG_EQ( 0, power, "Calculated power incorrect");
 
   interference->NotifyRxEnd(event);
 }

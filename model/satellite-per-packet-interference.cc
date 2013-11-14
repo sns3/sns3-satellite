@@ -86,14 +86,14 @@ SatPerPacketInterference::DoAdd (Time duration, double power)
 }
 
 double
-SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event, double* finalPower)
+SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
   bool calcReady = false;
   bool increaseFirstPower = true;
 
   NS_ASSERT (m_rxing);
 
-  *finalPower = 0;
+  double finalPower = 0;
   double firstPower = m_firstPower;
 
   double rxDuration = event->GetDuration().GetDouble();
@@ -120,13 +120,13 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event, double
         {
           // increase/descrease final power according to change in list
           double itemTime = item->first.GetDouble();
-          *finalPower += ((rxEndTime - itemTime) / rxDuration) * item->second.second;
+          finalPower += ((rxEndTime - itemTime) / rxDuration) * item->second.second;
         }
     }
 
-  *finalPower += firstPower;
+  finalPower += firstPower;
 
-  return firstPower;
+  return finalPower;
 }
 
 void

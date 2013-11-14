@@ -64,11 +64,10 @@ private:
    * finalPower is set to returned value.
    *
    * \param event Reference event which for interference is calculated.
-   * \param finalPower Pointer to variable to store calculated power value at end of receiving
    *
-   * \return first power at start time
+   * \return Final power value at end of receiving
    */
-  virtual double DoCalculate (Ptr<SatInterference::Event> event, double* finalPower);
+  virtual double DoCalculate (Ptr<SatInterference::Event> event);
 
   /**
    * Resets current interference.

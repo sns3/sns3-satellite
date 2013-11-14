@@ -116,9 +116,9 @@ public:
    * \param event Reference event which for interference is calculated.
    * \param finalPower Pointer to variable to store calculated power value at end of receiving
    *
-   * \return first power at start time
+   * \return Calculated power value at end of receiving
    */
-  double Calculate (Ptr<SatInterference::Event> event, double* finalPower);
+  double Calculate (Ptr<SatInterference::Event> event );
 
   /**
    * Resets current interference.
@@ -155,13 +155,12 @@ private:
    * Sets final power at end time to finalPower.
    *
    * \param event Reference event which for interference is calculated.
-   * \param finalPower Pointer to variable to store calculated power value at end of receiving
    *
-   * \return first power at start time
+   * \return Final power value at end of receiving
    *
    * Concrete subclasses of this base class must implement this method.
    */
-  virtual double DoCalculate (Ptr<SatInterference::Event> event, double* finalPower) = 0;
+  virtual double DoCalculate (Ptr<SatInterference::Event> event ) = 0;
 
   /**
    * Resets current interference.

@@ -64,7 +64,7 @@ SatTracedInterference::DoAdd (Time duration, double power)
 }
 
 double
-SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event, double* finalPower)
+SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
   return 0;
 }

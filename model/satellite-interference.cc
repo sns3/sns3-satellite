@@ -99,9 +99,9 @@ SatInterference::Add (Time duration, double power)
 }
 
 double
-SatInterference::Calculate (Ptr<SatInterference::Event> event, double* finalPower)
+SatInterference::Calculate (Ptr<SatInterference::Event> event )
 {
-  return DoCalculate(event, finalPower);
+  return DoCalculate (event);
 }
 
 void

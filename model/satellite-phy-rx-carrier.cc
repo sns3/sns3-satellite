@@ -208,8 +208,7 @@ SatPhyRxCarrier::EndRxData ()
   NS_ASSERT (m_state == RX);
   ChangeState (IDLE);
 
-  double ifPower = 0.0;
-  m_satInterference->Calculate ( m_interferenceEvent, &ifPower );
+  double ifPower = m_satInterference->Calculate ( m_interferenceEvent );
 
   double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, ifPower );
   double cSinr = sinr;
