@@ -69,7 +69,7 @@ public:
    * \param column
    * \return
    */
-  std::vector<double> ProceedToLastSmallerThanAndReturnIt (double comparisonValue, uint32_t column);
+  std::vector<double> ProceedToNextClosestTimeSample ();
 
 private:
 
@@ -87,6 +87,16 @@ private:
    * \brief
    */
   void ClearContainer ();
+
+  /**
+   *
+   * \param lastValidPosition
+   * \param column
+   * \param shiftValue
+   * \param comparisonValue
+   * \return
+   */
+  bool FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue);
 
   /**
    * \brief
@@ -117,6 +127,26 @@ private:
    * \brief
    */
   uint32_t m_valuesInRow;
+
+  /**
+   * \brief
+   */
+  uint32_t m_currentPosition;
+
+  /**
+   * \brief
+   */
+  uint32_t m_numOfPasses;
+
+  /**
+   * \brief
+   */
+  double m_shiftValue;
+
+  /**
+   * \brief
+   */
+  uint32_t m_timeColumn;
 };
 
 } // namespace ns3

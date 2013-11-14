@@ -44,9 +44,18 @@ SatTracedInterference::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatTracedInterference::SatTracedInterference () :
-    m_rxing (false)
+SatTracedInterference::SatTracedInterference (std::string filename) :
+    m_rxing (false),
+    m_power ()
 {
+  m_tracedInterference = CreateObject<SatInputFileStreamDoubleContainer> (filename,std::ios::in,ROW_COUNT);
+}
+
+SatTracedInterference::SatTracedInterference () :
+    m_rxing (false),
+    m_power ()
+{
+  NS_ASSERT (0);
 }
 
 SatTracedInterference::~SatTracedInterference ()
@@ -66,7 +75,10 @@ SatTracedInterference::DoAdd (Time duration, double power)
 double
 SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
-  return 0;
+  m_power = (m_tracedInterference->ProceedToNextClosestTimeSample ()).at(INTERFERENCE_VALUE_COLUMN_NUMBER);
+
+  return m_power;
+
 }
 
 void
@@ -74,11 +86,13 @@ SatTracedInterference::DoReset (void)
 {
 
 }
+
 void
 SatTracedInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
 {
   m_rxing = true;
 }
+
 void
 SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 {

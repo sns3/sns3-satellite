@@ -21,6 +21,7 @@
 #include "satellite-input-fstream-double-container.h"
 #include "ns3/log.h"
 #include "ns3/abort.h"
+#include "ns3/simulator.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatInputFileStreamDoubleContainer");
 
@@ -41,7 +42,11 @@ SatInputFileStreamDoubleContainer::SatInputFileStreamDoubleContainer (std::strin
     m_container (),
     m_fileName (filename),
     m_fileMode (filemode),
-    m_valuesInRow (valuesInRow)
+    m_valuesInRow (valuesInRow),
+    m_currentPosition (0),
+    m_numOfPasses (0),
+    m_shiftValue (0),
+    m_timeColumn (0)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
@@ -54,7 +59,11 @@ SatInputFileStreamDoubleContainer::SatInputFileStreamDoubleContainer () :
     m_container (),
     m_fileName (),
     m_fileMode (),
-    m_valuesInRow ()
+    m_valuesInRow (),
+    m_currentPosition (),
+    m_numOfPasses (),
+    m_shiftValue (),
+    m_timeColumn ()
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (0);
@@ -109,29 +118,66 @@ SatInputFileStreamDoubleContainer::UpdateContainer (std::string filename, std::i
 }
 
 std::vector<double>
-SatInputFileStreamDoubleContainer::ProceedToLastSmallerThanAndReturnIt (double comparisonValue, uint32_t column)
+SatInputFileStreamDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
+  while (!FindNextClosest(m_currentPosition,m_timeColumn,m_shiftValue, Now ().GetDouble()))
+    {
+      m_numOfPasses++;
+      m_shiftValue = m_numOfPasses * m_container[m_container.size () - 1].at (m_timeColumn);
+    }
+
+  if (m_numOfPasses > 0)
+    {
+      std::cout << "WARNING WARNING WARNING! - SatInputFileStreamDoubleContainer OUT OF SAMPLES! Looping old samples!" << std::endl;
+    }
+
+  return m_container[m_currentPosition];
+}
+
+bool
+SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue)
+{
   NS_ASSERT (column < m_valuesInRow);
   NS_ASSERT (m_container.size () > 0);
+  NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
 
-  uint32_t lastValidPosition = 0;
+  bool valueFound = false;
 
-  for (uint32_t i = 0; i < m_container.size (); i++)
+  for (uint32_t i = lastValidPosition; i < m_container.size (); i++)
     {
-      if (m_container[i].at (column) > comparisonValue)
+      if (m_container[i].at (column) + shiftValue > comparisonValue)
         {
-          lastValidPosition = i - 1;
+          double difference1 = (m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
+          double difference2 = (m_container[i].at (column) + shiftValue - comparisonValue);
+
+          if (difference1 < difference2)
+            {
+              m_currentPosition = lastValidPosition;
+            }
+          else
+            {
+              m_currentPosition = i;
+            }
+          valueFound = true;
+          break;
+        }
+      lastValidPosition = i;
+    }
+
+  if (valueFound && m_numOfPasses > 0 && m_currentPosition == 0)
+    {
+      double difference1 = (m_container[m_currentPosition].at (column) + shiftValue - comparisonValue);
+      double difference2 = (m_container[m_container.size() - 1].at (column) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (column)) - comparisonValue);
+
+      if (difference1 > difference2)
+        {
+          m_currentPosition = m_container.size() - 1;
         }
     }
 
-  if (lastValidPosition < 0)
-    {
-      lastValidPosition = 0;
-    }
-
-  return m_container[lastValidPosition];
+  return valueFound;
 }
 
 void
@@ -167,6 +213,9 @@ SatInputFileStreamDoubleContainer::ClearContainer ()
   m_container.clear ();
 
   m_valuesInRow = 0;
+  m_currentPosition = 0;
+  m_numOfPasses = 0;
+  m_shiftValue = 0;
 }
 
 } // namespace ns3

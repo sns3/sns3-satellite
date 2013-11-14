@@ -22,6 +22,7 @@
 #define SATELLITE_TRACED_INTERFERENCE_H
 
 #include "satellite-interference.h"
+#include "ns3/satellite-input-fstream-double-container.h"
 
 namespace ns3 {
 
@@ -34,10 +35,17 @@ class SatTracedInterference : public SatInterference
 public:
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+  SatTracedInterference (std::string filename);
   SatTracedInterference ();
   ~SatTracedInterference ();
 
 private:
+
+  static const uint32_t ROW_COUNT = 3;
+
+  static const uint32_t INTERFERENCE_VALUE_COLUMN_NUMBER = 3;
+
+  static const uint32_t TIME_VALUE_COLUMN_NUMBER = 0;
   /**
    * Adds interference power to interference object.
    * No effect in this implementation.
@@ -84,6 +92,10 @@ private:
   SatTracedInterference &operator = (const SatTracedInterference &o);
 
   bool m_rxing;
+
+  double m_power;
+
+  Ptr<SatInputFileStreamDoubleContainer> m_tracedInterference;
 };
 
 } // namespace ns3
