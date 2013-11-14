@@ -179,7 +179,7 @@ SatConf::Configure (std::string wfConf)
         Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
 
         // get default waveform
-        uint32_t defaultWaveFormId = waveFormConf->GetDefaultWaveform ();
+        uint32_t defaultWaveFormId = waveFormConf->GetDefaultWaveformId ();
         Ptr<SatWaveform> defaultWaveForm = waveFormConf->GetWaveform (defaultWaveFormId);
 
         double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRate_baud ());

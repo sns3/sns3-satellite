@@ -50,7 +50,13 @@ public:
    * \param payload in bytes
    * \param duration in symbols
    */
-  SatWaveform (uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols);
+  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols);
+
+  /**
+   * Get waveform id
+   * \return payload in bits
+   */
+  uint32_t GetWaveformId () const;
 
   /**
    * Get payload of a waveform in bits
@@ -105,6 +111,11 @@ public:
   void Dump (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
 private:
+
+  /**
+   * Id of this waveform
+   */
+  uint32_t m_waveformId;
 
   /**
    * Modulated bits
@@ -172,10 +183,10 @@ public:
   Ptr<SatWaveform> GetWaveform (uint32_t wfId) const;
 
   /**
-   * Get the details of default waveform
+   * Get default waveform id
    * \return SatWaveform id of the confg holding all the details of the default wf
    */
-  uint32_t GetDefaultWaveform () const;
+  uint32_t GetDefaultWaveformId () const;
 
   /**
    * Get the best waveform id based on UT's C/No and C/No thresholds

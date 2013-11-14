@@ -40,14 +40,22 @@ SatWaveform::SatWaveform ()
   NS_ASSERT (true);
 }
 
-SatWaveform::SatWaveform (uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols)
-:m_modulatedBits (modulatedBits),
+SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols)
+:m_waveformId (wfId),
+ m_modulatedBits (modulatedBits),
  m_codingRate (codingRate),
  m_payloadBytes (payloadBytes),
  m_lengthInSymbols (lengthInSymbols)
 {
 
 }
+
+uint32_t
+SatWaveform::GetWaveformId () const
+{
+  return m_waveformId;
+}
+
 
 uint32_t
 SatWaveform::GetPayloadInBits () const
@@ -214,7 +222,7 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
       double dCodingRate = double(output[0]) / output[1];
 
       // Create new waveform and insert it to the waveform map
-      Ptr<SatWaveform> wf = Create<SatWaveform> (modulatedBits, dCodingRate, payloadBytes, durationInSymbols);
+      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, payloadBytes, durationInSymbols);
       m_waveforms.insert (std::make_pair (wfIndex, wf));
 
       // get next row
@@ -253,7 +261,7 @@ SatWaveformConf::GetWaveform (uint32_t wfId) const
 }
 
 uint32_t
-SatWaveformConf::GetDefaultWaveform () const
+SatWaveformConf::GetDefaultWaveformId () const
 {
   NS_LOG_FUNCTION (this << m_defaultWfId);
   NS_ASSERT(m_minWfId <= m_defaultWfId && m_defaultWfId <= m_maxWfId);
