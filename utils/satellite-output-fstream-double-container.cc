@@ -72,7 +72,21 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
 {
   OpenStream ();
 
-  // do the thing
+  if (m_outputFileStream->is_open ())
+  {
+      for (uint32_t i = 0; i < m_container.size (); i++)
+        {
+          for( uint32_t j = 0; j < m_valuesInRow; j++ )
+            {
+              *m_outputFileStream << m_container[i].at (j);
+            }
+        }
+    m_outputFileStream->close ();
+  }
+  else
+    {
+      NS_ABORT_MSG ("Output stream is not valid for writing.");
+    }
 
   Reset ();
 }
