@@ -44,6 +44,12 @@ class SatUtHelper : public Object
 public:
   typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
 
+  typedef enum
+  {
+    CONSTANT_CRA,
+    RANDOM_CRA,
+  } CraAllocationMode_t;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
@@ -159,7 +165,7 @@ public:
    * /param stream  stream for creation trace outputs
    * /param cb  callback to connect traces
    */
-  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+  void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
     CarrierBandwidthConverter m_carrierBandwidthConverter;
@@ -217,6 +223,11 @@ private:
      * link results is needed for all UTs.
      */
     Ptr<SatLinkResults> m_linkResults;
+
+    /*
+     * CRA allocation mode to be used to set intial CRA for UTs.
+     */
+    CraAllocationMode_t m_craAllocMode;
 
     /**
      * Trace callback for creation traces
