@@ -94,6 +94,12 @@ SatUtHelper::GetTypeId (void)
                       DoubleValue (0.0),
                       MakeDoubleAccessor(&SatUtHelper::m_aciIfWrtNoise),
                       MakeDoubleChecker<double> ())
+      .AddAttribute ("CraAllocMode",
+                     "Intial Constant Rate Assignment (CRA) allocation mode used for UTs.",
+                      EnumValue (SatUtHelper::CONSTANT_CRA),
+                      MakeEnumAccessor (&SatUtHelper::m_craAllocMode),
+                      MakeEnumChecker (SatUtHelper::CONSTANT_CRA, "Constant CRA used for UTs. (not set by helper, UT's attribute defines value.",
+                                       SatUtHelper::RANDOM_CRA, "Random CRA value (128 is set by helper for every UT."))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
