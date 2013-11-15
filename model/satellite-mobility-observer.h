@@ -61,6 +61,8 @@ public:
    */
   virtual ~SatMobilityObserver ();
 
+  virtual void DoDispose (void);
+
   /**
    * Enable observing of the timing advance.
    *

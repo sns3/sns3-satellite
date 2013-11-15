@@ -90,7 +90,10 @@ SatMobilityObserver::SatMobilityObserver ()
 
 SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility)
  : m_ownMobility (ownMobility),
+   m_anotherMobility (NULL),
    m_geoSatMobility (geoSatMobility),
+   m_ownProgDelayModel (NULL),
+   m_anotherProgDelayModel (NULL),
    m_initialized (false)
 {
   NS_LOG_FUNCTION (this << ownMobility << geoSatMobility);
@@ -120,6 +123,16 @@ SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr
   m_velocity = 0.0;
 
   m_initialized = true;
+}
+
+void SatMobilityObserver::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( m_ownMobility )
+    {
+      m_ownMobility = NULL;
+    }
 }
 
 SatMobilityObserver::~SatMobilityObserver ()
