@@ -65,6 +65,11 @@ public:
   ~SatMarkovContainer ();
 
   /**
+   *  \brief Do needed dispose actions.
+   */
+  virtual void DoDispose ();
+
+  /**
    * \brief Function for getting the fading
    * \param channeltype channel type
    * \return fading value

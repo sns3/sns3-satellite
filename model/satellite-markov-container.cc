@@ -116,6 +116,15 @@ SatMarkovContainer::~SatMarkovContainer ()
   NS_LOG_FUNCTION (this);
 }
 
+void SatMarkovContainer::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_markovConf = NULL;
+  m_fader_up = NULL;
+  m_fader_down = NULL;
+}
+
 void
 SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
 {
