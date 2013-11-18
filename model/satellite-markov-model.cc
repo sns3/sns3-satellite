@@ -67,7 +67,7 @@ SatMarkovModel::~SatMarkovModel ()
 {
   NS_LOG_FUNCTION (this);
 
-  delete[] m_probabilities;
+  Reset ();
 }
 
 void
@@ -82,6 +82,12 @@ void
 SatMarkovModel::Reset ()
 {
   NS_LOG_FUNCTION (this);
+
+  if (m_probabilities != NULL)
+    {
+      delete[] m_probabilities;
+      m_probabilities = NULL;
+    }
 }
 
 uint32_t
