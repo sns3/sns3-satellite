@@ -54,6 +54,7 @@ void SatPhyRx::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_mobility = 0;
   m_device = 0;
+  m_fadingContainer = 0;
   m_rxCarriers.clear();
   Object::DoDispose ();
 } 

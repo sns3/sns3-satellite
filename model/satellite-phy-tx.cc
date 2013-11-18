@@ -59,6 +59,7 @@ void SatPhyTx::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_channel = 0;
   m_mobility = 0;
+  m_fadingContainer = 0;
   Object::DoDispose ();
 } 
 
