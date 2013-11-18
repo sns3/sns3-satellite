@@ -92,14 +92,30 @@ SatLooModel::Reset ()
   m_normalRandomVariable = NULL;
   m_uniformVariable = NULL;
 
-  for (uint32_t i = 0; i < m_numOfStates; i++)
+  if (!m_directSignalOscillators.empty())
     {
-      m_directSignalOscillators[i].clear ();
-      m_multipathOscillators[i].clear ();
+      for (uint32_t i = 0; i < m_numOfStates; i++)
+        {
+          if (!m_directSignalOscillators[i].empty ())
+            {
+              m_directSignalOscillators[i].clear ();
+            }
+        }
+      m_directSignalOscillators.clear ();
     }
 
-  m_directSignalOscillators.clear ();
-  m_multipathOscillators.clear ();
+  if (!m_multipathOscillators.empty())
+    {
+      for (uint32_t i = 0; i < m_numOfStates; i++)
+        {
+          if (!m_multipathOscillators[i].empty ())
+            {
+              m_multipathOscillators[i].clear ();
+            }
+        }
+      m_multipathOscillators.clear ();
+    }
+
   m_looParameters.clear ();
   m_sigma.clear ();
 }
@@ -252,14 +268,30 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
 
   ChangeState (newState);
 
-  for (uint32_t i = 0; i < m_numOfStates; i++)
+  if (!m_directSignalOscillators.empty())
     {
-      m_directSignalOscillators[i].clear ();
-      m_multipathOscillators[i].clear ();
+      for (uint32_t i = 0; i < m_numOfStates; i++)
+        {
+          if (!m_directSignalOscillators[i].empty ())
+            {
+              m_directSignalOscillators[i].clear ();
+            }
+        }
+      m_directSignalOscillators.clear ();
     }
 
-  m_directSignalOscillators.clear ();
-  m_multipathOscillators.clear ();
+  if (!m_multipathOscillators.empty())
+    {
+      for (uint32_t i = 0; i < m_numOfStates; i++)
+        {
+          if (!m_multipathOscillators[i].empty ())
+            {
+              m_multipathOscillators[i].clear ();
+            }
+        }
+      m_multipathOscillators.clear ();
+    }
+
   m_sigma.clear ();
 
   ConstructDirectSignalOscillators ();
