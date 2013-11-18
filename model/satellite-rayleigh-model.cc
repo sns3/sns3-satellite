@@ -22,8 +22,6 @@
 
 namespace ns3 {
 
-const double SatRayleighModel::PI = 3.14159265358979323846;
-
 NS_OBJECT_ENSURE_REGISTERED (SatRayleighModel);
 NS_LOG_COMPONENT_DEFINE ("SatRayleighModel");
 
@@ -50,8 +48,8 @@ SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t 
   NS_LOG_FUNCTION (this);
 
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
-  m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
-  m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
+  m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * M_PI));
+  m_uniformVariable->SetAttribute ("Max", DoubleValue (M_PI));
 
   m_rayleighParameters = m_rayleighConf->GetParameters (m_currentSet);
 
@@ -64,6 +62,13 @@ SatRayleighModel::~SatRayleighModel ()
 
   m_oscillators.clear ();
   m_uniformVariable = 0;
+}
+
+void SatRayleighModel::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_rayleighConf = NULL;
 }
 
 void
@@ -80,9 +85,9 @@ SatRayleighModel::ConstructOscillators ()
       uint32_t n = i + 1;
       /// 1. Rotation speed
       /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-      double alpha = (2.0 * SatRayleighModel::PI * n - SatRayleighModel::PI + theta) / (4.0 * m_rayleighParameters[0][1]);
+      double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_rayleighParameters[0][1]);
       /// 1b. Initiate rotation speed:
-      double omega = 2.0 * m_rayleighParameters[0][0] * SatRayleighModel::PI * std::cos (alpha);
+      double omega = 2.0 * m_rayleighParameters[0][0] * M_PI * std::cos (alpha);
       /// 2. Initiate complex amplitude:
       double psi = m_uniformVariable->GetValue ();
       std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_rayleighParameters[0][1]);

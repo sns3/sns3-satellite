@@ -38,11 +38,6 @@ class SatRayleighModel : public SatFader
 public:
 
   /**
-   * \brief Value for PI
-   */
-  static const double PI;
-
-  /**
    * \brief NS-3 function for type id
    * \return type id
    */
@@ -64,6 +59,11 @@ public:
    * \brief Destructor
    */
   ~SatRayleighModel ();
+
+  /**
+   *  \brief Do needed dispose actions.
+   */
+  virtual void DoDispose ();
 
   /**
    * \brief Function for calculating the oscillator complex gain
