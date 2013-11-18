@@ -129,10 +129,11 @@ void SatMobilityObserver::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( m_ownMobility )
-    {
-      m_ownMobility = NULL;
-    }
+  m_ownMobility = NULL;
+  m_anotherMobility = NULL;
+  m_geoSatMobility = NULL;
+  m_ownProgDelayModel = NULL;
+  m_anotherProgDelayModel = NULL;
 }
 
 SatMobilityObserver::~SatMobilityObserver ()
