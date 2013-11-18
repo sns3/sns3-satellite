@@ -25,8 +25,6 @@ NS_LOG_COMPONENT_DEFINE ("SatLooModel");
 
 namespace ns3 {
 
-const double SatLooModel::PI = 3.14159265358979323846;
-
 NS_OBJECT_ENSURE_REGISTERED (SatLooModel);
 
 TypeId SatLooModel::GetTypeId (void)
@@ -63,8 +61,8 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
   /// initialize random number generators
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
-  m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * PI));
-  m_uniformVariable->SetAttribute ("Max", DoubleValue (PI));
+  m_uniformVariable->SetAttribute ("Min", DoubleValue (-1.0 * M_PI));
+  m_uniformVariable->SetAttribute ("Max", DoubleValue (M_PI));
 
   /// initialize parameters for this set and state, construct oscillators
   ChangeSet (m_currentSet, m_currentState);
@@ -73,6 +71,13 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
 SatLooModel::~SatLooModel ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void SatLooModel::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_looConf = NULL;
 }
 
 void
@@ -93,9 +98,9 @@ SatLooModel::ConstructDirectSignalOscillators ()
           uint32_t n = j + 1;
           /// 1. Rotation speed
           /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-          double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_looParameters[i][3]);
+          double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_looParameters[i][3]);
           /// 1b. Initiate rotation speed:
-          double omega = 2.0 * SatLooModel::PI * m_looParameters[i][5] * std::cos (alpha);
+          double omega = 2.0 * M_PI * m_looParameters[i][5] * std::cos (alpha);
           /// 2. Initiate amplitude:
           double psi = m_normalRandomVariable->GetValue ();
           double amplitude = (m_looParameters[i][0] + (m_looParameters[i][1] * psi));
@@ -126,9 +131,9 @@ SatLooModel::ConstructMultipathOscillators ()
           uint32_t n = j + 1;
           /// 1. Rotation speed
           /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
-          double alpha = (2.0 * SatLooModel::PI * n - SatLooModel::PI + theta) / (4.0 * m_looParameters[i][4]);
+          double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_looParameters[i][4]);
           /// 1b. Initiate rotation speed:
-          double omega = 2.0 * SatLooModel::PI * m_looParameters[i][6] * std::cos (alpha);
+          double omega = 2.0 * M_PI * m_looParameters[i][6] * std::cos (alpha);
           /// 2. Initiate complex amplitude:
           double psi = m_normalRandomVariable->GetValue ();
           std::complex<double> amplitude = std::complex<double> (std::cos (psi), std::sin (psi)) * 2.0 / std::sqrt (m_looParameters[i][4]);

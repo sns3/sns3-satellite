@@ -38,11 +38,6 @@ class SatLooModel : public SatFader
 public:
 
   /**
-   * \brief Value for PI
-   */
-  static const double PI;
-
-  /**
    * \brief NS-3 function for type id
    * \return type id
    */
@@ -66,6 +61,11 @@ public:
    * \brief Destructor
    */
   ~SatLooModel ();
+
+  /**
+   *  \brief Do needed dispose actions.
+   */
+  virtual void DoDispose ();
 
   /**
    * \brief Function for returning the channel gain in dB
