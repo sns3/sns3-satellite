@@ -71,13 +71,37 @@ SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_
 SatLooModel::~SatLooModel ()
 {
   NS_LOG_FUNCTION (this);
+
+  Reset ();
 }
 
-void SatLooModel::DoDispose ()
+void
+SatLooModel::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+}
+
+void
+SatLooModel::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
   m_looConf = NULL;
+  m_normalRandomVariable = NULL;
+  m_uniformVariable = NULL;
+
+  for (uint32_t i = 0; i < m_numOfStates; i++)
+    {
+      m_directSignalOscillators[i].clear ();
+      m_multipathOscillators[i].clear ();
+    }
+
+  m_directSignalOscillators.clear ();
+  m_multipathOscillators.clear ();
+  m_looParameters.clear ();
+  m_sigma.clear ();
 }
 
 void
@@ -227,6 +251,12 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
   m_currentSet = newSet;
 
   ChangeState (newState);
+
+  for (uint32_t i = 0; i < m_numOfStates; i++)
+    {
+      m_directSignalOscillators[i].clear ();
+      m_multipathOscillators[i].clear ();
+    }
 
   m_directSignalOscillators.clear ();
   m_multipathOscillators.clear ();

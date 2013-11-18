@@ -73,7 +73,7 @@ public:
   /**
    * \brief Destructor
    */
-  virtual ~SatMarkovConf () {}
+  ~SatMarkovConf ();
 
   /**
    * \brief Function for returning the parameter set
@@ -143,6 +143,11 @@ public:
    */
   bool AreDecibelsUsed ();
 
+  /**
+   *  \brief Do needed dispose actions.
+   */
+  void DoDispose ();
+
 private:
 
   /**
@@ -199,6 +204,11 @@ private:
    * \brief Selected fader type
    */
   SatMarkovConf::MarkovFaderType_t m_faderType;
+
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 };
 
 } // namespace ns3

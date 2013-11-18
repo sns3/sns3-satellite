@@ -131,6 +131,41 @@ SatMarkovConf::SatMarkovConf () :
   NS_ASSERT (m_markovElevations.size() == m_elevationCount);
 }
 
+SatMarkovConf::~SatMarkovConf ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+}
+
+void
+SatMarkovConf::Reset ()
+{
+  NS_LOG_FUNCTION (this);
+
+  for (uint32_t i = 0; i < m_elevationCount; i++)
+    {
+      for (uint32_t j = 0; j < m_stateCount; j++)
+        {
+          m_markovProbabilities[i][j].clear ();
+        }
+    }
+
+  m_looConf = NULL;
+  m_rayleighConf = NULL;
+
+  m_initialProbabilities.clear ();
+  m_markovElevations.clear ();
+}
+
+void
+SatMarkovConf::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+}
+
 std::vector<std::vector<double> >
 SatMarkovConf::GetElevationProbabilities (uint32_t set)
 {

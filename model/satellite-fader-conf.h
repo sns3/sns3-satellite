@@ -58,6 +58,11 @@ public:
    */
   virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;
 
+  /**
+   * \brief Do needed dispose actions
+   */
+  virtual void DoDispose () = 0;
+
 private:
 
 };

@@ -65,7 +65,7 @@ public:
   /**
    *  \brief Do needed dispose actions.
    */
-  virtual void DoDispose ();
+  void DoDispose ();
 
   /**
    * \brief Function for returning the channel gain in dB
@@ -179,6 +179,11 @@ private:
    * \brief Function for calculating sigma for different states
    */
   void CalculateSigma ();
+
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 };
 
 } // namespace ns3

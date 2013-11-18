@@ -85,6 +85,13 @@ SatRayleighConf::SatRayleighConf () :
     }
 }
 
+SatRayleighConf::~SatRayleighConf ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+}
+
 std::vector<std::vector<double> >
 SatRayleighConf::GetParameters (uint32_t set)
 {
@@ -93,6 +100,29 @@ SatRayleighConf::GetParameters (uint32_t set)
   NS_ASSERT ( (set >= 0) && (set < m_elevationCount));
   NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf - Getting Rayleigh parameters for set ID " << set);
   return m_rayleighParameters[set];
+}
+
+
+void
+SatRayleighConf::Reset()
+{
+  NS_LOG_FUNCTION (this);
+
+  for (uint32_t i = 0; i < m_elevationCount; i++)
+    {
+      for (uint32_t j = 0; j < m_stateCount; j++)
+        {
+          m_rayleighParameters[i][j].clear ();
+        }
+    }
+}
+
+void
+SatRayleighConf::DoDispose()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
 }
 
 } // namespace ns3

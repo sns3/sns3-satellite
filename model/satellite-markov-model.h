@@ -84,6 +84,11 @@ public:
    */
   void SetState (uint32_t newState);
 
+  /**
+   *  \brief Do needed dispose actions.
+   */
+  void DoDispose ();
+
 private:
 
   /**
@@ -101,6 +106,10 @@ private:
    */
   uint32_t m_currentState;
 
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 };
 
 } // namespace ns3

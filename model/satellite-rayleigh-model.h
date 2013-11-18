@@ -63,7 +63,7 @@ public:
   /**
    *  \brief Do needed dispose actions.
    */
-  virtual void DoDispose ();
+  void DoDispose ();
 
   /**
    * \brief Function for calculating the oscillator complex gain
@@ -96,6 +96,11 @@ private:
    * \brief Function for constructing the oscillators
    */
   void ConstructOscillators ();
+
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 
   /**
    * \brief Vector of oscillators

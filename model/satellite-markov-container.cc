@@ -114,9 +114,20 @@ SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading
 SatMarkovContainer::~SatMarkovContainer ()
 {
   NS_LOG_FUNCTION (this);
+
+  Reset ();
 }
 
-void SatMarkovContainer::DoDispose ()
+void
+SatMarkovContainer::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+}
+
+void
+SatMarkovContainer::Reset ()
 {
   NS_LOG_FUNCTION (this);
 

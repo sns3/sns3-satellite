@@ -76,6 +76,11 @@ public:
    */
   virtual double DoGetFading (SatEnums::ChannelType_t channelType) = 0;
 
+  /**
+   * \brief Do needed dispose actions
+   */
+  virtual void DoDispose () = 0;
+
 private:
 
 };

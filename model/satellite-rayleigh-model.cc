@@ -33,7 +33,10 @@ TypeId SatRayleighModel::GetTypeId (void)
   return tid;
 }
 
-SatRayleighModel::SatRayleighModel ()
+SatRayleighModel::SatRayleighModel () :
+  m_currentSet (),
+  m_currentState (),
+  m_rayleighConf ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -60,15 +63,23 @@ SatRayleighModel::~SatRayleighModel ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_oscillators.clear ();
-  m_uniformVariable = 0;
+  Reset ();
 }
 
 void SatRayleighModel::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  Reset ();
+}
+
+void SatRayleighModel::Reset ()
+{
+  NS_LOG_FUNCTION (this);
+
   m_rayleighConf = NULL;
+  m_oscillators.clear ();
+  m_uniformVariable = NULL;
 }
 
 void

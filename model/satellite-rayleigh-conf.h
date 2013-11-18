@@ -52,7 +52,7 @@ public:
   /**
    * \brief Destructor
    */
-  virtual ~SatRayleighConf () {}
+  ~SatRayleighConf ();
 
   /**
    * \brief Function for getting the Rayleigh parameters
@@ -61,7 +61,17 @@ public:
    */
   std::vector<std::vector<double> > GetParameters (uint32_t set);
 
+  /**
+   * \brief Do needed dispose actions
+   */
+  void DoDispose ();
+
 private:
+
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 
   /**
    * \brief Number of parameters sets

@@ -67,17 +67,35 @@ SatMarkovModel::~SatMarkovModel ()
 {
   NS_LOG_FUNCTION (this);
 
+  Reset ();
+}
+
+void
+SatMarkovModel::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+}
+
+void
+SatMarkovModel::Reset ()
+{
+  NS_LOG_FUNCTION (this);
+
   delete[] m_probabilities;
 }
 
-uint32_t SatMarkovModel::GetState () const
+uint32_t
+SatMarkovModel::GetState () const
 {
   NS_LOG_FUNCTION (this);
 
   return m_currentState;
 }
 
-void SatMarkovModel::SetState (uint32_t newState)
+void
+SatMarkovModel::SetState (uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newState);
 
@@ -85,7 +103,8 @@ void SatMarkovModel::SetState (uint32_t newState)
   m_currentState = newState;
 }
 
-uint32_t SatMarkovModel::DoTransition ()
+uint32_t
+SatMarkovModel::DoTransition ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -122,7 +141,8 @@ uint32_t SatMarkovModel::DoTransition ()
   return m_numOfStates - 1;
 }
 
-void SatMarkovModel::SetProbability (uint32_t from,
+void
+SatMarkovModel::SetProbability (uint32_t from,
                                      uint32_t to,
                                      double probability)
 {

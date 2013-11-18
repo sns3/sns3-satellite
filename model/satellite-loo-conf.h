@@ -52,7 +52,7 @@ public:
   /**
    * \brief Destructor
    */
-  virtual ~SatLooConf () {}
+  ~SatLooConf ();
 
   /**
    * \brief Function for getting the Loo parameters
@@ -60,6 +60,11 @@ public:
    * \return Loo parameter values
    */
   std::vector<std::vector<double> > GetParameters (uint32_t set);
+
+  /**
+   * \brief Do needed dispose actions
+   */
+  void DoDispose ();
 
 private:
 
@@ -77,6 +82,11 @@ private:
    * \brief Loo's model parameters
    */
   std::vector<std::vector<std::vector<double> > > m_looParameters;
+
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 };
 
 } // namespace ns3

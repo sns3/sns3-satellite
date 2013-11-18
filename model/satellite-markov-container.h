@@ -67,7 +67,7 @@ public:
   /**
    *  \brief Do needed dispose actions.
    */
-  virtual void DoDispose ();
+  void DoDispose ();
 
   /**
    * \brief Function for getting the fading
@@ -259,6 +259,10 @@ private:
    */
   double CalculateDistanceSinceLastStateChange ();
 
+  /**
+   * \brief Clear used variables
+   */
+  void Reset ();
 };
 
 } // namespace ns3
