@@ -46,6 +46,7 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::str
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
+  NS_ASSERT (m_valuesInRow > 0);
 }
 
 SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer () :
@@ -78,8 +79,16 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
         {
           for( uint32_t j = 0; j < m_valuesInRow; j++ )
             {
-              *m_outputFileStream << m_container[i].at (j);
+              if (j + 1 == m_valuesInRow)
+                {
+                  *m_outputFileStream << m_container[i].at (j);
+                }
+              else
+                {
+                  *m_outputFileStream << m_container[i].at (j) << "\t";
+                }
             }
+          *m_outputFileStream << std::endl;
         }
     m_outputFileStream->close ();
   }
