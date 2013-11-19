@@ -164,6 +164,7 @@ SatMarkovConf::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
+  Object::DoDispose();
 }
 
 std::vector<std::vector<double> >

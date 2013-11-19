@@ -124,6 +124,7 @@ SatMarkovContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
+  SatFading::DoDispose();
 }
 
 void

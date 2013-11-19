@@ -76,6 +76,7 @@ SatMarkovModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
+  Object::DoDispose();
 }
 
 void

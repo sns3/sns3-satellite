@@ -84,4 +84,12 @@ SatFadingOscillator::~SatFadingOscillator ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatFadingOscillator::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Object::DoDispose();
+}
+
 } // namespace ns3

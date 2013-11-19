@@ -123,6 +123,7 @@ SatRayleighConf::DoDispose()
   NS_LOG_FUNCTION (this);
 
   Reset ();
+  SatFaderConf::DoDispose();
 }
 
 } // namespace ns3

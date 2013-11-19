@@ -83,6 +83,11 @@ public:
    */
   std::complex<double> GetCosineWaveValueAt (Time t) const;
 
+  /**
+   * \brief Do needed dispose actions
+   */
+  void DoDispose ();
+
 private:
 
   /**

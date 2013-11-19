@@ -70,11 +70,6 @@ public:
    */
   virtual void UpdateParameters (uint32_t newSet, uint32_t newState) = 0;
 
-  /**
-   * \brief Do needed dispose actions
-   */
-  virtual void DoDispose () = 0;
-
 private:
 
 };

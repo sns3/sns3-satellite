@@ -71,6 +71,7 @@ void SatRayleighModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
+  SatFader::DoDispose();
 }
 
 void SatRayleighModel::Reset ()
