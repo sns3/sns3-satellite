@@ -65,6 +65,11 @@ public:
    */
   void AddToContainer (std::vector<double> newItem);
 
+  /**
+   * \brief Do needed dispose actions
+   */
+  void DoDispose ();
+
 private:
 
 

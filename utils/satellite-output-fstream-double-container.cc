@@ -69,8 +69,19 @@ SatOutputFileStreamDoubleContainer::~SatOutputFileStreamDoubleContainer ()
 }
 
 void
+SatOutputFileStreamDoubleContainer::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+  Object::DoDispose();
+}
+
+void
 SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
 {
+  NS_LOG_FUNCTION (this);
+
   OpenStream ();
 
   if (m_outputFileStream->is_open ())
@@ -103,6 +114,8 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
 void
 SatOutputFileStreamDoubleContainer::AddToContainer (std::vector<double> newItem)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT (newItem.size () == m_valuesInRow);
 
   m_container.push_back (newItem);
@@ -111,6 +124,8 @@ SatOutputFileStreamDoubleContainer::AddToContainer (std::vector<double> newItem)
 void
 SatOutputFileStreamDoubleContainer::OpenStream ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_outputFileStreamWrapper = new SatOutputFileStreamWrapper (m_fileName,m_fileMode);
   m_outputFileStream = m_outputFileStreamWrapper->GetStream ();
 }
@@ -129,7 +144,11 @@ SatOutputFileStreamDoubleContainer::ResetStream ()
 {
   NS_LOG_FUNCTION (this);
 
-  delete m_outputFileStreamWrapper;
+  if (m_outputFileStreamWrapper != NULL)
+    {
+      delete m_outputFileStreamWrapper;
+      m_outputFileStreamWrapper = 0;
+    }
   m_outputFileStream = 0;
 
   m_fileName = "";
@@ -141,11 +160,17 @@ SatOutputFileStreamDoubleContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 
-  for( uint32_t i = 0; i < m_container.size (); i++ )
+  if (!m_container.empty())
     {
-      m_container[i].clear ();
+      for (uint32_t i = 0; i < m_container.size (); i++)
+        {
+          if (!m_container[i].empty ())
+            {
+              m_container[i].clear ();
+            }
+        }
+      m_container.clear ();
     }
-  m_container.clear ();
 
   m_valuesInRow = 0;
 }

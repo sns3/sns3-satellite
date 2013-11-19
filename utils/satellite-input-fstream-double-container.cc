@@ -77,6 +77,15 @@ SatInputFileStreamDoubleContainer::~SatInputFileStreamDoubleContainer ()
 }
 
 void
+SatInputFileStreamDoubleContainer::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Reset ();
+  Object::DoDispose();
+}
+
+void
 SatInputFileStreamDoubleContainer::UpdateContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
 {
   NS_LOG_FUNCTION (this);
@@ -139,6 +148,8 @@ SatInputFileStreamDoubleContainer::ProceedToNextClosestTimeSample ()
 bool
 SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue)
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT (column < m_valuesInRow);
   NS_ASSERT (m_container.size () > 0);
   NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
@@ -194,7 +205,11 @@ SatInputFileStreamDoubleContainer::ResetStream ()
 {
   NS_LOG_FUNCTION (this);
 
-  delete m_inputFileStreamWrapper;
+  if (m_inputFileStreamWrapper != NULL)
+    {
+      delete m_inputFileStreamWrapper;
+      m_inputFileStreamWrapper = 0;
+    }
   m_inputFileStream = 0;
 
   m_fileName = "";
@@ -206,11 +221,17 @@ SatInputFileStreamDoubleContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 
-  for( uint32_t i = 0; i < m_container.size (); i++ )
+  if (!m_container.empty())
     {
-      m_container[i].clear ();
+      for (uint32_t i = 0; i < m_container.size (); i++)
+        {
+          if (!m_container[i].empty ())
+            {
+              m_container[i].clear ();
+            }
+        }
+      m_container.clear ();
     }
-  m_container.clear ();
 
   m_valuesInRow = 0;
   m_currentPosition = 0;

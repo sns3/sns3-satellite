@@ -71,6 +71,11 @@ public:
    */
   std::vector<double> ProceedToNextClosestTimeSample ();
 
+  /**
+   * \brief Do needed dispose actions
+   */
+  void DoDispose ();
+
 private:
 
   /**
