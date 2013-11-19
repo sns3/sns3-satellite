@@ -245,6 +245,11 @@ private:
   SatBeamHelper::FadingModel m_fadingModel;
 
   /**
+   * Common configuration for Markov model
+   */
+  Ptr<SatMarkovConf> m_markovConf;
+
+  /**
    * Creates info of the beam.
    * /returns info for beams as std::string.
    */

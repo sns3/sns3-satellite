@@ -88,7 +88,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandw
 
   // uncomment next code line, if attributes are needed already in construction phase.
   // E.g attributes set by object factory affecting object creation
-  //ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
@@ -104,6 +104,22 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandw
   m_geoHelper->Install (m_geoNode);
 
   m_ncc = CreateObject<SatNcc> ();
+
+  switch (m_fadingModel)
+    {
+    case SatBeamHelper::FADING_MARKOV:
+      {
+        /// create default Markov & Loo configurations
+        m_markovConf = CreateObject<SatMarkovConf> ();
+        break;
+      }
+    case SatBeamHelper::FADING_OFF:
+    default:
+      {
+        m_markovConf = NULL;
+        break;
+      }
+    }
 }
 
 void
@@ -148,7 +164,7 @@ void SatBeamHelper::SetBaseAddress ( const Ipv4Address network, const Ipv4Mask m
 }
 
 Ptr<Node>
-SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId )
+SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId)
 {
   NS_LOG_FUNCTION (this << gwNode << gwId << beamId << ulFreqId << flFreqId);
 
@@ -574,16 +590,13 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
             Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
             NS_ASSERT(observer != NULL);
 
-            /// create default Markov & Loo configurations
-            Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
-
             SatFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle,
                                                                      observer);
             SatFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity,
                                                                    observer);
 
             /// create fading container based on default configuration
-            fadingContainer = CreateObject<SatMarkovContainer> (markovConf,
+            fadingContainer = CreateObject<SatMarkovContainer> (m_markovConf,
                                                                 elevationCb,
                                                                 velocityCb);
 
