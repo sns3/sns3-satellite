@@ -99,10 +99,16 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
 }
 
 void
-SatBeamScheduler::AddUt (Address utId)
+SatBeamScheduler::AddUt (Address utId, double cra)
 {
   NS_LOG_FUNCTION (this << utId);
-  m_uts.insert (utId);
+
+  UtInfo utInfo;
+  utInfo.m_cra = cra;
+
+  std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair(utId, utInfo));
+
+  NS_ASSERT (result.second == true);
 }
 
 void
@@ -181,7 +187,7 @@ SatBeamScheduler::AddUtTimeSlots (SatTbtpHeader& header)
       while ( timeSlotForUt )
         {
           Ptr<SatTbtpHeader::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpHeader::TbtpTimeSlotInfo> (0, GetNextTimeSlot () );
-          header.SetTimeslot (Mac48Address::ConvertFrom (*m_currentUt), timeSlotInfo);
+          header.SetTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), timeSlotInfo);
 
           timeSlotForUt--;
         }

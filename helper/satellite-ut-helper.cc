@@ -95,7 +95,7 @@ SatUtHelper::GetTypeId (void)
                       MakeDoubleAccessor(&SatUtHelper::m_aciIfWrtNoise),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("CraAllocMode",
-                     "Intial Constant Rate Assignment (CRA) allocation mode used for UTs.",
+                     "Constant Rate Assignment (CRA) allocation mode used for UTs.",
                       EnumValue (SatUtHelper::CONSTANT_CRA),
                       MakeEnumAccessor (&SatUtHelper::m_craAllocMode),
                       MakeEnumChecker (SatUtHelper::CONSTANT_CRA, "Constant CRA used for UTs. (not set by helper, UT's attribute defines value.",
@@ -201,7 +201,7 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -209,14 +209,14 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add (Install (*i, beamId, fCh, rCh));
+    devs.Add (Install (*i, beamId, fCh, rCh, ncc));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -271,6 +271,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
   mac->SetAttribute ("Interval", StringValue ("0s"));
 
+  if ( m_craAllocMode == SatUtHelper::RANDOM_CRA )
+    {
+      Ptr<UniformRandomVariable> craRnd = CreateObject<UniformRandomVariable> ();
+      mac->SetAttribute ( "Cra", DoubleValue ( craRnd->GetValue (0.0, std::numeric_limits<double>::max ())));
+    }
+
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   mac->SetQueue (queue);
@@ -285,12 +291,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatPhy::ReceiveCallback cb = MakeCallback (&SatUtMac::Receive, mac);
 
   // Create SatPhy modules
-  m_phyFactory.Set ("PhyRx", PointerValue(phyRx));
-  m_phyFactory.Set ("PhyTx", PointerValue(phyTx));
-  m_phyFactory.Set ("BeamId",UintegerValue(beamId));
-  m_phyFactory.Set ("ReceiveCb", CallbackValue(cb));
+  m_phyFactory.Set ("PhyRx", PointerValue (phyRx));
+  m_phyFactory.Set ("PhyTx", PointerValue (phyTx));
+  m_phyFactory.Set ("BeamId",UintegerValue (beamId));
+  m_phyFactory.Set ("ReceiveCb", CallbackValue (cb));
 
-  Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy>();
+  Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy> ();
   phy->Initialize();
 
   // Attach the PHY layer to SatNetDevice
@@ -309,20 +315,25 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the device receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));
 
-  // Attach the SatNetDevices to nodes
+  // Attach the SatNetDevice to node
   n->AddDevice (dev);
 
-  return DynamicCast <NetDevice> (dev);
+  // Add UT to NCC
+  DoubleValue macCra (0.0);
+  mac->GetAttribute ( "Cra", macCra );
+  ncc->AddUt (dev->GetAddress (), macCra.Get (), beamId);
+
+  return dev;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
 
   Ptr<Node> a = Names::Find<Node> (aName);
 
-  return Install (a, beamId, fCh, rCh);
+  return Install (a, beamId, fCh, rCh, ncc);
 }
 
 void

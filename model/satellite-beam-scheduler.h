@@ -90,9 +90,17 @@ public:
   /**
     * \param utId ID (mac address) of the UT to be added
     */
-  void AddUt (Address utId);
+  void AddUt (Address utId, double cra);
 
 private:
+  // UT information
+  class UtInfo
+  {
+    public:
+      double m_cra;
+      UtInfo() { m_cra = 0;}
+  };
+
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);
 
@@ -128,17 +136,17 @@ private:
   /**
    * Set to store UTs in beam.
    */
-  std::set<Address> m_uts;
+  std::map<Address, UtInfo> m_uts;
 
   /**
    * Iterator of the current UT to schedule
    */
-  std::set<Address>::iterator m_currentUt;
+  std::map<Address, UtInfo>::iterator m_currentUt;
 
   /**
    * Iterator of the UT scheduled first
    */
-  std::set<Address>::iterator m_firstUt;
+  std::map<Address, UtInfo>::iterator m_firstUt;
 
   /**
    * Shuffled list of carrier ids.

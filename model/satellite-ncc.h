@@ -85,9 +85,10 @@ public:
 
   /**
     * \param utId ID (mac address) of the UT to be added
+    * \param cra  Constant Rate Assigment of the UT to be added.
     * \param beamId ID of the beam where UT is connected.
     */
-  void AddUt (Address utId, uint32_t beamId);
+  void AddUt (Address utId, double cra, uint32_t beamId);
 
 private:
 

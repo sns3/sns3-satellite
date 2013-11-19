@@ -21,6 +21,7 @@
 #include "ns3/string.h"
 #include "ns3/log.h"
 #include "ns3/ptr.h"
+#include "ns3/double.h"
 #include "ns3/random-variable.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
@@ -54,7 +55,13 @@ SatUtMac::GetTypeId (void)
                    TimeValue (Seconds (0.001)),
                    MakeTimeAccessor (&SatUtMac::m_tInterval),
                    MakeTimeChecker ())
-                   ;
+    .AddAttribute ("Cra",
+                   "Constant Rate Assignment value for this UT Mac.",
+                   DoubleValue (128),
+                   MakeDoubleAccessor (&SatUtMac::m_cra),
+                   MakeDoubleChecker<double> (0.0))
+  ;
+
   return tid;
 }
 

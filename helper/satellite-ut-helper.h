@@ -31,6 +31,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-link-results.h"
+#include "ns3/satellite-ncc.h"
 #include "satellite-superframe-sequence.h"
 
 namespace ns3 {
@@ -130,6 +131,7 @@ public:
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
+   * \param ncc NCC (Network Control Center)
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatUtHelper::SetChannelAttribute,
@@ -138,27 +140,29 @@ public:
    * a queue for this ns3::NetDevice, and associate the resulting 
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh );
+  NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc);
 
   /**
    * \param n node
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
+   * \param ncc NCC (Network Control Center)
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh );
+  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
 
   /**
    * \param aName Name of the node
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
+   * \param ncc NCC (Network Control Center)
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh );
+  Ptr<NetDevice> Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
 
   /**
    * Enables creation traces to be written in given file

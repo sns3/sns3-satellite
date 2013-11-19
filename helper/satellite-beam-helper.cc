@@ -216,35 +216,26 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
         {
           InstallFadingContainer (*i);
         }
+
+      //save UT node pointer to multimap container
+      m_utNode.insert (std::make_pair (beamId, *i) );
     }
 
   //install GW
   Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode, beamId, feederLink.first, feederLink.second);
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
+  // add beam to NCC
+  m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd), m_superframeSeq );
+
   // install UTs
-  NetDeviceContainer utNd = m_utHelper->Install (ut, beamId, userLink.first, userLink.second);
+  NetDeviceContainer utNd = m_utHelper->Install (ut, beamId, userLink.first, userLink.second, m_ncc);
   Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign (utNd);
 
   // set needed routings and fill ARP cache
   PopulateRoutings (ut, utNd, gwNode, gwNd, gwAddress.GetAddress (0), utAddress );
 
-  // add beam to NCC
-  m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd), m_superframeSeq );
-
-  // add UTs to NCC
-  for ( NetDeviceContainer::Iterator i = utNd.Begin ();  i != utNd.End (); i++ )
-    {
-      m_ncc->AddUt ((*i)->GetAddress(), beamId);
-    }
-
   m_ipv4Helper.NewNetwork ();
-
-  //save UT node pointers to multimap
-  for ( NodeContainer::Iterator i = ut.Begin ();  i != ut.End (); i++ )
-    {
-      m_utNode.insert (std::make_pair (beamId, *i) );
-    }
 
   return gwNode;
 }
@@ -605,6 +596,7 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
         default:
           {
             NS_ASSERT(0);
+            break;
           }
         }
     }

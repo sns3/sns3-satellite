@@ -158,6 +158,11 @@ private:
    * The interval that the Mac uses to throttle packet transmission
    */
   Time m_tInterval;
+
+  /**
+   * The configured Constant Rate Assignment (CRA) for this UT Mac.
+   */
+  double m_cra;
 };
 
 } // namespace ns3

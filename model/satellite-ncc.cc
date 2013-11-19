@@ -87,11 +87,11 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
 }
 
 void
-SatNcc::AddUt (Address utId, uint32_t beamId)
+SatNcc::AddUt (Address utId, double cra, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
-  m_beamSchedulers[beamId]->AddUt(utId);
+  m_beamSchedulers[beamId]->AddUt (utId, cra);
 }
 
 } // namespace ns3
