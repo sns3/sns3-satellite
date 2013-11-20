@@ -142,7 +142,7 @@ SatPhyTx::GetFadingValue (SatEnums::ChannelType_t channelType)
 }
 
 void
-SatPhyTx::SetFadingContainer (Ptr<SatFading> fadingContainer)
+SatPhyTx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
 {
   NS_LOG_FUNCTION (this);
 

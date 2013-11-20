@@ -292,7 +292,7 @@ private:
    * \param node Pointer to node
    * \return Pointer to fading container
    */
-  Ptr<SatFading>  InstallFadingContainer (Ptr<Node> node) const;
+  Ptr<SatBaseFading>  InstallFadingContainer (Ptr<Node> node) const;
 
 };
 

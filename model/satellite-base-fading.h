@@ -17,8 +17,8 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_FADING_H
-#define SATELLITE_FADING_H
+#ifndef SATELLITE_BASE_FADING_H
+#define SATELLITE_BASE_FADING_H
 
 #include "ns3/object.h"
 #include "ns3/uinteger.h"
@@ -33,7 +33,7 @@ namespace ns3 {
  *
  * \brief Base class for fading
  */
-class SatFading : public Object
+class SatBaseFading : public Object
 {
 public:
   /**
@@ -49,12 +49,12 @@ public:
   /**
    * \brief Constructor
    */
-  SatFading ();
+  SatBaseFading ();
 
   /**
    * \brief Destructor
    */
-  virtual ~SatFading ();
+  virtual ~SatBaseFading ();
 
   /**
    * \brief NS-3 type id function
@@ -82,4 +82,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_FADING_H */
+#endif /* SATELLITE_BASE_FADING_H */

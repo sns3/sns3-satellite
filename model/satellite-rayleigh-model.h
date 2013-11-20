@@ -22,7 +22,7 @@
 
 #include "ns3/vector.h"
 #include "satellite-fading-oscillator.h"
-#include "satellite-fader.h"
+#include "satellite-base-fader.h"
 #include "ns3/random-variable-stream.h"
 #include "satellite-rayleigh-conf.h"
 
@@ -33,7 +33,7 @@ namespace ns3 {
  *
  * \brief
  */
-class SatRayleighModel : public SatFader
+class SatRayleighModel : public SatBaseFader
 {
 public:
 

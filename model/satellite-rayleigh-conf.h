@@ -21,7 +21,7 @@
 #ifndef SAT_RAYLEIGH_CONF_H
 #define SAT_RAYLEIGH_CONF_H
 
-#include "satellite-fader-conf.h"
+#include "satellite-base-fader-conf.h"
 
 namespace ns3 {
 
@@ -29,7 +29,7 @@ namespace ns3 {
  * \brief A configuration class for Rayleigh model
  *
  */
-class SatRayleighConf : public SatFaderConf
+class SatRayleighConf : public SatBaseFaderConf
 {
 public:
 

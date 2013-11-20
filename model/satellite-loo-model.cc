@@ -30,7 +30,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatLooModel);
 TypeId SatLooModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLooModel")
-      .SetParent<SatFader> ()
+      .SetParent<SatBaseFader> ()
       .AddConstructor<SatLooModel> ();
   return tid;
 }
@@ -81,7 +81,7 @@ SatLooModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatFader::DoDispose();
+  SatBaseFader::DoDispose();
 }
 
 void

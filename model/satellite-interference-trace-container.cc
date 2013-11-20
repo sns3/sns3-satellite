@@ -17,51 +17,37 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_FADER_CONF_H
-#define SATELLITE_FADER_CONF_H
+#include "satellite-interference-trace-container.h"
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+NS_LOG_COMPONENT_DEFINE ("SatInterferenceTraceContainer");
 
 namespace ns3 {
 
-/**
- * \ingroup satellite
- *
- * \brief Base class for fading
- */
-class SatFaderConf : public Object
+NS_OBJECT_ENSURE_REGISTERED (SatInterferenceTraceContainer);
+
+TypeId 
+SatInterferenceTraceContainer::GetTypeId (void)
 {
-public:
-  /**
-   * \brief Constructor
-   */
-  SatFaderConf ();
+  static TypeId tid = TypeId ("ns3::SatInterferenceTraceContainer")
+    .SetParent<SatBaseTraceContainer> ();
+  return tid;
+}
 
-  /**
-   * \brief Destructor
-   */
-  virtual ~SatFaderConf ();
+SatInterferenceTraceContainer::SatInterferenceTraceContainer ()
+{
+  NS_LOG_FUNCTION (this);
+}
 
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+SatInterferenceTraceContainer::~SatInterferenceTraceContainer ()
+{
+  NS_LOG_FUNCTION (this);
+}
 
-  /**
-   * \brief Function for getting the fading value
-   * \param channelType channel type
-   * \return fading value
-   */
-  virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;
+void SatInterferenceTraceContainer::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
 
-private:
-
-};
+  SatBaseTraceContainer::DoDispose();
+}
 
 } // namespace ns3
-
-#endif /* SATELLITE_FADER_CONF_H */

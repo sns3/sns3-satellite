@@ -265,8 +265,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phyRx->ConfigurePhyRxCarriers (carrierConf);
 
   // Set fading
-  phyTx->SetFadingContainer (n->GetObject<SatFading> ());
-  phyRx->SetFadingContainer (n->GetObject<SatFading> ());
+  phyTx->SetFadingContainer (n->GetObject<SatBaseFading> ());
+  phyRx->SetFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
   mac->SetAttribute ("Interval", StringValue ("0s"));

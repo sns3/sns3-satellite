@@ -574,12 +574,12 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
     }
 }
 
-Ptr<SatFading>
+Ptr<SatBaseFading>
 SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
 {
   NS_LOG_FUNCTION (this << node);
 
-  Ptr<SatFading> fadingContainer = node->GetObject<SatFading> ();
+  Ptr<SatBaseFading> fadingContainer = node->GetObject<SatBaseFading> ();
 
   if (fadingContainer == 0)
     {
@@ -590,9 +590,9 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
             Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
             NS_ASSERT(observer != NULL);
 
-            SatFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle,
+            SatBaseFading::ElevationCallback elevationCb = MakeCallback (&SatMobilityObserver::GetElevationAngle,
                                                                      observer);
-            SatFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity,
+            SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity,
                                                                    observer);
 
             /// create fading container based on default configuration

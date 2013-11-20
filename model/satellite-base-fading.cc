@@ -17,34 +17,34 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-fading.h"
+#include "satellite-base-fading.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatFading");
+NS_LOG_COMPONENT_DEFINE ("SatBaseFading");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFading);
+NS_OBJECT_ENSURE_REGISTERED (SatBaseFading);
 
 TypeId 
-SatFading::GetTypeId (void)
+SatBaseFading::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatFading")
+  static TypeId tid = TypeId ("ns3::SatBaseFading")
     .SetParent<Object> ();
   return tid;
 }
 
-SatFading::SatFading ()
+SatBaseFading::SatBaseFading ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatFading::~SatFading ()
+SatBaseFading::~SatBaseFading ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 double
-SatFading::GetFading (SatEnums::ChannelType_t channelType)
+SatBaseFading::GetFading (SatEnums::ChannelType_t channelType)
 {
   return DoGetFading (channelType);
 }

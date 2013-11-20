@@ -17,8 +17,8 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_FADER_H
-#define SATELLITE_FADER_H
+#ifndef SATELLITE_BASE_FADER_H
+#define SATELLITE_BASE_FADER_H
 
 #include "ns3/object.h"
 #include "ns3/uinteger.h"
@@ -32,18 +32,18 @@ namespace ns3 {
  *
  * \brief Base class for Markov model faders
  */
-class SatFader : public Object
+class SatBaseFader : public Object
 {
 public:
   /**
    * \brief Constructor
    */
-  SatFader ();
+  SatBaseFader ();
 
   /**
    * \brief Destructor
    */
-  virtual ~SatFader ();
+  virtual ~SatBaseFader ();
 
   /**
    * \brief NS-3 type id function
@@ -76,4 +76,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_FADER_H */
+#endif /* SATELLITE_BASE_FADER_H */

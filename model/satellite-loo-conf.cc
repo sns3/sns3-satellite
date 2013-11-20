@@ -46,7 +46,7 @@ TypeId
 SatLooConf::GetTypeId (void) //TODO: add attribute m_looParameters
 {
   static TypeId tid = TypeId ("ns3::SatLooConf")
-      .SetParent<SatFaderConf> ()
+      .SetParent<SatBaseFaderConf> ()
       .AddConstructor<SatLooConf> ()
       .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
                      UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
@@ -122,7 +122,7 @@ SatLooConf::DoDispose()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatFaderConf::DoDispose();
+  SatBaseFaderConf::DoDispose();
 }
 
 } // namespace ns3

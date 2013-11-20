@@ -17,30 +17,45 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-fader-conf.h"
+#ifndef SATELLITE_BASE_TRACE_CONTAINER_H
+#define SATELLITE_BASE_TRACE_CONTAINER_H
 
-NS_LOG_COMPONENT_DEFINE ("SatFaderConf");
+#include "ns3/object.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFaderConf);
-
-TypeId 
-SatFaderConf::GetTypeId (void)
+/**
+ * \ingroup satellite
+ *
+ * \brief Base class for trace containers
+ */
+class SatBaseTraceContainer : public Object
 {
-  static TypeId tid = TypeId ("ns3::SatFaderConf")
-    .SetParent<Object> ();
-  return tid;
-}
+public:
 
-SatFaderConf::SatFaderConf ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  /**
+   * \brief Constructor
+   */
+  SatBaseTraceContainer ();
 
-SatFaderConf::~SatFaderConf ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  /**
+   * \brief Destructor
+   */
+  virtual ~SatBaseTraceContainer ();
+
+  /**
+   * \brief NS-3 type id function
+   * \return type id
+   */
+  static TypeId GetTypeId (void);
+
+private:
+
+};
 
 } // namespace ns3
+
+#endif /* SATELLITE_BASE_TRACE_CONTAINER_H */

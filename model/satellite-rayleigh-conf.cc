@@ -46,7 +46,7 @@ TypeId
 SatRayleighConf::GetTypeId (void) //TODO: add attribute m_rayleighParameters
 {
   static TypeId tid = TypeId ("ns3::SatRayleighConf")
-      .SetParent<SatFaderConf> ()
+      .SetParent<SatBaseFaderConf> ()
       .AddConstructor<SatRayleighConf> ()
       .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
                      UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
@@ -123,7 +123,7 @@ SatRayleighConf::DoDispose()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatFaderConf::DoDispose();
+  SatBaseFaderConf::DoDispose();
 }
 
 } // namespace ns3

@@ -51,8 +51,8 @@ main (int argc, char *argv[])
   /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
-  SatFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
-  SatFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
+  SatBaseFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
+  SatBaseFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
 
   /// create fading container based on default configuration
   Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer>(markovConf,elevationCb,velocityCb);

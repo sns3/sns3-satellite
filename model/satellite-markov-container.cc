@@ -31,7 +31,7 @@ TypeId
 SatMarkovContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMarkovContainer")
-    .SetParent<SatFading> ()
+    .SetParent<SatBaseFading> ()
     .AddConstructor<SatMarkovContainer> ()
     .AddTraceSource ("FadingTrace",
                      "The trace for fading values",
@@ -64,7 +64,7 @@ SatMarkovContainer::SatMarkovContainer () :
   NS_ASSERT(0);
 }
 
-SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity) :
+SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFading::ElevationCallback elevation, SatBaseFading::VelocityCallback velocity) :
     m_markovModel (NULL),
     m_markovConf (markovConf),
     m_fader_up (NULL),
@@ -124,7 +124,7 @@ SatMarkovContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatFading::DoDispose();
+  SatBaseFading::DoDispose();
 }
 
 void

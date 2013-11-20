@@ -17,30 +17,51 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-fader.h"
+#ifndef SATELLITE_BASE_FADER_CONF_H
+#define SATELLITE_BASE_FADER_CONF_H
 
-NS_LOG_COMPONENT_DEFINE ("SatFader");
+#include "ns3/object.h"
+#include "ns3/uinteger.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFader);
-
-TypeId 
-SatFader::GetTypeId (void)
+/**
+ * \ingroup satellite
+ *
+ * \brief Base class for fading
+ */
+class SatBaseFaderConf : public Object
 {
-  static TypeId tid = TypeId ("ns3::SatFader")
-    .SetParent<Object> ();
-  return tid;
-}
+public:
+  /**
+   * \brief Constructor
+   */
+  SatBaseFaderConf ();
 
-SatFader::SatFader ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  /**
+   * \brief Destructor
+   */
+  virtual ~SatBaseFaderConf ();
 
-SatFader::~SatFader ()
-{
-  NS_LOG_FUNCTION (this);
-}
+  /**
+   * \brief NS-3 type id function
+   * \return type id
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Function for getting the fading value
+   * \param channelType channel type
+   * \return fading value
+   */
+  virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;
+
+private:
+
+};
 
 } // namespace ns3
+
+#endif /* SATELLITE_BASE_FADER_CONF_H */

@@ -21,7 +21,7 @@
 #ifndef SAT_LOO_CONF_H
 #define SAT_LOO_CONF_H
 
-#include "satellite-fader-conf.h"
+#include "satellite-base-fader-conf.h"
 
 namespace ns3 {
 
@@ -29,7 +29,7 @@ namespace ns3 {
  * \brief A configuration class for Loo's model
  *
  */
-class SatLooConf : public SatFaderConf
+class SatLooConf : public SatBaseFaderConf
 {
 public:
 

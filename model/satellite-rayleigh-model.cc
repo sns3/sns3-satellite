@@ -28,7 +28,7 @@ NS_LOG_COMPONENT_DEFINE ("SatRayleighModel");
 TypeId SatRayleighModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRayleighModel")
-      .SetParent<SatFader> ()
+      .SetParent<SatBaseFader> ()
       .AddConstructor<SatRayleighModel> ();
   return tid;
 }
@@ -71,7 +71,7 @@ void SatRayleighModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatFader::DoDispose();
+  SatBaseFader::DoDispose();
 }
 
 void SatRayleighModel::Reset ()

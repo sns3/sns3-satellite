@@ -28,7 +28,7 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
-#include "satellite-fading.h"
+#include "satellite-base-fading.h"
 
 namespace ns3 {
 
@@ -94,7 +94,7 @@ public:
    * \brief Set fading container
    * \param fadingContainer fading container
    */
-  void SetFadingContainer (Ptr<SatFading> fadingContainer);
+  void SetFadingContainer (Ptr<SatBaseFading> fadingContainer);
 
   /**
    * Set the Antenna loss in Db
@@ -182,7 +182,7 @@ private:
   /**
    * \brief Fading container for fading model
    */
-  Ptr<SatFading> m_fadingContainer;
+  Ptr<SatBaseFading> m_fadingContainer;
 
   /**
    * \brief Default fading value

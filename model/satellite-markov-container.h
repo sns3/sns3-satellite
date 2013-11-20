@@ -24,7 +24,7 @@
 #include "satellite-markov-conf.h"
 #include "geo-coordinate.h"
 #include "ns3/vector.h"
-#include "satellite-fading.h"
+#include "satellite-base-fading.h"
 #include "satellite-loo-model.h"
 #include "satellite-rayleigh-model.h"
 #include "ns3/traced-callback.h"
@@ -36,7 +36,7 @@ namespace ns3 {
  *
  * \brief Markov fading model container
  */
-class SatMarkovContainer : public SatFading
+class SatMarkovContainer : public SatBaseFading
 {
 public:
 
@@ -57,7 +57,7 @@ public:
    * \param looConf Loo configuration object
    * \param currentPosition current position
    */
-  SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatFading::ElevationCallback elevation, SatFading::VelocityCallback velocity);
+  SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFading::ElevationCallback elevation, SatBaseFading::VelocityCallback velocity);
 
   /**
    * \brief Destructor
@@ -114,12 +114,12 @@ private:
   /**
    * \brief Uplink fader
    */
-  Ptr<SatFader> m_fader_up;
+  Ptr<SatBaseFader> m_fader_up;
 
   /**
    * \brief Downlink fader
    */
-  Ptr<SatFader> m_fader_down;
+  Ptr<SatBaseFader> m_fader_down;
 
   /**
    * \brief Number of states available
