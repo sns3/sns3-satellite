@@ -136,6 +136,9 @@ SatMarkovContainer::Reset ()
   m_fader_up = NULL;
   m_fader_down = NULL;
   m_markovModel = NULL;
+
+  m_currentElevation.Nullify();
+  m_velocity.Nullify();
 }
 
 void
