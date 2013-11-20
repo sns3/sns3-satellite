@@ -17,11 +17,11 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
-#define SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
+#ifndef SATELLITE_INTERFERENCE_OUTPUT_TRACE_CONTAINER_H
+#define SATELLITE_INTERFERENCE_OUTPUT_TRACE_CONTAINER_H
 
 #include "satellite-base-trace-container.h"
-#include "ns3/satellite-input-fstream-double-container.h"
+#include "ns3/satellite-output-fstream-double-container.h"
 #include "satellite-enums.h"
 #include "ns3/mac48-address.h"
 
@@ -30,9 +30,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for interference input trace container
+ * \brief Class for interference output trace container
  */
-class SatInterferenceInputTraceContainer : public SatBaseTraceContainer
+class SatInterferenceOutputTraceContainer : public SatBaseTraceContainer
 {
 public:
 
@@ -59,17 +59,17 @@ public:
   /**
    * \brief typedef for map of containers
    */
-  typedef std::map <key_t, Ptr<SatInputFileStreamDoubleContainer> > container_t;
+  typedef std::map <key_t, Ptr<SatOutputFileStreamDoubleContainer> > container_t;
 
   /**
    * \brief Constructor
    */
-  SatInterferenceInputTraceContainer ();
+  SatInterferenceOutputTraceContainer ();
 
   /**
    * \brief Destructor
    */
-  ~SatInterferenceInputTraceContainer ();
+  ~SatInterferenceOutputTraceContainer ();
 
   /**
    * \brief NS-3 type id function
@@ -93,21 +93,20 @@ public:
    * \param key key
    * \return matching container
    */
-  Ptr<SatInputFileStreamDoubleContainer> FindNode (key_t key);
+  Ptr<SatOutputFileStreamDoubleContainer> FindNode (key_t key);
 
   /**
-   * \brief Function for getting the interference density
+   * \brief Write the contents of a container matching to the key into a file
    * \param key key
-   * \return Interference density
    */
-  double GetInterferenceDensity (key_t key);
+  void WriteToFile (key_t key);
 
   /**
-   * \brief Function for getting the Rx power density
+   * \brief Add the vector containing the values to container matching the key
    * \param key key
-   * \return Rx power density
+   * \param newItem vector of values
    */
-  double GetRxPowerDensity (key_t key);
+  void AddToContainer (key_t key, std::vector<double> newItem);
 
 private:
 
@@ -129,4 +128,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H */
+#endif /* SATELLITE_INTERFERENCE_OUTPUT_TRACE_CONTAINER_H */
