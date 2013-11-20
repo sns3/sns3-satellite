@@ -17,10 +17,13 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_INTERFERENCE_TRACE_CONTAINER_H
-#define SATELLITE_INTERFERENCE_TRACE_CONTAINER_H
+#ifndef SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
+#define SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
 
 #include "satellite-base-trace-container.h"
+#include "ns3/satellite-input-fstream-double-container.h"
+#include "satellite-enums.h"
+#include "ns3/mac48-address.h"
 
 namespace ns3 {
 
@@ -29,19 +32,29 @@ namespace ns3 {
  *
  * \brief Class for interference trace container
  */
-class SatInterferenceTraceContainer : public SatBaseTraceContainer
+class SatInterferenceInputTraceContainer : public SatBaseTraceContainer
 {
 public:
+
+  static const uint32_t DEFAULT_RX_POWER_DENSITY_INDEX = 1;
+
+  static const uint32_t DEFAULT_INTF_DENSITY_INDEX = 2;
+
+  static const uint32_t DEFAULT_NUMBER_OF_COLUMNS = 3;
+
+  typedef std::pair<Address,SatEnums::ChannelType_t> key_t;
+
+  typedef std::map <key_t, Ptr<SatInputFileStreamDoubleContainer> > container_t;
 
   /**
    * \brief Constructor
    */
-  SatInterferenceTraceContainer ();
+  SatInterferenceInputTraceContainer ();
 
   /**
    * \brief Destructor
    */
-  virtual ~SatInterferenceTraceContainer ();
+  virtual ~SatInterferenceInputTraceContainer ();
 
   /**
    * \brief NS-3 type id function
@@ -54,16 +67,29 @@ public:
    */
   void DoDispose ();
 
+  void AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
 
+  Ptr<SatInputFileStreamDoubleContainer> FindNode (key_t key);
+
+  double GetInterferenceDensity (key_t key);
+
+  double GetRxPowerDensity (key_t key);
 
 private:
+
+  void Reset ();
 
   /**
    *
    */
-  //std::map m_container;
+  container_t m_container;
+
+  /**
+   *
+   */
+  uint32_t m_index;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_INTERFERENCE_TRACE_CONTAINER_H */
+#endif /* SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H */

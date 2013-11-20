@@ -66,7 +66,8 @@ SatRayleighModel::~SatRayleighModel ()
   Reset ();
 }
 
-void SatRayleighModel::DoDispose ()
+void
+SatRayleighModel::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -74,7 +75,8 @@ void SatRayleighModel::DoDispose ()
   SatBaseFader::DoDispose();
 }
 
-void SatRayleighModel::Reset ()
+void
+SatRayleighModel::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
