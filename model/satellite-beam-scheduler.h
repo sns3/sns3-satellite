@@ -62,42 +62,61 @@ public:
    */
   ~SatBeamScheduler ();
 
-   /**
+  /**
    * Receive a packet from a beam.
    *
    * The SatBeamScheduler receives CR packets from own beam (sent by UTs)
    * and takes CRs into account when making schedule decisions.
    *
-   * /param p       Pointer to the received CR packet.
+   * \param p       Pointer to the received CR packet.
    */
-
   void Receive (Ptr<Packet> p);
 
   /**
-    * \param packet     the packet send
-    * \param address    Packet destination address
-    * \param protocol   protocol number to send packet.
-    */
+   * \param packet     the packet send
+   * \param address    Packet destination address
+   * \param protocol   protocol number to send packet.
+   */
   typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
 
   /**
-    * \param beamId ID of the beam which for callback is set
-    * \param cb callback to invoke whenever a TBTP is ready for sending and must
-    *        be forwarded to the Beam UTs.
-    */
+   * \param beamId ID of the beam which for callback is set
+   * \param cb callback to invoke whenever a TBTP is ready for sending and must
+   *        be forwarded to the Beam UTs.
+   */
   void Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb, Ptr<SatSuperframeSeq> seq);
 
   /**
-    * \param utId ID (mac address) of the UT to be added
-    */
+   * Add UT to scheduler.
+   *
+   * \param utId ID (mac address) of the UT to be added
+   * \param cra CRA value for UT.
+   */
   void AddUt (Address utId, double cra);
+
+  /**
+   * Update UT C/N0 info with the latest value.
+   *
+   * \param utId Id of the UT (address).
+   * \param cno C/N0 value
+   */
+  void UpdateUtCno (Address utId, double cno);
+
+  /**
+   * Estimate UT's C/N0 value for next transmission.
+   *
+   * \param utId Id of the UT (address).
+   * \return Estimated C/N0 value. Zero means that no estimation is done.
+   */
+  double EstimateUtCno (Address utId);
 
 private:
   // UT information
   class UtInfo
   {
     public:
-      double m_cra;
+      double m_cra; // Constant Rate Assignment (CRA)
+      double m_cno; // The latest calculated value of C/N0
       UtInfo() { m_cra = 0;}
   };
 

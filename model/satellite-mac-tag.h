@@ -37,8 +37,11 @@ public:
 
   SatMacTag ();
   ~SatMacTag ();
-  void SetAddress (Address dest);
-  Address GetAddress (void) const;
+  void SetDestAddress (Address dest);
+  Address GetDestAddress (void) const;
+
+  void SetSourceAddress (Address source);
+  Address GetSourceAddress (void) const;
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -48,8 +51,8 @@ public:
   virtual void Print (std::ostream &os) const;
 
 private:
-  Address   m_macAddress;
-
+  Address   m_destAddress;
+  Address   m_sourceAddress;
 };
 
 } // namespace ns3

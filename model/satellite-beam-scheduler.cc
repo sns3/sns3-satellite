@@ -105,10 +105,33 @@ SatBeamScheduler::AddUt (Address utId, double cra)
 
   UtInfo utInfo;
   utInfo.m_cra = cra;
+  utInfo.m_cno = 0.0;
 
   std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair(utId, utInfo));
 
   NS_ASSERT (result.second == true);
+}
+
+void
+SatBeamScheduler::UpdateUtCno (Address utId, double cno)
+{
+  NS_LOG_FUNCTION (this << utId << cno);
+
+  // check that UT is added to this scheduler.
+  std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
+  NS_ASSERT (result != m_uts.end());
+
+  // TODO: Container for C/N0 values needed, now we just save latest value.
+  m_uts[utId].m_cno = cno;
+}
+
+double
+SatBeamScheduler::EstimateUtCno (Address utId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  // TODO: Estimation logic needed to implement. Now we just return the latest value calculated by UT.
+  return m_uts[utId].m_cno;
 }
 
 void
@@ -147,6 +170,9 @@ void SatBeamScheduler::ScheduleUts (SatTbtpHeader& header)
   NS_LOG_FUNCTION (this);
 
   bool UtsOrSlotsLeft = true;
+
+  // TODO: UT C/N0 estimation utilization missing still
+  // EstimateUtCno (m_currentUt->first);
 
   while (UtsOrSlotsLeft)
     {

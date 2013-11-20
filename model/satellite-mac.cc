@@ -142,7 +142,8 @@ SatMac::Send ( Ptr<Packet> packet, Address dest )
 
   // Add destination MAC address to the packet as a tag.
   SatMacTag tag;
-  tag.SetAddress (dest);
+  tag.SetDestAddress (dest);
+  tag.SetSourceAddress (m_macAddress);
   packet->AddPacketTag (tag);
 
   m_macTxTrace (packet);
@@ -179,11 +180,11 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
   SatMacTag msgTag;
   packet->RemovePacketTag (msgTag);
 
-  NS_LOG_LOGIC("Packet to " << msgTag.GetAddress());
+  NS_LOG_LOGIC("Packet to " << msgTag.GetDestAddress());
   NS_LOG_LOGIC("Receiver " << m_macAddress );
 
   // If the packet is intended for this receiver
-  Mac48Address addr = Mac48Address::ConvertFrom (msgTag.GetAddress());
+  Mac48Address addr = Mac48Address::ConvertFrom (msgTag.GetDestAddress());
 
   if ( addr == m_macAddress || addr.IsBroadcast() )
     {

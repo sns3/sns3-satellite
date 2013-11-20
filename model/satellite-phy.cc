@@ -44,7 +44,7 @@ SatPhy::SatPhy (void)
   NS_LOG_FUNCTION (this);
 }
 
-SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback cb)
+SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback recCb, SatPhy::CnoCallback cnoCb)
 {
   NS_LOG_FUNCTION (this << phyTx << phyRx << beamId);
   ObjectBase::ConstructSelf(AttributeConstructionList ());
@@ -52,7 +52,8 @@ SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPh
   m_phyTx = phyTx;
   m_phyRx = phyRx;
   m_beamId = beamId;
-  m_rxCallback = cb;
+  m_rxCallback = recCb;
+  m_cnoCallback = cnoCb;
 
   Initialize();
 
@@ -70,6 +71,11 @@ SatPhy::Initialize()
   m_phyRx->SetBeamId (m_beamId);
 
   m_phyRx->SetReceiveCallback ( MakeCallback (&SatPhy::Receive, this) );
+
+  if ( m_cnoCallback.IsNull() == false )
+    {
+      m_phyRx->SetCnoCallback( MakeCallback (&SatPhy::CnoInfo, this) );
+    }
 
   m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_db);
   m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_db);
@@ -126,6 +132,10 @@ SatPhy::GetTypeId (void)
     .AddAttribute ("ReceiveCb", "The receive callback for this phy.",
                    CallbackValue (),
                    MakeCallbackAccessor (&SatPhy::m_rxCallback),
+                   MakeCallbackChecker ())
+    .AddAttribute ("CnoCb", "The C/N0 info callback for this phy.",
+                   CallbackValue (),
+                   MakeCallbackAccessor (&SatPhy::m_cnoCallback),
                    MakeCallbackChecker ())
     .AddAttribute("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
                    DoubleValue(0.00),
@@ -262,5 +272,11 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
   m_rxCallback( rxParams->m_packet, rxParams);
 }
 
+void
+SatPhy::CnoInfo (uint32_t beamId, Address source, double cno)
+{
+  NS_LOG_FUNCTION (this << beamId << source << cno);
+  m_cnoCallback( beamId, source, cno);
+}
 
 } // namespace ns3

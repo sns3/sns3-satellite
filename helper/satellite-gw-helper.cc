@@ -189,7 +189,7 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -197,14 +197,14 @@ SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add (Install (*i, beamId, fCh, rCh));
+    devs.Add (Install (*i, beamId, fCh, rCh, ncc));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -259,12 +259,16 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetQueue (queue);
 
   // Attach the Mac layer receiver to Phy
-  SatPhy::ReceiveCallback cb = MakeCallback (&SatGwMac::Receive, mac);
+  SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
+
+  // Attach the NCC C/N0 update to Phy
+  SatPhy::CnoCallback cnoCb = MakeCallback (&SatNcc::UtCnoUpdated, ncc);
 
   m_phyFactory.Set ("PhyRx", PointerValue(phyRx));
   m_phyFactory.Set ("PhyTx", PointerValue(phyTx));
   m_phyFactory.Set ("BeamId",UintegerValue(beamId));
-  m_phyFactory.Set ("ReceiveCb", CallbackValue(cb));
+  m_phyFactory.Set ("ReceiveCb", CallbackValue(recCb));
+  m_phyFactory.Set ("CnoCb", CallbackValue(cnoCb));
 
   Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy>();
   phy->Initialize();
@@ -294,13 +298,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh )
+SatGwHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
 
   Ptr<Node> a = Names::Find<Node> (aName);
 
-  return Install (a, beamId, fCh, rCh);
+  return Install (a, beamId, fCh, rCh, ncc);
 }
 
 void

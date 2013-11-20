@@ -127,15 +127,28 @@ public:
   void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * \param packet the packet received
+   * \param the packet received
    */
   typedef Callback<void,Ptr<SatSignalParameters> > ReceiveCallback;
+
+  /**
+   * \param beam Id
+   * \param Id (address) of the source (sender)
+   * \param C/N0 value
+   */
+  typedef Callback<void, uint32_t, Address, double > CnoCallback;
 
   /**
    * Set the upper layer receive callback
    * \param cb receive callback funtion pointer
    */
    void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
+
+  /**
+   * Set C/N0 receiver
+   * \param cb receive callback funtion pointer
+   */
+  void SetCnoCallback (SatPhyRx::CnoCallback cb);
 
   /**
    * Set the device address owning this object

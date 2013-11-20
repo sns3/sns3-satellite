@@ -62,17 +62,28 @@ public:
    */
   ~SatNcc ();
 
-   /**
+  /**
    * Receive a packet from a beam.
    *
    * The SatNcc receives CR packets from its connected GWs (CRs sent by UT)
    * and takes CRs into account when making schedule decisions.
    *
-   * /param p       Pointer to the received CR packet.
-   * /param beamId  The id of the beam where packet is from.
+   * \param p       Pointer to the received CR packet.
+   * \param beamId  The id of the beam where packet is from.
    */
-
   void Receive (Ptr<Packet> p, uint32_t beamId);
+
+  /**
+   * Update C/N0 information from UT.
+   *
+   * The SatNcc receives C/N0 information from UTs
+   * to take into account when making schedule decisions.
+   *
+   * \param beamId  The id of the beam where C/N0 is from.
+   * \param utId  The id of the UT.
+   * \param cno Value of the C/N0.
+   */
+  void UtCnoUpdated (uint32_t beamId, Address utId, double cno);
 
   typedef SatBeamScheduler::SendCallback SendCallback;
 

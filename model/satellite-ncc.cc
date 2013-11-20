@@ -72,6 +72,14 @@ SatNcc::Receive (Ptr<Packet> packet, uint32_t beamId)
 }
 
 void
+SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, double cno)
+{
+  NS_LOG_FUNCTION (this << beamId << utId << cno);
+
+  m_beamSchedulers[beamId]->UpdateUtCno (utId, cno);
+}
+
+void
 SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq)
 {
   NS_LOG_FUNCTION (this << &cb);

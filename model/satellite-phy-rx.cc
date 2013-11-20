@@ -180,7 +180,21 @@ SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
       it != m_rxCarriers.end();
       ++it)
     {
-      (*it)->SetCb(cb);
+      (*it)->SetReceiveCb(cb);
+    }
+}
+
+void
+SatPhyRx::SetCnoCallback (SatPhyRx::CnoCallback cb)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (!m_rxCarriers.empty ());
+
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
+      it != m_rxCarriers.end();
+      ++it)
+    {
+      (*it)->SetCnoCb(cb);
     }
 }
 

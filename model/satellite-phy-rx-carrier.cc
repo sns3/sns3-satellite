@@ -136,10 +136,17 @@ std::ostream& operator<< (std::ostream& os, SatPhyRxCarrier::State s)
 }
 
 void
-SatPhyRxCarrier::SetCb (SatPhyRx::ReceiveCallback cb)
+SatPhyRxCarrier::SetReceiveCb (SatPhyRx::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this);
   m_rxCallback = cb;
+}
+
+void
+SatPhyRxCarrier::SetCnoCb (SatPhyRx::CnoCallback cb)
+{
+  NS_LOG_FUNCTION (this);
+  m_cnoCallback = cb;
 }
 
 void
@@ -168,7 +175,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           SatMacTag tag;
           rxParams->m_packet->PeekPacketTag (tag);
 
-          m_destAddress = Mac48Address::ConvertFrom (tag.GetAddress ());
+          m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+          m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
 
           // Check whether the packet is sent to our beam.
           // In case that RX mode is something else than transparent
@@ -231,6 +239,12 @@ SatPhyRxCarrier::EndRxData ()
 
   // Send packet upwards
   m_rxCallback ( m_rxParams );
+
+  if ( m_cnoCallback.IsNull() == false )
+    {
+      double cno = cSinr * m_rxBandwidth_Hz;
+      m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, cno);
+    }
 }
 
 void

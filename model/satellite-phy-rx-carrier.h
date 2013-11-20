@@ -86,7 +86,8 @@ public:
    *
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
-  void SetCb(SatPhyRx::ReceiveCallback cb);
+  void SetReceiveCb(SatPhyRx::ReceiveCallback cb);
+  void SetCnoCb(SatPhyRx::CnoCallback cb);
 
 private:
   static const double BoltzmannConstant = 1.3806488e-23;
@@ -161,9 +162,14 @@ private:
   double m_rxAciInterference; 
 
   /**
-    * The upper layer package receive callback.
-    */
+   * The upper layer package receive callback.
+   */
   SatPhyRx::ReceiveCallback m_rxCallback;
+
+  /**
+   * The upper layer C/N0 receive callback.
+   */
+  SatPhy::CnoCallback m_cnoCallback;
 
   /**
    * Address of the device owning this object.
@@ -174,6 +180,11 @@ private:
    * Destination address of the packet in m_rxParams.
    */
   Mac48Address m_destAddress;
+
+  /**
+   * Source address of the packet in m_rxParams.
+   */
+  Mac48Address m_sourceAddress;
 
   /**
    * Receiving mode.

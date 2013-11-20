@@ -25,6 +25,7 @@
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 #include "ns3/packet.h"
+#include "ns3/address.h"
 
 #include "satellite-signal-parameters.h"
 
@@ -45,17 +46,24 @@ class SatPhy : public Object
 public:
 
   /**
-   * \param packet the packet received
+   * \param  the packet received
    * \param  the id of the beam where packet is from
    */
   typedef Callback<void, Ptr<Packet>, Ptr<SatSignalParameters> > ReceiveCallback;
+
+  /**
+   * \param The id of the beam.
+   * \param The id (address) of the source
+   * \param C/N0 value
+   */
+  typedef Callback<void, uint32_t, Address, double> CnoCallback;
 
   /**
    * Default constructor
    */
   SatPhy (void);
 
-  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback cb);
+  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback receiveCb, SatPhy::CnoCallback cnoCb );
 
   virtual ~SatPhy ();
 
@@ -125,9 +133,17 @@ public:
   /**
    * Receives packets from lower layer (phyRx)
    *
-   * @param rxParams Packet reception parameters
+   * \param rxParams Packet reception parameters
    */
   void Receive (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   *
+   * \param beamId Beam id of C/N0 is received
+   * \param source Id (address) of the source (sender)
+   * \param cno Value of the C/N0
+   */
+  void CnoInfo (uint32_t beamId, Address source, double cno);
 
 private:
 
@@ -184,6 +200,11 @@ private:
    * The upper layer package receive callback.
    */
   SatPhy::ReceiveCallback m_rxCallback;
+
+  /**
+   * The C/N0 info callback
+   */
+  SatPhy::CnoCallback m_cnoCallback;
 
   /**
    * \brief Default fading value
