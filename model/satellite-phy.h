@@ -121,7 +121,7 @@ public:
    * \param p packet to be sent
    * \param rxParams Transmission parameters
    */
-  virtual void SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> rxParams);
+  virtual void SendPduWithParams (Ptr<Packet> p, Ptr<SatSignalParameters> rxParams);
 
   /**
    * Set the beamId this PHY is connected with

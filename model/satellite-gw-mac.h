@@ -26,7 +26,6 @@
 #include "ns3/address.h"
 #include "ns3/ptr.h"
 #include "ns3/node.h"
-#include "ns3/error-model.h"
 #include "ns3/callback.h"
 #include "ns3/packet.h"
 #include "ns3/traced-callback.h"
@@ -71,12 +70,6 @@ public:
    */
   void StartScheduling();
 
-  /**
-   * Schedules one sending opportunity. Called for every sending opportunity scheduler.
-   * /param Time transmitTime time when transmit possibility starts
-   */
-  void ScheduleTransmit ( Time transmitTime, uint32_t carrierId );
-
 private:
 
   SatGwMac& operator = (const SatGwMac &);
@@ -85,11 +78,11 @@ private:
   void DoDispose (void);
 
   /**
-   * Start new sending if there is packet in queue, otherwise schedules next send moment.
-   *
-   * The TransmitReady method is used internally to schedule sending of a packet out on the phy.
+   * Schedules the next transmission time.
+   * \param txTime Next Tx opportunity
+   * \param carrierId Carrier id for next transmission
    */
-  void TransmitReady (uint32_t carrierId);
+  void ScheduleNextTransmissionTime (Time txTime, uint32_t carrierId);
 
   /**
     * Start Sending a Packet Down the Wire.
@@ -101,7 +94,7 @@ private:
     * \param carrierId id of the carrier.
     * \returns true if success, false on failure
     */
-   bool TransmitStart (Ptr<Packet> p,  uint32_t carrierId);
+   void TransmitTime (uint32_t carrierId);
 
   /**
    * The interval that the Mac uses to throttle packet transmission

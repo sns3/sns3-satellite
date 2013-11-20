@@ -26,6 +26,7 @@
 #include "ns3/uinteger.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
+#include "../model/satellite-llc.h"
 #include "../model/satellite-gw-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-geo-net-device.h"
@@ -254,10 +255,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> ();
 
-  // Create and set queues for Mac modules
-  Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
-  mac->SetQueue (queue);
-
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
 
@@ -276,9 +273,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
-  // Attach the PHY layer to SatMac
-  mac->SetPhy (phy);
-
   // Attach the Mac layer to SatNetDevice
   dev->SetMac (mac);
 
@@ -286,8 +280,27 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   dev->SetAddress (Mac48Address::Allocate ());
   phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
-  // Attach the device receive callback to SatMac
-  mac->SetReceiveCallback (MakeCallback (&SatNetDevice::ReceiveMac, dev));
+  // Create Logical Link Control (LLC) layer
+  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
+
+  // Create and set queues for Mac modules
+  Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
+  llc->SetQueue (queue);
+
+  // Attach the transmit callback to PHY
+  mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+
+  // Attach the device receive callback to SatLlc
+  mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
+
+  // Attach the LLC Tx opportunity callback to SatMac
+  mac->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
+
+  // Attach the device receive callback to SatNetDevice
+  llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
+
+  // Attach the LLC layer to SatNetDevice
+  dev->SetLlc (llc);
 
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);

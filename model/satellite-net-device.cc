@@ -32,6 +32,7 @@
 #include "satellite-net-device.h"
 #include "satellite-phy.h"
 #include "satellite-mac.h"
+#include "satellite-llc.h"
 #include "satellite-channel.h"
 
 
@@ -80,7 +81,7 @@ SatNetDevice::SatNetDevice ()
 }
 
 void
-SatNetDevice::ReceiveMac (Ptr<const Packet> packet)
+SatNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid());
@@ -100,6 +101,14 @@ SatNetDevice::SetMac (Ptr<SatMac> mac)
   NS_LOG_FUNCTION (this << mac);
   m_mac = mac;
 }
+
+void
+SatNetDevice::SetLlc (Ptr<SatLlc> llc)
+{
+  NS_LOG_FUNCTION (this << llc);
+  m_llc = llc;
+}
+
 void
 SatNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 {
@@ -131,6 +140,14 @@ SatNetDevice::GetMac (void) const
   NS_LOG_FUNCTION (this);
   return m_mac;
 }
+
+Ptr<SatLlc>
+SatNetDevice::GetLlc (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_llc;
+}
+
 void
 SatNetDevice::SetAddress (Address address)
 {
@@ -228,7 +245,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
   NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid() << ", dest: " << dest);
 
-  m_mac->Send (packet, dest);
+  m_llc->Enque (packet, dest);
 
   return true;
 }
@@ -237,7 +254,7 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
 
-  m_mac->Send (packet, dest);
+  m_llc->Enque (packet, dest);
 
   return true;
 }

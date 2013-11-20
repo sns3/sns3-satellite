@@ -82,7 +82,7 @@ SatGeoNetDevice::ReceiveUser (Ptr<Packet> packet, Ptr<SatSignalParameters> rxPar
 {
   NS_LOG_FUNCTION (this << packet << rxParams);
   NS_LOG_LOGIC (this << " receiving a packet at the satellite from user link");
-  m_feederPhy[rxParams->m_beamId]->SendPdu (packet, rxParams);
+  m_feederPhy[rxParams->m_beamId]->SendPduWithParams (packet, rxParams);
 }
 
 void
@@ -90,7 +90,7 @@ SatGeoNetDevice::ReceiveFeeder (Ptr<Packet> packet, Ptr<SatSignalParameters> rxP
 {
   NS_LOG_FUNCTION (this << packet << rxParams);
   NS_LOG_LOGIC (this << " receiving a packet at the satellite from feeder link");
-  m_userPhy[rxParams->m_beamId]->SendPdu (packet, rxParams);
+  m_userPhy[rxParams->m_beamId]->SendPduWithParams (packet, rxParams);
 }
 
 void

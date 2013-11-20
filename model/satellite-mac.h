@@ -25,11 +25,12 @@
 
 #include "ns3/address.h"
 #include "ns3/ptr.h"
-#include "ns3/queue.h"
 #include "ns3/callback.h"
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
-#include "satellite-phy.h"
+
+#include "satellite-signal-parameters.h"
+
 
 namespace ns3 {
 
@@ -63,70 +64,55 @@ public:
   ~SatMac ();
 
   /**
-   * Attach the Phy object to SatMac.
-   *
-   * \param phy Ptr to the attached phy object.
+   * Send packet to lower layer by using a callback
+   * \param packet Packet to be sent.
    */
-  bool SetPhy (Ptr<SatPhy> phy);
-
-  /**
-   * Get a copy of the attached Phy.
-   *
-   * \returns Ptr to the phy object.
-   */
-  Ptr<SatPhy> GetPhy (void) const;
-
-  /**
-   * Attach the a Net Device to SatMac.
-   *
-   * \param phy Ptr to the attached Net Device object.
-   */
-  void SetQueue (Ptr<Queue> queue);
-
-  /**
-   * Get a copy of the attached Queue.
-   *
-   * @returns Ptr to the queue.
-   */
-  Ptr<Queue> GetQueue (void) const;
-
-  /**
-    * \param packet packet sent from above down to SatMac
-    *
-    *  Called from higher layer to send packet into Mac layer
-    *  to the specified destination Address
-    *
-    * \return whether the Send operation succeeded
-    */
-  virtual bool Send (Ptr<Packet> packet, Address dest);
+  void SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration);
 
   /**
    * Receive packet from lower layer.
    *
    * \param packet Pointer to packet received.
-   * \param
    */
   virtual void Receive (Ptr<Packet> p, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
-    * \param packet the packet received
+   * Callback to send packet to lower layer.
+    * \param Ptr<Packet> the packet received
+    * \param uint32_t carrierId
+    * \param  Time duration
     */
-  typedef Callback<void,Ptr<const Packet> > ReceiveCallback;
+  typedef Callback<void, Ptr<Packet>, uint32_t, Time> TransmitCallback;
 
   /**
+   * Callback to receive packet by upper layer.
+    * \param packet the packet received
+    */
+  typedef Callback<void, Ptr<Packet> > ReceiveCallback;
+
+  /**
+   * Method to set transmit callback.
+    * \param cb callback to invoke whenever a packet needs to be sent
+    * to lower layer (PHY)
+    */
+  void SetTransmitCallback (SatMac::TransmitCallback cb);
+
+  /**
+   * Method to set receive callback.
     * \param cb callback to invoke whenever a packet has been received and must
     *        be forwarded to the higher layers.
-    *
     */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
   /**
+   * Callback to notify upper layer about Tx opportunity.
    * \param uint32_t payload size in bytes
    * \return packet Packet to be transmitted to PHY
    */
   typedef Callback< Ptr<Packet>, uint32_t > TxOpportunityCallback;
 
   /**
+   * Method to set Tx opportunity callback.
     * \param cb callback to invoke whenever a packet has been received and must
     *        be forwarded to the higher layers.
     *
@@ -138,11 +124,6 @@ public:
    */
   void SetAddress (Mac48Address macAddress);
 
-  /**
-   * Inline function to check whether there are packets in a queue
-   * \return boolean identifying whether there was packets in a queue
-   */
-  inline bool PacketInQueue() { return (bool)(m_queue->GetNPackets() > 0);}
 
 private:
   SatMac& operator = (const SatMac &);
@@ -153,22 +134,15 @@ protected:
 
   void DoDispose (void);
 
-  /**
-   * The Phy object to which this SatMac has been attached.
-   */
-  Ptr<SatPhy> m_phy;
-
-  /**
-   * The Queue which this SatMac uses as a packet source.
-   * @see class Queue
-   * @see class DropTailQueue
-   */
-  Ptr<Queue> m_queue;
-
    /**
     * MAC address of the this mac instance
     */
    Mac48Address m_macAddress;
+
+   /**
+    * The lower layer packet transmit callback.
+    */
+   SatMac::TransmitCallback m_txCallback;
 
   /**
    * The upper layer package receive callback.
@@ -180,7 +154,7 @@ protected:
    * Returns a packet
    * Attributes: payload in bytes
    */
-  Callback<Ptr<Packet>, uint32_t> m_txOpportunityCallback;
+  SatMac::TxOpportunityCallback m_txOpportunityCallback;
 
   /**
    * The trace source fired when packets come into the "top" of the device
@@ -200,7 +174,7 @@ protected:
 
   /**
    * The trace source fired for packets successfully received by the device
-   * immediately before being forwarded up to higher layers (at the L2/L3 
+   * immediately before being forwarded up to higher layers (at the L2/L3
    * transition).  This is a promiscuous trace (which doesn't mean a lot here
    * in the point-to-point device).
    *
@@ -210,8 +184,8 @@ protected:
 
   /**
    * The trace source fired for packets successfully received by the device
-   * immediately before being forwarded up to higher layers (at the L2/L3 
-   * transition).  This is a non-promiscuous trace (which doesn't mean a lot 
+   * immediately before being forwarded up to higher layers (at the L2/L3
+   * transition).  This is a non-promiscuous trace (which doesn't mean a lot
    * here in the point-to-point device).
    *
    * \see class CallBackTraceSource
@@ -220,7 +194,7 @@ protected:
 
   /**
    * The trace source fired for packets successfully received by the device
-   * but are dropped before being forwarded up to higher layers (at the L2/L3 
+   * but are dropped before being forwarded up to higher layers (at the L2/L3
    * transition).
    *
    * \see class CallBackTraceSource
@@ -228,19 +202,19 @@ protected:
   TracedCallback<Ptr<const Packet> > m_macRxDropTrace;
 
   /**
-   * A trace source that emulates a non-promiscuous protocol sniffer connected 
-   * to the device.  Unlike your average everyday sniffer, this trace source 
+   * A trace source that emulates a non-promiscuous protocol sniffer connected
+   * to the device.  Unlike your average everyday sniffer, this trace source
    * will not fire on PACKET_OTHERHOST events.
    *
    * On the transmit size, this trace hook will fire after a packet is dequeued
    * from the device queue for transmission.  In Linux, for example, this would
-   * correspond to the point just before a device hard_start_xmit where 
-   * dev_queue_xmit_nit is called to dispatch the packet to the PF_PACKET 
+   * correspond to the point just before a device hard_start_xmit where
+   * dev_queue_xmit_nit is called to dispatch the packet to the PF_PACKET
    * ETH_P_ALL handlers.
    *
    * On the receive side, this trace hook will fire when a packet is received,
-   * just before the receive callback is executed.  In Linux, for example, 
-   * this would correspond to the point at which the packet is dispatched to 
+   * just before the receive callback is executed.  In Linux, for example,
+   * this would correspond to the point at which the packet is dispatched to
    * packet sniffers in netif_receive_skb.
    *
    * \see class CallBackTraceSource
@@ -254,13 +228,13 @@ protected:
    *
    * On the transmit size, this trace hook will fire after a packet is dequeued
    * from the device queue for transmission.  In Linux, for example, this would
-   * correspond to the point just before a device hard_start_xmit where 
-   * dev_queue_xmit_nit is called to dispatch the packet to the PF_PACKET 
+   * correspond to the point just before a device hard_start_xmit where
+   * dev_queue_xmit_nit is called to dispatch the packet to the PF_PACKET
    * ETH_P_ALL handlers.
    *
    * On the receive side, this trace hook will fire when a packet is received,
-   * just before the receive callback is executed.  In Linux, for example, 
-   * this would correspond to the point at which the packet is dispatched to 
+   * just before the receive callback is executed.  In Linux, for example,
+   * this would correspond to the point at which the packet is dispatched to
    * packet sniffers in netif_receive_skb.
    *
    * \see class CallBackTraceSource

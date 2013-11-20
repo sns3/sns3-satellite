@@ -50,11 +50,6 @@ SatUtMac::GetTypeId (void)
                     PointerValue (),
                     MakePointerAccessor (&SatUtMac::m_superframeSeq),
                     MakePointerChecker<SatSuperframeSeq> ())
-    .AddAttribute ("Interval",
-                   "The time to wait between packet (frame) transmissions",
-                   TimeValue (Seconds (0.001)),
-                   MakeTimeAccessor (&SatUtMac::m_tInterval),
-                   MakeTimeChecker ())
     .AddAttribute ("Cra",
                    "Constant Rate Assignment value for this UT Mac.",
                    DoubleValue (128),
@@ -99,20 +94,6 @@ SatUtMac::DoDispose (void)
   SatMac::DoDispose ();
 }
 
-void
-SatUtMac::StartScheduling()
-{
-  if ( m_tInterval.GetDouble() > 0 )
-    {
-      ScheduleTransmit (m_tInterval, 0);
-    }
-}
-
-void
-SatUtMac::ScheduleTransmit(Time transmitTime, uint32_t carrierId)
-{
-  Simulator::Schedule (transmitTime, &SatUtMac::TransmitReady, this, carrierId);
-}
 
 void
 SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
@@ -146,48 +127,35 @@ SatUtMac::ScheduleTimeSlots (SatTbtpHeader * tbtp)
           Time slotStartTime = startTime + Seconds (timeSlotConf->GetStartTime_s ());
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, (*it)->GetFrameId (), timeSlotConf->GetCarrierId () );
 
-          ScheduleTransmit (slotStartTime, carrierId);
+          ScheduleTxOpportunity (slotStartTime, carrierId);
         }
     }
 }
 
-bool
-SatUtMac::TransmitStart (Ptr<Packet> p, uint32_t carrierId)
+void
+SatUtMac::ScheduleTxOpportunity(Time transmitTime, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << p);
-  NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
-
-  /* TODO: Now we are using only a static (time slot) duration
-   * for packet transmissions and receptions.
-   * The (time slot) durations for packet transmissions should be coming from:
-   * - TBTP in return link
-   * - GW scheduler in the forward link
-   */
-  Time DURATION (MicroSeconds(20));
-  m_phy->SendPdu (p, carrierId, DURATION);
-
-  return true;
+  Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, carrierId);
 }
 
 void
-SatUtMac::TransmitReady (uint32_t carrierId)
+SatUtMac::TransmitTime (uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this);
-  //
-  // This function is called to when we're all done transmitting a packet.
-  // We try and pull another packet off of the transmit queue.  If the queue
-  // is empty, we are done, otherwise we need to start transmitting the
-  // next packet.
+  NS_LOG_FUNCTION (this << carrierId);
 
-  if ( PacketInQueue() )
-    {
-      Ptr<Packet> p = m_queue->Dequeue();
-      TransmitStart(p, carrierId);
-    }
+  /* TODO: The scheduling information should be acquired from the TBTP:
+   * - waveform: payload, duration
+   * - carrierId
+   * - RC_index
+   */
 
-  if ( m_tInterval.GetDouble() > 0)
+  uint32_t txBytes (30);
+  Ptr<Packet> p = m_txOpportunityCallback (txBytes);
+
+  if ( p )
     {
-      Simulator::Schedule (m_tInterval, &SatUtMac::TransmitReady, this, 0);
+      Time DURATION (MicroSeconds(20));
+      SendPacket (p, carrierId, DURATION);
     }
 }
 

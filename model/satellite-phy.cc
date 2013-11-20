@@ -242,7 +242,7 @@ SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
 }
 
 void
-SatPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
+SatPhy::SendPduWithParams (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
 {
   NS_LOG_FUNCTION (this << p << txParams);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);

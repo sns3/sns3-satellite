@@ -21,14 +21,12 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
-#include "ns3/error-model.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/uinteger.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 
 #include "satellite-mac-tag.h"
-#include "satellite-phy.h"
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-gw-mac.h"
@@ -67,15 +65,10 @@ SatGwMac::~SatGwMac ()
 
 void SatGwMac::StartScheduling()
 {
-  if ( m_tInterval.GetDouble() > 0 )
-    {
-      ScheduleTransmit (m_tInterval, 0);
-    }
-}
+  NS_ASSERT (m_tInterval.GetDouble() > 0.0);
 
-void SatGwMac::ScheduleTransmit(Time transmitTime, uint32_t carrierId)
-{
-  Simulator::Schedule (transmitTime, &SatGwMac::TransmitReady, this, carrierId);
+  // Note, carrierId currently set by default to 0
+  ScheduleNextTransmissionTime (m_tInterval, 0);
 }
 
 void
@@ -85,44 +78,40 @@ SatGwMac::DoDispose ()
   SatMac::DoDispose ();
 }
 
-bool
-SatGwMac::TransmitStart (Ptr<Packet> p, uint32_t carrierId)
+void
+SatGwMac::ScheduleNextTransmissionTime (Time txTime, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << p);
-  NS_LOG_LOGIC (this << " transmit packet UID " << p->GetUid ());
-
-  /* TODO: Now we are using only a static (time slot) duration
-   * for packet transmissions and receptions.
-   * The (time slot) durations for packet transmissions should be coming from:
-   * - TBTP in return link
-   * - GW scheduler in the forward link
-   */
-  Time DURATION (MicroSeconds(20));
-  m_phy->SendPdu (p, carrierId, DURATION);
-
-  return true;
+  Simulator::Schedule (txTime, &SatGwMac::TransmitTime, this, 0);
 }
 
 void
-SatGwMac::TransmitReady (uint32_t carrierId)
+SatGwMac::TransmitTime (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
-  //
-  // This function is called to when we're all done transmitting a packet.
-  // We try and pull another packet off of the transmit queue.  If the queue
-  // is empty, we are done, otherwise we need to start transmitting the
-  // next packet.
 
-  if ( PacketInQueue() )
+  // TODO: In forward link txBytes should be either
+  // - Short BBFrame = 16200 bits = 2025 Bytes
+  // - Long BBFrame = 64800 bits = 8100 Bytes
+  // This should be decided on-the-fly based on buffered bytes
+  // in LLC layer.
+  uint32_t txBytes (8100);
+  Ptr<Packet> p = m_txOpportunityCallback (txBytes);
+
+  if ( p )
     {
-      Ptr<Packet> p = m_queue->Dequeue();
-      TransmitStart(p, carrierId);
+      /* TODO: The carrierId should be acquired from somewhere. Now
+       * we assume only one carrier in forward link, so it is safe to use 0.
+       * The duration should be calculated based on BBFrame length and
+       * used MODCOD.
+       */
+      Time DURATION (MicroSeconds(20));
+      SendPacket (p, carrierId, DURATION);
     }
 
-  if ( m_tInterval.GetDouble() > 0)
-    {
-      Simulator::Schedule (m_tInterval, &SatGwMac::TransmitReady, this, 0);
-    }
+  // TODO: The next TransmitTime should be scheduled to be when just transmitted
+  // packet transmission ends. This is dependent on the used BBFrame length and
+  // used MODCOD.
+  ScheduleNextTransmissionTime (m_tInterval, 0);
 }
 
 } // namespace ns3

@@ -33,6 +33,7 @@ namespace ns3 {
 
 class SatPhy;
 class SatMac;
+class SatLlc;
 class Node;
 class ErrorModel;
 class VirtualChannel;
@@ -57,7 +58,7 @@ public:
    * Receive the packet from mac layer
    * \param packet Pointer to the packet to be received.
    */
-  void ReceiveMac (Ptr<const Packet> packet);
+  void Receive (Ptr<const Packet> packet);
 
   /*
    * Attach the SatPhy physical layer to this netdevice.
@@ -84,6 +85,19 @@ public:
     * \returns Ptr to the SatMac object.
     */
    Ptr<SatMac> GetMac (void) const;
+
+   /**
+    * Attach the SatLlc llc layer to this netdevice.
+    * @param llc SatLlc pointer to be added
+    */
+    void SetLlc (Ptr<SatLlc> llc);
+
+    /**
+     * Get a copy of the attached Llc.
+     *
+     * \returns Ptr to the SatLlc object.
+     */
+    Ptr<SatLlc> GetLlc (void) const;
 
   /**
    * Attach a receive ErrorModel to the SatNetDevice.
@@ -126,6 +140,7 @@ protected:
 private:
   Ptr<SatPhy> m_phy;
   Ptr<SatMac> m_mac;
+  Ptr<SatLlc> m_llc;
   NetDevice::ReceiveCallback m_rxCallback;
   NetDevice::PromiscReceiveCallback m_promiscCallback;
   Ptr<Node> m_node;

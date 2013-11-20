@@ -19,7 +19,6 @@
  */
 
 #include "ns3/log.h"
-#include "ns3/queue.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "ns3/trace-source-accessor.h"
@@ -27,7 +26,6 @@
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "satellite-mac.h"
-#include "satellite-phy.h"
 #include "satellite-mac-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatMac");
@@ -42,32 +40,27 @@ SatMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatMac")
     .SetParent<Object> ()
     .AddConstructor<SatMac> ()
-    .AddAttribute ("TxQueue",
-                   "A queue to use as the transmit queue in the device.",
-                   PointerValue (),
-                   MakePointerAccessor (&SatMac::m_queue),
-                   MakePointerChecker<Queue> ())
     //
     // Trace sources at the "top" of the net device, where packets transition
     // to/from higher layers.
     //
-    .AddTraceSource ("MacTx", 
+    .AddTraceSource ("MacTx",
                      "Trace source indicating a packet has arrived for transmission by this device",
                      MakeTraceSourceAccessor (&SatMac::m_macTxTrace))
-    .AddTraceSource ("MacTxDrop", 
+    .AddTraceSource ("MacTxDrop",
                      "Trace source indicating a packet has been dropped by the device before transmission",
                      MakeTraceSourceAccessor (&SatMac::m_macTxDropTrace))
-    .AddTraceSource ("MacPromiscRx", 
+    .AddTraceSource ("MacPromiscRx",
                      "A packet has been received by this device, has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  This is a promiscuous trace,",
                      MakeTraceSourceAccessor (&SatMac::m_macPromiscRxTrace))
-    .AddTraceSource ("MacRx", 
+    .AddTraceSource ("MacRx",
                      "A packet has been received by this device, has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  This is a non-promiscuous trace,",
                      MakeTraceSourceAccessor (&SatMac::m_macRxTrace))
 #if 0
     // Not currently implemented for this device
-    .AddTraceSource ("MacRxDrop", 
+    .AddTraceSource ("MacRxDrop",
                      "Trace source indicating a packet was dropped before being forwarded up the stack",
                      MakeTraceSourceAccessor (&SatMac::m_macRxDropTrace))
 #endif
@@ -77,7 +70,6 @@ SatMac::GetTypeId (void)
 }
 
 SatMac::SatMac ()
-  : m_phy(0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -91,9 +83,6 @@ void
 SatMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_phy = 0;
-  m_queue->DequeueAll();
-  m_queue = 0;
   Object::DoDispose ();
 }
 
@@ -103,63 +92,20 @@ void SatMac::SetAddress( Mac48Address macAddress )
   m_macAddress = macAddress;
 }
 
-bool
-SatMac::SetPhy (Ptr<SatPhy> phy)
-{
-  NS_LOG_FUNCTION (this << phy);
-  m_phy = phy;
-  return true;
-}
-
-Ptr<SatPhy>
-SatMac::GetPhy (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_phy;
-}
-
 void
-SatMac::SetQueue (Ptr<Queue> queue)
+SatMac::SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration)
 {
-  NS_LOG_FUNCTION (this << queue);
-  m_queue = queue;
-}
-
-Ptr<Queue>
-SatMac::GetQueue (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_queue;
-}
-
-bool
-SatMac::Send ( Ptr<Packet> packet, Address dest )
-{
-  NS_LOG_FUNCTION (this << packet << dest);
-  NS_LOG_LOGIC ("p=" << packet );
-  NS_LOG_LOGIC ("dest=" << dest );
-  NS_LOG_LOGIC ("UID is " << packet->GetUid ());
-
-  // Add destination MAC address to the packet as a tag.
+  // TODO: Think again the process of setting both destination
+  // and source MAC addresses to the packet
   SatMacTag tag;
-  tag.SetDestAddress (dest);
+  packet->RemovePacketTag (tag);
+
+  // Insert a source mac tag to the packet
   tag.SetSourceAddress (m_macAddress);
   packet->AddPacketTag (tag);
 
-  m_macTxTrace (packet);
-
-  if (m_queue->Enqueue (packet) == false)
-    {
-       // Enqueue may fail (overflow)
-      m_macTxDropTrace (packet);
-      return false;
-    }
-  else
-    {
-      return true;
-    }
-
-  return true;
+  // Use call back to send packet to lower layer
+  m_txCallback (packet, carrierId, duration);
 }
 
 void
@@ -188,6 +134,7 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 
   if ( addr == m_macAddress || addr.IsBroadcast() )
     {
+      // Use callback to forward the packet to higher layer
       m_rxCallback (packet);
     }
   else
@@ -197,10 +144,25 @@ SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 }
 
 void
+SatMac::SetTransmitCallback (SatMac::TransmitCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_txCallback = cb;
+}
+
+void
 SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_rxCallback = cb;
 }
+
+void
+SatMac::SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_txOpportunityCallback = cb;
+}
+
 
 } // namespace ns3
