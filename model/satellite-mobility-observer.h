@@ -82,9 +82,9 @@ public:
   double GetElevationAngle (void);
 
   /**
-   * Get elevation angle.
+   * Get velocity of own movement (speed).
    *
-   * @return the current elevation angle as degrees.
+   * @return the current velocity.
    */
   double GetVelocity (void);
 

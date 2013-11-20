@@ -184,6 +184,9 @@ SatMobilityObserver::GetVelocity (void)
 {
   NS_LOG_FUNCTION (this);
 
+  Vector velocity = m_ownMobility->GetVelocity();
+  m_velocity = std::sqrt( ( velocity.x * velocity.x ) + ( velocity.y * velocity.y ) + ( velocity.z * velocity.z ) );
+
   return m_velocity;
 }
 
