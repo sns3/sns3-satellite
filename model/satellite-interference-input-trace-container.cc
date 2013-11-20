@@ -63,6 +63,7 @@ SatInterferenceInputTraceContainer::Reset ()
     {
       m_container.clear();
     }
+  m_index = 0;
 }
 
 void
