@@ -26,8 +26,9 @@
 namespace ns3 {
 
 /**
- * \brief A configuration class for Loo's model
+ * \ingroup satellite
  *
+ * \brief A configuration class for Loo's model
  */
 class SatLooConf : public SatBaseFaderConf
 {

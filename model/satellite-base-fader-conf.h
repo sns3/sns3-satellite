@@ -30,7 +30,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for fading
+ * \brief Base class for fader configuration classes
  */
 class SatBaseFaderConf : public Object
 {

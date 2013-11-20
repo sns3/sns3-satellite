@@ -31,7 +31,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for fading
+ * \brief Base class for fading models
  */
 class SatBaseFading : public Object
 {

@@ -34,7 +34,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Markov fading model container
+ * \brief Container for Markov model
  */
 class SatMarkovContainer : public SatBaseFading
 {

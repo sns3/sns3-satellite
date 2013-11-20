@@ -30,20 +30,35 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for interference trace container
+ * \brief Class for interference input trace container
  */
 class SatInterferenceInputTraceContainer : public SatBaseTraceContainer
 {
 public:
 
+  /**
+   * \brief Default Rx power density index
+   */
   static const uint32_t DEFAULT_RX_POWER_DENSITY_INDEX = 1;
 
+  /**
+   * \brief Default interference density index
+   */
   static const uint32_t DEFAULT_INTF_DENSITY_INDEX = 2;
 
+  /**
+   * \brief Default number of columns
+   */
   static const uint32_t DEFAULT_NUMBER_OF_COLUMNS = 3;
 
+  /**
+   * \brief typedef for map key
+   */
   typedef std::pair<Address,SatEnums::ChannelType_t> key_t;
 
+  /**
+   * \brief typedef for map of containers
+   */
   typedef std::map <key_t, Ptr<SatInputFileStreamDoubleContainer> > container_t;
 
   /**
@@ -67,25 +82,47 @@ public:
    */
   void DoDispose ();
 
+  /**
+   * \brief Function for adding the node to the map
+   * \param key key
+   */
   void AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
 
+  /**
+   * \brief Function for finding the container matching the key
+   * \param key key
+   * \return matching container
+   */
   Ptr<SatInputFileStreamDoubleContainer> FindNode (key_t key);
 
+  /**
+   * \brief Function for getting the interference density
+   * \param key key
+   * \return Interference density
+   */
   double GetInterferenceDensity (key_t key);
 
+  /**
+   * \brief Function for getting the Rx power density
+   * \param key key
+   * \return Rx power density
+   */
   double GetRxPowerDensity (key_t key);
 
 private:
 
+  /**
+   * \brief Function for resetting the variables
+   */
   void Reset ();
 
   /**
-   *
+   * \brief Map for containers
    */
   container_t m_container;
 
   /**
-   *
+   * \brief Current index number
    */
   uint32_t m_index;
 };

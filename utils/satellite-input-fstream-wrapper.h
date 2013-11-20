@@ -27,8 +27,8 @@
 
 namespace ns3 {
 
-/*
- * @brief A class encapsulating an STL input stream.
+/**
+ * \brief A class encapsulating an STL input stream.
  *
  * This class wraps a pointer to a C++ std::ifstream and provides
  * reference counting of the object.
@@ -41,14 +41,14 @@ class SatInputFileStreamWrapper : public SimpleRefCount<SatInputFileStreamWrappe
 public:
 
   /**
-   * \brief
-   * \param filename
-   * \param filemode
+   * \brief Constructor
+   * \param filename file name
+   * \param filemode file mode
    */
   SatInputFileStreamWrapper (std::string filename, std::ios::openmode filemode);
 
   /**
-   * \brief
+   * \brief Destructor
    */
   ~SatInputFileStreamWrapper ();
 
@@ -60,12 +60,12 @@ public:
 
 private:
   /**
-   * \brief
+   * \brief Input file stream
    */
   std::ifstream *m_ifstream;
 
   /**
-   * \brief
+   * \brief Is the stream destroyable
    */
   bool m_destroyable;
 };

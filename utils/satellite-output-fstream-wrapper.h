@@ -27,8 +27,8 @@
 
 namespace ns3 {
 
-/*
- * @brief A class encapsulating an STL output stream.
+/**
+ * \brief A class encapsulating an STL output stream.
  *
  * This class wraps a pointer to a C++ std::ofstream and provides
  * reference counting of the object.
@@ -40,14 +40,14 @@ class SatOutputFileStreamWrapper : public SimpleRefCount<SatOutputFileStreamWrap
 {
 public:
   /**
-   * \brief
-   * \param filename
-   * \param filemode
+   * \brief Constructor
+   * \param filename file name
+   * \param filemode file mode
    */
   SatOutputFileStreamWrapper (std::string filename, std::ios::openmode filemode);
 
   /**
-   * \brief
+   * \brief Destructor
    */
   ~SatOutputFileStreamWrapper ();
 
@@ -59,12 +59,12 @@ public:
 
 private:
   /**
-   * \brief
+   * \brief Output file stream
    */
   std::ofstream *m_ofstream;
 
   /**
-   * \brief
+   * \brief Is the stream destroyable
    */
   bool m_destroyable;
 };

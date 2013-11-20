@@ -34,8 +34,9 @@
 namespace ns3 {
 
 /**
- * \brief A configuration class for three state Markov model
+ * \ingroup satellite
  *
+ * \brief A configuration class for three state Markov model
  */
 class SatMarkovConf : public Object
 {

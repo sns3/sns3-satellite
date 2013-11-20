@@ -27,47 +27,50 @@
 
 namespace ns3 {
 
+/**
+ * \ingroup satellite
+ *
+ * \brief Class for input file stream container for double values
+ */
 class SatInputFileStreamDoubleContainer : public Object
 {
 public:
 
   /**
-   * \brief
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   * \brief
-   * \param filename
-   * \param filemode
-   * \param valuesInRow
+   * \brief Constructor
+   * \param filename file name
+   * \param filemode file mode
+   * \param valuesInRow number of values in a row
    */
   SatInputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
   /**
-   * \brief
+   * \brief Constructor
    */
   SatInputFileStreamDoubleContainer ();
 
   /**
-   * \brief
+   * \brief Destructor
    */
   ~SatInputFileStreamDoubleContainer ();
 
   /**
-   * \brief
-   * \param filename
-   * \param filemode
-   * \param valuesInRow
+   * \brief Function for updating the container
+   * \param filename file name
+   * \param filemode file mode
+   * \param valuesInRow number of values in a row
    */
   void UpdateContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
   /**
-   * \brief
-   * \param comparisonValue
-   * \param column
-   * \return
+   * \brief Function for locating the next closest time sample and returning the values related to it
+   * \return matching values
    */
   std::vector<double> ProceedToNextClosestTimeSample ();
 
@@ -79,77 +82,77 @@ public:
 private:
 
   /**
-   * \brief
+   * \brief Function for resetting the variables
    */
   void Reset ();
 
   /**
-   * \brief
+   * \brief Function for resetting the stream
    */
   void ResetStream ();
 
   /**
-   * \brief
+   * \brief Function for clearing the container
    */
   void ClearContainer ();
 
   /**
-   *
-   * \param lastValidPosition
-   * \param column
-   * \param shiftValue
-   * \param comparisonValue
+   * \brief Function for locating the next closest value. This locator loops the samples if the container does not have enough samples.
+   * \param lastValidPosition position of last matching value
+   * \param column column to search
+   * \param shiftValue value to shift the time if needed
+   * \param comparisonValue value which next closest match to find
    * \return
    */
   bool FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue);
 
   /**
-   * \brief
+   * \brief Pointer to input file stream wrapper
    */
   SatInputFileStreamWrapper* m_inputFileStreamWrapper;
 
   /**
-   * \brief
+   * \brief Pointer to input file stream
    */
   std::ifstream* m_inputFileStream;
 
   /**
-   * \brief
+   * \brief Container for value rows
    */
   std::vector<std::vector<double> > m_container;
 
   /**
-   * \brief
+   * \brief File name
    */
   std::string m_fileName;
 
   /**
-   * \brief
+   * \brief File mode
    */
   std::ios::openmode m_fileMode;
 
   /**
-   * \brief
+   * \brief Number of values in a row
    */
   uint32_t m_valuesInRow;
 
   /**
-   * \brief
+   * \brief Current position
    */
   uint32_t m_currentPosition;
 
   /**
-   * \brief
+   * \brief Number for how many times the available samples have been looped over
    */
   uint32_t m_numOfPasses;
 
   /**
-   * \brief
+   * \brief Shift value for sample time
    */
   double m_shiftValue;
 
   /**
-   * \brief
+   * \brief Index for column which contains time information
    */
   uint32_t m_timeColumn;
 };

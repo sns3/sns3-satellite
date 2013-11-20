@@ -27,41 +27,46 @@
 
 namespace ns3 {
 
+/**
+ * \ingroup satellite
+ *
+ * \brief Class for output file stream container for double values
+ */
 class SatOutputFileStreamDoubleContainer : public Object
 {
 public:
 
   /**
-   * \brief
-   * \return
+   * \brief NS-3 function for type id
+   * \return type id
    */
   static TypeId GetTypeId (void);
 
   /**
-   * \brief
-   * \param filename
-   * \param filemode
-   * \param valuesInRow
+   * \brief Constructor
+   * \param filename file name
+   * \param filemode file mode
+   * \param valuesInRow number of values in a row
    */
   SatOutputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
   /**
-   * \brief
+   * \brief Constructor
    */
   SatOutputFileStreamDoubleContainer ();
 
   /**
-   * \brief
+   * \brief Destructor
    */
   ~SatOutputFileStreamDoubleContainer ();
 
   /**
-   * \brief
+   * \brief Function for writing the container contents to file
    */
   void WriteContainerToFile ();
 
   /**
-   * \brief
+   * \brief Function for adding the values to container
    */
   void AddToContainer (std::vector<double> newItem);
 
@@ -72,54 +77,53 @@ public:
 
 private:
 
-
   /**
-   * \brief
+   * \brief Function for resetting the variables
    */
   void Reset ();
 
   /**
-   * \brief
+   * \brief Function for resetting the stream
    */
   void ResetStream ();
 
   /**
-   * \brief
+   * \brief Function for clearing the container
    */
   void ClearContainer ();
 
   /**
-   * \brief
+   * \brief Function for opening the output file stream
    */
   void OpenStream ();
 
   /**
-   * \brief
+   * \brief Pointer to output file stream wrappwer
    */
   SatOutputFileStreamWrapper* m_outputFileStreamWrapper;
 
   /**
-   * \brief
+   * \brief Pointer to output file stream
    */
   std::ofstream* m_outputFileStream;
 
   /**
-   * \brief
+   * \brief Container for value rows
    */
   std::vector<std::vector<double> > m_container;
 
   /**
-   * \brief
+   * \brief File name
    */
   std::string m_fileName;
 
   /**
-   * \brief
+   * \brief File mode
    */
   std::ios::openmode m_fileMode;
 
   /**
-   * \brief
+   * \brief Number of values in a row
    */
   uint32_t m_valuesInRow;
 };

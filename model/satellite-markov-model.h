@@ -28,7 +28,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Markov model
+ * \brief Class for Markov model based fading
  */
 class SatMarkovModel : public Object
 {

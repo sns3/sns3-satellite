@@ -50,9 +50,9 @@ SatOutputFileStreamWrapper::~SatOutputFileStreamWrapper ()
   if (m_destroyable)
     {
       delete m_ofstream;
+      m_ofstream = 0;
     }
-
-  m_ofstream = 0;
+  m_destroyable = false;
 }
 
 std::ofstream *

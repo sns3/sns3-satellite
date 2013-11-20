@@ -55,9 +55,9 @@ SatInputFileStreamWrapper::~SatInputFileStreamWrapper ()
   if (m_destroyable)
     {
       delete m_ifstream;
+      m_ifstream = 0;
     }
-
-  m_ifstream = 0;
+  m_destroyable = false;
 }
 
 std::ifstream *

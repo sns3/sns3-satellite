@@ -26,8 +26,9 @@
 namespace ns3 {
 
 /**
- * \brief A configuration class for Rayleigh model
+ * \ingroup satellite
  *
+ * \brief A configuration class for Rayleigh model fader
  */
 class SatRayleighConf : public SatBaseFaderConf
 {

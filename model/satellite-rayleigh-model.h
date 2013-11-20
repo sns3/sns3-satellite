@@ -31,7 +31,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief
+ * \brief Class for Rayleigh model fader
  */
 class SatRayleighModel : public SatBaseFader
 {

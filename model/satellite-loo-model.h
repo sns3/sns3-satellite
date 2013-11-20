@@ -31,7 +31,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Loo model
+ * \brief Class for Loo model fader
  */
 class SatLooModel : public SatBaseFader
 {
