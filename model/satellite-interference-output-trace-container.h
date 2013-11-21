@@ -37,11 +37,6 @@ class SatInterferenceOutputTraceContainer : public SatBaseTraceContainer
 public:
 
   /**
-   * \brief Default number of columns
-   */
-  static const uint32_t DEFAULT_NUMBER_OF_COLUMNS = 3;
-
-  /**
    * \brief typedef for map key
    */
   typedef std::pair<Address,SatEnums::ChannelType_t> key_t;

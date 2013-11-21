@@ -77,7 +77,7 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
 
   filename << "data/interference_trace/input/nodeId_" << m_index << "_channelType_" + key.second;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str(), std::ios::in, DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str(), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {
@@ -100,7 +100,7 @@ SatInterferenceInputTraceContainer::GetInterferenceDensity (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
-  return FindNode (key)->ProceedToNextClosestTimeSample ().at (DEFAULT_INTF_DENSITY_INDEX);
+  return FindNode (key)->ProceedToNextClosestTimeSample ().at (SatBaseTraceContainer::INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX);
 }
 
 double
@@ -108,7 +108,7 @@ SatInterferenceInputTraceContainer::GetRxPowerDensity (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
-  return FindNode (key)->ProceedToNextClosestTimeSample ().at (DEFAULT_RX_POWER_DENSITY_INDEX);
+  return FindNode (key)->ProceedToNextClosestTimeSample ().at (SatBaseTraceContainer::INTF_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX);
 }
 
 } // namespace ns3

@@ -37,21 +37,6 @@ class SatInterferenceInputTraceContainer : public SatBaseTraceContainer
 public:
 
   /**
-   * \brief Default Rx power density index
-   */
-  static const uint32_t DEFAULT_RX_POWER_DENSITY_INDEX = 1;
-
-  /**
-   * \brief Default interference density index
-   */
-  static const uint32_t DEFAULT_INTF_DENSITY_INDEX = 2;
-
-  /**
-   * \brief Default number of columns
-   */
-  static const uint32_t DEFAULT_NUMBER_OF_COLUMNS = 3;
-
-  /**
    * \brief typedef for map key
    */
   typedef std::pair<Address,SatEnums::ChannelType_t> key_t;
