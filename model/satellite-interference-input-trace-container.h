@@ -110,6 +110,11 @@ private:
    * \brief Current index number
    */
   uint32_t m_index;
+
+  /**
+   * \brief Path to simulator root folder
+   */
+  std::string m_simulatorRootPath;
 };
 
 } // namespace ns3

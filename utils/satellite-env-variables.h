@@ -34,6 +34,7 @@ namespace ns3 {
 class SatEnvVariables : public Object
 {
 public:
+
   /**
    * \brief Constructor
    */
