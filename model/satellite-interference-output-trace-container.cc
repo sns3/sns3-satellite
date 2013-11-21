@@ -64,6 +64,8 @@ SatInterferenceOutputTraceContainer::DoDispose ()
 void
 SatInterferenceOutputTraceContainer::Reset ()
 {
+  NS_LOG_FUNCTION (this);
+
   if ( !m_container.empty() )
     {
       m_container.clear();
@@ -88,6 +90,8 @@ SatInterferenceOutputTraceContainer::AddNode (key_t key)
       NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
     }
 
+  NS_LOG_INFO ("SatInterferenceOutputTraceContainer::AddNode: Added node with ID " << m_index);
+
   m_index++;
 }
 
@@ -102,12 +106,16 @@ SatInterferenceOutputTraceContainer::FindNode (key_t key)
 void
 SatInterferenceOutputTraceContainer::WriteToFile (key_t key)
 {
+  NS_LOG_FUNCTION (this);
+
   FindNode (key)->WriteContainerToFile ();
 }
 
 void
 SatInterferenceOutputTraceContainer::AddToContainer (key_t key, std::vector<double> newItem)
 {
+  NS_LOG_FUNCTION (this);
+
   FindNode (key)->AddToContainer (newItem);
 }
 

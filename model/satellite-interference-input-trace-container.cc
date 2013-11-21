@@ -64,6 +64,8 @@ SatInterferenceInputTraceContainer::DoDispose ()
 void
 SatInterferenceInputTraceContainer::Reset ()
 {
+  NS_LOG_FUNCTION (this);
+
   if ( !m_container.empty() )
     {
       m_container.clear();
@@ -87,6 +89,8 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
     {
       NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
     }
+
+  NS_LOG_INFO ("SatInterferenceInputTraceContainer::AddNode: Added node with ID " << m_index);
 
   m_index++;
 }

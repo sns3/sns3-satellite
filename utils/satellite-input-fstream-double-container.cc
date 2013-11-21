@@ -154,6 +154,8 @@ SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, 
   NS_ASSERT (m_container.size () > 0);
   NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
 
+  NS_LOG_INFO ("SatInputFileStreamDoubleContainer::FindNextClosest: lastValidPosition " << lastValidPosition << " column " << column << " shiftValue " << shiftValue << " comparisonValue " << comparisonValue);
+
   bool valueFound = false;
 
   for (uint32_t i = lastValidPosition; i < m_container.size (); i++)
