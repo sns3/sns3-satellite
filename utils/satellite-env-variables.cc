@@ -35,7 +35,7 @@ SatEnvVariables::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatEnvVariables")
     .SetParent<Object> ()
     .AddConstructor<SatEnvVariables>()
-    .AddAttribute ("SimulatorRootPath", "Path to simulator root folder.",
+    .AddAttribute ("CurrentWorkingDirectory", "Path to the current working directory.",
                    StringValue (""),
                    MakeStringAccessor (&SatEnvVariables::m_currentWorkingDirectory),
                    MakeStringChecker ());
