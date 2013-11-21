@@ -52,18 +52,33 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * \brief Function for getting the simulator root path
+   * \brief Function for getting the path to current working directory
    * \return
    */
-  std::string GetSimulatorRootPath ();
+  std::string GetCurrentWorkingDirectory ();
+
+  /**
+   * \brief Function for getting the path to executable
+   * \return
+   */
+  std::string GetPathToExecutable ();
 
 private:
+
+  /**
+   *
+   */
+  void ReadExecutablePath ();
 
   /**
    * \brief Path to current working directory
    */
   std::string m_currentWorkingDirectory;
 
+  /**
+   * \brief Path to executable
+   */
+  std::string m_pathToExecutable;
 };
 
 } // namespace ns3

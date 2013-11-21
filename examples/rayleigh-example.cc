@@ -11,7 +11,7 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief
+* \brief Example for Rayleigh fading class.
 *
 */
 
@@ -31,7 +31,7 @@ main (int argc, char *argv[])
   /// run simulation
   for (uint32_t i = 0; i < 1000; i++)
     {
-      Simulator::Schedule(Time(500000 + i*500000), &SatRayleighModel::GetChannelGainDb, rayleighFader);
+      Simulator::Schedule (Time (500000 + i*500000), &SatRayleighModel::GetChannelGainDb, rayleighFader);
     }
 
   Simulator::Run ();

@@ -41,7 +41,7 @@ SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer () :
   NS_LOG_FUNCTION (this);
 
   Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
-  m_currentWorkingDirectory = envVariables->GetSimulatorRootPath();
+  m_currentWorkingDirectory = envVariables->GetCurrentWorkingDirectory ();
 }
 
 SatInterferenceInputTraceContainer::~SatInterferenceInputTraceContainer ()
