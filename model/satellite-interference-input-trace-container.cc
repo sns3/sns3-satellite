@@ -36,12 +36,12 @@ SatInterferenceInputTraceContainer::GetTypeId (void)
 
 SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer () :
   m_index (0),
-  m_simulatorRootPath ("")
+  m_currentWorkingDirectory ("")
 {
   NS_LOG_FUNCTION (this);
 
   Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
-  m_simulatorRootPath = envVariables->GetSimulatorRootPath();
+  m_currentWorkingDirectory = envVariables->GetSimulatorRootPath();
 }
 
 SatInterferenceInputTraceContainer::~SatInterferenceInputTraceContainer ()
@@ -69,7 +69,7 @@ SatInterferenceInputTraceContainer::Reset ()
       m_container.clear();
     }
   m_index = 0;
-  m_simulatorRootPath = "";
+  m_currentWorkingDirectory = "";
 }
 
 void
@@ -79,7 +79,7 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_simulatorRootPath << "/data/interference_trace/input/nodeId_" << m_index << "_channelType_" + key.second;
+  filename << m_currentWorkingDirectory << "/data/interference_trace/input/nodeId_" << m_index << "_channelType_" + key.second;
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str(), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

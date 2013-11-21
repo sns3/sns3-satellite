@@ -60,9 +60,9 @@ public:
 private:
 
   /**
-   * \brief Path to simulator root folder
+   * \brief Path to current working directory
    */
-  std::string m_simulatorRootPath;
+  std::string m_currentWorkingDirectory;
 
 };
 

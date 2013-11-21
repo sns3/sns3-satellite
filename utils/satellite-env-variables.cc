@@ -37,19 +37,19 @@ SatEnvVariables::GetTypeId (void)
     .AddConstructor<SatEnvVariables>()
     .AddAttribute ("SimulatorRootPath", "Path to simulator root folder.",
                    StringValue (""),
-                   MakeStringAccessor (&SatEnvVariables::m_simulatorRootPath),
+                   MakeStringAccessor (&SatEnvVariables::m_currentWorkingDirectory),
                    MakeStringChecker ());
   return tid;
 }
 
 SatEnvVariables::SatEnvVariables () :
-  m_simulatorRootPath ("")
+  m_currentWorkingDirectory ("")
 {
   NS_LOG_FUNCTION (this);
 
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
-  if (!m_simulatorRootPath.length() > 0)
+  if (!m_currentWorkingDirectory.length() > 0)
     {
       char currentPath[FILENAME_MAX];
       std::stringstream path;
@@ -61,7 +61,7 @@ SatEnvVariables::SatEnvVariables () :
 
        currentPath[sizeof (currentPath) - 1] = '\0';
        path << currentPath;
-       m_simulatorRootPath = path.str ();
+       m_currentWorkingDirectory = path.str ();
     }
 }
 
@@ -73,7 +73,7 @@ SatEnvVariables::~SatEnvVariables ()
 std::string
 SatEnvVariables::GetSimulatorRootPath ()
 {
-  return m_simulatorRootPath;
+  return m_currentWorkingDirectory;
 }
 
 } // namespace ns3
