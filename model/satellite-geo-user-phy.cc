@@ -172,7 +172,7 @@ SatGeoUserPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
   NS_LOG_FUNCTION (this << p << txParams);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
-  SatPhy::SendPdu  (p, txParams);
+  SatPhy::SendPduWithParams  (p, txParams);
 }
 
 } // namespace ns3
