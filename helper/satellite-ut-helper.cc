@@ -27,13 +27,14 @@
 #include "ns3/uinteger.h"
 #include "ns3/string.h"
 #include "ns3/callback.h"
+#include "ns3/config.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mobility-observer.h"
 #include "../model/satellite-llc.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
-#include "../model/satellite-phy.h"
+#include "../model/satellite-ut-phy.h"
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
@@ -133,16 +134,6 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
-  m_phyFactory.SetTypeId ("ns3::SatPhy");
-
-  m_phyFactory.Set ("RxMaxAntennaGainDb", DoubleValue(44.60));
-  m_phyFactory.Set ("RxAntennaLossDb", DoubleValue(0.00));
-  m_phyFactory.Set ("TxMaxAntennaGainDb", DoubleValue(45.20));
-  m_phyFactory.Set ("TxMaxPowerDbW", DoubleValue(4.00));
-  m_phyFactory.Set ("TxOutputLossDb", DoubleValue(0.50));
-  m_phyFactory.Set ("TxPointingLossDb", DoubleValue(1.00));
-  m_phyFactory.Set ("TxOboLossDb", DoubleValue(0.50));
-  m_phyFactory.Set ("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
@@ -198,7 +189,7 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
 
-  m_phyFactory.Set (n1, v1);
+  Config::SetDefault ("ns3::SatUtPhy::" + n1, v1);
 }
 
 NetDeviceContainer 
@@ -226,16 +217,10 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create SatNetDevice
   Ptr<SatNetDevice> dev = m_deviceFactory.Create<SatNetDevice> ();
 
-  // Create the SatPhyTx and SatPhyRx modules
-  Ptr<SatPhyTx> phyTx = CreateObject<SatPhyTx> ();
-  Ptr<SatPhyRx> phyRx = CreateObject<SatPhyRx> ();
+  // Attach the SatNetDevice to node
+  n->AddDevice (dev);
 
-  // Set SatChannels to SatPhyTx/SatPhyRx
-  phyTx->SetChannel (rCh);
-  fCh->AddRx (phyRx);
-  phyRx->SetDevice (dev);
-  phyRx->SetMobility (n->GetObject<MobilityModel> ());
-  phyTx->SetMobility (n->GetObject<MobilityModel> ());
+  Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (dev, rCh, fCh, beamId);
 
   // Configure the SatPhyRxCarrier instances
   // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
@@ -243,18 +228,18 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
   Ptr<SatPhyRxCarrierConf> carrierConf =
         CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
-                                           m_otherSysNoise_dbHz,
                                            m_errorModel,
                                            m_interferenceModel,
-                                           SatPhyRxCarrierConf::NORMAL);
+                                           SatPhyRxCarrierConf::NORMAL,
+                                           SatEnums::FORWARD_USER_CH,
+                                           m_carrierBandwidthConverter,
+                                           m_fwdLinkCarrierCount);
 
+  carrierConf->SetAttribute ("ExtNoiseDensityDbWHz", DoubleValue (m_otherSysNoise_dbHz) );
   carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterference_db) );
   carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
   carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
   carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
-  carrierConf->SetAttribute ("ChannelType", EnumValue (SatEnums::FORWARD_USER_CH));
-  carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue (m_carrierBandwidthConverter));
-  carrierConf->SetAttribute ("CarrierCount", UintegerValue (m_fwdLinkCarrierCount));
 
   // If the link results are created, we pass those
   // to SatPhyRxCarrier for error modeling.
@@ -263,11 +248,11 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       carrierConf->SetLinkResults (m_linkResults);
     }
 
-  phyRx->ConfigurePhyRxCarriers (carrierConf);
+  phy->ConfigureRxCarriers (carrierConf);
 
   // Set fading
-  phyTx->SetFadingContainer (n->GetObject<SatBaseFading> ());
-  phyRx->SetFadingContainer (n->GetObject<SatBaseFading> ());
+  phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
+  phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
 
@@ -286,14 +271,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback cb = MakeCallback (&SatUtMac::Receive, mac);
 
-  // Create SatPhy modules
-  m_phyFactory.Set ("PhyRx", PointerValue (phyRx));
-  m_phyFactory.Set ("PhyTx", PointerValue (phyTx));
-  m_phyFactory.Set ("BeamId",UintegerValue (beamId));
-  m_phyFactory.Set ("ReceiveCb", CallbackValue (cb));
-
-  Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy> ();
-  phy->Initialize();
+  phy->SetAttribute ("ReceiveCb", CallbackValue (cb));
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
@@ -303,7 +281,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Set the device address and pass it to MAC as well
   dev->SetAddress (Mac48Address::Allocate ());
-  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
+  phy->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
   // Create Logical Link Control (LLC) layer
   Ptr<SatLlc> llc = CreateObject<SatLlc> ();
@@ -327,13 +305,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
 
-  // Attach the SatNetDevice to node
-  n->AddDevice (dev);
-
   // Add UT to NCC
   DoubleValue macCra (0.0);
   mac->GetAttribute ( "Cra", macCra );
   ncc->AddUt (dev->GetAddress (), macCra.Get (), beamId);
+
+  phy->Initialize();
 
   return dev;
 }

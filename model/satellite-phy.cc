@@ -23,6 +23,7 @@
 #include "ns3/double.h"
 #include "ns3/uinteger.h"
 #include "ns3/pointer.h"
+#include "ns3/node.h"
 
 #include "satellite-utils.h"
 #include "satellite-phy.h"
@@ -40,27 +41,70 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
+  : m_eirpWoGain_W(0),
+    m_rxMaxAntennaGain_db (0),
+    m_txMaxAntennaGain_db (0),
+    m_txMaxPower_dbW (0),
+    m_txOutputLoss_db (0),
+    m_txPointingLoss_db (0),
+    m_txOboLoss_db (0),
+    m_txAntennaLoss_db (0),
+    m_rxAntennaLoss_db (0),
+    m_defaultFadingValue (1)
 {
   NS_LOG_FUNCTION (this);
+
+  // Create the first needed SatPhyTx and SatPhyRx modules
 }
 
-SatPhy::SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback recCb, SatPhy::CnoCallback cnoCb)
+SatPhy::SatPhy (Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId)
+ : m_eirpWoGain_W(0),
+   m_rxMaxAntennaGain_db (0),
+   m_txMaxAntennaGain_db (0),
+   m_txMaxPower_dbW (0),
+   m_txOutputLoss_db (0),
+   m_txPointingLoss_db (0),
+   m_txOboLoss_db (0),
+   m_txAntennaLoss_db (0),
+   m_rxAntennaLoss_db (0),
+   m_defaultFadingValue (1)
 {
-  NS_LOG_FUNCTION (this << phyTx << phyRx << beamId);
+  NS_LOG_FUNCTION (this << d << txCh << rxCh << beamId);
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
-  m_phyTx = phyTx;
-  m_phyRx = phyRx;
+  Ptr<MobilityModel> mobility = d->GetNode()->GetObject<MobilityModel>();
+
+  m_phyTx = CreateObject<SatPhyTx> ();
+  m_phyTx->SetChannel (txCh);
+  m_phyRx = CreateObject<SatPhyRx> ();
   m_beamId = beamId;
-  m_rxCallback = recCb;
-  m_cnoCallback = cnoCb;
 
-  Initialize();
+  rxCh->AddRx (m_phyRx);
+  m_phyRx->SetDevice (d);
+  m_phyTx->SetMobility (mobility);
+  m_phyRx->SetMobility (mobility);
+}
 
+TypeId
+SatPhy::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatPhy")
+    .SetParent<Object> ()
+    .AddConstructor<SatPhy> ()
+    .AddAttribute ("ReceiveCb", "The receive callback for this phy.",
+                    CallbackValue (),
+                    MakeCallbackAccessor (&SatPhy::m_rxCallback),
+                    MakeCallbackChecker ())
+    .AddAttribute ("CnoCb", "The C/N0 info callback for this phy.",
+                    CallbackValue (),
+                    MakeCallbackAccessor (&SatPhy::m_cnoCallback),
+                    MakeCallbackChecker ())
+  ;
+  return tid;
 }
 
 void
-SatPhy::Initialize()
+SatPhy::Initialize ()
 {
  // calculate EIRP without Gain (maximum)
   double eirpWoGain_DbW = m_txMaxPower_dbW - m_txOutputLoss_db - m_txPointingLoss_db - m_txOboLoss_db - m_txAntennaLoss_db;
@@ -103,79 +147,55 @@ SatPhy::DoDispose ()
   Object::DoDispose ();
 }
 
+void
+SatPhy::SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+{
+  NS_LOG_FUNCTION (this);
+  m_phyTx->SetAntennaGainPattern (agp);
+}
+
+void
+SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+{
+  NS_LOG_FUNCTION (this);
+  m_phyRx->SetAntennaGainPattern (agp);
+}
+
+void
+SatPhy::ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
+{
+  NS_LOG_FUNCTION (this);
+  m_phyRx->ConfigurePhyRxCarriers (carrierConf);
+}
+
+void
+SatPhy::SetRxFadingContainer (Ptr<SatBaseFading> fadingContainer)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_phyRx->SetFadingContainer (fadingContainer);
+}
+
+void
+SatPhy::SetTxFadingContainer (Ptr<SatBaseFading> fadingContainer)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_phyTx->SetFadingContainer (fadingContainer);
+}
+
+void
+SatPhy::SetAddress (Mac48Address ownAddress)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_phyRx->SetAddress (ownAddress);
+}
+
 TypeId
 SatPhy::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
-}
-
-TypeId
-SatPhy::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatPhy")
-    .SetParent<Object> ()
-    .AddConstructor<SatPhy> ()
-    .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
-                   PointerValue (),
-                   MakePointerAccessor (&SatPhy::GetPhyRx,
-                                        &SatPhy::SetPhyRx),
-                   MakePointerChecker<SatPhyRx> ())
-    .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
-                   PointerValue (),
-                   MakePointerAccessor (&SatPhy::GetPhyTx,
-                                        &SatPhy::SetPhyTx),
-                   MakePointerChecker<SatPhyTx> ())
-    .AddAttribute ("BeamId", "The beam ID of this phy.",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&SatPhy::m_beamId),
-                   MakeUintegerChecker<uint32_t> (1))
-    .AddAttribute ("ReceiveCb", "The receive callback for this phy.",
-                   CallbackValue (),
-                   MakeCallbackAccessor (&SatPhy::m_rxCallback),
-                   MakeCallbackChecker ())
-    .AddAttribute ("CnoCb", "The C/N0 info callback for this phy.",
-                   CallbackValue (),
-                   MakeCallbackAccessor (&SatPhy::m_cnoCallback),
-                   MakeCallbackChecker ())
-    .AddAttribute("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_db),
-                   MakeDoubleChecker<double_t> ())
-    .AddAttribute("TxMaxAntennaGainDb", "Maximum TX gain in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txMaxAntennaGain_db),
-                   MakeDoubleChecker<double_t> ())
-    .AddAttribute("TxMaxPowerDbW", "Maximum TX power in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txMaxPower_dbW),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute("TxOutputLossDb", "TX Output loss in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txOutputLoss_db),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute("TxPointingLossDb", "TX Pointing loss in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txPointingLoss_db),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute("TxOboLossDb", "TX OBO loss in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txOboLoss_db),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute("TxAntennaLossDb", "TX Antenna loss in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_txAntennaLoss_db),
-                   MakeDoubleChecker<double> ())
-   .AddAttribute("RxAntennaLossDb", "RX Antenna loss in Dbs",
-                   DoubleValue(0.00),
-                   MakeDoubleAccessor(&SatPhy::m_rxAntennaLoss_db),
-                   MakeDoubleChecker<double> ())
-   .AddAttribute("DefaultFadingValue", "Default value for fading",
-                   DoubleValue(1.00),
-                   MakeDoubleAccessor(&SatPhy::m_defaultFadingValue),
-                   MakeDoubleChecker<double_t> ())
-
-  ;
-  return tid;
 }
 
 void

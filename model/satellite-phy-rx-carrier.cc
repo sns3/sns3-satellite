@@ -72,7 +72,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_rxMode = carrierConf->GetRxMode ();
   m_rxBandwidth_Hz = carrierConf->GetCarrierBandwidth_Hz (carrierId);
 
-  m_rxOtherSysNoise_W = carrierConf->GetRxOtherSystemNoise_W () * m_rxBandwidth_Hz;
+  m_rxOtherSysNoise_W = SatUtils::DbWToW(carrierConf->GetExtPowerDensity_dbWHz ()) * m_rxBandwidth_Hz;
 
   if (carrierConf->GetErrorModel () == SatPhyRxCarrierConf::EM_AVI)
     {

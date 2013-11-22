@@ -35,16 +35,24 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf()
   m_ifModel = IF_CONSTANT;
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperature_dBK, double rxOtherSysNoise_dBW,
-                                           ErrorModel errorModel, InterferenceModel ifModel,
-                                           RxMode rxMode)
+SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperature_dBK, ErrorModel errorModel, InterferenceModel ifModel,
+                                           RxMode rxMode, SatEnums::ChannelType_t chType,
+                                           CarrierBandwidthConverter converter, uint32_t carrierCount )
+ : m_ifModel (ifModel),
+   m_errorModel (errorModel),
+   m_rxMode (rxMode),
+   m_carrierCount (carrierCount),
+   m_carrierBandwidthConverter (converter),
+   m_channelType (chType)
 {
-  m_errorModel = errorModel;
-  m_ifModel = ifModel;
-  m_rxTemperature_K = SatUtils::DbToLinear (rxTemperature_dBK);
-  m_rxMode = rxMode;
-  m_rxOtherSysNoise_W = SatUtils::DbWToW<double> (rxOtherSysNoise_dBW);
 
+  m_rxTemperature_K = SatUtils::DbToLinear (rxTemperature_dBK);
+
+  m_rxExtNoiseDensity_dbWHz = 0;
+  m_rxOtherSysInterference_db = 0;
+  m_rxImInterference_db = 0;
+  m_rxAciInterference_db = 0;
+  m_rxAciIfWrtNoise = 0;
 }
 
 TypeId
@@ -52,21 +60,6 @@ SatPhyRxCarrierConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
     .SetParent<Object> ()
-    .AddAttribute("ChannelType", "The type of the channel where this object is associated.",
-                   EnumValue (SatEnums::UNKNOWN_CH),
-                   MakeEnumAccessor (&SatPhyRxCarrierConf::m_channelType),
-                   MakeEnumChecker (SatEnums::FORWARD_FEEDER_CH, "Forward feeder channel",
-                                    SatEnums::FORWARD_USER_CH, "Forward user channel",
-                                    SatEnums::RETURN_FEEDER_CH, "Return feeder channel",
-                                    SatEnums::RETURN_USER_CH, "Return user channel"))
-    .AddAttribute ("CarrierBandwidhtConverter", "Callback to convert carrier id to bandwidth.",
-                    CallbackValue (),
-                    MakeCallbackAccessor (&SatPhyRxCarrierConf::m_carrierBandwidthConverter),
-                    MakeCallbackChecker ())
-    .AddAttribute ("CarrierCount", "The count of carriers to create in installation",
-                    UintegerValue (1),
-                    MakeUintegerAccessor (&SatPhyRxCarrierConf::m_carrierCount),
-                    MakeUintegerChecker<uint32_t> (1))
     .AddAttribute( "RxOtherSysIfDb",
                    "Other system interference.",
                     DoubleValue (0.0),
@@ -86,6 +79,11 @@ SatPhyRxCarrierConf::GetTypeId (void)
                    "Adjacent channel interference wrt noise in percents.",
                     DoubleValue (0.0),
                     MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxAciIfWrtNoise),
+                    MakeDoubleChecker<double>())
+    .AddAttribute( "ExtNoiseDensityDbWHz",
+                   "External noise power density.",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxExtNoiseDensity_dbWHz),
                     MakeDoubleChecker<double>())
     .AddConstructor<SatPhyRxCarrierConf> ()
   ;
@@ -130,9 +128,9 @@ double SatPhyRxCarrierConf::GetRxTemperature_K () const
   return m_rxTemperature_K;
 }
 
-double SatPhyRxCarrierConf::GetRxOtherSystemNoise_W () const
+double SatPhyRxCarrierConf::GetExtPowerDensity_dbWHz () const
 {
-  return m_rxOtherSysNoise_W;
+  return m_rxExtNoiseDensity_dbWHz;
 }
 
 double SatPhyRxCarrierConf::GetRxOtherSystemInterference_dB () const

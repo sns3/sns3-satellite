@@ -80,14 +80,16 @@ public:
   /**
    * Constructor for SatPhyRxCarrierConf.
    * \param rxTemperature_K RX noise temperature in Kelvins
-   * \param rxOtherSysNoise_W other system noise in Watts
    * \param errorModel Used error model
    * \param ifModel Used interference model
    * \param rxMode RX mode used in carrier
+   * \param chType RX channel type
+   * \param converter Bandwidth converter
+   * \param carrierCount carrier count
    */
-  SatPhyRxCarrierConf ( double rxTemperature_K, double rxOtherSysNoise_W,
-                        ErrorModel errorModel, InterferenceModel ifModel,
-                        RxMode rxMode);
+  SatPhyRxCarrierConf ( double rxTemperature_K, ErrorModel errorModel, InterferenceModel ifModel,
+                        RxMode rxMode, SatEnums::ChannelType_t chType,
+                        CarrierBandwidthConverter converter, uint32_t carrierCount);
 
   /**
    * Destructor for SatPhyRxCarrierConf.
@@ -140,7 +142,7 @@ public:
   /*
    * Get other system RX noise
    */
-  double GetRxOtherSystemNoise_W () const;
+  double GetExtPowerDensity_dbWHz () const;
 
   /*
    * Get Other system interference (C over I)
@@ -180,7 +182,7 @@ private:
   Ptr<SatLinkResults> m_linkResults;
   double m_rxTemperature_K;
   double m_rxBandwidth_Hz;
-  double m_rxOtherSysNoise_W;
+  double m_rxExtNoiseDensity_dbWHz;
   double m_rxOtherSysInterference_db;
   double m_rxImInterference_db;
   double m_rxAciInterference_db;

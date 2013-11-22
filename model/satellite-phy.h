@@ -26,7 +26,8 @@
 #include "ns3/object.h"
 #include "ns3/packet.h"
 #include "ns3/address.h"
-
+#include "satellite-phy-rx-carrier-conf.h"
+#include "satellite-antenna-gain-pattern.h"
 #include "satellite-signal-parameters.h"
 
 namespace ns3 {
@@ -63,7 +64,7 @@ public:
    */
   SatPhy (void);
 
-  SatPhy (Ptr<SatPhyTx> phyTx, Ptr<SatPhyRx> phyRx, uint32_t beamId, SatPhy::ReceiveCallback receiveCb, SatPhy::CnoCallback cnoCb );
+  SatPhy ( Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId);
 
   virtual ~SatPhy ();
 
@@ -79,28 +80,61 @@ public:
   void Initialize();
 
   /**
+   * Set the transmit antenna gain pattern.
+   */
+  void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+
+  /**
+   * Set the transmit antenna gain pattern.
+   */
+  void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+
+  /**
+   * \param carrierConf Carrier configuration class
+   */
+  void ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf);
+
+  /**
+   * \brief Set fading container
+   * \param fadingContainer fading container
+   */
+  void SetRxFadingContainer (Ptr<SatBaseFading> fadingContainer);
+
+  /**
+   * \brief Set fading container
+   * \param fadingContainer fading container
+   */
+  void SetTxFadingContainer (Ptr<SatBaseFading> fadingContainer);
+
+  /**
+   * Set the device address owning this object
+   * \param ownAddress address of the device owning this object
+   */
+   void SetAddress (Mac48Address ownAddress);
+
+  /**
    * Get the SatPhyTx pointer
    * \return a pointer to the SatPhyTx instance
    */
-  Ptr<SatPhyTx> GetPhyTx () const;
+  virtual Ptr<SatPhyTx> GetPhyTx () const;
 
   /**
    * Get the SatPhyRx pointer
    * \return a pointer to the SatPhyRx instance
    */
-  Ptr<SatPhyRx> GetPhyRx () const;
+  virtual Ptr<SatPhyRx> GetPhyRx () const;
 
   /**
    * Set the SatPhyTx module
    * \param phyTx Transmitter PHY module
    */
-  void SetPhyTx (Ptr<SatPhyTx> phyTx);
+  virtual void SetPhyTx (Ptr<SatPhyTx> phyTx);
 
   /**
    * Set the SatPhyRx module
    * \param phyTx Receiver PHY module
    */
-  void SetPhyRx (Ptr<SatPhyRx> phyRx);
+  virtual void SetPhyRx (Ptr<SatPhyRx> phyRx);
 
   /**
    * Set the Tx satellite channel
@@ -152,6 +186,18 @@ private:
   uint32_t m_beamId;
 
   /**
+     * The upper layer package receive callback.
+     */
+    SatPhy::ReceiveCallback m_rxCallback;
+
+    /**
+     * The C/N0 info callback
+     */
+    SatPhy::CnoCallback m_cnoCallback;
+
+public:
+
+  /**
    * Calculated EIRP without gain in Watts
    */
   double m_eirpWoGain_W;
@@ -195,16 +241,6 @@ private:
    * Configured RX antenna loss in Dbs
    */
   double m_rxAntennaLoss_db;
-
-  /**
-   * The upper layer package receive callback.
-   */
-  SatPhy::ReceiveCallback m_rxCallback;
-
-  /**
-   * The C/N0 info callback
-   */
-  SatPhy::CnoCallback m_cnoCallback;
 
   /**
    * \brief Default fading value

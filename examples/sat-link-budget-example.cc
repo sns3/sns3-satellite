@@ -142,69 +142,69 @@ main (int argc, char *argv[])
   Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper();
   Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper();
 
-  utHelper->SetAttribute("RxOtherSysNoiseDbHz", DoubleValue (utOtherSysNoiseDbW));
-  utHelper->SetAttribute("RxOtherSysIfDb", DoubleValue (utOtherSysIfDb));
-  utHelper->SetAttribute("RxImIfDb", DoubleValue (utImIfDb));
-  utHelper->SetAttribute("RxAciIfDb", DoubleValue (utAciIfDb));
-  utHelper->SetAttribute("RxAciIfWrtNoise", DoubleValue (utAciIfWrtNoise));
-  utHelper->SetAttribute("RxTemperatureDbK", DoubleValue (utTemperatureDbK));
+//  utHelper->SetAttribute("RxOtherSysNoiseDbHz", DoubleValue (utOtherSysNoiseDbW));
+//  utHelper->SetAttribute("RxOtherSysIfDb", DoubleValue (utOtherSysIfDb));
+//  utHelper->SetAttribute("RxImIfDb", DoubleValue (utImIfDb));
+//  utHelper->SetAttribute("RxAciIfDb", DoubleValue (utAciIfDb));
+//  utHelper->SetAttribute("RxAciIfWrtNoise", DoubleValue (utAciIfWrtNoise));
+//  utHelper->SetAttribute("RxTemperatureDbK", DoubleValue (utTemperatureDbK));
+//
+//  gwHelper->SetAttribute("RxOtherSysNoiseDbHz", DoubleValue (gwOtherSysNoiseDbW));
+//  gwHelper->SetAttribute("RxOtherSysIfDb", DoubleValue (gwOtherSysIfDb));
+//  gwHelper->SetAttribute("RxImIfDb", DoubleValue (gwImIfDb));
+//  gwHelper->SetAttribute("RxAciIfDb", DoubleValue (gwAciIfDb));
+//  gwHelper->SetAttribute("RxAciIfWrtNoise", DoubleValue (gwAciIfWrtNoise));
+//  gwHelper->SetAttribute("RxTemperatureDbK", DoubleValue (gwTemperatureDbK));
+//
+//  geoHelper->SetAttribute("RtnLinkOtherSysNoiseDbHz", DoubleValue (geoRtnOtherSysNoiseDbW));
+//  geoHelper->SetAttribute("RtnRxOtherSysIfDb", DoubleValue (geoRtnOtherSysIfDb));
+//  geoHelper->SetAttribute("RtnRxImIfDb", DoubleValue (geoRtnImIfDb));
+//  geoHelper->SetAttribute("RtnRxAciIfDb", DoubleValue (geoRtnAciIfDb));
+//  geoHelper->SetAttribute("RtnRxAciIfWrtNoise", DoubleValue (geoRtnAciIfWrtNoise));
+//  geoHelper->SetAttribute("RtnLinkRxTemperatureDbK", DoubleValue (geoRtnTemperatureDbK));
+//
+//  geoHelper->SetAttribute("FwdLinkOtherSysNoiseDbHz", DoubleValue (geoFwdOtherSysNoiseDbW));
+//  geoHelper->SetAttribute("FwdRxOtherSysIfDb", DoubleValue (geoFwdOtherSysIfDb));
+//  geoHelper->SetAttribute("FwdRxImIfDb", DoubleValue (geoFwdImIfDb));
+//  geoHelper->SetAttribute("FwdRxAciIfDb", DoubleValue (geoFwdAciIfDb));
+//  geoHelper->SetAttribute("FwdRxAciIfWrtNoise", DoubleValue (geoFwdAciIfWrtNoise));
+//  geoHelper->SetAttribute("FwdLinkRxTemperatureDbK", DoubleValue (geoFwdTemperatureDbK));
 
-  gwHelper->SetAttribute("RxOtherSysNoiseDbHz", DoubleValue (gwOtherSysNoiseDbW));
-  gwHelper->SetAttribute("RxOtherSysIfDb", DoubleValue (gwOtherSysIfDb));
-  gwHelper->SetAttribute("RxImIfDb", DoubleValue (gwImIfDb));
-  gwHelper->SetAttribute("RxAciIfDb", DoubleValue (gwAciIfDb));
-  gwHelper->SetAttribute("RxAciIfWrtNoise", DoubleValue (gwAciIfWrtNoise));
-  gwHelper->SetAttribute("RxTemperatureDbK", DoubleValue (gwTemperatureDbK));
-
-  geoHelper->SetAttribute("RtnLinkOtherSysNoiseDbHz", DoubleValue (geoRtnOtherSysNoiseDbW));
-  geoHelper->SetAttribute("RtnRxOtherSysIfDb", DoubleValue (geoRtnOtherSysIfDb));
-  geoHelper->SetAttribute("RtnRxImIfDb", DoubleValue (geoRtnImIfDb));
-  geoHelper->SetAttribute("RtnRxAciIfDb", DoubleValue (geoRtnAciIfDb));
-  geoHelper->SetAttribute("RtnRxAciIfWrtNoise", DoubleValue (geoRtnAciIfWrtNoise));
-  geoHelper->SetAttribute("RtnLinkRxTemperatureDbK", DoubleValue (geoRtnTemperatureDbK));
-
-  geoHelper->SetAttribute("FwdLinkOtherSysNoiseDbHz", DoubleValue (geoFwdOtherSysNoiseDbW));
-  geoHelper->SetAttribute("FwdRxOtherSysIfDb", DoubleValue (geoFwdOtherSysIfDb));
-  geoHelper->SetAttribute("FwdRxImIfDb", DoubleValue (geoFwdImIfDb));
-  geoHelper->SetAttribute("FwdRxAciIfDb", DoubleValue (geoFwdAciIfDb));
-  geoHelper->SetAttribute("FwdRxAciIfWrtNoise", DoubleValue (geoFwdAciIfWrtNoise));
-  geoHelper->SetAttribute("FwdLinkRxTemperatureDbK", DoubleValue (geoFwdTemperatureDbK));
-
-  utHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (utRxMaxAntennaGainDb));
-  utHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (utRxAntennaLossDb));
-  utHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (utTxMaxAntennaGainDb));
-  utHelper->SetPhyAttribute ("TxMaxPowerDbW", DoubleValue (utTxMaxPowerDbW));
-  utHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (utTxOutputLossDb));
-  utHelper->SetPhyAttribute ("TxPointingLossDb", DoubleValue (utTxPointingLossDb));
-  utHelper->SetPhyAttribute ("TxOboLossDb", DoubleValue (utTxOboLossDb));
-  utHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (utTxAntennaLossDb));
-
-  gwHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (gwRxMaxAntennaGainDb));
-  gwHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (gwRxAntennaLossDb));
-  gwHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (gwTxMaxAntennaGainDb));
-  gwHelper->SetPhyAttribute ("TxMaxPowerDbW", DoubleValue (gwTxMaxPowerDbW));
-  gwHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (gwTxOutputLossDb));
-  gwHelper->SetPhyAttribute ("TxPointingLossDb", DoubleValue (gwTxPointingLossDb));
-  gwHelper->SetPhyAttribute ("TxOboLossDb", DoubleValue (gwTxOboLossDb));
-  gwHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (gwTxAntennaLossDb));
-
-  geoHelper->SetUserPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (geoUserRxMaxAntennaGainDb));
-  geoHelper->SetUserPhyAttribute ("RxAntennaLossDb", DoubleValue (geoUserRxAntennaLossDb));
-  geoHelper->SetUserPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (geoUserTxMaxAntennaGainDb));
-  geoHelper->SetUserPhyAttribute ("TxMaxPowerDbW", DoubleValue (geoUserTxMaxPowerDbW));
-  geoHelper->SetUserPhyAttribute ("TxOutputLossDb", DoubleValue (geoUserTxOutputLossDb));
-  geoHelper->SetUserPhyAttribute ("TxPointingLossDb", DoubleValue (geoUserTxPointingLossDb));
-  geoHelper->SetUserPhyAttribute ("TxOboLossDb", DoubleValue (geoUserTxOboLossDb));
-  geoHelper->SetUserPhyAttribute ("TxAntennaLossDb", DoubleValue (geoUserTxAntennaLossDb));
-
-  geoHelper->SetFeederPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (geoFeederRxMaxAntennaGainDb));
-  geoHelper->SetFeederPhyAttribute ("RxAntennaLossDb", DoubleValue (geoFeederRxAntennaLossDb));
-  geoHelper->SetFeederPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (geoFeederTxMaxAntennaGainDb));
-  geoHelper->SetFeederPhyAttribute ("TxMaxPowerDbW", DoubleValue (geoFeederTxMaxPowerDbW));
-  geoHelper->SetFeederPhyAttribute ("TxOutputLossDb", DoubleValue (geoFeederTxOutputLossDb));
-  geoHelper->SetFeederPhyAttribute ("TxPointingLossDb", DoubleValue (geoFeederTxPointingLossDb));
-  geoHelper->SetFeederPhyAttribute ("TxOboLossDb", DoubleValue (geoFeederTxOboLossDb));
-  geoHelper->SetFeederPhyAttribute ("TxAntennaLossDb", DoubleValue (geoFeederTxAntennaLossDb));
+//  utHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (utRxMaxAntennaGainDb));
+//  utHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (utRxAntennaLossDb));
+//  utHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (utTxMaxAntennaGainDb));
+//  utHelper->SetPhyAttribute ("TxMaxPowerDbW", DoubleValue (utTxMaxPowerDbW));
+//  utHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (utTxOutputLossDb));
+//  utHelper->SetPhyAttribute ("TxPointingLossDb", DoubleValue (utTxPointingLossDb));
+//  utHelper->SetPhyAttribute ("TxOboLossDb", DoubleValue (utTxOboLossDb));
+//  utHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (utTxAntennaLossDb));
+//
+//  gwHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (gwRxMaxAntennaGainDb));
+//  gwHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (gwRxAntennaLossDb));
+//  gwHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (gwTxMaxAntennaGainDb));
+//  gwHelper->SetPhyAttribute ("TxMaxPowerDbW", DoubleValue (gwTxMaxPowerDbW));
+//  gwHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (gwTxOutputLossDb));
+//  gwHelper->SetPhyAttribute ("TxPointingLossDb", DoubleValue (gwTxPointingLossDb));
+//  gwHelper->SetPhyAttribute ("TxOboLossDb", DoubleValue (gwTxOboLossDb));
+//  gwHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (gwTxAntennaLossDb));
+//
+//  geoHelper->SetUserPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (geoUserRxMaxAntennaGainDb));
+//  geoHelper->SetUserPhyAttribute ("RxAntennaLossDb", DoubleValue (geoUserRxAntennaLossDb));
+//  geoHelper->SetUserPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (geoUserTxMaxAntennaGainDb));
+//  geoHelper->SetUserPhyAttribute ("TxMaxPowerDbW", DoubleValue (geoUserTxMaxPowerDbW));
+//  geoHelper->SetUserPhyAttribute ("TxOutputLossDb", DoubleValue (geoUserTxOutputLossDb));
+//  geoHelper->SetUserPhyAttribute ("TxPointingLossDb", DoubleValue (geoUserTxPointingLossDb));
+//  geoHelper->SetUserPhyAttribute ("TxOboLossDb", DoubleValue (geoUserTxOboLossDb));
+//  geoHelper->SetUserPhyAttribute ("TxAntennaLossDb", DoubleValue (geoUserTxAntennaLossDb));
+//
+//  geoHelper->SetFeederPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (geoFeederRxMaxAntennaGainDb));
+//  geoHelper->SetFeederPhyAttribute ("RxAntennaLossDb", DoubleValue (geoFeederRxAntennaLossDb));
+//  geoHelper->SetFeederPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (geoFeederTxMaxAntennaGainDb));
+//  geoHelper->SetFeederPhyAttribute ("TxMaxPowerDbW", DoubleValue (geoFeederTxMaxPowerDbW));
+//  geoHelper->SetFeederPhyAttribute ("TxOutputLossDb", DoubleValue (geoFeederTxOutputLossDb));
+//  geoHelper->SetFeederPhyAttribute ("TxPointingLossDb", DoubleValue (geoFeederTxPointingLossDb));
+//  geoHelper->SetFeederPhyAttribute ("TxOboLossDb", DoubleValue (geoFeederTxOboLossDb));
+//  geoHelper->SetFeederPhyAttribute ("TxAntennaLossDb", DoubleValue (geoFeederTxAntennaLossDb));
 
   // create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);

@@ -170,7 +170,6 @@ private:
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
-    ObjectFactory m_phyFactory;
 
     /*
      * Configured interference model for the return link. Set as an attribute.
