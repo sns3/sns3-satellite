@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "ns3/fatal-error.h"
-#include <climits>
 
 NS_LOG_COMPONENT_DEFINE ("SatEnvVariables");
 

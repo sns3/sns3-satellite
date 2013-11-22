@@ -132,6 +132,11 @@ SatBeamHelper::DoDispose()
   m_ulChannels.clear ();
   m_flChannels.clear ();
   m_beamFreqs.clear ();
+  m_markovConf = NULL;
+  m_ncc = NULL;
+  m_geoHelper = NULL;
+  m_gwHelper = NULL;
+  m_utHelper = NULL;
 }
 
 void 

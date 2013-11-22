@@ -87,6 +87,7 @@ SatLlc::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_queue->DequeueAll();
   m_queue = 0;
+  m_rxCallback.Nullify();
   Object::DoDispose ();
 }
 

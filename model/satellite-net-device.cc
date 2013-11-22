@@ -293,6 +293,7 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
+  m_llc = 0;
   NetDevice::DoDispose ();
 }
 

@@ -83,6 +83,9 @@ void
 SatMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+  m_txCallback.Nullify();
+  m_rxCallback.Nullify();
+  m_txOpportunityCallback.Nullify();
   Object::DoDispose ();
 }
 
