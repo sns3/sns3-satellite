@@ -100,14 +100,18 @@ private:
     * Schdules one Tx opportunity, i.e. time slot.
     * \param transmitTime time when transmit possibility starts
     * \param carrierId Carrier id used for the transmission
+    * \param timeSlotConf Time Slot configuration of the scheduled time slot
     */
-   void ScheduleTxOpportunity ( Time transmitTime, uint32_t carrierId );
+   void ScheduleTxOpportunity ( Time transmitTime, uint32_t carrierId, Ptr<SatTimeSlotConf> timeSlotConf );
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
     * returns a PDU, send it to lower layer.
+    *
+    * \param carrierId Carrier id used for the transmission
+    * \param timeSlotConf Time Slot configuration of the scheduled time slot
     */
-   void TransmitTime (uint32_t carrierId);
+   void TransmitTime (uint32_t carrierId, Ptr<SatTimeSlotConf> timeSlotConf);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet
