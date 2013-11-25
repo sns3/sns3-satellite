@@ -116,6 +116,11 @@ SatInterferenceOutputTraceContainer::AddToContainer (key_t key, std::vector<doub
 {
   NS_LOG_FUNCTION (this);
 
+  if ( newItem.size() != SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)
+    {
+      NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddToContainer - Incorrect vector size");
+    }
+
   FindNode (key)->AddToContainer (newItem);
 }
 

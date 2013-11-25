@@ -44,18 +44,27 @@ SatTracedInterference::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatTracedInterference::SatTracedInterference (std::string filename) :
+SatTracedInterference::SatTracedInterference (Ptr<SatInterferenceInputTraceContainer> traceContainer, SatEnums::ChannelType_t channeltype, double rxBandwidth) :
     m_rxing (false),
-    m_power ()
+    m_power (),
+    m_traceContainer (traceContainer),
+    m_channelType (channeltype),
+    m_rxBandwidth_Hz (rxBandwidth)
 {
-  m_tracedInterference = CreateObject<SatInputFileStreamDoubleContainer> (filename,std::ios::in,ROW_COUNT);
+  if (!m_rxBandwidth_Hz > 0)
+    {
+      NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Invalid value");
+    }
 }
 
 SatTracedInterference::SatTracedInterference () :
     m_rxing (false),
-    m_power ()
+    m_power (),
+    m_traceContainer (),
+    m_channelType (),
+    m_rxBandwidth_Hz ()
 {
-  NS_ASSERT (0);
+  NS_FATAL_ERROR ("SatTracedInterference - Constructor not in use");
 }
 
 SatTracedInterference::~SatTracedInterference ()
@@ -75,10 +84,15 @@ SatTracedInterference::DoAdd (Time duration, double power)
 double
 SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
-  m_power = (m_tracedInterference->ProceedToNextClosestTimeSample ()).at(INTERFERENCE_VALUE_COLUMN_NUMBER);
+  std::pair<Address,SatEnums::ChannelType_t> key;
+  Address mac;
+
+  key.first = mac;
+  key.second = m_channelType;
+
+  m_power = m_rxBandwidth_Hz * m_traceContainer->GetInterferenceDensity (key);
 
   return m_power;
-
 }
 
 void
@@ -97,6 +111,24 @@ void
 SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 {
   m_rxing = false;
+}
+
+void
+SatTracedInterference::DoDispose ()
+{
+  m_traceContainer = NULL;
+  SatInterference::DoDispose();
+}
+
+void
+SatTracedInterference::SetRxBandwidth (double rxBandwidth)
+{
+  if (!m_rxBandwidth_Hz > 0)
+    {
+      NS_FATAL_ERROR ("SatTracedInterference::SetRxBandwidth - Invalid value");
+    }
+
+  m_rxBandwidth_Hz = rxBandwidth;
 }
 
 }

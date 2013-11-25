@@ -24,6 +24,8 @@
 #include <map>
 #include <set>
 #include "satellite-interference.h"
+#include "satellite-interference-output-trace-container.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -34,10 +36,47 @@ namespace ns3 {
 class SatPerPacketInterference : public SatInterference
 {
 public:
+  /**
+   *
+   * \return
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   *
+   * \return
+   */
   TypeId GetInstanceTypeId (void) const;
+
+  /**
+   *
+   */
   SatPerPacketInterference ();
+
+  /**
+   *
+   * \param traceContainer
+   * \param mac
+   * \param channeltype
+   * \param rxBandwidth
+   */
+  SatPerPacketInterference (Ptr<SatInterferenceOutputTraceContainer> traceContainer, SatEnums::ChannelType_t channeltype, double rxBandwidth);
+
+  /**
+   *
+   */
   ~SatPerPacketInterference ();
+
+  /**
+   *
+   */
+  void DoDispose ();
+
+  /**
+   *
+   * \param bandwidth
+   */
+  void SetRxBandwidth (double rxBandwidth);
 
 private:
   /**
@@ -79,27 +118,74 @@ private:
    */
   virtual void DoNotifyRxEnd (Ptr<SatInterference::Event> event);
 
+  /**
+   *
+   */
   typedef std::pair <uint32_t, double > InterferenceChange;
+
+  /**
+   *
+   */
   typedef std::multimap <Time, InterferenceChange > InterferenceChanges;
 
+  /**
+   *
+   * \param o
+   */
   SatPerPacketInterference (const SatPerPacketInterference &o);
+
+  /**
+   *
+   * \param o
+   * \return
+   */
   SatPerPacketInterference &operator = (const SatPerPacketInterference &o);
 
-  // interference change list
+  /**
+   * \brief interference change list
+   */
   InterferenceChanges m_changes;
 
-  // notified interference event IDs
+  /**
+   * \brief notified interference event IDs
+   */
   std::set <uint32_t> m_events;
 
-  // first power value for interference
-  // sum of negative values in list m_changes, which positive value is not in list
+  /**
+   * \brief First power value for interference. Sum of negative values in list m_changes, which positive value is not in list
+   */
   double m_firstPower;
 
-  // flag to indicate that at least one receiving is on
+  /**
+   * \brief flag to indicate that at least one receiving is on
+   */
   bool m_rxing;
 
-  // event id for Events
+  /**
+   * \brief event id for Events
+   */
   uint32_t m_nextEventId;
+
+  /**
+   *
+   */
+  Ptr<SatInterferenceOutputTraceContainer> m_traceContainer;
+
+  /**
+   *
+   */
+  bool m_enableTraceOutput;
+
+  /**
+   *
+   */
+  SatEnums::ChannelType_t m_channelType;
+
+  /**
+   * \brief RX Bandwidth in Hz
+   */
+  double m_rxBandwidth_Hz;
+
 };
 
 } // namespace ns3

@@ -17,24 +17,24 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-interference-input-trace-container.h"
+#include "satellite-rx-power-input-trace-container.h"
 #include "ns3/satellite-env-variables.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatInterferenceInputTraceContainer");
+NS_LOG_COMPONENT_DEFINE ("SatRxPowerInputTraceContainer");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatInterferenceInputTraceContainer);
+NS_OBJECT_ENSURE_REGISTERED (SatRxPowerInputTraceContainer);
 
 TypeId 
-SatInterferenceInputTraceContainer::GetTypeId (void)
+SatRxPowerInputTraceContainer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatInterferenceInputTraceContainer")
+  static TypeId tid = TypeId ("ns3::SatRxPowerInputTraceContainer")
     .SetParent<SatBaseTraceContainer> ();
   return tid;
 }
 
-SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer () :
+SatRxPowerInputTraceContainer::SatRxPowerInputTraceContainer () :
   m_index (0),
   m_currentWorkingDirectory ("")
 {
@@ -44,7 +44,7 @@ SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer () :
   m_currentWorkingDirectory = envVariables->GetCurrentWorkingDirectory ();
 }
 
-SatInterferenceInputTraceContainer::~SatInterferenceInputTraceContainer ()
+SatRxPowerInputTraceContainer::~SatRxPowerInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -52,7 +52,7 @@ SatInterferenceInputTraceContainer::~SatInterferenceInputTraceContainer ()
 }
 
 void
-SatInterferenceInputTraceContainer::DoDispose ()
+SatRxPowerInputTraceContainer::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -62,7 +62,7 @@ SatInterferenceInputTraceContainer::DoDispose ()
 }
 
 void
-SatInterferenceInputTraceContainer::Reset ()
+SatRxPowerInputTraceContainer::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -75,28 +75,28 @@ SatInterferenceInputTraceContainer::Reset ()
 }
 
 void
-SatInterferenceInputTraceContainer::AddNode (key_t key)
+SatRxPowerInputTraceContainer::AddNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/data/interference_trace/input/nodeId_" << m_index << "_channelType_" + key.second;
+  filename << m_currentWorkingDirectory << "/data/rx_power_trace/input/nodeId_" << m_index << "_channelType_" + key.second;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str(), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str(), std::ios::in, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {
-      NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
+      NS_FATAL_ERROR ("SatRxPowerInputTraceContainer::AddNode failed");
     }
 
-  NS_LOG_INFO ("SatInterferenceInputTraceContainer::AddNode: Added node with ID " << m_index);
+  NS_LOG_INFO ("SatRxPowerInputTraceContainer::AddNode: Added node with ID " << m_index);
 
   m_index++;
 }
 
 Ptr<SatInputFileStreamDoubleContainer>
-SatInterferenceInputTraceContainer::FindNode (key_t key)
+SatRxPowerInputTraceContainer::FindNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
@@ -104,11 +104,11 @@ SatInterferenceInputTraceContainer::FindNode (key_t key)
 }
 
 double
-SatInterferenceInputTraceContainer::GetInterferenceDensity (key_t key)
+SatRxPowerInputTraceContainer::GetRxPowerDensity (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
-  return FindNode (key)->ProceedToNextClosestTimeSample ().at (SatBaseTraceContainer::INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX);
+  return FindNode (key)->ProceedToNextClosestTimeSample ().at (SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX);
 }
 
 } // namespace ns3
