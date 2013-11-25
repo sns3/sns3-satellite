@@ -54,7 +54,7 @@ SatPerPacketInterference::SatPerPacketInterference ()
     m_channelType (),
     m_rxBandwidth_Hz ()
 {
-  NS_ASSERT(0);
+  //NS_ASSERT(0);
 }
 
 SatPerPacketInterference::SatPerPacketInterference (Ptr<SatInterferenceOutputTraceContainer> traceContainer, SatEnums::ChannelType_t channeltype, double rxBandwidth)
