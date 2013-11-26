@@ -106,11 +106,6 @@ private:
   container_t m_container;
 
   /**
-   * \brief Current index number
-   */
-  uint32_t m_index;
-
-  /**
    * \brief Path to current working directory
    */
   std::string m_currentWorkingDirectory;

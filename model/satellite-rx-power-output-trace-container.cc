@@ -35,7 +35,6 @@ SatRxPowerOutputTraceContainer::GetTypeId (void)
 }
 
 SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
-  m_index (0),
   m_currentWorkingDirectory ("")
 {
   NS_LOG_FUNCTION (this);
@@ -72,7 +71,6 @@ SatRxPowerOutputTraceContainer::Reset ()
     {
       m_container.clear ();
     }
-  m_index = 0;
   m_currentWorkingDirectory = "";
 }
 
@@ -83,7 +81,7 @@ SatRxPowerOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/data/rx_power_trace/output/nodeId_" << m_index << "_channelType_" << key.second;
+  filename << m_currentWorkingDirectory << "/data/rx_power_trace/output/mac_" << key.first << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
@@ -92,9 +90,7 @@ SatRxPowerOutputTraceContainer::AddNode (key_t key)
       NS_FATAL_ERROR ("SatRxPowerOutputTraceContainer::AddNode failed");
     }
 
-  NS_LOG_INFO ("SatRxPowerOutputTraceContainer::AddNode: Added node with ID " << m_index);
-
-  m_index++;
+  NS_LOG_INFO ("SatRxPowerOutputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
 
   return result.first->second;
 }

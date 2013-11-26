@@ -50,15 +50,15 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   NS_LOG_FUNCTION (this << carrierId);
 
   // Create proper interference object for carrier i
-  switch ( carrierConf->GetInterferenceModel () )
+  switch (carrierConf->GetInterferenceModel ())
   {
     case SatPhyRxCarrierConf::IF_CONSTANT:
-      NS_LOG_LOGIC(this << " Constant interference model created for carrier: " << carrierId);
+      NS_LOG_LOGIC (this << " Constant interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatConstantInterference> ();
       break;
 
     case SatPhyRxCarrierConf::IF_PER_PACKET:
-      NS_LOG_LOGIC(this << " Per packet interference model created for carrier: " << carrierId);
+      NS_LOG_LOGIC (this << " Per packet interference model created for carrier: " << carrierId);
 
       /// TODO change to attribute
       if (0)
@@ -72,7 +72,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       break;
 
     case SatPhyRxCarrierConf::IF_TRACE:
-      NS_LOG_LOGIC(this << " Traced interference model created for carrier: " << carrierId);
+      NS_LOG_LOGIC (this << " Traced interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatTracedInterference> (m_channelType, carrierConf->GetCarrierBandwidth_Hz (carrierId));
       break;
 
