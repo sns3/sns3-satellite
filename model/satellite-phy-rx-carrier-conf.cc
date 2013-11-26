@@ -158,4 +158,9 @@ SatPhyRxCarrierConf::RxMode SatPhyRxCarrierConf::GetRxMode () const
   return m_rxMode;
 }
 
+SatEnums::ChannelType_t SatPhyRxCarrierConf::GetChannelType () const
+{
+  return m_channelType;
+}
+
 } // namespace ns3

@@ -169,6 +169,12 @@ public:
    */
   RxMode GetRxMode () const;
 
+  /**
+   * \brief Get channel type
+   * \return channel type
+   */
+  SatEnums::ChannelType_t GetChannelType () const;
+
 private:
 
   /*

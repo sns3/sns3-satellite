@@ -42,7 +42,10 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf)
   :m_state (IDLE),
-   m_carrierId (carrierId)
+   m_beamId (),
+   m_carrierId (carrierId),
+   m_satInterference (),
+   m_channelType (carrierConf->GetChannelType ())
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -55,17 +58,22 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       break;
 
     case SatPhyRxCarrierConf::IF_PER_PACKET:
-      /// TODO change constructor
       NS_LOG_LOGIC(this << " Per packet interference model created for carrier: " << carrierId);
-      m_satInterference = CreateObject<SatPerPacketInterference> ();
-      //(SatEnums::ChannelType_t channeltype, double rxBandwidth)
+
+      /// TODO change to attribute
+      if (0)
+        {
+          m_satInterference = CreateObject<SatPerPacketInterference> (m_channelType, carrierConf->GetCarrierBandwidth_Hz (carrierId));
+        }
+      else
+        {
+          m_satInterference = CreateObject<SatPerPacketInterference> ();
+        }
       break;
 
     case SatPhyRxCarrierConf::IF_TRACE:
-      /// TODO change constructor
       NS_LOG_LOGIC(this << " Traced interference model created for carrier: " << carrierId);
-      m_satInterference = CreateObject<SatTracedInterference> ();
-      //(SatEnums::ChannelType_t channeltype, double rxBandwidth)
+      m_satInterference = CreateObject<SatTracedInterference> (m_channelType, carrierConf->GetCarrierBandwidth_Hz (carrierId));
       break;
 
     default:
@@ -179,9 +187,27 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
           m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
 
-          /** TODO add switch logic for address!! */
           // add interference in any case
-          m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W, m_destAddress);
+          switch (m_channelType)
+          {
+            case SatEnums::RETURN_FEEDER_CH :
+            case SatEnums::RETURN_USER_CH :
+              {
+                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_sourceAddress);
+                break;
+              }
+            case SatEnums::FORWARD_FEEDER_CH :
+            case SatEnums::FORWARD_USER_CH :
+              {
+                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_destAddress);
+                break;
+              }
+            default :
+              {
+                NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Invalid channel type");
+                break;
+              }
+          }
 
           // Check whether the packet is sent to our beam.
           // In case that RX mode is something else than transparent
@@ -207,7 +233,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
         break;
 
         default:
-          NS_FATAL_ERROR ("unknown state");
+          NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Unknown state");
           break;
       }
 }

@@ -68,25 +68,6 @@ public:
   void DoDispose ();
 
   /**
-   * \brief Function for adding the node to the map
-   * \param key key
-   */
-  void AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
-
-  /**
-   * \brief Function for finding the container matching the key
-   * \param key key
-   * \return matching container
-   */
-  Ptr<SatOutputFileStreamDoubleContainer> FindNode (key_t key);
-
-  /**
-   * \brief Write the contents of a container matching to the key into a file
-   * \param key key
-   */
-  void WriteToFile (key_t key);
-
-  /**
    * \brief Add the vector containing the values to container matching the key
    * \param key key
    * \param newItem vector of values
@@ -99,6 +80,25 @@ private:
    * \brief Function for resetting the variables
    */
   void Reset ();
+
+  /**
+   * \brief Function for adding the node to the map
+   * \param key key
+   * \return pointer to the added container
+   */
+  Ptr<SatOutputFileStreamDoubleContainer> AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
+
+  /**
+   * \brief Function for finding the container matching the key
+   * \param key key
+   * \return matching container
+   */
+  Ptr<SatOutputFileStreamDoubleContainer> FindNode (key_t key);
+
+  /**
+   * \brief Write the contents of a container matching to the key into a file
+   */
+  void WriteToFile ();
 
   /**
    * \brief Map for containers

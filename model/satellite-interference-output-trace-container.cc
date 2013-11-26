@@ -56,9 +56,11 @@ SatInterferenceOutputTraceContainer::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  WriteToFile ();
+
   Reset ();
 
-  SatBaseTraceContainer::DoDispose();
+  SatBaseTraceContainer::DoDispose ();
 }
 
 void
@@ -66,15 +68,15 @@ SatInterferenceOutputTraceContainer::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( !m_container.empty() )
+  if (!m_container.empty ())
     {
-      m_container.clear();
+      m_container.clear ();
     }
   m_index = 0;
   m_currentWorkingDirectory = "";
 }
 
-void
+Ptr<SatOutputFileStreamDoubleContainer>
 SatInterferenceOutputTraceContainer::AddNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
@@ -83,7 +85,7 @@ SatInterferenceOutputTraceContainer::AddNode (key_t key)
 
   filename << m_currentWorkingDirectory << "/data/interference_trace/output/nodeId_" << m_index << "_channelType_" << key.second;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str().c_str(), std::ios::out, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {
@@ -93,6 +95,8 @@ SatInterferenceOutputTraceContainer::AddNode (key_t key)
   NS_LOG_INFO ("SatInterferenceOutputTraceContainer::AddNode: Added node with ID " << m_index);
 
   m_index++;
+
+  return result.first->second;
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
@@ -100,15 +104,27 @@ SatInterferenceOutputTraceContainer::FindNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
-  return m_container.at (key);
+  container_t::iterator iter = m_container.find (key);
+
+  if (iter == m_container.end ())
+    {
+      return AddNode (key);
+    }
+
+  return iter->second;
 }
 
 void
-SatInterferenceOutputTraceContainer::WriteToFile (key_t key)
+SatInterferenceOutputTraceContainer::WriteToFile ()
 {
   NS_LOG_FUNCTION (this);
 
-  FindNode (key)->WriteContainerToFile ();
+  container_t::iterator iter;
+
+  for (iter = m_container.begin (); iter != m_container.end (); ++iter)
+    {
+      iter->second->WriteContainerToFile ();
+    }
 }
 
 void
@@ -116,7 +132,7 @@ SatInterferenceOutputTraceContainer::AddToContainer (key_t key, std::vector<doub
 {
   NS_LOG_FUNCTION (this);
 
-  if ( newItem.size() != SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)
+  if (newItem.size () != SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)
     {
       NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddToContainer - Incorrect vector size");
     }

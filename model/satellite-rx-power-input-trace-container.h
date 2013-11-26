@@ -68,19 +68,6 @@ public:
   void DoDispose ();
 
   /**
-   * \brief Function for adding the node to the map
-   * \param key key
-   */
-  void AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
-
-  /**
-   * \brief Function for finding the container matching the key
-   * \param key key
-   * \return matching container
-   */
-  Ptr<SatInputFileStreamDoubleContainer> FindNode (key_t key);
-
-  /**
    * \brief Function for getting the Rx power density
    * \param key key
    * \return Rx power density
@@ -93,6 +80,20 @@ private:
    * \brief Function for resetting the variables
    */
   void Reset ();
+
+  /**
+   * \brief Function for adding the node to the map
+   * \param key key
+   * \return pointer to the added container
+   */
+  Ptr<SatInputFileStreamDoubleContainer> AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
+
+  /**
+   * \brief Function for finding the container matching the key
+   * \param key key
+   * \return matching container
+   */
+  Ptr<SatInputFileStreamDoubleContainer> FindNode (key_t key);
 
   /**
    * \brief Map for containers

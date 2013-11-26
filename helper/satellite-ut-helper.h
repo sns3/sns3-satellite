@@ -173,36 +173,6 @@ public:
 
 private:
 
-  /**
-   *
-   * \param mac
-   */
-  void InitializeTraceContainers (Address mac);
-
-  /**
-   *
-   * \param mac
-   */
-  void InitializeIntfInputTraceContainers (Address mac);
-
-  /**
-   *
-   * \param mac
-   */
-  void InitializeIntfOutputTraceContainers (Address mac);
-
-  /**
-   *
-   * \param mac
-   */
-  void InitializeRxPowerInputTraceContainers (Address mac);
-
-  /**
-   *
-   * \param mac
-   */
-  void InitializeRxPowerOutputTraceContainers (Address mac);
-
     CarrierBandwidthConverter m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
     Ptr<SatSuperframeSeq> m_superframeSeq;

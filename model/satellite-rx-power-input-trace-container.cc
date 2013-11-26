@@ -58,7 +58,7 @@ SatRxPowerInputTraceContainer::DoDispose ()
 
   Reset ();
 
-  SatBaseTraceContainer::DoDispose();
+  SatBaseTraceContainer::DoDispose ();
 }
 
 void
@@ -66,15 +66,15 @@ SatRxPowerInputTraceContainer::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( !m_container.empty() )
+  if (!m_container.empty ())
     {
-      m_container.clear();
+      m_container.clear ();
     }
   m_index = 0;
   m_currentWorkingDirectory = "";
 }
 
-void
+Ptr<SatInputFileStreamDoubleContainer>
 SatRxPowerInputTraceContainer::AddNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
@@ -83,7 +83,7 @@ SatRxPowerInputTraceContainer::AddNode (key_t key)
 
   filename << m_currentWorkingDirectory << "/data/rx_power_trace/input/nodeId_" << m_index << "_channelType_" << key.second;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str().c_str(), std::ios::in, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {
@@ -93,6 +93,8 @@ SatRxPowerInputTraceContainer::AddNode (key_t key)
   NS_LOG_INFO ("SatRxPowerInputTraceContainer::AddNode: Added node with ID " << m_index);
 
   m_index++;
+
+  return result.first->second;
 }
 
 Ptr<SatInputFileStreamDoubleContainer>
@@ -100,7 +102,14 @@ SatRxPowerInputTraceContainer::FindNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
-  return m_container.at (key);
+  container_t::iterator iter = m_container.find (key);
+
+  if (iter == m_container.end ())
+    {
+      return AddNode (key);
+    }
+
+  return iter->second;
 }
 
 double
