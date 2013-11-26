@@ -95,7 +95,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
       m_carrierIds.push_back (i);
     }
 
-  Simulator::Schedule (Seconds (0.1), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule (Seconds (m_superframeSeq->GetDuration_s (0)), &SatBeamScheduler::Schedule, this);
 }
 
 void
@@ -162,7 +162,7 @@ SatBeamScheduler::Schedule ()
     }
 
   // re-schedule next TBTP sending (call of this function)
-  Simulator::Schedule (Seconds (0.1), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule (Seconds (m_superframeSeq->GetDuration_s (0)), &SatBeamScheduler::Schedule, this);
 }
 
 void SatBeamScheduler::ScheduleUts (SatTbtpHeader& header)
@@ -186,7 +186,7 @@ void SatBeamScheduler::ScheduleUts (SatTbtpHeader& header)
           m_currentUt = m_uts.begin ();
         }
 
-      if ( m_currentUt != m_firstUt )
+      if ( m_currentUt == m_firstUt )
         {
           UtsOrSlotsLeft = false;
         }
