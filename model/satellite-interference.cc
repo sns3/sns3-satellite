@@ -119,15 +119,18 @@ SatInterference::Reset (void)
 {
   DoReset();
 }
+
 void
 SatInterference::NotifyRxStart (Ptr<SatInterference::Event> event)
 {
   DoNotifyRxStart(event);
 }
+
 void
 SatInterference::NotifyRxEnd (Ptr<SatInterference::Event> event)
 {
   DoNotifyRxEnd(event);
 }
+
 }
 // namespace ns3

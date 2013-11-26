@@ -60,8 +60,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     case SatPhyRxCarrierConf::IF_PER_PACKET:
       NS_LOG_LOGIC (this << " Per packet interference model created for carrier: " << carrierId);
 
-      /// TODO change to attribute
-      if (0)
+      if (carrierConf->IsIntfOutputTraceEnabled ())
         {
           m_satInterference = CreateObject<SatPerPacketInterference> (m_channelType, carrierConf->GetCarrierBandwidth_Hz (carrierId));
         }

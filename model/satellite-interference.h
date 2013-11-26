@@ -35,6 +35,7 @@ namespace ns3 {
 class SatInterference : public Object
 {
 public:
+
   /**
    * Event for identifying interferences (receiving)
    */

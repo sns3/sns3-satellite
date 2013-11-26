@@ -175,6 +175,12 @@ public:
    */
   SatEnums::ChannelType_t GetChannelType () const;
 
+  /**
+   * \brief Is interference output trace enabled
+   * \return true or false
+   */
+  bool IsIntfOutputTraceEnabled () const;
+
 private:
 
   /*
@@ -187,14 +193,13 @@ private:
   ErrorModel m_errorModel;
   Ptr<SatLinkResults> m_linkResults;
   double m_rxTemperature_K;
-  double m_rxBandwidth_Hz;
   double m_rxExtNoiseDensity_dbWHz;
   double m_rxOtherSysInterference_db;
   double m_rxImInterference_db;
   double m_rxAciInterference_db;
   double m_rxAciIfWrtNoise;
   RxMode m_rxMode;
-
+  bool m_enableIntfOutputTrace;
   uint32_t m_carrierCount;
   CarrierBandwidthConverter m_carrierBandwidthConverter;
   SatEnums::ChannelType_t m_channelType;
