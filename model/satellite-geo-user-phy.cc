@@ -44,10 +44,27 @@ SatGeoUserPhy::SatGeoUserPhy (void)
   NS_LOG_FUNCTION (this);
 }
 
-SatGeoUserPhy::SatGeoUserPhy (Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId)
-  : SatPhy(d, txCh, rxCh, beamId)
+SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
+                              InterferenceModel ifModel, CarrierBandwidthConverter converter, uint32_t carrierCount)
+  : SatPhy (params)
 {
   SatPhy::GetPhyTx()->SetAttribute("TxMode", EnumValue(SatPhyTx::TRANSPARENT));
+
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
+
+  Ptr<SatPhyRxCarrierConf> carrierConf =
+            CreateObject<SatPhyRxCarrierConf> (SatPhy::m_rxTemperatureDbK,
+                                               SatPhyRxCarrierConf::EM_NONE,
+                                               ifModel,
+                                               SatPhyRxCarrierConf::TRANSPARENT,
+                                               SatEnums::RETURN_USER_CH,
+                                               converter,
+                                               carrierCount);
+
+  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterferenceCOverIDb));
+  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterferenceCOverIDb) );
+
+  SatPhy::ConfigureRxCarriers (carrierConf);
 }
 
 SatGeoUserPhy::~SatGeoUserPhy ()
@@ -76,12 +93,17 @@ SatGeoUserPhy::GetTypeId (void)
     .AddConstructor<SatGeoUserPhy> ()
     .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
                     PointerValue (),
-                    MakePointerAccessor (&SatGeoUserPhy::GetPhyRx, &SatGeoUserPhy::SetPhyRx),
+                    MakePointerAccessor (&SatPhy::GetPhyRx, &SatPhy::SetPhyRx),
                     MakePointerChecker<SatPhyRx> ())
     .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
                     PointerValue (),
-                    MakePointerAccessor (&SatGeoUserPhy::GetPhyTx, &SatGeoUserPhy::SetPhyTx),
+                    MakePointerAccessor (&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
                     MakePointerChecker<SatPhyTx> ())
+    .AddAttribute( "RxTemperatureDbK",
+                   "RX noise temperature in GW.",
+                    DoubleValue(28.4),
+                    MakeDoubleAccessor(&SatPhy::m_rxTemperatureDbK),
+                    MakeDoubleChecker<double>())
     .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
                     DoubleValue(54.00),
                     MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_db),
@@ -118,36 +140,18 @@ SatGeoUserPhy::GetTypeId (void)
                     DoubleValue(1.00),
                     MakeDoubleAccessor(&SatPhy::m_defaultFadingValue),
                     MakeDoubleChecker<double_t> ())
+    .AddAttribute( "OtherSysIfCOverIDb",
+                   "Other system interference, C over I in dB.",
+                    DoubleValue (27.5),
+                    MakeDoubleAccessor (&SatGeoUserPhy::m_otherSysInterferenceCOverIDb),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute( "AciIfCOverIDb",
+                   "Adjacent channel interference, C over I in dB.",
+                    DoubleValue (17.0),
+                    MakeDoubleAccessor(&SatGeoUserPhy::m_aciInterferenceCOverIDb),
+                    MakeDoubleChecker<double> ())
   ;
   return tid;
-}
-
-Ptr<SatPhyTx>
-SatGeoUserPhy::GetPhyTx () const
-{
-  NS_LOG_FUNCTION (this);
-  return SatPhy::GetPhyTx ();
-}
-
-Ptr<SatPhyRx>
-SatGeoUserPhy::GetPhyRx () const
-{
-  NS_LOG_FUNCTION (this);
-  return SatPhy::GetPhyRx ();
-}
-
-void
-SatGeoUserPhy::SetPhyTx (Ptr<SatPhyTx> phyTx)
-{
-  NS_LOG_FUNCTION (this << phyTx);
-  SatPhy::SetPhyTx (phyTx);
-}
-
-void
-SatGeoUserPhy::SetPhyRx (Ptr<SatPhyRx> phyRx)
-{
-  NS_LOG_FUNCTION (this << phyRx);
-  SatPhy::SetPhyRx (phyRx);
 }
 
 void
@@ -155,24 +159,6 @@ SatGeoUserPhy::DoStart ()
 {
   NS_LOG_FUNCTION (this);
   Object::DoStart ();
-}
-
-void
-SatGeoUserPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
-{
-  NS_LOG_FUNCTION (this << p << carrierId << duration);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
-
-  SatPhy::SendPdu (p, carrierId, duration);
-}
-
-void
-SatGeoUserPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
-{
-  NS_LOG_FUNCTION (this << p << txParams);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
-
-  SatPhy::SendPduWithParams  (p, txParams);
 }
 
 } // namespace ns3

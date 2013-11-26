@@ -61,66 +61,6 @@ SatGeoHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatGeoHelper::m_rtnLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute( "FwdLinkRxTemperatureDbK",
-                     "The forward link RX noise temperature in Geo satellite.",
-                     DoubleValue(28.4),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkRxTemperature_dbK),
-                     MakeDoubleChecker<double>())
-      .AddAttribute( "RtnLinkRxTemperatureDbK",
-                     "The return link RX noise temperature in Geo satellite.",
-                     DoubleValue(28.4),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkRxTemperature_dbK),
-                     MakeDoubleChecker<double>())
-      .AddAttribute( "FwdLinkOtherSysNoiseDbHz",
-                     "Other system noise of the forward link in Geo satellite.",
-                     DoubleValue (SatUtils::MinDb<double> ()),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdLinkOtherSysNoise_dbHz),
-                     MakeDoubleChecker<double>())
-      .AddAttribute( "RtnLinkOtherSysNoiseDbHz",
-                     "Other system noise of the return link in Geo satellite.",
-                     DoubleValue (SatUtils::MinDb<double> ()),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnLinkOtherSysNoise_dbHz),
-                     MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
-     .AddAttribute( "FwdRxOtherSysIfDb",
-                    "Other system interference of the forward link in Geo satellite.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdOtherSysInterference_db),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "RtnRxOtherSysIfDb",
-                    "Other system interference of the return link in Geo satellite.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnOtherSysInterference_db),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "FwdRxImIfDb",
-                    "Intermodultation interference of the forward link in Geo satellite.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdImInterference_db),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "RtnRxImIfDb",
-                    "Intermodultation interference of the retun link in Geo satellite.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnImInterference_db),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "FwdRxAciIfDb",
-                    "Adjacent channel interference of the forward link in Geo satellite.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdAciInterference_db),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "RtnRxAciIfDb",
-                    "Adjacent channel interference of the return link in Geo satellite.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnAciInterference_db),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "FwdRxAciIfWrtNoise",
-                    "Adjacent channel interference wrt noise in percents for the forward link.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_fwdAciIfWrtNoise),
-                     MakeDoubleChecker<double>())
-     .AddAttribute( "RtnRxAciIfWrtNoise",
-                    "Adjacent channel interference wrt noise in percents for the return link.",
-                     DoubleValue (0.0),
-                     MakeDoubleAccessor(&SatGeoHelper::m_rtnAciIfWrtNoise),
-                     MakeDoubleChecker<double>())
      .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
     ;
@@ -167,7 +107,7 @@ SatGeoHelper::SetUserPhyAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
 
-  Config::SetDefault ("ns3::SatGeoUserPhy" + n1, v1);
+  Config::SetDefault ("ns3::SatGeoUserPhy::" + n1, v1);
 }
 
 void
@@ -175,7 +115,7 @@ SatGeoHelper::SetFeederPhyAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
 
-  Config::SetDefault ("ns3::SatGeoFeederPhy" + n1, v1);
+  Config::SetDefault ("ns3::SatGeoFeederPhy::" + n1, v1);
 }
 
 NetDeviceContainer 
@@ -231,8 +171,20 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
   //Ptr<MobilityModel> mobility = dev->GetNode()->GetObject<MobilityModel>();
 
-  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (d, uf, ur, userBeamId);
-  Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (d, fr, ff, userBeamId);
+  SatPhy::CreateParam_t params;
+  params.m_beamId = userBeamId;
+  params.m_device = d;
+  params.m_txCh = uf;
+  params.m_rxCh = ur;
+
+  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params, m_rtnLinkInterferenceModel,
+                                                         m_carrierBandwidthConverter, m_rtnLinkCarrierCount);
+
+  params.m_txCh = fr;
+  params.m_rxCh = ff;
+
+  Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params, m_fwdLinkInterferenceModel,
+                                                             m_carrierBandwidthConverter, m_fwdLinkCarrierCount);
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);
@@ -245,56 +197,8 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   // in both uplink and downlink directions.
   uPhy->SetTxAntennaGainPattern (userAgp);
   uPhy->SetRxAntennaGainPattern (userAgp);
-
-  // Configure the SatPhyRxCarrier instances
-  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
-  // instead of just the number of carriers, since it should hold information about
-  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
-  // Note, that in GEO satellite, there is no need for error modeling.
-
-  Ptr<SatPhyRxCarrierConf> rtnCarrierConf =
-        CreateObject<SatPhyRxCarrierConf> (m_rtnLinkRxTemperature_dbK,
-                                           SatPhyRxCarrierConf::EM_NONE,
-                                           m_rtnLinkInterferenceModel,
-                                           SatPhyRxCarrierConf::TRANSPARENT,
-                                           SatEnums::RETURN_USER_CH,
-                                           m_carrierBandwidthConverter,
-                                           m_rtnLinkCarrierCount);
-
-  rtnCarrierConf->SetAttribute ("ExtNoiseDensityDbWHz", DoubleValue (m_rtnLinkOtherSysNoise_dbHz) );
-  rtnCarrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_rtnOtherSysInterference_db) );
-  rtnCarrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_rtnImInterference_db) );
-  rtnCarrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_rtnAciInterference_db) );
-  rtnCarrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_rtnAciIfWrtNoise) );
-
-  uPhy->ConfigureRxCarriers (rtnCarrierConf);
-
-  // Note, that currently we have only one set of antenna patterns,
-  // which are utilized in both in user link and feeder link, and
-  // in both uplink and downlink directions.
   fPhy->SetTxAntennaGainPattern (feederAgp);
   fPhy->SetRxAntennaGainPattern (feederAgp);
-
-  // Configure the SatPhyRxCarrier instances
-  // Note, that in GEO satellite, there is no need for error modeling.
-
-  Ptr<SatPhyRxCarrierConf> fwdCarrierConf =
-        CreateObject<SatPhyRxCarrierConf> (m_fwdLinkRxTemperature_dbK,
-                                           SatPhyRxCarrierConf::EM_NONE,
-                                           m_fwdLinkInterferenceModel,
-                                           SatPhyRxCarrierConf::TRANSPARENT,
-                                           SatEnums::FORWARD_FEEDER_CH,
-                                           m_carrierBandwidthConverter,
-                                           m_fwdLinkCarrierCount);
-
-
-  fwdCarrierConf->SetAttribute ("ExtNoiseDensityDbWHz", DoubleValue (m_fwdLinkOtherSysNoise_dbHz) );
-  fwdCarrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_fwdOtherSysInterference_db) );
-  fwdCarrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_fwdImInterference_db) );
-  fwdCarrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_fwdAciInterference_db) );
-  fwdCarrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_fwdAciIfWrtNoise) );
-
-  fPhy->ConfigureRxCarriers (fwdCarrierConf);
 
   dev->AddUserPhy(uPhy, userBeamId);
   dev->AddFeederPhy(fPhy, userBeamId);

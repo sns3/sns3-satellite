@@ -30,7 +30,7 @@
 #include "ns3/node-container.h"
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
-#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-phy.h"
 
 namespace ns3 {
 
@@ -41,7 +41,7 @@ namespace ns3 {
 class SatGeoHelper : public Object
 {
 public:
-  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+  typedef SatPhy::CarrierBandwidthConverter CarrierBandwidthConverter;
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -152,72 +152,12 @@ private:
     /*
      * Configured forward link interference model
      */
-    SatPhyRxCarrierConf::InterferenceModel m_fwdLinkInterferenceModel;
+    SatPhy::InterferenceModel m_fwdLinkInterferenceModel;
 
     /*
      * Configured return link interference model
      */
-    SatPhyRxCarrierConf::InterferenceModel m_rtnLinkInterferenceModel;
-
-    /*
-     * Configured RX noise temperature (in Kelvins) for return link.
-     */
-    double m_rtnLinkRxTemperature_dbK;
-
-    /*
-     * Configured RX noise temperature (in Kelvins) for forward link.
-     */
-    double m_fwdLinkRxTemperature_dbK;
-
-    /*
-     * Configured other system noise for return link.
-     */
-    double m_rtnLinkOtherSysNoise_dbHz;
-
-    /*
-     * Configured other system noise for forward link.
-     */
-    double m_fwdLinkOtherSysNoise_dbHz;
-
-    /*
-     * Other system interference (signal over interference) for forward link.
-     */
-    double m_fwdOtherSysInterference_db;
-
-    /*
-     * Other system interference (signal over interference) for return link.
-     */
-    double m_rtnOtherSysInterference_db;
-
-    /*
-     * Intermodulation interference (signal over interference) for forward link.
-     */
-    double m_fwdImInterference_db;
-
-    /*
-     * Intermodulation interference (signal over interference) for return link.
-     */
-    double m_rtnImInterference_db;
-
-    /*
-     * Adjacent channel interference (signal over interference) for forward link..
-     */
-    double m_fwdAciInterference_db;
-
-    /*
-     * Adjacent channel interference (signal over interference) for forward link..
-     */
-    double m_rtnAciInterference_db;
-
-    /*
-     * Adjacent channel interference wrt noise for forward link.
-     */
-    double m_fwdAciIfWrtNoise;
-
-    /*
-     * Adjacent channel interference wrt noise for return link.
-     */
-    double m_rtnAciIfWrtNoise;
+    SatPhy::InterferenceModel m_rtnLinkInterferenceModel;
 
     /**
      * Trace callback for creation traces

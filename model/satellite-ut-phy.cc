@@ -43,10 +43,31 @@ SatUtPhy::SatUtPhy (void)
   NS_LOG_FUNCTION (this);
 }
 
-SatUtPhy::SatUtPhy (Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId)
-  : SatPhy(d, txCh, rxCh, beamId)
+SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params, ErrorModel errorModel, Ptr<SatLinkResults> linkResults,
+                    InterferenceModel ifModel, CarrierBandwidthConverter converter, uint32_t carrierCount)
+  : SatPhy(params)
 {
   NS_LOG_FUNCTION (this);
+
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
+
+  Ptr<SatPhyRxCarrierConf> carrierConf =
+              CreateObject<SatPhyRxCarrierConf> (SatPhy::m_rxTemperatureDbK,
+                                                 errorModel,
+                                                 ifModel,
+                                                 SatPhyRxCarrierConf::NORMAL,
+                                                 SatEnums::FORWARD_USER_CH,
+                                                 converter,
+                                                 carrierCount);
+
+  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterferenceCOverIDb));
+
+  if (linkResults)
+    {
+       carrierConf->SetLinkResults (linkResults);
+    }
+
+  SatPhy::ConfigureRxCarriers (carrierConf);
 }
 
 SatUtPhy::~SatUtPhy ()
@@ -81,6 +102,11 @@ SatUtPhy::GetTypeId (void)
                     PointerValue (),
                     MakePointerAccessor (&SatUtPhy::GetPhyTx, &SatUtPhy::SetPhyTx),
                     MakePointerChecker<SatPhyTx> ())
+    .AddAttribute( "RxTemperatureDbK",
+                   "RX noise temperature in GW.",
+                    DoubleValue(24.6),  // ~290K
+                    MakeDoubleAccessor(&SatPhy::m_rxTemperatureDbK),
+                    MakeDoubleChecker<double>())
     .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
                     DoubleValue(44.60),
                     MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_db),
@@ -117,36 +143,13 @@ SatUtPhy::GetTypeId (void)
                     DoubleValue(1.00),
                     MakeDoubleAccessor(&SatPhy::m_defaultFadingValue),
                     MakeDoubleChecker<double_t> ())
+    .AddAttribute( "OtherSysIfCOverIDb",
+                   "Other system interference, C over I in dB.",
+                    DoubleValue (24.7),
+                    MakeDoubleAccessor(&SatUtPhy::m_otherSysInterferenceCOverIDb),
+                    MakeDoubleChecker<double> ())
   ;
   return tid;
-}
-
-Ptr<SatPhyTx>
-SatUtPhy::GetPhyTx () const
-{
-  NS_LOG_FUNCTION (this);
-  return SatPhy::GetPhyTx ();
-}
-
-Ptr<SatPhyRx>
-SatUtPhy::GetPhyRx () const
-{
-  NS_LOG_FUNCTION (this);
-  return SatPhy::GetPhyRx ();
-}
-
-void
-SatUtPhy::SetPhyTx (Ptr<SatPhyTx> phyTx)
-{
-  NS_LOG_FUNCTION (this << phyTx);
-  SatPhy::SetPhyTx (phyTx);
-}
-
-void
-SatUtPhy::SetPhyRx (Ptr<SatPhyRx> phyRx)
-{
-  NS_LOG_FUNCTION (this << phyRx);
-  SatPhy::SetPhyRx (phyRx);
 }
 
 void
@@ -154,24 +157,6 @@ SatUtPhy::DoStart ()
 {
   NS_LOG_FUNCTION (this);
   Object::DoStart ();
-}
-
-void
-SatUtPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
-{
-  NS_LOG_FUNCTION (this << p << carrierId << duration);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
-
-  SatPhy::SendPdu (p, carrierId, duration);
-}
-
-void
-SatUtPhy::SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
-{
-  NS_LOG_FUNCTION (this << p << txParams);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
-
-  SatPhy::SendPduWithParams  (p, txParams);
 }
 
 } // namespace ns3

@@ -57,7 +57,7 @@ SatPhy::SatPhy (void)
   // Create the first needed SatPhyTx and SatPhyRx modules
 }
 
-SatPhy::SatPhy (Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId)
+SatPhy::SatPhy (CreateParam_t & params)
  : m_eirpWoGain_W(0),
    m_rxMaxAntennaGain_db (0),
    m_txMaxAntennaGain_db (0),
@@ -69,18 +69,18 @@ SatPhy::SatPhy (Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, ui
    m_rxAntennaLoss_db (0),
    m_defaultFadingValue (1)
 {
-  NS_LOG_FUNCTION (this << d << txCh << rxCh << beamId);
+  NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
-  Ptr<MobilityModel> mobility = d->GetNode()->GetObject<MobilityModel>();
+  Ptr<MobilityModel> mobility = params.m_device->GetNode()->GetObject<MobilityModel>();
 
   m_phyTx = CreateObject<SatPhyTx> ();
-  m_phyTx->SetChannel (txCh);
+  m_phyTx->SetChannel (params.m_txCh);
   m_phyRx = CreateObject<SatPhyRx> ();
-  m_beamId = beamId;
+  m_beamId = params.m_beamId;
 
-  rxCh->AddRx (m_phyRx);
-  m_phyRx->SetDevice (d);
+  params.m_rxCh->AddRx (m_phyRx);
+  m_phyRx->SetDevice (params.m_device);
   m_phyTx->SetMobility (mobility);
   m_phyRx->SetMobility (mobility);
 }

@@ -66,36 +66,6 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumAccessor (&SatUtHelper::m_interferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute( "RxTemperatureDbK",
-                     "The forward link RX noise temperature in UT.",
-                     DoubleValue(24.62),  // ~290K
-                     MakeDoubleAccessor (&SatUtHelper::m_rxTemperature_dbK),
-                     MakeDoubleChecker<double> ())
-      .AddAttribute( "RxOtherSysNoiseDbHz",
-                     "Other system noise of RX in UT.",
-                     DoubleValue (SatUtils::MinDb<double> ()),
-                     MakeDoubleAccessor (&SatUtHelper::m_otherSysNoise_dbHz),
-                     MakeDoubleChecker<double> (SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
-      .AddAttribute( "RxOtherSysIfDb",
-                     "Other system interference of RX in UT.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor (&SatUtHelper::m_otherSysInterference_db),
-                      MakeDoubleChecker<double> ())
-      .AddAttribute( "RxImIfDb",
-                     "Intermodulation interference of RX in UT.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatUtHelper::m_imInterference_db),
-                      MakeDoubleChecker<double> ())
-      .AddAttribute( "RxAciIfDb",
-                     "Adjacent channel interference of RX in UT.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatUtHelper::m_aciInterference_db),
-                      MakeDoubleChecker<double> ())
-      .AddAttribute( "RxAciIfWrtNoise",
-                     "Adjacent channel interference wrt noise in percents.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatUtHelper::m_aciIfWrtNoise),
-                      MakeDoubleChecker<double> ())
       .AddAttribute ("CraAllocMode",
                      "Constant Rate Assignment (CRA) allocation mode used for UTs.",
                       EnumValue (SatUtHelper::CONSTANT_CRA),
@@ -220,35 +190,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the SatNetDevice to node
   n->AddDevice (dev);
 
-  Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (dev, rCh, fCh, beamId);
+  SatPhy::CreateParam_t params;
+  params.m_beamId = beamId;
+  params.m_device = dev;
+  params.m_txCh = rCh;
+  params.m_rxCh = fCh;
 
-  // Configure the SatPhyRxCarrier instances
-  // \todo We should pass the whole carrier configuration to the SatPhyRxCarrier,
-  // instead of just the number of carriers, since it should hold information about
-  // the number of carriers, carrier center frequencies and carrier bandwidths, etc.
-  Ptr<SatPhyRxCarrierConf> carrierConf =
-        CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
-                                           m_errorModel,
-                                           m_interferenceModel,
-                                           SatPhyRxCarrierConf::NORMAL,
-                                           SatEnums::FORWARD_USER_CH,
-                                           m_carrierBandwidthConverter,
-                                           m_fwdLinkCarrierCount);
-
-  carrierConf->SetAttribute ("ExtNoiseDensityDbWHz", DoubleValue (m_otherSysNoise_dbHz) );
-  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterference_db) );
-  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
-  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
-  carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
-
-  // If the link results are created, we pass those
-  // to SatPhyRxCarrier for error modeling.
-  if (m_linkResults)
-    {
-      carrierConf->SetLinkResults (m_linkResults);
-    }
-
-  phy->ConfigureRxCarriers (carrierConf);
+  Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params, m_errorModel, m_linkResults, m_interferenceModel,
+                                              m_carrierBandwidthConverter, m_fwdLinkCarrierCount);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

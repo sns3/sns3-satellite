@@ -46,7 +46,8 @@ public:
    */
   SatGeoUserPhy (void);
 
-  SatGeoUserPhy (Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId);
+  SatGeoUserPhy (SatPhy::CreateParam_t& params, InterferenceModel ifModel,
+                 CarrierBandwidthConverter converter, uint32_t carrierCount);
 
   virtual ~SatGeoUserPhy ();
 
@@ -56,47 +57,17 @@ public:
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
-  /**
-       * Get the SatPhyTx pointer
-       * \return a pointer to the SatPhyTx instance
-       */
-      Ptr<SatPhyTx> GetPhyTx () const;
-
-      /**
-       * Get the SatPhyRx pointer
-       * \return a pointer to the SatPhyRx instance
-       */
-      Ptr<SatPhyRx> GetPhyRx () const;
-
-      /**
-       * Set the SatPhyTx module
-       * \param phyTx Transmitter PHY module
-       */
-      void SetPhyTx (Ptr<SatPhyTx> phyTx);
-
-      /**
-       * Set the SatPhyRx module
-       * \param phyTx Receiver PHY module
-       */
-      void SetPhyRx (Ptr<SatPhyRx> phyRx);
-
-
-  /**
-   * Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
-   * \param p packet to be sent
-   * \param carrierId Carrier id for the packet transmission
-   * \param duration the packet transmission duration (from MAC layer)
-   */
-  virtual void SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration);
-
-  /**
-   * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
-   * \param p packet to be sent
-   * \param rxParams Transmission parameters
-   */
-  virtual void SendPdu (Ptr<Packet> p, Ptr<SatSignalParameters> rxParams);
-
 private:
+
+  /**
+   * Adjacent channel interference (signal over interference) for forward link..
+   */
+  double m_aciInterferenceCOverIDb;
+
+  /**
+   * Other system interference (signal over interference).
+   */
+  double m_otherSysInterferenceCOverIDb;
 
 };
 

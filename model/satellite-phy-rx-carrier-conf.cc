@@ -82,7 +82,7 @@ SatPhyRxCarrierConf::GetTypeId (void)
                     MakeDoubleChecker<double>())
     .AddAttribute( "ExtNoiseDensityDbWHz",
                    "External noise power density.",
-                    DoubleValue (0.0),
+                    DoubleValue (SatUtils::MinDb<double>()),
                     MakeDoubleAccessor(&SatPhyRxCarrierConf::m_rxExtNoiseDensity_dbWHz),
                     MakeDoubleChecker<double>())
     .AddConstructor<SatPhyRxCarrierConf> ()

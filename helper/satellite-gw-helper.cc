@@ -64,36 +64,6 @@ SatGwHelper::GetTypeId (void)
                       MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
                       MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute( "RxTemperatureDbK",
-                     "RX noise temperature in GW.",
-                      DoubleValue(24.62),  // ~290K
-                      MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_dbK),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxOtherSysNoiseDbHz",
-                     "Other system noise of RX in GW.",
-                      DoubleValue (SatUtils::MinDb<double> ()),
-                      MakeDoubleAccessor(&SatGwHelper::m_otherSysNoise_dbHz),
-                      MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
-      .AddAttribute( "RxOtherSysIfDb",
-                     "Other system interference of RX in GW.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_otherSysInterference_db),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxImIfDb",
-                     "Intermodultation interference of RX in GW.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_imInterference_db),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxAciIfDb",
-                     "Adjacent channel interference of RX in GW.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_aciInterference_db),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxAciIfWrtNoise",
-                     "Adjacent channel interference wrt noise in percents.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_aciIfWrtNoise),
-                      MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                         MakeTraceSourceAccessor (&SatGwHelper::m_creation))
     ;
@@ -208,31 +178,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);
 
-  Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (dev, fCh, rCh, beamId);
+  SatPhy::CreateParam_t params;
+  params.m_beamId = beamId;
+  params.m_device = dev;
+  params.m_txCh = fCh;
+  params.m_rxCh = rCh;
 
-  // Configure the SatPhyRxCarrier instances
-  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
-                                                                            m_errorModel,
-                                                                            m_interferenceModel,
-                                                                            SatPhyRxCarrierConf::NORMAL,
-                                                                            SatEnums::RETURN_FEEDER_CH,
-                                                                            m_carrierBandwidthConverter,
-                                                                            m_rtnLinkCarrierCount);
-
-  carrierConf->SetAttribute ("ExtNoiseDensityDbWHz", DoubleValue (m_otherSysNoise_dbHz) );
-  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterference_db) );
-  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
-  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
-  carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
-
-  // If the link results are created, we pass those
-  // to SatPhyRxCarrier for error modeling
-  if (m_linkResults)
-    {
-      carrierConf->SetLinkResults (m_linkResults);
-    }
-
-  phy->ConfigureRxCarriers (carrierConf);
+  Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params, m_errorModel, m_linkResults, m_interferenceModel, m_carrierBandwidthConverter, m_rtnLinkCarrierCount);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

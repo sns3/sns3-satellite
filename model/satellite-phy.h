@@ -45,6 +45,9 @@ class SatMac;
 class SatPhy : public Object
 {
 public:
+  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+  typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
+  typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;
 
   /**
    * \param  the packet received
@@ -59,12 +62,20 @@ public:
    */
   typedef Callback<void, uint32_t, Address, double> CnoCallback;
 
+  typedef struct
+  {
+    Ptr<NetDevice> m_device;
+    Ptr<SatChannel> m_txCh;
+    Ptr<SatChannel> m_rxCh;
+    uint32_t m_beamId;
+  } CreateParam_t;
+
   /**
    * Default constructor
    */
   SatPhy (void);
 
-  SatPhy ( Ptr<NetDevice> d, Ptr<SatChannel> txCh, Ptr<SatChannel> rxCh, uint32_t beamId);
+  SatPhy ( CreateParam_t& params );
 
   virtual ~SatPhy ();
 
@@ -82,12 +93,12 @@ public:
   /**
    * Set the transmit antenna gain pattern.
    */
-  void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+  virtual void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
    * Set the transmit antenna gain pattern.
    */
-  void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+  virtual void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
    * \param carrierConf Carrier configuration class
@@ -196,6 +207,11 @@ private:
     SatPhy::CnoCallback m_cnoCallback;
 
 public:
+
+  /**
+   * Receiver temperature in dbK.
+   */
+  double m_rxTemperatureDbK;
 
   /**
    * Calculated EIRP without gain in Watts
