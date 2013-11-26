@@ -37,19 +37,24 @@ class SatBaseTraceContainer : public Object
 public:
 
   /**
-   * \brief Default Rx power density index for interference traces
+   * \brief Default Rx power density index for Rx power traces
    */
-  static const uint32_t INTF_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
+  static const uint32_t RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
+
+  /**
+   * \brief Default Rx power density index for Rx power traces
+   */
+  static const uint32_t RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
   /**
    * \brief Default interference density index for interference traces
    */
-  static const uint32_t INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX = 2;
+  static const uint32_t INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX = 1;
 
   /**
    * \brief Default number of columns for interference traces
    */
-  static const uint32_t INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 3;
+  static const uint32_t INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
   /**
    * \brief Constructor

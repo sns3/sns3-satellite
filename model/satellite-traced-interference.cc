@@ -21,6 +21,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "satellite-traced-interference.h"
+#include "ns3/satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatTracedInterference");
 
@@ -44,18 +45,25 @@ SatTracedInterference::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatTracedInterference::SatTracedInterference (std::string filename) :
+SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth) :
     m_rxing (false),
-    m_power ()
+    m_power (),
+    m_channelType (channeltype),
+    m_rxBandwidth_Hz (rxBandwidth)
 {
-  m_tracedInterference = CreateObject<SatInputFileStreamDoubleContainer> (filename,std::ios::in,ROW_COUNT);
+  if (!m_rxBandwidth_Hz > 0)
+    {
+      NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Invalid value");
+    }
 }
 
 SatTracedInterference::SatTracedInterference () :
     m_rxing (false),
-    m_power ()
+    m_power (),
+    m_channelType (),
+    m_rxBandwidth_Hz ()
 {
-  NS_ASSERT (0);
+  NS_FATAL_ERROR ("SatTracedInterference - Constructor not in use");
 }
 
 SatTracedInterference::~SatTracedInterference ()
@@ -64,10 +72,10 @@ SatTracedInterference::~SatTracedInterference ()
 }
 
 Ptr<SatInterference::Event>
-SatTracedInterference::DoAdd (Time duration, double power)
+SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
   Ptr<SatInterference::Event> event;
-  event = Create<SatInterference::Event> (0, duration, power);
+  event = Create<SatInterference::Event> (0, duration, power, rxAddress);
 
   return event;
 }
@@ -75,10 +83,9 @@ SatTracedInterference::DoAdd (Time duration, double power)
 double
 SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
-  m_power = (m_tracedInterference->ProceedToNextClosestTimeSample ()).at(INTERFERENCE_VALUE_COLUMN_NUMBER);
+  m_power = m_rxBandwidth_Hz * SatHelper::m_satIntfInputTraceContainer->GetInterferenceDensity (std::make_pair (event->GetRxAddress(),m_channelType));
 
   return m_power;
-
 }
 
 void
@@ -97,6 +104,23 @@ void
 SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 {
   m_rxing = false;
+}
+
+void
+SatTracedInterference::DoDispose ()
+{
+  SatInterference::DoDispose();
+}
+
+void
+SatTracedInterference::SetRxBandwidth (double rxBandwidth)
+{
+  if (!m_rxBandwidth_Hz > 0)
+    {
+      NS_FATAL_ERROR ("SatTracedInterference::SetRxBandwidth - Invalid value");
+    }
+
+  m_rxBandwidth_Hz = rxBandwidth;
 }
 
 }

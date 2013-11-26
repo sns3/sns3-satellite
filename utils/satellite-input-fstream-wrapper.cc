@@ -34,16 +34,8 @@ SatInputFileStreamWrapper::SatInputFileStreamWrapper (std::string filename, std:
 
   std::ifstream* ifs = new std::ifstream (filename.c_str (), filemode);
 
-  if (!ifs->is_open ())
-    {
-      // script might be launched by test.py, try a different base path
-      delete ifs;
-      filename = "../../" + filename;
-      ifs = new std::ifstream (filename.c_str (), filemode);
-
-      NS_ABORT_MSG_UNLESS (ifs->is_open (), "SatOutputStreamWrapper::OutputStreamWrapper():  " <<
-                           "Unable to Open " << filename << " for mode " << filemode);
-    }
+  NS_ABORT_MSG_UNLESS (ifs->is_open (), "SatOutputStreamWrapper::OutputStreamWrapper():  " <<
+                       "Unable to Open " << filename << " for mode " << filemode);
 
   m_ifstream = ifs;
 }

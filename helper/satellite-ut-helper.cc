@@ -40,6 +40,7 @@
 #include "../model/satellite-phy-rx-carrier-conf.h"
 
 #include "satellite-ut-helper.h"
+#include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 

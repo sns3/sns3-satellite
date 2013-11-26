@@ -17,24 +17,24 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-interference-output-trace-container.h"
+#include "satellite-rx-power-output-trace-container.h"
 #include "ns3/satellite-env-variables.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatInterferenceOutputTraceContainer");
+NS_LOG_COMPONENT_DEFINE ("SatRxPowerOutputTraceContainer");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatInterferenceOutputTraceContainer);
+NS_OBJECT_ENSURE_REGISTERED (SatRxPowerOutputTraceContainer);
 
 TypeId 
-SatInterferenceOutputTraceContainer::GetTypeId (void)
+SatRxPowerOutputTraceContainer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatInterferenceOutputTraceContainer")
+  static TypeId tid = TypeId ("ns3::SatRxPowerOutputTraceContainer")
     .SetParent<SatBaseTraceContainer> ();
   return tid;
 }
 
-SatInterferenceOutputTraceContainer::SatInterferenceOutputTraceContainer () :
+SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
   m_currentWorkingDirectory ("")
 {
   NS_LOG_FUNCTION (this);
@@ -43,7 +43,7 @@ SatInterferenceOutputTraceContainer::SatInterferenceOutputTraceContainer () :
   m_currentWorkingDirectory = envVariables->GetCurrentWorkingDirectory ();
 }
 
-SatInterferenceOutputTraceContainer::~SatInterferenceOutputTraceContainer ()
+SatRxPowerOutputTraceContainer::~SatRxPowerOutputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -51,7 +51,7 @@ SatInterferenceOutputTraceContainer::~SatInterferenceOutputTraceContainer ()
 }
 
 void
-SatInterferenceOutputTraceContainer::DoDispose ()
+SatRxPowerOutputTraceContainer::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -63,7 +63,7 @@ SatInterferenceOutputTraceContainer::DoDispose ()
 }
 
 void
-SatInterferenceOutputTraceContainer::Reset ()
+SatRxPowerOutputTraceContainer::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -75,28 +75,28 @@ SatInterferenceOutputTraceContainer::Reset ()
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
-SatInterferenceOutputTraceContainer::AddNode (key_t key)
+SatRxPowerOutputTraceContainer::AddNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/data/interference_trace/output/mac_" << key.first << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/data/rx_power_trace/output/mac_" << key.first << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {
-      NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddNode failed");
+      NS_FATAL_ERROR ("SatRxPowerOutputTraceContainer::AddNode failed");
     }
 
-  NS_LOG_INFO ("SatInterferenceOutputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
+  NS_LOG_INFO ("SatRxPowerOutputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
 
   return result.first->second;
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
-SatInterferenceOutputTraceContainer::FindNode (key_t key)
+SatRxPowerOutputTraceContainer::FindNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
@@ -111,7 +111,7 @@ SatInterferenceOutputTraceContainer::FindNode (key_t key)
 }
 
 void
-SatInterferenceOutputTraceContainer::WriteToFile ()
+SatRxPowerOutputTraceContainer::WriteToFile ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -124,13 +124,13 @@ SatInterferenceOutputTraceContainer::WriteToFile ()
 }
 
 void
-SatInterferenceOutputTraceContainer::AddToContainer (key_t key, std::vector<double> newItem)
+SatRxPowerOutputTraceContainer::AddToContainer (key_t key, std::vector<double> newItem)
 {
   NS_LOG_FUNCTION (this);
 
-  if (newItem.size () != SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)
+  if (newItem.size () != SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX)
     {
-      NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddToContainer - Incorrect vector size");
+      NS_FATAL_ERROR ("SatRxPowerOutputTraceContainer::AddToContainer - Incorrect vector size");
     }
 
   FindNode (key)->AddToContainer (newItem);
