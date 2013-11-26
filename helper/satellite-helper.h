@@ -33,7 +33,10 @@
 #include "satellite-beam-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
-
+#include "ns3/satellite-rx-power-input-trace-container.h"
+#include "ns3/satellite-rx-power-output-trace-container.h"
+#include "ns3/satellite-interference-input-trace-container.h"
+#include "ns3/satellite-interference-output-trace-container.h"
 
 namespace ns3 {
 
@@ -44,6 +47,12 @@ namespace ns3 {
 class SatHelper : public Object
 {
 public:
+
+  static Ptr<SatInterferenceInputTraceContainer> m_satIntfInputTraceContainer;
+  static Ptr<SatInterferenceOutputTraceContainer> m_satIntfOutputTraceContainer;
+  static Ptr<SatRxPowerInputTraceContainer> m_satRxPowerInputTraceContainer;
+  static Ptr<SatRxPowerOutputTraceContainer> m_satRxPowerOutputTraceContainer;
+
   /**
    * definition for beam map key and value.
    */
@@ -141,6 +150,8 @@ public:
   inline NodeContainer GwNodes () { return m_beamHelper->GetGwNodes(); }
   inline NodeContainer UtNodes () { return m_beamHelper->GetUtNodes(); }
   inline Ptr<Node> GeoSatNode () { return m_beamHelper->GetGeoSatNode(); }
+
+  void DoDispose();
 
 private:
   /**

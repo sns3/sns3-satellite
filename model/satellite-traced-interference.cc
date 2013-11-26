@@ -21,6 +21,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "satellite-traced-interference.h"
+#include "ns3/satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatTracedInterference");
 
@@ -44,10 +45,9 @@ SatTracedInterference::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatTracedInterference::SatTracedInterference (Ptr<SatInterferenceInputTraceContainer> traceContainer, SatEnums::ChannelType_t channeltype, double rxBandwidth) :
+SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth) :
     m_rxing (false),
     m_power (),
-    m_traceContainer (traceContainer),
     m_channelType (channeltype),
     m_rxBandwidth_Hz (rxBandwidth)
 {
@@ -60,7 +60,6 @@ SatTracedInterference::SatTracedInterference (Ptr<SatInterferenceInputTraceConta
 SatTracedInterference::SatTracedInterference () :
     m_rxing (false),
     m_power (),
-    m_traceContainer (),
     m_channelType (),
     m_rxBandwidth_Hz ()
 {
@@ -73,10 +72,10 @@ SatTracedInterference::~SatTracedInterference ()
 }
 
 Ptr<SatInterference::Event>
-SatTracedInterference::DoAdd (Time duration, double power)
+SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
   Ptr<SatInterference::Event> event;
-  event = Create<SatInterference::Event> (0, duration, power);
+  event = Create<SatInterference::Event> (0, duration, power, rxAddress);
 
   return event;
 }
@@ -84,13 +83,7 @@ SatTracedInterference::DoAdd (Time duration, double power)
 double
 SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
-  std::pair<Address,SatEnums::ChannelType_t> key;
-  Address mac;
-
-  key.first = mac;
-  key.second = m_channelType;
-
-  m_power = m_rxBandwidth_Hz * m_traceContainer->GetInterferenceDensity (key);
+  m_power = m_rxBandwidth_Hz * SatHelper::m_satIntfInputTraceContainer->GetInterferenceDensity (std::make_pair (event->GetRxAddress(),m_channelType));
 
   return m_power;
 }
@@ -116,7 +109,6 @@ SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 void
 SatTracedInterference::DoDispose ()
 {
-  m_traceContainer = NULL;
   SatInterference::DoDispose();
 }
 

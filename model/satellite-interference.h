@@ -24,6 +24,7 @@
 #include "ns3/object.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/nstime.h"
+#include "ns3/mac48-address.h"
 
 namespace ns3 {
 
@@ -46,7 +47,7 @@ public:
       * \param duration duration of the interference event
       * \param rxPower  RX power of interference
       */
-    Event (uint32_t id, Time duration, double rxPower);
+    Event (uint32_t id, Time duration, double rxPower, Address rxAddress);
 
     /**
      * Destructor of Event for satellite interference
@@ -78,11 +79,17 @@ public:
       */
     double GetRxPower (void) const;
 
+    /**
+      * \return Rx address of the interference event
+      */
+    Address GetRxAddress (void) const;
+
   private:
     Time m_startTime;
     Time m_endTime;
     double m_rxPower;
     uint32_t m_id;
+    Address m_rxAddress;
   };
 
   static TypeId GetTypeId (void);
@@ -104,10 +111,11 @@ public:
    *
    * \param rxDuration Duration of the receiving.
    * \param rxPower Receiving power.
+   * \param rxAddress MAC address.
    *
    * \return the pointer to interference event as a reference of the addition
    */
-  Ptr<SatInterference::Event> Add (Time rxDuration, double rxPower);
+  Ptr<SatInterference::Event> Add (Time rxDuration, double rxPower, Address rxAddress);
 
   /**
    * Calculates interference power for the given reference
@@ -143,12 +151,13 @@ private:
    *
    * \param rxDuration Duration of the receiving.
    * \param rxPower Receiving power.
+   * \param rxAddress MAC address.
    *
    * \return the pointer to interference event as a reference of the addition
    *
    * Concrete subclasses of this base class must implement this method.
    */
-  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower) = 0;
+  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower, Address rxAddress) = 0;
 
   /**
    * Calculates interference power for the given reference
@@ -160,7 +169,7 @@ private:
    *
    * Concrete subclasses of this base class must implement this method.
    */
-  virtual double DoCalculate (Ptr<SatInterference::Event> event ) = 0;
+  virtual double DoCalculate (Ptr<SatInterference::Event> event) = 0;
 
   /**
    * Resets current interference.

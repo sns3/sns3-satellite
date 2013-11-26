@@ -40,6 +40,7 @@
 #include "../model/satellite-phy-rx-carrier-conf.h"
 
 #include "satellite-ut-helper.h"
+#include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 
@@ -312,6 +313,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   phy->Initialize();
 
+  InitializeTraceContainers (dev->GetAddress ());
+
   return dev;
 }
 
@@ -331,6 +334,80 @@ SatUtHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase 
   NS_LOG_FUNCTION (this);
 
   TraceConnect("Creation", "SatUtHelper", cb);
+}
+
+void
+SatUtHelper::InitializeTraceContainers (Address mac)
+{
+  /// TODO add conditional initialization based on attributes
+  //InitializeIntfInputTraceContainers (mac);
+  //InitializeIntfOutputTraceContainers (mac);
+  //InitializeRxPowerInputTraceContainers (mac);
+  //InitializeRxPowerOutputTraceContainers (mac);
+}
+
+void
+SatUtHelper::InitializeIntfInputTraceContainers (Address mac)
+{
+  /** FORWARD FEEDER LINK **/
+  SatHelper::m_satIntfInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_FEEDER_CH));
+
+  /** FORWARD USER LINK **/
+  SatHelper::m_satIntfInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_USER_CH));
+
+  /** RETURN FEEDER LINK **/
+  SatHelper::m_satIntfInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_FEEDER_CH));
+
+  /** RETURN USER LINK **/
+  SatHelper::m_satIntfInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_USER_CH));
+}
+
+void
+SatUtHelper::InitializeIntfOutputTraceContainers (Address mac)
+{
+  /** FORWARD FEEDER LINK **/
+  SatHelper::m_satIntfOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_FEEDER_CH));
+
+  /** FORWARD USER LINK **/
+  SatHelper::m_satIntfOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_USER_CH));
+
+  /** RETURN FEEDER LINK **/
+  SatHelper::m_satIntfOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_FEEDER_CH));
+
+  /** RETURN USER LINK **/
+  SatHelper::m_satIntfOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_USER_CH));
+}
+
+void
+SatUtHelper::InitializeRxPowerInputTraceContainers (Address mac)
+{
+  /** FORWARD FEEDER LINK **/
+  SatHelper::m_satRxPowerInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_FEEDER_CH));
+
+  /** FORWARD USER LINK **/
+  SatHelper::m_satRxPowerInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_USER_CH));
+
+  /** RETURN FEEDER LINK **/
+  SatHelper::m_satRxPowerInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_FEEDER_CH));
+
+  /** RETURN USER LINK **/
+  SatHelper::m_satRxPowerInputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_USER_CH));
+}
+
+void
+SatUtHelper::InitializeRxPowerOutputTraceContainers (Address mac)
+{
+  /** FORWARD FEEDER LINK **/
+  SatHelper::m_satRxPowerOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_FEEDER_CH));
+
+  /** FORWARD USER LINK **/
+  SatHelper::m_satRxPowerOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::FORWARD_USER_CH));
+
+  /** RETURN FEEDER LINK **/
+  SatHelper::m_satRxPowerOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_FEEDER_CH));
+
+  /** RETURN USER LINK **/
+  SatHelper::m_satRxPowerOutputTraceContainer->AddNode (std::make_pair (mac,SatEnums::RETURN_USER_CH));
 }
 
 } // namespace ns3

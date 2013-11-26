@@ -55,13 +55,17 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       break;
 
     case SatPhyRxCarrierConf::IF_PER_PACKET:
+      /// TODO change constructor
       NS_LOG_LOGIC(this << " Per packet interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatPerPacketInterference> ();
+      //(SatEnums::ChannelType_t channeltype, double rxBandwidth)
       break;
 
     case SatPhyRxCarrierConf::IF_TRACE:
+      /// TODO change constructor
       NS_LOG_LOGIC(this << " Traced interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatTracedInterference> ();
+      //(SatEnums::ChannelType_t channeltype, double rxBandwidth)
       break;
 
     default:
@@ -169,14 +173,15 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-          // add interference in any case
-          m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W);
-
           SatMacTag tag;
           rxParams->m_packet->PeekPacketTag (tag);
 
           m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
           m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+          /** TODO add switch logic for address!! */
+          // add interference in any case
+          m_interferenceEvent = m_satInterference->Add(rxParams->m_duration, rxParams->m_rxPower_W, m_destAddress);
 
           // Check whether the packet is sent to our beam.
           // In case that RX mode is something else than transparent
@@ -270,12 +275,12 @@ SatPhyRxCarrier::CalculateSinr (double rxPower_W, double ifPower_W)
 
   NS_ASSERT( m_rxNoise_W >= SatUtils::MinLin<double> () );
 
-  // caluclate first sinr based on co-channel interference, Adjacent channel interference, noise and other sys noise
+  // calculate first sinr based on co-channel interference, Adjacent channel interference, noise and other system noise
   double sinr = rxPower_W / (ifPower_W + m_rxAciIf_W + m_rxNoise_W + m_rxOtherSysNoise_W);
 
   double inverseSinr = 1 / sinr;
 
-  // calculate final sinr taken into account configured interferencies (C over I)
+  // calculate final sinr taken into account configured interference (C over I)
   // interference ratio 1 means that it is not configured and is not calculated
 
   if ( m_rxOtherSysInterference != 1 )

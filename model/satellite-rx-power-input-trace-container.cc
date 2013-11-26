@@ -81,9 +81,9 @@ SatRxPowerInputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/data/rx_power_trace/input/nodeId_" << m_index << "_channelType_" + key.second;
+  filename << m_currentWorkingDirectory << "/data/rx_power_trace/input/nodeId_" << m_index << "_channelType_" << key.second;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str(), std::ios::in, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair(key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str().c_str(), std::ios::in, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {

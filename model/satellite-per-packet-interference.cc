@@ -22,6 +22,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "satellite-per-packet-interference.h"
+#include "ns3/satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPerPacketInterference");
 
@@ -49,7 +50,6 @@ SatPerPacketInterference::SatPerPacketInterference ()
   : m_firstPower (0.0),
     m_rxing (false),
     m_nextEventId (0),
-    m_traceContainer (),
     m_enableTraceOutput (false),
     m_channelType (),
     m_rxBandwidth_Hz ()
@@ -57,11 +57,10 @@ SatPerPacketInterference::SatPerPacketInterference ()
   //NS_ASSERT(0);
 }
 
-SatPerPacketInterference::SatPerPacketInterference (Ptr<SatInterferenceOutputTraceContainer> traceContainer, SatEnums::ChannelType_t channeltype, double rxBandwidth)
+SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth)
   : m_firstPower (0.0),
     m_rxing (false),
     m_nextEventId (0),
-    m_traceContainer (traceContainer),
     m_enableTraceOutput (true),
     m_channelType (channeltype),
     m_rxBandwidth_Hz (rxBandwidth)
@@ -79,10 +78,10 @@ SatPerPacketInterference::~SatPerPacketInterference ()
 }
 
 Ptr<SatInterference::Event>
-SatPerPacketInterference::DoAdd (Time duration, double power)
+SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
   Ptr<SatInterference::Event> event;
-  event = Create<SatInterference::Event> (m_nextEventId++, duration, power);
+  event = Create<SatInterference::Event> (m_nextEventId++, duration, power, rxAddress);
   Time now = event->GetStartTime ();
 
   if (!m_rxing)
@@ -150,16 +149,10 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event)
 
   if (m_enableTraceOutput)
     {
-      std::pair<Address,SatEnums::ChannelType_t> key;
-      Address mac;
-
-      key.first = mac;
-      key.second = m_channelType;
-
       std::vector<double> tempVector;
       tempVector.push_back (Now ().GetDouble());
       tempVector.push_back (finalPower / m_rxBandwidth_Hz);
-      m_traceContainer->AddToContainer (key, tempVector);
+      SatHelper::m_satIntfOutputTraceContainer->AddToContainer (std::make_pair (event->GetRxAddress (), m_channelType), tempVector);
     }
 
   return finalPower;
@@ -196,7 +189,6 @@ SatPerPacketInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 void
 SatPerPacketInterference::DoDispose ()
 {
-  m_traceContainer = NULL;
   SatInterference::DoDispose ();
 }
 

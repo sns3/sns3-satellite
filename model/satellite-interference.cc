@@ -26,11 +26,12 @@ NS_LOG_COMPONENT_DEFINE ("SatInterference");
 
 namespace ns3 {
 
-SatInterference::Event::Event (uint32_t id, Time rxDuration, double rxPower)
+SatInterference::Event::Event (uint32_t id, Time rxDuration, double rxPower, Address rxAddress)
   : m_startTime (Simulator::Now ()),
     m_endTime (m_startTime + rxDuration),
     m_rxPower (rxPower),
-    m_id(id)
+    m_id (id),
+    m_rxAddress (rxAddress)
 {
 }
 SatInterference::Event::~Event ()
@@ -42,27 +43,36 @@ SatInterference::Event::GetId (void) const
 {
   return m_id;
 }
+
 Time
 SatInterference::Event::GetDuration (void) const
 {
   return m_endTime - m_startTime;
 }
+
 Time
 SatInterference::Event::GetStartTime (void) const
 {
   return m_startTime;
 }
+
 Time
 SatInterference::Event::GetEndTime (void) const
 {
   return m_endTime;
 }
+
 double
 SatInterference::Event::GetRxPower (void) const
 {
   return m_rxPower;
 }
 
+Address
+SatInterference::Event::GetRxAddress (void) const
+{
+  return m_rxAddress;
+}
 /****************************************************************
  *       The actual SatInterference
  ****************************************************************/
@@ -93,13 +103,13 @@ SatInterference::~SatInterference ()
 }
 
 Ptr<SatInterference::Event>
-SatInterference::Add (Time duration, double power)
+SatInterference::Add (Time duration, double power, Address rxAddress)
 {
-  return DoAdd(duration, power);
+  return DoAdd(duration, power, rxAddress);
 }
 
 double
-SatInterference::Calculate (Ptr<SatInterference::Event> event )
+SatInterference::Calculate (Ptr<SatInterference::Event> event)
 {
   return DoCalculate (event);
 }

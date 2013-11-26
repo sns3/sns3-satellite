@@ -55,12 +55,11 @@ public:
 
   /**
    *
-   * \param traceContainer
    * \param mac
    * \param channeltype
    * \param rxBandwidth
    */
-  SatPerPacketInterference (Ptr<SatInterferenceOutputTraceContainer> traceContainer, SatEnums::ChannelType_t channeltype, double rxBandwidth);
+  SatPerPacketInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth);
 
   /**
    *
@@ -87,7 +86,7 @@ private:
    *
    * \return the pointer to interference event as a reference of the addition
    */
-  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower);
+  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
 
   /**
    * Calculates interference power for the given reference
@@ -165,11 +164,6 @@ private:
    * \brief event id for Events
    */
   uint32_t m_nextEventId;
-
-  /**
-   *
-   */
-  Ptr<SatInterferenceOutputTraceContainer> m_traceContainer;
 
   /**
    *
