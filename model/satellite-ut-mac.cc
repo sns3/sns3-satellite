@@ -149,8 +149,10 @@ SatUtMac::TransmitTime (uint32_t carrierId)
    * - RC_index
    */
 
-  uint32_t txBytes (30);
-  Ptr<Packet> p = m_txOpportunityCallback (txBytes);
+  // Default payload size of waveform  13
+  // (long burst with most robust MODCOD of QPSK 1/3)
+  uint32_t txBytes (123);
+  Ptr<Packet> p = m_txOpportunityCallback (txBytes, m_macAddress);
 
   if ( p )
     {
@@ -161,31 +163,64 @@ SatUtMac::TransmitTime (uint32_t carrierId)
 
 
 void
-SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
+SatUtMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  bool deliverUp = true;
+  // Hit the trace hooks.  All of these hooks are in the same place in this
+  // device because it is so simple, but this is not usually the case in
+  // more complicated devices.
 
+  m_snifferTrace (packet);
+  m_promiscSnifferTrace (packet);
+  m_macRxTrace (packet);
+
+  // Remove packet tag
   SatMacTag macTag;
-  packet->PeekPacketTag (macTag);
-
-  SatControlMsgTag ctrlTag;
-  packet->RemovePacketTag (ctrlTag);
-
-  SatControlMsgTag::SatControlMsgType_t cType = ctrlTag.GetMsgType ();
-  if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
+  bool mSuccess = packet->PeekPacketTag (macTag);
+  if (!mSuccess)
     {
-      ReceiveSignalingPacket (packet, cType);
-      deliverUp = false;
+      NS_FATAL_ERROR ("MAC tag was not found from the packet!");
     }
 
-  // deliver packet to parent SatMac, if not UT specific packet
-  if (deliverUp)
+  NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
+  NS_LOG_LOGIC("Receiver " << m_macAddress );
+
+  Mac48Address destAddress = Mac48Address::ConvertFrom(macTag.GetDestAddress());
+  if (destAddress == m_macAddress || destAddress.IsBroadcast())
     {
-      SatMac::Receive (packet, rxParams);
+      // Remove control msg tag
+      SatControlMsgTag ctrlTag;
+      bool cSuccess = packet->RemovePacketTag (ctrlTag);
+
+      if (cSuccess)
+        {
+          SatControlMsgTag::SatControlMsgType_t cType = ctrlTag.GetMsgType ();
+
+          if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
+            {
+              // Remove the ctrl tag
+              packet->RemovePacketTag (ctrlTag);
+              ReceiveSignalingPacket (packet, cType);
+            }
+          else
+            {
+              NS_FATAL_ERROR ("A control message received with not valid msg type!");
+            }
+        }
+      // Control msg tag not found, send the packet to higher layer
+      else
+        {
+          // Pass the receiver address to LLC
+          m_rxCallback (packet, destAddress);
+        }
+    }
+  else
+    {
+      NS_FATAL_ERROR ("UT received a packet not intended for it");
     }
 }
+
 
 void
 SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType)

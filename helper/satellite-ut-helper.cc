@@ -37,6 +37,8 @@
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
+#include "../model/satellite-generic-encapsulator.h"
+#include "../model/satellite-net-device.h"
 
 #include "satellite-ut-helper.h"
 
@@ -202,7 +204,7 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -210,14 +212,14 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add (Install (*i, beamId, fCh, rCh, ncc));
+    devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -295,18 +297,38 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy> ();
   phy->Initialize();
 
+  // Create Logical Link Control (LLC) layer
+  Ptr<SatLlc> llc = CreateObject<SatLlc> (true);
+
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
   dev->SetMac (mac);
 
-  // Set the device address and pass it to MAC as well
-  dev->SetAddress (Mac48Address::Allocate ());
-  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
+  // Attach the LLC layer to SatNetDevice
+  dev->SetLlc (llc);
 
-  // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
+  // Set the device address and pass it to MAC as well
+  Mac48Address addr = Mac48Address::Allocate ();
+  dev->SetAddress (addr);
+  phyRx->SetAddress (addr);
+
+  // Create RLE and add it to UT's LLC
+  Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
+  Ptr<SatGenericEncapsulator> utEncap = CreateObject<SatGenericEncapsulator> (addr, gwAddr);
+  Ptr<SatGenericEncapsulator> utDecap = CreateObject<SatGenericEncapsulator> (gwAddr, addr);
+  utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
+  llc->AddEncap (addr, utEncap); // Tx
+  llc->AddDecap (addr, utDecap); // Rx
+
+  // Create RLE and add it to GW's LLC
+  Ptr<SatGenericEncapsulator> gwEncap = CreateObject<SatGenericEncapsulator> (gwAddr, addr);
+  Ptr<SatGenericEncapsulator> gwDecap = CreateObject<SatGenericEncapsulator> (addr, gwAddr);
+  Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
+  gwLlc->AddEncap (addr, gwEncap);
+  gwLlc->AddDecap (addr, gwDecap);
+  gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, gwLlc));
 
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
@@ -324,9 +346,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
-  // Attach the LLC layer to SatNetDevice
-  dev->SetLlc (llc);
-
   // Attach the SatNetDevice to node
   n->AddDevice (dev);
 
@@ -339,13 +358,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
 
   Ptr<Node> a = Names::Find<Node> (aName);
 
-  return Install (a, beamId, fCh, rCh, ncc);
+  return Install (a, beamId, fCh, rCh, gwNd, ncc);
 }
 
 void

@@ -245,7 +245,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd), m_superframeSeq );
 
   // install UTs
-  NetDeviceContainer utNd = m_utHelper->Install (ut, beamId, userLink.first, userLink.second, m_ncc);
+  NetDeviceContainer utNd = m_utHelper->Install (ut, beamId, userLink.first, userLink.second, DynamicCast<SatNetDevice>(gwNd), m_ncc);
   Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign (utNd);
 
   // set needed routings and fill ARP cache

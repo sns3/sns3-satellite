@@ -60,12 +60,6 @@ public:
   ~SatUtMac ();
 
   /**
-   * Starts scheduling of the sending. Called when MAC is wanted to take care of scheduling.
-   */
-  //void StartScheduling();
-
-
-  /**
    * Receive packet from lower layer.
    *
    * \param packet Pointer to packet received.

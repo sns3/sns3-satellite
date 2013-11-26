@@ -64,19 +64,6 @@ public:
   ~SatMac ();
 
   /**
-   * Send packet to lower layer by using a callback
-   * \param packet Packet to be sent.
-   */
-  void SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration);
-
-  /**
-   * Receive packet from lower layer.
-   *
-   * \param packet Pointer to packet received.
-   */
-  virtual void Receive (Ptr<Packet> p, Ptr<SatSignalParameters> /*rxParams*/);
-
-  /**
    * Callback to send packet to lower layer.
     * \param Ptr<Packet> the packet received
     * \param uint32_t carrierId
@@ -86,9 +73,10 @@ public:
 
   /**
    * Callback to receive packet by upper layer.
-    * \param packet the packet received
-    */
-  typedef Callback<void, Ptr<Packet> > ReceiveCallback;
+   * \param MAC address related to the received packet connection
+   * \param packet the packet received
+   */
+  typedef Callback<void, Ptr<Packet>, Mac48Address> ReceiveCallback;
 
   /**
    * Method to set transmit callback.
@@ -106,10 +94,11 @@ public:
 
   /**
    * Callback to notify upper layer about Tx opportunity.
+   * \param Mac48Address address
    * \param uint32_t payload size in bytes
    * \return packet Packet to be transmitted to PHY
    */
-  typedef Callback< Ptr<Packet>, uint32_t > TxOpportunityCallback;
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address > TxOpportunityCallback;
 
   /**
    * Method to set Tx opportunity callback.
@@ -124,7 +113,6 @@ public:
    */
   void SetAddress (Mac48Address macAddress);
 
-
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
@@ -134,8 +122,14 @@ protected:
 
   void DoDispose (void);
 
+  /**
+   * Send packet to lower layer by using a callback
+   * \param packet Packet to be sent.
+   */
+  void SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration);
+
    /**
-    * MAC address of the this mac instance
+    * MAC address of the this mac instance (node)
     */
    Mac48Address m_macAddress;
 

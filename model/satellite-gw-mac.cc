@@ -30,6 +30,7 @@
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-gw-mac.h"
+#include "satellite-scheduling-object.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGwMac");
@@ -56,6 +57,9 @@ SatGwMac::GetTypeId (void)
 SatGwMac::SatGwMac ()
 {
   NS_LOG_FUNCTION (this);
+
+  // Random variable used in scheduling
+  m_random = CreateObject<UniformRandomVariable> ();
 }
 
 SatGwMac::~SatGwMac ()
@@ -63,7 +67,16 @@ SatGwMac::~SatGwMac ()
   NS_LOG_FUNCTION (this);
 }
 
-void SatGwMac::StartScheduling()
+void
+SatGwMac::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+  m_schedContextCallback.Nullify ();
+  SatMac::DoDispose ();
+}
+
+void
+SatGwMac::StartScheduling()
 {
   NS_ASSERT (m_tInterval.GetDouble() > 0.0);
 
@@ -72,11 +85,41 @@ void SatGwMac::StartScheduling()
 }
 
 void
-SatGwMac::DoDispose ()
+SatGwMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
 {
-  NS_LOG_FUNCTION (this);
-  SatMac::DoDispose ();
+  NS_LOG_FUNCTION (this << packet);
+
+  // Hit the trace hooks.  All of these hooks are in the same place in this
+  // device because it is so simple, but this is not usually the case in
+  // more complicated devices.
+  m_snifferTrace (packet);
+  m_promiscSnifferTrace (packet);
+  m_macRxTrace (packet);
+
+  // Remove packet tag
+  SatMacTag macTag;
+  bool mSuccess = packet->PeekPacketTag (macTag);
+  if (!mSuccess)
+    {
+      NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+    }
+
+  NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
+  NS_LOG_LOGIC("Receiver " << m_macAddress );
+
+  // If the packet is intended for this receiver
+  Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress());
+  if (destAddress == m_macAddress || destAddress.IsBroadcast())
+    {
+      // Pass the source address to LLC
+      m_rxCallback (packet, Mac48Address::ConvertFrom(macTag.GetSourceAddress ()));
+    }
+  else
+    {
+      NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
+    }
 }
+
 
 void
 SatGwMac::ScheduleNextTransmissionTime (Time txTime, uint32_t carrierId)
@@ -89,23 +132,54 @@ SatGwMac::TransmitTime (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO: In forward link txBytes should be either
-  // - Short BBFrame = 16200 bits = 2025 Bytes
-  // - Long BBFrame = 64800 bits = 8100 Bytes
-  // This should be decided on-the-fly based on buffered bytes
-  // in LLC layer.
-  uint32_t txBytes (8100);
-  Ptr<Packet> p = m_txOpportunityCallback (txBytes);
+  /**
+   * TODO: This is a first skeleton implementation of the FWD link scheduler.
+   * It is sending only one packet from each UT at a time, which a predefined
+   * interval. In reality, the FWD link scheduler should be building BBFrames,
+   * with possible GSE packets to several UTs.
+   * In forward link txBytes should be either
+   * - Short BBFrame = 16200 bits = 2025 Bytes
+   * - Long BBFrame = 64800 bits = 8100 Bytes
+   * The usage of either short or long BBFrame should be decided on-the-fly
+   * based on buffered bytes in LLC layer.
+   *
+  */
 
-  if ( p )
+  // Default size for Tx opportunity
+  uint32_t txBytes (100);
+
+  // Get scheduling objects from LLC
+  std::vector< Ptr<SatSchedulingObject> > sos = m_schedContextCallback ();
+
+  if ( !sos.empty ())
     {
-      /* TODO: The carrierId should be acquired from somewhere. Now
-       * we assume only one carrier in forward link, so it is safe to use 0.
-       * The duration should be calculated based on BBFrame length and
-       * used MODCOD.
-       */
-      Time DURATION (MicroSeconds(20));
-      SendPacket (p, carrierId, DURATION);
+      uint32_t ind;
+
+      // Prioritize control
+      if (sos.front()->IsControl () || sos.size() == 1)
+        {
+          ind = 0;
+        }
+      // Randomize users
+      else
+        {
+          ind = (uint32_t)(m_random->GetInteger (0, sos.size()-1));
+        }
+
+      // Notify certain UT of the Tx opportunity
+      // Returns a packet.
+      Ptr<Packet> p = m_txOpportunityCallback (txBytes, sos[ind]->GetMacAddress ());
+
+      if ( p )
+        {
+          /* TODO: The carrierId should be acquired from somewhere. Now
+           * we assume only one carrier in forward link, so it is safe to use 0.
+           * The BBFrame duration should be calculated based on BBFrame length and
+           * used MODCOD.
+           */
+          Time DURATION (Seconds(0.0005));
+          SendPacket (p, carrierId, DURATION);
+        }
     }
 
   // TODO: The next TransmitTime should be scheduled to be when just transmitted
@@ -113,5 +187,13 @@ SatGwMac::TransmitTime (uint32_t carrierId)
   // used MODCOD.
   ScheduleNextTransmissionTime (m_tInterval, 0);
 }
+
+void
+SatGwMac::SetSchedContextCallback (SatGwMac::SchedContextCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_schedContextCallback = cb;
+}
+
 
 } // namespace ns3

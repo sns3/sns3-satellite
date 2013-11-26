@@ -31,10 +31,12 @@
 #include "ns3/traced-callback.h"
 #include "ns3/nstime.h"
 #include "ns3/mac48-address.h"
+#include "ns3/random-variable-stream.h"
 
 #include "satellite-mac.h"
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-scheduling-object.h"
 
 namespace ns3 {
 
@@ -70,6 +72,27 @@ public:
    */
   void StartScheduling();
 
+  /**
+   * Receive packet from lower layer.
+   *
+   * \param packet Pointer to packet received.
+   */
+  void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
+
+  /**
+   * Callback to get scheduling contexts from upper layer
+   * \param vector of scheduling contexts
+   */
+  typedef Callback<std::vector< Ptr<SatSchedulingObject> > > SchedContextCallback;
+
+  /**
+   * Method to set Tx opportunity callback.
+    * \param cb callback to invoke whenever a packet has been received and must
+    *        be forwarded to the higher layers.
+    *
+    */
+  void SetSchedContextCallback (SatGwMac::SchedContextCallback cb);
+
 private:
 
   SatGwMac& operator = (const SatGwMac &);
@@ -96,10 +119,20 @@ private:
     */
    void TransmitTime (uint32_t carrierId);
 
+   /**
+    * Random variable used in FWD link scheduling
+    */
+   Ptr<UniformRandomVariable> m_random;
+
   /**
    * The interval that the Mac uses to throttle packet transmission
    */
   Time m_tInterval;
+
+  /**
+   * The lower layer packet transmit callback.
+   */
+  SatGwMac::SchedContextCallback m_schedContextCallback;
 
 };
 

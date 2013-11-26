@@ -319,7 +319,7 @@ SimpleP2p3::DoRun (void)
   uint32_t maxReceivers = utUsers.GetN();
   Time cbrStartDelay = Seconds(0.00001);
   Time cbrStopDelay = Seconds(0.1);
-  Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrInterval + cbrInterval;
+  Time stopTime = Seconds(maxReceivers*cbrStartDelay.GetSeconds()) + cbrInterval + cbrInterval + Seconds(5);
 
   ApplicationContainer gwApps;
   ApplicationContainer utApps;

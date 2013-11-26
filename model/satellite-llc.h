@@ -21,6 +21,7 @@
 #ifndef SATELLITE_LLC_H_
 #define SATELLITE_LLC_H_
 
+#include <vector>
 #include "ns3/object.h"
 #include "ns3/queue.h"
 #include "ns3/traced-callback.h"
@@ -28,7 +29,10 @@
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/ptr.h"
+#include "ns3/mac48-address.h"
 
+#include "satellite-scheduling-object.h"
+#include "satellite-generic-encapsulator.h"
 
 namespace ns3 {
 
@@ -42,13 +46,16 @@ class SatLlc : public Object
 public:
   static TypeId GetTypeId (void);
 
+  SatLlc ();
+
   /**
    * Construct a SatLlc
    *
    * This is the constructor for the SatLlc
-   *
+   * \param isUt boolean flag to indicate whether this LLC 
+   * is attached to GW or UT.
    */
-  SatLlc ();
+  SatLlc (bool isUt);
 
   /**
    * Destroy a SatLlc
@@ -56,6 +63,8 @@ public:
    * This is the destructor for the SatLlc.
    */
   ~SatLlc ();
+
+  typedef std::map<Mac48Address, Ptr<SatGenericEncapsulator> > encapContainer_t;
 
   /**
    * Receive callback used for sending packet to netdevice layer.
@@ -90,17 +99,25 @@ public:
     *  Called from lower layer (MAC) to inform a tx
     *  opportunity of certain amount of bytes
     *
+    * \param macAddr Mac address of the UT with tx opportunity
     * \param bytes Size of the Tx opportunity
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr);
 
   /**
    * Receive packet from lower layer.
+   * \param macAddr MAC address of the UT (either as transmitter or receiver)
+   * \param packet Pointer to packet received.
+   */
+  virtual void Receive (Ptr<Packet> packet, Mac48Address macAddr);
+
+  /**
+   * Receive HL PDU from RLE/GSE entity
    *
    * \param packet Pointer to packet received.
    */
-  virtual void Receive (Ptr<Packet> p);
+  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet);
 
   /**
    * Set Receive callback to forward packet to upper layer
@@ -109,6 +126,33 @@ public:
    */
   void SetReceiveCallback (SatLlc::ReceiveCallback cb);
 
+  /**
+   * Add an encapsulator entry for the LLC
+   * Key = UT's MAC address
+   * Value = encap entity
+   */
+  void AddEncap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> enc);
+
+  /**
+   * Add an decapsulator entry for the LLC
+   * Key = UT's MAC address
+   * Value = decap entity
+   */
+  void AddDecap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> dec);
+
+  /**
+   * Set the address of this MAC
+   * \param macAddress MAC address of this LLC
+   */
+  void SetAddress (Mac48Address macAddress);
+
+  /**
+   * Create and fill the scheduling objects based on LLC layer information.
+   * Scheduling objects may be used at the MAC layer to assist in scheduling.
+   * \return vector of scheduling object pointers
+   */
+  std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
+
 protected:
 
   void DoDispose ();
@@ -116,11 +160,28 @@ protected:
 private:
 
   /**
+   * MAC address of this node
+   */
+  Mac48Address m_macAddress;
+
+  // Map of encapsulators
+  encapContainer_t m_encaps;
+
+  // Map of decapsulators
+  encapContainer_t m_decaps;
+
+  /**
+   * Boolean to identify whether this instance is attached to UT or GW.
+   * TODO: probably the LLC should be split into UT and GW entities.
+   */
+  bool m_isUt;
+
+  /**
    * The Queue which this SatMac uses as a packet source.
    * @see class Queue
    * @see class DropTailQueue
    */
-  Ptr<Queue> m_queue;
+  Ptr<Queue> m_controlQueue;
 
   /**
    * The upper layer package receive callback.

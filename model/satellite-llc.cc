@@ -25,6 +25,9 @@
 
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
+#include "satellite-generic-encapsulator.h"
+#include "satellite-scheduling-object.h"
+#include "satellite-control-message.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLlc");
 
@@ -38,10 +41,10 @@ SatLlc::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatLlc")
     .SetParent<Object> ()
     .AddConstructor<SatLlc> ()
-    .AddAttribute ("TxQueue",
-                   "A queue to use as the transmit queue in the device.",
+    .AddAttribute ("ControlTxQueue",
+                   "A queue to use as the transmit queue for control packets in the device.",
                    PointerValue (),
-                   MakePointerAccessor (&SatLlc::m_queue),
+                   MakePointerAccessor (&SatLlc::m_controlQueue),
                    MakePointerChecker<Queue> ())
     //
     // Trace sources at the "top" of the net device, where packets transition
@@ -74,6 +77,13 @@ SatLlc::GetTypeId (void)
 SatLlc::SatLlc ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (true);
+}
+
+SatLlc::SatLlc (bool isUt)
+:m_isUt (isUt)
+{
+  NS_LOG_FUNCTION (this);
 }
 
 SatLlc::~SatLlc ()
@@ -85,8 +95,10 @@ void
 SatLlc::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_queue->DequeueAll();
-  m_queue = 0;
+  m_controlQueue->DequeueAll();
+  m_controlQueue = 0;
+  m_encaps.clear ();
+  m_decaps.clear ();
   Object::DoDispose ();
 }
 
@@ -94,68 +106,198 @@ void
 SatLlc::SetQueue (Ptr<Queue> queue)
 {
   NS_LOG_FUNCTION (this << queue);
-  m_queue = queue;
+  m_controlQueue = queue;
 }
 
 Ptr<Queue>
 SatLlc::GetQueue (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_queue;
+  return m_controlQueue;
 }
 
 bool
-SatLlc::Enque ( Ptr<Packet> packet, Address dest )
+SatLlc::Enque (Ptr<Packet> packet, Address dest)
 {
   NS_LOG_FUNCTION (this << packet << dest);
   NS_LOG_LOGIC ("p=" << packet );
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
-  // TODO: Think again the process of setting both destination
-  // and source MAC addresses to the packet.
-  SatMacTag tag;
-  tag.SetDestAddress (dest);
-  packet->AddPacketTag (tag);
-
   m_llcTxTrace (packet);
 
-  if (m_queue->Enqueue (packet) == false)
+  // Control PDUs use separate queue, since they do not need
+  // encapsulation, fragmentation nor packing.
+  if ( Mac48Address::ConvertFrom (dest).IsBroadcast () )
     {
-       // Enqueue may fail (overflow)
-      m_llcTxDropTrace (packet);
-      return false;
+      SatControlMsgTag cTag;
+      bool cSuccess = packet->PeekPacketTag (cTag);
+      if (cSuccess && cTag.GetMsgType() != SatControlMsgTag::SAT_NON_CTRL_MSG)
+        {
+          // Add MAC tag
+          SatMacTag mTag;
+          mTag.SetDestAddress (dest);
+          mTag.SetSourceAddress (m_macAddress);
+          packet->AddPacketTag (mTag);
+
+          // Enque the control packet
+          m_controlQueue->Enqueue (packet);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("LLC does not support any other broadcast messages than control messages!");
+        }
     }
   else
     {
-      return true;
+      // UT: user own mac address
+      // GW: use destination address
+      Mac48Address mac = ( m_isUt ? m_macAddress : Mac48Address::ConvertFrom (dest) );
+      encapContainer_t::iterator it = m_encaps.find (mac);
+
+      if (it != m_encaps.end ())
+        {
+          it->second->TransmitPdu (packet);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Mac48Address not found in the encapsulator container!");
+        }
     }
 
   return true;
 }
 
 Ptr<Packet>
-SatLlc::NotifyTxOpportunity(uint32_t /*bytes*/)
+SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr)
 {
-  Ptr<Packet> packet (NULL);
-  if ( m_queue->GetNPackets() > 0)
+  NS_LOG_FUNCTION (this << macAddr << bytes);
+
+  Ptr<Packet> packet;
+
+  // Prioritize control packets
+  if (m_controlQueue->GetNPackets())
+      // && m_controlQueue->GetNBytes() <= bytes)
     {
-      return m_queue->Dequeue ();
+      NS_ASSERT (macAddr.IsBroadcast());
+      packet = m_controlQueue->Dequeue ();
+    }
+  // Forward the txOpportunity to a certain encapsulator
+  else
+    {
+      encapContainer_t::iterator it = m_encaps.find (macAddr);
+
+      if (it != m_encaps.end ())
+        {
+          packet = it->second->NotifyTxOpportunity (bytes);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Mac48Address not found in the encapsulator container!");
+        }
     }
   return packet;
 }
 
 void
-SatLlc::Receive (Ptr<Packet> packet)
+SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
+{
+  NS_LOG_FUNCTION (this << macAddr << packet);
+
+  // Receive packet with a decapsulator instance which is handling the
+  // packets for this specific id
+  encapContainer_t::iterator it = m_decaps.find (macAddr);
+
+  // Note: control messages should not be seen at the LLC layer, since
+  // they are received already at the MAC layer.
+  if (it != m_decaps.end ())
+    {
+      it->second->ReceivePdu (packet);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Mac48Address not found in the decapsulator container!");
+    }
+}
+
+void
+SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-
   m_llcRxTrace (packet);
 
   // Call a callback to receive the packet at upper layer
   m_rxCallback (packet);
 }
 
+void
+SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> enc)
+{
+  NS_LOG_FUNCTION (this);
+
+  encapContainer_t::iterator it = m_encaps.find (macAddr);
+
+  if (it == m_encaps.end ())
+    {
+      m_encaps.insert(std::make_pair (macAddr, enc));
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Encapsulator container already contains this MAC address!");
+    }
+}
+
+void
+SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> dec)
+{
+  NS_LOG_FUNCTION (this);
+
+  encapContainer_t::iterator it = m_decaps.find (macAddr);
+
+  if (it == m_decaps.end ())
+    {
+      m_decaps.insert(std::make_pair (macAddr, dec));
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Decapsulator container already contains this MAC address!");
+    }
+}
+
+void SatLlc::SetAddress( Mac48Address macAddress )
+{
+  NS_LOG_FUNCTION (this << macAddress);
+  m_macAddress = macAddress;
+}
+
+std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
+{
+  std::vector< Ptr<SatSchedulingObject> > schedObjects;
+
+  // First fill the control scheduling object
+  if (m_controlQueue->GetNPackets ())
+    {
+      Ptr<SatSchedulingObject> so =
+          Create<SatSchedulingObject> (Mac48Address::GetBroadcast (), m_controlQueue->GetNBytes (), true);
+      schedObjects.push_back (so);
+    }
+
+  // Then the user data
+  for (encapContainer_t::const_iterator cit = m_encaps.begin ();
+      cit != m_encaps.end ();
+      ++cit)
+    {
+      uint32_t buf = cit->second->GetTxBufferSizeInBytes ();
+
+      if (buf > 0)
+        {
+          Ptr<SatSchedulingObject> so =
+              Create<SatSchedulingObject> (cit->first, buf);
+          schedObjects.push_back (so);
+        }
+    }
+  return schedObjects;
+}
 
 void
 SatLlc::SetReceiveCallback (SatLlc::ReceiveCallback cb)

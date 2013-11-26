@@ -270,22 +270,28 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy>();
   phy->Initialize();
 
+  // Create Logical Link Control (LLC) layer
+  Ptr<SatLlc> llc = CreateObject<SatLlc> (false);
+
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
   dev->SetMac (mac);
 
-  // Set the device address and pass it to MAC as well
-  dev->SetAddress (Mac48Address::Allocate ());
-  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
-
-  // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
+  // Attach the LLC layer to SatNetDevice
+  dev->SetLlc (llc);
 
   // Create and set queues for Mac modules
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   llc->SetQueue (queue);
+
+  // Attach the LLC Tx opportunity callback to SatMac
+  mac->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
+  mac->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+
+  // Attach the device receive callback to SatNetDevice
+  llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
@@ -293,14 +299,10 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the device receive callback to SatLlc
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
-  // Attach the LLC Tx opportunity callback to SatMac
-  mac->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
-
-  // Attach the device receive callback to SatNetDevice
-  llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
-
-  // Attach the LLC layer to SatNetDevice
-  dev->SetLlc (llc);
+  // Set the device address and pass it to MAC as well
+  Mac48Address addr = Mac48Address::Allocate ();
+  dev->SetAddress (addr);
+  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
   // Attach the SatNetDevices to nodes
   n->AddDevice (dev);

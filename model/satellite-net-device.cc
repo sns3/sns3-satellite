@@ -156,6 +156,7 @@ SatNetDevice::SetAddress (Address address)
 
   NS_ASSERT( m_mac );
   m_mac->SetAddress (m_address);
+  m_llc->SetAddress (m_address);
 }
 Address 
 SatNetDevice::GetAddress (void) const

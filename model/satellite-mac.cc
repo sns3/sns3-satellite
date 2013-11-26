@@ -95,52 +95,8 @@ void SatMac::SetAddress( Mac48Address macAddress )
 void
 SatMac::SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration)
 {
-  // TODO: Think again the process of setting both destination
-  // and source MAC addresses to the packet
-  SatMacTag tag;
-  packet->RemovePacketTag (tag);
-
-  // Insert a source mac tag to the packet
-  tag.SetSourceAddress (m_macAddress);
-  packet->AddPacketTag (tag);
-
   // Use call back to send packet to lower layer
   m_txCallback (packet, carrierId, duration);
-}
-
-void
-SatMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
-{
-  NS_LOG_FUNCTION (this << packet);
-
-  //
-  // Hit the trace hooks.  All of these hooks are in the same place in this
-  // device because it is so simple, but this is not usually the case in
-  // more complicated devices.
-  //
-  m_snifferTrace (packet);
-  m_promiscSnifferTrace (packet);
-
-  m_macRxTrace (packet);
-
-  SatMacTag msgTag;
-  packet->RemovePacketTag (msgTag);
-
-  NS_LOG_LOGIC("Packet to " << msgTag.GetDestAddress());
-  NS_LOG_LOGIC("Receiver " << m_macAddress );
-
-  // If the packet is intended for this receiver
-  Mac48Address addr = Mac48Address::ConvertFrom (msgTag.GetDestAddress());
-
-  if ( addr == m_macAddress || addr.IsBroadcast() )
-    {
-      // Use callback to forward the packet to higher layer
-      m_rxCallback (packet);
-    }
-  else
-    {
-      NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
-    }
 }
 
 void
