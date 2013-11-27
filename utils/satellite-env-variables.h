@@ -17,54 +17,33 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_BASE_TRACE_CONTAINER_H
-#define SATELLITE_BASE_TRACE_CONTAINER_H
+#ifndef SATELLITE_ENV_VARIABLES_H
+#define SATELLITE_ENV_VARIABLES_H
 
 #include "ns3/object.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "satellite-enums.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
  *
- * \brief Base class for trace containers
+ * \brief Class for environmental variables
  */
-class SatBaseTraceContainer : public Object
+class SatEnvVariables : public Object
 {
 public:
 
   /**
-   * \brief Default Rx power density index for Rx power traces
-   */
-  static const uint32_t RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
-
-  /**
-   * \brief Default Rx power density index for Rx power traces
-   */
-  static const uint32_t RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
-
-  /**
-   * \brief Default interference density index for interference traces
-   */
-  static const uint32_t INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX = 1;
-
-  /**
-   * \brief Default number of columns for interference traces
-   */
-  static const uint32_t INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
-
-  /**
    * \brief Constructor
    */
-  SatBaseTraceContainer ();
+  SatEnvVariables ();
 
   /**
    * \brief Destructor
    */
-  virtual ~SatBaseTraceContainer ();
+  virtual ~SatEnvVariables ();
 
   /**
    * \brief NS-3 type id function
@@ -72,10 +51,36 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  /**
+   * \brief Function for getting the path to current working directory
+   * \return
+   */
+  std::string GetCurrentWorkingDirectory ();
+
+  /**
+   * \brief Function for getting the path to executable
+   * \return
+   */
+  std::string GetPathToExecutable ();
+
 private:
 
+  /**
+   *
+   */
+  void ReadExecutablePath ();
+
+  /**
+   * \brief Path to current working directory
+   */
+  std::string m_currentWorkingDirectory;
+
+  /**
+   * \brief Path to executable
+   */
+  std::string m_pathToExecutable;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_BASE_TRACE_CONTAINER_H */
+#endif /* SATELLITE_ENV_VARIABLES_H */

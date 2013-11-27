@@ -47,7 +47,7 @@ SatGwMac::GetTypeId (void)
     .AddConstructor<SatGwMac> ()
     .AddAttribute ("Interval",
                    "The time to wait between packet (frame) transmissions",
-                   TimeValue (Seconds (0.001)),
+                   TimeValue (Seconds (0.002)),
                    MakeTimeAccessor (&SatGwMac::m_tInterval),
                    MakeTimeChecker ())
   ;
@@ -177,7 +177,7 @@ SatGwMac::TransmitTime (uint32_t carrierId)
            * The BBFrame duration should be calculated based on BBFrame length and
            * used MODCOD.
            */
-          Time DURATION (Seconds(0.0005));
+          Time DURATION (Seconds(0.001));
           SendPacket (p, carrierId, DURATION);
         }
     }

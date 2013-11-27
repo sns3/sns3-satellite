@@ -174,6 +174,7 @@ public:
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
+
     CarrierBandwidthConverter m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
     Ptr<SatSuperframeSeq> m_superframeSeq;
@@ -181,47 +182,16 @@ private:
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
-    ObjectFactory m_phyFactory;
 
     /*
      * Configured interference model for the forward link. Set as an attribute.
      */
-    SatPhyRxCarrierConf::InterferenceModel m_interferenceModel;
-
-    /*
-     * Configured RX noise temperature.
-     */
-    double m_rxTemperature_dbK;
-
-    /*
-     * Configured other system noise.
-    */
-    double m_otherSysNoise_dbHz;
-
-    /*
-     * Other system interference (signal over interference).
-     */
-    double m_otherSysInterference_db;
-
-    /*
-     * Intermodulation interference (signal over interference).
-     */
-    double m_imInterference_db;
-
-    /*
-     * Adjacent channel interference (signal over interference).
-     */
-    double m_aciInterference_db;
-
-    /*
-     *  Adjacent channel interference wrt noise (percent).
-     */
-    double m_aciIfWrtNoise;
+    SatPhy::InterferenceModel m_interferenceModel;
 
     /*
      * Configured error model for the forward link. Set as an attribute.
      */
-    SatPhyRxCarrierConf::ErrorModel m_errorModel;
+    SatPhy::ErrorModel m_errorModel;
 
     /*
      * Forward channel link results (DVB-S2) are created if ErrorModel

@@ -99,6 +99,7 @@ SatLlc::DoDispose ()
   m_controlQueue = 0;
   m_encaps.clear ();
   m_decaps.clear ();
+  m_rxCallback.Nullify ();
   Object::DoDispose ();
 }
 

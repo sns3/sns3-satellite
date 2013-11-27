@@ -63,16 +63,16 @@ SatConstantInterference::Set (double power)
 }
 
 Ptr<SatInterference::Event>
-SatConstantInterference::DoAdd (Time duration, double power)
+SatConstantInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
   Ptr<SatInterference::Event> event;
-  event = Create<SatInterference::Event> (0, duration, power);
+  event = Create<SatInterference::Event> (0, duration, power, rxAddress);
 
   return event;
 }
 
 double
-SatConstantInterference::DoCalculate (Ptr<SatInterference::Event> event )
+SatConstantInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
   NS_ASSERT (m_rxing);
 

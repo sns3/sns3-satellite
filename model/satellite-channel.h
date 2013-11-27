@@ -144,6 +144,26 @@ private:
   void StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
+   * \brief Function for Rx power output trace
+   * \param rxParams Rx parameters
+   */
+  void DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * \brief Function for Rx power input trace
+   * \param rxParams Rx parameters
+   */
+  void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * \brief Function for calculating the Rx power
+   * \param rxParams Rx parameters
+   * \param phyRx phy Rx
+   * \param frequency_hz frequency in Hz
+   */
+  void DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
    * list of SatPhyRx instances attached to
    * the channel
    */

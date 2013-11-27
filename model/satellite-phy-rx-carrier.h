@@ -38,72 +38,136 @@ namespace ns3 {
  *
  * The SatPhyRxCarrier models the physical layer receiver of satellite system. There
  * are one SatPhyRxCarrier receiver for each carrier in both forward and return links.
- *
  */
 
 class SatPhyRxCarrier : public Object
 {
 public:
 
+  /**
+   * \brief
+   * \param satInterference
+   * \param carrierId
+   * \param carrierConf
+   */
   SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf);
+
+  /**
+   * \brief
+   */
   virtual ~SatPhyRxCarrier ();
 
   /**
-   *  PHY states
+   * \brief PHY states
    */
   enum State
   {
     IDLE, RX
   };
 
-  // inherited from Object
+  /**
+   * \brief
+   * \return
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * \brief
+   */
   virtual void DoDispose ();
 
   /**
-  * Set the SatPhy module
-  * @param phy PHY module
+  * \brief Set the SatPhy module
+  * \param phy PHY module
   */
-
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
-   * Set the beam id for all the transmissions from this SatPhyTx
+   * \brief Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
   void SetBeamId (uint32_t beamId);
 
   /**
-   * Set the own device MAC address
+   * \brief Set the own device MAC address
    * \param ownAddress address of the device owning this object
    */
   void SetAddress (Mac48Address ownAddress);
 
   /**
-   * Start packet reception from the SatChannel
+   * \brief Start packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
-   *
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * \brief
+   * \param cb
+   */
   void SetReceiveCb(SatPhyRx::ReceiveCallback cb);
+
+  /**
+   * \brief
+   * \param cb
+   */
   void SetCnoCb(SatPhyRx::CnoCallback cb);
 
 private:
+
+  /**
+   * \brief
+   */
   static const double BoltzmannConstant = 1.3806488e-23;
 
+  /**
+   * \brief
+   * \param newState
+   */
   void ChangeState (State newState);
+
+  /**
+   * \brief
+   */
   void EndRxData ();
 
+  /**
+   * \brief
+   * \param rxPower_W
+   * \param iPower_W
+   * \return
+   */
   double CalculateSinr(double rxPower_W, double iPower_W);
+
+  /**
+   * \brief
+   * \param sinr1
+   * \param sinr2
+   * \return
+   */
   double CalculateCompositeSinr(double sinr1, double sinr2);
 
+  /**
+   * \brief
+   */
   State m_state;
+
+  /**
+   * \brief
+   */
   Ptr<SatSignalParameters> m_rxParams;
+
+  /**
+   * \brief
+   */
   uint32_t m_beamId;
+
+  /**
+   * \brief
+   */
   uint32_t m_carrierId;
 
-  /*
+  /**
+   * \brief
    * Interference model:
    * - Constant
    * - Per-packet
@@ -111,92 +175,96 @@ private:
    */
   Ptr<SatInterference> m_satInterference;
 
-  /*
-   * Interference event
+  /**
+   * \brief Interference event
    */
   Ptr<SatInterference::Event> m_interferenceEvent;
 
-  /*
-   * Link results used for error modeling
+  /**
+   * \brief Link results used for error modeling
    */
   Ptr<SatLinkResults> m_linkResults;
 
-  /*
-   * RX noise temperature in Kelvins
+  /**
+   * \brief RX noise temperature in Kelvins
    */
   double m_rxTemperature_K;
 
-  /*
-   * RX Bandwidth in Hz
+  /**
+   * \brief RX Bandwidth in Hz
    */
   double m_rxBandwidth_Hz;
 
-  /*
-   * Other system RX noise
+  /**
+   * \brief Other system RX noise
    */
   double m_rxOtherSysNoise_W;
 
-  /*
-   * RX noise
+  /**
+   * \brief RX noise
    */
   double m_rxNoise_W;
 
-  /*
-   * RX Adjacent channel interference
+  /**
+   * \brief RX Adjacent channel interference
    */
   double m_rxAciIf_W;
 
-  /*
-   * RX Other system interference (C over I in linear)
-  */
+  /**
+   * \brief RX Other system interference (C over I in linear)
+   */
   double m_rxOtherSysInterference;
 
-  /*
-   * RX Intermodulation interference (C over I in linear)
-  */
+  /**
+   * \brief RX Intermodulation interference (C over I in linear)
+   */
   double m_rxImInterference;
 
-  /*
-   * RX Adjacent channel interference (C over I in linear)
-  */
+  /**
+   * \brief RX Adjacent channel interference (C over I in linear)
+   */
   double m_rxAciInterference; 
 
   /**
-   * The upper layer package receive callback.
+   * \brief The upper layer package receive callback.
    */
   SatPhyRx::ReceiveCallback m_rxCallback;
 
   /**
-   * The upper layer C/N0 receive callback.
+   * \brief The upper layer C/N0 receive callback.
    */
   SatPhy::CnoCallback m_cnoCallback;
 
   /**
-   * Address of the device owning this object.
+   * \brief Address of the device owning this object.
    */
   Mac48Address m_ownAddress;
 
   /**
-   * Destination address of the packet in m_rxParams.
+   * \brief Destination address of the packet in m_rxParams.
    */
   Mac48Address m_destAddress;
 
   /**
-   * Source address of the packet in m_rxParams.
+   * \brief Source address of the packet in m_rxParams.
    */
   Mac48Address m_sourceAddress;
 
   /**
-   * Receiving mode.
+   * \brief Receiving mode.
    */
   SatPhyRxCarrierConf::RxMode m_rxMode;
 
   /**
-   * The trace source fired for added interferencies
+   * \brief Channel type.
+   */
+  SatEnums::ChannelType_t m_channelType;
+
+  /**
+   * \brief The trace source fired for added interference
    *
    * \see class CallBackTraceSource
    */
-
   TracedCallback< Ptr<SatSignalParameters>, // RX signalling parameters
                   Mac48Address,             // receiver address
                   Mac48Address,             // packet destination address

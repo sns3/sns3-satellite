@@ -41,8 +41,45 @@ public:
    */
   typedef enum
   {
-    UNKNOWN_CH, FORWARD_FEEDER_CH, FORWARD_USER_CH, RETURN_USER_CH, RETURN_FEEDER_CH
+    UNKNOWN_CH = 0,
+    FORWARD_FEEDER_CH = 1,
+    FORWARD_USER_CH = 2,
+    RETURN_USER_CH = 3,
+    RETURN_FEEDER_CH = 4
   } ChannelType_t;
+
+  static inline std::string GetChannelTypeName (ChannelType_t channelType)
+  {
+    switch (channelType)
+    {
+      case UNKNOWN_CH:
+        {
+          return "UNKNOWN_CH";
+        }
+      case FORWARD_FEEDER_CH:
+        {
+          return "FORWARD_FEEDER_CH";
+        }
+      case FORWARD_USER_CH:
+        {
+          return "FORWARD_USER_CH";
+        }
+      case RETURN_USER_CH:
+        {
+          return "RETURN_USER_CH";
+        }
+      case RETURN_FEEDER_CH:
+        {
+          return "RETURN_FEEDER_CH";
+        }
+      default :
+        {
+          NS_FATAL_ERROR ("SatEnums::GetChannelTypeName - Invalid channel type");
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetChannelTypeName - Invalid channel type");
+    return "";
+  };
 
 private:
 

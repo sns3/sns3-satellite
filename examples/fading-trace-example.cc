@@ -11,13 +11,13 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief
+* \brief Example for fading calculations. Can be used to produce simple fading traces.
 *
 */
 
 NS_LOG_COMPONENT_DEFINE ("fading-trace-example");
 
-static void FadingTraceCb ( std::string context, double time, SatEnums::ChannelType_t chType, double fadingValue)
+static void FadingTraceCb (std::string context, double time, SatEnums::ChannelType_t chType, double fadingValue)
 {
   std::cout << time << " " << chType << " " << 20 * log10(fadingValue) << std::endl;
 }
@@ -46,21 +46,21 @@ main (int argc, char *argv[])
   SatBaseFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
 
   /// create fading container based on default configuration
-  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer>(markovConf,elevationCb,velocityCb);
+  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
 
-  markovContainer->TraceConnect("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
+  markovContainer->TraceConnect ("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 
   /// run simulation
   for (uint32_t i = 0; i < 100000; i++)
     {
-      Simulator::Schedule( MilliSeconds(1 * i), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
+      Simulator::Schedule (MilliSeconds (1 * i), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
     }
 
-  Simulator::Schedule( MilliSeconds(0), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);
-  Simulator::Schedule( MilliSeconds(20000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,1);
-  Simulator::Schedule( MilliSeconds(40000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,2);
-  Simulator::Schedule( MilliSeconds(60000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);
-  Simulator::Schedule( MilliSeconds(80000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,1);
+  Simulator::Schedule (MilliSeconds (0), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);
+  Simulator::Schedule (MilliSeconds (20000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,1);
+  Simulator::Schedule (MilliSeconds (40000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,2);
+  Simulator::Schedule (MilliSeconds (60000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);
+  Simulator::Schedule (MilliSeconds (80000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,1);
 
   Simulator::Run ();
   Simulator::Destroy ();

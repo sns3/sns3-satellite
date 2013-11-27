@@ -18,9 +18,7 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-
 #include <algorithm>
-
 #include "ns3/object.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
@@ -32,7 +30,8 @@
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
-
+#include "satellite-mac-tag.h" /// TODO do not introduce the whole class
+#include "ns3/satellite-helper.h" /// TODO do not introduce the whole class
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 
@@ -41,7 +40,12 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
- :m_channelType(SatEnums::UNKNOWN_CH)
+ : m_phyList (),
+   m_channelType (SatEnums::UNKNOWN_CH),
+   m_carrierFreqConverter (),
+   m_freqId (),
+   m_propagationDelay (),
+   m_freeSpaceLoss ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -68,8 +72,7 @@ SatChannel::GetTypeId (void)
     .AddConstructor<SatChannel> ()
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
-                     MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint))
-  ;
+                     MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint));
   return tid;
 }
 
@@ -136,45 +139,151 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   NS_LOG_FUNCTION (this << rxParams << phyRx);
 
-  Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility();
-  Ptr<MobilityModel> rxMobility = phyRx->GetMobility();
+  rxParams->m_channel = this;
+
+  double frequency_hz = m_carrierFreqConverter (m_channelType, m_freqId, rxParams->m_carrierId);
+  rxParams->m_carrierFreq_hz = frequency_hz;
+
+  /// TODO add as an attribute
+  uint32_t rxPowerCalculationMode = 0;
+
+  switch (rxPowerCalculationMode)
+  {
+    case 0:
+      {
+        DoRxPowerCalculation (rxParams, phyRx);
+
+        /// TODO add as an attribute
+        if (0)
+          {
+            DoRxPowerOutputTrace (rxParams);
+          }
+        break;
+      }
+    case 1:
+      {
+        DoRxPowerInputTrace (rxParams);
+        break;
+      }
+    default :
+      {
+        NS_FATAL_ERROR ("SatChannel::StartRx - Rx power calculation mode");
+        break;
+      }
+  }
+
+  phyRx->StartRx (rxParams);
+}
+
+void
+SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams)
+{
+  SatMacTag tag;
+
+  /// TODO get rid of peeking
+  rxParams->m_packet->PeekPacketTag (tag);
+
+  Mac48Address destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+  std::vector<double> tempVector;
+  tempVector.push_back (Now ().GetDouble());
+  tempVector.push_back (rxParams->m_rxPower_W / rxParams->m_carrierFreq_hz);
+
+  switch (m_channelType)
+  {
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+      {
+        SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (destAddress, m_channelType), tempVector);
+        break;
+      }
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+      {
+        SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (sourceAddress, m_channelType), tempVector);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::StartRx - Invalid channel type");
+        break;
+      }
+  }
+}
+
+void
+SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams)
+{
+  SatMacTag tag;
+
+  /// TODO get rid of peeking
+  rxParams->m_packet->PeekPacketTag (tag);
+
+  Mac48Address destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+  switch (m_channelType)
+  {
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+      {
+        rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (destAddress, m_channelType));
+        break;
+      }
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+      {
+        rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (sourceAddress, m_channelType));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::StartRx - Invalid channel type");
+        break;
+      }
+  }
+}
+
+void
+SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
+{
+  Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility ();
+  Ptr<MobilityModel> rxMobility = phyRx->GetMobility ();
 
   double txAntennaGain_W = 0.0;
   double rxAntennaGain_W = 0.0;
   double fading = 0.0;
 
   // use always UT's or GW's position when getting antenna gain
-  switch ( m_channelType )
+  switch (m_channelType)
   {
     case SatEnums::RETURN_FEEDER_CH:
     case SatEnums::FORWARD_USER_CH:
-      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (rxMobility);
-      rxAntennaGain_W = phyRx->GetAntennaGain (rxMobility);
-      fading = phyRx->GetFadingValue (m_channelType);
-      break;
-
+      {
+        txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (rxMobility);
+        rxAntennaGain_W = phyRx->GetAntennaGain (rxMobility);
+        fading = phyRx->GetFadingValue (m_channelType);
+        break;
+      }
     case SatEnums::RETURN_USER_CH:
     case SatEnums::FORWARD_FEEDER_CH:
-      txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (txMobility);
-      rxAntennaGain_W = phyRx->GetAntennaGain (txMobility);
-      fading = rxParams->m_phyTx->GetFadingValue (m_channelType);
-      break;
-
+      {
+        txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (txMobility);
+        rxAntennaGain_W = phyRx->GetAntennaGain (txMobility);
+        fading = rxParams->m_phyTx->GetFadingValue (m_channelType);
+        break;
+      }
     default:
-      NS_ASSERT(false);
-      break;
+      {
+        NS_FATAL_ERROR ("SatChannel::StartRx - Invalid channel type");
+        break;
+      }
   }
 
-  rxParams->m_channel = this;
-
-  double frequency_hz = m_carrierFreqConverter( m_channelType, m_freqId, rxParams->m_carrierId);
-  rxParams->m_carrierFreq_hz = frequency_hz;
-
   // get (calculate) free space loss and RX power and set it to RX params
-  double rxPower_W = ( rxParams->m_txPower_W * txAntennaGain_W ) / m_freeSpaceLoss->GetFsl(txMobility, rxMobility, frequency_hz );
-  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses() * fading;
-
-  phyRx->StartRx (rxParams);
+  double rxPower_W = (rxParams->m_txPower_W * txAntennaGain_W) / m_freeSpaceLoss->GetFsl (txMobility, rxMobility, rxParams->m_carrierFreq_hz);
+  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses () * fading;
 }
 
 void

@@ -127,19 +127,19 @@ SatUtMac::ScheduleTimeSlots (SatTbtpHeader * tbtp)
           Time slotStartTime = startTime + Seconds (timeSlotConf->GetStartTime_s ());
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, (*it)->GetFrameId (), timeSlotConf->GetCarrierId () );
 
-          ScheduleTxOpportunity (slotStartTime, carrierId);
+          ScheduleTxOpportunity (slotStartTime, carrierId, timeSlotConf);
         }
     }
 }
 
 void
-SatUtMac::ScheduleTxOpportunity(Time transmitTime, uint32_t carrierId)
+SatUtMac::ScheduleTxOpportunity(Time transmitTime, uint32_t carrierId, Ptr<SatTimeSlotConf> timeSlotConf)
 {
-  Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, carrierId);
+  Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, carrierId, timeSlotConf);
 }
 
 void
-SatUtMac::TransmitTime (uint32_t carrierId)
+SatUtMac::TransmitTime (uint32_t carrierId, Ptr<SatTimeSlotConf> timeSlotConf)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -156,8 +156,11 @@ SatUtMac::TransmitTime (uint32_t carrierId)
 
   if ( p )
     {
-      Time DURATION (MicroSeconds(20));
-      SendPacket (p, carrierId, DURATION);
+      // Decrease one tick from time slot duration. This evaluates guard period.
+      // If more sophisticated guard period is needed, it is needed done before hand and
+      // remove this 'one tick decrease' implementation
+      Time duration (Time::FromDouble (timeSlotConf->GetDuration_s(), Time::S) - Time (1));
+      SendPacket (p, carrierId, duration);
     }
 }
 

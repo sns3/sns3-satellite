@@ -55,7 +55,7 @@ private:
    *
    * \return the pointer to interference event as a reference of the addition
    */
-  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower);
+  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
   /**
    * Calculates interference power for the given reference
    * Sets final power at end time to finalPower.

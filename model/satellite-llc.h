@@ -113,7 +113,7 @@ public:
   virtual void Receive (Ptr<Packet> packet, Mac48Address macAddr);
 
   /**
-   * Receive HL PDU from RLE/GSE entity
+   * Receive HL PDU from encapsulator/decapsulator entity
    *
    * \param packet Pointer to packet received.
    */

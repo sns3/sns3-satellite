@@ -34,6 +34,11 @@ NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
 namespace ns3 {
 
+Ptr<SatInterferenceInputTraceContainer> SatHelper::m_satIntfInputTraceContainer;
+Ptr<SatInterferenceOutputTraceContainer> SatHelper::m_satIntfOutputTraceContainer;
+Ptr<SatRxPowerInputTraceContainer> SatHelper::m_satRxPowerInputTraceContainer;
+Ptr<SatRxPowerOutputTraceContainer> SatHelper::m_satRxPowerOutputTraceContainer;
+
 NS_OBJECT_ENSURE_REGISTERED (SatHelper);
 
 TypeId
@@ -94,6 +99,11 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string gwPos = scenarioName + "GwPos.txt";
   std::string satPos = scenarioName + "GeoPos.txt";
   std::string wfConf = "dvbRcs2Waveforms.txt";
+
+  m_satIntfInputTraceContainer = CreateObject <SatInterferenceInputTraceContainer> ();
+  m_satIntfOutputTraceContainer = CreateObject <SatInterferenceOutputTraceContainer> ();
+  m_satRxPowerInputTraceContainer = CreateObject <SatRxPowerInputTraceContainer> ();
+  m_satRxPowerOutputTraceContainer = CreateObject <SatRxPowerOutputTraceContainer> ();
 
   m_satConf = CreateObject<SatConf> ();
 
@@ -465,6 +475,15 @@ SatHelper::CreateCreationSummary(std::string title)
   oss << m_beamHelper->GetBeamInfo() << std::endl;
 
   return oss.str();
+}
+
+void
+SatHelper::DoDispose()
+{
+  m_satIntfInputTraceContainer = NULL;
+  m_satIntfOutputTraceContainer = NULL;
+  m_satRxPowerInputTraceContainer = NULL;
+  m_satRxPowerOutputTraceContainer = NULL;
 }
 
 } // namespace ns3

@@ -95,8 +95,6 @@ SatGenericEncapsulator::TransmitPdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
-  std::cout << "PDU enque: " << p->GetSize() << std::endl;
-
   if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
     {
       /** Store arrival time */
@@ -158,7 +156,7 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
     }
 
   packet = Create<Packet> ();
-  SatEncapsulationHeader rleHeader;
+  SatEncapsulationHeader encapHeader;
 
   NS_LOG_LOGIC ("SDUs in TxBuffer  = " << m_txBuffer.size ());
   NS_LOG_LOGIC ("First SDU buffer  = " << *(m_txBuffer.begin()));
@@ -250,7 +248,7 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
           newSegment = 0;
 
           // ExtensionBit (Next_Segment - 1) = 0
-          rleHeader.PushExtensionBit (SatEncapsulationHeader::DATA_FIELD_FOLLOWS);
+          encapHeader.PushExtensionBit (SatEncapsulationHeader::DATA_FIELD_FOLLOWS);
 
           // no LengthIndicator for the last one
 
@@ -272,7 +270,7 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
           firstSegment = 0;
 
           // ExtensionBit (Next_Segment - 1) = 0
-          rleHeader.PushExtensionBit (SatEncapsulationHeader::DATA_FIELD_FOLLOWS);
+          encapHeader.PushExtensionBit (SatEncapsulationHeader::DATA_FIELD_FOLLOWS);
 
           // no LengthIndicator for the last one
 
@@ -301,10 +299,10 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
           dataField.push_back (firstSegment);
 
           // ExtensionBit (Next_Segment - 1) = 1
-          rleHeader.PushExtensionBit (SatEncapsulationHeader::E_LI_FIELDS_FOLLOWS);
+          encapHeader.PushExtensionBit (SatEncapsulationHeader::E_LI_FIELDS_FOLLOWS);
 
           // LengthIndicator (Next_Segment)  = txBuffer.FirstBuffer.length()
-          rleHeader.PushLengthIndicator (firstSegment->GetSize ());
+          encapHeader.PushLengthIndicator (firstSegment->GetSize ());
 
           nextSegmentSize -= ((nextSegmentId % 2) ? (2) : (1)) + dataFieldAddedSize;
           nextSegmentId++;
@@ -327,10 +325,10 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
 
     }
 
-  // Build RLE header
-  rleHeader.SetSequenceNumber (m_sequenceNumber++);
+  // Build encapsulation header
+  encapHeader.SetSequenceNumber (m_sequenceNumber++);
 
-  // Build RLE PDU with DataField and Header
+  // Build encapsulated PDU with DataField and Header
   std::vector< Ptr<Packet> >::iterator it;
   it = dataField.begin ();
 
@@ -372,10 +370,10 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
     }
   (*it)->AddPacketTag (tag);
 
-  rleHeader.SetFramingInfo (framingInfo);
+  encapHeader.SetFramingInfo (framingInfo);
 
-  NS_LOG_LOGIC ("RLE header: " << rleHeader);
-  packet->AddHeader (rleHeader);
+  NS_LOG_LOGIC ("Encapsulation header: " << encapHeader);
+  packet->AddHeader (encapHeader);
 
   // Sender timestamp
   SatEncapTag encapTag (Simulator::Now ());
@@ -425,10 +423,10 @@ SatGenericEncapsulator::ReceivePdu (Ptr<Packet> p)
   // 5.1.2.2 Receive operations
 
   // Get RLC header parameters
-  SatEncapsulationHeader rleHeader;
-  p->PeekHeader (rleHeader);
-  NS_LOG_LOGIC ("RLE header: " << rleHeader);
-  SequenceNumber10 seqNumber = rleHeader.GetSequenceNumber ();
+  SatEncapsulationHeader encapHeader;
+  p->PeekHeader (encapHeader);
+  NS_LOG_LOGIC ("Encapsulation header: " << encapHeader);
+  SequenceNumber10 seqNumber = encapHeader.GetSequenceNumber ();
 
   // 5.1.2.2.1 General
   // The receiving UM RLC entity shall maintain a reordering window according to state variable VR(UH) as follows:
@@ -597,10 +595,10 @@ SatGenericEncapsulator::IsInsideReorderingWindow (SequenceNumber10 seqNumber)
 void
 SatGenericEncapsulator::ReassembleAndDeliver (Ptr<Packet> packet)
 {
-  SatEncapsulationHeader rleHeader;
-  packet->RemoveHeader (rleHeader);
-  uint8_t framingInfo = rleHeader.GetFramingInfo ();
-  SequenceNumber10 currSeqNumber = rleHeader.GetSequenceNumber ();
+  SatEncapsulationHeader encapHeader;
+  packet->RemoveHeader (encapHeader);
+  uint8_t framingInfo = encapHeader.GetFramingInfo ();
+  SequenceNumber10 currSeqNumber = encapHeader.GetSequenceNumber ();
   bool expectedSnLost;
 
   if ( currSeqNumber != m_expectedSeqNumber )
@@ -621,7 +619,7 @@ SatGenericEncapsulator::ReassembleAndDeliver (Ptr<Packet> packet)
   uint16_t lengthIndicator;
   do
     {
-      extensionBit = rleHeader.PopExtensionBit ();
+      extensionBit = encapHeader.PopExtensionBit ();
       NS_LOG_LOGIC ("E = " << (uint16_t)extensionBit);
 
       if ( extensionBit == 0 )
@@ -630,7 +628,7 @@ SatGenericEncapsulator::ReassembleAndDeliver (Ptr<Packet> packet)
         }
       else // extensionBit == 1
         {
-          lengthIndicator = rleHeader.PopLengthIndicator ();
+          lengthIndicator = encapHeader.PopLengthIndicator ();
           NS_LOG_LOGIC ("LI = " << lengthIndicator);
 
           // Check if there is enough data in the packet

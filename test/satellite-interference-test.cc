@@ -63,34 +63,34 @@ SatConstantInterferenceTestCase::~SatConstantInterferenceTestCase ()
 void
 SatConstantInterferenceTestCase::DoRun (void)
 {
-  Ptr<SatConstantInterference> interference = CreateObject<SatConstantInterference>();
+  Ptr<SatConstantInterference> interference = CreateObject<SatConstantInterference> ();
 
-  interference->Set(100);
+  interference->Set (100);
 
   // just test that we can call add. However, It shouldn't have any effect on interference.
-  Ptr<SatInterference::Event> event =  interference->Add(Time(10), 55);
+  Ptr<SatInterference::Event> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
 
   // Test event setting with constant interference (base class SatInterference can't be instantiate)
-  NS_TEST_ASSERT_MSG_EQ( event->GetDuration(), Time(10), "Event duration is incorrect");
-  NS_TEST_ASSERT_MSG_EQ( event->GetEndTime() - event->GetStartTime(), Time(10), "Event start time or end time incorrect");
-  NS_TEST_ASSERT_MSG_EQ( event->GetRxPower(), 55, "Event RX power incorrect");
+  NS_TEST_ASSERT_MSG_EQ (event->GetDuration (), Time (10), "Event duration is incorrect");
+  NS_TEST_ASSERT_MSG_EQ (event->GetEndTime () - event->GetStartTime (), Time (10), "Event start time or end time incorrect");
+  NS_TEST_ASSERT_MSG_EQ (event->GetRxPower (), 55, "Event RX power incorrect");
 
-  interference->NotifyRxStart(event);
+  interference->NotifyRxStart (event);
 
   double power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ( 100, power, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (100, power, "Calculated power not correct");
 
-  interference->NotifyRxEnd(event);
+  interference->NotifyRxEnd (event);
 
   // just test that we can set interference again
-  interference->Set(50);
+  interference->Set (50);
 
-  interference->NotifyRxStart(event);
+  interference->NotifyRxStart (event);
 
   power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ( 50, power, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (50, power, "Calculated power not correct");
 }
 
 /**
@@ -104,10 +104,10 @@ public:
   virtual ~SatPerPacketInterferenceTestCase ();
 
   // adds interference to model object
-  void AddInterference(Time duration, double power);
+  void AddInterference(Time duration, double power, Address rxAddress);
 
   // adds receivers own interference to model object and schedules receiving
-  void StartReceiver(Time duration, double power);
+  void StartReceiver(Time duration, double power, Address rxAddress);
 
   // receives packets i.e. calculates interference and stops receiving.
   void Receive (uint32_t rxIndex);
@@ -123,7 +123,7 @@ private:
 SatPerPacketInterferenceTestCase::SatPerPacketInterferenceTestCase ()
   : TestCase ("Test satellite per packet interference model.")
 {
-  m_interference = CreateObject<SatPerPacketInterference>();
+  m_interference = CreateObject<SatPerPacketInterference> ();
   m_rxIndex = 0;
 
   for (int i = 0; i < 4; i++)
@@ -138,22 +138,22 @@ SatPerPacketInterferenceTestCase::~SatPerPacketInterferenceTestCase ()
 }
 
 void
-SatPerPacketInterferenceTestCase::AddInterference (Time duration, double power)
+SatPerPacketInterferenceTestCase::AddInterference (Time duration, double power, Address rxAddress)
 {
-  Ptr<SatInterference::Event> event =  m_interference->Add(duration, power);
+  Ptr<SatInterference::Event> event =  m_interference->Add (duration, power, rxAddress);
 }
 
 void
-SatPerPacketInterferenceTestCase::StartReceiver (Time duration, double power)
+SatPerPacketInterferenceTestCase::StartReceiver (Time duration, double power, Address rxAddress)
 {
   // add own interference
-  m_rxEvent[m_rxIndex] =  m_interference->Add(duration, power);
+  m_rxEvent[m_rxIndex] =  m_interference->Add (duration, power, rxAddress);
 
   // notify interference object of receiving
-  m_interference->NotifyRxStart(m_rxEvent[m_rxIndex]);
+  m_interference->NotifyRxStart (m_rxEvent[m_rxIndex]);
 
   // schedule receiving
-  Simulator::Schedule(Time(duration), &SatPerPacketInterferenceTestCase::Receive, this, m_rxIndex);
+  Simulator::Schedule (Time (duration), &SatPerPacketInterferenceTestCase::Receive, this, m_rxIndex);
 
   m_rxIndex++;
 }
@@ -162,21 +162,21 @@ void
 SatPerPacketInterferenceTestCase::Receive (uint32_t rxIndex)
 {
   finalPower[rxIndex] = m_interference->Calculate (m_rxEvent[rxIndex]);
-  m_interference->NotifyRxEnd(m_rxEvent[rxIndex]);
+  m_interference->NotifyRxEnd (m_rxEvent[rxIndex]);
 }
 
 void
 SatPerPacketInterferenceTestCase::DoRun (void)
 {
   // simulate interferences and receiving (4 receivers), adding and calculation done in callback routines
-  Simulator::Schedule(Time(0), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(60), 60);
-  Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 70);
-  Simulator::Schedule(Time(30), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(50), 10);
-  Simulator::Schedule(Time(50), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 20);
-  Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(90), 50);  //event[0]
-  Simulator::Schedule(Time(20), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(50), 5);   //event[1]
-  Simulator::Schedule(Time(30), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(60), 30);  //event[2]
-  Simulator::Schedule(Time(50), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(20), 40);  //event[3]
+  Simulator::Schedule(Time(0), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(60), 60, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 70, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule(Time(30), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(50), 10, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule(Time(50), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 20, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(90), 50, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[0]
+  Simulator::Schedule(Time(20), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(50), 5, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));   //event[1]
+  Simulator::Schedule(Time(30), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(60), 30, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[2]
+  Simulator::Schedule(Time(50), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(20), 40, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[3]
 
   Simulator::Run ();
 
@@ -232,16 +232,16 @@ void
 SatTracedInterferenceTestCase::DoRun (void)
 {
   // traced implementation is just place holder currently, so just test interface (interference 0)
-  Ptr<SatTracedInterference> interference = CreateObject<SatTracedInterference>();
-  Ptr<SatInterference::Event> event =  interference->Add(Time(10), 55);
+  Ptr<SatTracedInterference> interference = CreateObject<SatTracedInterference> ();
+  Ptr<SatInterference::Event> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
 
-  interference->NotifyRxStart(event);
+  interference->NotifyRxStart (event);
 
   double power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ( 0, power, "Calculated power incorrect");
+  NS_TEST_ASSERT_MSG_EQ (0, power, "Calculated power incorrect");
 
-  interference->NotifyRxEnd(event);
+  interference->NotifyRxEnd (event);
 }
 
 /**

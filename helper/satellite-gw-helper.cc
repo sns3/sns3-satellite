@@ -24,13 +24,14 @@
 #include "ns3/double.h"
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
+#include "ns3/config.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-llc.h"
 #include "../model/satellite-gw-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-geo-net-device.h"
-#include "../model/satellite-phy.h"
+#include "../model/satellite-gw-phy.h"
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/virtual-channel.h"
@@ -63,36 +64,6 @@ SatGwHelper::GetTypeId (void)
                       MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
                       MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute( "RxTemperatureDbK",
-                     "RX noise temperature in GW.",
-                      DoubleValue(24.62),  // ~290K
-                      MakeDoubleAccessor(&SatGwHelper::m_rxTemperature_dbK),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxOtherSysNoiseDbHz",
-                     "Other system noise of RX in GW.",
-                      DoubleValue (SatUtils::MinDb<double> ()),
-                      MakeDoubleAccessor(&SatGwHelper::m_otherSysNoise_dbHz),
-                      MakeDoubleChecker<double>(SatUtils::MinDb<double> (), SatUtils::MaxDb<double> ()))
-      .AddAttribute( "RxOtherSysIfDb",
-                     "Other system interference of RX in GW.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_otherSysInterference_db),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxImIfDb",
-                     "Intermodultation interference of RX in GW.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_imInterference_db),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxAciIfDb",
-                     "Adjacent channel interference of RX in GW.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_aciInterference_db),
-                      MakeDoubleChecker<double>())
-      .AddAttribute( "RxAciIfWrtNoise",
-                     "Adjacent channel interference wrt noise in percents.",
-                      DoubleValue (0.0),
-                      MakeDoubleAccessor(&SatGwHelper::m_aciIfWrtNoise),
-                      MakeDoubleChecker<double>())
       .AddTraceSource ("Creation", "Creation traces",
                         MakeTraceSourceAccessor (&SatGwHelper::m_creation))
     ;
@@ -120,16 +91,6 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
   m_queueFactory.SetTypeId ("ns3::DropTailQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
-  m_phyFactory.SetTypeId ("ns3::SatPhy");
-
-  m_phyFactory.Set ("RxMaxAntennaGainDb", DoubleValue(61.50));
-  m_phyFactory.Set ("RxAntennaLossDb", DoubleValue(0.00));
-  m_phyFactory.Set ("TxMaxAntennaGainDb", DoubleValue(65.20));
-  m_phyFactory.Set ("TxMaxPowerDbW", DoubleValue(8.97));
-  m_phyFactory.Set ("TxOutputLossDb", DoubleValue(2.00));
-  m_phyFactory.Set ("TxPointingLossDb", DoubleValue(1.10));
-  m_phyFactory.Set ("TxOboLossDb", DoubleValue(6.00));
-  m_phyFactory.Set ("TxAntennaLossDb", DoubleValue(0.00));
 
   //LogComponentEnable ("SatGwHelper", LOG_LEVEL_INFO);
 }
@@ -186,7 +147,7 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
 
-  m_phyFactory.Set (n1, v1);
+  Config::SetDefault ("ns3::SatGwPhy::" + n1, v1);
 }
 
 NetDeviceContainer 
@@ -214,44 +175,20 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create SatNetDevice
   Ptr<SatNetDevice> dev = m_deviceFactory.Create<SatNetDevice> ();
 
-  // Create the SatPhyTx and SatPhyRx modules
-  Ptr<SatPhyTx> phyTx = CreateObject<SatPhyTx> ();
-  Ptr<SatPhyRx> phyRx = CreateObject<SatPhyRx> ();
+  // Attach the SatNetDevices to nodes
+  n->AddDevice (dev);
 
-  // Set SatChannels to SatPhyTx/SatPhyRx
-  phyTx->SetChannel (fCh);
-  rCh->AddRx (phyRx);
-  phyRx->SetDevice (dev);
-  phyRx->SetMobility (n->GetObject<MobilityModel> ());
-  phyTx->SetMobility (n->GetObject<MobilityModel> ());
+  SatPhy::CreateParam_t params;
+  params.m_beamId = beamId;
+  params.m_device = dev;
+  params.m_txCh = fCh;
+  params.m_rxCh = rCh;
 
-  // Configure the SatPhyRxCarrier instances
-  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (m_rxTemperature_dbK,
-                                                                            m_otherSysNoise_dbHz,
-                                                                            m_errorModel,
-                                                                            m_interferenceModel,
-                                                                            SatPhyRxCarrierConf::NORMAL);
-
-  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterference_db) );
-  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterference_db) );
-  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterference_db) );
-  carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoise) );
-  carrierConf->SetAttribute ("ChannelType", EnumValue (SatEnums::RETURN_FEEDER_CH));
-  carrierConf->SetAttribute ("CarrierBandwidhtConverter", CallbackValue (m_carrierBandwidthConverter));
-  carrierConf->SetAttribute ("CarrierCount", UintegerValue (m_rtnLinkCarrierCount));
-
-  // If the link results are created, we pass those
-  // to SatPhyRxCarrier for error modeling
-  if (m_linkResults)
-    {
-      carrierConf->SetLinkResults (m_linkResults);
-    }
-
-  phyRx->ConfigurePhyRxCarriers (carrierConf);
+  Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params, m_errorModel, m_linkResults, m_interferenceModel, m_carrierBandwidthConverter, m_rtnLinkCarrierCount);
 
   // Set fading
-  phyTx->SetFadingContainer (n->GetObject<SatBaseFading> ());
-  phyRx->SetFadingContainer (n->GetObject<SatBaseFading> ());
+  phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
+  phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> ();
 
@@ -261,23 +198,20 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the NCC C/N0 update to Phy
   SatPhy::CnoCallback cnoCb = MakeCallback (&SatNcc::UtCnoUpdated, ncc);
 
-  m_phyFactory.Set ("PhyRx", PointerValue(phyRx));
-  m_phyFactory.Set ("PhyTx", PointerValue(phyTx));
-  m_phyFactory.Set ("BeamId",UintegerValue(beamId));
-  m_phyFactory.Set ("ReceiveCb", CallbackValue(recCb));
-  m_phyFactory.Set ("CnoCb", CallbackValue(cnoCb));
+  phy->SetAttribute ("ReceiveCb", CallbackValue(recCb));
+  phy->SetAttribute ("CnoCb", CallbackValue(cnoCb));
 
-  Ptr<SatPhy> phy = m_phyFactory.Create<SatPhy>();
-  phy->Initialize();
-
-  // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> (false);
+  //Ptr<SatPhy> phy = DynamicCast<SatPhy> ( m_phyFactory.Create<SatGwPhy>() );
+  //phy->Initialize();
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
   dev->SetMac (mac);
+
+  // Create Logical Link Control (LLC) layer
+  Ptr<SatLlc> llc = CreateObject<SatLlc> (false);
 
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
@@ -302,14 +236,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
-  phyRx->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
-
-  // Attach the SatNetDevices to nodes
-  n->AddDevice (dev);
+  phy->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
   mac->StartScheduling ();
 
-  return DynamicCast <NetDevice> (dev);
+  phy->Initialize();
+
+  return dev;
 }
 
 Ptr<NetDevice>

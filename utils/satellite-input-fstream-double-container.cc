@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2010 University of Washington
+ * Copyright (c) 2013 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -153,6 +153,8 @@ SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, 
   NS_ASSERT (column < m_valuesInRow);
   NS_ASSERT (m_container.size () > 0);
   NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
+
+  NS_LOG_INFO ("SatInputFileStreamDoubleContainer::FindNextClosest: lastValidPosition " << lastValidPosition << " column " << column << " shiftValue " << shiftValue << " comparisonValue " << comparisonValue);
 
   bool valueFound = false;
 

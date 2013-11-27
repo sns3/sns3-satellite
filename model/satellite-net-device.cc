@@ -239,12 +239,7 @@ SatNetDevice::IsBridge (void) const
 bool 
 SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  /*
-   * \todo The duration should be specified by the TBTP or the GW/NCC scheduler
-   */
-
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
-  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": sending a packet: " << packet->GetUid() << ", dest: " << dest);
 
   m_llc->Enque (packet, dest);
 
@@ -294,6 +289,7 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
+  m_llc = 0;
   NetDevice::DoDispose ();
 }
 

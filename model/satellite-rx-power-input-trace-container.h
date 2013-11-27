@@ -17,8 +17,8 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
-#define SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
+#ifndef SATELLITE_RX_POWER_INPUT_TRACE_CONTAINER_H
+#define SATELLITE_RX_POWER_INPUT_TRACE_CONTAINER_H
 
 #include "satellite-base-trace-container.h"
 #include "ns3/satellite-input-fstream-double-container.h"
@@ -30,9 +30,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for interference input trace container
+ * \brief Class for Rx power input trace container
  */
-class SatInterferenceInputTraceContainer : public SatBaseTraceContainer
+class SatRxPowerInputTraceContainer : public SatBaseTraceContainer
 {
 public:
 
@@ -49,12 +49,12 @@ public:
   /**
    * \brief Constructor
    */
-  SatInterferenceInputTraceContainer ();
+  SatRxPowerInputTraceContainer ();
 
   /**
    * \brief Destructor
    */
-  ~SatInterferenceInputTraceContainer ();
+  ~SatRxPowerInputTraceContainer ();
 
   /**
    * \brief NS-3 type id function
@@ -68,11 +68,11 @@ public:
   void DoDispose ();
 
   /**
-   * \brief Function for getting the interference density
+   * \brief Function for getting the Rx power density
    * \param key key
-   * \return Interference density
+   * \return Rx power density
    */
-  double GetInterferenceDensity (key_t key);
+  double GetRxPowerDensity (key_t key);
 
 private:
 
@@ -108,4 +108,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H */
+#endif /* SATELLITE_RX_POWER_INPUT_TRACE_CONTAINER_H */
