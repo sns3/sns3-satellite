@@ -62,6 +62,9 @@ public:
    */
   typedef Callback<void, uint32_t, Address, double> CnoCallback;
 
+  /**
+   * \brief Creation parameters for base PHY object
+   */
   typedef struct
   {
     Ptr<NetDevice> m_device;
@@ -75,6 +78,9 @@ public:
    */
   SatPhy (void);
 
+  /**
+   * Constructor to create PHY objects with parameters.
+   */
   SatPhy ( CreateParam_t& params );
 
   virtual ~SatPhy ();
@@ -89,6 +95,126 @@ public:
    * Initialize phy.
    */
   void Initialize();
+
+  /**
+   * Get the noise temperature of the receiver in dbK.
+   * \return the receiver noise temperature in dbK.
+   */
+  inline double GetRxNoiseTemperatureDbk () const { return m_rxNoiseTemperatureDbk; }
+
+  /**
+   * Set the noise temperature of the receiver in dbK.
+   * \param temperatureDbK the receiver noise temperature in dbK.
+   */
+  inline void SetRxNoiseTemperatureDbk (double temperatureDbk) { m_rxNoiseTemperatureDbk = temperatureDbk; }
+
+  /**
+   * Get the maximum antenna gain of the receiver in dB.
+   * \return the receiver noise temperature in dB.
+   */
+  inline double GetRxAntennaGainDb () const { return m_rxMaxAntennaGainDb; }
+
+  /**
+   * Set the maximum antenna gain of the receiver in dB.
+   * \param gainDb the receiver antenna gain in dB.
+   */
+  inline void SetRxAntennaGainDb (double gainDb) { m_rxMaxAntennaGainDb = gainDb; }
+
+  /**
+   * Get the antenna loss of the receiver in dB.
+   * \return the receiver antenna loss in dB.
+   */
+  inline double GetRxAntennaLossDb () const { return m_rxAntennaLossDb; }
+
+  /**
+   * Set the antenna loss of the receiver in dB.
+   * \param lossDb the receiver antenna loss in dB.
+   */
+  inline void SetRxAntennaLossDb (double lossDb) { m_rxAntennaLossDb = lossDb; }
+
+  /**
+   * Get the maximum antenna gain of the transmitter in dB.
+   * \return the transmitter noise temperature in dB.
+   */
+  inline double GetTxAntennaGainDb () const { return m_txMaxAntennaGainDb; }
+
+  /**
+   * Set the maximum antenna gain of the transmitter in dB.
+   * \param gainDb the transmitter antenna gain in dB.
+   */
+  inline void SetTxAntennaGainDb (double gainDb) { m_txMaxAntennaGainDb = gainDb; }
+
+  /**
+   * Get the maximum transmit power of the transmitter in dB.
+   * \return the transmitter transmit power in dB.
+   */
+  inline double GetTxMaxPowerDbw () const { return m_txMaxPowerDbw; }
+
+  /**
+   * Set the maximum transmit power of the transmitter in dB.
+   * \param powerDb the transmitter transmit power in dB.
+   */
+  inline void SetTxMaxPowerDbw (double powerDb) { m_txMaxPowerDbw = powerDb; }
+
+  /**
+   * Get the output loss of the transmitter in dB.
+   * \return the transmitter output loss in dB.
+   */
+  inline double GetTxOutputLossDb () const { return m_txOutputLossDb; }
+
+  /**
+   * Set the output loss of the transmitter in dB.
+   * \param lossDb the transmitter output loss in dB.
+   */
+  inline void SetTxOutputLossDb (double lossDb) { m_txOutputLossDb = lossDb; }
+
+  /**
+   * Get the pointing loss of the transmitter in dB.
+   * \return the transmitter pointing loss in dB.
+   */
+  inline double GetTxPointingLossDb () const { return m_txPointingLossDb; }
+
+  /**
+   * Set the pointing loss of the transmitter in dB.
+   * \param lossDb the transmitter pointing loss in dB.
+   */
+  inline void SetTxPointingLossDb (double lossDb) { m_txPointingLossDb = lossDb; }
+
+  /**
+   * Get the OBO loss of the transmitter in dB.
+   * \return the transmitter OBO loss in dB.
+   */
+  inline double GetTxOboLossDb () const { return m_txOboLossDb; }
+
+  /**
+   * Set the OBO loss of the transmitter in dB.
+   * \param lossDb the transmitter OBO loss in dB.
+   */
+  inline void SetTxOboLossDb (double lossDb) { m_txOboLossDb = lossDb; }
+
+  /**
+   * Get the antenna loss of the transmitter in dB.
+   * \return the transmitter antenna loss in dB.
+   */
+  inline double GetTxAntennaLossDb () const { return m_txAntennaLossDb; }
+
+  /**
+   * Set the antenna loss of the transmitter in dB.
+   * \param lossDb the transmitter antenna loss in dB.
+   */
+  inline void SetTxAntennaLossDb (double lossDb) { m_txAntennaLossDb = lossDb; }
+
+  /**
+   * Get the default fading of the PHY.
+   * \return the default fading of the PHY.
+   */
+  inline double GetDefaultFading () const { return m_defaultFadingValue; }
+
+  /**
+   * Set the default fading of the PHY.
+   * \param fading the default fading of the PHY.
+   */
+  inline void SetDefaultFading (double fading) { m_defaultFadingValue = fading; }
 
   /**
    * Set the transmit antenna gain pattern.
@@ -197,66 +323,64 @@ private:
   uint32_t m_beamId;
 
   /**
-     * The upper layer package receive callback.
-     */
-    SatPhy::ReceiveCallback m_rxCallback;
-
-    /**
-     * The C/N0 info callback
-     */
-    SatPhy::CnoCallback m_cnoCallback;
-
-public:
+   * The upper layer package receive callback.
+   */
+  SatPhy::ReceiveCallback m_rxCallback;
 
   /**
-   * Receiver temperature in dbK.
+   * The C/N0 info callback
    */
-  double m_rxTemperatureDbK;
+  SatPhy::CnoCallback m_cnoCallback;
 
   /**
-   * Calculated EIRP without gain in Watts
+   * Calculated EIRP without gain in W.
    */
-  double m_eirpWoGain_W;
+  double m_eirpWoGainW;
 
   /**
-   * Configured maximum RX antenna gain in Dbs
+   * Configured receiver noise temperature in dBK.
    */
-  double m_rxMaxAntennaGain_db;
+  double m_rxNoiseTemperatureDbk;
 
   /**
-   * Configured maximum TX antenna gain in Dbs
+   * Configured maximum receiver antenna gain in dBi.
    */
-  double m_txMaxAntennaGain_db;
+  double m_rxMaxAntennaGainDb;
 
   /**
-   * Configured maximum TX power in DbWs
+   * Configured receiver antenna loss in Dbs
    */
-  double m_txMaxPower_dbW;
+  double m_rxAntennaLossDb;
 
   /**
-   * Configured output loss in Dbs
+   * Configured maximum transmitter antenna gain in dBi
    */
-  double m_txOutputLoss_db;
+  double m_txMaxAntennaGainDb;
 
   /**
-   * Configured pointing loss in Dbs
+   * Configured maximum transmitter power in DbWs
    */
-  double m_txPointingLoss_db;
+  double m_txMaxPowerDbw;
 
   /**
-   * Configured OBO loss in Dbs
+   * Configured transmitter output loss in Dbs
    */
-  double m_txOboLoss_db;
+  double m_txOutputLossDb;
 
   /**
-   * Configured TX antenna loss in Dbs
+   * Configured transmitter pointing loss in Dbs
    */
-  double m_txAntennaLoss_db;
+  double m_txPointingLossDb;
 
   /**
-   * Configured RX antenna loss in Dbs
+   * Configured transmitter OBO loss in Dbs
    */
-  double m_rxAntennaLoss_db;
+  double m_txOboLossDb;
+
+  /**
+   * Configured transmitter antenna loss in Dbs
+   */
+  double m_txAntennaLossDb;
 
   /**
    * \brief Default fading value

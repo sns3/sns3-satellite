@@ -39,15 +39,95 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatGeoFeederPhy);
 
+TypeId
+SatGeoFeederPhy::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatGeoFeederPhy")
+    .SetParent<SatPhy> ()
+    .AddConstructor<SatGeoFeederPhy> ()
+    .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatPhy::GetPhyRx, &SatPhy::SetPhyRx),
+                    MakePointerChecker<SatPhyRx> ())
+    .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
+                    MakePointerChecker<SatPhyTx> ())
+    .AddAttribute( "RxTemperatureDbk",
+                   "RX noise temperature in Geo Feeder in dBK.",
+                    DoubleValue (28.4),
+                    MakeDoubleAccessor (&SatPhy::GetRxNoiseTemperatureDbk, &SatPhy::SetRxNoiseTemperatureDbk),
+                    MakeDoubleChecker<double>())
+    .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX gain in dB",
+                    DoubleValue (54.00),
+                    MakeDoubleAccessor (&SatPhy::GetRxAntennaGainDb, &SatPhy::SetRxAntennaGainDb),
+                    MakeDoubleChecker<double_t> ())
+    .AddAttribute ("TxMaxAntennaGainDb", "Maximum TX gain in dB",
+                    DoubleValue (54.00),
+                    MakeDoubleAccessor (&SatPhy::GetTxAntennaGainDb, &SatPhy::SetTxAntennaGainDb),
+                    MakeDoubleChecker<double_t> ())
+    .AddAttribute ("TxMaxPowerDbw", "Maximum TX power in dB",
+                    DoubleValue (-4.38),
+                    MakeDoubleAccessor (&SatPhy::GetTxMaxPowerDbw, &SatPhy::SetTxMaxPowerDbw),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ("TxOutputLossDb", "TX Output loss in dB",
+                    DoubleValue (1.75),
+                    MakeDoubleAccessor (&SatPhy::GetTxOutputLossDb, &SatPhy::SetTxOutputLossDb),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ("TxPointingLossDb", "TX Pointing loss in dB",
+                    DoubleValue (0.00),
+                    MakeDoubleAccessor (&SatPhy::GetTxPointingLossDb, &SatPhy::SetTxPointingLossDb),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ("TxOboLossDb", "TX OBO loss in dB",
+                    DoubleValue (4.00),
+                    MakeDoubleAccessor (&SatPhy::GetTxOboLossDb, &SatPhy::SetTxOboLossDb),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ("TxAntennaLossDb", "TX Antenna loss in dB",
+                    DoubleValue (1.00),
+                    MakeDoubleAccessor (&SatPhy::GetTxAntennaLossDb, &SatPhy::SetTxAntennaLossDb),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ("RxAntennaLossDb", "RX Antenna loss in dB",
+                    DoubleValue (1.00),
+                    MakeDoubleAccessor (&SatPhy::GetRxAntennaLossDb, &SatPhy::SetRxAntennaLossDb),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ("DefaultFadingValue", "Default value for fading",
+                    DoubleValue (1.00),
+                    MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
+                    MakeDoubleChecker<double_t> ())
+    .AddAttribute( "ExtNoisePowerDensityDbWHz",
+                   "Other system interference, C over I in dB.",
+                    DoubleValue (-207.0),
+                    MakeDoubleAccessor (&SatGeoFeederPhy::m_extNoisePowerDensityDbWHz),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute( "ImIfCOverIDb",
+                   "Adjacent channel interference, C over I in dB.",
+                    DoubleValue (27.0),
+                    MakeDoubleAccessor (&SatGeoFeederPhy::m_imInterferenceCiDb),
+                    MakeDoubleChecker<double> ())
+  ;
+  return tid;
+}
+
+TypeId
+SatGeoFeederPhy::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
 SatGeoFeederPhy::SatGeoFeederPhy (void)
 {
   NS_LOG_FUNCTION (this);
+  NS_FATAL_ERROR ("SatGeoFeederPhy default constructor is not allowed to use");
 }
 
 SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params, InterferenceModel ifModel,
                                   CarrierBandwidthConverter converter, uint32_t carrierCount )
   : SatPhy (params)
 {
+  NS_LOG_FUNCTION (this);
+
   SatPhy::GetPhyTx()->SetAttribute("TxMode", EnumValue(SatPhyTx::TRANSPARENT));
 
   ObjectBase::ConstructSelf(AttributeConstructionList ());
@@ -56,7 +136,7 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params, InterferenceMod
   // Note, that in GEO satellite, there is no need for error modeling.
 
   Ptr<SatPhyRxCarrierConf> carrierConf =
-          CreateObject<SatPhyRxCarrierConf> (SatPhy::m_rxTemperatureDbK,
+          CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
                                              SatPhyRxCarrierConf::EM_NONE,
                                              ifModel,
                                              SatPhyRxCarrierConf::TRANSPARENT,
@@ -80,81 +160,6 @@ SatGeoFeederPhy::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
   Object::DoDispose ();
-}
-
-TypeId
-SatGeoFeederPhy::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
-TypeId
-SatGeoFeederPhy::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatGeoFeederPhy")
-    .SetParent<SatPhy> ()
-    .AddConstructor<SatGeoFeederPhy> ()
-    .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatPhy::GetPhyRx, &SatPhy::SetPhyRx),
-                    MakePointerChecker<SatPhyRx> ())
-    .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
-                    MakePointerChecker<SatPhyTx> ())
-    .AddAttribute( "RxTemperatureDbK",
-                   "RX noise temperature in GW.",
-                    DoubleValue(28.4),
-                    MakeDoubleAccessor(&SatPhy::m_rxTemperatureDbK),
-                    MakeDoubleChecker<double>())
-    .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX gain in Dbs",
-                    DoubleValue(54.00),
-                    MakeDoubleAccessor(&SatPhy::m_rxMaxAntennaGain_db),
-                    MakeDoubleChecker<double_t> ())
-    .AddAttribute ("TxMaxAntennaGainDb", "Maximum TX gain in Dbs",
-                    DoubleValue(54.00),
-                    MakeDoubleAccessor(&SatPhy::m_txMaxAntennaGain_db),
-                    MakeDoubleChecker<double_t> ())
-    .AddAttribute ("TxMaxPowerDbW", "Maximum TX power in Dbs",
-                    DoubleValue(-4.38),
-                    MakeDoubleAccessor(&SatPhy::m_txMaxPower_dbW),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("TxOutputLossDb", "TX Output loss in Dbs",
-                    DoubleValue(1.75),
-                    MakeDoubleAccessor(&SatPhy::m_txOutputLoss_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("TxPointingLossDb", "TX Pointing loss in Dbs",
-                    DoubleValue(0.00),
-                    MakeDoubleAccessor(&SatPhy::m_txPointingLoss_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("TxOboLossDb", "TX OBO loss in Dbs",
-                    DoubleValue(4.00),
-                    MakeDoubleAccessor(&SatPhy::m_txOboLoss_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("TxAntennaLossDb", "TX Antenna loss in Dbs",
-                    DoubleValue(1.00),
-                    MakeDoubleAccessor(&SatPhy::m_txAntennaLoss_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("RxAntennaLossDb", "RX Antenna loss in Dbs",
-                    DoubleValue(1.00),
-                    MakeDoubleAccessor(&SatPhy::m_rxAntennaLoss_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("DefaultFadingValue", "Default value for fading",
-                    DoubleValue(1.00),
-                    MakeDoubleAccessor(&SatPhy::m_defaultFadingValue),
-                    MakeDoubleChecker<double_t> ())
-    .AddAttribute( "ExtNoisePowerDensityDbWHz",
-                   "Other system interference, C over I in dB.",
-                    DoubleValue (-207.0),
-                    MakeDoubleAccessor (&SatGeoFeederPhy::m_extNoisePowerDensityDbWHz),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute( "ImIfCOverIDb",
-                   "Adjacent channel interference, C over I in dB.",
-                    DoubleValue (27.0),
-                    MakeDoubleAccessor(&SatGeoFeederPhy::m_imInterferenceCiDb),
-                    MakeDoubleChecker<double> ())
-  ;
-  return tid;
 }
 
 void

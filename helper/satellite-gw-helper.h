@@ -164,34 +164,34 @@ public:
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
-    CarrierBandwidthConverter  m_carrierBandwidthConverter;
-    int32_t m_rtnLinkCarrierCount;
+  CarrierBandwidthConverter  m_carrierBandwidthConverter;
+  int32_t m_rtnLinkCarrierCount;
 
-    ObjectFactory m_queueFactory;
-    ObjectFactory m_channelFactory;
-    ObjectFactory m_deviceFactory;
+  ObjectFactory m_queueFactory;
+  ObjectFactory m_channelFactory;
+  ObjectFactory m_deviceFactory;
 
-    /*
-     * Configured interference model for the return link. Set as an attribute.
-     */
-    SatPhy::InterferenceModel m_interferenceModel;
+  /*
+   * Configured interference model for the return link. Set as an attribute.
+   */
+  SatPhy::InterferenceModel m_interferenceModel;
 
-    /*
-     * Configured error model for the return link. Set as an attribute.
-     */
-    SatPhy::ErrorModel m_errorModel;
+  /*
+   * Configured error model for the return link. Set as an attribute.
+   */
+  SatPhy::ErrorModel m_errorModel;
 
-    /*
-     * Return channel link results (DVB-RCS2) are created if ErrorModel
-     * is configured to be AVI. Note, that only one instance of the
-     * link results is needed for all GWs.
-     */
-    Ptr<SatLinkResults> m_linkResults;
+  /*
+   * Return channel link results (DVB-RCS2) are created if ErrorModel
+   * is configured to be AVI. Note, that only one instance of the
+   * link results is needed for all GWs.
+   */
+  Ptr<SatLinkResults> m_linkResults;
 
-    /**
-     * Trace callback for creation traces
-     */
-    TracedCallback<std::string> m_creation;
+  /**
+   * Trace callback for creation traces
+   */
+  TracedCallback<std::string> m_creation;
 };
 
 } // namespace ns3

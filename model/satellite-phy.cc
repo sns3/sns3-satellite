@@ -41,32 +41,31 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_eirpWoGain_W(0),
-    m_rxMaxAntennaGain_db (0),
-    m_txMaxAntennaGain_db (0),
-    m_txMaxPower_dbW (0),
-    m_txOutputLoss_db (0),
-    m_txPointingLoss_db (0),
-    m_txOboLoss_db (0),
-    m_txAntennaLoss_db (0),
-    m_rxAntennaLoss_db (0),
+  : m_eirpWoGainW(0),
+    m_rxMaxAntennaGainDb (0),
+    m_rxAntennaLossDb (0),
+    m_txMaxAntennaGainDb (0),
+    m_txMaxPowerDbw (0),
+    m_txOutputLossDb (0),
+    m_txPointingLossDb (0),
+    m_txOboLossDb (0),
+    m_txAntennaLossDb (0),
     m_defaultFadingValue (1)
 {
   NS_LOG_FUNCTION (this);
-
-  // Create the first needed SatPhyTx and SatPhyRx modules
+  NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
- : m_eirpWoGain_W(0),
-   m_rxMaxAntennaGain_db (0),
-   m_txMaxAntennaGain_db (0),
-   m_txMaxPower_dbW (0),
-   m_txOutputLoss_db (0),
-   m_txPointingLoss_db (0),
-   m_txOboLoss_db (0),
-   m_txAntennaLoss_db (0),
-   m_rxAntennaLoss_db (0),
+ : m_eirpWoGainW(0),
+   m_rxMaxAntennaGainDb (0),
+   m_rxAntennaLossDb (0),
+   m_txMaxAntennaGainDb (0),
+   m_txMaxPowerDbw (0),
+   m_txOutputLossDb (0),
+   m_txPointingLossDb (0),
+   m_txOboLossDb (0),
+   m_txAntennaLossDb (0),
    m_defaultFadingValue (1)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
@@ -107,9 +106,9 @@ void
 SatPhy::Initialize ()
 {
  // calculate EIRP without Gain (maximum)
-  double eirpWoGain_DbW = m_txMaxPower_dbW - m_txOutputLoss_db - m_txPointingLoss_db - m_txOboLoss_db - m_txAntennaLoss_db;
+  double eirpWoGainDbw = m_txMaxPowerDbw - m_txOutputLossDb - m_txPointingLossDb - m_txOboLossDb - m_txAntennaLossDb;
 
-  m_eirpWoGain_W = SatUtils::DbWToW ( eirpWoGain_DbW );
+  m_eirpWoGainW = SatUtils::DbWToW ( eirpWoGainDbw );
 
   m_phyTx->SetBeamId (m_beamId);
   m_phyRx->SetBeamId (m_beamId);
@@ -121,13 +120,13 @@ SatPhy::Initialize ()
       m_phyRx->SetCnoCallback( MakeCallback (&SatPhy::CnoInfo, this) );
     }
 
-  m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGain_db);
-  m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGain_db);
+  m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGainDb);
+  m_phyRx->SetMaxAntennaGain_Db (m_rxMaxAntennaGainDb);
 
   m_phyTx->SetDefaultFadingValue (m_defaultFadingValue);
   m_phyRx->SetDefaultFadingValue (m_defaultFadingValue);
 
-  m_phyRx->SetAntennaLoss_Db (m_rxAntennaLoss_db);
+  m_phyRx->SetAntennaLoss_Db (m_rxAntennaLossDb);
 }
 
 SatPhy::~SatPhy ()
@@ -256,7 +255,7 @@ SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_sinr = 0;
-  txParams->m_txPower_W = m_eirpWoGain_W;
+  txParams->m_txPower_W = m_eirpWoGainW;
 
   m_phyTx->StartTx (p, txParams);
 }
@@ -272,7 +271,7 @@ SatPhy::SendPduWithParams (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
   // copy on tx power too.
 
   txParams->m_phyTx = m_phyTx;
-  txParams->m_txPower_W = m_eirpWoGain_W;
+  txParams->m_txPower_W = m_eirpWoGainW;
   m_phyTx->StartTx (p, txParams);
 }
 
