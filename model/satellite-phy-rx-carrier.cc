@@ -62,7 +62,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
       if (carrierConf->IsIntfOutputTraceEnabled ())
         {
-          m_satInterference = CreateObject<SatPerPacketInterference> (m_channelType, carrierConf->GetCarrierBandwidth_Hz (carrierId));
+          m_satInterference = CreateObject<SatPerPacketInterference> (m_channelType, carrierConf->GetCarrierBandwidthHz (carrierId));
         }
       else
         {
@@ -72,7 +72,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
     case SatPhyRxCarrierConf::IF_TRACE:
       NS_LOG_LOGIC (this << " Traced interference model created for carrier: " << carrierId);
-      m_satInterference = CreateObject<SatTracedInterference> (m_channelType, carrierConf->GetCarrierBandwidth_Hz (carrierId));
+      m_satInterference = CreateObject<SatTracedInterference> (m_channelType, carrierConf->GetCarrierBandwidthHz (carrierId));
       break;
 
     default:
@@ -81,9 +81,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   }
 
   m_rxMode = carrierConf->GetRxMode ();
-  m_rxBandwidth_Hz = carrierConf->GetCarrierBandwidth_Hz (carrierId);
+  m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId);
 
-  m_rxOtherSysNoise_W = SatUtils::DbWToW(carrierConf->GetExtPowerDensity_dbWHz ()) * m_rxBandwidth_Hz;
+  m_rxExtNoisePowerW = SatUtils::DbWToW(carrierConf->GetExtPowerDensityDbwhz ()) * m_rxBandwidthHz;
 
   if (carrierConf->GetErrorModel () == SatPhyRxCarrierConf::EM_AVI)
     {
@@ -91,17 +91,16 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       m_linkResults = carrierConf->GetLinkResults ();
     }
 
-  m_rxTemperature_K = carrierConf->GetRxTemperature_K ();
+  m_rxTemperatureK = carrierConf->GetRxTemperatureK ();
 
   // calculate RX noise
-  m_rxNoise_W = BoltzmannConstant * m_rxTemperature_K * m_rxBandwidth_Hz;
+  m_rxNoisePowerW = BoltzmannConstant * m_rxTemperatureK * m_rxBandwidthHz;
 
-  // calculate RX Aci wrt noise
-  m_rxAciIf_W = m_rxNoise_W * carrierConf->GetRxAciInterferenceWrtNoise () / 100;
+  // calculate RX ACI power with percent wrt noise
+  m_rxAciIfPowerW = m_rxNoisePowerW * carrierConf->GetRxAciInterferenceWrtNoise () / 100;
 
-  m_rxOtherSysInterference = SatUtils::DbToLinear (carrierConf->GetRxOtherSystemInterference_dB ());
-  m_rxImInterference = SatUtils::DbToLinear (carrierConf->GetRxImInterference_dB ());
-  m_rxAciInterference = SatUtils::DbToLinear (carrierConf->GetRxAciInterference_dB ());
+  m_sinrCalculate = carrierConf->GetSinrCalculatorCb ();
+
 }
 
 
@@ -116,7 +115,7 @@ SatPhyRxCarrier::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrier")
     .SetParent<Object> ()
     .AddTraceSource ("PacketTrace",
-                     "The trace for calculated interferencies of the received packets",
+                     "The trace for calculated interferences of the received packets",
                       MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
   ;
   return tid;
@@ -126,6 +125,13 @@ void
 SatPhyRxCarrier::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_rxCallback.Nullify();
+  m_cnoCallback.Nullify();
+  m_sinrCalculate.Nullify();
+  m_satInterference = NULL;
+  m_interferenceEvent = NULL;
+
   Object::DoDispose ();
 }
 
@@ -272,7 +278,7 @@ SatPhyRxCarrier::EndRxData ()
 
   if ( m_cnoCallback.IsNull() == false )
     {
-      double cno = cSinr * m_rxBandwidth_Hz;
+      double cno = cSinr * m_rxBandwidthHz;
       m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, cno);
     }
 }
@@ -294,38 +300,23 @@ SatPhyRxCarrier::SetAddress (Mac48Address ownAddress)
 }
 
 double
-SatPhyRxCarrier::CalculateSinr (double rxPower_W, double ifPower_W)
+SatPhyRxCarrier::CalculateSinr (double rxPowerW, double ifPowerW)
 {
-  NS_LOG_FUNCTION (this << rxPower_W <<  ifPower_W);
+  NS_LOG_FUNCTION (this << rxPowerW <<  ifPowerW);
 
-  NS_ASSERT( m_rxNoise_W >= SatUtils::MinLin<double> () );
-
-  // calculate first sinr based on co-channel interference, Adjacent channel interference, noise and other system noise
-  double sinr = rxPower_W / (ifPower_W + m_rxAciIf_W + m_rxNoise_W + m_rxOtherSysNoise_W);
-
-  double inverseSinr = 1 / sinr;
-
-  // calculate final sinr taken into account configured interference (C over I)
-  // interference ratio 1 means that it is not configured and is not calculated
-
-  if ( m_rxOtherSysInterference != 1 )
+  if (  m_rxNoisePowerW <= 0 )
     {
-      inverseSinr += 1 / m_rxOtherSysInterference;
+      NS_FATAL_ERROR ("Noise power must be greater than zero!!!");
     }
 
-  if ( m_rxImInterference != 1 )
-    {
-      inverseSinr += 1 / m_rxImInterference;
-    }
+  // Calculate first SINR based on co-channel interference, Adjacent channel interference, noise and external noise
+  // NOTE! ACI noise power and Ext noise power are set 0 by default and given as attributes by PHY object when used.
+  double sinr = rxPowerW / (ifPowerW +  m_rxNoisePowerW + m_rxAciIfPowerW + m_rxExtNoisePowerW);
 
-  if ( m_rxAciInterference != 1 )
-    {
-      inverseSinr += 1 / m_rxAciInterference;
-    }
+  // Call PHY calculator to composite C over I interference configured to PHY.
+  double finalSinr = m_sinrCalculate (sinr);
 
-  sinr = 1 / inverseSinr;
-
-  return (sinr);
+  return (finalSinr);
 }
 
 double
@@ -333,8 +324,15 @@ SatPhyRxCarrier::CalculateCompositeSinr (double sinr1, double sinr2)
 {
   NS_LOG_FUNCTION (this << sinr1 << sinr2 );
 
-  NS_ASSERT (sinr1);
-  NS_ASSERT (sinr2);
+  if (  sinr1 <= 0 )
+    {
+      NS_FATAL_ERROR ("SINR 1 must be greater than zero!!!");
+    }
+
+  if (  sinr2 <= 0 )
+    {
+      NS_FATAL_ERROR ("SINR 2 must be greater than zero!!!");
+    }
 
   return 1 / ( (1 / sinr1) + (1 / sinr2) );
 }

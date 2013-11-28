@@ -57,17 +57,35 @@ public:
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
+  /**
+   * Geo User specific SINR calculator.
+   * Calculate SINR with Geo User PHY specific parameters and given SINR.
+   *
+   * \param sinr Calculated (C/NI)
+   */
+  virtual double CalculateSinr (double sinr);
+
 private:
 
   /**
-   * Adjacent channel interference (signal over interference) for forward link..
+   * Configured Adjacent Channel Interference (ACI) in dB.
    */
   double m_aciInterferenceCOverIDb;
 
   /**
-   * Other system interference (signal over interference).
+   * Configured other system interference in dB.
    */
   double m_otherSysInterferenceCOverIDb;
+
+  /**
+   * Adjacent Channel Interference (ACI) in linear.
+   */
+  double m_aciInterferenceCOverI;
+
+  /**
+   * Other system interference in linear.
+   */
+  double m_otherSysInterferenceCOverI;
 
 };
 

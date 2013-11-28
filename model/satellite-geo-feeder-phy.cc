@@ -94,15 +94,15 @@ SatGeoFeederPhy::GetTypeId (void)
                     DoubleValue (1.00),
                     MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
                     MakeDoubleChecker<double_t> ())
-    .AddAttribute( "ExtNoisePowerDensityDbWHz",
+    .AddAttribute( "ExtNoisePowerDensityDbwhz",
                    "Other system interference, C over I in dB.",
                     DoubleValue (-207.0),
-                    MakeDoubleAccessor (&SatGeoFeederPhy::m_extNoisePowerDensityDbWHz),
+                    MakeDoubleAccessor (&SatGeoFeederPhy::m_extNoisePowerDensityDbwhz),
                     MakeDoubleChecker<double> ())
     .AddAttribute( "ImIfCOverIDb",
                    "Adjacent channel interference, C over I in dB.",
                     DoubleValue (27.0),
-                    MakeDoubleAccessor (&SatGeoFeederPhy::m_imInterferenceCiDb),
+                    MakeDoubleAccessor (&SatGeoFeederPhy::m_imInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
   ;
   return tid;
@@ -132,6 +132,8 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params, InterferenceMod
 
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  m_imInterferenceCOverI = SatUtils::DbToLinear (m_imInterferenceCOverIDb);
+
   // Configure the SatPhyRxCarrier instances
   // Note, that in GEO satellite, there is no need for error modeling.
 
@@ -144,8 +146,9 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params, InterferenceMod
                                              converter,
                                              carrierCount);
 
-  carrierConf->SetAttribute ("ExtNoiseDensityDbWHz", DoubleValue (m_extNoisePowerDensityDbWHz) );
-  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterferenceCiDb) );
+  carrierConf->SetAttribute ("ExtNoiseDensityDbwhz", DoubleValue (m_extNoisePowerDensityDbwhz) );
+
+  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoFeederPhy::CalculateSinr, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf);
 }
@@ -167,6 +170,24 @@ SatGeoFeederPhy::DoStart ()
 {
   NS_LOG_FUNCTION (this);
   Object::DoStart ();
+}
+
+double
+SatGeoFeederPhy::CalculateSinr (double sinr)
+{
+  NS_LOG_FUNCTION (this << sinr);
+
+  if ( sinr <= 0  )
+    {
+      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
+    }
+
+  // calculate final SINR taken into account configured additional interferences (C over I)
+  // in addition to CCI which is included in given SINR
+
+  double finalSinr = 1 / ( (1 / sinr) + (1 / m_imInterferenceCOverI) );
+
+  return (finalSinr);
 }
 
 } // namespace ns3

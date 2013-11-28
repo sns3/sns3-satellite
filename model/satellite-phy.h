@@ -92,6 +92,14 @@ public:
   virtual void DoDispose (void);
 
   /**
+   * Calculate final SINR with PHY specific parameters and given calculated SINR.
+   * Objects inheriting this PHY object must implement this method.
+   *
+   * \param sinr Calculated C/NI
+   */
+  virtual double CalculateSinr (double sinr) = 0;
+
+  /**
    * Initialize phy.
    */
   void Initialize();

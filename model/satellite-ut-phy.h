@@ -57,11 +57,24 @@ public:
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
+  /**
+   * UT specific SINR calculator.
+   * Calculate SINR with UT PHY specific parameters and given SINR.
+   *
+   * \param sinr Calculated (C/NI)
+   */
+  virtual double CalculateSinr (double sinr);
+
 private:
   /**
-   * Other system interference (signal over interference).
+   * Configured other system interference in dB.
    */
   double m_otherSysInterferenceCOverIDb;
+
+  /**
+   * Other system interference in linear.
+   */
+  double m_otherSysInterferenceCOverI;
 };
 
 }

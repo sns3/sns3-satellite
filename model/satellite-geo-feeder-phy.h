@@ -57,17 +57,30 @@ public:
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
+  /**
+   * Geo Feeder specific SINR calculator.
+   * Calculate SINR with Geo Feeder PHY specific parameters and given SINR.
+   *
+   * \param sinr Calculated (C/NI)
+   */
+  virtual double CalculateSinr (double sinr);
+
 private:
 
   /**
-   * Configured external noise power .
+   * Configured external noise power.
    */
-  double m_extNoisePowerDensityDbWHz;
+  double m_extNoisePowerDensityDbwhz;
 
   /**
-   * Intermodulation interference (signal over interference).
+   * Configured Intermodulation interference in dB.
    */
-  double m_imInterferenceCiDb;
+  double m_imInterferenceCOverIDb;
+
+  /**
+   * Intermodulation interference in linear.
+   */
+  double m_imInterferenceCOverI;
 };
 
 }

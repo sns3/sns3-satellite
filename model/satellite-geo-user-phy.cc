@@ -132,6 +132,9 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
 
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  m_aciInterferenceCOverI = SatUtils::DbToLinear (m_aciInterferenceCOverIDb);
+  m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
+
   Ptr<SatPhyRxCarrierConf> carrierConf =
             CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
                                                SatPhyRxCarrierConf::EM_NONE,
@@ -141,8 +144,7 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
                                                converter,
                                                carrierCount);
 
-  carrierConf->SetAttribute ("RxOtherSysIfDb", DoubleValue (m_otherSysInterferenceCOverIDb));
-  carrierConf->SetAttribute ("RxAciIfDb", DoubleValue (m_aciInterferenceCOverIDb) );
+  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoUserPhy::CalculateSinr, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf);
 }
@@ -164,6 +166,24 @@ SatGeoUserPhy::DoStart ()
 {
   NS_LOG_FUNCTION (this);
   Object::DoStart ();
+}
+
+double
+SatGeoUserPhy::CalculateSinr (double sinr)
+{
+  NS_LOG_FUNCTION (this << sinr);
+
+  if ( sinr <= 0  )
+    {
+      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
+    }
+
+  // calculate final SINR taken into account configured additional interferences (C over I)
+  // in addition to CCI which is included in given SINR
+
+  double finalSinr = 1 / ( (1 / sinr) + (1 / m_aciInterferenceCOverI) + (1 / m_otherSysInterferenceCOverI) );
+
+  return (finalSinr);
 }
 
 } // namespace ns3

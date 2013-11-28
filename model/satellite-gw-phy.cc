@@ -96,14 +96,14 @@ SatGwPhy::GetTypeId (void)
                     MakeDoubleChecker<double_t> ())
     .AddAttribute( "ImIfCOverIDb",
                    "Intermodultation interference, C over I in dB.",
-                    DoubleValue (27.5),
+                    DoubleValue (22.0),
                     MakeDoubleAccessor (&SatGwPhy::m_imInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
     .AddAttribute( "AciIfWrtNoisePercent",
                    "Adjacent channel interference wrt white noise in percents.",
                     DoubleValue (10.0),
                     MakeDoubleAccessor (&SatGwPhy::m_aciIfWrtNoisePercent),
-                    MakeDoubleChecker<double> ())
+                    MakeDoubleChecker<double> (0, 100))
   ;
   return tid;
 }
@@ -130,6 +130,8 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params, ErrorModel errorModel, Ptr<Sa
 
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  m_imInterferenceCOverI = SatUtils::DbToLinear (m_imInterferenceCOverIDb);
+
   Ptr<SatPhyRxCarrierConf> carrierConf =
               CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
                                                  errorModel,
@@ -139,14 +141,14 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params, ErrorModel errorModel, Ptr<Sa
                                                  converter,
                                                  carrierCount);
 
-
-  carrierConf->SetAttribute ("RxImIfDb", DoubleValue (m_imInterferenceCOverIDb) );
   carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoisePercent) );
 
   if (linkResults)
     {
        carrierConf->SetLinkResults (linkResults);
     }
+
+  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGwPhy::CalculateSinr, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf);
 }
@@ -169,5 +171,24 @@ SatGwPhy::DoStart ()
   NS_LOG_FUNCTION (this);
   SatPhy::DoStart ();
 }
+
+double
+SatGwPhy::CalculateSinr (double sinr)
+{
+  NS_LOG_FUNCTION (this << sinr);
+
+  if ( sinr <= 0  )
+    {
+      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
+    }
+
+  // calculate final SINR taken into account configured additional interferences (C over I)
+  // in addition to CCI which is included in given SINR
+
+  double finalSinr = 1 / ( (1 / sinr) + (1 / m_imInterferenceCOverI) );
+
+  return (finalSinr);
+}
+
 
 } // namespace ns3

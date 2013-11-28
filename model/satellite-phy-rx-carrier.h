@@ -46,7 +46,6 @@ public:
 
   /**
    * \brief
-   * \param satInterference
    * \param carrierId
    * \param carrierConf
    */
@@ -132,11 +131,11 @@ private:
 
   /**
    * \brief
-   * \param rxPower_W
-   * \param iPower_W
+   * \param rxPowerW
+   * \param iPowerW
    * \return
    */
-  double CalculateSinr(double rxPower_W, double iPower_W);
+  double CalculateSinr(double rxPowerW, double iPowerW);
 
   /**
    * \brief
@@ -186,44 +185,29 @@ private:
   Ptr<SatLinkResults> m_linkResults;
 
   /**
-   * \brief RX noise temperature in Kelvins
+   * \brief RX noise temperature in K.
    */
-  double m_rxTemperature_K;
+  double m_rxTemperatureK;
 
   /**
    * \brief RX Bandwidth in Hz
    */
-  double m_rxBandwidth_Hz;
+  double m_rxBandwidthHz;
 
   /**
-   * \brief Other system RX noise
+   * \brief External noise power  system RX noise
    */
-  double m_rxOtherSysNoise_W;
+  double m_rxExtNoisePowerW;
 
   /**
    * \brief RX noise
    */
-  double m_rxNoise_W;
+  double m_rxNoisePowerW;
 
   /**
    * \brief RX Adjacent channel interference
    */
-  double m_rxAciIf_W;
-
-  /**
-   * \brief RX Other system interference (C over I in linear)
-   */
-  double m_rxOtherSysInterference;
-
-  /**
-   * \brief RX Intermodulation interference (C over I in linear)
-   */
-  double m_rxImInterference;
-
-  /**
-   * \brief RX Adjacent channel interference (C over I in linear)
-   */
-  double m_rxAciInterference; 
+  double m_rxAciIfPowerW;
 
   /**
    * \brief The upper layer package receive callback.
@@ -259,6 +243,11 @@ private:
    * \brief Channel type.
    */
   SatEnums::ChannelType_t m_channelType;
+
+  /**
+   * Callback to calculate SINR.
+   */
+  SatPhyRxCarrierConf::SinrCalculatorCallback m_sinrCalculate;
 
   /**
    * \brief The trace source fired for added interference

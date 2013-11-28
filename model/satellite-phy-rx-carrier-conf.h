@@ -38,6 +38,12 @@ class SatPhyRxCarrierConf : public Object
 public:
 
   /**
+   * \param Calculated C/NI
+   * \return Calculated Final SINR in linear
+   */
+  typedef Callback<double, double> SinrCalculatorCallback;
+
+  /**
      * \param channelType     The type of the channel
      * \param carrierId       The id of the carrier
      *
@@ -79,7 +85,7 @@ public:
 
   /**
    * Constructor for SatPhyRxCarrierConf.
-   * \param rxTemperature_K RX noise temperature in Kelvins
+   * \param rxTemperatureK RX noise temperature in Kelvins
    * \param errorModel Used error model
    * \param ifModel Used interference model
    * \param rxMode RX mode used in carrier
@@ -87,9 +93,9 @@ public:
    * \param converter Bandwidth converter
    * \param carrierCount carrier count
    */
-  SatPhyRxCarrierConf ( double rxTemperature_K, ErrorModel errorModel, InterferenceModel ifModel,
-                        RxMode rxMode, SatEnums::ChannelType_t chType,
-                        CarrierBandwidthConverter converter, uint32_t carrierCount);
+  SatPhyRxCarrierConf ( double rxTemperatureK, ErrorModel errorModel, InterferenceModel ifModel,
+                        RxMode rxMode, SatEnums::ChannelType_t chType, CarrierBandwidthConverter converter,
+                        uint32_t carrierCount);
 
   /**
    * Destructor for SatPhyRxCarrierConf.
@@ -97,6 +103,11 @@ public:
   virtual ~SatPhyRxCarrierConf () {}
 
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief
+   */
+  virtual void DoDispose ();
 
   /**
    * Set link results for the carrier configuration, either
@@ -132,32 +143,17 @@ public:
    *
    * \return Bandwidth of the requested carrier.
    */
-  double GetCarrierBandwidth_Hz ( uint32_t carrierId ) const;
+  double GetCarrierBandwidthHz ( uint32_t carrierId ) const;
 
   /*
    * Get configured RX noise temperature
    */
-  double GetRxTemperature_K () const;
+  double GetRxTemperatureK () const;
 
   /*
    * Get other system RX noise
    */
-  double GetExtPowerDensity_dbWHz () const;
-
-  /*
-   * Get Other system interference (C over I)
-   */
-  double GetRxOtherSystemInterference_dB () const;
-
-  /*
-   * Get Intermodulation interference (C over I)
-   */
-  double GetRxImInterference_dB () const;
-
-  /*
-   * Get adjacent channel interference (signal over interference)
-   */
-  double GetRxAciInterference_dB () const;
+  double GetExtPowerDensityDbwhz () const;
 
   /*
    * Get adjacent channel interference wrt noise (percent)
@@ -181,6 +177,16 @@ public:
    */
   bool IsIntfOutputTraceEnabled () const;
 
+  /**
+   * \brief Get callback function to calculate final SINR.
+   */
+  inline SinrCalculatorCallback  GetSinrCalculatorCb () {return m_sinrCalculate;}
+
+  /**
+   * \brief Set callback function to calculate final SINR.
+   */
+  inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator ) {m_sinrCalculate = sinrCalculator;}
+
 private:
 
   /*
@@ -192,17 +198,15 @@ private:
   InterferenceModel m_ifModel;
   ErrorModel m_errorModel;
   Ptr<SatLinkResults> m_linkResults;
-  double m_rxTemperature_K;
-  double m_rxExtNoiseDensity_dbWHz;
-  double m_rxOtherSysInterference_db;
-  double m_rxImInterference_db;
-  double m_rxAciInterference_db;
+  double m_rxTemperatureK;
+  double m_rxExtNoiseDensityDbwhz;
   double m_rxAciIfWrtNoise;
   RxMode m_rxMode;
   bool m_enableIntfOutputTrace;
   uint32_t m_carrierCount;
   CarrierBandwidthConverter m_carrierBandwidthConverter;
   SatEnums::ChannelType_t m_channelType;
+  SinrCalculatorCallback m_sinrCalculate;
  };
 
 } // namespace ns3

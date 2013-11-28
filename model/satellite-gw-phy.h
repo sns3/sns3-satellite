@@ -57,18 +57,30 @@ public:
   virtual void DoStart (void);
   virtual void DoDispose (void);
 
+  /**
+   * GW specific SINR calculator.
+   * Calculate SINR with GW PHY specific parameters and given SINR.
+   *
+   * \param sinr Calculated (C/NI)
+   */
+  virtual double CalculateSinr (double sinr);
+
 private:
 
   /**
-   * Intermodulation interference (signal over interference).
+   *  Configured adjacent channel interference wrt noise (percent).
+   */
+  double m_aciIfWrtNoisePercent;
+
+  /**
+   * Configured intermodulation interference in dB.
    */
   double m_imInterferenceCOverIDb;
 
   /**
-  *  Adjacent channel interference wrt noise (percent).
-  */
-  double m_aciIfWrtNoisePercent;
-
+   * Intermodulation interference in linear.
+   */
+  double m_imInterferenceCOverI;
 };
 
 }

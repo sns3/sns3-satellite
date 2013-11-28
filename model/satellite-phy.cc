@@ -89,7 +89,6 @@ SatPhy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhy")
     .SetParent<Object> ()
-    .AddConstructor<SatPhy> ()
     .AddAttribute ("ReceiveCb", "The receive callback for this phy.",
                     CallbackValue (),
                     MakeCallbackAccessor (&SatPhy::m_rxCallback),

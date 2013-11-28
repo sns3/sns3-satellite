@@ -34,32 +34,27 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
 : m_ifModel (),
   m_errorModel (),
   m_linkResults (),
-  m_rxTemperature_K (),
-  m_rxExtNoiseDensity_dbWHz (),
-  m_rxOtherSysInterference_db (),
-  m_rxImInterference_db (),
-  m_rxAciInterference_db (),
+  m_rxTemperatureK (),
+  m_rxExtNoiseDensityDbwhz (),
   m_rxAciIfWrtNoise (),
   m_rxMode (),
   m_enableIntfOutputTrace (false),
   m_carrierCount (),
   m_carrierBandwidthConverter (),
-  m_channelType ()
+  m_channelType (),
+  m_sinrCalculate ()
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperature_dBK, ErrorModel errorModel, InterferenceModel ifModel,
+SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperatureDbk, ErrorModel errorModel, InterferenceModel ifModel,
                                            RxMode rxMode, SatEnums::ChannelType_t chType,
                                            CarrierBandwidthConverter converter, uint32_t carrierCount )
  : m_ifModel (ifModel),
    m_errorModel (errorModel),
    m_linkResults (),
-   m_rxTemperature_K (SatUtils::DbToLinear (rxTemperature_dBK)),
-   m_rxExtNoiseDensity_dbWHz (0),
-   m_rxOtherSysInterference_db (0),
-   m_rxImInterference_db (0),
-   m_rxAciInterference_db (0),
+   m_rxTemperatureK (SatUtils::DbToLinear (rxTemperatureDbk)),
+   m_rxExtNoiseDensityDbwhz (0),
    m_rxAciIfWrtNoise (0),
    m_rxMode (rxMode),
    m_enableIntfOutputTrace (false),
@@ -75,31 +70,16 @@ SatPhyRxCarrierConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
     .SetParent<Object> ()
-    .AddAttribute( "RxOtherSysIfDb",
-                   "Other system interference.",
-                    DoubleValue (0.0),
-                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxOtherSysInterference_db),
+    .AddAttribute( "ExtNoiseDensityDbwhz",
+                   "External noise power density.",
+                    DoubleValue (SatUtils::MinDb<double> ()),
+                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxExtNoiseDensityDbwhz),
                     MakeDoubleChecker<double> ())
-    .AddAttribute( "RxImIfDb",
-                   "Intermodulation interference.",
-                    DoubleValue (0.0),
-                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxImInterference_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute( "RxAciIfDb",
-                   "Adjacent channel interference.",
-                    DoubleValue (0.0),
-                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxAciInterference_db),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute( "RxAciIfWrtNoise",
+	  .AddAttribute( "RxAciIfWrtNoise",
                    "Adjacent channel interference wrt noise in percents.",
                     DoubleValue (0.0),
                     MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxAciIfWrtNoise),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute( "ExtNoiseDensityDbWHz",
-                   "External noise power density.",
-                    DoubleValue (SatUtils::MinDb<double> ()),
-                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxExtNoiseDensity_dbWHz),
-                    MakeDoubleChecker<double> ())
+                    MakeDoubleChecker<double> ())                    
     .AddAttribute( "EnableIntfOutputTrace",
                    "Enable interference output trace.",
                     BooleanValue (false),
@@ -108,6 +88,18 @@ SatPhyRxCarrierConf::GetTypeId (void)
     .AddConstructor<SatPhyRxCarrierConf> ()
   ;
   return tid;
+}
+
+void
+SatPhyRxCarrierConf::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_linkResults = NULL;
+  m_carrierBandwidthConverter.Nullify();
+  m_sinrCalculate.Nullify();
+
+  Object::DoDispose ();
 }
 
 
@@ -138,34 +130,19 @@ Ptr<SatLinkResults> SatPhyRxCarrierConf::GetLinkResults () const
   return m_linkResults;
 }
 
-double SatPhyRxCarrierConf::GetCarrierBandwidth_Hz ( uint32_t carrierId ) const
+double SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId ) const
 {
   return m_carrierBandwidthConverter( m_channelType, carrierId );
 }
 
-double SatPhyRxCarrierConf::GetRxTemperature_K () const
+double SatPhyRxCarrierConf::GetRxTemperatureK () const
 {
-  return m_rxTemperature_K;
+  return m_rxTemperatureK;
 }
 
-double SatPhyRxCarrierConf::GetExtPowerDensity_dbWHz () const
+double SatPhyRxCarrierConf::GetExtPowerDensityDbwhz () const
 {
-  return m_rxExtNoiseDensity_dbWHz;
-}
-
-double SatPhyRxCarrierConf::GetRxOtherSystemInterference_dB () const
-{
-  return m_rxOtherSysInterference_db;
-}
-
-double SatPhyRxCarrierConf::GetRxImInterference_dB () const
-{
-  return m_rxImInterference_db;
-}
-
-double SatPhyRxCarrierConf::GetRxAciInterference_dB () const
-{
-  return m_rxAciInterference_db;
+  return m_rxExtNoiseDensityDbwhz;
 }
 
 double SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoise () const
