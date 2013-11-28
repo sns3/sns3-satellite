@@ -48,6 +48,15 @@ public:
     RETURN_FEEDER_CH = 4
   } ChannelType_t;
 
+  /**
+   * Possible modes of Rx power calculation.
+   */
+  typedef enum
+  {
+    RX_PWR_CALCULATION = 0,
+    RX_PWR_INPUT_TRACE = 1,
+  } RxPowerCalculationMode_t;
+
   static inline std::string GetChannelTypeName (ChannelType_t channelType)
   {
     switch (channelType)

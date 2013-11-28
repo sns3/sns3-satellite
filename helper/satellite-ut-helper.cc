@@ -274,9 +274,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
-  // Attach the LLC layer to SatNetDevice
-  dev->SetLlc (llc);
-
   // Add UT to NCC
   DoubleValue macCra (0.0);
   mac->GetAttribute ( "Cra", macCra );

@@ -87,6 +87,25 @@ SatGenericEncapsulator::DoDispose ()
   m_reorderingTimer.Cancel ();
   m_rxCallback.Nullify ();
 
+  while (!m_txBuffer.empty ()) m_txBuffer.pop_back ();
+  m_txBuffer.clear();
+
+  std::map <uint16_t, Ptr<Packet> >::iterator it;
+
+  for ( it = m_rxBuffer.begin(); it != m_rxBuffer.end(); ++it)
+    {
+      it->second = 0;
+    }
+  m_rxBuffer.clear();
+
+  while (!m_reasBuffer.empty ()) m_reasBuffer.pop_back ();
+  m_reasBuffer.clear();
+
+  while (!m_sdusBuffer.empty ()) m_sdusBuffer.pop_back ();
+  m_sdusBuffer.clear();
+
+  m_keepS0 = 0;
+
   SatEncapsulator::DoDispose ();
 }
 

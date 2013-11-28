@@ -95,11 +95,28 @@ void
 SatLlc::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_controlQueue->DequeueAll();
-  m_controlQueue = 0;
-  m_encaps.clear ();
-  m_decaps.clear ();
   m_rxCallback.Nullify ();
+
+  if (m_controlQueue != 0)
+    {
+      m_controlQueue->DequeueAll();
+    }
+  m_controlQueue = 0;
+
+  encapContainer_t::iterator it;
+
+  for ( it = m_encaps.begin(); it != m_encaps.end(); ++it)
+    {
+      it->second = 0;
+    }
+  m_encaps.clear ();
+
+  for ( it = m_decaps.begin(); it != m_decaps.end(); ++it)
+    {
+      it->second = 0;
+    }
+  m_decaps.clear ();
+
   Object::DoDispose ();
 }
 

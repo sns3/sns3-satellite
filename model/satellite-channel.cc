@@ -45,7 +45,9 @@ SatChannel::SatChannel ()
    m_carrierFreqConverter (),
    m_freqId (),
    m_propagationDelay (),
-   m_freeSpaceLoss ()
+   m_freeSpaceLoss (),
+   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO add as an attribute
+   m_enableRxPowerOutputTrace (false) /// TODO add as an attribute
 {
   NS_LOG_FUNCTION (this);
 }
@@ -144,23 +146,19 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   double frequency_hz = m_carrierFreqConverter (m_channelType, m_freqId, rxParams->m_carrierId);
   rxParams->m_carrierFreq_hz = frequency_hz;
 
-  /// TODO add as an attribute
-  uint32_t rxPowerCalculationMode = 0;
-
-  switch (rxPowerCalculationMode)
+  switch (m_rxPowerCalculationMode)
   {
-    case 0:
+    case SatEnums::RX_PWR_CALCULATION:
       {
         DoRxPowerCalculation (rxParams, phyRx);
 
-        /// TODO add as an attribute
-        if (0)
+        if (m_enableRxPowerOutputTrace)
           {
             DoRxPowerOutputTrace (rxParams);
           }
         break;
       }
-    case 1:
+    case SatEnums::RX_PWR_INPUT_TRACE:
       {
         DoRxPowerInputTrace (rxParams);
         break;

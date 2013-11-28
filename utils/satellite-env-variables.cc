@@ -50,32 +50,26 @@ SatEnvVariables::SatEnvVariables () :
 
   if (!m_currentWorkingDirectory.length() > 0)
     {
-      char currentPath[FILENAME_MAX];
-      std::stringstream path;
+      char currentWorkingDirectory[FILENAME_MAX] = "";
 
-       if (!getcwd (currentPath, sizeof (currentPath)))
-         {
-           NS_FATAL_ERROR ("SatEnvVariables - Could not determine current working directory.");
-         }
-
-       currentPath[sizeof (currentPath) - 1] = '\0';
-       path << currentPath;
-       m_currentWorkingDirectory = path.str ();
+      if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
+        {
+          NS_FATAL_ERROR ("SatEnvVariables - Could not determine current working directory.");
+        }
+      currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
+      m_currentWorkingDirectory = std::string (currentWorkingDirectory);
     }
 
   if (!m_pathToExecutable.length() > 0)
     {
-      char currentPath[FILENAME_MAX];
-      std::stringstream path;
+      char pathToExecutable[FILENAME_MAX] = "";
 
-      if (readlink("/proc/self/exe", currentPath, sizeof (currentPath)) < 0)
+      if (readlink("/proc/self/exe", pathToExecutable, sizeof (pathToExecutable)) < 0)
         {
           NS_FATAL_ERROR ("SatEnvVariables - Could not determine the path to executable.");
         }
-
-      currentPath[sizeof (currentPath) - 1] = '\0';
-      path << currentPath;
-      m_pathToExecutable = path.str ();
+      pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
+      m_pathToExecutable = std::string (pathToExecutable);
     }
 }
 

@@ -128,7 +128,7 @@ SatRxPowerOutputTraceContainer::AddToContainer (key_t key, std::vector<double> n
 {
   NS_LOG_FUNCTION (this);
 
-  if (newItem.size () != SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX)
+  if (newItem.size () != SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)
     {
       NS_FATAL_ERROR ("SatRxPowerOutputTraceContainer::AddToContainer - Incorrect vector size");
     }

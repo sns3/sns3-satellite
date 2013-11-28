@@ -154,7 +154,9 @@ public:
   std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
 
 protected:
-
+  /**
+   * \brief
+   */
   void DoDispose ();
 
 private:

@@ -284,12 +284,17 @@ void
 SatNetDevice::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
+  m_rxCallback.Nullify ();
+  m_promiscCallback.Nullify ();
   m_phy = 0;
-  m_mac->Dispose();
+  m_mac->Dispose ();
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
+  m_virtualChannel = 0;
+  m_llc->Dispose ();
   m_llc = 0;
+
   NetDevice::DoDispose ();
 }
 
