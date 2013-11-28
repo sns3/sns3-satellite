@@ -29,33 +29,27 @@
 using namespace ns3;
 
 
-NS_LOG_COMPONENT_DEFINE ("SatHttpExample");
+NS_LOG_COMPONENT_DEFINE ("SatNrtvExample");
 
 
-class HttpCalculator
+class NrtvCalculator
 {
 public:
-  HttpCalculator (ApplicationContainer apps, Time duration);
+  NrtvCalculator (ApplicationContainer apps, Time duration);
   void Print ();
 private:
   void RxCallback (std::string context, Ptr<const Packet> packet);
-  void RxMainObjectCallback (std::string context);
-  void RxEmbeddedObjectCallback (std::string context);
   static std::string GetContext (uint32_t appId);
   static uint32_t GetAppId (std::string context);
   Time m_duration;
   std::vector<uint64_t> m_rxBytes;
-  std::vector<uint32_t> m_rxMainObject;
-  std::vector<uint32_t> m_rxEmbeddedObject;
 };
 
-HttpCalculator::HttpCalculator (ApplicationContainer apps, Time duration)
+NrtvCalculator::NrtvCalculator (ApplicationContainer apps, Time duration)
   : m_duration (duration)
 {
   uint32_t n = apps.GetN ();
   m_rxBytes.resize (n, 0);
-  m_rxMainObject.resize (n, 0);
-  m_rxEmbeddedObject.resize (n, 0);
 
   uint32_t appId = 0;
 
@@ -64,37 +58,23 @@ HttpCalculator::HttpCalculator (ApplicationContainer apps, Time duration)
     {
       NS_ASSERT (appId < n);
       std::string context = GetContext (appId);
-      (*it)->TraceConnect ("RxMainObjectPacket", context,
-                           MakeCallback (&HttpCalculator::RxCallback, this));
-      (*it)->TraceConnect ("RxEmbeddedObjectPacket", context,
-                           MakeCallback (&HttpCalculator::RxCallback, this));
-      (*it)->TraceConnect ("RxMainObject", context,
-                           MakeCallback (&HttpCalculator::RxMainObjectCallback,
-                                         this));
-      (*it)->TraceConnect ("RxEmbeddedObject", context,
-                           MakeCallback (&HttpCalculator::RxEmbeddedObjectCallback,
-                                         this));
+      (*it)->TraceConnect ("Rx", context,
+                           MakeCallback (&NrtvCalculator::RxCallback, this));
       appId++;
     }
 }
 
 void
-HttpCalculator::Print ()
+NrtvCalculator::Print ()
 {
   uint64_t sumRxBytes = 0;
-  uint32_t sumRxMainObject = 0;
-  uint32_t sumRxEmbeddedObject = 0;
   double throughput = 0.0;
   double duration = m_duration.GetSeconds ();
   uint32_t n = m_rxBytes.size ();
-  NS_ASSERT (m_rxMainObject.size () == n);
-  NS_ASSERT (m_rxEmbeddedObject.size () == n);
 
-  NS_LOG_INFO (this << " HTTP clients round-up statistics:");
+  NS_LOG_INFO (this << " NRTV clients round-up statistics:");
   NS_LOG_INFO (this << " ---------------------------------");
   NS_LOG_INFO (this << std::setw (4) << "#"
-                    << std::setw (6) << "main"
-                    << std::setw (6) << "emb"
                     << std::setw (9) << "bytes"
                     << std::setw (9) << "kbps");
   NS_LOG_INFO (this << " ---------------------------------");
@@ -103,25 +83,17 @@ HttpCalculator::Print ()
     {
       throughput = static_cast<double> (m_rxBytes[i] * 8) / 1000.0 / duration;
       NS_LOG_INFO (this << std::setw (4) << i
-                        << std::setw (6) << m_rxMainObject[i]
-                        << std::setw (6) << m_rxEmbeddedObject[i]
                         << std::setw (9) << m_rxBytes[i]
                         << std::setw (9) << throughput);
       sumRxBytes += m_rxBytes[i];
-      sumRxMainObject += m_rxMainObject[i];
-      sumRxEmbeddedObject += m_rxEmbeddedObject[i];
     }
 
   throughput = static_cast<double> (sumRxBytes * 8) / 1000.0 / duration;
   NS_LOG_INFO (this << " ---------------------------------");
   NS_LOG_INFO (this << std::setw (4) << "sum"
-                    << std::setw (6) << sumRxMainObject
-                    << std::setw (6) << sumRxEmbeddedObject
                     << std::setw (9) << sumRxBytes
                     << std::setw (9) << throughput);
   NS_LOG_INFO (this << std::setw (4) << "avg"
-                    << std::setw (6) << static_cast<double> (sumRxMainObject) / n
-                    << std::setw (6) << static_cast<double> (sumRxEmbeddedObject) / n
                     << std::setw (9) << static_cast<double> (sumRxBytes) / n
                     << std::setw (9) << static_cast<double> (throughput) / n);
   NS_LOG_INFO (this << " ---------------------------------");
@@ -130,31 +102,15 @@ HttpCalculator::Print ()
 }
 
 void
-HttpCalculator::RxCallback (std::string context, Ptr<const Packet> packet)
+NrtvCalculator::RxCallback (std::string context, Ptr<const Packet> packet)
 {
   uint32_t appId = GetAppId (context);
   NS_ASSERT (appId < m_rxBytes.size ());
   m_rxBytes[appId] += packet->GetSize ();
 }
 
-void
-HttpCalculator::RxMainObjectCallback (std::string context)
-{
-  uint32_t appId = GetAppId (context);
-  NS_ASSERT (appId < m_rxMainObject.size ());
-  m_rxMainObject[appId]++;
-}
-
-void
-HttpCalculator::RxEmbeddedObjectCallback (std::string context)
-{
-  uint32_t appId = GetAppId (context);
-  NS_ASSERT (appId < m_rxEmbeddedObject.size ());
-  m_rxEmbeddedObject[appId]++;
-}
-
 std::string
-HttpCalculator::GetContext (uint32_t appId)
+NrtvCalculator::GetContext (uint32_t appId)
 {
   std::ostringstream context;
   context << appId;
@@ -162,7 +118,7 @@ HttpCalculator::GetContext (uint32_t appId)
 }
 
 uint32_t
-HttpCalculator::GetAppId (std::string context)
+NrtvCalculator::GetAppId (std::string context)
 {
   std::stringstream ss (context);
   uint32_t appId;
@@ -177,26 +133,26 @@ HttpCalculator::GetAppId (std::string context)
 /**
  * \ingroup satellite
  *
- * \brief Example of using HTTP traffic model in a satellite network.
+ * \brief Example of using NRTV traffic model in a satellite network.
  *
- * One HTTP server application is installed in the first GW user. One HTTP
+ * One NRTV server application is installed in the first GW user. One NRTV
  * client application is installed in each UT user, configured to point to the
  * server.
  *
  * By default, the SIMPLE test scenario is used. Another test scenario can be
  * given from command line as user argument, e.g.:
  *
- *     $ ./waf --run="sat-http-example --scenario=larger"
- *     $ ./waf --run="sat-http-example --scenario=full"
+ *     $ ./waf --run="sat-nrtv-example --scenario=larger"
+ *     $ ./waf --run="sat-nrtv-example --scenario=full"
  *
  * Simulation runs for 1000 seconds by default. This can be changed from the
  * command line argument as well, e.g.:
  *
- *     $ ./waf --run="sat-http-example --duration=500"
+ *     $ ./waf --run="sat-nrtv-example --duration=500"
  *
  * To see help for user arguments:
  *
- *     $ ./waf --run "sat-http-example --PrintHelp"
+ *     $ ./waf --run "sat-nrtv-example --PrintHelp"
  *
  */
 int
@@ -227,9 +183,9 @@ main (int argc, char *argv[])
     }
 
   LogComponentEnableAll (LOG_PREFIX_ALL);
-  //LogComponentEnable ("HttpClient", LOG_WARN);
-  //LogComponentEnable ("HttpServer", LOG_WARN);
-  LogComponentEnable ("SatHttpExample", LOG_LEVEL_INFO);
+  LogComponentEnable ("NrtvClient", LOG_LEVEL_ALL);
+  LogComponentEnable ("NrtvServer", LOG_LEVEL_ALL);
+  LogComponentEnable ("SatNrtvExample", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   // GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
@@ -255,15 +211,15 @@ main (int argc, char *argv[])
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
 
-  HttpHelper httpHelper ("ns3::TcpSocketFactory");
-  httpHelper.InstallUsingIpv4 (gwUsers.Get (0), utUsers);
-  httpHelper.GetServer ().Start (Seconds (1.0));
-  httpHelper.GetClients ().Start (Seconds (3.0));
+  NrtvHelper nrtvHelper ("ns3::TcpSocketFactory");
+  nrtvHelper.InstallUsingIpv4 (gwUsers.Get (0), utUsers);
+  nrtvHelper.GetServer ().Start (Seconds (1.0));
+  nrtvHelper.GetClients ().Start (Seconds (3.0));
 
   // install calculator
-  HttpCalculator httpCalculator (httpHelper.GetClients (), Seconds (duration));
+  NrtvCalculator nrtvCalculator (nrtvHelper.GetClients (), Seconds (duration));
 
-  NS_LOG_INFO ("--- sat-http-example ---");
+  NS_LOG_INFO ("--- sat-nrtv-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
   NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO ("  ");
@@ -271,7 +227,7 @@ main (int argc, char *argv[])
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();
 
-  httpCalculator.Print ();
+  nrtvCalculator.Print ();
 
   Simulator::Destroy ();
 
