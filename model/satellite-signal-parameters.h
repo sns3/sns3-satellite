@@ -25,12 +25,11 @@
 #include "ns3/packet.h"
 #include "ns3/nstime.h"
 #include "ns3/object.h"
-
+#include "satellite-enums.h"
 
 namespace ns3 {
 
 class SatPhyTx;
-class SatChannel;
 
 /**
 * \ingroup satellite
@@ -105,7 +104,8 @@ public:
   /**
    * The SatChannel instance received the packet.
    */
-  Ptr<SatChannel> m_channel;
+  SatEnums::ChannelType_t m_channelType;
+  //Ptr<SatChannel> m_channel;
 
 };
 

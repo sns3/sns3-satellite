@@ -141,7 +141,7 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   NS_LOG_FUNCTION (this << rxParams << phyRx);
 
-  rxParams->m_channel = this;
+  rxParams->m_channelType = m_channelType;
 
   double frequency_hz = m_carrierFreqConverter (m_channelType, m_freqId, rxParams->m_carrierId);
   rxParams->m_carrierFreq_hz = frequency_hz;

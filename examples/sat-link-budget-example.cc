@@ -34,7 +34,7 @@ static void PacketTraceCb ( std::string context, Ptr<SatSignalParameters> params
   if ( !destAdd.IsBroadcast() )
     {
       NS_LOG_INFO ( Simulator::Now() << " "
-                    << params->m_channel->GetChannelType () << " "
+                    << params->m_channelType << " "
                     << ownAdd << " "
                     << destAdd << " "
                     << params->m_beamId << " "
