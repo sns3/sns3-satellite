@@ -18,8 +18,8 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#ifndef SAT_INPUT_FSTREAM_DOUBLE_CONTAINER_H
-#define SAT_INPUT_FSTREAM_DOUBLE_CONTAINER_H
+#ifndef SAT_INPUT_FSTREAM_TIME_DOUBLE_CONTAINER_H
+#define SAT_INPUT_FSTREAM_TIME_DOUBLE_CONTAINER_H
 
 #include <fstream>
 #include "ns3/object.h"
@@ -30,9 +30,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for input file stream container for double values
+ * \brief Class for input file stream container for double values. Row format is [time, value1, ..., value n].
  */
-class SatInputFileStreamDoubleContainer : public Object
+class SatInputFileStreamTimeDoubleContainer : public Object
 {
 public:
 
@@ -48,17 +48,17 @@ public:
    * \param filemode file mode
    * \param valuesInRow number of values in a row
    */
-  SatInputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
+  SatInputFileStreamTimeDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
   /**
    * \brief Constructor
    */
-  SatInputFileStreamDoubleContainer ();
+  SatInputFileStreamTimeDoubleContainer ();
 
   /**
    * \brief Destructor
    */
-  ~SatInputFileStreamDoubleContainer ();
+  ~SatInputFileStreamTimeDoubleContainer ();
 
   /**
    * \brief Function for updating the container
@@ -105,6 +105,11 @@ private:
    * \return
    */
   bool FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue);
+
+  /**
+   * \brief Check container time sample sanity
+   */
+  void CheckContainerSanity ();
 
   /**
    * \brief Pointer to input file stream wrapper
@@ -159,4 +164,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SAT_INPUT_FSTREAM_DOUBLE_CONTAINER_H */
+#endif /* SAT_INPUT_FSTREAM_TIME_DOUBLE_CONTAINER_H */

@@ -27,6 +27,7 @@
 #include "ns3/node.h"
 #include "ns3/propagation-delay-model.h"
 #include "ns3/mobility-model.h"
+#include "ns3/enum.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
@@ -46,8 +47,8 @@ SatChannel::SatChannel ()
    m_freqId (),
    m_propagationDelay (),
    m_freeSpaceLoss (),
-   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO add as an attribute
-   m_enableRxPowerOutputTrace (false) /// TODO add as an attribute
+   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
+   m_enableRxPowerOutputTrace (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -72,6 +73,17 @@ SatChannel::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatChannel")
     .SetParent<Channel> ()
     .AddConstructor<SatChannel> ()
+    .AddAttribute( "EnableRxPowerOutputTrace",
+                   "Enable Rx power output trace.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatChannel::m_enableRxPowerOutputTrace),
+                    MakeBooleanChecker ())
+    .AddAttribute ("RxPowerCalculationMode",
+                   "Rx Power calculation mode",
+                    EnumValue (SatEnums::RX_PWR_CALCULATION),
+                    MakeEnumAccessor (&SatChannel::m_rxPowerCalculationMode),
+                    MakeEnumChecker (SatEnums::RX_PWR_CALCULATION, "RxPowerCalculation",
+                                     SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
                      MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint));

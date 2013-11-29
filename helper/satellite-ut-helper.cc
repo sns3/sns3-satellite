@@ -40,7 +40,6 @@
 #include "../model/satellite-phy-rx-carrier-conf.h"
 #include "../model/satellite-generic-encapsulator.h"
 #include "../model/satellite-net-device.h"
-
 #include "satellite-ut-helper.h"
 #include "satellite-helper.h"
 
@@ -68,6 +67,7 @@ SatUtHelper::GetTypeId (void)
                      EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
                      MakeEnumAccessor (&SatUtHelper::m_interferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute ("CraAllocMode",
                      "Constant Rate Assignment (CRA) allocation mode used for UTs.",
@@ -241,6 +241,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
   phy->SetAddress (addr);
+
+  SatHelper::m_satMacIdMacMapper->AddMacToMapper (dev->GetAddress ());
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());

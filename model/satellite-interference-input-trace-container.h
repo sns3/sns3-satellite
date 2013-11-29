@@ -21,7 +21,7 @@
 #define SATELLITE_INTERFERENCE_INPUT_TRACE_CONTAINER_H
 
 #include "satellite-base-trace-container.h"
-#include "ns3/satellite-input-fstream-double-container.h"
+#include "ns3/satellite-input-fstream-time-double-container.h"
 #include "satellite-enums.h"
 #include "ns3/mac48-address.h"
 
@@ -44,7 +44,7 @@ public:
   /**
    * \brief typedef for map of containers
    */
-  typedef std::map <key_t, Ptr<SatInputFileStreamDoubleContainer> > container_t;
+  typedef std::map <key_t, Ptr<SatInputFileStreamTimeDoubleContainer> > container_t;
 
   /**
    * \brief Constructor
@@ -86,14 +86,14 @@ private:
    * \param key key
    * \return pointer to the added container
    */
-  Ptr<SatInputFileStreamDoubleContainer> AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
+  Ptr<SatInputFileStreamTimeDoubleContainer> AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
 
   /**
    * \brief Function for finding the container matching the key
    * \param key key
    * \return matching container
    */
-  Ptr<SatInputFileStreamDoubleContainer> FindNode (key_t key);
+  Ptr<SatInputFileStreamTimeDoubleContainer> FindNode (key_t key);
 
   /**
    * \brief Map for containers

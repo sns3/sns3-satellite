@@ -18,25 +18,25 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-input-fstream-double-container.h"
+#include "satellite-input-fstream-time-double-container.h"
 #include "ns3/log.h"
 #include "ns3/abort.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatInputFileStreamDoubleContainer");
+NS_LOG_COMPONENT_DEFINE ("SatInputFileStreamTimeDoubleContainer");
 
 namespace ns3 {
 
 TypeId
-SatInputFileStreamDoubleContainer::GetTypeId (void)
+SatInputFileStreamTimeDoubleContainer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatInputFileStreamDoubleContainer")
+  static TypeId tid = TypeId ("ns3::SatInputFileStreamTimeDoubleContainer")
     .SetParent<Object> ()
-    .AddConstructor<SatInputFileStreamDoubleContainer> ();
+    .AddConstructor<SatInputFileStreamTimeDoubleContainer> ();
   return tid;
 }
 
-SatInputFileStreamDoubleContainer::SatInputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow) :
+SatInputFileStreamTimeDoubleContainer::SatInputFileStreamTimeDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow) :
     m_inputFileStreamWrapper (),
     m_inputFileStream (),
     m_container (),
@@ -53,7 +53,7 @@ SatInputFileStreamDoubleContainer::SatInputFileStreamDoubleContainer (std::strin
   UpdateContainer (m_fileName, m_fileMode, m_valuesInRow);
 }
 
-SatInputFileStreamDoubleContainer::SatInputFileStreamDoubleContainer () :
+SatInputFileStreamTimeDoubleContainer::SatInputFileStreamTimeDoubleContainer () :
     m_inputFileStreamWrapper (),
     m_inputFileStream (),
     m_container (),
@@ -66,10 +66,10 @@ SatInputFileStreamDoubleContainer::SatInputFileStreamDoubleContainer () :
     m_timeColumn ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (0);
+  NS_FATAL_ERROR ("SatInputFileStreamTimeDoubleContainer - Constructor not in use");
 }
 
-SatInputFileStreamDoubleContainer::~SatInputFileStreamDoubleContainer ()
+SatInputFileStreamTimeDoubleContainer::~SatInputFileStreamTimeDoubleContainer ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -77,7 +77,7 @@ SatInputFileStreamDoubleContainer::~SatInputFileStreamDoubleContainer ()
 }
 
 void
-SatInputFileStreamDoubleContainer::DoDispose ()
+SatInputFileStreamTimeDoubleContainer::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -86,7 +86,7 @@ SatInputFileStreamDoubleContainer::DoDispose ()
 }
 
 void
-SatInputFileStreamDoubleContainer::UpdateContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
+SatInputFileStreamTimeDoubleContainer::UpdateContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
 {
   NS_LOG_FUNCTION (this);
 
@@ -123,11 +123,49 @@ SatInputFileStreamDoubleContainer::UpdateContainer (std::string filename, std::i
       NS_ABORT_MSG ("Input stream is not valid for reading.");
     }
 
+  /// Pop the end-of-file zero row out of the container
+  if (m_container.size () > 0 && m_container[m_container.size () - 1].at (m_timeColumn) == 0)
+    {
+      m_container.pop_back();
+    }
+
+  CheckContainerSanity ();
+
   ResetStream ();
 }
 
+void
+SatInputFileStreamTimeDoubleContainer::CheckContainerSanity ()
+{
+  /// check time sample sanity
+  if (m_container.size () < 1)
+    {
+      NS_FATAL_ERROR ("SatInputFileStreamDoubleContainer::UpdateContainer - Empty file");
+    }
+  else if (m_container.size () == 1)
+    {
+      if (m_container[m_container.size () - 1].at (m_timeColumn) == 0)
+        {
+          NS_FATAL_ERROR ("SatInputFileStreamDoubleContainer::UpdateContainer - Invalid input file format (time sample error)");
+        }
+    }
+  else
+    {
+      double tempValue1 = m_container[0].at (m_timeColumn);
+
+      for (uint32_t i = 1; i < m_container.size (); i++)
+        {
+          if (tempValue1 > m_container[i].at (m_timeColumn))
+            {
+              NS_FATAL_ERROR ("SatInputFileStreamDoubleContainer::UpdateContainer - Invalid input file format (time sample error)");
+            }
+          tempValue1 = m_container[i].at (m_timeColumn);
+        }
+    }
+}
+
 std::vector<double>
-SatInputFileStreamDoubleContainer::ProceedToNextClosestTimeSample ()
+SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -139,14 +177,15 @@ SatInputFileStreamDoubleContainer::ProceedToNextClosestTimeSample ()
 
   if (m_numOfPasses > 0)
     {
-      std::cout << "WARNING WARNING WARNING! - SatInputFileStreamDoubleContainer OUT OF SAMPLES! Looping old samples!" << std::endl;
+      std::cout << "WARNING! - SatInputFileStreamDoubleContainer for " << m_fileName << " is out of samples (passes "<< m_numOfPasses << ")" << std::endl;
+      std::cout << "The container will loop samples from the beginning." << std::endl;
     }
 
   return m_container[m_currentPosition];
 }
 
 bool
-SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue)
+SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue)
 {
   NS_LOG_FUNCTION (this);
 
@@ -160,7 +199,7 @@ SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, 
 
   for (uint32_t i = lastValidPosition; i < m_container.size (); i++)
     {
-      if (m_container[i].at (column) + shiftValue > comparisonValue)
+      if (m_container[i].at (column) + shiftValue >= comparisonValue)
         {
           double difference1 = (m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
           double difference2 = (m_container[i].at (column) + shiftValue - comparisonValue);
@@ -194,7 +233,7 @@ SatInputFileStreamDoubleContainer::FindNextClosest (uint32_t lastValidPosition, 
 }
 
 void
-SatInputFileStreamDoubleContainer::Reset ()
+SatInputFileStreamTimeDoubleContainer::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -203,7 +242,7 @@ SatInputFileStreamDoubleContainer::Reset ()
 }
 
 void
-SatInputFileStreamDoubleContainer::ResetStream ()
+SatInputFileStreamTimeDoubleContainer::ResetStream ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -213,13 +252,10 @@ SatInputFileStreamDoubleContainer::ResetStream ()
       m_inputFileStreamWrapper = 0;
     }
   m_inputFileStream = 0;
-
-  m_fileName = "";
-  m_fileMode = std::ifstream::in;
 }
 
 void
-SatInputFileStreamDoubleContainer::ClearContainer ()
+SatInputFileStreamTimeDoubleContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 

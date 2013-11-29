@@ -38,6 +38,7 @@
 #include "../model/satellite-phy-rx-carrier-conf.h"
 #include "../model/satellite-link-results.h"
 #include "ns3/satellite-gw-helper.h"
+#include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
 
@@ -63,6 +64,7 @@ SatGwHelper::GetTypeId (void)
                       EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
                       MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
                       MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddTraceSource ("Creation", "Creation traces",
                         MakeTraceSourceAccessor (&SatGwHelper::m_creation))

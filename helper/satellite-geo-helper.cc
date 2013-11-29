@@ -34,8 +34,8 @@
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
-
 #include "satellite-geo-helper.h"
+#include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoHelper");
 
@@ -60,6 +60,7 @@ SatGeoHelper::GetTypeId (void)
                      EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
                      MakeEnumAccessor (&SatGeoHelper::m_rtnLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
      .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatGeoHelper::m_creation))

@@ -19,6 +19,7 @@
  */
 #include "satellite-interference-input-trace-container.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatInterferenceInputTraceContainer");
 
@@ -72,16 +73,16 @@ SatInterferenceInputTraceContainer::Reset ()
   m_currentWorkingDirectory = "";
 }
 
-Ptr<SatInputFileStreamDoubleContainer>
+Ptr<SatInputFileStreamTimeDoubleContainer>
 SatInterferenceInputTraceContainer::AddNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/data/interference_trace/input/mac_" << key.first << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/data/satellite/interference_trace/input/id_" << SatHelper::m_satMacIdMacMapper->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
   if (result.second == false)
     {
@@ -93,7 +94,7 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
   return result.first->second;
 }
 
-Ptr<SatInputFileStreamDoubleContainer>
+Ptr<SatInputFileStreamTimeDoubleContainer>
 SatInterferenceInputTraceContainer::FindNode (key_t key)
 {
   NS_LOG_FUNCTION (this);
