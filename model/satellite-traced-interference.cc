@@ -83,7 +83,7 @@ SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 double
 SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
-  m_power = m_rxBandwidth_Hz * SatHelper::m_satIntfInputTraceContainer->GetInterferenceDensity (std::make_pair (event->GetRxAddress(),m_channelType));
+  m_power = m_rxBandwidth_Hz * SatHelper::m_satIntfInputTraceContainer->GetInterferenceDensity (std::make_pair (event->GetTerrestrialNodeAddress (),m_channelType));
 
   return m_power;
 }

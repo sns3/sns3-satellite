@@ -195,16 +195,16 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           // add interference in any case
           switch (m_channelType)
           {
-            case SatEnums::RETURN_FEEDER_CH :
+            case SatEnums::FORWARD_FEEDER_CH :
             case SatEnums::RETURN_USER_CH :
               {
                 m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_sourceAddress);
                 break;
               }
-            case SatEnums::FORWARD_FEEDER_CH :
             case SatEnums::FORWARD_USER_CH :
+            case SatEnums::RETURN_FEEDER_CH :
               {
-                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_destAddress);
+                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
                 break;
               }
             default :

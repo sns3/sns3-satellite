@@ -65,7 +65,7 @@ SatGwHelper::GetTypeId (void)
                       MakeEnumAccessor (&SatGwHelper::m_interferenceModel),
                       MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                        SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddTraceSource ("Creation", "Creation traces",
                         MakeTraceSourceAccessor (&SatGwHelper::m_creation))
     ;
@@ -239,6 +239,8 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
   phy->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
+
+  SatHelper::m_satMacIdMacMapper->AddMacToMapper (dev->GetAddress ());
 
   mac->StartScheduling ();
 

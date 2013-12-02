@@ -54,6 +54,7 @@ SatGeoHelper::GetTypeId (void)
                      EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
                      MakeEnumAccessor (&SatGeoHelper::m_fwdLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                      SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute ("RtnLinkInterferenceModel",
                      "Return link interference model",

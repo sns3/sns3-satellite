@@ -37,8 +37,6 @@ SatMacIdMacMapper::SatMacIdMacMapper () :
   m_index (0)
 {
   NS_LOG_FUNCTION (this);
-
-  AddBroadcastMac ();
 }
 
 SatMacIdMacMapper::~SatMacIdMacMapper ()
@@ -108,7 +106,7 @@ SatMacIdMacMapper::GetMac (uint32_t id)
 
   if (iter == m_idToMacMap.end ())
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::GetMac - Not found");
+      NS_FATAL_ERROR ("SatMacIdMacMapper::GetMac - ID " << id << " not found");
     }
 
   return iter->second;
@@ -123,7 +121,7 @@ SatMacIdMacMapper::GetId (Address mac)
 
   if (iter == m_macToIdMap.end ())
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::GetId - Not found");
+      NS_FATAL_ERROR ("SatMacIdMacMapper::GetId - MAC " << mac << " not found");
     }
 
   return iter->second;
@@ -133,6 +131,17 @@ void
 SatMacIdMacMapper::AddBroadcastMac ()
 {
   AddMacToMapper (Mac48Address::GetBroadcast ());
+}
+
+void
+SatMacIdMacMapper::PrintMap ()
+{
+  std::map<uint32_t, Address>::iterator iter;
+
+  for ( iter = m_idToMacMap.begin(); iter != m_idToMacMap.end(); ++iter)
+    {
+      std::cout << "ID: " << iter->first << " MAC: " << iter->second << std::endl;
+    }
 }
 
 } // namespace ns3

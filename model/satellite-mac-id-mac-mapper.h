@@ -75,6 +75,11 @@ public:
    */
   Address GetMac (uint32_t id);
 
+  /**
+   *
+   */
+  void PrintMap ();
+
 private:
 
   /**
