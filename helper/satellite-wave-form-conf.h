@@ -60,9 +60,9 @@ public:
 
   /**
    * Get payload of a waveform in bits
-   * \return payload in bits
+   * \return payload in bytes
    */
-  uint32_t GetPayloadInBits () const;
+  uint32_t GetPayloadInBytes () const;
 
   /**
    * Get burst lenght of the waveform in symbols

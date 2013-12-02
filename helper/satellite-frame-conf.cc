@@ -62,9 +62,8 @@ SatTimeSlotConf::SatTimeSlotConf ()
   NS_ASSERT (false);
 }
 
-SatTimeSlotConf::SatTimeSlotConf (double startTime_s, double duration_s, uint32_t waveFormId, uint32_t frameCarrierId)
+SatTimeSlotConf::SatTimeSlotConf (double startTime_s, uint32_t waveFormId, uint32_t frameCarrierId)
   : m_startTime_s (startTime_s),
-    m_duration_s (duration_s),
     m_waveFormId (waveFormId),
     m_frameCarrierId (frameCarrierId)
 {

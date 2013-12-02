@@ -109,11 +109,10 @@ public:
    * Constructor for SatTimeSlotConf
    *
    * \param startTime_s Start time of time slot in side frame.
-   * \param duration_s  Duration of time slot in seconds
    * \param waveFormId  Wave form id of time slot
    * \param carrierId   Carrier id of time slot
    */
-  SatTimeSlotConf (double startTime_s, double duration_s, uint32_t waveFormId, uint32_t carrierId);
+  SatTimeSlotConf (double startTime_s, uint32_t waveFormId, uint32_t carrierId);
 
   /**
    * Destructor for SatTimeSlotConf
@@ -126,13 +125,6 @@ public:
    * \return The start time of time slot in seconds.
    */
   inline double GetStartTime_s () const { return m_startTime_s; }
-
-  /**
-   * Get duration of time slot.
-   *
-   * \return The duration of time slot in seconds.
-   */
-  inline double GetDuration_s () const { return m_duration_s; }
 
   /**
    * Get wave form id of time slot.
@@ -150,7 +142,6 @@ public:
 
 private:
   double  m_startTime_s;
-  double  m_duration_s;
   uint32_t m_waveFormId;
   uint32_t m_frameCarrierId;
 };

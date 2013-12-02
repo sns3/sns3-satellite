@@ -32,6 +32,7 @@
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
 #include "satellite-ut-mac.h"
+#include "../helper/satellite-wave-form-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
 
@@ -124,42 +125,48 @@ SatUtMac::ScheduleTimeSlots (SatTbtpHeader * tbtp)
           Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf ((*it)->GetFrameId ());
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( (*it)->GetTimeSlotId () );
 
+          // Start time
           Time slotStartTime = startTime + Seconds (timeSlotConf->GetStartTime_s ());
+
+          // Duration
+          Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
+          double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRate_baud ());
+
+          // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, (*it)->GetFrameId (), timeSlotConf->GetCarrierId () );
 
-          ScheduleTxOpportunity (slotStartTime, carrierId, timeSlotConf);
+          ScheduleTxOpportunity (slotStartTime, duration, wf->GetPayloadInBytes (), carrierId);
         }
     }
 }
 
 void
-SatUtMac::ScheduleTxOpportunity(Time transmitTime, uint32_t carrierId, Ptr<SatTimeSlotConf> timeSlotConf)
+SatUtMac::ScheduleTxOpportunity(Time transmitTime, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
-  Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, carrierId, timeSlotConf);
+  NS_LOG_FUNCTION (this << transmitTime << durationInSecs << payloadBytes << carrierId);
+
+  Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, durationInSecs, payloadBytes, carrierId);
 }
 
 void
-SatUtMac::TransmitTime (uint32_t carrierId, Ptr<SatTimeSlotConf> timeSlotConf)
+SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << carrierId);
+  NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId);
 
-  /* TODO: The scheduling information should be acquired from the TBTP:
-   * - waveform: payload, duration
-   * - carrierId
-   * - RC_index
+  /**
+   * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
+   * should be passed with txOpportunity to higher layer, so that it knows which RC_index
+   * (= queue) to serve.
    */
 
-  // Default payload size of waveform  13
-  // (long burst with most robust MODCOD of QPSK 1/3)
-  uint32_t txBytes (123);
-  Ptr<Packet> p = m_txOpportunityCallback (txBytes, m_macAddress);
+  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_macAddress);
 
   if ( p )
     {
       // Decrease one tick from time slot duration. This evaluates guard period.
       // If more sophisticated guard period is needed, it is needed done before hand and
       // remove this 'one tick decrease' implementation
-      Time duration (Time::FromDouble (timeSlotConf->GetDuration_s(), Time::S) - Time (1));
+      Time duration (Time::FromDouble (durationInSecs, Time::S) - Time (1));
       SendPacket (p, carrierId, duration);
     }
 }

@@ -58,9 +58,9 @@ SatWaveform::GetWaveformId () const
 
 
 uint32_t
-SatWaveform::GetPayloadInBits () const
+SatWaveform::GetPayloadInBytes () const
 {
-  return 8 * m_payloadBytes;
+  return m_payloadBytes;
 }
 
 uint32_t

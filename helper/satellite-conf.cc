@@ -194,7 +194,7 @@ SatConf::Configure (std::string wfConf)
           {
             for (uint32_t j = 0; j < slotCount; j++)
               {
-                Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (j * timeSlotDuration, timeSlotDuration, defaultWaveFormId, i);
+                Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (j * timeSlotDuration, defaultWaveFormId, i);
                 frameConf->AddTimeSlotConf (timeSlot);
               }
           }
