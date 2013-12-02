@@ -186,11 +186,33 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-          SatMacTag tag;
-          rxParams->m_packet->PeekPacketTag (tag);
+          bool receivePacket = false;
+          bool ownAddressFound = false;
 
-          m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
-          m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+          for ( SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+                ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
+            {
+              SatMacTag tag;
+              (*i)->PeekPacketTag (tag);
+
+              m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+              m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+              if (( m_destAddress == m_ownAddress ))
+                {
+                  receivePacket = true;
+                  ownAddressFound = true;
+                }
+              else if ( m_destAddress.IsBroadcast () )
+                {
+                  receivePacket = true;
+                }
+            }
+
+          if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
+            {
+              receivePacket = true;
+            }
 
           // add interference in any case
           switch (m_channelType)
@@ -218,10 +240,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           // In case that RX mode is something else than transparent
           // additionally check that whether the packet was intended for this specific receiver
 
-          if ( ( rxParams->m_beamId == m_beamId ) &&
-               ( ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT ) ||
-                 ( m_destAddress == m_ownAddress ) ||
-                 ( m_destAddress.IsBroadcast () ) ) )
+          if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
             {
               NS_ASSERT (m_state == IDLE);
 
@@ -252,7 +271,7 @@ SatPhyRxCarrier::EndRxData ()
   NS_ASSERT (m_state == RX);
   ChangeState (IDLE);
 
-  double ifPower = m_satInterference->Calculate ( m_interferenceEvent );
+  double ifPower = m_satInterference->Calculate (m_interferenceEvent);
 
   double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, ifPower );
   double cSinr = sinr;
@@ -271,12 +290,12 @@ SatPhyRxCarrier::EndRxData ()
   
   m_packetTrace (m_rxParams, m_ownAddress, m_destAddress, ifPower, cSinr);
 
-  m_satInterference->NotifyRxEnd ( m_interferenceEvent );
+  m_satInterference->NotifyRxEnd (m_interferenceEvent);
 
   // Send packet upwards
   m_rxCallback ( m_rxParams );
 
-  if ( m_cnoCallback.IsNull() == false )
+  if ( m_cnoCallback.IsNull () == false )
     {
       double cno = cSinr * m_rxBandwidthHz;
       m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, cno);

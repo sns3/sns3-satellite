@@ -39,6 +39,13 @@ class SatPhyTx;
 class SatSignalParameters : public Object
 {
 public:
+  /**
+   * Buffer for transmissions. Buffer just holds data as pointer to packets.
+   * Real length of buffer is simulated by duration of the PDU transmission.
+   *
+   * NOTE! In case of return link this buffer includes only one packet pointer.
+   */
+  typedef std::vector< Ptr<Packet> > TansmitBuffer_t;
   
   /**
   * default constructor
@@ -54,9 +61,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-  * The packet being transmitted with this signal
-  */
-  Ptr<Packet> m_packet;
+   * The packets being transmitted with this signal i.e.
+   * this is transmit buffer including packet pointers.
+   */
+
+  TansmitBuffer_t m_packetBuffer;
 
   /**
    * The beam for the packet transmission

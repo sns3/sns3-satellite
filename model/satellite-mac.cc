@@ -99,7 +99,11 @@ void
 SatMac::SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration)
 {
   // Use call back to send packet to lower layer
-  m_txCallback (packet, carrierId, duration);
+
+  SatPhy::PacketContainer_t packets;
+  packets.push_back (packet);
+
+  m_txCallback (packets, carrierId, duration);
 }
 
 void

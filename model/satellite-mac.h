@@ -30,6 +30,7 @@
 #include "ns3/mac48-address.h"
 
 #include "satellite-signal-parameters.h"
+#include "satellite-phy.h"
 
 
 namespace ns3 {
@@ -65,11 +66,11 @@ public:
 
   /**
    * Callback to send packet to lower layer.
-    * \param Ptr<Packet> the packet received
+    * \param Coitainer of the pointers to the packets received
     * \param uint32_t carrierId
     * \param  Time duration
     */
-  typedef Callback<void, Ptr<Packet>, uint32_t, Time> TransmitCallback;
+  typedef Callback<void, SatPhy::PacketContainer_t, uint32_t, Time> TransmitCallback;
 
   /**
    * Callback to receive packet by upper layer.

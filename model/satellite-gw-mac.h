@@ -37,6 +37,7 @@
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-scheduling-object.h"
+#include "satellite-phy.h"
 
 namespace ns3 {
 
@@ -75,9 +76,9 @@ public:
   /**
    * Receive packet from lower layer.
    *
-   * \param packet Pointer to packet received.
+   * \param packets Pointers to packets received.
    */
-  void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
+  void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
    * Callback to get scheduling contexts from upper layer

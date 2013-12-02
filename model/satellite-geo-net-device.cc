@@ -78,19 +78,19 @@ SatGeoNetDevice::SatGeoNetDevice ()
 }
 
 void
-SatGeoNetDevice::ReceiveUser (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
+SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packet << rxParams);
+  NS_LOG_FUNCTION (this << rxParams);
   NS_LOG_LOGIC (this << " receiving a packet at the satellite from user link");
-  m_feederPhy[rxParams->m_beamId]->SendPduWithParams (packet, rxParams);
+  m_feederPhy[rxParams->m_beamId]->SendPduWithParams (rxParams);
 }
 
 void
-SatGeoNetDevice::ReceiveFeeder (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams)
+SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packet << rxParams);
+  NS_LOG_FUNCTION (this  << rxParams);
   NS_LOG_LOGIC (this << " receiving a packet at the satellite from feeder link");
-  m_userPhy[rxParams->m_beamId]->SendPduWithParams (packet, rxParams);
+  m_userPhy[rxParams->m_beamId]->SendPduWithParams (rxParams);
 }
 
 void

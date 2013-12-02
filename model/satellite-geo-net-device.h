@@ -52,28 +52,28 @@ public:
   static TypeId GetTypeId (void);
   SatGeoNetDevice ();
 
-  /*
+  /**
    * Receive the packet from the lower layers
-   * \param packet Pointer to the packet to be received.
+   * \param packets Container of pointers to the packets to be received.
    * \param rxParams Packet transmission parameters
    */
-  void ReceiveUser (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams);
+  void ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
-  /*
+  /**
    * Receive the packet from the lower layers
-   * \param packet Pointer to the packet to be received.
+   * \param packets Container of pointers to the packets to be received.
    * \param beamId the id of the beam where packet is from
    */
-  void ReceiveFeeder (Ptr<Packet> packet, Ptr<SatSignalParameters> rxParams);
+  void ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
-  /*
+  /**
    * Add the User Phy object for the beam
    * \param phy user phy object to add.
    * \param beamId the id of the beam to use phy for
    */
   void AddUserPhy (Ptr<SatPhy> phy, uint32_t beamId);
 
-  /*
+  /**
    * Add the Feeder Phy object for the beam
    * \param phy feeder phy object to add.
    * \param beamId the id of the beam to use phy for

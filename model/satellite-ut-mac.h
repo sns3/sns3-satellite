@@ -24,6 +24,7 @@
 #include "satellite-mac.h"
 #include "ns3/satellite-superframe-sequence.h"
 #include "satellite-control-message.h"
+#include "satellite-phy.h"
 
 namespace ns3 {
 
@@ -62,9 +63,9 @@ public:
   /**
    * Receive packet from lower layer.
    *
-   * \param packet Pointer to packet received.
+   * \param packets Pointers to packets received.
    */
-  virtual void Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/);
+  virtual void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
    * \return Timing advance as Time object.

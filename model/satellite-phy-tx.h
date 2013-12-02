@@ -114,10 +114,9 @@ public:
 
   /**
   * Start packet transmission to the channel.
-  * \param p Packet to be transmitted
   * \param txParams Transmission parameters for a packet
   */
-  void StartTx (Ptr<Packet> p, Ptr<SatSignalParameters> txParams);
+  void StartTx (Ptr<SatSignalParameters> txParams);
   
   /** 
    * Set the beam id for all the transmissions from this SatPhyTx

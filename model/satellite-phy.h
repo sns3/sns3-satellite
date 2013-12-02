@@ -48,12 +48,13 @@ public:
   typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
   typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;
+  typedef SatSignalParameters::TansmitBuffer_t PacketContainer_t;
 
   /**
-   * \param  the packet received
+   * \param  the container of pointers to packets received
    * \param  the id of the beam where packet is from
    */
-  typedef Callback<void, Ptr<Packet>, Ptr<SatSignalParameters> > ReceiveCallback;
+  typedef Callback<void, PacketContainer_t, Ptr<SatSignalParameters> > ReceiveCallback;
 
   /**
    * \param The id of the beam.
@@ -293,14 +294,13 @@ public:
    * \param carrierId Carrier id for the packet transmission
    * \param duration the packet transmission duration (from MAC layer)
    */
-  virtual void SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration);
+  virtual void SendPdu (PacketContainer_t, uint32_t carrierId, Time duration);
 
   /**
    * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
-   * \param p packet to be sent
    * \param rxParams Transmission parameters
    */
-  virtual void SendPduWithParams (Ptr<Packet> p, Ptr<SatSignalParameters> rxParams);
+  virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
 
   /**
    * Set the beamId this PHY is connected with

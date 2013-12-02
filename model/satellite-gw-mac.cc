@@ -85,38 +85,41 @@ SatGwMac::StartScheduling()
 }
 
 void
-SatGwMac::Receive (Ptr<Packet> packet, Ptr<SatSignalParameters> /*rxParams*/)
+SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
-  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_FUNCTION (this);
 
-  // Hit the trace hooks.  All of these hooks are in the same place in this
-  // device because it is so simple, but this is not usually the case in
-  // more complicated devices.
-  m_snifferTrace (packet);
-  m_promiscSnifferTrace (packet);
-  m_macRxTrace (packet);
-
-  // Remove packet tag
-  SatMacTag macTag;
-  bool mSuccess = packet->PeekPacketTag (macTag);
-  if (!mSuccess)
+  for (SatPhy::PacketContainer_t::iterator i = packets.begin(); i != packets.end(); i++ )
     {
-      NS_FATAL_ERROR ("MAC tag was not found from the packet!");
-    }
+      // Hit the trace hooks.  All of these hooks are in the same place in this
+      // device because it is so simple, but this is not usually the case in
+      // more complicated devices.
+      m_snifferTrace (*i);
+      m_promiscSnifferTrace (*i);
+      m_macRxTrace (*i);
 
-  NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
-  NS_LOG_LOGIC("Receiver " << m_macAddress );
+      // Remove packet tag
+      SatMacTag macTag;
+      bool mSuccess = (*i)->PeekPacketTag (macTag);
+      if (!mSuccess)
+        {
+          NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+        }
 
-  // If the packet is intended for this receiver
-  Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress());
-  if (destAddress == m_macAddress || destAddress.IsBroadcast())
-    {
-      // Pass the source address to LLC
-      m_rxCallback (packet, Mac48Address::ConvertFrom(macTag.GetSourceAddress ()));
-    }
-  else
-    {
-      NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
+      NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
+      NS_LOG_LOGIC("Receiver " << m_macAddress );
+
+      // If the packet is intended for this receiver
+      Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress());
+      if (destAddress == m_macAddress || destAddress.IsBroadcast())
+        {
+          // Pass the source address to LLC
+          m_rxCallback (*i, Mac48Address::ConvertFrom(macTag.GetSourceAddress ()));
+        }
+      else
+        {
+          NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_macAddress );
+        }
     }
 }
 

@@ -41,7 +41,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_eirpWoGainW(0),
+  : m_eirpWoGainW (0),
     m_rxMaxAntennaGainDb (0),
     m_rxAntennaLossDb (0),
     m_txMaxAntennaGainDb (0),
@@ -57,7 +57,7 @@ SatPhy::SatPhy (void)
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
- : m_eirpWoGainW(0),
+ : m_eirpWoGainW (0),
    m_rxMaxAntennaGainDb (0),
    m_rxAntennaLossDb (0),
    m_txMaxAntennaGainDb (0),
@@ -69,9 +69,9 @@ SatPhy::SatPhy (CreateParam_t & params)
    m_defaultFadingValue (1)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  Ptr<MobilityModel> mobility = params.m_device->GetNode()->GetObject<MobilityModel>();
+  Ptr<MobilityModel> mobility = params.m_device->GetNode ()->GetObject<MobilityModel> ();
 
   m_phyTx = CreateObject<SatPhyTx> ();
   m_phyTx->SetChannel (params.m_txCh);
@@ -101,10 +101,26 @@ SatPhy::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatPhy::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return GetTypeId ();
+}
+
+void
+SatPhy::DoStart ()
+{
+  NS_LOG_FUNCTION (this);
+  Object::DoStart ();
+}
+
 void
 SatPhy::Initialize ()
 {
- // calculate EIRP without Gain (maximum)
+  NS_LOG_FUNCTION (this);
+
+  // calculate EIRP without Gain (maximum)
   double eirpWoGainDbw = m_txMaxPowerDbw - m_txOutputLossDb - m_txPointingLossDb - m_txOboLossDb - m_txAntennaLossDb;
 
   m_eirpWoGainW = SatUtils::DbWToW ( eirpWoGainDbw );
@@ -114,9 +130,9 @@ SatPhy::Initialize ()
 
   m_phyRx->SetReceiveCallback ( MakeCallback (&SatPhy::Receive, this) );
 
-  if ( m_cnoCallback.IsNull() == false )
+  if ( m_cnoCallback.IsNull () == false )
     {
-      m_phyRx->SetCnoCallback( MakeCallback (&SatPhy::CnoInfo, this) );
+      m_phyRx->SetCnoCallback ( MakeCallback (&SatPhy::CnoInfo, this) );
     }
 
   m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGainDb);
@@ -190,19 +206,6 @@ SatPhy::SetAddress (Mac48Address ownAddress)
   m_phyRx->SetAddress (ownAddress);
 }
 
-TypeId
-SatPhy::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
-void
-SatPhy::DoStart ()
-{
-  NS_LOG_FUNCTION (this);
-  Object::DoStart ();
-}
-
 Ptr<SatPhyTx>
 SatPhy::GetPhyTx () const
 {
@@ -241,28 +244,28 @@ SatPhy::GetTxChannel ()
 }
 
 void
-SatPhy::SendPdu (Ptr<Packet> p, uint32_t carrierId, Time duration )
+SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration )
 {
-  NS_LOG_FUNCTION (this << p << carrierId << duration);
+  NS_LOG_FUNCTION (this << carrierId << duration);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
   // Create a new SatSignalParameters related to this packet transmission
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
   txParams->m_phyTx = m_phyTx;
-  txParams->m_packet = p;
+  txParams->m_packetBuffer = p;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_sinr = 0;
   txParams->m_txPower_W = m_eirpWoGainW;
 
-  m_phyTx->StartTx (p, txParams);
+  m_phyTx->StartTx (txParams);
 }
 
 void
-SatPhy::SendPduWithParams (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
+SatPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 {
-  NS_LOG_FUNCTION (this << p << txParams);
+  NS_LOG_FUNCTION (this << txParams);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
   // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
@@ -271,7 +274,7 @@ SatPhy::SendPduWithParams (Ptr<Packet> p, Ptr<SatSignalParameters> txParams )
 
   txParams->m_phyTx = m_phyTx;
   txParams->m_txPower_W = m_eirpWoGainW;
-  m_phyTx->StartTx (p, txParams);
+  m_phyTx->StartTx (txParams);
 }
 
 void
@@ -287,14 +290,14 @@ void
 SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
-  m_rxCallback( rxParams->m_packet, rxParams);
+  m_rxCallback ( rxParams->m_packetBuffer, rxParams);
 }
 
 void
 SatPhy::CnoInfo (uint32_t beamId, Address source, double cno)
 {
   NS_LOG_FUNCTION (this << beamId << source << cno);
-  m_cnoCallback( beamId, source, cno);
+  m_cnoCallback ( beamId, source, cno);
 }
 
 } // namespace ns3
