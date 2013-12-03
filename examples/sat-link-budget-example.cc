@@ -78,7 +78,7 @@ main (int argc, char *argv[])
   Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper();
   Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper();
 
-  // These are deafult values used by different PHY objects.
+  // These are default values used by different PHY objects.
   // Uncomment a line and change attribute value to override default
 
 //  gwHelper->SetPhyAttribute ("RxTemperatureDbk", DoubleValue (24.62));

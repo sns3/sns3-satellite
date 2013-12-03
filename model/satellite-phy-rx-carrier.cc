@@ -186,32 +186,18 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
       case IDLE:
       case RX:
         {
-          bool receivePacket = false;
-          bool ownAddressFound = false;
+          // TODO: periodic C/N0 calculation needed to add
 
-          for ( SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-                ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
+          if (rxParams->m_packetBuffer.empty ())
+            {
+              NS_FATAL_ERROR ("Packet buffer of the signaling parameters can't be empty!!!");
+            }
+          else
             {
               SatMacTag tag;
-              (*i)->PeekPacketTag (tag);
-
-              m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+              rxParams->m_packetBuffer[0]->PeekPacketTag (tag);
               m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
-
-              if (( m_destAddress == m_ownAddress ))
-                {
-                  receivePacket = true;
-                  ownAddressFound = true;
-                }
-              else if ( m_destAddress.IsBroadcast () )
-                {
-                  receivePacket = true;
-                }
-            }
-
-          if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
-            {
-              receivePacket = true;
+              m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
             }
 
           // add interference in any case
@@ -236,13 +222,53 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               }
           }
 
+          bool receivePacket = false;
+
           // Check whether the packet is sent to our beam.
+          if ( rxParams->m_beamId == m_beamId )
+            {
+              if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
+                {
+                  receivePacket = true; // in case of transparent RX mode, always receive packet
+                }
+              else
+                {
+                  // in case of normal mode receive only broadcast and own packet
+                  bool ownAddressFound = false;
+
+                  for ( SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+                        ( (i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
+                    {
+                      SatMacTag tag;
+                      (*i)->PeekPacketTag (tag);
+
+                      Mac48Address destAddr = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+
+                      if (( destAddr == m_ownAddress ))
+                        {
+                          receivePacket = true;
+                          ownAddressFound = true;
+                          m_destAddress = destAddr;
+                        }
+                      else if ( destAddr.IsBroadcast () )
+                        {
+                          receivePacket = true;
+                          m_destAddress = destAddr;
+                        }
+                    }
+                }
+            }
+
+
           // In case that RX mode is something else than transparent
           // additionally check that whether the packet was intended for this specific receiver
 
-          if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
+          if ( receivePacket )
             {
-              NS_ASSERT (m_state == IDLE);
+              if (m_state == RX)
+                {
+                  NS_FATAL_ERROR ("Receiving already on, concurrent receiving not supported!!!");
+                }
 
               m_satInterference->NotifyRxStart (m_interferenceEvent);
 
