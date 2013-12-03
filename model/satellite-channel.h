@@ -170,13 +170,13 @@ private:
    * \brief Function for Rx power output trace
    * \param rxParams Rx parameters
    */
-  void DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams);
+  void DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
    * \brief Function for Rx power input trace
    * \param rxParams Rx parameters
    */
-  void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams);
+  void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
    * \brief Function for calculating the Rx power

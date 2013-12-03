@@ -99,39 +99,45 @@ SatInputFileStreamTimeDoubleContainer::UpdateContainer (std::string filename, st
   m_inputFileStreamWrapper = new SatInputFileStreamWrapper (filename,filemode);
   m_inputFileStream = m_inputFileStreamWrapper->GetStream ();
 
-  std::string tempString;
-  double tempValue;
-
   if (m_inputFileStream->is_open ())
-  {
-    while (m_inputFileStream->good ())
-      {
-        std::vector<double> tempVector;
+    {
+      std::vector<double> tempVector = ReadRow ();
 
-        for( uint32_t i = 0; i < m_valuesInRow; i++ )
-          {
-            *m_inputFileStream >> tempString;
-            tempValue = atof (tempString.c_str ());
-            tempVector.push_back (tempValue);
-          }
-        m_container.push_back (tempVector);
-      }
-    m_inputFileStream->close ();
-  }
+      while (!m_inputFileStream->eof ())
+        {
+          m_container.push_back (tempVector);
+          tempVector = ReadRow ();
+        }
+      m_inputFileStream->close ();
+    }
   else
     {
-      NS_ABORT_MSG ("Input stream is not valid for reading.");
+      NS_ABORT_MSG("Input stream is not valid for reading.");
     }
 
-  /// Pop the end-of-file zero row out of the container
-  if (m_container.size () > 0 && m_container[m_container.size () - 1].at (m_timeColumn) == 0)
+  /**
+  for (uint32_t i = 0; i < m_container.size (); i++)
     {
-      m_container.pop_back();
+      std::cout << m_container[i].at (0) << " " << m_container[i].at (1) << std::endl;
     }
-
+    */
   CheckContainerSanity ();
 
   ResetStream ();
+}
+
+std::vector<double>
+SatInputFileStreamTimeDoubleContainer::ReadRow ()
+{
+  double tempValue;
+  std::vector<double> tempVector;
+
+  for( uint32_t i = 0; i < m_valuesInRow; i++ )
+    {
+      *m_inputFileStream >> tempValue;
+      tempVector.push_back (tempValue);
+    }
+  return tempVector;
 }
 
 void
@@ -171,13 +177,16 @@ SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
 
   while (!FindNextClosest(m_currentPosition,m_timeColumn,m_shiftValue, Now ().GetDouble()))
     {
+      m_currentPosition = 0;
       m_numOfPasses++;
       m_shiftValue = m_numOfPasses * m_container[m_container.size () - 1].at (m_timeColumn);
+
+      NS_LOG_INFO ("Looping samples again with shift value: " << m_shiftValue);
     }
 
   if (m_numOfPasses > 0)
     {
-      std::cout << "WARNING! - SatInputFileStreamDoubleContainer for " << m_fileName << " is out of samples (passes "<< m_numOfPasses << ")" << std::endl;
+      std::cout << "WARNING! - SatInputFileStreamDoubleContainer for " << m_fileName << " is out of samples @ time sample " << Now ().GetDouble() << " (passes "<< m_numOfPasses << ")" << std::endl;
       std::cout << "The container will loop samples from the beginning." << std::endl;
     }
 
@@ -201,8 +210,8 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
     {
       if (m_container[i].at (column) + shiftValue >= comparisonValue)
         {
-          double difference1 = (m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
-          double difference2 = (m_container[i].at (column) + shiftValue - comparisonValue);
+          double difference1 = fabs(m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
+          double difference2 = fabs(m_container[i].at (column) + shiftValue - comparisonValue);
 
           if (difference1 < difference2)
             {
@@ -220,14 +229,17 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
 
   if (valueFound && m_numOfPasses > 0 && m_currentPosition == 0)
     {
-      double difference1 = (m_container[m_currentPosition].at (column) + shiftValue - comparisonValue);
-      double difference2 = (m_container[m_container.size() - 1].at (column) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (column)) - comparisonValue);
+      double difference1 = fabs(m_container[m_currentPosition].at (column) + shiftValue - comparisonValue);
+      double difference2 = fabs(m_container[m_container.size() - 1].at (column) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (column)) - comparisonValue);
 
       if (difference1 > difference2)
         {
           m_currentPosition = m_container.size() - 1;
+          m_numOfPasses--;
         }
     }
+
+  NS_LOG_INFO ("Done: " << valueFound << " value: " << m_container[m_currentPosition].at (column) << " @ line: " << m_currentPosition + 1 << " comparison value: " << comparisonValue << " passes: " << m_numOfPasses);
 
   return valueFound;
 }

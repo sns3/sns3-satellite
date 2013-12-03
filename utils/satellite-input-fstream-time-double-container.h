@@ -97,6 +97,12 @@ private:
   void ClearContainer ();
 
   /**
+   * \brief Function for reading a row from file
+   * \return the row
+   */
+  std::vector<double> ReadRow ();
+
+  /**
    * \brief Function for locating the next closest value. This locator loops the samples if the container does not have enough samples.
    * \param lastValidPosition position of last matching value
    * \param column column to search

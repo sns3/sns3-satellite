@@ -47,7 +47,7 @@ SatChannel::SatChannel ()
    m_freqId (),
    m_propagationDelay (),
    m_freeSpaceLoss (),
-   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
+   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO tie this properly to e.g. fading (do not create fading objects!)
    m_enableRxPowerOutputTrace (false)
 {
   NS_LOG_FUNCTION (this);
@@ -166,18 +166,18 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 
         if (m_enableRxPowerOutputTrace)
           {
-            DoRxPowerOutputTrace (rxParams);
+            DoRxPowerOutputTrace (rxParams, phyRx);
           }
         break;
       }
     case SatEnums::RX_PWR_INPUT_TRACE:
       {
-        DoRxPowerInputTrace (rxParams);
+        DoRxPowerInputTrace (rxParams, phyRx);
         break;
       }
     default :
       {
-        NS_FATAL_ERROR ("SatChannel::StartRx - Rx power calculation mode");
+        NS_FATAL_ERROR ("SatChannel::StartRx - Invalid Rx power calculation mode");
         break;
       }
   }
@@ -186,82 +186,85 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 }
 
 void
-SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams)
+SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   SatMacTag tag;
 
   /// TODO get rid of peeking
+  SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
 
-  for ( SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-        i != rxParams->m_packetBuffer.end (); i++)
+  if (*i == NULL)
+  {
+    NS_FATAL_ERROR ("SatChannel::DoRxPowerOutputTrace - Empty packet list");
+  }
+
+  (*i)->PeekPacketTag (tag);
+
+  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+  std::vector<double> tempVector;
+  tempVector.push_back (Now ().GetDouble ());
+  tempVector.push_back (rxParams->m_rxPower_W / rxParams->m_carrierFreq_hz);
+
+  switch (m_channelType)
     {
-      (*i)->PeekPacketTag (tag);
-
-      Mac48Address destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
-      Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
-
-      std::vector<double> tempVector;
-      tempVector.push_back (Now ().GetDouble ());
-      tempVector.push_back (rxParams->m_rxPower_W / rxParams->m_carrierFreq_hz);
-
-      switch (m_channelType)
-      {
-        case SatEnums::FORWARD_FEEDER_CH:
-        case SatEnums::FORWARD_USER_CH:
-          {
-            SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (destAddress, m_channelType), tempVector);
-            break;
-          }
-        case SatEnums::RETURN_FEEDER_CH:
-        case SatEnums::RETURN_USER_CH:
-          {
-            SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (sourceAddress, m_channelType), tempVector);
-            break;
-          }
-        default:
-          {
-            NS_FATAL_ERROR ("SatChannel::StartRx - Invalid channel type");
-            break;
-          }
-      }
+      case SatEnums::RETURN_FEEDER_CH:
+      case SatEnums::FORWARD_USER_CH:
+        {
+          SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
+          break;
+        }
+      case SatEnums::FORWARD_FEEDER_CH:
+      case SatEnums::RETURN_USER_CH:
+        {
+          SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (sourceAddress, m_channelType), tempVector);
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatChannel::DoRxPowerOutputTrace - Invalid channel type");
+          break;
+        }
     }
 }
 
 void
-SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams)
+SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
 
-  for ( SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-          i != rxParams->m_packetBuffer.end (); i++)
+  SatMacTag tag;
+
+  /// TODO get rid of peeking
+  SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+
+  if (*i == NULL)
+  {
+    NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Empty packet list");
+  }
+
+  (*i)->PeekPacketTag (tag);
+
+  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+  switch (m_channelType)
     {
-      SatMacTag tag;
-
-      /// TODO get rid of peeking
-      (*i)->PeekPacketTag (tag);
-
-      Mac48Address destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
-      Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
-
-      switch (m_channelType)
-      {
-        case SatEnums::FORWARD_FEEDER_CH:
-        case SatEnums::FORWARD_USER_CH:
-          {
-            rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (destAddress, m_channelType));
-            break;
-          }
-        case SatEnums::RETURN_FEEDER_CH:
-        case SatEnums::RETURN_USER_CH:
-          {
-            rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (sourceAddress, m_channelType));
-            break;
-          }
-        default:
-          {
-            NS_FATAL_ERROR ("SatChannel::StartRx - Invalid channel type");
-            break;
-          }
-      }
+      case SatEnums::RETURN_FEEDER_CH:
+      case SatEnums::FORWARD_USER_CH:
+        {
+          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
+          break;
+        }
+      case SatEnums::FORWARD_FEEDER_CH:
+      case SatEnums::RETURN_USER_CH:
+        {
+          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (sourceAddress, m_channelType));
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Invalid channel type");
+          break;
+        }
     }
 }
 
@@ -296,7 +299,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       }
     default:
       {
-        NS_FATAL_ERROR ("SatChannel::StartRx - Invalid channel type");
+        NS_FATAL_ERROR ("SatChannel::DoRxPowerCalculation - Invalid channel type");
         break;
       }
   }
