@@ -49,6 +49,16 @@ public:
   } ChannelType_t;
 
   /**
+   * Possible types of bandwidth.
+   */
+  typedef enum
+  {
+    ALLOCATED_BANDWIDTH,
+    OCCUPIED_BANDWIDTH,
+    EFFECTIVE_BANDWIDTH
+  } CarrierBandwidthType_t;
+
+  /**
    * \enum SatModcod_t
    *
    * \brief Modulation scheme and coding rate for DVB-S2.

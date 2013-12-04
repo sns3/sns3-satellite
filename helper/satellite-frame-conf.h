@@ -25,6 +25,7 @@
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/random-variable-stream.h"
+#include "ns3/satellite-enums.h"
 
 namespace ns3 {
 
@@ -208,9 +209,36 @@ public:
   /**
    * Get carrier bandwidth in frame.
    *
+   * \param bandwidthType Type of bandwidth requested.
+   *
    * \return The carrier bandwidth in frame in Hertz.
    */
-  inline double GetCarrierBandwidth_hz() const { return m_btu->GetAllocatedBandwidth_hz(); }
+  inline double GetCarrierBandwidth_hz (SatEnums::CarrierBandwidthType_t bandwidthType) const
+  {
+    double bandwidth = 0.0;
+
+    switch (bandwidthType)
+    {
+      case SatEnums::ALLOCATED_BANDWIDTH:
+        bandwidth = m_btu->GetAllocatedBandwidth_hz();
+        break;
+
+      case SatEnums::OCCUPIED_BANDWIDTH:
+        bandwidth = m_btu->GetOccupiedBandwidth_hz();
+        break;
+
+      case SatEnums::EFFECTIVE_BANDWIDTH:
+        bandwidth = m_btu->GetEffectiveBandwidth_hz();
+        break;
+
+      default:
+        NS_FATAL_ERROR ("Invalid bandwidth type!!!");
+        break;
+
+    }
+
+    return bandwidth;
+  }
 
   /**
    * Get BTU conf of the frame.
@@ -352,10 +380,11 @@ public:
    * Get the bandwidth of the requested carrier.
    *
    * \param carrierId  Id of the carrier inside superframe which bandwidth is requested.
+   * \param bandwidthType Type of bandwidth requested.
    *
    * \return The bandwidth of the requested carrier.
    */
-  double GetCarrierBandwidth_hz (uint32_t carrierId) const;
+  double GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
 private:
   double m_bandwidth_hz;

@@ -52,6 +52,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 {
   NS_LOG_FUNCTION (this << carrierId);
 
+  m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId, SatEnums::EFFECTIVE_BANDWIDTH);
+
   // Create proper interference object for carrier i
   switch (carrierConf->GetInterferenceModel ())
   {
@@ -65,7 +67,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
       if (carrierConf->IsIntfOutputTraceEnabled ())
         {
-          m_satInterference = CreateObject<SatPerPacketInterference> (m_channelType, carrierConf->GetCarrierBandwidthHz (carrierId));
+          m_satInterference = CreateObject<SatPerPacketInterference> (m_channelType, m_rxBandwidthHz);
         }
       else
         {
@@ -75,7 +77,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
     case SatPhyRxCarrierConf::IF_TRACE:
       NS_LOG_LOGIC (this << " Traced interference model created for carrier: " << carrierId);
-      m_satInterference = CreateObject<SatTracedInterference> (m_channelType, carrierConf->GetCarrierBandwidthHz (carrierId));
+      m_satInterference = CreateObject<SatTracedInterference> (m_channelType, m_rxBandwidthHz);
       break;
 
     default:
@@ -84,7 +86,6 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   }
 
   m_rxMode = carrierConf->GetRxMode ();
-  m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId);
 
   m_rxExtNoisePowerW = SatUtils::DbWToW(carrierConf->GetExtPowerDensityDbwhz ()) * m_rxBandwidthHz;
 

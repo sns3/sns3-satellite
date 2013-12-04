@@ -158,7 +158,7 @@ SatSuperframeSeq::GetCarrierFrequency_hz (uint32_t carrierId) const
 }
 
 double
-SatSuperframeSeq::GetCarrierBandwidth_hz (uint32_t carrierId) const
+SatSuperframeSeq::GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -173,7 +173,7 @@ SatSuperframeSeq::GetCarrierBandwidth_hz (uint32_t carrierId) const
       lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
     }
 
-  return m_superframe[currentSuperframe]->GetCarrierBandwidth_hz ( carrierIdInSuperframe );
+  return m_superframe[currentSuperframe]->GetCarrierBandwidth_hz ( carrierIdInSuperframe, bandwidthType );
 }
 
 

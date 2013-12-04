@@ -44,12 +44,13 @@ public:
   typedef Callback<double, double> SinrCalculatorCallback;
 
   /**
-     * \param channelType     The type of the channel
-     * \param carrierId       The id of the carrier
-     *
-     * \return The bandwidth of the carrier.
-     */
-  typedef Callback<double, SatEnums::ChannelType_t, uint32_t > CarrierBandwidthConverter;
+   * \param channelType     The type of the channel
+   * \param carrierId       The id of the carrier
+   * \param bandwidthType   The type of the bandwidth
+   *
+   * \return The bandwidth of the carrier.
+   */
+  typedef Callback<double, SatEnums::ChannelType_t, uint32_t, SatEnums::CarrierBandwidthType_t > CarrierBandwidthConverter;
 
   /**
    *  RX mode.
@@ -116,51 +117,52 @@ public:
    */
   void SetLinkResults (Ptr<SatLinkResults> linkResults);
 
-  /*
+  /**
    * Get the number of configured carriers
    */
   uint32_t GetCarrierCount () const;
 
-  /*
+  /**
    * Get configured error model
    */
   ErrorModel GetErrorModel () const;
 
-  /*
+  /**
    * Get configured interference model
    */
   InterferenceModel GetInterferenceModel () const;
 
-  /*
+  /**
    * Get configured link results
    */
   Ptr<SatLinkResults> GetLinkResults () const;
 
-  /*
+  /**
    * Get configured bandwidth
    *
    * \param carrierId   Id of the carrier
+   * \param bandwidhtType Type of the bandwidth
    *
    * \return Bandwidth of the requested carrier.
    */
-  double GetCarrierBandwidthHz ( uint32_t carrierId ) const;
+  double GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType ) const;
 
-  /*
+  /**
    * Get configured RX noise temperature
    */
   double GetRxTemperatureK () const;
 
-  /*
+  /**
    * Get other system RX noise
    */
   double GetExtPowerDensityDbwhz () const;
 
-  /*
+  /**
    * Get adjacent channel interference wrt noise (percent)
    */
   double GetRxAciInterferenceWrtNoise () const;
 
-  /*
+  /**
    * Get configured RX mode
    */
   RxMode GetRxMode () const;

@@ -132,10 +132,11 @@ public:
    * Get the bandwidth of the requested carrier.
    *
    * \param carrierId  Id of the carrier inside superframe which bandwidth is requested.
+   * \param bandwidthType Type of bandwidth requested.
    *
    * \return The bandwidth of the requested carrier.
    */
-  double GetCarrierBandwidth_hz (uint32_t carrierId) const;
+  double GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
 private:
   /**

@@ -137,9 +137,9 @@ SatPhyRxCarrierConf::GetLinkResults () const
 }
 
 double
-SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId ) const
+SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType ) const
 {
-  return m_carrierBandwidthConverter( m_channelType, carrierId );
+  return m_carrierBandwidthConverter( m_channelType, carrierId, bandwidhtType );
 }
 
 double

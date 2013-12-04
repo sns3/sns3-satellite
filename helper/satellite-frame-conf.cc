@@ -257,7 +257,7 @@ SatSuperframeConf::GetCarrierFrequency_hz (uint32_t carrierId) const
 }
 
 double
-SatSuperframeConf::GetCarrierBandwidth_hz (uint32_t carrierId) const
+SatSuperframeConf::GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
   uint32_t currentFrame = 0;
   uint32_t lastIdInFrame = m_frames[0]->GetCarrierCount () - 1;
@@ -270,7 +270,7 @@ SatSuperframeConf::GetCarrierBandwidth_hz (uint32_t carrierId) const
       lastIdInFrame += m_frames[currentFrame]->GetCarrierCount ();
     }
 
-  return m_frames[currentFrame]->GetCarrierBandwidth_hz ();
+  return m_frames[currentFrame]->GetCarrierBandwidth_hz (bandwidthType);
 }
 
 
