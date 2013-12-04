@@ -249,7 +249,7 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)
 }
 
 void
-SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> enc)
+SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc)
 {
   NS_LOG_FUNCTION (this);
 
@@ -266,7 +266,7 @@ SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> enc)
 }
 
 void
-SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> dec)
+SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec)
 {
   NS_LOG_FUNCTION (this);
 

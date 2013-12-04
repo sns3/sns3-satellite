@@ -40,6 +40,8 @@ SatEncapsulator::SatEncapsulator ()
 SatEncapsulator::~SatEncapsulator ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_rxCallback.Nullify ();
 }
 
 TypeId SatEncapsulator::GetTypeId (void)
@@ -62,5 +64,11 @@ SatEncapsulator::DoDispose ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatEncapsulator::SetReceiveCallback (ReceiveCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_rxCallback = cb;
+}
 
 } // namespace ns3

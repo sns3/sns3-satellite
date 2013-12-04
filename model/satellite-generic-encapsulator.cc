@@ -85,7 +85,6 @@ SatGenericEncapsulator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
   m_reorderingTimer.Cancel ();
-  m_rxCallback.Nullify ();
 
   while (!m_txBuffer.empty ()) m_txBuffer.pop_back ();
   m_txBuffer.clear();
@@ -1171,13 +1170,6 @@ SatGenericEncapsulator::ExpireReorderingTimer (void)
       m_vrUx = m_vrUh;
       NS_LOG_LOGIC ("New VR(UX) = " << m_vrUx);
     }
-}
-
-void
-SatGenericEncapsulator::SetReceiveCallback (ReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_rxCallback = cb;
 }
 
 } // namespace ns3

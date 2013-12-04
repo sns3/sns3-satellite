@@ -31,7 +31,11 @@
 
 namespace ns3 {
 
-
+/**
+ * \ingroup satellite
+ * \brief SatGenericEncapsulator class. The implementation is based on
+ * LTE sequence number based encapsulator.
+ */
 class SatGenericEncapsulator : public SatEncapsulator
 {
 public:
@@ -48,19 +52,6 @@ public:
 
   virtual uint32_t GetTxBufferSizeInBytes () const;
 
-  /**
-   * Callback to send packet to lower layer.
-    * \param Ptr<Packet> the packet received
-    */
-  typedef Callback<void, Ptr<Packet> > ReceiveCallback;
-
-  /**
-   * Method to set receive callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    */
-  void SetReceiveCallback (ReceiveCallback cb);
-
 private:
   void ExpireReorderingTimer (void);
   void ExpireRbsTimer (void);
@@ -76,8 +67,6 @@ private:
 
   Mac48Address m_sourceAddress;
   Mac48Address m_destAddress;
-
-  ReceiveCallback m_rxCallback;
 
   uint32_t m_maxTxBufferSize;
   uint32_t m_txBufferSize;

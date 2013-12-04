@@ -32,13 +32,14 @@
 #include "ns3/mac48-address.h"
 
 #include "satellite-scheduling-object.h"
-#include "satellite-generic-encapsulator.h"
+#include "satellite-encapsulator.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Base Llc class for Sat Net Devices.
+ * \brief SatLlc class holds the encapsulator instances, which
+ * are capable of encapsulation, fragmentation and packing.
  *
  */
 class SatLlc : public Object
@@ -64,7 +65,7 @@ public:
    */
   ~SatLlc ();
 
-  typedef std::map<Mac48Address, Ptr<SatGenericEncapsulator> > encapContainer_t;
+  typedef std::map<Mac48Address, Ptr<SatEncapsulator> > encapContainer_t;
 
   /**
    * Receive callback used for sending packet to netdevice layer.
@@ -131,14 +132,14 @@ public:
    * Key = UT's MAC address
    * Value = encap entity
    */
-  void AddEncap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> enc);
+  void AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc);
 
   /**
    * Add an decapsulator entry for the LLC
    * Key = UT's MAC address
    * Value = decap entity
    */
-  void AddDecap (Mac48Address macAddr, Ptr<SatGenericEncapsulator> dec);
+  void AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec);
 
   /**
    * Set the address of this MAC
@@ -166,10 +167,10 @@ private:
    */
   Mac48Address m_macAddress;
 
-  // Map of encapsulators
+  // Map of encapsulator base pointers
   encapContainer_t m_encaps;
 
-  // Map of decapsulators
+  // Map of decapsulator base pointers
   encapContainer_t m_decaps;
 
   /**

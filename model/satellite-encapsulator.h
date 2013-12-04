@@ -32,7 +32,13 @@
 namespace ns3 {
 
 
-
+/**
+ * \ingroup satellite
+ * \brief SatEncapsulator base class. The actual implementations are located
+ * in the inherited classes, e.g.
+ * - SatGenericEncapsulator
+ * - SatReturnLinkEncapsulator
+ */
 class SatEncapsulator : public Object
 {
 
@@ -42,11 +48,27 @@ public:
   static TypeId GetTypeId (void);
   virtual void DoDispose ();
 
-protected:
-  virtual void TransmitPdu (Ptr<Packet> p) = 0;
+  /**
+   * Callback to send packet to lower layer.
+    * \param Ptr<Packet> the packet received
+    */
+  typedef Callback<void, Ptr<Packet> > ReceiveCallback;
 
+  /**
+   * Method to set receive callback.
+    * \param cb callback to invoke whenever a packet has been received and must
+    *        be forwarded to the higher layers.
+    */
+  void SetReceiveCallback (ReceiveCallback cb);
+
+  virtual void TransmitPdu (Ptr<Packet> p) = 0;
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes) = 0;
   virtual void ReceivePdu (Ptr<Packet> p) = 0;
+  virtual uint32_t GetTxBufferSizeInBytes () const = 0;
+
+protected:
+
+  ReceiveCallback m_rxCallback;
 
   /**
    * Used to inform of a PDU delivery
