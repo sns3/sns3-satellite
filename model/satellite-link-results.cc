@@ -148,42 +148,42 @@ void
 SatLinkResultsDvbS2::DoInitialize ()
 {
   // QPSK
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_1_TO_2] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_2_to_3.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_3_to_4.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_3_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_3_to_5.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_4_to_5.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_5_to_6.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_8_to_9.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_QPSK_9_TO_10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_9_to_10.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_1_TO_2] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_2_to_3.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_3_to_4.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_3_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_3_to_5.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_4_to_5.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_5_to_6.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_8_to_9.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_9_TO_10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_9_to_10.txt");
 
   // 8PSK
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_8PSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_2_to_3.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_8PSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_3_to_4.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_8PSK_3_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_3_to_5.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_8PSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_5_to_6.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_8PSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_8_to_9.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_8PSK_9_TO_10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_9_to_10.txt");
+  m_table[SatEnums::SAT_MODCOD_8PSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_2_to_3.txt");
+  m_table[SatEnums::SAT_MODCOD_8PSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_3_to_4.txt");
+  m_table[SatEnums::SAT_MODCOD_8PSK_3_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_3_to_5.txt");
+  m_table[SatEnums::SAT_MODCOD_8PSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_5_to_6.txt");
+  m_table[SatEnums::SAT_MODCOD_8PSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_8_to_9.txt");
+  m_table[SatEnums::SAT_MODCOD_8PSK_9_TO_10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_8psk_9_to_10.txt");
 
   // 16APSK
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_16APSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_2_to_3.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_16APSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_3_to_4.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_16APSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_4_to_5.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_16APSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_5_to_6.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_16APSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_8_to_9.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_16APSK_9_TO_10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_9_to_10.txt");
+  m_table[SatEnums::SAT_MODCOD_16APSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_2_to_3.txt");
+  m_table[SatEnums::SAT_MODCOD_16APSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_3_to_4.txt");
+  m_table[SatEnums::SAT_MODCOD_16APSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_4_to_5.txt");
+  m_table[SatEnums::SAT_MODCOD_16APSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_5_to_6.txt");
+  m_table[SatEnums::SAT_MODCOD_16APSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_8_to_9.txt");
+  m_table[SatEnums::SAT_MODCOD_16APSK_9_TO_10] = CreateObject<SatLookUpTable> (m_inputPath + "s2_16apsk_9_to_10.txt");
 
   // 32APSK
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_32APSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_3_to_4.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_32APSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_32APSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
-  m_table[SatLinkResultsDvbS2::SAT_MODCOD_32APSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_8_to_9.txt");
+  m_table[SatEnums::SAT_MODCOD_32APSK_3_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_3_to_4.txt");
+  m_table[SatEnums::SAT_MODCOD_32APSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
+  m_table[SatEnums::SAT_MODCOD_32APSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
+  m_table[SatEnums::SAT_MODCOD_32APSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_8_to_9.txt");
 
 } // end of void SatLinkResultsDvbS2::DoInitialize
 
 
 double
-SatLinkResultsDvbS2::GetBler (SatLinkResultsDvbS2::SatModcod_e modcod, double esNoDb) const
+SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, double esNoDb) const
 {
   NS_LOG_FUNCTION (this << modcod << esNoDb);
 
@@ -197,7 +197,7 @@ SatLinkResultsDvbS2::GetBler (SatLinkResultsDvbS2::SatModcod_e modcod, double es
 
 
 double
-SatLinkResultsDvbS2::GetEsNoDb (SatLinkResultsDvbS2::SatModcod_e modcod, double blerTarget) const
+SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, double blerTarget) const
 {
   NS_LOG_FUNCTION (this << modcod << blerTarget);
 

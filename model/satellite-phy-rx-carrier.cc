@@ -32,6 +32,7 @@
 #include "satellite-traced-interference.h"
 #include "satellite-mac-tag.h"
 #include "satellite-mac.h"
+#include "satellite-rx-error-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -45,7 +46,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_beamId (),
    m_carrierId (carrierId),
    m_satInterference (),
-   m_channelType (carrierConf->GetChannelType ())
+   m_channelType (carrierConf->GetChannelType ()),
+   m_startRxTime (),
+   m_bitsToContainByte (8)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -85,7 +88,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   m_rxExtNoisePowerW = SatUtils::DbWToW(carrierConf->GetExtPowerDensityDbwhz ()) * m_rxBandwidthHz;
 
-  if (carrierConf->GetErrorModel () == SatPhyRxCarrierConf::EM_AVI)
+  m_errorModel = carrierConf->GetErrorModel ();
+
+  if ( m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
       NS_LOG_LOGIC (this << " link results in use in carrier: " << carrierId);
       m_linkResults = carrierConf->GetLinkResults ();
@@ -101,6 +106,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   m_sinrCalculate = carrierConf->GetSinrCalculatorCb ();
 
+  m_constantErrorRate = carrierConf->GetConstantErrorRate ();
 }
 
 
@@ -181,40 +187,57 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
   NS_LOG_LOGIC (this << " state: " << m_state);
   NS_ASSERT (rxParams->m_carrierId == m_carrierId);
 
+  m_startRxTime = Now ();
+
   switch (m_state)
     {
       case IDLE:
       case RX:
         {
-          // TODO: periodic C/N0 calculation needed to add
+          bool receivePacket = false;
+          bool ownAddressFound = false;
 
-          if (rxParams->m_packetBuffer.empty ())
-            {
-              NS_FATAL_ERROR ("Packet buffer of the signaling parameters can't be empty!!!");
-            }
-          else
+          for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+                ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
             {
               SatMacTag tag;
-              rxParams->m_packetBuffer[0]->PeekPacketTag (tag);
-              m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+              (*i)->PeekPacketTag (tag);
+
               m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+              m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+              if (( m_destAddress == m_ownAddress ))
+                {
+                  receivePacket = true;
+                  ownAddressFound = true;
+                }
+              else if ( m_destAddress.IsBroadcast () )
+                {
+                  receivePacket = true;
+                }
+            }
+
+          if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
+            {
+              receivePacket = true;
             }
 
           // add interference in any case
           switch (m_channelType)
           {
-            case SatEnums::FORWARD_FEEDER_CH :
-            case SatEnums::RETURN_USER_CH :
+            case SatEnums::FORWARD_FEEDER_CH:
+            case SatEnums::RETURN_USER_CH:
               {
                 m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_sourceAddress);
                 break;
               }
-            case SatEnums::FORWARD_USER_CH :
-            case SatEnums::RETURN_FEEDER_CH :
+            case SatEnums::FORWARD_USER_CH:
+            case SatEnums::RETURN_FEEDER_CH:
               {
                 m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
                 break;
               }
+            case SatEnums::UNKNOWN_CH:
             default :
               {
                 NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Invalid channel type");
@@ -222,53 +245,13 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               }
           }
 
-          bool receivePacket = false;
-
           // Check whether the packet is sent to our beam.
-          if ( rxParams->m_beamId == m_beamId )
-            {
-              if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
-                {
-                  receivePacket = true; // in case of transparent RX mode, always receive packet
-                }
-              else
-                {
-                  // in case of normal mode receive only broadcast and own packet
-                  bool ownAddressFound = false;
-
-                  for ( SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-                        ( (i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
-                    {
-                      SatMacTag tag;
-                      (*i)->PeekPacketTag (tag);
-
-                      Mac48Address destAddr = Mac48Address::ConvertFrom (tag.GetDestAddress ());
-
-                      if (( destAddr == m_ownAddress ))
-                        {
-                          receivePacket = true;
-                          ownAddressFound = true;
-                          m_destAddress = destAddr;
-                        }
-                      else if ( destAddr.IsBroadcast () )
-                        {
-                          receivePacket = true;
-                          m_destAddress = destAddr;
-                        }
-                    }
-                }
-            }
-
-
           // In case that RX mode is something else than transparent
           // additionally check that whether the packet was intended for this specific receiver
 
-          if ( receivePacket )
+          if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
             {
-              if (m_state == RX)
-                {
-                  NS_FATAL_ERROR ("Receiving already on, concurrent receiving not supported!!!");
-                }
+              NS_ASSERT (m_state == IDLE);
 
               m_satInterference->NotifyRxStart (m_interferenceEvent);
 
@@ -291,6 +274,12 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 void
 SatPhyRxCarrier::EndRxData ()
 {
+  /**
+   * For code comments:
+   * 1st link is the link to satellite
+   * 2nd link is the link from satellite to ground
+   */
+
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC (this << " state: " << m_state);
 
@@ -299,33 +288,162 @@ SatPhyRxCarrier::EndRxData ()
 
   double ifPower = m_satInterference->Calculate (m_interferenceEvent);
 
+  /// in 1st link: calculates sinr for 1st link
+  /// in 2nd link: calculates sinr for 2nd link
   double sinr = CalculateSinr ( m_rxParams->m_rxPower_W, ifPower );
+
+  /// in 1st link: initializes composite sinr with 1st link sinr
+  /// in 2nd link: initializes composite sinr with 2st link sinr. This value will be replaced in the following block
   double cSinr = sinr;
 
   NS_ASSERT( ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && m_rxParams->m_sinr == 0  ) ||
              ( m_rxMode == SatPhyRxCarrierConf::NORMAL && m_rxParams->m_sinr != 0  ) );
 
+  /// in 1st link: does not enter this block
+  /// in 2nd link: calculates composite sinr
   if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
     {
-      // calculate composite SINR
-      // TODO: just calculated now, needed to check against link results later
+      /// calculate composite SINR
       cSinr = CalculateCompositeSinr (sinr, m_rxParams->m_sinr);
+
+      /// check against link results
+      if (CheckAgainstLinkResults (cSinr))
+        {
+          for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = m_rxParams->m_packetBuffer.begin ();
+                i != m_rxParams->m_packetBuffer.end (); i++)
+            {
+              SatRxErrorTag tag;
+              tag.SetError (true);
+              (*i)->AddPacketTag (tag);
+            }
+        }
     }
 
+  /// in 1st link: save 1st link sinr value for 2nd link composite sinr calculations
+  /// in 2nd link: save 2nd link sinr value
   m_rxParams->m_sinr = sinr;
-  
+
+  /// in 1st link: uses 1st link sinr
+  /// in 2nd link: uses composite sinr
   m_packetTrace (m_rxParams, m_ownAddress, m_destAddress, ifPower, cSinr);
 
   m_satInterference->NotifyRxEnd (m_interferenceEvent);
 
-  // Send packet upwards
+  /// Send packet upwards
   m_rxCallback ( m_rxParams );
 
-  if ( m_cnoCallback.IsNull () == false )
+  /// in 1st link: uses 1st link sinr
+  /// in 2nd link: uses composite sinr
+  if (!m_cnoCallback.IsNull ())
     {
       double cno = cSinr * m_rxBandwidthHz;
       m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, cno);
     }
+}
+
+bool
+SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
+{
+  /// Init with no error
+  bool error = false;
+
+  switch (m_errorModel)
+    {
+    case SatPhyRxCarrierConf::EM_AVI:
+      {
+        switch (m_channelType)
+          {
+          case SatEnums::FORWARD_FEEDER_CH:
+          case SatEnums::FORWARD_USER_CH:
+            {
+              /// TODO check this! (cSinr -> esN0)
+              double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (m_rxParams->m_modCod,SatUtils::LinearToDb (cSinr));
+
+              /// TODO make proper version without rand
+              double r = ((double) rand () / (RAND_MAX));
+
+              if ( r < ber )
+                {
+                  error = true;
+                }
+
+              NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
+                        << " Rx bandwidth (Hz): " << m_rxBandwidthHz
+                        << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
+                        << " rand: " << r
+                        << " ber: " << ber
+                        << " error: " << error);
+              break;
+            }
+          case SatEnums::RETURN_FEEDER_CH:
+          case SatEnums::RETURN_USER_CH:
+            {
+              uint32_t bytes = 0;
+
+              for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = m_rxParams->m_packetBuffer.begin ();
+                    i != m_rxParams->m_packetBuffer.end (); i++)
+                {
+                  bytes += (*i)->GetSize ();
+                }
+
+              double duration = Now ().GetSeconds () - m_startRxTime.GetSeconds ();
+              double bitrate = (bytes * m_bitsToContainByte) / duration;
+
+              /// TODO check this!
+              double ebNo = cSinr * (m_rxBandwidthHz / bitrate);
+              double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (m_rxParams->m_waveformId,SatUtils::LinearToDb (ebNo));
+
+              /// TODO make proper version without rand
+              double r = ((double) rand () / (RAND_MAX));
+
+              if ( r < ber )
+                {
+                  error = true;
+                }
+
+              NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
+                        << " Rx bandwidth (Hz): " << m_rxBandwidthHz
+                        << " bytes: " << bytes
+                        << " duration (s): " << duration
+                        << " bitrate (bps): " << bitrate
+                        << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
+                        << " rand: " << r
+                        << " ber: " << ber
+                        << " error: " << error);
+              break;
+            }
+          case SatEnums::UNKNOWN_CH:
+          default :
+            {
+              NS_FATAL_ERROR ("SatPhyRxCarrier::CheckAgainstLinkResults - Invalid channel type");
+              break;
+            }
+          }
+        break;
+      }
+    case SatPhyRxCarrierConf::EM_CONSTANT:
+      {
+        /// TODO make proper version without rand
+        double r = ((double) rand () / (RAND_MAX));
+
+        if (r <  m_constantErrorRate)
+          {
+            error = true;
+          }
+        break;
+      }
+    case SatPhyRxCarrierConf::EM_NONE:
+      {
+        /// No errors i.e. error = false;
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR("SatPhyRxCarrier::EndRxData - Error model not defined");
+        break;
+      }
+    }
+  return error;
 }
 
 void

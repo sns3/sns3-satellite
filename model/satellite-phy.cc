@@ -259,6 +259,10 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration )
   txParams->m_sinr = 0;
   txParams->m_txPower_W = m_eirpWoGainW;
 
+  /// TODO needs to be modified!
+  txParams->m_modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  txParams->m_waveformId = 13;
+
   m_phyTx->StartTx (txParams);
 }
 

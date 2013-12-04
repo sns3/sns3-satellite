@@ -123,7 +123,7 @@ SatGeoFeederPhy::SatGeoFeederPhy (void)
 }
 
 SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params, InterferenceModel ifModel,
-                                  CarrierBandwidthConverter converter, uint32_t carrierCount )
+                                  CarrierBandwidthConverter converter, uint32_t carrierCount)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);

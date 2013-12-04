@@ -42,14 +42,15 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_carrierCount (),
   m_carrierBandwidthConverter (),
   m_channelType (),
-  m_sinrCalculate ()
+  m_sinrCalculate (),
+  m_constantErrorRate ()
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperatureDbk, ErrorModel errorModel, InterferenceModel ifModel,
                                            RxMode rxMode, SatEnums::ChannelType_t chType,
-                                           CarrierBandwidthConverter converter, uint32_t carrierCount )
+                                           CarrierBandwidthConverter converter, uint32_t carrierCount)
  : m_ifModel (ifModel),
    m_errorModel (errorModel),
    m_linkResults (),
@@ -60,7 +61,9 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperatureDbk, ErrorModel e
    m_enableIntfOutputTrace (false),
    m_carrierCount (carrierCount),
    m_carrierBandwidthConverter (converter),
-   m_channelType (chType)
+   m_channelType (chType),
+   m_sinrCalculate (),
+   m_constantErrorRate (0.03)
 {
 
 }
@@ -102,67 +105,83 @@ SatPhyRxCarrierConf::DoDispose ()
   Object::DoDispose ();
 }
 
-
 void
 SatPhyRxCarrierConf::SetLinkResults (Ptr<SatLinkResults> linkResults)
 {
   m_linkResults = linkResults;
 }
 
-uint32_t SatPhyRxCarrierConf::GetCarrierCount () const
+uint32_t
+SatPhyRxCarrierConf::GetCarrierCount () const
 {
   return m_carrierCount;
 }
 
 
-SatPhyRxCarrierConf::ErrorModel SatPhyRxCarrierConf::GetErrorModel () const
+SatPhyRxCarrierConf::ErrorModel
+SatPhyRxCarrierConf::GetErrorModel () const
 {
   return m_errorModel;
 }
 
-SatPhyRxCarrierConf::InterferenceModel SatPhyRxCarrierConf::GetInterferenceModel () const
+SatPhyRxCarrierConf::InterferenceModel
+SatPhyRxCarrierConf::GetInterferenceModel () const
 {
   return m_ifModel;
 }
 
-Ptr<SatLinkResults> SatPhyRxCarrierConf::GetLinkResults () const
+Ptr<SatLinkResults>
+SatPhyRxCarrierConf::GetLinkResults () const
 {
   return m_linkResults;
 }
 
-double SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId ) const
+double
+SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId ) const
 {
   return m_carrierBandwidthConverter( m_channelType, carrierId );
 }
 
-double SatPhyRxCarrierConf::GetRxTemperatureK () const
+double
+SatPhyRxCarrierConf::GetRxTemperatureK () const
 {
   return m_rxTemperatureK;
 }
 
-double SatPhyRxCarrierConf::GetExtPowerDensityDbwhz () const
+double
+SatPhyRxCarrierConf::GetExtPowerDensityDbwhz () const
 {
   return m_rxExtNoiseDensityDbwhz;
 }
 
-double SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoise () const
+double
+SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoise () const
 {
   return m_rxAciIfWrtNoise;
 }
 
-SatPhyRxCarrierConf::RxMode SatPhyRxCarrierConf::GetRxMode () const
+SatPhyRxCarrierConf::RxMode
+SatPhyRxCarrierConf::GetRxMode () const
 {
   return m_rxMode;
 }
 
-SatEnums::ChannelType_t SatPhyRxCarrierConf::GetChannelType () const
+SatEnums::ChannelType_t
+SatPhyRxCarrierConf::GetChannelType () const
 {
   return m_channelType;
 }
 
-bool SatPhyRxCarrierConf::IsIntfOutputTraceEnabled () const
+bool
+SatPhyRxCarrierConf::IsIntfOutputTraceEnabled () const
 {
   return m_enableIntfOutputTrace;
+}
+
+double
+SatPhyRxCarrierConf::GetConstantErrorRate () const
+{
+  return m_constantErrorRate;
 }
 
 } // namespace ns3

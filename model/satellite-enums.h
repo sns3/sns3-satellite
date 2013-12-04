@@ -49,6 +49,39 @@ public:
   } ChannelType_t;
 
   /**
+   * \enum SatModcod_t
+   *
+   * \brief Modulation scheme and coding rate for DVB-S2.
+   */
+  typedef enum
+  {
+    SAT_MODCOD_QPSK_1_TO_2 = 0,
+    SAT_MODCOD_QPSK_2_TO_3,
+    SAT_MODCOD_QPSK_3_TO_4,
+    SAT_MODCOD_QPSK_3_TO_5,
+    SAT_MODCOD_QPSK_4_TO_5,
+    SAT_MODCOD_QPSK_5_TO_6,
+    SAT_MODCOD_QPSK_8_TO_9,
+    SAT_MODCOD_QPSK_9_TO_10,
+    SAT_MODCOD_8PSK_2_TO_3,
+    SAT_MODCOD_8PSK_3_TO_4,
+    SAT_MODCOD_8PSK_3_TO_5,
+    SAT_MODCOD_8PSK_5_TO_6,
+    SAT_MODCOD_8PSK_8_TO_9,
+    SAT_MODCOD_8PSK_9_TO_10,
+    SAT_MODCOD_16APSK_2_TO_3,
+    SAT_MODCOD_16APSK_3_TO_4,
+    SAT_MODCOD_16APSK_4_TO_5,
+    SAT_MODCOD_16APSK_5_TO_6,
+    SAT_MODCOD_16APSK_8_TO_9,
+    SAT_MODCOD_16APSK_9_TO_10,
+    SAT_MODCOD_32APSK_3_TO_4,
+    SAT_MODCOD_32APSK_4_TO_5,
+    SAT_MODCOD_32APSK_5_TO_6,
+    SAT_MODCOD_32APSK_8_TO_9
+  } SatModcod_t;
+
+  /**
    * Possible modes of Rx power calculation.
    */
   typedef enum

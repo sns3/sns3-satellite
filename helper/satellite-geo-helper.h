@@ -160,7 +160,7 @@ private:
     SatPhy::InterferenceModel m_rtnLinkInterferenceModel;
 
     /**
-     * Trace callback for creation traces
+     * \brief Trace callback for creation traces
      */
     TracedCallback<std::string> m_creation;
 };

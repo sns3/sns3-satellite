@@ -28,14 +28,25 @@ NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
 
 namespace ns3 {
 
-SatSignalParameters::SatSignalParameters ()
+SatSignalParameters::SatSignalParameters () :
+  m_beamId (),
+  m_carrierId (),
+  m_carrierFreq_hz (),
+  m_duration (),
+  m_txPower_W (),
+  m_rxPower_W (),
+  m_phyTx (),
+  m_sinr (),
+  m_channelType (),
+  m_modCod (),
+  m_waveformId ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
 {
-  for ( TansmitBuffer_t::const_iterator i = p.m_packetBuffer.begin(); i != p.m_packetBuffer.end(); i++  )
+  for ( TransmitBuffer_t::const_iterator i = p.m_packetBuffer.begin(); i != p.m_packetBuffer.end(); i++  )
     {
       m_packetBuffer.push_back ((*i)->Copy ());
     }
@@ -49,6 +60,8 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_sinr = p.m_sinr;
   m_channelType = p.m_channelType;
   m_carrierFreq_hz = p.m_carrierFreq_hz;
+  m_modCod = p.m_modCod;
+  m_waveformId = p.m_waveformId;
 }
 
 Ptr<SatSignalParameters>

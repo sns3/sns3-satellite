@@ -27,6 +27,7 @@
 #include <ns3/object.h>
 #include <ns3/ptr.h>
 #include <ns3/satellite-look-up-table.h>
+#include <ns3/satellite-enums.h>
 
 namespace ns3 {
 
@@ -159,38 +160,6 @@ private:
 class SatLinkResultsDvbS2 : public SatLinkResults
 {
 public:
-  /**
-   * \enum SatModcod_e
-   *
-   * \brief Modulation scheme and coding rate for DVB-S2.
-   */
-  enum SatModcod_e
-  {
-    SAT_MODCOD_QPSK_1_TO_2 = 0,
-    SAT_MODCOD_QPSK_2_TO_3,
-    SAT_MODCOD_QPSK_3_TO_4,
-    SAT_MODCOD_QPSK_3_TO_5,
-    SAT_MODCOD_QPSK_4_TO_5,
-    SAT_MODCOD_QPSK_5_TO_6,
-    SAT_MODCOD_QPSK_8_TO_9,
-    SAT_MODCOD_QPSK_9_TO_10,
-    SAT_MODCOD_8PSK_2_TO_3,
-    SAT_MODCOD_8PSK_3_TO_4,
-    SAT_MODCOD_8PSK_3_TO_5,
-    SAT_MODCOD_8PSK_5_TO_6,
-    SAT_MODCOD_8PSK_8_TO_9,
-    SAT_MODCOD_8PSK_9_TO_10,
-    SAT_MODCOD_16APSK_2_TO_3,
-    SAT_MODCOD_16APSK_3_TO_4,
-    SAT_MODCOD_16APSK_4_TO_5,
-    SAT_MODCOD_16APSK_5_TO_6,
-    SAT_MODCOD_16APSK_8_TO_9,
-    SAT_MODCOD_16APSK_9_TO_10,
-    SAT_MODCOD_32APSK_3_TO_4,
-    SAT_MODCOD_32APSK_4_TO_5,
-    SAT_MODCOD_32APSK_5_TO_6,
-    SAT_MODCOD_32APSK_8_TO_9
-  };
 
   static TypeId GetTypeId ();
 
@@ -204,7 +173,7 @@ public:
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetBler (SatLinkResultsDvbS2::SatModcod_e modcod, double sinrDb) const;
+  double GetBler (SatEnums::SatModcod_t modcod, double sinrDb) const;
 
   /**
    * \brief Get a Es/No requirement for a given BLER target from link results.
@@ -216,7 +185,7 @@ public:
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetEsNoDb (SatLinkResultsDvbS2::SatModcod_e modcod, double blerTarget) const;
+  double GetEsNoDb (SatEnums::SatModcod_t modcod, double blerTarget) const;
 
 protected:
   /**
@@ -231,7 +200,7 @@ private:
    * - key = SatModcod_e, i.e. modulation and coding scheme
    * - value = Ptr<SatLookUpTable>, i.e. look-up table containing the link results
    */
-  std::map<SatLinkResultsDvbS2::SatModcod_e, Ptr<SatLookUpTable> > m_table;
+  std::map<SatEnums::SatModcod_t, Ptr<SatLookUpTable> > m_table;
 };
 
 

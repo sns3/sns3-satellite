@@ -45,7 +45,7 @@ public:
    *
    * NOTE! In case of return link this buffer includes only one packet pointer.
    */
-  typedef std::vector< Ptr<Packet> > TansmitBuffer_t;
+  typedef std::vector< Ptr<Packet> > TransmitBuffer_t;
   
   /**
   * default constructor
@@ -65,7 +65,7 @@ public:
    * this is transmit buffer including packet pointers.
    */
 
-  TansmitBuffer_t m_packetBuffer;
+  TransmitBuffer_t m_packetBuffer;
 
   /**
    * The beam for the packet transmission
@@ -114,8 +114,16 @@ public:
    * The SatChannel instance received the packet.
    */
   SatEnums::ChannelType_t m_channelType;
-  //Ptr<SatChannel> m_channel;
 
+  /**
+   * \brief ModCod
+   */
+  SatEnums::SatModcod_t m_modCod;
+
+  /**
+   * \brief Waveform ID
+   */
+  uint32_t m_waveformId;
 };
 
 

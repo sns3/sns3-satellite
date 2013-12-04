@@ -166,6 +166,12 @@ public:
   RxMode GetRxMode () const;
 
   /**
+   * \brief Function for getting the error rate for constant error model
+   * \return
+   */
+  double GetConstantErrorRate () const;
+
+  /**
    * \brief Get channel type
    * \return channel type
    */
@@ -207,6 +213,7 @@ private:
   CarrierBandwidthConverter m_carrierBandwidthConverter;
   SatEnums::ChannelType_t m_channelType;
   SinrCalculatorCallback m_sinrCalculate;
+  double m_constantErrorRate;
  };
 
 } // namespace ns3

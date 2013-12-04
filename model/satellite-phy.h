@@ -48,7 +48,7 @@ public:
   typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
   typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;
-  typedef SatSignalParameters::TansmitBuffer_t PacketContainer_t;
+  typedef SatSignalParameters::TransmitBuffer_t PacketContainer_t;
 
   /**
    * \param  the container of pointers to packets received

@@ -191,7 +191,7 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
   SatMacTag tag;
 
   /// TODO get rid of peeking
-  SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
 
   if (*i == NULL)
   {
@@ -235,7 +235,7 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
   SatMacTag tag;
 
   /// TODO get rid of peeking
-  SatSignalParameters::TansmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
 
   if (*i == NULL)
   {

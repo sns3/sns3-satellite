@@ -125,6 +125,13 @@ private:
   void ChangeState (State newState);
 
   /**
+   * \brief Function for checking the SINR against the link results
+   * \param cSinr composite SINR
+   * \return result of the check
+   */
+  bool CheckAgainstLinkResults (double cSinr);
+
+  /**
    * \brief
    */
   void EndRxData ();
@@ -240,14 +247,24 @@ private:
   SatPhyRxCarrierConf::RxMode m_rxMode;
 
   /**
+   * \brief Error model.
+   */
+  SatPhyRxCarrierConf::ErrorModel m_errorModel;
+
+  /**
    * \brief Channel type.
    */
   SatEnums::ChannelType_t m_channelType;
 
   /**
-   * Callback to calculate SINR.
+   * \brief Callback to calculate SINR.
    */
   SatPhyRxCarrierConf::SinrCalculatorCallback m_sinrCalculate;
+
+  /**
+   * \brief Error rate for constant error model
+   */
+  double m_constantErrorRate;
 
   /**
    * \brief The trace source fired for added interference
@@ -261,6 +278,16 @@ private:
                   double                    // composite SINR
                   >
      m_packetTrace;
+
+  /**
+   * \brief Rx start time
+   */
+  Time m_startRxTime;
+
+  /**
+   * \brief Amount of bits to contain a byte
+   */
+  uint32_t m_bitsToContainByte;
 };
 
 }

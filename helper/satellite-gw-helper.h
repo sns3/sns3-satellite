@@ -189,7 +189,7 @@ private:
   Ptr<SatLinkResults> m_linkResults;
 
   /**
-   * Trace callback for creation traces
+   * \brief Trace callback for creation traces
    */
   TracedCallback<std::string> m_creation;
 };
