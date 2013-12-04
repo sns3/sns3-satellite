@@ -64,7 +64,7 @@ main (int argc, char *argv[])
   //                     StringValue ("ns3::TcpRfc793"));
 
   std::string scenario = "simple";
-  double duration = 1000;
+  double duration = 10;
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
@@ -122,7 +122,7 @@ main (int argc, char *argv[])
   nrtvHelper.GetClients ().Start (Seconds (3.0));
 
   // install KPI statistics collector
-  NrtvClientKpiHelper kpi (Seconds (duration), nrtvHelper.GetClients ());
+  NrtvKpiHelper kpiHelper (&nrtvHelper);
 
   NS_LOG_INFO ("--- sat-nrtv-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
@@ -131,6 +131,9 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();
+
+  kpiHelper.Print ();
+
   Simulator::Destroy ();
 
   return 0;
