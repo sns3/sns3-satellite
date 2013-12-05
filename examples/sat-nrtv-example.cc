@@ -64,7 +64,7 @@ main (int argc, char *argv[])
   //                     StringValue ("ns3::TcpRfc793"));
 
   std::string scenario = "simple";
-  double duration = 10;
+  double duration = 100;
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
