@@ -193,18 +193,26 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest)
 }
 
 Ptr<Packet>
-SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr)
+SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft )
 {
   NS_LOG_FUNCTION (this << macAddr << bytes);
 
   Ptr<Packet> packet;
 
   // Prioritize control packets
-  if (m_controlQueue->GetNPackets())
-      // && m_controlQueue->GetNBytes() <= bytes)
+  if (m_controlQueue->GetNPackets() && macAddr.IsBroadcast ())
     {
-      NS_ASSERT (macAddr.IsBroadcast());
-      packet = m_controlQueue->Dequeue ();
+      uint32_t cPacketSize = m_controlQueue->Peek ()->GetSize();
+      if (cPacketSize <= bytes)
+        {
+          bytesLeft = m_controlQueue->GetNBytes() - cPacketSize;
+          packet = m_controlQueue->Dequeue ();
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Too small TxOpportunity for the control packet at buffer head!");
+
+        }
     }
   // Forward the txOpportunity to a certain encapsulator
   else
@@ -213,7 +221,7 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr)
 
       if (it != m_encaps.end ())
         {
-          packet = it->second->NotifyTxOpportunity (bytes);
+          packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
         }
       else
         {
@@ -306,7 +314,7 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
     {
       // Calculate HoL delay
       SatTimeTag tag;
-      m_controlQueue->Peek()->PeekPacketTag (tag);
+      m_controlQueue->Peek ()->PeekPacketTag (tag);
       holDelay = Simulator::Now () - tag.GetSenderTimestamp ();
 
       Ptr<SatSchedulingObject> so =

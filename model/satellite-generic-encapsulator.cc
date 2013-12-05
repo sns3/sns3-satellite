@@ -145,7 +145,7 @@ SatGenericEncapsulator::TransmitPdu (Ptr<Packet> p)
 
 
 Ptr<Packet>
-SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
+SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
 {
   NS_LOG_FUNCTION (this << bytes);
 
@@ -403,6 +403,9 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
   mTag.SetDestAddress (m_destAddress);
   mTag.SetSourceAddress (m_sourceAddress);
   packet->AddPacketTag (mTag);
+
+  // Update bytes left
+  bytesLeft = GetTxBufferSizeInBytes ();
 
   return packet;
 }

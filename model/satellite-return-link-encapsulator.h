@@ -70,9 +70,10 @@ public:
    * PPDU = Payload Adapted PDU
    * FPDU = Frame PDU
    * \param bytes Notified tx opportunity bytes from lower layer
+   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
    * \return Ptr<Packet> a Frame PDU
    */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
 
   /**
    * Receive a packet, thus decapsulate and defragment/deconcatenate

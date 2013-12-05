@@ -149,7 +149,7 @@ SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p)
 }
 
 Ptr<Packet>
-SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes)
+SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
 {
   NS_LOG_FUNCTION (this << bytes);
 
@@ -332,72 +332,6 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes)
               firstSegment = 0;
             }
         }
-      /*
-      // First segment fits as a whole
-      else if ( (nextSegmentSize - firstSegment->GetSize () <= (m_ppduHeaderSize + m_fpduHeaderSize)) ||
-                (m_txBuffer.size () == 0) )
-        {
-          // Add txBuffer.FirstBuffer to DataField
-          dataFieldAddedSize = firstSegment->GetSize ();
-          dataFieldTotalSize += dataFieldAddedSize;
-          dataField.push_back (firstSegment);
-
-          // no LengthIndicator for the last one
-          nextSegmentSize -= dataFieldAddedSize;
-
-          // Add PPDU headrr
-          SatPPduHeader ppduHeader;
-          ppduHeader.SetEndIndicator ();
-          ppduHeader.SetFragmentId (m_fragmentId);
-          ppduHeader.SetPPduLength (firstSegment->GetSize());
-
-          // Add PPDU header
-          firstSegment->AddHeader (ppduHeader);
-
-          // Add PPDU info to the FPDU header
-          fpduHeader.PushPPduLength (firstSegment->GetSize());
-
-          firstSegment = 0;
-        }
-
-      // Packing functionality
-      else // (firstSegment->GetSize () < m_nextSegmentSize) && (m_txBuffer.size () > 0)
-        {
-          NS_LOG_LOGIC ("    IF firstSegment < NextSegmentSize && txBuffer.size > 0");
-          // Add txBuffer.FirstBuffer to DataField
-          dataFieldAddedSize = firstSegment->GetSize ();
-          dataFieldTotalSize += dataFieldAddedSize;
-          dataField.push_back (firstSegment);
-
-          // (more segments)
-          firstSegment = (*(m_txBuffer.begin ()))->Copy ();
-          m_txBufferSize -= (*(m_txBuffer.begin()))->GetSize ();
-          m_txBuffer.erase (m_txBuffer.begin ());
-          NS_LOG_LOGIC ("        txBufferSize = " << m_txBufferSize );
-
-          // Add PPDU header
-          SatPPduHeader ppduHeader;
-
-          // If the next PDU is full, increase the fragment id
-          SatRlePduStatusTag tag;
-          firstSegment->RemovePacketTag (tag);
-          if (tag.GetStatus () == SatRlePduStatusTag::FULL_PPDU)
-            {
-              m_fragmentId++;
-              ppduHeader.SetStartIndicator ();
-            }
-
-          ppduHeader.SetEndIndicator ();
-          ppduHeader.SetFragmentId (m_fragmentId);
-          ppduHeader.SetPPduLength (firstSegment->GetSize());
-
-          // Add PPDU header
-          firstSegment->AddHeader (ppduHeader);
-
-          // Add PPDU info to the FPDU header
-          fpduHeader.PushPPduLength (firstSegment->GetSize());
-        }
-        */
     }
 
   // Build encapsulated PDU with DataField and Header
@@ -420,6 +354,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes)
   mTag.SetDestAddress (m_destAddress);
   mTag.SetSourceAddress (m_sourceAddress);
   packet->AddPacketTag (mTag);
+
+  // Update bytes left
+  bytesLeft = GetTxBufferSizeInBytes ();
 
   return packet;
 }

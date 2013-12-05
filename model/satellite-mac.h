@@ -99,7 +99,7 @@ public:
    * \param uint32_t payload size in bytes
    * \return packet Packet to be transmitted to PHY
    */
-  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address > TxOpportunityCallback;
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint32_t& > TxOpportunityCallback;
 
   /**
    * Method to set Tx opportunity callback.

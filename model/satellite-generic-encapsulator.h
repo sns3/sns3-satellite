@@ -47,7 +47,7 @@ public:
   virtual void DoDispose ();
 
   virtual void TransmitPdu (Ptr<Packet> p);
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
   virtual void ReceivePdu (Ptr<Packet> p);
 
   virtual uint32_t GetTxBufferSizeInBytes () const;

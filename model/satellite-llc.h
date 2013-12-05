@@ -102,9 +102,10 @@ public:
     *
     * \param macAddr Mac address of the UT with tx opportunity
     * \param bytes Size of the Tx opportunity
+    * \param &bytesLeft Bytes left after TxOpportunity
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft);
 
   /**
    * Receive packet from lower layer.

@@ -149,8 +149,7 @@ SatGwMac::TransmitTime (uint32_t carrierId)
   */
 
   // Default size for Tx opportunity
-  uint32_t txBytes (100);
-
+  uint32_t txBytes (120);
   // Get scheduling objects from LLC
   std::vector< Ptr<SatSchedulingObject> > sos = m_schedContextCallback ();
 
@@ -169,9 +168,14 @@ SatGwMac::TransmitTime (uint32_t carrierId)
           ind = (uint32_t)(m_random->GetInteger (0, sos.size()-1));
         }
 
-      // Notify certain UT of the Tx opportunity
-      // Returns a packet.
-      Ptr<Packet> p = m_txOpportunityCallback (txBytes, sos[ind]->GetMacAddress ());
+      /**
+       * Notify LLC of the Tx opportunity; returns a packet.
+       * In addition, the function returns the bytes left after txOpportunity in
+       * bytesLeft reference variable.
+       */
+
+      uint32_t bytesLeft (0);
+      Ptr<Packet> p = m_txOpportunityCallback (txBytes, sos[ind]->GetMacAddress (), bytesLeft);
 
       if ( p )
         {

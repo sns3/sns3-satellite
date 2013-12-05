@@ -159,7 +159,13 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
    * (= queue) to serve.
    */
 
-  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_macAddress);
+  /**
+   * Notify LLC of the Tx opportunity; returns a packet.
+   * In addition, the function returns the bytes left after txOpportunity in
+   * bytesLeft reference variable.
+   */
+  uint32_t bytesLeft (0);
+  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_macAddress, bytesLeft);
 
   if ( p )
     {
