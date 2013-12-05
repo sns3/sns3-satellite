@@ -96,6 +96,13 @@ public:
   virtual Time GetHolDelay () const;
 
   /**
+   * Get minimum Tx opportunity in bytes, which takes the
+   * assumed header sizes into account.
+   * \return uint32_t minimum tx opportunity
+   */
+  virtual uint32_t GetMinTxOpportunityInBytes () const;
+
+  /**
    * Callback to send packet to lower layer.
     * \param Ptr<Packet> the packet received
     */

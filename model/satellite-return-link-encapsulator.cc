@@ -523,4 +523,16 @@ SatReturnLinkEncapsulator::GetHolDelay () const
   return holDelay;
 }
 
+
+uint32_t
+SatReturnLinkEncapsulator::GetMinTxOpportunityInBytes () const
+{
+  /**
+   * Minimum valid Tx opportunity is the assumed header sizes + 1
+   *
+   */
+  return m_ppduHeaderSize + m_fpduHeaderSize + 1;
+}
+
+
 } // namespace ns3

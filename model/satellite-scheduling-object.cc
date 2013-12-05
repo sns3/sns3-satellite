@@ -34,9 +34,10 @@ SatSchedulingObject::SatSchedulingObject ()
 }
 
 
-SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, Time holDelay, bool isControl)
+SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, bool isControl)
   :m_macAddress (addr),
    m_bufferedBytes (bytes),
+   m_minTxOpportunity (minTxOpportunity),
    m_holDelay (holDelay),
    m_isControl (isControl)
 {
@@ -60,6 +61,13 @@ SatSchedulingObject::GetBufferedBytes () const
 {
   NS_LOG_FUNCTION (this);
   return m_bufferedBytes;
+}
+
+uint32_t
+SatSchedulingObject::GetMinTxOpportunityInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_minTxOpportunity;
 }
 
 bool

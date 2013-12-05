@@ -44,7 +44,7 @@ public:
   /**
    * Default constructor
    */
-  SatSchedulingObject (Mac48Address addr, uint32_t bytes, Time holDelay, bool isControl = false);
+  SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, bool isControl = false);
 
   /**
    * Destructor
@@ -64,16 +64,22 @@ public:
   uint32_t GetBufferedBytes () const;
 
   /**
+   * Get minimum tx opportunity in bytes
+   * \return minimum Tx opportunity in bytes
+   */
+  uint32_t GetMinTxOpportunityInBytes () const;
+
+  /**
    * Check whether the object is control
    * \return boolean
    */
   bool IsControl () const;
 
-
 private:
 
   Mac48Address m_macAddress;
   uint32_t m_bufferedBytes;
+  uint32_t m_minTxOpportunity;
   Time m_holDelay;
   bool m_isControl;
 

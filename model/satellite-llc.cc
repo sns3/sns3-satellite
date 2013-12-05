@@ -319,11 +319,12 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
     {
       // Calculate HoL delay
       SatTimeTag tag;
-      m_controlQueue->Peek ()->PeekPacketTag (tag);
+      Ptr<const Packet> p = m_controlQueue->Peek ();
+      p->PeekPacketTag (tag);
       holDelay = Simulator::Now () - tag.GetSenderTimestamp ();
 
       Ptr<SatSchedulingObject> so =
-          Create<SatSchedulingObject> (Mac48Address::GetBroadcast (), m_controlQueue->GetNBytes (), holDelay, true);
+          Create<SatSchedulingObject> (Mac48Address::GetBroadcast (), m_controlQueue->GetNBytes (), p->GetSize(), holDelay, true);
       schedObjects.push_back (so);
     }
 
@@ -337,8 +338,9 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
       if (buf > 0)
         {
           holDelay = cit->second->GetHolDelay ();
+          uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
           Ptr<SatSchedulingObject> so =
-              Create<SatSchedulingObject> (cit->first, buf, holDelay);
+              Create<SatSchedulingObject> (cit->first, buf, minTxOpportunityInBytes, holDelay);
           schedObjects.push_back (so);
         }
     }

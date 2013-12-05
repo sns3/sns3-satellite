@@ -51,8 +51,8 @@ public:
   virtual void ReceivePdu (Ptr<Packet> p);
 
   virtual uint32_t GetTxBufferSizeInBytes () const;
+  virtual uint32_t GetMinTxOpportunityInBytes () const;
   virtual Time GetHolDelay () const;
-
 
 private:
   void ExpireReorderingTimer (void);

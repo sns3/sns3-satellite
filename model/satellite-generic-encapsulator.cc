@@ -1192,4 +1192,14 @@ SatGenericEncapsulator::GetHolDelay () const
   return holDelay;
 }
 
+uint32_t
+SatGenericEncapsulator::GetMinTxOpportunityInBytes () const
+{
+  /**
+   * Generic encapsulator assumes 2 Bytes for header, thus the
+   * minimum tx opportunity to be able to transmit any data is 3.
+   */
+  return 3;
+}
+
 } // namespace ns3
