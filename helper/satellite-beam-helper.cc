@@ -74,7 +74,8 @@ SatBeamHelper::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatBeamHelper::SatBeamHelper ()
+SatBeamHelper::SatBeamHelper () :
+    m_fadingModel ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -84,7 +85,8 @@ SatBeamHelper::SatBeamHelper ()
 
 SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandwidthConverterCb,
                               uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
-  : m_superframeSeq (seq)
+  : m_superframeSeq (seq),
+    m_fadingModel (SatEnums::FADING_MARKOV)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
