@@ -21,20 +21,20 @@
 #include "ns3/tag.h"
 #include "ns3/uinteger.h"
 
-#include "satellite-encapsulation-tag.h"
+#include "satellite-time-tag.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatEncapTag);
+NS_OBJECT_ENSURE_REGISTERED (SatTimeTag);
 
-SatEncapTag::SatEncapTag ()
+SatTimeTag::SatTimeTag ()
   : m_senderTimestamp (Seconds (0))
 {
   // Nothing to do here
 }
 
 
-SatEncapTag::SatEncapTag (Time senderTimestamp)
+SatTimeTag::SatTimeTag (Time senderTimestamp)
   : m_senderTimestamp (senderTimestamp)
 
 {
@@ -42,44 +42,43 @@ SatEncapTag::SatEncapTag (Time senderTimestamp)
 }
 
 TypeId
-SatEncapTag::GetTypeId (void)
+SatTimeTag::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatEncapTag")
+  static TypeId tid = TypeId ("ns3::SatTimeTag")
     .SetParent<Tag> ()
-    .AddConstructor<SatEncapTag> ();
+    .AddConstructor<SatTimeTag> ();
   return tid;
 }
 
 TypeId
-SatEncapTag::GetInstanceTypeId (void) const
+SatTimeTag::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 uint32_t
-SatEncapTag::GetSerializedSize (void) const
+SatTimeTag::GetSerializedSize (void) const
 {
   return sizeof(Time);
 }
 
 void
-SatEncapTag::Serialize (TagBuffer i) const
+SatTimeTag::Serialize (TagBuffer i) const
 {
   int64_t senderTimestamp = m_senderTimestamp.GetNanoSeconds ();
   i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
 }
 
 void
-SatEncapTag::Deserialize (TagBuffer i)
+SatTimeTag::Deserialize (TagBuffer i)
 {
   int64_t senderTimestamp;
   i.Read ((uint8_t *)&senderTimestamp, 8);
   m_senderTimestamp   = NanoSeconds (senderTimestamp);
-
 }
 
 void
-SatEncapTag::Print (std::ostream &os) const
+SatTimeTag::Print (std::ostream &os) const
 {
   os << m_senderTimestamp;
 }

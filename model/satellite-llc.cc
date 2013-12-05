@@ -18,6 +18,7 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/queue.h"
 #include "ns3/trace-source-accessor.h"
@@ -25,6 +26,7 @@
 
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
+#include "satellite-time-tag.h"
 #include "satellite-generic-encapsulator.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-control-message.h"
@@ -152,6 +154,10 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest)
       bool cSuccess = packet->PeekPacketTag (cTag);
       if (cSuccess && cTag.GetMsgType() != SatControlMsgTag::SAT_NON_CTRL_MSG)
         {
+          // Store packet arrival time
+          SatTimeTag timeTag (Simulator::Now ());
+          packet->AddPacketTag (timeTag);
+
           // Add MAC tag
           SatMacTag mTag;
           mTag.SetDestAddress (dest);
@@ -290,13 +296,21 @@ void SatLlc::SetAddress( Mac48Address macAddress )
 
 std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
 {
+  // Head of link queuing delay
+  Time holDelay;
+
   std::vector< Ptr<SatSchedulingObject> > schedObjects;
 
   // First fill the control scheduling object
   if (m_controlQueue->GetNPackets ())
     {
+      // Calculate HoL delay
+      SatTimeTag tag;
+      m_controlQueue->Peek()->PeekPacketTag (tag);
+      holDelay = Simulator::Now () - tag.GetSenderTimestamp ();
+
       Ptr<SatSchedulingObject> so =
-          Create<SatSchedulingObject> (Mac48Address::GetBroadcast (), m_controlQueue->GetNBytes (), true);
+          Create<SatSchedulingObject> (Mac48Address::GetBroadcast (), m_controlQueue->GetNBytes (), holDelay, true);
       schedObjects.push_back (so);
     }
 
@@ -309,8 +323,9 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
 
       if (buf > 0)
         {
+          holDelay = cit->second->GetHolDelay ();
           Ptr<SatSchedulingObject> so =
-              Create<SatSchedulingObject> (cit->first, buf);
+              Create<SatSchedulingObject> (cit->first, buf, holDelay);
           schedObjects.push_back (so);
         }
     }

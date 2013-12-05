@@ -25,7 +25,7 @@
 
 #include "satellite-encapsulation-header.h"
 #include "satellite-encapsulation-sdu-status-tag.h"
-#include "satellite-encapsulation-tag.h"
+#include "satellite-time-tag.h"
 #include "satellite-generic-encapsulator.h"
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
@@ -115,8 +115,8 @@ SatGenericEncapsulator::TransmitPdu (Ptr<Packet> p)
 
   if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
     {
-      /** Store arrival time */
-      SatEncapTag timeTag (Simulator::Now ());
+      // Store packet arrival time
+      SatTimeTag timeTag (Simulator::Now ());
       p->AddPacketTag (timeTag);
 
       SatEncapSduStatusTag tag;
@@ -394,7 +394,7 @@ SatGenericEncapsulator::NotifyTxOpportunity (uint32_t bytes)
   packet->AddHeader (encapHeader);
 
   // Sender timestamp
-  SatEncapTag encapTag (Simulator::Now ());
+  SatTimeTag encapTag (Simulator::Now ());
   packet->AddByteTag (encapTag);
   //m_txPdu (m_rnti, m_lcid, packet->GetSize ());
 
@@ -430,7 +430,7 @@ SatGenericEncapsulator::ReceivePdu (Ptr<Packet> p)
     }
 
   // Receiver timestamp
-  SatEncapTag encapTag;
+  SatTimeTag encapTag;
   Time delay;
   if (p->FindFirstMatchingByteTag (encapTag))
     {
@@ -1170,6 +1170,23 @@ SatGenericEncapsulator::ExpireReorderingTimer (void)
       m_vrUx = m_vrUh;
       NS_LOG_LOGIC ("New VR(UX) = " << m_vrUx);
     }
+}
+
+Time
+SatGenericEncapsulator::GetHolDelay () const
+{
+  Time holDelay (0.0);
+  SatTimeTag timeTag;
+  if (m_txBuffer.front ()->PeekPacketTag(timeTag))
+    {
+      holDelay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatTimeTag not found!");
+    }
+
+  return holDelay;
 }
 
 } // namespace ns3

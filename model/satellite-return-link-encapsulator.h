@@ -87,6 +87,12 @@ public:
    * \return uint32_t buffered bytes
    */
   virtual uint32_t GetTxBufferSizeInBytes () const;
+  
+  /**
+   * Get Head-of-Line packet buffering delay.
+   * \return Time HoL buffering delay
+   */
+  virtual Time GetHolDelay () const;
 
   /**
    * Callback to send packet to lower layer.

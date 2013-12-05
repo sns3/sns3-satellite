@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_ENCAPSULATION_TAG_H
-#define SATELLITE_ENCAPSULATION_TAG_H
+#ifndef SATELLITE_TIME_TAG_H
+#define SATELLITE_TIME_TAG_H
 
 #include "ns3/packet.h"
 #include "ns3/nstime.h"
@@ -30,41 +30,30 @@ namespace ns3 {
 class Tag;
 
 /**
- * Tag to calculate the per-PDU delay from eNb RLC to UE RLC
+ * \ingroup satellite
+ * \brief Time tag used to identify the time when packet is
+ * enqued.
+ *
  */
-
-class SatEncapTag : public Tag
+class SatTimeTag : public Tag
 {
 public:
   static TypeId  GetTypeId (void);
   virtual TypeId  GetInstanceTypeId (void) const;
 
-  /**
-   * Create an empty RLC tag
-   */
-  SatEncapTag ();
-  /**
-   * Create an RLC tag with the given senderTimestamp
-   */
-  SatEncapTag (Time senderTimestamp);
+  SatTimeTag ();
+  SatTimeTag (Time senderTimestamp);
 
   virtual void  Serialize (TagBuffer i) const;
   virtual void  Deserialize (TagBuffer i);
   virtual uint32_t  GetSerializedSize () const;
   virtual void Print (std::ostream &os) const;
 
-  /**
-   * Get the instant when the RLC delivers the PDU to the MAC SAP provider
-   */
   Time  GetSenderTimestamp (void) const
   {
     return m_senderTimestamp;
   }
 
-  /**
-   * Set the sender timestamp
-   * @param senderTimestamp time stamp of the instant when the RLC delivers the PDU to the MAC SAP provider
-   */
   void  SetSenderTimestamp (Time senderTimestamp)
   {
     this->m_senderTimestamp = senderTimestamp;
@@ -77,4 +66,4 @@ private:
 
 } //namespace ns3
 
-#endif /* SATELLITE_ENCAPSULATION_TAG_H */
+#endif /* SATELLITE_TIME_TAG_H */

@@ -28,6 +28,7 @@
 #include "satellite-mac-tag.h"
 #include "satellite-rle-pdu-status-tag.h"
 #include "satellite-rle-headers.h"
+#include "satellite-time-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatReturnLinkEncapsulator");
 
@@ -116,6 +117,10 @@ SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p)
   // If the packet still fits into the buffer
   if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
     {
+      // Store packet arrival time
+      SatTimeTag timeTag (Simulator::Now ());
+      p->AddPacketTag (timeTag);
+
       // Mark the PDU with FULL_PDU tag
       SatRlePduStatusTag tag;
       tag.SetStatus (SatRlePduStatusTag::FULL_PPDU);
@@ -557,6 +562,23 @@ SatReturnLinkEncapsulator::SetReceiveCallback (ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_rxCallback = cb;
+}
+
+Time
+SatReturnLinkEncapsulator::GetHolDelay () const
+{
+  Time holDelay;
+  SatTimeTag timeTag;
+  if (m_txBuffer.front ()->PeekPacketTag(timeTag))
+    {
+      holDelay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatTimeTag not found in the packet!");
+    }
+
+  return holDelay;
 }
 
 } // namespace ns3

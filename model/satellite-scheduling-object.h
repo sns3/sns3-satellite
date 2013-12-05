@@ -23,6 +23,7 @@
 #define SATELLITE_SCHEDULING_OBJECT_H_
 
 #include "ns3/simple-ref-count.h"
+#include "ns3/nstime.h"
 
 namespace ns3 {
 
@@ -43,7 +44,7 @@ public:
   /**
    * Default constructor
    */
-  SatSchedulingObject (Mac48Address addr, uint32_t bytes, bool isControl = false);
+  SatSchedulingObject (Mac48Address addr, uint32_t bytes, Time holDelay, bool isControl = false);
 
   /**
    * Destructor
@@ -73,6 +74,7 @@ private:
 
   Mac48Address m_macAddress;
   uint32_t m_bufferedBytes;
+  Time m_holDelay;
   bool m_isControl;
 
 };

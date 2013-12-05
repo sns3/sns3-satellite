@@ -65,6 +65,7 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes) = 0;
   virtual void ReceivePdu (Ptr<Packet> p) = 0;
   virtual uint32_t GetTxBufferSizeInBytes () const = 0;
+  virtual Time GetHolDelay () const = 0;
 
 protected:
 
