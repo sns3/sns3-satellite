@@ -236,36 +236,6 @@ SatGwMac::ScheduleBbFrames ()
   // Get scheduling objects from LLC
   std::vector< Ptr<SatSchedulingObject> > sos = m_schedContextCallback ();
 
-  // Schedule first all Control messages.
-//  while ((sos.empty () == false) && sos[0]->IsControl() )
-//    {
-//      if ( frameBytes == 0)
-//        {
-//          frame = CreateFrame(3, SatBbFrame::SHORT_FRAME);
-//          frameBytes = frame->GetBytesLeft();
-//        }
-//
-//      Ptr<Packet> p = m_txOpportunityCallback (frameBytes, sos[0]->GetMacAddress ());
-//
-//      if ( p != NULL)
-//        {
-//          frame->AddTransmitData (p, true );
-//          frameBytes -= 117;
-//
-//          if ( frameBytes == 0)
-//            {
-//              m_bbFrameContainer.push_back (frame);
-//            }
-//        }
-//      else
-//        {
-//          m_bbFrameContainer.push_back (frame);
-//          frameBytes = 0;
-//        }
-//
-//      sos = m_schedContextCallback ();
-//    }
-
   if ( sos.empty () == false )
     {
       uint32_t bytesToSent = 0;
@@ -346,10 +316,6 @@ SatGwMac::ScheduleBbFrames ()
             }
         }
     }
-//  else if (frameBytes > 0)
-//    {
-//      m_bbFrameContainer.push_back (frame);
-//    }
 }
 
 Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
@@ -373,6 +339,8 @@ Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
 Ptr<SatBbFrame>
 SatGwMac::CreateFrame (uint32_t modCod, uint32_t byteCount) const
 {
+  NS_LOG_FUNCTION (this << modCod << byteCount);
+
   Ptr<SatBbFrame> frame;
 
   switch (m_bbFrameUsageMode)
