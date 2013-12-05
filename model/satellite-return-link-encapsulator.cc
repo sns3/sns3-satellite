@@ -430,6 +430,11 @@ SatReturnLinkEncapsulator::Reassemble ()
       SatPPduHeader ppduHeader;
       m_rxBuffer.front()->RemoveHeader (ppduHeader);
 
+      /**
+       * TODO: The PHY packet errors have to be checked from FPDUs and distributed
+       * to HL PDUs.
+       */
+
       // FULL_PPDU
       if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == true)
         {

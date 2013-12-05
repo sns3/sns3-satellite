@@ -202,17 +202,22 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
   // Prioritize control packets
   if (m_controlQueue->GetNPackets() && macAddr.IsBroadcast ())
     {
+      /**
+       * TODO: The TxOpportunity for control packets may be handled in a
+       * better way when we have FWD link scheduler in place.
+       */
       uint32_t cPacketSize = m_controlQueue->Peek ()->GetSize();
-      if (cPacketSize <= bytes)
+      //if (cPacketSize <= bytes)
         {
           bytesLeft = m_controlQueue->GetNBytes() - cPacketSize;
           packet = m_controlQueue->Dequeue ();
         }
+        /*
       else
         {
           NS_FATAL_ERROR ("Too small TxOpportunity for the control packet at buffer head!");
-
         }
+        */
     }
   // Forward the txOpportunity to a certain encapsulator
   else
