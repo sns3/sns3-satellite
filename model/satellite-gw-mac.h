@@ -38,6 +38,7 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-phy.h"
+#include "satellite-bbframe.h"
 
 namespace ns3 {
 
@@ -51,6 +52,28 @@ namespace ns3 {
 class SatGwMac : public SatMac
 {
 public:
+  /**
+   * Types for sorting algorithm used by forward link scheduler
+   */
+  typedef enum
+  {
+    NO_SORT,             //!< NO_SORT
+    BUFFERING_DELAY_SORT,//!< BUFFERING_DELAY_SORT
+    BUFFERING_LOAD_SORT, //!< BUFFERING_LOAD_SORT
+    RANDOM_SORT,         //!< RANDOM_SORT
+    PRIORITY_SORT        //!< PRIORITY_SORT
+  } ScheduleSortingCriteria_t;
+
+  /**
+   * BBFrame usage modes.
+   */
+  typedef enum
+  {
+    SHORT_FRAMES,          //!< SHORT_FRAMES
+    NORMAL_FRAMES,         //!< NORMAL_FRAMES
+    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
+  } BbFrameUsageMode_t;
+
   static TypeId GetTypeId (void);
 
   /**
@@ -121,6 +144,26 @@ private:
    void TransmitTime (uint32_t carrierId);
 
    /**
+    * Schedule BB Frames.
+    */
+   void ScheduleBbFrames ();
+
+   /**
+    * Create short or normal frame according to byteCount and
+    * according to \member m_bbFrameUsageMode.
+    *
+    * \param Used MODCOD for frame.
+    * \param byteCount
+    * \return Pointer to created frame.
+    */
+   Ptr<SatBbFrame> CreateFrame (uint32_t modCod, uint32_t byteCount) const;
+
+   /**
+    * Create dummy frame. Dummy frame is sent when there is nothing else to send.
+    */
+   Ptr<SatBbFrame> CreateDummyFrame () const;
+
+   /**
     * Random variable used in FWD link scheduling
     */
    Ptr<UniformRandomVariable> m_random;
@@ -131,9 +174,40 @@ private:
   Time m_tInterval;
 
   /**
+   * Flag indicating if Dummy Frames are sent or not.
+   * false means that only transmission time is simulated without sending.
+   */
+  bool m_dummyFrameSendingOn;
+
+  /**
+   * Threshold time of total transmissions in BB Frame container to trigger a scheduling round.
+   */
+  Time m_schedulingStartThresholdTime;
+
+  /**
+   * Threshold time of total transmissions in BB Frame container to stop a scheduling round.
+   */
+  Time m_schedulingStopThresholdTime;
+
+  /**
+   * Sorting criteria for scheduling objects received from LLC.
+   */
+  ScheduleSortingCriteria_t m_schedulingSortCriteria;
+
+  /**
+   * BBFrame usage mode.
+   */
+  BbFrameUsageMode_t m_bbFrameUsageMode;
+
+  /**
    * The lower layer packet transmit callback.
    */
   SatGwMac::SchedContextCallback m_schedContextCallback;
+
+  /**
+   * The container for BB Frames.
+   */
+  std::list< Ptr<SatBbFrame> > m_bbFrameContainer;
 
 };
 

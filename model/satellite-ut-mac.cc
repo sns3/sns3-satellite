@@ -158,14 +158,17 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
    * should be passed with txOpportunity to higher layer, so that it knows which RC_index
    * (= queue) to serve.
    */
-
-  /**
+   
+   /**
    * Notify LLC of the Tx opportunity; returns a packet.
    * In addition, the function returns the bytes left after txOpportunity in
    * bytesLeft reference variable.
    */
   uint32_t bytesLeft (0);
+
   Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_macAddress, bytesLeft);
+  SatPhy::PacketContainer_t packets;
+  packets.push_back (p);
 
   if ( p )
     {
@@ -173,7 +176,7 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
       // If more sophisticated guard period is needed, it is needed done before hand and
       // remove this 'one tick decrease' implementation
       Time duration (Time::FromDouble (durationInSecs, Time::S) - Time (1));
-      SendPacket (p, carrierId, duration);
+      SendPacket (packets, carrierId, duration);
     }
 }
 
@@ -233,10 +236,6 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
               // Pass the receiver address to LLC
               m_rxCallback (*i, destAddress);
             }
-        }
-      else
-        {
-          NS_FATAL_ERROR ("UT received a packet not intended for it");
         }
     }
 }

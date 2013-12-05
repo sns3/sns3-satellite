@@ -44,7 +44,7 @@ SatBtuConf::SatBtuConf (double bandwidth_hz, double rollOff, double spacing)
   NS_ASSERT ( (rollOff >= 0.00 ) && ( rollOff < 1.00 ) );
 
   m_occupiedBandwidth_hz = m_allocatedBandwidth_hz / (rollOff + 1.00);
-  m_effectiveBandwidth_hz = m_occupiedBandwidth_hz / (rollOff + spacing + 1.00);
+  m_effectiveBandwidth_hz = m_allocatedBandwidth_hz / (rollOff + spacing + 1.00);
 
   m_length_s = 1 / m_effectiveBandwidth_hz;
 }

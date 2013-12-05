@@ -25,6 +25,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
+#include "ns3/enum.h"
+#include "ns3/boolean.h"
 
 #include "satellite-mac-tag.h"
 #include "satellite-net-device.h"
@@ -47,9 +49,41 @@ SatGwMac::GetTypeId (void)
     .AddConstructor<SatGwMac> ()
     .AddAttribute ("Interval",
                    "The time to wait between packet (frame) transmissions",
-                   TimeValue (Seconds (0.002)),
-                   MakeTimeAccessor (&SatGwMac::m_tInterval),
-                   MakeTimeChecker ())
+                    TimeValue (Seconds (0.002)),
+                    MakeTimeAccessor (&SatGwMac::m_tInterval),
+                    MakeTimeChecker ())
+    .AddAttribute ("DummyFrameSendingOn",
+                   "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatGwMac::m_dummyFrameSendingOn),
+                    MakeBooleanChecker ())
+    .AddAttribute ("BBFrameUsageMode",
+                   "Mode for selecting used BBFrames.",
+                    EnumValue (SatGwMac::NORMAL_FRAMES),
+                    MakeEnumAccessor (&SatGwMac::m_bbFrameUsageMode),
+                    MakeEnumChecker (SatGwMac::SHORT_FRAMES, "Only short frames used.",
+                                     SatGwMac::NORMAL_FRAMES, "Only normal frames used",
+                                     SatGwMac::SHORT_AND_NORMAL_FRAMES, "Both short and normal frames used."))
+    .AddAttribute ("SchedulingStartThresholdTime",
+                   "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
+                    TimeValue (Seconds (0.005)),
+                    MakeTimeAccessor (&SatGwMac::m_schedulingStartThresholdTime),
+                    MakeTimeChecker ())
+    .AddAttribute ("SchedulingStopThresholdTime",
+                   "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
+                    TimeValue (Seconds (0.015)),
+                    MakeTimeAccessor (&SatGwMac::m_schedulingStopThresholdTime),
+                    MakeTimeChecker ())
+    .AddAttribute ("SchedulingSortCriteria",
+                   "Sorting criteria fort scheduling objects from LLC.",
+                    EnumValue (SatGwMac::NO_SORT),
+                    MakeEnumAccessor (&SatGwMac::m_schedulingSortCriteria),
+                    MakeEnumChecker (SatGwMac::NO_SORT, "No sorting",
+                                     SatGwMac::BUFFERING_DELAY_SORT, "Sorting by delay in buffer",
+                                     SatGwMac::BUFFERING_LOAD_SORT, "Sorting by load in buffer",
+                                     SatGwMac::RANDOM_SORT, "Random sorting ",
+                                     SatGwMac::PRIORITY_SORT, "Sorting by priority"))
+
   ;
   return tid;
 }
@@ -148,45 +182,32 @@ SatGwMac::TransmitTime (uint32_t carrierId)
    *
   */
 
-  // Default size for Tx opportunity
-  uint32_t txBytes (120);
-  // Get scheduling objects from LLC
-  std::vector< Ptr<SatSchedulingObject> > sos = m_schedContextCallback ();
+  ScheduleBbFrames ();
+  Ptr<SatBbFrame> bbFrame;
 
-  if ( !sos.empty ())
+  if ( m_bbFrameContainer.empty() )
     {
-      uint32_t ind;
-
-      // Prioritize control
-      if (sos.front()->IsControl () || sos.size() == 1)
+      if ( m_dummyFrameSendingOn )
         {
-          ind = 0;
+          bbFrame = CreateDummyFrame ();
         }
-      // Randomize users
-      else
-        {
-          ind = (uint32_t)(m_random->GetInteger (0, sos.size()-1));
-        }
+    }
+  else
+    {
+      bbFrame = m_bbFrameContainer.front();
+      m_bbFrameContainer.pop_front();
+    }
 
-      /**
-       * Notify LLC of the Tx opportunity; returns a packet.
-       * In addition, the function returns the bytes left after txOpportunity in
-       * bytesLeft reference variable.
-       */
+  if ( bbFrame )
+    {
+        /* TODO: The carrierId should be acquired from somewhere. Now
+         * we assume only one carrier in forward link, so it is safe to use 0.
+         * The BBFrame duration should be calculated based on BBFrame length and
+         * used MODCOD.
+         */
 
-      uint32_t bytesLeft (0);
-      Ptr<Packet> p = m_txOpportunityCallback (txBytes, sos[ind]->GetMacAddress (), bytesLeft);
-
-      if ( p )
-        {
-          /* TODO: The carrierId should be acquired from somewhere. Now
-           * we assume only one carrier in forward link, so it is safe to use 0.
-           * The BBFrame duration should be calculated based on BBFrame length and
-           * used MODCOD.
-           */
-          Time DURATION (Seconds(0.001));
-          SendPacket (p, carrierId, DURATION);
-        }
+        //Time DURATION (Seconds (0.001));
+        SendPacket (bbFrame->GetTransmitData() , carrierId, bbFrame->GetDuration ());
     }
 
   // TODO: The next TransmitTime should be scheduled to be when just transmitted
@@ -200,6 +221,188 @@ SatGwMac::SetSchedContextCallback (SatGwMac::SchedContextCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_schedContextCallback = cb;
+}
+
+void
+SatGwMac::ScheduleBbFrames ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // TODO: logic of this function is needed to check
+  // and implemented in own scheduler class
+  uint32_t frameBytes = 0;
+  Ptr<SatBbFrame> frame;
+
+  // Get scheduling objects from LLC
+  std::vector< Ptr<SatSchedulingObject> > sos = m_schedContextCallback ();
+
+  // Schedule first all Control messages.
+//  while ((sos.empty () == false) && sos[0]->IsControl() )
+//    {
+//      if ( frameBytes == 0)
+//        {
+//          frame = CreateFrame(3, SatBbFrame::SHORT_FRAME);
+//          frameBytes = frame->GetBytesLeft();
+//        }
+//
+//      Ptr<Packet> p = m_txOpportunityCallback (frameBytes, sos[0]->GetMacAddress ());
+//
+//      if ( p != NULL)
+//        {
+//          frame->AddTransmitData (p, true );
+//          frameBytes -= 117;
+//
+//          if ( frameBytes == 0)
+//            {
+//              m_bbFrameContainer.push_back (frame);
+//            }
+//        }
+//      else
+//        {
+//          m_bbFrameContainer.push_back (frame);
+//          frameBytes = 0;
+//        }
+//
+//      sos = m_schedContextCallback ();
+//    }
+
+  if ( sos.empty () == false )
+    {
+      uint32_t bytesToSent = 0;
+      std::vector< Ptr<SatSchedulingObject> >::const_iterator currentObject;
+
+      for ( currentObject = sos.begin (); currentObject != sos.end (); currentObject++ )
+        {
+          bytesToSent += (*currentObject)->GetBufferedBytes();
+        }
+
+      currentObject = sos.begin ();
+      uint32_t currentObBytes = (*currentObject)->GetBufferedBytes();
+      uint32_t currentObMinReqBytes = 5;
+
+      if ( (*currentObject)->IsControl() )
+        {
+          currentObMinReqBytes = 500;
+        }
+
+      while ( bytesToSent )
+        {
+          if ( frameBytes == 0)
+            {
+              frame = CreateFrame (3, bytesToSent);
+              frameBytes = frame->GetBytesLeft();
+            }
+
+          if ( frameBytes < currentObMinReqBytes )
+            {
+              m_bbFrameContainer.push_back (frame);
+              frameBytes = 0;
+            }
+          else if ( currentObBytes > frameBytes )
+            {
+              uint32_t bytesLeft = 0;
+              Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*currentObject)->GetMacAddress (), bytesLeft);
+
+              if ( p )
+                {
+                  frameBytes = frame->AddTransmitData (p, (*currentObject)->IsControl() );
+                }
+
+              m_bbFrameContainer.push_back (frame);
+
+              frameBytes = 0;
+              bytesToSent -= currentObBytes;
+              currentObBytes = bytesLeft;
+            }
+          else
+            {
+              // TODO: Something wrong here. We need to ask two extra bytes, otherwise fails.
+              uint32_t bytesLeft = 0;
+              Ptr<Packet> p = m_txOpportunityCallback (currentObBytes + 2, (*currentObject)->GetMacAddress (), bytesLeft);
+
+              if ( p )
+                {
+                  frameBytes = frame->AddTransmitData (p, (*currentObject)->IsControl() );
+                  bytesToSent -= currentObBytes;
+                  currentObBytes = bytesLeft;
+                }
+
+              if ( bytesToSent )
+                {
+                  currentObject++;
+                  currentObBytes = (*currentObject)->GetBufferedBytes();
+
+                  currentObMinReqBytes = 5;
+
+                  if ( (*currentObject)->IsControl() )
+                    {
+                      currentObMinReqBytes = 500;
+                    }
+                }
+              else
+                {
+                  m_bbFrameContainer.push_back (frame);
+                }
+            }
+        }
+    }
+//  else if (frameBytes > 0)
+//    {
+//      m_bbFrameContainer.push_back (frame);
+//    }
+}
+
+Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatBbFrame> dummyFrame = Create<SatBbFrame> ();
+  Ptr<Packet> dummyPacket = Create<Packet> (SatBbFrame::m_shortBbFrameLengthInBytes);
+
+  // Add MAC tag
+  SatMacTag tag;
+  tag.SetDestAddress (m_macAddress);
+  tag.SetSourceAddress (m_macAddress);
+  dummyPacket->AddPacketTag (tag);
+
+  dummyFrame->AddTransmitData (dummyPacket, false);
+
+  return dummyFrame;
+}
+
+Ptr<SatBbFrame>
+SatGwMac::CreateFrame (uint32_t modCod, uint32_t byteCount) const
+{
+  Ptr<SatBbFrame> frame;
+
+  switch (m_bbFrameUsageMode)
+  {
+    case SHORT_FRAMES:
+      frame = Create<SatBbFrame> (modCod, SatBbFrame::SHORT_FRAME);
+      break;
+
+    case NORMAL_FRAMES:
+      frame = Create<SatBbFrame> (modCod, SatBbFrame::NORMAL_FRAME);
+      break;
+
+    case SHORT_AND_NORMAL_FRAMES:
+      if (byteCount > SatBbFrame::m_shortBbFrameLengthInBytes)
+        {
+          frame = Create<SatBbFrame> (modCod, SatBbFrame::NORMAL_FRAME);
+        }
+      else
+        {
+          frame = Create<SatBbFrame> (modCod, SatBbFrame::SHORT_FRAME);
+        }
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Invalid BBFrame usage mode!!!");
+      break;
+
+  }
+
+  return frame;
 }
 
 

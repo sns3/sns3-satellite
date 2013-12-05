@@ -193,7 +193,7 @@ main (int argc, char *argv[])
   Ptr<Node> geo = helper->GeoSatNode ();
   Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel> ();
 
-  // print used parameters usign log info
+  // print used parameters using log info
   NS_LOG_INFO ("--- Satellite link budget ---");
   NS_LOG_INFO (" Beam ID: " << beamId);
   NS_LOG_INFO (" Geo position: " << geoMob->GetGeoPosition () << " " << geoMob->GetPosition () );

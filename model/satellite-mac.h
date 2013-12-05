@@ -125,9 +125,9 @@ protected:
 
   /**
    * Send packet to lower layer by using a callback
-   * \param packet Packet to be sent.
+   * \param packets Packets to be sent.
    */
-  void SendPacket (Ptr<Packet> packet, uint32_t carrierId, Time duration);
+  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration);
 
    /**
     * MAC address of the this mac instance (node)
