@@ -57,6 +57,16 @@ public:
   static const uint32_t INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
   /**
+   * \brief Default fading value index for fading traces
+   */
+  static const uint32_t FADING_TRACE_DEFAULT_INTF_DENSITY_INDEX = 1;
+
+  /**
+   * \brief Default number of columns for fading traces
+   */
+  static const uint32_t FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
+
+  /**
    * \brief Constructor
    */
   SatBaseTraceContainer ();

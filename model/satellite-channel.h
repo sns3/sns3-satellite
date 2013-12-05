@@ -169,20 +169,29 @@ private:
   /**
    * \brief Function for Rx power output trace
    * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
    */
   void DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
    * \brief Function for Rx power input trace
    * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
    */
   void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
+   * \brief Function for fading output trace
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   * \param fadingValue fading value
+   */
+  void DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue);
+
+  /**
    * \brief Function for calculating the Rx power
    * \param rxParams Rx parameters
-   * \param phyRx phy Rx
-   * \param frequency_hz frequency in Hz
+   * \param phyRx The receiver SatPhyRx entity
    */
   void DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
@@ -202,7 +211,7 @@ private:
   CarrierFreqConverter m_carrierFreqConverter;
 
   /**
-   * \brief Freequency id of the channel
+   * \brief Frequency id of the channel
    */
   uint32_t m_freqId;
 
@@ -217,14 +226,19 @@ private:
   Ptr<SatFreeSpaceLoss> m_freeSpaceLoss;
 
   /**
-   * \brief
+   * \brief Defines the mode used for Rx power calculation
    */
   SatEnums::RxPowerCalculationMode_t m_rxPowerCalculationMode;
 
   /**
-   * \brief
+   * \brief Defines whether Rx power output tracing is in use or not
    */
   bool m_enableRxPowerOutputTrace;
+
+  /**
+   * \brief Defines whether fading output tracing is in use or not
+   */
+  bool m_enableFadingOutputTrace;
 
   /**
    * The trace source for the packet transmission animation events that the

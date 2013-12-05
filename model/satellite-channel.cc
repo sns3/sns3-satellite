@@ -48,7 +48,8 @@ SatChannel::SatChannel ()
    m_propagationDelay (),
    m_freeSpaceLoss (),
    m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO tie this properly to e.g. fading (do not create fading objects!)
-   m_enableRxPowerOutputTrace (false)
+   m_enableRxPowerOutputTrace (false),
+   m_enableFadingOutputTrace (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -77,6 +78,11 @@ SatChannel::GetTypeId (void)
                    "Enable Rx power output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatChannel::m_enableRxPowerOutputTrace),
+                    MakeBooleanChecker ())
+    .AddAttribute( "EnableFadingOutputTrace",
+                   "Enable fading output trace.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatChannel::m_enableFadingOutputTrace),
                     MakeBooleanChecker ())
     .AddAttribute ("RxPowerCalculationMode",
                    "Rx Power calculation mode",
@@ -269,6 +275,49 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
 }
 
 void
+SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue)
+{
+  SatMacTag tag;
+
+  /// TODO get rid of peeking
+  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+
+  if (*i == NULL)
+  {
+    NS_FATAL_ERROR ("SatChannel::DoFadingOutputTrace - Empty packet list");
+  }
+
+  (*i)->PeekPacketTag (tag);
+
+  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+
+  std::vector<double> tempVector;
+  tempVector.push_back (Now ().GetDouble ());
+  tempVector.push_back (fadingValue);
+
+  switch (m_channelType)
+    {
+      case SatEnums::RETURN_FEEDER_CH:
+      case SatEnums::FORWARD_USER_CH:
+        {
+          SatHelper::m_satFadingOutputTraceContainer->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
+          break;
+        }
+      case SatEnums::FORWARD_FEEDER_CH:
+      case SatEnums::RETURN_USER_CH:
+        {
+          SatHelper::m_satFadingOutputTraceContainer->AddToContainer (std::make_pair (sourceAddress, m_channelType), tempVector);
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatChannel::DoFadingOutputTrace - Invalid channel type");
+          break;
+        }
+    }
+}
+
+void
 SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility ();
@@ -303,6 +352,11 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
         break;
       }
   }
+
+  if (m_enableFadingOutputTrace)
+    {
+      DoFadingOutputTrace (rxParams, phyRx, fading);
+    }
 
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = (rxParams->m_txPower_W * txAntennaGain_W) / m_freeSpaceLoss->GetFsl (txMobility, rxMobility, rxParams->m_carrierFreq_hz);

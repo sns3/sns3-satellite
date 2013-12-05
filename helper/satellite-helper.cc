@@ -38,6 +38,7 @@ Ptr<SatInterferenceInputTraceContainer> SatHelper::m_satIntfInputTraceContainer;
 Ptr<SatInterferenceOutputTraceContainer> SatHelper::m_satIntfOutputTraceContainer;
 Ptr<SatRxPowerInputTraceContainer> SatHelper::m_satRxPowerInputTraceContainer;
 Ptr<SatRxPowerOutputTraceContainer> SatHelper::m_satRxPowerOutputTraceContainer;
+Ptr<SatFadingOutputTraceContainer> SatHelper::m_satFadingOutputTraceContainer;
 Ptr<SatMacIdMacMapper> SatHelper::m_satMacIdMacMapper;
 
 NS_OBJECT_ENSURE_REGISTERED (SatHelper);
@@ -105,6 +106,7 @@ SatHelper::SatHelper (std::string scenarioName)
   m_satIntfOutputTraceContainer = CreateObject <SatInterferenceOutputTraceContainer> ();
   m_satRxPowerInputTraceContainer = CreateObject <SatRxPowerInputTraceContainer> ();
   m_satRxPowerOutputTraceContainer = CreateObject <SatRxPowerOutputTraceContainer> ();
+  m_satFadingOutputTraceContainer = CreateObject <SatFadingOutputTraceContainer> ();
   m_satMacIdMacMapper = CreateObject <SatMacIdMacMapper> ();
 
   m_satConf = CreateObject<SatConf> ();
@@ -486,6 +488,7 @@ SatHelper::DoDispose()
   m_satIntfOutputTraceContainer = NULL;
   m_satRxPowerInputTraceContainer = NULL;
   m_satRxPowerOutputTraceContainer = NULL;
+  m_satFadingOutputTraceContainer = NULL;
   m_satMacIdMacMapper = NULL;
 }
 
