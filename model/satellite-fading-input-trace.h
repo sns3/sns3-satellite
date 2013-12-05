@@ -17,45 +17,32 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_BASE_FADING_H
-#define SATELLITE_BASE_FADING_H
+#ifndef SATELLITE_FADING_INPUT_TRACE_H
+#define SATELLITE_FADING_INPUT_TRACE_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "satellite-enums.h"
-#include "ns3/mac48-address.h"
+#include "satellite-base-fading.h"
+#include "ns3/satellite-fading-input-trace-container.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
  *
- * \brief Base class for fading models
+ * \brief Class for fading input trace
  */
-class SatBaseFading : public Object
+class SatFadingInputTrace : public SatBaseFading
 {
 public:
-  /**
-   * \brief Gets elevation angle in degrees
-   */
-  typedef Callback<double> ElevationCallback;
-
-  /**
-   * \brief Gets velocity in m/s
-   */
-  typedef Callback<double> VelocityCallback;
 
   /**
    * \brief Constructor
    */
-  SatBaseFading ();
+  SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer);
 
   /**
    * \brief Destructor
    */
-  virtual ~SatBaseFading ();
+  ~SatFadingInputTrace ();
 
   /**
    * \brief NS-3 type id function
@@ -65,22 +52,20 @@ public:
 
   /**
    * \brief Function for getting the fading value
+   * \param macAddress MAC address
    * \param channelType channel type
    * \return fading value
    */
-  double GetFading (Address macAddress, SatEnums::ChannelType_t channelType);
-
-  /**
-   * \brief Function for getting the fading value
-   * \param channelType channel type
-   * \return fading value
-   */
-  virtual double DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType) = 0;
+  double DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType);
 
 private:
 
+  /**
+   * \brief Pointer to input trace container
+   */
+  Ptr<SatFadingInputTraceContainer> m_satFadingInputTraceContainer;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_BASE_FADING_H */
+#endif /* SATELLITE_FADING_INPUT_TRACE_H */

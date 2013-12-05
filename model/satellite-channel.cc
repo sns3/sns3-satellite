@@ -194,20 +194,6 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 void
 SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
-  SatMacTag tag;
-
-  /// TODO get rid of peeking
-  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-
-  if (*i == NULL)
-  {
-    NS_FATAL_ERROR ("SatChannel::DoRxPowerOutputTrace - Empty packet list");
-  }
-
-  (*i)->PeekPacketTag (tag);
-
-  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
-
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetDouble ());
   tempVector.push_back (rxParams->m_rxPower_W / rxParams->m_carrierFreq_hz);
@@ -223,7 +209,7 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       case SatEnums::FORWARD_FEEDER_CH:
       case SatEnums::RETURN_USER_CH:
         {
-          SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (sourceAddress, m_channelType), tempVector);
+          SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
           break;
         }
       default:
@@ -237,21 +223,6 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 void
 SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
-
-  SatMacTag tag;
-
-  /// TODO get rid of peeking
-  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-
-  if (*i == NULL)
-  {
-    NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Empty packet list");
-  }
-
-  (*i)->PeekPacketTag (tag);
-
-  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
-
   switch (m_channelType)
     {
       case SatEnums::RETURN_FEEDER_CH:
@@ -263,7 +234,7 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
       case SatEnums::FORWARD_FEEDER_CH:
       case SatEnums::RETURN_USER_CH:
         {
-          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (sourceAddress, m_channelType));
+          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
           break;
         }
       default:
@@ -277,20 +248,6 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
 void
 SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue)
 {
-  SatMacTag tag;
-
-  /// TODO get rid of peeking
-  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-
-  if (*i == NULL)
-  {
-    NS_FATAL_ERROR ("SatChannel::DoFadingOutputTrace - Empty packet list");
-  }
-
-  (*i)->PeekPacketTag (tag);
-
-  Mac48Address sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
-
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetDouble ());
   tempVector.push_back (fadingValue);
@@ -306,7 +263,7 @@ SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
       case SatEnums::FORWARD_FEEDER_CH:
       case SatEnums::RETURN_USER_CH:
         {
-          SatHelper::m_satFadingOutputTraceContainer->AddToContainer (std::make_pair (sourceAddress, m_channelType), tempVector);
+          SatHelper::m_satFadingOutputTraceContainer->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
           break;
         }
       default:
@@ -335,7 +292,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       {
         txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (rxMobility);
         rxAntennaGain_W = phyRx->GetAntennaGain (rxMobility);
-        fading = phyRx->GetFadingValue (m_channelType);
+        fading = phyRx->GetFadingValue (phyRx->GetDevice ()->GetAddress (),m_channelType);
         break;
       }
     case SatEnums::RETURN_USER_CH:
@@ -343,7 +300,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       {
         txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (txMobility);
         rxAntennaGain_W = phyRx->GetAntennaGain (txMobility);
-        fading = rxParams->m_phyTx->GetFadingValue (m_channelType);
+        fading = rxParams->m_phyTx->GetFadingValue (GetSourceAddress (rxParams),m_channelType);
         break;
       }
     default:
@@ -361,6 +318,24 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = (rxParams->m_txPower_W * txAntennaGain_W) / m_freeSpaceLoss->GetFsl (txMobility, rxMobility, rxParams->m_carrierFreq_hz);
   rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses () * fading;
+}
+
+/// TODO get rid of source MAC address peeking
+Mac48Address
+SatChannel::GetSourceAddress (Ptr<SatSignalParameters> rxParams)
+{
+  SatMacTag tag;
+
+  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+
+  if (*i == NULL)
+  {
+    NS_FATAL_ERROR ("SatChannel::DoFadingOutputTrace - Empty packet list");
+  }
+
+  (*i)->PeekPacketTag (tag);
+
+  return Mac48Address::ConvertFrom (tag.GetSourceAddress ());
 }
 
 void

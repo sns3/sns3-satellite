@@ -22,31 +22,31 @@
 #include <algorithm>
 #include "ns3/simulator.h"
 #include "ns3/log.h"
-#include "satellite-channel-fading-trace.h"
+#include "satellite-channel-external-fading-trace.h"
 #include "satellite-utils.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatChannelFadingTrace");
+NS_LOG_COMPONENT_DEFINE ("SatChannelExternalFadingTrace");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatChannelFadingTrace);
+NS_OBJECT_ENSURE_REGISTERED (SatChannelExternalFadingTrace);
 
 TypeId
-SatChannelFadingTrace::GetTypeId (void)
+SatChannelExternalFadingTrace::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatChannelFadingTrace")
+  static TypeId tid = TypeId ("ns3::SatChannelExternalFadingTrace")
     .SetParent<Object> ()
-    .AddConstructor<SatChannelFadingTrace> ()
+    .AddConstructor<SatChannelExternalFadingTrace> ()
   ;
   return tid;
 }
 
-SatChannelFadingTrace::SatChannelFadingTrace ()
+SatChannelExternalFadingTrace::SatChannelExternalFadingTrace ()
 {
   NS_ASSERT (true);
 }
 
-SatChannelFadingTrace::SatChannelFadingTrace (TraceFileType_e type, std::string fileName)
+SatChannelExternalFadingTrace::SatChannelExternalFadingTrace (TraceFileType_e type, std::string fileName)
 :m_startTime(-1.0), m_timeInterval (-1.0)
 {
   NS_LOG_FUNCTION (this);
@@ -56,13 +56,13 @@ SatChannelFadingTrace::SatChannelFadingTrace (TraceFileType_e type, std::string 
 }
 
 
-SatChannelFadingTrace::~SatChannelFadingTrace ()
+SatChannelExternalFadingTrace::~SatChannelExternalFadingTrace ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
-void SatChannelFadingTrace::ReadTrace (std::string filePathName)
+void SatChannelExternalFadingTrace::ReadTrace (std::string filePathName)
 {
   NS_LOG_FUNCTION (this << filePathName);
 
@@ -120,7 +120,7 @@ void SatChannelFadingTrace::ReadTrace (std::string filePathName)
 }
 
 double
-SatChannelFadingTrace::GetFading () const
+SatChannelExternalFadingTrace::GetFading () const
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (!m_traceVector.empty ());
@@ -164,7 +164,7 @@ SatChannelFadingTrace::GetFading () const
 }
 
 bool
-SatChannelFadingTrace::TestFadingTrace () const
+SatChannelExternalFadingTrace::TestFadingTrace () const
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (!m_traceVector.empty ());

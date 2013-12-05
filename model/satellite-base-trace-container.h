@@ -59,7 +59,7 @@ public:
   /**
    * \brief Default fading value index for fading traces
    */
-  static const uint32_t FADING_TRACE_DEFAULT_INTF_DENSITY_INDEX = 1;
+  static const uint32_t FADING_TRACE_DEFAULT_FADING_VALUE_INDEX = 1;
 
   /**
    * \brief Default number of columns for fading traces

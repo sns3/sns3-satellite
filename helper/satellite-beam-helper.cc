@@ -34,7 +34,8 @@
 #include "../model/satellite-propagation-delay-model.h"
 #include "../model/satellite-antenna-gain-pattern-container.h"
 #include "satellite-beam-helper.h"
-
+#include "satellite-helper.h"
+#include "ns3/satellite-fading-input-trace.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 
@@ -54,10 +55,11 @@ SatBeamHelper::GetTypeId (void)
                       MakeCallbackChecker ())
       .AddAttribute ("FadingModel",
                      "Fading model",
-                      EnumValue (SatBeamHelper::FADING_MARKOV),
+                      EnumValue (SatEnums::FADING_MARKOV),
                       MakeEnumAccessor (&SatBeamHelper::m_fadingModel),
-                      MakeEnumChecker (SatBeamHelper::FADING_OFF, "FadingOff",
-                                       SatBeamHelper::FADING_MARKOV, "FadingMarkov"))
+                      MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
+                                       SatEnums::FADING_TRACE, "FadingTrace",
+                                       SatEnums::FADING_MARKOV, "FadingMarkov"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
     ;
@@ -107,13 +109,14 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandw
 
   switch (m_fadingModel)
     {
-    case SatBeamHelper::FADING_MARKOV:
+    case SatEnums::FADING_MARKOV:
       {
         /// create default Markov & Loo configurations
         m_markovConf = CreateObject<SatMarkovConf> ();
         break;
       }
-    case SatBeamHelper::FADING_OFF:
+    case SatEnums::FADING_OFF:
+    case SatEnums::FADING_TRACE:
     default:
       {
         m_markovConf = NULL;
@@ -214,7 +217,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   NS_ASSERT ( storedOk );
 
   // install fading container to GW
-  if (m_fadingModel != SatBeamHelper::FADING_OFF)
+  if (m_fadingModel != SatEnums::FADING_OFF)
     {
       InstallFadingContainer (gwNode);
     }
@@ -233,7 +236,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
       observer->ObserveTimingAdvance (userLink.second->GetPropagationDelayModel(),
                                       feederLink.second->GetPropagationDelayModel(), gwMobility);
 
-      if (m_fadingModel != SatBeamHelper::FADING_OFF)
+      if (m_fadingModel != SatEnums::FADING_OFF)
         {
           InstallFadingContainer (*i);
         }
@@ -590,7 +593,7 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
     {
       switch (m_fadingModel)
         {
-        case SatBeamHelper::FADING_MARKOV:
+        case SatEnums::FADING_MARKOV:
           {
             Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver> ();
             NS_ASSERT(observer != NULL);
@@ -600,20 +603,26 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
             SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatMobilityObserver::GetVelocity,
                                                                    observer);
 
-            /// create fading container based on default configuration
+            /// create a Markov fading container based on default configuration
             fadingContainer = CreateObject<SatMarkovContainer> (m_markovConf,
                                                                 elevationCb,
                                                                 velocityCb);
+            node->AggregateObject (fadingContainer);
+            break;
+          }
+        case SatEnums::FADING_TRACE:
+          {
+            /// create a input trace fading container based on default configuration
+            fadingContainer = CreateObject<SatFadingInputTrace> (SatHelper::m_satFadingInputTraceContainer);
 
             node->AggregateObject (fadingContainer);
             break;
           }
-
         /// FADING_OFF option should never get to InstallFadingContainer
-        case SatBeamHelper::FADING_OFF:
+        case SatEnums::FADING_OFF:
         default:
           {
-            NS_ASSERT(0);
+            NS_FATAL_ERROR ("SatBeamHelper::InstallFadingContainer - Incorrect fading model");
             break;
           }
         }

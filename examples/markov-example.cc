@@ -57,18 +57,20 @@ main (int argc, char *argv[])
   /// create fading container based on default configuration
   Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
 
+  Address macAddress;
+
   /// run simulation
   Simulator::Schedule (Time ("5ms"), &SetVelocity, 0);
-  Simulator::Schedule (Time ("10ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("30ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("10ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("30ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
   Simulator::Schedule (Time ("45ms"), &SetElevation, 55);
-  Simulator::Schedule (Time ("50ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("60ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("90ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("50ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("60ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("90ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
   Simulator::Schedule (Time ("95ms"), &SetElevation, 75);
-  Simulator::Schedule (Time ("100ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("130ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("200ms"), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("100ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("130ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Time ("200ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
 
   Simulator::Run ();
   Simulator::Destroy ();

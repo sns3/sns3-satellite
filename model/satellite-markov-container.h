@@ -71,10 +71,11 @@ public:
 
   /**
    * \brief Function for getting the fading
+   * \param macAddress MAC address
    * \param channeltype channel type
    * \return fading value
    */
-  double DoGetFading (SatEnums::ChannelType_t channeltype);
+  double DoGetFading (Address macAddress, SatEnums::ChannelType_t channeltype);
 
   /**
    * \brief Function for unlocking the parameter set and state

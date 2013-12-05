@@ -59,6 +59,15 @@ public:
   } CarrierBandwidthType_t;
 
   /**
+   * Possible fading models
+   */
+  typedef enum
+  {
+    FADING_OFF, FADING_TRACE, FADING_MARKOV
+  } FadingModel_t;
+
+
+  /**
    * \enum SatModcod_t
    *
    * \brief Modulation scheme and coding rate for DVB-S2.

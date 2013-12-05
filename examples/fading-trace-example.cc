@@ -50,10 +50,12 @@ main (int argc, char *argv[])
 
   markovContainer->TraceConnect ("FadingTrace","The trace for fading values",MakeCallback (&FadingTraceCb));
 
+  Address macAddress;
+
   /// run simulation
   for (uint32_t i = 0; i < 100000; i++)
     {
-      Simulator::Schedule (MilliSeconds (1 * i), &SatMarkovContainer::DoGetFading, markovContainer, SatEnums::FORWARD_USER_CH);
+      Simulator::Schedule (MilliSeconds (1 * i), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
     }
 
   Simulator::Schedule (MilliSeconds (0), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);

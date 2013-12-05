@@ -168,7 +168,7 @@ SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
 }
 
 double
-SatMarkovContainer::DoGetFading (SatEnums::ChannelType_t channelType)
+SatMarkovContainer::DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << channelType);
 

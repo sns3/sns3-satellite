@@ -39,6 +39,7 @@ Ptr<SatInterferenceOutputTraceContainer> SatHelper::m_satIntfOutputTraceContaine
 Ptr<SatRxPowerInputTraceContainer> SatHelper::m_satRxPowerInputTraceContainer;
 Ptr<SatRxPowerOutputTraceContainer> SatHelper::m_satRxPowerOutputTraceContainer;
 Ptr<SatFadingOutputTraceContainer> SatHelper::m_satFadingOutputTraceContainer;
+Ptr<SatFadingInputTraceContainer> SatHelper::m_satFadingInputTraceContainer;
 Ptr<SatMacIdMacMapper> SatHelper::m_satMacIdMacMapper;
 
 NS_OBJECT_ENSURE_REGISTERED (SatHelper);
@@ -102,11 +103,14 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string satPos = scenarioName + "GeoPos.txt";
   std::string wfConf = "dvbRcs2Waveforms.txt";
 
+  /// TODO these should be moved to a different class
+  /// TODO trace objects should be created only when needed
   m_satIntfInputTraceContainer = CreateObject <SatInterferenceInputTraceContainer> ();
   m_satIntfOutputTraceContainer = CreateObject <SatInterferenceOutputTraceContainer> ();
   m_satRxPowerInputTraceContainer = CreateObject <SatRxPowerInputTraceContainer> ();
   m_satRxPowerOutputTraceContainer = CreateObject <SatRxPowerOutputTraceContainer> ();
   m_satFadingOutputTraceContainer = CreateObject <SatFadingOutputTraceContainer> ();
+  m_satFadingInputTraceContainer = CreateObject <SatFadingInputTraceContainer> ();
   m_satMacIdMacMapper = CreateObject <SatMacIdMacMapper> ();
 
   m_satConf = CreateObject<SatConf> ();
@@ -489,6 +493,7 @@ SatHelper::DoDispose()
   m_satRxPowerInputTraceContainer = NULL;
   m_satRxPowerOutputTraceContainer = NULL;
   m_satFadingOutputTraceContainer = NULL;
+  m_satFadingInputTraceContainer = NULL;
   m_satMacIdMacMapper = NULL;
 }
 

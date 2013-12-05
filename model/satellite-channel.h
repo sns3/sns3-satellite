@@ -63,6 +63,9 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  /**
+   * \brief
+   */
   typedef std::vector<Ptr<SatPhyRx> > PhyList;
 
   /**
@@ -156,6 +159,9 @@ public:
 
 private:
 
+  /**
+   *
+   */
   virtual void DoDispose ();
 
   /**
@@ -194,6 +200,13 @@ private:
    * \param phyRx The receiver SatPhyRx entity
    */
   void DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Function for getting the source MAC address from Rx parameters
+   * \param rxParams Rx parameters
+   * \return source MAC address
+   */
+  Mac48Address GetSourceAddress (Ptr<SatSignalParameters> rxParams);
 
   /**
    * \brief list of SatPhyRx instances attached to the channel

@@ -101,10 +101,11 @@ public:
 
   /**
    * \brief Get fading value
+   * \param macAddress MAC address
    * \param channelType channel type
    * \return
    */
-  double GetFadingValue (SatEnums::ChannelType_t channelType);
+  double GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType);
 
   /**
    * \brief Set fading container

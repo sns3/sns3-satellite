@@ -42,8 +42,12 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyTx);
 
 
-SatPhyTx::SatPhyTx ()
-  :m_state (IDLE)
+SatPhyTx::SatPhyTx () :
+  m_maxAntennaGain (),
+  m_state (IDLE),
+  m_beamId (),
+  m_txMode (),
+  m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -95,7 +99,7 @@ SatPhyTx::GetTypeId (void)
 }
 
 void
-SatPhyTx::SetMaxAntennaGain_Db(double gain_db)
+SatPhyTx::SetMaxAntennaGain_Db (double gain_db)
 {
   NS_LOG_FUNCTION (this);
   m_maxAntennaGain = SatUtils::DbToLinear (gain_db);
@@ -127,7 +131,7 @@ SatPhyTx::SetDefaultFadingValue (double fadingValue)
 }
 
 double
-SatPhyTx::GetFadingValue (SatEnums::ChannelType_t channelType)
+SatPhyTx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this);
 
@@ -135,7 +139,7 @@ SatPhyTx::GetFadingValue (SatEnums::ChannelType_t channelType)
 
   if (m_fadingContainer)
     {
-      fadingValue = m_fadingContainer->GetFading (channelType);
+      fadingValue = m_fadingContainer->GetFading (macAddress, channelType);
     }
   // Returns value 1 if fading is not set, as fading value is used as multiplier
   return fadingValue;

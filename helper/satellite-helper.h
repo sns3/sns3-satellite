@@ -38,6 +38,7 @@
 #include "ns3/satellite-interference-input-trace-container.h"
 #include "ns3/satellite-interference-output-trace-container.h"
 #include "ns3/satellite-fading-output-trace-container.h"
+#include "ns3/satellite-fading-input-trace-container.h"
 #include "ns3/satellite-mac-id-mac-mapper.h"
 
 namespace ns3 {
@@ -55,6 +56,7 @@ public:
   static Ptr<SatRxPowerInputTraceContainer> m_satRxPowerInputTraceContainer;
   static Ptr<SatRxPowerOutputTraceContainer> m_satRxPowerOutputTraceContainer;
   static Ptr<SatFadingOutputTraceContainer> m_satFadingOutputTraceContainer;
+  static Ptr<SatFadingInputTraceContainer> m_satFadingInputTraceContainer;
   static Ptr<SatMacIdMacMapper> m_satMacIdMacMapper;
 
   /**

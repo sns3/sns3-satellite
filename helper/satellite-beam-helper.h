@@ -60,18 +60,9 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Used fading model
-   */
-  enum FadingModel
-  {
-    FADING_OFF, FADING_MARKOV
-  };
-
-  /**
    * Default constructor for SatBeamHelper (should not be used).
    */
   SatBeamHelper ();
-
 
   /**
    * Constructor for SatBeamHelper.
@@ -242,7 +233,7 @@ private:
   /**
    * Configured fading model. Set as an attribute.
    */
-  SatBeamHelper::FadingModel m_fadingModel;
+  SatEnums::FadingModel_t m_fadingModel;
 
   /**
    * Common configuration for Markov model

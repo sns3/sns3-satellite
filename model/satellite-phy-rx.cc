@@ -39,7 +39,10 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRx);
 
-SatPhyRx::SatPhyRx ()
+SatPhyRx::SatPhyRx () :
+  m_maxAntennaGain (),
+  m_antennaLoss (),
+  m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -119,7 +122,7 @@ SatPhyRx::SetDefaultFadingValue (double fadingValue)
 }
 
 double
-SatPhyRx::GetFadingValue (SatEnums::ChannelType_t channelType)
+SatPhyRx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this);
 
@@ -127,7 +130,7 @@ SatPhyRx::GetFadingValue (SatEnums::ChannelType_t channelType)
 
   if (m_fadingContainer)
     {
-      fadingValue = m_fadingContainer->GetFading (channelType);
+      fadingValue = m_fadingContainer->GetFading (macAddress, channelType);
     }
   // Returns value 1 if fading is not set, as fading value is used as multiplier
   return fadingValue;

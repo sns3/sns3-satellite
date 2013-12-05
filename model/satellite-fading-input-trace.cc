@@ -17,36 +17,37 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-base-fading.h"
+#include "satellite-fading-input-trace.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatBaseFading");
+NS_LOG_COMPONENT_DEFINE ("SatFadingInputTrace");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatBaseFading);
+NS_OBJECT_ENSURE_REGISTERED (SatFadingInputTrace);
 
 TypeId 
-SatBaseFading::GetTypeId (void)
+SatFadingInputTrace::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatBaseFading")
-    .SetParent<Object> ();
+  static TypeId tid = TypeId ("ns3::SatFadingInputTrace")
+    .SetParent<SatBaseFading> ();
   return tid;
 }
 
-SatBaseFading::SatBaseFading ()
+SatFadingInputTrace::SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer) :
+  m_satFadingInputTraceContainer (satFadingInputTraceContainer)
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatBaseFading::~SatBaseFading ()
+SatFadingInputTrace::~SatFadingInputTrace ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 double
-SatBaseFading::GetFading (Address macAddress, SatEnums::ChannelType_t channelType)
+SatFadingInputTrace::DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  return DoGetFading (macAddress,channelType);
+  return m_satFadingInputTraceContainer->GetFadingValue (std::make_pair<Address,SatEnums::ChannelType_t> (macAddress,channelType));
 }
 
 } // namespace ns3
