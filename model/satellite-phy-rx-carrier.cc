@@ -197,6 +197,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
         {
           bool receivePacket = false;
           bool ownAddressFound = false;
+          Mac48Address source;
+          Mac48Address dest;
 
           for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
                 ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
@@ -204,15 +206,15 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               SatMacTag tag;
               (*i)->PeekPacketTag (tag);
 
-              m_destAddress = Mac48Address::ConvertFrom (tag.GetDestAddress ());
-              m_sourceAddress = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+              dest = Mac48Address::ConvertFrom (tag.GetDestAddress ());
+              source = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
 
-              if (( m_destAddress == m_ownAddress ))
+              if (( dest == m_ownAddress ))
                 {
                   receivePacket = true;
                   ownAddressFound = true;
                 }
-              else if ( m_destAddress.IsBroadcast () )
+              else if ( dest.IsBroadcast () )
                 {
                   receivePacket = true;
                 }
@@ -229,7 +231,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             case SatEnums::FORWARD_FEEDER_CH:
             case SatEnums::RETURN_USER_CH:
               {
-                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_sourceAddress);
+                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, source);
                 break;
               }
             case SatEnums::FORWARD_USER_CH:
@@ -252,7 +254,15 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
           if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
             {
-              NS_ASSERT (m_state == IDLE);
+              if (m_state != IDLE)
+                {
+                  NS_FATAL_ERROR ("Starting reception of a packet when not in IDLE state!");
+                }
+
+              // Now, we are starting to receive a packet, set the source and
+              // destination addresses of packet
+              m_destAddress = dest;
+              m_sourceAddress = source;
 
               m_satInterference->NotifyRxStart (m_interferenceEvent);
 
