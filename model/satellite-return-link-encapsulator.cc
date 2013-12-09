@@ -243,21 +243,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
               m_txBuffer.insert (m_txBuffer.begin (), firstSegment);
               m_txBufferSize += (*(m_txBuffer.begin()))->GetSize ();
             }
-          // No bytes left anymore
           else
             {
-              // Set end indicator
-              ppduHeader.SetEndIndicator ();
-
-              // Whole segment was taken, so adjust tag
-              if (newTag.GetStatus () == SatRlePduStatusTag::START_PPDU)
-                {
-                  newTag.SetStatus (SatRlePduStatusTag::FULL_PPDU);
-                }
-              else if (newTag.GetStatus () == SatRlePduStatusTag::CONTINUATION_PPDU)
-                {
-                  newTag.SetStatus (SatRlePduStatusTag::END_PPDU);
-                }
+              NS_FATAL_ERROR ("The full segment was taken even though we are in the fragmentation part of the code!");
             }
 
           // Segment is completely taken or
@@ -285,7 +273,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 
           newSegment = 0;
         }
-      // Packing functionality
+      // Packing functionality, for either a FULL_PPDU or END_PPDU
       else
         {
           // Add txBuffer.FirstBuffer to DataField
@@ -295,11 +283,18 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 
           nextSegmentSize -= dataFieldAddedSize;
 
-          // Add PPDU headrr
+          // Add PPDU header
           SatPPduHeader ppduHeader;
           ppduHeader.SetEndIndicator ();
           ppduHeader.SetFragmentId (m_txFragmentId);
           ppduHeader.SetPPduLength (firstSegment->GetSize());
+
+          SatRlePduStatusTag tag;
+          firstSegment->PeekPacketTag (tag);
+          if (tag.GetStatus() == SatRlePduStatusTag::FULL_PPDU)
+            {
+              ppduHeader.SetStartIndicator ();
+            }
 
           // Add PPDU header
           firstSegment->AddHeader (ppduHeader);
@@ -400,7 +395,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
           uint32_t lengthIndicator = fpduHeader.GetPPduLength (i);
 
           // Sanity check
-          if (p->GetSize() < lengthIndicator)
+         if (p->GetSize() < lengthIndicator)
             {
               NS_FATAL_ERROR ("Packet size is smaller than the fragment size!");
             }
@@ -484,17 +479,20 @@ SatReturnLinkEncapsulator::Reassemble ()
             {
               NS_FATAL_ERROR ("Fragmenting wrong fragment id!");
             }
+
           m_currRxPacketFragmentBytes += ppduHeader.GetPPduLength ();
 
           if (m_currRxPacketFragmentBytes != m_currRxPacketSize)
             {
               NS_FATAL_ERROR ("Total packet size wrong!");
             }
+
           m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
           m_rxBuffer.pop_front();
 
           m_rxCallback (m_currRxPacketFragment);
           m_currRxPacketFragment = 0;
+          m_currRxPacketFragmentBytes = 0;
         }
     }
 }

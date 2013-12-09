@@ -117,6 +117,7 @@ def build(bld):
         'test/satellite-antenna-pattern-test.cc',
         'test/satellite-mobility-observer-test.cc',
         'test/satellite-waveform-table-test.cc',
+        'test/satellite-rle-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
