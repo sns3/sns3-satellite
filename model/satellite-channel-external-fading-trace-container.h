@@ -31,7 +31,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Satellite channel fading trace container
+ * \brief Satellite channel external fading trace container
  */
 class SatChannelExternalFadingTraceContainer : public Object
 {

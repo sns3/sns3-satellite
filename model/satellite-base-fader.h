@@ -30,7 +30,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for Markov model faders
+ * \brief Base class for faders
  */
 class SatBaseFader : public Object
 {

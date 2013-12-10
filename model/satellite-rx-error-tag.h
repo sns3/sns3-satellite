@@ -27,7 +27,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements a tag that carries information wheter the packet was received correctly
+ * \brief This class implements a tag that carries information whether the packet was received correctly
  */
 class SatRxErrorTag : public Tag
 {

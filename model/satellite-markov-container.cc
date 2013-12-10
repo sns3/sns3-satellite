@@ -106,7 +106,7 @@ SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFa
               << " SatMarkovContainer - Creating SatMarkovContainer, States: " << m_numOfStates
               << " Elevation: " << m_currentElevation ()
               << " Current Set ID: " << m_currentSet
-              << " Cooldown Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
+              << " Cool down Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
               << " Minimum Position Change In Meters: " << m_minimumPositionChangeInMeters
   );
 }
@@ -178,7 +178,7 @@ SatMarkovContainer::DoGetFading (Address macAddress, SatEnums::ChannelType_t cha
 
   if (HasCooldownPeriodPassed (channelType))
     {
-      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Cooldown period has passed, calculating new fading value");
+      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Cool down period has passed, calculating new fading value");
 
       if (m_velocity () > 0)
         {
@@ -188,7 +188,7 @@ SatMarkovContainer::DoGetFading (Address macAddress, SatEnums::ChannelType_t cha
     }
   else
     {
-      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Cooldown period in effect, using old fading value");
+      NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovContainer - Cool down period in effect, using old fading value");
       fadingValue = GetCachedFadingValue (channelType);
     }
 

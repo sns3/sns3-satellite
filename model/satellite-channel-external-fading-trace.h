@@ -28,7 +28,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Satellite channel fading from a trace
+ * \brief Satellite channel external fading trace
  */
 class SatChannelExternalFadingTrace : public Object
 {
