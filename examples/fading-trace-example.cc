@@ -154,9 +154,17 @@ SatFadingExamplePlot::Run ()
 
   std::cout << "Output file written: " << plotFileName << std::endl;
 
-  system ("gnuplot fading_trace.plt");
+  int result = system ("gnuplot fading_trace.plt");
 
-  std::cout << "Output file converted to: fading_trace.png" << std::endl;
+  if (result < 0)
+    {
+      std::cout << "Unable to create shell process for file conversion" << std::endl;
+    }
+  else
+    {
+      std::cout << "Output file converted to: fading_trace.png" << std::endl;
+    }
+
 
   Simulator::Destroy ();
 }
