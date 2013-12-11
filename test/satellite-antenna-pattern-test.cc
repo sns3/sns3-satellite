@@ -18,11 +18,6 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-/**
- * \file satellite-antenna-pattern-test.cc
- * \brief Test cases to unit test Satellite Antenna Pattern
- */
-
 #include "ns3/log.h"
 #include "ns3/test.h"
 #include "ns3/simulator.h"
@@ -31,8 +26,11 @@
 using namespace ns3;
 
 /**
- * \brief Test case to unit test satellite antenna patterns
+ * \brief Satellite antenna pattern test case implementation.
  *
+ * This case creates the antenna gain patterns classes and compares the
+ * antenna gain values and best beam ids for the test positions (= GW positions
+ * of the 72 beam reference system).
  */
 class SatAntennaPatternTestCase : public TestCase
 {
@@ -111,9 +109,7 @@ SatAntennaPatternTestCase::DoRun (void)
     }
 }
 
-/**
- * \brief Test suite for Satellite free space loss unit test cases.
- */
+//Test suite for testing the satellite antenna gain patterns
 class SatAntennaPatternTestSuite : public TestSuite
 {
 public:

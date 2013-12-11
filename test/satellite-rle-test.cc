@@ -19,8 +19,9 @@
  */
 
 /**
+ * \ingroup satellite
  * \file satellite-rle-test.cc
- * \brief Test cases to unit test RLE
+ * \brief Return Link Encapsulator test suite
  */
 
 #include <vector>
@@ -35,8 +36,15 @@
 using namespace ns3;
 
 /**
- * \brief Test case to unit test RLE
+ * \brief Return Link Encapsulation (RLE) test case implementation.
  *
+ * Expected results
+ * - 100 packets of random size (in bytes) are generated and enqued to RLE
+ * - NotifyTxOpportunity is called with random size (in bytes) until all the packets have been
+ *   dequed from RLE. RLE performs encapsulation, fragmentation and packing if needed.
+ * - Packets are forwarded to the receive functionality of RLE, where they are reassembled
+ * - The same amount of packets have to be received as were transmitted
+ * - The packet sizes of each enqued HL packet has to be the same as the received (reassembled) packet
  */
 class SatRleTestCase : public TestCase
 {

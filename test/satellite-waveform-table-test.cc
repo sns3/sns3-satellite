@@ -19,8 +19,9 @@
  */
 
 /**
- * \file satellite-antenna-pattern-test.cc
- * \brief Test cases to unit test Satellite Antenna Pattern
+ * \ingroup satellite
+ * \file satellite-waveform-table-test.cc
+ * \brief Waveform table test suite
  */
 
 #include "ns3/log.h"
@@ -34,8 +35,14 @@
 using namespace ns3;
 
 /**
- * \brief Test case to unit test satellite antenna patterns
+ * \ingroup satellite
+ * \brief Test case to unit test the waveform configuration table for DVB-RCS2
  *
+ * Expected result:
+ * - Creates link results and waveform config instances for DVB-RCS2
+ * - Calculates the best waveform ids for a range of C/Nos from 60 to 70 dBs
+ * - If waveform is not found or the waveform id is not expected, the test
+ *   case shall fail
  */
 class SatWaveformTableTestCase : public TestCase
 {
