@@ -115,12 +115,6 @@ SatInputFileStreamTimeDoubleContainer::UpdateContainer (std::string filename, st
       NS_ABORT_MSG("Input stream is not valid for reading.");
     }
 
-  /**
-  for (uint32_t i = 0; i < m_container.size (); i++)
-    {
-      std::cout << m_container[i].at (0) << " " << m_container[i].at (1) << std::endl;
-    }
-    */
   CheckContainerSanity ();
 
   ResetStream ();
@@ -175,7 +169,7 @@ SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
-  while (!FindNextClosest(m_currentPosition,m_timeColumn,m_shiftValue, Now ().GetDouble()))
+  while (!FindNextClosest(m_currentPosition,m_timeColumn,m_shiftValue, Now ().GetSeconds ()))
     {
       m_currentPosition = 0;
       m_numOfPasses++;
@@ -186,7 +180,7 @@ SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
 
   if (m_numOfPasses > 0)
     {
-      std::cout << "WARNING! - SatInputFileStreamDoubleContainer for " << m_fileName << " is out of samples @ time sample " << Now ().GetDouble() << " (passes "<< m_numOfPasses << ")" << std::endl;
+      std::cout << "WARNING! - SatInputFileStreamDoubleContainer for " << m_fileName << " is out of samples @ time sample " << Now ().GetSeconds () << " (passes "<< m_numOfPasses << ")" << std::endl;
       std::cout << "The container will loop samples from the beginning." << std::endl;
     }
 
@@ -210,8 +204,8 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
     {
       if (m_container[i].at (column) + shiftValue >= comparisonValue)
         {
-          double difference1 = fabs(m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
-          double difference2 = fabs(m_container[i].at (column) + shiftValue - comparisonValue);
+          double difference1 = fabs (m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
+          double difference2 = fabs (m_container[i].at (column) + shiftValue - comparisonValue);
 
           if (difference1 < difference2)
             {
@@ -229,8 +223,8 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
 
   if (valueFound && m_numOfPasses > 0 && m_currentPosition == 0)
     {
-      double difference1 = fabs(m_container[m_currentPosition].at (column) + shiftValue - comparisonValue);
-      double difference2 = fabs(m_container[m_container.size() - 1].at (column) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (column)) - comparisonValue);
+      double difference1 = fabs (m_container[m_currentPosition].at (column) + shiftValue - comparisonValue);
+      double difference2 = fabs (m_container[m_container.size() - 1].at (column) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (column)) - comparisonValue);
 
       if (difference1 > difference2)
         {

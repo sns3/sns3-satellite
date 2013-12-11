@@ -195,7 +195,7 @@ void
 SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   std::vector<double> tempVector;
-  tempVector.push_back (Now ().GetDouble ());
+  tempVector.push_back (Now ().GetSeconds ());
   tempVector.push_back (rxParams->m_rxPower_W / rxParams->m_carrierFreq_hz);
 
   switch (m_channelType)
@@ -249,7 +249,7 @@ void
 SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue)
 {
   std::vector<double> tempVector;
-  tempVector.push_back (Now ().GetDouble ());
+  tempVector.push_back (Now ().GetSeconds ());
   tempVector.push_back (fadingValue);
 
   switch (m_channelType)

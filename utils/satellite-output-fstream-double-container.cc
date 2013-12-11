@@ -221,10 +221,7 @@ SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
           {
             for (uint32_t i = 0; i < m_container.size (); i++)
               {
-                for( uint32_t j = 0; j < m_valuesInRow; j++ )
-                  {
-                    ret.Add (m_container[i].at (0), ConvertValue (m_container[i].at (1)));
-                  }
+                ret.Add (m_container[i].at (0), ConvertValue (m_container[i].at (1)));
               }
             break;
           }
