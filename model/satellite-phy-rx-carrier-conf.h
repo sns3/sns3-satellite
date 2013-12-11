@@ -119,21 +119,25 @@ public:
 
   /**
    * Get the number of configured carriers
+   * \return the number of configured carriers
    */
   uint32_t GetCarrierCount () const;
 
   /**
    * Get configured error model
+   * \return configured error model
    */
   ErrorModel GetErrorModel () const;
 
   /**
    * Get configured interference model
+   * \return configured interference model
    */
   InterferenceModel GetInterferenceModel () const;
 
   /**
    * Get configured link results
+   * \return configured link results
    */
   Ptr<SatLinkResults> GetLinkResults () const;
 
@@ -149,27 +153,31 @@ public:
 
   /**
    * Get configured RX noise temperature
+   * \return configured RX noise temperature
    */
   double GetRxTemperatureK () const;
 
   /**
    * Get other system RX noise
+   * \return other system RX noise
    */
   double GetExtPowerDensityDbwhz () const;
 
   /**
    * Get adjacent channel interference wrt noise (percent)
+   * \return adjacent channel interference wrt noise (percent)
    */
   double GetRxAciInterferenceWrtNoise () const;
 
   /**
    * Get configured RX mode
+   * \return configured RX mode
    */
   RxMode GetRxMode () const;
 
   /**
    * \brief Function for getting the error rate for constant error model
-   * \return
+   * \return error rate for constant error model
    */
   double GetConstantErrorRate () const;
 

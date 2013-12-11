@@ -257,8 +257,7 @@ public:
   /**
    * Get time slot count of the frame.
    *
-   * \param index Id of the time slot requested.
-   * \return      The requested time slot conf of frame.
+   * \return      The requested time slot count of frame.
    */
   inline uint32_t GetTimeSlotCount () const { return m_timeSlotConfs.size(); }
 
@@ -268,7 +267,7 @@ public:
    * \param index Id of the time slot requested.
    * \return      The requested time slot conf of frame.
    */
-  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t id) const;
+  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
 
   /**
    * Get time slot ids of the specific carrier.

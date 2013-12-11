@@ -70,7 +70,7 @@ public:
 
   /**
    * \brief
-   * \param
+   * \param id
    * \return
    */
   Address GetMac (uint32_t id);

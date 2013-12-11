@@ -168,8 +168,8 @@ public:
 
   /**
    * Enables creation traces to be written in given file
-   * /param stream  stream for creation trace outputs
-   * /param cb  callback to connect traces
+   * \param stream  stream for creation trace outputs
+   * \param cb  callback to connect traces
    */
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 

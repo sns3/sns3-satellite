@@ -64,12 +64,14 @@ private:
   /**
    * Create the UT fading traces for a certain number of UTs (defined by
    * the creator of this class).
+   * \param numUts number of UTs
    */
   void CreateUtFadingTraces (uint32_t numUts);
 
   /**
    * Create the GW fading traces for a certain number of GWs (defined by
    * the creator of this class).
+   * \param numGws number of GWs
    */
   void CreateGwFadingTraces (uint32_t numGws);
 

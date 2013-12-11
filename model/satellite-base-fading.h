@@ -65,6 +65,7 @@ public:
 
   /**
    * \brief Function for getting the fading value
+   * \param macAddress
    * \param channelType channel type
    * \return fading value
    */
@@ -72,6 +73,7 @@ public:
 
   /**
    * \brief Function for getting the fading value
+   * \param macAddress
    * \param channelType channel type
    * \return fading value
    */

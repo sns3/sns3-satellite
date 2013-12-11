@@ -76,12 +76,13 @@ public:
   
   /*
    * Set the transmit antenna gain pattern.
+   * \param agp antenna gain pattern
    */
   void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
    * Set the maximum Antenna gain in Db
-   * /param gain_Db maximum antenna gain in Dbs
+   * \param gain_db maximum antenna gain in Dbs
    */
   void SetMaxAntennaGain_Db (double gain_db);
 
@@ -89,7 +90,8 @@ public:
    * Get antenna gain based on position
    * or in case that antenna pattern is not configured, maximum configured gain is return
    *
-   * /param mobility  Mobility used to get gain from antenna pattern
+   * \param mobility  Mobility used to get gain from antenna pattern
+   * \return antenna gain
    */
   double GetAntennaGain (Ptr<MobilityModel> mobility);
 

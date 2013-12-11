@@ -45,10 +45,11 @@ public:
 
   /**
    * Constructor for SatWaveform
-   * \param modulated bits
-   * \param coding rate
-   * \param payload in bytes
-   * \param duration in symbols
+   * \param wfId waveform id
+   * \param modulatedBits modulated bits
+   * \param codingRate coding rate
+   * \param payloadBytes payload in bytes
+   * \param lengthInSymbols duration in symbols
    */
   SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols);
 
@@ -72,25 +73,29 @@ public:
 
   /**
    * Get/calculate the burst duration of a waveform based on symbol rate
-   * \param symbol rate
+   * \param symbolRateInBaud symbol rate
    * \return burst duration in seconds
    */
   double GetBurstDurationInSeconds (double symbolRateInBaud) const;
 
   /**
    * Get/calculate the spectral efficiency of a waveform
+   * \param carrierBandwidthInHz
+   * \param symbolRateInBaud symbol rate
    * \return spectral efficiency in bits/s/Hz
    */
   double GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
   /**
    * Get/calculate the throughput of a waveform based on symbol rate
+   * \param symbolRateInBaud symbol rate
    * \return throughput in bits per second
    */
-  double GetThroughputInBitsPerSecond (double symbolRateBaud) const;
+  double GetThroughputInBitsPerSecond (double symbolRateInBaud) const;
 
   /**
    * Get the C/No threshold of the waveform in linear domain
+   * \param symbolRateInBaud symbol rate
    * \return C/No threshold
    */
   double GetCNoThreshold (double symbolRateInBaud) const;
@@ -98,7 +103,7 @@ public:
   /**
    * Set the EsNo threshold of the waveform  in linear domain
    * based on the used link results
-   * \param EsNo threshold
+   * \param esnoThreshold EsNo threshold
    */
   void SetEsNoThreshold (double esnoThreshold);
 
@@ -171,7 +176,7 @@ public:
   /**
    * Initialize the Es/No requirements of the waveforms based on
    * the used DVB-RCS2 link results.
-   * \param Pointer to DVB-RCS2 link results
+   * \param linkResults Pointer to DVB-RCS2 link results
    */
   void InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
 
@@ -218,7 +223,7 @@ private:
 
   /**
    * Read the waveform table from a file
-   * \param path and file name
+   * \param filePathName path and file name
    */
   void ReadFromFile (std::string filePathName);
 

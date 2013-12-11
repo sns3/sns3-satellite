@@ -38,7 +38,7 @@ public:
 
   /**
    * Set PPDU status
-   * \return status PpduStatus_t
+   * \param status PpduStatus_t
    */
   void SetStatus (uint8_t status);
 

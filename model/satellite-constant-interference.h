@@ -52,6 +52,7 @@ private:
    *
    * \param rxDuration Duration of the receiving.
    * \param rxPower Receiving power.
+   * \param rxAddress
    *
    * \return the pointer to interference event as a reference of the addition
    */

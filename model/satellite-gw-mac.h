@@ -137,7 +137,6 @@ private:
     * The TransmitStart method is the method that is used internally in the
     * SatGwMac to begin the process of sending a packet out on the phy layer.'
     *
-    * \param p a reference to the packet to send
     * \param carrierId id of the carrier.
     * \returns true if success, false on failure
     */
@@ -150,16 +149,17 @@ private:
 
    /**
     * Create short or normal frame according to byteCount and
-    * according to \member m_bbFrameUsageMode.
+    * according to member #m_bbFrameUsageMode.
     *
-    * \param Used MODCOD for frame.
-    * \param byteCount
+    * \param modCod Used MODCOD for frame.
+    * \param byteCount byte count
     * \return Pointer to created frame.
     */
    Ptr<SatBbFrame> CreateFrame (uint32_t modCod, uint32_t byteCount) const;
 
    /**
     * Create dummy frame. Dummy frame is sent when there is nothing else to send.
+    * \return dummy frame
     */
    Ptr<SatBbFrame> CreateDummyFrame () const;
 

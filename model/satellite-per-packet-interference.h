@@ -55,7 +55,6 @@ public:
 
   /**
    *
-   * \param mac
    * \param channeltype
    * \param rxBandwidth
    */
@@ -73,7 +72,7 @@ public:
 
   /**
    *
-   * \param bandwidth
+   * \param rxBandwidth
    */
   void SetRxBandwidth (double rxBandwidth);
 

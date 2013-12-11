@@ -76,14 +76,14 @@ public:
   /**
    * Attach the a Net Device to SatMac.
    *
-   * \param phy Ptr to the attached Net Device object.
+   * \param queue Ptr to the attached Net Device object.
    */
   void SetQueue (Ptr<Queue> queue);
 
   /**
    * Get a copy of the attached Queue.
    *
-   * @returns Ptr to the queue.
+   * \return Ptr to the queue.
    */
   Ptr<Queue> GetQueue (void) const;
 
@@ -132,6 +132,8 @@ public:
    * Add an encapsulator entry for the LLC
    * Key = UT's MAC address
    * Value = encap entity
+   * \param macAddr UT's MAC address
+   * \param enc encap entity
    */
   void AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc);
 
@@ -139,6 +141,8 @@ public:
    * Add an decapsulator entry for the LLC
    * Key = UT's MAC address
    * Value = decap entity
+   * \param macAddr UT's MAC address
+   * \param dec decap entity
    */
   void AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec);
 

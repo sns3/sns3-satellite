@@ -79,7 +79,7 @@ public:
    * Receive a packet, thus decapsulate and defragment/deconcatenate
    * if needed. The formulated HL PDU is forwarded back to LLC and
    * to upper layer.
-   * \param Ptr<Packet> packet pointer received from lower layer
+   * \param p packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
 

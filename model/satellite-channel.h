@@ -86,7 +86,7 @@ public:
 
   /**
    * \brief Get the  propagation delay model to be used in the SatChannel
-   * \param Ptr to the propagation delay model to be used.
+   * \return Ptr to the propagation delay model to be used.
    */
   virtual Ptr<PropagationDelayModel> GetPropagationDelayModel ();
 
@@ -100,7 +100,7 @@ public:
   /**
    * \brief Set the frequency id of the channel.
    *
-   * \param frequencyId The frequency id of the channel.
+   * \param freqId The frequency id of the channel.
    */
   virtual void SetFrequencyId (uint32_t freqId);
 
@@ -140,7 +140,7 @@ public:
   /**
    * This method is used to remove a SatPhyRx instance from a
    * SatChannel instance, e.g. due to a spot-beam handover
-   * \param phy the SatPhyRx instance to be removed from the channel.
+   * \param phyRx the SatPhyRx instance to be removed from the channel.
    */
   virtual void RemoveRx (Ptr<SatPhyRx> phyRx);
 
@@ -152,8 +152,8 @@ public:
 
   /**
    *
-   *\@param i
-   *\@return
+   * \param i
+   * \return
    */
   virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
 

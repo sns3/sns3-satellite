@@ -93,12 +93,14 @@ public:
 
   /**
    * Get free bytes in transmit buffer.
+   * \return free bytes in transmit buffer
    */
   uint32_t GetBytesLeft () const ;
 
   //TODO: Needed to calculate according to MODCOD
   /**
    * Get duration of the frame transmission.
+   * \return duration of the frame transmission
    */
   inline Time GetDuration () const {return m_duration;}
 

@@ -39,6 +39,8 @@ public:
   SatConstantPropagationDelayModel ();
 
   /**
+   * \param a the source
+   * \param b the destination
    * \returns the propagation delay (s).
    */
   virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;

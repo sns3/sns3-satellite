@@ -53,7 +53,7 @@ public:
 
   /**
    * \brief Function for getting the fading value
-   * \param channelType channel type
+   * \param set parameter set
    * \return fading value
    */
   virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;

@@ -113,7 +113,7 @@ public:
 
   /**
    * Set the noise temperature of the receiver in dbK.
-   * \param temperatureDbK the receiver noise temperature in dbK.
+   * \param temperatureDbk the receiver noise temperature in dbK.
    */
   inline void SetRxNoiseTemperatureDbk (double temperatureDbk) { m_rxNoiseTemperatureDbk = temperatureDbk; }
 
@@ -227,11 +227,13 @@ public:
 
   /**
    * Set the transmit antenna gain pattern.
+   * \param agp antenna gain pattern
    */
   virtual void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
-   * Set the transmit antenna gain pattern.
+   * Set the receive antenna gain pattern.
+   * \param agp antenna gain pattern
    */
   virtual void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
@@ -278,13 +280,13 @@ public:
 
   /**
    * Set the SatPhyRx module
-   * \param phyTx Receiver PHY module
+   * \param phyRx Receiver PHY module
    */
   virtual void SetPhyRx (Ptr<SatPhyRx> phyRx);
 
   /**
-   * Set the Tx satellite channel
-   * \param c the Tx channel
+   * Get the Tx satellite channel
+   * \return the Tx channel
    */
   Ptr<SatChannel> GetTxChannel ();
 

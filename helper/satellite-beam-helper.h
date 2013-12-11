@@ -88,7 +88,7 @@ public:
    * and user forward (Tx gain) links. Antenna gain patterns are not utilized
    * in feeder link at all.
    *
-   * \param pointer to antenna gain pattern container
+   * \param antennaPatterns to antenna gain pattern container
    */
   void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaPatterns);
 
@@ -129,7 +129,7 @@ public:
 
   /**
    * \param ut a set of UT nodes
-   * \param node pointer of GW node
+   * \param gwNode pointer of GW node
    * \param gwId id of the GW
    * \param beamId  id of the beam
    * \param ulFreqId id of the user link frequency
@@ -142,12 +142,12 @@ public:
   Ptr<Node> Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
 
   /**
-   * /return A container having all GW nodes in satellite network.
+   * \return A container having all GW nodes in satellite network.
    */
   NodeContainer GetGwNodes ();
 
   /**
-   * /return A container having all UT nodes in satellite network.
+   * \return A container having all UT nodes in satellite network.
    */
   NodeContainer GetUtNodes ();
 
@@ -159,14 +159,14 @@ public:
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
   /**
-   * /return info of created beams as std::string.
+   * \return info of created beams as std::string.
    */
   std::string GetBeamInfo ();
 
   /**
    * \param printMacAddress flag to indicated, if mac addresses of the UTs is wanted to print.
    *
-   * /return info of UT positions
+   * \return info of UT positions
    */
   std::string GetUtPositionInfo (bool printMacAddress);
 
@@ -175,14 +175,14 @@ public:
    * In case that GW is not found NULL is returned.
    *
    * \param id ID of the GW
-   * /return pointer to found GW node or NULL.
+   * \return pointer to found GW node or NULL.
    */
   Ptr<Node> GetGwNode (uint32_t id);
 
   /**
    * Gets Geo Satellite node.
    *
-   * /return pointer to Geo Satellite node.
+   * \return pointer to Geo Satellite node.
    */
   Ptr<Node> GetGeoSatNode ();
 
@@ -242,7 +242,7 @@ private:
 
   /**
    * Creates info of the beam.
-   * /returns info for beams as std::string.
+   * \return info for beams as std::string.
    */
   std::string CreateBeamInfo ();
 
@@ -252,6 +252,7 @@ private:
    * \param chPairMap map where channel pair is get
    * \param frequencyId ID of the frequency
    * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
+   * \return satellite channel pair from requested map
    */
   ChannelPair_t GetChannelPair (std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
 
@@ -261,7 +262,7 @@ private:
    * \param id ID of the GW
    * \param node pointer to the GW
    *
-   * /return result of storing
+   * \return result of storing
    */
   bool StoreGwNode (uint32_t id, Ptr<Node> node);
 
@@ -270,7 +271,7 @@ private:
    * \param ut    container having UTs of the beam
    * \param utNd  container having UT netdevices of the beam
    * \param gw    pointer to gateway node
-   * \param gw    pointer to gateway netdevice
+   * \param gwNd  pointer to gateway netdevice
    * \param gwAddr address of the gateway
    * \param utIfs container having UT ipv2 interfaces (for addresses)
    */

@@ -46,16 +46,16 @@ public:
 
   /**
    * Get the antenna pattern of a specified beam id
-   * /param beamId Beam identifier
-   * /return the antenna gain pattern instance of the specified beam id
+   * \param beamId Beam identifier
+   * \return the antenna gain pattern instance of the specified beam id
    */
   Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
 
   /**
    * Get the best beam id based on the antenna patterns in a
    * specified geo coordinate
-   * /param coord Geo coordinate
-   * /return best beam id in the specified geo coordinate
+   * \param coord Geo coordinate
+   * \return best beam id in the specified geo coordinate
    */
   uint32_t GetBestBeamId (GeoCoordinate coord) const;
 

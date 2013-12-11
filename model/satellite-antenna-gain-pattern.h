@@ -46,7 +46,6 @@ public:
 
   /**
    * Calculate the antenna gain value for a certain {latitude, longitude} point
-   * \param filePathName Path and file name of the antenna pattern file
    * \return The gain value
    */
   double GetAntennaGain_lin (GeoCoordinate coord) const;

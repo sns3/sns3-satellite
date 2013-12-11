@@ -62,7 +62,7 @@ public:
   /**
    * Receive the packet from the lower layers
    * \param packets Container of pointers to the packets to be received.
-   * \param beamId the id of the beam where packet is from
+   * \param rxParams Packet transmission parameters
    */
   void ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 

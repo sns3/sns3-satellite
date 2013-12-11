@@ -147,30 +147,30 @@ public:
   NodeContainer InstallGw (NodeContainer gw , uint32_t users);
 
   /**
-   * /return A container having all GW user nodes in satellite network.
+   * \return A container having all GW user nodes in satellite network.
    */
   NodeContainer GetGwUsers();
 
   /**
-   * /return A container having all UT nodes in satellite network.
+   * \return A container having all UT nodes in satellite network.
    */
   NodeContainer GetUtUsers();
 
   /**
-   * /return number of GW users in satellite network.
+   * \return number of GW users in satellite network.
    */
   uint32_t GetGwUserCount();
 
   /**
-   * /return number of UT users in satellite network.
+   * \return number of UT users in satellite network.
    */
   uint32_t GetUtUserCount();
 
   /**
    * Enables creation traces to be written in given file
    *
-   * /param stream  stream for creation trace outputs
-   * /param cb  callback to connect traces
+   * \param stream  stream for creation trace outputs
+   * \param cb  callback to connect traces
    */
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
@@ -179,21 +179,24 @@ private:
   /**
    * Install network between UT and its users
    *
-   * /param c nodecontainer having UT and its users
+   * \param c nodecontainer having UT and its users
+   * \return container of the installed net devices
    */
   NetDeviceContainer InstallSubscriberNetwork (const NodeContainer &c ) const;
 
   /**
    * Install network between GW and Router (or users) or Router and its users.
    *
-   * /param c nodecontainer having UT and its users
+   * \param c nodecontainer having UT and its users
+   * \return container of the installed net devices
    */
   NetDeviceContainer InstallBackboneNetwork (const NodeContainer &c ) const;
 
   /**
    * Install ideal network.
    *
-   * /param c nodecontainer having UT and its users
+   * \param c nodecontainer having UT and its users
+   * \return container of the installed net devices
    */
   NetDeviceContainer InstallIdealNetwork (const NodeContainer &c ) const;
 
@@ -215,8 +218,8 @@ private:
   /**
    * Install IP router to to Gateways. Creates csma link between gateways and router.
    *
-   * /param gw      container having GWs
-   * /param router  pointer to IP router
+   * \param gw      container having GWs
+   * \param router  pointer to IP router
    */
   void InstallRouter(NodeContainer gw, Ptr<Node> router);
 };

@@ -147,8 +147,8 @@ public:
 
   /**
    * Enables creation traces to be written in given file
-   * /param filename  name to the file for trace writing
-   * /param details true means that lower layer details are printed also,
+   * \param filename  name to the file for trace writing
+   * \param details true means that lower layer details are printed also,
    *                false means that only creation summary is printed
    */
   void EnableCreationTraces(std::string filename, bool details);
@@ -166,14 +166,14 @@ private:
   void EnableDetailedCreationTraces ();
   /**
    * Sink for creation details traces
-   * /param stream stream for traces
-   * /param context context for traces
-   * /param info creation info
+   * \param stream stream for traces
+   * \param context context for traces
+   * \param info creation info
    */
   static void CreationDetailsSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
   /**
    * Sink for creation summary traces
-   * /param title creation summary title
+   * \param title creation summary title
    */
   void CreationSummarySink (std::string title);
   /**
@@ -196,37 +196,37 @@ private:
 
   /**
    * Creates satellite objects according to given beam info.
-   * /param beamInfos information of the beam to create (and beams which are given in map)
-   * /param gwUsers number of the users in GW(s) side
+   * \param beamInfos information of the beam to create (and beams which are given in map)
+   * \param gwUsers number of the users in GW(s) side
    */
   void DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
-   * /param title title for summary
-   * /returns std::string as summary
+   * \param title title for summary
+   * \returns std::string as summary
    */
   std::string CreateCreationSummary(std::string title);
 
   /**
    * Sets mobilities to created GW nodes.
    *
-   * /param gws node container of UTs to set mobility
+   * \param gws node container of UTs to set mobility
    */
   void SetGwMobility (NodeContainer gws);
 
   /**
    * Sets mobility to created Sat Geo node.
    *
-   * /param node node pointer of Geo Satellite to set mobility
+   * \param node node pointer of Geo Satellite to set mobility
    */
   void SetGeoSatMobility(Ptr<Node> node);
 
   /**
    * Sets mobility to created UT nodes.
    *
-   * /param uts node container of UTs to set mobility
-   * /param the spot-beam id, where the UTs should be placed
+   * \param uts node container of UTs to set mobility
+   * \param beamId the spot-beam id, where the UTs should be placed
    *
    */
   void SetUtMobility (NodeContainer uts, uint32_t beamId);

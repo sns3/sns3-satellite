@@ -57,6 +57,7 @@ public:
 
   /*
    * Set the receive antenna gain pattern.
+   * \param agp antenna gain pattern
    */
   void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
@@ -65,7 +66,7 @@ public:
 
   /**
    * Set the maximum Antenna gain in Db
-   * /param gain_Db maximum antenna gain in Dbs
+   * \param gain_Db maximum antenna gain in Dbs
    */
   void SetMaxAntennaGain_Db (double gain_Db);
 
@@ -73,7 +74,8 @@ public:
    * Get antenna gain based on position
    * or in case that antenna pattern is not configured, maximum configured gain is return
    *
-   * /param mobility  Mobility used to get gain from antenna pattern
+   * \param mobility  Mobility used to get gain from antenna pattern
+   * \return antenna gain
    */
   double GetAntennaGain (Ptr<MobilityModel> mobility);
 
@@ -99,14 +101,14 @@ public:
 
   /**
    * Set the Antenna loss in Db
-   * /param loss_Db antenna loss in Dbs
+   * \param loss_Db antenna loss in Dbs
    */
   void SetAntennaLoss_Db (double loss_Db);
 
   /**
    * Get configures RX losses, currently only antenna loss used.
    *
-   * /return  Antenna loss in linear
+   * \return  Antenna loss in linear
    */
   double GetLosses ();
 

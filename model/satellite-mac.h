@@ -66,10 +66,10 @@ public:
 
   /**
    * Callback to send packet to lower layer.
-    * \param Coitainer of the pointers to the packets received
-    * \param uint32_t carrierId
-    * \param  Time duration
-    */
+   * \param Coitainer of the pointers to the packets received
+   * \param uint32_t carrierId
+   * \param  Time duration
+   */
   typedef Callback<void, SatPhy::PacketContainer_t, uint32_t, Time> TransmitCallback;
 
   /**
@@ -81,16 +81,16 @@ public:
 
   /**
    * Method to set transmit callback.
-    * \param cb callback to invoke whenever a packet needs to be sent
-    * to lower layer (PHY)
-    */
+   * \param cb callback to invoke whenever a packet needs to be sent
+   * to lower layer (PHY)
+   */
   void SetTransmitCallback (SatMac::TransmitCallback cb);
 
   /**
    * Method to set receive callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    */
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
   /**
@@ -103,14 +103,14 @@ public:
 
   /**
    * Method to set Tx opportunity callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    *
-    */
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
   void SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb);
 
   /**
    * Set the address of this MAC
+   * \param macAddress the address of this MAC
    */
   void SetAddress (Mac48Address macAddress);
 
@@ -129,15 +129,15 @@ protected:
    */
   void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration);
 
-   /**
-    * MAC address of the this mac instance (node)
-    */
-   Mac48Address m_macAddress;
+  /**
+   * MAC address of the this mac instance (node)
+   */
+  Mac48Address m_macAddress;
 
-   /**
-    * The lower layer packet transmit callback.
-    */
-   SatMac::TransmitCallback m_txCallback;
+  /**
+   * The lower layer packet transmit callback.
+   */
+  SatMac::TransmitCallback m_txCallback;
 
   /**
    * The upper layer package receive callback.

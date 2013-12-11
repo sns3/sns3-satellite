@@ -47,7 +47,7 @@ public:
   /**
    * \param latitude latitude of position
    * \param longitude longitude of position
-   * \param altitute altitute of position
+   * \param altitude altitude of position
    *
    * Creates GeoCoordinate from given latitude, longitude and altitude decimal degree values.
    * Reference ellipsoide to be used is sphere.
@@ -64,7 +64,7 @@ public:
   /**
    * \param latitude latitude of position
    * \param longitude longitude of position
-   * \param altitute altitute of position
+   * \param altitude altitude of position
    * \param refEllipsoide Reference ellipsoide to be used
    *
    * Creates GeoCoordinate from given latitude, longitude and altitude decimal degree values
@@ -79,14 +79,14 @@ public:
   GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoide_t refEllipsoide);
 
   /**
-   * \param vector, coordinates as Vector (x,y,z) (Cartesian)
+   * \param vector coordinates as Vector (x,y,z) (Cartesian)
    *
    * Creates GeoCoordinate from given vector (x,y,z). Reference ellipsoide to be used is sphere.
    */
   GeoCoordinate (Vector vector);
 
   /**
-   * \param vector, coordinates as Vector (x,y,z) (Cartesian)
+   * \param vector coordinates as Vector (x,y,z) (Cartesian)
    * \param refEllipsoide Reference ellipsoide to be used
    *
    * Creates GeoCoordinate from given vector (x,y,z)
@@ -197,9 +197,9 @@ private:
   /**
    * \param latitude latitude of position
    * \param longitude longitude of position
-   * \param altitute altitute of position
+   * \param altitude altitude of position
    *
-   * Helper for cnstructor to create GeoCoordinate from given latitude, longitude and altitude decimal degree values.
+   * Helper for constructor to create GeoCoordinate from given latitude, longitude and altitude decimal degree values.
    *
    * Accepted values:
    *

@@ -48,13 +48,13 @@ public:
   typedef std::vector< Ptr<Packet> > TransmitBuffer_t;
   
   /**
-  * default constructor
-  */
+   * default constructor
+   */
   SatSignalParameters ();
   
   /**
-    * copy constructor
-    */
+   * copy constructor
+   */
   SatSignalParameters (const SatSignalParameters& p);
 
   Ptr<SatSignalParameters> Copy ();

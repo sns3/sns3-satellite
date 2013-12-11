@@ -48,10 +48,8 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   *
-   * \param traceContainer
-   * \param mac
    * \param channeltype
+   * \param rxBandwidth
    */
   SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth);
 
@@ -72,7 +70,7 @@ public:
 
   /**
    *
-   * \param bandwidth
+   * \param rxBandwidth
    */
   void SetRxBandwidth (double rxBandwidth);
 
@@ -84,6 +82,7 @@ private:
    *
    * \param rxDuration Duration of the receiving.
    * \param rxPower Receiving power.
+   * \param rxAddress
    *
    * \return the pointer to interference event as a reference of the addition
    */

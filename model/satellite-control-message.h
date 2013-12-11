@@ -234,6 +234,7 @@ public:
 
   /**
    * Constructor for SatTbtpHeader to construct TBTP with given sequency id.
+   * \param seqId sequency id
    */
   SatTbtpHeader ( uint8_t seqId );
 

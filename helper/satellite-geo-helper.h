@@ -93,6 +93,8 @@ public:
    *
    * This method creates a ns3::SatGeoNetDevices with the requested attributes
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
+   *
+   * \return container to the created devices
    */
   NetDeviceContainer Install (NodeContainer c);
 
@@ -101,6 +103,8 @@ public:
    *
    * This method creates a ns3::SatGeoNetDevice with the requested attributes
    * and associate the resulting ns3::NetDevice with the ns3::Node.
+   *
+   * \return pointer to the created device
    */
   Ptr<NetDevice> Install (Ptr<Node> n);
 
@@ -109,6 +113,8 @@ public:
    *
    * This method creates a ns3::SatGeoNetDevice with the requested attributes
    * and associate the resulting ns3::NetDevice with the ns3::Node.
+   *
+   * \return pointer to the created device
    */
   Ptr<NetDevice> Install (std::string aName);
 
@@ -133,8 +139,8 @@ public:
 
   /**
    * Enables creation traces to be written in given file
-   * /param stream  stream for creation trace outputs
-   * /param cb  callback to connect traces
+   * \param stream  stream for creation trace outputs
+   * \param cb  callback to connect traces
    */
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 

@@ -30,7 +30,7 @@ namespace ns3 {
  *
  * Default constructor enables creating an empty information structure.
  * The developer needs to Append individual UTs with individual number of users in each UT by
- * calling the method @AppendUt.
+ * calling the method AppendUt().
  *
  * The second constructor allows creating a group of UT information
  * structures with each UT having the same number of users.

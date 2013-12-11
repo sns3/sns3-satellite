@@ -45,7 +45,7 @@ public:
   /**
    * Converts radians to degrees
    *
-   * \param radians value to convert as radians
+   * \param radian value to convert as radians
    * \return degrees converted from radians
    */
   template <typename T>
@@ -54,7 +54,7 @@ public:
   /**
    * Converts degrees to radians
    *
-   * \param degrees value to convert as degrees
+   * \param degree value to convert as degrees
    * \return radians converted from degrees
    */
   template <typename T>

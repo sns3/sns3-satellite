@@ -57,26 +57,35 @@ public:
 
   /**
    * Initialize the configuration
+   * \param path
+   * \param satConf
+   * \param gwPos
+   * \param satPos
+   * \param wfConf
    */
   void Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos, std::string wfConf);
 
   /**
    * Try to open a file from a given path
+   * \param filePathName
    */
   std::ifstream* OpenFile (std::string filePathName);
 
   /**
    * Load satellite configuration from a file
+   * \param filePathName
    */
   void LoadSatConf (std::string filePathName);
 
   /**
    * Load GW positions from a file
+   * \param filePathName
    */
   void LoadGwPos (std::string filePathName);
 
   /**
    * Load satellite position from a file
+   * \param filePathName
    */
   void LoadGeoSatPos (std::string filePathName);
 
@@ -91,6 +100,7 @@ public:
    * Get the configuration vector for a given satellite beam id
    *
    * \param beamId id of the beam
+   * \return the configuration vector for a given satellite beam id
    */
    std::vector <uint32_t> GetBeamConfiguration (uint32_t beamId) const;
 
@@ -115,7 +125,7 @@ public:
    /**
     * Get the position of the GW for a given GW id
     *
-    * \param gwid id of the GW
+    * \param gwId id of the GW
     *
     * \return Requested GW's position.
     */
@@ -148,6 +158,7 @@ public:
     * \param chType    Type of channel.
     * \param freqId    Id of the frequency.
     * \param carrierId Id of the carrier.
+    * \return real frequency value
     */
    double GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, uint32_t carrierId );
 
@@ -157,6 +168,7 @@ public:
     * \param chType    Type of channel.
     * \param carrierId Id of the carrier.
     * \param bandwidhtType Type of the bandwidth.
+    * \return bandwidth value
     */
    double GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType );
 

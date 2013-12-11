@@ -348,11 +348,11 @@ SatChannel::SetChannelType (SatEnums::ChannelType_t chType)
 }
 
 void
-SatChannel::SetFrequencyId (uint32_t fregId)
+SatChannel::SetFrequencyId (uint32_t freqId)
 {
-  NS_LOG_FUNCTION (this << fregId);
+  NS_LOG_FUNCTION (this << freqId);
 
-  m_freqId = fregId;
+  m_freqId = freqId;
 }
 
 void
