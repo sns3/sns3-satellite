@@ -273,7 +273,7 @@ GeoCoordinate::GetRadiusCurvature (double latitude)
 bool
 GeoCoordinate::IsValidAltitude (double altitude, ReferenceEllipsoide_t refEllipsoide)
 {
-  double polarRadius;
+  double polarRadius = NAN;
 
   switch ( refEllipsoide )
   {
@@ -290,7 +290,7 @@ GeoCoordinate::IsValidAltitude (double altitude, ReferenceEllipsoide_t refEllips
       break;
 
     default:
-      NS_ASSERT (false);
+      NS_FATAL_ERROR ("Invalid polar radius value!!!");
       break;
   }
 
