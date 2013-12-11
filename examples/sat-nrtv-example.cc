@@ -89,7 +89,7 @@ main (int argc, char *argv[])
   //LogComponentEnableAll (LOG_PREFIX_ALL);
   //LogComponentEnable ("NrtvClient", LOG_LEVEL_ALL);
   //LogComponentEnable ("NrtvServer", LOG_LEVEL_ALL);
-  LogComponentEnable ("SatNrtvExample", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-nrtv-example", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   // GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));

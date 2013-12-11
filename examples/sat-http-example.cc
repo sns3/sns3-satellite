@@ -85,7 +85,7 @@ main (int argc, char *argv[])
   //LogComponentEnableAll (LOG_PREFIX_ALL);
   //LogComponentEnable ("HttpClient", LOG_LEVEL_ALL);
   //LogComponentEnable ("HttpServer", LOG_LEVEL_ALL);
-  LogComponentEnable ("SatHttpExample", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-http-example", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   // GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
