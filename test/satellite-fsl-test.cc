@@ -33,7 +33,16 @@
 using namespace ns3;
 
 /**
- * \brief Test case to unit test satellite constant interference model.
+ * \ingroup satellite
+ * \brief Test case to unit test satellite free space loss (FSL) model.
+ *
+ * This case tests that SatFreeSpaceLoss object can be created successfully and free space loss (FSL) is calculates correctly.
+ *
+ *   1.  Create SatFreeSpaceLoss object.
+ *   2.  Get FSL value with getter methods.
+ *
+ *   Expected result:
+ *     Free space loss value returned by getter method should be correct (in tolerance).
  *
  */
 class SatFreeSpaceLossTestCase : public TestCase

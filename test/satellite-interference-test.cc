@@ -38,7 +38,17 @@
 using namespace ns3;
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test satellite constant interference model.
+ *
+ * This case tests that SatConstantInterference object can be created successfully and interference value set is correct.
+ *  1.  Create SatConstantInterference object.
+ *  2.  Set constant interference.
+ *  3.  Create event and notify SatConstantInterference about it.
+ *  4.  Get interference with calculate method with the event.
+ *
+ *  Expected result:
+ *   Calculate method should return set constant interference value.
  *
  */
 class SatConstantInterferenceTestCase : public TestCase
@@ -94,7 +104,17 @@ SatConstantInterferenceTestCase::DoRun (void)
 }
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test satellite per packet interference model.
+ *
+ * This case tests that SatPerPacketInterference object can be created successfully and interference value calculated correctly.
+ *  1.  Create SatPerPacketInterference object.
+ *  2.  Create events, add them to SatPerPacketInterference about them.
+ *  3.  Notify SatPerPacketInterference about the event wanted to calculate.
+ *  4.  Get interference with calculate method with the event to calculate.
+ *
+ *  Expected result:
+ *   Value should be correctly calculated. According to interfering events added.
  *
  */
 class SatPerPacketInterferenceTestCase : public TestCase
@@ -206,45 +226,7 @@ SatPerPacketInterferenceTestCase::DoRun (void)
 }
 
 /**
- * \brief Test case to unit test satellite constant interference model.
- *
- */
-class SatTracedInterferenceTestCase : public TestCase
-{
-public:
-  SatTracedInterferenceTestCase ();
-  virtual ~SatTracedInterferenceTestCase ();
-
-private:
-  virtual void DoRun (void);
-};
-
-SatTracedInterferenceTestCase::SatTracedInterferenceTestCase ()
-  : TestCase ("Test satellite traced interference model.")
-{
-}
-
-SatTracedInterferenceTestCase::~SatTracedInterferenceTestCase ()
-{
-}
-
-void
-SatTracedInterferenceTestCase::DoRun (void)
-{
-  // traced implementation is just place holder currently, so just test interface (interference 0)
-  Ptr<SatTracedInterference> interference = CreateObject<SatTracedInterference> ();
-  Ptr<SatInterference::Event> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
-
-  interference->NotifyRxStart (event);
-
-  double power = interference->Calculate (event);
-
-  NS_TEST_ASSERT_MSG_EQ (0, power, "Calculated power incorrect");
-
-  interference->NotifyRxEnd (event);
-}
-
-/**
+ * \ingroup satellite
  * \brief Test suite for Satellite interference unit test cases.
  */
 class SatInterferenceTestSuite : public TestSuite
@@ -257,8 +239,6 @@ SatInterferenceTestSuite::SatInterferenceTestSuite ()
   : TestSuite ("sat-interference-test", UNIT)
 {
   AddTestCase (new SatConstantInterferenceTestCase);
-  //TODO: Test needed to change according to new implementation
-  //AddTestCase (new SatTracedInterferenceTestCase);
   AddTestCase (new SatPerPacketInterferenceTestCase);
 }
 

@@ -40,6 +40,7 @@
 using namespace ns3;
 
 /**
+ * \ingroup satellite
  * \brief 'Performance and memory tracking' test case implementation, id: pm-1 / TN4.
  *
  * Full scenario created with helper
