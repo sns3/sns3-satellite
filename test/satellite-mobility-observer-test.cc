@@ -35,7 +35,7 @@
 
 using namespace ns3;
 
-// defintions for reference elevation angle table, g_refElAngles
+// definitions for reference elevation angle table, g_refElAngles
 static const uint32_t g_latitudeCount = 19;
 static const uint32_t g_longitudeCount = 37;
 
@@ -227,7 +227,27 @@ static const double g_refElAngles[g_latitudeCount][g_longitudeCount] =
 };
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test Satellite Mobility Observer.
+ *
+ * This case tests that SatMobilityObserver object can be created successfully and it calculates correctly.
+ *  1.  Create SatMobilityObserver object with geo mobility and own mobility.
+ *  2.  Set position of Geo satellite mobility.
+ *  3.  Set position of own mobility.
+ *  4.  Set propagation delay and another mobility to observer.
+ *  5.  Get timing advance from observer.
+ *  6.  Set position of own mobility.
+ *  7.  Get elevation angle from observer.
+ *  8.  Repeat steps 6 and 7 several times.
+ *  9.  Set Geo satellite using reference satellite and repeat steps 6 and 7 several times.
+ *
+ *  Expected result:
+ *      Timing advance and elevation angle values got are correct.
+ *
+ *  Notes:
+ *    At least corner points, valid values and out of range (NAN) elevation angle values is needed to test.
+ *    When reference satellite is used for example MatLab is useful to get reference values for elevation angles.
+ *
  *
  */
 class SatMobilityObserverTestCase : public TestCase
@@ -285,7 +305,7 @@ SatMobilityObserverTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ( earthRadius, 6378137, "Earth radius is not what expected");
 
   // check that timing advance is correct
-  NS_TEST_ASSERT_MSG_EQ ( timingAdvance, 500, "Timing Advacnce incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( timingAdvance, 500, "Timing Advance incorrect");
 
 
   // Test that we get 0 degrees elevation angle at range points, where we stop seeing satellite

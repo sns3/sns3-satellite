@@ -82,9 +82,20 @@ GeoCoordinate::Construct (double latitude, double longitude, double altitude)
 {
   NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
-  NS_ASSERT (IsValidLatitude (latitude));
-  NS_ASSERT (IsValidLongtitude (longitude));
-  NS_ASSERT (IsValidAltitude (altitude, m_refEllipsoide));
+  if ( IsValidLatitude (latitude) == false)
+    {
+      NS_FATAL_ERROR ("Invalid latitude!!!");
+    }
+
+  if (IsValidLongtitude (longitude) == false)
+    {
+      NS_FATAL_ERROR ("Invalid longitude!!!");
+    }
+
+  if (IsValidAltitude (altitude, m_refEllipsoide) == false)
+    {
+      NS_FATAL_ERROR ("Invalid altitude!!!");
+    }
 
   Initialize ();
 
@@ -98,12 +109,12 @@ Vector GeoCoordinate::ToVector ()
   NS_LOG_FUNCTION (this);
 
   Vector cartesian;
-  double latRads = SatUtils::DegreesToRadians(m_latitude);
-  double lonRads = SatUtils::DegreesToRadians(m_longitude);
+  double latRads = SatUtils::DegreesToRadians (m_latitude);
+  double lonRads = SatUtils::DegreesToRadians (m_longitude);
 
-  cartesian.x = ( GetRadiusCurvature(latRads) + m_altitude) * std::cos (latRads) * std::cos (lonRads);
-  cartesian.y = ( GetRadiusCurvature(latRads) + m_altitude) * std::cos (latRads) * std::sin (lonRads);
-  cartesian.z = ( GetRadiusCurvature(latRads) * (1 - m_e2Param) + m_altitude) * std::sin (latRads);
+  cartesian.x = ( GetRadiusCurvature (latRads) + m_altitude) * std::cos (latRads) * std::cos (lonRads);
+  cartesian.y = ( GetRadiusCurvature (latRads) + m_altitude) * std::cos (latRads) * std::sin (lonRads);
+  cartesian.z = ( GetRadiusCurvature (latRads) * (1 - m_e2Param) + m_altitude) * std::sin (latRads);
 
   return cartesian;
 }
@@ -128,7 +139,7 @@ GeoCoordinate::Initialize ()
       break;
 
     default:
-      NS_ASSERT (false);
+      NS_FATAL_ERROR ("Invalid Reference Ellipsoid!!!");
       break;
   }
 
@@ -136,43 +147,61 @@ GeoCoordinate::Initialize ()
   m_e2Param = ( ( m_equatorRadius * m_equatorRadius ) - ( m_polarRadius * m_polarRadius ) ) / (m_equatorRadius * m_equatorRadius );
 }
 
-double GeoCoordinate::GetLongitude() const
+double GeoCoordinate::GetLongitude () const
 {
   NS_LOG_FUNCTION (this);
   return m_longitude;
 }
 
-double GeoCoordinate::GetLatitude() const
+double GeoCoordinate::GetLatitude () const
 {
   NS_LOG_FUNCTION (this);
   return m_latitude;
 }
 
-double GeoCoordinate::GetAltitude() const
+double GeoCoordinate::GetAltitude () const
 {
   NS_LOG_FUNCTION (this);
   return m_altitude;
 }
 
-void GeoCoordinate::SetLongitude(double longitude)
+void GeoCoordinate::SetLongitude (double longitude)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << longitude);
+
+  if ( IsValidLatitude (longitude) == false)
+    {
+       NS_FATAL_ERROR ("Invalid longitude!!!");
+    }
+
   m_longitude = longitude;
 }
 
-void GeoCoordinate::SetLatitude(double latitude)
+void GeoCoordinate::SetLatitude (double latitude)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << latitude);
+
+  if ( IsValidLongtitude (latitude) == false)
+     {
+       NS_FATAL_ERROR ("Invalid latitude!!!");
+     }
+
   m_latitude = latitude;
 }
 
-void GeoCoordinate::SetAltitude(double altitude)
+void GeoCoordinate::SetAltitude (double altitude)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << altitude);
+
+  if ( IsValidAltitude (altitude, m_refEllipsoide) == false)
+     {
+       NS_FATAL_ERROR ("Invalid altitude!!!");
+     }
+
   m_altitude = altitude;
 }
 
-void GeoCoordinate::ConstructFromVector(const Vector &v)
+void GeoCoordinate::ConstructFromVector (const Vector &v)
 {
   NS_LOG_FUNCTION (this << v);
 
@@ -289,9 +318,9 @@ std::istream &operator >> (std::istream &is, GeoCoordinate &coordinate)
 
   is >> latitude >> c1 >> longitude >> c2 >> altitude;
 
-  coordinate.SetLongitude(longitude);
-  coordinate.SetLatitude(latitude);
-  coordinate.SetAltitude(altitude);
+  coordinate.SetLongitude (longitude);
+  coordinate.SetLatitude (latitude);
+  coordinate.SetAltitude (altitude);
 
   if (c1 != ',' || c2 != ',')
     {

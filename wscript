@@ -109,7 +109,7 @@ def build(bld):
         'test/performance-memory-test.cc',
         'test/cbr-test.cc',
         'test/link-results-test.cc',
-        'test/satellite-simple-p2p.cc',
+        'test/satellite-simple-unicast.cc',
         'test/satellite-scenario-creation.cc',
         'test/satellite-mobility-test.cc',
         'test/satellite-interference-test.cc',

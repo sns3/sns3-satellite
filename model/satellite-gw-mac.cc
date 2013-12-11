@@ -53,7 +53,7 @@ SatGwMac::GetTypeId (void)
                     MakeTimeAccessor (&SatGwMac::m_tInterval),
                     MakeTimeChecker ())
     .AddAttribute ("DummyFrameSendingOn",
-                   "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
+                   "Flag to tell, if dummy frames are sent or not.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatGwMac::m_dummyFrameSendingOn),
                     MakeBooleanChecker ())

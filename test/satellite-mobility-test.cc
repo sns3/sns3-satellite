@@ -19,6 +19,7 @@
  */
 
 /**
+ * \ingroup satellite
  * \file satellite-mobility-test.cc
  * \brief Test cases to unit test Satellite Mobility.
  */
@@ -51,9 +52,19 @@ SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
 }
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test satellite mobility's position
  *        setting from random box position allocator.
  *        (Constant position mobility model used).
+ *
+ *  This case tests that SatConstantPositionMobilityModel object can be created successfully and position allocation can be done with random box allocator.
+ *    1.  Create SatConstantPositionMobilityModel object with SatRandomBoxPositionAllocator with MobilityHelper.
+ *    2.  Install nodes to mobility with helper.
+ *    3.  Get position of nodes by mobility model.
+ *
+ *  Expected result:
+ *    Positions should be in range defined in SatRandomBoxPositionAllocator.
+ *
  */
 class SatMobilityRandomTestCase : public TestCase
 {
@@ -111,9 +122,24 @@ SatMobilityRandomTestCase::DoRun (void)
 
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test satellite mobility's position
  *        setting from list position allocator. No conversion expected to happen.
  *        (Constant position mobility model used).
+ *
+ *  This case tests that SatConstantPositionMobilityModel object can be created successfully and position allocation can be done with list allocator when they operate using geodetic coordinates.
+ *    1.  Create SatListPositionAllocator object and set positions to it.
+ *    2.  Create SatConstantPositionMobilityModel object with SatListPositionAllocator with MobilityHelper.
+ *    3.  Install nodes to mobility with helper.
+ *    4.  Get position of nodes by mobility model.
+ *
+ *  Expected result:
+ *    Positions should be same as set to allocator.
+ *
+ *  Notes:
+ *    SatMobilityModel and SatListPositionAllocator (SatPositionAllocator) attributes AsGeoCoordinates define,
+ *    if mobility and allocator operate using geodetic coordinates or using Cartesian Coordinates. By default geodetic coordinates is used.
+ *
  */
 class SatMobilityList1TestCase : public TestCase
 {
@@ -177,9 +203,26 @@ SatMobilityList1TestCase::DoRun (void)
 }
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test satellite mobility's position
  *        setting from list position allocator. Conversion expected to happen.
  *        (Constant position mobility model used).
+ *
+ *  This case tests that SatConstantPositionMobilityModel object can be created successfully and position allocation can be done with list allocator when they operate using geodetic coordinates.
+ *    1.  Configure SatConstantPositionMobilityModel and SatListPositionAllocator to use Cartesian coordinates.
+ *    2.  Create SatListPositionAllocator object and set positions to it.
+ *    3.  Create SatConstantPositionMobilityModel object with SatListPositionAllocator with MobilityHelper.
+ *    4.  Install nodes to mobility with helper.
+ *    5.  Get position of nodes by mobility model.
+ *
+ *  Expected result:
+ *    Positions should be same as set to allocator.
+ *    But due to needed conversion they are not necessarily exactly same, so some tolerance is accepted.
+ *
+ *  Notes:
+ *    SatMobilityModel and SatListPositionAllocator (SatPositionAllocator) attributes AsGeoCoordinates define,
+ *    if mobility and allocator operate using geodetic coordinates or using Cartesian Coordinates. By default geodetic coordinates is used.
+ *
  */
 class SatMobilityList2TestCase : public TestCase
 {
@@ -237,6 +280,7 @@ SatMobilityList2TestCase::DoRun (void)
 }
 
 /**
+ * \ingroup satellite
  * \brief Test suite for Satellite mobility unit test cases.
  */
 class SatMobilityTestSuite : public TestSuite

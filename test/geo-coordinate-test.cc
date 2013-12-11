@@ -20,6 +20,7 @@
 
 /**
  * \file geo-coordinate-test.cc
+ * \ingroup satellite
  * \brief Test cases to unit test GeoCoordinate class.
  *
  */
@@ -47,7 +48,7 @@ static void PrintPositionInfo (GeoCoordinate pos)
 #endif
 
 /**
- * \brief Test case to unit test that GeoCoordinate with valid values.
+ * \brief Test case to unit test that GeoCoordinate can be created with valid values.
  */
 class GeoCoordinateTestCase : public TestCase
 {
@@ -97,7 +98,6 @@ GeoCoordinateTestCase::DoRun (void)
 
       Validate ( position1, position2 );
     }
-
 }
 
 void
