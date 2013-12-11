@@ -106,7 +106,7 @@ SatFadingExamplePlot::GetGnuplot (std::string outputName, std::string title)
   ret.SetTitle (title);
   ret.SetTerminal ("png");
   ret.SetLegend ("Time (s)", "Fading (dB)");
-  ret.AppendExtra ("set key bottom left");
+  ret.AppendExtra ("set key top right");
   ret.AppendExtra ("set grid xtics mxtics ytics");
   return ret;
 }
@@ -158,7 +158,7 @@ SatFadingExamplePlot::Run ()
 
   if (result < 0)
     {
-      std::cout << "Unable to create shell process for file conversion" << std::endl;
+      std::cout << "Unable to open shell process for Gnuplot file conversion, conversion not done!" << std::endl;
     }
   else
     {

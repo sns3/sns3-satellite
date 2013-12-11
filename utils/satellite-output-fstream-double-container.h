@@ -24,6 +24,7 @@
 #include <fstream>
 #include "ns3/object.h"
 #include "satellite-output-fstream-wrapper.h"
+#include <ns3/gnuplot.h>
 
 namespace ns3 {
 
@@ -35,6 +36,13 @@ namespace ns3 {
 class SatOutputFileStreamDoubleContainer : public Object
 {
 public:
+
+  typedef enum
+  {
+    RAW,
+    DECIBEL,
+    DECIBEL_AMPLITUDE
+  } FigureUnitConversion_t;
 
   /**
    * \brief NS-3 function for type id
@@ -75,6 +83,16 @@ public:
    */
   void DoDispose ();
 
+  /**
+   * \brief Function for enabling the figure output
+   * \param title title text
+   * \param legendY Y-axis title
+   * \param legendX X-axis title
+   * \param keyPosition Legend position
+   * \param figureUnitConversionType Conversion type for units in the figure
+   */
+  void EnableFigureOutput (std::string title, std::string legendY, std::string legendX, std::string keyPosition, FigureUnitConversion_t figureUnitConversionType);
+
 private:
 
   /**
@@ -98,7 +116,31 @@ private:
   void OpenStream ();
 
   /**
-   * \brief Pointer to output file stream wrappwer
+   * \brief Function for printing the container contents into a figure
+   */
+  void PrintFigure ();
+
+  /**
+   * \brief Function for converting the container data samples
+   * \param value original data sample value
+   * \return converted data sample value
+   */
+  double ConvertValue (double value);
+
+  /**
+   * \brief Function for creating Gnuplot datasets
+   * \return dataset
+   */
+  Gnuplot2dDataset GetGnuplotDataset ();
+
+  /**
+   * \brief Function for creating Gnuplots
+   * \return Gnuplot
+   */
+  Gnuplot GetGnuplot ();
+
+  /**
+   * \brief Pointer to output file stream wrapper
    */
   SatOutputFileStreamWrapper* m_outputFileStreamWrapper;
 
@@ -126,6 +168,36 @@ private:
    * \brief Number of values in a row
    */
   uint32_t m_valuesInRow;
+
+  /**
+   * \brief Enable / disable printing of container contents into a figure
+   */
+  bool m_printFigure;
+
+  /**
+   * \brief Figure title
+   */
+  std::string m_title;
+
+  /**
+   * \brief  Figure Y-axis title
+   */
+  std::string m_legendY;
+
+  /**
+   * \brief Figure X-axis title
+   */
+  std::string m_legendX;
+
+  /**
+   * \brief Figure legend position
+   */
+  std::string m_keyPosition;
+
+  /**
+   * \brief Describes which unit conversion should be used with the figure
+   */
+  FigureUnitConversion_t m_figureUnitConversionType;
 };
 
 } // namespace ns3

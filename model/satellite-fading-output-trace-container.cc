@@ -120,6 +120,7 @@ SatFadingOutputTraceContainer::WriteToFile ()
 
   for (iter = m_container.begin (); iter != m_container.end (); ++iter)
     {
+      iter->second->EnableFigureOutput ("Fading trace","Time (s)","Fading (dB)","set key top right", SatOutputFileStreamDoubleContainer::DECIBEL_AMPLITUDE);
       iter->second->WriteContainerToFile ();
     }
 }

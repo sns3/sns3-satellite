@@ -126,7 +126,7 @@ SatPhyRx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelTyp
 {
   NS_LOG_FUNCTION (this);
 
-  double fadingValue (m_defaultFadingValue);
+  double fadingValue = m_defaultFadingValue;
 
   if (m_fadingContainer)
     {

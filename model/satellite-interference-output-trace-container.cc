@@ -120,6 +120,7 @@ SatInterferenceOutputTraceContainer::WriteToFile ()
 
   for (iter = m_container.begin (); iter != m_container.end (); ++iter)
     {
+      iter->second->EnableFigureOutput ("Interference trace","Time (s)","Interference (mW)","set key top right",SatOutputFileStreamDoubleContainer::RAW);
       iter->second->WriteContainerToFile ();
     }
 }
