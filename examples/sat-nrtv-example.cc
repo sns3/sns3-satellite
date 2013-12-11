@@ -28,17 +28,13 @@
 using namespace ns3;
 
 
-NS_LOG_COMPONENT_DEFINE ("SatNrtvExample");
-
-
 /**
  * \ingroup satellite
- *
  * \brief Example of using NRTV traffic model in a satellite network.
  *
- * One NRTV server application is installed in the first GW user. One NRTV
+ * One NRTV server application is installed in the first GW user. Then one NRTV
  * client application is installed in each UT user, configured to point to the
- * server.
+ * server. TCP protocol is used between the applications.
  *
  * By default, the SIMPLE test scenario is used. Another test scenario can be
  * given from command line as user argument, e.g.:
@@ -46,7 +42,7 @@ NS_LOG_COMPONENT_DEFINE ("SatNrtvExample");
  *     $ ./waf --run="sat-nrtv-example --scenario=larger"
  *     $ ./waf --run="sat-nrtv-example --scenario=full"
  *
- * Simulation runs for 1000 seconds by default. This can be changed from the
+ * Simulation runs for 100 seconds by default. This can be changed from the
  * command line argument as well, e.g.:
  *
  *     $ ./waf --run="sat-nrtv-example --duration=500"
@@ -56,6 +52,9 @@ NS_LOG_COMPONENT_DEFINE ("SatNrtvExample");
  *     $ ./waf --run "sat-nrtv-example --PrintHelp"
  *
  */
+NS_LOG_COMPONENT_DEFINE ("sat-nrtv-example");
+
+
 int
 main (int argc, char *argv[])
 {
@@ -94,8 +93,6 @@ main (int argc, char *argv[])
 
   // remove next line from comments to run real time simulation
   // GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
-
-  // create satellite helper with given scenario default=simple
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -138,4 +135,4 @@ main (int argc, char *argv[])
 
   return 0;
 
-}
+} // end of `int main (int argc, char *argv[])`
