@@ -11,7 +11,7 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Example for Rayleigh fading class.
+* \brief Example for Rayleigh fader class.
 *
 */
 

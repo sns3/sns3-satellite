@@ -11,7 +11,7 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Example for Loo's model fading class.
+* \brief Example for Loo's model fader class.
 *
 */
 

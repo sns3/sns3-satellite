@@ -22,7 +22,7 @@ using namespace ns3;
  *         to UT connected users and after that from UT connected user to GW connected
  *         user.
  *
- *         This example uses the following traces:
+ *         This example produces the following traces:
  *         - interference density trace
  *         - rx power density trace
  *         - fading trace
