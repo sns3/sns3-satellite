@@ -22,12 +22,12 @@ namespace ns3 {
 *
 *     ./waf --run="src/satellite/examples/markov-trace-example"
 *
-* Gnuplot file (markov_trace.plt) will be generated as output. This
+* Gnuplot file (markov_fading_trace.plt) will be generated as output. This
 * file can be converted to a PNG file, for example by this command:
 *
-*     gnuplot markov_trace.plt
+*     gnuplot markov_fading_trace.plt
 *
-* which will produce `fading_trace.png` file in the same directory.
+* which will produce `markov_fading_trace.png` file in the same directory.
 */
 
 class SatMarkovFadingExamplePlot : public Object
