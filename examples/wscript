@@ -36,4 +36,15 @@ def build(bld):
 
     obj = bld.create_ns3_program('environmental-variables-example', ['satellite'])
     obj.source = 'environmental-variables-example.cc'
+
+    obj = bld.create_ns3_program('trace-output-example', ['satellite'])
+    obj.source = 'trace-output-example.cc'
+
+    obj = bld.create_ns3_program('trace-input-interference-example', ['satellite'])
+    obj.source = 'trace-input-interference-example.cc'    
     
+    obj = bld.create_ns3_program('trace-input-fading-example', ['satellite'])
+    obj.source = 'trace-input-fading-example.cc'
+
+    obj = bld.create_ns3_program('trace-input-rx-power-example', ['satellite'])
+    obj.source = 'trace-input-rx-power-example.cc'    

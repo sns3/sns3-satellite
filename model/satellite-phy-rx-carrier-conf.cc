@@ -30,6 +30,8 @@ NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierConf");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
+
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
 : m_ifModel (),
   m_errorModel (),
