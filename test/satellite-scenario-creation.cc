@@ -20,6 +20,7 @@
 
 /**
  * \file satellite-scenario-creation.cc
+ * \ingroup satellite
  * \brief 'Scenario Creation Test Cases' implementation of TN4.
  *
  * In this module are implemented all 'Scenario Creation' Test Cases

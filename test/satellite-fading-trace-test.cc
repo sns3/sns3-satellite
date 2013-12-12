@@ -19,7 +19,7 @@
  */
 
 /**
- * \file satellite-antenna-pattern-test.cc
+ * \file satellite-fading-trace-test.cc
  * \brief Test cases to unit test Satellite Antenna Pattern
  */
 

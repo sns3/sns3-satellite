@@ -20,6 +20,7 @@
 
 /**
  * \file performance-memory.cc
+ * \ingroup satellite
  * \brief 'Performance and Memory Consumption Test Cases' implementation of TN4.
  *
  * In this module are implemented all 'Performance and Memory Consumption' Test Cases

@@ -19,7 +19,8 @@
  */
 
 /**
- * \ingroup satellite-fsl-test.cc
+ * \file satellite-fsl-test.cc
+ * \ingroup satellite
  * \brief Test cases to unit test Satellite Free Space Loss model.
  */
 

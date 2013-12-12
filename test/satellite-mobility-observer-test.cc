@@ -19,8 +19,9 @@
  */
 
 /**
-  * \ingroup satellite
-  * \brief Test cases to unit test Satellite Mobility Observer model.
+ * \file satellite-mobility-observer-test.cc
+ * \ingroup satellite
+ * \brief Test cases to unit test Satellite Mobility Observer model.
  */
 
 #include "ns3/log.h"

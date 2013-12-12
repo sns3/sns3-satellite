@@ -25,34 +25,43 @@
 #include <fstream>
 
 
+/**
+ * \ingroup satellite
+ * \brief Example for plotting satellite link results data.
+ *
+ * \sa SatLinkResultsPlot
+ */
 NS_LOG_COMPONENT_DEFINE ("SatLinkResultsPlot");
 
 
 namespace ns3 {
 
+
 /**
+ * \ingroup satellite
  * \brief Example for plotting satellite link results data.
  *
  * This example can be run as it is, without any argument, i.e.:
  *
- *     ./waf --run="src/satellite/examples/link-results-plot"
+ *     $ ./waf --run="link-results-plot"
  *
  * Several Gnuplot files (.plt) will be generated as output. Each of these
  * files can be converted to a PNG file, for example by this command:
  *
- *     gnuplot s2-32apsk.plt
+ *     $ gnuplot s2-32apsk.plt
  *
  * which will produce `s2-32apsk.png` file in the same directory. To convert all
  * the Gnuplot files in the directory, the command below can be used:
  *
- *     gnuplot *.plt
+ *     $ gnuplot *.plt
  *
  */
-class SatLinkResultsPlot : public Object
+class SatLinkResultsPlot : public SimpleRefCount<SatLinkResultsPlot>
 {
 public:
+  /// Creates an empty instance.
   SatLinkResultsPlot ();
-  static TypeId GetTypeId ();
+  /// Load link results data files and generate plots from them.
   void Run ();
 
 private:
@@ -72,10 +81,8 @@ private:
   double m_minSinrDb;
   double m_maxSinrDb;
   std::string m_inputPath;
+
 }; // end of class SatLinkResultsPlot
-
-
-NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsPlot);
 
 
 SatLinkResultsPlot::SatLinkResultsPlot ()
@@ -84,17 +91,6 @@ SatLinkResultsPlot::SatLinkResultsPlot ()
   m_minSinrDb = 0.0;
   m_maxSinrDb = 20.0;
   m_inputPath = "src/satellite/data/linkresults/";
-}
-
-
-TypeId
-SatLinkResultsPlot::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::SatLinkResultsPlot")
-    .SetParent<Object> ()
-    .AddConstructor<SatLinkResultsPlot> ()
-  ;
-  return tid;
 }
 
 
@@ -442,8 +438,7 @@ int
 main (int argc, char *argv[])
 {
   ns3::Ptr<ns3::SatLinkResultsPlot> stub;
-  stub = ns3::CreateObject<ns3::SatLinkResultsPlot> ();
-  ns3::Config::RegisterRootNamespaceObject (stub);
+  stub = ns3::Create<ns3::SatLinkResultsPlot> ();
   stub->Run ();
 
   return 0;

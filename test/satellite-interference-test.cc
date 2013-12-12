@@ -20,6 +20,7 @@
 
 /**
  * \file satellite-interference-test.cc
+ * \ingroup satellite
  * \brief Test cases to unit test Satellite Interference Models.
  */
 
