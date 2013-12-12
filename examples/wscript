@@ -13,8 +13,8 @@ def build(bld):
     obj = bld.create_ns3_program('link-results-plot', ['satellite', 'tools'])
     obj.source = 'link-results-plot.cc'
     
-    obj = bld.create_ns3_program('markov-example', ['satellite'])
-    obj.source = 'markov-example.cc'
+    obj = bld.create_ns3_program('markov-logic-example', ['satellite'])
+    obj.source = 'markov-logic-example.cc'
 
     obj = bld.create_ns3_program('rayleigh-example', ['satellite'])
     obj.source = 'rayleigh-example.cc'
@@ -22,8 +22,8 @@ def build(bld):
     obj = bld.create_ns3_program('loo-example', ['satellite'])
     obj.source = 'loo-example.cc'
 
-    obj = bld.create_ns3_program('fading-trace-example', ['satellite'])
-    obj.source = 'fading-trace-example.cc'
+    obj = bld.create_ns3_program('markov-fading-trace-example', ['satellite'])
+    obj.source = 'markov-fading-trace-example.cc'
     
     obj = bld.create_ns3_program('sat-link-budget-example', ['satellite'])
     obj.source = 'sat-link-budget-example.cc'

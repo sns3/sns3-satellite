@@ -9,31 +9,31 @@
 #include <fstream>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE ("fading-trace-example");
+NS_LOG_COMPONENT_DEFINE ("markov-trace-example");
 
 namespace ns3 {
 
 /**
 * \ingroup satellite
 *
-* \brief Example for fading calculations. Can be used to produce simple fading traces.
+* \brief Example for Markov fading calculations. Can be used to produce simple fading traces.
 *
 * This example can be run as it is, without any argument, i.e.:
 *
-*     ./waf --run="src/satellite/examples/fading-trace-example"
+*     ./waf --run="src/satellite/examples/markov-trace-example"
 *
-* Gnuplot file (fading_trace.plt) will be generated as output. This
+* Gnuplot file (markov_trace.plt) will be generated as output. This
 * file can be converted to a PNG file, for example by this command:
 *
-*     gnuplot fading_trace.plt
+*     gnuplot markov_trace.plt
 *
 * which will produce `fading_trace.png` file in the same directory.
 */
 
-class SatFadingExamplePlot : public Object
+class SatMarkovFadingExamplePlot : public Object
 {
 public:
-  SatFadingExamplePlot ();
+  SatMarkovFadingExamplePlot ();
   static TypeId GetTypeId ();
   void Run ();
 
@@ -49,44 +49,44 @@ private:
   std::vector <std::pair<double,double> > m_fadingValues;
 };
 
-NS_OBJECT_ENSURE_REGISTERED (SatFadingExamplePlot);
+NS_OBJECT_ENSURE_REGISTERED (SatMarkovFadingExamplePlot);
 
 TypeId
-SatFadingExamplePlot::GetTypeId ()
+SatMarkovFadingExamplePlot::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatFadingExamplePlot")
+  static TypeId tid = TypeId ("ns3::SatMarkovFadingExamplePlot")
     .SetParent<Object> ()
-    .AddConstructor<SatFadingExamplePlot> ();
+    .AddConstructor<SatMarkovFadingExamplePlot> ();
   return tid;
 }
 
-SatFadingExamplePlot::SatFadingExamplePlot ()
+SatMarkovFadingExamplePlot::SatMarkovFadingExamplePlot ()
 {
   m_elevation = 45;
   m_velocity = 0;
 }
 
 void
-SatFadingExamplePlot::FadingTraceCb (std::string context, double time, SatEnums::ChannelType_t chType, double fadingValue)
+SatMarkovFadingExamplePlot::FadingTraceCb (std::string context, double time, SatEnums::ChannelType_t chType, double fadingValue)
 {
   std::cout << time << " " << chType << " " << 20 * log10 (fadingValue) << std::endl;
   m_fadingValues.push_back (std::make_pair (time,20 * log10 (fadingValue)));
 }
 
 double
-SatFadingExamplePlot::GetElevation ()
+SatMarkovFadingExamplePlot::GetElevation ()
 {
    return m_elevation;
 }
 
 double
-SatFadingExamplePlot::GetVelocity ()
+SatMarkovFadingExamplePlot::GetVelocity ()
 {
    return m_velocity;
 }
 
 Gnuplot2dDataset
-SatFadingExamplePlot::GetGnuplotDataset (std::string title)
+SatMarkovFadingExamplePlot::GetGnuplotDataset (std::string title)
 {
   Gnuplot2dDataset ret;
   ret.SetTitle (title);
@@ -100,7 +100,7 @@ SatFadingExamplePlot::GetGnuplotDataset (std::string title)
 }
 
 Gnuplot
-SatFadingExamplePlot::GetGnuplot (std::string outputName, std::string title)
+SatMarkovFadingExamplePlot::GetGnuplot (std::string outputName, std::string title)
 {
   Gnuplot ret (outputName + ".png");
   ret.SetTitle (title);
@@ -113,18 +113,18 @@ SatFadingExamplePlot::GetGnuplot (std::string outputName, std::string title)
 
 
 void
-SatFadingExamplePlot::Run ()
+SatMarkovFadingExamplePlot::Run ()
 {
   /// create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 
-  SatBaseFading::ElevationCallback elevationCb = MakeCallback (&SatFadingExamplePlot::GetElevation,this);
-  SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatFadingExamplePlot::GetVelocity,this);
+  SatBaseFading::ElevationCallback elevationCb = MakeCallback (&SatMarkovFadingExamplePlot::GetElevation,this);
+  SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatMarkovFadingExamplePlot::GetVelocity,this);
 
   /// create fading container based on default configuration
   Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
 
-  markovContainer->TraceConnect ("FadingTrace","The trace for fading values",MakeCallback (&SatFadingExamplePlot::FadingTraceCb,this));
+  markovContainer->TraceConnect ("FadingTrace","The trace for fading values",MakeCallback (&SatMarkovFadingExamplePlot::FadingTraceCb,this));
 
   Address macAddress;
 
@@ -142,19 +142,19 @@ SatFadingExamplePlot::Run ()
 
   Simulator::Run ();
 
-  Gnuplot2dDataset dataset = GetGnuplotDataset ("Fading Trace");
-  Gnuplot plot = GetGnuplot ("fading_trace",
-                             "Fading Trace");
+  Gnuplot2dDataset dataset = GetGnuplotDataset ("Markov Fading Trace");
+  Gnuplot plot = GetGnuplot ("markov_fading_trace",
+                             "Markov Fading Trace");
   plot.AddDataset (dataset);
 
-  std::string plotFileName = "fading_trace.plt";
+  std::string plotFileName = "markov_fading_trace.plt";
   std::ofstream plotFile (plotFileName.c_str ());
   plot.GenerateOutput (plotFile);
   plotFile.close ();
 
   std::cout << "Output file written: " << plotFileName << std::endl;
 
-  int result = system ("gnuplot fading_trace.plt");
+  int result = system ("gnuplot markov_fading_trace.plt");
 
   if (result < 0)
     {
@@ -162,7 +162,7 @@ SatFadingExamplePlot::Run ()
     }
   else
     {
-      std::cout << "Output file converted to: fading_trace.png" << std::endl;
+      std::cout << "Output file converted to: markov_fading_trace.png" << std::endl;
     }
 
 
@@ -174,8 +174,8 @@ SatFadingExamplePlot::Run ()
 int
 main (int argc, char *argv[])
 {
-  ns3::Ptr<ns3::SatFadingExamplePlot> stub;
-  stub = ns3::CreateObject<ns3::SatFadingExamplePlot> ();
+  ns3::Ptr<ns3::SatMarkovFadingExamplePlot> stub;
+  stub = ns3::CreateObject<ns3::SatMarkovFadingExamplePlot> ();
   ns3::Config::RegisterRootNamespaceObject (stub);
   stub->Run ();
 
