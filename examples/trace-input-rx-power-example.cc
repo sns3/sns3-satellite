@@ -22,11 +22,15 @@ using namespace ns3;
  *         to UT connected users and after that from UT connected user to GW connected
  *         user.
  *
- *         This example uses the following traces:
+ *         This example uses the following trace for input:
  *         - rx power density trace
  *
- *         The input folders are:
+ *         The input folder is:
  *         {NS-3-root-folder}/src/satellite/data/rxpowertraces/input
+ *
+ *         The input data files must be available in the folder stated above for the example
+ *         program to read, otherwise the program will fail. Trace output example can be
+ *         used to produce the required trace files if these are missing.
  */
 
 NS_LOG_COMPONENT_DEFINE ("trace-input-rx-power-example");
