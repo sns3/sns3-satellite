@@ -43,28 +43,32 @@ SatPerPacketInterference::GetTypeId (void)
 TypeId
 SatPerPacketInterference::GetInstanceTypeId (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return GetTypeId();
 }
 
 SatPerPacketInterference::SatPerPacketInterference ()
-  : m_firstPower (0.0),
+  : m_firstPowerW (0.0),
     m_rxing (false),
     m_nextEventId (0),
     m_enableTraceOutput (false),
     m_channelType (),
     m_rxBandwidth_Hz ()
 {
-
+  NS_LOG_FUNCTION (this);
 }
 
 SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth)
-  : m_firstPower (0.0),
+  : m_firstPowerW (0.0),
     m_rxing (false),
     m_nextEventId (0),
     m_enableTraceOutput (true),
     m_channelType (channeltype),
     m_rxBandwidth_Hz (rxBandwidth)
 {
+  NS_LOG_FUNCTION (this);
+
   if (!m_rxBandwidth_Hz > 0)
     {
       NS_FATAL_ERROR ("SatPerPacketInterference::SatPerPacketInterference - Invalid value");
@@ -74,33 +78,35 @@ SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t chan
 
 SatPerPacketInterference::~SatPerPacketInterference ()
 {
+  NS_LOG_FUNCTION (this);
+
   Reset ();
 }
 
 Ptr<SatInterference::Event>
 SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
+  NS_LOG_FUNCTION (this);
+
   Ptr<SatInterference::Event> event;
   event = Create<SatInterference::Event> (m_nextEventId++, duration, power, rxAddress);
   Time now = event->GetStartTime ();
 
+  // do update and clean-ups, if we are not receiving
   if (!m_rxing)
     {
       InterferenceChanges::iterator nowIterator = m_changes.upper_bound (now);
 
       for (InterferenceChanges::iterator i = m_changes.begin (); i != nowIterator; i++)
         {
-          m_firstPower += i->second.second;
+          m_firstPowerW += i->second.second;
         }
 
       m_changes.erase (m_changes.begin (), nowIterator);
-      m_changes.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));
-    }
-  else
-    {
-      m_changes.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));
+
     }
 
+  m_changes.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));
   m_changes.insert (std::make_pair (event->GetEndTime (), InterferenceChange (event->GetId (), -power)));
 
   return event;
@@ -109,66 +115,71 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
 double
 SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
-  bool calcReady = false;
-  bool increaseFirstPower = true;
+  NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (m_rxing);
+  if ( m_rxing == false )
+    {
+      NS_FATAL_ERROR ("Receiving is not set on!!!");
+    }
 
-  double finalPower = 0;
-  double firstPower = m_firstPower;
-
+  double ifPowerW = m_firstPowerW;
   double rxDuration = event->GetDuration ().GetDouble ();
   double rxEndTime = event->GetEndTime ().GetDouble ();
+  bool updatePartialPower = false;
+  InterferenceChanges::iterator currentItem = m_changes.begin();
 
-  for (InterferenceChanges::iterator item = m_changes.begin(); item != m_changes.end () && calcReady == false; item++)
+  // calculate power values until own "stop" event found (own negative power event)
+  while ( (currentItem != m_changes.end ()) &&
+         !( (event->GetId () == currentItem->second.first) && (event->GetRxPower () == -currentItem->second.second)) )
     {
-      if ( event->GetId () == item->second.first && event->GetRxPower () == -item->second.second)
+      if (event->GetId () == currentItem->second.first)
         {
-          calcReady = true; // receivers own 'end' event reached
+          // stop increasing power value fully, when own 'start' event is reached
+          // needed to support multiple simultaneous receiving (currently not supported)
+          // own event is not updated to ifPower
+          updatePartialPower = true;
         }
-      else if (event->GetId () == item->second.first)
+      else if (updatePartialPower)
         {
-          // stop first power increasing when own 'start' event is reached
-          // needed to support multiple simultaneous receiving
-          increaseFirstPower = false;
-        }
-      else if (increaseFirstPower)
-        {
-          // increase first power (until own 'start' event is reached)
-          firstPower += item->second.second;
+          // increase/decrease interference power with relative part of duration of power change in list
+          double itemTime = currentItem->first.GetDouble();
+          ifPowerW += ((rxEndTime - itemTime) / rxDuration) * currentItem->second.second;
         }
       else
         {
-          // increase/descrease final power according to change in list
-          double itemTime = item->first.GetDouble();
-          finalPower += ((rxEndTime - itemTime) / rxDuration) * item->second.second;
+          // increase/decrease interference power with full power change in list
+          ifPowerW += currentItem->second.second;
         }
-    }
 
-  finalPower += firstPower;
+      currentItem++;
+    }
 
   if (m_enableTraceOutput)
     {
       std::vector<double> tempVector;
-      tempVector.push_back (Now ().GetSeconds ());
-      tempVector.push_back (finalPower / m_rxBandwidth_Hz);
+      tempVector.push_back (Now ().GetSeconds());
+      tempVector.push_back (ifPowerW / m_rxBandwidth_Hz);
       SatHelper::m_satIntfOutputTraceContainer->AddToContainer (std::make_pair (event->GetTerrestrialNodeAddress (), m_channelType), tempVector);
     }
 
-  return finalPower;
+  return ifPowerW;
 }
 
 void
 SatPerPacketInterference::DoReset (void)
 {
+  NS_LOG_FUNCTION (this);
+
   m_changes.clear ();
   m_rxing = false;
-  m_firstPower = 0.0;
+  m_firstPowerW = 0.0;
 }
 
 void
 SatPerPacketInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
 {
+  NS_LOG_FUNCTION (this);
+
   std::pair<std::set<uint32_t>::iterator, bool> result = m_events.insert (event->GetId ());
 
   NS_ASSERT (result.second);
@@ -178,6 +189,8 @@ SatPerPacketInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
 void
 SatPerPacketInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 {
+  NS_LOG_FUNCTION (this);
+
   m_events.erase (event->GetId ());
 
   if (m_events.empty ())
@@ -189,12 +202,16 @@ SatPerPacketInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 void
 SatPerPacketInterference::DoDispose ()
 {
+  NS_LOG_FUNCTION (this);
+
   SatInterference::DoDispose ();
 }
 
 void
 SatPerPacketInterference::SetRxBandwidth (double rxBandwidth)
 {
+  NS_LOG_FUNCTION (this);
+
   if (!m_rxBandwidth_Hz > 0)
     {
       NS_FATAL_ERROR ("SatPerPacketInterference::SetRxBandwidth - Invalid value");
