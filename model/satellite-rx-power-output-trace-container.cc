@@ -19,8 +19,8 @@
  */
 #include "satellite-rx-power-output-trace-container.h"
 #include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-singleton.h"
-#include "ns3/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "satellite-mac-id-mac-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatRxPowerOutputTraceContainer");
 
@@ -41,7 +41,7 @@ SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
 {
   NS_LOG_FUNCTION (this);
 
-  m_currentWorkingDirectory = (SatSingleton<SatEnvVariables>::Instance ()).GetCurrentWorkingDirectory ();
+  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatRxPowerOutputTraceContainer::~SatRxPowerOutputTraceContainer ()
@@ -56,8 +56,6 @@ SatRxPowerOutputTraceContainer::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  WriteToFile ();
-
   Reset ();
 
   SatBaseTraceContainer::DoDispose ();
@@ -70,6 +68,8 @@ SatRxPowerOutputTraceContainer::Reset ()
 
   if (!m_container.empty ())
     {
+      WriteToFile ();
+
       m_container.clear ();
     }
   m_currentWorkingDirectory = "";
@@ -82,7 +82,7 @@ SatRxPowerOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/rxpowertraces/output/id_" << SatHelper::m_satMacIdMacMapper->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/src/satellite/data/rxpowertraces/output/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

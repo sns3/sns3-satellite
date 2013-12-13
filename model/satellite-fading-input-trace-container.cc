@@ -19,8 +19,8 @@
  */
 #include "satellite-fading-input-trace-container.h"
 #include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-singleton.h"
-#include "ns3/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "satellite-mac-id-mac-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFadingInputTraceContainer");
 
@@ -41,7 +41,7 @@ SatFadingInputTraceContainer::SatFadingInputTraceContainer () :
 {
   NS_LOG_FUNCTION (this);
 
-  m_currentWorkingDirectory = (SatSingleton<SatEnvVariables>::Instance ()).GetCurrentWorkingDirectory ();
+  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatFadingInputTraceContainer::~SatFadingInputTraceContainer ()
@@ -80,7 +80,7 @@ SatFadingInputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/input/id_" << SatHelper::m_satMacIdMacMapper->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/input/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

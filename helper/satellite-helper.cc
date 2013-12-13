@@ -34,14 +34,6 @@ NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
 namespace ns3 {
 
-Ptr<SatInterferenceInputTraceContainer> SatHelper::m_satIntfInputTraceContainer;
-Ptr<SatInterferenceOutputTraceContainer> SatHelper::m_satIntfOutputTraceContainer;
-Ptr<SatRxPowerInputTraceContainer> SatHelper::m_satRxPowerInputTraceContainer;
-Ptr<SatRxPowerOutputTraceContainer> SatHelper::m_satRxPowerOutputTraceContainer;
-Ptr<SatFadingOutputTraceContainer> SatHelper::m_satFadingOutputTraceContainer;
-Ptr<SatFadingInputTraceContainer> SatHelper::m_satFadingInputTraceContainer;
-Ptr<SatMacIdMacMapper> SatHelper::m_satMacIdMacMapper;
-
 NS_OBJECT_ENSURE_REGISTERED (SatHelper);
 
 TypeId
@@ -102,16 +94,6 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string gwPos = scenarioName + "GwPos.txt";
   std::string satPos = scenarioName + "GeoPos.txt";
   std::string wfConf = "dvbRcs2Waveforms.txt";
-
-  /// TODO these should be moved to a different class
-  /// TODO trace objects should be created only when needed
-  m_satIntfInputTraceContainer = CreateObject <SatInterferenceInputTraceContainer> ();
-  m_satIntfOutputTraceContainer = CreateObject <SatInterferenceOutputTraceContainer> ();
-  m_satRxPowerInputTraceContainer = CreateObject <SatRxPowerInputTraceContainer> ();
-  m_satRxPowerOutputTraceContainer = CreateObject <SatRxPowerOutputTraceContainer> ();
-  m_satFadingOutputTraceContainer = CreateObject <SatFadingOutputTraceContainer> ();
-  m_satFadingInputTraceContainer = CreateObject <SatFadingInputTraceContainer> ();
-  m_satMacIdMacMapper = CreateObject <SatMacIdMacMapper> ();
 
   m_satConf = CreateObject<SatConf> ();
 
@@ -488,13 +470,6 @@ SatHelper::CreateCreationSummary(std::string title)
 void
 SatHelper::DoDispose()
 {
-  m_satIntfInputTraceContainer = NULL;
-  m_satIntfOutputTraceContainer = NULL;
-  m_satRxPowerInputTraceContainer = NULL;
-  m_satRxPowerOutputTraceContainer = NULL;
-  m_satFadingOutputTraceContainer = NULL;
-  m_satFadingInputTraceContainer = NULL;
-  m_satMacIdMacMapper = NULL;
 }
 
 } // namespace ns3

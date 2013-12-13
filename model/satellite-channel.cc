@@ -32,7 +32,11 @@
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
 #include "satellite-mac-tag.h" /// TODO do not introduce the whole class
-#include "ns3/satellite-helper.h" /// TODO do not introduce the whole class
+#include "ns3/singleton.h"
+#include "ns3/boolean.h"
+#include "satellite-rx-power-output-trace-container.h"
+#include "satellite-rx-power-input-trace-container.h"
+#include "satellite-fading-output-trace-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 
@@ -203,13 +207,13 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       case SatEnums::RETURN_FEEDER_CH:
       case SatEnums::FORWARD_USER_CH:
         {
-          SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
+          Singleton<SatRxPowerOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
           break;
         }
       case SatEnums::FORWARD_FEEDER_CH:
       case SatEnums::RETURN_USER_CH:
         {
-          SatHelper::m_satRxPowerOutputTraceContainer->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
+          Singleton<SatRxPowerOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
           break;
         }
       default:
@@ -228,13 +232,13 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
       case SatEnums::RETURN_FEEDER_CH:
       case SatEnums::FORWARD_USER_CH:
         {
-          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
+          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
           break;
         }
       case SatEnums::FORWARD_FEEDER_CH:
       case SatEnums::RETURN_USER_CH:
         {
-          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * SatHelper::m_satRxPowerInputTraceContainer->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
+          rxParams->m_rxPower_W = rxParams->m_carrierFreq_hz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
           break;
         }
       default:
@@ -257,13 +261,13 @@ SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
       case SatEnums::RETURN_FEEDER_CH:
       case SatEnums::FORWARD_USER_CH:
         {
-          SatHelper::m_satFadingOutputTraceContainer->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
+          Singleton<SatFadingOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
           break;
         }
       case SatEnums::FORWARD_FEEDER_CH:
       case SatEnums::RETURN_USER_CH:
         {
-          SatHelper::m_satFadingOutputTraceContainer->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
+          Singleton<SatFadingOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
           break;
         }
       default:

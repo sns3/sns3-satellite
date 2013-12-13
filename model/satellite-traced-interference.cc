@@ -21,7 +21,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "satellite-traced-interference.h"
-#include "ns3/satellite-helper.h"
+#include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatTracedInterference");
 
@@ -93,7 +93,7 @@ SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
   NS_LOG_FUNCTION (this);
 
-  m_power = m_rxBandwidth_Hz * SatHelper::m_satIntfInputTraceContainer->GetInterferenceDensity (std::make_pair (event->GetTerrestrialNodeAddress (),m_channelType));
+  m_power = m_rxBandwidth_Hz * Singleton<SatInterferenceInputTraceContainer>::Get ()->GetInterferenceDensity (std::make_pair (event->GetTerrestrialNodeAddress (),m_channelType));
 
   return m_power;
 }

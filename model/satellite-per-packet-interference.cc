@@ -22,7 +22,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "satellite-per-packet-interference.h"
-#include "ns3/satellite-helper.h"
+#include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPerPacketInterference");
 
@@ -159,7 +159,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::Event> event)
       std::vector<double> tempVector;
       tempVector.push_back (Now ().GetSeconds());
       tempVector.push_back (ifPowerW / m_rxBandwidth_Hz);
-      SatHelper::m_satIntfOutputTraceContainer->AddToContainer (std::make_pair (event->GetTerrestrialNodeAddress (), m_channelType), tempVector);
+      Singleton<SatInterferenceOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (event->GetTerrestrialNodeAddress (), m_channelType), tempVector);
     }
 
   return ifPowerW;

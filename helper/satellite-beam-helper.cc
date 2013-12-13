@@ -34,8 +34,9 @@
 #include "../model/satellite-propagation-delay-model.h"
 #include "../model/satellite-antenna-gain-pattern-container.h"
 #include "satellite-beam-helper.h"
-#include "satellite-helper.h"
+#include "ns3/satellite-fading-input-trace-container.h"
 #include "ns3/satellite-fading-input-trace.h"
+#include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 
@@ -615,7 +616,8 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
         case SatEnums::FADING_TRACE:
           {
             /// create a input trace fading container based on default configuration
-            fadingContainer = CreateObject<SatFadingInputTrace> (SatHelper::m_satFadingInputTraceContainer);
+
+            fadingContainer = CreateObject<SatFadingInputTrace> (Singleton<SatFadingInputTraceContainer>::Get ());
 
             node->AggregateObject (fadingContainer);
             break;

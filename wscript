@@ -201,7 +201,6 @@ def build(bld):
         'model/satellite-mac-id-mac-mapper.h',
         'model/satellite-bbframe.h',       
         'utils/satellite-env-variables.h',
-        'utils/satellite-singleton.h',
         'utils/satellite-output-fstream-wrapper.h',
         'utils/satellite-output-fstream-double-container.h',
         'utils/satellite-output-fstream-string-container.h',
