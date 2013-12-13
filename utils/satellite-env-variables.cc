@@ -34,7 +34,7 @@ SatEnvVariables::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatEnvVariables")
     .SetParent<Object> ()
-    .AddConstructor<SatEnvVariables>();
+    .AddConstructor<SatEnvVariables> ();
   return tid;
 }
 

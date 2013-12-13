@@ -19,6 +19,7 @@
  */
 #include "satellite-fading-output-trace-container.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-singleton.h"
 #include "ns3/satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFadingOutputTraceContainer");
@@ -40,8 +41,7 @@ SatFadingOutputTraceContainer::SatFadingOutputTraceContainer () :
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
-  m_currentWorkingDirectory = envVariables->GetCurrentWorkingDirectory ();
+  m_currentWorkingDirectory = (SatSingleton<SatEnvVariables>::Instance ()).GetCurrentWorkingDirectory ();
 }
 
 SatFadingOutputTraceContainer::~SatFadingOutputTraceContainer ()

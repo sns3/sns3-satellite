@@ -36,6 +36,12 @@ class SatEnvVariables : public Object
 public:
 
   /**
+   * \brief NS-3 function for type id
+   * \return type id
+   */
+  static TypeId GetTypeId (void);
+
+  /**
    * \brief Constructor
    */
   SatEnvVariables ();
@@ -43,13 +49,7 @@ public:
   /**
    * \brief Destructor
    */
-  virtual ~SatEnvVariables ();
-
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+  ~SatEnvVariables ();
 
   /**
    * \brief Function for getting the path to current working directory
@@ -64,11 +64,6 @@ public:
   std::string GetPathToExecutable ();
 
 private:
-
-  /**
-   *
-   */
-  void ReadExecutablePath ();
 
   /**
    * \brief Path to current working directory
