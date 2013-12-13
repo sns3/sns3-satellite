@@ -46,6 +46,8 @@ SatBaseFading::~SatBaseFading ()
 double
 SatBaseFading::GetFading (Address macAddress, SatEnums::ChannelType_t channelType)
 {
+  NS_LOG_FUNCTION (this);
+
   return DoGetFading (macAddress,channelType);
 }
 

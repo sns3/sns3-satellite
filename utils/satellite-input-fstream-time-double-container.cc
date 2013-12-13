@@ -123,6 +123,8 @@ SatInputFileStreamTimeDoubleContainer::UpdateContainer (std::string filename, st
 std::vector<double>
 SatInputFileStreamTimeDoubleContainer::ReadRow ()
 {
+  NS_LOG_FUNCTION (this);
+
   double tempValue;
   std::vector<double> tempVector;
 
@@ -137,6 +139,8 @@ SatInputFileStreamTimeDoubleContainer::ReadRow ()
 void
 SatInputFileStreamTimeDoubleContainer::CheckContainerSanity ()
 {
+  NS_LOG_FUNCTION (this);
+
   /// check time sample sanity
   if (m_container.size () < 1)
     {

@@ -45,7 +45,7 @@ SatLooModel::SatLooModel () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT(0);
+  NS_FATAL_ERROR ("SatLooModel - Constructor not in use");
 }
 
 SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState) :
@@ -311,6 +311,8 @@ SatLooModel::ChangeState (uint32_t newState)
 void
 SatLooModel::CalculateSigma ()
 {
+  NS_LOG_FUNCTION (this);
+
   for (uint32_t i = 0; i < m_numOfStates; i++)
     {
       m_sigma.push_back (sqrt (0.5 * pow (10,(m_looParameters[i][2] / 10))));

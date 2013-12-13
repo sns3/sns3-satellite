@@ -51,6 +51,8 @@ SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltyp
     m_channelType (channeltype),
     m_rxBandwidth_Hz (rxBandwidth)
 {
+  NS_LOG_FUNCTION (this);
+
   if (!m_rxBandwidth_Hz > 0)
     {
       NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Invalid value");
@@ -63,17 +65,23 @@ SatTracedInterference::SatTracedInterference () :
     m_channelType (),
     m_rxBandwidth_Hz ()
 {
+  NS_LOG_FUNCTION (this);
+
   NS_FATAL_ERROR ("SatTracedInterference - Constructor not in use");
 }
 
 SatTracedInterference::~SatTracedInterference ()
 {
+  NS_LOG_FUNCTION (this);
+
   Reset ();
 }
 
 Ptr<SatInterference::Event>
 SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
+  NS_LOG_FUNCTION (this);
+
   Ptr<SatInterference::Event> event;
   event = Create<SatInterference::Event> (0, duration, power, rxAddress);
 
@@ -83,6 +91,8 @@ SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 double
 SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 {
+  NS_LOG_FUNCTION (this);
+
   m_power = m_rxBandwidth_Hz * SatHelper::m_satIntfInputTraceContainer->GetInterferenceDensity (std::make_pair (event->GetTerrestrialNodeAddress (),m_channelType));
 
   return m_power;
@@ -91,30 +101,38 @@ SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
 void
 SatTracedInterference::DoReset (void)
 {
-
+  NS_LOG_FUNCTION (this);
 }
 
 void
 SatTracedInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
 {
+  NS_LOG_FUNCTION (this);
+
   m_rxing = true;
 }
 
 void
 SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
 {
+  NS_LOG_FUNCTION (this);
+
   m_rxing = false;
 }
 
 void
 SatTracedInterference::DoDispose ()
 {
+  NS_LOG_FUNCTION (this);
+
   SatInterference::DoDispose();
 }
 
 void
 SatTracedInterference::SetRxBandwidth (double rxBandwidth)
 {
+  NS_LOG_FUNCTION (this);
+
   if (!m_rxBandwidth_Hz > 0)
     {
       NS_FATAL_ERROR ("SatTracedInterference::SetRxBandwidth - Invalid value");

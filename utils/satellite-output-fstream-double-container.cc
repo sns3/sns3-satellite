@@ -48,7 +48,10 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::str
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
-  NS_ASSERT (m_valuesInRow > 0);
+  if (!m_valuesInRow > 0)
+    {
+      NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer - No values in the row");
+    }
 }
 
 SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer () :
@@ -62,7 +65,7 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer () :
     m_figureUnitConversionType ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (0);
+  NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer - Constructor not in use");
 }
 
 SatOutputFileStreamDoubleContainer::~SatOutputFileStreamDoubleContainer ()
@@ -123,6 +126,8 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
 void
 SatOutputFileStreamDoubleContainer::PrintFigure ()
 {
+  NS_LOG_FUNCTION (this);
+
   Gnuplot2dDataset dataset = GetGnuplotDataset ();
   Gnuplot plot = GetGnuplot ();
   plot.AddDataset (dataset);
@@ -147,7 +152,10 @@ SatOutputFileStreamDoubleContainer::AddToContainer (std::vector<double> newItem)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (newItem.size () == m_valuesInRow);
+  if (!newItem.size () == m_valuesInRow)
+    {
+      NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer::AddToContainer - Invalid vector size");
+    }
 
   m_container.push_back (newItem);
 }
@@ -209,6 +217,8 @@ SatOutputFileStreamDoubleContainer::ClearContainer ()
 Gnuplot2dDataset
 SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
 {
+  NS_LOG_FUNCTION (this);
+
   Gnuplot2dDataset ret;
   ret.SetTitle (m_title);
   ret.SetStyle (Gnuplot2dDataset::LINES);
@@ -237,6 +247,8 @@ SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
 double
 SatOutputFileStreamDoubleContainer::ConvertValue (double value)
 {
+  NS_LOG_FUNCTION (this << value);
+
   switch (m_figureUnitConversionType)
   {
     case RAW:
@@ -271,6 +283,8 @@ SatOutputFileStreamDoubleContainer::ConvertValue (double value)
 Gnuplot
 SatOutputFileStreamDoubleContainer::GetGnuplot ()
 {
+  NS_LOG_FUNCTION (this);
+
   Gnuplot ret (m_fileName + ".png");
   ret.SetTitle (m_title);
   ret.SetTerminal ("png");
@@ -283,6 +297,8 @@ SatOutputFileStreamDoubleContainer::GetGnuplot ()
 void
 SatOutputFileStreamDoubleContainer::EnableFigureOutput (std::string title, std::string legendY, std::string legendX, std::string keyPosition, FigureUnitConversion_t figureUnitConversionType)
 {
+  NS_LOG_FUNCTION (this);
+
   m_printFigure = true;
   m_title = title;
   m_legendY = legendY;

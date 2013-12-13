@@ -97,7 +97,11 @@ SatLooConf::GetParameters (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
-  NS_ASSERT ( (set >= 0) && (set < m_elevationCount));
+  if (set < 0 && set >= m_elevationCount)
+    {
+      NS_FATAL_ERROR ("SatLooConf::GetParameters - Invalid set");
+    }
+
   NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatLooConf - Getting Loo parameters for set ID " << set);
   return m_looParameters[set];
 }

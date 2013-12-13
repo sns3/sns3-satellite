@@ -128,7 +128,10 @@ SatMarkovConf::SatMarkovConf () :
   m_looConf = CreateObject<SatLooConf> ();
   m_rayleighConf = CreateObject<SatRayleighConf> ();
 
-  NS_ASSERT (m_markovElevations.size() == m_elevationCount);
+  if (!m_markovElevations.size() == m_elevationCount)
+    {
+      NS_FATAL_ERROR ("SatMarkovConf - Markov elevations does not match");
+    }
 }
 
 SatMarkovConf::~SatMarkovConf ()
@@ -172,7 +175,11 @@ SatMarkovConf::GetElevationProbabilities (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
-  NS_ASSERT ( (set >= 0) && (set < m_elevationCount));
+  if (set < 0 && set >= m_elevationCount)
+    {
+      NS_FATAL_ERROR ("SatMarkovConf::GetElevationProbabilities - Invalid set");
+    }
+
   NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << set);
   return m_markovProbabilities[set];
 }
@@ -182,7 +189,10 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
 {
   NS_LOG_FUNCTION (this << elevation);
 
-  NS_ASSERT ((elevation >= 0.0) && (elevation <= 90.0));
+  if (elevation < 0.0 && elevation > 90.0)
+    {
+      NS_FATAL_ERROR ("SatMarkovConf::GetProbabilitySetID - Invalid elevation");
+    }
 
   uint32_t smallestDifferenceIndex = 0;
   double smallestDifference = 360; /// elevation angle can never be this large
@@ -248,7 +258,10 @@ SatMarkovConf::GetInitialState ()
       total += m_initialProbabilities[i];
     }
 
-  NS_ASSERT(total == 1);
+  if (!total == 1)
+    {
+      NS_FATAL_ERROR ("SatMarkovConf::GetInitialState - Total sum doesn not match");
+    }
 
   double r = total * (std::rand () / double (RAND_MAX));
   double acc = 0.0;
@@ -285,12 +298,16 @@ SatMarkovConf::GetRayleighConf ()
 SatMarkovConf::MarkovFaderType_t
 SatMarkovConf::GetFaderType ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_faderType;
 }
 
 bool
 SatMarkovConf::AreDecibelsUsed ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_useDecibels;
 }
 

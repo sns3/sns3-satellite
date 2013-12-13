@@ -42,7 +42,7 @@ SatMarkovModel::SatMarkovModel () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT(0);
+  NS_FATAL_ERROR ("SatMarkovModel - Constructor not in use");
 }
 
 SatMarkovModel::SatMarkovModel (uint32_t numOfStates, uint32_t initialState) :
@@ -104,7 +104,11 @@ SatMarkovModel::SetState (uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newState);
 
-  NS_ASSERT ((newState >= 0 ) && (newState < m_numOfStates));
+  if ( (newState < 0) || (newState >= m_numOfStates ))
+    {
+      NS_FATAL_ERROR ("SatMarkovModel::SetState - Invalid state");
+    }
+
   m_currentState = newState;
 }
 
@@ -121,7 +125,10 @@ SatMarkovModel::DoTransition ()
       total += m_probabilities[m_currentState * m_numOfStates + i];
     }
 
-  NS_ASSERT(total == 1);
+  if ( !(total == 1) )
+    {
+      NS_FATAL_ERROR ("SatMarkovModel::DoTransition - Probability sum does not match");
+    }
 
   double r = total * (std::rand () / double (RAND_MAX));
 
@@ -148,8 +155,8 @@ SatMarkovModel::DoTransition ()
 
 void
 SatMarkovModel::SetProbability (uint32_t from,
-                                     uint32_t to,
-                                     double probability)
+                                uint32_t to,
+                                double probability)
 {
   NS_LOG_FUNCTION (this << from << " " << to << " " << probability);
 

@@ -40,7 +40,7 @@ SatRayleighModel::SatRayleighModel () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT(0);
+  NS_FATAL_ERROR ("SatRayleighModel - Constructor not in use");
 }
 
 SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState) :

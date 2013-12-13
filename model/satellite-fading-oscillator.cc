@@ -41,7 +41,7 @@ SatFadingOscillator::SatFadingOscillator () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT(0);
+  NS_FATAL_ERROR ("SatFadingOscillator - Constructor not in use");
 }
 
 SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega) :

@@ -61,7 +61,7 @@ SatMarkovContainer::SatMarkovContainer () :
     m_useDecibels (false)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT(0);
+  NS_FATAL_ERROR ("SatMarkovContainer - Constructor not in use");
 }
 
 SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFading::ElevationCallback elevation, SatBaseFading::VelocityCallback velocity) :
@@ -162,7 +162,7 @@ SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
       }
     default :
       {
-        NS_ASSERT(0);
+        NS_FATAL_ERROR ("SatMarkovContainer::CreateFaders - Invalid fader type");
       }
   }
 }
@@ -216,10 +216,9 @@ SatMarkovContainer::GetCachedFadingValue (SatEnums::ChannelType_t channelType)
       }
     default :
       {
-        NS_ASSERT (0);
+        NS_FATAL_ERROR ("SatMarkovContainer::GetCachedFadingValue - Invalid channel type");
       }
   }
-  NS_ASSERT (0);
   return 0;
 }
 
@@ -282,7 +281,7 @@ SatMarkovContainer::HasCooldownPeriodPassed (SatEnums::ChannelType_t channelType
       }
     default :
       {
-        NS_ASSERT (0);
+        NS_FATAL_ERROR ("SatMarkovContainer::HasCooldownPeriodPassed - Invalid channel type");
       }
   }
   return false;
@@ -361,12 +360,11 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
 
         return m_latestCalculatedFadingValue_down;
       }
-    default :
+    default:
       {
-        NS_ASSERT (0);
+        NS_FATAL_ERROR ("SatMarkovContainer::CalculateFading - Invalid channel type");
       }
   }
-  NS_ASSERT (0);
   return -1;
 }
 
@@ -375,8 +373,14 @@ SatMarkovContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newSet << " " << newState);
 
-  NS_ASSERT( (newState >= 0) && (newState < m_numOfStates));
-  NS_ASSERT( (newSet >= 0) && (newSet < m_numOfSets));
+  if ( newState < 0 || newState >= m_numOfStates)
+    {
+      NS_FATAL_ERROR ("SatMarkovContainer::LockToSetAndState - Invalid state");
+    }
+  if ( newSet < 0 || newSet >= m_numOfSets)
+    {
+      NS_FATAL_ERROR ("SatMarkovContainer::LockToSetAndState - Invalid set");
+    }
 
   m_currentSet = newSet;
   m_currentState = newState;
@@ -392,7 +396,10 @@ SatMarkovContainer::LockToSet (uint32_t newSet)
 {
   NS_LOG_FUNCTION (this << newSet);
 
-  NS_ASSERT ( (newSet >= 0) && (newSet < m_numOfSets));
+  if ( newSet < 0 || newSet >= m_numOfSets)
+    {
+      NS_FATAL_ERROR ("SatMarkovContainer::LockToSetAndState - Invalid set");
+    }
 
   m_currentSet = newSet;
 
