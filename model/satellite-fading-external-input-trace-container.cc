@@ -20,30 +20,30 @@
 
 #include <sstream>
 #include "ns3/log.h"
-#include "satellite-channel-external-fading-trace-container.h"
+#include "satellite-fading-external-input-trace-container.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatChannelExternalFadingTraceContainer");
+NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTraceContainer");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatChannelExternalFadingTraceContainer);
+NS_OBJECT_ENSURE_REGISTERED (SatFadingExternalInputTraceContainer);
 
 TypeId
-SatChannelExternalFadingTraceContainer::GetTypeId (void)
+SatFadingExternalInputTraceContainer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatChannelExternalFadingTraceContainer")
+  static TypeId tid = TypeId ("ns3::SatFadingExternalInputTraceContainer")
     .SetParent<Object> ()
-    .AddConstructor<SatChannelExternalFadingTraceContainer> ()
+    .AddConstructor<SatFadingExternalInputTraceContainer> ()
   ;
   return tid;
 }
 
-SatChannelExternalFadingTraceContainer::SatChannelExternalFadingTraceContainer ()
+SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
 {
-  NS_ASSERT (true);
+  NS_FATAL_ERROR ("SatFadingExternalInputTraceContainer - Constructor not in use");
 }
 
-SatChannelExternalFadingTraceContainer::SatChannelExternalFadingTraceContainer (uint32_t numUts, uint32_t numGws)
+SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer (uint32_t numUts, uint32_t numGws)
 {
   NS_LOG_FUNCTION (this << numUts << numGws);
 
@@ -53,12 +53,12 @@ SatChannelExternalFadingTraceContainer::SatChannelExternalFadingTraceContainer (
 }
 
 
-SatChannelExternalFadingTraceContainer::~SatChannelExternalFadingTraceContainer ()
+SatFadingExternalInputTraceContainer::~SatFadingExternalInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-void SatChannelExternalFadingTraceContainer::CreateUtFadingTraces (uint32_t numUts)
+void SatFadingExternalInputTraceContainer::CreateUtFadingTraces (uint32_t numUts)
 {
   NS_LOG_FUNCTION (this << numUts);
 
@@ -73,8 +73,8 @@ void SatChannelExternalFadingTraceContainer::CreateUtFadingTraces (uint32_t numU
       std::string fwd = path + "term_ID" + ss.str () + "_fading_fwddwn.dat";
       std::string ret = path + "term_ID" + ss.str () + "_fading_rtnup.dat";
 
-      Ptr<SatChannelExternalFadingTrace> ftRet = CreateObject<SatChannelExternalFadingTrace> (SatChannelExternalFadingTrace::FT_TWO_COLUMN, ret);
-      Ptr<SatChannelExternalFadingTrace> ftFwd = CreateObject<SatChannelExternalFadingTrace> (SatChannelExternalFadingTrace::FT_THREE_COLUMN, fwd);
+      Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
+      Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_THREE_COLUMN, fwd);
 
       // First = RETURN_USER
       // Second = FORWARD_USER
@@ -82,7 +82,7 @@ void SatChannelExternalFadingTraceContainer::CreateUtFadingTraces (uint32_t numU
     }
 }
 
-void SatChannelExternalFadingTraceContainer::CreateGwFadingTraces (uint32_t numGws)
+void SatFadingExternalInputTraceContainer::CreateGwFadingTraces (uint32_t numGws)
 {
   NS_LOG_FUNCTION (this << numGws);
 
@@ -97,8 +97,8 @@ void SatChannelExternalFadingTraceContainer::CreateGwFadingTraces (uint32_t numG
       std::string fwd = path + "GW_ID" + ss.str () + "_fading_fwdup.dat";
       std::string ret = path + "GW_ID" + ss.str () + "_fading_rtndwn.dat";
 
-      Ptr<SatChannelExternalFadingTrace> ftRet = CreateObject<SatChannelExternalFadingTrace> (SatChannelExternalFadingTrace::FT_TWO_COLUMN, ret);
-      Ptr<SatChannelExternalFadingTrace> ftFwd = CreateObject<SatChannelExternalFadingTrace> (SatChannelExternalFadingTrace::FT_TWO_COLUMN, fwd);
+      Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
+      Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, fwd);
 
       // First = RETURN_FEEDER
       // Second = FORWARD_FEEDR
@@ -107,14 +107,14 @@ void SatChannelExternalFadingTraceContainer::CreateGwFadingTraces (uint32_t numG
 }
 
 
-Ptr<SatChannelExternalFadingTrace>
-SatChannelExternalFadingTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const
+Ptr<SatFadingExternalInputTrace>
+SatFadingExternalInputTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const
 {
   NS_LOG_FUNCTION (this << nodeId);
   NS_ASSERT (!m_utFadingMap.empty ());
   NS_ASSERT (!m_gwFadingMap.empty ());
 
-  Ptr<SatChannelExternalFadingTrace> ft;
+  Ptr<SatFadingExternalInputTrace> ft;
   switch (channelType)
   {
     case SatEnums::FORWARD_USER_CH:
@@ -141,7 +141,8 @@ SatChannelExternalFadingTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnum
 }
 
 
-bool SatChannelExternalFadingTraceContainer::TestFadingTraces () const
+bool
+SatFadingExternalInputTraceContainer::TestFadingTraces () const
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (!m_utFadingMap.empty ());

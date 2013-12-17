@@ -107,9 +107,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
 
           NS_LOG_LOGIC ( "First power after erase: " << m_firstPowerW);
         }
-
       m_changes.erase (m_changes.begin (), nowIterator);
-
     }
 
   NS_LOG_LOGIC ( "Change count before addition: " << m_changes.size() );
