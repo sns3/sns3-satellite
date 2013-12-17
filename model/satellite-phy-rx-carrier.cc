@@ -199,6 +199,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           bool ownAddressFound = false;
           Mac48Address source;
           Mac48Address dest;
+          Ptr<SatInterference::Event> interferenceEvent;
 
           for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
                 ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
@@ -231,13 +232,13 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             case SatEnums::FORWARD_FEEDER_CH:
             case SatEnums::RETURN_USER_CH:
               {
-                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, source);
+                interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, source);
                 break;
               }
             case SatEnums::FORWARD_USER_CH:
             case SatEnums::RETURN_FEEDER_CH:
               {
-                m_interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
+                interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
                 break;
               }
             case SatEnums::UNKNOWN_CH:
@@ -263,6 +264,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               // destination addresses of packet
               m_destAddress = dest;
               m_sourceAddress = source;
+              m_interferenceEvent = interferenceEvent;
 
               m_satInterference->NotifyRxStart (m_interferenceEvent);
 

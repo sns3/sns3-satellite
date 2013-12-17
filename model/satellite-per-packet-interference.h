@@ -119,7 +119,7 @@ private:
   /**
    *
    */
-  typedef std::pair <uint32_t, double > InterferenceChange;
+  typedef std::pair <uint32_t, long double > InterferenceChange;
 
   /**
    *
@@ -152,7 +152,7 @@ private:
   /**
    * \brief First power value for interference. Sum of negative values in list m_changes, which positive value is not in list
    */
-  double m_firstPowerW;
+  long double m_firstPowerW;
 
   /**
    * \brief flag to indicate that at least one receiving is on
