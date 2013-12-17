@@ -95,7 +95,7 @@ SatMarkovConf::SatMarkovConf () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf...");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -200,7 +200,7 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
 
   std::map<double, uint32_t>::iterator iter;
 
-  for (iter = m_markovElevations.begin (); iter != m_markovElevations.end (); ++iter)
+  for (iter = m_markovElevations.begin (); iter != m_markovElevations.end (); iter++)
     {
       difference = fabs (iter->first - elevation);
       if (difference < smallestDifference)

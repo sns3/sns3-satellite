@@ -31,7 +31,7 @@
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
-#include "satellite-mac-tag.h" /// TODO do not introduce the whole class
+#include "satellite-mac-tag.h"
 #include "ns3/singleton.h"
 #include "ns3/boolean.h"
 #include "satellite-rx-power-output-trace-container.h"

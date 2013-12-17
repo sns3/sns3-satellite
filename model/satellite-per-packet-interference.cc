@@ -101,9 +101,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
         {
           m_firstPowerW += i->second.second;
         }
-
       m_changes.erase (m_changes.begin (), nowIterator);
-
     }
 
   m_changes.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));

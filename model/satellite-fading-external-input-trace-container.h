@@ -19,38 +19,50 @@
  */
 
 
-#ifndef SATELLITE_CHANNEL_EXTERNAL_FADING_TRACE_CONTAINER_H_
-#define SATELLITE_CHANNEL_EXTERNAL_FADING_TRACE_CONTAINER_H_
+#ifndef SATELLITE_FADING_EXTERNAL_INPUT_TRACE_CONTAINER_H_
+#define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_CONTAINER_H_
 
 #include <map>
 #include "ns3/object.h"
-#include "satellite-channel-external-fading-trace.h"
+#include "satellite-fading-external-input-trace.h"
 #include "satellite-channel.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Satellite channel external fading trace container
+ * \brief Satellite fading external input trace container
  */
-class SatChannelExternalFadingTraceContainer : public Object
+class SatFadingExternalInputTraceContainer : public Object
 {
 public:
 
-  typedef std::pair<Ptr<SatChannelExternalFadingTrace>, Ptr<SatChannelExternalFadingTrace> >  ChannelTracePair_t;
+  typedef std::pair<Ptr<SatFadingExternalInputTrace>, Ptr<SatFadingExternalInputTrace> >  ChannelTracePair_t;
 
   static TypeId GetTypeId (void);
 
-  SatChannelExternalFadingTraceContainer ();
-  SatChannelExternalFadingTraceContainer (uint32_t numUts, uint32_t numGws);
+  /**
+   * \brief Constructor
+   */
+  SatFadingExternalInputTraceContainer ();
 
-  ~SatChannelExternalFadingTraceContainer ();
+  /**
+   * \brief Constructor
+   * \param numUts number of UTs
+   * \param numGws number of GWs
+   */
+  SatFadingExternalInputTraceContainer (uint32_t numUts, uint32_t numGws);
+
+  /**
+   * \brief Destructor
+   */
+  ~SatFadingExternalInputTraceContainer ();
 
   /**
    * Get method for getting a proper fading trace
    * \return Channel fading trace for a certain node and channel.
    */
-  Ptr<SatChannelExternalFadingTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const;
+  Ptr<SatFadingExternalInputTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const;
 
   /**
    * A method to test that the fading traces are according to
@@ -90,4 +102,4 @@ private:
 } // namespace ns3
 
 
-#endif /* SATELLITE_CHANNEL_EXTERNAL_FADING_TRACE_CONTAINER_H_ */
+#endif /* SATELLITE_FADING_EXTERNAL_INPUT_TRACE_CONTAINER_H_ */

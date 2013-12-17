@@ -28,7 +28,7 @@
 #include "ns3/test.h"
 #include "ns3/timer.h"
 #include "ns3/simulator.h"
-#include "../model/satellite-channel-external-fading-trace-container.h"
+#include "../model/satellite-fading-external-input-trace-container.h"
 #include "../model/satellite-channel.h"
 
 
@@ -49,7 +49,7 @@ public:
 private:
   virtual void DoRun (void);
 
-  Ptr<SatChannelExternalFadingTraceContainer> m_fadingTraceContainer;
+  Ptr<SatFadingExternalInputTraceContainer> m_fadingTraceContainer;
 
   std::vector<double> m_results;
 };
@@ -65,7 +65,7 @@ SatFadingTraceTestCase::~SatFadingTraceTestCase ()
 
 void SatFadingTraceTestCase::TestGetFading (uint32_t nodeId, SatEnums::ChannelType_t channelType)
 {
-  Ptr<SatChannelExternalFadingTrace> trace = m_fadingTraceContainer->GetFadingTrace (nodeId, channelType);
+  Ptr<SatFadingExternalInputTrace> trace = m_fadingTraceContainer->GetFadingTrace (nodeId, channelType);
   double fading = trace->GetFading ();
   m_results.push_back (fading);
 }
@@ -79,7 +79,7 @@ SatFadingTraceTestCase::DoRun (void)
   uint32_t numGws (5);
 
   // Read and prepare the fading traces
-  m_fadingTraceContainer = CreateObject<SatChannelExternalFadingTraceContainer> (numUts, numGws);
+  m_fadingTraceContainer = CreateObject<SatFadingExternalInputTraceContainer> (numUts, numGws);
 
   // Test the fading traces
   bool success = m_fadingTraceContainer->TestFadingTraces ();

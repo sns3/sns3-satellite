@@ -138,7 +138,7 @@ SatMacIdMacMapper::PrintMap ()
 {
   std::map<uint32_t, Address>::iterator iter;
 
-  for ( iter = m_idToMacMap.begin(); iter != m_idToMacMap.end(); ++iter)
+  for (iter = m_idToMacMap.begin(); iter != m_idToMacMap.end(); iter++)
     {
       std::cout << "ID: " << iter->first << " MAC: " << iter->second << std::endl;
     }

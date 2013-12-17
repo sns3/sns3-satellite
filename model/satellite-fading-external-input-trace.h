@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_CHANNEL_EXTERNAL_FADING_TRACE_H
-#define SATELLITE_CHANNEL_EXTERNAL_FADING_TRACE_H
+#ifndef SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H
+#define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H
 
 #include <vector>
 #include "ns3/object.h"
@@ -28,9 +28,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Satellite channel external fading trace
+ * \brief Satellite fading external input trace
  */
-class SatChannelExternalFadingTrace : public Object
+class SatFadingExternalInputTrace : public Object
 {
 public:
   enum TraceFileType_e
@@ -41,10 +41,10 @@ public:
 
   static TypeId GetTypeId (void);
 
-  SatChannelExternalFadingTrace ();
-  SatChannelExternalFadingTrace (TraceFileType_e type, std::string filePathName);
+  SatFadingExternalInputTrace ();
+  SatFadingExternalInputTrace (TraceFileType_e type, std::string filePathName);
 
-  ~SatChannelExternalFadingTrace ();
+  ~SatFadingExternalInputTrace ();
 
   /**
    * Get the current fading value for this specific fading file
@@ -102,4 +102,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_CHANNEL_EXTERNAL_FADING_TRACE_H */
+#endif /* SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H */
