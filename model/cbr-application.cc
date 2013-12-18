@@ -94,6 +94,12 @@ CbrApplication::GetSocket (void) const
   return m_socket;
 }
 
+const Address
+CbrApplication::GetRemote (void) const
+{
+  return m_peer;
+}
+
 void
 CbrApplication::DoDispose (void)
 {

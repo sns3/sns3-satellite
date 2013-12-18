@@ -53,6 +53,12 @@ public:
   */
   uint32_t GetSent (void) const;
 
+  /**
+   * \brief Get the destination address of the application
+   * \return the destination address
+   */
+  const Address GetRemote (void) const;
+
 protected:
   virtual void DoDispose (void);
 private:
@@ -80,6 +86,7 @@ private:
   void ConnectionSucceeded (Ptr<Socket> socket);
   void ConnectionFailed (Ptr<Socket> socket);
   void HandleRead (Ptr<Socket> socket);
+
 };
 
 } // namespace ns3
