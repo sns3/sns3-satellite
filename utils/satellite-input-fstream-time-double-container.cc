@@ -43,9 +43,9 @@ SatInputFileStreamTimeDoubleContainer::SatInputFileStreamTimeDoubleContainer (st
     m_fileName (filename),
     m_fileMode (filemode),
     m_valuesInRow (valuesInRow),
-    m_currentPosition (0),
+    m_lastValidPosition (0),
     m_numOfPasses (0),
-    m_shiftValue (0),
+    m_timeShiftValue (0),
     m_timeColumn (0)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
@@ -60,9 +60,9 @@ SatInputFileStreamTimeDoubleContainer::SatInputFileStreamTimeDoubleContainer () 
     m_fileName (),
     m_fileMode (),
     m_valuesInRow (),
-    m_currentPosition (),
+    m_lastValidPosition (),
     m_numOfPasses (),
-    m_shiftValue (),
+    m_timeShiftValue (),
     m_timeColumn ()
 {
   NS_LOG_FUNCTION (this);
@@ -173,13 +173,13 @@ SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
-  while (!FindNextClosest(m_currentPosition,m_timeColumn,m_shiftValue, Now ().GetSeconds ()))
+  while (!FindNextClosest(m_lastValidPosition,m_timeShiftValue, Now ().GetSeconds ()))
     {
-      m_currentPosition = 0;
+      m_lastValidPosition = 0;
       m_numOfPasses++;
-      m_shiftValue = m_numOfPasses * m_container[m_container.size () - 1].at (m_timeColumn);
+      m_timeShiftValue = m_numOfPasses * m_container[m_container.size () - 1].at (m_timeColumn);
 
-      NS_LOG_INFO ("Looping samples again with shift value: " << m_shiftValue);
+      NS_LOG_INFO ("Looping samples again with shift value: " << m_timeShiftValue);
     }
 
   if (m_numOfPasses > 0)
@@ -188,36 +188,36 @@ SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
       std::cout << "The container will loop samples from the beginning." << std::endl;
     }
 
-  return m_container[m_currentPosition];
+  return m_container[m_lastValidPosition];
 }
 
 bool
-SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue)
+SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPosition, double timeShiftValue, double comparisonTimeValue)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (column < m_valuesInRow);
+  NS_ASSERT (m_timeColumn < m_valuesInRow);
   NS_ASSERT (m_container.size () > 0);
   NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
 
-  NS_LOG_INFO ("SatInputFileStreamDoubleContainer::FindNextClosest: lastValidPosition " << lastValidPosition << " column " << column << " shiftValue " << shiftValue << " comparisonValue " << comparisonValue);
+  NS_LOG_INFO ("SatInputFileStreamDoubleContainer::FindNextClosest: lastValidPosition " << lastValidPosition << " column " << m_timeColumn << " timeShiftValue " << timeShiftValue << " comparisonTimeValue " << comparisonTimeValue);
 
   bool valueFound = false;
 
   for (uint32_t i = lastValidPosition; i < m_container.size (); i++)
     {
-      if (m_container[i].at (column) + shiftValue >= comparisonValue)
+      if (m_container[i].at (m_timeColumn) + timeShiftValue >= comparisonTimeValue)
         {
-          double difference1 = fabs (m_container[lastValidPosition].at (column) + shiftValue - comparisonValue);
-          double difference2 = fabs (m_container[i].at (column) + shiftValue - comparisonValue);
+          double difference1 = fabs (m_container[lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
+          double difference2 = fabs (m_container[i].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
 
           if (difference1 < difference2)
             {
-              m_currentPosition = lastValidPosition;
+              m_lastValidPosition = lastValidPosition;
             }
           else
             {
-              m_currentPosition = i;
+              m_lastValidPosition = i;
             }
           valueFound = true;
           break;
@@ -225,19 +225,20 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
       lastValidPosition = i;
     }
 
-  if (valueFound && m_numOfPasses > 0 && m_currentPosition == 0)
+  if (valueFound && m_numOfPasses > 0 && m_lastValidPosition == 0)
     {
-      double difference1 = fabs (m_container[m_currentPosition].at (column) + shiftValue - comparisonValue);
-      double difference2 = fabs (m_container[m_container.size() - 1].at (column) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (column)) - comparisonValue);
+      double difference1 = fabs (m_container[m_lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
+      double difference2 = fabs (m_container[m_container.size() - 1].at (m_timeColumn) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (m_timeColumn)) - comparisonTimeValue);
 
       if (difference1 > difference2)
         {
-          m_currentPosition = m_container.size() - 1;
+          m_lastValidPosition = m_container.size() - 1;
           m_numOfPasses--;
+          m_timeShiftValue = m_numOfPasses * m_container[m_container.size () - 1].at (m_timeColumn);
         }
     }
 
-  NS_LOG_INFO ("Done: " << valueFound << " value: " << m_container[m_currentPosition].at (column) << " @ line: " << m_currentPosition + 1 << " comparison value: " << comparisonValue << " passes: " << m_numOfPasses);
+  NS_LOG_INFO ("Done: " << valueFound << " value: " << m_container[m_lastValidPosition].at (m_timeColumn) << " @ line: " << m_lastValidPosition + 1 << " comparison time value: " << comparisonTimeValue << " passes: " << m_numOfPasses);
 
   return valueFound;
 }
@@ -282,9 +283,9 @@ SatInputFileStreamTimeDoubleContainer::ClearContainer ()
     }
 
   m_valuesInRow = 0;
-  m_currentPosition = 0;
+  m_lastValidPosition = 0;
   m_numOfPasses = 0;
-  m_shiftValue = 0;
+  m_timeShiftValue = 0;
 }
 
 } // namespace ns3

@@ -103,14 +103,13 @@ private:
   std::vector<double> ReadRow ();
 
   /**
-   * \brief Function for locating the next closest value. This locator loops the samples if the container does not have enough samples.
+   * \brief Function for locating the next closest value index. This locator loops the samples if the container does not have enough samples. Next closest index value is saved to a separate member variable.
    * \param lastValidPosition position of last matching value
-   * \param column column to search
    * \param shiftValue value to shift the time if needed
    * \param comparisonValue value which next closest match to find
-   * \return
+   * \return was next time sample found
    */
-  bool FindNextClosest (uint32_t lastValidPosition, uint32_t column, double shiftValue, double comparisonValue);
+  bool FindNextClosest (uint32_t lastValidPosition, double timeShiftValue, double comparisonTimeValue);
 
   /**
    * \brief Check container time sample sanity
@@ -148,9 +147,9 @@ private:
   uint32_t m_valuesInRow;
 
   /**
-   * \brief Current position
+   * \brief Last valid position
    */
-  uint32_t m_currentPosition;
+  uint32_t m_lastValidPosition;
 
   /**
    * \brief Number for how many times the available samples have been looped over
@@ -160,7 +159,7 @@ private:
   /**
    * \brief Shift value for sample time
    */
-  double m_shiftValue;
+  double m_timeShiftValue;
 
   /**
    * \brief Index for column which contains time information

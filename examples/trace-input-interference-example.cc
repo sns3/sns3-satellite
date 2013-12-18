@@ -71,6 +71,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   LogComponentEnable ("trace-input-interference-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatInputFileStreamTimeDoubleContainer", LOG_LEVEL_INFO);
 
   /// remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
