@@ -44,7 +44,7 @@ SatInterferenceOutputTraceContainer::GetTypeId (void)
     .AddAttribute( "Tag",
                    "Tag.",
                     StringValue (""),
-                    MakeStringAccessor (&SatFadingOutputTraceContainer::m_tag),
+                    MakeStringAccessor (&SatInterferenceOutputTraceContainer::m_tag),
                     MakeStringChecker ());
   return tid;
 }
