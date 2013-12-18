@@ -29,7 +29,8 @@ TypeId
 SatMacIdMacMapper::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMacIdMacMapper")
-    .SetParent<Object> ();
+    .SetParent<Object> ()
+    .AddConstructor<SatMacIdMacMapper> ();
   return tid;
 }
 

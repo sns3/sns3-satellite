@@ -21,6 +21,8 @@
 #include "ns3/satellite-env-variables.h"
 #include "ns3/singleton.h"
 #include "satellite-mac-id-mac-mapper.h"
+#include "ns3/boolean.h"
+#include "ns3/string.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatRxPowerOutputTraceContainer");
 
@@ -32,12 +34,25 @@ TypeId
 SatRxPowerOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRxPowerOutputTraceContainer")
-    .SetParent<SatBaseTraceContainer> ();
+    .SetParent<SatBaseTraceContainer> ()
+    .AddConstructor<SatRxPowerOutputTraceContainer> ()
+    .AddAttribute( "EnableFigureOutput",
+                   "Enable figure output.",
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&SatRxPowerOutputTraceContainer::m_enableFigureOutput),
+                    MakeBooleanChecker ())
+    .AddAttribute( "Tag",
+                   "Tag.",
+                    StringValue (""),
+                    MakeStringAccessor (&SatFadingOutputTraceContainer::m_tag),
+                    MakeStringChecker ());
   return tid;
 }
 
 SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
-  m_currentWorkingDirectory ("")
+  m_currentWorkingDirectory (""),
+  m_enableFigureOutput (true),
+  m_tag ("")
 {
   NS_LOG_FUNCTION (this);
 
@@ -73,6 +88,7 @@ SatRxPowerOutputTraceContainer::Reset ()
       m_container.clear ();
     }
   m_currentWorkingDirectory = "";
+  m_tag = "";
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
@@ -82,7 +98,7 @@ SatRxPowerOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/rxpowertraces/output/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/src/satellite/data/rxpowertraces/output/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

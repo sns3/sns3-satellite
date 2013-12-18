@@ -21,6 +21,8 @@
 #include "ns3/satellite-env-variables.h"
 #include "ns3/singleton.h"
 #include "satellite-mac-id-mac-mapper.h"
+#include "ns3/boolean.h"
+#include "ns3/string.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFadingOutputTraceContainer");
 
@@ -32,12 +34,25 @@ TypeId
 SatFadingOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingOutputTraceContainer")
-    .SetParent<SatBaseTraceContainer> ();
+    .SetParent<SatBaseTraceContainer> ()
+    .AddConstructor<SatFadingOutputTraceContainer> ()
+    .AddAttribute( "EnableFigureOutput",
+                   "Enable figure output.",
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&SatFadingOutputTraceContainer::m_enableFigureOutput),
+                    MakeBooleanChecker ())
+    .AddAttribute( "Tag",
+                   "Tag.",
+                    StringValue (""),
+                    MakeStringAccessor (&SatFadingOutputTraceContainer::m_tag),
+                    MakeStringChecker ());
   return tid;
 }
 
 SatFadingOutputTraceContainer::SatFadingOutputTraceContainer () :
-  m_currentWorkingDirectory ("")
+  m_currentWorkingDirectory (""),
+  m_enableFigureOutput (true),
+  m_tag ("")
 {
   NS_LOG_FUNCTION (this);
 
@@ -73,6 +88,7 @@ SatFadingOutputTraceContainer::Reset ()
       m_container.clear ();
     }
   m_currentWorkingDirectory = "";
+  m_tag = "";
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
@@ -82,7 +98,7 @@ SatFadingOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/output/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/output/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
@@ -120,7 +136,10 @@ SatFadingOutputTraceContainer::WriteToFile ()
 
   for (iter = m_container.begin (); iter != m_container.end (); iter++)
     {
-      iter->second->EnableFigureOutput ("Fading trace","Time (s)","Fading (dB)","set key top right", SatOutputFileStreamDoubleContainer::DECIBEL_AMPLITUDE);
+      if (m_enableFigureOutput)
+        {
+          iter->second->EnableFigureOutput ("Fading trace","Time (s)","Fading (dB)","set key top right", SatOutputFileStreamDoubleContainer::DECIBEL_AMPLITUDE);
+        }
       iter->second->WriteContainerToFile ();
     }
 }

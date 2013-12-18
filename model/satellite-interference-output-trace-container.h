@@ -109,6 +109,16 @@ private:
    * \brief Path to current working directory
    */
   std::string m_currentWorkingDirectory;
+
+  /**
+   * \brief Switch for figure output
+   */
+  bool m_enableFigureOutput;
+
+  /**
+   * \brief Info tag
+   */
+  std::string m_tag;
 };
 
 } // namespace ns3

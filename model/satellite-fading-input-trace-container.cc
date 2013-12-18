@@ -32,7 +32,8 @@ TypeId
 SatFadingInputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingInputTraceContainer")
-    .SetParent<SatBaseTraceContainer> ();
+    .SetParent<SatBaseTraceContainer> ()
+    .AddConstructor<SatFadingInputTraceContainer> ();
   return tid;
 }
 

@@ -29,7 +29,8 @@ TypeId
 SatFadingInputTrace::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingInputTrace")
-    .SetParent<SatBaseFading> ();
+    .SetParent<SatBaseFading> ()
+    .AddConstructor<SatFadingInputTrace> ();
   return tid;
 }
 
@@ -37,6 +38,14 @@ SatFadingInputTrace::SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satF
   m_satFadingInputTraceContainer (satFadingInputTraceContainer)
 {
   NS_LOG_FUNCTION (this);
+}
+
+SatFadingInputTrace::SatFadingInputTrace () :
+  m_satFadingInputTraceContainer ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_FATAL_ERROR ("SatFadingInputTrace - Constructor not in use.");
 }
 
 SatFadingInputTrace::~SatFadingInputTrace ()

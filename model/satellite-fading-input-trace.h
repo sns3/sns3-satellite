@@ -37,6 +37,11 @@ public:
   /**
    * \brief Constructor
    */
+  SatFadingInputTrace ();
+
+  /**
+   * \brief Constructor
+   */
   SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer);
 
   /**

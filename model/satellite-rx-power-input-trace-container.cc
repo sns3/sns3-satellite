@@ -32,7 +32,8 @@ TypeId
 SatRxPowerInputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRxPowerInputTraceContainer")
-    .SetParent<SatBaseTraceContainer> ();
+    .SetParent<SatBaseTraceContainer> ()
+    .AddConstructor<SatRxPowerInputTraceContainer> ();
   return tid;
 }
 

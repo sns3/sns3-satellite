@@ -32,7 +32,8 @@ TypeId
 SatInterferenceInputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatInterferenceInputTraceContainer")
-    .SetParent<SatBaseTraceContainer> ();
+    .SetParent<SatBaseTraceContainer> ()
+    .AddConstructor<SatInterferenceInputTraceContainer> ();
   return tid;
 }
 
