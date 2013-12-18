@@ -20,7 +20,7 @@
 #include "satellite-interference-input-trace-container.h"
 #include "ns3/satellite-env-variables.h"
 #include "ns3/singleton.h"
-#include "satellite-mac-id-mac-mapper.h"
+#include "satellite-id-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatInterferenceInputTraceContainer");
 
@@ -81,7 +81,7 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/input/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/input/id_" << Singleton<SatIdMapper>::Get ()->GetDeviceId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

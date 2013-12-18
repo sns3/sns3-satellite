@@ -17,30 +17,30 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-mac-id-mac-mapper.h"
+#include "satellite-id-mapper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatMacIdMacMapper");
+NS_LOG_COMPONENT_DEFINE ("SatIdMapper");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatMacIdMacMapper);
+NS_OBJECT_ENSURE_REGISTERED (SatIdMapper);
 
 TypeId 
-SatMacIdMacMapper::GetTypeId (void)
+SatIdMapper::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatMacIdMacMapper")
+  static TypeId tid = TypeId ("ns3::SatIdMapper")
     .SetParent<Object> ()
-    .AddConstructor<SatMacIdMacMapper> ();
+    .AddConstructor<SatIdMapper> ();
   return tid;
 }
 
-SatMacIdMacMapper::SatMacIdMacMapper () :
+SatIdMapper::SatIdMapper () :
   m_index (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatMacIdMacMapper::~SatMacIdMacMapper ()
+SatIdMapper::~SatIdMapper ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -48,7 +48,7 @@ SatMacIdMacMapper::~SatMacIdMacMapper ()
 }
 
 void
-SatMacIdMacMapper::DoDispose ()
+SatIdMapper::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -58,7 +58,7 @@ SatMacIdMacMapper::DoDispose ()
 }
 
 void
-SatMacIdMacMapper::Reset ()
+SatIdMapper::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -75,7 +75,7 @@ SatMacIdMacMapper::Reset ()
 }
 
 void
-SatMacIdMacMapper::AddMacToMapper (Address mac)
+SatIdMapper::AddMacToMapper (Address mac)
 {
   NS_LOG_FUNCTION (this);
 
@@ -99,7 +99,7 @@ SatMacIdMacMapper::AddMacToMapper (Address mac)
 }
 
 Address
-SatMacIdMacMapper::GetMac (uint32_t id)
+SatIdMapper::GetMac (uint32_t id)
 {
   NS_LOG_FUNCTION (this);
 
@@ -114,7 +114,7 @@ SatMacIdMacMapper::GetMac (uint32_t id)
 }
 
 uint32_t
-SatMacIdMacMapper::GetId (Address mac)
+SatIdMapper::GetDeviceId (Address mac)
 {
   NS_LOG_FUNCTION (this);
 
@@ -129,13 +129,13 @@ SatMacIdMacMapper::GetId (Address mac)
 }
 
 void
-SatMacIdMacMapper::AddBroadcastMac ()
+SatIdMapper::AddBroadcastMac ()
 {
   AddMacToMapper (Mac48Address::GetBroadcast ());
 }
 
 void
-SatMacIdMacMapper::PrintMap ()
+SatIdMapper::PrintMap ()
 {
   std::map<uint32_t, Address>::iterator iter;
 

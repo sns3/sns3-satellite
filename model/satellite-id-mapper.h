@@ -17,8 +17,8 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_MAC_ID_MAC_MAPPER_H
-#define SATELLITE_MAC_ID_MAC_MAPPER_H
+#ifndef SATELLITE_ID_MAPPER_H
+#define SATELLITE_ID_MAPPER_H
 
 #include "satellite-enums.h"
 #include "ns3/mac48-address.h"
@@ -28,21 +28,21 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for MAC to ID to MAC -mapper
+ * \brief Class for ID -mapper
  */
-class SatMacIdMacMapper : public Object
+class SatIdMapper : public Object
 {
 public:
 
   /**
    * \brief Constructor
    */
-  SatMacIdMacMapper ();
+  SatIdMapper ();
 
   /**
    * \brief Destructor
    */
-  ~SatMacIdMacMapper ();
+  ~SatIdMapper ();
 
   /**
    * \brief NS-3 type id function
@@ -66,7 +66,7 @@ public:
    * \param mac
    * \return
    */
-  uint32_t GetId (Address mac);
+  uint32_t GetDeviceId (Address mac);
 
   /**
    * \brief
@@ -110,4 +110,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SATELLITE_MAC_ID_MAC_MAPPER_H */
+#endif /* SATELLITE_ID_MAPPER_H */

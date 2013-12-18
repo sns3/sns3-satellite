@@ -39,7 +39,7 @@
 #include "../model/satellite-link-results.h"
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
-#include "ns3/satellite-mac-id-mac-mapper.h"
+#include "ns3/satellite-id-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
 
@@ -241,7 +241,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   dev->SetAddress (addr);
   phy->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
-  Singleton<SatMacIdMacMapper>::Get ()->AddMacToMapper (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AddMacToMapper (dev->GetAddress ());
 
   mac->StartScheduling ();
 

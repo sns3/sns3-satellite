@@ -20,7 +20,7 @@
 #include "satellite-fading-output-trace-container.h"
 #include "ns3/satellite-env-variables.h"
 #include "ns3/singleton.h"
-#include "satellite-mac-id-mac-mapper.h"
+#include "satellite-id-mapper.h"
 #include "ns3/boolean.h"
 #include "ns3/string.h"
 
@@ -98,7 +98,7 @@ SatFadingOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/output/id_" << Singleton<SatMacIdMacMapper>::Get ()->GetId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
+  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/output/id_" << Singleton<SatIdMapper>::Get ()->GetDeviceId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

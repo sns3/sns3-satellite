@@ -43,7 +43,7 @@
 #include "../model/satellite-net-device.h"
 #include "satellite-ut-helper.h"
 #include "ns3/singleton.h"
-#include "ns3/satellite-mac-id-mac-mapper.h"
+#include "ns3/satellite-id-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 
@@ -244,7 +244,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   dev->SetAddress (addr);
   phy->SetAddress (addr);
 
-  Singleton<SatMacIdMacMapper>::Get ()->AddMacToMapper (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AddMacToMapper (dev->GetAddress ());
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
