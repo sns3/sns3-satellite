@@ -49,6 +49,14 @@ SatFadingOutputTraceContainer::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatFadingOutputTraceContainer::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId();
+}
+
 SatFadingOutputTraceContainer::SatFadingOutputTraceContainer () :
   m_currentWorkingDirectory (""),
   m_enableFigureOutput (true),
@@ -98,7 +106,7 @@ SatFadingOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/output/id_" << Singleton<SatIdMapper>::Get ()->GetDeviceId (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
+  filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/output/id_" << Singleton<SatIdMapper>::Get ()->GetTraceIdWithMac (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

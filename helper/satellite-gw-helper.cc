@@ -154,7 +154,7 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -162,14 +162,14 @@ SatGwHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add (Install (*i, beamId, fCh, rCh, ncc));
+    devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -241,7 +241,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   dev->SetAddress (addr);
   phy->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
-  Singleton<SatIdMapper>::Get ()->AddMacToMapper (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (),gwId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (),beamId);
 
   mac->StartScheduling ();
 
@@ -251,13 +253,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatGwHelper::Install (std::string aName, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
 
   Ptr<Node> a = Names::Find<Node> (aName);
 
-  return Install (a, beamId, fCh, rCh, ncc);
+  return Install (a, gwId, beamId, fCh, rCh, ncc);
 }
 
 void

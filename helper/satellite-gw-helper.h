@@ -120,6 +120,7 @@ public:
 
   /**
    * \param c a set of nodes
+   * \param gwId  id of the gw
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -132,10 +133,11 @@ public:
    * a queue for this ns3::SatNetDevice, and associate the resulting
    * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  NetDeviceContainer Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
 
   /**
    * \param n node
+   * \param gwId  id of the gw
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -143,10 +145,11 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
 
   /**
    * \param aName Name of the node
+   * \param gwId  id of the gw
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -154,7 +157,7 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  Ptr<NetDevice> Install (std::string aName, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
 
   /**
    * Enables creation traces to be written in given file

@@ -249,7 +249,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
     }
 
   //install GW
-  Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode, beamId, feederLink.first, feederLink.second, m_ncc);
+  Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode, gwId, beamId, feederLink.first, feederLink.second, m_ncc);
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
   // add beam to NCC

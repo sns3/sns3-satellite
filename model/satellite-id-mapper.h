@@ -55,30 +55,105 @@ public:
    */
   void DoDispose ();
 
+  /** ATTACH TO MAPS */
+
   /**
-   * \brief Add the vector containing the values to container matching the key
+   * \brief Attach MAC address to the Trace ID maps and give it a running trace ID
    * \param mac MAC address
    */
-  void AddMacToMapper (Address mac);
+  void AttachMacToTraceId (Address mac);
 
   /**
-   * \brief
-   * \param mac
-   * \return
+   * \brief Attach MAC address to the UT ID maps and give it a running UT ID
+   * \param mac MAC address
    */
-  uint32_t GetDeviceId (Address mac);
+  void AttachMacToUtId (Address mac);
 
   /**
-   * \brief
-   * \param id
-   * \return
+   * \brief Attach MAC address to the beam ID maps
+   * \param mac MAC address
+   * \param beamID beam ID
    */
-  Address GetMac (uint32_t id);
+  void AttachMacToBeamId (Address mac, uint32_t beamId);
 
   /**
-   *
+   * \brief Attach MAC address to the GW ID maps
+   * \param mac MAC address
+   * \param gwID GW ID
    */
-  void PrintMap ();
+  void AttachMacToGwId (Address mac, uint32_t gwId);
+
+  /** ID GETTERS */
+
+  /**
+   * \brief Function for getting the trace ID with MAC
+   * \param mac MAC address
+   * \return Trace ID
+   */
+  uint32_t GetTraceIdWithMac (Address mac);
+
+  /**
+   * \brief Function for getting the UT ID with MAC
+   * \param mac MAC address
+   * \return UT ID
+   */
+  uint32_t GetUtIdWithMac (Address mac);
+
+  /**
+   * \brief Function for getting the beam ID with MAC
+   * \param mac MAC address
+   * \return beam ID
+   */
+  uint32_t GetBeamIdWithMac (Address mac);
+
+  /**
+   * \brief Function for getting the GW ID with MAC
+   * \param mac MAC address
+   * \return GW ID
+   */
+  uint32_t GetGwIdWithMac (Address mac);
+
+  /** MAC GETTERS */
+
+  /**
+   * \brief Function for getting the MAC with trace ID
+   * \param traceId Trace ID
+   * \return MAC address
+   */
+  Address GetMacWithTraceId (uint32_t traceId);
+
+  /**
+   * \brief Function for getting the MAC with UT ID
+   * \param utId UT ID
+   * \return MAC address
+   */
+  Address GetMacWithUtId (uint32_t utId);
+
+  /**
+   * \brief Function for getting the MAC with beam ID
+   * \param beamId beam ID
+   * \return MAC address
+   */
+  Address GetMacWithBeamId (uint32_t beamId);
+
+  /**
+   * \brief Function for getting the MAC with GW ID
+   * \param gwId GW ID
+   * \return MAC address
+   */
+  Address GetMacWithGwId (uint32_t gwId);
+
+  /**
+   * \brief Function for printing out the maps
+   */
+  void PrintMaps ();
+
+  /**
+   * \brief Function for getting the IDs related to a MAC address in an info string
+   * \param mac MAC address
+   * \return info string
+   */
+  std::string GetMacInfo (Address mac);
 
 private:
 
@@ -88,24 +163,54 @@ private:
   void Reset ();
 
   /**
-   * \brief
+   * \brief Running trace index number
    */
-  void AddBroadcastMac ();
+  uint32_t m_traceIdIndex;
 
   /**
-   * \brief
+   * \brief Running UT index number
    */
-  uint32_t m_index;
+  uint32_t m_utIdIndex;
 
   /**
-   * \brief Map for MAC to ID conversion
+   * \brief Map for MAC to trace ID conversion
    */
-  std::map <Address, uint32_t> m_macToIdMap;
+  std::map <Address, uint32_t> m_macToTraceIdMap;
 
   /**
-   * \brief Map for ID to MAC conversion
+   * \brief Map for trace ID to MAC conversion
    */
-  std::map <uint32_t, Address> m_idToMacMap;
+  std::map <uint32_t, Address> m_traceIdToMacMap;
+
+  /**
+   * \brief Map for MAC to UT ID conversion
+   */
+  std::map <Address, uint32_t> m_macToUtIdMap;
+
+  /**
+   * \brief Map for UT ID to MAC conversion
+   */
+  std::map <uint32_t, Address> m_utIdToMacMap;
+
+  /**
+   * \brief Map for MAC to beam ID conversion
+   */
+  std::map <Address, uint32_t> m_macToBeamIdMap;
+
+  /**
+   * \brief Map for beam ID to MAC conversion
+   */
+  std::map <uint32_t, Address> m_beamIdToMacMap;
+
+  /**
+   * \brief Map for MAC to GW ID conversion
+   */
+  std::map <Address, uint32_t> m_macToGwIdMap;
+
+  /**
+   * \brief Map for GW ID to MAC conversion
+   */
+  std::map <uint32_t, Address> m_gwIdToMacMap;
 };
 
 } // namespace ns3

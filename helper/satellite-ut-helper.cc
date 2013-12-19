@@ -244,7 +244,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   dev->SetAddress (addr);
   phy->SetAddress (addr);
 
-  Singleton<SatIdMapper>::Get ()->AddMacToMapper (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (),beamId);
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());

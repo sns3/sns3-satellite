@@ -33,6 +33,14 @@ SatBaseTraceContainer::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatBaseTraceContainer::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId();
+}
+
 SatBaseTraceContainer::SatBaseTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
