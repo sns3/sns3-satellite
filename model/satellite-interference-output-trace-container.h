@@ -74,6 +74,24 @@ public:
    */
   void AddToContainer (key_t key, std::vector<double> newItem);
 
+  /**
+   * Function for inserting / replacing a tag
+   * \param tag
+   */
+  void InsertTag (std::string tag)
+  {
+    m_tag = tag;
+  }
+
+  /**
+   * Function for enabling / disabling figure output
+   * \param enableFigureOutput
+   */
+  void EnableFigureOutput (bool enableFigureOutput)
+  {
+    m_enableFigureOutput = enableFigureOutput;
+  }
+
 private:
 
   /**

@@ -136,7 +136,10 @@ SatRxPowerOutputTraceContainer::WriteToFile ()
 
   for (iter = m_container.begin (); iter != m_container.end (); iter++)
     {
-      iter->second->EnableFigureOutput ("Rx power density","Time (s)","Rx power (dBW / Hz)","set key top right",SatOutputFileStreamDoubleContainer::DECIBEL);
+      if (m_enableFigureOutput)
+        {
+          iter->second->EnableFigureOutput ("Rx power density","Time (s)","Rx power (dBW / Hz)","set key top right",SatOutputFileStreamDoubleContainer::DECIBEL);
+        }
       iter->second->WriteContainerToFile ();
     }
 }

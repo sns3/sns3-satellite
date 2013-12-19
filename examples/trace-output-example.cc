@@ -67,6 +67,14 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
 
+  Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+  Singleton<SatInterferenceOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+  Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+
+  Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("_fadingExampleTag");
+  Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("_interferenceExampleTag");
+  Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
+
   if ( scenario == "larger")
     {
       satScenario = SatHelper::LARGER;
