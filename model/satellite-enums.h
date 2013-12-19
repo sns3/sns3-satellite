@@ -100,6 +100,81 @@ public:
     SAT_MODCOD_32APSK_8_TO_9
   } SatModcod_t;
 
+
+  static inline std::string GetModcodTypeName (SatModcod_t modcod)
+  {
+    switch (modcod)
+    {
+      case SAT_MODCOD_QPSK_1_TO_2:
+        return "QPSK_1_TO_2";
+      case SAT_MODCOD_QPSK_2_TO_3:
+        return "QPSK_2_TO_3";
+      case SAT_MODCOD_QPSK_3_TO_4:
+        return "QPSK_3_TO_4";
+      case SAT_MODCOD_QPSK_3_TO_5:
+        return "QPSK_3_TO_5";
+      case SAT_MODCOD_QPSK_4_TO_5:
+        return "QPSK_4_TO_5";
+      case SAT_MODCOD_QPSK_5_TO_6:
+        return "QPSK_5_TO_6";
+      case SAT_MODCOD_QPSK_8_TO_9:
+        return "QPSK_8_TO_9";
+      case SAT_MODCOD_QPSK_9_TO_10:
+        return "QPSK_9_TO_10";
+      case SAT_MODCOD_8PSK_2_TO_3:
+        return "8PSK_2_TO_3";
+      case SAT_MODCOD_8PSK_3_TO_4:
+        return "8PSK_3_TO_4";
+      case SAT_MODCOD_8PSK_3_TO_5:
+        return "8PSK_3_TO_5";
+      case SAT_MODCOD_8PSK_5_TO_6:
+        return "8PSK_5_TO_6";
+      case SAT_MODCOD_8PSK_8_TO_9:
+        return "8PSK_8_TO_9";
+      case SAT_MODCOD_8PSK_9_TO_10:
+        return "8PSK_9_TO_10";
+      case SAT_MODCOD_16APSK_2_TO_3:
+        return "16APSK_2_TO_3";
+      case SAT_MODCOD_16APSK_3_TO_4:
+        return "16APSK_3_TO_4";
+      case SAT_MODCOD_16APSK_4_TO_5:
+        return "16APSK_4_TO_5";
+      case SAT_MODCOD_16APSK_5_TO_6:
+        return "16APSK_5_TO_6";
+      case SAT_MODCOD_16APSK_8_TO_9:
+        return "16APSK_8_TO_9";
+      case SAT_MODCOD_16APSK_9_TO_10:
+        return "16APSK_9_TO_10";
+      case SAT_MODCOD_32APSK_3_TO_4:
+        return "32APSK_3_TO_4";
+      case SAT_MODCOD_32APSK_4_TO_5:
+        return "32APSK_4_TO_5";
+      case SAT_MODCOD_32APSK_5_TO_6:
+        return "32APSK_5_TO_6";
+      case SAT_MODCOD_32APSK_8_TO_9:
+        return "32APSK_8_TO_9";
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetModcodTypeName - Invalid modcod type");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetModcodTypeName - Invalid modcod type");
+    return "";
+  };
+
+  /**
+   * \enum SatBbFrameType_t
+   *
+   * \brief BB frame type used in DVB-S2 FWD link
+   */
+  typedef enum
+  {
+    SHORT_FRAME = 0,
+    NORMAL_FRAME = 1
+  } SatBbFrameType_t;
+
+
   /**
    * Possible modes of Rx power calculation.
    */
