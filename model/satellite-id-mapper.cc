@@ -83,11 +83,6 @@ SatIdMapper::Reset ()
     {
       m_macToUtIdMap.clear ();
     }
-
-  if (!m_utIdToMacMap.empty ())
-    {
-      m_utIdToMacMap.clear ();
-    }
   m_utIdIndex = 0;
 
   // Beam ID maps
@@ -97,21 +92,11 @@ SatIdMapper::Reset ()
       m_macToBeamIdMap.clear ();
     }
 
-  if (!m_beamIdToMacMap.empty ())
-    {
-      m_beamIdToMacMap.clear ();
-    }
-
   // GW ID maps
 
   if (!m_macToGwIdMap.empty ())
     {
       m_macToGwIdMap.clear ();
-    }
-
-  if (!m_gwIdToMacMap.empty ())
-    {
-      m_gwIdToMacMap.clear ();
     }
 }
 
@@ -151,13 +136,6 @@ SatIdMapper::AttachMacToUtId (Address mac)
       NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToUtId - MAC to UT ID failed");
     }
 
-  std::pair < std::map<uint32_t, Address>::iterator, bool> resultUtIdToMac = m_utIdToMacMap.insert (std::make_pair (m_utIdIndex, mac));
-
-  if (resultUtIdToMac.second == false)
-    {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToUtId - UT ID to MAC failed");
-    }
-
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToUtId - Added MAC " << mac << " with UT ID " << m_utIdIndex);
 
   m_utIdIndex++;
@@ -175,13 +153,6 @@ SatIdMapper::AttachMacToBeamId (Address mac, uint32_t beamId)
       NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToBeamId - MAC to beam ID failed");
     }
 
-  std::pair < std::map<uint32_t, Address>::iterator, bool> resultBeamIdToMac = m_beamIdToMacMap.insert (std::make_pair (beamId, mac));
-
-  if (resultBeamIdToMac.second == false)
-    {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToBeamId - beam ID to MAC failed");
-    }
-
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToBeamId - Added MAC " << mac << " with beam ID " << beamId);
 }
 
@@ -195,13 +166,6 @@ SatIdMapper::AttachMacToGwId (Address mac, uint32_t gwId)
   if (resultMacToGwId.second == false)
     {
       NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToGwId - MAC to GW ID failed");
-    }
-
-  std::pair < std::map<uint32_t, Address>::iterator, bool> resultGwIdToMac = m_gwIdToMacMap.insert (std::make_pair (gwId, mac));
-
-  if (resultGwIdToMac.second == false)
-    {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToGwId - GW ID to MAC failed");
     }
 
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToGwId - Added MAC " << mac << " with GW ID " << gwId);
@@ -219,51 +183,6 @@ SatIdMapper::GetMacWithTraceId (uint32_t traceId)
   if (iter == m_traceIdToMacMap.end ())
     {
       NS_FATAL_ERROR ("GetMacWithTraceId::GetMacWithTraceIdv - Trace ID " << traceId << " not found");
-    }
-
-  return iter->second;
-}
-
-Address
-SatIdMapper::GetMacWithUtId (uint32_t utId)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::map<uint32_t, Address>::iterator iter = m_utIdToMacMap.find (utId);
-
-  if (iter == m_utIdToMacMap.end ())
-    {
-      NS_FATAL_ERROR ("GetMacWithTraceId::GetMacWithUtId - UT ID " << utId << " not found");
-    }
-
-  return iter->second;
-}
-
-Address
-SatIdMapper::GetMacWithBeamId (uint32_t beamId)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::map<uint32_t, Address>::iterator iter = m_beamIdToMacMap.find (beamId);
-
-  if (iter == m_beamIdToMacMap.end ())
-    {
-      NS_FATAL_ERROR ("GetMacWithTraceId::GetMacWithBeamId - beam ID " << beamId << " not found");
-    }
-
-  return iter->second;
-}
-
-Address
-SatIdMapper::GetMacWithGwId (uint32_t gwId)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::map<uint32_t, Address>::iterator iter = m_gwIdToMacMap.find (gwId);
-
-  if (iter == m_gwIdToMacMap.end ())
-    {
-      NS_FATAL_ERROR ("GetMacWithTraceId::GetMacWithGwId - GW ID " << gwId << " not found");
     }
 
   return iter->second;
@@ -388,26 +307,26 @@ SatIdMapper::PrintMaps ()
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<uint32_t, Address>::iterator iter;
+  std::map<Address, uint32_t>::iterator iter;
 
-  for (iter = m_traceIdToMacMap.begin(); iter != m_traceIdToMacMap.end(); iter++)
+  for (iter = m_macToTraceIdMap.begin(); iter != m_macToTraceIdMap.end(); iter++)
     {
-      std::cout << "Trace ID: " << iter->first << " MAC: " << iter->second << std::endl;
+      std::cout << "Trace ID: " << iter->second << " MAC: " << iter->first << std::endl;
     }
 
-  for (iter = m_utIdToMacMap.begin(); iter != m_utIdToMacMap.end(); iter++)
+  for (iter = m_macToUtIdMap.begin(); iter != m_macToUtIdMap.end(); iter++)
     {
-      std::cout << "UT ID: " << iter->first << " MAC: " << iter->second << std::endl;
+      std::cout << "UT ID: " << iter->second << " MAC: " << iter->first << std::endl;
     }
 
-  for (iter = m_beamIdToMacMap.begin(); iter != m_beamIdToMacMap.end(); iter++)
+  for (iter = m_macToGwIdMap.begin(); iter != m_macToGwIdMap.end(); iter++)
     {
-      std::cout << "beam ID: " << iter->first << " MAC: " << iter->second << std::endl;
+      std::cout << "GW ID: " << iter->second << " MAC: " << iter->first << std::endl;
     }
 
-  for (iter = m_gwIdToMacMap.begin(); iter != m_gwIdToMacMap.end(); iter++)
+  for (iter = m_macToBeamIdMap.begin(); iter != m_macToBeamIdMap.end(); iter++)
     {
-      std::cout << "GW ID: " << iter->first << " MAC: " << iter->second << std::endl;
+      std::cout << "beam ID: " << iter->second << " MAC: " << iter->first << std::endl;
     }
 }
 

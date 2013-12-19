@@ -188,29 +188,14 @@ private:
   std::map <Address, uint32_t> m_macToUtIdMap;
 
   /**
-   * \brief Map for UT ID to MAC conversion
-   */
-  std::map <uint32_t, Address> m_utIdToMacMap;
-
-  /**
    * \brief Map for MAC to beam ID conversion
    */
   std::map <Address, uint32_t> m_macToBeamIdMap;
 
   /**
-   * \brief Map for beam ID to MAC conversion
-   */
-  std::map <uint32_t, Address> m_beamIdToMacMap;
-
-  /**
    * \brief Map for MAC to GW ID conversion
    */
   std::map <Address, uint32_t> m_macToGwIdMap;
-
-  /**
-   * \brief Map for GW ID to MAC conversion
-   */
-  std::map <uint32_t, Address> m_gwIdToMacMap;
 };
 
 } // namespace ns3
