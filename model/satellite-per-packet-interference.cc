@@ -117,10 +117,8 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
     {
       if ( ( m_firstPowerW != 0 ) && std::abs (m_firstPowerW) < std::numeric_limits<long double>::epsilon () )
         {
-          // we shouldn't end up here
-          // TODO: But if we do, we need to consider removing next line to reset first power
-          // This problem might be due to rounding problems with double (long double) values
-          NS_FATAL_ERROR ("Possibly some rounding problem!!!");
+          // if we end up here,
+          // reset first power (this probably due to roundin problem with very small values)
           m_firstPowerW = 0;
         }
     }

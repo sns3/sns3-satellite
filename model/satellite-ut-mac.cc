@@ -231,6 +231,11 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                 }
             }
           // Control msg tag not found, send the packet to higher layer
+          else if (destAddress.IsBroadcast())
+            {
+				// TODO: dummy frames and other bradcast needed to handle
+				// dummy frames should ignored already in Phy layer
+            }
           else
             {
               // Pass the receiver address to LLC

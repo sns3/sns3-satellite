@@ -91,7 +91,6 @@ def build(bld):
         'utils/satellite-output-fstream-long-double-container.cc',
         'utils/satellite-output-fstream-string-container.cc',
         'utils/satellite-output-fstream-wrapper.cc',
-        'helper/satellite-bbframe-conf.cc',
         'helper/cbr-helper.cc',
         'helper/cbr-kpi-helper.cc',
         'helper/satellite-beam-helper.cc',
@@ -122,7 +121,8 @@ def build(bld):
         'test/satellite-rle-test.cc',
         'test/satellite-scenario-creation.cc',
         'test/satellite-simple-unicast.cc',
-        'test/satellite-waveform-conf-test.cc',
+        'test/satellite-waveform-table-test.cc',
+        'test/satellite-per-packet-if-test.cc',
         ]
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -212,7 +212,6 @@ def build(bld):
         'utils/satellite-output-fstream-long-double-container.h',
         'utils/satellite-output-fstream-string-container.h',
         'utils/satellite-output-fstream-wrapper.h',
-        'helper/satellite-bbframe-conf.h',
         'helper/cbr-helper.h',
         'helper/cbr-kpi-helper.h',
         'helper/satellite-beam-helper.h',

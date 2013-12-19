@@ -327,7 +327,7 @@ Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
 
   // Add MAC tag
   SatMacTag tag;
-  tag.SetDestAddress (m_macAddress);
+  tag.SetDestAddress (Mac48Address::GetBroadcast());
   tag.SetSourceAddress (m_macAddress);
   dummyPacket->AddPacketTag (tag);
 
