@@ -160,6 +160,14 @@ public:
    */
   void Reset ();
 
+  /**
+   * \brief Function for enabling the map prints
+   */
+  void EnableMapPrint (bool enableMapPrint)
+  {
+    m_enableMapPrint = enableMapPrint;
+  }
+
 private:
 
   /**
@@ -196,6 +204,11 @@ private:
    * \brief Map for MAC to GW ID conversion
    */
   std::map <Address, uint32_t> m_macToGwIdMap;
+
+  /**
+   * \brief Is map printing enabled or not
+   */
+  bool m_enableMapPrint;
 };
 
 } // namespace ns3

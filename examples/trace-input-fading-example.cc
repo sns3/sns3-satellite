@@ -55,6 +55,8 @@ main (int argc, char *argv[])
   /// enable fading input trace
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_TRACE));
 
+  Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
+
   if ( scenario == "larger")
     {
       satScenario = SatHelper::LARGER;

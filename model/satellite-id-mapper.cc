@@ -37,7 +37,8 @@ SatIdMapper::GetTypeId (void)
 
 SatIdMapper::SatIdMapper () :
   m_traceIdIndex (0),
-  m_utIdIndex (0)
+  m_utIdIndex (0),
+  m_enableMapPrint (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -63,6 +64,11 @@ void
 SatIdMapper::Reset ()
 {
   NS_LOG_FUNCTION (this);
+
+  if (m_enableMapPrint)
+    {
+      PrintTraceMap ();
+    }
 
   // Trace ID maps
 
@@ -98,6 +104,8 @@ SatIdMapper::Reset ()
     {
       m_macToGwIdMap.clear ();
     }
+
+  m_enableMapPrint = false;
 }
 
 void
@@ -256,19 +264,16 @@ SatIdMapper::GetMacInfo (Address mac)
   NS_LOG_FUNCTION (this);
 
   std::stringstream out;
+  bool isInMap = false;
 
-  std::map<Address, uint32_t>::iterator iterUt = m_macToUtIdMap.find (mac);
+  out << mac << " ";
 
-  if (!(iterUt == m_macToUtIdMap.end ()))
+  std::map<Address, uint32_t>::iterator iterTrace = m_macToTraceIdMap.find (mac);
+
+  if (!(iterTrace == m_macToTraceIdMap.end ()))
     {
-      out << "UT ID: " << iterUt->second << " ";
-    }
-
-  std::map<Address, uint32_t>::iterator iterGw = m_macToGwIdMap.find (mac);
-
-  if (!(iterGw == m_macToGwIdMap.end ()))
-    {
-      out << "GW ID: " << iterGw->second << " ";
+      out << "trace ID: " << iterTrace->second << " ";
+      isInMap = true;
     }
 
   std::map<Address, uint32_t>::iterator iterBeam = m_macToBeamIdMap.find (mac);
@@ -276,26 +281,31 @@ SatIdMapper::GetMacInfo (Address mac)
   if (!(iterBeam == m_macToBeamIdMap.end ()))
     {
       out << "beam ID: " << iterBeam->second << " ";
+      isInMap = true;
     }
 
-  std::map<Address, uint32_t>::iterator iterTrace = m_macToTraceIdMap.find (mac);
+  std::map<Address, uint32_t>::iterator iterUt = m_macToUtIdMap.find (mac);
 
-  if (!(iterTrace == m_macToTraceIdMap.end ()))
+  if (!(iterUt == m_macToUtIdMap.end ()))
     {
-      out << "trace ID: " << iterTrace->second << " ";
+      out << "UT ID: " << iterUt->second << " ";
+      isInMap = true;
+    }
+
+  std::map<Address, uint32_t>::iterator iterGw = m_macToGwIdMap.find (mac);
+
+  if (!(iterGw == m_macToGwIdMap.end ()))
+    {
+      out << "GW ID: " << iterGw->second << " ";
+      isInMap = true;
     }
 
   std::string infoString = out.str ();
 
-  // remove trailing space if the string in not empty
-  if (infoString.length () > 0)
-    {
-      infoString.replace (infoString.length() - 1,1,'\0');
-    }
   // if the string is empty, the MAC was not found in any of the maps
-  else
+  if (!isInMap)
     {
-      out << "MAC " << mac << " not found in the mapper";
+      out << "not found in the mapper";
       infoString = out.str ();
     }
 

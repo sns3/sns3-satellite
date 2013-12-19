@@ -75,6 +75,8 @@ main (int argc, char *argv[])
   //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("_interferenceExampleTag");
   //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
 
+  Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
+
   if ( scenario == "larger")
     {
       satScenario = SatHelper::LARGER;

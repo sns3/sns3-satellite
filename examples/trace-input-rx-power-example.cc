@@ -55,6 +55,8 @@ main (int argc, char *argv[])
   /// enable Rx power density input trace
   Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode",EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
 
+  Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
+
   if ( scenario == "larger")
     {
       satScenario = SatHelper::LARGER;
