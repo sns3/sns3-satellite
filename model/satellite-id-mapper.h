@@ -155,12 +155,12 @@ public:
    */
   std::string GetMacInfo (Address mac);
 
-private:
-
   /**
    * \brief Function for resetting the variables
    */
   void Reset ();
+
+private:
 
   /**
    * \brief Running trace index number

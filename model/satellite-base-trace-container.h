@@ -88,6 +88,11 @@ public:
    */
   TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * \brief Function for resetting the trace
+   */
+  virtual void Reset () = 0;
+
 private:
 
 };

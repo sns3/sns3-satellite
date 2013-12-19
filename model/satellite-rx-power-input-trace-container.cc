@@ -46,11 +46,9 @@ SatRxPowerInputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatRxPowerInputTraceContainer::SatRxPowerInputTraceContainer () :
-  m_currentWorkingDirectory ("")
+  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ())
 {
   NS_LOG_FUNCTION (this);
-
-  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatRxPowerInputTraceContainer::~SatRxPowerInputTraceContainer ()
@@ -79,7 +77,6 @@ SatRxPowerInputTraceContainer::Reset ()
     {
       m_container.clear ();
     }
-  m_currentWorkingDirectory = "";
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>

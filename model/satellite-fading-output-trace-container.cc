@@ -35,17 +35,7 @@ SatFadingOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingOutputTraceContainer")
     .SetParent<SatBaseTraceContainer> ()
-    .AddConstructor<SatFadingOutputTraceContainer> ()
-    .AddAttribute( "EnableFigureOutput",
-                   "Enable figure output.",
-                    BooleanValue (true),
-                    MakeBooleanAccessor (&SatFadingOutputTraceContainer::m_enableFigureOutput),
-                    MakeBooleanChecker ())
-    .AddAttribute( "Tag",
-                   "Tag.",
-                    StringValue (""),
-                    MakeStringAccessor (&SatFadingOutputTraceContainer::m_tag),
-                    MakeStringChecker ());
+    .AddConstructor<SatFadingOutputTraceContainer> ();
   return tid;
 }
 
@@ -58,13 +48,11 @@ SatFadingOutputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatFadingOutputTraceContainer::SatFadingOutputTraceContainer () :
-  m_currentWorkingDirectory (""),
+  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ()),
   m_enableFigureOutput (true),
   m_tag ("")
 {
   NS_LOG_FUNCTION (this);
-
-  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatFadingOutputTraceContainer::~SatFadingOutputTraceContainer ()
@@ -95,7 +83,7 @@ SatFadingOutputTraceContainer::Reset ()
 
       m_container.clear ();
     }
-  m_currentWorkingDirectory = "";
+  m_enableFigureOutput = true;
   m_tag = "";
 }
 

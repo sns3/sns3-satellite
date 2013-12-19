@@ -46,11 +46,9 @@ SatFadingInputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatFadingInputTraceContainer::SatFadingInputTraceContainer () :
-  m_currentWorkingDirectory ("")
+  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ())
 {
   NS_LOG_FUNCTION (this);
-
-  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatFadingInputTraceContainer::~SatFadingInputTraceContainer ()
@@ -79,7 +77,6 @@ SatFadingInputTraceContainer::Reset ()
     {
       m_container.clear ();
     }
-  m_currentWorkingDirectory = "";
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>

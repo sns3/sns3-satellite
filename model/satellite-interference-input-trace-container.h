@@ -80,12 +80,12 @@ public:
    */
   double GetInterferenceDensity (key_t key);
 
-private:
-
   /**
    * \brief Function for resetting the variables
    */
   void Reset ();
+
+private:
 
   /**
    * \brief Function for adding the node to the map

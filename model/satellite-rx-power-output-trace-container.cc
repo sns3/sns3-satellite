@@ -35,17 +35,7 @@ SatRxPowerOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRxPowerOutputTraceContainer")
     .SetParent<SatBaseTraceContainer> ()
-    .AddConstructor<SatRxPowerOutputTraceContainer> ()
-    .AddAttribute( "EnableFigureOutput",
-                   "Enable figure output.",
-                    BooleanValue (true),
-                    MakeBooleanAccessor (&SatRxPowerOutputTraceContainer::m_enableFigureOutput),
-                    MakeBooleanChecker ())
-    .AddAttribute( "Tag",
-                   "Tag.",
-                    StringValue (""),
-                    MakeStringAccessor (&SatRxPowerOutputTraceContainer::m_tag),
-                    MakeStringChecker ());
+    .AddConstructor<SatRxPowerOutputTraceContainer> ();
   return tid;
 }
 
@@ -58,13 +48,11 @@ SatRxPowerOutputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
-  m_currentWorkingDirectory (""),
+  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ()),
   m_enableFigureOutput (true),
   m_tag ("")
 {
   NS_LOG_FUNCTION (this);
-
-  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatRxPowerOutputTraceContainer::~SatRxPowerOutputTraceContainer ()
@@ -95,7 +83,7 @@ SatRxPowerOutputTraceContainer::Reset ()
 
       m_container.clear ();
     }
-  m_currentWorkingDirectory = "";
+  m_enableFigureOutput = true;
   m_tag = "";
 }
 

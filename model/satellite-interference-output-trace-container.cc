@@ -35,17 +35,7 @@ SatInterferenceOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatInterferenceOutputTraceContainer")
     .SetParent<SatBaseTraceContainer> ()
-    .AddConstructor<SatInterferenceOutputTraceContainer> ()
-    .AddAttribute( "EnableFigureOutput",
-                   "Enable figure output.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatInterferenceOutputTraceContainer::m_enableFigureOutput),
-                   MakeBooleanChecker ())
-    .AddAttribute( "Tag",
-                   "Tag.",
-                    StringValue (""),
-                    MakeStringAccessor (&SatInterferenceOutputTraceContainer::m_tag),
-                    MakeStringChecker ());
+    .AddConstructor<SatInterferenceOutputTraceContainer> ();
   return tid;
 }
 
@@ -58,13 +48,11 @@ SatInterferenceOutputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatInterferenceOutputTraceContainer::SatInterferenceOutputTraceContainer () :
-  m_currentWorkingDirectory (""),
+  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ()),
   m_enableFigureOutput (true),
   m_tag ("")
 {
   NS_LOG_FUNCTION (this);
-
-  m_currentWorkingDirectory = Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ();
 }
 
 SatInterferenceOutputTraceContainer::~SatInterferenceOutputTraceContainer ()
@@ -95,7 +83,7 @@ SatInterferenceOutputTraceContainer::Reset ()
 
       m_container.clear ();
     }
-  m_currentWorkingDirectory = "";
+  m_enableFigureOutput = true;
   m_tag = "";
 }
 
