@@ -93,6 +93,7 @@ def build(bld):
         'utils/satellite-output-fstream-wrapper.cc',
         'helper/cbr-helper.cc',
         'helper/cbr-kpi-helper.cc',
+        'helper/satellite-bbframe-conf.cc',
         'helper/satellite-beam-helper.cc',
         'helper/satellite-beam-user-info.cc',
         'helper/satellite-conf.cc',
@@ -121,7 +122,7 @@ def build(bld):
         'test/satellite-rle-test.cc',
         'test/satellite-scenario-creation.cc',
         'test/satellite-simple-unicast.cc',
-        'test/satellite-waveform-table-test.cc',
+        'test/satellite-waveform-conf-test.cc',
         'test/satellite-per-packet-if-test.cc',
         ]
 
@@ -214,6 +215,7 @@ def build(bld):
         'utils/satellite-output-fstream-wrapper.h',
         'helper/cbr-helper.h',
         'helper/cbr-kpi-helper.h',
+        'helper/satellite-bbframe-conf.h',
         'helper/satellite-beam-helper.h',
         'helper/satellite-beam-user-info.h',
         'helper/satellite-conf.h',
