@@ -144,9 +144,9 @@ public:
   Address GetMacWithGwId (uint32_t gwId);
 
   /**
-   * \brief Function for printing out the maps
+   * \brief Function for printing out the trace map
    */
-  void PrintMaps ();
+  void PrintTraceMap ();
 
   /**
    * \brief Function for getting the IDs related to a MAC address in an info string

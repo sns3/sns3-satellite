@@ -303,7 +303,7 @@ SatIdMapper::GetMacInfo (Address mac)
 }
 
 void
-SatIdMapper::PrintMaps ()
+SatIdMapper::PrintTraceMap ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -311,22 +311,7 @@ SatIdMapper::PrintMaps ()
 
   for (iter = m_macToTraceIdMap.begin(); iter != m_macToTraceIdMap.end(); iter++)
     {
-      std::cout << "Trace ID: " << iter->second << " MAC: " << iter->first << std::endl;
-    }
-
-  for (iter = m_macToUtIdMap.begin(); iter != m_macToUtIdMap.end(); iter++)
-    {
-      std::cout << "UT ID: " << iter->second << " MAC: " << iter->first << std::endl;
-    }
-
-  for (iter = m_macToGwIdMap.begin(); iter != m_macToGwIdMap.end(); iter++)
-    {
-      std::cout << "GW ID: " << iter->second << " MAC: " << iter->first << std::endl;
-    }
-
-  for (iter = m_macToBeamIdMap.begin(); iter != m_macToBeamIdMap.end(); iter++)
-    {
-      std::cout << "beam ID: " << iter->second << " MAC: " << iter->first << std::endl;
+      std::cout << GetMacInfo (iter->first) << std::endl;
     }
 }
 

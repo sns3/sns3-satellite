@@ -136,6 +136,7 @@ SatPerPacketBaseTestCase::SetOutputFiles( std::string extName, bool figureOutput
   extName.insert (extName.begin (), '_');
 
   Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get();
+  ptrMapper->PrintTraceMap ();
   ptrMapper->Reset ();
 
   Ptr<SatInterferenceOutputTraceContainer> ptr = Singleton<SatInterferenceOutputTraceContainer>::Get();
