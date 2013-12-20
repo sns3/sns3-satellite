@@ -66,18 +66,26 @@ class SatPerPacketBaseTestCase : public TestCase
 {
 public:
   SatPerPacketBaseTestCase ();
-  SatPerPacketBaseTestCase (std::string name, StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2);
+  SatPerPacketBaseTestCase (std::string name, std::string extName, SatEnums::FadingModel_t fading, bool dummyFrames,
+                            StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2);
   virtual ~SatPerPacketBaseTestCase ();
 
 protected:
   virtual void DoRun (void) = 0;
-  void SetOutputFiles( std::string extName, bool figureOutput );
+  void InitOutput ( bool figureOutput );
+  void PrintTraceInfo ( );
 
   StringValue m_Interval1;
   StringValue m_Interval2;
 
   UintegerValue m_PackageSize1;
   UintegerValue m_PackageSize2;
+
+  std::string m_extName;
+
+  SatEnums::FadingModel_t m_fading;
+  bool m_dummyFrames;
+
 };
 
 SatPerPacketBaseTestCase::SatPerPacketBaseTestCase ()
@@ -85,20 +93,26 @@ SatPerPacketBaseTestCase::SatPerPacketBaseTestCase ()
     m_Interval1 (),
     m_Interval2 (),
     m_PackageSize1 (),
-    m_PackageSize2 ()
+    m_PackageSize2 (),
+    m_extName (),
+    m_fading (),
+    m_dummyFrames (false)
 {
 
 }
 
-SatPerPacketBaseTestCase::SatPerPacketBaseTestCase (std::string name, StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
+SatPerPacketBaseTestCase::SatPerPacketBaseTestCase (std::string name, std::string extName, SatEnums::FadingModel_t fading, bool dummyFrames,
+                                                    StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
   : TestCase (name),
-    m_Interval1 ("0.1s"),
-    m_Interval2 ("0.1s"),
-    m_PackageSize1 (512),
-    m_PackageSize2 (512)
+    m_Interval1 (ival1),
+    m_Interval2 (ival2),
+    m_PackageSize1 (pSize1),
+    m_PackageSize2 (pSize2),
+    m_extName (extName),
+    m_fading (fading),
+    m_dummyFrames (dummyFrames)
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_OFF));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (false));
+
 }
 
 SatPerPacketBaseTestCase::~SatPerPacketBaseTestCase ()
@@ -107,42 +121,51 @@ SatPerPacketBaseTestCase::~SatPerPacketBaseTestCase ()
 }
 
 void
-SatPerPacketBaseTestCase::SetOutputFiles( std::string extName, bool figureOutput )
+SatPerPacketBaseTestCase::InitOutput( bool figureOutput )
 {
-  std::size_t pos = extName.find(' ');
-
-  while ( pos != std::string::npos )
-    {
-      extName.replace ( pos, 1, "_");
-      pos = extName.find(' ');
-    }
-
-  pos = extName.find(',');
-
-  while ( pos != std::string::npos )
-    {
-      extName.replace ( pos, 1, "\0");
-      pos = extName.find(',');
-    }
-
-  pos = extName.find('.');
-
-  while ( pos != std::string::npos )
-    {
-      extName.replace ( pos, 1, "\0");
-      pos = extName.find('.');
-    }
-
-  extName.insert (extName.begin (), '_');
-
   Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get();
-  ptrMapper->PrintTraceMap ();
   ptrMapper->Reset ();
 
-  Ptr<SatInterferenceOutputTraceContainer> ptr = Singleton<SatInterferenceOutputTraceContainer>::Get();
-  ptr->Reset ();
-  ptr->EnableFigureOutput (figureOutput);
-  ptr->InsertTag (extName);
+  Ptr<SatInterferenceOutputTraceContainer> ptrCont = Singleton<SatInterferenceOutputTraceContainer>::Get();
+  ptrCont->Reset ();
+
+  std::size_t pos = m_extName.find(' ');
+
+  while ( pos != std::string::npos )
+    {
+      m_extName.replace ( pos, 1, "_");
+      pos = m_extName.find(' ');
+    }
+
+  pos = m_extName.find(',');
+
+  while ( pos != std::string::npos )
+    {
+      m_extName.replace ( pos, 1, "\0");
+      pos = m_extName.find(',');
+    }
+
+  pos = m_extName.find('.');
+
+  while ( pos != std::string::npos )
+    {
+      m_extName.replace ( pos, 1, "\0");
+      pos = m_extName.find('.');
+    }
+
+  m_extName.insert (m_extName.begin (), '_');
+
+  ptrCont->EnableFigureOutput (figureOutput);
+  ptrCont->InsertTag (m_extName);
+}
+
+void
+SatPerPacketBaseTestCase::PrintTraceInfo ( )
+{
+  Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get();
+
+  std::cout << m_extName << std::endl;
+  ptrMapper->PrintTraceMap ();
 }
 
 /**
@@ -187,28 +210,24 @@ private:
 };
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defFwdUserName, StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512))
+  : SatPerPacketBaseTestCase (defFwdUserName, "_IfTestFU", SatEnums::FADING_OFF, false,
+                              StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512))
 {
-  SetOutputFiles ("_IfTestFU", true );
+
 }
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
- : SatPerPacketBaseTestCase (defFwdUserName + name, StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512) )
+ : SatPerPacketBaseTestCase (defFwdUserName + name, "_IfTestFU_" + name, fading, dummyFrames,
+                             StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512) )
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (dummyFrames));
 
-  SetOutputFiles ("_IfTestFU_" + name, true );
 }
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
- : SatPerPacketBaseTestCase (defFwdUserName + name, ival1, pSize1, ival2, pSize2 )
+ : SatPerPacketBaseTestCase (defFwdUserName + name, "_IfTestFU_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (dummyFrames));
 
-  SetOutputFiles ("_IfTestFU_" + name, true );
 }
 
 SatPerPacketFwdLinkUserTestCase::~SatPerPacketFwdLinkUserTestCase ()
@@ -218,6 +237,11 @@ SatPerPacketFwdLinkUserTestCase::~SatPerPacketFwdLinkUserTestCase ()
 void
 SatPerPacketFwdLinkUserTestCase::DoRun (void)
 {
+  InitOutput (true );
+
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
   Config::SetDefault("ns3::SatGeoHelper::FwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -283,10 +307,12 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
 
   ApplicationContainer gw2Cbr = cbrHelper.Install (gwUsers.Get (1));
   gw2Cbr.Start (Seconds (0.2));
-  gw2Cbr.Stop (Seconds (0.5));
+  gw2Cbr.Stop (Seconds (1.0));
 
-  Simulator::Stop (Seconds (0.5));
+  Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
+
+  PrintTraceInfo ();
   Simulator::Destroy ();
 }
 
@@ -331,29 +357,26 @@ private:
 };
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase ()
-  : SatPerPacketBaseTestCase (defFwdFullName, StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
+  : SatPerPacketBaseTestCase (defFwdFullName, "_IfTestFF", SatEnums::FADING_OFF, false,
+                              StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 
 {
-  SetOutputFiles ("_IfTestFF", false );
+
 }
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "_IfTestFF_"+ name, fading, dummyFrames,
+                              StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (dummyFrames));
 
-  SetOutputFiles ("_IfTestFF_"+name, false );
 }
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, ival1, pSize1, ival2, pSize2 )
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "_IfTestFF_"+ name, fading, dummyFrames,
+                              ival1, pSize1, ival2, pSize2 )
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (dummyFrames));
 
-  SetOutputFiles ("_IfTestFF_"+name, false );
 }
 
 SatPerPacketFwdLinkFullTestCase::~SatPerPacketFwdLinkFullTestCase ()
@@ -364,6 +387,11 @@ SatPerPacketFwdLinkFullTestCase::~SatPerPacketFwdLinkFullTestCase ()
 void
 SatPerPacketFwdLinkFullTestCase::DoRun (void)
 {
+  InitOutput ( false );
+
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
   Config::SetDefault("ns3::SatGeoHelper::FwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -424,8 +452,9 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   gw2Cbr.Start (Seconds (0.2));
   gw2Cbr.Stop (Seconds (0.4));
 
-  Simulator::Stop (Seconds (0.5));
+  Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
+  PrintTraceInfo ();
   Simulator::Destroy ();
 }
 
@@ -460,7 +489,7 @@ public:
   SatPerPacketRtnLinkUserTestCase ();
   SatPerPacketRtnLinkUserTestCase ( std::string name, SatEnums::FadingModel_t fading );
   SatPerPacketRtnLinkUserTestCase ( std::string name, SatEnums::FadingModel_t fading,
-                                      StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2);
+                                    StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2);
 
   virtual ~SatPerPacketRtnLinkUserTestCase ();
 
@@ -469,23 +498,25 @@ private:
 };
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defRtnUserName , StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
+  : SatPerPacketBaseTestCase (defRtnUserName , "_IfTestRU", SatEnums::FADING_OFF, false,
+                              StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
-  SetOutputFiles ("_IfTestRU", true );
+
 }
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "_IfTestRU_"+ name, fading, false,
+                              StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
-  SetOutputFiles ("_IfTestRU_"+name, true );
+
 }
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, ival1, pSize1, ival2, pSize2 )
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "_IfTestRU_"+ name, fading, false,
+                              ival1, pSize1, ival2, pSize2 )
 {
-  SetOutputFiles ("_IfTestRU_"+name, true );
-}
+  }
 
 SatPerPacketRtnLinkUserTestCase::~SatPerPacketRtnLinkUserTestCase ()
 {
@@ -494,6 +525,11 @@ SatPerPacketRtnLinkUserTestCase::~SatPerPacketRtnLinkUserTestCase ()
 void
 SatPerPacketRtnLinkUserTestCase::DoRun (void)
 {
+  InitOutput (false);
+
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
   Config::SetDefault("ns3::SatConf::StaticConfAllocatedBandwidth", DoubleValue (1.25e8));
@@ -557,8 +593,9 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   ut5Cbr.Start (Seconds (0.1));
   ut5Cbr.Stop (Seconds (0.4));
 
-  Simulator::Stop (Seconds (0.5));
+  Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
+  PrintTraceInfo ();
   Simulator::Destroy ();
 }
 
@@ -580,25 +617,26 @@ private:
 };
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase ()
-  : SatPerPacketBaseTestCase (defRtnFullName, StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
+  : SatPerPacketBaseTestCase (defRtnFullName, "_IfTestRF", SatEnums::FADING_OFF, false,
+                              StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
-  SetOutputFiles ("_IfTestRF", false );
+
 }
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnFullName + name,  StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "_IfTestRF_"+ name, fading, false,
+                              StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (fading) );
-  SetOutputFiles ("_IfTestRF_"+name, false );
+
 }
 
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnFullName + name,  ival1, pSize1, ival2, pSize2 )
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "_IfTestRF_"+ name, fading, false,
+                              ival1, pSize1, ival2, pSize2 )
 {
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (fading) );
-  SetOutputFiles ("_IfTestRF_"+name, false );
+
 }
 
 
@@ -609,6 +647,11 @@ SatPerPacketRtnLinkFullTestCase::~SatPerPacketRtnLinkFullTestCase ()
 void
 SatPerPacketRtnLinkFullTestCase::DoRun (void)
 {
+  InitOutput (false);
+
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
   Config::SetDefault("ns3::SatConf::StaticConfAllocatedBandwidth", DoubleValue (1.25e8));
@@ -664,8 +707,9 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   ut5Cbr.Start (Seconds (0.1));
   ut5Cbr.Stop (Seconds (0.4));
 
-  Simulator::Stop (Seconds (0.5));
+  Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
+  PrintTraceInfo ();
   Simulator::Destroy ();
 }
 
@@ -683,17 +727,17 @@ SatPerPacketIfTestSuite::SatPerPacketIfTestSuite ()
   : TestSuite ("sat-per-packet-if-test", SYSTEM)
 {
   AddTestCase (new SatPerPacketFwdLinkUserTestCase);
-  AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading.", SatEnums::FADING_OFF, false ));
+  AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading.", SatEnums::FADING_MARKOV, false ));
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading, DummyFrames.", SatEnums::FADING_MARKOV, true ));
 
   AddTestCase (new SatPerPacketFwdLinkFullTestCase);
-  AddTestCase (new SatPerPacketFwdLinkFullTestCase ("Markov_Fading.", SatEnums::FADING_OFF, false ));
+  AddTestCase (new SatPerPacketFwdLinkFullTestCase ("Markov_Fading.", SatEnums::FADING_MARKOV, false ));
 
   AddTestCase (new SatPerPacketRtnLinkUserTestCase);
-  AddTestCase (new SatPerPacketRtnLinkUserTestCase ("Markov_Fading.", SatEnums::FADING_OFF ));
+  AddTestCase (new SatPerPacketRtnLinkUserTestCase ("Markov_Fading.", SatEnums::FADING_MARKOV ));
 
   AddTestCase (new SatPerPacketRtnLinkFullTestCase);
-  AddTestCase (new SatPerPacketRtnLinkFullTestCase ("Markov_Fading.", SatEnums::FADING_OFF ));
+  AddTestCase (new SatPerPacketRtnLinkFullTestCase ("Markov_Fading.", SatEnums::FADING_MARKOV ));
 }
 
 // Do allocate an instance of this TestSuite
