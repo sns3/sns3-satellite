@@ -106,7 +106,22 @@ SatConf::GetTypeId (void)
                      DoubleValue (0.30),
                      MakeDoubleAccessor (&SatConf::m_frameConfSpacingFactor),
                      MakeDoubleChecker<double> (0.00, 1.00))
-    ;
+      .AddAttribute ("FwdCarrierAllocatedBandwidth",
+                     "The allocated carrier bandwidth for forward link carriers [Hz].",
+                     DoubleValue (0.125e9),
+                     MakeDoubleAccessor (&SatConf::m_fwdCarrierAllocatedBandwidth),
+                     MakeDoubleChecker<double> ())
+      .AddAttribute ("FwdCarrierRollOff",
+                     "The roll-off factor for forward link carriers.",
+                     DoubleValue (0.20),
+                     MakeDoubleAccessor (&SatConf::m_fwdCarrierRollOffFactor),
+                     MakeDoubleChecker<double> (0.00, 1.00))
+      .AddAttribute ("FwdCarrierSpacing",
+                     "The carrier spacing factor for forward link carriers.",
+                     DoubleValue (0.00),
+                     MakeDoubleAccessor (&SatConf::m_fwdCarrierSpacingFactor),
+                     MakeDoubleChecker<double> (0.00, 1.00))
+;
     return tid;
 }
 
@@ -150,15 +165,29 @@ SatConf::Configure (std::string wfConf)
   // *** configure forward link ***
 
   // currently only one carrier in forward link is used.
-  m_forwardLinkCarrierConf.push_back (1);
+  double fwdFeederLinkBandwidth = m_fwdFeederLinkBandwidth_hz / m_feederLinkChannelCount;
+  double fwdUserLinkBandwidth = m_fwdUserLinkBandwidth_hz / m_userLinkChannelCount;
+
+  // bandwidths of the forward feeder and user links is expected to be equal
+    if ( fwdFeederLinkBandwidth != fwdUserLinkBandwidth )
+      {
+        NS_FATAL_ERROR ( "Bandwidths of forward feeder and user links are not equal!!!");
+      }
+
+  Ptr<SatBtuConf> fwdCarrierConf = Create<SatBtuConf> (m_fwdCarrierAllocatedBandwidth, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
+
+  m_forwardLinkCarrierConf.push_back (fwdCarrierConf);
 
   // *** configure return link ***
 
   double rtnFeederLinkBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
   double rtnUserLinkBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
 
-  // bandwidths of the feeder and user links is expected to be equal
-  NS_ASSERT ( rtnFeederLinkBandwidth == rtnUserLinkBandwidth );
+  // bandwidths of the return feeder and user links is expected to be equal
+  if ( rtnFeederLinkBandwidth != rtnUserLinkBandwidth )
+    {
+      NS_FATAL_ERROR ( "Bandwidths of return feeder and user links are not equal!!!");
+    }
 
   switch (m_staticFrameConfig)
   {
@@ -240,14 +269,14 @@ SatConf::GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, u
   {
     case SatEnums::FORWARD_FEEDER_CH:
       channelBandwidth = m_fwdFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-      carrierBandwidth = channelBandwidth / m_forwardLinkCarrierConf[0];
+      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidth_hz ();
       baseFreq_hz = m_fwdFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
       centerFrequency_hz = baseFreq_hz + (carrierBandwidth * carrierId) + (carrierBandwidth / 2);
       break;
 
     case SatEnums::FORWARD_USER_CH:
       channelBandwidth = m_fwdUserLinkBandwidth_hz / m_userLinkChannelCount;
-      carrierBandwidth = channelBandwidth / m_forwardLinkCarrierConf[0];
+      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidth_hz ();
       baseFreq_hz = m_fwdUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
       centerFrequency_hz = baseFreq_hz + (carrierBandwidth * carrierId) + (carrierBandwidth / 2);
       break;
@@ -277,28 +306,23 @@ SatConf::GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId
 {
   NS_LOG_FUNCTION (this << chType << carrierId);
 
-  double channelBandwidth = 0.0;
   double carrierBandwidth = 0.0;
 
   switch (chType)
   {
     case SatEnums::FORWARD_FEEDER_CH:
-      channelBandwidth = m_fwdFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-      carrierBandwidth = channelBandwidth / m_forwardLinkCarrierConf[0];
+      carrierBandwidth = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::FORWARD_USER_CH:
-      channelBandwidth = m_fwdUserLinkBandwidth_hz / m_userLinkChannelCount;
-      carrierBandwidth = channelBandwidth / m_forwardLinkCarrierConf[0];
+      carrierBandwidth = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
-      channelBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
       carrierBandwidth = m_superframeSeq->GetCarrierBandwidth_hz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::RETURN_USER_CH:
-      channelBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
       carrierBandwidth = m_superframeSeq->GetCarrierBandwidth_hz (carrierId, bandwidhtType);
       break;
 
@@ -467,6 +491,35 @@ SatConf::GetFwdLinkCarrierCount () const
   NS_LOG_FUNCTION (this);
 
   return m_forwardLinkCarrierConf.size();
+}
+
+double
+SatConf::GetFwdLinkCarrierFrequencyHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+{
+  NS_LOG_FUNCTION (this);
+
+  double bandwidtHz = 0.0;
+
+  switch (bandwidthType)
+  {
+    case SatEnums::ALLOCATED_BANDWIDTH:
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidth_hz ();
+      break;
+
+    case SatEnums::OCCUPIED_BANDWIDTH:
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetOccupiedBandwidth_hz ();
+      break;
+
+    case SatEnums::EFFECTIVE_BANDWIDTH:
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidth_hz ();
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Invalid bandwidth type");
+      break;
+  }
+
+  return bandwidtHz;
 }
 
 GeoCoordinate

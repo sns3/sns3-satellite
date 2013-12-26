@@ -116,6 +116,15 @@ public:
    uint32_t GetFwdLinkCarrierCount () const;
 
    /**
+    * Get bandwidth of the forward link carrier.
+    *
+    * \param carrierId Id of the carrier.
+    * \param bandwidthType Type of the bandwidth.
+    * \return Requested carrier frequency.
+    */
+   double GetFwdLinkCarrierFrequencyHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
+
+   /**
     * Get count of the GWs (positions).
     *
     * \return GW count
@@ -261,7 +270,7 @@ private:
     * Item index of the list means carrier configuration sequence.
     * Currently only one sequence used and only one carrier inside carrier conf.
     */
-   std::vector<uint32_t>  m_forwardLinkCarrierConf;
+   std::vector<Ptr<SatBtuConf> >  m_forwardLinkCarrierConf;
 
    /**
     *  Base frequency of forward feeder link.
@@ -329,7 +338,7 @@ private:
    double m_frameConfAllocatedBandwidth;
 
    /**
-    * The configured carriee roll-off factor for static configurations.
+    * The configured carrier roll-off factor for static configurations.
     */
    double m_frameConfRollOffFactor;
 
@@ -337,6 +346,21 @@ private:
     * The configured carrier spacing factor for static configurations.
     */
    double m_frameConfSpacingFactor;
+
+   /**
+    * The configured allocated bandwidth for forward link carriers.
+    */
+   double m_fwdCarrierAllocatedBandwidth;
+
+   /**
+    * The configured carrier roll-off factor for forward link carriers.
+    */
+   double m_fwdCarrierRollOffFactor;
+
+   /**
+    * The configured carrier spacing factor for forward link carriers.
+    */
+   double m_fwdCarrierSpacingFactor;
 };
 
 
