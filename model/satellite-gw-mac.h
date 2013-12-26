@@ -39,6 +39,7 @@
 #include "satellite-scheduling-object.h"
 #include "satellite-phy.h"
 #include "satellite-bbframe.h"
+#include "ns3/satellite-bbframe-conf.h"
 
 namespace ns3 {
 
@@ -172,6 +173,24 @@ private:
    * The interval that the Mac uses to throttle packet transmission
    */
   Time m_tInterval;
+
+  /**
+   * Configured BB Frame conf.
+   */
+  Ptr<SatBbFrameConf> m_bbFrameConf;
+
+  /**
+   * Configured symbol rate for transmissions.
+   *
+   * TODO: Multiple carrier use needed to taken into account.
+   * Now it is assumed only one carrier to be used in forward link.
+   */
+  double m_symbolRate;
+
+  /**
+   * Configured default ModCod for transmission.
+   */
+  SatEnums::SatModcod_t m_defModCod;
 
   /**
    * Flag indicating if Dummy Frames are sent or not.

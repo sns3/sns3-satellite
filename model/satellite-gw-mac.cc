@@ -27,6 +27,7 @@
 #include "ns3/pointer.h"
 #include "ns3/enum.h"
 #include "ns3/boolean.h"
+#include "ns3/double.h"
 
 #include "satellite-mac-tag.h"
 #include "satellite-net-device.h"
@@ -52,6 +53,16 @@ SatGwMac::GetTypeId (void)
                     TimeValue (Seconds (0.002)),
                     MakeTimeAccessor (&SatGwMac::m_tInterval),
                     MakeTimeChecker ())
+    .AddAttribute ("BBFrameConf",
+                   "BB Frame configuration for this GW Mac.",
+                    PointerValue(),
+                    MakePointerAccessor (&SatGwMac::m_bbFrameConf),
+                    MakePointerChecker<SatBbFrameConf> ())
+    .AddAttribute ("SymbolRate",
+                   "Symbol rate for transmission.",
+                    DoubleValue(),
+                    MakeDoubleAccessor (&SatGwMac::m_symbolRate),
+                    MakeDoubleChecker<double> (0.0))
     .AddAttribute ("DummyFrameSendingOn",
                    "Flag to tell, if dummy frames are sent or not.",
                     BooleanValue (false),
@@ -89,6 +100,7 @@ SatGwMac::GetTypeId (void)
 }
 
 SatGwMac::SatGwMac ()
+ : m_defModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2)
 {
   NS_LOG_FUNCTION (this);
 
@@ -184,18 +196,23 @@ SatGwMac::TransmitTime (uint32_t carrierId)
 
   ScheduleBbFrames ();
   Ptr<SatBbFrame> bbFrame;
+  Time nextTransmitTime;
 
-  if ( m_bbFrameContainer.empty() )
+  if ( m_bbFrameContainer.empty () )
     {
       if ( m_dummyFrameSendingOn )
         {
           bbFrame = CreateDummyFrame ();
         }
+
+      nextTransmitTime = m_bbFrameConf->GetDummyBbFrameLength( m_symbolRate  );
     }
   else
     {
-      bbFrame = m_bbFrameContainer.front();
-      m_bbFrameContainer.pop_front();
+      bbFrame = m_bbFrameContainer.front ();
+      m_bbFrameContainer.pop_front ();
+
+      nextTransmitTime = bbFrame->GetDuration ();
     }
 
   if ( bbFrame )
@@ -207,13 +224,13 @@ SatGwMac::TransmitTime (uint32_t carrierId)
          */
 
         //Time DURATION (Seconds (0.001));
-        SendPacket (bbFrame->GetTransmitData() , carrierId, bbFrame->GetDuration ());
+        SendPacket (bbFrame->GetTransmitData (), carrierId, bbFrame->GetDuration () - Time (1));
     }
 
   // TODO: The next TransmitTime should be scheduled to be when just transmitted
   // packet transmission ends. This is dependent on the used BBFrame length and
   // used MODCOD.
-  ScheduleNextTransmissionTime (m_tInterval, 0);
+  ScheduleNextTransmissionTime (nextTransmitTime, 0);
 }
 
 void
@@ -259,7 +276,7 @@ SatGwMac::ScheduleBbFrames ()
         {
           if ( frameBytes == 0)
             {
-              frame = CreateFrame (3, bytesToSent);
+              frame = CreateFrame (m_defModCod, bytesToSent);
               frameBytes = frame->GetBytesLeft();
             }
 
