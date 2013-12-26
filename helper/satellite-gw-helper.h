@@ -30,6 +30,7 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-link-results.h"
+#include "satellite-bbframe-conf.h"
 
 namespace ns3 {
 
@@ -168,7 +169,8 @@ public:
 
 private:
   CarrierBandwidthConverter  m_carrierBandwidthConverter;
-  int32_t m_rtnLinkCarrierCount;
+  uint32_t m_rtnLinkCarrierCount;
+  Ptr<SatBbFrameConf> m_bbFrameConf;
 
   ObjectFactory m_queueFactory;
   ObjectFactory m_channelFactory;
