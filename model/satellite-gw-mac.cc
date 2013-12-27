@@ -212,10 +212,7 @@ SatGwMac::TransmitTime (uint32_t carrierId)
       bbFrame = m_bbFrameContainer.front ();
       m_bbFrameContainer.pop_front ();
 
-      //txDuration = bbFrame->GetDuration ();
-      // TODO: Frame real duration is needed to use.
-      // but currently using real causes problems
-      txDuration = m_bbFrameConf->GetDummyBbFrameLength ( m_symbolRate );
+      txDuration = bbFrame->GetDuration ();
     }
 
   if ( bbFrame )

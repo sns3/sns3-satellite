@@ -141,6 +141,33 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
       if (m_propagationDelay)
         {
           delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
+
+          // TODO: This still needed to check
+          // Transmission time is needed to decrease from second link delay
+          // to prevent overlapping receiving and in second hand this closer
+          // to real receiving time (because sending start already when first bit arrives)
+          switch (m_channelType)
+            {
+              case SatEnums::RETURN_FEEDER_CH:
+              case SatEnums::FORWARD_USER_CH:
+                {
+                  if ( delay > txParams->m_duration)
+                    {
+                      delay -= txParams->m_duration;
+                    }
+                  else
+                    {
+                      delay = Seconds (0);
+                    }
+                  break;
+                }
+
+              default:
+                {
+                  break;
+                }
+            }
+
           NS_LOG_LOGIC("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
         }
 
