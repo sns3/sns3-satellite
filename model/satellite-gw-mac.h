@@ -156,7 +156,7 @@ private:
     * \param byteCount byte count
     * \return Pointer to created frame.
     */
-   Ptr<SatBbFrame> CreateFrame (uint32_t modCod, uint32_t byteCount) const;
+   Ptr<SatBbFrame> CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCount) const;
 
    /**
     * Create dummy frame. Dummy frame is sent when there is nothing else to send.

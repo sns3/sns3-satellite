@@ -26,6 +26,8 @@
 #include "ns3/simple-ref-count.h"
 #include "ns3/packet.h"
 #include "ns3/nstime.h"
+#include "ns3/satellite-bbframe-conf.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -39,19 +41,7 @@ class SatBbFrame :  public SimpleRefCount<SatBbFrame>
 {
 public:
 
-  /**
-   *
-   */
-  typedef enum
-  {
-    SHORT_FRAME, //!< SHORT_FRAME
-    NORMAL_FRAME,//!< NORMAL_FRAME
-    DUMMY_FRAME  //!< DUMMY_FRAME
-  } FrameType_t;
-
   typedef std::vector<Ptr<Packet > > SatBbFrameData;
-  static const uint32_t m_shortBbFrameLengthInBytes = 2025;   // 16200 bits without ModCod
-  static const uint32_t m_normalBbFrameLengthInBytes =  8100;   // 64800 bits without ModCod
 
   /**
    * Default constructor. Constructs BB frame with default ModCod and default frame type.
@@ -62,8 +52,10 @@ public:
    * Constructor to create BB frame according to given type and MODCOD.
    * \param modCod Used ModCod
    * \param type Type if the frame
+   * \param conf Pointer to BBFrame configuration
+   * \param symRateInBauds Symbol rate in bauds.
    */
-  SatBbFrame (uint32_t modCod, FrameType_t type);
+  SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf, double symRateInBauds);
 
   /**
    * Destructor

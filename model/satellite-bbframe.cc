@@ -27,9 +27,9 @@ namespace ns3 {
 
 
 SatBbFrame::SatBbFrame ()
- : m_modCod (3),
-   m_freeBytes (m_shortBbFrameLengthInBytes),
-   m_TotalBytes (m_shortBbFrameLengthInBytes),
+ : m_modCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4),
+   m_freeBytes (1),
+   m_TotalBytes (1),
    m_containsControlData (false),
    m_duration(Seconds (0.00009))
 
@@ -38,7 +38,7 @@ SatBbFrame::SatBbFrame ()
 }
 
 
-SatBbFrame::SatBbFrame (uint32_t modCod, FrameType_t type)
+SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf, double symbolRateInBauds)
   :m_modCod (modCod),
    m_containsControlData (false)
 {
@@ -46,22 +46,17 @@ SatBbFrame::SatBbFrame (uint32_t modCod, FrameType_t type)
 
   switch (type)
   {
-    case SatBbFrame::SHORT_FRAME:
-      m_freeBytes = m_shortBbFrameLengthInBytes;
-      m_TotalBytes = m_shortBbFrameLengthInBytes;
-      m_duration = Seconds (0.00009);
+    case SatEnums::SHORT_FRAME:
+    case SatEnums::NORMAL_FRAME:
+      m_freeBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
+      m_TotalBytes = m_freeBytes;
+      m_duration = conf->GetBbFrameLength (modCod, type, symbolRateInBauds);
       break;
 
-    case SatBbFrame::NORMAL_FRAME:
-      m_freeBytes = m_normalBbFrameLengthInBytes;
-      m_TotalBytes = m_normalBbFrameLengthInBytes;
-      m_duration = Seconds (0.00036);
-      break;
-
-    case SatBbFrame::DUMMY_FRAME:
-      m_freeBytes = m_shortBbFrameLengthInBytes;
-      m_TotalBytes = m_shortBbFrameLengthInBytes;
-      m_duration = Seconds (0.00009);
+    case SatEnums::DUMMY_FRAME:
+      m_freeBytes = 1;
+      m_TotalBytes = 1;
+      m_duration = conf->GetDummyBbFrameLength (symbolRateInBauds);
       break;
 
     default:
@@ -98,6 +93,11 @@ SatBbFrame::AddTransmitData (Ptr<Packet> data, bool controlData)
       m_freeBytes -= dataLengthInBytes;
       m_containsControlData |= controlData;
     }
+  else
+    {
+      std::cout << dataLengthInBytes << std::endl;
+      NS_ASSERT (0);
+    }
 
   return GetBytesLeft();
 }
@@ -112,7 +112,6 @@ SatBbFrame::ContainsControlData () const
 uint32_t
 SatBbFrame::GetBytesLeft () const
 {
-  // TODO: Needed calculate according to ModCod
   return m_freeBytes;
 }
 

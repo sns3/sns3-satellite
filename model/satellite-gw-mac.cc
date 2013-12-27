@@ -100,7 +100,7 @@ SatGwMac::GetTypeId (void)
 }
 
 SatGwMac::SatGwMac ()
- : m_defModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2)
+ : m_defModCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4)
 {
   NS_LOG_FUNCTION (this);
 
@@ -196,7 +196,7 @@ SatGwMac::TransmitTime (uint32_t carrierId)
 
   ScheduleBbFrames ();
   Ptr<SatBbFrame> bbFrame;
-  Time nextTransmitTime;
+  Time txDuration;
 
   if ( m_bbFrameContainer.empty () )
     {
@@ -205,14 +205,17 @@ SatGwMac::TransmitTime (uint32_t carrierId)
           bbFrame = CreateDummyFrame ();
         }
 
-      nextTransmitTime = m_bbFrameConf->GetDummyBbFrameLength( m_symbolRate  );
+      txDuration = m_bbFrameConf->GetDummyBbFrameLength ( m_symbolRate );
     }
   else
     {
       bbFrame = m_bbFrameContainer.front ();
       m_bbFrameContainer.pop_front ();
 
-      nextTransmitTime = bbFrame->GetDuration ();
+      //txDuration = bbFrame->GetDuration ();
+      // TODO: Frame real duration is needed to use.
+      // but currently using real causes problems
+      txDuration = m_bbFrameConf->GetDummyBbFrameLength ( m_symbolRate );
     }
 
   if ( bbFrame )
@@ -222,15 +225,13 @@ SatGwMac::TransmitTime (uint32_t carrierId)
          * The BBFrame duration should be calculated based on BBFrame length and
          * used MODCOD.
          */
-
-        //Time DURATION (Seconds (0.001));
-        SendPacket (bbFrame->GetTransmitData (), carrierId, bbFrame->GetDuration () - Time (1));
+        SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - Time (1) );
     }
 
   // TODO: The next TransmitTime should be scheduled to be when just transmitted
   // packet transmission ends. This is dependent on the used BBFrame length and
   // used MODCOD.
-  ScheduleNextTransmissionTime (nextTransmitTime, 0);
+  ScheduleNextTransmissionTime (txDuration, 0);
 }
 
 void
@@ -340,7 +341,7 @@ Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
   NS_LOG_FUNCTION (this);
 
   Ptr<SatBbFrame> dummyFrame = Create<SatBbFrame> ();
-  Ptr<Packet> dummyPacket = Create<Packet> (SatBbFrame::m_shortBbFrameLengthInBytes);
+  Ptr<Packet> dummyPacket = Create<Packet> (1);
 
   // Add MAC tag
   SatMacTag tag;
@@ -354,7 +355,7 @@ Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
 }
 
 Ptr<SatBbFrame>
-SatGwMac::CreateFrame (uint32_t modCod, uint32_t byteCount) const
+SatGwMac::CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCount) const
 {
   NS_LOG_FUNCTION (this << modCod << byteCount);
 
@@ -363,22 +364,26 @@ SatGwMac::CreateFrame (uint32_t modCod, uint32_t byteCount) const
   switch (m_bbFrameUsageMode)
   {
     case SHORT_FRAMES:
-      frame = Create<SatBbFrame> (modCod, SatBbFrame::SHORT_FRAME);
+      frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf, m_symbolRate);
       break;
 
     case NORMAL_FRAMES:
-      frame = Create<SatBbFrame> (modCod, SatBbFrame::NORMAL_FRAME);
+      frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf, m_symbolRate);
       break;
 
     case SHORT_AND_NORMAL_FRAMES:
-      if (byteCount > SatBbFrame::m_shortBbFrameLengthInBytes)
-        {
-          frame = Create<SatBbFrame> (modCod, SatBbFrame::NORMAL_FRAME);
-        }
-      else
-        {
-          frame = Create<SatBbFrame> (modCod, SatBbFrame::SHORT_FRAME);
-        }
+      {
+        uint32_t bytesInShortFrame = m_bbFrameConf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
+
+        if (byteCount > bytesInShortFrame)
+          {
+            frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf, m_symbolRate);
+          }
+        else
+          {
+            frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf, m_symbolRate);
+          }
+      }
       break;
 
     default:
