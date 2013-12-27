@@ -171,7 +171,8 @@ public:
   typedef enum
   {
     SHORT_FRAME = 0,
-    NORMAL_FRAME = 1
+    NORMAL_FRAME = 1,
+    DUMMY_FRAME = 2
   } SatBbFrameType_t;
 
 
