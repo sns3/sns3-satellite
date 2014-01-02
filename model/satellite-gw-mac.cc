@@ -205,7 +205,7 @@ SatGwMac::TransmitTime (uint32_t carrierId)
           bbFrame = CreateDummyFrame ();
         }
 
-      txDuration = m_bbFrameConf->GetDummyBbFrameLength ( m_symbolRate );
+      txDuration = m_bbFrameConf->GetDummyBbFrameLength ();
     }
   else
     {

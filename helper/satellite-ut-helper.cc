@@ -114,16 +114,15 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
 }
 
 void
-SatUtHelper::Initialize ()
+SatUtHelper::Initialize (Ptr<SatLinkResultsDvbS2> lrS2)
 {
   NS_LOG_FUNCTION (this);
   /*
    * Forward channel link results (DVB-S2) are created for UTs.
    */
-  if (m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+  if (lrS2 && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
-      m_linkResults = CreateObject<SatLinkResultsDvbS2> ();
-      m_linkResults->Initialize ();
+      m_linkResults = lrS2;
     }
 }
 

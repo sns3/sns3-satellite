@@ -84,8 +84,11 @@ SatBeamHelper::SatBeamHelper () :
   NS_ASSERT(false);
 }
 
-SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandwidthConverterCb,
-                              uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
+SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
+                              CarrierBandwidthConverter bandwidthConverterCb,
+                              uint32_t rtnLinkCarrierCount,
+                              uint32_t fwdLinkCarrierCount,
+                              Ptr<SatSuperframeSeq> seq)
   : m_superframeSeq (seq),
     m_fadingModel (SatEnums::FADING_MARKOV)
 {
@@ -102,8 +105,29 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandw
   m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount);
   m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, seq );
 
-  m_gwHelper->Initialize ();
-  m_utHelper->Initialize ();
+  // Two usage of link results is two-fold: on the other hand they are needed in the
+  // packet reception for packet decoding, but on the other hand they are utilized in
+  // transmission side in ACM for deciding the best MODCOD.
+  //
+  // DVB-RCS2 link results:
+  // - Packet reception at the GW
+  // - RTN link packet scheduling at the NCC
+  // DVB-S2 link results:
+  // - Packet reception at the UT
+  // - FWD link packet scheduling at the GW
+  //
+  Ptr<SatLinkResultsDvbS2> linkResultsS2 = CreateObject<SatLinkResultsDvbS2> ();
+  Ptr<SatLinkResultsDvbRcs2> linkResultsRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
+  linkResultsS2->Initialize ();
+  linkResultsRcs2->Initialize ();
+
+  // DVB-S2 link results for packet decoding at the UT
+  m_utHelper->Initialize (linkResultsS2);
+  // DVB-RCS2 link results for packet decoding at the GW +
+  // DVB-S2 link results for FWD link RRM
+  m_gwHelper->Initialize (linkResultsRcs2, linkResultsS2);
+  // DVB-RCS2 link results for RTN link waveform configurations
+  m_superframeSeq->GetWaveformConf()->InitializeEbNoRequirements (linkResultsRcs2);
 
   m_geoNode = geoNode;
   m_geoHelper->Install (m_geoNode);

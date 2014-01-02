@@ -110,25 +110,25 @@ public:
    * \brief Get a BLER value from link results.
    *
    * \param waveformId (which determines burst length and MODCOD)
-   * \param sinrDb the received Es/No in dB
+   * \param ebNoDb the received Eb/No in dB
    * \return BLER value, which is a `double` ranging between [0..1]
    *
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetBler (uint32_t waveformId, double sinrDb) const;
+  double GetBler (uint32_t waveformId, double ebNoDb) const;
 
   /**
-   * \brief Get a Es/No requirement for a given BLER target from link results.
+   * \brief Get a Eb/No requirement for a given BLER target from link results.
    *
    * \param waveformId (which determines burst length and MODCOD)
    * \param blerTarget Target BLER for the system
-   * \return Es/No value
+   * \return Eb/No value
    *
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetEsNoDb (uint32_t waveformId, double blerTarget) const;
+  double GetEbNoDb (uint32_t waveformId, double blerTarget) const;
 
 protected:
   /**
@@ -167,13 +167,13 @@ public:
    * \brief Get a BLER value from link results.
    *
    * \param modcod Modulation and coding scheme
-   * \param sinrDb the received Es/No in dB
+   * \param esNoDb the received Es/No in dB
    * \return BLER value, which is a `double` ranging between [0..1]
    *
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetBler (SatEnums::SatModcod_t modcod, double sinrDb) const;
+  double GetBler (SatEnums::SatModcod_t modcod, double esNoDb) const;
 
   /**
    * \brief Get a Es/No requirement for a given BLER target from link results.

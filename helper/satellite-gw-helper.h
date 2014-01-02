@@ -57,8 +57,10 @@ public:
 
   /*
    * Initializes the GW helper based on attributes
+   * \param lrRcs2 DVB-RCS2 link results
+   * \param lrS2 DVB-S2 link results
    */
-  void Initialize ();
+  void Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2);
 
   /**
    * Each point to point net device must have a queue to pass packets through.
@@ -197,6 +199,8 @@ private:
    * \brief Trace callback for creation traces
    */
   TracedCallback<std::string> m_creation;
+
+  double m_symbolRate;
 };
 
 } // namespace ns3

@@ -64,8 +64,9 @@ public:
 
   /*
    * Initializes the UT helper based on attributes
+   * \param lrS2 DVB-S2 link results
    */
-  void Initialize ();
+  void Initialize (Ptr<SatLinkResultsDvbS2> lrS2);
 
   /**
    * Each point to point net device must have a queue to pass packets through.

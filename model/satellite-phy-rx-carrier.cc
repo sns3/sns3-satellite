@@ -370,6 +370,13 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
           case SatEnums::FORWARD_USER_CH:
             {
               /// TODO check this! (cSinr -> esN0)
+
+              /**
+               * Es/No = C/N * B/fs, where
+               * C/N is the composite SINR
+               * B is the channel bandwidth
+               * fs is the symbol rate
+              */
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (m_rxParams->m_modCod,SatUtils::LinearToDb (cSinr));
 
               /// TODO make proper version without rand
@@ -403,6 +410,13 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
               double bitrate = (bytes * m_bitsToContainByte) / duration;
 
               /// TODO check this!
+
+              /**
+               * Eb/No = C/N * B/fb, where
+               * C/N is the composite SINR
+               * B is the channel bandwidth
+               * fb is net bitrate (bitrate without PHY overhead)
+              */
               double ebNo = cSinr * (m_rxBandwidthHz / bitrate);
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (m_rxParams->m_waveformId,SatUtils::LinearToDb (ebNo));
 

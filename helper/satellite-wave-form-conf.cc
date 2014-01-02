@@ -100,15 +100,17 @@ SatWaveform::GetCNoThreshold (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
 
-  return m_esnoThreshold * symbolRateInBaud * m_modulatedBits;
+  // TODO: Check: symbolRateInBaud * m_modulatedBits is not the net bitrate,
+  // but the bitrate including the PHY overhead!
+  return m_ebnoRequirement * symbolRateInBaud * m_modulatedBits;
 }
 
 void
-SatWaveform::SetEsNoThreshold (double esnoThreshold)
+SatWaveform::SetEbNoRequirement (double ebnoRequirement)
 {
-  NS_LOG_FUNCTION (this << esnoThreshold);
+  NS_LOG_FUNCTION (this << ebnoRequirement);
 
-  m_esnoThreshold = esnoThreshold;
+  m_ebnoRequirement = ebnoRequirement;
 }
 
 void
@@ -118,7 +120,7 @@ SatWaveform::Dump (double carrierBandwidthInHz, double symbolRateInBaud) const
 
   std::cout << "ModulatedBits: " << m_modulatedBits << ", CodingRate: " << m_codingRate <<
       ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
-      ", EsNoThreshold: " << SatUtils::LinearToDb (m_esnoThreshold) <<
+      ", EbNoRequirement: " << SatUtils::LinearToDb (m_ebnoRequirement) <<
       ", BurstDuration: " << GetBurstDurationInSeconds (symbolRateInBaud) <<
       ", Throughput: " << GetThroughputInBitsPerSecond (symbolRateInBaud) <<
       ", SpectralEfficiency: " << GetSpectralEfficiency (carrierBandwidthInHz, symbolRateInBaud) <<
@@ -238,7 +240,7 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
 }
 
 
-void SatWaveformConf::InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults )
+void SatWaveformConf::InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults )
 {
   NS_LOG_FUNCTION (this);
 
@@ -246,8 +248,8 @@ void SatWaveformConf::InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> lin
       it != m_waveforms.end ();
       ++it )
     {
-      double esnoTresholdDb = linkResults->GetEsNoDb (it->first, m_perTarget);
-      it->second->SetEsNoThreshold (SatUtils::DbToLinear (esnoTresholdDb));
+      double ebnoRequirementDb = linkResults->GetEbNoDb (it->first, m_perTarget);
+      it->second->SetEbNoRequirement (SatUtils::DbToLinear (ebnoRequirementDb));
     }
 }
 

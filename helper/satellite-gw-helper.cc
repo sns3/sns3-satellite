@@ -95,24 +95,28 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
-  m_bbFrameConf = CreateObject<SatBbFrameConf> ();
-
   //LogComponentEnable ("SatGwHelper", LOG_LEVEL_INFO);
 }
 
 void
-SatGwHelper::Initialize ()
+SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2)
 {
   NS_LOG_FUNCTION (this );
+
+  // TODO: Usage of multiple carriers needed to take into account, now only one carrier assumed to be used.
+  // TODO: Symbol rate needed to check.
+  m_symbolRate = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
 
   /*
    * Return channel link results (DVB-RCS2) are created for GWs.
    */
-  if (m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+  if (lrRcs2 && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
-      m_linkResults = CreateObject<SatLinkResultsDvbRcs2> ();
-      m_linkResults->Initialize ();
+      m_linkResults = lrRcs2;
     }
+
+  m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate);
+  m_bbFrameConf->InitializeCNoRequirements (lrS2);
 }
 
 void 
@@ -198,12 +202,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> ();
 
   mac->SetAttribute ("BBFrameConf", PointerValue (m_bbFrameConf));
-
-  // TODO: Usage of multiple carriers needed to take into account, now only one carrier assumed to be used.
-  // TODO: Symbol rate needed to check.
-  double symbolrate = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-
-  mac->SetAttribute ("SymbolRate", DoubleValue (symbolrate));
+  mac->SetAttribute ("SymbolRate", DoubleValue (m_symbolRate));
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);

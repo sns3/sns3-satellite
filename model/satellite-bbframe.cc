@@ -50,13 +50,13 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
     case SatEnums::NORMAL_FRAME:
       m_freeBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
       m_TotalBytes = m_freeBytes;
-      m_duration = conf->GetBbFrameLength (modCod, type, symbolRateInBauds);
+      m_duration = conf->GetBbFrameLength (modCod, type);
       break;
 
     case SatEnums::DUMMY_FRAME:
       m_freeBytes = 1;
       m_TotalBytes = 1;
-      m_duration = conf->GetDummyBbFrameLength (symbolRateInBauds);
+      m_duration = conf->GetDummyBbFrameLength ();
       break;
 
     default:

@@ -77,7 +77,7 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   lr->Initialize ();
 
   Ptr<SatWaveformConf> wf = CreateObject<SatWaveformConf> (path+fileName);
-  wf->InitializeEsNoRequirements( lr );
+  wf->InitializeEbNoRequirements( lr );
 
   uint32_t refResults [23] = {4, 5, 6, 7, 7, 7, 7, 7, 8, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12};
 
@@ -135,11 +135,15 @@ SatDvbS2BbFrameConfTestCase::~SatDvbS2BbFrameConfTestCase ()
 void
 SatDvbS2BbFrameConfTestCase::DoRun (void)
 {
-  // Create BBFrame conf
-  Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> ();
-
   // Tested symbol rate in baud
   double symbolRate (93750000);
+
+  Ptr<SatLinkResultsDvbS2> lr = CreateObject<SatLinkResultsDvbS2> ();
+  lr->Initialize ();
+
+  // Create BBFrame conf
+  Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> (symbolRate);
+  bbFrameConf->InitializeCNoRequirements (lr);
 
   // Available modcods
   SatEnums::SatModcod_t modcods[24] = { SatEnums::SAT_MODCOD_QPSK_1_TO_2,
@@ -183,7 +187,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
       for (uint32_t j = 0; j < 24; ++j)
         {
           // Get BBFrame length in Time
-          Time l = bbFrameConf->GetBbFrameLength (modcods[j], frameTypes[i], symbolRate);
+          Time l = bbFrameConf->GetBbFrameLength (modcods[j], frameTypes[i]);
 
           // Get BBFrame payload in bits
           uint32_t p = bbFrameConf->GetBbFramePayloadBits (modcods[j], frameTypes[i]);
@@ -191,7 +195,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
           std::cout << "MODCOD: " << SatEnums::GetModcodTypeName(modcods[j]) <<
               ", frameType: " << frameTypes[i] <<
               ", length [s]: " << l.GetSeconds () <<
-              ", payload [B]: " << p << std::endl;
+              ", payload [b]: " << p << std::endl;
         }
     }
 }

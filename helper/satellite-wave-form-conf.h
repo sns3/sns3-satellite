@@ -101,11 +101,11 @@ public:
   double GetCNoThreshold (double symbolRateInBaud) const;
 
   /**
-   * Set the EsNo threshold of the waveform  in linear domain
+   * Set the Eb/No requirement of the waveform  in linear domain
    * based on the used link results
-   * \param esnoThreshold EsNo threshold
+   * \param ebnoRequirement EbNo requirement
    */
-  void SetEsNoThreshold (double esnoThreshold);
+  void SetEbNoRequirement (double ebnoRequirement);
 
   /**
    * Dump the contents of the waveform. For spectral efficiency calculation,
@@ -146,10 +146,10 @@ private:
   uint32_t m_lengthInSymbols;
 
   /**
-   * Es/No threshold calculated with a certain BLER target
+   * Eb/No threshold calculated with a certain BLER target
    * from the link results
    */
-  double m_esnoThreshold;
+  double m_ebnoRequirement;
 };
 
 
@@ -174,11 +174,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Initialize the Es/No requirements of the waveforms based on
+   * Initialize the Eb/No requirements of the waveforms based on
    * the used DVB-RCS2 link results.
    * \param linkResults Pointer to DVB-RCS2 link results
    */
-  void InitializeEsNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
+  void InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
 
   /**
    * Get the details of a certain waveform

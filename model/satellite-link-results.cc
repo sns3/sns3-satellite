@@ -101,21 +101,21 @@ SatLinkResultsDvbRcs2::DoInitialize ()
 
 
 double
-SatLinkResultsDvbRcs2::GetBler (uint32_t waveformId, double esNoDb) const
+SatLinkResultsDvbRcs2::GetBler (uint32_t waveformId, double ebNoDb) const
 {
-  NS_LOG_FUNCTION (this << waveformId << esNoDb);
+  NS_LOG_FUNCTION (this << waveformId << ebNoDb);
 
   if (!m_isInitialized)
     {
       NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
     }
 
-  return m_table.at(waveformId)->GetBler (esNoDb);
+  return m_table.at(waveformId)->GetBler (ebNoDb);
 }
 
 
 double
-SatLinkResultsDvbRcs2::GetEsNoDb (uint32_t waveformId, double blerTarget) const
+SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 {
   NS_LOG_FUNCTION (this << waveformId << blerTarget);
 

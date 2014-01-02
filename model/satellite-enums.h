@@ -101,6 +101,35 @@ public:
   } SatModcod_t;
 
 
+  static inline void GetAvailableModcods (std::vector<SatModcod_t>& modcods)
+  {
+    modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
+    modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
+    modcods.push_back (SAT_MODCOD_QPSK_3_TO_4);
+    modcods.push_back (SAT_MODCOD_QPSK_3_TO_5);
+    modcods.push_back (SAT_MODCOD_QPSK_4_TO_5);
+    modcods.push_back (SAT_MODCOD_QPSK_5_TO_6);
+    modcods.push_back (SAT_MODCOD_QPSK_8_TO_9);
+    modcods.push_back (SAT_MODCOD_QPSK_9_TO_10);
+    modcods.push_back (SAT_MODCOD_8PSK_2_TO_3);
+    modcods.push_back (SAT_MODCOD_8PSK_3_TO_4);
+    modcods.push_back (SAT_MODCOD_8PSK_3_TO_5);
+    modcods.push_back (SAT_MODCOD_8PSK_5_TO_6);
+    modcods.push_back (SAT_MODCOD_8PSK_8_TO_9);
+    modcods.push_back (SAT_MODCOD_8PSK_9_TO_10);
+    modcods.push_back (SAT_MODCOD_16APSK_2_TO_3);
+    modcods.push_back (SAT_MODCOD_16APSK_3_TO_4);
+    modcods.push_back (SAT_MODCOD_16APSK_4_TO_5);
+    modcods.push_back (SAT_MODCOD_16APSK_5_TO_6);
+    modcods.push_back (SAT_MODCOD_16APSK_8_TO_9);
+    modcods.push_back (SAT_MODCOD_16APSK_9_TO_10);
+    modcods.push_back (SAT_MODCOD_32APSK_3_TO_4);
+    modcods.push_back (SAT_MODCOD_32APSK_4_TO_5);
+    modcods.push_back (SAT_MODCOD_32APSK_5_TO_6);
+    modcods.push_back (SAT_MODCOD_32APSK_8_TO_9);
+  };
+
+
   static inline std::string GetModcodTypeName (SatModcod_t modcod)
   {
     switch (modcod)
@@ -175,6 +204,12 @@ public:
     DUMMY_FRAME = 2
   } SatBbFrameType_t;
 
+
+  static inline void GetAvailableBbFrameTypes (std::vector<SatBbFrameType_t>& frameTypes)
+  {
+    frameTypes.push_back (SHORT_FRAME);
+    frameTypes.push_back (NORMAL_FRAME);
+  };
 
   /**
    * Possible modes of Rx power calculation.
