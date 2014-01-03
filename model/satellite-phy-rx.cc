@@ -165,12 +165,20 @@ SatPhyRx::SetAddress (Mac48Address ownAddress)
 {
   NS_ASSERT (!m_rxCarriers.empty ());
 
+  m_macAddress = ownAddress;
+
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
         it != m_rxCarriers.end();
         ++it)
-      {
-        (*it)->SetAddress(ownAddress);
-      }
+    {
+      (*it)->SetAddress(ownAddress);
+    }
+}
+
+Mac48Address
+SatPhyRx::GetAddress () const
+{
+  return m_macAddress;
 }
 
 void
@@ -242,10 +250,18 @@ SatPhyRx::SetBeamId (uint32_t beamId)
   NS_ASSERT (beamId >= 0);
   NS_ASSERT (!m_rxCarriers.empty());
 
+  m_beamId = beamId;
+
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin(); it != m_rxCarriers.end(); ++it)
     {
       (*it)->SetBeamId (beamId);
     }
+}
+
+uint32_t
+SatPhyRx::GetBeamId () const
+{
+  return m_beamId;
 }
 
 void

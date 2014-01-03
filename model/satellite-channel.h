@@ -58,6 +58,16 @@ public:
   virtual ~SatChannel ();
 
   /**
+   * SINGLE_RX = only the proper receiver of the packet shall receive the packet
+   * MULTI_RX = all receivers in the channel shall receive the packet
+   */
+  enum SatChannelRxMode_e
+    {
+      SINGLE_RX,
+      MULTI_RX
+    };
+
+  /**
    * \brief
    * \return
    */
@@ -165,7 +175,14 @@ private:
   virtual void DoDispose ();
 
   /**
-   * \brief Used internally to schedule the reception start after the propagation delay.
+   * \brief Used internally to schedule the StartRx method call after the propagation delay.
+   * \param rxParams Parameters of the signal being received
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Used internally to start the packet reception of at the phyRx.
    *
    * \param rxParams Parameters of the signal being received
    * \param phyRx The receiver SatPhyRx entity
@@ -207,6 +224,13 @@ private:
    * \return source MAC address
    */
   Mac48Address GetSourceAddress (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * Receiving mode of the SatChannel:
+   * SINGLE_RX = only the proper receiver of the packet shall receive the packet
+   * MULTI_RX = all receivers in the channel shall receive the packet
+   */
+  SatChannelRxMode_e m_rxMode;
 
   /**
    * \brief list of SatPhyRx instances attached to the channel

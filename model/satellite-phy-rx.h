@@ -118,6 +118,12 @@ public:
    */
   void SetBeamId (uint32_t beamId);
 
+   /**
+    * \brief Get beam id of this receiver
+    * \return uint32_t beam id
+    */
+   uint32_t GetBeamId () const;
+
   /**
    * \param carrierConf Carrier configuration class
    */
@@ -159,10 +165,19 @@ public:
    */
    void SetAddress (Mac48Address ownAddress);
 
+   /**
+    * \brief Get MAC address of this PHY/MAC
+    * \return Mac48Address MAC address of this PHY
+    */
+   Mac48Address GetAddress () const;
+
 private:
 
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;
+
+  uint32_t m_beamId;
+  Mac48Address m_macAddress;
 
   /*
    * Receive antenna gain pattern

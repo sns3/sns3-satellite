@@ -94,6 +94,12 @@ SatChannel::GetTypeId (void)
                     MakeEnumAccessor (&SatChannel::m_rxPowerCalculationMode),
                     MakeEnumChecker (SatEnums::RX_PWR_CALCULATION, "RxPowerCalculation",
                                      SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
+    .AddAttribute ("RxMode",
+                   "Channel receiving mode",
+                   EnumValue (SatChannel::MULTI_RX),
+                   MakeEnumAccessor (&SatChannel::m_rxMode),
+                   MakeEnumChecker (SatChannel::SINGLE_RX, "SingleRx",
+                                    SatChannel::MULTI_RX, "MultiRx"))
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
                      MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint));
@@ -126,63 +132,99 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
   NS_LOG_FUNCTION (this << txParams);
   NS_ASSERT_MSG (txParams->m_phyTx, "NULL phyTx");
 
+  switch (m_rxMode)
+  {
+    /**
+     * The packet shall be received by only the intended receiver. The purpose is
+     * to be able to speed-up the simulations. Note, that with SINLGE_RX mode,
+     * the PerPacket interference may not be used, since the will be no interference.
+    */
+    case SatChannel::SINGLE_RX:
+      {
+        NS_FATAL_ERROR ("Single Rx mode not yet supported by the SatChanne!l");
+        break;
+      }
+      /**
+       * The packet shall be received by all the receivers in the channel. The
+       * intended receiver shall receive the packet, while other receivers in the
+       * channel see the packet as co-channel interference. Note, that MULTI_RX mode
+       * is needed by the PerPacket interference.
+      */
+    case SatChannel::MULTI_RX:
+      {
+        for (PhyList::const_iterator rxPhyIterator = m_phyList.begin ();
+            rxPhyIterator != m_phyList.end ();
+            ++rxPhyIterator)
+          {
+            ScheduleRx (txParams, *rxPhyIterator);
+          }
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported SatChannel RxMode!");
+        break;
+      }
+  }
+}
+
+void
+SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receiver)
+{
+  NS_LOG_FUNCTION (this << txParams << receiver);
+
+  Time delay = Seconds (0);
+
   Ptr<MobilityModel> senderMobility = txParams->m_phyTx->GetMobility ();
+  Ptr<MobilityModel> receiverMobility = receiver->GetMobility ();
 
-  for (PhyList::const_iterator rxPhyIterator = m_phyList.begin ();
-       rxPhyIterator != m_phyList.end ();
-       ++rxPhyIterator)
+  NS_LOG_LOGIC ("copying signal parameters " << txParams);
+  Ptr<SatSignalParameters> rxParams = txParams->Copy ();
+
+  if (m_propagationDelay)
     {
-      Time delay = Seconds (0);
+      delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
 
-      Ptr<MobilityModel> receiverMobility = (*rxPhyIterator)->GetMobility ();
-      NS_LOG_LOGIC ("copying signal parameters " << txParams);
-      Ptr<SatSignalParameters> rxParams = txParams->Copy ();
-
-      if (m_propagationDelay)
-        {
-          delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
-
-          // TODO: This still needed to check
-          // Transmission time is needed to decrease from second link delay
-          // to prevent overlapping receiving and in second hand this closer
-          // to real receiving time (because sending start already when first bit arrives)
-          switch (m_channelType)
+      // TODO: This still needed to check
+      // Transmission time is needed to decrease from second link delay
+      // to prevent overlapping receiving and in second hand this closer
+      // to real receiving time (because sending start already when first bit arrives)
+      switch (m_channelType)
+      {
+        case SatEnums::RETURN_FEEDER_CH:
+        case SatEnums::FORWARD_USER_CH:
+          {
+            if ( delay > txParams->m_duration)
             {
-              case SatEnums::RETURN_FEEDER_CH:
-              case SatEnums::FORWARD_USER_CH:
-                {
-                  if ( delay > txParams->m_duration)
-                    {
-                      delay -= txParams->m_duration;
-                    }
-                  else
-                    {
-                      delay = Seconds (0);
-                    }
-                  break;
-                }
-
-              default:
-                {
-                  break;
-                }
+              delay -= txParams->m_duration;
             }
-
-          NS_LOG_LOGIC("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
+          else
+            {
+              delay = Seconds (0);
+            }
+          break;
         }
 
-      Ptr<NetDevice> netDev = (*rxPhyIterator)->GetDevice ();
-      uint32_t dstNode =  netDev->GetNode ()->GetId ();
-      Simulator::ScheduleWithContext (dstNode, delay, &SatChannel::StartRx, this, rxParams, *rxPhyIterator);
+      default:
+        {
+          break;
+        }
+      }
 
-      // Call the tx anim callback on the channel (check net devices from virtual channel)
-      // Note: this is only needed for NetAnim. By default, the NetDevice does not have a channel
-      // pointer.
-      /*
-      Ptr<Channel> ch = netDev->GetChannel();
-      m_txrxPointToPoint(txParams->m_packet, ch->GetDevice(0), ch->GetDevice(1), Seconds(0), delay );
-      */
+      NS_LOG_LOGIC("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
     }
+
+  Ptr<NetDevice> netDev = receiver->GetDevice ();
+  uint32_t dstNode =  netDev->GetNode ()->GetId ();
+  Simulator::ScheduleWithContext (dstNode, delay, &SatChannel::StartRx, this, rxParams, receiver);
+
+  // Call the tx anim callback on the channel (check net devices from virtual channel)
+  // Note: this is only needed for NetAnim. By default, the NetDevice does not have a channel
+  // pointer.
+  /*
+  Ptr<Channel> ch = netDev->GetChannel();
+  m_txrxPointToPoint(txParams->m_packet, ch->GetDevice(0), ch->GetDevice(1), Seconds(0), delay );
+   */
 }
 
 void
