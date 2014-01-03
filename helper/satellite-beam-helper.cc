@@ -61,6 +61,11 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
                                        SatEnums::FADING_TRACE, "FadingTrace",
                                        SatEnums::FADING_MARKOV, "FadingMarkov"))
+      .AddAttribute ("PrintMacAddressToCreationTraces",
+                     "Print MAC address to creation traces",
+                     BooleanValue (false),
+                     MakeBooleanAccessor(&SatBeamHelper::m_printMacAddressToTraces),
+                     MakeBooleanChecker ())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
     ;
@@ -76,6 +81,7 @@ SatBeamHelper::GetInstanceTypeId (void) const
 }
 
 SatBeamHelper::SatBeamHelper () :
+    m_printMacAddressToTraces (false),
     m_fadingModel ()
 {
   NS_LOG_FUNCTION (this);
@@ -90,6 +96,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
                               uint32_t fwdLinkCarrierCount,
                               Ptr<SatSuperframeSeq> seq)
   : m_superframeSeq (seq),
+    m_printMacAddressToTraces (false),
     m_fadingModel (SatEnums::FADING_MARKOV)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
@@ -373,9 +380,9 @@ SatBeamHelper::GetBeamInfo ()
 }
 
 std::string
-SatBeamHelper::GetUtPositionInfo (bool printMacAddress)
+SatBeamHelper::GetUtPositionInfo ()
 {
-  NS_LOG_FUNCTION (this << printMacAddress);
+  NS_LOG_FUNCTION (this);
 
   std::ostringstream oss;
 
@@ -384,7 +391,7 @@ SatBeamHelper::GetUtPositionInfo (bool printMacAddress)
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
       GeoCoordinate pos = model->GetGeoPosition ();
 
-      if ( printMacAddress  )
+      if ( m_printMacAddressToTraces )
         {
           Address devAddress;
 

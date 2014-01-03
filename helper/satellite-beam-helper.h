@@ -164,11 +164,9 @@ public:
   std::string GetBeamInfo ();
 
   /**
-   * \param printMacAddress flag to indicated, if mac addresses of the UTs is wanted to print.
-   *
    * \return info of UT positions
    */
-  std::string GetUtPositionInfo (bool printMacAddress);
+  std::string GetUtPositionInfo ();
 
   /**
    * Gets GW node according to given id.
@@ -229,6 +227,12 @@ private:
    * Trace callback for creation traces
    */
   TracedCallback<std::string> m_creation;
+
+  /**
+   * Flag indicating whether to print MAC address to
+   * the creating traces
+   */
+  bool m_printMacAddressToTraces;
 
   /**
    * Configured fading model. Set as an attribute.

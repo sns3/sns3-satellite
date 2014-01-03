@@ -449,8 +449,8 @@ SatHelper::CreationDetailsSink(Ptr<OutputStreamWrapper> stream, std::string cont
 void
 SatHelper::CreationSummarySink(std::string title)
 {
-  *m_creationTraceStream->GetStream () << CreateCreationSummary(title);
-  *m_utPosTraceStream->GetStream() << m_beamHelper->GetUtPositionInfo(false);
+  *m_creationTraceStream->GetStream () << CreateCreationSummary (title);
+  *m_utPosTraceStream->GetStream() << m_beamHelper->GetUtPositionInfo ();
 }
 
 std::string
