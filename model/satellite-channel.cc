@@ -141,7 +141,26 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
     */
     case SatChannel::SINGLE_RX:
       {
-        NS_FATAL_ERROR ("Single Rx mode not yet supported by the SatChanne!l");
+        for (PhyList::const_iterator rxPhyIterator = m_phyList.begin ();
+            rxPhyIterator != m_phyList.end ();
+            ++rxPhyIterator)
+          {
+            /**
+             * Currently SINGLE_RX mode restricts only the transmissions to the
+             * intended beam id. When the SatSignalParameters includes the
+             * packet target MAC addresses and information whether the PHY
+             * transmission contains broadcast data, this may be enhanced to
+             * pass data to only the intended receivers within the spot-beam
+             * TODO: Add the target MAC address container and a flag indicating
+             * whether the PHY transmission contains broadcast data to the
+             * SatSignalParameters. Implement the functionality to pass the PHY
+             * transmission to only for the proper receivers within the beam.
+             */
+            if ( (*rxPhyIterator)->GetBeamId() == txParams->m_beamId )
+              {
+                ScheduleRx (txParams, *rxPhyIterator);
+              }
+          }
         break;
       }
       /**
