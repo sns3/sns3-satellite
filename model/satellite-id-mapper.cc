@@ -36,8 +36,8 @@ SatIdMapper::GetTypeId (void)
 }
 
 SatIdMapper::SatIdMapper () :
-  m_traceIdIndex (0),
-  m_utIdIndex (0),
+  m_traceIdIndex (1),
+  m_utIdIndex (1),
   m_enableMapPrint (false)
 {
   NS_LOG_FUNCTION (this);
@@ -81,7 +81,7 @@ SatIdMapper::Reset ()
     {
       m_traceIdToMacMap.clear ();
     }
-  m_traceIdIndex = 0;
+  m_traceIdIndex = 1;
 
   // UT ID maps
 
@@ -89,7 +89,7 @@ SatIdMapper::Reset ()
     {
       m_macToUtIdMap.clear ();
     }
-  m_utIdIndex = 0;
+  m_utIdIndex = 1;
 
   // Beam ID maps
 

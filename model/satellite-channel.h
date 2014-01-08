@@ -219,6 +219,14 @@ private:
   void DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
+   * \brief Function for getting the external source fading value
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   * \return fading value
+   */
+  double GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
    * \brief Function for getting the source MAC address from Rx parameters
    * \param rxParams Rx parameters
    * \return source MAC address
@@ -276,6 +284,11 @@ private:
    * \brief Defines whether fading output tracing is in use or not
    */
   bool m_enableFadingOutputTrace;
+
+  /**
+   * \brief Defines whether external fading input tracing is in use or not
+   */
+  bool m_enableExternalFadingInputTrace;
 
   /**
    * The trace source for the packet transmission animation events that the

@@ -30,7 +30,7 @@
 #include "ns3/simulator.h"
 #include "../model/satellite-fading-external-input-trace-container.h"
 #include "../model/satellite-channel.h"
-
+#include "ns3/singleton.h"
 
 using namespace ns3;
 
@@ -49,8 +49,6 @@ public:
 private:
   virtual void DoRun (void);
 
-  Ptr<SatFadingExternalInputTraceContainer> m_fadingTraceContainer;
-
   std::vector<double> m_results;
 };
 
@@ -65,24 +63,19 @@ SatFadingTraceTestCase::~SatFadingTraceTestCase ()
 
 void SatFadingTraceTestCase::TestGetFading (uint32_t nodeId, SatEnums::ChannelType_t channelType)
 {
-  Ptr<SatFadingExternalInputTrace> trace = m_fadingTraceContainer->GetFadingTrace (nodeId, channelType);
+  Ptr<SatFadingExternalInputTrace> trace = Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace (nodeId, channelType);
   double fading = trace->GetFading ();
   m_results.push_back (fading);
 }
 
-
 void
 SatFadingTraceTestCase::DoRun (void)
 {
-  // Create antenna gain container
   uint32_t numUts (2);
   uint32_t numGws (5);
 
-  // Read and prepare the fading traces
-  m_fadingTraceContainer = CreateObject<SatFadingExternalInputTraceContainer> (numUts, numGws);
-
   // Test the fading traces
-  bool success = m_fadingTraceContainer->TestFadingTraces ();
+  bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts,numGws);
   NS_TEST_ASSERT_MSG_EQ( success, true, "SatChannelFadingTrace test failed");
 
   double time [4] = {1.434, 40.923, 80.503, 140.3};

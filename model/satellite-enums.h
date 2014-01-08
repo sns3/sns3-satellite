@@ -37,7 +37,8 @@ class SatEnums
 public:
 
   /**
-   * Possible types of channel.
+   * \enum ChannelType_t
+   * \brief Types of channel.
    */
   typedef enum
   {
@@ -49,7 +50,8 @@ public:
   } ChannelType_t;
 
   /**
-   * Possible types of bandwidth.
+   * \enum CarrierBandwidthType_t
+   * \brief Types of bandwidth.
    */
   typedef enum
   {
@@ -59,17 +61,18 @@ public:
   } CarrierBandwidthType_t;
 
   /**
-   * Possible fading models
+   * \enum FadingModel_t
+   * \brief Fading models
    */
   typedef enum
   {
-    FADING_OFF, FADING_TRACE, FADING_MARKOV
+    FADING_OFF,
+    FADING_TRACE,
+    FADING_MARKOV
   } FadingModel_t;
-
 
   /**
    * \enum SatModcod_t
-   *
    * \brief Modulation scheme and coding rate for DVB-S2.
    */
   typedef enum
@@ -212,7 +215,8 @@ public:
   };
 
   /**
-   * Possible modes of Rx power calculation.
+   * \enum RxPowerCalculationMode_t
+   * \brief Modes of Rx power calculation.
    */
   typedef enum
   {

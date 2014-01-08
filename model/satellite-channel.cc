@@ -37,6 +37,8 @@
 #include "satellite-rx-power-output-trace-container.h"
 #include "satellite-rx-power-input-trace-container.h"
 #include "satellite-fading-output-trace-container.h"
+#include "satellite-id-mapper.h"
+#include "satellite-fading-external-input-trace-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 
@@ -53,7 +55,8 @@ SatChannel::SatChannel ()
    m_freeSpaceLoss (),
    m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO tie this properly to e.g. fading (do not create fading objects!)
    m_enableRxPowerOutputTrace (false),
-   m_enableFadingOutputTrace (false)
+   m_enableFadingOutputTrace (false),
+   m_enableExternalFadingInputTrace (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -87,6 +90,11 @@ SatChannel::GetTypeId (void)
                    "Enable fading output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatChannel::m_enableFadingOutputTrace),
+                    MakeBooleanChecker ())
+    .AddAttribute( "EnableExternalFadingInputTrace",
+                   "Enable external fading input trace.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatChannel::m_enableExternalFadingInputTrace),
                     MakeBooleanChecker ())
     .AddAttribute ("RxPowerCalculationMode",
                    "Rx Power calculation mode",
@@ -335,6 +343,12 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
           break;
         }
     }
+
+  // get external fading input trace
+  if (m_enableExternalFadingInputTrace)
+    {
+      rxParams->m_rxPower_W *= GetExternalFadingTrace (rxParams, phyRx);
+    }
 }
 
 void
@@ -402,6 +416,13 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       }
   }
 
+  // get external fading input trace
+  if (m_enableExternalFadingInputTrace)
+    {
+      fading *= GetExternalFadingTrace (rxParams, phyRx);
+    }
+
+  // save fading output trace
   if (m_enableFadingOutputTrace)
     {
       DoFadingOutputTrace (rxParams, phyRx, fading);
@@ -410,6 +431,44 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = (rxParams->m_txPower_W * txAntennaGain_W) / m_freeSpaceLoss->GetFsl (txMobility, rxMobility, rxParams->m_carrierFreq_hz);
   rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses () * fading;
+
+}
+
+double
+SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
+{
+  uint32_t nodeId;
+
+  switch (m_channelType)
+  {
+    case SatEnums::RETURN_FEEDER_CH:
+      {
+        nodeId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (phyRx->GetDevice ()->GetAddress ());
+        break;
+      }
+    case SatEnums::FORWARD_USER_CH:
+      {
+        nodeId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (phyRx->GetDevice ()->GetAddress ());
+        break;
+      }
+    case SatEnums::RETURN_USER_CH:
+      {
+        nodeId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (GetSourceAddress (rxParams));
+        break;
+      }
+    case SatEnums::FORWARD_FEEDER_CH:
+      {
+        nodeId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (GetSourceAddress (rxParams));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::GetExternalFadingTrace - Invalid channel type");
+        break;
+      }
+  }
+
+  return (Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace (nodeId, m_channelType))->GetFading ();
 }
 
 /// TODO get rid of source MAC address peeking

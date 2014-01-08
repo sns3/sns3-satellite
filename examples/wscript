@@ -48,6 +48,9 @@ def build(bld):
     
     obj = bld.create_ns3_program('trace-input-fading-example', ['satellite'])
     obj.source = 'trace-input-fading-example.cc'
+    
+    obj = bld.create_ns3_program('trace-input-external-fading-example', ['satellite'])
+    obj.source = 'trace-input-external-fading-example.cc'
 
     obj = bld.create_ns3_program('trace-input-rx-power-example', ['satellite'])
     obj.source = 'trace-input-rx-power-example.cc'    

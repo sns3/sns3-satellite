@@ -40,113 +40,151 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
 {
-  NS_FATAL_ERROR ("SatFadingExternalInputTraceContainer - Constructor not in use");
+  NS_LOG_FUNCTION (this);
 }
-
-SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer (uint32_t numUts, uint32_t numGws)
-{
-  NS_LOG_FUNCTION (this << numUts << numGws);
-
-  // Create the fading traces
-  CreateUtFadingTraces (numUts);
-  CreateGwFadingTraces (numGws);
-}
-
 
 SatFadingExternalInputTraceContainer::~SatFadingExternalInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-void SatFadingExternalInputTraceContainer::CreateUtFadingTraces (uint32_t numUts)
+void
+SatFadingExternalInputTraceContainer::CreateUtFadingTrace (uint32_t utId)
 {
-  NS_LOG_FUNCTION (this << numUts);
+  NS_LOG_FUNCTION (this << utId);
 
   std::string path = "src/satellite/data/fadingtraces/";
 
   // UT identifiers start from 1
-  for (uint32_t i = 1; i <= numUts; ++i)
-    {
-      std::stringstream ss;
-      ss << i;
+  std::stringstream ss;
+  ss << utId;
 
-      std::string fwd = path + "term_ID" + ss.str () + "_fading_fwddwn.dat";
-      std::string ret = path + "term_ID" + ss.str () + "_fading_rtnup.dat";
+  std::string fwd = path + "term_ID" + ss.str () + "_fading_fwddwn.dat";
+  std::string ret = path + "term_ID" + ss.str () + "_fading_rtnup.dat";
 
-      Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
-      Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_THREE_COLUMN, fwd);
+  Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
+  Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_THREE_COLUMN, fwd);
 
-      // First = RETURN_USER
-      // Second = FORWARD_USER
-      m_utFadingMap.insert (std::make_pair (i, std::make_pair (ftRet, ftFwd)));
-    }
+  // First = RETURN_USER
+  // Second = FORWARD_USER
+  m_utFadingMap.insert (std::make_pair (utId, std::make_pair (ftRet, ftFwd)));
 }
 
-void SatFadingExternalInputTraceContainer::CreateGwFadingTraces (uint32_t numGws)
+
+void
+SatFadingExternalInputTraceContainer::CreateGwFadingTrace (uint32_t gwId)
 {
-  NS_LOG_FUNCTION (this << numGws);
+  NS_LOG_FUNCTION (this << gwId);
 
   std::string path = "src/satellite/data/fadingtraces/";
 
   // GW identifiers start from 1
-  for (uint32_t i = 1; i <= numGws; ++i)
-    {
-      std::stringstream ss;
-      ss << i;
+  std::stringstream ss;
+  ss << gwId;
 
-      std::string fwd = path + "GW_ID" + ss.str () + "_fading_fwdup.dat";
-      std::string ret = path + "GW_ID" + ss.str () + "_fading_rtndwn.dat";
+  std::string fwd = path + "GW_ID" + ss.str () + "_fading_fwdup.dat";
+  std::string ret = path + "GW_ID" + ss.str () + "_fading_rtndwn.dat";
 
-      Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
-      Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, fwd);
+  Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
+  Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, fwd);
 
-      // First = RETURN_FEEDER
-      // Second = FORWARD_FEEDR
-      m_gwFadingMap.insert (std::make_pair (i, std::make_pair (ftRet, ftFwd)));
-    }
+  // First = RETURN_FEEDER
+  // Second = FORWARD_FEEDR
+  m_gwFadingMap.insert (std::make_pair (gwId, std::make_pair (ftRet, ftFwd)));
 }
 
 
 Ptr<SatFadingExternalInputTrace>
-SatFadingExternalInputTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const
+SatFadingExternalInputTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << nodeId);
-  NS_ASSERT (!m_utFadingMap.empty ());
-  NS_ASSERT (!m_gwFadingMap.empty ());
 
   Ptr<SatFadingExternalInputTrace> ft;
   switch (channelType)
   {
     case SatEnums::FORWARD_USER_CH:
-      ft = m_utFadingMap.at(nodeId).second;
-      break;
+      {
+        std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_utFadingMap.find (nodeId);
+
+        if (iter == m_utFadingMap.end ())
+          {
+            CreateUtFadingTrace (nodeId);
+          }
+
+        ft = m_utFadingMap.at (nodeId).second;
+        break;
+      }
     case SatEnums::RETURN_USER_CH:
-      ft = m_utFadingMap.at(nodeId).first;
-      break;
+      {
+        std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_utFadingMap.find (nodeId);
 
+        if (iter == m_utFadingMap.end ())
+          {
+            CreateUtFadingTrace (nodeId);
+          }
+
+        ft = m_utFadingMap.at (nodeId).first;
+        break;
+      }
     case SatEnums::FORWARD_FEEDER_CH:
-      ft = m_gwFadingMap.at(nodeId).second;
-      break;
+      {
+        std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_gwFadingMap.find (nodeId);
 
+        if (iter == m_gwFadingMap.end ())
+          {
+            CreateGwFadingTrace (nodeId);
+          }
+
+        ft = m_gwFadingMap.at (nodeId).second;
+        break;
+      }
     case SatEnums::RETURN_FEEDER_CH:
-      ft = m_gwFadingMap.at(nodeId).first;
-      break;
+      {
+        std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_gwFadingMap.find (nodeId);
 
+        if (iter == m_gwFadingMap.end ())
+          {
+            CreateGwFadingTrace (nodeId);
+          }
+
+        ft = m_gwFadingMap.at (nodeId).first;
+        break;
+      }
     default:
-      NS_LOG_ERROR (this << " not valid channel type!");
-
-      break;
+      {
+        NS_LOG_ERROR (this << " not valid channel type!");
+        break;
+      }
   }
   return ft;
 }
 
-
 bool
-SatFadingExternalInputTraceContainer::TestFadingTraces () const
+SatFadingExternalInputTraceContainer::TestFadingTraces (uint32_t numOfUts, uint32_t numOfGws)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (!m_utFadingMap.empty ());
-  NS_ASSERT (!m_gwFadingMap.empty ());
+  NS_ASSERT (numOfUts > 0);
+  NS_ASSERT (numOfGws > 0);
+
+  for (uint32_t i = 1; i <= numOfUts; i++)
+    {
+      std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_utFadingMap.find (i);
+
+      if (iter == m_utFadingMap.end ())
+        {
+          CreateUtFadingTrace (i);
+        }
+    }
+
+  for (uint32_t i = 1; i <= numOfGws; i++)
+    {
+      std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_gwFadingMap.find (i);
+
+      if (iter == m_gwFadingMap.end ())
+        {
+          CreateUtFadingTrace (i);
+        }
+    }
 
   // Go through all the created fading trace class as
   // test each one of those. If even one test fails,
@@ -184,4 +222,3 @@ SatFadingExternalInputTraceContainer::TestFadingTraces () const
 }
 
 } // namespace ns3
-

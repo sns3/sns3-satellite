@@ -47,13 +47,6 @@ public:
   SatFadingExternalInputTraceContainer ();
 
   /**
-   * \brief Constructor
-   * \param numUts number of UTs
-   * \param numGws number of GWs
-   */
-  SatFadingExternalInputTraceContainer (uint32_t numUts, uint32_t numGws);
-
-  /**
    * \brief Destructor
    */
   ~SatFadingExternalInputTraceContainer ();
@@ -62,30 +55,28 @@ public:
    * Get method for getting a proper fading trace
    * \return Channel fading trace for a certain node and channel.
    */
-  Ptr<SatFadingExternalInputTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType) const;
+  Ptr<SatFadingExternalInputTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType);
 
   /**
-   * A method to test that the fading traces are according to
+   * \brief A method to test that the fading traces are according to
    * assumptions.
+   * \param numOfUts number of UTs to test
+   * \param numOfGws number of GWs to test
    * \return boolean value indicating success or failure
    */
-  bool TestFadingTraces () const;
+  bool TestFadingTraces (uint32_t numOfUts, uint32_t numOfGws);
 
 private:
 
   /**
-   * Create the UT fading traces for a certain number of UTs (defined by
-   * the creator of this class).
-   * \param numUts number of UTs
+   * Create new UT fading trace
    */
-  void CreateUtFadingTraces (uint32_t numUts);
+  void CreateUtFadingTrace (uint32_t utId);
 
   /**
-   * Create the GW fading traces for a certain number of GWs (defined by
-   * the creator of this class).
-   * \param numGws number of GWs
+   * Create new GW fading trace
    */
-  void CreateGwFadingTraces (uint32_t numGws);
+  void CreateGwFadingTrace (uint32_t gwId);
 
   /**
    * Container of the UT fading traces
@@ -96,7 +87,6 @@ private:
    * Container of the GW fading traces
    */
   std::map< uint32_t, ChannelTracePair_t> m_gwFadingMap;
-
 };
 
 } // namespace ns3
