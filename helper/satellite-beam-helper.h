@@ -34,11 +34,11 @@
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-mobility-observer.h"
 #include "ns3/satellite-markov-container.h"
+#include "ns3/satellite-packet-trace.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
 #include "satellite-superframe-sequence.h"
-
 
 namespace ns3 {
 
@@ -201,6 +201,12 @@ public:
 
   virtual void DoDispose ();
 
+  /**
+   * Enable packet traces.
+   * This is to be called from the actual simulation script.
+   */
+  void EnablePacketTrace ();
+
 private:
   CarrierFreqConverter m_carrierFreqConverter;
   Ptr<SatSuperframeSeq> m_superframeSeq;
@@ -243,6 +249,11 @@ private:
    * Common configuration for Markov model
    */
   Ptr<SatMarkovConf> m_markovConf;
+
+  /**
+   * Packet trace
+   */
+  Ptr<SatPacketTrace> m_packetTrace;
 
   /**
    * Creates info of the beam.

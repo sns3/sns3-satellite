@@ -32,6 +32,8 @@
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
 #include "satellite-ut-mac.h"
+#include "satellite-enums.h"
+#include "satellite-utils.h"
 #include "../helper/satellite-wave-form-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -109,7 +111,7 @@ SatUtMac::ScheduleTimeSlots (SatTbtpHeader * tbtp)
 {
   NS_LOG_FUNCTION (this << tbtp);
 
-  std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots = tbtp->GetTimeslots (m_macAddress);
+  std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots = tbtp->GetTimeslots (m_nodeInfo->GetMacAddress ());
 
   if ( !slots.empty ())
     {
@@ -166,12 +168,22 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
    */
   uint32_t bytesLeft (0);
 
-  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_macAddress, bytesLeft);
+  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), bytesLeft);
   SatPhy::PacketContainer_t packets;
   packets.push_back (p);
 
   if ( p )
     {
+      // Add packet trace entry:
+      m_packetTrace (Simulator::Now(),
+                     SatEnums::PACKET_SENT,
+                     m_nodeInfo->GetNodeType (),
+                     m_nodeInfo->GetNodeId (),
+                     m_nodeInfo->GetMacAddress (),
+                     SatEnums::LL_MAC,
+                     SatEnums::LD_RETURN,
+                     SatUtils::GetPacketInfo (p));
+
       // Decrease one tick from time slot duration. This evaluates guard period.
       // If more sophisticated guard period is needed, it is needed done before hand and
       // remove this 'one tick decrease' implementation
@@ -185,6 +197,16 @@ void
 SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this);
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_MAC,
+                 SatEnums::LD_FORWARD,
+                 SatUtils::GetPacketInfo (packets));
 
   // Hit the trace hooks.  All of these hooks are in the same place in this
   // device because it is so simple, but this is not usually the case in
@@ -206,10 +228,10 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
         }
 
       NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
-      NS_LOG_LOGIC("Receiver " << m_macAddress );
+      NS_LOG_LOGIC("Receiver " << m_nodeInfo->GetMacAddress ());
 
       Mac48Address destAddress = Mac48Address::ConvertFrom(macTag.GetDestAddress());
-      if (destAddress == m_macAddress || destAddress.IsBroadcast())
+      if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast())
         {
           // Remove control msg tag
           SatControlMsgTag ctrlTag;

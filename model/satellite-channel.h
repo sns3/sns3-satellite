@@ -306,6 +306,18 @@ private:
                  Time               // Last bit receive time (relative to now)
                 > m_txrxPointToPoint;
 
+  /**
+   * Trace callback used for packet tracing:
+   */
+  TracedCallback< Time,
+                  SatEnums::SatPacketEvent_t,
+                  SatEnums::SatNodeType_t,
+                  uint32_t,
+                  Mac48Address,
+                  SatEnums::SatLogLevel_t,
+                  SatEnums::SatLinkDir_t,
+                  std::string
+                  > m_packetTrace;
 };
 
 }

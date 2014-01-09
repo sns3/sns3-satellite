@@ -25,6 +25,7 @@
 #include "ns3/ipv4-interface.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/enum.h"
+#include "ns3/config.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -33,6 +34,7 @@
 #include "../model/satellite-mobility-model.h"
 #include "../model/satellite-propagation-delay-model.h"
 #include "../model/satellite-antenna-gain-pattern-container.h"
+#include "../model/satellite-packet-trace.h"
 #include "satellite-beam-helper.h"
 #include "ns3/satellite-fading-input-trace-container.h"
 #include "ns3/satellite-fading-input-trace.h"
@@ -244,7 +246,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
                                 userLink.second,
                                 m_antennaGainPatterns->GetAntennaGainPattern (beamId),
                                 m_antennaGainPatterns->GetAntennaGainPattern (feederBeamId),
-                                beamId );
+                                beamId);
 
   // store GW node
   bool storedOk = StoreGwNode (gwId, gwNode);
@@ -280,14 +282,26 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
     }
 
   //install GW
-  Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode, gwId, beamId, feederLink.first, feederLink.second, m_ncc);
+  Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode,
+                                             gwId,
+                                             beamId,
+                                             feederLink.first,
+                                             feederLink.second,
+                                             m_ncc);
+
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
   // add beam to NCC
   m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd), m_superframeSeq );
 
   // install UTs
-  NetDeviceContainer utNd = m_utHelper->Install (ut, beamId, userLink.first, userLink.second, DynamicCast<SatNetDevice>(gwNd), m_ncc);
+  NetDeviceContainer utNd = m_utHelper->Install (ut,
+                                                 beamId,
+                                                 userLink.first,
+                                                 userLink.second,
+                                                 DynamicCast<SatNetDevice>(gwNd),
+                                                 m_ncc);
+
   Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign (utNd);
 
   // set needed routings and fill ARP cache
@@ -361,6 +375,29 @@ SatBeamHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBa
   m_geoHelper->EnableCreationTraces (stream, cb);
   m_gwHelper->EnableCreationTraces (stream, cb);
   m_utHelper->EnableCreationTraces (stream, cb);
+}
+
+void
+SatBeamHelper::EnablePacketTrace ()
+{
+  // Create packet trace instance
+  m_packetTrace = CreateObject<SatPacketTrace> ();
+
+  /**
+   * Connect the trace callbacks
+   * By default the packet traces are connected to
+   * - NetDevice
+   * - LLC
+   * - MAC
+   * - PHY
+   */
+
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatPhy/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/UserPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/FeederPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatMac/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
 }
 
 std::string

@@ -41,6 +41,8 @@
 #include "../model/satellite-generic-encapsulator.h"
 #include "../model/satellite-return-link-encapsulator.h"
 #include "../model/satellite-net-device.h"
+#include "../model/satellite-node-info.h"
+#include "../model/satellite-enums.h"
 #include "satellite-ut-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -227,7 +229,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetAttribute ("ReceiveCb", CallbackValue (cb));
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> (true);
+  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
@@ -241,7 +243,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
-  phy->SetAddress (addr);
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
@@ -285,6 +286,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   ncc->AddUt (dev->GetAddress (), macCra.Get (), beamId);
 
   phy->Initialize();
+
+  // Create a node info to all the protocol layers
+  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), Mac48Address::ConvertFrom (addr));
+  dev->SetNodeInfo (nodeInfo);
+  llc->SetNodeInfo (nodeInfo);
+  mac->SetNodeInfo (nodeInfo);
+  phy->SetNodeInfo (nodeInfo);
 
   return dev;
 }

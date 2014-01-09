@@ -206,6 +206,13 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
   m_detailedCreationTraces = details;
 }
 
+void
+SatHelper::EnablePacketTrace ()
+{
+  m_beamHelper->EnablePacketTrace ();
+}
+
+
 void SatHelper::EnableDetailedCreationTraces()
 {
   NS_LOG_FUNCTION (this);

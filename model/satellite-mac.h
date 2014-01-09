@@ -31,6 +31,7 @@
 
 #include "satellite-signal-parameters.h"
 #include "satellite-phy.h"
+#include "satellite-node-info.h"
 
 
 namespace ns3 {
@@ -109,15 +110,14 @@ public:
   void SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb);
 
   /**
-   * Set the address of this MAC
-   * \param macAddress the address of this MAC
+   * Set the node info
+   * \param nodeInfo containing node specific information
    */
-  void SetAddress (Mac48Address macAddress);
+  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
-
 
 protected:
 
@@ -128,11 +128,6 @@ protected:
    * \param packets Packets to be sent.
    */
   void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration);
-
-  /**
-   * MAC address of the this mac instance (node)
-   */
-  Mac48Address m_macAddress;
 
   /**
    * The lower layer packet transmit callback.
@@ -150,6 +145,25 @@ protected:
    * Attributes: payload in bytes
    */
   SatMac::TxOpportunityCallback m_txOpportunityCallback;
+
+  /**
+   * Trace callback used for packet tracing:
+   */
+  TracedCallback< Time,
+                  SatEnums::SatPacketEvent_t,
+                  SatEnums::SatNodeType_t,
+                  uint32_t,
+                  Mac48Address,
+                  SatEnums::SatLogLevel_t,
+                  SatEnums::SatLinkDir_t,
+                  std::string
+                  > m_packetTrace;
+
+  /**
+   * Node info containing node related information, such as
+   * node type, node id and MAC address (of the SatNetDevice)
+   */
+  Ptr<SatNodeInfo> m_nodeInfo;
 
   /**
    * The trace source fired when packets come into the "top" of the device

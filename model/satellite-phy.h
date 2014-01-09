@@ -21,6 +21,7 @@
 #ifndef SATELLITE_PHY_H
 #define SATELLITE_PHY_H
 
+#include <string>
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/object.h"
@@ -29,6 +30,7 @@
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-node-info.h"
 
 namespace ns3 {
 
@@ -255,12 +257,6 @@ public:
   void SetTxFadingContainer (Ptr<SatBaseFading> fadingContainer);
 
   /**
-   * Set the device address owning this object
-   * \param ownAddress address of the device owning this object
-   */
-   void SetAddress (Mac48Address ownAddress);
-
-  /**
    * Get the SatPhyTx pointer
    * \return a pointer to the SatPhyTx instance
    */
@@ -316,7 +312,7 @@ public:
    *
    * \param rxParams Packet reception parameters
    */
-  void Receive (Ptr<SatSignalParameters> rxParams);
+  virtual void Receive (Ptr<SatSignalParameters> rxParams);
 
   /**
    *
@@ -326,11 +322,13 @@ public:
    */
   void CnoInfo (uint32_t beamId, Address source, double cno);
 
-private:
+  /**
+   * Set the node info
+   * \param nodeInfo containing node specific information
+   */
+  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
-  Ptr<SatPhyTx> m_phyTx;
-  Ptr<SatPhyRx> m_phyRx;
-  uint32_t m_beamId;
+protected:
 
   /**
    * The upper layer package receive callback.
@@ -338,14 +336,40 @@ private:
   SatPhy::ReceiveCallback m_rxCallback;
 
   /**
-   * The C/N0 info callback
+   * Trace callback used for packet tracing:
    */
-  SatPhy::CnoCallback m_cnoCallback;
+  TracedCallback< Time,
+                  SatEnums::SatPacketEvent_t,
+                  SatEnums::SatNodeType_t,
+                  uint32_t,
+                  Mac48Address,
+                  SatEnums::SatLogLevel_t,
+                  SatEnums::SatLinkDir_t,
+                  std::string
+                  > m_packetTrace;
+
+  /**
+   * Node info containing node related information, such as
+   * node type, node id and MAC address (of the SatNetDevice)
+   */
+  Ptr<SatNodeInfo> m_nodeInfo;
+
+  Ptr<SatPhyTx> m_phyTx;
+  Ptr<SatPhyRx> m_phyRx;
 
   /**
    * Calculated EIRP without gain in W.
    */
   double m_eirpWoGainW;
+
+private:
+
+  uint32_t m_beamId;
+
+  /**
+   * The C/N0 info callback
+   */
+  SatPhy::CnoCallback m_cnoCallback;
 
   /**
    * Configured receiver noise temperature in dBK.

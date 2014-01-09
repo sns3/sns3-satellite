@@ -31,6 +31,7 @@
 #include "ns3/ptr.h"
 #include "ns3/mac48-address.h"
 
+#include "satellite-node-info.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-encapsulator.h"
 
@@ -47,16 +48,10 @@ class SatLlc : public Object
 public:
   static TypeId GetTypeId (void);
 
-  SatLlc ();
-
   /**
    * Construct a SatLlc
-   *
-   * This is the constructor for the SatLlc
-   * \param isUt boolean flag to indicate whether this LLC 
-   * is attached to GW or UT.
    */
-  SatLlc (bool isUt);
+  SatLlc ();
 
   /**
    * Destroy a SatLlc
@@ -147,10 +142,10 @@ public:
   void AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec);
 
   /**
-   * Set the address of this MAC
-   * \param macAddress MAC address of this LLC
+   * Set the node info
+   * \param nodeInfo containing node specific information
    */
-  void SetAddress (Mac48Address macAddress);
+  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
    * Create and fill the scheduling objects based on LLC layer information.
@@ -165,24 +160,32 @@ protected:
    */
   void DoDispose ();
 
-private:
+  /**
+   * Trace callback used for packet tracing:
+   */
+  TracedCallback<Time,
+                 SatEnums::SatPacketEvent_t,
+                 SatEnums::SatNodeType_t,
+                 uint32_t,
+                 Mac48Address,
+                 SatEnums::SatLogLevel_t,
+                 SatEnums::SatLinkDir_t,
+                 std::string
+                 > m_packetTrace;
 
   /**
-   * MAC address of this node
+   * Node info containing node related information, such as
+   * node type, node id and MAC address (of the SatNetDevice)
    */
-  Mac48Address m_macAddress;
+  Ptr<SatNodeInfo> m_nodeInfo;
+
+private:
 
   // Map of encapsulator base pointers
   encapContainer_t m_encaps;
 
   // Map of decapsulator base pointers
   encapContainer_t m_decaps;
-
-  /**
-   * Boolean to identify whether this instance is attached to UT or GW.
-   * TODO: probably the LLC should be split into UT and GW entities.
-   */
-  bool m_isUt;
 
   /**
    * The Queue which this SatMac uses as a packet source.

@@ -110,7 +110,11 @@ SatChannel::GetTypeId (void)
                                     SatChannel::MULTI_RX, "MultiRx"))
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
-                     MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint));
+                     MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint))
+    .AddTraceSource ("PacketTrace",
+                     "Packet event trace",
+                     MakeTraceSourceAccessor (&SatChannel::m_packetTrace))
+                     ;
   return tid;
 }
 

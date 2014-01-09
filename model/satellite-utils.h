@@ -22,7 +22,11 @@
 
 #include <cmath>
 #include <limits>
+#include <vector>
 #include "ns3/assert.h"
+#include "ns3/packet.h"
+#include "ns3/mac48-address.h"
+#include "ns3/satellite-mac-tag.h"
 
 namespace ns3 {
 
@@ -161,6 +165,43 @@ public:
    */
   template <typename T>
   static inline T WToDbm ( T w ) { return (T) ( WToDbW<T> ( w * 1000.0 ) ); }
+
+  /**
+   * Gets packet information in std::string for printing purposes
+   *
+   * \param p Packet
+   * \return Packet information in std::string
+   */
+  static inline std::string GetPacketInfo (const Ptr<const Packet> p)
+  {
+    std::ostringstream oss;
+    oss << p->GetUid () << " ";
+    SatMacTag tag;
+    if (p->PeekPacketTag (tag))
+      {
+        oss << Mac48Address::ConvertFrom(tag.GetSourceAddress ()) << " ";
+        oss << Mac48Address::ConvertFrom(tag.GetDestAddress ()) << " ";
+      }
+    return oss.str ();
+  }
+
+  /**
+   * Gets packet information in std::string for printing purposes
+   *
+   * \param packets A vector of packets
+   * \return Packet information in std::string
+   */
+  static inline std::string GetPacketInfo (const std::vector< Ptr<Packet> > packets)
+  {
+    std::ostringstream oss;
+    for (std::vector< Ptr<Packet> >::const_iterator it = packets.begin ();
+         it != packets.end ();
+         ++it)
+      {
+        oss << GetPacketInfo (*it);
+      }
+    return oss.str ();
+  }
 
 private:
   /**

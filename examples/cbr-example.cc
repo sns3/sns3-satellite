@@ -78,6 +78,8 @@ main (int argc, char *argv[])
 
   helper->CreateScenario(satScenario);
 
+  helper->EnablePacketTrace ();
+
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();

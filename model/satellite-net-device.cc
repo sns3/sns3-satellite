@@ -27,14 +27,15 @@
 #include "ns3/ipv4-header.h"
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/channel.h"
-#include "ns3/virtual-channel.h"
 
+#include "virtual-channel.h"
 #include "satellite-net-device.h"
 #include "satellite-phy.h"
 #include "satellite-mac.h"
 #include "satellite-llc.h"
 #include "satellite-channel.h"
-
+#include "satellite-utils.h"
+#include "satellite-node-info.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -66,13 +67,22 @@ SatNetDevice::GetTypeId (void)
                     MakePointerAccessor (&SatNetDevice::GetPhy,
                                          &SatNetDevice::SetPhy),
                     MakePointerChecker<SatPhy> ())
-  ;
+     .AddAttribute ("SatLlc", "The Satellite Llc layer attached to this device.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatNetDevice::GetLlc,
+                                         &SatNetDevice::SetLlc),
+                                         MakePointerChecker<SatLlc> ())
+     .AddTraceSource ("PacketTrace",
+                      "Packet event trace",
+                      MakeTraceSourceAccessor (&SatNetDevice::m_packetTrace))
+                    ;
   return tid;
 }
 
 SatNetDevice::SatNetDevice ()
   : m_phy (0),
     m_mac (0),
+    m_llc (0),
     m_node (0),
     m_mtu (0xffff),
     m_ifIndex (0)
@@ -85,6 +95,19 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid());
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
 
   m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
@@ -107,6 +130,13 @@ SatNetDevice::SetLlc (Ptr<SatLlc> llc)
 {
   NS_LOG_FUNCTION (this << llc);
   m_llc = llc;
+}
+
+void
+SatNetDevice::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
+{
+  NS_LOG_FUNCTION (this << nodeInfo);
+  m_nodeInfo = nodeInfo;
 }
 
 void
@@ -153,10 +183,6 @@ SatNetDevice::SetAddress (Address address)
 {
   NS_LOG_FUNCTION (this << address);
   m_address = Mac48Address::ConvertFrom (address);
-
-  NS_ASSERT( m_mac );
-  m_mac->SetAddress (m_address);
-  m_llc->SetAddress (m_address);
 }
 Address 
 SatNetDevice::GetAddress (void) const
@@ -241,6 +267,19 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 {
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
 
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
   m_llc->Enque (packet, dest);
 
   return true;
@@ -249,6 +288,19 @@ bool
 SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
 
   m_llc->Enque (packet, dest);
 
@@ -291,7 +343,6 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
-  m_virtualChannel = 0;
   m_llc->Dispose ();
   m_llc = 0;
 
@@ -320,7 +371,6 @@ SatNetDevice::SetVirtualChannel (Ptr<VirtualChannel> vChannel)
 
   m_virtualChannel = vChannel;
 }
-
 
 Ptr<Channel>
 SatNetDevice::GetChannel (void) const

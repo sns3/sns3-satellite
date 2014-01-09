@@ -248,12 +248,195 @@ public:
         {
           return "RETURN_FEEDER_CH";
         }
-      default :
+      default:
         {
           NS_FATAL_ERROR ("SatEnums::GetChannelTypeName - Invalid channel type");
+          break;
         }
     }
     NS_FATAL_ERROR ("SatEnums::GetChannelTypeName - Invalid channel type");
+    return "";
+  };
+
+  /**
+   * \enum SatPacketEvent_t
+   *
+   * \brief Packet event used for packet tracing
+   */
+  typedef enum
+  {
+    PACKET_SENT = 0,
+    PACKET_RECV = 1,
+    PACKET_ENQUE = 2,
+    PACKET_DROP = 3
+  } SatPacketEvent_t;
+
+  static inline std::string GetPacketEventName (SatPacketEvent_t packetEvent)
+  {
+    switch (packetEvent)
+    {
+      case PACKET_SENT:
+        {
+          return "SND";
+        }
+      case PACKET_RECV:
+        {
+          return "RCV";
+        }
+      case PACKET_ENQUE:
+        {
+          return "ENQ";
+        }
+      case PACKET_DROP:
+        {
+          return "DRP";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetPacketEventName - Invalid packet event");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetPacketEventName - Invalid packet event");
+    return "";
+  };
+
+  /**
+   * \enum SatNodeType_t
+   *
+   * \brief Node type used for packet tracing
+   */
+  typedef enum
+  {
+    NT_UT = 0,
+    NT_SAT = 1,
+    NT_GW = 2,
+    NT_NCC = 3,
+    NT_TER = 4,
+    NT_UNDEFINED = 5
+  } SatNodeType_t;
+
+  static inline std::string GetNodeTypeName (SatNodeType_t nodeType)
+  {
+    switch (nodeType)
+    {
+      case NT_UT:
+        {
+          return "UT";
+        }
+      case NT_SAT:
+        {
+          return "SAT";
+        }
+      case NT_GW:
+        {
+          return "GW";
+        }
+      case NT_NCC:
+        {
+          return "NCC";
+        }
+      case NT_TER:
+        {
+          return "TER";
+        }
+      case NT_UNDEFINED:
+        {
+          return "UNDEF";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetNodeTypeName - Invalid node type");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetNodeTypeName - Invalid node type");
+    return "";
+  };
+
+  /**
+   * \enum SatLinkDir_t
+   *
+   * \brief Link direction used for packet tracing
+   */
+  typedef enum
+  {
+    LD_FORWARD = 0,
+    LD_RETURN = 1,
+    LD_UNDEFINED = 2
+  } SatLinkDir_t;
+
+  static inline std::string GetLinkDirName (SatLinkDir_t linkDir)
+  {
+    switch (linkDir)
+    {
+      case LD_FORWARD:
+        {
+          return "FWD";
+        }
+      case LD_RETURN:
+        {
+          return "RTN";
+        }
+      case LD_UNDEFINED:
+        {
+          return "UNDEF";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetLinkDirName - Invalid link direction");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetLinkDirName - Invalid link direction");
+    return "";
+  };
+
+  /**
+   * \enum SatLogLevel_t
+   *
+   * \brief Log level used for packet tracing
+   */
+  typedef enum
+  {
+    LL_ND = 0,
+    LL_LLC = 1,
+    LL_MAC = 2,
+    LL_PHY = 3,
+    LL_CH = 4,
+  } SatLogLevel_t;
+
+  static inline std::string GetLogLevelName (SatLogLevel_t logLevel)
+  {
+    switch (logLevel)
+    {
+      case LL_ND:
+        {
+          return "ND";
+        }
+      case LL_LLC:
+        {
+          return "LLC";
+        }
+      case LL_MAC:
+        {
+          return "MAC";
+        }
+      case LL_PHY:
+        {
+          return "PHY";
+        }
+      case LL_CH:
+        {
+          return "CH";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetLogLevelName - Invalid log level");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetLogLevelName - Invalid log level");
     return "";
   };
 
@@ -267,6 +450,7 @@ private:
    */
   virtual ~SatEnums() = 0;
 };
+
 
 } // namespace ns3
 

@@ -37,6 +37,8 @@
 #include "../model/virtual-channel.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
 #include "../model/satellite-link-results.h"
+#include "../model/satellite-node-info.h"
+#include "../model/satellite-enums.h"
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -220,7 +222,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   dev->SetMac (mac);
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> (false);
+  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
 
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
@@ -245,7 +247,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
-  phy->SetAddress (Mac48Address::ConvertFrom (dev->GetAddress ()));
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (),gwId);
@@ -254,6 +255,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   mac->StartScheduling ();
 
   phy->Initialize();
+
+  // Create a node info to all the protocol layers
+  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), Mac48Address::ConvertFrom (addr));
+  dev->SetNodeInfo (nodeInfo);
+  llc->SetNodeInfo (nodeInfo);
+  mac->SetNodeInfo (nodeInfo);
+  phy->SetNodeInfo (nodeInfo);
 
   return dev;
 }

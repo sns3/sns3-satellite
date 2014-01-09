@@ -30,6 +30,9 @@
 #include "satellite-generic-encapsulator.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-control-message.h"
+#include "satellite-node-info.h"
+#include "satellite-enums.h"
+#include "satellite-utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLlc");
 
@@ -52,6 +55,9 @@ SatLlc::GetTypeId (void)
     // Trace sources at the "top" of the net device, where packets transition
     // to/from higher layers.
     //
+    .AddTraceSource ("PacketTrace",
+                     "Packet event trace",
+                     MakeTraceSourceAccessor (&SatLlc::m_packetTrace))
     .AddTraceSource ("LlcTx",
                      "Trace source indicating a packet has arrived for transmission by this device",
                      MakeTraceSourceAccessor (&SatLlc::m_llcTxTrace))
@@ -77,13 +83,6 @@ SatLlc::GetTypeId (void)
 }
 
 SatLlc::SatLlc ()
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
-}
-
-SatLlc::SatLlc (bool isUt)
-:m_isUt (isUt)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -161,7 +160,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest)
           // Add MAC tag
           SatMacTag mTag;
           mTag.SetDestAddress (dest);
-          mTag.SetSourceAddress (m_macAddress);
+          mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           packet->AddPacketTag (mTag);
 
           // Enque the control packet
@@ -176,7 +175,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest)
     {
       // UT: user own mac address
       // GW: use destination address
-      Mac48Address mac = ( m_isUt ? m_macAddress : Mac48Address::ConvertFrom (dest) );
+      Mac48Address mac = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? m_nodeInfo->GetMacAddress () : Mac48Address::ConvertFrom (dest) );
       encapContainer_t::iterator it = m_encaps.find (mac);
 
       if (it != m_encaps.end ())
@@ -188,6 +187,19 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest)
           NS_FATAL_ERROR ("Mac48Address not found in the encapsulator container!");
         }
     }
+
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_ENQUE,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_LLC,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
 
   return true;
 }
@@ -233,6 +245,22 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
           NS_FATAL_ERROR ("Mac48Address not found in the encapsulator container!");
         }
     }
+  if (packet)
+    {
+      SatEnums::SatLinkDir_t ld =
+          (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+      // Add packet trace entry:
+      m_packetTrace (Simulator::Now(),
+                     SatEnums::PACKET_SENT,
+                     m_nodeInfo->GetNodeType (),
+                     m_nodeInfo->GetNodeId (),
+                     m_nodeInfo->GetMacAddress (),
+                     SatEnums::LL_LLC,
+                     ld,
+                     SatUtils::GetPacketInfo (packet));
+    }
+
   return packet;
 }
 
@@ -240,6 +268,19 @@ void
 SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
 {
   NS_LOG_FUNCTION (this << macAddr << packet);
+
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_LLC,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
 
   // Receive packet with a decapsulator instance which is handling the
   // packets for this specific id
@@ -301,10 +342,11 @@ SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec)
     }
 }
 
-void SatLlc::SetAddress( Mac48Address macAddress )
+void
+SatLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_LOG_FUNCTION (this << macAddress);
-  m_macAddress = macAddress;
+  NS_LOG_FUNCTION (this << nodeInfo);
+  m_nodeInfo = nodeInfo;
 }
 
 std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const

@@ -146,6 +146,12 @@ public:
 
 
 private:
+
+	/**
+	 * GEO satellite node id
+	 */
+    uint32_t m_nodeId;
+
     CarrierBandwidthConverter m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
     uint32_t m_rtnLinkCarrierCount;

@@ -144,6 +144,8 @@ public:
    */
   void EnableCreationTraces(std::string filename, bool details);
 
+  void EnablePacketTrace ();
+
   inline NodeContainer GwNodes () { return m_beamHelper->GetGwNodes(); }
   inline NodeContainer UtNodes () { return m_beamHelper->GetUtNodes(); }
   inline Ptr<Node> GeoSatNode () { return m_beamHelper->GetGeoSatNode(); }

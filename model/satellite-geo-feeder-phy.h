@@ -47,7 +47,9 @@ public:
   SatGeoFeederPhy (void);
 
   SatGeoFeederPhy (SatPhy::CreateParam_t& params,
-                   InterferenceModel ifModel, CarrierBandwidthConverter converter, uint32_t carrierCount);
+                   InterferenceModel ifModel,
+                   CarrierBandwidthConverter converter,
+                   uint32_t carrierCount);
 
   virtual ~SatGeoFeederPhy ();
 
@@ -56,6 +58,19 @@ public:
   TypeId GetInstanceTypeId (void) const;
   virtual void DoStart (void);
   virtual void DoDispose (void);
+
+  /**
+   * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+   * \param rxParams Transmission parameters
+   */
+  virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * Receives packets from lower layer (phyRx)
+   *
+   * \param rxParams Packet reception parameters
+   */
+  virtual void Receive (Ptr<SatSignalParameters> rxParams);
 
   /**
    * Geo Feeder specific SINR calculator.

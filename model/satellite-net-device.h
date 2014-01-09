@@ -24,9 +24,11 @@
 #include <stdint.h>
 #include <string>
 
+#include "ns3/simulator.h"
 #include "ns3/net-device.h"
 #include "ns3/mac48-address.h"
 #include "ns3/traced-callback.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -37,6 +39,7 @@ class SatLlc;
 class Node;
 class ErrorModel;
 class VirtualChannel;
+class SatNodeInfo;
 
 /**
  * \defgroup satellite Satellite Models
@@ -134,6 +137,12 @@ public:
   virtual void SetVirtualChannel (Ptr<VirtualChannel>);
   virtual Ptr<Channel> GetChannel (void) const;
 
+  /**
+   * Set the node info
+   * \param nodeInfo containing node specific information
+   */
+  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
+
 protected:
   virtual void DoDispose (void);
 
@@ -149,11 +158,23 @@ private:
   Mac48Address m_address;
   Ptr<ErrorModel> m_receiveErrorModel;
 
+  Ptr<SatNodeInfo> m_nodeInfo;
+
   /*
    * Virtual channel is used to virtually connect netdevices to each other.
    * This allows the usage of global "automated" routing.
    */
   Ptr<VirtualChannel> m_virtualChannel;
+
+  TracedCallback<Time,
+                 SatEnums::SatPacketEvent_t,
+                 SatEnums::SatNodeType_t,
+                 uint32_t,
+                 Mac48Address,
+                 SatEnums::SatLogLevel_t,
+                 SatEnums::SatLinkDir_t,
+                 std::string
+                 > m_packetTrace;
 
   /**
    * The trace source fired when the phy layer drops a packet it has received

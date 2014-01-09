@@ -40,6 +40,9 @@ SatMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatMac")
     .SetParent<Object> ()
     .AddConstructor<SatMac> ()
+    .AddTraceSource ("PacketTrace",
+                     "Packet event trace",
+                     MakeTraceSourceAccessor (&SatMac::m_packetTrace))
     //
     // Trace sources at the "top" of the net device, where packets transition
     // to/from higher layers.
@@ -89,11 +92,14 @@ SatMac::DoDispose ()
   Object::DoDispose ();
 }
 
-void SatMac::SetAddress( Mac48Address macAddress )
+
+void
+SatMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_LOG_FUNCTION (this << macAddress);
-  m_macAddress = macAddress;
+  NS_LOG_FUNCTION (this << nodeInfo);
+  m_nodeInfo = nodeInfo;
 }
+
 
 void
 SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration)

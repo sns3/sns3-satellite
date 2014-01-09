@@ -123,7 +123,9 @@ SatGeoUserPhy::SatGeoUserPhy (void)
 }
 
 SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
-                              InterferenceModel ifModel, CarrierBandwidthConverter converter, uint32_t carrierCount)
+                              InterferenceModel ifModel,
+                              CarrierBandwidthConverter converter,
+                              uint32_t carrierCount)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
@@ -166,6 +168,49 @@ SatGeoUserPhy::DoStart ()
 {
   NS_LOG_FUNCTION (this);
   Object::DoStart ();
+}
+
+void
+SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
+{
+  NS_LOG_FUNCTION (this << txParams);
+  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 SatEnums::LD_FORWARD,
+                 SatUtils::GetPacketInfo (txParams->m_packetBuffer));
+
+  // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
+  // and antenna gain getting at receiver (UT or GW)
+  // copy on tx power too.
+
+  txParams->m_phyTx = m_phyTx;
+  txParams->m_txPower_W = m_eirpWoGainW;
+  m_phyTx->StartTx (txParams);
+}
+
+void
+SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this << rxParams);
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (rxParams->m_packetBuffer));
+
+  m_rxCallback ( rxParams->m_packetBuffer, rxParams);
 }
 
 double

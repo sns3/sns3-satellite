@@ -32,6 +32,8 @@
 #include "satellite-channel.h"
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-node-info.h"
+#include "satellite-enums.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhy");
@@ -97,6 +99,9 @@ SatPhy::GetTypeId (void)
                     CallbackValue (),
                     MakeCallbackAccessor (&SatPhy::m_cnoCallback),
                     MakeCallbackChecker ())
+    .AddTraceSource ("PacketTrace",
+                     "Packet event trace",
+                     MakeTraceSourceAccessor (&SatPhy::m_packetTrace))
   ;
   return tid;
 }
@@ -199,11 +204,11 @@ SatPhy::SetTxFadingContainer (Ptr<SatBaseFading> fadingContainer)
 }
 
 void
-SatPhy::SetAddress (Mac48Address ownAddress)
+SatPhy::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_LOG_FUNCTION (this);
-
-  m_phyRx->SetAddress (ownAddress);
+  NS_LOG_FUNCTION (this << nodeInfo);
+  m_nodeInfo = nodeInfo;
+  m_phyRx->SetAddress (m_nodeInfo->GetMacAddress ());
 }
 
 Ptr<SatPhyTx>
@@ -249,6 +254,20 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration )
   NS_LOG_FUNCTION (this << carrierId << duration);
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 ld,
+                 SatUtils::GetPacketInfo (p));
+
+
   // Create a new SatSignalParameters related to this packet transmission
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
@@ -270,15 +289,7 @@ void
 SatPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 {
   NS_LOG_FUNCTION (this << txParams);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
-
-  // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
-  // and antenna gain getting at receiver (UT or GW)
-  // copy on tx power too.
-
-  txParams->m_phyTx = m_phyTx;
-  txParams->m_txPower_W = m_eirpWoGainW;
-  m_phyTx->StartTx (txParams);
+  NS_ASSERT (true);
 }
 
 void
@@ -294,6 +305,20 @@ void
 SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 ld,
+                 SatUtils::GetPacketInfo (rxParams->m_packetBuffer));
+
   m_rxCallback ( rxParams->m_packetBuffer, rxParams);
 }
 
@@ -303,5 +328,7 @@ SatPhy::CnoInfo (uint32_t beamId, Address source, double cno)
   NS_LOG_FUNCTION (this << beamId << source << cno);
   m_cnoCallback ( beamId, source, cno);
 }
+
+
 
 } // namespace ns3

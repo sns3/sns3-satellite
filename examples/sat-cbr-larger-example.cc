@@ -70,6 +70,8 @@ main (int argc, char *argv[])
    Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
    helper->CreateScenario (SatHelper::FULL);
 
+   helper->EnablePacketTrace ();
+
    NodeContainer utUsers = helper->GetUtUsers ();
    NodeContainer gwUsers = helper->GetGwUsers ();
 

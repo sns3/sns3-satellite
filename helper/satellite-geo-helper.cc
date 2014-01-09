@@ -151,6 +151,7 @@ SatGeoHelper::Install (Ptr<Node> n)
   satDev->SetAddress (Mac48Address::Allocate ());
   n->AddDevice(satDev);
   m_deviceCount++;
+  m_nodeId = n->GetId ();
 
   return satDev;
 }
@@ -207,6 +208,13 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   uPhy->Initialize();
   fPhy->Initialize();
+
+  // Create a node info to PHY layers
+  Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
+  uPhy->SetNodeInfo (niUser);
+
+  Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
+  fPhy->SetNodeInfo (niFeeder);
 }
 
 void
