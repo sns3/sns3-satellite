@@ -397,7 +397,7 @@ SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> fram
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t frameBytesLeft;
+  uint32_t frameBytesLeft = 0;
 
   bytesLeft = 0;
   Ptr<Packet> p = m_txOpportunityCallback (bytesToReq, address, bytesLeft);
