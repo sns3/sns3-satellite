@@ -203,9 +203,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> ();
 
-  mac->SetAttribute ("BBFrameConf", PointerValue (m_bbFrameConf));
-  mac->SetAttribute ("SymbolRate", DoubleValue (m_symbolRate));
-
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
 
@@ -231,9 +228,11 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   llc->SetQueue (queue);
 
+  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkScheduler> (m_bbFrameConf);
+
   // Attach the LLC Tx opportunity callback to SatMac
-  mac->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
-  mac->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
+  fdwLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // Attach the device receive callback to SatNetDevice
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
@@ -243,6 +242,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // Attach the device receive callback to SatLlc
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
+
+  // set scheduler to Mac
+  mac->SetAttribute("Scheduler", PointerValue (fdwLinkScheduler));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();

@@ -34,7 +34,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * \brief BB Frame class.
- * Holds information of BB Frames for forward link scheduling.
+ * Holds information of a BB Frame for forward link scheduling.
  *
  */
 class SatBbFrame :  public SimpleRefCount<SatBbFrame>
@@ -53,9 +53,8 @@ public:
    * \param modCod Used ModCod
    * \param type Type if the frame
    * \param conf Pointer to BBFrame configuration
-   * \param symRateInBauds Symbol rate in bauds.
    */
-  SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf, double symRateInBauds);
+  SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf);
 
   /**
    * Destructor
@@ -89,13 +88,17 @@ public:
    */
   uint32_t GetBytesLeft () const ;
 
-  //TODO: Needed to calculate according to MODCOD
   /**
    * Get duration of the frame transmission.
    * \return duration of the frame transmission
    */
   inline Time GetDuration () const {return m_duration;}
 
+  /**
+   * Get type of the frame.
+   * \return Type of the frame
+   */
+  inline SatEnums::SatBbFrameType_t GetFrameType () const {return m_frameType;}
 
 private:
 
@@ -105,6 +108,7 @@ private:
   bool m_containsControlData;
   SatBbFrameData frameData;
   Time m_duration;
+  SatEnums::SatBbFrameType_t m_frameType;
 };
 
 

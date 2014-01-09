@@ -33,9 +33,7 @@
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-gw-mac.h"
-#include "satellite-scheduling-object.h"
 #include "satellite-utils.h"
-
 
 NS_LOG_COMPONENT_DEFINE ("SatGwMac");
 
@@ -49,64 +47,23 @@ SatGwMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGwMac")
     .SetParent<SatMac> ()
     .AddConstructor<SatGwMac> ()
-    .AddAttribute ("Interval",
-                   "The time to wait between packet (frame) transmissions",
-                    TimeValue (Seconds (0.002)),
-                    MakeTimeAccessor (&SatGwMac::m_tInterval),
-                    MakeTimeChecker ())
-    .AddAttribute ("BBFrameConf",
-                   "BB Frame configuration for this GW Mac.",
-                    PointerValue(),
-                    MakePointerAccessor (&SatGwMac::m_bbFrameConf),
-                    MakePointerChecker<SatBbFrameConf> ())
-    .AddAttribute ("SymbolRate",
-                   "Symbol rate for transmission.",
-                    DoubleValue(),
-                    MakeDoubleAccessor (&SatGwMac::m_symbolRate),
-                    MakeDoubleChecker<double> (0.0))
-    .AddAttribute ("DummyFrameSendingOn",
+    .AddAttribute ("DummyFrameSendingEnabled",
                    "Flag to tell, if dummy frames are sent or not.",
-                    BooleanValue (false),
-                    MakeBooleanAccessor (&SatGwMac::m_dummyFrameSendingOn),
-                    MakeBooleanChecker ())
-    .AddAttribute ("BBFrameUsageMode",
-                   "Mode for selecting used BBFrames.",
-                    EnumValue (SatGwMac::NORMAL_FRAMES),
-                    MakeEnumAccessor (&SatGwMac::m_bbFrameUsageMode),
-                    MakeEnumChecker (SatGwMac::SHORT_FRAMES, "Only short frames used.",
-                                     SatGwMac::NORMAL_FRAMES, "Only normal frames used",
-                                     SatGwMac::SHORT_AND_NORMAL_FRAMES, "Both short and normal frames used."))
-    .AddAttribute ("SchedulingStartThresholdTime",
-                   "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
-                    TimeValue (Seconds (0.005)),
-                    MakeTimeAccessor (&SatGwMac::m_schedulingStartThresholdTime),
-                    MakeTimeChecker ())
-    .AddAttribute ("SchedulingStopThresholdTime",
-                   "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
-                    TimeValue (Seconds (0.015)),
-                    MakeTimeAccessor (&SatGwMac::m_schedulingStopThresholdTime),
-                    MakeTimeChecker ())
-    .AddAttribute ("SchedulingSortCriteria",
-                   "Sorting criteria fort scheduling objects from LLC.",
-                    EnumValue (SatGwMac::NO_SORT),
-                    MakeEnumAccessor (&SatGwMac::m_schedulingSortCriteria),
-                    MakeEnumChecker (SatGwMac::NO_SORT, "No sorting",
-                                     SatGwMac::BUFFERING_DELAY_SORT, "Sorting by delay in buffer",
-                                     SatGwMac::BUFFERING_LOAD_SORT, "Sorting by load in buffer",
-                                     SatGwMac::RANDOM_SORT, "Random sorting ",
-                                     SatGwMac::PRIORITY_SORT, "Sorting by priority"))
-
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatGwMac::m_dummyFrameSendingEnabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("Scheduler",
+                   "Forward link scheduler used by this Sat GW MAC.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatGwMac::m_scheduler),
+                   MakePointerChecker<SatFwdLinkScheduler> ())
   ;
   return tid;
 }
 
 SatGwMac::SatGwMac ()
- : m_defModCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4)
 {
   NS_LOG_FUNCTION (this);
-
-  // Random variable used in scheduling
-  m_random = CreateObject<UniformRandomVariable> ();
 }
 
 SatGwMac::~SatGwMac ()
@@ -118,17 +75,21 @@ void
 SatGwMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_schedContextCallback.Nullify ();
   SatMac::DoDispose ();
 }
 
 void
 SatGwMac::StartScheduling()
 {
-  NS_ASSERT (m_tInterval.GetDouble() > 0.0);
+  if ( m_scheduler == NULL )
+    {
+      NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
+    }
+
+  m_scheduler->SetMacAdderss (m_macAddress);
 
   // Note, carrierId currently set by default to 0
-  ScheduleNextTransmissionTime (m_tInterval, 0);
+  Simulator::Schedule (Seconds (0), &SatGwMac::TransmitTime, this, 0);
 }
 
 void
@@ -180,53 +141,22 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
     }
 }
 
-
-void
-SatGwMac::ScheduleNextTransmissionTime (Time txTime, uint32_t carrierId)
-{
-  Simulator::Schedule (txTime, &SatGwMac::TransmitTime, this, 0);
-}
-
 void
 SatGwMac::TransmitTime (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
-  /**
-   * TODO: This is a first skeleton implementation of the FWD link scheduler.
-   * It is sending only one packet from each UT at a time, which a predefined
-   * interval. In reality, the FWD link scheduler should be building BBFrames,
-   * with possible GSE packets to several UTs.
-   * In forward link txBytes should be either
-   * - Short BBFrame = 16200 bits = 2025 Bytes
-   * - Long BBFrame = 64800 bits = 8100 Bytes
-   * The usage of either short or long BBFrame should be decided on-the-fly
-   * based on buffered bytes in LLC layer.
-   *
-  */
+  Ptr<SatBbFrame> bbFrame = m_scheduler->GetNextFrame ();
 
-  ScheduleBbFrames ();
-  Ptr<SatBbFrame> bbFrame;
-  Time txDuration;
-
-  if ( m_bbFrameContainer.empty () )
+  if ( bbFrame == NULL )
     {
-      if ( m_dummyFrameSendingOn )
-        {
-          bbFrame = CreateDummyFrame ();
-        }
-
-      txDuration = m_bbFrameConf->GetDummyBbFrameLength ();
-    }
-  else
-    {
-      bbFrame = m_bbFrameContainer.front ();
-      m_bbFrameContainer.pop_front ();
-
-      txDuration = bbFrame->GetDuration ();
+      NS_FATAL_ERROR ("BB Frame is missing!!!");
     }
 
-  if ( bbFrame )
+  Time txDuration = bbFrame->GetDuration ();
+
+  // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
+  if ( ( bbFrame->GetFrameType() != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
     {
       // Add packet trace entry:
       m_packetTrace (Simulator::Now(),
@@ -237,181 +167,14 @@ SatGwMac::TransmitTime (uint32_t carrierId)
                      SatEnums::LL_MAC,
                      SatEnums::LD_FORWARD,
                      SatUtils::GetPacketInfo (bbFrame->GetTransmitData()));
-
-        /* TODO: The carrierId should be acquired from somewhere. Now
-         * we assume only one carrier in forward link, so it is safe to use 0.
-         * The BBFrame duration should be calculated based on BBFrame length and
-         * used MODCOD.
-         */
-        SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - Time (1) );
+                     
+      /* TODO: The carrierId should be acquired from somewhere. Now
+       * we assume only one carrier in forward link, so it is safe to use 0.
+       */
+      SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - Time (1) );
     }
 
-  // TODO: The next TransmitTime should be scheduled to be when just transmitted
-  // packet transmission ends. This is dependent on the used BBFrame length and
-  // used MODCOD.
-  ScheduleNextTransmissionTime (txDuration, 0);
+  Simulator::Schedule (txDuration, &SatGwMac::TransmitTime, this, 0);
 }
-
-void
-SatGwMac::SetSchedContextCallback (SatGwMac::SchedContextCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_schedContextCallback = cb;
-}
-
-void
-SatGwMac::ScheduleBbFrames ()
-{
-  NS_LOG_FUNCTION (this);
-
-  // TODO: logic of this function is needed to check
-  // and implemented in own scheduler class
-  uint32_t frameBytes = 0;
-  Ptr<SatBbFrame> frame;
-
-  // Get scheduling objects from LLC
-  std::vector< Ptr<SatSchedulingObject> > sos = m_schedContextCallback ();
-
-  if ( sos.empty () == false )
-    {
-      uint32_t bytesToSent = 0;
-      std::vector< Ptr<SatSchedulingObject> >::const_iterator currentObject;
-
-      for ( currentObject = sos.begin (); currentObject != sos.end (); currentObject++ )
-        {
-          bytesToSent += (*currentObject)->GetBufferedBytes();
-        }
-
-      currentObject = sos.begin ();
-      uint32_t currentObBytes = (*currentObject)->GetBufferedBytes();
-      uint32_t currentObMinReqBytes = 5;
-
-      if ( (*currentObject)->IsControl() )
-        {
-          currentObMinReqBytes = 500;
-        }
-
-      while ( bytesToSent )
-        {
-          if ( frameBytes == 0)
-            {
-              frame = CreateFrame (m_defModCod, bytesToSent);
-              frameBytes = frame->GetBytesLeft();
-            }
-
-          if ( frameBytes < currentObMinReqBytes )
-            {
-              m_bbFrameContainer.push_back (frame);
-              frameBytes = 0;
-            }
-          else if ( currentObBytes > frameBytes )
-            {
-              uint32_t bytesLeft = 0;
-              Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*currentObject)->GetMacAddress (), bytesLeft);
-
-              if ( p )
-                {
-                  frameBytes = frame->AddTransmitData (p, (*currentObject)->IsControl() );
-                }
-
-              m_bbFrameContainer.push_back (frame);
-
-              frameBytes = 0;
-              bytesToSent -= currentObBytes;
-              currentObBytes = bytesLeft;
-            }
-          else
-            {
-              // TODO: Something wrong here. We need to ask two extra bytes, otherwise fails.
-              uint32_t bytesLeft = 0;
-              Ptr<Packet> p = m_txOpportunityCallback (currentObBytes + 2, (*currentObject)->GetMacAddress (), bytesLeft);
-
-              if ( p )
-                {
-                  frameBytes = frame->AddTransmitData (p, (*currentObject)->IsControl() );
-                  bytesToSent -= currentObBytes;
-                  currentObBytes = bytesLeft;
-                }
-
-              if ( bytesToSent )
-                {
-                  currentObject++;
-                  currentObBytes = (*currentObject)->GetBufferedBytes();
-
-                  currentObMinReqBytes = 5;
-
-                  if ( (*currentObject)->IsControl() )
-                    {
-                      currentObMinReqBytes = 500;
-                    }
-                }
-              else
-                {
-                  m_bbFrameContainer.push_back (frame);
-                }
-            }
-        }
-    }
-}
-
-Ptr<SatBbFrame> SatGwMac::CreateDummyFrame () const
-{
-  NS_LOG_FUNCTION (this);
-
-  Ptr<SatBbFrame> dummyFrame = Create<SatBbFrame> ();
-  Ptr<Packet> dummyPacket = Create<Packet> (1);
-
-  // Add MAC tag
-  SatMacTag tag;
-  tag.SetDestAddress (Mac48Address::GetBroadcast());
-  tag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
-  dummyPacket->AddPacketTag (tag);
-
-  dummyFrame->AddTransmitData (dummyPacket, false);
-
-  return dummyFrame;
-}
-
-Ptr<SatBbFrame>
-SatGwMac::CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCount) const
-{
-  NS_LOG_FUNCTION (this << modCod << byteCount);
-
-  Ptr<SatBbFrame> frame;
-
-  switch (m_bbFrameUsageMode)
-  {
-    case SHORT_FRAMES:
-      frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf, m_symbolRate);
-      break;
-
-    case NORMAL_FRAMES:
-      frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf, m_symbolRate);
-      break;
-
-    case SHORT_AND_NORMAL_FRAMES:
-      {
-        uint32_t bytesInShortFrame = m_bbFrameConf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
-
-        if (byteCount > bytesInShortFrame)
-          {
-            frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf, m_symbolRate);
-          }
-        else
-          {
-            frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf, m_symbolRate);
-          }
-      }
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Invalid BBFrame usage mode!!!");
-      break;
-
-  }
-
-  return frame;
-}
-
 
 } // namespace ns3

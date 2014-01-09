@@ -28,19 +28,20 @@ namespace ns3 {
 
 SatBbFrame::SatBbFrame ()
  : m_modCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4),
-   m_freeBytes (1),
-   m_TotalBytes (1),
+   m_freeBytes (0),
+   m_TotalBytes (0),
    m_containsControlData (false),
-   m_duration(Seconds (0.00009))
-
+   m_frameType ()
 {
   NS_LOG_FUNCTION (this);
+  NS_FATAL_ERROR ("Default constructor of SatBbFrame not supported.");
 }
 
 
-SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf, double symbolRateInBauds)
+SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf)
   :m_modCod (modCod),
-   m_containsControlData (false)
+   m_containsControlData (false),
+   m_frameType (type)
 {
   NS_LOG_FUNCTION (this << modCod << type);
 
@@ -62,7 +63,6 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
     default:
       NS_FATAL_ERROR ("Invalid BBFrame type!!!");
       break;
-
   }
 
   m_freeBytes = m_TotalBytes;

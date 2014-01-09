@@ -36,10 +36,8 @@
 #include "satellite-mac.h"
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
-#include "satellite-scheduling-object.h"
 #include "satellite-phy.h"
-#include "satellite-bbframe.h"
-#include "ns3/satellite-bbframe-conf.h"
+#include "satellite-fwd-link-scheduler.h"
 
 namespace ns3 {
 
@@ -53,27 +51,6 @@ namespace ns3 {
 class SatGwMac : public SatMac
 {
 public:
-  /**
-   * Types for sorting algorithm used by forward link scheduler
-   */
-  typedef enum
-  {
-    NO_SORT,             //!< NO_SORT
-    BUFFERING_DELAY_SORT,//!< BUFFERING_DELAY_SORT
-    BUFFERING_LOAD_SORT, //!< BUFFERING_LOAD_SORT
-    RANDOM_SORT,         //!< RANDOM_SORT
-    PRIORITY_SORT        //!< PRIORITY_SORT
-  } ScheduleSortingCriteria_t;
-
-  /**
-   * BBFrame usage modes.
-   */
-  typedef enum
-  {
-    SHORT_FRAMES,          //!< SHORT_FRAMES
-    NORMAL_FRAMES,         //!< NORMAL_FRAMES
-    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
-  } BbFrameUsageMode_t;
 
   static TypeId GetTypeId (void);
 
@@ -104,20 +81,6 @@ public:
    */
   void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
-  /**
-   * Callback to get scheduling contexts from upper layer
-   * \param vector of scheduling contexts
-   */
-  typedef Callback<std::vector< Ptr<SatSchedulingObject> > > SchedContextCallback;
-
-  /**
-   * Method to set Tx opportunity callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    *
-    */
-  void SetSchedContextCallback (SatGwMac::SchedContextCallback cb);
-
 private:
 
   SatGwMac& operator = (const SatGwMac &);
@@ -126,108 +89,26 @@ private:
   void DoDispose (void);
 
   /**
-   * Schedules the next transmission time.
-   * \param txTime Next Tx opportunity
-   * \param carrierId Carrier id for next transmission
-   */
-  void ScheduleNextTransmissionTime (Time txTime, uint32_t carrierId);
-
-  /**
-    * Start Sending a Packet Down the Wire.
-    *
-    * The TransmitStart method is the method that is used internally in the
-    * SatGwMac to begin the process of sending a packet out on the phy layer.'
-    *
-    * \param carrierId id of the carrier.
-    * \returns true if success, false on failure
-    */
-   void TransmitTime (uint32_t carrierId);
-
-   /**
-    * Schedule BB Frames.
-    */
-   void ScheduleBbFrames ();
-
-   /**
-    * Create short or normal frame according to byteCount and
-    * according to member #m_bbFrameUsageMode.
-    *
-    * \param modCod Used MODCOD for frame.
-    * \param byteCount byte count
-    * \return Pointer to created frame.
-    */
-   Ptr<SatBbFrame> CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCount) const;
-
-   /**
-    * Create dummy frame. Dummy frame is sent when there is nothing else to send.
-    * \return dummy frame
-    */
-   Ptr<SatBbFrame> CreateDummyFrame () const;
-
-   /**
-    * Random variable used in FWD link scheduling
-    */
-   Ptr<UniformRandomVariable> m_random;
-
-  /**
-   * The interval that the Mac uses to throttle packet transmission
-   */
-  Time m_tInterval;
-
-  /**
-   * Configured BB Frame conf.
-   */
-  Ptr<SatBbFrameConf> m_bbFrameConf;
-
-  /**
-   * Configured symbol rate for transmissions.
+   * Start Sending a Packet Down the Wire.
    *
-   * TODO: Multiple carrier use needed to taken into account.
-   * Now it is assumed only one carrier to be used in forward link.
+   * The TransmitStart method is the method that is used internally in the
+   * SatGwMac to begin the process of sending a packet out on the phy layer.'
+   *
+   * \param carrierId id of the carrier.
+   * \returns true if success, false on failure
    */
-  double m_symbolRate;
+  void TransmitTime (uint32_t carrierId);
 
   /**
-   * Configured default ModCod for transmission.
+   * Scheduler for the forward link.
    */
-  SatEnums::SatModcod_t m_defModCod;
+  Ptr<SatFwdLinkScheduler> m_scheduler;
 
   /**
    * Flag indicating if Dummy Frames are sent or not.
    * false means that only transmission time is simulated without sending.
    */
-  bool m_dummyFrameSendingOn;
-
-  /**
-   * Threshold time of total transmissions in BB Frame container to trigger a scheduling round.
-   */
-  Time m_schedulingStartThresholdTime;
-
-  /**
-   * Threshold time of total transmissions in BB Frame container to stop a scheduling round.
-   */
-  Time m_schedulingStopThresholdTime;
-
-  /**
-   * Sorting criteria for scheduling objects received from LLC.
-   */
-  ScheduleSortingCriteria_t m_schedulingSortCriteria;
-
-  /**
-   * BBFrame usage mode.
-   */
-  BbFrameUsageMode_t m_bbFrameUsageMode;
-
-  /**
-   * The lower layer packet transmit callback.
-   */
-  SatGwMac::SchedContextCallback m_schedContextCallback;
-
-  /**
-   * The container for BB Frames.
-   */
-  std::list< Ptr<SatBbFrame> > m_bbFrameContainer;
-
+  bool m_dummyFrameSendingEnabled;
 };
 
 } // namespace ns3
