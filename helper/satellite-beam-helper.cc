@@ -392,6 +392,11 @@ SatBeamHelper::EnablePacketTrace ()
    * - PHY
    */
 
+  /**
+   * TODO: Currently the packet trace logs all entries updated by the protocol layers. Here
+   * we could restrict the protocol layers from where the traced data are collected from.
+   * This could be controlled by the user using attributes.
+   */
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatPhy/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/UserPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));

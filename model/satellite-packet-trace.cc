@@ -105,6 +105,17 @@ SatPacketTrace::AddTraceEntry (Time now,
                                SatEnums::SatLinkDir_t linkDir,
                                std::string packetInfo)
 {
+  /**
+   * TODO: Currently the packet trace logs all entries updated by the protocol layers.
+   * A filtering functionality may be implemented later, to restrict the amount of output
+   * data. The user may configure the filtering rules by attributes, e.g.
+   * - Entries from only certain type packet events
+   * - Entries from only certain node types
+   * - Entries from only certain node ids
+   * - Entries with certain log level (i.e. protocol layer)
+   * - Entries from one simulation direction
+   */
+
   std::ostringstream oss;
   oss << now.GetSeconds () << " "
       << SatEnums::GetPacketEventName (packetEvent) << " "
