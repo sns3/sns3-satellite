@@ -86,7 +86,7 @@ SatGwMac::StartScheduling()
       NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
     }
 
-  m_scheduler->SetMacAdderss (m_macAddress);
+  m_scheduler->SetMacAdderss (m_nodeInfo->GetMacAddress ());
 
   // Note, carrierId currently set by default to 0
   Simulator::Schedule (Seconds (0), &SatGwMac::TransmitTime, this, 0);
@@ -98,7 +98,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
   NS_LOG_FUNCTION (this);
 
   // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_RECV,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -107,7 +107,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                  SatEnums::LD_RETURN,
                  SatUtils::GetPacketInfo (packets));
 
-  for (SatPhy::PacketContainer_t::iterator i = packets.begin(); i != packets.end(); i++ )
+  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
       // Hit the trace hooks.  All of these hooks are in the same place in this
       // device because it is so simple, but this is not usually the case in
@@ -124,15 +124,15 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
         }
 
-      NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
-      NS_LOG_LOGIC("Receiver " << m_nodeInfo->GetMacAddress ());
+      NS_LOG_LOGIC ("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
+      NS_LOG_LOGIC ("Receiver " << m_nodeInfo->GetMacAddress ());
 
       // If the packet is intended for this receiver
-      Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress());
-      if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast())
+      Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+      if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
           // Pass the source address to LLC
-          m_rxCallback (*i, Mac48Address::ConvertFrom(macTag.GetSourceAddress ()));
+          m_rxCallback (*i, Mac48Address::ConvertFrom (macTag.GetSourceAddress ()));
         }
       else
         {
@@ -156,17 +156,17 @@ SatGwMac::TransmitTime (uint32_t carrierId)
   Time txDuration = bbFrame->GetDuration ();
 
   // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
-  if ( ( bbFrame->GetFrameType() != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
+  if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
     {
       // Add packet trace entry:
-      m_packetTrace (Simulator::Now(),
+      m_packetTrace (Simulator::Now (),
                      SatEnums::PACKET_SENT,
                      m_nodeInfo->GetNodeType (),
                      m_nodeInfo->GetNodeId (),
                      m_nodeInfo->GetMacAddress (),
                      SatEnums::LL_MAC,
                      SatEnums::LD_FORWARD,
-                     SatUtils::GetPacketInfo (bbFrame->GetTransmitData()));
+                     SatUtils::GetPacketInfo (bbFrame->GetTransmitData ()));
                      
       /* TODO: The carrierId should be acquired from somewhere. Now
        * we assume only one carrier in forward link, so it is safe to use 0.
