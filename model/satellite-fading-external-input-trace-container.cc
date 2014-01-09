@@ -166,13 +166,17 @@ SatFadingExternalInputTraceContainer::TestFadingTraces (uint32_t numOfUts, uint3
   NS_ASSERT (numOfUts > 0);
   NS_ASSERT (numOfGws > 0);
 
+  uint32_t ueCount = m_utFadingMap.size ();
+  uint32_t gwCount = m_gwFadingMap.size ();
+
   for (uint32_t i = 1; i <= numOfUts; i++)
     {
       std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_utFadingMap.find (i);
 
       if (iter == m_utFadingMap.end ())
         {
-          CreateUtFadingTrace (i);
+          ueCount++;
+          CreateUtFadingTrace (ueCount);
         }
     }
 
@@ -182,7 +186,8 @@ SatFadingExternalInputTraceContainer::TestFadingTraces (uint32_t numOfUts, uint3
 
       if (iter == m_gwFadingMap.end ())
         {
-          CreateUtFadingTrace (i);
+          gwCount++;
+          CreateGwFadingTrace (gwCount);
         }
     }
 

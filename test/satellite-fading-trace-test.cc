@@ -76,21 +76,21 @@ SatFadingTraceTestCase::DoRun (void)
 
   // Test the fading traces
   bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts,numGws);
-  NS_TEST_ASSERT_MSG_EQ( success, true, "SatChannelFadingTrace test failed");
+  NS_TEST_ASSERT_MSG_EQ (success, true, "SatChannelFadingTrace test failed");
 
   double time [4] = {1.434, 40.923, 80.503, 140.3};
   double preCalcRes [4] = {1.06879, 1.03526, 1.03093, 1.00159};
 
-  Simulator::Schedule(Seconds(time[0]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
-  Simulator::Schedule(Seconds(time[1]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
-  Simulator::Schedule(Seconds(time[2]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule(Seconds(time[3]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatEnums::FORWARD_FEEDER_CH);
+  Simulator::Schedule (Seconds(time[0]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
+  Simulator::Schedule (Seconds(time[1]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
+  Simulator::Schedule (Seconds(time[2]), &SatFadingTraceTestCase::TestGetFading, this, 1, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Seconds(time[3]), &SatFadingTraceTestCase::TestGetFading, this, 2, SatEnums::FORWARD_FEEDER_CH);
 
   Simulator::Run ();
 
   for (uint32_t i = 0; i < 4; ++i)
     {
-      NS_TEST_ASSERT_MSG_EQ_TOL(m_results[i], preCalcRes[i], 0.001, "Fading not within expected tolerance");
+      NS_TEST_ASSERT_MSG_EQ_TOL (m_results[i], preCalcRes[i], 0.001, "Fading not within expected tolerance");
     }
 
   Simulator::Destroy ();
