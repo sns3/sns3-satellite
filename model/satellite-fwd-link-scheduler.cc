@@ -47,9 +47,9 @@ SatFwdLinkScheduler::GetTypeId (void)
     .SetParent<Object> ()
     .AddConstructor<SatFwdLinkScheduler> ()
     .AddAttribute ("Interval",
-                   "The time to wait between packet (frame) transmissions",
+                   "The time for periodic scheduling",
                     TimeValue (MilliSeconds (20)),
-                    MakeTimeAccessor (&SatFwdLinkScheduler::m_interval),
+                    MakeTimeAccessor (&SatFwdLinkScheduler::m_periodicInterval),
                     MakeTimeChecker ())
     .AddAttribute ("BBFrameConf",
                    "BB Frame configuration for this scheduler.",
@@ -94,8 +94,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler ()
 }
 
 SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address)
- : m_periodicTimer (Timer::CANCEL_ON_DESTROY),
-   m_macAddress (address),
+ : m_macAddress (address),
    m_bbFrameConf (conf),
    m_defModCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4)
 {
@@ -122,9 +121,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   // Add dummy packet to dummy frame
   m_dummyFrame->AddTransmitData (dummyPacket, false);
 
-  m_periodicTimer.SetDelay (m_interval);
-  m_periodicTimer.SetFunction (&SatFwdLinkScheduler::PeriodicTimerExpired, this);
-  //m_periodicTimer.Schedule();
+  Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
 }
 
 SatFwdLinkScheduler::~SatFwdLinkScheduler ()
@@ -184,7 +181,7 @@ SatFwdLinkScheduler::PeriodicTimerExpired ()
 
   ScheduleBbFrames ();
 
-  m_periodicTimer.Schedule();
+  Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
 }
 
 void

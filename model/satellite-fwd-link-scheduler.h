@@ -188,11 +188,6 @@ private:
   void SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject> >& so);
 
   /**
-   * Periodic timer for scheduling.
-   */
-  Timer m_periodicTimer;
-
-  /**
    * Dummy frame
    */
   Ptr<SatBbFrame> m_dummyFrame;
@@ -208,9 +203,9 @@ private:
   Ptr<UniformRandomVariable> m_random;
 
   /**
-   * The interval for periodic timer
+   * The interval for periodic scheduling timer. Timer is evaluated by scheduling calls to PeriodicTimerExpired.
    */
-  Time m_interval;
+  Time m_periodicInterval;
 
   /**
    * Configured BB Frame conf.
