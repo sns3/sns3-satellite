@@ -91,8 +91,9 @@ public:
    * Actual constructor of a SatFwdLinkScheduler
    *    *
    * \param conf BB Frame configuration
+   * \param address MAC address
    */
-  SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf);
+  SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address);
 
   /**
    * Destroy a SatFwdLinkScheduler
@@ -107,9 +108,6 @@ public:
    * \param packets Pointers to packets received.
    */
   virtual Ptr<SatBbFrame> GetNextFrame ();
-
-
-  void SetMacAdderss (Mac48Address address);
 
   /**
    * Callback to get scheduling contexts from upper layer

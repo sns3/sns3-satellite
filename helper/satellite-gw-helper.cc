@@ -228,12 +228,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
   llc->SetQueue (queue);
 
-  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkScheduler> (m_bbFrameConf);
-
-  // Attach the LLC Tx opportunity callback to SatMac
-  fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
-  fdwLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
-
   // Attach the device receive callback to SatNetDevice
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
@@ -243,18 +237,13 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Attach the device receive callback to SatLlc
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
-  // set scheduler to Mac
-  mac->SetAttribute("Scheduler", PointerValue (fdwLinkScheduler));
-
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
-  Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (),gwId);
-  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (),beamId);
-
-  mac->StartScheduling ();
+  Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
 
   phy->Initialize();
 
@@ -264,6 +253,17 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
+
+  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkScheduler> (m_bbFrameConf, addr);
+
+  // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
+  fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
+  fdwLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+
+  // set scheduler to Mac
+  mac->SetAttribute("Scheduler", PointerValue (fdwLinkScheduler));
+
+  mac->StartScheduling ();
 
   return dev;
 }

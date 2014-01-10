@@ -86,8 +86,6 @@ SatGwMac::StartScheduling()
       NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
     }
 
-  m_scheduler->SetMacAdderss (m_nodeInfo->GetMacAddress ());
-
   // Note, carrierId currently set by default to 0
   Simulator::Schedule (Seconds (0), &SatGwMac::TransmitTime, this, 0);
 }

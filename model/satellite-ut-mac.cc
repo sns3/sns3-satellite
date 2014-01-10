@@ -252,6 +252,11 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                   NS_FATAL_ERROR ("A control message received with not valid msg type!");
                 }
             }
+          else if (destAddress.IsBroadcast())
+            {
+              // TODO: dummy frames and other broadcast needed to handle
+              // dummy frames should ignored already in Phy layer
+            }
           // Control msg tag not found, send the packet to higher layer
           else
             {

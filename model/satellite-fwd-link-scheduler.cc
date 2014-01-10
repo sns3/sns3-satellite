@@ -93,8 +93,9 @@ SatFwdLinkScheduler::SatFwdLinkScheduler ()
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
 }
 
-SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf)
+SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address)
  : m_periodicTimer (Timer::CANCEL_ON_DESTROY),
+   m_macAddress (address),
    m_bbFrameConf (conf),
    m_defModCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4)
 {
@@ -110,6 +111,17 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf)
   // create dummy frame
   m_dummyFrame = Create<SatBbFrame> (m_defModCod, SatEnums::DUMMY_FRAME, m_bbFrameConf);
 
+  Ptr<Packet> dummyPacket = Create<Packet> (1);
+
+  // Add MAC tag
+  SatMacTag tag;
+  tag.SetDestAddress (Mac48Address::GetBroadcast());
+  tag.SetSourceAddress (m_macAddress);
+  dummyPacket->AddPacketTag (tag);
+
+  // Add dummy packet to dummy frame
+  m_dummyFrame->AddTransmitData (dummyPacket, false);
+
   m_periodicTimer.SetDelay (m_interval);
   m_periodicTimer.SetFunction (&SatFwdLinkScheduler::PeriodicTimerExpired, this);
   //m_periodicTimer.Schedule();
@@ -124,6 +136,10 @@ void
 SatFwdLinkScheduler::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+  m_schedContextCallback.Nullify();
+  m_txOpportunityCallback.Nullify();
+  m_dummyFrame = NULL;
+  m_bbFrameContainer = NULL;
 }
 
 void
@@ -159,13 +175,6 @@ SatFwdLinkScheduler::GetNextFrame ()
     }
 
   return frame;
-}
-
-void
-SatFwdLinkScheduler::SetMacAdderss (Mac48Address address)
-{
-  NS_LOG_FUNCTION (this << address);
-  m_macAddress = address;
 }
 
 void

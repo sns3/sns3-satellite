@@ -210,14 +210,14 @@ private:
 };
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defFwdUserName, "_IfTestFU", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defFwdUserName, "IfTestFU", SatEnums::FADING_OFF, false,
                               StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512))
 {
 
 }
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
- : SatPerPacketBaseTestCase (defFwdUserName + name, "_IfTestFU_" + name, fading, dummyFrames,
+ : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFU_" + name, fading, dummyFrames,
                              StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512) )
 {
 
@@ -225,7 +225,7 @@ SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string na
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
- : SatPerPacketBaseTestCase (defFwdUserName + name, "_IfTestFU_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
+ : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFU_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
 {
 
 }
@@ -240,7 +240,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   InitOutput (true );
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -357,7 +357,7 @@ private:
 };
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase ()
-  : SatPerPacketBaseTestCase (defFwdFullName, "_IfTestFF", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defFwdFullName, "IfTestFF", SatEnums::FADING_OFF, false,
                               StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 
 {
@@ -365,7 +365,7 @@ SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase ()
 }
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, "_IfTestFF_"+ name, fading, dummyFrames,
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFF_"+ name, fading, dummyFrames,
                               StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 {
 
@@ -373,7 +373,7 @@ SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string na
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, "_IfTestFF_"+ name, fading, dummyFrames,
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFF_"+ name, fading, dummyFrames,
                               ival1, pSize1, ival2, pSize2 )
 {
 
@@ -390,7 +390,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   InitOutput ( false );
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -498,14 +498,14 @@ private:
 };
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defRtnUserName , "_IfTestRU", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defRtnUserName , "IfTestRU", SatEnums::FADING_OFF, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
 }
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, "_IfTestRU_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRU_"+ name, fading, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
@@ -513,7 +513,7 @@ SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string na
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, "_IfTestRU_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRU_"+ name, fading, false,
                               ival1, pSize1, ival2, pSize2 )
 {
   }
@@ -528,7 +528,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   InitOutput (false);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -617,14 +617,14 @@ private:
 };
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase ()
-  : SatPerPacketBaseTestCase (defRtnFullName, "_IfTestRF", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defRtnFullName, "IfTestRF", SatEnums::FADING_OFF, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
 }
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnFullName + name, "_IfTestRF_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRF_"+ name, fading, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
@@ -633,7 +633,7 @@ SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string na
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnFullName + name, "_IfTestRF_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRF_"+ name, fading, false,
                               ival1, pSize1, ival2, pSize2 )
 {
 
@@ -650,7 +650,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   InitOutput (false);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingOn", BooleanValue (m_dummyFrames));
+  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
