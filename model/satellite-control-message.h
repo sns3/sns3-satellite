@@ -228,13 +228,13 @@ public:
   };
 
   /**
-   * Default constructor for SatTbtpHeader. Set sequency id to 0.
+   * Default constructor for SatTbtpHeader. Set sequence id to 0.
    */
   SatTbtpHeader ();
 
   /**
-   * Constructor for SatTbtpHeader to construct TBTP with given sequency id.
-   * \param seqId sequency id
+   * Constructor for SatTbtpHeader to construct TBTP with given sequence id.
+   * \param seqId sequence id
    */
   SatTbtpHeader ( uint8_t seqId );
 
