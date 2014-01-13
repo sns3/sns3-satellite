@@ -159,7 +159,7 @@ SatFwdLinkScheduler::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime )
+  if ( m_bbFrameContainer->GetTotalDuration() < m_schedulingStartThresholdTime )
     {
         ScheduleBbFrames ();
     }
