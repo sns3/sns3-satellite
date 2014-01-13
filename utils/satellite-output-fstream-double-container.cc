@@ -221,7 +221,7 @@ SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
 
   Gnuplot2dDataset ret;
   ret.SetTitle (m_title);
-  ret.SetStyle (Gnuplot2dDataset::LINES);
+  ret.SetStyle (m_style);
 
   if (!m_container.empty())
     {
@@ -295,7 +295,12 @@ SatOutputFileStreamDoubleContainer::GetGnuplot ()
 }
 
 void
-SatOutputFileStreamDoubleContainer::EnableFigureOutput (std::string title, std::string legendY, std::string legendX, std::string keyPosition, FigureUnitConversion_t figureUnitConversionType)
+SatOutputFileStreamDoubleContainer::EnableFigureOutput (std::string title,
+                                                        std::string legendY,
+                                                        std::string legendX,
+                                                        std::string keyPosition,
+                                                        FigureUnitConversion_t figureUnitConversionType,
+                                                        Gnuplot2dDataset::Style style)
 {
   NS_LOG_FUNCTION (this);
 
@@ -305,6 +310,7 @@ SatOutputFileStreamDoubleContainer::EnableFigureOutput (std::string title, std::
   m_legendX = legendX;
   m_keyPosition = keyPosition;
   m_figureUnitConversionType = figureUnitConversionType;
+  m_style = style;
 }
 
 } // namespace ns3

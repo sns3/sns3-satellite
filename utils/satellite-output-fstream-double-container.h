@@ -90,8 +90,14 @@ public:
    * \param legendX X-axis title
    * \param keyPosition Legend position
    * \param figureUnitConversionType Conversion type for units in the figure
+   * \param style 2D dataset figure style
    */
-  void EnableFigureOutput (std::string title, std::string legendY, std::string legendX, std::string keyPosition, FigureUnitConversion_t figureUnitConversionType);
+  void EnableFigureOutput (std::string title,
+                           std::string legendY,
+                           std::string legendX,
+                           std::string keyPosition,
+                           FigureUnitConversion_t figureUnitConversionType,
+                           Gnuplot2dDataset::Style style);
 
 private:
 
@@ -198,6 +204,11 @@ private:
    * \brief Describes which unit conversion should be used with the figure
    */
   FigureUnitConversion_t m_figureUnitConversionType;
+
+  /**
+   * \brief 2D dataset figure style
+   */
+  Gnuplot2dDataset::Style m_style;
 };
 
 } // namespace ns3

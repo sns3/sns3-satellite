@@ -94,18 +94,27 @@ SatInterferenceOutputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/output/id_" << Singleton<SatIdMapper>::Get ()->GetTraceIdWithMac (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
+  int32_t traceId = Singleton<SatIdMapper>::Get ()->GetTraceIdWithMac (key.first);
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
-
-  if (result.second == false)
+  if (traceId < 0)
     {
-      NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddNode failed");
+      return NULL;
     }
+  else
+    {
+      filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/output/id_" << traceId << "_channelType_" << SatEnums::GetChannelTypeName (key.second) << m_tag;
 
-  NS_LOG_INFO ("SatInterferenceOutputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
+      std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
-  return result.first->second;
+      if (result.second == false)
+        {
+          NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddNode failed");
+        }
+
+      NS_LOG_INFO ("SatInterferenceOutputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
+
+      return result.first->second;
+    }
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
@@ -134,7 +143,12 @@ SatInterferenceOutputTraceContainer::WriteToFile ()
     {
       if (m_enableFigureOutput)
         {
-          iter->second->EnableFigureOutput ("Interference density","Time (s)","Interference (W / Hz)","set key top right",SatOutputFileStreamDoubleContainer::RAW);
+          iter->second->EnableFigureOutput ("Interference density",
+                                            "Time (s)",
+                                            "Interference (W / Hz)",
+                                            "set key top right",
+                                            SatOutputFileStreamDoubleContainer::RAW,
+                                            Gnuplot2dDataset::LINES_POINTS);
         }
       iter->second->WriteContainerToFile ();
     }
@@ -150,7 +164,12 @@ SatInterferenceOutputTraceContainer::AddToContainer (key_t key, std::vector<doub
       NS_FATAL_ERROR ("SatInterferenceOutputTraceContainer::AddToContainer - Incorrect vector size");
     }
 
-  FindNode (key)->AddToContainer (newItem);
+  Ptr<SatOutputFileStreamDoubleContainer> node = FindNode (key);
+
+  if (node != NULL)
+    {
+      node->AddToContainer (newItem);
+    }
 }
 
 } // namespace ns3

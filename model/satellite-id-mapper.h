@@ -86,62 +86,32 @@ public:
   /** ID GETTERS */
 
   /**
-   * \brief Function for getting the trace ID with MAC
+   * \brief Function for getting the trace ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return Trace ID
    */
-  uint32_t GetTraceIdWithMac (Address mac);
+  int32_t GetTraceIdWithMac (Address mac);
 
   /**
-   * \brief Function for getting the UT ID with MAC
+   * \brief Function for getting the UT ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return UT ID
    */
-  uint32_t GetUtIdWithMac (Address mac);
+  int32_t GetUtIdWithMac (Address mac);
 
   /**
-   * \brief Function for getting the beam ID with MAC
+   * \brief Function for getting the beam ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return beam ID
    */
-  uint32_t GetBeamIdWithMac (Address mac);
+  int32_t GetBeamIdWithMac (Address mac);
 
   /**
-   * \brief Function for getting the GW ID with MAC
+   * \brief Function for getting the GW ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return GW ID
    */
-  uint32_t GetGwIdWithMac (Address mac);
-
-  /** MAC GETTERS */
-
-  /**
-   * \brief Function for getting the MAC with trace ID
-   * \param traceId Trace ID
-   * \return MAC address
-   */
-  Address GetMacWithTraceId (uint32_t traceId);
-
-  /**
-   * \brief Function for getting the MAC with UT ID
-   * \param utId UT ID
-   * \return MAC address
-   */
-  Address GetMacWithUtId (uint32_t utId);
-
-  /**
-   * \brief Function for getting the MAC with beam ID
-   * \param beamId beam ID
-   * \return MAC address
-   */
-  Address GetMacWithBeamId (uint32_t beamId);
-
-  /**
-   * \brief Function for getting the MAC with GW ID
-   * \param gwId GW ID
-   * \return MAC address
-   */
-  Address GetMacWithGwId (uint32_t gwId);
+  int32_t GetGwIdWithMac (Address mac);
 
   /**
    * \brief Function for printing out the trace map
@@ -184,11 +154,6 @@ private:
    * \brief Map for MAC to trace ID conversion
    */
   std::map <Address, uint32_t> m_macToTraceIdMap;
-
-  /**
-   * \brief Map for trace ID to MAC conversion
-   */
-  std::map <uint32_t, Address> m_traceIdToMacMap;
 
   /**
    * \brief Map for MAC to UT ID conversion

@@ -76,11 +76,6 @@ SatIdMapper::Reset ()
     {
       m_macToTraceIdMap.clear ();
     }
-
-  if (!m_traceIdToMacMap.empty ())
-    {
-      m_traceIdToMacMap.clear ();
-    }
   m_traceIdIndex = 1;
 
   // UT ID maps
@@ -118,13 +113,6 @@ SatIdMapper::AttachMacToTraceId (Address mac)
   if (resultMacToTraceId.second == false)
     {
       NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToTraceId - MAC to Trace ID failed");
-    }
-
-  std::pair < std::map<uint32_t, Address>::iterator, bool> resultTraceIdToMac = m_traceIdToMacMap.insert (std::make_pair (m_traceIdIndex, mac));
-
-  if (resultTraceIdToMac.second == false)
-    {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToTraceId - Trace ID to MAC failed");
     }
 
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToTraceId - Added MAC " << mac << " with Trace ID " << m_traceIdIndex);
@@ -179,26 +167,9 @@ SatIdMapper::AttachMacToGwId (Address mac, uint32_t gwId)
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToGwId - Added MAC " << mac << " with GW ID " << gwId);
 }
 
-// MAC GETTERS
-
-Address
-SatIdMapper::GetMacWithTraceId (uint32_t traceId)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::map<uint32_t, Address>::iterator iter = m_traceIdToMacMap.find (traceId);
-
-  if (iter == m_traceIdToMacMap.end ())
-    {
-      NS_FATAL_ERROR ("GetMacWithTraceId::GetMacWithTraceIdv - Trace ID " << traceId << " not found");
-    }
-
-  return iter->second;
-}
-
 // ID GETTERS
 
-uint32_t
+int32_t
 SatIdMapper::GetTraceIdWithMac (Address mac)
 {
   NS_LOG_FUNCTION (this);
@@ -207,13 +178,13 @@ SatIdMapper::GetTraceIdWithMac (Address mac)
 
   if (iter == m_macToTraceIdMap.end ())
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::GetTraceIdWithMac - MAC " << mac << " not found");
+      return -1;
     }
 
   return iter->second;
 }
 
-uint32_t
+int32_t
 SatIdMapper::GetUtIdWithMac (Address mac)
 {
   NS_LOG_FUNCTION (this);
@@ -222,13 +193,13 @@ SatIdMapper::GetUtIdWithMac (Address mac)
 
   if (iter == m_macToUtIdMap.end ())
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::GetUtIdWithMac - MAC " << mac << " not found");
+      return -1;
     }
 
   return iter->second;
 }
 
-uint32_t
+int32_t
 SatIdMapper::GetBeamIdWithMac (Address mac)
 {
   NS_LOG_FUNCTION (this);
@@ -237,13 +208,13 @@ SatIdMapper::GetBeamIdWithMac (Address mac)
 
   if (iter == m_macToBeamIdMap.end ())
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::GetBeamIdWithMac - MAC " << mac << " not found");
+      return -1;
     }
 
   return iter->second;
 }
 
-uint32_t
+int32_t
 SatIdMapper::GetGwIdWithMac (Address mac)
 {
   NS_LOG_FUNCTION (this);
@@ -252,7 +223,7 @@ SatIdMapper::GetGwIdWithMac (Address mac)
 
   if (iter == m_macToGwIdMap.end ())
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::GetGwIdWithMac - MAC " << mac << " not found");
+      return -1;
     }
 
   return iter->second;

@@ -86,7 +86,14 @@ SatRxPowerInputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/rxpowertraces/input/id_" << Singleton<SatIdMapper>::Get ()->GetTraceIdWithMac (key.first) << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+  int32_t traceId = Singleton<SatIdMapper>::Get ()->GetTraceIdWithMac (key.first);
+
+  if (traceId < 0)
+    {
+      NS_FATAL_ERROR ("SatRxPowerInputTraceContainer::AddNode - No such MAC address in the trace ID mapper");
+    }
+
+  filename << m_currentWorkingDirectory << "/src/satellite/data/rxpowertraces/input/id_" << traceId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
 
   std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

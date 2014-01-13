@@ -441,7 +441,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 double
 SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
-  uint32_t nodeId;
+  int32_t nodeId;
 
   switch (m_channelType)
   {
@@ -472,7 +472,12 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
       }
   }
 
-  return (Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace (nodeId, m_channelType))->GetFading ();
+  if (nodeId < 0)
+    {
+      NS_FATAL_ERROR ("SatChannel::GetExternalFadingTrace - Invalid node ID");
+    }
+
+  return (Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace ((uint32_t)nodeId, m_channelType))->GetFading ();
 }
 
 /// TODO get rid of source MAC address peeking
