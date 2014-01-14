@@ -38,7 +38,7 @@ class SatControlMsgTag : public Tag
 {
 public:
 
-  /*
+  /**
    * \brief Definition for different types of control messages
    */
   typedef enum
@@ -49,17 +49,17 @@ public:
       SAT_RA_CTRL_MSG
     }SatControlMsgType_t;
 
-  /*
+  /**
    * Constructor for SatControlMsgTag
    */
   SatControlMsgTag ();
 
-  /*
+  /**
    * Destructor for SatControlMsgTag
    */
   ~SatControlMsgTag ();
 
-  /*
+  /**
    * Set type of the contol message. In construction phase initialized
    * to value SAT_UNKNOWN_CTRL_MSG.
    *
@@ -67,7 +67,7 @@ public:
    */
   void SetMsgType (SatControlMsgType_t type);
 
-  /*
+  /**
    * Get type of the contol message.
    *
    * \return The type of the control message
@@ -98,8 +98,8 @@ class SatCapacityReqHeader : public Header
 {
 public:
 
-  /*
-   * \brief Definition for different types of Capacity Reqeuest (CR) messages.
+  /**
+   * \brief Definition for different types of Capacity Request (CR) messages.
    */
   typedef enum
   {
@@ -118,14 +118,14 @@ public:
    */
   ~SatCapacityReqHeader ();
 
-  /*
+  /**
    * Get type of the CR message.
    *
    * \return The type of the CR message
    */
   SatCrRequestType_t GetReqType () const;
 
-  /*
+  /**
    * Set type of the CR message. In construction phase initialized
    * to value SAT_UNKNOWN_CR.
    *
@@ -133,19 +133,33 @@ public:
    */
   void SetReqType (SatCrRequestType_t type);
 
-  /*
-   * GSet rate of the CR.
+  /**
+   * Get rate of the CR.
    *
    * \return Rate of the CR
    */
-  uint32_t GetRequestedRate () const;
+  double GetRequestedRate () const;
 
-  /*
+  /**
    * Set rate of the CR.
    *
    * \param rate The rate of the CR.
    */
-  void SetRequestedRate (uint32_t rate);
+  void SetRequestedRate (double rate);
+
+  /**
+   * Get C/N0 estimate.
+   *
+   * \return Estimate of the C/N0.
+   */
+  double GetCnoEstimate () const;
+
+  /**
+   * Set C/N0 estimate.
+   *
+   * \param cno The estimate of the C/N0.
+   */
+  void SetCnoEstimate (double cno);
 
   // methods derived from base classes
   static TypeId GetTypeId (void);
@@ -164,7 +178,12 @@ private:
   /**
    * Requested rate.
    */
-  uint32_t m_requestedRate;
+  double m_requestedRate;
+
+  /**
+   * C/N0 estimate.
+   */
+  double m_cno;
 };
 
 /**

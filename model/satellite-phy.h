@@ -60,10 +60,11 @@ public:
 
   /**
    * \param The id of the beam.
-   * \param The id (address) of the source
+   * \param The id (address) of the source or sender
+   * \param The id (address) of the destination or receiver
    * \param C/N0 value
    */
-  typedef Callback<void, uint32_t, Address, double> CnoCallback;
+  typedef Callback<void, uint32_t, Address, Address, double> CnoCallback;
 
   /**
    * \brief Creation parameters for base PHY object
@@ -320,7 +321,7 @@ public:
    * \param source Id (address) of the source (sender)
    * \param cno Value of the C/N0
    */
-  void CnoInfo (uint32_t beamId, Address source, double cno);
+  void CnoInfo (uint32_t beamId, Address source, Address destination, double cno);
 
   /**
    * Set the node info

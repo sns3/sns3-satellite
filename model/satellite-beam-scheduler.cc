@@ -121,7 +121,7 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
   std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
   NS_ASSERT (result != m_uts.end());
 
-  // TODO: Container for C/N0 values needed, now we just save latest value.
+  // TODO: Container for C/N0 values needed, now we just save the latest value.
   m_uts[utId].m_cno = cno;
 }
 
@@ -130,7 +130,7 @@ SatBeamScheduler::EstimateUtCno (Address utId)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  // TODO: Estimation logic needed to implement. Now we just return the latest value calculated by UT.
+  // TODO: Estimation logic needed to implement. Now we just return the latest value calculated by lower layer (Phy).
   return m_uts[utId].m_cno;
 }
 

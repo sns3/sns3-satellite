@@ -78,11 +78,48 @@ public:
    */
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
+  /**
+     * \param packet     the packet send
+     * \param address    Packet destination address
+     * \param protocol   protocol number to send packet.
+     */
+    typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
+
+  /**
+   * \param cb callback to send control messages.
+   *
+   */
+  void SetTxCallback (SatUtMac::SendCallback cb);
+
+  /**
+   * Update C/N0 information from lower layer.
+   *
+   * The SatUtMac receives C/N0 information of packet receptions from GW
+   * to update this information to serving GW periodically.
+   *
+   * \param beamId  The id of the beam where C/N0 is from.
+   * \param gwId  The id of the GW.
+   * \param utId  The id (address) of the UT.
+   * \param cno Value of the C/N0.
+   */
+  void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
+
+  /**
+   * Set address of the GW (or its MAC) serving this UT.
+   *
+   * \param gwAddress Address of the GW.
+   */
+  void SetGwAddress (Mac48Address gwAddress);
+
 protected:
 
    void DoDispose (void);
 
 private:
+   /**
+    * Send capacity request update to GW.
+    */
+   void SendCapacityReq ();
 
    /**
     *  Schedules time slots according to received TBTP message.
@@ -132,9 +169,29 @@ private:
   TimingAdvanceCallback m_timingAdvanceCb;
 
   /**
+   * Callback to send control messages.
+  */
+  SendCallback m_txCallback;
+
+  /**
    * The configured Constant Rate Assignment (CRA) for this UT Mac.
    */
   double m_cra;
+
+  /**
+   * The last received C/N0 information from lower layer.
+   */
+  double m_lastCno;
+
+  /**
+   * Serving GW's address.
+   */
+  Mac48Address m_gwAddress;
+
+  /**
+   * Interval to send capacity requests.
+   */
+  Time m_crInterval;
 };
 
 } // namespace ns3

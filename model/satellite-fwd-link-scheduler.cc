@@ -137,6 +137,7 @@ SatFwdLinkScheduler::DoDispose ()
   m_txOpportunityCallback.Nullify();
   m_dummyFrame = NULL;
   m_bbFrameContainer = NULL;
+  m_cnoInfo.clear ();
 }
 
 void
@@ -172,6 +173,26 @@ SatFwdLinkScheduler::GetNextFrame ()
     }
 
   return frame;
+}
+
+void
+SatFwdLinkScheduler::CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate)
+{
+  NS_LOG_FUNCTION (this << utAddress << cnoEstimate);
+
+  /*
+   * If value is not valid then remove possible previous value from list with UT address.
+   * In valid case override previous value.
+   *
+  */
+  if (isnan (cnoEstimate))
+    {
+      m_cnoInfo.erase (utAddress);
+    }
+  else
+    {
+      m_cnoInfo[utAddress] = cnoEstimate;
+    }
 }
 
 void

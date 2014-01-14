@@ -350,7 +350,7 @@ SatPhyRxCarrier::EndRxData ()
   if (!m_cnoCallback.IsNull ())
     {
       double cno = cSinr * m_rxBandwidthHz;
-      m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, cno);
+      m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, m_ownAddress, cno);
     }
 }
 

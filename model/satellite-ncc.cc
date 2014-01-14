@@ -72,7 +72,7 @@ SatNcc::Receive (Ptr<Packet> packet, uint32_t beamId)
 }
 
 void
-SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, double cno)
+SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cno)
 {
   NS_LOG_FUNCTION (this << beamId << utId << cno);
 
@@ -85,19 +85,30 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
   NS_LOG_FUNCTION (this << &cb);
 
   Ptr<SatBeamScheduler> scheduler;
-  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find(beamId);
-  NS_ASSERT(iterator == m_beamSchedulers.end());
+  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
 
-  scheduler = CreateObject<SatBeamScheduler>();
-  scheduler->Initialize(beamId, cb, seq);
+  if ( iterator != m_beamSchedulers.end () )
+    {
+      NS_FATAL_ERROR ( "Beam tried to add, already added." );
+    }
 
-  m_beamSchedulers.insert(std::make_pair(beamId, scheduler));
+  scheduler = CreateObject<SatBeamScheduler> ();
+  scheduler->Initialize (beamId, cb, seq);
+
+  m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }
 
 void
 SatNcc::AddUt (Address utId, double cra, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
+
+  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
+
+  if ( iterator == m_beamSchedulers.end () )
+    {
+      NS_FATAL_ERROR ( "Beam where tried to add, not found." );
+    }
 
   m_beamSchedulers[beamId]->AddUt (utId, cra);
 }

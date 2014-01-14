@@ -323,10 +323,10 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
 }
 
 void
-SatPhy::CnoInfo (uint32_t beamId, Address source, double cno)
+SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno)
 {
   NS_LOG_FUNCTION (this << beamId << source << cno);
-  m_cnoCallback ( beamId, source, cno);
+  m_cnoCallback ( beamId, source, dest, cno);
 }
 
 

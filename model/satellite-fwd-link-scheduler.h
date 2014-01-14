@@ -138,6 +138,14 @@ public:
    */
   void SetTxOpportunityCallback (SatFwdLinkScheduler::TxOpportunityCallback cb);
 
+  /**
+   * Called when UT's C/N0 estimation is updated.
+   *
+   * \param utAddress Address of the UT updated C/N0 info.
+   * \param cnoEstimate Value of the estimated C/N0.
+   */
+  void CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate);
+
 private:
 
   SatFwdLinkScheduler& operator = (const SatFwdLinkScheduler &);
@@ -250,9 +258,15 @@ private:
   SatFwdLinkScheduler::TxOpportunityCallback m_txOpportunityCallback;
 
   /**
-   * The lower layer packet transmit callback.
+   * The scheduling context getter callback.
    */
   SatFwdLinkScheduler::SchedContextCallback m_schedContextCallback;
+
+  /**
+   * C/N0 estimation per UT.
+   */
+  std::map<Address, double> m_cnoInfo;
+
  };
 
 } // namespace ns3

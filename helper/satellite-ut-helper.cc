@@ -220,13 +220,23 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Set timing advance callback to mac.
   Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
   NS_ASSERT (observer != NULL);
+
   SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
   mac->SetTimingAdvanceCallback (timingCb);
 
-  // Attach the Mac layer receiver to Phy
-  SatPhy::ReceiveCallback cb = MakeCallback (&SatUtMac::Receive, mac);
+  SatUtMac::SendCallback txCb = MakeCallback (&SatNetDevice::Send, dev);
+  mac->SetTxCallback (txCb);
 
-  phy->SetAttribute ("ReceiveCb", CallbackValue (cb));
+  // Attach the Mac layer C/N0 updates receiver to Phy
+  SatPhy::CnoCallback cnoCb = MakeCallback (&SatUtMac::CnoUpdated, mac);
+
+  // Attach the Mac layer receiver to Phy
+  SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
+
+  // Attach the NCC C/N0 update to Phy
+
+  phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
+  phy->SetAttribute ("ReceiveCb", CallbackValue(recCb));
 
   // Create Logical Link Control (LLC) layer
   Ptr<SatLlc> llc = CreateObject<SatLlc> ();
@@ -263,6 +273,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   gwLlc->AddEncap (addr, gwEncap); // Tx
   gwLlc->AddDecap (addr, gwDecap); // Rx
   gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, gwLlc));
+
+  // set serving GW MAC address to UT MAC
+  mac->SetGwAddress (gwAddr);
 
   // Create and set control packet queue to LLC
   Ptr<Queue> queue = m_queueFactory.Create<Queue> ();

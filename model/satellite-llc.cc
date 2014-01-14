@@ -145,31 +145,29 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest)
 
   m_llcTxTrace (packet);
 
+  SatControlMsgTag cTag;
+  bool cSuccess = packet->PeekPacketTag (cTag);
+
   // Control PDUs use separate queue, since they do not need
   // encapsulation, fragmentation nor packing.
-  if ( Mac48Address::ConvertFrom (dest).IsBroadcast () )
+  if (cSuccess && cTag.GetMsgType() != SatControlMsgTag::SAT_NON_CTRL_MSG)
+     {
+        // Store packet arrival time
+        SatTimeTag timeTag (Simulator::Now ());
+        packet->AddPacketTag (timeTag);
+
+        // Add MAC tag
+        SatMacTag mTag;
+        mTag.SetDestAddress (dest);
+        mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
+        packet->AddPacketTag (mTag);
+
+        // Enque the control packet
+        m_controlQueue->Enqueue (packet);
+     }
+  else if (cSuccess)
     {
-      SatControlMsgTag cTag;
-      bool cSuccess = packet->PeekPacketTag (cTag);
-      if (cSuccess && cTag.GetMsgType() != SatControlMsgTag::SAT_NON_CTRL_MSG)
-        {
-          // Store packet arrival time
-          SatTimeTag timeTag (Simulator::Now ());
-          packet->AddPacketTag (timeTag);
-
-          // Add MAC tag
-          SatMacTag mTag;
-          mTag.SetDestAddress (dest);
-          mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
-          packet->AddPacketTag (mTag);
-
-          // Enque the control packet
-          m_controlQueue->Enqueue (packet);
-        }
-      else
-        {
-          NS_FATAL_ERROR ("LLC does not support any other broadcast messages than control messages!");
-        }
+      NS_FATAL_ERROR ("LLC does not support any other broadcast messages than control messages!");
     }
   else
     {
@@ -212,7 +210,7 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
   Ptr<Packet> packet;
 
   // Prioritize control packets
-  if (m_controlQueue->GetNPackets() && macAddr.IsBroadcast ())
+  if (m_controlQueue->GetNPackets() )
     {
       /**
        * TODO: The TxOpportunity for control packets may be handled in a

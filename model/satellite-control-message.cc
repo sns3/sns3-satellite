@@ -117,9 +117,10 @@ SatTbtpHeader::TbtpTimeSlotInfo::TbtpTimeSlotInfo (uint8_t frameId, uint16_t tim
 {
   NS_LOG_FUNCTION (this);
 
-  //TODO: maximum Time Slot id should taken into account when creating confs
-  // now check commented
-  //NS_ASSERT (timeSlotId <= maximumTimeSlotId);
+  if (timeSlotId > maximumTimeSlotId)
+    {
+      NS_FATAL_ERROR ("Timeslot ID is out or range!!!");
+    }
 
   m_timeSlotId = timeSlotId;
 }
@@ -277,6 +278,22 @@ SatTbtpHeader::Deserialize (Buffer::Iterator start)
 
 NS_OBJECT_ENSURE_REGISTERED (SatCapacityReqHeader);
 
+TypeId
+SatCapacityReqHeader::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatCapacityReqHeader")
+    .SetParent<Tag> ()
+    .AddConstructor<SatCapacityReqHeader> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatCapacityReqHeader::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
 SatCapacityReqHeader::SatCapacityReqHeader ()
 {
   NS_LOG_FUNCTION (this);
@@ -294,27 +311,39 @@ SatCapacityReqHeader::SetReqType (SatCrRequestType_t type)
   m_reqType = type;
 }
 
+double
+SatCapacityReqHeader::GetRequestedRate (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_requestedRate;
+}
+
+void
+SatCapacityReqHeader::SetRequestedRate (double rate)
+{
+  NS_LOG_FUNCTION (this << rate);
+  m_requestedRate = rate;
+}
+
+double
+SatCapacityReqHeader::GetCnoEstimate (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_cno;
+}
+
+void
+SatCapacityReqHeader::SetCnoEstimate (double cno)
+{
+  NS_LOG_FUNCTION (this << cno);
+  m_cno = cno;
+}
+
 SatCapacityReqHeader::SatCrRequestType_t
 SatCapacityReqHeader::GetReqType (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_reqType;
-}
-
-TypeId
-SatCapacityReqHeader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatCapacityReqHeader")
-    .SetParent<Tag> ()
-    .AddConstructor<SatCapacityReqHeader> ()
-  ;
-  return tid;
-}
-
-TypeId
-SatCapacityReqHeader::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
 }
 
 void SatCapacityReqHeader::Print (std::ostream &os)  const
@@ -324,17 +353,21 @@ void SatCapacityReqHeader::Print (std::ostream &os)  const
 
 uint32_t SatCapacityReqHeader::GetSerializedSize (void) const
 {
- return ( sizeof(uint32_t) );
+ return ( sizeof (m_reqType) + sizeof (m_requestedRate) + sizeof (m_cno) );
 }
 
 void SatCapacityReqHeader::Serialize (Buffer::Iterator start) const
 {
   start.WriteU32 (m_reqType);
+  start.Write ((uint8_t const*) &m_requestedRate, sizeof (m_requestedRate));
+  start.Write ((uint8_t const*) &m_cno, sizeof (m_cno));
 }
 
 uint32_t SatCapacityReqHeader::Deserialize (Buffer::Iterator start)
 {
   m_reqType = (SatCrRequestType_t) start.ReadU32();
+  start.Read ((uint8_t *) &m_requestedRate, sizeof (m_requestedRate));
+  start.Read ((uint8_t *) &m_cno, sizeof (m_cno));
 
   return GetSerializedSize();
 }

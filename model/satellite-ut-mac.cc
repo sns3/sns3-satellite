@@ -31,6 +31,7 @@
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
+#include "ns3/ipv4-l3-protocol.h"
 #include "satellite-ut-mac.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
@@ -58,6 +59,11 @@ SatUtMac::GetTypeId (void)
                    DoubleValue (128),
                    MakeDoubleAccessor (&SatUtMac::m_cra),
                    MakeDoubleChecker<double> (0.0))
+    .AddAttribute ("CrUpdatePeriod",
+                   "Capacity request update period.",
+                   TimeValue (MilliSeconds (50)),
+                   MakeTimeAccessor (&SatUtMac::m_crInterval),
+                   MakeTimeChecker())
   ;
 
   return tid;
@@ -80,9 +86,12 @@ SatUtMac::SatUtMac ()
 }
 
 SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq)
- : m_superframeSeq (seq)
+ : m_superframeSeq (seq),
+   m_lastCno (NAN)
 {
 	NS_LOG_FUNCTION (this);
+
+	Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
 }
 
 SatUtMac::~SatUtMac ()
@@ -97,6 +106,12 @@ SatUtMac::DoDispose (void)
   SatMac::DoDispose ();
 }
 
+void SatUtMac::SetGwAddress (Mac48Address gwAddress)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_gwAddress = gwAddress;
+}
 
 void
 SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
@@ -104,6 +119,14 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_timingAdvanceCb = cb;
+}
+
+void
+SatUtMac::SetTxCallback (SatUtMac::SendCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_txCallback = cb;
 }
 
 void
@@ -192,6 +215,42 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
     }
 }
 
+void
+SatUtMac::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId*/, double cno)
+{
+  NS_LOG_FUNCTION (this << beamId << cno);
+
+  // TODO: Some estimation algorithm needed to use, now we just save the latest received C/N0 info.
+  m_lastCno = cno;
+}
+
+void
+SatUtMac::SendCapacityReq ()
+{
+
+  if ( m_txCallback.IsNull() == false )
+    {
+      Ptr<Packet> packet = Create<Packet> ();
+
+      // add tag to message
+      SatControlMsgTag tag;
+      tag.SetMsgType (SatControlMsgTag::SAT_CR_CTRL_MSG);
+      packet->AddPacketTag (tag);
+
+      // add TBTP specific header to message
+      SatCapacityReqHeader header;
+      header.SetReqType (SatCapacityReqHeader::SAT_RBDC_CR);
+
+      // TODO: estimated value of C/N0 must be used instead of last received value
+      header.SetCnoEstimate (m_lastCno);
+
+      packet->AddHeader (header);
+
+      m_txCallback (packet, m_gwAddress, Ipv4L3Protocol::PROT_NUMBER);
+
+      Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
+    }
+}
 
 void
 SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)

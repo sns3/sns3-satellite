@@ -143,9 +143,10 @@ public:
   /**
    * \param beam Id
    * \param Id (address) of the source (sender)
+   * \param Id (address) of the destination (receiver)
    * \param C/N0 value
    */
-  typedef Callback<void, uint32_t, Address, double > CnoCallback;
+  typedef Callback<void, uint32_t, Address, Address, double > CnoCallback;
 
   /**
    * Set the upper layer receive callback

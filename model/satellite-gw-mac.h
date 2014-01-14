@@ -36,6 +36,7 @@
 #include "satellite-mac.h"
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-control-message.h"
 #include "satellite-phy.h"
 #include "satellite-fwd-link-scheduler.h"
 
@@ -98,6 +99,15 @@ private:
    * \returns true if success, false on failure
    */
   void TransmitTime (uint32_t carrierId);
+
+  /**
+   * Signaling packet receiver, which handles all the signaling packet
+   * receptions.
+   * \param sourceAddress Address of the packet sender.
+   * \param packet Received signaling packet
+   * \param cType Control message type
+   */
+  void ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType);
 
   /**
    * Scheduler for the forward link.

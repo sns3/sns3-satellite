@@ -127,10 +127,36 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
       // If the packet is intended for this receiver
       Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
-          // Pass the source address to LLC
-          m_rxCallback (*i, Mac48Address::ConvertFrom (macTag.GetSourceAddress ()));
+          // Remove control msg tag
+          SatControlMsgTag ctrlTag;
+          bool cSuccess = (*i)->RemovePacketTag (ctrlTag);
+
+          if (cSuccess)
+            {
+              SatControlMsgTag::SatControlMsgType_t cType = ctrlTag.GetMsgType ();
+
+              if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
+                {
+                  // Remove the ctrl tag
+                  (*i)->RemovePacketTag (ctrlTag);
+
+                  Mac48Address sourceAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
+
+                  ReceiveSignalingPacket (sourceAddress, *i, cType);
+                }
+              else
+                {
+                  NS_FATAL_ERROR ("A control message received with not valid msg type!");
+                }
+            }
+          else
+            {
+              // Pass the source address to LLC
+              m_rxCallback (*i, Mac48Address::ConvertFrom (macTag.GetSourceAddress ()));
+            }
         }
       else
         {
@@ -173,6 +199,34 @@ SatGwMac::TransmitTime (uint32_t carrierId)
     }
 
   Simulator::Schedule (txDuration, &SatGwMac::TransmitTime, this, 0);
+}
+
+void
+SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType)
+{
+  switch (cType)
+  {
+    case SatControlMsgTag::SAT_CR_CTRL_MSG:
+      {
+        SatCapacityReqHeader cr;
+        if ( packet->RemoveHeader (cr) > 0 )
+          {
+            m_scheduler->CnoInfoUpdated (sourceAddress, cr.GetCnoEstimate());
+          }
+        break;
+      }
+    case SatControlMsgTag::SAT_RA_CTRL_MSG:
+    case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
+      {
+        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        break;
+      }
+  }
 }
 
 } // namespace ns3
