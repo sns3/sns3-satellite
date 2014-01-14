@@ -18,6 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include <math.h>
+
 #include "ns3/log.h"
 #include "ns3/object.h"
 #include "ns3/simulator.h"
@@ -112,6 +114,12 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_sinrCalculate = carrierConf->GetSinrCalculatorCb ();
 
   m_constantErrorRate = carrierConf->GetConstantErrorRate ();
+
+  /**
+   * Uniform random variable used for checking whether a packet
+   * was received successfully or not
+   */
+  m_uniformVariable = CreateObject<UniformRandomVariable> ();
 }
 
 
@@ -382,7 +390,7 @@ SatPhyRxCarrier::DoCompositeSinrOutputTrace (double cSinr)
 bool
 SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
 {
-  /// Init with no error
+  /// Initialize with no errors
   bool error = false;
 
   switch (m_errorModel)
@@ -391,21 +399,16 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
       {
         switch (m_channelType)
           {
-          case SatEnums::FORWARD_FEEDER_CH:
           case SatEnums::FORWARD_USER_CH:
             {
-              /// TODO check this! (cSinr -> esN0)
-
               /**
-               * Es/No = C/N * B/fs, where
-               * C/N is the composite SINR
-               * B is the channel bandwidth
-               * fs is the symbol rate
+               * In forward link the link results are in Es/No format, thus here we need
+               * to convert the SINR into Es/No:
+               * Es/No = (C*Ts)/No = C/No * (1/fs) = C/N
               */
-              double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (m_rxParams->m_modCod,SatUtils::LinearToDb (cSinr));
 
-              /// TODO make proper version without rand
-              double r = ((double) rand () / (RAND_MAX));
+              double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (m_rxParams->m_modCod,SatUtils::LinearToDb (cSinr));
+              double r = m_uniformVariable->GetValue (0, 1);
 
               if ( r < ber )
                 {
@@ -413,7 +416,6 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
                 }
 
               NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
-                        << " Rx bandwidth (Hz): " << m_rxBandwidthHz
                         << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
                         << " rand: " << r
                         << " ber: " << ber
@@ -421,32 +423,16 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
               break;
             }
           case SatEnums::RETURN_FEEDER_CH:
-          case SatEnums::RETURN_USER_CH:
             {
-              uint32_t bytes = 0;
-
-              for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = m_rxParams->m_packetBuffer.begin ();
-                    i != m_rxParams->m_packetBuffer.end (); i++)
-                {
-                  bytes += (*i)->GetSize ();
-                }
-
-              double duration = Now ().GetSeconds () - m_startRxTime.GetSeconds ();
-              double bitrate = (bytes * m_bitsToContainByte) / duration;
-
-              /// TODO check this!
-
               /**
-               * Eb/No = C/N * B/fb, where
-               * C/N is the composite SINR
-               * B is the channel bandwidth
-               * fb is net bitrate (bitrate without PHY overhead)
+               * In return link the link results are in Eb/No format, thus here we need
+               * to convert the SINR into Eb/No:
+               * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
               */
-              double ebNo = cSinr * (m_rxBandwidthHz / bitrate);
-              double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (m_rxParams->m_waveformId,SatUtils::LinearToDb (ebNo));
 
-              /// TODO make proper version without rand
-              double r = ((double) rand () / (RAND_MAX));
+              double ebNo = cSinr * (1/log2(SatUtils::GetModulatedBits (m_rxParams->m_modCod)));
+              double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (m_rxParams->m_waveformId,SatUtils::LinearToDb (ebNo));
+              double r = m_uniformVariable->GetValue (0, 1);
 
               if ( r < ber )
                 {
@@ -454,16 +440,14 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
                 }
 
               NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
-                        << " Rx bandwidth (Hz): " << m_rxBandwidthHz
-                        << " bytes: " << bytes
-                        << " duration (s): " << duration
-                        << " bitrate (bps): " << bitrate
                         << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
                         << " rand: " << r
                         << " ber: " << ber
                         << " error: " << error);
               break;
             }
+          case SatEnums::FORWARD_FEEDER_CH:
+          case SatEnums::RETURN_USER_CH:
           case SatEnums::UNKNOWN_CH:
           default :
             {
@@ -475,9 +459,7 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr)
       }
     case SatPhyRxCarrierConf::EM_CONSTANT:
       {
-        /// TODO make proper version without rand
-        double r = ((double) rand () / (RAND_MAX));
-
+        double r = m_uniformVariable->GetValue (0, 1);
         if (r <  m_constantErrorRate)
           {
             error = true;

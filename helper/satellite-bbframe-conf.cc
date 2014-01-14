@@ -28,6 +28,8 @@
 #include "ns3/ptr.h"
 #include "ns3/double.h"
 #include "ns3/uinteger.h"
+#include "ns3/boolean.h"
+#include "ns3/enum.h"
 #include "ns3/satellite-enums.h"
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-utils.h"
@@ -105,11 +107,11 @@ SatDvbS2Waveform::SetCNoRequirement (double cnoRequirement)
 void
 SatDvbS2Waveform::Dump () const
 {
-  std::cout << "Modcod: " << SatEnums::GetModcodTypeName (m_modcod) <<
-      ", frameType: " << m_frameType <<
-      ", payloadBits: " << m_payloadBits <<
-      ", frameLength: " << m_frameLength <<
-      ", cnoRequirement: " << m_cnoRequirement << std::endl;
+  std::cout << "Modcod, " << SatEnums::GetModcodTypeName (m_modcod) <<
+      ", frameType, " << m_frameType <<
+      ", payloadBits, " << m_payloadBits <<
+      ", frameLength, " << m_frameLength <<
+      ", cnoRequirement, " << m_cnoRequirement << std::endl;
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatBbFrameConf);
@@ -199,6 +201,37 @@ SatBbFrameConf::GetTypeId (void)
                    DoubleValue (0.00001),
                    MakeDoubleAccessor(&SatBbFrameConf::m_perTarget),
                    MakeDoubleChecker<double>())
+    .AddAttribute( "AcmEnabled",
+                   "Enable ACM",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatBbFrameConf::m_acmEnabled),
+                   MakeBooleanChecker ())
+    .AddAttribute( "DefaultModCod",
+                   "Default MODCOD",
+                   EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+                   MakeEnumAccessor (&SatBbFrameConf::m_defaultModCod),
+                   MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_2,  "QPSK_1_TO_2",
+                                    SatEnums::SAT_MODCOD_QPSK_2_TO_3, "QPSK_2_TO_3",
+                                    SatEnums::SAT_MODCOD_QPSK_3_TO_4, "QPSK_3_TO_4",
+                                    SatEnums::SAT_MODCOD_QPSK_3_TO_5, "QPSK_3_TO_5",
+                                    SatEnums::SAT_MODCOD_QPSK_4_TO_5, "QPSK_4_TO_5",
+                                    SatEnums::SAT_MODCOD_QPSK_5_TO_6, "QPSK_5_TO_6",
+                                    SatEnums::SAT_MODCOD_QPSK_8_TO_9, "QPSK_8_TO_9",
+                                    SatEnums::SAT_MODCOD_QPSK_9_TO_10, "QPSK_9_TO_10",
+                                    SatEnums::SAT_MODCOD_8PSK_2_TO_3, "8PSK_2_TO_3",
+                                    SatEnums::SAT_MODCOD_8PSK_3_TO_4, "8PSK_3_TO_4",
+                                    SatEnums::SAT_MODCOD_8PSK_3_TO_5, "8PSK_3_TO_5",
+                                    SatEnums::SAT_MODCOD_8PSK_5_TO_6, "8PSK_5_TO_6",
+                                    SatEnums::SAT_MODCOD_8PSK_8_TO_9, "8PSK_8_TO_9",
+                                    SatEnums::SAT_MODCOD_8PSK_9_TO_10, "8PSK_9_TO_10",
+                                    SatEnums::SAT_MODCOD_16APSK_2_TO_3, "16APSK_2_TO_3",
+                                    SatEnums::SAT_MODCOD_16APSK_3_TO_4, "16APSK_3_TO_4",
+                                    SatEnums::SAT_MODCOD_16APSK_4_TO_5, "16APSK_4_TO_5",
+                                    SatEnums::SAT_MODCOD_16APSK_5_TO_6, "16APSK_5_TO_6",
+                                    SatEnums::SAT_MODCOD_16APSK_8_TO_9, "16APSK_8_TO_9",
+                                    SatEnums::SAT_MODCOD_16APSK_9_TO_10, "16APSK_9_TO_10",
+                                    SatEnums::SAT_MODCOD_32APSK_3_TO_4, "32APSK_3_TO_4",
+                                    SatEnums::SAT_MODCOD_32APSK_4_TO_5, "32APSK_4_TO_5"))
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;
@@ -224,12 +257,18 @@ SatBbFrameConf::InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults 
       it != m_waveforms.end ();
       ++it)
     {
-      // Get the Es/No requirement for a certain PER target
+      /**
+       * TODO, We have link results for only normal BB frames! The link results for short
+       * BB frames should be added and the interface changed to be able to GetEsNoDb for
+       * both frame types.
+       */
       double esnoRequirementDb = linkResults->GetEsNoDb (it->second->GetModcod(), m_perTarget);
 
-      // Convert the Es/No to C/No. Note, that here we assume that
-      // symbol rate is constant during the simulation.
-      // TODO: Check: the EsNo to C/No conversion!
+      /**
+       * In forward link the link results are in Es/No format, thus here we need
+       * to convert the Es/No into C/No:
+       * Es/No = (C*Ts)/No = C/No * (1/fs) = C/N
+      */
       it->second->SetCNoRequirement (SatUtils::DbToLinear (esnoRequirementDb) * m_symbolRate);
     }
 }
@@ -241,7 +280,7 @@ SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEn
   NS_LOG_FUNCTION (this << modcod << frameType);
 
   uint32_t dataSlots (0);
-  uint32_t modulatedBits = GetModulatedBits (modcod);
+  uint32_t modulatedBits = SatUtils::GetModulatedBits (modcod);
 
   switch (frameType)
   {
@@ -261,7 +300,7 @@ SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEn
         break;
       }
   }
-  return dataSlots * m_symbolsPerSlot * modulatedBits * GetCodingRate (modcod);
+  return dataSlots * m_symbolsPerSlot * modulatedBits * SatUtils::GetCodingRate (modcod);
 }
 
 
@@ -271,7 +310,7 @@ SatBbFrameConf::CalculateBbFrameLength (SatEnums::SatModcod_t modcod, SatEnums::
   NS_LOG_FUNCTION (this << modcod << frameType);
 
   uint32_t dataSlots (0);
-  uint32_t modulatedBits = GetModulatedBits (modcod);
+  uint32_t modulatedBits = SatUtils::GetModulatedBits (modcod);
 
   switch (frameType)
   {
@@ -330,9 +369,14 @@ SatBbFrameConf::GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType)
   NS_LOG_FUNCTION (this << frameType);
 
   // Return the waveform with best spectral efficiency
-
-  // JPU: Note, that this algorithm is not final, but just a skeleton which shall be enhanced
+  // JPU, Note, that this algorithm is not final, but just a skeleton which shall be enhanced
   // when implementing the actual NCC RTN link burst scheduler algorithm!
+
+  // If ACM is disabled, return the default MODCOD
+  if (!m_acmEnabled)
+    {
+      return m_defaultModCod;
+    }
 
   for ( waveformMap_t::const_reverse_iterator rit = m_waveforms.rbegin ();
       rit != m_waveforms.rend ();
@@ -348,135 +392,13 @@ SatBbFrameConf::GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType)
             }
         }
     }
-  return SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  return m_defaultModCod;
 }
 
-uint32_t
-SatBbFrameConf::GetModulatedBits (SatEnums::SatModcod_t modcod) const
+SatEnums::SatModcod_t
+SatBbFrameConf::GetDefaultModCod () const
 {
-  NS_LOG_FUNCTION (this << modcod);
-
-  switch (modcod)
-  {
-    case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
-    case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
-    case SatEnums::SAT_MODCOD_QPSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
-    case SatEnums::SAT_MODCOD_QPSK_4_TO_5:
-    case SatEnums::SAT_MODCOD_QPSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_QPSK_8_TO_9:
-    case SatEnums::SAT_MODCOD_QPSK_9_TO_10:
-      {
-        return 2;
-        break;
-      }
-    case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
-    case SatEnums::SAT_MODCOD_8PSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
-    case SatEnums::SAT_MODCOD_8PSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_8PSK_8_TO_9:
-    case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
-    {
-       return 3;
-       break;
-     }
-    case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
-    case SatEnums::SAT_MODCOD_16APSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_16APSK_4_TO_5:
-    case SatEnums::SAT_MODCOD_16APSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_16APSK_8_TO_9:
-    case SatEnums::SAT_MODCOD_16APSK_9_TO_10:
-      {
-         return 4;
-         break;
-       }
-    case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_32APSK_4_TO_5:
-    case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
-      {
-         return 5;
-         break;
-       }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported enum SatModcod_t!");
-        break;
-      }
-  }
-  return 0;
-}
-
-double
-SatBbFrameConf::GetCodingRate (SatEnums::SatModcod_t modcod) const
-{
-  NS_LOG_FUNCTION (this << modcod);
-
-  switch (modcod)
-  {
-    case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
-    {
-      return 1.0/2.0;
-      break;
-    }
-    case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
-    case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
-    case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
-      {
-        return 2.0/3.0;
-        break;
-      }
-    case SatEnums::SAT_MODCOD_QPSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_8PSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_16APSK_3_TO_4:
-    case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
-      {
-        return 3.0/4.0;
-        break;
-      }
-    case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
-    case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
-      {
-        return 3.0/5.0;
-        break;
-      }
-    case SatEnums::SAT_MODCOD_QPSK_4_TO_5:
-    case SatEnums::SAT_MODCOD_16APSK_4_TO_5:
-    case SatEnums::SAT_MODCOD_32APSK_4_TO_5:
-      {
-        return 4.0/5.0;
-        break;
-      }
-    case SatEnums::SAT_MODCOD_QPSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_8PSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_16APSK_5_TO_6:
-    case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
-      {
-        return 5.0/6.0;
-        break;
-      }
-    case SatEnums::SAT_MODCOD_QPSK_8_TO_9:
-    case SatEnums::SAT_MODCOD_8PSK_8_TO_9:
-    case SatEnums::SAT_MODCOD_16APSK_8_TO_9:
-    case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
-    {
-      return 8.0/9.0;
-      break;
-    }
-    case SatEnums::SAT_MODCOD_QPSK_9_TO_10:
-    case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
-    case SatEnums::SAT_MODCOD_16APSK_9_TO_10:
-      {
-        return 9.0/10.0;
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported enum SatModcod_t!");
-        break;
-      }
-  }
-  return 0.0;
+  return m_defaultModCod;
 }
 
 

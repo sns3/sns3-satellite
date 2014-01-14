@@ -172,6 +172,21 @@ public:
    */
   uint32_t GetBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
+  /**
+   * Get the best MODCOD with a given BB frame type
+   * \param cNo C/No of the UT to be scheduled
+   * \param frameType Used BBFrame type (short OR normal)
+   * \return SatModcod_t The best MODCOD
+   */
+  SatEnums::SatModcod_t GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType) const;
+
+  /**
+   * Get the default MODCOD
+   * \return SatModcod_t The default MODCOD
+   */
+  SatEnums::SatModcod_t GetDefaultModCod () const;
+
+
 private:
 
   /**
@@ -190,27 +205,6 @@ private:
    * \return The BBFrame length in Time
    */
   Time CalculateBbFrameLength (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
-
-  /**
-   * Get the best MODCOD with a given BB frame type
-   * \param cNo C/No of the UT to be scheduled
-   * \param frameType Used BBFrame type (short OR normal)
-   */
-  SatEnums::SatModcod_t GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType) const;
-
-  /**
-   * Convert the SatModCod_t enum to modulated bits
-   * \param modcod Used modcod in SatModCod_t enum
-   * \return modulated bits in uint32_t
-   */
-  uint32_t GetModulatedBits (SatEnums::SatModcod_t modcod) const;
-
-  /**
-   * Convert the SatModCod_t enum to modulated bits
-   * \param modcod Used modcod in SatModCod_t enum
-   * \return coding rate in double
-   */
-  double GetCodingRate (SatEnums::SatModcod_t modcod) const;
 
   /**
    * Symbol rate
@@ -247,6 +241,23 @@ private:
    * set as an attribute to 10^(-5).
    */
   double m_perTarget;
+
+  /**
+   * Flag to indicate whether ACM is enabled or disabled. If ACM is
+   * disabled, the m_defaultModCod is used.
+   */
+  bool m_acmEnabled;
+
+  /**
+   * Default MODCOD is used
+   * - For broadcast control messages
+   * - When ACM is disabled
+   * - When there is not valid C/No information
+   *
+   * TODO: The attribute for m_defaultModCod does not currently accept
+   * all MODCODs due to maximum arguments limitation (<=22) of MakeEnumChecker (...)
+   */
+  SatEnums::SatModcod_t m_defaultModCod;
 
   std::map<uint32_t, uint32_t> m_payloadsShortFrame;
   std::map<uint32_t, uint32_t> m_payloadsNormalFrame;

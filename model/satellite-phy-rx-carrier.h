@@ -299,6 +299,11 @@ private:
    * \brief Enable composite SINR output tracing
    */
   bool m_enableCompositeSinrOutputTrace;
+
+  /**
+   * \brief A random variable for packet reception
+   */
+    Ptr<UniformRandomVariable> m_uniformVariable;
 };
 
 }

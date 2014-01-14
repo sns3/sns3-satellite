@@ -26,7 +26,9 @@
 
 #include "ns3/log.h"
 #include "ns3/test.h"
-#include <ns3/ptr.h>
+#include "ns3/ptr.h"
+#include "ns3/boolean.h"
+#include "ns3/config.h"
 #include "../helper/satellite-wave-form-conf.h"
 #include "../helper/satellite-bbframe-conf.h"
 #include "../model/satellite-link-results.h"
@@ -73,13 +75,16 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   std::string path = "src/satellite/data/";
   std::string fileName = "dvbRcs2Waveforms.txt";
 
+  // Enable ACM
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
+
   Ptr<SatLinkResultsDvbRcs2> lr = CreateObject<SatLinkResultsDvbRcs2> ();
   lr->Initialize ();
 
   Ptr<SatWaveformConf> wf = CreateObject<SatWaveformConf> (path+fileName);
   wf->InitializeEbNoRequirements( lr );
 
-  uint32_t refResults [23] = {4, 5, 6, 7, 7, 7, 7, 7, 8, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12};
+  uint32_t refResults [21] = {7, 7, 7, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
 
   // 250 kbaud
   double symbolRate (250000);
@@ -96,6 +101,7 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
     {
       uint32_t wfid (0);
       bool success = wf->GetBestWaveformId(SatUtils::DbToLinear (d), symbolRate, wfid);
+
       NS_TEST_ASSERT_MSG_EQ(success, true, "A suitable waveform not found");
       NS_TEST_ASSERT_MSG_EQ(wfid, refResults[i], "Not expected waveform id");
       ++i;
@@ -145,54 +151,38 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
   Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> (symbolRate);
   bbFrameConf->InitializeCNoRequirements (lr);
 
-  // Available modcods
-  SatEnums::SatModcod_t modcods[24] = { SatEnums::SAT_MODCOD_QPSK_1_TO_2,
-                                        SatEnums::SAT_MODCOD_QPSK_2_TO_3,
-                                        SatEnums::SAT_MODCOD_QPSK_3_TO_4,
-                                        SatEnums::SAT_MODCOD_QPSK_3_TO_5,
-                                        SatEnums::SAT_MODCOD_QPSK_4_TO_5,
-                                        SatEnums::SAT_MODCOD_QPSK_5_TO_6,
-                                        SatEnums::SAT_MODCOD_QPSK_8_TO_9,
-                                        SatEnums::SAT_MODCOD_QPSK_9_TO_10,
-                                        SatEnums::SAT_MODCOD_8PSK_2_TO_3,
-                                        SatEnums::SAT_MODCOD_8PSK_3_TO_4,
-                                        SatEnums::SAT_MODCOD_8PSK_3_TO_5,
-                                        SatEnums::SAT_MODCOD_8PSK_5_TO_6,
-                                        SatEnums::SAT_MODCOD_8PSK_8_TO_9,
-                                        SatEnums::SAT_MODCOD_8PSK_9_TO_10,
-                                        SatEnums::SAT_MODCOD_16APSK_2_TO_3,
-                                        SatEnums::SAT_MODCOD_16APSK_3_TO_4,
-                                        SatEnums::SAT_MODCOD_16APSK_4_TO_5,
-                                        SatEnums::SAT_MODCOD_16APSK_5_TO_6,
-                                        SatEnums::SAT_MODCOD_16APSK_8_TO_9,
-                                        SatEnums::SAT_MODCOD_16APSK_9_TO_10,
-                                        SatEnums::SAT_MODCOD_32APSK_3_TO_4,
-                                        SatEnums::SAT_MODCOD_32APSK_4_TO_5,
-                                        SatEnums::SAT_MODCOD_32APSK_5_TO_6,
-                                        SatEnums::SAT_MODCOD_32APSK_8_TO_9,
-  };
+  std::vector<SatEnums::SatModcod_t> modcods;
+  SatEnums::GetAvailableModcods (modcods);
 
-  // Available BBFrames
-  SatEnums::SatBbFrameType_t frameTypes[2] = { SatEnums::SHORT_FRAME,
-                                               SatEnums::NORMAL_FRAME,
-  };
+  /**
+   * Available BBFrames. Note that SHORT_FRAME is not yet supported, since
+   * we do not have link results for it.
+   */
+
+  //SatEnums::SatBbFrameType_t frameTypes[2] = { SatEnums::SHORT_FRAME,
+  //                                             SatEnums::NORMAL_FRAME,
+  //};
+
+  SatEnums::SatBbFrameType_t frameTypes[1] = { SatEnums::NORMAL_FRAME };
 
   std::cout << "BBFrame config output: " << std::endl;
   std::cout << "----------------------" << std::endl;
 
   // BBFrames
-  for (uint32_t i = 0; i < 2; ++i)
+  for (uint32_t i = 0; i < 1; ++i)
     {
       // Modcods
-      for (uint32_t j = 0; j < 24; ++j)
+      for (std::vector<SatEnums::SatModcod_t>::iterator it = modcods.begin ();
+          it != modcods.end ();
+          ++it)
         {
           // Get BBFrame length in Time
-          Time l = bbFrameConf->GetBbFrameLength (modcods[j], frameTypes[i]);
+          Time l = bbFrameConf->GetBbFrameLength ((*it), frameTypes[i]);
 
           // Get BBFrame payload in bits
-          uint32_t p = bbFrameConf->GetBbFramePayloadBits (modcods[j], frameTypes[i]);
+          uint32_t p = bbFrameConf->GetBbFramePayloadBits (*it, frameTypes[i]);
 
-          std::cout << "MODCOD: " << SatEnums::GetModcodTypeName(modcods[j]) <<
+          std::cout << "MODCOD: " << SatEnums::GetModcodTypeName(*it) <<
               ", frameType: " << frameTypes[i] <<
               ", length [s]: " << l.GetSeconds () <<
               ", payload [b]: " << p << std::endl;

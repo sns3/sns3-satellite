@@ -27,6 +27,7 @@
 #include "ns3/packet.h"
 #include "ns3/mac48-address.h"
 #include "ns3/satellite-mac-tag.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -201,6 +202,140 @@ public:
         oss << GetPacketInfo (*it);
       }
     return oss.str ();
+  }
+
+  /**
+   * Gets the modulated bits of a certain modcod
+   *
+   * \param modcod Modulation and coding scheme
+   * \return uint32_t modulated bits
+   */
+  static inline uint32_t GetModulatedBits (SatEnums::SatModcod_t modcod)
+  {
+    switch (modcod)
+    {
+      case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
+      case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
+      case SatEnums::SAT_MODCOD_QPSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
+      case SatEnums::SAT_MODCOD_QPSK_4_TO_5:
+      case SatEnums::SAT_MODCOD_QPSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_QPSK_8_TO_9:
+      case SatEnums::SAT_MODCOD_QPSK_9_TO_10:
+        {
+          return 2;
+          break;
+        }
+      case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
+      case SatEnums::SAT_MODCOD_8PSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
+      case SatEnums::SAT_MODCOD_8PSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_8PSK_8_TO_9:
+      case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
+      {
+         return 3;
+         break;
+       }
+      case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
+      case SatEnums::SAT_MODCOD_16APSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_16APSK_4_TO_5:
+      case SatEnums::SAT_MODCOD_16APSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_16APSK_8_TO_9:
+      case SatEnums::SAT_MODCOD_16APSK_9_TO_10:
+        {
+           return 4;
+           break;
+         }
+      case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_32APSK_4_TO_5:
+      case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
+        {
+           return 5;
+           break;
+         }
+      default:
+        {
+          NS_FATAL_ERROR ("Unsupported enum SatModcod_t!");
+          break;
+        }
+    }
+    return 0;
+  }
+
+  /**
+   * Gets the coding rate of a certain modcod
+   *
+   * \param modcod Modulation and coding scheme
+   * \return double coding rate
+   */
+  static inline double GetCodingRate (SatEnums::SatModcod_t modcod)
+  {
+    switch (modcod)
+    {
+      case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
+      {
+        return 1.0/2.0;
+        break;
+      }
+      case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
+      case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
+      case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
+        {
+          return 2.0/3.0;
+          break;
+        }
+      case SatEnums::SAT_MODCOD_QPSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_8PSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_16APSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
+        {
+          return 3.0/4.0;
+          break;
+        }
+      case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
+      case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
+        {
+          return 3.0/5.0;
+          break;
+        }
+      case SatEnums::SAT_MODCOD_QPSK_4_TO_5:
+      case SatEnums::SAT_MODCOD_16APSK_4_TO_5:
+      case SatEnums::SAT_MODCOD_32APSK_4_TO_5:
+        {
+          return 4.0/5.0;
+          break;
+        }
+      case SatEnums::SAT_MODCOD_QPSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_8PSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_16APSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
+        {
+          return 5.0/6.0;
+          break;
+        }
+      case SatEnums::SAT_MODCOD_QPSK_8_TO_9:
+      case SatEnums::SAT_MODCOD_8PSK_8_TO_9:
+      case SatEnums::SAT_MODCOD_16APSK_8_TO_9:
+      case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
+      {
+        return 8.0/9.0;
+        break;
+      }
+      case SatEnums::SAT_MODCOD_QPSK_9_TO_10:
+      case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
+      case SatEnums::SAT_MODCOD_16APSK_9_TO_10:
+        {
+          return 9.0/10.0;
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("Unsupported enum SatModcod_t!");
+          break;
+        }
+    }
+    return 0.0;
   }
 
 private:

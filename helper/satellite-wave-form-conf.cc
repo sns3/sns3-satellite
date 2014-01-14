@@ -25,6 +25,7 @@
 #include "ns3/log.h"
 #include "ns3/ptr.h"
 #include "ns3/double.h"
+#include "ns3/boolean.h"
 #include "ns3/uinteger.h"
 #include "satellite-wave-form-conf.h"
 #include "../model/satellite-link-results.h"
@@ -100,9 +101,12 @@ SatWaveform::GetCNoThreshold (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
 
-  // TODO: Check: symbolRateInBaud * m_modulatedBits is not the net bitrate,
-  // but the bitrate including the PHY overhead!
-  return m_ebnoRequirement * symbolRateInBaud * m_modulatedBits;
+  /**
+   * Convert the Eb/No requirement into C/No requirement by using the carrier
+   * symbol rate and log2(modulatedBits).
+   * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
+   */
+  return m_ebnoRequirement * symbolRateInBaud * log2 (m_modulatedBits);
 }
 
 void
@@ -152,6 +156,11 @@ SatWaveformConf::GetTypeId (void)
                     DoubleValue (0.00001),
                     MakeDoubleAccessor(&SatWaveformConf::m_perTarget),
                     MakeDoubleChecker<double>())
+    .AddAttribute( "AcmEnabled",
+                   "Enable ACM",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatWaveformConf::m_acmEnabled),
+                   MakeBooleanChecker ())
     .AddAttribute( "DefaultWfId",
                    "Default waveform id",
                    UintegerValue (3),
@@ -248,6 +257,11 @@ void SatWaveformConf::InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> lin
       it != m_waveforms.end ();
       ++it )
     {
+      /**
+       * In return link the link results are in Eb/No format. Since, the C/No is dependent
+       * on the symbol rate, we cannot store the requirement in C/No format, but in Eb/No.
+       * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
+      */
       double ebnoRequirementDb = linkResults->GetEbNoDb (it->first, m_perTarget);
       it->second->SetEbNoRequirement (SatUtils::DbToLinear (ebnoRequirementDb));
     }
@@ -277,6 +291,14 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
   NS_LOG_FUNCTION (this << cno << symbolRateInBaud << wfId << burstLength);
 
   bool success (false);
+
+  // If ACM is disabled, return the default waveform
+  if (!m_acmEnabled)
+    {
+      wfId = m_defaultWfId;
+      success = true;
+      return success;
+    }
 
   // Return the waveform with best spectral efficiency
 

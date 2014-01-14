@@ -189,7 +189,7 @@ public:
 
   /**
    * Get default waveform id
-   * \return SatWaveform id of the confg holding all the details of the default wf
+   * \return SatWaveform id of the conf holding all the details of the default wf
    */
   uint32_t GetDefaultWaveformId () const;
 
@@ -233,15 +233,21 @@ private:
   std::map< uint32_t, Ptr<SatWaveform> > m_waveforms;
 
   /**
-   * Default waveform id
-   */
-  uint32_t m_defaultWfId;
-
-  /**
    * Packet error rate target for the waveforms. Default value
    * set as an attribute to 10^(-5).
    */
   double m_perTarget;
+
+  /**
+   * Flag to indicate whether ACM is enabled or disabled. If ACM is
+   * disabled, the m_defaultWfId is used.
+   */
+  bool m_acmEnabled;
+
+  /**
+   * Default waveform id
+   */
+  uint32_t m_defaultWfId;
 
   /**
    * Minimum and maximum waveform ids. Note, that currently it is

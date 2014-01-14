@@ -380,6 +380,12 @@ SatBeamHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBa
 void
 SatBeamHelper::EnablePacketTrace ()
 {
+  /**
+   * TODO: Enabling of the packet traces could be changed to use an attribute
+   * instead of a simulation script function call. This would enable packet trace
+   * enabling/disabling without recompilation.
+   */
+
   // Create packet trace instance
   m_packetTrace = CreateObject<SatPacketTrace> ();
 
