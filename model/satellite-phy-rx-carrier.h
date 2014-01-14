@@ -114,9 +114,15 @@ public:
 private:
 
   /**
-   * \brief
+   * \brief Boltzmann Constant
    */
   static const double BoltzmannConstant = 1.3806488e-23;
+
+  /**
+   * \brief Function for composite SINR output tracing
+   * \param cSinr composite SINR
+   */
+  void DoCompositeSinrOutputTrace (double cSinr);
 
   /**
    * \brief
@@ -288,6 +294,11 @@ private:
    * \brief Amount of bits to contain a byte
    */
   uint32_t m_bitsToContainByte;
+
+  /**
+   * \brief Enable composite SINR output tracing
+   */
+  bool m_enableCompositeSinrOutputTrace;
 };
 
 }

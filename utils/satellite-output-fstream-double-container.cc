@@ -44,7 +44,8 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::str
     m_fileMode (filemode),
     m_valuesInRow (valuesInRow),
     m_printFigure (false),
-    m_figureUnitConversionType (RAW)
+    m_figureUnitConversionType (RAW),
+    m_style (Gnuplot2dDataset::LINES)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
@@ -62,7 +63,8 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer () :
     m_fileMode (),
     m_valuesInRow (),
     m_printFigure (),
-    m_figureUnitConversionType ()
+    m_figureUnitConversionType (),
+    m_style ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer - Constructor not in use");

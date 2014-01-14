@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/object.h"
 #include "ns3/simulator.h"
+#include "ns3/boolean.h"
 
 #include "satellite-utils.h"
 #include "satellite-phy-rx-carrier.h"
@@ -33,6 +34,8 @@
 #include "satellite-mac-tag.h"
 #include "satellite-mac.h"
 #include "satellite-rx-error-tag.h"
+#include "ns3/singleton.h"
+#include "satellite-composite-sinr-output-trace-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -48,7 +51,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_satInterference (),
    m_channelType (carrierConf->GetChannelType ()),
    m_startRxTime (),
-   m_bitsToContainByte (8)
+   m_bitsToContainByte (8),
+   m_enableCompositeSinrOutputTrace (false)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -124,6 +128,11 @@ SatPhyRxCarrier::GetTypeId (void)
     .AddTraceSource ("PacketTrace",
                      "The trace for calculated interferences of the received packets",
                       MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
+    .AddAttribute( "EnableCompositeSinrOutputTrace",
+                   "Enable composite SINR output trace.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatPhyRxCarrier::m_enableCompositeSinrOutputTrace),
+                    MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -319,6 +328,12 @@ SatPhyRxCarrier::EndRxData ()
       /// calculate composite SINR
       cSinr = CalculateCompositeSinr (sinr, m_rxParams->m_sinr);
 
+      /// composite sinr output trace
+      if (m_enableCompositeSinrOutputTrace)
+        {
+          DoCompositeSinrOutputTrace (cSinr);
+        }
+
       /// check against link results
       if (CheckAgainstLinkResults (cSinr))
         {
@@ -352,6 +367,16 @@ SatPhyRxCarrier::EndRxData ()
       double cno = cSinr * m_rxBandwidthHz;
       m_cnoCallback (m_rxParams->m_beamId, m_sourceAddress, m_ownAddress, cno);
     }
+}
+
+void
+SatPhyRxCarrier::DoCompositeSinrOutputTrace (double cSinr)
+{
+  std::vector<double> tempVector;
+  tempVector.push_back (Now ().GetSeconds ());
+  tempVector.push_back (cSinr);
+
+  Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (m_ownAddress, m_channelType), tempVector);
 }
 
 bool
