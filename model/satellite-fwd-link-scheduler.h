@@ -159,14 +159,30 @@ private:
   void ScheduleBbFrames ();
 
   /**
-   * Create short or normal frame according to byteCount and
+   * Create short or normal frame according to byteCount, estimated C/N0 and
    * according to member #m_bbFrameUsageMode.
    *
-   * \param modCod Used MODCOD for frame.
+   * \param cno Estimated C/N0 value.
    * \param byteCount byte count
    * \return Pointer to created frame.
    */
-  Ptr<SatBbFrame> CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCount) const;
+  Ptr<SatBbFrame> CreateFrame (double cno, uint32_t byteCount) const;
+
+  /**
+   * Check if given estimated C/N0 match with given frame.
+   *
+   * \param cno Estimated C/N0 value.
+   * \param frame Frame to match
+   * \return True if C/N0 match with frame false otherwise.
+   */
+  bool CnoMatchWithFrame (double cno, Ptr<SatBbFrame> frame) const;
+
+  /**
+   *
+   * \param Scheduling object
+   * \return C/N0 estimated for object. NAN, if estimate is not available.
+   */
+  double GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob);
 
   /**
    *
@@ -192,7 +208,7 @@ private:
    */
   void PeriodicTimerExpired ();
 
-  std::vector< Ptr<SatSchedulingObject> > GetSchedulingObjects (uint32_t &bytesToSent);
+  std::vector< Ptr<SatSchedulingObject> > GetSchedulingObjects ();
   void SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject> >& so);
 
   /**
@@ -219,11 +235,6 @@ private:
    * Configured BB Frame conf.
    */
   Ptr<SatBbFrameConf> m_bbFrameConf;
-
-  /**
-   * Configured default ModCod for transmission.
-   */
-  SatEnums::SatModcod_t m_defModCod;
 
   /**
    * Threshold time of total transmissions in BB Frame container to trigger a scheduling round.
@@ -265,7 +276,7 @@ private:
   /**
    * C/N0 estimation per UT.
    */
-  std::map<Address, double> m_cnoInfo;
+  std::map<Mac48Address, double> m_cnoInfo;
 
  };
 

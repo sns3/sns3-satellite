@@ -95,8 +95,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler ()
 
 SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address)
  : m_macAddress (address),
-   m_bbFrameConf (conf),
-   m_defModCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4)
+   m_bbFrameConf (conf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -108,7 +107,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   m_random = CreateObject<UniformRandomVariable> ();
 
   // create dummy frame
-  m_dummyFrame = Create<SatBbFrame> (m_defModCod, SatEnums::DUMMY_FRAME, m_bbFrameConf);
+  m_dummyFrame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod(), SatEnums::DUMMY_FRAME, m_bbFrameConf);
 
   Ptr<Packet> dummyPacket = Create<Packet> (1);
 
@@ -210,102 +209,74 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO: logic of this function is still needed to improve
   uint32_t frameBytes = 0;
   Ptr<SatBbFrame> frame;
-  uint32_t bytesToSent = 0;
 
   // Get scheduling objects from LLC
-  std::vector< Ptr<SatSchedulingObject> > so =  GetSchedulingObjects (bytesToSent);
+  std::vector< Ptr<SatSchedulingObject> > so =  GetSchedulingObjects ();
 
   if ( so.empty () == false )
     {
-      std::vector< Ptr<SatSchedulingObject> >::const_iterator currentObject = so.begin ();
+      uint32_t priorityClass;
 
-      uint32_t currentObBytes = (*currentObject)->GetBufferedBytes();
-      uint32_t currentObMinReqBytes = 5;
-      uint32_t priorityClass = 1;
-
-      if ( (*currentObject)->IsControl() )
+      for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin () ;it != so.end(); it++  )
         {
-          currentObMinReqBytes = 500;
-          priorityClass = 0;
+          uint32_t currentObBytes = (*it)->GetBufferedBytes ();
+          double cno = GetSchedulingObjectCno (*it);
+          uint32_t currentObMinReqBytes = 5;
+          priorityClass = 1;
+
+          if ( (*it)->IsControl () )
+            {
+              currentObMinReqBytes = 500;
+              priorityClass = 0;
+            }
+
+          while ( (m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime ) &&
+                   (currentObBytes > 0) )
+            {
+              if ( frame == NULL )
+                {
+                  frame = CreateFrame (cno, currentObBytes);
+                  frameBytes = frame->GetBytesLeft();
+                }
+              else if ( CnoMatchWithFrame ( cno, frame ) == false )
+                {
+                  // finish with this frame if MODCOD is more robust than we are currently using
+                  // TODO: we need to check rest of object left in list too
+                  AddFrameToContainer (priorityClass, frame);
+                  frame = NULL;
+                }
+              else
+                {
+                  if ( frameBytes < currentObMinReqBytes )
+                    {
+                      AddFrameToContainer (priorityClass, frame);
+                      frame = NULL;
+                    }
+                  else
+                    {
+                      uint32_t bytesLeft = 0;
+
+                      frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft ,(*it)->IsControl () );
+                      currentObBytes = bytesLeft;
+                    }
+                }
+            }
         }
 
-      while ( bytesToSent )
+      if ( frame )
         {
-          if (frameBytes == 0)
-            {
-              frame = CreateFrame (m_defModCod, bytesToSent);
-              frameBytes = frame->GetBytesLeft();
-            }
-
-          if ( frameBytes < currentObMinReqBytes )
-            {
-              if ( AddFrameToContainer (priorityClass, frame) )
-                {
-                  bytesToSent = 0;
-                }
-
-              frameBytes = 0;
-            }
-          else if ( currentObBytes > frameBytes )
-            {
-              uint32_t bytesLeft = 0;
-
-              frameBytes = AddPacketToFrame (frameBytes, frame, (*currentObject)->GetMacAddress (), bytesLeft ,(*currentObject)->IsControl() );
-
-              if ( AddFrameToContainer (priorityClass, frame) )
-                {
-                  bytesToSent = 0;
-                }
-              else
-                {
-                  bytesToSent -= frameBytes;
-                  frameBytes = 0;
-                  currentObBytes = bytesLeft;
-                }
-            }
-          else
-            {
-              // TODO: Something wrong here. We need to ask two extra bytes, otherwise fails.
-              uint32_t bytesLeft = 0;
-
-              frameBytes = AddPacketToFrame (currentObBytes + 2, frame, (*currentObject)->GetMacAddress (), bytesLeft ,(*currentObject)->IsControl() );
-
-              bytesToSent -= currentObBytes;
-              currentObBytes = bytesLeft;
-
-              if ( bytesToSent )
-                {
-                  currentObject++;
-                  currentObBytes = (*currentObject)->GetBufferedBytes();
-
-                  currentObMinReqBytes = 5;
-                  priorityClass = 1;
-
-                  if ( (*currentObject)->IsControl() )
-                    {
-                      currentObMinReqBytes = 500;
-                      priorityClass = 0;
-                    }
-                }
-              else
-                {
-                  if ( AddFrameToContainer (priorityClass, frame) )
-                    {
-                      bytesToSent = 0;
-                    }
-                }
-            }
+          AddFrameToContainer (priorityClass, frame);
         }
     }
 }
 
 std::vector< Ptr<SatSchedulingObject> >
-SatFwdLinkScheduler::GetSchedulingObjects (uint32_t &bytesToSent)
+SatFwdLinkScheduler::GetSchedulingObjects ()
 {
-  bytesToSent = 0;
+  NS_LOG_FUNCTION (this);
+
   std::vector< Ptr<SatSchedulingObject> > so;
 
   if ( m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime )
@@ -315,15 +286,7 @@ SatFwdLinkScheduler::GetSchedulingObjects (uint32_t &bytesToSent)
 
     if ( so.empty () == false )
       {
-        // calculate bytes to sent
-        std::vector< Ptr<SatSchedulingObject> >::const_iterator currentObject;
-
-        for ( currentObject = so.begin (); currentObject != so.end (); currentObject++ )
-          {
-            bytesToSent += (*currentObject)->GetBufferedBytes();
-          }
-
-        // sort if there more than one scheduling objects
+        // sort if there is more than one scheduling objects
         if ( so.size() > 1 )
           {
             SortSchedulingObjects (so);
@@ -337,6 +300,8 @@ SatFwdLinkScheduler::GetSchedulingObjects (uint32_t &bytesToSent)
 void
 SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject> >& so)
 {
+  NS_LOG_FUNCTION (this);
+
   //TODO: Sorting should be implemented
   switch (m_schedulingSortCriteria)
   {
@@ -362,15 +327,33 @@ SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject
 }
 
 Ptr<SatBbFrame>
-SatFwdLinkScheduler::CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCount) const
+SatFwdLinkScheduler::CreateFrame (double cno, uint32_t byteCount) const
 {
-  NS_LOG_FUNCTION (this << modCod << byteCount);
+  NS_LOG_FUNCTION (this << cno << byteCount);
 
-  Ptr<SatBbFrame> frame;
+  // TODO: If frame is needed to optimize based on total data in scheduling objects
+  // possibly it can be done here and also taken into account when sorting objects
+
+  Ptr<SatBbFrame> frame = NULL;
+
+  // set default MODCOD first
+  SatEnums::SatModcod_t modCod = m_bbFrameConf->GetDefaultModCod ();
+
+  if ( isnan (cno) == false )
+    {
+      // use MODCOD based on C/N0 for normal frame first
+      modCod = m_bbFrameConf->GetBestModcod (cno, SatEnums::NORMAL_FRAME);
+    }
 
   switch (m_bbFrameUsageMode)
   {
     case SHORT_FRAMES:
+      if ( isnan (cno) == false )
+        {
+          // use MODCOD based on C/N0 for short frame
+          modCod = m_bbFrameConf->GetBestModcod (cno, SatEnums::SHORT_FRAME);
+        }
+
       frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf);
       break;
 
@@ -380,14 +363,20 @@ SatFwdLinkScheduler::CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCou
 
     case SHORT_AND_NORMAL_FRAMES:
       {
-        uint32_t bytesInShortFrame = m_bbFrameConf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
+        uint32_t bytesInNormalFrame = m_bbFrameConf->GetBbFramePayloadBits (modCod, SatEnums::NORMAL_FRAME) / 8;
 
-        if (byteCount > bytesInShortFrame)
+        if (byteCount >= bytesInNormalFrame)
           {
             frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf);
           }
         else
           {
+            if ( isnan (cno) == false )
+              {
+                // use MODCOD based on C/N0 for short frame
+                modCod = m_bbFrameConf->GetBestModcod (cno, SatEnums::SHORT_FRAME);
+              }
+
             frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf);
           }
       }
@@ -400,6 +389,40 @@ SatFwdLinkScheduler::CreateFrame (SatEnums::SatModcod_t modCod, uint32_t byteCou
   }
 
   return frame;
+}
+
+bool
+SatFwdLinkScheduler::CnoMatchWithFrame (double cno, Ptr<SatBbFrame> frame) const
+{
+  NS_LOG_FUNCTION (this << cno << frame);
+
+  bool match = false;
+
+  SatEnums::SatModcod_t modCod = m_bbFrameConf->GetBestModcod (cno, frame->GetFrameType ());
+
+  if ( modCod >= frame->GetModcod () )
+    {
+      match = true;
+    }
+
+  return match;
+}
+
+double
+SatFwdLinkScheduler::GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob)
+{
+  NS_LOG_FUNCTION (this << ob);
+
+  double cno = NAN;
+
+  std::map<Mac48Address, double>::const_iterator it = m_cnoInfo.find (ob->GetMacAddress ());
+
+  if ( it != m_cnoInfo.end() )
+    {
+      cno = it->second;
+    }
+
+  return cno;
 }
 
 bool
@@ -432,6 +455,17 @@ SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> fram
   if ( p )
     {
       frameBytesLeft = frame->AddTransmitData (p, control );
+    }
+  else if ( control )
+    {
+      if ( frame->GetBytesLeft() == frame->GetSizeInBytes () )
+        {
+           NS_FATAL_ERROR ("Control packet does not fit in BB Frame!!!");
+        }
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Possible error in LLC???");
     }
 
   return frameBytesLeft;

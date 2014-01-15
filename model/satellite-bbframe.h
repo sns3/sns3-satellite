@@ -89,6 +89,12 @@ public:
   uint32_t GetBytesLeft () const ;
 
   /**
+   * Get the size of the transmit buffer in bytes.
+   * \return the size of the transmit buffer
+   */
+  uint32_t GetSizeInBytes () const ;
+
+  /**
    * Get duration of the frame transmission.
    * \return duration of the frame transmission
    */
@@ -100,11 +106,17 @@ public:
    */
   inline SatEnums::SatBbFrameType_t GetFrameType () const {return m_frameType;}
 
+  /**
+   * Get type of the frame.
+   * \return Type of the frame
+   */
+  inline SatEnums::SatModcod_t GetModcod () const {return m_modCod;}
+
 private:
 
-  uint32_t m_modCod;
+  SatEnums::SatModcod_t m_modCod;
   uint32_t m_freeBytes;
-  uint32_t m_TotalBytes;
+  uint32_t m_totalBytes;
   bool m_containsControlData;
   SatBbFrameData frameData;
   Time m_duration;

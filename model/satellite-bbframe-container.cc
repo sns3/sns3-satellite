@@ -56,6 +56,10 @@ SatBbFrameContainer::AddFrame (uint32_t priorityClass, Ptr<SatBbFrame> frame)
       m_container.insert (std::make_pair (priorityClass, frame));
       m_totalDuration += frame->GetDuration();
     }
+  else
+    {
+      NS_FATAL_ERROR ("Priority out of range!!!");
+    }
 }
 
 Time

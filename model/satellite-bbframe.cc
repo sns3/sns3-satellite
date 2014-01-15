@@ -29,7 +29,7 @@ namespace ns3 {
 SatBbFrame::SatBbFrame ()
  : m_modCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4),
    m_freeBytes (0),
-   m_TotalBytes (0),
+   m_totalBytes (0),
    m_containsControlData (false),
    m_frameType ()
 {
@@ -50,14 +50,14 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
     case SatEnums::SHORT_FRAME:
     case SatEnums::NORMAL_FRAME:
       m_freeBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
-      m_TotalBytes = m_freeBytes;
+      m_totalBytes = m_freeBytes;
       m_duration = conf->GetBbFrameLength (modCod, type);
       break;
 
     case SatEnums::DUMMY_FRAME:
       // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
       m_freeBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
-      m_TotalBytes = m_freeBytes;
+      m_totalBytes = m_freeBytes;
       m_duration = conf->GetDummyBbFrameLength ();
       break;
 
@@ -66,7 +66,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
       break;
   }
 
-  m_freeBytes = m_TotalBytes;
+  m_freeBytes = m_totalBytes;
 }
 
 SatBbFrame::~SatBbFrame ()
@@ -113,8 +113,15 @@ SatBbFrame::ContainsControlData () const
 uint32_t
 SatBbFrame::GetBytesLeft () const
 {
+  NS_LOG_FUNCTION (this);
   return m_freeBytes;
 }
 
+uint32_t
+SatBbFrame::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_totalBytes;
+}
 
 } // namespace ns3
