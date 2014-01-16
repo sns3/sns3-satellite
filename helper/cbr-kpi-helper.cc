@@ -179,19 +179,21 @@ CbrKpiHelper::Print ()
 
   std::cout << "CBR/sink applications' client specific statistics:" << std::endl;
   std::cout << "-------------------------------------------------------------------------" << std::endl;
-  std::cout << std::setw (12) << "address"
-            << std::setw (12) << "Tx packet"
-            << std::setw (12) << "Tx bytes"
-            << std::setw (12) << "Rx packet"
-            << std::setw (12) << "Rx bytes"
-            << std::setw (12) << "Rx IP packets"
-            << std::setw (12) << "User throughput [kbps]" << std::endl;
+  std::cout << std::setw (16) << "address"
+            << std::setw (16) << "Tx packet"
+            << std::setw (16) << "Tx bytes"
+            << std::setw (16) << "Rx packet"
+            << std::setw (16) << "Rx bytes"
+            << std::setw (16) << "Rx IP packets"
+            << std::setw (16) << "User throughput [kbps]" << std::endl;
   std::cout << "-------------------------------------------------------------------------" << std::endl;
 
   // PRINT ONE LINE FOR EACH CLIENT
 
   uint64_t sumTxBytes (0);
   uint64_t sumRxBytes (0);
+  uint64_t sumTxPackets (0);
+  uint64_t sumRxPackets (0);
   uint32_t sumRxIpLevelPackets = 0;
   Time sumPacketDelaySecond = Seconds (0.0);
   double sumUserTroughputs (0.0);
@@ -206,28 +208,32 @@ CbrKpiHelper::Print ()
       Time length = it2->second.appStop - it2->second.appStart;
       const double userThroughput = GetKbps (it2->second.rxBytes, length);
       sumUserTroughputs += userThroughput;
-      std::cout << std::setw (12) << AddressToString (it2->first)
-                << std::setw (12) << it2->second.txPackets
-                << std::setw (12) << it2->second.txBytes
-                << std::setw (12) << it2->second.rxPackets
-                << std::setw (12) << it2->second.rxBytes
-                << std::setw (12) << it2->second.rxIpLevelPackets
-                << std::setw (12) << userThroughput
+      std::cout << std::setw (16) << AddressToString (it2->first)
+                << std::setw (16) << it2->second.txPackets
+                << std::setw (16) << it2->second.txBytes
+                << std::setw (16) << it2->second.rxPackets
+                << std::setw (16) << it2->second.rxBytes
+                << std::setw (16) << it2->second.rxIpLevelPackets
+                << std::setw (16) << userThroughput
                 << std::endl;
       sumTxBytes += it2->second.txBytes;
       sumRxBytes += it2->second.rxBytes;
+      sumTxPackets += it2->second.txPackets;
+      sumRxPackets += it2->second.rxPackets;
       sumRxIpLevelPackets += it2->second.rxIpLevelPackets;
       sumPacketDelaySecond += it2->second.sumPacketDelay;
     }
 
   // PRINT FOOTER
   const double sumThroughput = GetKbps (sumRxBytes, Simulator::Now ());
+  const double avgErrorRatio = (sumTxPackets - sumRxPackets) / (double)(sumTxPackets);
   const double avgDelaySecond = sumPacketDelaySecond.GetSeconds () / sumRxIpLevelPackets;
   std::cout << "-------------------------------------------------------------------------" << std::endl;
   std::cout << std::setw (16) << "SumTxBytes [B]"
             << std::setw (16) << "SumRxBytes [B]"
             << std::setw (16) << "SumTput [kbps]"
             << std::setw (16) << "AvgTput [kbps]"
+            << std::setw (16) << "AvgErrorRatio [-]"
             << std::setw (16) << "AvgDelay [s]"
             << std::endl;
 
@@ -235,6 +241,7 @@ CbrKpiHelper::Print ()
             << std::setw (16) << sumRxBytes
             << std::setw (16) << sumThroughput
             << std::setw (16) << sumUserTroughputs / m_clientCounters.size ()
+            << std::setw (16) << avgErrorRatio
             << std::setw (16) << avgDelaySecond
             << std::endl;
 

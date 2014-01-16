@@ -34,6 +34,8 @@
 #include "ns3/test.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/config.h"
+#include "ns3/enum.h"
 #include "../model/cbr-application.h"
 #include "../helper/cbr-helper.h"
 #include "../helper/satellite-helper.h"
@@ -88,6 +90,11 @@ void
 Pm1::DoRun (void)
 {
   // Create simple scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"

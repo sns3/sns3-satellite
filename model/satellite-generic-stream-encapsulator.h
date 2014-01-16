@@ -119,6 +119,8 @@ private:
 
   void Reassemble ();
 
+  void Reset ();
+
   /**
    * Source and destination mac addresses. Used to tag the Frame PDU
    * so that lower layers are capable of passing the packet to the

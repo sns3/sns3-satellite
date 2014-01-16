@@ -61,6 +61,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue(utsPerBeam));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue(endUsersPerUt));
 
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_CONSTANT);
+  double errorRate (0.2);
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue(errorRate));
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
+
   // Create full scenario
 
    // Create reference system, two options:

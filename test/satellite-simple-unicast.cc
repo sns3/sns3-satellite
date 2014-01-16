@@ -34,6 +34,8 @@
 #include "ns3/test.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/config.h"
+#include "ns3/enum.h"
 #include "../model/cbr-application.h"
 #include "../helper/cbr-helper.h"
 #include "../helper/satellite-helper.h"
@@ -85,6 +87,11 @@ void
 SimpleUnicast1::DoRun (void)
 {
   // Create simple scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -178,6 +185,11 @@ void
 SimpleUnicast2::DoRun (void)
 {
   // Create larger scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -293,6 +305,11 @@ void
 SimpleUnicast3::DoRun (void)
 {
   // Create full scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -413,6 +430,11 @@ SimpleUnicast4::DoRun (void)
 {
   // Create simple scenario
 
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
+
   // Create reference system, two options:
   // - "Scenario72"
   // - "Scenario98"
@@ -506,6 +528,11 @@ void
 SimpleUnicast5::DoRun (void)
 {
   // Create larger scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -609,6 +636,11 @@ void
 SimpleUnicast6::DoRun (void)
 {
   // Create full scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -732,6 +764,11 @@ SimpleUnicast7::DoRun (void)
 {
   // Create simple scenario
 
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
+
   // Create reference system, two options:
   // - "Scenario72"
   // - "Scenario98"
@@ -845,6 +882,11 @@ void
 SimpleUnicast8::DoRun (void)
 {
   // Create Larger scenario
+
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create reference system, two options:
   // - "Scenario72"

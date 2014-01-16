@@ -239,6 +239,11 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
 {
   InitOutput (true );
 
+  // Configure a static error probability
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
+
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
   Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 

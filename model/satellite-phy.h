@@ -313,7 +313,7 @@ public:
    *
    * \param rxParams Packet reception parameters
    */
-  virtual void Receive (Ptr<SatSignalParameters> rxParams);
+  virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
    *

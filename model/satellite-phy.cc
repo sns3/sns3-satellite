@@ -302,7 +302,7 @@ SatPhy::SetBeamId (uint32_t beamId)
 }
 
 void
-SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
+SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
   NS_LOG_FUNCTION (this << rxParams);
 
@@ -310,8 +310,10 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
 
+  SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
+
   m_packetTrace (Simulator::Now(),
-                 SatEnums::PACKET_RECV,
+                 event,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
                  m_nodeInfo->GetMacAddress (),
@@ -319,7 +321,11 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams)
                  ld,
                  SatUtils::GetPacketInfo (rxParams->m_packetBuffer));
 
-  m_rxCallback ( rxParams->m_packetBuffer, rxParams);
+  // If there was a PHY error, packet dropped here
+  if (!phyError)
+    {
+      m_rxCallback ( rxParams->m_packetBuffer, rxParams);
+    }
 }
 
 void

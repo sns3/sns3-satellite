@@ -65,7 +65,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperatureDbk, ErrorModel e
    m_carrierBandwidthConverter (converter),
    m_channelType (chType),
    m_sinrCalculate (),
-   m_constantErrorRate (0.03)
+   m_constantErrorRate (0.0)
 {
 
 }
@@ -90,6 +90,11 @@ SatPhyRxCarrierConf::GetTypeId (void)
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableIntfOutputTrace),
                     MakeBooleanChecker ())
+    .AddAttribute( "ConstantErrorRatio",
+                   "Constant error ratio",
+                   DoubleValue (0.01),
+                   MakeDoubleAccessor (&SatPhyRxCarrierConf::m_constantErrorRate),
+                   MakeDoubleChecker<double> ())
     .AddConstructor<SatPhyRxCarrierConf> ()
   ;
   return tid;

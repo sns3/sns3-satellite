@@ -329,6 +329,10 @@ SatPhyRxCarrier::EndRxData ()
   NS_ASSERT( ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && m_rxParams->m_sinr == 0  ) ||
              ( m_rxMode == SatPhyRxCarrierConf::NORMAL && m_rxParams->m_sinr != 0  ) );
 
+  // PHY transmission decoded successfully. Note, that at transparent satellite,
+  // all the transmissions are not decoded.
+  bool phyError (false);
+
   /// in 1st link: does not enter this block
   /// in 2nd link: calculates composite sinr
   if ( m_rxMode == SatPhyRxCarrierConf::NORMAL )
@@ -343,16 +347,7 @@ SatPhyRxCarrier::EndRxData ()
         }
 
       /// check against link results
-      if (CheckAgainstLinkResults (cSinr))
-        {
-          for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = m_rxParams->m_packetBuffer.begin ();
-                i != m_rxParams->m_packetBuffer.end (); i++)
-            {
-              SatRxErrorTag tag;
-              tag.SetError (true);
-              (*i)->AddPacketTag (tag);
-            }
-        }
+      phyError = CheckAgainstLinkResults (cSinr);
     }
 
   /// in 1st link: save 1st link sinr value for 2nd link composite sinr calculations
@@ -366,7 +361,7 @@ SatPhyRxCarrier::EndRxData ()
   m_satInterference->NotifyRxEnd (m_interferenceEvent);
 
   /// Send packet upwards
-  m_rxCallback ( m_rxParams );
+  m_rxCallback ( m_rxParams, phyError );
 
   /// in 1st link: uses 1st link sinr
   /// in 2nd link: uses composite sinr

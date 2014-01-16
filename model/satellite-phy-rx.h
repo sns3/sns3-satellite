@@ -136,9 +136,11 @@ public:
   void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * \param the packet received
+   * \param SatSignalParameters containing e.g. the received packet
+   * \param boolean indicating whether there was a PHY error
+   *
    */
-  typedef Callback<void,Ptr<SatSignalParameters> > ReceiveCallback;
+  typedef Callback<void,Ptr<SatSignalParameters>,bool> ReceiveCallback;
 
   /**
    * \param beam Id

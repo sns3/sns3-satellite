@@ -369,8 +369,8 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
 
   // Sanity check
   SatMacTag mTag;
-  bool success = p->RemovePacketTag (mTag);
-  if (!success)
+  bool mSuccess = p->RemovePacketTag (mTag);
+  if (!mSuccess)
     {
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
@@ -425,14 +425,13 @@ SatReturnLinkEncapsulator::Reassemble ()
       SatPPduHeader ppduHeader;
       m_rxBuffer.front()->RemoveHeader (ppduHeader);
 
-      /**
-       * TODO: The PHY packet errors have to be checked from FPDUs and distributed
-       * to HL PDUs.
-       */
-
       // FULL_PPDU
       if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == true)
         {
+          NS_LOG_LOGIC ("FULL PPDU received");
+
+          Reset ();
+
           m_rxCallback(m_rxBuffer.front ());
           m_rxBuffer.pop_front();
         }
@@ -440,10 +439,7 @@ SatReturnLinkEncapsulator::Reassemble ()
       // START_PPDU
       else if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == false)
         {
-          if (m_currRxPacketFragment)
-            {
-              NS_FATAL_ERROR ("Trying to defragment a new packet while we have previous packet in process!");
-            }
+          NS_LOG_LOGIC ("START PPDU received");
 
           m_currRxFragmentId = ppduHeader.GetFragmentId ();
           m_currRxPacketSize = ppduHeader.GetTotalLength ();
@@ -455,46 +451,62 @@ SatReturnLinkEncapsulator::Reassemble ()
       // CONTINUATION_PPDU
       else if (ppduHeader.GetStartIndicator() == false && ppduHeader.GetEndIndicator() == false)
         {
-          if (!m_currRxPacketFragment)
+          NS_LOG_LOGIC ("CONTINUATION PPDU received");
+
+          // Previous fragment found
+          if (m_currRxPacketFragment && ppduHeader.GetFragmentId () == m_currRxFragmentId)
             {
-              NS_FATAL_ERROR ("Trying to defragment end of packet while we do not have packet in process!");
+              m_currRxPacketFragmentBytes += ppduHeader.GetPPduLength ();
+              m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
             }
-          if (ppduHeader.GetFragmentId () != m_currRxFragmentId)
+          else
             {
-              NS_FATAL_ERROR ("Fragmenting wrong fragment id!");
+              Reset ();
+              NS_LOG_LOGIC ("CONTINUATION PPDU received while the START of the PPDU may have been lost");
             }
-          m_currRxPacketFragmentBytes += ppduHeader.GetPPduLength ();
-          m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
           m_rxBuffer.pop_front();
         }
 
       // END_PPDU
       else if (ppduHeader.GetStartIndicator() == false && ppduHeader.GetEndIndicator() == true)
         {
-          if (!m_currRxPacketFragment)
+          NS_LOG_LOGIC ("END PPDU received");
+
+          // Previous fragment found
+          if (m_currRxPacketFragment && ppduHeader.GetFragmentId () == m_currRxFragmentId)
             {
-              NS_FATAL_ERROR ("Trying to defragment end of packet while we do not have packet in process!");
+              m_currRxPacketFragmentBytes += ppduHeader.GetPPduLength ();
+
+              // The packet size is wrong!
+              if (m_currRxPacketFragmentBytes != m_currRxPacketSize)
+                {
+                  NS_LOG_LOGIC ("END PDU received, but the packet size of the HL PDU is wrong. Drop the HL packet!");
+                }
+              // Receive the HL packet here
+              else
+                {
+                  m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
+                  m_rxBuffer.pop_front();
+                  m_rxCallback (m_currRxPacketFragment);
+                }
             }
-          if (ppduHeader.GetFragmentId () != m_currRxFragmentId)
+          else
             {
-              NS_FATAL_ERROR ("Fragmenting wrong fragment id!");
+              NS_LOG_LOGIC ("END PPDU received while the START of the PPDU may have been lost");
             }
 
-          m_currRxPacketFragmentBytes += ppduHeader.GetPPduLength ();
-
-          if (m_currRxPacketFragmentBytes != m_currRxPacketSize)
-            {
-              NS_FATAL_ERROR ("Total packet size wrong!");
-            }
-
-          m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
-          m_rxBuffer.pop_front();
-
-          m_rxCallback (m_currRxPacketFragment);
-          m_currRxPacketFragment = 0;
-          m_currRxPacketFragmentBytes = 0;
+          // Reset anyway
+          Reset ();
         }
     }
+}
+
+void SatReturnLinkEncapsulator::Reset ()
+{
+  m_currRxFragmentId = 0;
+  m_currRxPacketSize = 0;
+  m_currRxPacketFragment = 0;
+  m_currRxPacketFragmentBytes = 0;
 }
 
 void
