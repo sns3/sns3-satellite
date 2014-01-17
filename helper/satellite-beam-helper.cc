@@ -39,6 +39,7 @@
 #include "ns3/satellite-fading-input-trace-container.h"
 #include "ns3/satellite-fading-input-trace.h"
 #include "ns3/singleton.h"
+#include "ns3/satellite-id-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 
@@ -63,10 +64,10 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
                                        SatEnums::FADING_TRACE, "FadingTrace",
                                        SatEnums::FADING_MARKOV, "FadingMarkov"))
-      .AddAttribute ("PrintMacAddressToCreationTraces",
-                     "Print MAC address to creation traces",
-                     BooleanValue (false),
-                     MakeBooleanAccessor(&SatBeamHelper::m_printMacAddressToTraces),
+      .AddAttribute ("PrintDetailedInformationToCreationTraces",
+                     "Print detailed information to creation traces",
+                     BooleanValue (true),
+                     MakeBooleanAccessor(&SatBeamHelper::m_printDetailedInformationToCreationTraces),
                      MakeBooleanChecker ())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
@@ -83,7 +84,7 @@ SatBeamHelper::GetInstanceTypeId (void) const
 }
 
 SatBeamHelper::SatBeamHelper () :
-    m_printMacAddressToTraces (false),
+    m_printDetailedInformationToCreationTraces (false),
     m_fadingModel ()
 {
   NS_LOG_FUNCTION (this);
@@ -98,7 +99,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
                               uint32_t fwdLinkCarrierCount,
                               Ptr<SatSuperframeSeq> seq)
   : m_superframeSeq (seq),
-    m_printMacAddressToTraces (false),
+    m_printDetailedInformationToCreationTraces (false),
     m_fadingModel (SatEnums::FADING_MARKOV)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
@@ -439,27 +440,43 @@ SatBeamHelper::GetUtPositionInfo ()
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
       GeoCoordinate pos = model->GetGeoPosition ();
 
-      if ( m_printMacAddressToTraces )
+      Address devAddress;
+      Ptr<Ipv4> ipv4 = i->second->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+
+      std::vector<Ipv4Address> IPAddressVector;
+      std::vector<std::string> devNameVector;
+      std::vector<Address> devAddressVector;
+
+      for ( uint32_t j = 0; j < i->second->GetNDevices (); j++)
         {
-          Address devAddress;
+          Ptr<NetDevice> device = i->second->GetDevice (j);
+
+          if ( device->GetInstanceTypeId ().GetName () == "ns3::SatNetDevice")
+            {
+              devAddress = device->GetAddress ();
+            }
+          IPAddressVector.push_back (ipv4->GetAddress (j, 0).GetLocal()); // Get Ipv4InterfaceAddress of interface
+          devNameVector.push_back (device->GetInstanceTypeId ().GetName ());
+          devAddressVector.push_back (device->GetAddress ());
+        }
+
+      if ( m_printDetailedInformationToCreationTraces )
+        {
+          oss << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+              << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude () << " ";
 
           for ( uint32_t j = 0; j < i->second->GetNDevices (); j++)
             {
-              Ptr<NetDevice> device = i->second->GetDevice (j);
-
-              if ( device->GetInstanceTypeId ().GetName () == "ns3::SatNetDevice")
-                {
-                  devAddress = device->GetAddress ();
-                }
+              oss << devNameVector[j] << " " << devAddressVector[j] << " " << IPAddressVector[j] << " ";
             }
 
-          oss << i->first << " " << devAddress << " " <<  i->second->GetId () << " "
-        		  << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude () << std::endl;
+          oss << std::endl;
         }
       else
         {
-          oss << i->first << " " <<  i->second->GetId () << " "
-        		  << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude () << std::endl;
+          oss << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+        		  << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude ()
+        		  << std::endl;
         }
 
     }

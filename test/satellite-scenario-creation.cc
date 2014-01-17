@@ -32,6 +32,8 @@
 #include "ns3/test.h"
 #include "ns3/simulator.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "ns3/satellite-id-mapper.h"
 
 using namespace ns3;
 
@@ -76,6 +78,9 @@ ScenarioCreationSimple::~ScenarioCreationSimple ()
 void
 ScenarioCreationSimple::DoRun (void)
 {
+  // Reset ID mapper
+  Singleton<SatIdMapper>::Get ()->Reset ();
+
   // Create simple scenario
 
   // Create reference system, two options:
@@ -136,6 +141,9 @@ ScenarioCreationLarger::~ScenarioCreationLarger ()
 void
 ScenarioCreationLarger::DoRun (void)
 {
+  // Reset ID mapper
+  Singleton<SatIdMapper>::Get ()->Reset ();
+
   // Create larger scenario
 
   // Create reference system, two options:
@@ -196,6 +204,9 @@ ScenarioCreationFull::~ScenarioCreationFull ()
 void
 ScenarioCreationFull::DoRun (void)
 {
+  // Reset ID mapper
+  Singleton<SatIdMapper>::Get ()->Reset ();
+
   // Create full scenario
 
   // Create reference system, two options:
@@ -261,6 +272,9 @@ ScenarioCreationUser::~ScenarioCreationUser ()
 void
 ScenarioCreationUser::DoRun (void)
 {
+  // Reset ID mapper
+  Singleton<SatIdMapper>::Get ()->Reset ();
+
   // Create user scenario
 
   // Create reference system, two options:

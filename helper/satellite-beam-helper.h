@@ -235,10 +235,10 @@ private:
   TracedCallback<std::string> m_creation;
 
   /**
-   * Flag indicating whether to print MAC address to
-   * the creating traces
+   * Flag indicating whether to print detailed information to
+   * the creation traces
    */
-  bool m_printMacAddressToTraces;
+  bool m_printDetailedInformationToCreationTraces;
 
   /**
    * Configured fading model. Set as an attribute.
