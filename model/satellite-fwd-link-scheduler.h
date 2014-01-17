@@ -77,6 +77,35 @@ public:
     SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
   } BbFrameUsageMode_t;
 
+  /**
+   * Compares to scheduling objects priorities
+   *
+   * \param obj1 First object to compare
+   * \param obj2 Second object to compare
+   * \return true if first object priority is considered to be higher that second object, false otherwise
+   */
+  static bool CompareSoPriority (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
+
+  /**
+   * Compares to scheduling objects priorities and load
+   *
+   * \param obj1 First object to compare
+   * \param obj2 Second object to compare
+   * \return true if first object priority is considered to be higher that second object or
+   *         if priorities are same first object load is considered to be higher, false otherwise
+   */
+  static bool CompareSoPriorityLoad (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
+
+  /**
+   * Compares to scheduling objects priorities and HOL
+   *
+   * \param obj1 First object to compare
+   * \param obj2 Second object to compare
+   * \return true if first object priority is considered to be higher that second object or
+   *         if priorities are same first object HOL is considered to be higher, false otherwise
+   */
+  static bool CompareSoPriorityHol (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
+
   static TypeId GetTypeId (void);
 
   /**
@@ -151,6 +180,9 @@ private:
   SatFwdLinkScheduler& operator = (const SatFwdLinkScheduler &);
   SatFwdLinkScheduler (const SatFwdLinkScheduler &);
 
+  /**
+   * Do dispose actions.
+   */
   void DoDispose (void);
 
   /**
@@ -201,14 +233,25 @@ private:
    * \param control
    * \return
    */
-  uint32_t AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint32_t &bytesLeft, bool control );
+  uint32_t AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint32_t &bytesLeft);
 
   /**
    *  Handles periodic timer timeouts.
    */
   void PeriodicTimerExpired ();
 
+  /**
+   * Gets scheduling object in sorted order according to configured sorting criteria.
+   *
+   * \return Scheduling object available for scheduling
+   */
   std::vector< Ptr<SatSchedulingObject> > GetSchedulingObjects ();
+
+  /**
+   * Sorts given scheduling objects according to configured sorting criteria.
+   *
+   * \param so Scheduling objects to sort.
+   */
   void SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject> >& so);
 
   /**
@@ -247,9 +290,9 @@ private:
   Time m_schedulingStopThresholdTime;
 
   /**
-   * Sorting criteria for scheduling objects received from LLC.
+   * Additional sorting criteria for scheduling objects received from LLC.
    */
-  ScheduleSortingCriteria_t m_schedulingSortCriteria;
+  ScheduleSortingCriteria_t m_additionalSortCriteria;
 
   /**
    * BBFrame usage mode.

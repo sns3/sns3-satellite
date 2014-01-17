@@ -34,14 +34,14 @@ SatSchedulingObject::SatSchedulingObject ()
 }
 
 
-SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, bool isControl)
+SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint32_t priority)
   :m_macAddress (addr),
    m_bufferedBytes (bytes),
    m_minTxOpportunity (minTxOpportunity),
    m_holDelay (holDelay),
-   m_isControl (isControl)
+   m_priority (priority)
 {
-  NS_LOG_FUNCTION (this << addr << bytes << holDelay << isControl);
+  NS_LOG_FUNCTION (this << addr << bytes << holDelay << priority);
 }
 
 SatSchedulingObject::~SatSchedulingObject ()
@@ -70,11 +70,18 @@ SatSchedulingObject::GetMinTxOpportunityInBytes () const
   return m_minTxOpportunity;
 }
 
-bool
-SatSchedulingObject::IsControl () const
+uint32_t
+SatSchedulingObject::GetPriority () const
 {
   NS_LOG_FUNCTION (this);
-  return m_isControl;
+  return m_priority;
+}
+
+Time
+SatSchedulingObject::GetHolDelay () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_holDelay;
 }
 
 } // namespace ns3

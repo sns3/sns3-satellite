@@ -71,10 +71,9 @@ public:
    * Add data to transmit buffer of this BB Frame info
    *
    * \param packet        Pointer to packet wanted to add transmit buffer
-   * \param controlData   Is given data treated as control data
    * \return Free bytes left in transmit buffer
    */
-  uint32_t AddTransmitData (Ptr<Packet> packet, bool controlData);
+  uint32_t AddTransmitData (Ptr<Packet> packet);
 
   /**
    * Check whether the buffer contains control messages

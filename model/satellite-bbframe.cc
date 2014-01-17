@@ -82,7 +82,7 @@ SatBbFrame::GetTransmitData ()
 }
 
 uint32_t
-SatBbFrame::AddTransmitData (Ptr<Packet> data, bool controlData)
+SatBbFrame::AddTransmitData (Ptr<Packet> data)
 {
   NS_LOG_FUNCTION (this);
 
@@ -92,7 +92,6 @@ SatBbFrame::AddTransmitData (Ptr<Packet> data, bool controlData)
     {
       frameData.push_back (data);
       m_freeBytes -= dataLengthInBytes;
-      m_containsControlData |= controlData;
     }
   else
     {
@@ -101,13 +100,6 @@ SatBbFrame::AddTransmitData (Ptr<Packet> data, bool controlData)
     }
 
   return GetBytesLeft();
-}
-
-bool
-SatBbFrame::ContainsControlData () const
-{
-  NS_LOG_FUNCTION (this);
-  return m_containsControlData;
 }
 
 uint32_t

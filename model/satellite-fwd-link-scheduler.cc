@@ -18,6 +18,7 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include <algorithm>
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
@@ -39,6 +40,59 @@ NS_LOG_COMPONENT_DEFINE ("SatFwdLinkScheduler");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatFwdLinkScheduler);
+
+//#define SAT_FWD_LINK_SCHEDULER_PRINT_SORT_RESULT
+
+#ifdef SAT_FWD_LINK_SCHEDULER_PRINT_SORT_RESULT
+static void PrintSoContent (std::string context, std::vector< Ptr<SatSchedulingObject> >& so)
+{
+  std::cout << context << std::endl;
+
+  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin();
+        it != so.end(); it++ )
+    {
+      std::cout << "So-Content (ptr, priority, load, hol): "
+                << (*it) << ", "
+                << (*it)->GetPriority() << ", "
+                << (*it)->GetBufferedBytes() << ", "
+                << (*it)->GetHolDelay() << std::endl;
+    }
+
+  std::cout << std::endl;
+}
+#endif
+
+bool
+SatFwdLinkScheduler::CompareSoPriority (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
+{
+  return (bool) (obj1->GetPriority () < obj2->GetPriority ());
+}
+
+bool
+SatFwdLinkScheduler::CompareSoPriorityLoad (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
+{
+  bool result = CompareSoPriority (obj1, obj2);
+
+  if ( obj1->GetPriority() == obj2->GetPriority() )
+    {
+      result = (bool) ( obj1->GetBufferedBytes() > obj2->GetBufferedBytes() );
+    }
+
+  return result;
+}
+
+bool
+SatFwdLinkScheduler::CompareSoPriorityHol (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
+{
+  bool result = CompareSoPriority (obj1, obj2);
+
+  if ( obj1->GetPriority() == obj2->GetPriority() )
+    {
+      result = (bool) ( obj1->GetHolDelay() > obj2->GetHolDelay() );
+    }
+
+  return result;
+}
 
 TypeId
 SatFwdLinkScheduler::GetTypeId (void)
@@ -73,15 +127,13 @@ SatFwdLinkScheduler::GetTypeId (void)
                     TimeValue (Seconds (0.015)),
                     MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStopThresholdTime),
                     MakeTimeChecker ())
-    .AddAttribute ("SchedulingSortCriteria",
-                   "Sorting criteria fort scheduling objects from LLC.",
+    .AddAttribute ("AdditionalSortCriteria",
+                   "Sorting criteria after priority for scheduling objects from LLC.",
                     EnumValue (SatFwdLinkScheduler::NO_SORT),
-                    MakeEnumAccessor (&SatFwdLinkScheduler::m_schedulingSortCriteria),
+                    MakeEnumAccessor (&SatFwdLinkScheduler::m_additionalSortCriteria),
                     MakeEnumChecker (SatFwdLinkScheduler::NO_SORT, "No sorting",
                                      SatFwdLinkScheduler::BUFFERING_DELAY_SORT, "Sorting by delay in buffer",
-                                     SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "Sorting by load in buffer",
-                                     SatFwdLinkScheduler::RANDOM_SORT, "Random sorting ",
-                                     SatFwdLinkScheduler::PRIORITY_SORT, "Sorting by priority"))
+                                     SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "Sorting by load in buffer"))
 
   ;
   return tid;
@@ -118,7 +170,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   dummyPacket->AddPacketTag (tag);
 
   // Add dummy packet to dummy frame
-  m_dummyFrame->AddTransmitData (dummyPacket, false);
+  m_dummyFrame->AddTransmitData (dummyPacket);
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
 }
@@ -223,14 +275,8 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
         {
           uint32_t currentObBytes = (*it)->GetBufferedBytes ();
           double cno = GetSchedulingObjectCno (*it);
-          uint32_t currentObMinReqBytes = 5;
-          priorityClass = 1;
-
-          if ( (*it)->IsControl () )
-            {
-              currentObMinReqBytes = 500;
-              priorityClass = 0;
-            }
+          uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
+          priorityClass = (*it)->GetPriority ();
 
           while ( (m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime ) &&
                    (currentObBytes > 0) )
@@ -258,7 +304,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
                     {
                       uint32_t bytesLeft = 0;
 
-                      frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft ,(*it)->IsControl () );
+                      frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft );
                       currentObBytes = bytesLeft;
                     }
                 }
@@ -281,17 +327,10 @@ SatFwdLinkScheduler::GetSchedulingObjects ()
 
   if ( m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime )
     {
-    // Get scheduling objects from LLC
-    so = m_schedContextCallback ();
+      // Get scheduling objects from LLC
+      so = m_schedContextCallback ();
 
-    if ( so.empty () == false )
-      {
-        // sort if there is more than one scheduling objects
-        if ( so.size() > 1 )
-          {
-            SortSchedulingObjects (so);
-          }
-      }
+      SortSchedulingObjects (so);
     }
 
   return so;
@@ -302,28 +341,36 @@ SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject
 {
   NS_LOG_FUNCTION (this);
 
-  //TODO: Sorting should be implemented
-  switch (m_schedulingSortCriteria)
-  {
-    case SatFwdLinkScheduler::NO_SORT:
-      // no sort, use them objects in order got from upper layer
-      break;
+  // sort only if there is need to sort
+  if ( ( so.empty () == false ) && ( so.size() > 1 ) )
+    {
+#ifdef SAT_FWD_LINK_SCHEDULER_PRINT_SORT_RESULT
+      PrintSoContent ("Before sort",  so);
+#endif
 
-    case SatFwdLinkScheduler::PRIORITY_SORT:
-      break;
+      switch (m_additionalSortCriteria)
+        {
+          case SatFwdLinkScheduler::NO_SORT:
+            std::sort (so.begin (), so.end (), CompareSoPriority);
+            break;
 
-    case SatFwdLinkScheduler::BUFFERING_DELAY_SORT:
-      break;
+          case SatFwdLinkScheduler::BUFFERING_DELAY_SORT:
+            std::sort (so.begin (), so.end (), CompareSoPriorityHol);
+            break;
 
-    case SatFwdLinkScheduler::BUFFERING_LOAD_SORT:
-      break;
+          case SatFwdLinkScheduler::BUFFERING_LOAD_SORT:
+            std::sort (so.begin (), so.end (), CompareSoPriorityLoad);
+            break;
 
-    case SatFwdLinkScheduler::RANDOM_SORT:
-      break;
+          default:
+            NS_FATAL_ERROR ("Not supported sorting criteria!!!");
+            break;
+        }
 
-    default:
-      break;
-  }
+#ifdef SAT_FWD_LINK_SCHEDULER_PRINT_SORT_RESULT
+        PrintSoContent ("After sort",  so);
+#endif
+    }
 }
 
 Ptr<SatBbFrame>
@@ -443,7 +490,7 @@ SatFwdLinkScheduler::AddFrameToContainer (uint32_t priorityClass, Ptr<SatBbFrame
 }
 
 uint32_t
-SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint32_t &bytesLeft, bool control )
+SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint32_t &bytesLeft )
 {
   NS_LOG_FUNCTION (this);
 
@@ -454,22 +501,15 @@ SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> fram
 
   if ( p )
     {
-      frameBytesLeft = frame->AddTransmitData (p, control );
+      frameBytesLeft = frame->AddTransmitData (p);
     }
-  else if ( control )
+  else if ( frame->GetBytesLeft() == frame->GetSizeInBytes () )
     {
-      if ( frame->GetBytesLeft() == frame->GetSizeInBytes () )
-        {
-           NS_FATAL_ERROR ("Control packet does not fit in BB Frame!!!");
-        }
+      NS_FATAL_ERROR ("Packet does not fit in empty BB Frame. Control package too long or fragmentation problem in user package!!!");
     }
-  else
-    {
-      NS_FATAL_ERROR ("Possible error in LLC???");
-    }
+  // TODO: else should we try to fill frame with some other data?
 
   return frameBytesLeft;
 }
-
 
 } // namespace ns3

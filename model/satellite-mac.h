@@ -96,8 +96,8 @@ public:
 
   /**
    * Callback to notify upper layer about Tx opportunity.
-   * \param Mac48Address address
    * \param uint32_t payload size in bytes
+   * \param Mac48Address address
    * \return packet Packet to be transmitted to PHY
    */
   typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint32_t& > TxOpportunityCallback;
