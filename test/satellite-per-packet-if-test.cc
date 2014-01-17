@@ -153,7 +153,7 @@ SatPerPacketBaseTestCase::InitOutput( bool figureOutput )
       pos = m_extName.find('.');
     }
 
-  m_extName.insert (m_extName.begin (), '_');
+  m_extName.insert (m_extName.end (), '_');
 
   ptrCont->EnableFigureOutput (figureOutput);
   ptrCont->InsertTag (m_extName);
@@ -210,14 +210,14 @@ private:
 };
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defFwdUserName, "IfTestFU", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defFwdUserName, "IfTestFwdUsr", SatEnums::FADING_OFF, false,
                               StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512))
 {
 
 }
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
- : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFU_" + name, fading, dummyFrames,
+ : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFwdUsr_" + name, fading, dummyFrames,
                              StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512) )
 {
 
@@ -225,7 +225,7 @@ SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string na
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
- : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFU_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
+ : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFwdUsr_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
 {
 
 }
@@ -362,7 +362,7 @@ private:
 };
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase ()
-  : SatPerPacketBaseTestCase (defFwdFullName, "IfTestFF", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defFwdFullName, "IfTestFwdFull", SatEnums::FADING_OFF, false,
                               StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 
 {
@@ -370,7 +370,7 @@ SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase ()
 }
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFF_"+ name, fading, dummyFrames,
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFwdFull_"+ name, fading, dummyFrames,
                               StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 {
 
@@ -378,7 +378,7 @@ SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string na
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFF_"+ name, fading, dummyFrames,
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFwdFull_"+ name, fading, dummyFrames,
                               ival1, pSize1, ival2, pSize2 )
 {
 
@@ -503,14 +503,14 @@ private:
 };
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defRtnUserName , "IfTestRU", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defRtnUserName , "IfTestRtnUsr", SatEnums::FADING_OFF, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
 }
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRU_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRtnUsr_"+ name, fading, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
@@ -518,7 +518,7 @@ SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string na
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRU_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRtnUsr_"+ name, fading, false,
                               ival1, pSize1, ival2, pSize2 )
 {
   }
@@ -622,14 +622,14 @@ private:
 };
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase ()
-  : SatPerPacketBaseTestCase (defRtnFullName, "IfTestRF", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defRtnFullName, "IfTestRtnFull", SatEnums::FADING_OFF, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
 }
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRF_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRtnFull_"+ name, fading, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
@@ -638,7 +638,7 @@ SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string na
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRF_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRtnFull_"+ name, fading, false,
                               ival1, pSize1, ival2, pSize2 )
 {
 
@@ -732,6 +732,7 @@ SatPerPacketIfTestSuite::SatPerPacketIfTestSuite ()
   : TestSuite ("sat-per-packet-if-test", SYSTEM)
 {
   AddTestCase (new SatPerPacketFwdLinkUserTestCase);
+  AddTestCase (new SatPerPacketFwdLinkUserTestCase ("DummyFrames.", SatEnums::FADING_OFF, true ));
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading.", SatEnums::FADING_MARKOV, false ));
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading, DummyFrames.", SatEnums::FADING_MARKOV, true ));
 
