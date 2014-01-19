@@ -26,7 +26,7 @@
 #include "satellite-return-link-encapsulator.h"
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
-#include "satellite-rle-pdu-status-tag.h"
+#include "satellite-encap-pdu-status-tag.h"
 #include "satellite-rle-headers.h"
 #include "satellite-time-tag.h"
 
@@ -122,8 +122,8 @@ SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p)
       p->AddPacketTag (timeTag);
 
       // Mark the PDU with FULL_PDU tag
-      SatRlePduStatusTag tag;
-      tag.SetStatus (SatRlePduStatusTag::FULL_PPDU);
+      SatEncapPduStatusTag tag;
+      tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
       p->AddPacketTag (tag);
 
       /**
@@ -188,9 +188,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   m_txBuffer.erase (m_txBuffer.begin ());
 
   // If the next PDU is full, increase the fragment id
-  SatRlePduStatusTag tag;
+  SatEncapPduStatusTag tag;
   firstSegment->PeekPacketTag (tag);
-  if (tag.GetStatus () == SatRlePduStatusTag::FULL_PPDU)
+  if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
     {
       m_txFragmentId++;
     }
@@ -211,7 +211,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
           // Status tag of the new and remaining segments
           // Note: This is the only place where a PDU is segmented and
           // therefore its status can change
-          SatRlePduStatusTag oldTag, newTag;
+          SatEncapPduStatusTag oldTag, newTag;
           firstSegment->RemovePacketTag (oldTag);
           newSegment->RemovePacketTag (newTag);
 
@@ -220,17 +220,17 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
           ppduHeader.SetPPduLength (newSegment->GetSize());
           ppduHeader.SetFragmentId (m_txFragmentId);
 
-          if (oldTag.GetStatus () == SatRlePduStatusTag::FULL_PPDU)
+          if (oldTag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
             {
               ppduHeader.SetStartIndicator ();
               ppduHeader.SetTotalLength (firstSegment->GetSize());
-              newTag.SetStatus (SatRlePduStatusTag::START_PPDU);
-              oldTag.SetStatus (SatRlePduStatusTag::END_PPDU);
+              newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
+              oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
             }
-          else if (oldTag.GetStatus () == SatRlePduStatusTag::END_PPDU)
+          else if (oldTag.GetStatus () == SatEncapPduStatusTag::END_PDU)
             {
               // oldTag still is left with the END_PPDU tag
-              newTag.SetStatus (SatRlePduStatusTag::CONTINUATION_PPDU);
+              newTag.SetStatus (SatEncapPduStatusTag::CONTINUATION_PDU);
             }
 
           // Give back the remaining segment to the transmission buffer
@@ -289,9 +289,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
           ppduHeader.SetFragmentId (m_txFragmentId);
           ppduHeader.SetPPduLength (firstSegment->GetSize());
 
-          SatRlePduStatusTag tag;
+          SatEncapPduStatusTag tag;
           firstSegment->PeekPacketTag (tag);
-          if (tag.GetStatus() == SatRlePduStatusTag::FULL_PPDU)
+          if (tag.GetStatus() == SatEncapPduStatusTag::FULL_PDU)
             {
               ppduHeader.SetStartIndicator ();
             }
@@ -314,9 +314,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
               NS_LOG_LOGIC ("        txBufferSize = " << m_txBufferSize );
 
               // If the next PDU is full, increase the fragment id
-              SatRlePduStatusTag tag;
+              SatEncapPduStatusTag tag;
               firstSegment->PeekPacketTag (tag);
-              if (tag.GetStatus () == SatRlePduStatusTag::FULL_PPDU)
+              if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
                 {
                   m_txFragmentId++;
                 }

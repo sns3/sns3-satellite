@@ -140,19 +140,14 @@ private:
   uint32_t m_txBufferSize;
 
   /**
-   * Maximum Addressed Link PDU size
+   * Maximum GSE PDU size
    */
-  uint32_t m_maxAlPduSize;
+  uint32_t m_maxGsePduSize;
 
   /**
-   * Physical PDU header size
+   * GSE PDU header size
    */
-  uint32_t m_ppduHeaderSize;
-
-  /**
-   * Frame PDU header size
-   */
-  uint32_t m_fpduHeaderSize;
+  uint32_t m_gseHeaderSize;
 
   /**
    * Fragment id used in the packet transmissions

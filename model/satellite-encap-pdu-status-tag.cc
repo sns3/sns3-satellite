@@ -18,63 +18,63 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "satellite-rle-pdu-status-tag.h"
+#include "satellite-encap-pdu-status-tag.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatRlePduStatusTag);
+NS_OBJECT_ENSURE_REGISTERED (SatEncapPduStatusTag);
 
-SatRlePduStatusTag::SatRlePduStatusTag ()
+SatEncapPduStatusTag::SatEncapPduStatusTag ()
 {
 }
 
 void
-SatRlePduStatusTag::SetStatus (uint8_t status)
+SatEncapPduStatusTag::SetStatus (uint8_t status)
 {
-  m_ppduStatus = status;
+  m_pduStatus = status;
 }
 
 uint8_t
-SatRlePduStatusTag::GetStatus (void) const
+SatEncapPduStatusTag::GetStatus (void) const
 {
-  return m_ppduStatus;
+  return m_pduStatus;
 }
 
 
 TypeId
-SatRlePduStatusTag::GetTypeId (void)
+SatEncapPduStatusTag::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatRlePduStatusTag")
+  static TypeId tid = TypeId ("ns3::SatEncapPduStatusTag")
     .SetParent<Tag> ()
-    .AddConstructor<SatRlePduStatusTag> ()
+    .AddConstructor<SatEncapPduStatusTag> ()
   ;
   return tid;
 }
 TypeId
-SatRlePduStatusTag::GetInstanceTypeId (void) const
+SatEncapPduStatusTag::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 uint32_t
-SatRlePduStatusTag::GetSerializedSize (void) const
+SatEncapPduStatusTag::GetSerializedSize (void) const
 {
   return 1;
 }
 void
-SatRlePduStatusTag::Serialize (TagBuffer i) const
+SatEncapPduStatusTag::Serialize (TagBuffer i) const
 {
-  i.WriteU8 (m_ppduStatus);
+  i.WriteU8 (m_pduStatus);
 }
 void
-SatRlePduStatusTag::Deserialize (TagBuffer i)
+SatEncapPduStatusTag::Deserialize (TagBuffer i)
 {
-  m_ppduStatus = i.ReadU8 ();
+  m_pduStatus = i.ReadU8 ();
 }
 void
-SatRlePduStatusTag::Print (std::ostream &os) const
+SatEncapPduStatusTag::Print (std::ostream &os) const
 {
-  os << "PPDU Status=" << (uint32_t) m_ppduStatus;
+  os << "PPDU Status=" << (uint32_t) m_pduStatus;
 }
 
 }; // namespace ns3

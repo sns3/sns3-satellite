@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_RLE_PDU_STATUS_TAG_H
-#define SATELLITE_RLE_PDU_STATUS_TAG_H
+#ifndef SATELLITE_ENCAP_PDU_STATUS_TAG_H
+#define SATELLITE_ENCAP_PDU_STATUS_TAG_H
 
 #include "ns3/tag.h"
 
@@ -28,23 +28,23 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatRlePduStatusTag is used to tag Payload adapted
- * PDUs in fragmentation.
+ * \brief SatEncapPduStatusTag is used to tag packets in the
+ * fragmentation process
  */
-class SatRlePduStatusTag : public Tag
+class SatEncapPduStatusTag : public Tag
 {
 public:
-  SatRlePduStatusTag ();
+  SatEncapPduStatusTag ();
 
   /**
-   * Set PPDU status
-   * \param status PpduStatus_t
+   * Set PDU status
+   * \param status
    */
   void SetStatus (uint8_t status);
 
   /**
-   * Get PPDU status
-   * \return uint8_t PPDU status
+   * Get PDU status
+   * \return uint8_t PDU status
    */
   uint8_t GetStatus (void) const;
 
@@ -56,19 +56,19 @@ public:
   virtual void Print (std::ostream &os) const;
 
   /**
-   * Enums for Payload adapted PDU fragmentation
+   * Fragmentation enums
    */
-  typedef enum { FULL_PPDU          = 0,
-                 START_PPDU         = 1,
-                 CONTINUATION_PPDU  = 2,
-                 END_PPDU           = 3,
-                 LAST_ELEMENT       = 4 } PpduStatus_t;
+  typedef enum { FULL_PDU          = 0,
+                 START_PDU         = 1,
+                 CONTINUATION_PDU  = 2,
+                 END_PDU           = 3,
+                 LAST_ELEMENT       = 4 } PduStatus_t;
 
 private:
-  uint8_t m_ppduStatus;
+  uint8_t m_pduStatus;
 };
 
 
 }; // namespace ns3
 
-#endif // SATELLITE_ENCAPSULATION_STATUS_TAG_H
+#endif // SATELLITE_ENCAP_PDU_STATUS_TAG_H
