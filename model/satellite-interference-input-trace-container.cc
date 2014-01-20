@@ -86,25 +86,40 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
 
   std::stringstream filename;
 
-  int32_t traceId = Singleton<SatIdMapper>::Get ()->GetTraceIdWithMac (key.first);
+  int32_t gwId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (key.first);
+  int32_t utId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (key.first);
+  int32_t beamId = Singleton<SatIdMapper>::Get ()->GetBeamIdWithMac (key.first);
 
-  if (traceId < 0)
+  if (beamId < 0 || (utId < 0 && gwId < 0))
     {
-      NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode - No such MAC address in the trace ID mapper");
+      return NULL;
+    }
+  else
+    {
+      if (utId >= 0 && gwId < 0)
+        {
+          filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/input/BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+        }
+
+      if (gwId >= 0 && utId < 0)
+        {
+          filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/input/BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+        }
+
+      std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+
+      if (result.second == false)
+        {
+          NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
+        }
+
+      NS_LOG_INFO ("SatInterferenceInputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
+
+      return result.first->second;
     }
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/input/id_" << traceId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
-
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
-
-  if (result.second == false)
-    {
-      NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
-    }
-
-  NS_LOG_INFO ("SatInterferenceInputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
-
-  return result.first->second;
+  NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
+  return NULL;
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>

@@ -44,7 +44,7 @@ SatRxPowerOutputTraceContainer::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
