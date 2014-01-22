@@ -124,17 +124,17 @@ public:
   /**
    * \return container having UT users
    */
-  NodeContainer  GetUtUsers ();
+  NodeContainer GetUtUsers () const;
 
   /**
    * \return container having GW users.
    */
-  NodeContainer  GetGwUsers ();
+  NodeContainer GetGwUsers () const;
 
   /**
    * \return pointer to beam helper.
    */
-  Ptr<SatBeamHelper>  GetBeamHelper () { return m_beamHelper;}
+  Ptr<SatBeamHelper> GetBeamHelper () const;
 
   /**
    * Enables creation traces to be written in given file
@@ -199,7 +199,7 @@ private:
    * \param title title for summary
    * \returns std::string as summary
    */
-  std::string CreateCreationSummary(std::string title);
+  std::string CreateCreationSummary (std::string title);
 
   /**
    * Sets mobilities to created GW nodes.
@@ -229,7 +229,7 @@ private:
    *
    * \param nodes Nodecontainer of nodes to install mobility observer.
    */
-  void  InstallMobilityObserver (NodeContainer nodes) const;
+  void InstallMobilityObserver (NodeContainer nodes) const;
 
   /**
    * \brief Set the initial network number to use during allocation of satellite
@@ -312,7 +312,7 @@ private:
   /**
    * Stream wrapper used for UT position traces
    */
-  Ptr<OutputStreamWrapper>m_utTraceStream;
+  Ptr<OutputStreamWrapper> m_utTraceStream;
 
   bool m_hasBeamNetworkSet;  ///< #m_beamNetworkAddress has been set a value.
   bool m_hasGwNetworkSet;    ///< #m_gwNetworkAddress has been set a value.

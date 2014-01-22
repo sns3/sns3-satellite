@@ -252,19 +252,26 @@ SatHelper::GetUserAddress(Ptr<Node> node)
 }
 
 NodeContainer
-SatHelper::GetUtUsers()
+SatHelper::GetUtUsers () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_userHelper->GetUtUsers();
+  return m_userHelper->GetUtUsers ();
 }
 
 NodeContainer
-SatHelper::GetGwUsers()
+SatHelper::GetGwUsers () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_userHelper->GetGwUsers();
+  return m_userHelper->GetGwUsers ();
+}
+
+Ptr<SatBeamHelper>
+SatHelper::GetBeamHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_beamHelper;
 }
 
 void
@@ -468,6 +475,8 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
 bool
 SatHelper::SetBeamNetworkAddress (Ipv4Address addr)
 {
+  NS_LOG_FUNCTION (this << addr);
+
   if (m_hasGwNetworkSet && (addr == m_gwNetworkAddress))
     {
       NS_FATAL_ERROR ("Network number " << addr << " has been used in GW network");
@@ -495,6 +504,8 @@ SatHelper::GetBeamNetworkAddress () const
 bool
 SatHelper::SetGwNetworkAddress (Ipv4Address addr)
 {
+  NS_LOG_FUNCTION (this << addr);
+
   if (m_hasBeamNetworkSet && (addr == m_beamNetworkAddress))
     {
       NS_FATAL_ERROR ("Network number " << addr << " has been used in beam network");
@@ -522,6 +533,8 @@ SatHelper::GetGwNetworkAddress () const
 bool
 SatHelper::SetUtNetworkAddress (Ipv4Address addr)
 {
+  NS_LOG_FUNCTION (this << addr);
+
   if (m_hasBeamNetworkSet && (addr == m_beamNetworkAddress))
     {
       NS_FATAL_ERROR ("Network number " << addr << " has been used in beam network");
