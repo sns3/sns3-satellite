@@ -429,7 +429,7 @@ SatBeamHelper::GetBeamInfo ()
 }
 
 std::string
-SatBeamHelper::GetUtPositionInfo ()
+SatBeamHelper::GetUtInfo ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -491,7 +491,7 @@ SatBeamHelper::CreateBeamInfo ()
 
   std::ostringstream oss;
 
-  oss << std::endl << " -- Beam detailes --";
+  oss << std::endl << " -- Beam details --";
 
   for (std::map<uint32_t, uint32_t>::iterator i = m_beam.begin (); i != m_beam.end (); i++)
     {
@@ -508,7 +508,7 @@ SatBeamHelper::CreateBeamInfo ()
       oss << ", GW ID: " << (*i).second;
     }
 
-  oss << std::endl << std::endl << " -- GW positions --" << std::endl;
+  oss << std::endl << std::endl << " -- GW details --" << std::endl;
 
   oss.precision (8);
   oss.setf (std::ios::fixed, std::ios::floatfield);
@@ -517,9 +517,50 @@ SatBeamHelper::CreateBeamInfo ()
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
       GeoCoordinate pos = model->GetGeoPosition ();
-      oss << "GW " << i->first << ": latitude=" << pos.GetLatitude ()
-    		  << ", longitude=" << pos.GetLongitude ()
-    		  << ", altitude=" << pos.GetAltitude () << std::endl;
+
+      Address devAddress;
+      Ptr<Ipv4> ipv4 = i->second->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+
+      std::vector<Ipv4Address> IPAddressVector;
+      std::vector<std::string> devNameVector;
+      std::vector<Address> devAddressVector;
+
+      for ( uint32_t j = 0; j < i->second->GetNDevices (); j++)
+        {
+          Ptr<NetDevice> device = i->second->GetDevice (j);
+
+          if ( device->GetInstanceTypeId ().GetName () == "ns3::SatNetDevice")
+            {
+              devAddress = device->GetAddress ();
+            }
+
+          IPAddressVector.push_back (ipv4->GetAddress (j, 0).GetLocal()); // Get Ipv4InterfaceAddress of interface
+          devNameVector.push_back (device->GetInstanceTypeId ().GetName ());
+          devAddressVector.push_back (device->GetAddress ());
+        }
+
+      if ( m_printDetailedInformationToCreationTraces )
+        {
+          oss << "GW=" << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+              << " latitude=" << pos.GetLatitude ()
+              << " longitude=" << pos.GetLongitude ()
+              << " altitude=" << pos.GetAltitude () << " ";
+
+          for ( uint32_t j = 0; j < i->second->GetNDevices (); j++)
+            {
+              oss << devNameVector[j] << " " << devAddressVector[j] << " " << IPAddressVector[j] << " ";
+            }
+
+          oss << std::endl;
+        }
+      else
+        {
+          oss << "GW=" << i->first << " "
+              << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) <<  " "
+              << " latitude=" << pos.GetLatitude ()
+              << " longitude=" << pos.GetLongitude ()
+              << " altitude=" << pos.GetAltitude () << std::endl;
+        }
     }
 
   oss << std::endl << " -- Geo Satellite position --" << std::endl;

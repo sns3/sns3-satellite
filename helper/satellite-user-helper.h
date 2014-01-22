@@ -174,6 +174,13 @@ public:
    */
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
+  /**
+   * Get router information.
+   *
+   * \return Information of router used between GWs and users.
+   */
+  std::string GetRouterInfo () const;
+
 private:
 
   /**
@@ -200,6 +207,14 @@ private:
    */
   NetDeviceContainer InstallIdealNetwork (const NodeContainer &c ) const;
 
+  /**
+   * Install IP router to to Gateways. Creates csma link between gateways and router.
+   *
+   * \param gw      container having GWs
+   * \param router  pointer to IP router
+   */
+  void InstallRouter(NodeContainer gw, Ptr<Node> router);
+
   CsmaHelper        m_csma;
   Ipv4AddressHelper m_ipv4Ut;
   Ipv4AddressHelper m_ipv4Gw;
@@ -210,18 +225,13 @@ private:
   NetworkType       m_backboneNetworkType;
   NetworkType       m_subscriberNetworkType;
 
+  Ptr<Node>         m_router;
+
   /**
    * Trace callback for creation traces
    */
   TracedCallback<std::string> m_creation;
 
-  /**
-   * Install IP router to to Gateways. Creates csma link between gateways and router.
-   *
-   * \param gw      container having GWs
-   * \param router  pointer to IP router
-   */
-  void InstallRouter(NodeContainer gw, Ptr<Node> router);
 };
 
 } // namespace ns3

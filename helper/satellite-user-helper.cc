@@ -64,35 +64,46 @@ SatUserHelper::GetInstanceTypeId (void) const
 }
 
 SatUserHelper::SatUserHelper ()
+ :m_router (0)
 {
-
+  NS_LOG_FUNCTION (this);
 }
 
 void 
 SatUserHelper::SetCsmaDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this);
+
   m_csma.SetDeviceAttribute(n1,v1);
 }
 
 void
 SatUserHelper::SetCsmaChannelAttribute (std::string n1, const AttributeValue &v1)
 {
+  NS_LOG_FUNCTION (this);
+
   m_csma.SetChannelAttribute(n1,v1);
 }
 
 void SatUserHelper::SetUtBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
 {
+  NS_LOG_FUNCTION (this);
+
   m_ipv4Ut.SetBase(network, mask, address);
 }
 
 void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
 {
+  NS_LOG_FUNCTION (this);
+
   m_ipv4Gw.SetBase(network, mask, address);
 }
 
 NodeContainer
 SatUserHelper::InstallUt (NodeContainer ut, uint32_t userCount )
 {
+  NS_LOG_FUNCTION (this << userCount);
+
   NodeContainer createdUsers;
 
   // create users and csma links between UTs and users and add IP routes
@@ -107,7 +118,12 @@ SatUserHelper::InstallUt (NodeContainer ut, uint32_t userCount )
 NodeContainer
 SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
 {
-  NS_ASSERT(userCount > 0);
+  NS_LOG_FUNCTION (this << userCount);
+
+  if ( userCount == 0 )
+    {
+      NS_FATAL_ERROR ("User count is zero!!!");
+    }
 
   InternetStackHelper internet;
 
@@ -140,24 +156,21 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
 NodeContainer
 SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 {
-  InternetStackHelper internet;
-  Ptr<Node> router;
+  NS_LOG_FUNCTION (this << userCount);
 
-  if (gw.GetN() == 1)
+  InternetStackHelper internet;
+
+  if ( m_router == NULL )
     {
-      router = gw.Get(0);
-    }
-  else
-    {
-      router = CreateObject<Node>();
-      internet.Install(router);
-      InstallRouter(gw, router);
+      m_router = CreateObject<Node> ();
+      internet.Install (m_router);
+      InstallRouter (gw, m_router);
     }
 
   // create users and csma links between Router and users and add IP routes
   NodeContainer users;
   users.Create(userCount);
-  NodeContainer routerUsers = NodeContainer(router, users);
+  NodeContainer routerUsers = NodeContainer(m_router, users);
 
   internet.Install (users);
 
@@ -165,8 +178,8 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
   Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
-  Ptr<Ipv4> ipv4Router = router->GetObject<Ipv4> ();
-  uint32_t lastRouterIf = ipv4Router->GetNInterfaces() - 1;
+  Ptr<Ipv4> ipv4Router = m_router->GetObject<Ipv4> ();
+  uint32_t lastRouterIf = ipv4Router->GetNInterfaces () - 1;
   Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
   routingRouter->SetDefaultRoute(addresses.GetAddress(1), lastRouterIf);
   NS_LOG_INFO ("SatUserHelper::InstallGw, Router default route: " << addresses.GetAddress(1) );
@@ -190,36 +203,48 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 NodeContainer
 SatUserHelper::GetGwUsers()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_gwUsers;
 }
 
 NodeContainer
 SatUserHelper::GetUtUsers()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_utUsers;
 }
 
 uint32_t
 SatUserHelper::GetGwUserCount()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_gwUsers.GetN();
 }
 
 uint32_t
 SatUserHelper::GetUtUserCount()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_utUsers.GetN();
 }
 
 void
 SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
+  NS_LOG_FUNCTION (this);
+
   TraceConnect("Creation", "SatUserHelper", cb);
 }
 
 void
 SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
 {
+  NS_LOG_FUNCTION (this);
+
   for (NodeContainer::Iterator i = gw.Begin (); i != gw.End (); i++)
   {
     NodeContainer gwRouter = NodeContainer((*i), router);
@@ -261,6 +286,8 @@ SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
 NetDeviceContainer
 SatUserHelper::InstallSubscriberNetwork (const NodeContainer &c ) const
 {
+  NS_LOG_FUNCTION (this);
+
   NetDeviceContainer devs;
 
   switch (m_subscriberNetworkType)
@@ -284,6 +311,8 @@ SatUserHelper::InstallSubscriberNetwork (const NodeContainer &c ) const
 NetDeviceContainer
 SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
 {
+  NS_LOG_FUNCTION (this);
+
   NetDeviceContainer devs;
 
   switch (m_backboneNetworkType)
@@ -307,6 +336,8 @@ SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
 NetDeviceContainer
 SatUserHelper::InstallIdealNetwork (const NodeContainer &c ) const
 {
+  NS_LOG_FUNCTION (this);
+
   NetDeviceContainer devs;
   Ptr<SimpleChannel> channel = CreateObject<SimpleChannel>();
 
@@ -322,5 +353,32 @@ SatUserHelper::InstallIdealNetwork (const NodeContainer &c ) const
   return devs;
 }
 
+std::string
+SatUserHelper::GetRouterInfo () const
+{
+  NS_LOG_FUNCTION (this);
+
+  std::ostringstream oss;
+
+  Address devAddress;
+  Ptr<Ipv4> ipv4 = m_router->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+
+  std::vector<Ipv4Address> IPAddressVector;
+  std::vector<std::string> devNameVector;
+  std::vector<Address> devAddressVector;
+
+  oss << "---  Router info  ---" << std::endl << std::endl;
+
+  for ( uint32_t j = 0; j < m_router->GetNDevices (); j++)
+    {
+      Ptr<NetDevice> device = m_router->GetDevice (j);
+
+      oss << device->GetInstanceTypeId ().GetName () << " ";
+      oss << device->GetAddress () << " ";
+      oss << ipv4->GetAddress (j, 0).GetLocal() << " ";
+    }
+
+  return oss.str ();
+}
 
 } // namespace ns3

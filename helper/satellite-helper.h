@@ -270,7 +270,7 @@ private:
   /**
    * Stream wrapper used for UT position traces
    */
-  Ptr<OutputStreamWrapper>m_utPosTraceStream;
+  Ptr<OutputStreamWrapper>m_utTraceStream;
 
   /**
    * flag to check if scenario is alreay created.

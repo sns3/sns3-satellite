@@ -159,14 +159,14 @@ public:
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
   /**
-   * \return info of created beams as std::string.
+   * \return info of created beams as std::string with GW info..
    */
   std::string GetBeamInfo ();
 
   /**
-   * \return info of UT positions
+   * \return Information of UTs.
    */
-  std::string GetUtPositionInfo ();
+  std::string GetUtInfo ();
 
   /**
    * Gets GW node according to given id.

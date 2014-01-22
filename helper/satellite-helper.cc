@@ -199,7 +199,7 @@ void SatHelper::EnableCreationTraces(std::string filename, bool details)
     }
 
   m_creationTraceStream = asciiTraceHelper.CreateFileStream (outputFile);
-  m_utPosTraceStream = asciiTraceHelper.CreateFileStream ("ut-pos-" + outputFile);
+  m_utTraceStream = asciiTraceHelper.CreateFileStream ("ut-pos-" + outputFile);
 
   TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 
@@ -457,7 +457,7 @@ void
 SatHelper::CreationSummarySink(std::string title)
 {
   *m_creationTraceStream->GetStream () << CreateCreationSummary (title);
-  *m_utPosTraceStream->GetStream() << m_beamHelper->GetUtPositionInfo ();
+  *m_utTraceStream->GetStream() << m_beamHelper->GetUtInfo ();
 }
 
 std::string
@@ -469,7 +469,8 @@ SatHelper::CreateCreationSummary(std::string title)
   oss << "--- User Info ---" << std::endl << std::endl;
   oss << "Created GW users: " << m_userHelper->GetGwUserCount() << ", ";
   oss << "Created UT users: " << m_userHelper->GetUtUserCount() << std::endl << std::endl;
-  oss << m_beamHelper->GetBeamInfo() << std::endl;
+  oss << m_userHelper->GetRouterInfo () << std::endl << std:: endl;
+  oss << m_beamHelper->GetBeamInfo () << std::endl;
 
   return oss.str();
 }
