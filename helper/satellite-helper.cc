@@ -54,6 +54,30 @@ SatHelper::GetTypeId (void)
                       UintegerValue (3),
                       MakeUintegerAccessor (&SatHelper::m_utUsers),
                       MakeUintegerChecker<uint32_t> (1))
+      .AddAttribute ("BeamNetworkAddress",
+                     "Initial network number to use "
+                     "during allocation of satellite devices "
+                     "(255.255.255.0 will be used as the network mask)",
+                     Ipv4AddressValue ("10.1.1.0"),
+                     MakeIpv4AddressAccessor (&SatHelper::SetBeamNetworkAddress,
+                                              &SatHelper::GetBeamNetworkAddress),
+                     MakeIpv4AddressChecker ())
+      .AddAttribute ("GwNetworkAddress",
+                     "Initial network number to use "
+                     "during allocation of GW, router, and GW users "
+                     "(255.255.255.0 will be used as the network mask)",
+                     Ipv4AddressValue ("10.2.1.0"),
+                     MakeIpv4AddressAccessor (&SatHelper::SetGwNetworkAddress,
+                                              &SatHelper::GetGwNetworkAddress),
+                     MakeIpv4AddressChecker ())
+      .AddAttribute ("UtNetworkAddress",
+                     "Initial network number to use "
+                     "during allocation of UT and UT users "
+                     "(255.255.255.0 will be used as the network mask)",
+                     Ipv4AddressValue ("10.3.1.0"),
+                     MakeIpv4AddressAccessor (&SatHelper::SetUtNetworkAddress,
+                                              &SatHelper::GetUtNetworkAddress),
+                     MakeIpv4AddressChecker ())
       .AddTraceSource ("Creation", "Creation traces",
                         MakeTraceSourceAccessor (&SatHelper::m_creation))
       .AddTraceSource ("CreationSummary", "Creation summary traces",
@@ -80,8 +104,11 @@ SatHelper::SatHelper ()
 }
 
 SatHelper::SatHelper (std::string scenarioName)
- : m_scenarioCreated(false),
-   m_detailedCreationTraces(false)
+ : m_hasBeamNetworkSet (false),
+   m_hasGwNetworkSet (false),
+   m_hasUtNetworkSet (false),
+   m_scenarioCreated (false),
+   m_detailedCreationTraces (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -121,15 +148,6 @@ SatHelper::SatHelper (std::string scenarioName)
     {
       EnableDetailedCreationTraces();
     }
-
-  // set address base for GW user networks
-  m_userHelper->SetGwBaseAddress("10.2.1.0", "255.255.255.0");
-
-  // set address base for UT user networks
-  m_userHelper->SetUtBaseAddress("10.3.1.0", "255.255.255.0");
-
-  // set address base for satellite network
-  m_beamHelper->SetBaseAddress("10.1.1.0", "255.255.255.0");
 
   // set Csma channel attributes
   m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
@@ -445,6 +463,87 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
           (*i)->AggregateObject (observer);
         }
     }
+}
+
+bool
+SatHelper::SetBeamNetworkAddress (Ipv4Address addr)
+{
+  if (m_hasGwNetworkSet && (addr == m_gwNetworkAddress))
+    {
+      NS_FATAL_ERROR ("Network number " << addr << " has been used in GW network");
+      return false;
+    }
+
+  if (m_hasUtNetworkSet && (addr == m_utNetworkAddress))
+    {
+      NS_FATAL_ERROR ("Network number " << addr << " has been used in UT network");
+      return false;
+    }
+
+  m_beamHelper->SetBaseAddress (addr, "255.255.255.0");
+  m_beamNetworkAddress = addr;
+  m_hasBeamNetworkSet = true;
+  return true;
+}
+
+Ipv4Address
+SatHelper::GetBeamNetworkAddress () const
+{
+  return m_beamNetworkAddress;
+}
+
+bool
+SatHelper::SetGwNetworkAddress (Ipv4Address addr)
+{
+  if (m_hasBeamNetworkSet && (addr == m_beamNetworkAddress))
+    {
+      NS_FATAL_ERROR ("Network number " << addr << " has been used in beam network");
+      return false;
+    }
+
+  if (m_hasUtNetworkSet && (addr == m_utNetworkAddress))
+    {
+      NS_FATAL_ERROR ("Network number " << addr << " has been used in UT network");
+      return false;
+    }
+
+  m_userHelper->SetGwBaseAddress (addr, "255.255.255.0");
+  m_gwNetworkAddress = addr;
+  m_hasGwNetworkSet = true;
+  return true;
+}
+
+Ipv4Address
+SatHelper::GetGwNetworkAddress () const
+{
+  return m_gwNetworkAddress;
+}
+
+bool
+SatHelper::SetUtNetworkAddress (Ipv4Address addr)
+{
+  if (m_hasBeamNetworkSet && (addr == m_beamNetworkAddress))
+    {
+      NS_FATAL_ERROR ("Network number " << addr << " has been used in beam network");
+      return false;
+    }
+
+  if (m_hasGwNetworkSet && (addr == m_gwNetworkAddress))
+    {
+      NS_FATAL_ERROR ("Network number " << addr << " has been used in GW network");
+      return false;
+    }
+
+  m_userHelper->SetUtBaseAddress (addr, "255.255.255.0");
+  m_utNetworkAddress = addr;
+  m_hasUtNetworkSet = true;
+  return true;
+}
+
+Ipv4Address
+SatHelper::GetUtNetworkAddress () const
+{
+  return m_utNetworkAddress;
 }
 
 void

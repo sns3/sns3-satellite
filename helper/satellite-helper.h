@@ -232,6 +232,48 @@ private:
   void  InstallMobilityObserver (NodeContainer nodes) const;
 
   /**
+   * \brief Set the initial network number to use during allocation of satellite
+   *        devices.
+   * \param addr the initial network number, e.g., 10.1.1.0 (must be different
+   *             from network numbers of GW and UT networks)
+   * \return true if the operation is successful
+   *
+   * 255.255.255.0 will be used as the network mask.
+   */
+  bool SetBeamNetworkAddress (Ipv4Address addr);
+
+  /// \return the initial network number of satellite devices
+  Ipv4Address GetBeamNetworkAddress () const;
+
+  /**
+   * \brief Set the initial network number to use during allocation of GW,
+   *        router, and GW users.
+   * \param addr the initial network number, e.g., 10.2.1.0 (must be different
+   *             from network numbers of beam and UT networks)
+   * \return true if the operation is successful
+   *
+   * 255.255.255.0 will be used as the network mask.
+   */
+  bool SetGwNetworkAddress (Ipv4Address addr);
+
+  /// \return the initial network number of GW, router, and GW users
+  Ipv4Address GetGwNetworkAddress () const;
+
+  /**
+   * \brief Set the initial network number to use during allocation of UT and
+   *        UT users.
+   * \param addr the initial network number, e.g., 10.3.1.0 (must be different
+   *             from network numbers of beam and GW networks)
+   * \return true if the operation is successful
+   *
+   * 255.255.255.0 will be used as the network mask.
+   */
+  bool SetUtNetworkAddress (Ipv4Address addr);
+
+  /// \return the initial network number of UT and UT users
+  Ipv4Address GetUtNetworkAddress () const;
+
+  /**
    * User helper
    */
   Ptr<SatUserHelper> m_userHelper;
@@ -271,6 +313,14 @@ private:
    * Stream wrapper used for UT position traces
    */
   Ptr<OutputStreamWrapper>m_utTraceStream;
+
+  bool m_hasBeamNetworkSet;  ///< #m_beamNetworkAddress has been set a value.
+  bool m_hasGwNetworkSet;    ///< #m_gwNetworkAddress has been set a value.
+  bool m_hasUtNetworkSet;    ///< #m_utNetworkAddress has been set a value.
+
+  Ipv4Address m_beamNetworkAddress;  ///< Initial network number of satellite devices, e.g., 10.1.1.0.
+  Ipv4Address m_gwNetworkAddress;    ///< Initial network number of GW, router, and GW users, e.g., 10.2.1.0.
+  Ipv4Address m_utNetworkAddress;    ///< Initial network number of UT and UT users, e.g., 10.3.1.0.
 
   /**
    * flag to check if scenario is alreay created.
