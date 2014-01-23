@@ -14,7 +14,7 @@ using namespace ns3;
 * \brief Example for Markov model class logic.
 *
 */
-NS_LOG_COMPONENT_DEFINE ("markov-logic-example");
+NS_LOG_COMPONENT_DEFINE ("sat-markov-logic-example");
 
 static double g_elevation = 45;
 static double g_velocity = 0;
@@ -43,7 +43,7 @@ int
 main (int argc, char *argv[])
 {
   /// enable info logs
-  LogComponentEnable ("markov-logic-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-markov-logic-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovContainer", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovModel", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovConf", LOG_LEVEL_INFO);

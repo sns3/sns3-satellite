@@ -233,7 +233,7 @@ bool
 SatNetDevice::IsMulticast (void) const
 {
   NS_LOG_FUNCTION (this);
-  return false;
+  return true;
 }
 Address 
 SatNetDevice::GetMulticast (Ipv4Address multicastGroup) const

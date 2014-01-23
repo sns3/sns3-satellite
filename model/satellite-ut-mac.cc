@@ -290,7 +290,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
       NS_LOG_LOGIC("Receiver " << m_nodeInfo->GetMacAddress ());
 
       Mac48Address destAddress = Mac48Address::ConvertFrom(macTag.GetDestAddress());
-      if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast())
+      if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast () || destAddress.IsGroup ())
         {
           // Remove control msg tag
           SatControlMsgTag ctrlTag;

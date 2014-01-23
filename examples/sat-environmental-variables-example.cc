@@ -15,12 +15,12 @@ using namespace ns3;
 *
 */
 
-NS_LOG_COMPONENT_DEFINE ("environmental-variables-example");
+NS_LOG_COMPONENT_DEFINE ("sat-environmental-variables-example");
 
 int
 main (int argc, char *argv[])
 {
-  LogComponentEnable ("environmental-variables-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-environmental-variables-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatEnvVariables", LOG_LEVEL_INFO);
 
   /// create default environmental variables

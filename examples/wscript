@@ -16,17 +16,17 @@ def build(bld):
     obj = bld.create_ns3_program('link-results-plot', ['satellite', 'tools'])
     obj.source = 'link-results-plot.cc'
     
-    obj = bld.create_ns3_program('markov-logic-example', ['satellite'])
-    obj.source = 'markov-logic-example.cc'
+    obj = bld.create_ns3_program('sat-markov-logic-example', ['satellite'])
+    obj.source = 'sat-markov-logic-example.cc'
 
-    obj = bld.create_ns3_program('rayleigh-example', ['satellite'])
-    obj.source = 'rayleigh-example.cc'
+    obj = bld.create_ns3_program('sat-rayleigh-example', ['satellite'])
+    obj.source = 'sat-rayleigh-example.cc'
 
-    obj = bld.create_ns3_program('loo-example', ['satellite'])
-    obj.source = 'loo-example.cc'
+    obj = bld.create_ns3_program('sat-loo-example', ['satellite'])
+    obj.source = 'sat-loo-example.cc'
 
-    obj = bld.create_ns3_program('markov-fading-trace-example', ['satellite'])
-    obj.source = 'markov-fading-trace-example.cc'
+    obj = bld.create_ns3_program('sat-markov-fading-trace-example', ['satellite'])
+    obj.source = 'sat-markov-fading-trace-example.cc'
     
     obj = bld.create_ns3_program('sat-link-budget-example', ['satellite'])
     obj.source = 'sat-link-budget-example.cc'
@@ -37,23 +37,23 @@ def build(bld):
     obj = bld.create_ns3_program('sat-nrtv-example', ['satellite', 'traffic'])
     obj.source = 'sat-nrtv-example.cc'
 
-    obj = bld.create_ns3_program('environmental-variables-example', ['satellite'])
-    obj.source = 'environmental-variables-example.cc'
+    obj = bld.create_ns3_program('sat-environmental-variables-example', ['satellite'])
+    obj.source = 'sat-environmental-variables-example.cc'
 
-    obj = bld.create_ns3_program('trace-output-example', ['satellite'])
-    obj.source = 'trace-output-example.cc'
+    obj = bld.create_ns3_program('sat-trace-output-example', ['satellite'])
+    obj.source = 'sat-trace-output-example.cc'
 
-    obj = bld.create_ns3_program('trace-input-interference-example', ['satellite'])
-    obj.source = 'trace-input-interference-example.cc'    
+    obj = bld.create_ns3_program('sat-trace-input-interference-example', ['satellite'])
+    obj.source = 'sat-trace-input-interference-example.cc'    
     
-    obj = bld.create_ns3_program('trace-input-fading-example', ['satellite'])
-    obj.source = 'trace-input-fading-example.cc'
+    obj = bld.create_ns3_program('sat-trace-input-fading-example', ['satellite'])
+    obj.source = 'sat-trace-input-fading-example.cc'
     
-    obj = bld.create_ns3_program('trace-input-external-fading-example', ['satellite'])
-    obj.source = 'trace-input-external-fading-example.cc'
+    obj = bld.create_ns3_program('sat-trace-input-external-fading-example', ['satellite'])
+    obj.source = 'sat-trace-input-external-fading-example.cc'
 
-    obj = bld.create_ns3_program('trace-input-rx-power-example', ['satellite'])
-    obj.source = 'trace-input-rx-power-example.cc'
-    
-    obj = bld.create_ns3_program('sat-onoff-example', ['satellite'])
-    obj.source = 'sat-onoff-example.cc'    
+    obj = bld.create_ns3_program('sat-trace-input-rx-power-example', ['satellite'])
+    obj.source = 'sat-trace-input-rx-power-example.cc'
+
+    obj = bld.create_ns3_program('sat-multicast-example', ['satellite'])
+    obj.source = 'sat-multicast-example.cc'

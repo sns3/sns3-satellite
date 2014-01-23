@@ -12,30 +12,28 @@ using namespace ns3;
 /**
  * \ingroup satellite
  *
- * \brief  Trace output example application based on CBR example for satellite network.
+ * \brief  Trace input Rx power example application based on CBR example for satellite network.
  *         Interval, packet size and test scenario can be given in command line as user argument.
  *         To see help for user arguments, execute the command
  *
- *         ./waf --run "trace-output-example --PrintHelp"
+ *         ./waf --run "trace-input-rx-power-example --PrintHelp"
  *
  *         This example application sends first packets from GW connected user
  *         to UT connected users and after that from UT connected user to GW connected
  *         user.
  *
- *         This example produces the following traces:
- *         - interference density trace
+ *         This example uses the following trace for input:
  *         - rx power density trace
- *         - fading trace
- *         - composite SINR
  *
- *         The output folders are:
- *         {NS-3-root-folder}/src/satellite/data/interferencetraces/output
- *         {NS-3-root-folder}/src/satellite/data/rxpowertraces/output
- *         {NS-3-root-folder}/src/satellite/data/fadingtraces/output
- *         {NS-3-root-folder}/src/satellite/data/compositesinrtraces/output
+ *         The input folder is:
+ *         {NS-3-root-folder}/src/satellite/data/rxpowertraces/input
+ *
+ *         The input data files must be available in the folder stated above for the example
+ *         program to read, otherwise the program will fail. Trace output example can be
+ *         used to produce the required trace files if these are missing.
  */
 
-NS_LOG_COMPONENT_DEFINE ("trace-output-example");
+NS_LOG_COMPONENT_DEFINE ("sat-trace-input-rx-power-example");
 
 int
 main (int argc, char *argv[])
@@ -54,35 +52,9 @@ main (int argc, char *argv[])
   cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
-  /// enable Rx power calculation & Rx power density output trace
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode",EnumValue (SatEnums::RX_PWR_CALCULATION));
-  Config::SetDefault ("ns3::SatChannel::EnableRxPowerOutputTrace",BooleanValue (true));
+  /// enable Rx power density input trace
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode",EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
 
-  /// enable Markov fading calculation & fading output trace
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_MARKOV));
-  Config::SetDefault ("ns3::SatChannel::EnableFadingOutputTrace",BooleanValue (true));
-
-  /// enable per packet interference & interference density output trace
-  Config::SetDefault ("ns3::SatGwHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatUtHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
-
-  /// enable composite SINR output trace
-  Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
-
-  //Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
-  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->EnableFigureOutput (false);
-  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
-  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->EnableFigureOutput (false);
-
-  //Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("_fadingExampleTag");
-  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("_interferenceExampleTag");
-  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
-  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
-
-  /// enable the printing of ID mapper trace IDs
   Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
 
   if ( scenario == "larger")
@@ -97,7 +69,8 @@ main (int argc, char *argv[])
   /// enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  LogComponentEnable ("trace-output-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-trace-input-rx-power-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatInputFileStreamTimeDoubleContainer", LOG_LEVEL_INFO);
 
   /// remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
@@ -151,7 +124,7 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
 
-  NS_LOG_INFO("--- Trace-output-example ---");
+  NS_LOG_INFO("--- Trace-input-rx-power-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);

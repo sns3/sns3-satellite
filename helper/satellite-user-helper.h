@@ -181,6 +181,11 @@ public:
    */
   std::string GetRouterInfo () const;
 
+  /**
+   * \return pointer to router.
+   */
+  Ptr<Node>  GetRouter () { return m_router;}
+
 private:
 
   /**

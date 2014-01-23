@@ -9,7 +9,7 @@
 #include <fstream>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE ("markov-trace-example");
+NS_LOG_COMPONENT_DEFINE ("sat-markov-trace-example");
 
 namespace ns3 {
 

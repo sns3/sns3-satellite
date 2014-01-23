@@ -236,6 +236,10 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
                 {
                   receivePacket = true;
                 }
+              else if ( dest.IsGroup () )
+                {
+                  receivePacket = true;
+                }
             }
 
           if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )

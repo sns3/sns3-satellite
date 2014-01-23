@@ -137,6 +137,11 @@ public:
   Ptr<SatBeamHelper> GetBeamHelper () const;
 
   /**
+   * \return pointer to user helper.
+   */
+  Ptr<SatUserHelper>  GetUserHelper () { return m_userHelper;}
+
+  /**
    * Enables creation traces to be written in given file
    * \param filename  name to the file for trace writing
    * \param details true means that lower layer details are printed also,

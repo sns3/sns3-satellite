@@ -15,13 +15,13 @@ using namespace ns3;
 *
 */
 
-NS_LOG_COMPONENT_DEFINE ("loo-example");
+NS_LOG_COMPONENT_DEFINE ("sat-loo-example");
 
 int
 main (int argc, char *argv[])
 {
   /// enable info logs
-  LogComponentEnable ("loo-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-loo-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatLooModel", LOG_LEVEL_INFO);
 
   /// load default configuration

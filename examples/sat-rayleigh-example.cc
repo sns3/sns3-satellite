@@ -15,13 +15,13 @@ using namespace ns3;
 *
 */
 
-NS_LOG_COMPONENT_DEFINE ("rayleigh-example");
+NS_LOG_COMPONENT_DEFINE ("sat-rayleigh-example");
 
 int
 main (int argc, char *argv[])
 {
   /// enable info logs
-  LogComponentEnable ("rayleigh-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-rayleigh-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRayleighModel", LOG_LEVEL_INFO);
 
   /// create fader
