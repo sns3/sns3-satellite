@@ -91,7 +91,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq)
 {
 	NS_LOG_FUNCTION (this);
 
-	Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
+	//Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
 }
 
 SatUtMac::~SatUtMac ()

@@ -17,7 +17,7 @@ using namespace ns3;
 *         Interval, packet size and test scenario can be given
 *         in command line as user argument.
 *         To see help for user arguments:
-*         execute command -> ./waf --run "cbr-example --PrintHelp"
+*         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
 *
 *         Cbr example application sends first packets from GW connected user
 *         to UT connected users and after that from UT connected user to GW connected
@@ -25,7 +25,7 @@ using namespace ns3;
 *
 */
 
-NS_LOG_COMPONENT_DEFINE ("cbr-example");
+NS_LOG_COMPONENT_DEFINE ("sat-cbr-example");
 
 int
 main (int argc, char *argv[])
@@ -56,7 +56,7 @@ main (int argc, char *argv[])
   // enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  LogComponentEnable ("cbr-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-cbr-example", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
@@ -97,8 +97,8 @@ main (int argc, char *argv[])
   gwSink.Stop (Seconds (10.0));
 
   ApplicationContainer gwCbr = cbrHelper.Install (gwUsers.Get (0));
-  gwCbr.Start (Seconds (3.0));
-  gwCbr.Stop (Seconds (5.1));
+  gwCbr.Start (Seconds (1.0));
+  gwCbr.Stop (Seconds (2.1));
 
   // create application on UT user
   sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));

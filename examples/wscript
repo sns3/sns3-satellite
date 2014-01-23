@@ -1,8 +1,8 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    obj = bld.create_ns3_program('cbr-example', ['satellite'])
-    obj.source = 'cbr-example.cc'
+    obj = bld.create_ns3_program('sat-cbr-example', ['satellite'])
+    obj.source = 'sat-cbr-example.cc'
     
     obj = bld.create_ns3_program('sat-cbr-larger-example', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-cbr-larger-example.cc'
@@ -53,4 +53,7 @@ def build(bld):
     obj.source = 'trace-input-external-fading-example.cc'
 
     obj = bld.create_ns3_program('trace-input-rx-power-example', ['satellite'])
-    obj.source = 'trace-input-rx-power-example.cc'    
+    obj.source = 'trace-input-rx-power-example.cc'
+    
+    obj = bld.create_ns3_program('sat-onoff-example', ['satellite'])
+    obj.source = 'sat-onoff-example.cc'    

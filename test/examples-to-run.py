@@ -9,11 +9,12 @@
 #
 # See test.py for more information.
 cpp_examples = [
-    ("cbr-example", "True", "True"),
+    ("sat-cbr-example", "True", "True"),
     ("simple-scenario-p2p", "True", "True"),
     ("larger-scenario-p2p", "True", "True"),
     ("sat-http-example", "True", "True"),
-    ("sat-nrtv-example", "True", "True")
+    ("sat-nrtv-example", "True", "True"),
+    ("sat-onoff-example", "True", "True")
 ]
 
 # A list of Python examples to run in order to ensure that they remain
