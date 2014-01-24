@@ -24,6 +24,16 @@ NS_LOG_COMPONENT_DEFINE ("sat-multicast-example");
 int
 main (int argc, char *argv[])
 {
+  // GWs 1,3
+  // UTs 1,2,3,4
+  // UT users 1,2,3,4,5
+  bool enableMulticastGroup_1 = true;
+
+  // GWs 1,3
+  // UTs 1,2,4
+  // UT users 2,3,5
+  bool enableMulticastGroup_2 = true;
+
   // Enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
@@ -109,11 +119,14 @@ main (int argc, char *argv[])
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
 
+  NS_LOG_INFO ("UT users: " << utUsers.GetN () << ", GW users: " << gwUsers.GetN ());
+
   // Create multicast groups
   Ipv4Address multicastSource_1 (helper->GetUserAddress (gwUsers.Get (0)));
   Ipv4Address multicastGroup_1 ("225.1.1.1");
   Mac48Address multicastMacGroup_1;
 
+  Ipv4Address multicastSource_2 (helper->GetUserAddress (gwUsers.Get (0)));
   Ipv4Address multicastGroup_2 ("225.1.2.1");
   Mac48Address multicastMacGroup_2;
 
@@ -152,245 +165,549 @@ main (int argc, char *argv[])
   Ptr<SatGenericEncapsulator> decapsulator;                        // Decapsulator
   Ptr<SatLlc> llc;                                                 // LLC
 
-  NS_LOG_INFO ("--- Routes for multicast group 1 ---");
-
-  /// Configure a (static) multicast route for group 1 on GW 1
-  /// Behind this Router are GWs 1, 2 and UTs 1, 2, 3, 4
-  // Get IP router node
-  multicastRouter = helper->GetUserHelper ()->GetRouter ();
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (ipRouterInputDeviceId);
-
-  // A container of IP router output NetDevices
-  NetDeviceContainer outputDevicesRouter;
-
-  // Add output NetDevices
-  outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_1));
-  outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_2));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesRouter);
-
-  NS_LOG_INFO ("--- IP Router ---");
-  NS_LOG_INFO ("IP Router num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("IP Router input device: " << ipRouterInputDeviceId);
-  NS_LOG_INFO ("IP Router output devices: " << ipRouterOutputDeviceId_1 << ", " << ipRouterOutputDeviceId_2);
-
-  /// Configure a (static) multicast route for group 1 on GW 1
-  /// Behind this GW are UTs 1, 2, 3
-  // Get GW 1 node
-  multicastRouter = helper->GetBeamHelper ()->GetGwNode (1);
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (gw_1_InputDeviceId);
-
-  // A container of GW 1 output NetDevices
-  NetDeviceContainer outputDevicesGW1;
-
-  // Add output NetDevices
-  outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_1));
-  outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_2));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesGW1);
-
-  for (uint32_t i = 0; i < outputDevicesGW1.GetN(); i++)
+  if (enableMulticastGroup_1)
     {
-      encapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW1.Get(i)->GetAddress()), multicastMacGroup_1);
-      llc = DynamicCast<SatNetDevice> (outputDevicesGW1.Get(i))->GetLlc ();
-      llc->AddEncap (multicastMacGroup_1, encapsulator);
+      NS_LOG_INFO ("--- Routes for multicast group 1 ---");
+
+      /// Configure a (static) multicast route for group 1 on GW 1
+      /// Behind this Router are GWs 1, 2 and UTs 1, 2, 3, 4
+      // Get IP router node
+      multicastRouter = helper->GetUserHelper ()->GetRouter ();
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ipRouterInputDeviceId);
+
+      // A container of IP router output NetDevices
+      NetDeviceContainer outputDevicesRouter;
+
+      // Add output NetDevices
+      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_1));
+      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_2));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesRouter);
+
+      NS_LOG_INFO ("--- IP Router ---");
+      NS_LOG_INFO ("IP Router num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("IP Router input device: " << ipRouterInputDeviceId);
+      NS_LOG_INFO ("IP Router output devices: " << ipRouterOutputDeviceId_1 << ", " << ipRouterOutputDeviceId_2);
+
+      /// Configure a (static) multicast route for group 1 on GW 1
+      /// Behind this GW are UTs 1, 2, 3
+      // Get GW 1 node
+      multicastRouter = helper->GetBeamHelper ()->GetGwNode (1);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (gw_1_InputDeviceId);
+
+      // A container of GW 1 output NetDevices
+      NetDeviceContainer outputDevicesGW1;
+
+      // Add output NetDevices
+      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_1));
+      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_2));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesGW1);
+
+      // Create and add encapsulators for the multicast group
+      for (uint32_t i = 0; i < outputDevicesGW1.GetN (); i++)
+        {
+          encapsulator =
+              CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW1.Get (i)->GetAddress ()),
+                                                    multicastMacGroup_1);
+          llc = DynamicCast<SatNetDevice> (outputDevicesGW1.Get (i))->GetLlc ();
+          llc->AddEncap (multicastMacGroup_1,
+                         encapsulator);
+        }
+
+      NS_LOG_INFO ("--- GW 1 ---");
+      NS_LOG_INFO ("GW 1 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("GW 1 input device: " << gw_1_InputDeviceId);
+      NS_LOG_INFO ("GW 1 output devices: " << gw_1_OutputDeviceId_1 << ", " << gw_1_OutputDeviceId_2);
+
+      /// Configure a (static) multicast route for group 1 on GW 3
+      /// Behind this GW is UT 4
+      // Get GW 3 node
+      multicastRouter = helper->GetBeamHelper ()->GetGwNode (3);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (gw_3_InputDeviceId);
+
+      // A container of GW 3 output NetDevices
+      NetDeviceContainer outputDevicesGW3;
+
+      // Add output NetDevices
+      outputDevicesGW3.Add (multicastRouter->GetDevice (gw_3_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesGW3);
+
+      // Create and add encapsulators for the multicast group
+      for (uint32_t i = 0; i < outputDevicesGW3.GetN (); i++)
+        {
+          encapsulator =
+              CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW3.Get (i)->GetAddress ()),
+                                                    multicastMacGroup_1);
+          llc = DynamicCast<SatNetDevice> (outputDevicesGW3.Get (i))->GetLlc ();
+          llc->AddEncap (multicastMacGroup_1,
+                         encapsulator);
+        }
+
+      NS_LOG_INFO ("--- GW 3 ---");
+      NS_LOG_INFO ("GW 3 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("GW 3 input device: " << gw_3_InputDeviceId);
+      NS_LOG_INFO ("GW 3 output devices: " << gw_3_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 1 on UT 1
+      // Get UT 1 node
+      multicastRouter = utNodes.Get (0);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_1_InputDeviceId);
+
+      // A container of UT 1 output NetDevices
+      NetDeviceContainer outputDevicesUT1;
+
+      // Add output NetDevices
+      outputDevicesUT1.Add (multicastRouter->GetDevice (ut_1_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesUT1);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_1);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_1,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 1 ---");
+      NS_LOG_INFO ("UT 1 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 1 input device: " << ut_1_InputDeviceId);
+      NS_LOG_INFO ("UT 1 output devices: " << ut_1_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 1 on UT 2
+      // Get UT 2 node
+      multicastRouter = utNodes.Get (1);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_2_InputDeviceId);
+
+      // A container of UT 2 output NetDevices
+      NetDeviceContainer outputDevicesUT2;
+
+      // Add output NetDevices
+      outputDevicesUT2.Add (multicastRouter->GetDevice (ut_2_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesUT2);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_1);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_1,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 2 ---");
+      NS_LOG_INFO ("UT 2 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 2 input device: " << ut_2_InputDeviceId);
+      NS_LOG_INFO ("UT 2 output devices: " << ut_2_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 1 on UT 3
+      // Get UT 3 node
+      multicastRouter = utNodes.Get (2);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_3_InputDeviceId);
+
+      // A container of UT 3 output NetDevices
+      NetDeviceContainer outputDevicesUT3;
+
+      // Add output NetDevices
+      outputDevicesUT3.Add (multicastRouter->GetDevice (ut_3_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesUT3);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_2);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_1);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_1,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 3 ---");
+      NS_LOG_INFO ("UT 3 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 3 input device: " << ut_3_InputDeviceId);
+      NS_LOG_INFO ("UT 3 output devices: " << ut_3_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 1 on UT 4
+      // Get UT 4 node
+      multicastRouter = utNodes.Get (3);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_4_InputDeviceId);
+
+      // A container of UT 4 output NetDevices
+      NetDeviceContainer outputDevicesUT4;
+
+      // Add output NetDevices
+      outputDevicesUT4.Add (multicastRouter->GetDevice (ut_4_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_1,
+                                   multicastGroup_1,
+                                   inputDevice,
+                                   outputDevicesUT4);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (3);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_1);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_1,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 4 ---");
+      NS_LOG_INFO ("UT 4 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 4 input device: " << ut_4_InputDeviceId);
+      NS_LOG_INFO ("UT 4 output devices: " << ut_4_OutputDeviceId_1);
+
+      NS_LOG_INFO ("--- Create traffic generator for multicast group 1 ---");
+
+      // Traffic generators for multicast group 1
+      CbrHelper gwCbrHelper_1 ("ns3::UdpSocketFactory",
+                               InetSocketAddress (multicastGroup_1,
+                                                  multicastPort));
+      gwCbrHelper_1.SetAttribute ("Interval",
+                                  StringValue (interval));
+      gwCbrHelper_1.SetAttribute ("PacketSize",
+                                  UintegerValue (packetSize));
+
+      ApplicationContainer gwCbr_1 = gwCbrHelper_1.Install (gwUsers.Get (0));
+      gwCbr_1.Start (Seconds (2.0));
+      gwCbr_1.Stop (Seconds (3.1));
     }
 
-  NS_LOG_INFO ("--- GW 1 ---");
-  NS_LOG_INFO ("GW 1 num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("GW 1 input device: " << gw_1_InputDeviceId);
-  NS_LOG_INFO ("GW 1 output devices: " << gw_1_OutputDeviceId_1 << ", " << gw_1_OutputDeviceId_2);
-
-  /// Configure a (static) multicast route for group 1 on GW 3
-  /// Behind this GW is UT 4
-  // Get GW 3 node
-  multicastRouter = helper->GetBeamHelper ()->GetGwNode (3);
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (gw_3_InputDeviceId);
-
-  // A container of GW 3 output NetDevices
-  NetDeviceContainer outputDevicesGW3;
-
-  // Add output NetDevices
-  outputDevicesGW3.Add (multicastRouter->GetDevice (gw_3_OutputDeviceId_1));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesGW3);
-
-  for (uint32_t i = 0; i < outputDevicesGW3.GetN(); i++)
+  if (enableMulticastGroup_2)
     {
-      encapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW3.Get(i)->GetAddress()), multicastMacGroup_1);
-      llc = DynamicCast<SatNetDevice> (outputDevicesGW3.Get(i))->GetLlc ();
-      llc->AddEncap (multicastMacGroup_1, encapsulator);
+      NS_LOG_INFO ("--- Routes for multicast group 2 ---");
+
+      /// Configure a (static) multicast route for group 2 on GW 1
+      /// Behind this Router are GWs 1, 2 and UTs 1, 2, 4
+      // Get IP router node
+      multicastRouter = helper->GetUserHelper ()->GetRouter ();
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ipRouterInputDeviceId);
+
+      // A container of IP router output NetDevices
+      NetDeviceContainer outputDevicesRouter;
+
+      // Add output NetDevices
+      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_1));
+      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_2));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_2,
+                                   multicastGroup_2,
+                                   inputDevice,
+                                   outputDevicesRouter);
+
+      NS_LOG_INFO ("--- IP Router ---");
+      NS_LOG_INFO ("IP Router num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("IP Router input device: " << ipRouterInputDeviceId);
+      NS_LOG_INFO ("IP Router output devices: " << ipRouterOutputDeviceId_1 << ", " << ipRouterOutputDeviceId_2);
+
+      /// Configure a (static) multicast route for group 2 on GW 1
+      /// Behind this GW are UTs 1, 2
+      // Get GW 1 node
+      multicastRouter = helper->GetBeamHelper ()->GetGwNode (1);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (gw_1_InputDeviceId);
+
+      // A container of GW 1 output NetDevices
+      NetDeviceContainer outputDevicesGW1;
+
+      // Add output NetDevices
+      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_1));
+      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_2));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_2,
+                                   multicastGroup_2,
+                                   inputDevice,
+                                   outputDevicesGW1);
+
+      // Create and add encapsulators for the multicast group
+      for (uint32_t i = 0; i < outputDevicesGW1.GetN (); i++)
+        {
+          encapsulator =
+              CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW1.Get (i)->GetAddress ()),
+                                                    multicastMacGroup_2);
+          llc = DynamicCast<SatNetDevice> (outputDevicesGW1.Get (i))->GetLlc ();
+          llc->AddEncap (multicastMacGroup_2,
+                         encapsulator);
+        }
+
+      NS_LOG_INFO ("--- GW 1 ---");
+      NS_LOG_INFO ("GW 1 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("GW 1 input device: " << gw_1_InputDeviceId);
+      NS_LOG_INFO ("GW 1 output devices: " << gw_1_OutputDeviceId_1 << ", " << gw_1_OutputDeviceId_2);
+
+      /// Configure a (static) multicast route for group 1 on GW 3
+      /// Behind this GW is UT 4
+      // Get GW 3 node
+      multicastRouter = helper->GetBeamHelper ()->GetGwNode (3);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (gw_3_InputDeviceId);
+
+      // A container of GW 3 output NetDevices
+      NetDeviceContainer outputDevicesGW3;
+
+      // Add output NetDevices
+      outputDevicesGW3.Add (multicastRouter->GetDevice (gw_3_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_2,
+                                   multicastGroup_2,
+                                   inputDevice,
+                                   outputDevicesGW3);
+
+      // Create and add encapsulators for the multicast group
+      for (uint32_t i = 0; i < outputDevicesGW3.GetN (); i++)
+        {
+          encapsulator =
+              CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW3.Get (i)->GetAddress ()),
+                                                    multicastMacGroup_2);
+          llc = DynamicCast<SatNetDevice> (outputDevicesGW3.Get (i))->GetLlc ();
+          llc->AddEncap (multicastMacGroup_2,
+                         encapsulator);
+        }
+
+      NS_LOG_INFO ("--- GW 3 ---");
+      NS_LOG_INFO ("GW 3 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("GW 3 input device: " << gw_3_InputDeviceId);
+      NS_LOG_INFO ("GW 3 output devices: " << gw_3_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 2 on UT 1
+      // Get UT 1 node
+      multicastRouter = utNodes.Get (0);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_1_InputDeviceId);
+
+      // A container of UT 1 output NetDevices
+      NetDeviceContainer outputDevicesUT1;
+
+      // Add output NetDevices
+      outputDevicesUT1.Add (multicastRouter->GetDevice (ut_1_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_2,
+                                   multicastGroup_2,
+                                   inputDevice,
+                                   outputDevicesUT1);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_2);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_2,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 1 ---");
+      NS_LOG_INFO ("UT 1 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 1 input device: " << ut_1_InputDeviceId);
+      NS_LOG_INFO ("UT 1 output devices: " << ut_1_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 2 on UT 2
+      // Get UT 2 node
+      multicastRouter = utNodes.Get (1);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_2_InputDeviceId);
+
+      // A container of UT 2 output NetDevices
+      NetDeviceContainer outputDevicesUT2;
+
+      // Add output NetDevices
+      outputDevicesUT2.Add (multicastRouter->GetDevice (ut_2_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_2,
+                                   multicastGroup_2,
+                                   inputDevice,
+                                   outputDevicesUT2);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_2);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_2,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 2 ---");
+      NS_LOG_INFO ("UT 2 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 2 input device: " << ut_2_InputDeviceId);
+      NS_LOG_INFO ("UT 2 output devices: " << ut_2_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 1 on UT 3
+      // Get UT 3 node
+      multicastRouter = utNodes.Get (2);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_3_InputDeviceId);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_2);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_2);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_2,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      //NS_LOG_INFO ("--- UT 3 ---");
+      //NS_LOG_INFO ("UT 3 num of devices: " << multicastRouter->GetNDevices ());
+      //NS_LOG_INFO ("UT 3 input device: " << ut_3_InputDeviceId);
+      //NS_LOG_INFO ("UT 3 output devices: " << ut_3_OutputDeviceId_1);
+
+      /// Configure a (static) multicast route for group 2 on UT 4
+      // Get UT 4 node
+      multicastRouter = utNodes.Get (3);
+
+      // Get input NetDevice
+      inputDevice = multicastRouter->GetDevice (ut_4_InputDeviceId);
+
+      // A container of UT 4 output NetDevices
+      NetDeviceContainer outputDevicesUT4;
+
+      // Add output NetDevices
+      outputDevicesUT4.Add (multicastRouter->GetDevice (ut_4_OutputDeviceId_1));
+
+      // Add multicast route
+      multicast.AddMulticastRoute (multicastRouter,
+                                   multicastSource_2,
+                                   multicastGroup_2,
+                                   inputDevice,
+                                   outputDevicesUT4);
+
+      sourceNode = helper->GetBeamHelper ()->GetGwNode (3);
+      sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
+
+      // Create and add decapsulator for the multicast group
+      decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
+                                                           multicastMacGroup_2);
+      llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
+      llc->AddDecap (multicastMacGroup_2,
+                     decapsulator);
+      decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
+                                                      llc));
+
+      NS_LOG_INFO ("--- UT 4 ---");
+      NS_LOG_INFO ("UT 4 num of devices: " << multicastRouter->GetNDevices ());
+      NS_LOG_INFO ("UT 4 input device: " << ut_4_InputDeviceId);
+      NS_LOG_INFO ("UT 4 output devices: " << ut_4_OutputDeviceId_1);
+
+      NS_LOG_INFO ("--- Create traffic generator for multicast group 2 ---");
+      // Traffic generators for multicast group 1
+      CbrHelper gwCbrHelper_2 ("ns3::UdpSocketFactory",
+                               InetSocketAddress (multicastGroup_2,
+                                                  multicastPort));
+      gwCbrHelper_2.SetAttribute ("Interval",
+                                  StringValue (interval));
+      gwCbrHelper_2.SetAttribute ("PacketSize",
+                                  UintegerValue (packetSize));
+
+      ApplicationContainer gwCbr_2 = gwCbrHelper_2.Install (gwUsers.Get (0));
+      gwCbr_2.Start (Seconds (5.0));
+      gwCbr_2.Stop (Seconds (6.1));
     }
-
-  NS_LOG_INFO ("--- GW 3 ---");
-  NS_LOG_INFO ("GW 3 num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("GW 3 input device: " << gw_3_InputDeviceId);
-  NS_LOG_INFO ("GW 3 output devices: " << gw_3_OutputDeviceId_1);
-
-  /// Configure a (static) multicast route for group 1 on UT 1
-  // Get UT 1 node
-  multicastRouter = utNodes.Get (0);
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (ut_1_InputDeviceId);
-
-  // A container of UT 1 output NetDevices
-  NetDeviceContainer outputDevicesUT1;
-
-  // Add output NetDevices
-  outputDevicesUT1.Add (multicastRouter->GetDevice (ut_1_OutputDeviceId_1));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesUT1);
-
-  sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
-  sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
-
-  decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()), multicastMacGroup_1);
-  llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
-  llc->AddDecap (multicastMacGroup_1, decapsulator);
-  decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-
-  NS_LOG_INFO ("--- UT 1 ---");
-  NS_LOG_INFO ("UT 1 num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("UT 1 input device: " << ut_1_InputDeviceId);
-  NS_LOG_INFO ("UT 1 output devices: " << ut_1_OutputDeviceId_1);
-
-  /// Configure a (static) multicast route for group 1 on UT 2
-  // Get UT 2 node
-  multicastRouter = utNodes.Get (1);
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (ut_2_InputDeviceId);
-
-  // A container of UT 2 output NetDevices
-  NetDeviceContainer outputDevicesUT2;
-
-  // Add output NetDevices
-  outputDevicesUT2.Add (multicastRouter->GetDevice (ut_2_OutputDeviceId_1));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesUT2);
-
-  sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
-  sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
-
-  decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()), multicastMacGroup_1);
-  llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
-  llc->AddDecap (multicastMacGroup_1, decapsulator);
-  decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-
-  NS_LOG_INFO ("--- UT 2 ---");
-  NS_LOG_INFO ("UT 2 num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("UT 2 input device: " << ut_2_InputDeviceId);
-  NS_LOG_INFO ("UT 2 output devices: " << ut_2_OutputDeviceId_1);
-
-  /// Configure a (static) multicast route for group 1 on UT 3
-  // Get UT 3 node
-  multicastRouter = utNodes.Get (2);
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (ut_3_InputDeviceId);
-
-  // A container of UT 3 output NetDevices
-  NetDeviceContainer outputDevicesUT3;
-
-  // Add output NetDevices
-  outputDevicesUT3.Add (multicastRouter->GetDevice (ut_3_OutputDeviceId_1));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesUT3);
-
-  sourceNode = helper->GetBeamHelper ()->GetGwNode (1);
-  sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_2);
-
-  decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()), multicastMacGroup_1);
-  llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
-  llc->AddDecap (multicastMacGroup_1, decapsulator);
-  decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-
-  NS_LOG_INFO ("--- UT 3 ---");
-  NS_LOG_INFO ("UT 3 num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("UT 3 input device: " << ut_3_InputDeviceId);
-  NS_LOG_INFO ("UT 3 output devices: " << ut_3_OutputDeviceId_1);
-
-  /// Configure a (static) multicast route for group 1 on UT 4
-  // Get UT 4 node
-  multicastRouter = utNodes.Get (3);
-
-  // Get input NetDevice
-  inputDevice = multicastRouter->GetDevice (ut_4_InputDeviceId);
-
-  // A container of UT 4 output NetDevices
-  NetDeviceContainer outputDevicesUT4;
-
-  // Add output NetDevices
-  outputDevicesUT4.Add (multicastRouter->GetDevice (ut_4_OutputDeviceId_1));
-
-  // Add multicast route
-  multicast.AddMulticastRoute (multicastRouter, multicastSource_1,
-                               multicastGroup_1, inputDevice, outputDevicesUT4);
-
-  sourceNode = helper->GetBeamHelper ()->GetGwNode (3);
-  sourceDevice = sourceNode->GetDevice (gw_1_OutputDeviceId_1);
-
-  decapsulator = CreateObject<SatGenericEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()), multicastMacGroup_1);
-  llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
-  llc->AddDecap (multicastMacGroup_1, decapsulator);
-  decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-
-  NS_LOG_INFO ("--- UT 4 ---");
-  NS_LOG_INFO ("UT 4 num of devices: " << multicastRouter->GetNDevices ());
-  NS_LOG_INFO ("UT 4 input device: " << ut_4_InputDeviceId);
-  NS_LOG_INFO ("UT 4 output devices: " << ut_4_OutputDeviceId_1);
-
-  NS_LOG_INFO ("--- Routes for multicast group 2 ---");
-
-  NS_LOG_INFO ("--- Create traffic generator for multicast group 1 ---");
-
-  // Traffic generators for multicast group 1
-  CbrHelper gwCbrHelper_1 ("ns3::UdpSocketFactory", InetSocketAddress(multicastGroup_1, multicastPort));
-  gwCbrHelper_1.SetAttribute("Interval", StringValue (interval));
-  gwCbrHelper_1.SetAttribute("PacketSize", UintegerValue (packetSize) );
-
-  ApplicationContainer gwCbr_1 = gwCbrHelper_1.Install (gwUsers.Get (0));
-  gwCbr_1.Start (Seconds (2.0));
-  gwCbr_1.Stop (Seconds (3.1));
-
-  NS_LOG_INFO ("--- Create traffic generator for multicast group 2 ---");
-  // Traffic generators for multicast group 1
-  CbrHelper gwCbrHelper_2 ("ns3::UdpSocketFactory", InetSocketAddress(multicastGroup_2, multicastPort));
-  gwCbrHelper_2.SetAttribute("Interval", StringValue (interval));
-  gwCbrHelper_2.SetAttribute("PacketSize", UintegerValue (packetSize) );
-
-  ApplicationContainer gwCbr_2 = gwCbrHelper_2.Install (gwUsers.Get (1));
-  gwCbr_2.Start (Seconds (5.0));
-  gwCbr_2.Stop (Seconds (6.1));
 
   NS_LOG_INFO ("--- Create UT sinks ---");
+
   // Create sink on UT user for receiving the traffic
   ApplicationContainer utSink;
 
+  // Sinks for group 1, all UT users will receive the traffic
   for (uint32_t i = 0; i < utUsers.GetN (); i++)
     {
       PacketSinkHelper utSinkHelperGroup_1 ("ns3::UdpSocketFactory", InetSocketAddress (multicastGroup_1, multicastPort));
       utSink = utSinkHelperGroup_1.Install (utUsers.Get (i));
+    }
 
+  // Sinks for group 2, one non-multicast user will not have a sink.
+  // Excluding the user needs to be done on sink level (no application
+  // to receive the transmission) as it is sharing the same link to UT with a multicast user.
+  for (uint32_t i = 1; i < utUsers.GetN (); i++)
+    {
       PacketSinkHelper utSinkHelperGroup_2 ("ns3::UdpSocketFactory", InetSocketAddress (multicastGroup_2, multicastPort));
       utSink = utSinkHelperGroup_2.Install (utUsers.Get (i));
     }
