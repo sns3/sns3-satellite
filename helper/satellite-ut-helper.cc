@@ -39,7 +39,6 @@
 #include "../model/satellite-phy-rx.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
 #include "../model/satellite-generic-stream-encapsulator.h"
-#include "../model/satellite-generic-encapsulator.h"
 #include "../model/satellite-return-link-encapsulator.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-node-info.h"
@@ -262,13 +261,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
   Ptr<SatReturnLinkEncapsulator> utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr);
-  Ptr<SatGenericEncapsulator> utDecap = CreateObject<SatGenericEncapsulator> (gwAddr, addr);
+  Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
   utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
   llc->AddEncap (addr, utEncap); // Tx
   llc->AddDecap (addr, utDecap); // Rx
 
   // Create encapsulator and add it to GW's LLC
-  Ptr<SatGenericEncapsulator> gwEncap = CreateObject<SatGenericEncapsulator> (gwAddr, addr);
+  Ptr<SatGenericStreamEncapsulator> gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
   Ptr<SatReturnLinkEncapsulator> gwDecap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr);
   Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
   gwLlc->AddEncap (addr, gwEncap); // Tx
