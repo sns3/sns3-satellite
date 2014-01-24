@@ -39,7 +39,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   LogComponentEnable ("sat-multicast-example", LOG_LEVEL_INFO);
 
-  NS_LOG_INFO ("--- Multicast-example ---");
+  NS_LOG_INFO ("--- Starting sat-multicast-example ---");
 
   uint32_t packetSize = 512;
   std::string interval = "1s";
@@ -79,6 +79,7 @@ main (int argc, char *argv[])
   std::string scenarioName = "Scenario72";
   //std::string scenarioName = "Scenario98";
 
+  NS_LOG_INFO ("--- Creating scenario ---");
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   if ( scenarioLogFile != "" )
@@ -121,6 +122,7 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("UT users: " << utUsers.GetN () << ", GW users: " << gwUsers.GetN ());
 
+  NS_LOG_INFO ("--- Creating multicast groups ---");
   // Create multicast groups
   Ipv4Address multicastSource_1 (helper->GetUserAddress (gwUsers.Get (0)));
   Ipv4Address multicastGroup_1 ("225.1.1.1");
@@ -129,8 +131,6 @@ main (int argc, char *argv[])
   Ipv4Address multicastSource_2 (helper->GetUserAddress (gwUsers.Get (0)));
   Ipv4Address multicastGroup_2 ("225.1.2.1");
   Mac48Address multicastMacGroup_2;
-
-  NS_LOG_INFO ("--- Create multicast groups ---");
 
   // Check the address sanity
   if (multicastGroup_1.IsMulticast ())
@@ -153,7 +153,7 @@ main (int argc, char *argv[])
       NS_FATAL_ERROR ("Invalid address for multicast group 2");
     }
 
-  NS_LOG_INFO ("--- Create multicast routes ---");
+  NS_LOG_INFO ("--- Creating multicast routes ---");
 
   Ipv4StaticRoutingHelper multicast;                               // Routing helper
   Ptr<Node> multicastRouter;                                       // The node in question
@@ -419,7 +419,7 @@ main (int argc, char *argv[])
       NS_LOG_INFO ("UT 4 input device: " << ut_4_InputDeviceId);
       NS_LOG_INFO ("UT 4 output devices: " << ut_4_OutputDeviceId_1);
 
-      NS_LOG_INFO ("--- Create traffic generator for multicast group 1 ---");
+      NS_LOG_INFO ("--- Creating traffic generator for multicast group 1 ---");
 
       // Traffic generators for multicast group 1
       CbrHelper gwCbrHelper_1 ("ns3::UdpSocketFactory",
@@ -691,7 +691,7 @@ main (int argc, char *argv[])
       gwCbr_2.Stop (Seconds (6.1));
     }
 
-  NS_LOG_INFO ("--- Create UT sinks ---");
+  NS_LOG_INFO ("--- Creating UT sinks ---");
 
   // Create sink on UT user for receiving the traffic
   ApplicationContainer utSink;
@@ -722,9 +722,12 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO ("  ");
 
+  NS_LOG_INFO ("--- Running simulation ---");
+
   Simulator::Stop (Seconds(11));
   Simulator::Run ();
   Simulator::Destroy ();
 
+  NS_LOG_INFO ("--- Finished ---");
   return 0;
 }
