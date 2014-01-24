@@ -44,13 +44,13 @@ SatUserHelper::GetTypeId (void)
                       EnumValue (SatUserHelper::NETWORK_TYPE_IDEAL),
                       MakeEnumAccessor (&SatUserHelper::m_backboneNetworkType),
                       MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
-                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma network"))
+                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
       .AddAttribute ("SubscriberNetworkType",
                      "Network used between UTs and Users in subscriber network",
                       EnumValue (SatUserHelper::NETWORK_TYPE_CSMA),
                       MakeEnumAccessor (&SatUserHelper::m_subscriberNetworkType),
                       MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
-                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma network"))
+                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUserHelper::m_creation))
     ;
