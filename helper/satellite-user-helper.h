@@ -177,22 +177,27 @@ public:
   /**
    * \return A container having all GW user nodes in satellite network.
    */
-  NodeContainer GetGwUsers();
+  NodeContainer GetGwUsers () const;
 
   /**
    * \return A container having all UT nodes in satellite network.
    */
-  NodeContainer GetUtUsers();
+  NodeContainer GetUtUsers () const;
+
+  /**
+   * \return A pointer to the GW router node in satellite network.
+   */
+  NodeContainer GetGwRouter () const;
 
   /**
    * \return number of GW users in satellite network.
    */
-  uint32_t GetGwUserCount();
+  uint32_t GetGwUserCount () const;
 
   /**
    * \return number of UT users in satellite network.
    */
-  uint32_t GetUtUserCount();
+  uint32_t GetUtUserCount () const;
 
   /**
    * Enables creation traces to be written in given file
@@ -210,9 +215,9 @@ public:
   std::string GetRouterInfo () const;
 
   /**
-   * \return pointer to router.
+   * \return pointer to the router.
    */
-  Ptr<Node>  GetRouter () { return m_router;}
+  Ptr<Node> GetRouter () const;
 
 private:
 

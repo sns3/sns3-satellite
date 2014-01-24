@@ -214,7 +214,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 }
 
 NodeContainer
-SatUserHelper::GetGwUsers()
+SatUserHelper::GetGwUsers () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -222,7 +222,7 @@ SatUserHelper::GetGwUsers()
 }
 
 NodeContainer
-SatUserHelper::GetUtUsers()
+SatUserHelper::GetUtUsers () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -230,19 +230,19 @@ SatUserHelper::GetUtUsers()
 }
 
 uint32_t
-SatUserHelper::GetGwUserCount()
+SatUserHelper::GetGwUserCount () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_gwUsers.GetN();
+  return m_gwUsers.GetN ();
 }
 
 uint32_t
-SatUserHelper::GetUtUserCount()
+SatUserHelper::GetUtUserCount () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_utUsers.GetN();
+  return m_utUsers.GetN ();
 }
 
 void
@@ -392,6 +392,14 @@ SatUserHelper::GetRouterInfo () const
     }
 
   return oss.str ();
+}
+
+Ptr<Node>
+SatUserHelper::GetRouter () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_router;
 }
 
 } // namespace ns3
