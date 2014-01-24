@@ -106,7 +106,11 @@ SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p)
   NS_LOG_FUNCTION (this << p->GetSize ());
 
   // If the packet still fits into the buffer
-  if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
+  if (p->GetSize () > MAX_HL_PACKET_SIZE)
+    {
+      NS_FATAL_ERROR ("SatGenericStreamEncapsulator received too large HL PDU!");
+    }
+  else if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
     {
       // Store packet arrival time
       SatTimeTag timeTag (Simulator::Now ());
@@ -195,7 +199,7 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 
       if (oldTag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
         {
-          ++m_txFragmentId;
+          IncreaseFragmentId ();
           gseHeader.SetStartIndicator ();
           gseHeader.SetTotalLength (nextPacket->GetSize());
           newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
@@ -272,6 +276,16 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   bytesLeft = GetTxBufferSizeInBytes ();
 
   return packet;
+}
+
+void
+SatGenericStreamEncapsulator::IncreaseFragmentId ()
+{
+  ++m_txFragmentId;
+  if (m_txFragmentId >= MAX_FRAGMENT_ID)
+    {
+      m_txFragmentId = 0;
+    }
 }
 
 uint32_t

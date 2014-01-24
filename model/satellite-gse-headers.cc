@@ -42,8 +42,7 @@ SatGseHeader::SatGseHeader ()
  m_fullGseHeaderSize (8),
  m_startGseHeaderSize (8),
  m_endGseHeaderSize (8),
- m_continuationGseHeaderSize (3),
- m_labelFieldLengthInBytes (3)
+ m_continuationGseHeaderSize (3)
 {
 
 }

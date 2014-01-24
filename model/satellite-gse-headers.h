@@ -119,7 +119,6 @@ public:
    */
   uint32_t GetMaxGseHeaderSizeInBytes () const;
 
-
 private:
 
   /**
@@ -142,7 +141,8 @@ private:
   const uint32_t m_startGseHeaderSize;
   const uint32_t m_endGseHeaderSize;
   const uint32_t m_continuationGseHeaderSize;
-  const uint32_t m_labelFieldLengthInBytes;
+
+  static const uint32_t m_labelFieldLengthInBytes = 3;
 };
 
 }; // namespace ns3

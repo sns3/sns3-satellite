@@ -118,6 +118,12 @@ public:
 private:
 
   /**
+   * Method increases the fragment id by one. If the maximum fragment id is
+   * reached, it is reset to zero.
+   */
+  void IncreaseFragmentId ();
+
+  /**
    * Method is calculating the total transmission size of a HL packet
    * by taking into account the fragmentation and header overhead. This is
    * needed to check that the HL packet fits into the available tx opportunity,
@@ -190,7 +196,23 @@ private:
    */
   uint32_t m_currRxPacketFragmentBytes;
 
+  /**
+   * If the GSE opportunity is smaller than this, a NULL
+   * packet is returned.
+   */
   uint32_t m_minGseTxOpportunity;
+
+  /**
+   * The fragment is described with 8 bits, thus the
+   * maximum fragment id is 256.
+   */
+  static const uint32_t MAX_FRAGMENT_ID = 256;
+
+  /**
+   * The maximum packet size is described with 16 bits,
+   * thus, the maximum HL packet size is 65536 bytes.
+   */
+  static const uint32_t MAX_HL_PACKET_SIZE = 65536;
 
 };
 
