@@ -64,25 +64,38 @@ SatUserHelper::GetInstanceTypeId (void) const
 }
 
 SatUserHelper::SatUserHelper ()
- :m_router (0)
+  : m_router (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 void 
-SatUserHelper::SetCsmaDeviceAttribute (std::string n1, const AttributeValue &v1)
+SatUserHelper::SetCsmaQueue (std::string type,
+                             std::string name1, const AttributeValue &value1,
+                             std::string name2, const AttributeValue &value2,
+                             std::string name3, const AttributeValue &value3,
+                             std::string name4, const AttributeValue &value4)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << type);
 
-  m_csma.SetDeviceAttribute(n1,v1);
+  m_csma.SetQueue (type, name1, value1, name2, value2,
+                   name3, value3, name4, value4);
 }
 
 void
-SatUserHelper::SetCsmaChannelAttribute (std::string n1, const AttributeValue &v1)
+SatUserHelper::SetCsmaDeviceAttribute (std::string name,
+                                       const AttributeValue &value)
 {
   NS_LOG_FUNCTION (this);
+  m_csma.SetDeviceAttribute (name, value);
+}
 
-  m_csma.SetChannelAttribute(n1,v1);
+void
+SatUserHelper::SetCsmaChannelAttribute (std::string name,
+                                        const AttributeValue &value)
+{
+  NS_LOG_FUNCTION (this);
+  m_csma.SetChannelAttribute (name, value);
 }
 
 void SatUserHelper::SetUtBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)

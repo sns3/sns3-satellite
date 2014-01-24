@@ -59,25 +59,53 @@ public:
   virtual ~SatUserHelper () {}
 
   /**
-   * Set an attribute value to be propagated to each CsmaNetDevice created by the
-   * helper.
+   * \brief Set the type and the attribute values to be associated with each
+   * Queue object in each CsmaNetDevice created by the helper.
+   *
+   * \param type the type of queue
+   * \param name1 the name of the attribute to set on the queue
+   * \param value1 the value of the attribute to set on the queue
+   * \param name2 the name of the attribute to set on the queue
+   * \param value2 the value of the attribute to set on the queue
+   * \param name3 the name of the attribute to set on the queue
+   * \param value3 the value of the attribute to set on the queue
+   * \param name4 the name of the attribute to set on the queue
+   * \param value4 the value of the attribute to set on the queue
+   *
+   * Set these attributes on each ns3::Queue created
+   * by SatUserHelper::Install().
+   */
+  void SetCsmaQueue (std::string type,
+                     std::string name1 = "",
+                     const AttributeValue &value1 = EmptyAttributeValue (),
+                     std::string name2 = "",
+                     const AttributeValue &value2 = EmptyAttributeValue (),
+                     std::string name3 = "",
+                     const AttributeValue &value3 = EmptyAttributeValue (),
+                     std::string name4 = "",
+                     const AttributeValue &value4 = EmptyAttributeValue ());
+
+  /**
+   * \brief Set an attribute value to be propagated to each CsmaNetDevice
+   * object created by the helper.
    *
    * \param name the name of the attribute to set
    * \param value the value of the attribute to set
    *
-   * Set these attributes on each ns3::SatNetDevice created
-   * by SatBeamHelper::Install
+   * Set these attributes on each ns3::CsmaNetDevice created
+   * by SatUserHelper::Install().
    */
   void SetCsmaDeviceAttribute (std::string name, const AttributeValue &value);
 
   /**
-   * Set an attribute value to be propagated to each Csma
+   * \brief Set an attribute value to be propagated to each CsmaChannel object
+   * created by the helper.
    *
    * \param name the name of the attribute to set
    * \param value the value of the attribute to set
    *
-   * Set these attribute on each ns3::SatChannel created
-   * by SatUserHelper::Install
+   * Set these attribute on each ns3::CsmaChannel created
+   * by SatUserHelper::Install().
    */
   void SetCsmaChannelAttribute (std::string name, const AttributeValue &value);
 
