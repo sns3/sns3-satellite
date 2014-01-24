@@ -149,10 +149,6 @@ SatHelper::SatHelper (std::string scenarioName)
       EnableDetailedCreationTraces();
     }
 
-  // set Csma channel attributes
-  m_userHelper->SetCsmaChannelAttribute ("DataRate", DataRateValue (5000000));
-  m_userHelper->SetCsmaChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
-
   // Set the antenna patterns to beam helper
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 }
