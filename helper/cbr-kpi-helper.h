@@ -34,10 +34,6 @@
 
 namespace ns3 {
 
-/**
- * \ingroup traffic
- * \brief
- */
 
 class CbrKpiHelper
 {
