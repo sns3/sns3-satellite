@@ -705,7 +705,7 @@ main (int argc, char *argv[])
 
   // Sinks for group 2, one non-multicast user will not have a sink.
   // Excluding the user needs to be done on sink level (no application
-  // to receive the transmission) as it is sharing the same link to UT with a multicast user.
+  // to receive the transmission) as it is sharing the same link from the UT with a multicast user.
   for (uint32_t i = 1; i < utUsers.GetN (); i++)
     {
       PacketSinkHelper utSinkHelperGroup_2 ("ns3::UdpSocketFactory", InetSocketAddress (multicastGroup_2, multicastPort));
