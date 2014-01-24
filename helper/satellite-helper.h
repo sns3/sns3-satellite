@@ -139,7 +139,7 @@ public:
   /**
    * \return pointer to user helper.
    */
-  Ptr<SatUserHelper>  GetUserHelper () { return m_userHelper;}
+  Ptr<SatUserHelper> GetUserHelper () const;
 
   /**
    * Enables creation traces to be written in given file

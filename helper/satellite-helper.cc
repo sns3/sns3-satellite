@@ -270,6 +270,13 @@ SatHelper::GetBeamHelper () const
   return m_beamHelper;
 }
 
+Ptr<SatUserHelper>
+SatHelper::GetUserHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_userHelper;
+}
+
 void
 SatHelper::CreateSimpleScenario()
 {
