@@ -33,11 +33,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatGenericStreamEncapsulator class used in return link for
- * encapsulation, fragmentation and packing of higher layer packets.
- * The SatGenericStreamEncapsulator object is UT specific and its entities
- * are located at both GW (encapsulation, fragmentation, packing) and
- * UT (decapsulation, defragmentation, reassembly).
+ * \brief SatGenericStreamEncapsulator class is used in the FWD link for
+ * GSE encapsulation and fragmentation of higher layer packets. The
+ * SatGenericStreamEncapsulator object is UT specific and its entities
+ * are located at both GW (encapsulation, fragmentation) and
+ * UT (decapsulation, defragmentation).
  */
 class SatGenericStreamEncapsulator : public SatEncapsulator
 {
@@ -117,6 +117,17 @@ public:
 
 private:
 
+  /**
+   * Method is calculating the total transmission size of a HL packet
+   * by taking into account the fragmentation and header overhead. This is
+   * needed to check that the HL packet fits into the available tx opportunity,
+   * since fragmentation between BB frames is not allowed.
+   */
+  uint32_t CalculateTotalPacketSizeWithHeaders (uint32_t hlPacketSize) const;
+
+  /**
+   * Reassemble functionality
+   */
   void Reassemble ();
 
   void Reset ();
@@ -143,11 +154,6 @@ private:
    * Maximum GSE PDU size
    */
   uint32_t m_maxGsePduSize;
-
-  /**
-   * GSE PDU header size
-   */
-  uint32_t m_gseHeaderSize;
 
   /**
    * Fragment id used in the packet transmissions
@@ -183,6 +189,8 @@ private:
    * Currently received bytes of the fragmented packet
    */
   uint32_t m_currRxPacketFragmentBytes;
+
+  uint32_t m_minGseTxOpportunity;
 
 };
 

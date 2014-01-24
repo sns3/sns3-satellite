@@ -107,14 +107,42 @@ public:
    */
   void SetTotalLength (uint32_t bytes);
 
+  /**
+   * Get the maximum GSE header size
+   * \return uint32_t header size
+   */
+  uint32_t GetGseHeaderSizeInBytes (uint8_t type) const;
+
+  /**
+   * Get the maximum GSE header size
+   * \return uint32_t header size
+   */
+  uint32_t GetMaxGseHeaderSizeInBytes () const;
+
+
 private:
 
+  /**
+   * GSE header content
+   */
   uint8_t m_startIndicator;
   uint8_t m_endIndicator;
-  uint32_t m_gsePduLengthInBytes;
-  uint32_t m_fragmentId;
-  uint32_t m_totalLengthInBytes;
+  uint16_t m_gsePduLengthInBytes;
+  uint8_t m_fragmentId;
+  uint16_t m_totalLengthInBytes;
+  uint16_t m_protocolType;
+  uint8_t m_labelByte;
+  uint32_t m_crc;
 
+  /**
+   * Constant variables for determining the header sizes
+   * of different GSE fragments.
+   */
+  const uint32_t m_fullGseHeaderSize;
+  const uint32_t m_startGseHeaderSize;
+  const uint32_t m_endGseHeaderSize;
+  const uint32_t m_continuationGseHeaderSize;
+  const uint32_t m_labelFieldLengthInBytes;
 };
 
 }; // namespace ns3

@@ -19,8 +19,9 @@
  */
 
 #include "ns3/log.h"
-
+#include "ns3/uinteger.h"
 #include "satellite-gse-headers.h"
+#include "satellite-encap-pdu-status-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGseHeader");
@@ -34,8 +35,17 @@ SatGseHeader::SatGseHeader ()
  m_endIndicator (0),
  m_gsePduLengthInBytes (0),
  m_fragmentId (0),
- m_totalLengthInBytes (0)
+ m_totalLengthInBytes (0),
+ m_protocolType (0),
+ m_labelByte (0),
+ m_crc (0),
+ m_fullGseHeaderSize (8),
+ m_startGseHeaderSize (8),
+ m_endGseHeaderSize (8),
+ m_continuationGseHeaderSize (3),
+ m_labelFieldLengthInBytes (3)
 {
+
 }
 
 
@@ -56,32 +66,116 @@ SatGseHeader::GetTypeId (void)
 
 uint32_t SatGseHeader::GetSerializedSize (void) const
 {
-  return ( sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t));
+  if (m_startIndicator)
+    {
+      // FULL PDU
+      if (m_endIndicator)
+        {
+          return m_fullGseHeaderSize + m_labelFieldLengthInBytes;
+        }
+      // START PDU
+      else
+        {
+          return m_startGseHeaderSize + m_labelFieldLengthInBytes;
+        }
+    }
+  else
+    {
+      // END PDU
+      if (m_endIndicator)
+        {
+          return m_endGseHeaderSize;
+        }
+      // CONTINUATION PDU
+      else
+        {
+          return m_continuationGseHeaderSize;
+        }
+    }
+  NS_ASSERT (false);
+  return 0;
 }
 
 void SatGseHeader::Serialize (Buffer::Iterator start) const
 {
-  start.WriteU8 (m_startIndicator);
-  start.WriteU8 (m_endIndicator);
-  start.WriteU32 (m_gsePduLengthInBytes);
-  start.WriteU32 (m_fragmentId);
-  start.WriteU32 (m_totalLengthInBytes);
+  Buffer::Iterator i = start;
+
+  // First two bytes
+  i.WriteU16 ( (m_startIndicator << 15) | (m_endIndicator << 14) | (0x0 << 13) | (0x0 << 12) | (m_gsePduLengthInBytes & 0x0FFF) );
+
+  // NOT FULL PDU (START PDU OR CONTINUATION PDU OR END PDU)
+  if ( !(m_startIndicator && m_endIndicator) )
+    {
+      i.WriteU8 (m_fragmentId);
+    }
+
+  // START OR FULL PDU
+  if (m_startIndicator)
+    {
+      // START PDU
+      if (!m_endIndicator)
+        {
+          i.WriteU16 (m_totalLengthInBytes);
+        }
+
+      // Protocol type
+      i.WriteU16 (m_protocolType);
+
+      for (uint32_t c = 0; c < m_labelFieldLengthInBytes; ++c)
+        {
+          i.WriteU8 (m_labelByte);
+        }
+    }
+
+  // FULL OR END PDU
+  if (m_endIndicator)
+    {
+      i.WriteU32 (m_crc);
+    }
 }
 
 uint32_t SatGseHeader::Deserialize (Buffer::Iterator start)
 {
-  m_startIndicator = start.ReadU8 ();
-  m_endIndicator = start.ReadU8 ();
-  m_gsePduLengthInBytes = start.ReadU32 ();
-  m_fragmentId = start.ReadU32 ();
-  m_totalLengthInBytes = start.ReadU32 ();
+  Buffer::Iterator i = start;
+  uint16_t field_16;
+
+  // First two bytes
+  field_16 = i.ReadU16 ();
+  m_startIndicator = field_16 >> 15 & 0x1;
+  m_endIndicator = field_16 >> 14 & 0x1;
+  m_gsePduLengthInBytes = field_16 & 0x0FFF;
+
+  // NOT FULL PDU
+  if ( !(m_startIndicator && m_endIndicator) )
+    {
+      m_fragmentId = i.ReadU8 ();
+    }
+
+  // START OR FULL PDU
+  if (m_startIndicator)
+    {
+      // START PDU
+      if (!m_endIndicator)
+        {
+          m_totalLengthInBytes = i.ReadU16 ();
+        }
+    }
+
+  /**
+   * The GSE header includes also other fields, but currently they are not
+   * deserialized because they are not used. They are just serialized so
+   * that the header size is correct.
+   */
 
   return GetSerializedSize();
 }
 
 void SatGseHeader::Print (std::ostream &os) const
 {
-  os << m_startIndicator << " " << m_endIndicator << " " << m_gsePduLengthInBytes << " " << m_fragmentId << " " << m_totalLengthInBytes;
+  os << m_startIndicator << " " << m_endIndicator << " "
+      << m_gsePduLengthInBytes << " " << m_fragmentId << " "
+      << m_totalLengthInBytes << " " << m_protocolType << " "
+      << m_labelByte << " " << m_crc << std::endl;
 }
 
 TypeId
@@ -138,6 +232,48 @@ void SatGseHeader::SetFragmentId (uint32_t id)
 void SatGseHeader::SetTotalLength (uint32_t bytes)
 {
   m_totalLengthInBytes = bytes;
+}
+
+uint32_t SatGseHeader::GetGseHeaderSizeInBytes (uint8_t type) const
+{
+  uint32_t size (0);
+  switch (type)
+  {
+    case SatEncapPduStatusTag::START_PDU:
+      {
+        size = m_startGseHeaderSize + m_labelFieldLengthInBytes;
+        break;
+      }
+    case SatEncapPduStatusTag::CONTINUATION_PDU:
+      {
+        size = m_continuationGseHeaderSize;
+        break;
+      }
+    case SatEncapPduStatusTag::END_PDU:
+      {
+        size = m_endGseHeaderSize;
+        break;
+      }
+    case SatEncapPduStatusTag::FULL_PDU:
+      {
+        size = m_fullGseHeaderSize + m_labelFieldLengthInBytes;
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported SatEncapPduStatusTag!");
+        break;
+      }
+  }
+  return size;
+}
+
+uint32_t SatGseHeader::GetMaxGseHeaderSizeInBytes () const
+{
+  return std::max (std::max ( (m_fullGseHeaderSize + m_labelFieldLengthInBytes),
+                              (m_startGseHeaderSize + m_labelFieldLengthInBytes) ),
+                  (std::max ( m_endGseHeaderSize,
+                              m_continuationGseHeaderSize)));
 }
 
 }; // namespace ns3
