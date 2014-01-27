@@ -48,7 +48,6 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48
     m_destAddress (dest),
     m_maxTxBufferSize (100 * 4095),
     m_txBufferSize (0),
-    m_maxAlPduSize (4095),
     m_ppduHeaderSize (2),
     m_fpduHeaderSize (1),
     m_txFragmentId (0),
@@ -76,21 +75,6 @@ SatReturnLinkEncapsulator::GetTypeId (void)
                    UintegerValue (100 * 4095),
                    MakeUintegerAccessor (&SatReturnLinkEncapsulator::m_maxTxBufferSize),
                    MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("MaxAdressedLinkPduSize",
-                   "Maximum size of the Addressed Link PDU (in Bytes)",
-                   UintegerValue (4095),
-                   MakeUintegerAccessor (&SatReturnLinkEncapsulator::m_maxAlPduSize),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("PayloadAdaptedPduHeaderSize",
-                   "Payload adapted PDU header size (in Bytes)",
-                   UintegerValue (2),
-                   MakeUintegerAccessor (&SatReturnLinkEncapsulator::m_ppduHeaderSize),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("FramePduHeaderSize",
-                   "Frame PDU header size (in Bytes)",
-                   UintegerValue (1),
-                   MakeUintegerAccessor (&SatReturnLinkEncapsulator::m_fpduHeaderSize),
-                   MakeUintegerChecker<uint32_t> ())
                    ;
   return tid;
 }
@@ -114,8 +98,13 @@ SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
+  // If the packet is smaller than the maximum size
+  if (p->GetSize () > MAX_HL_PDU_PACKET_SIZE)
+    {
+      NS_FATAL_ERROR ("SatReturnLinkEncapsulator received too large HL PDU!");
+    }
   // If the packet still fits into the buffer
-  if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
+  else if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
     {
       // Store packet arrival time
       SatTimeTag timeTag (Simulator::Now ());
@@ -156,8 +145,27 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   // Frame PDU
   Ptr<Packet> packet;
 
+  // No packets in buffer
+  if ( m_txBuffer.size () == 0 )
+    {
+      NS_LOG_LOGIC ("No data pending");
+      return packet;
+    }
+
+  // Burst (FPDU) header
+  SatFPduHeader fpduHeader;
+
+  // RLE (PPDU) header
+  SatPPduHeader ppduHeader;
+
+  // Take the first PDU from the buffer
+  Ptr<Packet> firstSegment = (*(m_txBuffer.begin ()))->Copy ();
+
+  SatEncapPduStatusTag tag;
+  firstSegment->PeekPacketTag (tag);
+
   // Tx opportunity bytes is not enough
-  if (bytes <= (m_ppduHeaderSize + m_fpduHeaderSize))
+  if (bytes <= 5)
     {
       NS_LOG_LOGIC ("TX opportunity too small = " << bytes);
       return packet;
@@ -169,38 +177,25 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   uint32_t dataFieldAddedSize = 0;
   std::vector < Ptr<Packet> > dataField;
 
-  // No packets in buffer
-  if ( m_txBuffer.size () == 0 )
-    {
-      NS_LOG_LOGIC ("No data pending");
-      return packet;
-    }
-
   // Frame PDU
   packet = Create<Packet> ();
 
-  // Frame header
-  SatFPduHeader fpduHeader;
-
-  // Take the first PDU from the buffer
-  Ptr<Packet> firstSegment = (*(m_txBuffer.begin ()))->Copy ();
   m_txBufferSize -= (*(m_txBuffer.begin()))->GetSize ();
   m_txBuffer.erase (m_txBuffer.begin ());
 
-  // If the next PDU is full, increase the fragment id
-  SatEncapPduStatusTag tag;
-  firstSegment->PeekPacketTag (tag);
+  // Increase the fragment id
   if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
     {
-      m_txFragmentId++;
+      IncreaseFragmentId ();
     }
 
   // While we have a first segment
   while ( firstSegment && (firstSegment->GetSize () > 0) && (nextSegmentSize > 0) )
     {
-      // Fragmentation functionality
+      // Fragmentation if the HL PDU does not fit into the burst or
+      // the HL packet is too large.
       if ( (firstSegment->GetSize () > nextSegmentSize) ||
-           (firstSegment->GetSize () > m_maxAlPduSize) )
+           (firstSegment->GetSize () > MAX_PPDU_PACKET_SIZE) )
         {
           uint32_t currSegmentSize = std::min (firstSegment->GetSize (), nextSegmentSize);
 
@@ -218,12 +213,14 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
           // Create new PPDU header
           SatPPduHeader ppduHeader;
           ppduHeader.SetPPduLength (newSegment->GetSize());
+
           ppduHeader.SetFragmentId (m_txFragmentId);
 
           if (oldTag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
             {
               ppduHeader.SetStartIndicator ();
               ppduHeader.SetTotalLength (firstSegment->GetSize());
+
               newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
               oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
             }
@@ -318,7 +315,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
               firstSegment->PeekPacketTag (tag);
               if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
                 {
-                  m_txFragmentId++;
+                  IncreaseFragmentId ();
                 }
             }
           // Else end loop
@@ -413,6 +410,17 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
 
   // Try to reassemble the received packets
   Reassemble ();
+}
+
+
+void
+SatReturnLinkEncapsulator::IncreaseFragmentId ()
+{
+  ++m_txFragmentId;
+  if (m_txFragmentId >= MAX_FRAGMENT_ID)
+    {
+      m_txFragmentId = 0;
+    }
 }
 
 

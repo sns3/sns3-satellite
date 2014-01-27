@@ -66,20 +66,20 @@ public:
    * Get PPDU fragment length in bytes
    * \return uint32_t PPDU length
    */
-  uint32_t GetPPduLength () const;
+  uint16_t GetPPduLength () const;
 
   /**
    * Get PPDU fragment id
    * \return uint32_t fragment id
    */
-  uint32_t GetFragmentId () const;
+  uint8_t GetFragmentId () const;
 
   /**
    * Get total length of higher layer PDU. Set in
    * START_PPDU status type.
    * \return uint32_t total length of HL PDU
    */
-  uint32_t GetTotalLength () const;
+  uint16_t GetTotalLength () const;
 
   /**
    * Set start indicator to PPDU header
@@ -95,27 +95,42 @@ public:
    * Set PPDU fragment length to PPDU header
    * \param bytes PPDU length in bytes
    */
-  void SetPPduLength (uint32_t bytes);
+  void SetPPduLength (uint16_t bytes);
 
   /**
    * Set fragment id to PPDU header
    * \param id Fragment id
    */
-  void SetFragmentId (uint32_t id);
+  void SetFragmentId (uint8_t id);
 
   /**
    * Set total length of higher layer PDU. Set in
    * START_PPDU status type.
    */
-  void SetTotalLength (uint32_t bytes);
+  void SetTotalLength (uint16_t bytes);
+
+  /**
+   * Get the maximum RLE header size
+   * \return uint32_t header size
+   */
+  uint32_t GetHeaderSizeInBytes (uint8_t type) const;
 
 private:
 
   uint8_t m_startIndicator;
   uint8_t m_endIndicator;
-  uint32_t m_ppduLengthInBytes;
-  uint32_t m_fragmentId;
-  uint32_t m_totalLengthInBytes;
+  uint16_t m_ppduLengthInBytes;
+  uint8_t m_fragmentId;
+  uint16_t m_totalLengthInBytes;
+
+  /**
+   * Constant variables for determining the header sizes
+   * of different RLE PPDU fragments.
+   */
+  const uint32_t m_fullPpduHeaderSize;
+  const uint32_t m_startPpduHeaderSize;
+  const uint32_t m_endPpduHeaderSize;
+  const uint32_t m_continuationPpduHeaderSize;
 
 };
 

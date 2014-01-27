@@ -117,6 +117,13 @@ public:
 
 private:
 
+  /**
+   * Method increases the fragment id by one. If the maximum fragment id is
+   * reached, it is reset to zero.
+   */
+  void IncreaseFragmentId ();
+
+
   void Reassemble ();
 
   void Reset ();
@@ -138,11 +145,6 @@ private:
    * Buffered bytes
    */
   uint32_t m_txBufferSize;
-
-  /**
-   * Maximum Addressed Link PDU size
-   */
-  uint32_t m_maxAlPduSize;
 
   /**
    * Physical PDU header size
@@ -188,6 +190,24 @@ private:
    * Currently received bytes of the fragmented packet
    */
   uint32_t m_currRxPacketFragmentBytes;
+
+  /**
+   * The fragment is described with 3 bits, thus the
+   * maximum fragment id is 8.
+   */
+  static const uint32_t MAX_FRAGMENT_ID = 8;
+
+  /**
+   * The maximum PPDU fragment size is described with 11 bits,
+   * thus, the maximum fragment size is 2048 bytes.
+   */
+  static const uint32_t MAX_PPDU_PACKET_SIZE = 2048;
+
+  /**
+   * The maximum packet size is described with 12 bits,
+   * thus, the maximum HL packet size is 4096 bytes.
+   */
+  static const uint32_t MAX_HL_PDU_PACKET_SIZE = 4096;
 
 };
 
