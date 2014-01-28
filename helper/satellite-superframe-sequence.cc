@@ -20,6 +20,7 @@
 
 #include "ns3/log.h"
 #include "ns3/object.h"
+#include "ns3/nstime.h"
 #include "satellite-superframe-sequence.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatSuperframeSeq");
@@ -48,6 +49,29 @@ SatSuperframeSeq::SatSuperframeSeq ( SatSuperframeConfList * confs)
 SatSuperframeSeq::~SatSuperframeSeq ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+TypeId
+SatSuperframeSeq::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatSuperframeSeq")
+    .SetParent<Object> ()
+    .AddConstructor<SatSuperframeSeq> ()
+    .AddAttribute ("MinTbtpStoreTime", "Minimum time to store sent TBTPs.",
+                    TimeValue (MilliSeconds (300)),
+                    MakeTimeAccessor (&SatSuperframeSeq::m_tbtpStoreTime),
+                    MakeTimeChecker ())
+  ;
+
+  return tid;
+}
+
+TypeId
+SatSuperframeSeq::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
 }
 
 void
@@ -98,13 +122,13 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
 }
 
 double
-SatSuperframeSeq::GetDuration_s ( uint8_t seqId ) const
+SatSuperframeSeq::GetDurationInSeconds ( uint8_t seqId ) const
 {
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT ( seqId < m_superframe.size() );
 
-  return m_superframe[seqId]->GetDuration_s();
+  return m_superframe[seqId]->GetDurationInSeconds();
 }
 
 Ptr<SatSuperframeConf>
@@ -135,7 +159,7 @@ SatSuperframeSeq::GetCarrierId ( uint8_t superframeId, uint8_t frameId, uint16_t
 }
 
 double
-SatSuperframeSeq::GetCarrierFrequency_hz (uint32_t carrierId) const
+SatSuperframeSeq::GetCarrierFrequencyHz (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -147,18 +171,18 @@ SatSuperframeSeq::GetCarrierFrequency_hz (uint32_t carrierId) const
   while( carrierId > lastIdInSuperframe )
     {
       carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount();
-      superFrameStartFrequency += m_superframe[currentSuperframe]->GetBandwidth_hz();
+      superFrameStartFrequency += m_superframe[currentSuperframe]->GetBandwidthHz();
       currentSuperframe++;
       lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
     }
 
-  double carrierFrequencyInSuperframe = m_superframe[currentSuperframe]->GetCarrierFrequency_hz ( carrierIdInSuperframe );
+  double carrierFrequencyInSuperframe = m_superframe[currentSuperframe]->GetCarrierFrequencyHz ( carrierIdInSuperframe );
 
   return superFrameStartFrequency + carrierFrequencyInSuperframe;
 }
 
 double
-SatSuperframeSeq::GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -173,10 +197,58 @@ SatSuperframeSeq::GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierB
       lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
     }
 
-  return m_superframe[currentSuperframe]->GetCarrierBandwidth_hz ( carrierIdInSuperframe, bandwidthType );
+  return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );
 }
 
+uint32_t
+SatSuperframeSeq::AddTbtpMessage (uint32_t beamId, Ptr<SatTbtpMessage> tbtpMsg)
+{
+  NS_LOG_FUNCTION (this << beamId << tbtpMsg);
 
+  TbtpMap_t::const_iterator it = tbtpContainers.find (beamId);
 
+  // create container, if not exist
+  if ( it == tbtpContainers.end () )
+    {
+      Ptr<SatTbtpContainer> tbtpCont = Create<SatTbtpContainer> ();
+
+      // calculate maximum number of messages to store based on given time to store and superframe duration.
+      uint32_t storeCount  = (uint32_t) (m_tbtpStoreTime.GetSeconds() / m_superframe[0]->GetDurationInSeconds() );
+
+      // store at least two messages always.
+      if (storeCount < 2)
+        {
+          storeCount = 2;
+        }
+
+      tbtpCont->SetMaxMsgCount (storeCount);
+
+      std::pair<TbtpMap_t::const_iterator, bool> result = tbtpContainers.insert (std::make_pair (beamId, tbtpCont));
+
+      if ( result.second == false )
+        {
+          NS_FATAL_ERROR ("TBTP container creation failed!!!");
+        }
+    }
+
+  return tbtpContainers[beamId]->Add (tbtpMsg);
+}
+
+Ptr<SatTbtpMessage>
+SatSuperframeSeq::GetTbtpMessage (uint32_t beamId, uint32_t msgId) const
+{
+  NS_LOG_FUNCTION (this << beamId);
+
+  Ptr<SatTbtpMessage> msg = NULL;
+
+  TbtpMap_t::const_iterator it = tbtpContainers.find (beamId);
+
+  if ( it != tbtpContainers.end () )
+    {
+      msg = tbtpContainers.at (beamId)->Get (msgId);
+    }
+
+  return msg;
+}
 
 }; // namespace ns3

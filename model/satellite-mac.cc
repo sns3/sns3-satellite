@@ -73,6 +73,14 @@ SatMac::GetTypeId (void)
 }
 
 SatMac::SatMac ()
+ : m_beamId (0)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (false); // this version of the constructor should not been used
+}
+
+SatMac::SatMac (uint32_t beamId)
+ : m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
 }

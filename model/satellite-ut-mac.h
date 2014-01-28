@@ -43,15 +43,17 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   SatUtMac ();
+
   /**
    * Construct a SatUtMac
    *
    * This is the constructor for the SatUtMac
    *
-   * \param seq Pointer to superframe sequence.
+   * \param seq   Pointer to superframe sequence.
+   * \param beamId Id of the beam.
    *
    */
-  SatUtMac (Ptr<SatSuperframeSeq> seq);
+  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId);
 
   /**
    * Destroy a SatUtMac
@@ -83,7 +85,7 @@ public:
      * \param address    Packet destination address
      * \param protocol   protocol number to send packet.
      */
-    typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
+  typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
 
   /**
    * \param cb callback to send control messages.
@@ -126,7 +128,7 @@ private:
     *
     * \param tbtp Pointer to TBTP message.
     */
-   void ScheduleTimeSlots (SatTbtpHeader * tbtp);
+   void ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp);
 
    /**
     * Schdules one Tx opportunity, i.e. time slot.
@@ -153,7 +155,7 @@ private:
    * \param packet Received signaling packet
    * \param cType Control message type
    */
-  void ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType);
+  void ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag);
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);

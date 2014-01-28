@@ -76,14 +76,22 @@ public:
    * \param packet     the packet send
    * \param address    Packet destination address
    * \param protocol   protocol number to send packet.
+   * \return Result of sending, true success or false failure
    */
   typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
+
+  /**
+   * \param id    Id of the TBTP message to add.
+   * \param tbtp  Pointer to the TBTP message to add.
+   */
+  typedef Callback<void, uint32_t, Ptr<SatTbtpMessage> > TbtpAddCallback;
 
   /**
    * \param beamId ID of the beam which for callback is set
    * \param cb callback to invoke whenever a TBTP is ready for sending and must
    *        be forwarded to the Beam UTs.
-   * \param seq
+   * \param seq Superframe sequence.
+   * \parma tbtpCb  TBTP message add callback.
    */
   void Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb, Ptr<SatSuperframeSeq> seq);
 
@@ -129,8 +137,8 @@ private:
   void Schedule ();
 
   void InitializeScheduling ();
-  void ScheduleUts (SatTbtpHeader& header);
-  uint32_t AddUtTimeSlots (SatTbtpHeader& header);
+  void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
+  uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
 
   /**
@@ -152,6 +160,11 @@ private:
    * The TBTP send callback.
    */
   SatBeamScheduler::SendCallback m_txCallback;
+
+  /**
+   * The TBTP send callback.
+   */
+  SatBeamScheduler::TbtpAddCallback m_tbtpAddCb;
 
   /**
    * Set to store UTs in beam.
@@ -202,6 +215,11 @@ private:
    * Number of time slots reserved per every UTs
    */
   uint32_t m_slotsPerUt;
+
+  /**
+   * Id of the next sent TBTP message.
+   */
+  uint32_t m_tbtpId;
 };
 
 } // namespace ns3

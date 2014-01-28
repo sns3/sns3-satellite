@@ -53,10 +53,18 @@ public:
   /**
    * Construct a SatMac
    *
-   * This is the constructor for the SatMac
+   * This default constructor for the SatMac, which should not been used
    *
    */
   SatMac ();
+
+  /**
+   * Construct a SatMac
+   *
+   * This is the constructor for the SatMac
+   *
+   */
+  SatMac (uint32_t beamId);
 
   /**
    * Destroy a SatMac
@@ -164,6 +172,11 @@ protected:
    * node type, node id and MAC address (of the SatNetDevice)
    */
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * The ID of the beam where mac belongs.
+   */
+  uint32_t m_beamId;
 
   /**
    * The trace source fired when packets come into the "top" of the device

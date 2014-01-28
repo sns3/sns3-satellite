@@ -209,7 +209,7 @@ SatBbFrameConf::GetTypeId (void)
     .AddAttribute( "DefaultModCod",
                    "Default MODCOD",
                    // TODO: most robust MODCOD needed to set SAT_MODCOD_QPSK_1_TO_2 when TBTP message length problem is solved.
-                   EnumValue (SatEnums::SAT_MODCOD_QPSK_3_TO_4),
+                   EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
                    MakeEnumAccessor (&SatBbFrameConf::m_defaultModCod),
                    MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_2,  "QPSK_1_TO_2",
                                     SatEnums::SAT_MODCOD_QPSK_2_TO_3, "QPSK_2_TO_3",

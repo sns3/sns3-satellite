@@ -61,6 +61,12 @@ SatGwMac::GetTypeId (void)
   return tid;
 }
 
+SatGwMac::SatGwMac (uint32_t beamId)
+ : SatMac (beamId)
+{
+  NS_LOG_FUNCTION (this);
+}
+
 SatGwMac::SatGwMac ()
 {
   NS_LOG_FUNCTION (this);

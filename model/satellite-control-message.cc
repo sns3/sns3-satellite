@@ -20,11 +20,12 @@
 
 #include <map>
 #include "ns3/log.h"
+#include "ns3/uinteger.h"
 #include "ns3/address-utils.h"
 
 #include "satellite-control-message.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatCtrlHeader");
+NS_LOG_COMPONENT_DEFINE ("SatCtrlMessage");
 
 namespace ns3 {
 
@@ -32,7 +33,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatControlMsgTag);
 
 
 SatControlMsgTag::SatControlMsgTag ()
- :m_msgType (SAT_NON_CTRL_MSG)
+ :m_msgType (SAT_NON_CTRL_MSG),
+  m_msgId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -78,7 +80,7 @@ SatControlMsgTag::GetSerializedSize (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return ( sizeof(m_msgType) );
+  return ( sizeof(m_msgType) + sizeof (m_msgId) );
 }
 
 void
@@ -86,25 +88,42 @@ SatControlMsgTag::Serialize (TagBuffer i) const
 {
   NS_LOG_FUNCTION (this << &i);
   i.WriteU32 ( m_msgType );
+  i.WriteU32 ( m_msgId );
 }
 
 void
 SatControlMsgTag::Deserialize (TagBuffer i)
 {
   NS_LOG_FUNCTION (this << &i);
-  m_msgType = (SatControlMsgType_t) i.ReadU32();
+  m_msgType = (SatControlMsgType_t) i.ReadU32 ();
+  m_msgId = i.ReadU32 ();
 }
 
 void
 SatControlMsgTag::Print (std::ostream &os) const
 {
   NS_LOG_FUNCTION (this << &os);
-  os << "SatontrolMsgType=" << m_msgType;
+  os << "SatControlMsgType=" << m_msgType << m_msgId;
+}
+
+void
+SatControlMsgTag::SetMsgId (uint32_t msgId)
+{
+  NS_LOG_FUNCTION (this << m_msgId);
+  m_msgId = msgId;
+}
+
+uint32_t
+SatControlMsgTag::GetMsgId () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_msgId;
 }
 
 // TBTP time slot information
 
-SatTbtpHeader::TbtpTimeSlotInfo::TbtpTimeSlotInfo ()
+SatTbtpMessage::TbtpTimeSlotInfo::TbtpTimeSlotInfo ()
   : m_frameId(0),
     m_timeSlotId(0)
 {
@@ -112,7 +131,7 @@ SatTbtpHeader::TbtpTimeSlotInfo::TbtpTimeSlotInfo ()
 }
 
 
-SatTbtpHeader::TbtpTimeSlotInfo::TbtpTimeSlotInfo (uint8_t frameId, uint16_t timeSlotId)
+SatTbtpMessage::TbtpTimeSlotInfo::TbtpTimeSlotInfo (uint8_t frameId, uint16_t timeSlotId)
   : m_frameId(frameId)
 {
   NS_LOG_FUNCTION (this);
@@ -125,32 +144,32 @@ SatTbtpHeader::TbtpTimeSlotInfo::TbtpTimeSlotInfo (uint8_t frameId, uint16_t tim
   m_timeSlotId = timeSlotId;
 }
 
-SatTbtpHeader::TbtpTimeSlotInfo::~TbtpTimeSlotInfo()
+SatTbtpMessage::TbtpTimeSlotInfo::~TbtpTimeSlotInfo()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-SatTbtpHeader::TbtpTimeSlotInfo::Print (std::ostream &os)  const
+SatTbtpMessage::TbtpTimeSlotInfo::Print (std::ostream &os)  const
 {
   os << "Frame ID= " << m_frameId << ", Time Slot ID= " << m_timeSlotId;
 }
 
 uint32_t
-SatTbtpHeader::TbtpTimeSlotInfo::GetSerializedSize (void) const
+SatTbtpMessage::TbtpTimeSlotInfo::GetSerializedSize (void) const
 {
   return ( sizeof(m_frameId)  + sizeof(m_timeSlotId) );
 }
 
 void
-SatTbtpHeader::TbtpTimeSlotInfo::Serialize (Buffer::Iterator start) const
+SatTbtpMessage::TbtpTimeSlotInfo::Serialize (Buffer::Iterator start) const
 {
    start.WriteU8 (m_frameId);
    start.WriteU16 (m_timeSlotId);
 }
 
 uint32_t
-SatTbtpHeader::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
+SatTbtpMessage::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
 {
   m_frameId = start.ReadU8 ();
   m_timeSlotId = start.ReadU16 ();
@@ -160,121 +179,212 @@ SatTbtpHeader::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
 
 // TBTP message header
 
-NS_OBJECT_ENSURE_REGISTERED (SatTbtpHeader);
+NS_OBJECT_ENSURE_REGISTERED (SatTbtpMessage);
 
-SatTbtpHeader::SatTbtpHeader ( )
+SatTbtpMessage::SatTbtpMessage ( )
   : m_superframeSeqId (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatTbtpHeader::SatTbtpHeader ( uint8_t seqId )
+SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
  : m_superframeSeqId (seqId)
+   m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatTbtpHeader::~SatTbtpHeader ()
+SatTbtpMessage::~SatTbtpMessage ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_timeSlots.clear();
+  m_frameIds.clear ();
+  m_timeSlots.clear ();
 }
 
 TypeId
-SatTbtpHeader::GetTypeId (void)
+SatTbtpMessage::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatTbtpHeader")
-    .SetParent<Header> ()
-    .AddConstructor<SatTbtpHeader> ()
+  static TypeId tid = TypeId ("ns3::SatTbtpMessage")
+    .SetParent<Object> ()
+    .AddConstructor<SatTbtpMessage> ()
+    .AddAttribute ("AssigmentFormat", "Assignment format of assignment IDs in TBTP.)",
+                    UintegerValue (0),
+                    MakeUintegerAccessor (&SatTbtpMessage::m_assignmentFormat),
+                    MakeUintegerChecker<uint8_t> ())
   ;
   return tid;
 }
 
 TypeId
-SatTbtpHeader::GetInstanceTypeId (void) const
+SatTbtpMessage::GetInstanceTypeId (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return GetTypeId ();
 }
 
-std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo> >
-SatTbtpHeader::GetTimeslots (Address utId)
+SatTbtpMessage::TimeSlotInfoContainer_t
+SatTbtpMessage::GetTimeslots (Address utId)
 {
-  std::pair <TimeSlotMap_t::iterator, TimeSlotMap_t::iterator> timeSlotRange;
+  NS_LOG_FUNCTION (this << utId);
 
-  timeSlotRange = m_timeSlots.equal_range (utId);
-  std::vector<Ptr<TbtpTimeSlotInfo> > timeSlots;
+  TimeSlotInfoContainer_t slotInfos;
+  TimeSlotMap_t::const_iterator it = m_timeSlots.find (utId);
 
-  for (TimeSlotMap_t::iterator it = timeSlotRange.first; it != timeSlotRange.second; it++)
+  if ( it != m_timeSlots.end () )
     {
-      timeSlots.push_back ( it->second );
+      slotInfos = it->second;
     }
 
-  return timeSlots;
+  return slotInfos;
 }
 
 void
-SatTbtpHeader::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
+SatTbtpMessage::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
 {
-  m_timeSlots.insert (std::make_pair(utId, info));
-}
+  NS_LOG_FUNCTION (this << utId << info);
 
-void SatTbtpHeader::Print (std::ostream &os)  const
-{
-  os << "TBTP header, Super Frame Seq ID= " << m_superframeSeqId;
-}
+  TimeSlotInfoContainer_t slotInfos;
 
-uint32_t SatTbtpHeader::GetSerializedSize (void) const
-{
-  uint32_t timeSlotSerializedSize = Address (Mac48Address ()).GetLength () * sizeof(uint8_t);
-  timeSlotSerializedSize += TbtpTimeSlotInfo().GetSerializedSize();
+  // find container for UT
+  // If found, add new in container, otherwise use container from map
 
-  // time slot map items (address + time slot info) + number of items in map
-  return ( ( m_timeSlots.size() * timeSlotSerializedSize ) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint8_t));
-}
+  TimeSlotMap_t::const_iterator it = m_timeSlots.find (utId);
 
-void
-SatTbtpHeader::Serialize (Buffer::Iterator start) const
-{
-  start.WriteU32 ( m_superframeCounter );
-  start.WriteU8 ( m_superframeSeqId );
-
-  // write number of time slot info
-  start.WriteU32 ( m_timeSlots.size() );
-
-  // write time slots
-  for (TimeSlotMap_t::const_iterator it = m_timeSlots.begin(); it != m_timeSlots.end(); it++)
+  if ( it == m_timeSlots.end () )
     {
-      WriteTo (start, Mac48Address::ConvertFrom(it->first));
-
-      it->second->Serialize(start);
-      start.Next( it->second->GetSerializedSize() );
+      m_timeSlots.insert (std::make_pair (utId, slotInfos));
     }
+  else
+    {
+      slotInfos = it->second;
+    }
+
+  // store time slot info to user specific container
+  slotInfos.push_back (info);
+
+  // store frame ID to count used frames
+  m_frameIds.insert (info->GetFrameId ());
 }
+
+uint32_t SatTbtpMessage::GetSizeinBytes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // see definition for TBTP2 from specification ETSI EN 301 545-2 (V1.1.1), chapter 6.4.9
+
+  uint32_t sizeInBytes = m_tbtpBodySizeInBytes + ( m_frameIds.size () * m_tbtpFrameBodySizeInBytes );
+  uint32_t assignmentBodySizeInBytes = 0;
+
+  switch (m_assignmentFormat)
+  {
+    case 0:
+      // assignment id 48 bits
+      assignmentBodySizeInBytes = 6;
+      break;
+
+    case 1:
+      // assignment id 8 bits
+      assignmentBodySizeInBytes = 1;
+      break;
+
+    case 2:
+      // assignment id 16 bits
+      assignmentBodySizeInBytes = 2;
+      break;
+
+    case 3:
+      // assignment id 24 bits
+      assignmentBodySizeInBytes = 3;
+      break;
+
+    case 10:
+      // dynamic tx type 8 bits + assignment id 8 bits
+      assignmentBodySizeInBytes = 2;
+      break;
+
+    case 11:
+      // dynamic tx type 8 bits + assignment id 16 bits
+      assignmentBodySizeInBytes = 3;
+      break;
+
+    case 12:
+      // dynamic tx type 8 bits + assignment id 24 bits
+      assignmentBodySizeInBytes = 4;
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Assignment format=" << m_assignmentFormat << " not supported!!!" );
+      break;
+  }
+
+  sizeInBytes += (m_timeSlots.size () * assignmentBodySizeInBytes);
+
+  return sizeInBytes;
+
+}
+
+// TBTP message container
+
+SatTbtpContainer::SatTbtpContainer ()
+ :m_id (0),
+  m_maxMsgCount (50)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatTbtpContainer::~SatTbtpContainer ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
 
 uint32_t
-SatTbtpHeader::Deserialize (Buffer::Iterator start)
+SatTbtpContainer::Add (Ptr<SatTbtpMessage> tbtpMsg)
 {
-  m_superframeCounter = start.ReadU32 ();
-  m_superframeSeqId = start.ReadU8 ();
+  NS_LOG_FUNCTION (this << tbtpMsg);
 
-  uint32_t count = start.ReadU32();
-
-  while (count)
+  // if limit to store msgs are reached, remove first msg from map before adding the new onw
+  if ( m_tbtps.size () >= m_maxMsgCount )
     {
-      Mac48Address address;
-      ReadFrom (start, address);
-
-      Ptr<TbtpTimeSlotInfo> timeSlotInfo = Create<SatTbtpHeader::TbtpTimeSlotInfo> ();
-      timeSlotInfo->Deserialize (start);
-      start.Next( timeSlotInfo->GetSerializedSize() );
-
-      m_timeSlots.insert (std::make_pair (address, timeSlotInfo) );
-      count--;
+      m_tbtps.erase (m_tbtps.begin ()->first );
     }
 
-  return GetSerializedSize();
+  std::pair<TbtpMap_t::iterator, bool> result = m_tbtps.insert (std::make_pair (m_id, tbtpMsg));
+
+  if ( result.second == false )
+    {
+      NS_FATAL_ERROR ("TBTP message can't added.");
+    }
+
+  return m_id++;
 }
+
+Ptr<SatTbtpMessage>
+SatTbtpContainer::Get (uint32_t id) const
+{
+  NS_LOG_FUNCTION (this << id);
+
+  Ptr<SatTbtpMessage> msg = NULL;
+
+  TbtpMap_t::const_iterator it = m_tbtps.find (id);
+
+  if ( it != m_tbtps.end () )
+    {
+      msg = it->second;
+    }
+
+  return msg;
+}
+
+void SatTbtpContainer::SetMaxMsgCount (uint32_t maxMsgCount)
+{
+  NS_LOG_FUNCTION (this << maxMsgCount);
+
+  m_maxMsgCount = maxMsgCount;
+}
+
 
 NS_OBJECT_ENSURE_REGISTERED (SatCapacityReqHeader);
 
@@ -291,6 +401,8 @@ SatCapacityReqHeader::GetTypeId (void)
 TypeId
 SatCapacityReqHeader::GetInstanceTypeId (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   return GetTypeId ();
 }
 

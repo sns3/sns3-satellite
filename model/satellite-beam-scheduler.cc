@@ -59,6 +59,7 @@ void
 SatBeamScheduler::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+  m_txCallback.Nullify ();
   Object::DoDispose ();
 }
 
@@ -82,7 +83,7 @@ SatBeamScheduler::Send (Ptr<Packet> packet)
 void
 SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb, Ptr<SatSuperframeSeq> seq)
 {
-  NS_LOG_FUNCTION (this << &cb);
+  NS_LOG_FUNCTION (this << beamId << &cb);
   m_beamId = beamId;
   m_txCallback = cb;
   m_superframeSeq = seq;
@@ -95,7 +96,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
       m_carrierIds.push_back (i);
     }
 
-  Simulator::Schedule (Seconds (m_superframeSeq->GetDuration_s (0)), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
 }
 
 void
@@ -141,31 +142,34 @@ SatBeamScheduler::Schedule ()
 
   if ( m_uts.size() > 0 )
     {
-      Ptr<Packet> packet = Create<Packet> ();
-
-      // add TBTP tag to message
-      SatControlMsgTag tag;
-      tag.SetMsgType (SatControlMsgTag::SAT_TBTP_CTRL_MSG);
-      packet->AddPacketTag (tag);
-
-      // add TBTP specific header to message
-      SatTbtpHeader header;
-      header.SetSuperframeCounter (m_superFrameCounter++);
+      // create TBTP  message
+      Ptr<SatTbtpMessage> tbtpMsg = CreateObject<SatTbtpMessage> ();
+      tbtpMsg->SetSuperframeCounter (m_superFrameCounter++);
 
       // schedule timeslots according to static configuration 0
       // TODO: algorithms for other configurations
       InitializeScheduling ();
-      ScheduleUts (header);
+      ScheduleUts (tbtpMsg);
 
-      packet->AddHeader (header);
+      uint32_t msgId = m_superframeSeq->AddTbtpMessage (m_beamId, tbtpMsg);
+
+      Ptr<Packet> packet = Create<Packet> (tbtpMsg->GetSizeinBytes ());
+
+      // add TBTP tag to message
+      SatControlMsgTag tag;
+      tag.SetMsgType (SatControlMsgTag::SAT_TBTP_CTRL_MSG);
+      tag.SetMsgId (msgId);
+
+      packet->AddPacketTag (tag);
+
       Send (packet);
     }
 
   // re-schedule next TBTP sending (call of this function)
-  Simulator::Schedule (Seconds (m_superframeSeq->GetDuration_s (0)), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
 }
 
-void SatBeamScheduler::ScheduleUts (SatTbtpHeader& header)
+void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
 {
   NS_LOG_FUNCTION (this);
 
@@ -194,7 +198,7 @@ void SatBeamScheduler::ScheduleUts (SatTbtpHeader& header)
 }
 
 uint32_t
-SatBeamScheduler::AddUtTimeSlots (SatTbtpHeader& header)
+SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
 {
   NS_LOG_FUNCTION (this);
 
@@ -212,8 +216,8 @@ SatBeamScheduler::AddUtTimeSlots (SatTbtpHeader& header)
 
       while ( timeSlotForUt )
         {
-          Ptr<SatTbtpHeader::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpHeader::TbtpTimeSlotInfo> (0, GetNextTimeSlot () );
-          header.SetTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), timeSlotInfo);
+          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (0, GetNextTimeSlot () );
+          header->SetTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), timeSlotInfo);
 
           timeSlotForUt--;
         }

@@ -201,7 +201,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatGwMac> mac = CreateObject<SatGwMac> ();
+  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);

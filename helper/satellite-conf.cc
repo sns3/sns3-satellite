@@ -206,7 +206,7 @@ SatConf::Configure (std::string wfConf)
         uint32_t defaultWaveFormId = waveFormConf->GetDefaultWaveformId ();
         Ptr<SatWaveform> defaultWaveForm = waveFormConf->GetWaveform (defaultWaveFormId);
 
-        double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRate_baud ());
+        double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRateInBauds ());
         uint32_t slotCount = m_frameConfTargetDuration / timeSlotDuration;
 
         if ( slotCount == 0 )
@@ -229,7 +229,7 @@ SatConf::Configure (std::string wfConf)
           }
 
         // Create superframe configuration without frame first
-        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> ( frameConf->GetBandwidth_hz (), frameConf->GetDuration_s (),
+        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> ( frameConf->GetBandwidthHz (), frameConf->GetDurationInSeconds (),
                                                                             (SatSuperframeConf::SatFrameConfList_t *) NULL);
 
         // Add earlier created frame to superframe configuration
@@ -269,14 +269,14 @@ SatConf::GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, u
   {
     case SatEnums::FORWARD_FEEDER_CH:
       channelBandwidth = m_fwdFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidth_hz ();
+      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
       baseFreq_hz = m_fwdFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
       centerFrequency_hz = baseFreq_hz + (carrierBandwidth * carrierId) + (carrierBandwidth / 2);
       break;
 
     case SatEnums::FORWARD_USER_CH:
       channelBandwidth = m_fwdUserLinkBandwidth_hz / m_userLinkChannelCount;
-      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidth_hz ();
+      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
       baseFreq_hz = m_fwdUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
       centerFrequency_hz = baseFreq_hz + (carrierBandwidth * carrierId) + (carrierBandwidth / 2);
       break;
@@ -284,13 +284,13 @@ SatConf::GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, u
     case SatEnums::RETURN_FEEDER_CH:
       channelBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
       baseFreq_hz = m_rtnFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequency_hz ( carrierId);
+      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequencyHz ( carrierId);
       break;
 
     case SatEnums::RETURN_USER_CH:
       channelBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
       baseFreq_hz = m_rtnUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequency_hz ( carrierId);
+      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequencyHz ( carrierId);
       break;
 
     default:
@@ -319,11 +319,11 @@ SatConf::GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
-      carrierBandwidth = m_superframeSeq->GetCarrierBandwidth_hz (carrierId, bandwidhtType);
+      carrierBandwidth = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::RETURN_USER_CH:
-      carrierBandwidth = m_superframeSeq->GetCarrierBandwidth_hz (carrierId, bandwidhtType);
+      carrierBandwidth = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
       break;
 
     default:
@@ -503,15 +503,15 @@ SatConf::GetFwdLinkCarrierFrequencyHz (uint32_t carrierId, SatEnums::CarrierBand
   switch (bandwidthType)
   {
     case SatEnums::ALLOCATED_BANDWIDTH:
-      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidth_hz ();
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthHz ();
       break;
 
     case SatEnums::OCCUPIED_BANDWIDTH:
-      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetOccupiedBandwidth_hz ();
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetOccupiedBandwidthHz ();
       break;
 
     case SatEnums::EFFECTIVE_BANDWIDTH:
-      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidth_hz ();
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidthHz ();
       break;
 
     default:

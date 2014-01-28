@@ -46,6 +46,14 @@ SatNcc::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatNcc::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
 SatNcc::SatNcc ()
 {
   NS_LOG_FUNCTION (this);
@@ -93,7 +101,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
     }
 
   scheduler = CreateObject<SatBeamScheduler> ();
-  scheduler->Initialize (beamId, cb, seq);
+  scheduler->Initialize (beamId, cb, seq );
 
   m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }

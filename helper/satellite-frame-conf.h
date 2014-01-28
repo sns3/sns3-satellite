@@ -46,11 +46,11 @@ public:
   /**
    * Constructor for SatBtuConf
    *
-   * \param bandwidth_hz      Allocated bandwidth of BTU in Hertz
+   * \param bandwidthHz      Allocated bandwidth of BTU in Hertz
    * \param rollOff           Roll-off factor
    * \param spacing           Spacing factor
    */
-  SatBtuConf (double bandwidth_hz, double rollOff, double spacing);
+  SatBtuConf (double bandwidthHz, double rollOff, double spacing);
 
   /**
    * Destructor for SatBtuConf
@@ -62,33 +62,33 @@ public:
    *
    * \return The bandwidth of BTU in Hertz.
    */
-  inline double GetAllocatedBandwidth_hz () const { return m_allocatedBandwidth_hz; }
+  inline double GetAllocatedBandwidthHz () const { return m_allocatedBandwidthHz; }
 
   /**
    * Get occupied bandwidth of BTU.
    *
    * \return The occupied bandwidth of BTU in Hertz.
    */
-  inline double GetOccupiedBandwidth_hz () const { return m_occupiedBandwidth_hz; }
+  inline double GetOccupiedBandwidthHz () const { return m_occupiedBandwidthHz; }
 
   /**
    * Get occupied bandwidth of BTU.
    *
    * \return The occupied bandwidth of BTU in Hertz.
    */
-  inline double GetEffectiveBandwidth_hz () const { return m_effectiveBandwidth_hz; }
+  inline double GetEffectiveBandwidthHz () const { return m_effectiveBandwidthHz; }
 
   /**
    * Get symbol rate of BTU.
    *
    * \return The symbol rate of BTU in bauds.
    */
-  inline double GetSymbolRate_baud () const { return GetEffectiveBandwidth_hz ();}
+  inline double GetSymbolRateInBauds () const { return GetEffectiveBandwidthHz ();}
 
 private:
-  double m_allocatedBandwidth_hz;
-  double m_occupiedBandwidth_hz;
-  double m_effectiveBandwidth_hz;  // i.e. symbol rate
+  double m_allocatedBandwidthHz;
+  double m_occupiedBandwidthHz;
+  double m_effectiveBandwidthHz;  // i.e. symbol rate
   double m_length_s;               // length field reserved, but not used currenly
 };
 
@@ -109,11 +109,11 @@ public:
   /**
    * Constructor for SatTimeSlotConf
    *
-   * \param startTime_s Start time of time slot in side frame.
-   * \param waveFormId  Wave form id of time slot
-   * \param carrierId   Carrier id of time slot
+   * \param startTimeInSeconds  Start time of time slot in side frame.
+   * \param waveFormId          Wave form id of time slot
+   * \param carrierId           Carrier id of time slot
    */
-  SatTimeSlotConf (double startTime_s, uint32_t waveFormId, uint32_t carrierId);
+  SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint32_t carrierId);
 
   /**
    * Destructor for SatTimeSlotConf
@@ -125,7 +125,7 @@ public:
    *
    * \return The start time of time slot in seconds.
    */
-  inline double GetStartTime_s () const { return m_startTime_s; }
+  inline double GetStartTimeInSeconds () const { return m_startTimeInSeconds; }
 
   /**
    * Get wave form id of time slot.
@@ -142,7 +142,7 @@ public:
   inline uint32_t GetCarrierId () const { return m_frameCarrierId; }
 
 private:
-  double  m_startTime_s;
+  double  m_startTimeInSeconds;
   uint32_t m_waveFormId;
   uint32_t m_frameCarrierId;
 };
@@ -169,12 +169,12 @@ public:
   /**
    * Constructor for SatFrameConf.
    *
-   * \param bandwidth_hz      Bandwidth of the frame in Hertz
-   * \param duration_s        Duration of the frame in seconds
+   * \param bandwidthHz       Bandwidth of the frame in Hertz
+   * \param durationInSeconds Duration of the frame in seconds
    * \param btu               BTU conf of the frame
    * \param timeSlots         Time slot of the frame.
    */
-  SatFrameConf ( double bandwidth_hz, double duration_s, Ptr<SatBtuConf> btu,
+  SatFrameConf ( double bandwidthHz, double durationInSeconds, Ptr<SatBtuConf> btu,
                  SatTimeSlotConfList_t * timeSlots );
 
   /**
@@ -190,45 +190,45 @@ public:
    *
    * \return The bandwidth of frame in Hertz.
    */
-  inline double GetBandwidth_hz () const { return m_bandwidth_hz; }
+  inline double GetBandwidthHz () const { return m_bandwidthHz; }
 
   /**
    * Get duration of frame.
    *
    * \return The duration of frame in seconds.
    */
-  inline double GetDuration_s () const { return m_duration_s; }
+  inline double GetDurationInSeconds () const { return m_durationInSeconds; }
 
   /**
    * Get carrier center frequency in frame.
    *
-   * \return The carrier bandwidth in frame in Hertz.
+   * \return The carrier bandwidth in frame in hertz.
    */
-  double GetCarrierFrequency_hz ( uint32_t carrierId ) const;
+  double GetCarrierFrequencyHz ( uint32_t carrierId ) const;
 
   /**
    * Get carrier bandwidth in frame.
    *
    * \param bandwidthType Type of bandwidth requested.
    *
-   * \return The carrier bandwidth in frame in Hertz.
+   * \return The carrier bandwidth in frame in hertz.
    */
-  inline double GetCarrierBandwidth_hz (SatEnums::CarrierBandwidthType_t bandwidthType) const
+  inline double GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthType) const
   {
     double bandwidth = 0.0;
 
     switch (bandwidthType)
     {
       case SatEnums::ALLOCATED_BANDWIDTH:
-        bandwidth = m_btu->GetAllocatedBandwidth_hz();
+        bandwidth = m_btu->GetAllocatedBandwidthHz();
         break;
 
       case SatEnums::OCCUPIED_BANDWIDTH:
-        bandwidth = m_btu->GetOccupiedBandwidth_hz();
+        bandwidth = m_btu->GetOccupiedBandwidthHz();
         break;
 
       case SatEnums::EFFECTIVE_BANDWIDTH:
-        bandwidth = m_btu->GetEffectiveBandwidth_hz();
+        bandwidth = m_btu->GetEffectiveBandwidthHz();
         break;
 
       default:
@@ -285,14 +285,14 @@ public:
 private:
   typedef std::multimap<uint32_t, uint16_t> SatCarrierTimeSlotId_t;
 
-  double    m_bandwidth_hz;
-  double    m_duration_s;
+  double    m_bandwidthHz;
+  double    m_durationInSeconds;
   uint16_t  m_nextTimeSlotId;
 
-  Ptr<SatBtuConf> m_btu;
-  uint32_t m_carrierCount;
-  SatTimeSlotConfList_t  m_timeSlotConfs;
-  SatCarrierTimeSlotId_t m_carrierTimeSlotIds;
+  Ptr<SatBtuConf>         m_btu;
+  uint32_t                m_carrierCount;
+  SatTimeSlotConfList_t   m_timeSlotConfs;
+  SatCarrierTimeSlotId_t  m_carrierTimeSlotIds;
 };
 
 /**
@@ -314,11 +314,11 @@ public:
   /**
    * Constructor for SatSuperframeConf.
    *
-   * \param bandwidth_hz      Bandwidth of the frame in Hertz
+   * \param bandwidthHz       Bandwidth of the frame in hertz
    * \param duration_s        Duration of the frame in seconds
-   * \param frames            Frames of the super frame. (In acsending order according to frequency inside superframe).
+   * \param frames            Frames of the super frame. (In ascending order according to frequency inside super frame).
    */
-  SatSuperframeConf ( double bandwidth_hz, double duration_s, SatFrameConfList_t * frames );
+  SatSuperframeConf ( double bandwidthHz, double durationInSeconds, SatFrameConfList_t * frames );
 
   /**
    * Destructor for SatSuperframeConf
@@ -328,21 +328,21 @@ public:
   void AddFrameConf (Ptr<SatFrameConf> conf);
 
   /**
-   * Get bandwidth of the superframe.
+   * Get bandwidth of the super frame.
    *
-   * \return The bandwidth of superframe in Hertz.
+   * \return The bandwidth of super frame in Hertz.
    */
-  inline double GetBandwidth_hz () const { return m_bandwidth_hz; }
+  inline double GetBandwidthHz () const { return m_bandwidthHz; }
 
   /**
    * Get duration of super frame.
    *
-   * \return The duration of superframe in seconds.
+   * \return The duration of super frame in seconds.
    */
-  inline double GetDuration_s () const { return m_duration_s; }
+  inline double GetDurationInSeconds () const { return m_durationInSeconds; }
 
   /**
-   * Get frame conf of the superframe.
+   * Get frame conf of the super frame.
    *
    * \param id    Id of the frame requested.
    * \return      The requested frame conf of the super frame.
@@ -350,44 +350,44 @@ public:
   Ptr<SatFrameConf> GetFrameConf (uint8_t id) const;
 
   /**
-   * Get carrier id of the superframe. Converts frame specific id to superframe specific id.
+   * Get carrier id of the super frame. Converts frame specific id to super frame specific id.
    *
    * \param frameId         Id of the frame requested.
    * \param frameCarrierId  Id of the carrier inside frame requested.
    *
-   * \return The requested carrier id of the superframe.
+   * \return The requested carrier id of the super frame.
    */
-  uint32_t GetCarrierId( uint8_t frameId, uint16_t frameCarrierId ) const;
+  uint32_t GetCarrierId (uint8_t frameId, uint16_t frameCarrierId) const;
 
   /**
-   * Get carrier count in the superframe.
+   * Get carrier count in the super frame.
    *
-   * \return The superframe carrier count.
+   * \return The super frame carrier count.
    */
   uint32_t GetCarrierCount () const;
 
   /**
    * Get the center frequency of the requested carrier.
    *
-   * \param carrierId  Id of the carrier inside superframe which center frequency is requested.
+   * \param carrierId  Id of the carrier inside super frame which center frequency is requested.
    *
    * \return The center frequency of the requested carrier.
    */
-  double GetCarrierFrequency_hz (uint32_t carrierId) const;
+  double GetCarrierFrequencyHz (uint32_t carrierId) const;
 
   /**
    * Get the bandwidth of the requested carrier.
    *
-   * \param carrierId  Id of the carrier inside superframe which bandwidth is requested.
+   * \param carrierId  Id of the carrier inside super frame which bandwidth is requested.
    * \param bandwidthType Type of bandwidth requested.
    *
    * \return The bandwidth of the requested carrier.
    */
-  double GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
+  double GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
 private:
-  double m_bandwidth_hz;
-  double m_duration_s;
+  double m_bandwidthHz;
+  double m_durationInSeconds;
   SatFrameConfList_t m_frames;
 };
 

@@ -56,12 +56,20 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatGwMac
+   * Default construct of SatGwMac. Should not been used.
    *
    * This is the constructor for the SatGwMac
    *
    */
   SatGwMac ();
+
+  /**
+   * Construct a SatGwMac
+   *
+   * This is the constructor for the SatGwMac
+   *
+   */
+  SatGwMac (uint32_t beamId);
 
   /**
    * Destroy a SatGwMac

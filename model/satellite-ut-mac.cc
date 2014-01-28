@@ -85,13 +85,16 @@ SatUtMac::SatUtMac ()
   NS_ASSERT (false);
 }
 
-SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq)
- : m_superframeSeq (seq),
+SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
+ : SatMac (beamId),
+   m_superframeSeq (seq),
+   m_timingAdvanceCb (0),
+   m_txCallback (0),
    m_lastCno (NAN)
 {
 	NS_LOG_FUNCTION (this);
 
-	//Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
+	Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
 }
 
 SatUtMac::~SatUtMac ()
@@ -103,6 +106,9 @@ void
 SatUtMac::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
+
+  m_timingAdvanceCb.Nullify ();
+
   SatMac::DoDispose ();
 }
 
@@ -130,35 +136,48 @@ SatUtMac::SetTxCallback (SatUtMac::SendCallback cb)
 }
 
 void
-SatUtMac::ScheduleTimeSlots (SatTbtpHeader * tbtp)
+SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 {
   NS_LOG_FUNCTION (this << tbtp);
 
-  std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > > slots = tbtp->GetTimeslots (m_nodeInfo->GetMacAddress ());
+  SatTbtpMessage::TimeSlotInfoContainer_t slots = tbtp->GetTimeslots (m_nodeInfo->GetMacAddress ());
 
   if ( !slots.empty ())
     {
-      double superframeDuration = m_superframeSeq->GetDuration_s (tbtp->GetSuperframeId ());
+      double superframeDuration = m_superframeSeq->GetDurationInSeconds (tbtp->GetSuperframeId ());
 
       // TODO: start time must be calculated using reference or global clock
       Time startTime = Seconds (superframeDuration * tbtp->GetSuperframeCounter ());
 
+      uint8_t frameId = 0;
+
       // schedule time slots
-      for ( std::vector< Ptr<SatTbtpHeader::TbtpTimeSlotInfo > >::iterator it = slots.begin (); it != slots.end (); it++ )
+      for ( SatTbtpMessage::TimeSlotInfoContainer_t::iterator it = slots.begin (); it != slots.end (); it++ )
         {
+          // Store frame id from first slot and check later that frame id is same
+          // If frame id changes in TBTP for same UT, raise error.
+          if ( it == slots.begin () )
+            {
+              frameId = (*it)->GetFrameId ();
+            }
+          else if ( frameId != (*it)->GetFrameId ())
+            {
+              NS_FATAL_ERROR ("Error in TBTP: slot allocate from different frames for same UT!!!");
+            }
+
           Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
-          Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf ((*it)->GetFrameId ());
+          Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( (*it)->GetTimeSlotId () );
 
           // Start time
-          Time slotStartTime = startTime + Seconds (timeSlotConf->GetStartTime_s ());
+          Time slotStartTime = startTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-          double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRate_baud ());
+          double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
           // Carrier
-          uint32_t carrierId = m_superframeSeq->GetCarrierId (0, (*it)->GetFrameId (), timeSlotConf->GetCarrierId () );
+          uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
           ScheduleTxOpportunity (slotStartTime, duration, wf->GetPayloadInBytes (), carrierId);
         }
@@ -294,7 +313,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
         {
           // Remove control msg tag
           SatControlMsgTag ctrlTag;
-          bool cSuccess = (*i)->RemovePacketTag (ctrlTag);
+          bool cSuccess = (*i)->PeekPacketTag (ctrlTag);
 
           if (cSuccess)
             {
@@ -302,9 +321,9 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  // Remove the ctrl tag
-                  (*i)->RemovePacketTag (ctrlTag);
-                  ReceiveSignalingPacket (*i, cType);
+                  // Remove the mac tag
+                  (*i)->RemovePacketTag (macTag);
+                  ReceiveSignalingPacket (*i, ctrlTag);
                 }
               else
                 {
@@ -328,17 +347,22 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
 
 void
-SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType)
+SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 {
-  switch (cType)
+  switch (ctrlTag.GetMsgType ())
   {
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
       {
-        SatTbtpHeader tbtp;
-        if ( packet->RemoveHeader (tbtp) > 0 )
+        uint32_t tbtpId = ctrlTag.GetMsgId ();
+
+        Ptr<SatTbtpMessage> tbtp = m_superframeSeq->GetTbtpMessage (m_beamId, tbtpId);
+
+        if ( tbtp == NULL )
           {
-            ScheduleTimeSlots (&tbtp);
+            NS_FATAL_ERROR ("TBTP not found, check that TBTP storage time is set long enough for superframe sequence!!!");
           }
+
+        ScheduleTimeSlots (tbtp);
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:

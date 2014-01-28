@@ -35,18 +35,18 @@ SatBtuConf::SatBtuConf ()
   NS_ASSERT (false);
 }
 
-SatBtuConf::SatBtuConf (double bandwidth_hz, double rollOff, double spacing)
-  : m_allocatedBandwidth_hz (bandwidth_hz)
+SatBtuConf::SatBtuConf (double bandwidthHz, double rollOff, double spacing)
+  : m_allocatedBandwidthHz (bandwidthHz)
 {
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT ( (spacing >= 0.00 ) && ( spacing < 1.00 ) );
   NS_ASSERT ( (rollOff >= 0.00 ) && ( rollOff < 1.00 ) );
 
-  m_occupiedBandwidth_hz = m_allocatedBandwidth_hz / (rollOff + 1.00);
-  m_effectiveBandwidth_hz = m_allocatedBandwidth_hz / (rollOff + spacing + 1.00);
+  m_occupiedBandwidthHz = m_allocatedBandwidthHz / (rollOff + 1.00);
+  m_effectiveBandwidthHz = m_allocatedBandwidthHz / (rollOff + spacing + 1.00);
 
-  m_length_s = 1 / m_effectiveBandwidth_hz;
+  m_length_s = 1 / m_effectiveBandwidthHz;
 }
 
 SatBtuConf::~SatBtuConf ()
@@ -62,8 +62,8 @@ SatTimeSlotConf::SatTimeSlotConf ()
   NS_ASSERT (false);
 }
 
-SatTimeSlotConf::SatTimeSlotConf (double startTime_s, uint32_t waveFormId, uint32_t frameCarrierId)
-  : m_startTime_s (startTime_s),
+SatTimeSlotConf::SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint32_t frameCarrierId)
+  : m_startTimeInSeconds (startTimeInSeconds),
     m_waveFormId (waveFormId),
     m_frameCarrierId (frameCarrierId)
 {
@@ -83,16 +83,16 @@ SatFrameConf::SatFrameConf ()
   NS_ASSERT (false);
 }
 
-SatFrameConf::SatFrameConf ( double bandwidth_hz, double duration_s,
+SatFrameConf::SatFrameConf ( double bandwidthHz, double durationInSeconds,
                              Ptr<SatBtuConf> btu, SatTimeSlotConfList_t * timeSlots)
-  : m_bandwidth_hz (bandwidth_hz),
-    m_duration_s (duration_s),
+  : m_bandwidthHz (bandwidthHz),
+    m_durationInSeconds (durationInSeconds),
     m_nextTimeSlotId (0),
     m_btu (btu)
 {
   NS_LOG_FUNCTION (this);
 
-  m_carrierCount = bandwidth_hz / btu->GetAllocatedBandwidth_hz ();
+  m_carrierCount = bandwidthHz / btu->GetAllocatedBandwidthHz ();
 
   if ( timeSlots != NULL )
     {
@@ -112,13 +112,13 @@ SatFrameConf::~SatFrameConf ()
 }
 
 double
-SatFrameConf::GetCarrierFrequency_hz (uint32_t carrierId) const
+SatFrameConf::GetCarrierFrequencyHz (uint32_t carrierId) const
 {
   NS_ASSERT (carrierId < m_carrierCount );
 
-  double carrierBandwidth_hz = m_btu->GetAllocatedBandwidth_hz ();
+  double carrierBandwidthHz = m_btu->GetAllocatedBandwidthHz ();
 
-  return ( (carrierBandwidth_hz * carrierId) + ( carrierBandwidth_hz / 2.0 ) );
+  return ( (carrierBandwidthHz * carrierId) + ( carrierBandwidthHz / 2.0 ) );
 }
 
 Ptr<SatTimeSlotConf>
@@ -173,9 +173,9 @@ SatSuperframeConf::SatSuperframeConf ()
   NS_ASSERT (false);
 }
 
-SatSuperframeConf::SatSuperframeConf ( double bandwidth_hz, double duration_s, SatFrameConfList_t * frames)
-  : m_bandwidth_hz (bandwidth_hz),
-    m_duration_s (duration_s)
+SatSuperframeConf::SatSuperframeConf ( double bandwidthHz, double durationInSeconds, SatFrameConfList_t * frames)
+  : m_bandwidthHz (bandwidthHz),
+    m_durationInSeconds (durationInSeconds)
 
 {
   NS_LOG_FUNCTION (this);
@@ -210,6 +210,8 @@ SatSuperframeConf::GetFrameConf (uint8_t index) const
 uint32_t
 SatSuperframeConf::GetCarrierCount () const
 {
+  NS_LOG_FUNCTION (this);
+
   uint32_t carrierCount = 0;
 
   for (uint8_t i = 0; i < m_frames.size (); i++)
@@ -223,6 +225,8 @@ SatSuperframeConf::GetCarrierCount () const
 uint32_t
 SatSuperframeConf::GetCarrierId ( uint8_t frameId, uint16_t frameCarrierId ) const
 {
+  NS_LOG_FUNCTION (this);
+
   uint32_t carrierId = frameCarrierId;
 
   for (uint8_t i = 0; i < frameId; i++)
@@ -236,8 +240,10 @@ SatSuperframeConf::GetCarrierId ( uint8_t frameId, uint16_t frameCarrierId ) con
 }
 
 double
-SatSuperframeConf::GetCarrierFrequency_hz (uint32_t carrierId) const
+SatSuperframeConf::GetCarrierFrequencyHz (uint32_t carrierId) const
 {
+  NS_LOG_FUNCTION (this);
+
   double frameStartFrequency = 0.0;
   uint32_t currentFrame = 0;
   uint32_t lastIdInFrame = m_frames[0]->GetCarrierCount () - 1;
@@ -246,19 +252,21 @@ SatSuperframeConf::GetCarrierFrequency_hz (uint32_t carrierId) const
   while( carrierId > lastIdInFrame )
     {
       carrierIdInFrame -= m_frames[currentFrame]->GetCarrierCount ();
-      frameStartFrequency += m_frames[currentFrame]->GetBandwidth_hz ();
+      frameStartFrequency += m_frames[currentFrame]->GetBandwidthHz ();
       currentFrame++;
       lastIdInFrame += m_frames[currentFrame]->GetCarrierCount ();
     }
 
-  double carrierFrequencyInFrame = m_frames[currentFrame]->GetCarrierFrequency_hz (carrierIdInFrame);
+  double carrierFrequencyInFrame = m_frames[currentFrame]->GetCarrierFrequencyHz (carrierIdInFrame);
 
   return frameStartFrequency + carrierFrequencyInFrame;
 }
 
 double
-SatSuperframeConf::GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+SatSuperframeConf::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
+  NS_LOG_FUNCTION (this);
+
   uint32_t currentFrame = 0;
   uint32_t lastIdInFrame = m_frames[0]->GetCarrierCount () - 1;
   uint32_t carrierIdInFrame = carrierId;
@@ -270,7 +278,7 @@ SatSuperframeConf::GetCarrierBandwidth_hz (uint32_t carrierId, SatEnums::Carrier
       lastIdInFrame += m_frames[currentFrame]->GetCarrierCount ();
     }
 
-  return m_frames[currentFrame]->GetCarrierBandwidth_hz (bandwidthType);
+  return m_frames[currentFrame]->GetCarrierBandwidthHz (bandwidthType);
 }
 
 

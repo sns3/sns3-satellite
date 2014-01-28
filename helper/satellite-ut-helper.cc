@@ -169,7 +169,7 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer 
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc )
+SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -184,7 +184,7 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc )
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -209,7 +209,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq);
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId);
 
   if ( m_craAllocMode == SatUtHelper::RANDOM_CRA )
     {
