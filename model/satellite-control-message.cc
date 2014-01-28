@@ -188,7 +188,7 @@ SatTbtpMessage::SatTbtpMessage ( )
 }
 
 SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
- : m_superframeSeqId (seqId)
+ : m_superframeSeqId (seqId),
    m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this);
