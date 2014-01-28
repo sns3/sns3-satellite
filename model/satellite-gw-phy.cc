@@ -166,10 +166,10 @@ SatGwPhy::DoDispose ()
 }
 
 void
-SatGwPhy::DoStart ()
+SatGwPhy::DoInitialize ()
 {
   NS_LOG_FUNCTION (this);
-  SatPhy::DoStart ();
+  SatPhy::DoInitialize ();
 }
 
 double

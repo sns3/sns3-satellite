@@ -19,6 +19,8 @@
 # Author: Budiarto Herman <budiarto.herman@magister.fi>
 #
 
+### WARNING: this file has not been compatible anymore since revision 9471 ###
+
 global g_step_db = 0.1;
 
 function bler = get_bler (sinr_list, bler_list, sinr)
@@ -45,7 +47,7 @@ function print_test_case (link_results_path, dvb_type, modcod, burst_length)
     printf ("(linkResults%s, ", dvb_type);
     printf ("SatLinkResults::SAT_MODCOD_%s, %d, ", modcod, burst_length);
     printf ("%f, %e)", sinr_db, get_bler (sinr_list_db, bler_list, sinr_db));
-    printf (");\n");    
+    printf (", TestCase::QUICK);\n");    
   endfor
 
   printf ("\n");

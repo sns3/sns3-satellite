@@ -203,8 +203,8 @@ public:
 SatWaveformConfTestSuite::SatWaveformConfTestSuite ()
   : TestSuite ("sat-waveform-conf-test", UNIT)
 {
-  AddTestCase (new SatDvbRcs2WaveformTableTestCase);
-  AddTestCase (new SatDvbS2BbFrameConfTestCase);
+  AddTestCase (new SatDvbRcs2WaveformTableTestCase, TestCase::QUICK);
+  AddTestCase (new SatDvbS2BbFrameConfTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

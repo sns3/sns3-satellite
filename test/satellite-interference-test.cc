@@ -239,8 +239,8 @@ public:
 SatInterferenceTestSuite::SatInterferenceTestSuite ()
   : TestSuite ("sat-if-unit-test", UNIT)
 {
-  AddTestCase (new SatConstantInterferenceTestCase);
-  AddTestCase (new SatPerPacketInterferenceTestCase);
+  AddTestCase (new SatConstantInterferenceTestCase, TestCase::QUICK);
+  AddTestCase (new SatPerPacketInterferenceTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

@@ -1,13 +1,7 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
-# def options(opt):
-#     pass
-
-# def configure(conf):
-#     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
-
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet', 'network', 'propagation', 'antenna', 'csma', 'traffic'])
+    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'flow-monitor'])
     module.source = [
         'model/cbr-application.cc',
         'model/geo-coordinate.cc',
@@ -140,7 +134,7 @@ def build(bld):
         'test/satellite-waveform-conf-test.cc',
         ]
 
-    headers = bld.new_task_gen(features=['ns3header'])
+    headers = bld(features='ns3header')
     headers.module = 'satellite'
     headers.source = [
         'model/cbr-application.h',
@@ -256,8 +250,8 @@ def build(bld):
         'helper/satellite-wave-form-conf.h',
         ]
 
-    if bld.env.ENABLE_EXAMPLES:
-        bld.add_subdirs('examples')
+    if (bld.env['ENABLE_EXAMPLES']):
+        bld.recurse('examples')
 
     # bld.ns3_python_bindings()
 

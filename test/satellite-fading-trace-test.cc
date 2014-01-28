@@ -108,7 +108,7 @@ public:
 SatFadingTraceSuite::SatFadingTraceSuite ()
   : TestSuite ("sat-fading-trace-test", UNIT)
 {
-  AddTestCase (new SatFadingTraceTestCase);
+  AddTestCase (new SatFadingTraceTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

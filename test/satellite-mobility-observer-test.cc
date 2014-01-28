@@ -443,7 +443,7 @@ public:
 SatMobilityObserverTestSuite::SatMobilityObserverTestSuite ()
   : TestSuite ("sat-mobility-observer-test", UNIT)
 {
-  AddTestCase (new SatMobilityObserverTestCase);
+  AddTestCase (new SatMobilityObserverTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

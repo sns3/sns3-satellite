@@ -157,10 +157,10 @@ SatUtPhy::DoDispose ()
 }
 
 void
-SatUtPhy::DoStart ()
+SatUtPhy::DoInitialize ()
 {
   NS_LOG_FUNCTION (this);
-  Object::DoStart ();
+  Object::DoInitialize ();
 }
 
 double

@@ -164,10 +164,10 @@ SatGeoUserPhy::DoDispose ()
 }
 
 void
-SatGeoUserPhy::DoStart ()
+SatGeoUserPhy::DoInitialize ()
 {
   NS_LOG_FUNCTION (this);
-  Object::DoStart ();
+  Object::DoInitialize ();
 }
 
 void

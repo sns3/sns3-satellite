@@ -989,28 +989,28 @@ SimpleUnicastTestSuite::SimpleUnicastTestSuite ()
   : TestSuite ("sat-simple-unicast", SYSTEM)
 {
   // add simple-unicast-1 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast1);
+  AddTestCase (new SimpleUnicast1, TestCase::QUICK);
 
   // add simple-unicast-2 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast2);
+  AddTestCase (new SimpleUnicast2, TestCase::EXTENSIVE);
 
   // add simple_unicast-3 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast3);
+  AddTestCase (new SimpleUnicast3, TestCase::TAKES_FOREVER);
 
   // add simple-unicast-4 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast4);
+  AddTestCase (new SimpleUnicast4, TestCase::QUICK);
 
   // add simple-unicast-5 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast5);
+  AddTestCase (new SimpleUnicast5, TestCase::EXTENSIVE);
 
   // add simple-unicast-6 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast6);
+  AddTestCase (new SimpleUnicast6, TestCase::TAKES_FOREVER);
 
   // add simple-unicast-7 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast7);
+  AddTestCase (new SimpleUnicast7, TestCase::QUICK);
 
   // add simple-unicast-8 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast8);
+  AddTestCase (new SimpleUnicast8, TestCase::EXTENSIVE);
 }
 
 // Allocate an instance of this TestSuite

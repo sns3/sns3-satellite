@@ -114,10 +114,10 @@ SatPhy::GetInstanceTypeId (void) const
 }
 
 void
-SatPhy::DoStart ()
+SatPhy::DoInitialize ()
 {
   NS_LOG_FUNCTION (this);
-  Object::DoStart ();
+  Object::DoInitialize ();
 }
 
 void

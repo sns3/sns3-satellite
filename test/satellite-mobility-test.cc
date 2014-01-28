@@ -292,9 +292,9 @@ public:
 SatMobilityTestSuite::SatMobilityTestSuite ()
   : TestSuite ("sat-mobility-test", UNIT)
 {
-  AddTestCase (new SatMobilityRandomTestCase);
-  AddTestCase (new SatMobilityList1TestCase);
-  AddTestCase (new SatMobilityList2TestCase);
+  AddTestCase (new SatMobilityRandomTestCase, TestCase::QUICK);
+  AddTestCase (new SatMobilityList1TestCase, TestCase::QUICK);
+  AddTestCase (new SatMobilityList2TestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

@@ -141,7 +141,7 @@ public:
 GeoCoordinateTestSuite::GeoCoordinateTestSuite ()
   : TestSuite ("geo-coordinate-test", UNIT)
 {
-  AddTestCase (new GeoCoordinateTestCase);
+  AddTestCase (new GeoCoordinateTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

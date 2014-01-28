@@ -54,7 +54,7 @@ public:
   // inherited from Object
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
-  virtual void DoStart (void);
+  virtual void DoInitialize (void);
   virtual void DoDispose (void);
 
   /**

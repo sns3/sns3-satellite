@@ -317,16 +317,16 @@ ScenarioCreationTestSuite::ScenarioCreationTestSuite ()
   : TestSuite ("sat-scenario-creation", SYSTEM)
 {
   // add ScenarioCreationSimple case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationSimple);
+  AddTestCase (new ScenarioCreationSimple, TestCase::QUICK);
 
   // add ScenarioCreationLarger case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationLarger);
+  AddTestCase (new ScenarioCreationLarger, TestCase::EXTENSIVE);
 
   // add ScenarioCreationFull case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationFull);
+  AddTestCase (new ScenarioCreationFull, TestCase::EXTENSIVE);
 
   // add ScenarioCreationUser case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationUser);
+  AddTestCase (new ScenarioCreationUser, TestCase::EXTENSIVE);
 
 }
 

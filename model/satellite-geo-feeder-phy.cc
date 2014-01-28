@@ -168,10 +168,10 @@ SatGeoFeederPhy::DoDispose ()
 }
 
 void
-SatGeoFeederPhy::DoStart ()
+SatGeoFeederPhy::DoInitialize ()
 {
   NS_LOG_FUNCTION (this);
-  Object::DoStart ();
+  Object::DoInitialize ();
 }
 
 void

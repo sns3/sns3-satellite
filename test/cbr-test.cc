@@ -123,7 +123,7 @@ public:
 CbrTestSuite::CbrTestSuite ()
   : TestSuite ("cbr-test", UNIT)
 {
-  AddTestCase (new CbrTestCase1);
+  AddTestCase (new CbrTestCase1, TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite
