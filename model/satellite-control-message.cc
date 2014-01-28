@@ -245,24 +245,34 @@ SatTbtpMessage::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
 {
   NS_LOG_FUNCTION (this << utId << info);
 
-  TimeSlotInfoContainer_t slotInfos;
+  // find container for the UT from map
+  TimeSlotMap_t::iterator it = m_timeSlots.find (utId);
 
-  // find container for UT
-  // If found, add new in container, otherwise use container from map
-
-  TimeSlotMap_t::const_iterator it = m_timeSlots.find (utId);
-
+  // If not found, add new UT container to map,
+  // otherwise use container found from map
   if ( it == m_timeSlots.end () )
     {
-      m_timeSlots.insert (std::make_pair (utId, slotInfos));
+      TimeSlotInfoContainer_t slotInfos;
+      std::pair<TimeSlotMap_t::iterator, bool> result = m_timeSlots.insert (std::make_pair (utId, slotInfos));
+
+      if ( result.second )
+        {
+          it = result.first;
+        }
+      else
+        {
+          it = m_timeSlots.end ();
+        }
     }
-  else
+
+  // container creation for UT has failed, so we need to crash
+  if (it == m_timeSlots.end ())
     {
-      slotInfos = it->second;
+      NS_FATAL_ERROR ("Cannot insert slot to container!!!");
     }
 
   // store time slot info to user specific container
-  slotInfos.push_back (info);
+  it->second.push_back (info);
 
   // store frame ID to count used frames
   m_frameIds.insert (info->GetFrameId ());
