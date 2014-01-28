@@ -19,8 +19,8 @@
  */
 
 #include "ns3/log.h"
-
 #include "satellite-rle-headers.h"
+#include "satellite-encap-pdu-status-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPPduHeader");
@@ -34,7 +34,11 @@ SatPPduHeader::SatPPduHeader ()
  m_endIndicator (0),
  m_ppduLengthInBytes (0),
  m_fragmentId (0),
- m_totalLengthInBytes (0)
+ m_totalLengthInBytes (0),
+ m_fullPpduHeaderSize (2),
+ m_startPpduHeaderSize (4),
+ m_endPpduHeaderSize (2),
+ m_continuationPpduHeaderSize (2)
 {
 }
 
@@ -56,25 +60,90 @@ SatPPduHeader::GetTypeId (void)
 
 uint32_t SatPPduHeader::GetSerializedSize (void) const
 {
-  return ( sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t));
+  if (m_startIndicator)
+    {
+      // FULL PDU
+      if (m_endIndicator)
+        {
+          return m_fullPpduHeaderSize;
+        }
+      // START PDU
+      else
+        {
+          return m_startPpduHeaderSize;
+        }
+    }
+  else
+    {
+      // END PDU
+      if (m_endIndicator)
+        {
+          return m_endPpduHeaderSize;
+        }
+      // CONTINUATION PDU
+      else
+        {
+          return m_continuationPpduHeaderSize;
+        }
+    }
+  NS_ASSERT (false);
+  return 0;
 }
 
 void SatPPduHeader::Serialize (Buffer::Iterator start) const
 {
-  start.WriteU8 (m_startIndicator);
-  start.WriteU8 (m_endIndicator);
-  start.WriteU32 (m_ppduLengthInBytes);
-  start.WriteU32 (m_fragmentId);
-  start.WriteU32 (m_totalLengthInBytes);
+  Buffer::Iterator i = start;
+
+  // FULL PDU
+  if (m_startIndicator && m_endIndicator)
+    {
+      i.WriteU16 ( (m_startIndicator << 15) | (m_endIndicator << 14) | (m_ppduLengthInBytes << 3) );
+    }
+  // START, CONTINUATION OR END PDU
+  else
+    {
+      // Fragment id
+      i.WriteU16 ( (m_startIndicator << 15) | (m_endIndicator << 14) | (m_ppduLengthInBytes << 3) | (m_fragmentId) );
+    }
+
+  // START PDU
+  if (m_startIndicator && !m_endIndicator)
+    {
+      i.WriteU16 ( (0x0 << 15 ) | ( m_totalLengthInBytes << 3 ) );
+    }
+
+  /**
+   * LT, T and C flags and PPDU_Label are not currently used.
+   */
 }
 
 uint32_t SatPPduHeader::Deserialize (Buffer::Iterator start)
 {
-  m_startIndicator = start.ReadU8 ();
-  m_endIndicator = start.ReadU8 ();
-  m_ppduLengthInBytes = start.ReadU32 ();
-  m_fragmentId = start.ReadU32 ();
-  m_totalLengthInBytes = start.ReadU32 ();
+  Buffer::Iterator i = start;
+  uint16_t field_16;
+
+  // First two bytes
+  field_16 = i.ReadU16 ();
+  m_startIndicator = field_16 >> 15 & 0x1;
+  m_endIndicator = field_16 >> 14 & 0x1;
+  m_ppduLengthInBytes = (field_16 & 0x3FF8) >> 3;
+
+  // NOT FULL PDU
+  if (!(m_startIndicator && m_endIndicator))
+    {
+      m_fragmentId = field_16 & 0x0007;
+    }
+
+  // START PDU
+  if (m_startIndicator && !m_endIndicator)
+    {
+      field_16 = i.ReadU16 ();
+      m_totalLengthInBytes = (field_16 & 0x7FF8) >> 3;
+    }
+
+  /**
+   * LT, T and C flags and PPDU_Label are not currently used.
+   */
 
   return GetSerializedSize();
 }
@@ -100,17 +169,17 @@ uint8_t SatPPduHeader::GetEndIndicator () const
   return m_endIndicator;
 }
 
-uint32_t SatPPduHeader::GetPPduLength () const
+uint16_t SatPPduHeader::GetPPduLength () const
 {
   return m_ppduLengthInBytes;
 }
 
-uint32_t SatPPduHeader::GetFragmentId () const
+uint8_t SatPPduHeader::GetFragmentId () const
 {
   return m_fragmentId;
 }
 
-uint32_t SatPPduHeader::GetTotalLength () const
+uint16_t SatPPduHeader::GetTotalLength () const
 {
   return m_totalLengthInBytes;
 }
@@ -125,21 +194,54 @@ void SatPPduHeader::SetEndIndicator ()
   m_endIndicator = 1;
 }
 
-void SatPPduHeader::SetPPduLength (uint32_t bytes)
+void SatPPduHeader::SetPPduLength (uint16_t bytes)
 {
   m_ppduLengthInBytes = bytes;
 }
 
-void SatPPduHeader::SetFragmentId (uint32_t id)
+void SatPPduHeader::SetFragmentId (uint8_t id)
 {
   m_fragmentId = id;
 }
 
-void SatPPduHeader::SetTotalLength (uint32_t bytes)
+void SatPPduHeader::SetTotalLength (uint16_t bytes)
 {
   m_totalLengthInBytes = bytes;
 }
 
+uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
+{
+  uint32_t size (0);
+  switch (type)
+  {
+    case SatEncapPduStatusTag::START_PDU:
+      {
+        size = m_startPpduHeaderSize;
+        break;
+      }
+    case SatEncapPduStatusTag::CONTINUATION_PDU:
+      {
+        size = m_continuationPpduHeaderSize;
+        break;
+      }
+    case SatEncapPduStatusTag::END_PDU:
+      {
+        size = m_endPpduHeaderSize;
+        break;
+      }
+    case SatEncapPduStatusTag::FULL_PDU:
+      {
+        size = m_fullPpduHeaderSize;
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported SatEncapPduStatusTag!");
+        break;
+      }
+  }
+  return size;
+}
 
 NS_OBJECT_ENSURE_REGISTERED (SatFPduHeader);
 

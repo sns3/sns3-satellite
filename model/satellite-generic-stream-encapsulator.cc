@@ -105,7 +105,7 @@ SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
-  // If the packet still fits into the buffer
+  // If the packet is smaller than the maximum size
   if (p->GetSize () > MAX_HL_PACKET_SIZE)
     {
       NS_FATAL_ERROR ("SatGenericStreamEncapsulator received too large HL PDU!");
