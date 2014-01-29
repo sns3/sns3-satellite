@@ -99,18 +99,6 @@ private:
 
   /**
    *
-   * \return
-   */
-  bool IsDamaAvailable ();
-
-  /**
-   *
-   * \return
-   */
-  bool IsDataAvailable ();
-
-  /**
-   *
    */
   RandomAccessModel_t m_randomAccessModel;
 

@@ -105,8 +105,143 @@ SatCrdsa::UpdateVariables (uint32_t min, uint32_t max, uint32_t setSize)
   NS_LOG_INFO ("SatCrdsa::UpdateVariables - new min: " << min << " new max: " << max << " new set size: " << setSize);
 }
 
+/// TODO: implement this
+bool
+SatCrdsa::IsBackoffPeriodOver ()
+{
+  NS_LOG_FUNCTION (this);
+
+  bool isBackoffPeriodOver = true;
+
+  NS_LOG_INFO ("SatCrdsa::IsBackoffPeriodOver: " << isBackoffPeriodOver);
+
+  return isBackoffPeriodOver;
+}
+
+/// TODO: implement this
+bool
+SatCrdsa::DoBackoff ()
+{
+  NS_LOG_FUNCTION (this);
+
+  bool doBackoff = true;
+
+  NS_LOG_INFO ("SatCrdsa::DoBackoff: " << doBackoff);
+
+  return doBackoff;
+}
+
+/// TODO: implement this
+bool
+SatCrdsa::IsDamaAvailable ()
+{
+  NS_LOG_FUNCTION (this);
+
+  bool isDamaAvailable = false;
+
+  NS_LOG_INFO ("SatCrdsa::IsDamaAvailable: " << isDamaAvailable);
+
+  return isDamaAvailable;
+}
+
+/// TODO: implement this
+bool
+SatCrdsa::AreBuffersEmpty ()
+{
+  NS_LOG_FUNCTION (this);
+
+  bool areBuffersEmpty = false;
+
+  NS_LOG_INFO ("SatCrdsa::AreBuffersEmpty: " << areBuffersEmpty);
+
+  return areBuffersEmpty;
+}
+
+void
+SatCrdsa::UpdateMaximumRateLimitationParameters ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatCrdsa::UpdateMaximumRateLimitationParameters - Updating parameters");
+}
+
+void
+SatCrdsa::CheckMaximumRateLimitations ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatCrdsa::CheckMaximumRateLimitations - Checking maximum rate limitations");
+}
+
+void
+SatCrdsa::SetBackoffTimer ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatCrdsa::SetBackoffTimer - Setting backoff timer");
+}
+
+std::set<uint32_t>
+SatCrdsa::PrepareToTransmit ()
+{
+  std::set<uint32_t> txOpportunities;
+
+  CheckMaximumRateLimitations ();
+
+  txOpportunities = RandomizeTxOpportunities ();
+
+  if (AreBuffersEmpty ())
+    {
+      m_newData = true;
+    }
+  return txOpportunities;
+}
+
+/// TODO: implement this
 std::set<uint32_t>
 SatCrdsa::DoCrdsa ()
+{
+  NS_LOG_FUNCTION (this);
+
+  /// TODO: what to return in the case CRDSA is not used?
+  std::set<uint32_t> txOpportunities;
+
+  if (IsBackoffPeriodOver ())
+    {
+      NS_LOG_INFO ("SatCrdsa::DoCrdsa - Backoff period over, checking DAMA status...");
+
+      if (!IsDamaAvailable ())
+        {
+          NS_LOG_INFO ("SatCrdsa::DoCrdsa - No DAMA, checking buffer status...");
+
+          if (m_newData)
+            {
+              m_newData = false;
+
+              if (DoBackoff ())
+                {
+                  SetBackoffTimer ();
+                }
+              else
+                {
+                  txOpportunities = PrepareToTransmit ();
+                }
+            }
+          else
+            {
+              txOpportunities = PrepareToTransmit ();
+            }
+        }
+    }
+
+  UpdateMaximumRateLimitationParameters ();
+
+  return txOpportunities;
+}
+
+
+std::set<uint32_t>
+SatCrdsa::RandomizeTxOpportunities ()
 {
   NS_LOG_FUNCTION (this);
 

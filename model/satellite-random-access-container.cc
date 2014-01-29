@@ -35,7 +35,8 @@ SatRandomAccess::GetTypeId (void)
 }
 
 SatRandomAccess::SatRandomAccess () :
-  m_randomAccessModel (RA_OFF)
+  m_randomAccessModel (RA_OFF),
+  m_randomAccessConf ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -58,24 +59,6 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Ran
 SatRandomAccess::~SatRandomAccess ()
 {
   NS_LOG_FUNCTION (this);
-}
-
-/// TODO: implement this
-bool
-SatRandomAccess::IsDamaAvailable ()
-{
-  NS_LOG_FUNCTION (this);
-
-  return false;
-}
-
-/// TODO: implement this
-bool
-SatRandomAccess::IsDataAvailable ()
-{
-  NS_LOG_FUNCTION (this);
-
-  return true;
 }
 
 /// TODO: implement this
@@ -128,16 +111,9 @@ SatRandomAccess::DoSlottedAloha ()
   /// Frame start is a known trigger for CRDSA, which has higher priority than SA. As such SA will not be used at frame start
   if (m_randomAccessModel == RA_SLOTTED_ALOHA || (m_randomAccessModel == RA_ANY_AVAILABLE && !IsFrameStart ()))
     {
-      NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Evaluating Slotted ALOHA, checking for DAMA allocations...");
+      NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Evaluating Slotted ALOHA");
 
-      /// Check if we have known DAMA allocations
-      if (!IsDamaAvailable ())
-        {
-          NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - No DAMA -> Running Slotted ALOHA");
-
-          /// Evaluate Slotted ALOHA
-          time = m_slottedAlohaModel->DoSlottedAloha ();
-        }
+      time = m_slottedAlohaModel->DoSlottedAloha ();
 
       NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Minimum time to wait: " << time << " seconds");
     }
@@ -155,27 +131,13 @@ SatRandomAccess::DoCrdsa ()
   /// Check the model
   if (m_randomAccessModel == RA_CRDSA || m_randomAccessModel == RA_ANY_AVAILABLE)
     {
-      NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Evaluating CRDSA, checking for DAMA allocations...");
+      NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Evaluating CRDSA");
 
-      /// Check if DAMA is available
-      if (!IsDamaAvailable ())
-        {
-          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No DAMA, checking buffer status...");
-
-          /// Check if suitable data is available
-          if (IsDataAvailable ())
-            {
-              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Data available -> Running CRDSA");
-
-              /// Evaluate CRDSA
-              txOpportunities = m_crdsaModel->DoCrdsa ();
-            }
-        }
-
-      std::set<uint32_t>::iterator iter;
+      txOpportunities = m_crdsaModel->DoCrdsa ();
 
       /// For debugging purposes
       /// TODO: comment out this code at later stage
+      std::set<uint32_t>::iterator iter;
       for (iter = txOpportunities.begin (); iter != txOpportunities.end (); iter++ )
         {
           NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Transmission opportunity at slot: " << (*iter));

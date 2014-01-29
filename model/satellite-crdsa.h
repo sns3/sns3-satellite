@@ -77,6 +77,57 @@ private:
 
   /**
    *
+   * \return
+   */
+  std::set<uint32_t> RandomizeTxOpportunities ();
+
+  /**
+   *
+   * \return
+   */
+  std::set<uint32_t> PrepareToTransmit ();
+
+  /**
+   *
+   * \return
+   */
+  bool IsDamaAvailable ();
+
+  /**
+   *
+   * \return
+   */
+  bool IsBackoffPeriodOver ();
+
+  /**
+   *
+   * \return
+   */
+  bool DoBackoff ();
+
+  /**
+   *
+   * \return
+   */
+  bool AreBuffersEmpty ();
+
+  /**
+   *
+   */
+  void UpdateMaximumRateLimitationParameters ();
+
+  /**
+   *
+   */
+  void CheckMaximumRateLimitations ();
+
+  /**
+   *
+   */
+  void SetBackoffTimer ();
+
+  /**
+   *
    */
   void DoVariableSanityCheck ();
 
@@ -109,6 +160,11 @@ private:
    *
    */
   uint32_t m_setSize;
+
+  /**
+   *
+   */
+  bool m_newData;
 };
 
 } // namespace ns3

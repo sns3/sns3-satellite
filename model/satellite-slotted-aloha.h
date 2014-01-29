@@ -85,6 +85,18 @@ private:
 
   /**
    *
+   * \return
+   */
+  bool IsDamaAvailable ();
+
+  /**
+    *
+    * \return
+    */
+  double RandomizeReleaseTime ();
+
+  /**
+   *
    */
   Ptr<SatRandomAccessConf> m_randomAccessConf;
 

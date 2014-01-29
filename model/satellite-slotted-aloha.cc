@@ -92,14 +92,50 @@ SatSlottedAloha::UpdateVariables (double min, double max)
   NS_LOG_INFO ("SatSlottedAloha::UpdateVariables - new min: " << min << " new max: " << max);
 }
 
+/// TODO: implement this
+bool
+SatSlottedAloha::IsDamaAvailable ()
+{
+  NS_LOG_FUNCTION (this);
+
+  bool isDamaAvailable = false;
+
+  NS_LOG_INFO ("SatSlottedAloha::IsDamaAvailable: " << isDamaAvailable);
+
+  return isDamaAvailable;
+}
+
 double
 SatSlottedAloha::DoSlottedAloha ()
 {
   NS_LOG_FUNCTION (this);
 
+  /// TODO: what to return in the case SA is not used?
+  double time = 0;
+
+  NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - Checking if we have DAMA allocations");
+
+  /// Check if we have known DAMA allocations
+  if (!IsDamaAvailable ())
+    {
+      NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - No DAMA -> Running Slotted ALOHA");
+
+      /// Evaluate Slotted ALOHA
+      time = RandomizeReleaseTime ();
+    }
+  return time;
+}
+
+double
+SatSlottedAloha::RandomizeReleaseTime ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatSlottedAloha::RandomizeReleaseTime - Randomizing the release time...");
+
   double releaseTime = Now ().GetSeconds () + m_uniformVariable->GetValue (m_min, m_max);
 
-  NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - TX opportunity in the next slot after the release time at: " << releaseTime << " seconds");
+  NS_LOG_INFO ("SatSlottedAloha::RandomizeReleaseTime - TX opportunity in the next slot after the release time at: " << releaseTime << " seconds");
 
   return releaseTime;
 }
