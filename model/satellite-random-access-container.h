@@ -27,6 +27,7 @@
 #include "satellite-slotted-aloha.h"
 #include "satellite-crdsa.h"
 #include "satellite-random-access-container-conf.h"
+#include <set>
 
 namespace ns3 {
 
@@ -89,12 +90,12 @@ private:
   /**
    *
    */
-  void DoSlottedAloha ();
+  double DoSlottedAloha ();
 
   /**
    *
    */
-  void DoCrdsa ();
+  std::set<uint32_t> DoCrdsa ();
 
   /**
    *

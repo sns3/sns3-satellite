@@ -132,7 +132,7 @@ SatRandomAccess::DoRandomAccess (bool isFrameStart)
     }
 }
 
-void
+double
 SatRandomAccess::DoSlottedAloha ()
 {
   NS_LOG_FUNCTION (this);
@@ -151,10 +151,12 @@ SatRandomAccess::DoSlottedAloha ()
     }
 
   NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Minimum time to wait: " << time << " seconds");
+
+  return time;
 }
 
 /// TODO: implement this
-void
+std::set<uint32_t>
 SatRandomAccess::DoCrdsa ()
 {
   NS_LOG_FUNCTION (this);
@@ -182,6 +184,7 @@ SatRandomAccess::DoCrdsa ()
     {
       NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Transmission opportunity at slot: " << (*iter));
     }
+  return txOpportunities;
 }
 
 } // namespace ns3
