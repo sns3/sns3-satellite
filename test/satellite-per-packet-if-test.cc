@@ -745,21 +745,21 @@ SatPerPacketIfTestSuite::SatPerPacketIfTestSuite ()
                                                     true),
                TestCase::QUICK);
 
-  AddTestCase (new SatPerPacketFwdLinkFullTestCase, TestCase::TAKES_FOREVER);
+  AddTestCase (new SatPerPacketFwdLinkFullTestCase, TestCase::EXTENSIVE);
   AddTestCase (new SatPerPacketFwdLinkFullTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV,
                                                     false),
-               TestCase::TAKES_FOREVER);
+               TestCase::EXTENSIVE);
 
   AddTestCase (new SatPerPacketRtnLinkUserTestCase, TestCase::QUICK);
   AddTestCase (new SatPerPacketRtnLinkUserTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV),
                TestCase::QUICK);
 
-  AddTestCase (new SatPerPacketRtnLinkFullTestCase, TestCase::TAKES_FOREVER);
+  AddTestCase (new SatPerPacketRtnLinkFullTestCase, TestCase::EXTENSIVE);
   AddTestCase (new SatPerPacketRtnLinkFullTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV),
-               TestCase::TAKES_FOREVER);
+               TestCase::EXTENSIVE);
 }
 
 // Do allocate an instance of this TestSuite

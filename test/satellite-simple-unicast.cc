@@ -995,7 +995,7 @@ SimpleUnicastTestSuite::SimpleUnicastTestSuite ()
   AddTestCase (new SimpleUnicast2, TestCase::EXTENSIVE);
 
   // add simple_unicast-3 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast3, TestCase::TAKES_FOREVER);
+  AddTestCase (new SimpleUnicast3, TestCase::EXTENSIVE);
 
   // add simple-unicast-4 case to suite sat-simple-unicast
   AddTestCase (new SimpleUnicast4, TestCase::QUICK);
@@ -1004,7 +1004,7 @@ SimpleUnicastTestSuite::SimpleUnicastTestSuite ()
   AddTestCase (new SimpleUnicast5, TestCase::EXTENSIVE);
 
   // add simple-unicast-6 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast6, TestCase::TAKES_FOREVER);
+  AddTestCase (new SimpleUnicast6, TestCase::EXTENSIVE);
 
   // add simple-unicast-7 case to suite sat-simple-unicast
   AddTestCase (new SimpleUnicast7, TestCase::QUICK);
