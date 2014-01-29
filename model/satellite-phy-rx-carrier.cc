@@ -24,7 +24,6 @@
 #include "ns3/object.h"
 #include "ns3/simulator.h"
 #include "ns3/boolean.h"
-
 #include "satellite-utils.h"
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-signal-parameters.h"

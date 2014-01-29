@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -24,7 +24,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "satellite-base-random-access.h"
+#include "satellite-random-access-container-conf.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 
@@ -33,13 +34,18 @@ namespace ns3 {
  *
  * \brief Class for slotted aloha
  */
-class SatSlottedAloha : public SatBaseRandomAccess
+class SatSlottedAloha : public Object
 {
 public:
   /**
    * \brief Constructor
    */
   SatSlottedAloha ();
+
+  /**
+   * \brief Constructor
+   */
+  SatSlottedAloha (Ptr<SatRandomAccessConf> randomAccessConf);
 
   /**
    * \brief Destructor
@@ -52,7 +58,50 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   * \return
+   */
+  double DoSlottedAloha ();
+
+  /**
+   *
+   * \param min
+   * \param max
+   */
+  void UpdateVariables (double min, double max);
+
 private:
+
+  /**
+   *
+   */
+  void DoVariableSanityCheck ();
+
+  /**
+   *
+   */
+  void InitializeVariables ();
+
+  /**
+   *
+   */
+  Ptr<SatRandomAccessConf> m_randomAccessConf;
+
+  /**
+   *
+   */
+  Ptr<UniformRandomVariable> m_uniformVariable;
+
+  /**
+   *
+   */
+  double m_min;
+
+  /**
+   *
+   */
+  double m_max;
 
 };
 

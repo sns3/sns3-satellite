@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -24,6 +24,9 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "satellite-slotted-aloha.h"
+#include "satellite-crdsa.h"
+#include "satellite-random-access-container-conf.h"
 
 namespace ns3 {
 
@@ -35,10 +38,28 @@ namespace ns3 {
 class SatRandomAccess : public Object
 {
 public:
+
+  /**
+   * \enum RandomAccessModel_t
+   * \brief Random access models
+   */
+  typedef enum
+  {
+    RA_OFF = 0,
+    RA_SLOTTED_ALOHA = 1,
+    RA_CRDSA = 2,
+    RA_ANY_AVAILABLE = 3
+  } RandomAccessModel_t;
+
   /**
    * \brief Constructor
    */
   SatRandomAccess ();
+
+  /**
+   * \brief Constructor
+   */
+  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel);
 
   /**
    * \brief Destructor
@@ -51,8 +72,61 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   * \param randomAccessModel
+   */
+  void SetRandomAccessModel (RandomAccessModel_t randomAccessModel);
+
+  /**
+   *
+   * \param isFrameStart
+   */
+  void DoRandomAccess (bool isFrameStart);
+
 private:
 
+  /**
+   *
+   */
+  void DoSlottedAloha ();
+
+  /**
+   *
+   */
+  void DoCrdsa ();
+
+  /**
+   *
+   * \return
+   */
+  bool IsDamaAvailable ();
+
+  /**
+   *
+   * \return
+   */
+  bool IsDataAvailable ();
+
+  /**
+   *
+   */
+  RandomAccessModel_t m_randomAccessModel;
+
+  /**
+   *
+   */
+  Ptr<SatRandomAccessConf> m_randomAccessConf;
+
+  /**
+   *
+   */
+  Ptr<SatSlottedAloha> m_slottedAlohaModel;
+
+  /**
+   *
+   */
+  Ptr<SatCrdsa> m_crdsaModel;
 };
 
 } // namespace ns3

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -17,33 +17,41 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_BASE_RANDOM_ACCESS_H
-#define SATELLITE_BASE_RANDOM_ACCESS_H
+#ifndef SATELLITE_CRDSA_H
+#define SATELLITE_CRDSA_H
 
 #include "ns3/object.h"
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "satellite-random-access-container-conf.h"
+#include "ns3/random-variable-stream.h"
+#include <set>
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
  *
- * \brief Base class for random access modules
+ * \brief Class for CRDSA
  */
-class SatBaseRandomAccess : public Object
+class SatCrdsa : public Object
 {
 public:
   /**
    * \brief Constructor
    */
-  SatBaseRandomAccess ();
+  SatCrdsa ();
+
+  /**
+   * \brief Constructor
+   */
+  SatCrdsa (Ptr<SatRandomAccessConf> randomAccessConf);
 
   /**
    * \brief Destructor
    */
-  virtual ~SatBaseRandomAccess ();
+  virtual ~SatCrdsa ();
 
   /**
    * \brief NS-3 type id function
@@ -51,10 +59,58 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   * \return
+   */
+  std::set<uint32_t> DoCrdsa ();
+
+  /**
+   *
+   * \param min
+   * \param max
+   * \param setSize
+   */
+  void UpdateVariables (uint32_t min, uint32_t max, uint32_t setSize);
+
 private:
 
+  /**
+   *
+   */
+  void DoVariableSanityCheck ();
+
+  /**
+   *
+   */
+  void InitializeVariables ();
+
+  /**
+   *
+   */
+  Ptr<SatRandomAccessConf> m_randomAccessConf;
+
+  /**
+   *
+   */
+  Ptr<UniformRandomVariable> m_uniformVariable;
+
+  /**
+   *
+   */
+  uint32_t m_min;
+
+  /**
+   *
+   */
+  uint32_t m_max;
+
+  /**
+   *
+   */
+  uint32_t m_setSize;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_BASE_RANDOM_ACCESS_H */
+#endif /* SATELLITE_CRDSA_H */

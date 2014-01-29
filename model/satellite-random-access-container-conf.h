@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -51,8 +51,62 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  /**
+   *
+   * \return
+   */
+  double GetSlottedAlohaDefaultMin () { return m_slottedAlohaMin; }
+
+  /**
+   *
+   * \return
+   */
+  double GetSlottedAlohaDefaultMax () { return m_slottedAlohaMax; }
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetCrdsaDefaultMin () { return m_crdsaMin; }
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetCrdsaDefaultMax () { return m_crdsaMax; }
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetCrdsaDefaultSetSize () { return m_crdsaSetSize; }
+
 private:
 
+  /**
+   *
+   */
+  double m_slottedAlohaMin;
+
+  /**
+   *
+   */
+  double m_slottedAlohaMax;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaMin;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaMax;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaSetSize;
 };
 
 } // namespace ns3

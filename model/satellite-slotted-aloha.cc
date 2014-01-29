@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -29,18 +29,79 @@ TypeId
 SatSlottedAloha::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatSlottedAloha")
-    .SetParent<SatBaseRandomAccess> ();
+    .SetParent<Object> ();
   return tid;
 }
 
-SatSlottedAloha::SatSlottedAloha ()
+SatSlottedAloha::SatSlottedAloha () :
+  m_min (0.0),
+  m_max (0.0)
 {
   NS_LOG_FUNCTION (this);
+
+  NS_FATAL_ERROR ("SatSlottedAloha::SatSlottedAloha - Constructor not in use");
+}
+
+SatSlottedAloha::SatSlottedAloha (Ptr<SatRandomAccessConf> randomAccessConf) :
+  m_randomAccessConf (randomAccessConf),
+  m_min (randomAccessConf->GetSlottedAlohaDefaultMin ()),
+  m_max (randomAccessConf->GetSlottedAlohaDefaultMax ())
+{
+  NS_LOG_FUNCTION (this);
+
+  m_uniformVariable = CreateObject<UniformRandomVariable> ();
+
+  DoVariableSanityCheck ();
+
+  NS_LOG_INFO ("SatSlottedAloha::SatSlottedAloha - Module created");
 }
 
 SatSlottedAloha::~SatSlottedAloha ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatSlottedAloha::DoVariableSanityCheck ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_min < 0 || m_max < 0)
+    {
+      NS_FATAL_ERROR ("SatSlottedAloha::DoVariableSanityCheck - min < 0 || max < 0");
+    }
+
+  if (m_min > m_max)
+    {
+      NS_FATAL_ERROR ("SatSlottedAloha::DoVariableSanityCheck - min > max");
+    }
+
+  NS_LOG_INFO ("SatSlottedAloha::DoVariableSanityCheck - Variable sanity check done");
+}
+
+void
+SatSlottedAloha::UpdateVariables (double min, double max)
+{
+  NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max);
+
+  m_min = min;
+  m_max = max;
+
+  DoVariableSanityCheck ();
+
+  NS_LOG_INFO ("SatSlottedAloha::UpdateVariables - new min: " << min << " new max: " << max);
+}
+
+double
+SatSlottedAloha::DoSlottedAloha ()
+{
+  NS_LOG_FUNCTION (this);
+
+  double timeToWait = m_uniformVariable->GetValue (m_min, m_max);
+
+  NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - Minimum time to wait: " << timeToWait << " seconds");
+
+  return timeToWait;
 }
 
 } // namespace ns3
