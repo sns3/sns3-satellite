@@ -338,7 +338,7 @@ SimpleUnicast3::DoRun (void)
 
   // initialized time values for simulation
   uint32_t maxReceivers = utUsers.GetN ();
-  Time cbrStartDelay = Seconds (0.00001);
+  Time cbrStartDelay = Seconds (0.01);
   Time cbrStopDelay = Seconds (0.1);
   Time stopTime = Seconds (maxReceivers*cbrStartDelay.GetSeconds ()) + cbrInterval + cbrInterval + Seconds (5);
 
@@ -354,7 +354,7 @@ SimpleUnicast3::DoRun (void)
       gwApps.Add(cbr.Install (gwUsers.Get (4)));
       utApps.Add(sink.Install (utUsers.Get (i)));
 
-      cbrStartDelay += Seconds (0.00001);
+      cbrStartDelay += Seconds (0.01);
 
       gwApps.Get(i)->SetStartTime (cbrStartDelay);
       gwApps.Get(i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);
