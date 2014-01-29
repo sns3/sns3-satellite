@@ -20,27 +20,29 @@ NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
 int
 main (int argc, char *argv[])
 {
-  /// enable info logs
+  /// Enable info logs
   LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
 
-  /// load default random access configuration
+  /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> ();
 
-  /// create Slotted ALOHA module
+  /// Create random access module with Slotted ALOHA as default
   Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, SatRandomAccess::RA_SLOTTED_ALOHA);
 
-  /// run simulation
+  /// Run simulation
   for (uint32_t i = 0; i < 5; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, false);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoSlottedAloha, randomAccess);
     }
 
+  /// Change random access model to CRDSA
   Simulator::Schedule (Time (300000 + 5*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_CRDSA);
 
+  /// Continue simulation
   for (uint32_t i = 6; i < 12; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, true);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoCrdsa, randomAccess);
     }
 
   Simulator::Run ();

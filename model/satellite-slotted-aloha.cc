@@ -97,11 +97,11 @@ SatSlottedAloha::DoSlottedAloha ()
 {
   NS_LOG_FUNCTION (this);
 
-  double timeToWait = m_uniformVariable->GetValue (m_min, m_max);
+  double releaseTime = Now ().GetSeconds () + m_uniformVariable->GetValue (m_min, m_max);
 
-  NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - Minimum time to wait: " << timeToWait << " seconds");
+  NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - TX opportunity in the next slot after the release time at: " << releaseTime << " seconds");
 
-  return timeToWait;
+  return releaseTime;
 }
 
 } // namespace ns3

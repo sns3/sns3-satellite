@@ -46,7 +46,7 @@ main (int argc, char *argv[])
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
-  /// read command line parameters given by user
+  /// Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
@@ -54,22 +54,22 @@ main (int argc, char *argv[])
   cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
-  /// enable Rx power calculation & Rx power density output trace
+  /// Enable Rx power calculation & Rx power density output trace
   Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode",EnumValue (SatEnums::RX_PWR_CALCULATION));
   Config::SetDefault ("ns3::SatChannel::EnableRxPowerOutputTrace",BooleanValue (true));
 
-  /// enable Markov fading calculation & fading output trace
+  /// Enable Markov fading calculation & fading output trace
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_MARKOV));
   Config::SetDefault ("ns3::SatChannel::EnableFadingOutputTrace",BooleanValue (true));
 
-  /// enable per packet interference & interference density output trace
+  /// Enable per packet interference & interference density output trace
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatGeoHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatGeoHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
 
-  /// enable composite SINR output trace
+  /// Enable composite SINR output trace
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
 
   //Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
@@ -82,7 +82,7 @@ main (int argc, char *argv[])
   //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
   //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
 
-  /// enable the printing of ID mapper trace IDs
+  /// Enable the printing of ID mapper trace IDs
   Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
 
   if ( scenario == "larger")
@@ -94,15 +94,15 @@ main (int argc, char *argv[])
       satScenario = SatHelper::FULL;
     }
 
-  /// enable info logs
+  /// Enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   LogComponentEnable ("sat-trace-output-example", LOG_LEVEL_INFO);
 
-  /// remove next line from comments to run real time simulation
+  /// Remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
-  /// create satellite helper with given scenario default=simple
+  /// Create satellite helper with given scenario default=simple
 
   /// Create reference system, two options:
   /// - "Scenario72"
@@ -119,13 +119,13 @@ main (int argc, char *argv[])
 
   helper->CreateScenario(satScenario);
 
-  /// get users
+  /// Get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
 
   uint16_t port = 9;
 
-  /// create application on GW user
+  /// Create application on GW user
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
   cbrHelper.SetAttribute("Interval", StringValue (interval));
@@ -139,7 +139,7 @@ main (int argc, char *argv[])
   gwCbr.Start (Seconds (3.0));
   gwCbr.Stop (Seconds (5.1));
 
-  /// create application on UT user
+  /// Create application on UT user
   sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
   cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
 

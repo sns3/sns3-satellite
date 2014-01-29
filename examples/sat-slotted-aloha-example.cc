@@ -20,24 +20,27 @@ NS_LOG_COMPONENT_DEFINE ("sat-slotted-aloha-example");
 int
 main (int argc, char *argv[])
 {
-  /// enable info logs
+  /// Enable info logs
   LogComponentEnable ("sat-slotted-aloha-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatSlottedAloha", LOG_LEVEL_INFO);
 
-  /// load default random access configuration
+  /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> ();
 
-  /// create Slotted ALOHA module
+  /// Create Slotted ALOHA module
   Ptr<SatSlottedAloha> slottedAloha = CreateObject<SatSlottedAloha> (randomAccessConf);
 
-  /// run simulation
+  /// Run simulation
   for (uint32_t i = 0; i < 5; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatSlottedAloha::DoSlottedAloha, slottedAloha);
     }
 
+  /// Update Slotted ALOHA variables
   Simulator::Schedule (Time (300000 + 6*500000), &SatSlottedAloha::UpdateVariables, slottedAloha, 4.5, 5.5);
 
+
+  /// Continue simulation
   for (uint32_t i = 7; i < 12; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatSlottedAloha::DoSlottedAloha, slottedAloha);

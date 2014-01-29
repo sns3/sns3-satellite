@@ -81,14 +81,6 @@ public:
 
   /**
    *
-   * \param isFrameStart
-   */
-  void DoRandomAccess (bool isFrameStart);
-
-private:
-
-  /**
-   *
    */
   double DoSlottedAloha ();
 
@@ -96,6 +88,14 @@ private:
    *
    */
   std::set<uint32_t> DoCrdsa ();
+
+private:
+
+  /**
+   *
+   * \return
+   */
+  bool IsFrameStart ();
 
   /**
    *

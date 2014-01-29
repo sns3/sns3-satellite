@@ -23,10 +23,10 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-environmental-variables-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatEnvVariables", LOG_LEVEL_INFO);
 
-  /// create default environmental variables
+  /// Create default environmental variables
   Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
 
-  /// run simulation
+  /// Run simulation
   Simulator::Schedule (MilliSeconds(0), &SatEnvVariables::GetCurrentWorkingDirectory, envVariables);
   Simulator::Schedule (MilliSeconds(1), &SatEnvVariables::GetPathToExecutable, envVariables);
 

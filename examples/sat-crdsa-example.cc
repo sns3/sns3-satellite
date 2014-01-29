@@ -20,24 +20,26 @@ NS_LOG_COMPONENT_DEFINE ("sat-crdsa-example");
 int
 main (int argc, char *argv[])
 {
-  /// enable info logs
+  /// Enable info logs
   LogComponentEnable ("sat-crdsa-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatCrdsa", LOG_LEVEL_INFO);
 
-  /// load default random access configuration
+  /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> ();
 
-  /// create CRDSA module
+  /// Create CRDSA module
   Ptr<SatCrdsa> crdsa = CreateObject<SatCrdsa> (randomAccessConf);
 
-  /// run simulation
+  /// Run simulation
   for (uint32_t i = 0; i < 5; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatCrdsa::DoCrdsa, crdsa);
     }
 
+  /// Update CRDSA variables
   Simulator::Schedule (Time (300000 + 6*500000), &SatCrdsa::UpdateVariables, crdsa, 1, 7, 2);
 
+  /// Continue simulation
   for (uint32_t i = 7; i < 12; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatCrdsa::DoCrdsa, crdsa);

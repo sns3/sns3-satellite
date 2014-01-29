@@ -115,20 +115,20 @@ SatMarkovFadingExamplePlot::GetGnuplot (std::string outputName, std::string titl
 void
 SatMarkovFadingExamplePlot::Run ()
 {
-  /// create default Markov & Loo configurations
+  /// Create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 
   SatBaseFading::ElevationCallback elevationCb = MakeCallback (&SatMarkovFadingExamplePlot::GetElevation,this);
   SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatMarkovFadingExamplePlot::GetVelocity,this);
 
-  /// create fading container based on default configuration
+  /// Create fading container based on default configuration
   Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
 
   markovContainer->TraceConnect ("FadingTrace","The trace for fading values",MakeCallback (&SatMarkovFadingExamplePlot::FadingTraceCb,this));
 
   Address macAddress;
 
-  /// run simulation
+  /// Run simulation
   for (uint32_t i = 0; i < 100000; i++)
     {
       Simulator::Schedule (MilliSeconds (1 * i), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
@@ -164,7 +164,6 @@ SatMarkovFadingExamplePlot::Run ()
     {
       std::cout << "Output file converted to: markov_fading_trace.png" << std::endl;
     }
-
 
   Simulator::Destroy ();
 }
