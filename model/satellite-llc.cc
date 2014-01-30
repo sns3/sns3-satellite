@@ -136,7 +136,7 @@ SatLlc::GetQueue (void) const
 }
 
 bool
-SatLlc::Enque (Ptr<Packet> packet, Address dest)
+SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
 {
   NS_LOG_FUNCTION (this << packet << dest);
   NS_LOG_LOGIC ("p=" << packet );

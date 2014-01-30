@@ -19,36 +19,39 @@
  *
  */
 
+
 #include <algorithm>
 
+#include "ns3/onoff-application.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4.h"
 #include "ns3/ipv4-l3-protocol.h"
+#include "ns3/ipv4-flow-classifier.h"
 
-#include "cbr-kpi-helper.h"
+#include "onoff-kpi-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("CbrKpiHelper");
+NS_LOG_COMPONENT_DEFINE ("OnOffKpiHelper");
 
 
 namespace ns3 {
 
 
-CbrKpiHelper::CbrKpiHelper (KpiHelper::KpiMode_t mode)
+OnOffKpiHelper::OnOffKpiHelper (KpiHelper::KpiMode_t mode)
 :KpiHelper (mode)
 {
   NS_LOG_FUNCTION (this);
 }
 
-CbrKpiHelper::~CbrKpiHelper ()
+OnOffKpiHelper::~OnOffKpiHelper ()
 {
 
 }
 
 
 void
-CbrKpiHelper::AddSender (ApplicationContainer apps)
+OnOffKpiHelper::AddSender (ApplicationContainer apps)
 {
   NS_LOG_FUNCTION (this << apps.GetN ());
 
@@ -60,20 +63,23 @@ CbrKpiHelper::AddSender (ApplicationContainer apps)
 }
 
 void
-CbrKpiHelper::AddSender (Ptr<Application> app)
+OnOffKpiHelper::AddSender (Ptr<Application> app)
 {
   NS_LOG_FUNCTION (this << app);
 
-  Ptr<CbrApplication> cbr = app->GetObject<CbrApplication> ();
+  Ptr<OnOffApplication> onoff = app->GetObject<OnOffApplication> ();
+
   Ipv4Address address;
 
   if (m_mode == KpiHelper::KPI_FWD)
     {
       // use the client's IP address as the context
-      address = InetSocketAddress::ConvertFrom(cbr->GetRemote ()).GetIpv4 ();
+      AddressValue remoteAddress;
+      onoff->GetAttribute ("Remote", remoteAddress);
+      address = InetSocketAddress::ConvertFrom(remoteAddress.Get()).GetIpv4 ();
       ConfigureAsServer (app);
 
-      NS_LOG_INFO ("Adding CBR application as server with remote address: " << address);
+      NS_LOG_INFO ("Adding OnOff application as server with remote address: " << address);
     }
   else if (m_mode == KpiHelper::KPI_RTN)
     {
@@ -81,7 +87,7 @@ CbrKpiHelper::AddSender (Ptr<Application> app)
       address = GetAddress (app->GetNode ());
       ConfigureAsClient (app);
 
-      NS_LOG_INFO ("Adding CBR application as client with local address: " << address);
+      NS_LOG_INFO ("Adding OnOff application as client with local address: " << address);
     }
   else
     {
@@ -90,12 +96,10 @@ CbrKpiHelper::AddSender (Ptr<Application> app)
 
   AddClientCounter (address);
   const std::string context = AddressToString (address);
-
-  // Set the trace callback with proper context
-  cbr->TraceConnect ("Tx", context,
+  onoff->TraceConnect ("Tx", context,
                      MakeCallback (&KpiHelper::TxCallback, this));
-
 }
+
 
 
 } // end of `namespace ns3`

@@ -224,7 +224,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
   mac->SetTimingAdvanceCallback (timingCb);
 
-  SatUtMac::SendCallback txCb = MakeCallback (&SatNetDevice::Send, dev);
+  SatUtMac::SendCallback txCb = MakeCallback (&SatNetDevice::SendControl, dev);
   mac->SetTxCallback (txCb);
 
   // Attach the Mac layer C/N0 updates receiver to Phy

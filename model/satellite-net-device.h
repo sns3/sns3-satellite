@@ -125,6 +125,7 @@ public:
   virtual bool IsBridge (void) const;
   virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
   virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
+  bool SendControl (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
   virtual Ptr<Node> GetNode (void) const;
   virtual void SetNode (Ptr<Node> node);
   virtual bool NeedsArp (void) const;
@@ -145,6 +146,8 @@ public:
 
 protected:
   virtual void DoDispose (void);
+
+  virtual void Classify (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
 
 private:
   Ptr<SatPhy> m_phy;

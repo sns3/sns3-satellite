@@ -117,9 +117,9 @@ main (int argc, char *argv[])
      }
 
    // Add the created applications to CbrKpiHelper
-   CbrKpiHelper kpiHelper;
-   kpiHelper.AddClient (utApps);
-   kpiHelper.AddServer (gwApps);
+   CbrKpiHelper kpiHelper (KpiHelper::KPI_FWD);
+   kpiHelper.AddSink (utApps);
+   kpiHelper.AddSender (gwApps);
 
    utApps.Start (appStartTime);
    utApps.Stop (Seconds (simLength));
