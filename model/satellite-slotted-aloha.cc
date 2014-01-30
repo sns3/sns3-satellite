@@ -34,6 +34,8 @@ SatSlottedAloha::GetTypeId (void)
 }
 
 SatSlottedAloha::SatSlottedAloha () :
+  m_randomAccessConf (),
+  m_uniformVariable (),
   m_min (0.0),
   m_max (0.0)
 {
@@ -44,6 +46,7 @@ SatSlottedAloha::SatSlottedAloha () :
 
 SatSlottedAloha::SatSlottedAloha (Ptr<SatRandomAccessConf> randomAccessConf) :
   m_randomAccessConf (randomAccessConf),
+  m_uniformVariable (),
   m_min (randomAccessConf->GetSlottedAlohaDefaultMin ()),
   m_max (randomAccessConf->GetSlottedAlohaDefaultMax ())
 {
@@ -120,7 +123,7 @@ SatSlottedAloha::DoSlottedAloha ()
     {
       NS_LOG_INFO ("SatSlottedAloha::DoSlottedAloha - No DAMA -> Running Slotted ALOHA");
 
-      /// Evaluate Slotted ALOHA
+      /// Randomize Tx opportunity release time
       time = RandomizeReleaseTime ();
     }
   return time;

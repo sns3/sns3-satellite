@@ -81,6 +81,18 @@ public:
    */
   uint32_t GetCrdsaDefaultSetSize () { return m_crdsaSetSize; }
 
+  /**
+   *
+   * \return
+   */
+  double GetCrdsaDefaultBackoffPeriodLength () { return m_crdsaBackoffPeriodLength; }
+
+  /**
+   *
+   * \return
+   */
+  double GetCrdsaDefaultBackoffPeriodProbability () { return m_crdsaBackoffPeriodProbability; }
+
 private:
 
   /**
@@ -107,6 +119,16 @@ private:
    *
    */
   uint32_t m_crdsaSetSize;
+
+  /**
+   *
+   */
+  double m_crdsaBackoffPeriodLength;
+
+  /**
+   *
+   */
+  double m_crdsaBackoffPeriodProbability;
 };
 
 } // namespace ns3

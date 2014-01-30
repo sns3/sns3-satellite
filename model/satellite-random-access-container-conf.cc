@@ -38,7 +38,9 @@ SatRandomAccessConf::SatRandomAccessConf () :
   m_slottedAlohaMax (2.0),
   m_crdsaMin (1),
   m_crdsaMax (160),
-  m_crdsaSetSize (3)
+  m_crdsaSetSize (3),
+  m_crdsaBackoffPeriodLength (0.5),
+  m_crdsaBackoffPeriodProbability (0.2)
 {
   NS_LOG_FUNCTION (this);
 }

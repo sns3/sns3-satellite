@@ -34,9 +34,15 @@ SatCrdsa::GetTypeId (void)
 }
 
 SatCrdsa::SatCrdsa () :
+  m_randomAccessConf (),
+  m_uniformVariable (),
   m_min (0.0),
   m_max (0.0),
-  m_setSize (0)
+  m_setSize (0),
+  m_newData (true),
+  m_backoffReleaseTime (0.0),
+  m_backoffPeriodLength (0.0),
+  m_backoffProbability (0.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -45,9 +51,14 @@ SatCrdsa::SatCrdsa () :
 
 SatCrdsa::SatCrdsa (Ptr<SatRandomAccessConf> randomAccessConf) :
   m_randomAccessConf (randomAccessConf),
+  m_uniformVariable (),
   m_min (randomAccessConf->GetCrdsaDefaultMin ()),
   m_max (randomAccessConf->GetCrdsaDefaultMax ()),
-  m_setSize (randomAccessConf->GetCrdsaDefaultSetSize ())
+  m_setSize (randomAccessConf->GetCrdsaDefaultSetSize ()),
+  m_newData (true),
+  m_backoffReleaseTime (Now ().GetSeconds ()),
+  m_backoffPeriodLength (randomAccessConf->GetCrdsaDefaultBackoffPeriodLength ()),
+  m_backoffProbability (randomAccessConf->GetCrdsaDefaultBackoffPeriodProbability ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -92,7 +103,7 @@ SatCrdsa::DoVariableSanityCheck ()
 }
 
 void
-SatCrdsa::UpdateVariables (uint32_t min, uint32_t max, uint32_t setSize)
+SatCrdsa::UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t setSize)
 {
   NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max << " new set size: " << setSize);
 
@@ -105,26 +116,46 @@ SatCrdsa::UpdateVariables (uint32_t min, uint32_t max, uint32_t setSize)
   NS_LOG_INFO ("SatCrdsa::UpdateVariables - new min: " << min << " new max: " << max << " new set size: " << setSize);
 }
 
-/// TODO: implement this
+void
+SatCrdsa::SetBackoffProbability (double backoffProbability)
+{
+  m_backoffProbability = backoffProbability;
+}
+
+void
+SatCrdsa::SetBackoffPeriodLength (double backoffPeriodLength)
+{
+  m_backoffPeriodLength = backoffPeriodLength;
+}
+
 bool
 SatCrdsa::IsBackoffPeriodOver ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool isBackoffPeriodOver = true;
+  bool isBackoffPeriodOver = false;
+
+  if (Now ().GetSeconds () >= m_backoffReleaseTime)
+    {
+      isBackoffPeriodOver = true;
+    }
 
   NS_LOG_INFO ("SatCrdsa::IsBackoffPeriodOver: " << isBackoffPeriodOver);
 
   return isBackoffPeriodOver;
 }
 
-/// TODO: implement this
 bool
 SatCrdsa::DoBackoff ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool doBackoff = true;
+  bool doBackoff = false;
+
+  if (m_uniformVariable->GetValue (0.0,1.0) < m_backoffProbability)
+    {
+      doBackoff = true;
+    }
 
   NS_LOG_INFO ("SatCrdsa::DoBackoff: " << doBackoff);
 
@@ -150,13 +181,14 @@ SatCrdsa::AreBuffersEmpty ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool areBuffersEmpty = false;
+  bool areBuffersEmpty = true;
 
   NS_LOG_INFO ("SatCrdsa::AreBuffersEmpty: " << areBuffersEmpty);
 
   return areBuffersEmpty;
 }
 
+/// TODO: implement this
 void
 SatCrdsa::UpdateMaximumRateLimitationParameters ()
 {
@@ -165,6 +197,7 @@ SatCrdsa::UpdateMaximumRateLimitationParameters ()
   NS_LOG_INFO ("SatCrdsa::UpdateMaximumRateLimitationParameters - Updating parameters");
 }
 
+/// TODO: implement this
 void
 SatCrdsa::CheckMaximumRateLimitations ()
 {
@@ -178,6 +211,8 @@ SatCrdsa::SetBackoffTimer ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_backoffReleaseTime = Now ().GetSeconds () + m_backoffPeriodLength;
+
   NS_LOG_INFO ("SatCrdsa::SetBackoffTimer - Setting backoff timer");
 }
 
@@ -185,6 +220,8 @@ std::set<uint32_t>
 SatCrdsa::PrepareToTransmit ()
 {
   std::set<uint32_t> txOpportunities;
+
+  NS_LOG_INFO ("SatCrdsa::PrepareToTransmit - Preparing for transmission...");
 
   CheckMaximumRateLimitations ();
 
@@ -197,7 +234,6 @@ SatCrdsa::PrepareToTransmit ()
   return txOpportunities;
 }
 
-/// TODO: implement this
 std::set<uint32_t>
 SatCrdsa::DoCrdsa ()
 {
@@ -205,6 +241,16 @@ SatCrdsa::DoCrdsa ()
 
   /// TODO: what to return in the case CRDSA is not used?
   std::set<uint32_t> txOpportunities;
+
+  NS_LOG_INFO ("-------------------------------------");
+  NS_LOG_INFO ("------ Running CRDSA algorithm ------");
+  NS_LOG_INFO ("-------------------------------------");
+
+  PrintVariables ();
+
+  NS_LOG_INFO ("-------------------------------------");
+
+  NS_LOG_INFO ("SatCrdsa::DoCrdsa - Checking backoff period status...");
 
   if (IsBackoffPeriodOver ())
     {
@@ -217,6 +263,8 @@ SatCrdsa::DoCrdsa ()
           if (m_newData)
             {
               m_newData = false;
+
+              NS_LOG_INFO ("SatCrdsa::DoCrdsa - Evaluating backoff...");
 
               if (DoBackoff ())
                 {
@@ -249,6 +297,7 @@ SatCrdsa::RandomizeTxOpportunities ()
   std::pair<std::set<uint32_t>::iterator,bool> result;
 
   NS_LOG_INFO ("SatCrdsa::DoCrdsa - Randomizing TX opportunities");
+
   while (txOpportunities.size () < m_setSize)
     {
       uint32_t slot = m_uniformVariable->GetInteger (m_min, m_max);
@@ -257,8 +306,22 @@ SatCrdsa::RandomizeTxOpportunities ()
 
       NS_LOG_INFO ("SatCrdsa::DoCrdsa - Insert successful: " << result.second << " for TX opportunity slot: " << (*result.first));
     }
+
   NS_LOG_INFO ("SatCrdsa::DoCrdsa - Randomizing done");
+
   return txOpportunities;
+}
+
+void
+SatCrdsa::PrintVariables ()
+{
+  NS_LOG_INFO ("Simulation time: " << Now ().GetSeconds () << " seconds");
+  NS_LOG_INFO ("Backoff period release time: " << m_backoffReleaseTime << " seconds");
+  NS_LOG_INFO ("Backoff period length: " << m_backoffPeriodLength << " seconds");
+  NS_LOG_INFO ("Backoff probability: " << m_backoffProbability * 100 << " %");
+  NS_LOG_INFO ("New data status: " << m_newData);
+  NS_LOG_INFO ("Slot randomization range: " << m_min << " to " << m_max);
+  NS_LOG_INFO ("Number of randomized TX opportunities: " << m_setSize);
 }
 
 } // namespace ns3

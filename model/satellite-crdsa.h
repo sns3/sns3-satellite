@@ -71,7 +71,19 @@ public:
    * \param max
    * \param setSize
    */
-  void UpdateVariables (uint32_t min, uint32_t max, uint32_t setSize);
+  void UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t setSize);
+
+  /**
+   *
+   * \param backoffProbability
+   */
+  void SetBackoffProbability (double backoffProbability);
+
+  /**
+   *
+   * \param backoffPeriodLength
+   */
+  void SetBackoffPeriodLength (double backoffPeriodLength);
 
 private:
 
@@ -139,6 +151,11 @@ private:
   /**
    *
    */
+  void PrintVariables ();
+
+  /**
+   *
+   */
   Ptr<SatRandomAccessConf> m_randomAccessConf;
 
   /**
@@ -165,6 +182,21 @@ private:
    *
    */
   bool m_newData;
+
+  /**
+   *
+   */
+  double m_backoffReleaseTime;
+
+  /**
+   *
+   */
+  double m_backoffPeriodLength;
+
+  /**
+   *
+   */
+  double m_backoffProbability;
 };
 
 } // namespace ns3

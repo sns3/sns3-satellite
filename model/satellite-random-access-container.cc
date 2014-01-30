@@ -67,7 +67,11 @@ SatRandomAccess::IsFrameStart ()
 {
   NS_LOG_FUNCTION (this);
 
-  return true;
+  bool isFrameStart = false;
+
+  NS_LOG_INFO ("SatRandomAccess::IsFrameStart: " << isFrameStart);
+
+  return isFrameStart;
 }
 
 void
@@ -118,6 +122,7 @@ SatRandomAccess::DoSlottedAloha ()
       NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Minimum time to wait: " << time << " seconds");
     }
 
+  /// TODO: What to return if SA is not enabled?
   return time;
 }
 
@@ -144,6 +149,7 @@ SatRandomAccess::DoCrdsa ()
         }
     }
 
+  /// TODO: What to return if CRDSA is not enabled?
   return txOpportunities;
 }
 
