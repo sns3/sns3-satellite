@@ -78,6 +78,10 @@ SatConf::GetTypeId (void)
                       UintegerValue (16),
                       MakeUintegerAccessor (&SatConf::m_feederLinkChannelCount),
                       MakeUintegerChecker<uint32_t> (1))
+      .AddAttribute ("FrameCount", "The number of frames in super frame",
+                      UintegerValue (10),
+                      MakeUintegerAccessor (&SatConf::m_frameCount),
+                      MakeUintegerChecker<uint32_t> (1))
       .AddAttribute ("StaticFrameConfig",
                      "Static frame configuration used for superframes.",
                       EnumValue (SatConf::STATIC_CONFIG_0),
@@ -88,7 +92,7 @@ SatConf::GetTypeId (void)
                                        SatConf::STATIC_CONFIG_3, "Configuration 3"))
       .AddAttribute ("StaticConfTargetDuration",
                      "Target duration of the superframe for static configuration [s].",
-                     DoubleValue (0.010),
+                     DoubleValue (0.100),
                      MakeDoubleAccessor (&SatConf::m_frameConfTargetDuration),
                      MakeDoubleChecker<double> ())
       .AddAttribute ("StaticConfAllocatedBandwidth",
@@ -197,7 +201,7 @@ SatConf::Configure (std::string wfConf)
         m_superframeSeq = CreateObject<SatSuperframeSeq> ();
 
         // Create BTU conf according to given attributes
-        Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameConfAllocatedBandwidth, m_frameConfRollOffFactor, m_frameConfSpacingFactor );
+        Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameConfAllocatedBandwidth /m_frameCount, m_frameConfRollOffFactor, m_frameConfSpacingFactor );
 
         // Create a waveform configuration
         Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
@@ -215,7 +219,7 @@ SatConf::Configure (std::string wfConf)
           }
 
         // Created one frame to be used utilizating earlier created BTU
-        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth, slotCount * timeSlotDuration,
+        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth / m_frameCount, slotCount * timeSlotDuration,
                                                             btuConf, (SatFrameConf::SatTimeSlotConfList_t *) NULL);
 
         // Created time slots for every carrier and add them to frame configuration

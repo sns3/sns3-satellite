@@ -159,13 +159,13 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   m_random = CreateObject<UniformRandomVariable> ();
 
   // create dummy frame
-  m_dummyFrame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod(), SatEnums::DUMMY_FRAME, m_bbFrameConf);
+  m_dummyFrame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod (), SatEnums::DUMMY_FRAME, m_bbFrameConf);
 
   Ptr<Packet> dummyPacket = Create<Packet> (1);
 
   // Add MAC tag
   SatMacTag tag;
-  tag.SetDestAddress (Mac48Address::GetBroadcast());
+  tag.SetDestAddress (Mac48Address::GetBroadcast ());
   tag.SetSourceAddress (m_macAddress);
   dummyPacket->AddPacketTag (tag);
 
@@ -184,8 +184,8 @@ void
 SatFwdLinkScheduler::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_schedContextCallback.Nullify();
-  m_txOpportunityCallback.Nullify();
+  m_schedContextCallback.Nullify ();
+  m_txOpportunityCallback.Nullify ();
   m_dummyFrame = NULL;
   m_bbFrameContainer = NULL;
   m_cnoInfo.clear ();
@@ -211,12 +211,12 @@ SatFwdLinkScheduler::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( m_bbFrameContainer->GetTotalDuration() < m_schedulingStartThresholdTime )
+  if ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStartThresholdTime )
     {
         ScheduleBbFrames ();
     }
 
-  Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame();
+  Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame ();
 
   if ( frame == NULL )
     {
@@ -271,20 +271,20 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
     {
       uint32_t priorityClass;
 
-      for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin () ;it != so.end(); it++  )
+      for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin () ;it != so.end(); it++ )
         {
           uint32_t currentObBytes = (*it)->GetBufferedBytes ();
           double cno = GetSchedulingObjectCno (*it);
           uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
           priorityClass = (*it)->GetPriority ();
 
-          while ( (m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime ) &&
+          while ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ) &&
                    (currentObBytes > 0) )
             {
               if ( frame == NULL )
                 {
                   frame = CreateFrame (cno, currentObBytes);
-                  frameBytes = frame->GetBytesLeft();
+                  frameBytes = frame->GetBytesLeft ();
                 }
               else if ( CnoMatchWithFrame ( cno, frame ) == false )
                 {
@@ -304,7 +304,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
                     {
                       uint32_t bytesLeft = 0;
 
-                      frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft );
+                      frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft);
                       currentObBytes = bytesLeft;
                     }
                 }
@@ -325,7 +325,7 @@ SatFwdLinkScheduler::GetSchedulingObjects ()
 
   std::vector< Ptr<SatSchedulingObject> > so;
 
-  if ( m_bbFrameContainer->GetTotalDuration() < m_schedulingStopThresholdTime )
+  if ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime )
     {
       // Get scheduling objects from LLC
       so = m_schedContextCallback ();
@@ -464,7 +464,7 @@ SatFwdLinkScheduler::GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob)
 
   std::map<Mac48Address, double>::const_iterator it = m_cnoInfo.find (ob->GetMacAddress ());
 
-  if ( it != m_cnoInfo.end() )
+  if ( it != m_cnoInfo.end () )
     {
       cno = it->second;
     }
@@ -481,7 +481,7 @@ SatFwdLinkScheduler::AddFrameToContainer (uint32_t priorityClass, Ptr<SatBbFrame
 
   m_bbFrameContainer->AddFrame (priorityClass, frame);
 
-  if ( m_bbFrameContainer->GetTotalDuration() >= m_schedulingStopThresholdTime )
+  if ( m_bbFrameContainer->GetTotalDuration () >= m_schedulingStopThresholdTime )
     {
       limitReached = true;
     }
@@ -503,7 +503,7 @@ SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> fram
     {
       frameBytesLeft = frame->AddTransmitData (p);
     }
-  else if ( frame->GetBytesLeft() == frame->GetSizeInBytes () )
+  else if ( frame->GetBytesLeft () == frame->GetSizeInBytes () )
     {
       NS_FATAL_ERROR ("Packet does not fit in empty BB Frame. Control package too long or fragmentation problem in user package!!!");
     }

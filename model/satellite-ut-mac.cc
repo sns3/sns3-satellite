@@ -61,9 +61,9 @@ SatUtMac::GetTypeId (void)
                    MakeDoubleChecker<double> (0.0))
     .AddAttribute ("CrUpdatePeriod",
                    "Capacity request update period.",
-                   TimeValue (MilliSeconds (50)),
+                   TimeValue (MilliSeconds (250)),
                    MakeTimeAccessor (&SatUtMac::m_crInterval),
-                   MakeTimeChecker())
+                   MakeTimeChecker ())
   ;
 
   return tid;
@@ -226,10 +226,10 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
                      SatEnums::LD_RETURN,
                      SatUtils::GetPacketInfo (p));
 
-      // Decrease one tick from time slot duration. This evaluates guard period.
+      // Decrease one microsecond from time slot duration. This evaluates guard period.
       // If more sophisticated guard period is needed, it is needed done before hand and
-      // remove this 'one tick decrease' implementation
-      Time duration (Time::FromDouble (durationInSecs, Time::S) - Time (1));
+      // remove this 'one microsecond decrease' implementation
+      Time duration (Time::FromDouble (durationInSecs, Time::S) - Time::FromInteger (1, Time::US));
       SendPacket (packets, carrierId, duration);
     }
 }
@@ -247,7 +247,7 @@ void
 SatUtMac::SendCapacityReq ()
 {
 
-  if ( m_txCallback.IsNull() == false )
+  if ( m_txCallback.IsNull () == false )
     {
       Ptr<Packet> packet = Create<Packet> ();
 
@@ -290,7 +290,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
   // device because it is so simple, but this is not usually the case in
   // more complicated devices.
 
-  for (SatPhy::PacketContainer_t::iterator i = packets.begin(); i != packets.end(); i++ )
+  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
       m_snifferTrace (*i);
       m_promiscSnifferTrace (*i);
@@ -305,10 +305,10 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
         }
 
-      NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
+      NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
       NS_LOG_LOGIC("Receiver " << m_nodeInfo->GetMacAddress ());
 
-      Mac48Address destAddress = Mac48Address::ConvertFrom(macTag.GetDestAddress());
+      Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast () || destAddress.IsGroup ())
         {
           // Remove control msg tag
@@ -330,7 +330,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                   NS_FATAL_ERROR ("A control message received with not valid msg type!");
                 }
             }
-          else if (destAddress.IsBroadcast())
+          else if (destAddress.IsBroadcast ())
             {
               // TODO: dummy frames and other broadcast needed to handle
               // dummy frames should ignored already in Phy layer

@@ -201,7 +201,10 @@ SatGwMac::TransmitTime (uint32_t carrierId)
       /* TODO: The carrierId should be acquired from somewhere. Now
        * we assume only one carrier in forward link, so it is safe to use 0.
        */
-      SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - Time (1) );
+      // Decrease one microsecond from BB frame duration. This evaluates guard period.
+      // If more sophisticated guard period is needed, it is needed done before hand and
+      // remove this 'one microsecond decrease' implementation
+      SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - Time::FromInteger (1, Time::US) );
     }
 
   Simulator::Schedule (txDuration, &SatGwMac::TransmitTime, this, 0);

@@ -333,6 +333,11 @@ private:
    double m_frameConfTargetDuration;
 
    /**
+    *  The number of the frames in super frame.
+    */
+   uint32_t m_frameCount;
+
+   /**
     * The configured allocated carrier bandwidth for static configurations.
     */
    double m_frameConfAllocatedBandwidth;
