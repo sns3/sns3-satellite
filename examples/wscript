@@ -19,7 +19,7 @@ def build(bld):
     obj = bld.create_ns3_program('larger-scenario-p2p', ['satellite', 'netanim', 'flow-monitor'])
     obj.source = 'larger-scenario-p2p.cc'
 
-    obj = bld.create_ns3_program('sat-link-results-plot', ['satellite', 'tools'])
+    obj = bld.create_ns3_program('sat-link-results-plot', ['satellite'])
     obj.source = 'sat-link-results-plot.cc'
     
     obj = bld.create_ns3_program('sat-markov-logic-example', ['satellite'])
