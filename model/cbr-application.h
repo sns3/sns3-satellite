@@ -49,7 +49,7 @@ public:
 
   /**
   * \brief returns the number of sent bytes
-  * \return the number of received bytes
+  * \return the number of sent bytes
   */
   uint32_t GetSent (void) const;
 

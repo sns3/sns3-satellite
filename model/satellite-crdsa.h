@@ -17,8 +17,8 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#ifndef SATELLITE_SLOTTED_ALOHA_H
-#define SATELLITE_SLOTTED_ALOHA_H
+#ifndef SATELLITE_CRDSA_H
+#define SATELLITE_CRDSA_H
 
 #include "ns3/object.h"
 #include "ns3/uinteger.h"
@@ -26,31 +26,32 @@
 #include "ns3/simulator.h"
 #include "satellite-random-access-container-conf.h"
 #include "ns3/random-variable-stream.h"
+#include <set>
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
  *
- * \brief Class for slotted aloha
+ * \brief Class for CRDSA
  */
-class SatSlottedAloha : public Object
+class SatCrdsa : public Object
 {
 public:
   /**
    * \brief Constructor
    */
-  SatSlottedAloha ();
+  SatCrdsa ();
 
   /**
    * \brief Constructor
    */
-  SatSlottedAloha (Ptr<SatRandomAccessConf> randomAccessConf);
+  SatCrdsa (Ptr<SatRandomAccessConf> randomAccessConf);
 
   /**
    * \brief Destructor
    */
-  virtual ~SatSlottedAloha ();
+  virtual ~SatCrdsa ();
 
   /**
    * \brief NS-3 type id function
@@ -62,16 +63,80 @@ public:
    *
    * \return
    */
-  double DoSlottedAloha ();
+  std::set<uint32_t> DoCrdsa ();
 
   /**
    *
    * \param min
    * \param max
+   * \param setSize
    */
-  void UpdateVariables (double min, double max);
+  void UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t setSize);
+
+  /**
+   *
+   * \param backoffProbability
+   */
+  void SetBackoffProbability (double backoffProbability);
+
+  /**
+   *
+   * \param backoffPeriodLength
+   */
+  void SetBackoffPeriodLength (double backoffPeriodLength);
 
 private:
+
+  /**
+   *
+   * \return
+   */
+  std::set<uint32_t> RandomizeTxOpportunities ();
+
+  /**
+   *
+   * \return
+   */
+  std::set<uint32_t> PrepareToTransmit ();
+
+  /**
+   *
+   * \return
+   */
+  bool IsDamaAvailable ();
+
+  /**
+   *
+   * \return
+   */
+  bool IsBackoffPeriodOver ();
+
+  /**
+   *
+   * \return
+   */
+  bool DoBackoff ();
+
+  /**
+   *
+   * \return
+   */
+  bool AreBuffersEmpty ();
+
+  /**
+   *
+   */
+  void UpdateMaximumRateLimitationParameters ();
+
+  /**
+   *
+   */
+  void CheckMaximumRateLimitations ();
+
+  /**
+   *
+   */
+  void SetBackoffTimer ();
 
   /**
    *
@@ -85,15 +150,8 @@ private:
 
   /**
    *
-   * \return
    */
-  bool IsDamaAvailable ();
-
-  /**
-    *
-    * \return
-    */
-  double RandomizeReleaseTime ();
+  void PrintVariables ();
 
   /**
    *
@@ -108,15 +166,39 @@ private:
   /**
    *
    */
-  double m_min;
+  uint32_t m_min;
 
   /**
    *
    */
-  double m_max;
+  uint32_t m_max;
 
+  /**
+   *
+   */
+  uint32_t m_setSize;
+
+  /**
+   *
+   */
+  bool m_newData;
+
+  /**
+   *
+   */
+  double m_backoffReleaseTime;
+
+  /**
+   *
+   */
+  double m_backoffPeriodLength;
+
+  /**
+   *
+   */
+  double m_backoffProbability;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_SLOTTED_ALOHA_H */
+#endif /* SATELLITE_CRDSA_H */

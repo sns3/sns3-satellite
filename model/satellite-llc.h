@@ -87,9 +87,10 @@ public:
     *
     * \param packet packet sent from above down to SatMac
     * \param dest Destination MAC address of the packet
+    * \param tos Type-of-Service of the IPv4 header
     * \return whether the Send operation succeeded
     */
-  virtual bool Enque(Ptr<Packet> packet, Address dest);
+  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t tos);
 
   /**
     *  Called from lower layer (MAC) to inform a tx

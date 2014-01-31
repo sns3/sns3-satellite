@@ -44,7 +44,7 @@ main (int argc, char *argv[])
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
-  /// read command line parameters given by user
+  /// Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
@@ -52,7 +52,7 @@ main (int argc, char *argv[])
   cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
-  /// enable fading input trace
+  /// Enable fading input trace
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_TRACE));
 
   Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
@@ -66,16 +66,16 @@ main (int argc, char *argv[])
       satScenario = SatHelper::FULL;
     }
 
-  /// enable info logs
+  /// Enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   LogComponentEnable ("sat-trace-input-fading-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatInputFileStreamTimeDoubleContainer", LOG_LEVEL_INFO);
 
-  /// remove next line from comments to run real time simulation
+  /// Remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
-  /// create satellite helper with given scenario default=simple
+  /// Create satellite helper with given scenario default=simple
 
   /// Create reference system, two options:
   /// - "Scenario72"
@@ -92,13 +92,13 @@ main (int argc, char *argv[])
 
   helper->CreateScenario(satScenario);
 
-  /// get users
+  /// Get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
 
   uint16_t port = 9;
 
-  /// create application on GW user
+  /// Create application on GW user
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
   cbrHelper.SetAttribute("Interval", StringValue (interval));
@@ -112,7 +112,7 @@ main (int argc, char *argv[])
   gwCbr.Start (Seconds (3.0));
   gwCbr.Stop (Seconds (5.1));
 
-  /// create application on UT user
+  /// Create application on UT user
   sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
   cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
 

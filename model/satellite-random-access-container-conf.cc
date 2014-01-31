@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -33,7 +33,14 @@ SatRandomAccessConf::GetTypeId (void)
   return tid;
 }
 
-SatRandomAccessConf::SatRandomAccessConf ()
+SatRandomAccessConf::SatRandomAccessConf () :
+  m_slottedAlohaMin (0.5),
+  m_slottedAlohaMax (2.0),
+  m_crdsaMin (1),
+  m_crdsaMax (160),
+  m_crdsaSetSize (3),
+  m_crdsaBackoffPeriodLength (0.5),
+  m_crdsaBackoffPeriodProbability (0.2)
 {
   NS_LOG_FUNCTION (this);
 }

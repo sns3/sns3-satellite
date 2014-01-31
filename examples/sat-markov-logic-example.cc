@@ -42,24 +42,24 @@ static void SetVelocity (double velocity)
 int
 main (int argc, char *argv[])
 {
-  /// enable info logs
+  /// Enable info logs
   LogComponentEnable ("sat-markov-logic-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovContainer", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovModel", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovConf", LOG_LEVEL_INFO);
 
-  /// create default Markov & Loo configurations
+  /// Create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 
   SatBaseFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
   SatBaseFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
 
-  /// create fading container based on default configuration
+  /// Create fading container based on default configuration
   Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
 
   Address macAddress;
 
-  /// run simulation
+  /// Run simulation
   Simulator::Schedule (Time ("5ms"), &SetVelocity, 0);
   Simulator::Schedule (Time ("10ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
   Simulator::Schedule (Time ("30ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);

@@ -293,7 +293,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
   // add beam to NCC
-  m_ncc->AddBeam (beamId, MakeCallback (&NetDevice::Send, gwNd), m_superframeSeq );
+  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControl, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq );
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,

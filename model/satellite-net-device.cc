@@ -280,7 +280,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
-  m_llc->Enque (packet, dest);
+  Classify (packet, dest, protocolNumber);
 
   return true;
 }
@@ -302,9 +302,42 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
-  m_llc->Enque (packet, dest);
+  Classify (packet, dest, protocolNumber);
 
   return true;
+}
+
+bool
+SatNetDevice::SendControl (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+{
+  NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  // ToS 0 = control
+  m_llc->Enque (packet, dest, 0);
+
+  return true;
+}
+
+void
+SatNetDevice::Classify (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+{
+  Ipv4Header ipv4Header;
+  packet->PeekHeader (ipv4Header);
+
+  m_llc->Enque (packet, dest, ipv4Header.GetTos ());
 }
 
 Ptr<Node> 

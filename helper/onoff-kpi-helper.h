@@ -19,13 +19,12 @@
  *
  */
 
-#ifndef CBR_KPI_HELPER_H
-#define CBR_KPI_HELPER_H
+#ifndef ONOFF_KPI_HELPER_H
+#define ONOFF_KPI_HELPER_H
 
 #include "kpi-helper.h"
 #include "ns3/ptr.h"
 #include "ns3/application-container.h"
-#include "ns3/cbr-application.h"
 
 
 namespace ns3 {
@@ -42,31 +41,29 @@ namespace ns3 {
  * KpiHelper is not used by itself, but actual used KpiHelper is inherited from it,
  * so that it implements proper trace callback set functions to the actual applications.
  *
- * CbrKpiHelper implements the KpiHelper functionality related to CbrApplication.
+ * OnOffKpiHelper implements the KpiHelper functionality related to OnOffApplication.
  */
-class CbrKpiHelper : public KpiHelper
+class OnOffKpiHelper : public KpiHelper
 {
 public:
 
-  CbrKpiHelper (KpiHelper::KpiMode_t mode);
-  virtual ~CbrKpiHelper ();
+  OnOffKpiHelper (KpiHelper::KpiMode_t mode);
+  virtual ~OnOffKpiHelper ();
 
   /**
    * Add sender applications
    * \param apps ApplicationContainer
    */
   virtual void AddSender (ApplicationContainer apps);
-
   /**
    * Add sender application
-   * \param application
+   * \param app Ptr to an application
    */
   virtual void AddSender (Ptr<Application> app);
 
 };
 
-
 } // end of `namespace ns3`
 
 
-#endif /* CBR_KPI_HELPER_H */
+#endif /* ONOFF_KPI_HELPER_H */

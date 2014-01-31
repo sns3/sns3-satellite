@@ -6,6 +6,12 @@ def build(bld):
     
     obj = bld.create_ns3_program('sat-cbr-larger-example', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-cbr-larger-example.cc'
+
+    obj = bld.create_ns3_program('sat-multi-application-rtn-example', ['satellite', 'traffic'])
+    obj.source = 'sat-multi-application-rtn-example.cc'
+    
+    obj = bld.create_ns3_program('sat-multi-application-fwd-example', ['satellite', 'traffic'])
+    obj.source = 'sat-multi-application-fwd-example.cc'
     
     obj = bld.create_ns3_program('simple-scenario-p2p', ['satellite', 'netanim', 'flow-monitor'])
     obj.source = 'simple-scenario-p2p.cc'
@@ -60,3 +66,13 @@ def build(bld):
 
     obj = bld.create_ns3_program('sat-multicast-example', ['satellite'])
     obj.source = 'sat-multicast-example.cc'
+
+    obj = bld.create_ns3_program('sat-slotted-aloha-example', ['satellite'])
+    obj.source = 'sat-slotted-aloha-example.cc'
+
+    obj = bld.create_ns3_program('sat-crdsa-example', ['satellite'])
+    obj.source = 'sat-crdsa-example.cc'
+
+    obj = bld.create_ns3_program('sat-random-access-example', ['satellite'])
+    obj.source = 'sat-random-access-example.cc'
+    
