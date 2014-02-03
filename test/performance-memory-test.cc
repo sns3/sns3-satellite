@@ -110,7 +110,7 @@ Pm1::DoRun (void)
 
   uint16_t port = 9; // Discard port (RFC 863)
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
-  cbr.SetAttribute ("Interval", StringValue ("1s"));
+  cbr.SetAttribute ("Interval", StringValue ("0.8s"));
 
   // Create a packet sink to receive packet and a Cbr to sent packet in UT
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
