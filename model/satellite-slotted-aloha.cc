@@ -36,8 +36,8 @@ SatSlottedAloha::GetTypeId (void)
 SatSlottedAloha::SatSlottedAloha () :
   m_randomAccessConf (),
   m_uniformVariable (),
-  m_min (0.0),
-  m_max (0.0)
+  m_slottedAlohaMinRandomizationValue (0.0),
+  m_slottedAlohaMaxRandomizationValue (0.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -47,8 +47,8 @@ SatSlottedAloha::SatSlottedAloha () :
 SatSlottedAloha::SatSlottedAloha (Ptr<SatRandomAccessConf> randomAccessConf) :
   m_randomAccessConf (randomAccessConf),
   m_uniformVariable (),
-  m_min (randomAccessConf->GetSlottedAlohaDefaultMin ()),
-  m_max (randomAccessConf->GetSlottedAlohaDefaultMax ())
+  m_slottedAlohaMinRandomizationValue (randomAccessConf->GetSlottedAlohaDefaultMinRandomizationValue ()),
+  m_slottedAlohaMaxRandomizationValue (randomAccessConf->GetSlottedAlohaDefaultMaxRandomizationValue ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -69,12 +69,12 @@ SatSlottedAloha::DoVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_min < 0 || m_max < 0)
+  if (m_slottedAlohaMinRandomizationValue < 0 || m_slottedAlohaMaxRandomizationValue < 0)
     {
       NS_FATAL_ERROR ("SatSlottedAloha::DoVariableSanityCheck - min < 0 || max < 0");
     }
 
-  if (m_min > m_max)
+  if (m_slottedAlohaMinRandomizationValue > m_slottedAlohaMaxRandomizationValue)
     {
       NS_FATAL_ERROR ("SatSlottedAloha::DoVariableSanityCheck - min > max");
     }
@@ -87,8 +87,8 @@ SatSlottedAloha::UpdateVariables (double min, double max)
 {
   NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max);
 
-  m_min = min;
-  m_max = max;
+  m_slottedAlohaMinRandomizationValue = min;
+  m_slottedAlohaMaxRandomizationValue = max;
 
   DoVariableSanityCheck ();
 
@@ -136,7 +136,7 @@ SatSlottedAloha::RandomizeReleaseTime ()
 
   NS_LOG_INFO ("SatSlottedAloha::RandomizeReleaseTime - Randomizing the release time...");
 
-  double releaseTime = Now ().GetSeconds () + m_uniformVariable->GetValue (m_min, m_max);
+  double releaseTime = Now ().GetSeconds () + m_uniformVariable->GetValue (m_slottedAlohaMinRandomizationValue, m_slottedAlohaMaxRandomizationValue);
 
   NS_LOG_INFO ("SatSlottedAloha::RandomizeReleaseTime - TX opportunity in the next slot after the release time at: " << releaseTime << " seconds");
 

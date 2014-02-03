@@ -55,80 +55,110 @@ public:
    *
    * \return
    */
-  double GetSlottedAlohaDefaultMin () { return m_slottedAlohaMin; }
+  double GetSlottedAlohaDefaultMinRandomizationValue () { return m_slottedAlohaMinRandomizationValue; }
 
   /**
    *
    * \return
    */
-  double GetSlottedAlohaDefaultMax () { return m_slottedAlohaMax; }
+  double GetSlottedAlohaDefaultMaxRandomizationValue () { return m_slottedAlohaMaxRandomizationValue; }
 
   /**
    *
    * \return
    */
-  uint32_t GetCrdsaDefaultMin () { return m_crdsaMin; }
+  uint32_t GetCrdsaDefaultMinRandomizationValue () { return m_crdsaMinRandomizationValue; }
 
   /**
    *
    * \return
    */
-  uint32_t GetCrdsaDefaultMax () { return m_crdsaMax; }
+  uint32_t GetCrdsaDefaultMaxRandomizationValue () { return m_crdsaMaxRandomizationValue; }
 
   /**
    *
    * \return
    */
-  uint32_t GetCrdsaDefaultSetSize () { return m_crdsaSetSize; }
+  uint32_t GetCrdsaDefaultNumOfInstances () { return m_crdsaNumOfInstances; }
 
   /**
    *
    * \return
    */
-  double GetCrdsaDefaultBackoffPeriodLength () { return m_crdsaBackoffPeriodLength; }
+  double GetCrdsaDefaultBackoffTime () { return m_crdsaBackoffTime; }
 
   /**
    *
    * \return
    */
-  double GetCrdsaDefaultBackoffPeriodProbability () { return m_crdsaBackoffPeriodProbability; }
+  double GetCrdsaDefaultBackoffProbability () { return m_crdsaBackoffProbability; }
+
+  /**
+   *
+   */
+  uint32_t GetCrdsaMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
+
+  /**
+   *
+   */
+  uint32_t GetCrdsaMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
+
+  /**
+   *
+   */
+  uint32_t GetCrdsaMinIdleBlocks () { return m_crdsaMinIdleBlocks; }
 
 private:
 
   /**
    *
    */
-  double m_slottedAlohaMin;
+  double m_slottedAlohaMinRandomizationValue;
 
   /**
    *
    */
-  double m_slottedAlohaMax;
+  double m_slottedAlohaMaxRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_crdsaMin;
+  uint32_t m_crdsaMinRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_crdsaMax;
+  uint32_t m_crdsaMaxRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_crdsaSetSize;
+  uint32_t m_crdsaNumOfInstances;
 
   /**
    *
    */
-  double m_crdsaBackoffPeriodLength;
+  uint32_t m_crdsaBackoffTime;
 
   /**
    *
    */
-  double m_crdsaBackoffPeriodProbability;
+  double m_crdsaBackoffProbability;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaMaxUniquePayloadPerBlock;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaMaxConsecutiveBlocksAccessed;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaMinIdleBlocks;
 };
 
 } // namespace ns3

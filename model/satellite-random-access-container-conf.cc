@@ -18,6 +18,8 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 #include "satellite-random-access-container-conf.h"
+#include "ns3/uinteger.h"
+#include "ns3/double.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatRandomAccessConf");
 
@@ -29,18 +31,72 @@ TypeId
 SatRandomAccessConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccessConf")
-    .SetParent<Object> ();
+    .SetParent<Object> ()
+    .AddAttribute ("SlottedAlohaMinRandomizationValue",
+                   "Slotted ALOHA randomization minimum value",
+                   DoubleValue (0.5),
+                   MakeDoubleAccessor (&SatRandomAccessConf::m_slottedAlohaMinRandomizationValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("SlottedAlohaMaxRandomizationValue",
+                   "Slotted ALOHA randomization maximum value",
+                   DoubleValue (2.0),
+                   MakeDoubleAccessor (&SatRandomAccessConf::m_slottedAlohaMaxRandomizationValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("CrdsaMinRandomizationValue",
+                   "CRDSA randomization minimum value",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMinRandomizationValue),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("CrdsaMaxRandomizationValue",
+                   "CRDSA randomization maximum value",
+                   UintegerValue (160),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxRandomizationValue),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("CrdsaNumOfInstances",
+                   "Number of instances within the block for CRDSA",
+                   UintegerValue (3),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaNumOfInstances),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("CrdsaBackoffTime",
+                   "CRDSA backoff time",
+                   UintegerValue (100),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaBackoffTime),
+                   MakeUintegerChecker<int32_t> ())
+    .AddAttribute ("CrdsaBackoffProbability",
+                   "CRDSA backoff probability",
+                   DoubleValue (0.2),
+                   MakeDoubleAccessor (&SatRandomAccessConf::m_crdsaBackoffProbability),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("CrdsaMaxUniquePayloadPerBlock",
+                   "CRDSA maximum unique payloads per block",
+                   UintegerValue (3),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxUniquePayloadPerBlock),
+                   MakeUintegerChecker<int32_t> ())
+    .AddAttribute ("CrdsaMaxConsecutiveBlocksAccessed",
+                   "CRDSA maximum consecutive blocks accessed",
+                   UintegerValue (6),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxConsecutiveBlocksAccessed),
+                   MakeUintegerChecker<int32_t> ())
+    .AddAttribute ("CrdsaMinIdleBlocks",
+                   "CRDSA minimum idle blocks",
+                   UintegerValue (2),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMinIdleBlocks),
+                   MakeUintegerChecker<int32_t> ())
+    ;
   return tid;
 }
 
 SatRandomAccessConf::SatRandomAccessConf () :
-  m_slottedAlohaMin (0.5),
-  m_slottedAlohaMax (2.0),
-  m_crdsaMin (1),
-  m_crdsaMax (160),
-  m_crdsaSetSize (3),
-  m_crdsaBackoffPeriodLength (0.5),
-  m_crdsaBackoffPeriodProbability (0.2)
+  m_slottedAlohaMinRandomizationValue (0.5),
+  m_slottedAlohaMaxRandomizationValue (2.0),
+  m_crdsaMinRandomizationValue (1),
+  m_crdsaMaxRandomizationValue (160),
+  m_crdsaNumOfInstances (3),
+  m_crdsaBackoffTime (100),
+  m_crdsaBackoffProbability (0.2),
+  m_crdsaMaxUniquePayloadPerBlock (3),
+  m_crdsaMaxConsecutiveBlocksAccessed (6),
+  m_crdsaMinIdleBlocks (2)
 {
   NS_LOG_FUNCTION (this);
 }

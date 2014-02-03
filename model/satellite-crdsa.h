@@ -71,7 +71,7 @@ public:
    * \param max
    * \param setSize
    */
-  void UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t setSize);
+  void UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances);
 
   /**
    *
@@ -81,9 +81,9 @@ public:
 
   /**
    *
-   * \param backoffPeriodLength
+   * \param backoffTime
    */
-  void SetBackoffPeriodLength (double backoffPeriodLength);
+  void SetBackoffTime (double backoffTime);
 
 private:
 
@@ -109,7 +109,7 @@ private:
    *
    * \return
    */
-  bool IsBackoffPeriodOver ();
+  bool HasBackoffTimePassed ();
 
   /**
    *
@@ -166,17 +166,17 @@ private:
   /**
    *
    */
-  uint32_t m_min;
+  uint32_t m_crdsaMinRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_max;
+  uint32_t m_crdsaMaxRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_setSize;
+  uint32_t m_crdsaNumOfInstances;
 
   /**
    *
@@ -186,17 +186,17 @@ private:
   /**
    *
    */
-  double m_backoffReleaseTime;
+  double m_crdsaBackoffReleaseTime;
 
   /**
    *
    */
-  double m_backoffPeriodLength;
+  double m_crdsaBackoffTime;
 
   /**
    *
    */
-  double m_backoffProbability;
+  double m_crdsaBackoffProbability;
 };
 
 } // namespace ns3

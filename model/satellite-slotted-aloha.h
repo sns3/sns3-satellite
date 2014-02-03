@@ -108,12 +108,12 @@ private:
   /**
    *
    */
-  double m_min;
+  double m_slottedAlohaMinRandomizationValue;
 
   /**
    *
    */
-  double m_max;
+  double m_slottedAlohaMaxRandomizationValue;
 
 };
 

@@ -36,13 +36,13 @@ SatCrdsa::GetTypeId (void)
 SatCrdsa::SatCrdsa () :
   m_randomAccessConf (),
   m_uniformVariable (),
-  m_min (0.0),
-  m_max (0.0),
-  m_setSize (0),
+  m_crdsaMinRandomizationValue (0.0),
+  m_crdsaMaxRandomizationValue (0.0),
+  m_crdsaNumOfInstances (0),
   m_newData (true),
-  m_backoffReleaseTime (0.0),
-  m_backoffPeriodLength (0.0),
-  m_backoffProbability (0.0)
+  m_crdsaBackoffReleaseTime (0.0),
+  m_crdsaBackoffTime (0.0),
+  m_crdsaBackoffProbability (0.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -52,13 +52,13 @@ SatCrdsa::SatCrdsa () :
 SatCrdsa::SatCrdsa (Ptr<SatRandomAccessConf> randomAccessConf) :
   m_randomAccessConf (randomAccessConf),
   m_uniformVariable (),
-  m_min (randomAccessConf->GetCrdsaDefaultMin ()),
-  m_max (randomAccessConf->GetCrdsaDefaultMax ()),
-  m_setSize (randomAccessConf->GetCrdsaDefaultSetSize ()),
+  m_crdsaMinRandomizationValue (randomAccessConf->GetCrdsaDefaultMinRandomizationValue ()),
+  m_crdsaMaxRandomizationValue (randomAccessConf->GetCrdsaDefaultMaxRandomizationValue ()),
+  m_crdsaNumOfInstances (randomAccessConf->GetCrdsaDefaultNumOfInstances ()),
   m_newData (true),
-  m_backoffReleaseTime (Now ().GetSeconds ()),
-  m_backoffPeriodLength (randomAccessConf->GetCrdsaDefaultBackoffPeriodLength ()),
-  m_backoffProbability (randomAccessConf->GetCrdsaDefaultBackoffPeriodProbability ())
+  m_crdsaBackoffReleaseTime (Now ().GetSeconds ()),
+  m_crdsaBackoffTime (randomAccessConf->GetCrdsaDefaultBackoffTime ()),
+  m_crdsaBackoffProbability (randomAccessConf->GetCrdsaDefaultBackoffProbability ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -79,70 +79,70 @@ SatCrdsa::DoVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_min < 0 || m_max < 0)
+  if (m_crdsaMinRandomizationValue < 0 || m_crdsaMaxRandomizationValue < 0)
     {
       NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - min < 0 || max < 0");
     }
 
-  if (m_min > m_max)
+  if (m_crdsaMinRandomizationValue > m_crdsaMaxRandomizationValue)
     {
       NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - min > max");
     }
 
-  if ( m_setSize < 1)
+  if ( m_crdsaNumOfInstances < 1)
     {
-      NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - set size < 1");
+      NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - instances < 1");
     }
 
-  if ( (m_max - m_min) < m_setSize)
+  if ( (m_crdsaMaxRandomizationValue - m_crdsaMinRandomizationValue) < m_crdsaNumOfInstances)
     {
-      NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - (max - min) < set size");
+      NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - (max - min) < instances");
     }
 
   NS_LOG_INFO ("SatCrdsa::DoVariableSanityCheck - Variable sanity check done");
 }
 
 void
-SatCrdsa::UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t setSize)
+SatCrdsa::UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances)
 {
-  NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max << " new set size: " << setSize);
+  NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max << " num of replicas: " << numOfInstances);
 
-  m_min = min;
-  m_max = max;
-  m_setSize = setSize;
+  m_crdsaMinRandomizationValue = min;
+  m_crdsaMaxRandomizationValue = max;
+  m_crdsaNumOfInstances = numOfInstances;
 
   DoVariableSanityCheck ();
 
-  NS_LOG_INFO ("SatCrdsa::UpdateVariables - new min: " << min << " new max: " << max << " new set size: " << setSize);
+  NS_LOG_INFO ("SatCrdsa::UpdateVariables - new min: " << min << " new max: " << max << " num of replicas: " << numOfInstances);
 }
 
 void
 SatCrdsa::SetBackoffProbability (double backoffProbability)
 {
-  m_backoffProbability = backoffProbability;
+  m_crdsaBackoffProbability = backoffProbability;
 }
 
 void
-SatCrdsa::SetBackoffPeriodLength (double backoffPeriodLength)
+SatCrdsa::SetBackoffTime (double backoffTime)
 {
-  m_backoffPeriodLength = backoffPeriodLength;
+  m_crdsaBackoffTime = backoffTime;
 }
 
 bool
-SatCrdsa::IsBackoffPeriodOver ()
+SatCrdsa::HasBackoffTimePassed ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool isBackoffPeriodOver = false;
+  bool hasBackoffTimePassed = false;
 
-  if (Now ().GetSeconds () >= m_backoffReleaseTime)
+  if (Now ().GetSeconds () >= m_crdsaBackoffReleaseTime)
     {
-      isBackoffPeriodOver = true;
+      hasBackoffTimePassed = true;
     }
 
-  NS_LOG_INFO ("SatCrdsa::IsBackoffPeriodOver: " << isBackoffPeriodOver);
+  NS_LOG_INFO ("SatCrdsa::HasBackoffTimePassed: " << hasBackoffTimePassed);
 
-  return isBackoffPeriodOver;
+  return hasBackoffTimePassed;
 }
 
 bool
@@ -152,7 +152,7 @@ SatCrdsa::DoBackoff ()
 
   bool doBackoff = false;
 
-  if (m_uniformVariable->GetValue (0.0,1.0) < m_backoffProbability)
+  if (m_uniformVariable->GetValue (0.0,1.0) < m_crdsaBackoffProbability)
     {
       doBackoff = true;
     }
@@ -211,7 +211,7 @@ SatCrdsa::SetBackoffTimer ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_backoffReleaseTime = Now ().GetSeconds () + m_backoffPeriodLength;
+  m_crdsaBackoffReleaseTime = Now ().GetSeconds () + m_crdsaBackoffTime;
 
   NS_LOG_INFO ("SatCrdsa::SetBackoffTimer - Setting backoff timer");
 }
@@ -252,7 +252,7 @@ SatCrdsa::DoCrdsa ()
 
   NS_LOG_INFO ("SatCrdsa::DoCrdsa - Checking backoff period status...");
 
-  if (IsBackoffPeriodOver ())
+  if (HasBackoffTimePassed ())
     {
       NS_LOG_INFO ("SatCrdsa::DoCrdsa - Backoff period over, checking DAMA status...");
 
@@ -298,9 +298,9 @@ SatCrdsa::RandomizeTxOpportunities ()
 
   NS_LOG_INFO ("SatCrdsa::DoCrdsa - Randomizing TX opportunities");
 
-  while (txOpportunities.size () < m_setSize)
+  while (txOpportunities.size () < m_crdsaNumOfInstances)
     {
-      uint32_t slot = m_uniformVariable->GetInteger (m_min, m_max);
+      uint32_t slot = m_uniformVariable->GetInteger (m_crdsaMinRandomizationValue, m_crdsaMaxRandomizationValue);
 
       result = txOpportunities.insert (slot);
 
@@ -316,12 +316,12 @@ void
 SatCrdsa::PrintVariables ()
 {
   NS_LOG_INFO ("Simulation time: " << Now ().GetSeconds () << " seconds");
-  NS_LOG_INFO ("Backoff period release time: " << m_backoffReleaseTime << " seconds");
-  NS_LOG_INFO ("Backoff period length: " << m_backoffPeriodLength << " seconds");
-  NS_LOG_INFO ("Backoff probability: " << m_backoffProbability * 100 << " %");
+  NS_LOG_INFO ("Backoff period release time: " << m_crdsaBackoffReleaseTime << " seconds");
+  NS_LOG_INFO ("Backoff period length: " << m_crdsaBackoffTime << " seconds");
+  NS_LOG_INFO ("Backoff probability: " << m_crdsaBackoffProbability * 100 << " %");
   NS_LOG_INFO ("New data status: " << m_newData);
-  NS_LOG_INFO ("Slot randomization range: " << m_min << " to " << m_max);
-  NS_LOG_INFO ("Number of randomized TX opportunities: " << m_setSize);
+  NS_LOG_INFO ("Slot randomization range: " << m_crdsaMinRandomizationValue << " to " << m_crdsaMaxRandomizationValue);
+  NS_LOG_INFO ("Number of instances: " << m_crdsaNumOfInstances);
 }
 
 } // namespace ns3
