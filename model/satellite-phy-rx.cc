@@ -160,25 +160,25 @@ SatPhyRx::GetLosses ()
   return m_antennaLoss;
 }
 
-void
-SatPhyRx::SetAddress (Mac48Address ownAddress)
+Mac48Address
+SatPhyRx::GetAddress () const
 {
-  NS_ASSERT (!m_rxCarriers.empty ());
+  return m_macAddress;
+}
 
-  m_macAddress = ownAddress;
+void
+SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
+{
+  NS_ASSERT (nodeInfo);
+
+  m_macAddress = nodeInfo->GetMacAddress ();
 
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
         it != m_rxCarriers.end();
         ++it)
     {
-      (*it)->SetAddress(ownAddress);
+      (*it)->SetNodeInfo(nodeInfo);
     }
-}
-
-Mac48Address
-SatPhyRx::GetAddress () const
-{
-  return m_macAddress;
 }
 
 void

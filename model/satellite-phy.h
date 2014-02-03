@@ -324,10 +324,10 @@ public:
   void CnoInfo (uint32_t beamId, Address source, Address destination, double cno);
 
   /**
-   * Set the node info
-   * \param nodeInfo containing node specific information
+   * \brief Set the node info class
+   * \param nodeInfo Node information related to this SatPhy
    */
-  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
+  void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
 protected:
 

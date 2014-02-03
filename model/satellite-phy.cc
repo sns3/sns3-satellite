@@ -204,11 +204,11 @@ SatPhy::SetTxFadingContainer (Ptr<SatBaseFading> fadingContainer)
 }
 
 void
-SatPhy::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
+SatPhy::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 {
   NS_LOG_FUNCTION (this << nodeInfo);
   m_nodeInfo = nodeInfo;
-  m_phyRx->SetAddress (m_nodeInfo->GetMacAddress ());
+  m_phyRx->SetNodeInfo (nodeInfo);
 }
 
 Ptr<SatPhyTx>

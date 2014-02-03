@@ -487,11 +487,12 @@ SatPhyRxCarrier::SetBeamId (uint32_t beamId)
 }
 
 void
-SatPhyRxCarrier::SetAddress (Mac48Address ownAddress)
+SatPhyRxCarrier::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_LOG_FUNCTION (this << ownAddress);
+  NS_LOG_FUNCTION (this << nodeInfo);
 
-  m_ownAddress = ownAddress;
+  m_ownAddress = nodeInfo->GetMacAddress ();
+  m_nodeInfo = nodeInfo;
 }
 
 double

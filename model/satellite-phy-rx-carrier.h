@@ -88,10 +88,10 @@ public:
   void SetBeamId (uint32_t beamId);
 
   /**
-   * \brief Set the own device MAC address
-   * \param ownAddress address of the device owning this object
+   * \brief Set the node info class
+   * \param nodeInfo Node information related to this SatPhyRxCarrier
    */
-  void SetAddress (Mac48Address ownAddress);
+  void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
   /**
    * \brief Start packet reception from the SatChannel
@@ -303,7 +303,13 @@ private:
   /**
    * \brief A random variable for packet reception
    */
-    Ptr<UniformRandomVariable> m_uniformVariable;
+  Ptr<UniformRandomVariable> m_uniformVariable;
+
+  /**
+   * \brief A node info class containing node related
+   * information, such as node id and address.
+   */
+  Ptr<SatNodeInfo> m_nodeInfo;
 };
 
 }

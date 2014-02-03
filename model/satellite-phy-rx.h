@@ -162,17 +162,17 @@ public:
    */
   void SetCnoCallback (SatPhyRx::CnoCallback cb);
 
-  /**
-   * Set the device address owning this object
-   * \param ownAddress address of the device owning this object
-   */
-   void SetAddress (Mac48Address ownAddress);
-
    /**
     * \brief Get MAC address of this PHY/MAC
     * \return Mac48Address MAC address of this PHY
     */
    Mac48Address GetAddress () const;
+
+   /**
+    * \brief Set the node info class
+    * \param nodeInfo Node information related to this SatPhyRx
+    */
+   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
 private:
 
