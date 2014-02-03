@@ -202,9 +202,7 @@ private:
   EncapContainer_t m_decaps;
 
   /**
-   * The Queue which this SatMac uses as a packet source.
-   * @see class Queue
-   * @see class DropTailQueue
+   * The Queue which this SatLlc uses as a packet source.
    */
   Ptr<Queue> m_controlQueue;
 

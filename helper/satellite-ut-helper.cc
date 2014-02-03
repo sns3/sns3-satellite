@@ -108,7 +108,7 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
 
-  m_queueFactory.SetTypeId ("ns3::DropTailQueue");
+  m_queueFactory.SetTypeId ("ns3::SatQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
