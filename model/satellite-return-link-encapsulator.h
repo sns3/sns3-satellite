@@ -147,16 +147,6 @@ private:
   uint32_t m_txBufferSize;
 
   /**
-   * Physical PDU header size
-   */
-  uint32_t m_ppduHeaderSize;
-
-  /**
-   * Frame PDU header size
-   */
-  uint32_t m_fpduHeaderSize;
-
-  /**
    * Fragment id used in the packet transmissions
    */
   uint32_t m_txFragmentId;
@@ -165,11 +155,6 @@ private:
    * Transmission buffer
    */
   std::list < Ptr<Packet> > m_txBuffer;
-
-  /**
-   * Reception buffer
-   */
-  std::list < Ptr<Packet> >  m_rxBuffer;
 
   /**
    * Current fragment id in the reassembly process
@@ -192,22 +177,27 @@ private:
   uint32_t m_currRxPacketFragmentBytes;
 
   /**
+   * Minimum Tx opportunity
+   */
+  uint32_t m_minTxOpportunity;
+
+  /**
    * The fragment is described with 3 bits, thus the
    * maximum fragment id is 8.
    */
-  static const uint32_t MAX_FRAGMENT_ID = 8;
+  const uint32_t MAX_FRAGMENT_ID;
 
   /**
    * The maximum PPDU fragment size is described with 11 bits,
    * thus, the maximum fragment size is 2048 bytes.
    */
-  static const uint32_t MAX_PPDU_PACKET_SIZE = 2048;
+  const uint32_t MAX_PPDU_PACKET_SIZE;
 
   /**
    * The maximum packet size is described with 12 bits,
    * thus, the maximum HL packet size is 4096 bytes.
    */
-  static const uint32_t MAX_HL_PDU_PACKET_SIZE = 4096;
+  const uint32_t MAX_HL_PDU_PACKET_SIZE;
 
 };
 

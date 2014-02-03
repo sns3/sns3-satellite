@@ -39,8 +39,21 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatLlc class holds the encapsulator instances, which
- * are capable of encapsulation, fragmentation and packing.
+ * \brief SatLlc class holds the UT specific SatEncapsulator instances, which are responsible
+ * of fragmentation, defragmentation, encapsulation and decapsulation. Packets are enqued by
+ * the SatNetDevice by using the Enque () method and classified to a correct encapsulator object or
+ * to a global control queue. Fragmentation is not allowed for control packets. Lower layer (MAC)
+ * requests the packets by using the NotifyTxOpportunity () method.
+ *
+ * At GW:
+ * - Encapsulators are of type SatGenericStreamEncapsulator
+ * - Decapsulators are of type SatReturnLinkEncapsulator
+ * - There are as many encapsulators and decapsulators as there are UTs within the spot-beam.
+ *
+ * At UT
+ * - Encapsulators are of type SatReturnLinkEncapsulator
+ * - Decapsulators are of type SatGenericStreamEncapsulator
+ * - There is only one encapsulator and one decapsulator
  *
  */
 class SatLlc : public Object
@@ -60,7 +73,7 @@ public:
    */
   ~SatLlc ();
 
-  typedef std::map<Mac48Address, Ptr<SatEncapsulator> > encapContainer_t;
+  typedef std::map<Mac48Address, Ptr<SatEncapsulator> > EncapContainer_t;
 
   /**
    * Receive callback used for sending packet to netdevice layer.
@@ -183,10 +196,10 @@ protected:
 private:
 
   // Map of encapsulator base pointers
-  encapContainer_t m_encaps;
+  EncapContainer_t m_encaps;
 
   // Map of decapsulator base pointers
-  encapContainer_t m_decaps;
+  EncapContainer_t m_decaps;
 
   /**
    * The Queue which this SatMac uses as a packet source.
@@ -199,51 +212,6 @@ private:
    * The upper layer package receive callback.
    */
   ReceiveCallback m_rxCallback;
-
-  /**
-   * The trace source fired when packets come into the "top" of the device
-   * at the L3/L2 transition, before being queued for transmission.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_llcTxTrace;
-
-  /**
-   * The trace source fired when packets coming into the "top" of the device
-   * at the L3/L2 transition are dropped before being queued for transmission.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_llcTxDropTrace;
-
-  /**
-   * The trace source fired for packets successfully received by the device
-   * immediately before being forwarded up to higher layers (at the L2/L3
-   * transition).  This is a non-promiscuous trace (which doesn't mean a lot
-   * here in the point-to-point device).
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_llcRxTrace;
-
-  /**
-   * The trace source fired for packets successfully received by the device
-   * but are dropped before being forwarded up to higher layers (at the L2/L3
-   * transition).
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_llcRxDropTrace;
-
-  /**
-   * The trace source fired for packets successfully received by the device
-   * immediately before being forwarded up to higher layers (at the L2/L3
-   * transition).  This is a promiscuous trace (which doesn't mean a lot here
-   * in the point-to-point device).
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_llcPromiscRxTrace;
 
 };
 

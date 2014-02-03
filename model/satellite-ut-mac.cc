@@ -64,6 +64,12 @@ SatUtMac::GetTypeId (void)
                    TimeValue (MilliSeconds (250)),
                    MakeTimeAccessor (&SatUtMac::m_crInterval),
                    MakeTimeChecker ())
+    .AddAttribute( "FramePduHeaderSize",
+                   "Frame PDU header size in bytes",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&SatUtMac::m_framePduHeaderSizeInBytes),
+                   MakeUintegerChecker<uint32_t> ())
+
   ;
 
   return tid;
@@ -197,39 +203,85 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
 {
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId);
 
+  NS_LOG_LOGIC ("Tx opportunity for UT MAC " << m_nodeInfo->GetMacAddress () << ", duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
+
   /**
    * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
    * should be passed with txOpportunity to higher layer, so that it knows which RC_index
    * (= queue) to serve.
    */
    
-   /**
-   * Notify LLC of the Tx opportunity; returns a packet.
-   * In addition, the function returns the bytes left after txOpportunity in
-   * bytesLeft reference variable.
+  NS_ASSERT (payloadBytes > m_framePduHeaderSizeInBytes);
+
+  /**
+   * The frame PDU header is taken into account as an overhead,
+   * thus the payload size of the time slot is reduced by a
+   * configured frame PDU header size.
    */
-  uint32_t bytesLeft (0);
+  uint32_t payloadLeft = payloadBytes - m_framePduHeaderSizeInBytes;
+  uint32_t bytesLeftInBuffer (0);
 
-  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), bytesLeft);
+  // Packet container to be sent to lower layers.
+  // Packet container models FPDU.
   SatPhy::PacketContainer_t packets;
-  packets.push_back (p);
 
-  if ( p )
+  /**
+   * Get new PPDUs from higher layer (LLC) until
+   * - The payload is filled to the max OR
+   * - The LLC returns NULL packet
+   */
+  while (payloadLeft > 0)
     {
-      // Add packet trace entry:
-      m_packetTrace (Simulator::Now(),
-                     SatEnums::PACKET_SENT,
-                     m_nodeInfo->GetNodeType (),
-                     m_nodeInfo->GetNodeId (),
-                     m_nodeInfo->GetMacAddress (),
-                     SatEnums::LL_MAC,
-                     SatEnums::LD_RETURN,
-                     SatUtils::GetPacketInfo (p));
+      NS_LOG_LOGIC ("Tx opportunity: payloadLeft: " << payloadLeft);
 
+      // TxOpportunity
+      Ptr<Packet> p = m_txOpportunityCallback (payloadLeft, m_nodeInfo->GetMacAddress (), bytesLeftInBuffer);
+
+      // A valid packet received
+      if ( p )
+        {
+          NS_LOG_LOGIC ("Received a PPDU of size: " << p->GetSize ());
+
+          // Add packet trace entry:
+          m_packetTrace (Simulator::Now(),
+                         SatEnums::PACKET_SENT,
+                         m_nodeInfo->GetNodeType (),
+                         m_nodeInfo->GetNodeId (),
+                         m_nodeInfo->GetMacAddress (),
+                         SatEnums::LL_MAC,
+                         SatEnums::LD_RETURN,
+                         SatUtils::GetPacketInfo (p));
+
+          packets.push_back (p);
+        }
+      // LLC returned a NULL packet, break the loop
+      else
+        {
+          break;
+        }
+
+      // Update the payloadLeft counter
+      if (payloadLeft >= p->GetSize ())
+        {
+          payloadLeft -= p->GetSize ();
+        }
+      else
+        {
+          NS_FATAL_ERROR ("The PPDU was too big for the time slot!");
+        }
+    }
+
+  NS_ASSERT (payloadLeft >= 0);
+  NS_LOG_LOGIC ("The Frame PDU holds " << packets.size () << " packets");
+  NS_LOG_LOGIC ("FPDU size:" << payloadBytes - payloadLeft);
+
+  // If there are packets to send
+  if (!packets.empty ())
+    {
       // Decrease one microsecond from time slot duration. This evaluates guard period.
-      // If more sophisticated guard period is needed, it is needed done before hand and
-      // remove this 'one microsecond decrease' implementation
-      Time duration (Time::FromDouble (durationInSecs, Time::S) - Time::FromInteger (1, Time::US));
+      // If more sophisticated guard period is needed, it is needed done before hand an
+      // remove this 'one microsecond decrease' implementation 
+      Time duration (Time::FromDouble(durationInSecs, Time::S) - Time::FromInteger (1, Time::US));
       SendPacket (packets, carrierId, duration);
     }
 }

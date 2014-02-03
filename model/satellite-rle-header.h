@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_RLE_HEADERS_H
-#define SATELLITE_RLE_HEADERS_H
+#ifndef SATELLITE_RLE_HEADER_H
+#define SATELLITE_RLE_HEADER_H
 
 
 #include <vector>
@@ -28,8 +28,9 @@
 /**
  * \ingroup satellite
  *
- * \brief SatPPduHeader (payload adapted PDU) and SatFPduHeader
- * (frame PDU) implementations.
+ * \brief Payload adapted PDU (PPDU) header implementation. PPDU header is used to
+ * encapsulate the HL packets at SatLlc/SatReturnLinkEncapsulator in RTN link (at UT) and
+ * to defragment (deconcatenate) the HL packets at GW.
  */
 namespace ns3 {
 
@@ -115,6 +116,12 @@ public:
    */
   uint32_t GetHeaderSizeInBytes (uint8_t type) const;
 
+  /**
+   * Get maximum RLE header size
+   * \return uint32_t header size
+   */
+  uint32_t GetMaxHeaderSizeInBytes () const;
+
 private:
 
   uint8_t m_startIndicator;
@@ -134,48 +141,7 @@ private:
 
 };
 
-class SatFPduHeader : public Header
-{
-public:
-
-  /**
-   * Constructor
-   */
-  SatFPduHeader ();
-  ~SatFPduHeader ();
-
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
-  virtual void Print (std::ostream &os) const;
-
-  /**
-   * Push PPDU length to header
-   * \param size PPDU length in bytes
-   */
-  void PushPPduLength (uint32_t size);
-
-  /**
-   * Get number of PPDUs inside FPDU
-   * \return uint8_t number of PPDUs
-   */
-  uint8_t GetNumPPdus () const;
-
-  /**
-   * Get PPDU length of certain index
-   * \param index PPDU index
-   * \return uint32_t PPDU length in bytes
-   */
-  uint32_t GetPPduLength (uint32_t index) const;
-
-private:
-
-  uint8_t m_numPPdus;
-  std::vector<uint32_t> m_ppduSizesInBytes;
-};
 
 }; // namespace ns3
 
-#endif // SATELLITE_RLE_HEADERS_H
+#endif // SATELLITE_RLE_HEADER_H

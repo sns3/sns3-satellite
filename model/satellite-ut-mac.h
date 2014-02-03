@@ -194,6 +194,12 @@ private:
    * Interval to send capacity requests.
    */
   Time m_crInterval;
+
+  /**
+   * Frame PDU header size in bytes. Note, that this is explicitly
+   * modeled but is assumed as overhead to the time slot payload.
+   */
+  uint32_t m_framePduHeaderSizeInBytes;
 };
 
 } // namespace ns3

@@ -51,33 +51,9 @@ SatLlc::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatLlc::m_controlQueue),
                    MakePointerChecker<Queue> ())
-    //
-    // Trace sources at the "top" of the net device, where packets transition
-    // to/from higher layers.
-    //
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatLlc::m_packetTrace))
-    .AddTraceSource ("LlcTx",
-                     "Trace source indicating a packet has arrived for transmission by this device",
-                     MakeTraceSourceAccessor (&SatLlc::m_llcTxTrace))
-    .AddTraceSource ("LlcTxDrop",
-                     "Trace source indicating a packet has been dropped by the device before transmission",
-                     MakeTraceSourceAccessor (&SatLlc::m_llcTxDropTrace))
-    .AddTraceSource ("LlcPromiscRx",
-                     "A packet has been received by this device, has been passed up from the physical layer "
-                     "and is being forwarded up the local protocol stack.  This is a promiscuous trace,",
-                     MakeTraceSourceAccessor (&SatLlc::m_llcPromiscRxTrace))
-    .AddTraceSource ("LlcRx",
-                     "A packet has been received by this device, has been passed up from the physical layer "
-                     "and is being forwarded up the local protocol stack.  This is a non-promiscuous trace,",
-                     MakeTraceSourceAccessor (&SatLlc::m_llcRxTrace))
-    #if 0
-    // Not currently implemented for this device
-    .AddTraceSource ("LlcRxDrop",
-                     "Trace source indicating a packet was dropped before being forwarded up the stack",
-                     MakeTraceSourceAccessor (&SatLlc::m_llcRxDropTrace))
-    #endif
   ;
   return tid;
 }
@@ -104,7 +80,7 @@ SatLlc::DoDispose ()
     }
   m_controlQueue = 0;
 
-  encapContainer_t::iterator it;
+  EncapContainer_t::iterator it;
 
   for ( it = m_encaps.begin(); it != m_encaps.end(); ++it)
     {
@@ -143,8 +119,6 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
-  m_llcTxTrace (packet);
-
   SatControlMsgTag cTag;
   bool cSuccess = packet->PeekPacketTag (cTag);
 
@@ -174,7 +148,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
       // UT: user own mac address
       // GW: use destination address
       Mac48Address mac = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? m_nodeInfo->GetMacAddress () : Mac48Address::ConvertFrom (dest) );
-      encapContainer_t::iterator it = m_encaps.find (mac);
+      EncapContainer_t::iterator it = m_encaps.find (mac);
 
       if (it != m_encaps.end ())
         {
@@ -212,27 +186,19 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
   // Prioritize control packets
   if (m_controlQueue->GetNPackets() )
     {
-      /**
-       * TODO: The TxOpportunity for control packets may be handled in a
-       * better way when we have FWD link scheduler in place.
-       */
       uint32_t cPacketSize = m_controlQueue->Peek ()->GetSize();
-      //if (cPacketSize <= bytes)
+
+      // If the control packet fits into the time slot
+      if (cPacketSize <= bytes)
         {
           bytesLeft = m_controlQueue->GetNBytes() - cPacketSize;
           packet = m_controlQueue->Dequeue ();
         }
-        /*
-      else
-        {
-          NS_FATAL_ERROR ("Too small TxOpportunity for the control packet at buffer head!");
-        }
-        */
     }
   // Forward the txOpportunity to a certain encapsulator
   else
     {
-      encapContainer_t::iterator it = m_encaps.find (macAddr);
+      EncapContainer_t::iterator it = m_encaps.find (macAddr);
 
       if (it != m_encaps.end ())
         {
@@ -282,7 +248,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
 
   // Receive packet with a decapsulator instance which is handling the
   // packets for this specific id
-  encapContainer_t::iterator it = m_decaps.find (macAddr);
+  EncapContainer_t::iterator it = m_decaps.find (macAddr);
 
   // Note: control messages should not be seen at the LLC layer, since
   // they are received already at the MAC layer.
@@ -300,7 +266,6 @@ void
 SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  m_llcRxTrace (packet);
 
   // Call a callback to receive the packet at upper layer
   m_rxCallback (packet);
@@ -311,7 +276,7 @@ SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc)
 {
   NS_LOG_FUNCTION (this);
 
-  encapContainer_t::iterator it = m_encaps.find (macAddr);
+  EncapContainer_t::iterator it = m_encaps.find (macAddr);
 
   if (it == m_encaps.end ())
     {
@@ -328,7 +293,7 @@ SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec)
 {
   NS_LOG_FUNCTION (this);
 
-  encapContainer_t::iterator it = m_decaps.find (macAddr);
+  EncapContainer_t::iterator it = m_decaps.find (macAddr);
 
   if (it == m_decaps.end ())
     {
@@ -369,7 +334,7 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
     }
 
   // Then the user data
-  for (encapContainer_t::const_iterator cit = m_encaps.begin ();
+  for (EncapContainer_t::const_iterator cit = m_encaps.begin ();
       cit != m_encaps.end ();
       ++cit)
     {

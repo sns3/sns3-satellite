@@ -19,7 +19,7 @@
  */
 
 #include "ns3/log.h"
-#include "satellite-rle-headers.h"
+#include "satellite-rle-header.h"
 #include "satellite-encap-pdu-status-tag.h"
 
 
@@ -243,82 +243,11 @@ uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
   return size;
 }
 
-NS_OBJECT_ENSURE_REGISTERED (SatFPduHeader);
 
-SatFPduHeader::SatFPduHeader ()
-:m_numPPdus (0)
+uint32_t SatPPduHeader::GetMaxHeaderSizeInBytes () const
 {
+  return std::max (std::max (m_startPpduHeaderSize, m_continuationPpduHeaderSize), std::max (m_endPpduHeaderSize, m_fullPpduHeaderSize));
 }
 
-SatFPduHeader::~SatFPduHeader ()
-{
-
-}
-
-TypeId
-SatFPduHeader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatFPduHeader")
-    .SetParent<Header> ()
-    .AddConstructor<SatFPduHeader> ()
-  ;
-  return tid;
-}
-
-uint32_t SatFPduHeader::GetSerializedSize (void) const
-{
-  return ( sizeof(uint8_t) + m_numPPdus * sizeof (uint32_t));
-}
-
-void SatFPduHeader::Serialize (Buffer::Iterator start) const
-{
-  start.WriteU8 (m_numPPdus);
-  for (std::vector<uint32_t>::const_iterator cit = m_ppduSizesInBytes.begin ();
-      cit != m_ppduSizesInBytes.end ();
-      ++cit)
-    {
-      start.WriteU32 (*cit);
-    }
-}
-
-uint32_t SatFPduHeader::Deserialize (Buffer::Iterator start)
-{
-  m_numPPdus = start.ReadU8 ();
-  for (uint32_t i = 0; i < m_numPPdus; ++i)
-    {
-      uint32_t s = start.ReadU32 ();
-      m_ppduSizesInBytes.push_back (s);
-    }
-
-  return GetSerializedSize();
-}
-
-void SatFPduHeader::Print (std::ostream &os) const
-{
-  os << m_numPPdus;
-}
-
-void SatFPduHeader::PushPPduLength (uint32_t size)
-{
-  m_numPPdus++;
-  m_ppduSizesInBytes.push_back (size);
-}
-
-TypeId
-SatFPduHeader::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
-uint8_t SatFPduHeader::GetNumPPdus () const
-{
-  return m_numPPdus;
-}
-
-uint32_t SatFPduHeader::GetPPduLength (uint32_t index) const
-{
-  NS_ASSERT(index < m_numPPdus);
-  return m_ppduSizesInBytes[index];
-}
 
 }; // namespace ns3
