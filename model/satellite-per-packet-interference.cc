@@ -115,7 +115,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
   // if no changes in future, first power should be zero
   if ( m_changes.size() == 0 )
     {
-      if ( ( m_firstPowerW != 0 ) && std::abs (m_firstPowerW) < std::numeric_limits<long double>::epsilon () )
+      if ( ( m_firstPowerW != 0 ) && std::fabs (m_firstPowerW) < std::numeric_limits<long double>::epsilon () )
         {
           // if we end up here,
           // reset first power (this probably due to roundin problem with very small values)

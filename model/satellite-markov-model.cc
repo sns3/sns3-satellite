@@ -125,7 +125,7 @@ SatMarkovModel::DoTransition ()
       total += m_probabilities[m_currentState * m_numOfStates + i];
     }
 
-  if ( !(total == 1) )
+  if ( ( fabs(total - 1.0) > std::numeric_limits<double>::epsilon ()) )
     {
       NS_FATAL_ERROR ("SatMarkovModel::DoTransition - Probability sum does not match");
     }
