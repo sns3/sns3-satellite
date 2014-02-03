@@ -36,13 +36,16 @@ SatCrdsa::GetTypeId (void)
 SatCrdsa::SatCrdsa () :
   m_randomAccessConf (),
   m_uniformVariable (),
-  m_crdsaMinRandomizationValue (0.0),
-  m_crdsaMaxRandomizationValue (0.0),
-  m_crdsaNumOfInstances (0),
+  m_minRandomizationValue (0.0),
+  m_maxRandomizationValue (0.0),
+  m_numOfInstances (0),
   m_newData (true),
-  m_crdsaBackoffReleaseTime (0.0),
-  m_crdsaBackoffTime (0.0),
-  m_crdsaBackoffProbability (0.0)
+  m_backoffReleaseTime (0.0),
+  m_backoffTime (0.0),
+  m_backoffProbability (0.0),
+  m_maxUniquePayloadPerBlock (0),
+  m_maxConsecutiveBlocksAccessed (0),
+  m_minIdleBlocks (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -52,13 +55,16 @@ SatCrdsa::SatCrdsa () :
 SatCrdsa::SatCrdsa (Ptr<SatRandomAccessConf> randomAccessConf) :
   m_randomAccessConf (randomAccessConf),
   m_uniformVariable (),
-  m_crdsaMinRandomizationValue (randomAccessConf->GetCrdsaDefaultMinRandomizationValue ()),
-  m_crdsaMaxRandomizationValue (randomAccessConf->GetCrdsaDefaultMaxRandomizationValue ()),
-  m_crdsaNumOfInstances (randomAccessConf->GetCrdsaDefaultNumOfInstances ()),
+  m_minRandomizationValue (randomAccessConf->GetCrdsaDefaultMinRandomizationValue ()),
+  m_maxRandomizationValue (randomAccessConf->GetCrdsaDefaultMaxRandomizationValue ()),
+  m_numOfInstances (randomAccessConf->GetCrdsaDefaultNumOfInstances ()),
   m_newData (true),
-  m_crdsaBackoffReleaseTime (Now ().GetSeconds ()),
-  m_crdsaBackoffTime (randomAccessConf->GetCrdsaDefaultBackoffTime ()),
-  m_crdsaBackoffProbability (randomAccessConf->GetCrdsaDefaultBackoffProbability ())
+  m_backoffReleaseTime (Now ().GetSeconds ()),
+  m_backoffTime (randomAccessConf->GetCrdsaDefaultBackoffTime () / 1000),
+  m_backoffProbability (randomAccessConf->GetCrdsaDefaultBackoffProbability ()),
+  m_maxUniquePayloadPerBlock (randomAccessConf->GetCrdsaDefaultMaxUniquePayloadPerBlock ()),
+  m_maxConsecutiveBlocksAccessed (randomAccessConf->GetCrdsaDefaultMaxConsecutiveBlocksAccessed()),
+  m_minIdleBlocks (randomAccessConf->GetCrdsaDefaultMinIdleBlocks ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -79,22 +85,22 @@ SatCrdsa::DoVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_crdsaMinRandomizationValue < 0 || m_crdsaMaxRandomizationValue < 0)
+  if (m_minRandomizationValue < 0 || m_maxRandomizationValue < 0)
     {
       NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - min < 0 || max < 0");
     }
 
-  if (m_crdsaMinRandomizationValue > m_crdsaMaxRandomizationValue)
+  if (m_minRandomizationValue > m_maxRandomizationValue)
     {
       NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - min > max");
     }
 
-  if ( m_crdsaNumOfInstances < 1)
+  if ( m_numOfInstances < 1)
     {
       NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - instances < 1");
     }
 
-  if ( (m_crdsaMaxRandomizationValue - m_crdsaMinRandomizationValue) < m_crdsaNumOfInstances)
+  if ( (m_maxRandomizationValue - m_minRandomizationValue) < m_numOfInstances)
     {
       NS_FATAL_ERROR ("SatCrdsa::DoVariableSanityCheck - (max - min) < instances");
     }
@@ -105,27 +111,27 @@ SatCrdsa::DoVariableSanityCheck ()
 void
 SatCrdsa::UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances)
 {
-  NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max << " num of replicas: " << numOfInstances);
+  NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max << " num of instances: " << numOfInstances);
 
-  m_crdsaMinRandomizationValue = min;
-  m_crdsaMaxRandomizationValue = max;
-  m_crdsaNumOfInstances = numOfInstances;
+  m_minRandomizationValue = min;
+  m_maxRandomizationValue = max;
+  m_numOfInstances = numOfInstances;
 
   DoVariableSanityCheck ();
 
-  NS_LOG_INFO ("SatCrdsa::UpdateVariables - new min: " << min << " new max: " << max << " num of replicas: " << numOfInstances);
+  NS_LOG_INFO ("SatCrdsa::UpdateVariables - new min: " << min << " new max: " << max << " num of instances: " << numOfInstances);
 }
 
 void
 SatCrdsa::SetBackoffProbability (double backoffProbability)
 {
-  m_crdsaBackoffProbability = backoffProbability;
+  m_backoffProbability = backoffProbability;
 }
 
 void
 SatCrdsa::SetBackoffTime (double backoffTime)
 {
-  m_crdsaBackoffTime = backoffTime;
+  m_backoffTime = backoffTime;
 }
 
 bool
@@ -135,9 +141,14 @@ SatCrdsa::HasBackoffTimePassed ()
 
   bool hasBackoffTimePassed = false;
 
-  if (Now ().GetSeconds () >= m_crdsaBackoffReleaseTime)
+  if ((Now ().GetSeconds () >= m_backoffReleaseTime) && (m_idleBlocksLeft < 1))
     {
       hasBackoffTimePassed = true;
+    }
+
+  if (!hasBackoffTimePassed && (m_idleBlocksLeft > 0))
+    {
+      m_idleBlocksLeft--;
     }
 
   NS_LOG_INFO ("SatCrdsa::HasBackoffTimePassed: " << hasBackoffTimePassed);
@@ -152,7 +163,7 @@ SatCrdsa::DoBackoff ()
 
   bool doBackoff = false;
 
-  if (m_uniformVariable->GetValue (0.0,1.0) < m_crdsaBackoffProbability)
+  if (m_uniformVariable->GetValue (0.0,1.0) < m_backoffProbability)
     {
       doBackoff = true;
     }
@@ -190,15 +201,6 @@ SatCrdsa::AreBuffersEmpty ()
 
 /// TODO: implement this
 void
-SatCrdsa::UpdateMaximumRateLimitationParameters ()
-{
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("SatCrdsa::UpdateMaximumRateLimitationParameters - Updating parameters");
-}
-
-/// TODO: implement this
-void
 SatCrdsa::CheckMaximumRateLimitations ()
 {
   NS_LOG_FUNCTION (this);
@@ -207,11 +209,11 @@ SatCrdsa::CheckMaximumRateLimitations ()
 }
 
 void
-SatCrdsa::SetBackoffTimer ()
+SatCrdsa::SetInitialBackoffTimer ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_crdsaBackoffReleaseTime = Now ().GetSeconds () + m_crdsaBackoffTime;
+  m_backoffReleaseTime = Now ().GetSeconds () + m_backoffTime;
 
   NS_LOG_INFO ("SatCrdsa::SetBackoffTimer - Setting backoff timer");
 }
@@ -231,7 +233,22 @@ SatCrdsa::PrepareToTransmit ()
     {
       m_newData = true;
     }
+
+  IncreaseConsecutiveBlocksUsed ();
+
   return txOpportunities;
+}
+
+void
+SatCrdsa::IncreaseConsecutiveBlocksUsed ()
+{
+  m_numOfConsecutiveBlocksUsed++;
+
+  if (m_numOfConsecutiveBlocksUsed >= m_maxConsecutiveBlocksAccessed)
+    {
+      m_idleBlocksLeft = m_minIdleBlocks;
+      m_numOfConsecutiveBlocksUsed = 0;
+    }
 }
 
 std::set<uint32_t>
@@ -268,7 +285,7 @@ SatCrdsa::DoCrdsa ()
 
               if (DoBackoff ())
                 {
-                  SetBackoffTimer ();
+                  SetInitialBackoffTimer ();
                 }
               else
                 {
@@ -281,8 +298,6 @@ SatCrdsa::DoCrdsa ()
             }
         }
     }
-
-  UpdateMaximumRateLimitationParameters ();
 
   return txOpportunities;
 }
@@ -298,9 +313,9 @@ SatCrdsa::RandomizeTxOpportunities ()
 
   NS_LOG_INFO ("SatCrdsa::DoCrdsa - Randomizing TX opportunities");
 
-  while (txOpportunities.size () < m_crdsaNumOfInstances)
+  while (txOpportunities.size () < (m_numOfInstances * m_maxUniquePayloadPerBlock))
     {
-      uint32_t slot = m_uniformVariable->GetInteger (m_crdsaMinRandomizationValue, m_crdsaMaxRandomizationValue);
+      uint32_t slot = m_uniformVariable->GetInteger (m_minRandomizationValue, m_maxRandomizationValue);
 
       result = txOpportunities.insert (slot);
 
@@ -316,12 +331,15 @@ void
 SatCrdsa::PrintVariables ()
 {
   NS_LOG_INFO ("Simulation time: " << Now ().GetSeconds () << " seconds");
-  NS_LOG_INFO ("Backoff period release time: " << m_crdsaBackoffReleaseTime << " seconds");
-  NS_LOG_INFO ("Backoff period length: " << m_crdsaBackoffTime << " seconds");
-  NS_LOG_INFO ("Backoff probability: " << m_crdsaBackoffProbability * 100 << " %");
+  NS_LOG_INFO ("Backoff release time: " << m_backoffReleaseTime << " seconds");
+  NS_LOG_INFO ("Backoff time: " << m_backoffTime << " seconds");
+  NS_LOG_INFO ("Backoff probability: " << m_backoffProbability * 100 << " %");
   NS_LOG_INFO ("New data status: " << m_newData);
-  NS_LOG_INFO ("Slot randomization range: " << m_crdsaMinRandomizationValue << " to " << m_crdsaMaxRandomizationValue);
-  NS_LOG_INFO ("Number of instances: " << m_crdsaNumOfInstances);
+  NS_LOG_INFO ("Slot randomization: " << m_numOfInstances * m_maxUniquePayloadPerBlock << " Tx opportunities with range from "<< m_minRandomizationValue << " to " << m_maxRandomizationValue);
+  NS_LOG_INFO ("Number of instances: " << m_numOfInstances);
+  NS_LOG_INFO ("Number of unique payloads per block: " << m_maxUniquePayloadPerBlock);
+  NS_LOG_INFO ("Number of consecutive blocks accessed: " << m_numOfConsecutiveBlocksUsed << "/" << m_maxConsecutiveBlocksAccessed);
+  NS_LOG_INFO ("Number of idle blocks left: " << m_idleBlocksLeft << "/" << m_minIdleBlocks);
 }
 
 } // namespace ns3

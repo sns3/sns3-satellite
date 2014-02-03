@@ -96,17 +96,17 @@ public:
   /**
    *
    */
-  uint32_t GetCrdsaMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
+  uint32_t GetCrdsaDefaultMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
 
   /**
    *
    */
-  uint32_t GetCrdsaMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
+  uint32_t GetCrdsaDefaultMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
 
   /**
    *
    */
-  uint32_t GetCrdsaMinIdleBlocks () { return m_crdsaMinIdleBlocks; }
+  uint32_t GetCrdsaDefaultMinIdleBlocks () { return m_crdsaMinIdleBlocks; }
 
 private:
 

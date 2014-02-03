@@ -126,17 +126,12 @@ private:
   /**
    *
    */
-  void UpdateMaximumRateLimitationParameters ();
-
-  /**
-   *
-   */
   void CheckMaximumRateLimitations ();
 
   /**
    *
    */
-  void SetBackoffTimer ();
+  void SetInitialBackoffTimer ();
 
   /**
    *
@@ -156,6 +151,11 @@ private:
   /**
    *
    */
+  void IncreaseConsecutiveBlocksUsed ();
+
+  /**
+   *
+   */
   Ptr<SatRandomAccessConf> m_randomAccessConf;
 
   /**
@@ -166,17 +166,17 @@ private:
   /**
    *
    */
-  uint32_t m_crdsaMinRandomizationValue;
+  uint32_t m_minRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_crdsaMaxRandomizationValue;
+  uint32_t m_maxRandomizationValue;
 
   /**
    *
    */
-  uint32_t m_crdsaNumOfInstances;
+  uint32_t m_numOfInstances;
 
   /**
    *
@@ -186,17 +186,42 @@ private:
   /**
    *
    */
-  double m_crdsaBackoffReleaseTime;
+  double m_backoffReleaseTime;
 
   /**
    *
    */
-  double m_crdsaBackoffTime;
+  double m_backoffTime;
 
   /**
    *
    */
-  double m_crdsaBackoffProbability;
+  double m_backoffProbability;
+
+  /**
+   *
+   */
+  uint32_t m_maxUniquePayloadPerBlock;
+
+  /**
+   *
+   */
+  uint32_t m_maxConsecutiveBlocksAccessed;
+
+  /**
+   *
+   */
+  uint32_t m_minIdleBlocks;
+
+  /**
+   *
+   */
+  uint32_t m_idleBlocksLeft;
+
+  /**
+   *
+   */
+  uint32_t m_numOfConsecutiveBlocksUsed;
 };
 
 } // namespace ns3
