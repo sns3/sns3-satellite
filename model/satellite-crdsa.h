@@ -71,7 +71,7 @@ public:
    * \param max
    * \param setSize
    */
-  void UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances);
+  void UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances, uint32_t maxUniquePayloadPerBlock);
 
   /**
    *
@@ -84,6 +84,24 @@ public:
    * \param backoffTime
    */
   void SetBackoffTime (double backoffTime);
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetNumOfInstances () { return m_numOfInstances; }
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetMaxUniquePayloadPerBlock () { return m_maxUniquePayloadPerBlock; }
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetMaxPacketSize () { return m_maxPacketSize; }
 
 private:
 
@@ -126,7 +144,8 @@ private:
   /**
    *
    */
-  void CheckMaximumRateLimitations ();
+  /// TODO: implement this. Logic will likely be in Tx with the max packet size calculations
+  //void CheckMaximumRateLimitations ();
 
   /**
    *
@@ -152,6 +171,17 @@ private:
    *
    */
   void IncreaseConsecutiveBlocksUsed ();
+
+  /**
+   *
+   */
+  void UpdateIdleBlocks ();
+
+  /**
+   *
+   */
+  /// TODO change later to be waveform dependent and possibly calculate it in the Tx logic
+  //void CalculateMaxPacketSize ();
 
   /**
    *
@@ -222,6 +252,11 @@ private:
    *
    */
   uint32_t m_numOfConsecutiveBlocksUsed;
+
+  /**
+   *
+   */
+  uint32_t m_maxPacketSize;
 };
 
 } // namespace ns3

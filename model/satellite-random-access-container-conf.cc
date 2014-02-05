@@ -44,12 +44,12 @@ SatRandomAccessConf::GetTypeId (void)
                    MakeDoubleChecker<double> ())
     .AddAttribute ("CrdsaMinRandomizationValue",
                    "CRDSA randomization minimum value",
-                   UintegerValue (1),
+                   UintegerValue (0),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMinRandomizationValue),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaMaxRandomizationValue",
                    "CRDSA randomization maximum value",
-                   UintegerValue (160),
+                   UintegerValue (159),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxRandomizationValue),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaNumOfInstances",
@@ -61,7 +61,7 @@ SatRandomAccessConf::GetTypeId (void)
                    "CRDSA backoff time",
                    UintegerValue (100),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaBackoffTime),
-                   MakeUintegerChecker<int32_t> ())
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaBackoffProbability",
                    "CRDSA backoff probability",
                    DoubleValue (0.2),
@@ -71,17 +71,22 @@ SatRandomAccessConf::GetTypeId (void)
                    "CRDSA maximum unique payloads per block",
                    UintegerValue (3),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxUniquePayloadPerBlock),
-                   MakeUintegerChecker<int32_t> ())
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaMaxConsecutiveBlocksAccessed",
                    "CRDSA maximum consecutive blocks accessed",
                    UintegerValue (6),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxConsecutiveBlocksAccessed),
-                   MakeUintegerChecker<int32_t> ())
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaMinIdleBlocks",
                    "CRDSA minimum idle blocks",
                    UintegerValue (2),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMinIdleBlocks),
-                   MakeUintegerChecker<int32_t> ())
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("CrdsaPayloadBytes",
+                   "CRDSA payload bytes",
+                   UintegerValue (2),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaPayloadBytes),
+                   MakeUintegerChecker<uint32_t> ())
     ;
   return tid;
 }
@@ -96,7 +101,8 @@ SatRandomAccessConf::SatRandomAccessConf () :
   m_crdsaBackoffProbability (0.2),
   m_crdsaMaxUniquePayloadPerBlock (3),
   m_crdsaMaxConsecutiveBlocksAccessed (6),
-  m_crdsaMinIdleBlocks (2)
+  m_crdsaMinIdleBlocks (2),
+  m_crdsaPayloadBytes (2000) /// TODO this should be waveform dependent
 {
   NS_LOG_FUNCTION (this);
 }

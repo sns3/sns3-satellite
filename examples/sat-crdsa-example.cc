@@ -37,7 +37,7 @@ main (int argc, char *argv[])
     }
 
   /// Update CRDSA variables
-  Simulator::Schedule (Time (300000 + 6*500000), &SatCrdsa::UpdateRandomizationVariables, crdsa, 1, 7, 2);
+  Simulator::Schedule (Time (300000 + 6*500000), &SatCrdsa::UpdateRandomizationVariables, crdsa, 0, 119, 3, 3);
 
   /// Continue simulation
   for (uint32_t i = 7; i < 12; i++)

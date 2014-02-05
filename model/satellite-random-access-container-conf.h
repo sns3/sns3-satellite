@@ -108,6 +108,11 @@ public:
    */
   uint32_t GetCrdsaDefaultMinIdleBlocks () { return m_crdsaMinIdleBlocks; }
 
+  /**
+   *
+   */
+  uint32_t GetCrdsaDefaultPayloadBytes () { return m_crdsaPayloadBytes; }
+
 private:
 
   /**
@@ -159,6 +164,11 @@ private:
    *
    */
   uint32_t m_crdsaMinIdleBlocks;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaPayloadBytes;
 };
 
 } // namespace ns3
