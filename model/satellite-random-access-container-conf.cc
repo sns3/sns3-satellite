@@ -59,12 +59,12 @@ SatRandomAccessConf::GetTypeId (void)
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaBackoffTime",
                    "CRDSA backoff time",
-                   UintegerValue (100),
+                   UintegerValue (5),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaBackoffTime),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaBackoffProbability",
                    "CRDSA backoff probability",
-                   DoubleValue (0.2),
+                   DoubleValue (0.05),
                    MakeDoubleAccessor (&SatRandomAccessConf::m_crdsaBackoffProbability),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("CrdsaMaxUniquePayloadPerBlock",
@@ -74,7 +74,7 @@ SatRandomAccessConf::GetTypeId (void)
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaMaxConsecutiveBlocksAccessed",
                    "CRDSA maximum consecutive blocks accessed",
-                   UintegerValue (6),
+                   UintegerValue (4),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxConsecutiveBlocksAccessed),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaMinIdleBlocks",
@@ -84,7 +84,7 @@ SatRandomAccessConf::GetTypeId (void)
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("CrdsaPayloadBytes",
                    "CRDSA payload bytes",
-                   UintegerValue (2),
+                   UintegerValue (2000),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaPayloadBytes),
                    MakeUintegerChecker<uint32_t> ())
     ;
@@ -94,13 +94,13 @@ SatRandomAccessConf::GetTypeId (void)
 SatRandomAccessConf::SatRandomAccessConf () :
   m_slottedAlohaMinRandomizationValue (0.5),
   m_slottedAlohaMaxRandomizationValue (2.0),
-  m_crdsaMinRandomizationValue (1),
-  m_crdsaMaxRandomizationValue (160),
+  m_crdsaMinRandomizationValue (0),
+  m_crdsaMaxRandomizationValue (159),
   m_crdsaNumOfInstances (3),
-  m_crdsaBackoffTime (100),
-  m_crdsaBackoffProbability (0.2),
+  m_crdsaBackoffTime (5),
+  m_crdsaBackoffProbability (0.05),
   m_crdsaMaxUniquePayloadPerBlock (3),
-  m_crdsaMaxConsecutiveBlocksAccessed (6),
+  m_crdsaMaxConsecutiveBlocksAccessed (4),
   m_crdsaMinIdleBlocks (2),
   m_crdsaPayloadBytes (2000) /// TODO this should be waveform dependent
 {

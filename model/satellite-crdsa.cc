@@ -151,12 +151,16 @@ SatCrdsa::UpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t num
 void
 SatCrdsa::SetBackoffProbability (double backoffProbability)
 {
+  NS_LOG_FUNCTION (this);
+
   m_backoffProbability = backoffProbability;
 }
 
 void
 SatCrdsa::SetBackoffTime (double backoffTime)
 {
+  NS_LOG_FUNCTION (this);
+
   m_backoffTime = backoffTime;
 }
 
@@ -184,8 +188,11 @@ SatCrdsa::HasBackoffTimePassed ()
 void
 SatCrdsa::UpdateIdleBlocks ()
 {
+  NS_LOG_FUNCTION (this);
+
   if (m_idleBlocksLeft > 0)
     {
+      NS_LOG_INFO ("SatCrdsa::UpdateIdleBlocks - Reducing idle blocks by one");
       m_idleBlocksLeft--;
     }
 }
@@ -242,12 +249,16 @@ SatCrdsa::SetInitialBackoffTimer ()
 
   UpdateIdleBlocks ();
 
+  m_numOfConsecutiveBlocksUsed = 0;
+
   NS_LOG_INFO ("SatCrdsa::SetBackoffTimer - Setting backoff timer");
 }
 
 std::set<uint32_t>
 SatCrdsa::PrepareToTransmit ()
 {
+  NS_LOG_FUNCTION (this);
+
   std::set<uint32_t> txOpportunities;
 
   NS_LOG_INFO ("SatCrdsa::PrepareToTransmit - Preparing for transmission...");
@@ -267,10 +278,15 @@ SatCrdsa::PrepareToTransmit ()
 void
 SatCrdsa::IncreaseConsecutiveBlocksUsed ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_numOfConsecutiveBlocksUsed++;
+
+  NS_LOG_INFO ("SatCrdsa::IncreaseConsecutiveBlocksUsed - Increasing the number of used consecutive blocks");
 
   if (m_numOfConsecutiveBlocksUsed >= m_maxConsecutiveBlocksAccessed)
     {
+      NS_LOG_INFO ("SatCrdsa::IncreaseConsecutiveBlocksUsed - Maximum number of consecutive blocks reached, forcing idle blocks");
       m_idleBlocksLeft = m_minIdleBlocks;
       m_numOfConsecutiveBlocksUsed = 0;
     }
@@ -328,6 +344,8 @@ SatCrdsa::DoCrdsa ()
         }
     }
 
+  NS_LOG_INFO ("SatCrdsa::DoCrdsa - Algorithm finished.");
+
   return txOpportunities;
 }
 
@@ -340,7 +358,7 @@ SatCrdsa::RandomizeTxOpportunities ()
   std::set<uint32_t> txOpportunities;
   std::pair<std::set<uint32_t>::iterator,bool> result;
 
-  NS_LOG_INFO ("SatCrdsa::DoCrdsa - Randomizing TX opportunities");
+  NS_LOG_INFO ("SatCrdsa::RandomizeTxOpportunities - Randomizing TX opportunities");
 
   while (txOpportunities.size () < (m_numOfInstances * m_maxUniquePayloadPerBlock))
     {
@@ -348,10 +366,10 @@ SatCrdsa::RandomizeTxOpportunities ()
 
       result = txOpportunities.insert (slot);
 
-      NS_LOG_INFO ("SatCrdsa::DoCrdsa - Insert successful: " << result.second << " for TX opportunity slot: " << (*result.first));
+      NS_LOG_INFO ("SatCrdsa::RandomizeTxOpportunities - Insert successful: " << result.second << " for TX opportunity slot: " << (*result.first));
     }
 
-  NS_LOG_INFO ("SatCrdsa::DoCrdsa - Randomizing done");
+  NS_LOG_INFO ("SatCrdsa::RandomizeTxOpportunities - Randomizing done");
 
   return txOpportunities;
 }
@@ -359,6 +377,8 @@ SatCrdsa::RandomizeTxOpportunities ()
 void
 SatCrdsa::PrintVariables ()
 {
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO ("Simulation time: " << Now ().GetSeconds () << " seconds");
   NS_LOG_INFO ("Backoff release time: " << m_backoffReleaseTime << " seconds");
   NS_LOG_INFO ("Backoff time: " << m_backoffTime << " seconds");

@@ -27,20 +27,11 @@ main (int argc, char *argv[])
   /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> ();
 
-  /// Create CRDSA module
+  /// Create CRDSA module with default configuration
   Ptr<SatCrdsa> crdsa = CreateObject<SatCrdsa> (randomAccessConf);
 
   /// Run simulation
-  for (uint32_t i = 0; i < 5; i++)
-    {
-      Simulator::Schedule (Time (300000 + i*500000), &SatCrdsa::DoCrdsa, crdsa);
-    }
-
-  /// Update CRDSA variables
-  Simulator::Schedule (Time (300000 + 6*500000), &SatCrdsa::UpdateRandomizationVariables, crdsa, 0, 119, 3, 3);
-
-  /// Continue simulation
-  for (uint32_t i = 7; i < 12; i++)
+  for (uint32_t i = 0; i < 30; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatCrdsa::DoCrdsa, crdsa);
     }
