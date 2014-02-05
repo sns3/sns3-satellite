@@ -21,6 +21,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/queue.h"
+#include "ns3/satellite-queue.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/mac48-address.h"
 
@@ -147,8 +148,11 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
     {
       // UT: user own mac address
       // GW: use destination address
+      uint32_t rcIndex (0);
       Mac48Address mac = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? m_nodeInfo->GetMacAddress () : Mac48Address::ConvertFrom (dest) );
-      EncapContainer_t::iterator it = m_encaps.find (mac);
+      EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (mac, rcIndex);
+
+      EncapContainer_t::iterator it = m_encaps.find (key);
 
       if (it != m_encaps.end ())
         {
@@ -198,7 +202,9 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
   // Forward the txOpportunity to a certain encapsulator
   else
     {
-      EncapContainer_t::iterator it = m_encaps.find (macAddr);
+      uint32_t rcIndex (0);
+      EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
+      EncapContainer_t::iterator it = m_encaps.find (key);
 
       if (it != m_encaps.end ())
         {
@@ -248,7 +254,9 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
 
   // Receive packet with a decapsulator instance which is handling the
   // packets for this specific id
-  EncapContainer_t::iterator it = m_decaps.find (macAddr);
+  uint32_t rcIndex (0);
+  EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
+  EncapContainer_t::iterator it = m_decaps.find (key);
 
   // Note: control messages should not be seen at the LLC layer, since
   // they are received already at the MAC layer.
@@ -272,15 +280,25 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)
 }
 
 void
+SatLlc::AddRequestManager (Ptr<SatRequestManager> rm)
+{
+  NS_LOG_FUNCTION (this);
+  m_requestManager = rm;
+}
+
+
+void
 SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc)
 {
   NS_LOG_FUNCTION (this);
 
-  EncapContainer_t::iterator it = m_encaps.find (macAddr);
+  uint32_t rcIndex (0);
+  EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
+  EncapContainer_t::iterator it = m_encaps.find (key);
 
   if (it == m_encaps.end ())
     {
-      m_encaps.insert(std::make_pair (macAddr, enc));
+      m_encaps.insert(std::make_pair (key, enc));
     }
   else
     {
@@ -293,11 +311,13 @@ SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec)
 {
   NS_LOG_FUNCTION (this);
 
-  EncapContainer_t::iterator it = m_decaps.find (macAddr);
+  uint32_t rcIndex (0);
+  EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
+  EncapContainer_t::iterator it = m_decaps.find (key);
 
   if (it == m_decaps.end ())
     {
-      m_decaps.insert(std::make_pair (macAddr, dec));
+      m_decaps.insert(std::make_pair (key, dec));
     }
   else
     {
@@ -345,7 +365,7 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
           holDelay = cit->second->GetHolDelay ();
           uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
           Ptr<SatSchedulingObject> so =
-              Create<SatSchedulingObject> (cit->first, buf, minTxOpportunityInBytes, holDelay, 1);
+              Create<SatSchedulingObject> (cit->first.first, buf, minTxOpportunityInBytes, holDelay, 1);
           schedObjects.push_back (so);
         }
     }
@@ -359,6 +379,22 @@ SatLlc::SetReceiveCallback (SatLlc::ReceiveCallback cb)
   m_rxCallback = cb;
 }
 
+
+double
+SatLlc::GetQueueKpis (uint32_t rcIndex)
+{
+  NS_LOG_FUNCTION (this << rcIndex);
+
+  if (rcIndex == 0)
+    {
+      return DynamicCast<SatQueue> (m_controlQueue)->GetEnqueBitRate();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Data queues not supported yet!");
+    }
+  return 0.0;
+}
 
 } // namespace ns3
 

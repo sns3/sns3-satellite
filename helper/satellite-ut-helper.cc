@@ -43,6 +43,8 @@
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-node-info.h"
 #include "../model/satellite-enums.h"
+#include "../model/satellite-request-manager.h"
+#include "../model/satellite-queue.h"
 #include "satellite-ut-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -241,6 +243,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create Logical Link Control (LLC) layer
   Ptr<SatLlc> llc = CreateObject<SatLlc> ();
 
+  // Create a request manager and attach it to LLC
+  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
+  SatRequestManager::QueueCallback queueCb = MakeCallback (&SatLlc::GetQueueKpis, llc);
+  rm->SetQueueCallback (queueCb);
+  llc->AddRequestManager (rm);
+
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
@@ -278,7 +286,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetGwAddress (gwAddr);
 
   // Create and set control packet queue to LLC
-  Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
+  Ptr<Queue> queue = m_queueFactory.Create<SatQueue> ();
+  SatQueue::QueueEventCallback qEventCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
+  DynamicCast<SatQueue> (queue)->SetQueueEventCallback (qEventCb);
   llc->SetQueue (queue);
 
   // Attach the transmit callback to PHY

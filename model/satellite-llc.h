@@ -34,6 +34,7 @@
 #include "satellite-node-info.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-encapsulator.h"
+#include "satellite-request-manager.h"
 
 namespace ns3 {
 
@@ -73,7 +74,8 @@ public:
    */
   ~SatLlc ();
 
-  typedef std::map<Mac48Address, Ptr<SatEncapsulator> > EncapContainer_t;
+  typedef std::pair<Mac48Address, uint32_t> EncapKey_t;
+  typedef std::map<EncapKey_t, Ptr<SatEncapsulator> > EncapContainer_t;
 
   /**
    * Receive callback used for sending packet to netdevice layer.
@@ -137,6 +139,8 @@ public:
    */
   void SetReceiveCallback (SatLlc::ReceiveCallback cb);
 
+  void AddRequestManager (Ptr<SatRequestManager> rm);
+
   /**
    * Add an encapsulator entry for the LLC
    * Key = UT's MAC address
@@ -168,6 +172,12 @@ public:
    */
   std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
 
+  /**
+   * Get the KPIs related to a specific queue
+   * @return
+   */
+  double GetQueueKpis (uint32_t rcIndex);
+
 protected:
   /**
    * \brief
@@ -194,6 +204,8 @@ protected:
   Ptr<SatNodeInfo> m_nodeInfo;
 
 private:
+
+  Ptr<SatRequestManager> m_requestManager;
 
   // Map of encapsulator base pointers
   EncapContainer_t m_encaps;

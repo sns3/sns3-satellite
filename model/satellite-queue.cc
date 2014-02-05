@@ -18,6 +18,7 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
@@ -59,7 +60,9 @@ TypeId SatQueue::GetTypeId (void)
 SatQueue::SatQueue () :
   Queue (),
   m_packets (),
-  m_bytesInQueue (0)
+  m_bytesInQueue (0),
+  m_lastResetTime (Seconds (0.0))
+
 {
   NS_LOG_FUNCTION (this);
 }
@@ -102,11 +105,19 @@ SatQueue::DoEnqueue (Ptr<Packet> p)
       return false;
     }
 
+  if (!m_queueEventCallback.IsNull() && m_packets.empty ())
+    {
+      m_queueEventCallback (SatQueue::FIRST_BUFFERED_PKT, 0);
+    }
+
   m_bytesInQueue += p->GetSize ();
   m_packets.push (p);
 
+  m_enquedBytesSinceReset += p->GetSize ();
+
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
   NS_LOG_LOGIC ("Number bytes " << m_bytesInQueue);
+  NS_LOG_LOGIC ("Number of bytes since last reset: " << m_enquedBytesSinceReset);
 
   return true;
 }
@@ -126,10 +137,18 @@ SatQueue::DoDequeue (void)
   m_packets.pop ();
   m_bytesInQueue -= p->GetSize ();
 
+  m_dequedBytesSinceReset += p->GetSize ();
+
+  if (!m_queueEventCallback.IsNull() && m_packets.empty ())
+    {
+      m_queueEventCallback (SatQueue::BUFFER_EMPTY, 0);
+    }
+
   NS_LOG_LOGIC ("Popped " << p);
 
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
   NS_LOG_LOGIC ("Number bytes " << m_bytesInQueue);
+  NS_LOG_LOGIC ("Number of bytes since last reset: " << m_dequedBytesSinceReset);
 
   return p;
 }
@@ -152,6 +171,52 @@ SatQueue::DoPeek (void) const
 
   return p;
 }
+
+double
+SatQueue::GetEnqueBitRate ()
+{
+  double bitrate (-1.0);
+  if (Simulator::Now () <= m_lastResetTime)
+    {
+      Time duration = Simulator::Now () - m_lastResetTime;
+      bitrate = 8.0 * m_enquedBytesSinceReset / duration.GetSeconds ();
+    }
+
+  NS_LOG_LOGIC ("Enque bitrate: " << bitrate);
+
+  return bitrate;
+}
+
+double
+SatQueue::GetDequeBitRate ()
+{
+  double bitrate (-1.0);
+  if (Simulator::Now () <= m_lastResetTime)
+    {
+      Time duration = Simulator::Now () - m_lastResetTime;
+      bitrate = 8.0 * m_dequedBytesSinceReset / duration.GetSeconds ();
+    }
+
+  NS_LOG_LOGIC ("Deque bitrate: " << bitrate);
+
+  return bitrate;
+}
+
+void
+SatQueue::ResetStatistics ()
+{
+  m_enquedBytesSinceReset = 0.0;
+  m_dequedBytesSinceReset = 0.0;
+  m_lastResetTime = Simulator::Now ();
+}
+
+void
+SatQueue::SetQueueEventCallback (SatQueue::QueueEventCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_queueEventCallback = cb;
+}
+
 
 } // namespace ns3
 
