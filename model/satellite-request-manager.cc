@@ -112,14 +112,14 @@ SatRequestManager::DoEvaluation ()
   /**
    * TODO: this does not do anything yet!
    */
-
+  /*
   double enqueBitrate (0.0);
   if (!m_queueCallback.IsNull ())
     {
       enqueBitrate = m_queueCallback (m_rcIndex);
     }
-
   NS_LOG_LOGIC ("Periodically evaluated enque bitrate: " << enqueBitrate);
+  */
 }
 
 
