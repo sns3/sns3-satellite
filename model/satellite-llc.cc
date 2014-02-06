@@ -75,10 +75,7 @@ SatLlc::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_rxCallback.Nullify ();
 
-  if (m_controlQueue != 0)
-    {
-      m_controlQueue->DequeueAll();
-    }
+  DynamicCast<SatQueue>(m_controlQueue)->DoDispose ();
   m_controlQueue = 0;
 
   EncapContainer_t::iterator it;
@@ -94,6 +91,9 @@ SatLlc::DoDispose ()
       it->second = 0;
     }
   m_decaps.clear ();
+
+  m_requestManager->DoDispose ();
+  m_requestManager = 0;
 
   Object::DoDispose ();
 }
