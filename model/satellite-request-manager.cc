@@ -30,7 +30,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatRequestManager);
 
 
 SatRequestManager::SatRequestManager ()
-:m_rcIndex (0)
+:m_requestInterval (MilliSeconds (100)),
+ m_rcIndex (0)
 {
   NS_LOG_FUNCTION (this);
 

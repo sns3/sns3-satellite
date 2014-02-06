@@ -106,6 +106,9 @@ public:
    */
   void SetQueueEventCallback (SatQueue::QueueEventCallback cb);
 
+protected:
+  void DoDispose ();
+
 private:
   virtual bool DoEnqueue (Ptr<Packet> p);
   virtual Ptr<Packet> DoDequeue (void);

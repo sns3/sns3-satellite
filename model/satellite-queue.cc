@@ -60,9 +60,13 @@ TypeId SatQueue::GetTypeId (void)
 SatQueue::SatQueue () :
   Queue (),
   m_packets (),
+  m_maxPackets (0),
+  m_maxBytes (0),
   m_bytesInQueue (0),
-  m_lastResetTime (Seconds (0.0))
-
+  m_mode (QUEUE_MODE_PACKETS),
+  m_enquedBytesSinceReset (0),
+  m_dequedBytesSinceReset (0),
+  m_lastResetTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -70,6 +74,14 @@ SatQueue::SatQueue () :
 SatQueue::~SatQueue ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void SatQueue::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+  m_queueEventCallback.Nullify ();
+  DequeueAll ();
+  Queue::Dispose ();
 }
 
 void
