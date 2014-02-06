@@ -36,16 +36,6 @@ SatSuperframeSeq::SatSuperframeSeq ()
   NS_LOG_FUNCTION (this);
 }
 
-SatSuperframeSeq::SatSuperframeSeq ( SatSuperframeConfList * confs)
-{
-  NS_LOG_FUNCTION (this);
-
-  if ( confs != NULL)
-    {
-      m_superframe = *confs;
-    }
-}
-
 SatSuperframeSeq::~SatSuperframeSeq ()
 {
   NS_LOG_FUNCTION (this);
@@ -60,6 +50,10 @@ SatSuperframeSeq::GetTypeId (void)
     .AddAttribute ("MinTbtpStoreTime", "Minimum time to store sent TBTPs.",
                     TimeValue (MilliSeconds (300)),
                     MakeTimeAccessor (&SatSuperframeSeq::m_tbtpStoreTime),
+                    MakeTimeChecker ())
+    .AddAttribute ("TargerDuration", "Target duration time.",
+                    TimeValue (MilliSeconds (100)),
+                    MakeTimeAccessor (&SatSuperframeSeq::m_targetDuration),
                     MakeTimeChecker ())
   ;
 

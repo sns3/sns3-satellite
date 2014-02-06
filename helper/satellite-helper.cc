@@ -134,12 +134,12 @@ SatHelper::SatHelper (std::string scenarioName)
   SetGeoSatMobility(geoSatNode);
 
   m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
-                                              MakeCallback (&SatConf::GetCarrierBandwidth, m_satConf),
+                                              MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
                                               m_satConf->GetRtnLinkCarrierCount(),
                                               m_satConf->GetFwdLinkCarrierCount(),
                                               m_satConf->GetSuperframeSeq());
 
-  SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequency, m_satConf);
+  SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequencyHz, m_satConf);
   m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );
 
   m_userHelper = CreateObject<SatUserHelper> ();

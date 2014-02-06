@@ -38,37 +38,37 @@ SatConf::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatConf")
       .SetParent<Object> ()
       .AddConstructor<SatConf> ()
-      .AddAttribute ("FwdLinkBandwidth", "Bandwidth of the forward link.",
+      .AddAttribute ("FwdFeederLinkBandwidth", "Bandwidth of the forward link.",
                       DoubleValue (2.0e9),
-                      MakeDoubleAccessor (&SatConf::m_fwdFeederLinkBandwidth_hz),
+                      MakeDoubleAccessor (&SatConf::m_fwdFeederLinkBandwidthHz),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("FwdFeederLinkBaseFrequency", "Base frequency of the forward feeder link band.",
                       DoubleValue (27.5e9),
-                      MakeDoubleAccessor (&SatConf::m_fwdFeederLinkFreq_hz),
-                      MakeDoubleChecker<double> ())
-      .AddAttribute ("RtnFeederLinkBaseFrequency", "Base frequency of the return feeder link band.",
-                      DoubleValue (17.7e9),
-                      MakeDoubleAccessor (&SatConf::m_rtnFeederLinkFreq_hz),
+                      MakeDoubleAccessor (&SatConf::m_fwdFeederLinkFreqHz),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("RtnFeederLinkBandwidth", "Bandwidth of the return feeder link band.",
                       DoubleValue (2.0e9),
-                      MakeDoubleAccessor (&SatConf::m_rtnFeederLinkBandwidth_hz),
+                      MakeDoubleAccessor (&SatConf::m_rtnFeederLinkBandwidthHz),
                       MakeDoubleChecker<double> ())
-      .AddAttribute ("FwdUserLinkBaseFrequency", "Base frequency of the forward user link band.",
-                      DoubleValue (19.7e9),
-                      MakeDoubleAccessor (&SatConf::m_fwdUserLinkFreq_hz),
+      .AddAttribute ("RtnFeederLinkBaseFrequency", "Base frequency of the return feeder link band.",
+                      DoubleValue (17.7e9),
+                      MakeDoubleAccessor (&SatConf::m_rtnFeederLinkFreqHz),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("FwdUserLinkBandwidth", "Bandwidth of the forward user link band.",
                       DoubleValue (0.5e9),
-                      MakeDoubleAccessor (&SatConf::m_fwdUserLinkBandwidth_hz),
+                      MakeDoubleAccessor (&SatConf::m_fwdUserLinkBandwidthHz),
                       MakeDoubleChecker<double> ())
-      .AddAttribute ("RtnUserLinkBaseFrequency", "Base frequency of the return user link band.",
-                      DoubleValue (29.5e9),
-                      MakeDoubleAccessor (&SatConf::m_rtnUserLinkFreq_hz),
+      .AddAttribute ("FwdUserLinkBaseFrequency", "Base frequency of the forward user link band.",
+                      DoubleValue (19.7e9),
+                      MakeDoubleAccessor (&SatConf::m_fwdUserLinkFreqHz),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("RtnUserLinkBandwidth", "Bandwidth of the return user link band.",
                       DoubleValue (0.5e9),
-                      MakeDoubleAccessor (&SatConf::m_rtnUserLinkBandwidth_hz),
+                      MakeDoubleAccessor (&SatConf::m_rtnUserLinkBandwidthHz),
+                      MakeDoubleChecker<double> ())
+      .AddAttribute ("RtnUserLinkBaseFrequency", "Base frequency of the return user link band.",
+                      DoubleValue (29.5e9),
+                      MakeDoubleAccessor (&SatConf::m_rtnUserLinkFreqHz),
                       MakeDoubleChecker<double> ())
       .AddAttribute ("UserLinkChannels", "The number of channels in user link",
                       UintegerValue (4),
@@ -78,42 +78,18 @@ SatConf::GetTypeId (void)
                       UintegerValue (16),
                       MakeUintegerAccessor (&SatConf::m_feederLinkChannelCount),
                       MakeUintegerChecker<uint32_t> (1))
-      .AddAttribute ("FrameCount", "The number of frames in super frame",
-                      UintegerValue (10),
-                      MakeUintegerAccessor (&SatConf::m_frameCount),
-                      MakeUintegerChecker<uint32_t> (1))
-      .AddAttribute ("StaticFrameConfig",
-                     "Static frame configuration used for superframes.",
-                      EnumValue (SatConf::STATIC_CONFIG_0),
-                      MakeEnumAccessor (&SatConf::m_staticFrameConfig),
-                      MakeEnumChecker (SatConf::STATIC_CONFIG_0, "Configuration 0",
-                                       SatConf::STATIC_CONFIG_1, "Configuration 1",
-                                       SatConf::STATIC_CONFIG_2, "Configuration 2",
-                                       SatConf::STATIC_CONFIG_3, "Configuration 3"))
-      .AddAttribute ("StaticConfTargetDuration",
-                     "Target duration of the superframe for static configuration [s].",
-                     DoubleValue (0.100),
-                     MakeDoubleAccessor (&SatConf::m_frameConfTargetDuration),
-                     MakeDoubleChecker<double> ())
-      .AddAttribute ("StaticConfAllocatedBandwidth",
-                     "The allocated carrier bandwidth for static configuration [Hz].",
-                     DoubleValue (1.25e6),
-                     MakeDoubleAccessor (&SatConf::m_frameConfAllocatedBandwidth),
-                     MakeDoubleChecker<double> ())
-      .AddAttribute ("StaticConfRollOff",
-                     "The roll-off factor for static configuration.",
-                     DoubleValue (0.20),
-                     MakeDoubleAccessor (&SatConf::m_frameConfRollOffFactor),
-                     MakeDoubleChecker<double> (0.00, 1.00))
-      .AddAttribute ("StaticConfSpacing",
-                     "The carrier spacing factor for static configuration.",
-                     DoubleValue (0.30),
-                     MakeDoubleAccessor (&SatConf::m_frameConfSpacingFactor),
-                     MakeDoubleChecker<double> (0.00, 1.00))
+      .AddAttribute ("SuperFrameConfForSeq0",
+                     "Super frame configuration used for super frame sequence 0.",
+                      EnumValue (SatConf::SUPER_FRAME_CONFIG_0),
+                      MakeEnumAccessor (&SatConf::m_SuperFrameConfForSeq0),
+                      MakeEnumChecker (SatConf::SUPER_FRAME_CONFIG_0, "Configuration 0",
+                                       SatConf::SUPER_FRAME_CONFIG_1, "Configuration 1",
+                                       SatConf::SUPER_FRAME_CONFIG_2, "Configuration 2",
+                                       SatConf::SUPER_FRAME_CONFIG_3, "Configuration 3"))
       .AddAttribute ("FwdCarrierAllocatedBandwidth",
                      "The allocated carrier bandwidth for forward link carriers [Hz].",
                      DoubleValue (0.125e9),
-                     MakeDoubleAccessor (&SatConf::m_fwdCarrierAllocatedBandwidth),
+                     MakeDoubleAccessor (&SatConf::m_fwdCarrierAllocatedBandwidthHz),
                      MakeDoubleChecker<double> ())
       .AddAttribute ("FwdCarrierRollOff",
                      "The roll-off factor for forward link carriers.",
@@ -144,7 +120,6 @@ SatConf::SatConf()
   // Nothing done here
 }
 
-
 void SatConf::Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos, std::string wfConf)
 {
   NS_LOG_FUNCTION (this);
@@ -169,132 +144,103 @@ SatConf::Configure (std::string wfConf)
   // *** configure forward link ***
 
   // currently only one carrier in forward link is used.
-  double fwdFeederLinkBandwidth = m_fwdFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-  double fwdUserLinkBandwidth = m_fwdUserLinkBandwidth_hz / m_userLinkChannelCount;
+  double fwdFeederLinkBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
+  double fwdUserLinkBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
 
   // bandwidths of the forward feeder and user links is expected to be equal
-    if ( fwdFeederLinkBandwidth != fwdUserLinkBandwidth )
+    if ( fwdFeederLinkBandwidthHz != fwdUserLinkBandwidthHz )
       {
         NS_FATAL_ERROR ( "Bandwidths of forward feeder and user links are not equal!!!");
       }
 
-  Ptr<SatBtuConf> fwdCarrierConf = Create<SatBtuConf> (m_fwdCarrierAllocatedBandwidth, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
+  // TODO: implement forward link specific conf instead of using BTU conf
+  Ptr<SatBtuConf> fwdCarrierConf = Create<SatBtuConf> (m_fwdCarrierAllocatedBandwidthHz, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
 
   m_forwardLinkCarrierConf.push_back (fwdCarrierConf);
 
   // *** configure return link ***
 
-  double rtnFeederLinkBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-  double rtnUserLinkBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
+  double rtnFeederLinkBandwidthHz = m_rtnFeederLinkBandwidthHz / m_feederLinkChannelCount;
+  double rtnUserLinkBandwidthHz = m_rtnUserLinkBandwidthHz / m_userLinkChannelCount;
 
   // bandwidths of the return feeder and user links is expected to be equal
-  if ( rtnFeederLinkBandwidth != rtnUserLinkBandwidth )
+  if ( rtnFeederLinkBandwidthHz != rtnUserLinkBandwidthHz )
     {
       NS_FATAL_ERROR ( "Bandwidths of return feeder and user links are not equal!!!");
     }
 
-  switch (m_staticFrameConfig)
+  // Create super frame sequence
+  m_superframeSeq = CreateObject<SatSuperframeSeq> ();
+
+  // Create a waveform configuration and add it to super frame sequence.
+  Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
+  m_superframeSeq->AddWaveformConf (waveFormConf);
+
+  Ptr<SatSuperframeConf> superFrameConf = CreateObject<SatSuperframeConf0> ();
+
+  switch (m_SuperFrameConfForSeq0)
   {
-    case STATIC_CONFIG_0:
-      {
-        // Create superframe sequence and add later needed elements to it
-        m_superframeSeq = CreateObject<SatSuperframeSeq> ();
-
-        // Create BTU conf according to given attributes
-        Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameConfAllocatedBandwidth /m_frameCount, m_frameConfRollOffFactor, m_frameConfSpacingFactor );
-
-        // Create a waveform configuration
-        Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
-
-        // get default waveform
-        uint32_t defaultWaveFormId = waveFormConf->GetDefaultWaveformId ();
-        Ptr<SatWaveform> defaultWaveForm = waveFormConf->GetWaveform (defaultWaveFormId);
-
-        double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRateInBauds ());
-        uint32_t slotCount = m_frameConfTargetDuration / timeSlotDuration;
-
-        if ( slotCount == 0 )
-          {
-            slotCount = 1;
-          }
-
-        // Created one frame to be used utilizating earlier created BTU
-        Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (rtnUserLinkBandwidth / m_frameCount, slotCount * timeSlotDuration,
-                                                            btuConf, (SatFrameConf::SatTimeSlotConfList_t *) NULL);
-
-        // Created time slots for every carrier and add them to frame configuration
-        for (uint32_t i = 0; i < frameConf->GetCarrierCount (); i++)
-          {
-            for (uint32_t j = 0; j < slotCount; j++)
-              {
-                Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (j * timeSlotDuration, defaultWaveFormId, i);
-                frameConf->AddTimeSlotConf (timeSlot);
-              }
-          }
-
-        // Create superframe configuration without frame first
-        Ptr<SatSuperframeConf> superframeConf = Create<SatSuperframeConf> ( frameConf->GetBandwidthHz (), frameConf->GetDurationInSeconds (),
-                                                                            (SatSuperframeConf::SatFrameConfList_t *) NULL);
-
-        // Add earlier created frame to superframe configuration
-        superframeConf->AddFrameConf (frameConf);
-
-        // Add earlier created superframe and wave form configurations to it
-        m_superframeSeq->AddWaveformConf (waveFormConf);
-        m_superframeSeq->AddSuperframe (superframeConf);
-      }
+    case SUPER_FRAME_CONFIG_0:
+      superFrameConf = CreateObject<SatSuperframeConf0> ();
       break;
 
-    case STATIC_CONFIG_1:
-    case STATIC_CONFIG_2:
-    case STATIC_CONFIG_3:
-      // TODO: Add other static configuration..
-      NS_ASSERT (false); // these are not supported yet
+    case SUPER_FRAME_CONFIG_1:
+      superFrameConf = CreateObject<SatSuperframeConf1> ();
+      break;
+
+    case SUPER_FRAME_CONFIG_2:
+      superFrameConf = CreateObject<SatSuperframeConf2> ();
+      break;
+
+    case SUPER_FRAME_CONFIG_3:
+      superFrameConf = CreateObject<SatSuperframeConf3> ();
       break;
 
     default:
-      NS_ASSERT (false);
+      NS_FATAL_ERROR ("Not supported super frame configuration!!!");
       break;
   }
 
+  superFrameConf->Configure ( rtnUserLinkBandwidthHz, m_superframeSeq->GetTargetDuration(), waveFormConf);
+  m_superframeSeq->AddSuperframe (superFrameConf);
 }
 
 double
-SatConf::GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, uint32_t carrierId )
+SatConf::GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId, uint32_t carrierId )
 {
   NS_LOG_FUNCTION (this << chType << freqId << carrierId);
 
-  double centerFrequency_hz = 0.0;
-  double baseFreq_hz = 0.0;
-  double channelBandwidth = 0.0;
-  double carrierBandwidth = 0.0;
+  double centerFrequencyHz = 0.0;
+  double baseFreqHz = 0.0;
+  double channelBandwidthHz = 0.0;
+  double carrierBandwidthHz = 0.0;
 
   switch (chType)
   {
     case SatEnums::FORWARD_FEEDER_CH:
-      channelBandwidth = m_fwdFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
-      baseFreq_hz = m_fwdFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + (carrierBandwidth * carrierId) + (carrierBandwidth / 2);
+      channelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
+      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
+      baseFreqHz = m_fwdFeederLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
+      centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
 
     case SatEnums::FORWARD_USER_CH:
-      channelBandwidth = m_fwdUserLinkBandwidth_hz / m_userLinkChannelCount;
-      carrierBandwidth = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
-      baseFreq_hz = m_fwdUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + (carrierBandwidth * carrierId) + (carrierBandwidth / 2);
+      channelBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
+      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
+      baseFreqHz = m_fwdUserLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
+      centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
-      channelBandwidth = m_rtnFeederLinkBandwidth_hz / m_feederLinkChannelCount;
-      baseFreq_hz = m_rtnFeederLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequencyHz ( carrierId);
+      channelBandwidthHz = m_rtnFeederLinkBandwidthHz / m_feederLinkChannelCount;
+      baseFreqHz = m_rtnFeederLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
+      centerFrequencyHz = baseFreqHz + m_superframeSeq->GetCarrierFrequencyHz (carrierId);
       break;
 
     case SatEnums::RETURN_USER_CH:
-      channelBandwidth = m_rtnUserLinkBandwidth_hz / m_userLinkChannelCount;
-      baseFreq_hz = m_rtnUserLinkFreq_hz + ( channelBandwidth * (freqId - 1) );
-      centerFrequency_hz = baseFreq_hz + m_superframeSeq->GetCarrierFrequencyHz ( carrierId);
+      channelBandwidthHz = m_rtnUserLinkBandwidthHz / m_userLinkChannelCount;
+      baseFreqHz = m_rtnUserLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
+      centerFrequencyHz = baseFreqHz + m_superframeSeq->GetCarrierFrequencyHz (carrierId);
       break;
 
     default:
@@ -302,32 +248,32 @@ SatConf::GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, u
       break;
   }
 
-  return centerFrequency_hz;
+  return centerFrequencyHz;
 }
 
 double
-SatConf::GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType )
+SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType )
 {
   NS_LOG_FUNCTION (this << chType << carrierId);
 
-  double carrierBandwidth = 0.0;
+  double carrierBandwidthHz = 0.0;
 
   switch (chType)
   {
     case SatEnums::FORWARD_FEEDER_CH:
-      carrierBandwidth = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::FORWARD_USER_CH:
-      carrierBandwidth = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
-      carrierBandwidth = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
       break;
 
     case SatEnums::RETURN_USER_CH:
-      carrierBandwidth = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
       break;
 
     default:
@@ -335,7 +281,7 @@ SatConf::GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId
       break;
   }
 
-  return carrierBandwidth;
+  return carrierBandwidthHz;
 }
 
 std::ifstream* SatConf::OpenFile (std::string filePathName)

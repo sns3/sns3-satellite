@@ -41,11 +41,11 @@ class SatConf : public Object
 public:
   typedef enum
   {
-    STATIC_CONFIG_0,
-    STATIC_CONFIG_1,
-    STATIC_CONFIG_2,
-    STATIC_CONFIG_3,
-  } StaticFrameConfiguration_t;
+    SUPER_FRAME_CONFIG_0,
+    SUPER_FRAME_CONFIG_1,
+    SUPER_FRAME_CONFIG_2,
+    SUPER_FRAME_CONFIG_3,
+  } SuperFrameConfiguration_t;
 
   SatConf ();
   virtual ~SatConf () {}
@@ -169,7 +169,7 @@ public:
     * \param carrierId Id of the carrier.
     * \return real frequency value
     */
-   double GetCarrierFrequency( SatEnums::ChannelType_t chType, uint32_t freqId, uint32_t carrierId );
+   double GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId, uint32_t carrierId );
 
    /**
     * Convert carrier id and sequence id to to bandwidth value.
@@ -179,7 +179,7 @@ public:
     * \param bandwidhtType Type of the bandwidth.
     * \return bandwidth value
     */
-   double GetCarrierBandwidth( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType );
+   double GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType );
 
    /**
     * Definition for beam ID index (column) in m_conf
@@ -275,42 +275,42 @@ private:
    /**
     *  Base frequency of forward feeder link.
     */
-   double m_fwdFeederLinkFreq_hz;
+   double m_fwdFeederLinkFreqHz;
 
    /**
     *  Bandwidth of forward feeder link.
     */
-   double m_fwdFeederLinkBandwidth_hz;
+   double m_fwdFeederLinkBandwidthHz;
 
    /**
     *  Base frequency of forward user link.
     */
-   double m_fwdUserLinkFreq_hz;
+   double m_fwdUserLinkFreqHz;
 
    /**
     *  Bandwidth of forward user link.
     */
-   double m_fwdUserLinkBandwidth_hz;
+   double m_fwdUserLinkBandwidthHz;
 
    /**
     *  Base frequency of return feeder link.
     */
-   double m_rtnFeederLinkFreq_hz;
+   double m_rtnFeederLinkFreqHz;
 
    /**
     *  Bandwidth of return feeder link.
     */
-   double m_rtnFeederLinkBandwidth_hz;
+   double m_rtnFeederLinkBandwidthHz;
 
    /**
     *  Base frequency of return user link.
     */
-   double m_rtnUserLinkFreq_hz;
+   double m_rtnUserLinkFreqHz;
 
    /**
     *  Bandwidth of return user link.
     */
-   double m_rtnUserLinkBandwidth_hz;
+   double m_rtnUserLinkBandwidthHz;
 
    /**
     *  The number of the channels in user link.
@@ -323,39 +323,14 @@ private:
    uint32_t m_feederLinkChannelCount;
 
    /**
-    * The configured static frame configuration to be used.
+    *  The id of the super frame configuration used for sequence 0.
     */
-   StaticFrameConfiguration_t m_staticFrameConfig;
-
-   /**
-    * The configured superframe target duration for static configurations.
-    */
-   double m_frameConfTargetDuration;
-
-   /**
-    *  The number of the frames in super frame.
-    */
-   uint32_t m_frameCount;
-
-   /**
-    * The configured allocated carrier bandwidth for static configurations.
-    */
-   double m_frameConfAllocatedBandwidth;
-
-   /**
-    * The configured carrier roll-off factor for static configurations.
-    */
-   double m_frameConfRollOffFactor;
-
-   /**
-    * The configured carrier spacing factor for static configurations.
-    */
-   double m_frameConfSpacingFactor;
+   SuperFrameConfiguration_t m_SuperFrameConfForSeq0;
 
    /**
     * The configured allocated bandwidth for forward link carriers.
     */
-   double m_fwdCarrierAllocatedBandwidth;
+   double m_fwdCarrierAllocatedBandwidthHz;
 
    /**
     * The configured carrier roll-off factor for forward link carriers.

@@ -51,13 +51,6 @@ public:
   SatSuperframeSeq ();
 
   /**
-   * Constructor for SatSuperframeSeq.
-   *
-   * \param confs Superframes in sequence. (In acsending order according to frequency).
-   */
-  SatSuperframeSeq ( SatSuperframeConfList * confs );
-
-  /**
    * Destructor for SatSuperframeSeq.
    */
   ~SatSuperframeSeq ();
@@ -159,6 +152,12 @@ public:
    */
   Ptr<SatTbtpMessage> GetTbtpMessage (uint32_t beamId, uint32_t msgId) const;
 
+  /**
+   * Get target duration for sequence.
+   * \return target duration for sequence
+   */
+  inline Time GetTargetDuration () const { return m_targetDuration; }
+
 private:
   typedef std::map<uint32_t, Ptr<SatTbtpContainer> > TbtpMap_t;
 
@@ -166,7 +165,7 @@ private:
     * Super frame sequences.
     *
     * Table includes super frame configurations for the return link.
-    * Item index of the list means super frame sequency (SFS).
+    * Item index of the list means super frame sequence (SFS).
     */
   SatSuperframeConfList m_superframe;
 
@@ -185,6 +184,10 @@ private:
    */
   Time m_tbtpStoreTime;
 
+  /**
+   * Target duration time for sequence.
+   */
+  Time m_targetDuration;
 };
 
 } // namespace ns3

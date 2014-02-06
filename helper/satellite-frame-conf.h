@@ -26,6 +26,7 @@
 #include "ns3/simple-ref-count.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/satellite-enums.h"
+#include "satellite-wave-form-conf.h"
 
 namespace ns3 {
 
@@ -89,7 +90,7 @@ private:
   double m_allocatedBandwidthHz;
   double m_occupiedBandwidthHz;
   double m_effectiveBandwidthHz;  // i.e. symbol rate
-  double m_length_s;               // length field reserved, but not used currenly
+  double m_lengthInSeconds;       // length field reserved, but not used currently
 };
 
 /**
@@ -106,7 +107,7 @@ public:
    */
   SatTimeSlotConf ();
 
-  /**
+  /**FRAME_ATTRIBUTE_ACCESSOR_DEFINE
    * Constructor for SatTimeSlotConf
    *
    * \param startTimeInSeconds  Start time of time slot in side frame.
@@ -234,7 +235,6 @@ public:
       default:
         NS_FATAL_ERROR ("Invalid bandwidth type!!!");
         break;
-
     }
 
     return bandwidth;
@@ -295,30 +295,36 @@ private:
   SatCarrierTimeSlotId_t  m_carrierTimeSlotIds;
 };
 
+
 /**
  * \ingroup satellite
- * \brief This class implements configuration for super frames
+ * \brief This abstract class defines and implements interface of configuration for super frames
  */
-class SatSuperframeConf : public SimpleRefCount<SatSuperframeConf>
+class SatSuperframeConf : public Object
 {
 public:
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
-  static const uint16_t maxFrameCount = 256;
+  static const uint8_t m_maxFrameCount = 10;
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   *
+   */
+  typedef enum
+    {
+      FRAME_CONFIG_0 = 0,//!< FRAME_CONFIG_0
+      FRAME_CONFIG_1 = 1,//!< FRAME_CONFIG_1
+      FRAME_CONFIG_2 = 2,//!< FRAME_CONFIG_2
+      FRAME_CONFIG_3 = 3,//!< FRAME_CONFIG_3
+    } StaticFrameConfiguration_t;
 
   /**
    * Default constructor for SatSuperframeConf
    */
   SatSuperframeConf ();
-
-  /**
-   * Constructor for SatSuperframeConf.
-   *
-   * \param bandwidthHz       Bandwidth of the frame in hertz
-   * \param duration_s        Duration of the frame in seconds
-   * \param frames            Frames of the super frame. (In ascending order according to frequency inside super frame).
-   */
-  SatSuperframeConf ( double bandwidthHz, double durationInSeconds, SatFrameConfList_t * frames );
 
   /**
    * Destructor for SatSuperframeConf
@@ -332,7 +338,7 @@ public:
    *
    * \return The bandwidth of super frame in Hertz.
    */
-  inline double GetBandwidthHz () const { return m_bandwidthHz; }
+  inline double GetBandwidthHz () const { return m_usedBandwidthHz; }
 
   /**
    * Get duration of super frame.
@@ -385,11 +391,216 @@ public:
    */
   double GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
+  /**
+   * Configures super frame configuration according to set attributes.
+   *
+   * \param bandwidthHz Allocated bandwidth for super frame.
+   * \param targetDuration Target duration for super frame sequence
+   * \param waveFormConf Wave Form Configuration
+   */
+  void Configure (double allocatedBandwidthHz, Time targetDuration, Ptr<SatWaveformConf> waveFormConf);
+
+  /**
+   * Do frame specific configuration as needed
+   *
+   */
+  virtual void DoConfigure () = 0;
+
+  /**
+   * Set number of frames to be used in super frame.
+   *
+   * \param frameCount Number of the frames in use
+   */
+  inline void SetFrameCount (uint32_t frameCount) { m_framesInUse = frameCount; }
+
+  /**
+   * Get number of frames to be used in super frame.
+   *
+   * \return Number of the frames in use
+   */
+  uint32_t GetFrameCount () const { return m_framesInUse; }
+
+  /**
+   * Set frame configuration type to be used in super frame.
+   *
+   * \param configType frame configuration type
+   */
+  inline void SetConfigType (StaticFrameConfiguration_t configType) { m_configType = configType; }
+
+  /**
+   * Get frame configuration type to be used in super frame.
+   * \return frame configuration type
+   */
+  StaticFrameConfiguration_t GetConfigType () const { return m_configType; }
+
+  // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
+  void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
+  void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
+  void SetFrameCarrierSpacing (uint8_t frameIndex, double spacing);
+  void SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff);
+
+  double GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const;
+  double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
+  double GetFrameCarrierSpacing (uint8_t frameIndex) const;
+  double GetFrameCarrierRollOff (uint8_t frameIndex) const;
+
 private:
-  double m_bandwidthHz;
-  double m_durationInSeconds;
+  double                      m_usedBandwidthHz;
+  double                      m_durationInSeconds;
+
+  uint32_t                    m_framesInUse;
+  StaticFrameConfiguration_t  m_configType;
+
+  double                      m_frameAllocatedBandwidth[m_maxFrameCount];
+  double                      m_frameCarrierAllocatedBandwidth[m_maxFrameCount];
+  double                      m_frameCarrierSpacing[m_maxFrameCount];
+  double                      m_frameCarrierRollOff[m_maxFrameCount];
+
   SatFrameConfList_t m_frames;
+
+public:
+  // macro to ease definition of access methods for frame specific attributes
+  #define FRAME_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
+    inline void SetFrame ## index ## AllocatedBandwidthHz (double value)  \
+      { return SetFrameAllocatedBandwidthHz (index, value); } \
+    inline double GetFrame ## index ## AllocatedBandwidthHz () const  \
+      { return GetFrameAllocatedBandwidthHz (index); }  \
+    inline void SetFrame ## index ## CarrierAllocatedBandwidthHz (double value)  \
+      { return SetFrameCarrierAllocatedBandwidthHz (index, value); } \
+    inline double GetFrame ## index ## CarrierAllocatedBandwidthHz () const      \
+      { return GetFrameCarrierAllocatedBandwidthHz (index); } \
+    inline void SetFrame ## index ## CarrierSpacing (double value)  \
+      { return SetFrameCarrierSpacing (index, value); } \
+    inline double GetFrame ## index ## CarrierSpacing () const      \
+      { return GetFrameCarrierSpacing (index); } \
+    inline void SetFrame ## index ## CarrierRollOff (double value)  \
+      { return SetFrameCarrierRollOff (index, value); } \
+    inline double GetFrame ## index ## CarrierRollOff () const      \
+      { return GetFrameCarrierRollOff (index); }
+
+  // Access method definition for frame specific attributes
+  // there should be as many macro calls as m_maxFrameCount defines
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (0);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (1);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (2);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (3);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (4);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (5);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (6);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (7);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (8);
+  FRAME_ATTRIBUTE_ACCESSOR_DEFINE (9);
+
 };
+
+/**
+ * \ingroup satellite
+ * \brief This class implements super frame configuration 0
+ */
+class SatSuperframeConf0 : public SatSuperframeConf
+{
+public:
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor for SatSuperframeConf
+   */
+  SatSuperframeConf0 ();
+
+  /**
+   * Destructor for SatSuperframeConf
+   */
+  ~SatSuperframeConf0 ();
+
+  virtual void DoConfigure ();
+
+private:
+
+};
+
+/**
+ * \ingroup satellite
+ * \brief This class implements super frame configuration 1
+ */
+class SatSuperframeConf1 : public SatSuperframeConf
+{
+public:
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor for SatSuperframeConf
+   */
+  SatSuperframeConf1 ();
+
+  /**
+   * Destructor for SatSuperframeConf
+   */
+  ~SatSuperframeConf1 ();
+
+  virtual void DoConfigure ();
+
+private:
+
+};
+
+/**
+ * \ingroup satellite
+ * \brief This class implements super frame configuration 2
+ */
+class SatSuperframeConf2 : public SatSuperframeConf
+{
+public:
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor for SatSuperframeConf
+   */
+  SatSuperframeConf2 ();
+
+  /**
+   * Destructor for SatSuperframeConf
+   */
+  ~SatSuperframeConf2 ();
+
+  virtual void DoConfigure ();
+
+private:
+
+};
+
+/**
+ * \ingroup satellite
+ * \brief This class implements super frame configuration 3
+ */
+class SatSuperframeConf3 : public SatSuperframeConf
+{
+public:
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor for SatSuperframeConf
+   */
+  SatSuperframeConf3 ();
+
+  /**
+   * Destructor for SatSuperframeConf
+   */
+  ~SatSuperframeConf3 ();
+
+  virtual void DoConfigure ();
+
+private:
+
+};
+
 
 } // namespace ns3
 
