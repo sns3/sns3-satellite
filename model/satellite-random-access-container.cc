@@ -209,12 +209,17 @@ SatRandomAccess::DoRandomAccess ()
   /// Do CRDSA
   if (m_randomAccessModel == RA_CRDSA)
     {
-      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only CRDSA enabled, evaluating CRDSA");
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only CRDSA enabled, check frame start");
 
-      txOpportunities = DoCrdsa ();
+      if (IsFrameStart ())
+        {
+          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - At the frame start, evaluating CRDSA");
 
-      results.resultType = RA_CRDSA_RESULT;
-      results.crdsaResult = txOpportunities;
+          txOpportunities = DoCrdsa ();
+
+          results.resultType = RA_CRDSA_RESULT;
+          results.crdsaResult = txOpportunities;
+        }
     }
   /// Do Slotted ALOHA
   else if (m_randomAccessModel == RA_SLOTTED_ALOHA)
