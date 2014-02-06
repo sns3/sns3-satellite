@@ -52,6 +52,27 @@ public:
   } RandomAccessModel_t;
 
   /**
+   * \enum RandomAccessResultType_t
+   * \brief Random access result types
+   */
+  typedef enum
+  {
+    RA_SLOTTED_ALOHA_RESULT = 0,
+    RA_CRDSA_RESULT = 1,
+  } RandomAccessResultType_t;
+
+  /**
+   * \struct RandomAccessResults_s
+   * \brief Random access results
+   */
+  typedef struct
+  {
+    RandomAccessResultType_t resultType;
+    double slottedAlohaResult;
+    std::set<uint32_t> crdsaResult;
+  } RandomAccessResults_s;
+
+  /**
    * \brief Constructor
    */
   SatRandomAccess ();
@@ -125,8 +146,9 @@ public:
 
   /**
    *
+   * \return
    */
-  void DoRandomAccess ();
+  SatRandomAccess::RandomAccessResults_s DoRandomAccess ();
 
 private:
 

@@ -192,7 +192,7 @@ SatRandomAccess::SetRandomAccessModel (RandomAccessModel_t randomAccessModel)
 }
 
 /// TODO implement return values!
-void
+SatRandomAccess::RandomAccessResults_s
 SatRandomAccess::DoRandomAccess ()
 {
   NS_LOG_FUNCTION (this);
@@ -200,6 +200,7 @@ SatRandomAccess::DoRandomAccess ()
   /// return variable initialization
   std::set<uint32_t> txOpportunities;
   double time = 0.0;
+  RandomAccessResults_s results;
 
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Starting Random Access ------");
@@ -211,6 +212,9 @@ SatRandomAccess::DoRandomAccess ()
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only CRDSA enabled, evaluating CRDSA");
 
       txOpportunities = DoCrdsa ();
+
+      results.resultType = RA_CRDSA_RESULT;
+      results.crdsaResult = txOpportunities;
     }
   /// Do Slotted ALOHA
   else if (m_randomAccessModel == RA_SLOTTED_ALOHA)
@@ -218,6 +222,9 @@ SatRandomAccess::DoRandomAccess ()
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only SA enabled, evaluating Slotted ALOHA");
 
       time = DoSlottedAloha ();
+
+      results.resultType = RA_SLOTTED_ALOHA_RESULT;
+      results.slottedAlohaResult = time;
     }
   /// Frame start is a known trigger for CRDSA, which has higher priority than SA.
   /// As such SA will not be used at frame start unless CRDSA backoff probability is higher than the parameterized value
@@ -229,6 +236,9 @@ SatRandomAccess::DoRandomAccess ()
         {
           NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Not at frame start, evaluating Slotted ALOHA");
           time = DoSlottedAloha ();
+
+          results.resultType = RA_SLOTTED_ALOHA_RESULT;
+          results.slottedAlohaResult = time;
         }
       else
         {
@@ -238,14 +248,18 @@ SatRandomAccess::DoRandomAccess ()
             {
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Low CRDSA backoff value AND CRDSA is free, evaluating CRDSA");
               txOpportunities = DoCrdsa ();
+
+              results.resultType = RA_CRDSA_RESULT;
+              results.crdsaResult = txOpportunities;
             }
           else
             {
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - High CRDSA backoff value OR CRDSA is not free, evaluating Slotted ALOHA");
               time = DoSlottedAloha ();
 
-              /// TODO RA_ANY_AVAILABLE the CRDSA idle block updating
-              /// think of more novel approach, maybe even combine SA and CRDSA classes with RA container
+              results.resultType = RA_SLOTTED_ALOHA_RESULT;
+              results.slottedAlohaResult = time;
+
               CrdsaUpdateIdleBlocks ();
             }
         }
@@ -267,6 +281,8 @@ SatRandomAccess::DoRandomAccess ()
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Random Access FINISHED ------");
   NS_LOG_INFO ("------------------------------------");
+
+  return results;
 }
 
 void
