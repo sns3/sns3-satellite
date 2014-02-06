@@ -81,7 +81,7 @@ void SatQueue::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_queueEventCallback.Nullify ();
   DequeueAll ();
-  Queue::Dispose ();
+  Queue::DoDispose ();
 }
 
 void
