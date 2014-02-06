@@ -113,6 +113,12 @@ public:
    */
   uint32_t GetCrdsaDefaultPayloadBytes () { return m_crdsaPayloadBytes; }
 
+  /**
+   *
+   * \return
+   */
+  double GetMaximumCrdsaBackoffProbability () { return m_raLogicMaximumCrdsaBackoffProbability; }
+
 private:
 
   /**
@@ -169,6 +175,11 @@ private:
    *
    */
   uint32_t m_crdsaPayloadBytes;
+
+  /**
+   *
+   */
+  double m_raLogicMaximumCrdsaBackoffProbability;
 };
 
 } // namespace ns3

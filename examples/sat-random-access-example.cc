@@ -27,22 +27,31 @@ main (int argc, char *argv[])
   /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> ();
 
-  /// Create random access module with Slotted ALOHA as default
+  /// Create random access module with RA_SLOTTED_ALOHA as default
   Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, SatRandomAccess::RA_SLOTTED_ALOHA);
 
   /// Run simulation
   for (uint32_t i = 0; i < 5; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoSlottedAloha, randomAccess);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess);
     }
 
-  /// Change random access model to CRDSA
-  Simulator::Schedule (Time (300000 + 5*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_CRDSA);
+  /// Change random access model to RA_CRDSA
+  Simulator::Schedule (Time (300000 + 6*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_CRDSA);
 
   /// Continue simulation
-  for (uint32_t i = 6; i < 12; i++)
+  for (uint32_t i = 7; i < 13; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoCrdsa, randomAccess);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess);
+    }
+
+  /// Change random access model to RA_ANY_AVAILABLE
+  Simulator::Schedule (Time (300000 + 14*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_ANY_AVAILABLE);
+
+  /// Continue simulation
+  for (uint32_t i = 15; i < 21; i++)
+    {
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess);
     }
 
   Simulator::Run ();

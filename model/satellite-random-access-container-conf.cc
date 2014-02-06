@@ -87,6 +87,11 @@ SatRandomAccessConf::GetTypeId (void)
                    UintegerValue (2000),
                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaPayloadBytes),
                    MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("RaLogicMaximumCrdsaBackoffProbability",
+                   "Maximum CRDSA backoff probability for RA logic",
+                   DoubleValue (0.2),
+                   MakeDoubleAccessor (&SatRandomAccessConf::m_raLogicMaximumCrdsaBackoffProbability),
+                   MakeDoubleChecker<double> ())
     ;
   return tid;
 }
@@ -102,7 +107,8 @@ SatRandomAccessConf::SatRandomAccessConf () :
   m_crdsaMaxUniquePayloadPerBlock (3),
   m_crdsaMaxConsecutiveBlocksAccessed (4),
   m_crdsaMinIdleBlocks (2),
-  m_crdsaPayloadBytes (2000) /// TODO this should be waveform dependent
+  m_crdsaPayloadBytes (2000), /// TODO this should be waveform dependent
+  m_raLogicMaximumCrdsaBackoffProbability (0.20)
 {
   NS_LOG_FUNCTION (this);
 }
