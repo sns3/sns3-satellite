@@ -53,6 +53,8 @@ public:
   SatQueue ();
   ~SatQueue ();
 
+  virtual void DoDispose ();
+
   typedef enum {
     FIRST_BUFFERED_PKT,
     BUFFER_EMPTY,
@@ -107,7 +109,6 @@ public:
   void SetQueueEventCallback (SatQueue::QueueEventCallback cb);
 
 protected:
-  void DoDispose ();
 
 private:
   virtual bool DoEnqueue (Ptr<Packet> p);
