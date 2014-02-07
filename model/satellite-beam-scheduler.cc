@@ -42,6 +42,15 @@ SatBeamScheduler::GetTypeId (void)
 }
 
 SatBeamScheduler::SatBeamScheduler ()
+  : m_beamId (0),
+    m_superframeSeq (0),
+    m_superFrameCounter (0),
+    m_txCallback (0),
+    m_tbtpAddCb (0),
+    m_currentFrame (0),
+    m_totalSlotLeft (0),
+    m_additionalSlots (0),
+    m_slotsPerUt (0)
 {
   NS_LOG_FUNCTION (this);
   m_currentUt = m_uts.end ();
@@ -88,13 +97,6 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
   m_txCallback = cb;
   m_superframeSeq = seq;
   m_superFrameCounter = 0;
-
-  Ptr<SatFrameConf> frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
-
-  for ( uint32_t i = 0; i < frameConf->GetCarrierCount(); i++ )
-    {
-      m_carrierIds.push_back (i);
-    }
 
   Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
 }
@@ -150,6 +152,7 @@ SatBeamScheduler::Schedule ()
       // TODO: algorithms for other configurations
       InitializeScheduling ();
       ScheduleUts (tbtpMsg);
+      ScheduleRandomSlots (tbtpMsg);
 
       uint32_t msgId = m_superframeSeq->AddTbtpMessage (m_beamId, tbtpMsg);
 
@@ -167,6 +170,35 @@ SatBeamScheduler::Schedule ()
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
+}
+
+void SatBeamScheduler::ScheduleRandomSlots (Ptr<SatTbtpMessage> header)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatFrameConf> frameConf = NULL;
+  uint32_t frameId = 0;
+
+  // find frame for RA entries
+  for ( uint32_t i = 0; ( (i <  m_superframeSeq->GetSuperframeConf (0)->GetFrameCount () ) && (frameConf == NULL) ); i++ )
+    {
+      if ( m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (i)->IsRandomAccess () )
+        {
+          frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
+          frameId = i;
+        }
+   }
+
+  if ( frameConf != NULL )
+    {
+      SatFrameConf::SatTimeSlotIdList_t timeSlots = frameConf->GetTimeSlotIds (0);
+
+      for (SatFrameConf::SatTimeSlotIdList_t::const_iterator it = timeSlots.begin (); it != timeSlots.end (); it++ )
+        {
+          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (frameId, GetNextTimeSlot () );
+          header->SetTimeslot (Mac48Address::GetBroadcast (), timeSlotInfo);
+        }
+    }
 }
 
 void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
@@ -216,7 +248,7 @@ SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
 
       while ( timeSlotForUt )
         {
-          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (0, GetNextTimeSlot () );
+          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (m_currentFrame, GetNextTimeSlot () );
           header->SetTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), timeSlotInfo);
 
           timeSlotForUt--;
@@ -234,7 +266,7 @@ SatBeamScheduler::GetNextTimeSlot ()
   NS_ASSERT (m_currentSlot != m_timeSlots.end ());
   NS_ASSERT (m_currentCarrier != m_carrierIds.end ());
 
-  Ptr<SatFrameConf> frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
+  Ptr<SatFrameConf> frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (m_currentFrame);
 
   uint16_t timeSlotId = *m_currentSlot;
 
@@ -277,7 +309,25 @@ void SatBeamScheduler::InitializeScheduling ()
 
       m_firstUt = m_currentUt;
 
-      Ptr<SatFrameConf> frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
+      Ptr<SatFrameConf> frameConf = NULL;
+
+      // find frame for DAMA entries
+      for ( uint32_t i = 0; ( (i <  m_superframeSeq->GetSuperframeConf (0)->GetFrameCount () ) && (frameConf == NULL) ); i++ )
+        {
+          if ( m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (i)->IsRandomAccess () == false )
+            {
+              frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
+              m_currentFrame = i;
+            }
+        }
+
+      NS_ASSERT (frameConf);
+      m_carrierIds.clear ();
+
+      for ( uint32_t i = 0; i < frameConf->GetCarrierCount(); i++ )
+        {
+          m_carrierIds.push_back (i);
+        }
 
       m_totalSlotLeft = frameConf->GetTimeSlotCount ();
 

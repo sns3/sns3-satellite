@@ -176,7 +176,7 @@ public:
    * \param timeSlots         Time slot of the frame.
    */
   SatFrameConf ( double bandwidthHz, double durationInSeconds, Ptr<SatBtuConf> btu,
-                 SatTimeSlotConfList_t * timeSlots );
+                 SatTimeSlotConfList_t * timeSlots, bool isRandomAccess );
 
   /**
    * Add time slot.
@@ -277,6 +277,8 @@ public:
    */
   SatTimeSlotIdList_t GetTimeSlotIds (uint32_t carrierId) const;
 
+  inline bool IsRandomAccess () const { return m_isRandomAccess;}
+
   /**
    * Destructor for SatFrameConf
    */
@@ -288,6 +290,7 @@ private:
   double    m_bandwidthHz;
   double    m_durationInSeconds;
   uint16_t  m_nextTimeSlotId;
+  bool      m_isRandomAccess;
 
   Ptr<SatBtuConf>         m_btu;
   uint32_t                m_carrierCount;
@@ -305,21 +308,11 @@ class SatSuperframeConf : public Object
 public:
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
-  static const uint8_t m_maxFrameCount = 10;
+  static const uint32_t m_maxFrameCount = 10;
+  static const uint32_t m_maxFrameConfigTypeIndex = 3;
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
-
-  /**
-   *
-   */
-  typedef enum
-    {
-      FRAME_CONFIG_0 = 0,//!< FRAME_CONFIG_0
-      FRAME_CONFIG_1 = 1,//!< FRAME_CONFIG_1
-      FRAME_CONFIG_2 = 2,//!< FRAME_CONFIG_2
-      FRAME_CONFIG_3 = 3,//!< FRAME_CONFIG_3
-    } StaticFrameConfiguration_t;
 
   /**
    * Default constructor for SatSuperframeConf
@@ -418,43 +411,46 @@ public:
    *
    * \return Number of the frames in use
    */
-  uint32_t GetFrameCount () const { return m_framesInUse; }
+  inline uint32_t GetFrameCount () const { return m_framesInUse; }
 
   /**
    * Set frame configuration type to be used in super frame.
    *
-   * \param configType frame configuration type
+   * \param configType index of the frame configuration type
    */
-  inline void SetConfigType (StaticFrameConfiguration_t configType) { m_configType = configType; }
+  inline void SetConfigType (uint32_t index) { m_configTypeIndex = index; }
 
   /**
    * Get frame configuration type to be used in super frame.
-   * \return frame configuration type
+   * \return index of the frame configuration type
    */
-  StaticFrameConfiguration_t GetConfigType () const { return m_configType; }
+  inline uint32_t GetConfigType () const { return m_configTypeIndex; }
 
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
-  void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
-  void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
-  void SetFrameCarrierSpacing (uint8_t frameIndex, double spacing);
-  void SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff);
+  void SetFrameAllocatedBandwidthHz (uint32_t frameIndex, double bandwidhtHz);
+  void SetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex, double bandwidhtHz);
+  void SetFrameCarrierSpacing (uint32_t frameIndex, double spacing);
+  void SetFrameCarrierRollOff (uint32_t frameIndex, double rollOff);
+  void SetFrameRandomAccess (uint32_t frameIndex, bool randomAccess);
 
-  double GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const;
-  double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
-  double GetFrameCarrierSpacing (uint8_t frameIndex) const;
-  double GetFrameCarrierRollOff (uint8_t frameIndex) const;
+  double GetFrameAllocatedBandwidthHz (uint32_t frameIndex) const;
+  double GetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex) const;
+  double GetFrameCarrierSpacing (uint32_t frameIndex) const;
+  double GetFrameCarrierRollOff (uint32_t frameIndex) const;
+  bool GetFrameRandomAccess (uint32_t frameIndex) const;
 
 private:
-  double                      m_usedBandwidthHz;
-  double                      m_durationInSeconds;
+  double    m_usedBandwidthHz;
+  double    m_durationInSeconds;
 
-  uint32_t                    m_framesInUse;
-  StaticFrameConfiguration_t  m_configType;
+  uint32_t  m_framesInUse;
+  uint32_t  m_configTypeIndex;
 
-  double                      m_frameAllocatedBandwidth[m_maxFrameCount];
-  double                      m_frameCarrierAllocatedBandwidth[m_maxFrameCount];
-  double                      m_frameCarrierSpacing[m_maxFrameCount];
-  double                      m_frameCarrierRollOff[m_maxFrameCount];
+  double    m_frameAllocatedBandwidth[m_maxFrameCount];
+  double    m_frameCarrierAllocatedBandwidth[m_maxFrameCount];
+  double    m_frameCarrierSpacing[m_maxFrameCount];
+  double    m_frameCarrierRollOff[m_maxFrameCount];
+  bool      m_frameIsRandomAccess[m_maxFrameCount];
 
   SatFrameConfList_t m_frames;
 
@@ -476,7 +472,11 @@ public:
     inline void SetFrame ## index ## CarrierRollOff (double value)  \
       { return SetFrameCarrierRollOff (index, value); } \
     inline double GetFrame ## index ## CarrierRollOff () const      \
-      { return GetFrameCarrierRollOff (index); }
+      { return GetFrameCarrierRollOff (index); } \
+    inline void SetFrame ## index ## RandomAccess (bool value)  \
+      { return SetFrameRandomAccess (index, value); } \
+    inline double GetFrame ## index ## RandomAccess () const      \
+      { return GetFrameRandomAccess (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines

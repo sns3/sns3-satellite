@@ -126,7 +126,12 @@ private:
     public:
       double m_cra; // Constant Rate Assignment (CRA)
       double m_cno; // The latest calculated value of C/N0
-      UtInfo() { m_cra = 0;}
+
+      UtInfo()
+        : m_cra (0.0),
+          m_cno (0.0)
+        {
+        }
   };
 
   SatBeamScheduler& operator = (const SatBeamScheduler &);
@@ -138,6 +143,7 @@ private:
 
   void InitializeScheduling ();
   void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
+  void ScheduleRandomSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
 
@@ -202,6 +208,11 @@ private:
   SatFrameConf::SatTimeSlotIdList_t::iterator m_currentSlot;
 
   /**
+   * Current frame id scheduled.
+   */
+  uint32_t m_currentFrame;
+
+  /**
    * Counter for total time slots left for scheduling
    */
   uint32_t m_totalSlotLeft;
@@ -215,11 +226,6 @@ private:
    * Number of time slots reserved per every UTs
    */
   uint32_t m_slotsPerUt;
-
-  /**
-   * Id of the next sent TBTP message.
-   */
-  uint32_t m_tbtpId;
 };
 
 } // namespace ns3
