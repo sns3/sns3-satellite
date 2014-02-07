@@ -35,15 +35,15 @@ SatRandomAccess::GetTypeId (void)
 }
 
 SatRandomAccess::SatRandomAccess () :
-  m_uniformVariable (),
+  m_uniformRandomVariable (),
   m_randomAccessModel (RA_OFF),
   m_randomAccessConf (),
 
-  /// Slotted ALOHA
+  /// Slotted ALOHA variables
   m_slottedAlohaMinRandomizationValue (),
   m_slottedAlohaMaxRandomizationValue (),
 
-  /// CRDSA
+  /// CRDSA variables
   m_crdsaBackoffProbability (),
   m_crdsaMaximumBackoffProbability (),
   m_crdsaMinRandomizationValue (),
@@ -65,7 +65,7 @@ SatRandomAccess::SatRandomAccess () :
 }
 
 SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel) :
-  m_uniformVariable (),
+  m_uniformRandomVariable (),
   m_randomAccessModel (randomAccessModel),
   m_randomAccessConf (randomAccessConf),
 
@@ -91,7 +91,7 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Ran
 {
   NS_LOG_FUNCTION (this);
 
-  m_uniformVariable = CreateObject<UniformRandomVariable> ();
+  m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
 
   if (m_randomAccessConf == NULL)
     {
@@ -103,6 +103,9 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Ran
 SatRandomAccess::~SatRandomAccess ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_uniformRandomVariable = NULL;
+  m_randomAccessConf = NULL;
 }
 
 ///---------------------------------------
@@ -115,7 +118,7 @@ SatRandomAccess::IsFrameStart ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool isFrameStart = m_uniformVariable->GetInteger (0,1);
+  bool isFrameStart = m_uniformRandomVariable->GetInteger (0,1);
 
   NS_LOG_INFO ("SatRandomAccess::IsFrameStart: " << isFrameStart);
 
@@ -128,7 +131,7 @@ SatRandomAccess::IsDamaAvailable ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool isDamaAvailable = m_uniformVariable->GetInteger (0,1);
+  bool isDamaAvailable = m_uniformRandomVariable->GetInteger (0,1);
 
   NS_LOG_INFO ("SatRandomAccess::IsDamaAvailable: " << isDamaAvailable);
 
@@ -141,7 +144,7 @@ SatRandomAccess::AreBuffersEmpty ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool areBuffersEmpty = m_uniformVariable->GetInteger (0,1);;
+  bool areBuffersEmpty = m_uniformRandomVariable->GetInteger (0,1);;
 
   NS_LOG_INFO ("SatRandomAccess::AreBuffersEmpty: " << areBuffersEmpty);
 
@@ -198,9 +201,9 @@ SatRandomAccess::DoRandomAccess ()
   NS_LOG_FUNCTION (this);
 
   /// return variable initialization
-  std::set<uint32_t> txOpportunities;
-  double time = 0.0;
   RandomAccessResults_s results;
+
+  results.resultType = SatRandomAccess::RA_DO_NOTHING;
 
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Starting Random Access ------");
@@ -215,10 +218,7 @@ SatRandomAccess::DoRandomAccess ()
         {
           NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - At the frame start, evaluating CRDSA");
 
-          txOpportunities = DoCrdsa ();
-
-          results.resultType = RA_CRDSA_RESULT;
-          results.crdsaResult = txOpportunities;
+          results = DoCrdsa ();
         }
     }
   /// Do Slotted ALOHA
@@ -226,13 +226,12 @@ SatRandomAccess::DoRandomAccess ()
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only SA enabled, evaluating Slotted ALOHA");
 
-      time = DoSlottedAloha ();
-
-      results.resultType = RA_SLOTTED_ALOHA_RESULT;
-      results.slottedAlohaResult = time;
+      results = DoSlottedAloha ();
     }
   /// Frame start is a known trigger for CRDSA, which has higher priority than SA.
-  /// As such SA will not be used at frame start unless CRDSA backoff probability is higher than the parameterized value
+  /// As such SA will not be used at frame start unless:
+  /// 1) CRDSA back off probability is higher than the parameterized value
+  /// 2) CRDSA back off is in effect
   else if (m_randomAccessModel == RA_ANY_AVAILABLE)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - All RA models enabled");
@@ -240,10 +239,7 @@ SatRandomAccess::DoRandomAccess ()
       if (!IsFrameStart ())
         {
           NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Not at frame start, evaluating Slotted ALOHA");
-          time = DoSlottedAloha ();
-
-          results.resultType = RA_SLOTTED_ALOHA_RESULT;
-          results.slottedAlohaResult = time;
+          results = DoSlottedAloha ();
         }
       else
         {
@@ -252,18 +248,12 @@ SatRandomAccess::DoRandomAccess ()
           if ((m_crdsaBackoffProbability < m_crdsaMaximumBackoffProbability) && IsCrdsaFree ())
             {
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Low CRDSA backoff value AND CRDSA is free, evaluating CRDSA");
-              txOpportunities = DoCrdsa ();
-
-              results.resultType = RA_CRDSA_RESULT;
-              results.crdsaResult = txOpportunities;
+              results = DoCrdsa ();
             }
           else
             {
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - High CRDSA backoff value OR CRDSA is not free, evaluating Slotted ALOHA");
-              time = DoSlottedAloha ();
-
-              results.resultType = RA_SLOTTED_ALOHA_RESULT;
-              results.slottedAlohaResult = time;
+              results = DoSlottedAloha ();
 
               CrdsaUpdateIdleBlocks ();
             }
@@ -276,12 +266,26 @@ SatRandomAccess::DoRandomAccess ()
 
   /// For debugging purposes
   /// TODO: comment out this code at later stage
-  std::set<uint32_t>::iterator iter;
-  for (iter = txOpportunities.begin (); iter != txOpportunities.end (); iter++ )
+  if (results.resultType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
     {
-      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity at slot: " << (*iter));
+      std::set<uint32_t>::iterator iter;
+      for (iter = results.crdsaResult.begin (); iter != results.crdsaResult.end (); iter++ )
+        {
+          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity at slot: " << (*iter));
+        }
     }
-  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA minimum time to wait: " << time << " seconds");
+  else if (results.resultType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA minimum time to wait: " << results.slottedAlohaResult << " seconds");
+    }
+  else if (results.resultType == SatRandomAccess::RA_DO_NOTHING)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - No Tx opportunity");
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid result type");
+    }
 
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Random Access FINISHED ------");
@@ -342,13 +346,14 @@ SatRandomAccess::SlottedAlohaUpdateVariables (double min, double max)
   NS_LOG_INFO ("SatRandomAccess::SlottedAlohaUpdateVariables - new min: " << min << " new max: " << max);
 }
 
-double
+SatRandomAccess::RandomAccessResults_s
 SatRandomAccess::DoSlottedAloha ()
 {
   NS_LOG_FUNCTION (this);
 
   /// TODO: what to return in the case SA is not used, e.g., DAMA is available?
-  double time = 0;
+  RandomAccessResults_s results;
+  results.resultType = SatRandomAccess::RA_DO_NOTHING;
 
   NS_LOG_INFO ("---------------------------------------------");
   NS_LOG_INFO ("------ Running Slotted ALOHA algorithm ------");
@@ -362,14 +367,15 @@ SatRandomAccess::DoSlottedAloha ()
       NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - No DAMA -> Running Slotted ALOHA");
 
       /// Randomize Tx opportunity release time
-      time = SlottedAlohaRandomizeReleaseTime ();
+      results.slottedAlohaResult = SlottedAlohaRandomizeReleaseTime ();
+      results.resultType = SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY;
     }
 
   NS_LOG_INFO ("----------------------------------------------");
   NS_LOG_INFO ("------ Slotted ALOHA algorithm FINISHED ------");
   NS_LOG_INFO ("----------------------------------------------");
 
-  return time;
+  return results;
 }
 
 double
@@ -379,7 +385,7 @@ SatRandomAccess::SlottedAlohaRandomizeReleaseTime ()
 
   NS_LOG_INFO ("SatRandomAccess::SlottedAlohaRandomizeReleaseTime - Randomizing the release time...");
 
-  double releaseTime = Now ().GetSeconds () + m_uniformVariable->GetValue (m_slottedAlohaMinRandomizationValue, m_slottedAlohaMaxRandomizationValue);
+  double releaseTime = Now ().GetSeconds () + m_uniformRandomVariable->GetValue (m_slottedAlohaMinRandomizationValue, m_slottedAlohaMaxRandomizationValue);
 
   NS_LOG_INFO ("SatRandomAccess::SlottedAlohaRandomizeReleaseTime - TX opportunity in the next slot after the release time at: " << releaseTime << " seconds");
 
@@ -524,7 +530,7 @@ SatRandomAccess::CrdsaDoBackoff ()
 
   bool doCrdsaBackoff = false;
 
-  if (m_uniformVariable->GetValue (0.0,1.0) < m_crdsaBackoffProbability)
+  if (m_uniformRandomVariable->GetValue (0.0,1.0) < m_crdsaBackoffProbability)
     {
       doCrdsaBackoff = true;
     }
@@ -587,13 +593,14 @@ SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsed ()
     }
 }
 
-std::set<uint32_t>
+SatRandomAccess::RandomAccessResults_s
 SatRandomAccess::DoCrdsa ()
 {
   NS_LOG_FUNCTION (this);
 
   /// TODO: what to return in the case CRDSA is not used?
-  std::set<uint32_t> txOpportunities;
+  RandomAccessResults_s results;
+  results.resultType = SatRandomAccess::RA_DO_NOTHING;
 
   NS_LOG_INFO ("-------------------------------------");
   NS_LOG_INFO ("------ Running CRDSA algorithm ------");
@@ -625,12 +632,14 @@ SatRandomAccess::DoCrdsa ()
                 }
               else
                 {
-                  txOpportunities = CrdsaPrepareToTransmit ();
+                  results.crdsaResult = CrdsaPrepareToTransmit ();
+                  results.resultType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
                 }
             }
           else
             {
-              txOpportunities = CrdsaPrepareToTransmit ();
+              results.crdsaResult = CrdsaPrepareToTransmit ();
+              results.resultType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
             }
         }
       else
@@ -643,7 +652,7 @@ SatRandomAccess::DoCrdsa ()
   NS_LOG_INFO ("------ CRDSA algorithm FINISHED ------");
   NS_LOG_INFO ("--------------------------------------");
 
-  return txOpportunities;
+  return results;
 }
 
 
@@ -659,7 +668,7 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities ()
 
   while (txOpportunities.size () < (m_crdsaNumOfInstances * m_crdsaMaxUniquePayloadPerBlock))
     {
-      uint32_t slot = m_uniformVariable->GetInteger (m_crdsaMinRandomizationValue, m_crdsaMaxRandomizationValue);
+      uint32_t slot = m_uniformRandomVariable->GetInteger (m_crdsaMinRandomizationValue, m_crdsaMaxRandomizationValue);
 
       result = txOpportunities.insert (slot);
 

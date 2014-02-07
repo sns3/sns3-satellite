@@ -84,28 +84,44 @@ SatUtMac::GetInstanceTypeId (void) const
 }
 
 SatUtMac::SatUtMac ()
+: SatMac (),
+  m_superframeSeq (),
+  m_timingAdvanceCb (),
+  m_txCallback (),
+  m_cra (),
+  m_lastCno (),
+  m_framePduHeaderSizeInBytes ()
 {
   NS_LOG_FUNCTION (this);
   
   // default constructor should not be used
-  NS_ASSERT (false);
+  NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
+SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAccessConf> randomAccessConf, SatRandomAccess::RandomAccessModel_t randomAccessModel)
  : SatMac (beamId),
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
    m_txCallback (0),
-   m_lastCno (NAN)
+   m_cra (),
+   m_lastCno (NAN),
+   m_framePduHeaderSizeInBytes ()
 {
 	NS_LOG_FUNCTION (this);
 
-	Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
+	if (randomAccessConf != NULL && randomAccessModel != SatRandomAccess::RA_OFF)
+	  {
+	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
+	  }
+
+  Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
 }
 
 SatUtMac::~SatUtMac ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_randomAccess = NULL;
 }
 
 void

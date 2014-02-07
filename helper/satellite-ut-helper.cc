@@ -77,10 +77,17 @@ SatUtHelper::GetTypeId (void)
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute ("CraAllocMode",
                      "Constant Rate Assignment (CRA) allocation mode used for UTs.",
-                      EnumValue (SatUtHelper::CONSTANT_CRA),
-                      MakeEnumAccessor (&SatUtHelper::m_craAllocMode),
-                      MakeEnumChecker (SatUtHelper::CONSTANT_CRA, "Constant CRA used for UTs. (not set by helper, UT's attribute defines value.",
+                     EnumValue (SatUtHelper::CONSTANT_CRA),
+                     MakeEnumAccessor (&SatUtHelper::m_craAllocMode),
+                     MakeEnumChecker (SatUtHelper::CONSTANT_CRA, "Constant CRA used for UTs. (not set by helper, UT's attribute defines value.",
                                        SatUtHelper::RANDOM_CRA, "Random CRA value (128 is set by helper for every UT."))
+      .AddAttribute ("RandomAccessModel",
+                     "Random Access Model",
+                     EnumValue (SatRandomAccess::RA_OFF),
+                     MakeEnumAccessor (&SatUtHelper::m_randomAccessModel),
+                     MakeEnumChecker (SatRandomAccess::RA_SLOTTED_ALOHA, "Slotted ALOHA",
+                                      SatRandomAccess::RA_CRDSA, "CRDSA",
+                                      SatRandomAccess::RA_ANY_AVAILABLE, "Any available"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creation))
     ;
@@ -96,17 +103,30 @@ SatUtHelper::GetInstanceTypeId (void) const
 }
 
 SatUtHelper::SatUtHelper ()
+ : m_carrierBandwidthConverter (),
+   m_fwdLinkCarrierCount (),
+   m_superframeSeq (),
+   m_interferenceModel (),
+   m_errorModel (),
+   m_linkResults (),
+   m_craAllocMode (),
+   m_randomAccessModel (SatRandomAccess::RA_OFF)
 {
   NS_LOG_FUNCTION (this);
 
   // this default constructor should be never called
-  NS_ASSERT (false);
+  NS_FATAL_ERROR ("SatUtHelper::SatUtHelper - Constructor not in use");
 }
 
 SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-   m_superframeSeq (seq)
+   m_superframeSeq (seq),
+   m_interferenceModel (),
+   m_errorModel (),
+   m_linkResults (),
+   m_craAllocMode (),
+   m_randomAccessModel (SatRandomAccess::RA_OFF)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
 
@@ -132,10 +152,10 @@ SatUtHelper::Initialize (Ptr<SatLinkResultsDvbS2> lrS2)
 
 void 
 SatUtHelper::SetQueue (std::string type,
-                              std::string n1, const AttributeValue &v1,
-                              std::string n2, const AttributeValue &v2,
-                              std::string n3, const AttributeValue &v3,
-                              std::string n4, const AttributeValue &v4)
+                       std::string n1, const AttributeValue &v1,
+                       std::string n2, const AttributeValue &v2,
+                       std::string n3, const AttributeValue &v3,
+                       std::string n4, const AttributeValue &v4)
 {
   NS_LOG_FUNCTION (this << type << n1 << n2 << n3 << n4 );
 
@@ -177,16 +197,23 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   NetDeviceContainer devs;
 
+  Ptr<SatRandomAccessConf> randomAccessConf = NULL;
+
+  if (m_randomAccessModel != SatRandomAccess::RA_OFF)
+    {
+      randomAccessConf = CreateObject<SatRandomAccessConf> ();
+    }
+
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
+    devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, randomAccessConf));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, Ptr<SatRandomAccessConf> randomAccessConf)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -211,7 +238,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId);
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, randomAccessConf, m_randomAccessModel);
 
   if ( m_craAllocMode == SatUtHelper::RANDOM_CRA )
     {
@@ -325,9 +352,17 @@ SatUtHelper::Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, P
 {
   NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
 
+  /// Load default random access configuration
+  Ptr<SatRandomAccessConf> randomAccessConf = NULL;
+
+  if (m_randomAccessModel != SatRandomAccess::RA_OFF)
+    {
+      randomAccessConf = CreateObject<SatRandomAccessConf> ();
+    }
+
   Ptr<Node> a = Names::Find<Node> (aName);
 
-  return Install (a, beamId, fCh, rCh, gwNd, ncc);
+  return Install (a, beamId, fCh, rCh, gwNd, ncc, randomAccessConf);
 }
 
 void

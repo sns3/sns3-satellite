@@ -62,7 +62,7 @@ public:
    * Construct a SatMac
    *
    * This is the constructor for the SatMac
-   *
+   * \param beamId
    */
   SatMac (uint32_t beamId);
 

@@ -33,6 +33,8 @@
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-ncc.h"
 #include "satellite-superframe-sequence.h"
+#include "ns3/satellite-random-access-container.h"
+#include "ns3/satellite-random-access-container-conf.h"
 
 namespace ns3 {
 
@@ -154,7 +156,7 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc );
+  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, Ptr<SatRandomAccessConf> randomAccessConf );
 
   /**
    * \param aName Name of the node
@@ -210,6 +212,11 @@ private:
      * \brief Trace callback for creation traces
      */
     TracedCallback<std::string> m_creation;
+
+    /**
+     *
+     */
+    SatRandomAccess::RandomAccessModel_t m_randomAccessModel;
 };
 
 } // namespace ns3

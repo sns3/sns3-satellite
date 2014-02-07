@@ -57,8 +57,9 @@ public:
    */
   typedef enum
   {
-    RA_SLOTTED_ALOHA_RESULT = 0,
-    RA_CRDSA_RESULT = 1,
+    RA_DO_NOTHING = 0,
+    RA_SLOTTED_ALOHA_TX_OPPORTUNITY = 1,
+    RA_CRDSA_TX_OPPORTUNITY = 2,
   } RandomAccessResultType_t;
 
   /**
@@ -185,7 +186,7 @@ private:
    *
    * \return
    */
-  double DoSlottedAloha ();
+  SatRandomAccess::RandomAccessResults_s DoSlottedAloha ();
 
   /**
     *
@@ -202,7 +203,7 @@ private:
    *
    * \return
    */
-  std::set<uint32_t> DoCrdsa ();
+  SatRandomAccess::RandomAccessResults_s DoCrdsa ();
 
   /**
    *
@@ -251,7 +252,7 @@ private:
   /**
    *
    */
-  Ptr<UniformRandomVariable> m_uniformVariable;
+  Ptr<UniformRandomVariable> m_uniformRandomVariable;
 
   /**
    *

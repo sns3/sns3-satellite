@@ -25,6 +25,8 @@
 #include "ns3/satellite-superframe-sequence.h"
 #include "satellite-control-message.h"
 #include "satellite-phy.h"
+#include "satellite-random-access-container.h"
+#include "satellite-random-access-container-conf.h"
 
 namespace ns3 {
 
@@ -51,9 +53,10 @@ public:
    *
    * \param seq   Pointer to superframe sequence.
    * \param beamId Id of the beam.
-   *
+   * \param randomAccessConf
+   * \param randomAccessModel
    */
-  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId);
+  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAccessConf> randomAccessConf, SatRandomAccess::RandomAccessModel_t randomAccessModel);
 
   /**
    * Destroy a SatUtMac
@@ -200,6 +203,11 @@ private:
    * modeled but is assumed as overhead to the time slot payload.
    */
   uint32_t m_framePduHeaderSizeInBytes;
+
+  /**
+   *
+   */
+  Ptr<SatRandomAccess> m_randomAccess;
 };
 
 } // namespace ns3
