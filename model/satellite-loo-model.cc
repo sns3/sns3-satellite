@@ -45,7 +45,7 @@ SatLooModel::SatLooModel () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_FATAL_ERROR ("SatLooModel - Constructor not in use");
+  NS_FATAL_ERROR ("SatLooModel::SatLooModel - Constructor not in use");
 }
 
 SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState) :

@@ -65,7 +65,7 @@ SatRayleighConf::SatRayleighConf () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf - Creating SatRayleighConf...");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf::SatRayleighConf - Creating SatRayleighConf...");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -102,7 +102,7 @@ SatRayleighConf::GetParameters (uint32_t set)
       NS_FATAL_ERROR ("SatRayleighConf::GetParameters - Invalid set");
     }
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf - Getting Rayleigh parameters for set ID " << set);
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf::GetParameters - Getting Rayleigh parameters for set ID " << set);
   return m_rayleighParameters[set];
 }
 

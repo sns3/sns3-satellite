@@ -34,7 +34,7 @@ SatInputFileStreamWrapper::SatInputFileStreamWrapper (std::string filename, std:
 
   std::ifstream* ifs = new std::ifstream (filename.c_str (), filemode);
 
-  NS_ABORT_MSG_UNLESS (ifs->is_open (), "SatOutputStreamWrapper::OutputStreamWrapper():  " <<
+  NS_ABORT_MSG_UNLESS (ifs->is_open (), "SatInputFileStreamWrapper::SatInputFileStreamWrapper():  " <<
                        "Unable to Open " << filename << " for mode " << filemode);
 
   m_ifstream = ifs;

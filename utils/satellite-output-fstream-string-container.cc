@@ -54,7 +54,7 @@ SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer () :
     m_fileMode ()
 {
   NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatOutputFileStreamStringContainer - Constructor not in use");
+  NS_FATAL_ERROR ("SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer - Constructor not in use");
 }
 
 SatOutputFileStreamStringContainer::~SatOutputFileStreamStringContainer ()

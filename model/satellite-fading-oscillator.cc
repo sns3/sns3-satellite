@@ -41,7 +41,7 @@ SatFadingOscillator::SatFadingOscillator () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_FATAL_ERROR ("SatFadingOscillator - Constructor not in use");
+  NS_FATAL_ERROR ("SatFadingOscillator::SatFadingOscillator - Constructor not in use");
 }
 
 SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega) :
@@ -76,7 +76,7 @@ SatFadingOscillator::GetCosineWaveValueAt (Time at) const
   NS_LOG_FUNCTION (this << at);
 
   std::complex<double> complexPhase = ( std::cos (at.GetSeconds () * m_omega + m_phase), std::sin (at.GetSeconds () * m_omega + m_phase) );
-  return ( m_amplitude * std::exp (complexPhase));
+  return (m_amplitude * std::exp (complexPhase));
 }
 
 SatFadingOscillator::~SatFadingOscillator ()

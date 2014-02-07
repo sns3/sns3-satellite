@@ -51,7 +51,7 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::str
 
   if (!m_valuesInRow > 0)
     {
-      NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer - No values in the row");
+      NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer - No values in the row");
     }
 }
 
@@ -67,7 +67,7 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer () :
     m_style ()
 {
   NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer - Constructor not in use");
+  NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer - Constructor not in use");
 }
 
 SatOutputFileStreamDoubleContainer::~SatOutputFileStreamDoubleContainer ()

@@ -46,7 +46,7 @@ SatFadingExternalInputTrace::SatFadingExternalInputTrace () :
   m_startTime (),
   m_timeInterval ()
 {
-  NS_FATAL_ERROR ("SatFadingExternalInputTrace - Constructor not in use");
+  NS_FATAL_ERROR ("SatFadingExternalInputTrace::SatFadingExternalInputTrace - Constructor not in use");
 }
 
 SatFadingExternalInputTrace::SatFadingExternalInputTrace (TraceFileType_e type, std::string fileName) :

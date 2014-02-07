@@ -54,7 +54,7 @@ SatEnvVariables::SatEnvVariables () :
 
       if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
         {
-          NS_FATAL_ERROR ("SatEnvVariables - Could not determine current working directory.");
+          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
         }
       currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
       m_currentWorkingDirectory = std::string (currentWorkingDirectory);
@@ -66,7 +66,7 @@ SatEnvVariables::SatEnvVariables () :
 
       if (readlink("/proc/self/exe", pathToExecutable, sizeof (pathToExecutable)) < 0)
         {
-          NS_FATAL_ERROR ("SatEnvVariables - Could not determine the path to executable.");
+          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
         }
       pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
       m_pathToExecutable = std::string (pathToExecutable);
@@ -86,7 +86,7 @@ SatEnvVariables::GetCurrentWorkingDirectory ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatEnvVariables - Current working directory: " << m_currentWorkingDirectory);
+  NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Current working directory: " << m_currentWorkingDirectory);
 
   return m_currentWorkingDirectory;
 }
@@ -96,7 +96,7 @@ SatEnvVariables::GetPathToExecutable ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatEnvVariables - Path to executable: " << m_pathToExecutable);
+  NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Path to executable: " << m_pathToExecutable);
 
   return m_pathToExecutable;
 }

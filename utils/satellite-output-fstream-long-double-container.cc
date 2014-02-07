@@ -50,7 +50,7 @@ SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (
 
   if (!m_valuesInRow > 0)
     {
-      NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer - No values in the row");
+      NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer - No values in the row");
     }
 }
 
@@ -65,7 +65,7 @@ SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (
     m_figureUnitConversionType ()
 {
   NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer - Constructor not in use");
+  NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer - Constructor not in use");
 }
 
 SatOutputFileStreamLongDoubleContainer::~SatOutputFileStreamLongDoubleContainer ()

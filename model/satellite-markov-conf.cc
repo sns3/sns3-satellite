@@ -95,7 +95,7 @@ SatMarkovConf::SatMarkovConf () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Creating SatMarkovConf");
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf::SatMarkovConf - Creating SatMarkovConf");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -130,7 +130,7 @@ SatMarkovConf::SatMarkovConf () :
 
   if (!m_markovElevations.size() == m_elevationCount)
     {
-      NS_FATAL_ERROR ("SatMarkovConf - Markov elevations does not match");
+      NS_FATAL_ERROR ("SatMarkovConf::SatMarkovConf - Markov elevations does not match");
     }
 }
 
@@ -180,7 +180,7 @@ SatMarkovConf::GetElevationProbabilities (uint32_t set)
       NS_FATAL_ERROR ("SatMarkovConf::GetElevationProbabilities - Invalid set");
     }
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - Getting elevation probabilities for set ID " << set);
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf::GetElevationProbabilities - Getting elevation probabilities for set ID " << set);
   return m_markovProbabilities[set];
 }
 
@@ -209,7 +209,7 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
           smallestDifferenceIndex = iter->second;
         }
     }
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf - New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
+  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf::GetProbabilitySetID - New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
 
   return smallestDifferenceIndex;
 }

@@ -67,7 +67,7 @@ SatTracedInterference::SatTracedInterference () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_FATAL_ERROR ("SatTracedInterference - Constructor not in use");
+  NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Constructor not in use");
 }
 
 SatTracedInterference::~SatTracedInterference ()

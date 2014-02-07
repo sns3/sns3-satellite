@@ -66,7 +66,7 @@ SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleConta
     m_timeColumn ()
 {
   NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatInputFileStreamTimeLongDoubleContainer - Constructor not in use");
+  NS_FATAL_ERROR ("SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer - Constructor not in use");
 }
 
 SatInputFileStreamTimeLongDoubleContainer::~SatInputFileStreamTimeLongDoubleContainer ()
@@ -184,7 +184,7 @@ SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample ()
 
   if (m_numOfPasses > 0)
     {
-      std::cout << "WARNING! - SatInputFileStreamTimeLongDoubleContainer for " << m_fileName << " is out of samples @ time sample " << Now ().GetSeconds () << " (passes "<< m_numOfPasses << ")" << std::endl;
+      std::cout << "WARNING! - SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample for " << m_fileName << " is out of samples @ time sample " << Now ().GetSeconds () << " (passes "<< m_numOfPasses << ")" << std::endl;
       std::cout << "The container will loop samples from the beginning." << std::endl;
     }
 

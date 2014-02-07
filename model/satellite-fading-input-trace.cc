@@ -45,7 +45,7 @@ SatFadingInputTrace::SatFadingInputTrace () :
 {
   NS_LOG_FUNCTION (this);
 
-  NS_FATAL_ERROR ("SatFadingInputTrace - Constructor not in use.");
+  NS_FATAL_ERROR ("SatFadingInputTrace::SatFadingInputTrace - Constructor not in use.");
 }
 
 SatFadingInputTrace::~SatFadingInputTrace ()
