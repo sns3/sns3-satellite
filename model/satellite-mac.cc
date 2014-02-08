@@ -43,44 +43,21 @@ SatMac::GetTypeId (void)
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatMac::m_packetTrace))
-    //
-    // Trace sources at the "top" of the net device, where packets transition
-    // to/from higher layers.
-    //
-    .AddTraceSource ("MacTx",
-                     "Trace source indicating a packet has arrived for transmission by this device",
-                     MakeTraceSourceAccessor (&SatMac::m_macTxTrace))
-    .AddTraceSource ("MacTxDrop",
-                     "Trace source indicating a packet has been dropped by the device before transmission",
-                     MakeTraceSourceAccessor (&SatMac::m_macTxDropTrace))
-    .AddTraceSource ("MacPromiscRx",
-                     "A packet has been received by this device, has been passed up from the physical layer "
-                     "and is being forwarded up the local protocol stack.  This is a promiscuous trace,",
-                     MakeTraceSourceAccessor (&SatMac::m_macPromiscRxTrace))
-    .AddTraceSource ("MacRx",
-                     "A packet has been received by this device, has been passed up from the physical layer "
-                     "and is being forwarded up the local protocol stack.  This is a non-promiscuous trace,",
-                     MakeTraceSourceAccessor (&SatMac::m_macRxTrace))
-#if 0
-    // Not currently implemented for this device
-    .AddTraceSource ("MacRxDrop",
-                     "Trace source indicating a packet was dropped before being forwarded up the stack",
-                     MakeTraceSourceAccessor (&SatMac::m_macRxDropTrace))
-#endif
-
   ;
   return tid;
 }
 
 SatMac::SatMac ()
- : m_beamId (0)
+ : m_nodeInfo (),
+   m_beamId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
 }
 
 SatMac::SatMac (uint32_t beamId)
- : m_beamId (beamId)
+ : m_nodeInfo (),
+   m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
 }

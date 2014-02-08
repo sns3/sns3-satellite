@@ -60,6 +60,11 @@ SatLlc::GetTypeId (void)
 }
 
 SatLlc::SatLlc ()
+:m_nodeInfo (),
+ m_requestManager (),
+ m_encaps (),
+ m_decaps (),
+ m_controlQueue ()
 {
   NS_LOG_FUNCTION (this);
 }

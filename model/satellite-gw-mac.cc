@@ -66,13 +66,20 @@ SatGwMac::GetTypeId (void)
   return tid;
 }
 
-SatGwMac::SatGwMac (uint32_t beamId)
- : SatMac (beamId)
+SatGwMac::SatGwMac ()
+ : SatMac (),
+   m_scheduler (),
+   m_dummyFrameSendingEnabled (false),
+   m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatGwMac::SatGwMac ()
+SatGwMac::SatGwMac (uint32_t beamId)
+ : SatMac (beamId),
+   m_scheduler (),
+   m_dummyFrameSendingEnabled (false),
+   m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -118,13 +125,6 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
-      // Hit the trace hooks.  All of these hooks are in the same place in this
-      // device because it is so simple, but this is not usually the case in
-      // more complicated devices.
-      m_snifferTrace (*i);
-      m_promiscSnifferTrace (*i);
-      m_macRxTrace (*i);
-
       // Remove packet tag
       SatMacTag macTag;
       bool mSuccess = (*i)->PeekPacketTag (macTag);

@@ -87,17 +87,20 @@ SatUtMac::GetInstanceTypeId (void) const
 }
 
 SatUtMac::SatUtMac ()
-: SatMac (),
-  m_superframeSeq (),
-  m_timingAdvanceCb (),
-  m_txCallback (),
-  m_cra (),
-  m_lastCno (),
-  m_framePduHeaderSizeInBytes ()
+ : SatMac (),
+   m_superframeSeq (),
+   m_timingAdvanceCb (0),
+   m_txCallback (0),
+   m_cra (128.0),
+   m_lastCno (NAN),
+   m_gwAddress (),
+   m_crInterval (MilliSeconds (100)),
+   m_framePduHeaderSizeInBytes (1),
+   m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
-  
-  // default constructor should not be used
+
+  // default construtctor should not be used
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
@@ -106,9 +109,12 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
    m_txCallback (0),
-   m_cra (),
+   m_cra (128.0),
    m_lastCno (NAN),
-   m_framePduHeaderSizeInBytes ()
+   m_gwAddress (),
+   m_crInterval (MilliSeconds (100)),
+   m_framePduHeaderSizeInBytes (1),
+   m_guardTime (MicroSeconds (1))
 {
 	NS_LOG_FUNCTION (this);
 
@@ -397,16 +403,8 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                  SatEnums::LD_FORWARD,
                  SatUtils::GetPacketInfo (packets));
 
-  // Hit the trace hooks.  All of these hooks are in the same place in this
-  // device because it is so simple, but this is not usually the case in
-  // more complicated devices.
-
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
-      m_snifferTrace (*i);
-      m_promiscSnifferTrace (*i);
-      m_macRxTrace (*i);
-
       // Remove packet tag
       SatMacTag macTag;
       bool mSuccess = (*i)->PeekPacketTag (macTag);
