@@ -134,6 +134,14 @@ private:
    void ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp);
 
    /**
+    * Superframe start time for this specific UT. This is triggered
+    * by the TBTP reception and takes into account the current propagation
+    * delay of the UT.
+    * \param superframeSeqId Superframe sequence id
+    */
+   void SuperFrameStart (uint8_t superframeSeqId);
+
+   /**
     * Schdules one Tx opportunity, i.e. time slot.
     * \param transmitTime time when transmit possibility starts
     * \param durationInSecs duration of the burst
@@ -205,9 +213,15 @@ private:
   uint32_t m_framePduHeaderSizeInBytes;
 
   /**
-   *
+  *
+  */ 
+  Ptr<>SatRandomAccess> m_randomAccess;
+
+  /**
+   * Guard time for time slots. The guard time is modeled by shortening
+   * the duration of a time slot by a m_guardTime set by an attribute.
    */
-  Ptr<SatRandomAccess> m_randomAccess;
+  Time m_guardTime;
 };
 
 } // namespace ns3

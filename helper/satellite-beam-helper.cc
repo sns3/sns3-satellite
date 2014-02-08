@@ -35,6 +35,7 @@
 #include "../model/satellite-propagation-delay-model.h"
 #include "../model/satellite-antenna-gain-pattern-container.h"
 #include "../model/satellite-packet-trace.h"
+#include "../model/satellite-utils.h"
 #include "satellite-beam-helper.h"
 #include "ns3/satellite-fading-input-trace-container.h"
 #include "ns3/satellite-fading-input-trace.h"
@@ -64,6 +65,17 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
                                        SatEnums::FADING_TRACE, "FadingTrace",
                                        SatEnums::FADING_MARKOV, "FadingMarkov"))
+       .AddAttribute ("PropagationDelayModel",
+                      "Propagation delay model",
+                      EnumValue (SatEnums::PD_CONSTANT_SPEED),
+                      MakeEnumAccessor (&SatBeamHelper::m_propagationDelayModel),
+                      MakeEnumChecker (SatEnums::PD_CONSTANT_SPEED, "ConstantSpeed",
+                                       SatEnums::PD_CONSTANT, "Constant"))
+        .AddAttribute ("ConstantPropagationDelayInSeconds",
+                       "Constant propagation delay in seconds",
+                       DoubleValue (0.13),
+                       MakeDoubleAccessor(&SatBeamHelper::m_constantPropagationDelay),
+                       MakeDoubleChecker<double> ())
       .AddAttribute ("PrintDetailedInformationToCreationTraces",
                      "Print detailed information to creation traces",
                      BooleanValue (true),
@@ -85,7 +97,9 @@ SatBeamHelper::GetInstanceTypeId (void) const
 
 SatBeamHelper::SatBeamHelper () :
     m_printDetailedInformationToCreationTraces (false),
-    m_fadingModel ()
+    m_fadingModel (),
+    m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
+    m_constantPropagationDelay (0.13)
 {
   NS_LOG_FUNCTION (this);
 
@@ -100,7 +114,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
                               Ptr<SatSuperframeSeq> seq)
   : m_superframeSeq (seq),
     m_printDetailedInformationToCreationTraces (false),
-    m_fadingModel (SatEnums::FADING_MARKOV)
+    m_fadingModel (SatEnums::FADING_MARKOV),
+    m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
+    m_constantPropagationDelay (0.13)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -601,11 +617,24 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
 
         forwardCh->SetFrequencyId (frequencyId);
         returnCh->SetFrequencyId (frequencyId);
-        /*
-         * Average propagation delay between UT/GW and satellite in seconds
-         * TODO: Change the propagation delay to be a parameter.
-        */
-        Ptr<SatConstantPropagationDelayModel> pDelay = CreateObject<SatConstantPropagationDelayModel> ();
+
+        Ptr<PropagationDelayModel> pDelay;
+        // Signal propagates at the speed of light
+        if (m_propagationDelayModel == SatEnums::PD_CONSTANT_SPEED)
+          {
+            pDelay = CreateObject<ConstantSpeedPropagationDelayModel> ();
+            DynamicCast<ConstantSpeedPropagationDelayModel> (pDelay)->SetSpeed (SatUtils::SPEED_OF_LIGHT);
+          }
+        else if (m_propagationDelayModel == SatEnums::PD_CONSTANT)
+          {
+            pDelay = CreateObject<SatConstantPropagationDelayModel> ();
+            DynamicCast<SatConstantPropagationDelayModel> (pDelay)->SetDelay (m_constantPropagationDelay);
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported propagation delay model!");
+          }
+
         forwardCh->SetPropagationDelayModel (pDelay);
         returnCh->SetPropagationDelayModel (pDelay);
 

@@ -69,9 +69,12 @@ SatUtMac::GetTypeId (void)
                    UintegerValue (1),
                    MakeUintegerAccessor (&SatUtMac::m_framePduHeaderSizeInBytes),
                    MakeUintegerChecker<uint32_t> ())
-
+    .AddAttribute ("GuardTime",
+                   "Guard time in return link",
+                   TimeValue (MicroSeconds (1)),
+                   MakeTimeAccessor (&SatUtMac::m_guardTime),
+                   MakeTimeChecker ())
   ;
-
   return tid;
 }
 
@@ -161,15 +164,41 @@ void
 SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 {
   NS_LOG_FUNCTION (this << tbtp);
+  NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " received TBTP " << tbtp->GetSuperframeCounter () << " at time: " << Simulator::Now ().GetSeconds ());
+
+  /**
+   * Calculate the sending time of the time slots within this TBTP for this specific UT.
+   * UTs may be located at different distances from the satellite, thus they shall have to
+   * send the time slots at different times so that the transmissions are received at the GW
+   * at correct time.
+   */
+  double superframeDuration = m_superframeSeq->GetDurationInSeconds (tbtp->GetSuperframeSeqId ());
+  Time expectedReceiveTime = Seconds (superframeDuration * tbtp->GetSuperframeCounter ());
+  Time twoWayPropagationDelay = m_timingAdvanceCb ();
+  Time startTime = expectedReceiveTime - twoWayPropagationDelay;
+
+  // The delay compared to Now when to start the transmission of this superframe
+  Time startDelay = startTime - Simulator::Now ();
+
+  // if the calculated start time of the superframe is already in the past
+  if (startTime < Simulator::Now ())
+    {
+      NS_FATAL_ERROR ("UT: " << m_nodeInfo->GetMacAddress () << " received TBTP " << tbtp->GetSuperframeCounter () << ", which should have been sent already in the past");
+    }
+
+  // Schedule superframe start
+  Simulator::Schedule (startDelay, &SatUtMac::SuperFrameStart, this, tbtp->GetSuperframeSeqId ());
+
+  NS_LOG_LOGIC ("Calculated propagation delay between UT and GW: " << twoWayPropagationDelay.GetSeconds ());
+  NS_LOG_LOGIC ("Time to start sending the superframe for this UT: " << startTime.GetSeconds ());
+
+  //tbtp->Dump ();
 
   SatTbtpMessage::TimeSlotInfoContainer_t slots = tbtp->GetTimeslots (m_nodeInfo->GetMacAddress ());
 
   if ( !slots.empty ())
     {
-      double superframeDuration = m_superframeSeq->GetDurationInSeconds (tbtp->GetSuperframeId ());
-
-      // TODO: start time must be calculated using reference or global clock
-      Time startTime = Seconds (superframeDuration * tbtp->GetSuperframeCounter ());
+      NS_LOG_LOGIC ("TBTP contains " << slots.size () << " timeslots for UT: " << m_nodeInfo->GetMacAddress ());
 
       uint8_t frameId = 0;
 
@@ -192,7 +221,9 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( (*it)->GetTimeSlotId () );
 
           // Start time
-          Time slotStartTime = startTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+          Time slotStartTime = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+
+          NS_LOG_LOGIC ("Slot start time " << slotStartTime.GetSeconds() << " for UT: " << m_nodeInfo->GetMacAddress ());
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
@@ -207,9 +238,20 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 }
 
 void
+SatUtMac::SuperFrameStart (uint8_t superframeSeqId)
+{
+  NS_LOG_FUNCTION (this << superframeSeqId);
+  NS_LOG_LOGIC ("Superframe start time at: " << Simulator::Now ().GetSeconds () << " for UT: " << m_nodeInfo->GetMacAddress ());
+
+  /**
+   * Here some functionality may be added for UT related to the superframe start time.
+   */
+}
+
+void
 SatUtMac::ScheduleTxOpportunity(Time transmitTime, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << transmitTime << durationInSecs << payloadBytes << carrierId);
+  NS_LOG_FUNCTION (this << transmitTime.GetSeconds() << durationInSecs << payloadBytes << carrierId);
 
   Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, durationInSecs, payloadBytes, carrierId);
 }
@@ -218,8 +260,7 @@ void
 SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId);
-
-  NS_LOG_LOGIC ("Tx opportunity for UT MAC " << m_nodeInfo->GetMacAddress () << ", duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
+  NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
   /**
    * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
@@ -294,11 +335,13 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
   // If there are packets to send
   if (!packets.empty ())
     {
-      // Decrease one microsecond from time slot duration. This evaluates guard period.
-      // If more sophisticated guard period is needed, it is needed done before hand an
-      // remove this 'one microsecond decrease' implementation 
-      Time duration (Time::FromDouble(durationInSecs, Time::S) - Time::FromInteger (1, Time::US));
+      // Decrease a guard time from time slot duration.
+      Time duration (Time::FromDouble(durationInSecs, Time::S) - m_guardTime);
+
+      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds ());
+
       SendPacket (packets, carrierId, duration);
+
     }
 }
 
@@ -417,6 +460,8 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 void
 SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 {
+  NS_LOG_FUNCTION (this);
+
   switch (ctrlTag.GetMsgType ())
   {
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:

@@ -322,7 +322,7 @@ public:
    *
    * \return The super frame sequence id.
    */
-  inline uint8_t GetSuperframeId () {return m_superframeSeqId;}
+  inline uint8_t GetSuperframeSeqId () {return m_superframeSeqId;}
 
   /**
    * Get counter of the super frame in this TBTP message.
@@ -353,6 +353,11 @@ public:
    * \return Real size of the TBTP message.
    */
   uint32_t GetSizeinBytes ();
+
+  /**
+   * Dump all the contents of the TBTP
+   */
+  void Dump () const;
 
 private:
 

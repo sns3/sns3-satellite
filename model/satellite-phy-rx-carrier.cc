@@ -37,6 +37,7 @@
 #include "satellite-rx-error-tag.h"
 #include "ns3/singleton.h"
 #include "satellite-composite-sinr-output-trace-container.h"
+#include "satellite-phy-tx.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -206,6 +207,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
   m_startRxTime = Now ();
 
+  NS_LOG_LOGIC ("Node: " << m_nodeInfo->GetMacAddress () << " starts receiving packet at: " << Simulator::Now().GetSeconds () << " in carrier: " << rxParams->m_carrierId);  NS_LOG_LOGIC ("Sender: " << rxParams->m_phyTx);
+
   switch (m_state)
     {
       case IDLE:
@@ -228,21 +231,28 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
               if (( dest == m_ownAddress ))
                 {
+                  NS_LOG_LOGIC ("Packet intended for this specific receiver: " << dest);
+
                   receivePacket = true;
                   ownAddressFound = true;
                 }
               else if ( dest.IsBroadcast () )
                 {
+                  NS_LOG_LOGIC ("Destination is broadcast address: " << dest);
+
                   receivePacket = true;
                 }
               else if ( dest.IsGroup () )
                 {
+                  NS_LOG_LOGIC ("Destination is multicast address: " << dest);
+
                   receivePacket = true;
                 }
             }
 
           if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
             {
+              NS_LOG_LOGIC ("Receiver is attached to satellite node");
               receivePacket = true;
             }
 

@@ -335,6 +335,28 @@ uint32_t SatTbtpMessage::GetSizeinBytes ()
 
 }
 
+void SatTbtpMessage::Dump () const
+{
+  std::cout << "Superframe counter: " << m_superframeCounter <<
+      ", superframe sequence id: " << m_superframeSeqId <<
+      ", assignment format: " << m_assignmentFormat << std::endl;
+
+  for (TimeSlotMap_t::const_iterator mit = m_timeSlots.begin ();
+      mit != m_timeSlots.end ();
+      ++mit)
+    {
+      std::cout << "UT: " << mit->first << ": ";
+      for (TimeSlotInfoContainer_t::const_iterator sit = mit->second.begin ();
+          sit != mit->second.end ();
+          ++sit)
+        {
+          std::cout << (*sit)->GetTimeSlotId () << " ";
+        }
+      std::cout << std::endl;
+    }
+
+}
+
 // TBTP message container
 
 SatTbtpContainer::SatTbtpContainer ()

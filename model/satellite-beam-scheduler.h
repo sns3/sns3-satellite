@@ -226,6 +226,12 @@ private:
    * Number of time slots reserved per every UTs
    */
   uint32_t m_slotsPerUt;
+
+  /**
+   * Round trip time estimate to be used in scheduling the TBTPs well in
+   * advance compared to the expected receive time.
+   */
+  Time m_rttEstimate;
 };
 
 } // namespace ns3

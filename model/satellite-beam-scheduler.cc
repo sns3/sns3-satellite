@@ -37,6 +37,11 @@ SatBeamScheduler::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatBeamScheduler")
     .SetParent<Object> ()
     .AddConstructor<SatBeamScheduler> ()
+    .AddAttribute( "RttEstimate",
+                   "Round trip time estimate for NCC scheduling",
+                   TimeValue (MilliSeconds (560)),
+                   MakeTimeAccessor (&SatBeamScheduler::m_rttEstimate),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -97,6 +102,14 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
   m_txCallback = cb;
   m_superframeSeq = seq;
   m_superFrameCounter = 0;
+
+  // How many TBTPs is transmitted during RTT?
+  uint32_t tbtpsPerRtt = (uint32_t)(ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (0)));
+
+  // Scheduling starts after one empty superframe.
+  m_superFrameCounter = tbtpsPerRtt + 1;
+
+  NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
   Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
 }
@@ -166,6 +179,8 @@ SatBeamScheduler::Schedule ()
       packet->AddPacketTag (tag);
 
       Send (packet);
+
+      NS_LOG_LOGIC ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
     }
 
   // re-schedule next TBTP sending (call of this function)

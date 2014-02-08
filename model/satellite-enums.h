@@ -50,6 +50,16 @@ public:
   } ChannelType_t;
 
   /**
+   * \enum PropagationDelayModel_t
+   * \brief Propagation delay model.
+   */
+  typedef enum
+  {
+    PD_CONSTANT = 0,
+    PD_CONSTANT_SPEED
+  } PropagationDelayModel_t;
+
+  /**
    * \enum CarrierBandwidthType_t
    * \brief Types of bandwidth.
    */

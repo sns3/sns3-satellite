@@ -251,6 +251,19 @@ private:
   Ptr<SatMarkovConf> m_markovConf;
 
   /**
+   * Propagation delay model
+   * - Constant
+   * - Constant speed (speed of light)
+   */
+  SatEnums::PropagationDelayModel_t m_propagationDelayModel;
+
+  /**
+   * Constant propagation delay in seconds. Note, that this is valid
+   * only if SatConstantPropagationDelay is used.
+   */
+  double m_constantPropagationDelay;
+
+  /**
    * Packet trace
    */
   Ptr<SatPacketTrace> m_packetTrace;
