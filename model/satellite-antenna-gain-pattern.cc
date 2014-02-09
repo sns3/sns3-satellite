@@ -202,7 +202,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 }
 
 
-GeoCoordinate SatAntennaGainPattern::GetValidPosition () const
+GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 {
   NS_LOG_FUNCTION (this);
 

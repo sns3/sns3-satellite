@@ -233,10 +233,10 @@ private:
   std::map< uint32_t, Ptr<SatWaveform> > m_waveforms;
 
   /**
-   * Packet error rate target for the waveforms. Default value
+   * Block error rate target for the waveforms. Default value
    * set as an attribute to 10^(-5).
    */
-  double m_perTarget;
+  double m_targetBLER;
 
   /**
    * Flag to indicate whether ACM is enabled or disabled. If ACM is

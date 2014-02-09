@@ -195,8 +195,10 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
   // Schedule superframe start
   Simulator::Schedule (startDelay, &SatUtMac::SuperFrameStart, this, tbtp->GetSuperframeSeqId ());
 
+  NS_LOG_LOGIC ("Expected receive time for the superframe: " << expectedReceiveTime.GetSeconds ());
   NS_LOG_LOGIC ("Calculated propagation delay between UT and GW: " << twoWayPropagationDelay.GetSeconds ());
   NS_LOG_LOGIC ("Time to start sending the superframe for this UT: " << startTime.GetSeconds ());
+  NS_LOG_LOGIC ("Waiting delay before the superframe start: " << startDelay.GetSeconds ());
 
   //tbtp->Dump ();
 
@@ -227,9 +229,8 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( (*it)->GetTimeSlotId () );
 
           // Start time
-          Time slotStartTime = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());
-
-          NS_LOG_LOGIC ("Slot start time " << slotStartTime.GetSeconds() << " for UT: " << m_nodeInfo->GetMacAddress ());
+          Time slotDelay = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+          NS_LOG_LOGIC ("Slot start delay: " << slotDelay.GetSeconds());
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
@@ -238,7 +239,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
-          ScheduleTxOpportunity (slotStartTime, duration, wf->GetPayloadInBytes (), carrierId);
+          ScheduleTxOpportunity (slotDelay, duration, wf->GetPayloadInBytes (), carrierId);
         }
     }
 }
@@ -255,15 +256,15 @@ SatUtMac::SuperFrameStart (uint8_t superframeSeqId)
 }
 
 void
-SatUtMac::ScheduleTxOpportunity(Time transmitTime, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
+SatUtMac::ScheduleTxOpportunity(Time transmitDelay, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << transmitTime.GetSeconds() << durationInSecs << payloadBytes << carrierId);
+  NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << durationInSecs << payloadBytes << carrierId);
 
-  Simulator::Schedule (transmitTime, &SatUtMac::TransmitTime, this, durationInSecs, payloadBytes, carrierId);
+  Simulator::Schedule (transmitDelay, &SatUtMac::Transmit, this, durationInSecs, payloadBytes, carrierId);
 }
 
 void
-SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
+SatUtMac::Transmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId);
   NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
@@ -343,8 +344,8 @@ SatUtMac::TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t c
     {
       // Decrease a guard time from time slot duration.
       Time duration (Time::FromDouble(durationInSecs, Time::S) - m_guardTime);
-
-      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds ());
+      NS_LOG_LOGIC ("Duration double: " << durationInSecs << " duration time: " << duration.GetSeconds ());
+      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds () << " duration: " << duration.GetSeconds ());
 
       SendPacket (packets, carrierId, duration);
 

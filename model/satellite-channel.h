@@ -58,13 +58,13 @@ public:
   virtual ~SatChannel ();
 
   /**
-   * SINGLE_RX = only the proper receiver of the packet shall receive the packet
-   * MULTI_RX = all receivers in the channel shall receive the packet
+   * ONLY_DEST_BEAM = only the receivers within the proper spot-beam shall receive the packet
+   * ALL_BEAMS = all receivers in the channel shall receive the packet
    */
   enum SatChannelRxMode_e
     {
-      SINGLE_RX,
-      MULTI_RX
+      ONLY_DEST_BEAM,
+      ALL_BEAMS
     };
 
   /**

@@ -258,7 +258,7 @@ SatSpotBeamPositionAllocator::GetNextGeo (void) const
   // - elevation is not higher than threshold
   while ( ( bestBeamId != m_targetBeamId || isnan(elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
     {
-      pos = agp->GetValidPosition ();
+      pos = agp->GetValidRandomPosition ();
       bestBeamId = m_antennaGainPatterns->GetBestBeamId (pos);
 
       // Set the new position to the UT mobility

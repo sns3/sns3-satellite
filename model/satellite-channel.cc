@@ -104,10 +104,10 @@ SatChannel::GetTypeId (void)
                                      SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
     .AddAttribute ("RxMode",
                    "Channel receiving mode",
-                   EnumValue (SatChannel::MULTI_RX),
+                   EnumValue (SatChannel::ALL_BEAMS),
                    MakeEnumAccessor (&SatChannel::m_rxMode),
-                   MakeEnumChecker (SatChannel::SINGLE_RX, "SingleRx",
-                                    SatChannel::MULTI_RX, "MultiRx"))
+                   MakeEnumChecker (SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
+                                    SatChannel::ALL_BEAMS, "AllBeams"))
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
                      MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint))
@@ -147,18 +147,18 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
   switch (m_rxMode)
   {
     /**
-     * The packet shall be received by only the intended receiver. The purpose is
-     * to be able to speed-up the simulations. Note, that with SINLGE_RX mode,
-     * the PerPacket interference may not be used, since the will be no interference.
+     * The packet shall be received by only by the receivers within the same spot-beam
+     * Note, that with ONLY_DEST_BEAM mode, the PerPacket interference may not be used,
+     * since there will be no interference.
     */
-    case SatChannel::SINGLE_RX:
+    case SatChannel::ONLY_DEST_BEAM:
       {
         for (PhyList::const_iterator rxPhyIterator = m_phyList.begin ();
             rxPhyIterator != m_phyList.end ();
             ++rxPhyIterator)
           {
             /**
-             * Currently SINGLE_RX mode restricts only the transmissions to the
+             * Currently ONLY_DEST_BEAM mode restricts only the transmissions to the
              * intended beam id. When the SatSignalParameters includes the
              * packet target MAC addresses and information whether the PHY
              * transmission contains broadcast data, this may be enhanced to
@@ -178,10 +178,10 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
       /**
        * The packet shall be received by all the receivers in the channel. The
        * intended receiver shall receive the packet, while other receivers in the
-       * channel see the packet as co-channel interference. Note, that MULTI_RX mode
+       * channel see the packet as co-channel interference. Note, that ALL_BEAMS mode
        * is needed by the PerPacket interference.
       */
-    case SatChannel::MULTI_RX:
+    case SatChannel::ALL_BEAMS:
       {
         for (PhyList::const_iterator rxPhyIterator = m_phyList.begin ();
             rxPhyIterator != m_phyList.end ();

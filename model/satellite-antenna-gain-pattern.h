@@ -31,8 +31,18 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
+ * \brief SatAntennaGainPattern class holds the antenna gain pattern data
+ * for a one single spot-beam. In initialization phase, the gain pattern
+ * is read from a file to a container. Current implementation assumes
+ * that the antenna pattern is using a constant longitude-latitude grid of
+ * samples. This assumption is made to enable fast look-ups from the container.
  *
- * \brief Antenna gain pattern
+ * Antenna gain patter is used also for spot-beam selection. In initialization phase
+ * a valid positions list is constructed based on a minimum accepted antenna gain set
+ * as an attribute. This approach is selected to speed up the random UT positioning.
+ *
+ * Antenna gain value for a given longitude and latitude position is calculated by
+ * using 4-point bilinear interpolation.
  */
 class SatAntennaGainPattern : public Object
 {
@@ -51,10 +61,10 @@ public:
   double GetAntennaGain_lin (GeoCoordinate coord) const;
 
   /**
-   * Get a valid position under this spot-beam coverage.
+   * Get a valid random position under this spot-beam coverage.
    * \return GeoCoordinate
    */
-  GeoCoordinate GetValidPosition () const;
+  GeoCoordinate GetValidRandomPosition () const;
 
 private:
   /**

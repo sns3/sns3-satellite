@@ -151,10 +151,10 @@ SatWaveformConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatWaveformConf")
     .SetParent<Object> ()
-    .AddAttribute( "PerTarget",
-                   "Packet error rate target",
+    .AddAttribute( "TargetBLER",
+                   "Block error rate target",
                     DoubleValue (0.00001),
-                    MakeDoubleAccessor(&SatWaveformConf::m_perTarget),
+                    MakeDoubleAccessor(&SatWaveformConf::m_targetBLER),
                     MakeDoubleChecker<double>())
     .AddAttribute( "AcmEnabled",
                    "Enable ACM",
@@ -262,7 +262,7 @@ void SatWaveformConf::InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> lin
        * on the symbol rate, we cannot store the requirement in C/No format, but in Eb/No.
        * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
       */
-      double ebnoRequirementDb = linkResults->GetEbNoDb (it->first, m_perTarget);
+      double ebnoRequirementDb = linkResults->GetEbNoDb (it->first, m_targetBLER);
       it->second->SetEbNoRequirement (SatUtils::DbToLinear (ebnoRequirementDb));
     }
 }

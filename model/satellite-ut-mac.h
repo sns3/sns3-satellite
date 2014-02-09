@@ -143,12 +143,12 @@ private:
 
    /**
     * Schdules one Tx opportunity, i.e. time slot.
-    * \param transmitTime time when transmit possibility starts
+    * \param transmitDelay time when transmit possibility starts
     * \param durationInSecs duration of the burst
     * \param payloadBytes payload in bytes
     * \param carrierId Carrier id used for the transmission
     */
-   void ScheduleTxOpportunity (Time transmitTime, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+   void ScheduleTxOpportunity (Time transmitDelay, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
@@ -158,7 +158,7 @@ private:
     * \param payloadBytes payload in bytes
     * \param carrierId Carrier id used for the transmission
     */
-   void TransmitTime (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+   void Transmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet
@@ -215,7 +215,7 @@ private:
   /**
   *
   */ 
-  Ptr<>SatRandomAccess> m_randomAccess;
+  Ptr<SatRandomAccess> m_randomAccess;
 
   /**
    * Guard time for time slots. The guard time is modeled by shortening
