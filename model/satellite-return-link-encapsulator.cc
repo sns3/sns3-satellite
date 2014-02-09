@@ -144,8 +144,9 @@ Ptr<Packet>
 SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
 {
   NS_LOG_FUNCTION (this << bytes);
+  NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
 
-  // Frame PDU
+  // Payload adapted PDU = NULL
   Ptr<Packet> packet;
 
   // No packets in buffer
@@ -164,6 +165,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   SatEncapPduStatusTag tag;
   firstSegment->PeekPacketTag (tag);
 
+  NS_LOG_LOGIC ("Size of the first packet in buffer: " << firstSegment->GetSize ());
+  NS_LOG_LOGIC ("Encapsulation status of the first packet in buffer: " << tag.GetStatus());
+
   // Tx opportunity bytes is not enough
   if (bytes <= ppduHeader.GetHeaderSizeInBytes(tag.GetStatus()))
     {
@@ -171,14 +175,14 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       return packet;
     }
 
+  NS_LOG_LOGIC ("Header size of " << tag.GetStatus () << " packet: " << ppduHeader.GetHeaderSizeInBytes(tag.GetStatus()));
+
   // Build Data field
   uint32_t maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - ppduHeader.GetHeaderSizeInBytes(tag.GetStatus());
 
   NS_LOG_LOGIC ("Maximum supported segment size: " << maxSegmentSize);
 
-  // Payload adapted PDU
-  packet = Create<Packet> ();
-
+  // Erase the packet from the buffer
   m_txBufferSize -= (*(m_txBuffer.begin()))->GetSize ();
   m_txBuffer.erase (m_txBuffer.begin ());
 
@@ -186,20 +190,38 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   // the HL packet is too large.
   if ( firstSegment->GetSize () > maxSegmentSize )
     {
-       // In case we have to fragment a FULL PDU, we need to increase
-       // the fragment id.
+      NS_LOG_LOGIC ("Buffered packet is larger than the maximum segment size!");
+
       if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
         {
-          maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::START_PDU);
+          // Calculate again that the packet fits into the Tx opportunity
+          uint32_t headerSize = ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::START_PDU);
+          if (bytes <= headerSize)
+            {
+              NS_LOG_LOGIC ("Start PDU does not fit into the TxOpportunity anymore!");
+              return packet;
+            }
+
+          maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - headerSize;
+
+          // In case we have to fragment a FULL PDU, we need to increase
+          // the fragment id.
           IncreaseFragmentId ();
         }
       else
         {
-          maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::CONTINUATION_PDU);
+          // Calculate again that the packet fits into the Tx opportunity
+          uint32_t headerSize = ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::CONTINUATION_PDU);
+          if (bytes <= headerSize)
+            {
+              NS_LOG_LOGIC ("Continuation PDU does not fit into the TxOpportunity anymore!");
+              return packet;
+            }
+
+          maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - headerSize;
         }
 
-      // Segment txBuffer.FirstBuffer and
-      // Give back the remaining segment to the transmission buffer
+      // Create a new fragment
       Ptr<Packet> newSegment = firstSegment->CreateFragment (0, maxSegmentSize);
 
       // Status tag of the new and remaining segments
@@ -248,6 +270,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       // Add PPDU header
       newSegment->AddHeader (ppduHeader);
 
+      // PPDU
       packet = newSegment;
 
       NS_LOG_LOGIC ("Created a fragment of size: " << packet->GetSize ());
@@ -270,6 +293,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       // Add PPDU header
       firstSegment->AddHeader (ppduHeader);
 
+      // PPDU
       packet = firstSegment;
 
       NS_LOG_LOGIC ("Packed a packet of size: " << packet->GetSize ());
