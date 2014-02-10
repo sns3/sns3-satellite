@@ -210,7 +210,7 @@ void SatBeamScheduler::ScheduleRandomSlots (Ptr<SatTbtpMessage> header)
 
       for (SatFrameConf::SatTimeSlotIdList_t::const_iterator it = timeSlots.begin (); it != timeSlots.end (); it++ )
         {
-          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (frameId, GetNextTimeSlot () );
+          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (frameId, (*it) );
           header->SetTimeslot (Mac48Address::GetBroadcast (), timeSlotInfo);
         }
     }
