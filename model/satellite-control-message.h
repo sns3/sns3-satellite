@@ -371,7 +371,7 @@ public:
    * \param utId  id of the UT which time slot information is requested
    * \return vector containing time slot info
    */
-  TimeSlotInfoContainer_t GetTimeslots (Address utId);
+  const TimeSlotInfoContainer_t& GetTimeslots (Address utId);
 
   /**
    * Set a time slot information
@@ -402,6 +402,11 @@ private:
   uint8_t           m_superframeSeqId;
   uint8_t           m_assignmentFormat;
   std::set<uint8_t> m_frameIds;
+
+  /**
+   * Empty slot container to be returned if there are not time slots
+   */
+  const TimeSlotInfoContainer_t m_emptySlotContainer;
 };
 
 /**

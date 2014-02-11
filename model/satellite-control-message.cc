@@ -239,20 +239,19 @@ SatTbtpMessage::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatTbtpMessage::TimeSlotInfoContainer_t
+const SatTbtpMessage::TimeSlotInfoContainer_t&
 SatTbtpMessage::GetTimeslots (Address utId)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  TimeSlotInfoContainer_t slotInfos;
   TimeSlotMap_t::const_iterator it = m_timeSlots.find (utId);
 
   if ( it != m_timeSlots.end () )
     {
-      slotInfos = it->second;
+      return it->second;
     }
 
-  return slotInfos;
+  return m_emptySlotContainer;
 }
 
 void
