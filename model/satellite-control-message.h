@@ -201,6 +201,40 @@ private:
   double m_cno;
 };
 
+
+/**
+ * \ingroup satellite
+ * \brief Abstract satellite control message class
+ */
+
+class SatControlMessage : public Object
+{
+public:
+
+  // methods derived from base classes
+  static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor for SatTbtpHeader. Set sequence id to 0.
+   */
+  SatControlMessage () {};
+
+  /**
+   * Destructor for SatTbtpHeader
+   */
+  ~SatControlMessage () {};
+
+  /**
+   * Get real size of the control message, which can be used to e.g. simulate real size.
+   *
+   * \return Real size of the control message.
+   */
+  virtual uint32_t GetSizeinBytes () = 0;
+
+private:
+
+};
+
 /**
  * \ingroup satellite
  * \brief The packet for the Terminal Burst Time Plan (TBTP) messages.
@@ -209,7 +243,7 @@ private:
  * However it introduced method GetSizeInBytes which can be used when real size is simulated.
  */
 
-class SatTbtpMessage : public Object
+class SatTbtpMessage : public SatControlMessage
 {
 public:
   /**
@@ -352,7 +386,7 @@ public:
    *
    * \return Real size of the TBTP message.
    */
-  uint32_t GetSizeinBytes ();
+  virtual uint32_t GetSizeinBytes ();
 
   /**
    * Dump all the contents of the TBTP
@@ -372,41 +406,41 @@ private:
 
 /**
  * \ingroup satellite
- * \brief The container to store TBTP messages. It assigns ID for added messages.
+ * \brief The container to store control messages. It assigns ID for added messages.
  * ID is used when message is requested. Count of stored messages can be configured
  * through attribute in creation time.
  *
  */
-class SatTbtpContainer : public SimpleRefCount<SatTbtpContainer>
+class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
 {
 public:
   /**
-   * Default constructor for SatTbtpContainer.
+   * Default constructor for SatControlMsgContainer.
    */
-  SatTbtpContainer ();
+  SatControlMsgContainer ();
 
   /**
-   * Destructor for SatTbtpHeader
+   * Destructor for SatControlMsgContainer
    */
-  ~SatTbtpContainer ();
+  ~SatControlMsgContainer ();
 
   /**
-   * Add a TBTP message.
+   * Add a control message.
    *
    * \param Id of the message to add.
    * \param Pointer to message to add.
    *
    * \return ID of the created added message.
    */
-  uint32_t Add (Ptr<SatTbtpMessage> tbtpMsg);
+  uint32_t Add (Ptr<SatControlMessage> controlMsg);
 
   /**
-   * Get a TBTP message.
+   * Get a control message.
    *
    * \param Id of the message to get.
    * \return Pointer to message.
    */
-  Ptr<SatTbtpMessage> Get (uint32_t id) const;
+  Ptr<SatControlMessage> Get (uint32_t id) const;
 
   /**
    * Set value for maximum number of messages to store in container.
@@ -417,10 +451,10 @@ public:
 
 private:
 
-  typedef std::map<uint32_t, Ptr<SatTbtpMessage> > TbtpMap_t;
-  TbtpMap_t   m_tbtps;
-  uint32_t    m_id;
-  uint32_t    m_maxMsgCount;
+  typedef std::map<uint32_t, Ptr<SatControlMessage> > CtrlMsgMap_t;
+  CtrlMsgMap_t   m_ctrlMsgs;
+  uint32_t       m_id;
+  uint32_t       m_maxMsgCount;
 };
 
 

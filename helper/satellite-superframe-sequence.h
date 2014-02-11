@@ -159,7 +159,7 @@ public:
   inline Time GetTargetDuration () const { return m_targetDuration; }
 
 private:
-  typedef std::map<uint32_t, Ptr<SatTbtpContainer> > TbtpMap_t;
+  typedef std::map<uint32_t, Ptr<SatControlMsgContainer> > TbtpMap_t;
 
   /**
     * Super frame sequences.

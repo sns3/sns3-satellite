@@ -204,7 +204,7 @@ SatSuperframeSeq::AddTbtpMessage (uint32_t beamId, Ptr<SatTbtpMessage> tbtpMsg)
   // create container, if not exist
   if ( it == tbtpContainers.end () )
     {
-      Ptr<SatTbtpContainer> tbtpCont = Create<SatTbtpContainer> ();
+      Ptr<SatControlMsgContainer> tbtpCont = Create<SatControlMsgContainer> ();
 
       // calculate maximum number of messages to store based on given time to store and superframe duration.
       uint32_t storeCount  = (uint32_t) (m_tbtpStoreTime.GetSeconds() / m_superframe[0]->GetDurationInSeconds() );
@@ -239,7 +239,15 @@ SatSuperframeSeq::GetTbtpMessage (uint32_t beamId, uint32_t msgId) const
 
   if ( it != tbtpContainers.end () )
     {
-      msg = tbtpContainers.at (beamId)->Get (msgId);
+      msg = DynamicCast<SatTbtpMessage> (tbtpContainers.at (beamId)->Get (msgId));
+      if (msg)
+        {
+          return msg;
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Dynamic cast to SatTbtpMessage was not successfull!");
+        }
     }
 
   return msg;

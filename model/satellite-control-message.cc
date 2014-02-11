@@ -177,7 +177,21 @@ SatTbtpMessage::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
   return GetSerializedSize();
 }
 
-// TBTP message header
+// Control message
+
+NS_OBJECT_ENSURE_REGISTERED (SatControlMessage);
+
+TypeId
+SatControlMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatControlMessage")
+    .SetParent<Object> ()
+  ;
+  return tid;
+}
+
+
+// TBTP message
 
 NS_OBJECT_ENSURE_REGISTERED (SatTbtpMessage);
 
@@ -206,12 +220,13 @@ TypeId
 SatTbtpMessage::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatTbtpMessage")
-    .SetParent<Object> ()
+    .SetParent<SatControlMessage> ()
     .AddConstructor<SatTbtpMessage> ()
-    .AddAttribute ("AssigmentFormat", "Assignment format of assignment IDs in TBTP.)",
-                    UintegerValue (0),
-                    MakeUintegerAccessor (&SatTbtpMessage::m_assignmentFormat),
-                    MakeUintegerChecker<uint8_t> ())
+    .AddAttribute ("AssigmentFormat",
+                   "Assignment format of assignment IDs in TBTP.)",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&SatTbtpMessage::m_assignmentFormat),
+                   MakeUintegerChecker<uint8_t> ())
   ;
   return tid;
 }
@@ -359,50 +374,50 @@ void SatTbtpMessage::Dump () const
 
 // TBTP message container
 
-SatTbtpContainer::SatTbtpContainer ()
+SatControlMsgContainer::SatControlMsgContainer ()
  :m_id (0),
   m_maxMsgCount (50)
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatTbtpContainer::~SatTbtpContainer ()
+SatControlMsgContainer::~SatControlMsgContainer ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 uint32_t
-SatTbtpContainer::Add (Ptr<SatTbtpMessage> tbtpMsg)
+SatControlMsgContainer::Add (Ptr<SatControlMessage> ctrlMsg)
 {
-  NS_LOG_FUNCTION (this << tbtpMsg);
+  NS_LOG_FUNCTION (this << ctrlMsg);
 
-  // if limit to store msgs are reached, remove first msg from map before adding the new onw
-  if ( m_tbtps.size () >= m_maxMsgCount )
+  // If limit to store msgs are reached, remove first msg from map before adding the new one
+  if ( m_ctrlMsgs.size () >= m_maxMsgCount )
     {
-      m_tbtps.erase (m_tbtps.begin ()->first );
+      m_ctrlMsgs.erase (m_ctrlMsgs.begin ()->first );
     }
 
-  std::pair<TbtpMap_t::iterator, bool> result = m_tbtps.insert (std::make_pair (m_id, tbtpMsg));
+  std::pair<CtrlMsgMap_t::iterator, bool> result = m_ctrlMsgs.insert (std::make_pair (m_id, ctrlMsg));
 
   if ( result.second == false )
     {
-      NS_FATAL_ERROR ("TBTP message can't added.");
+      NS_FATAL_ERROR ("Control message can't added.");
     }
 
   return m_id++;
 }
 
-Ptr<SatTbtpMessage>
-SatTbtpContainer::Get (uint32_t id) const
+Ptr<SatControlMessage>
+SatControlMsgContainer::Get (uint32_t id) const
 {
   NS_LOG_FUNCTION (this << id);
 
-  Ptr<SatTbtpMessage> msg = NULL;
+  Ptr<SatControlMessage> msg = NULL;
 
-  TbtpMap_t::const_iterator it = m_tbtps.find (id);
+  CtrlMsgMap_t::const_iterator it = m_ctrlMsgs.find (id);
 
-  if ( it != m_tbtps.end () )
+  if ( it != m_ctrlMsgs.end () )
     {
       msg = it->second;
     }
@@ -410,7 +425,7 @@ SatTbtpContainer::Get (uint32_t id) const
   return msg;
 }
 
-void SatTbtpContainer::SetMaxMsgCount (uint32_t maxMsgCount)
+void SatControlMsgContainer::SetMaxMsgCount (uint32_t maxMsgCount)
 {
   NS_LOG_FUNCTION (this << maxMsgCount);
 
