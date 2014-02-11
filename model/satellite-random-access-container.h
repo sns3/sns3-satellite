@@ -100,24 +100,37 @@ public:
    */
   void SetRandomAccessModel (RandomAccessModel_t randomAccessModel);
 
-  /**
-   *
-   * \param backoffProbability
-   */
-  void CrdsaSetBackoffProbability (double backoffProbability);
 
   /**
    *
+   * \param backoffProbability
    * \param backoffTime
+   * \param maximumBackoffProbability
    */
-  void CrdsaSetBackoffTime (double backoffTime);
+  void CrdsaSetLoadControlParameters (double backoffProbability, double backoffTime, double maximumBackoffProbability);
+
+  /**
+   *
+   * \param requestClass
+   * \param minRandomizationValue
+   * \param maxRandomizationValue
+   * \param minIdleBlocks
+   * \param numOfInstances
+   * \param payloadBytes
+   */
+  void CrdsaSetMaximumDataRateLimitationParameters (uint32_t requestClass,
+                                                    uint32_t minRandomizationValue,
+                                                    uint32_t maxRandomizationValue,
+                                                    uint32_t minIdleBlocks,
+                                                    uint32_t numOfInstances,
+                                                    uint32_t payloadBytes);
 
   /**
    *
    * \param min
    * \param max
    */
-  void SlottedAlohaUpdateVariables (double min, double max);
+  void SlottedAlohaSetLoadControlVariables (double min, double max);
 
   /**
    *
@@ -193,6 +206,8 @@ private:
 
   /**
    *
+   * \param requestClass
+   * \param txOpportunities
    * \return
    */
   std::set<uint32_t> CrdsaRandomizeTxOpportunities (uint32_t requestClass, std::set<uint32_t> txOpportunities);
@@ -217,12 +232,6 @@ private:
    *
    */
   void CrdsaIncreaseConsecutiveBlocksUsed ();
-
-  /**
-   *
-   * \param requestClass
-   */
-  void CrdsaReduceIdleBlocks (uint32_t requestClass);
 
   /**
    *

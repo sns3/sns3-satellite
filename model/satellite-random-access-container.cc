@@ -46,7 +46,7 @@ SatRandomAccess::SatRandomAccess () :
   /// CRDSA variables
   m_crdsaBackoffProbability (),
   m_crdsaMaximumBackoffProbability (),
-  m_crdsaNewData (),
+  m_crdsaNewData (true),
   m_crdsaBackoffReleaseTime (),
   m_crdsaBackoffTime ()
 {
@@ -62,15 +62,15 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Ran
   m_numOfRequestClasses (numOfRequestClasses),
 
   /// Slotted ALOHA variables
-  m_slottedAlohaMinRandomizationValue (randomAccessConf->GetSlottedAlohaDefaultMinRandomizationValue ()),
-  m_slottedAlohaMaxRandomizationValue (randomAccessConf->GetSlottedAlohaDefaultMaxRandomizationValue ()),
+  m_slottedAlohaMinRandomizationValue (),
+  m_slottedAlohaMaxRandomizationValue (),
 
   /// CRDSA variables
-  m_crdsaBackoffProbability (randomAccessConf->GetCrdsaDefaultBackoffProbability ()),
-  m_crdsaMaximumBackoffProbability (randomAccessConf->GetMaximumCrdsaBackoffProbability ()),
+  m_crdsaBackoffProbability (),
+  m_crdsaMaximumBackoffProbability (),
   m_crdsaNewData (true),
   m_crdsaBackoffReleaseTime (Now ().GetSeconds ()),
-  m_crdsaBackoffTime (randomAccessConf->GetCrdsaDefaultBackoffTime () / 1000)
+  m_crdsaBackoffTime ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -80,7 +80,15 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Ran
     {
       NS_FATAL_ERROR ("SatRandomAccess::SatRandomAccess - Configuration object is NULL");
     }
+
   SetRandomAccessModel (randomAccessModel);
+
+  CrdsaSetLoadControlParameters (randomAccessConf->GetCrdsaDefaultBackoffProbability (),
+                                 randomAccessConf->GetCrdsaDefaultBackoffTime () / 1000,
+                                 randomAccessConf->GetMaximumCrdsaBackoffProbability ());
+
+  SlottedAlohaSetLoadControlVariables (randomAccessConf->GetSlottedAlohaDefaultMinRandomizationValue (),
+                                       randomAccessConf->GetSlottedAlohaDefaultMaxRandomizationValue ());
 }
 
 SatRandomAccess::~SatRandomAccess ()
@@ -336,16 +344,23 @@ SatRandomAccess::SlottedAlohaDoVariableSanityCheck ()
 }
 
 void
-SatRandomAccess::SlottedAlohaUpdateVariables (double min, double max)
+SatRandomAccess::SlottedAlohaSetLoadControlVariables (double min, double max)
 {
   NS_LOG_FUNCTION (this << " new min: " << min << " new max: " << max);
 
-  m_slottedAlohaMinRandomizationValue = min;
-  m_slottedAlohaMaxRandomizationValue = max;
+  if (m_randomAccessModel == RA_SLOTTED_ALOHA || m_randomAccessModel == RA_ANY_AVAILABLE)
+    {
+      m_slottedAlohaMinRandomizationValue = min;
+      m_slottedAlohaMaxRandomizationValue = max;
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::SlottedAlohaSetLoadControlVariables - Wrong random access model in use");
+    }
 
   SlottedAlohaDoVariableSanityCheck ();
 
-  NS_LOG_INFO ("SatRandomAccess::SlottedAlohaUpdateVariables - new min: " << min << " new max: " << max);
+  NS_LOG_INFO ("SatRandomAccess::SlottedAlohaSetLoadControlVariables - new min: " << min << " new max: " << max);
 }
 
 SatRandomAccess::RandomAccessResults_s
@@ -412,37 +427,59 @@ SatRandomAccess::CrdsaDoVariableSanityCheck ()
       NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0");
     }
 
+  if (m_crdsaMaximumBackoffProbability < 0.0 || m_crdsaMaximumBackoffProbability > 1.0)
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - m_crdsaMaximumBackoffProbability < 0.0 || m_crdsaMaximumBackoffProbability > 1.0");
+    }
+
   NS_LOG_INFO ("SatRandomAccess::CrdsaDoVariableSanityCheck - Variable sanity check done");
 }
 
 void
-SatRandomAccess::CrdsaSetBackoffProbability (double crdsaBackoffProbability)
+SatRandomAccess::CrdsaSetLoadControlParameters (double crdsaBackoffProbability, double backoffTime, double maximumBackoffProbability)
 {
   NS_LOG_FUNCTION (this);
 
   if (m_randomAccessModel == RA_CRDSA || m_randomAccessModel == RA_ANY_AVAILABLE)
     {
       m_crdsaBackoffProbability = crdsaBackoffProbability;
+      m_crdsaBackoffTime = backoffTime;
+      m_crdsaMaximumBackoffProbability = maximumBackoffProbability;
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetBackoffProbability - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetLoadControlParameters - Wrong random access model in use");
     }
+
+  CrdsaDoVariableSanityCheck ();
 }
 
 void
-SatRandomAccess::CrdsaSetBackoffTime (double backoffTime)
+SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters (uint32_t requestClass,
+                                                              uint32_t minRandomizationValue,
+                                                              uint32_t maxRandomizationValue,
+                                                              uint32_t minIdleBlocks,
+                                                              uint32_t numOfInstances,
+                                                              uint32_t payloadBytes)
 {
   NS_LOG_FUNCTION (this);
 
   if (m_randomAccessModel == RA_CRDSA || m_randomAccessModel == RA_ANY_AVAILABLE)
     {
-      m_crdsaBackoffTime = backoffTime;
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetMinRandomizationValue (minRandomizationValue);
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetMaxRandomizationValue (maxRandomizationValue);
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetMinIdleBlocks (minIdleBlocks);
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetNumOfInstances (numOfInstances);
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetPayloadBytes (payloadBytes);
+
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->DoVariableSanityCheck ();
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetBackoffTime - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetLoadControlParameters - Wrong random access model in use");
     }
+
+  CrdsaDoVariableSanityCheck ();
 }
 
 bool
@@ -463,27 +500,19 @@ SatRandomAccess::CrdsaHasBackoffTimePassed ()
 }
 
 void
-SatRandomAccess::CrdsaReduceIdleBlocks (uint32_t requestClass)
-{
-  NS_LOG_FUNCTION (this);
-
-  uint32_t idleBlocksLeft = m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetIdleBlocksLeft ();
-
-  if (idleBlocksLeft > 0)
-    {
-      NS_LOG_INFO ("SatRandomAccess::CrdsaReduceIdleBlocks - Reducing request class: " << requestClass << " idle blocks by one");
-      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetIdleBlocksLeft (idleBlocksLeft - 1);
-    }
-}
-
-void
 SatRandomAccess::CrdsaReduceIdleBlocksFromAllRequestClasses ()
 {
   NS_LOG_FUNCTION (this);
 
   for (uint32_t requestClass = 0; requestClass < m_numOfRequestClasses; requestClass++)
     {
-      CrdsaReduceIdleBlocks (requestClass);
+      uint32_t idleBlocksLeft = m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetIdleBlocksLeft ();
+
+      if (idleBlocksLeft > 0)
+        {
+          NS_LOG_INFO ("SatRandomAccess::CrdsaReduceIdleBlocks - Reducing request class: " << requestClass << " idle blocks by one");
+          m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetIdleBlocksLeft (idleBlocksLeft - 1);
+        }
     }
 }
 

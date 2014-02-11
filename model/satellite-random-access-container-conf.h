@@ -81,7 +81,7 @@ public:
    *
    * \return
    */
-  double GetMaximumCrdsaBackoffProbability () { return m_raLogicMaximumCrdsaBackoffProbability; }
+  double GetMaximumCrdsaBackoffProbability () { return m_crdsaMaximumBackoffProbability; }
 
   /**
    *
@@ -144,7 +144,7 @@ private:
   /**
    *
    */
-  double m_raLogicMaximumCrdsaBackoffProbability;
+  double m_crdsaMaximumBackoffProbability;
 
   /**
    *

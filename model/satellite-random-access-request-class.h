@@ -133,12 +133,12 @@ public:
    */
   void SetIdleBlocksLeft (uint32_t idleBlocksLeft) { m_idleBlocksLeft = idleBlocksLeft; }
 
-private:
-
   /**
    *
    */
   void DoVariableSanityCheck ();
+
+private:
 
   /**
    *

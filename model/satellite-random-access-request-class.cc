@@ -94,6 +94,11 @@ SatRandomAccessRequestClass::DoVariableSanityCheck ()
       NS_FATAL_ERROR ("SatRandomAccessRequestClass::DoVariableSanityCheck - (max - min) < instances");
     }
 
+  if (m_payloadBytes < 1)
+    {
+      NS_FATAL_ERROR ("SatRandomAccessRequestClass::DoVariableSanityCheck - payload bytes < 1");
+    }
+
   NS_LOG_INFO ("SatRandomAccessRequestClass::DoVariableSanityCheck - Variable sanity check done");
 }
 

@@ -52,10 +52,10 @@ SatRandomAccessConf::GetTypeId (void)
                    DoubleValue (0.00),
                    MakeDoubleAccessor (&SatRandomAccessConf::m_crdsaBackoffProbability),
                    MakeDoubleChecker<double> (0.0,1.0))
-    .AddAttribute ("RaLogicMaximumCrdsaBackoffProbability",
+    .AddAttribute ("CrdsaMaximumCrdsaBackoffProbability",
                    "Maximum CRDSA backoff probability for RA logic",
                    DoubleValue (0.2),
-                   MakeDoubleAccessor (&SatRandomAccessConf::m_raLogicMaximumCrdsaBackoffProbability),
+                   MakeDoubleAccessor (&SatRandomAccessConf::m_crdsaMaximumBackoffProbability),
                    MakeDoubleChecker<double> (0.0,1.0))
     .AddAttribute ("CrdsaMaxUniquePayloadPerBlock",
                    "CRDSA max unique payloads per block",
@@ -72,14 +72,14 @@ SatRandomAccessConf::GetTypeId (void)
 }
 
 SatRandomAccessConf::SatRandomAccessConf () :
-  m_slottedAlohaMinRandomizationValue (0.5),
-  m_slottedAlohaMaxRandomizationValue (2.0),
-  m_crdsaBackoffTime (5),
-  m_crdsaBackoffProbability (0.05),
-  m_raLogicMaximumCrdsaBackoffProbability (0.20),
-  m_crdsaMaxUniquePayloadPerBlock (3),
-  m_crdsaMaxConsecutiveBlocksAccessed (4),
-  m_crdsaNumOfConsecutiveBlocksUsed (0)
+  m_slottedAlohaMinRandomizationValue (),
+  m_slottedAlohaMaxRandomizationValue (),
+  m_crdsaBackoffTime (),
+  m_crdsaBackoffProbability (),
+  m_crdsaMaximumBackoffProbability (),
+  m_crdsaMaxUniquePayloadPerBlock (),
+  m_crdsaMaxConsecutiveBlocksAccessed (),
+  m_crdsaNumOfConsecutiveBlocksUsed ()
 {
   NS_LOG_FUNCTION (this);
 
