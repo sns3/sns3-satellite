@@ -121,7 +121,7 @@ public:
    * Set the node info
    * \param nodeInfo containing node specific information
    */
-  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
+  virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 private:
   SatMac& operator = (const SatMac &);

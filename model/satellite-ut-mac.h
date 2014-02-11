@@ -27,6 +27,7 @@
 #include "satellite-phy.h"
 #include "satellite-random-access-container.h"
 #include "satellite-random-access-container-conf.h"
+#include "satellite-tbtp-container.h"
 
 namespace ns3 {
 
@@ -115,6 +116,12 @@ public:
    * \param gwAddress Address of the GW.
    */
   void SetGwAddress (Mac48Address gwAddress);
+
+  /**
+   * Set the node info
+   * \param nodeInfo containing node specific information
+   */
+  virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 protected:
 
@@ -222,6 +229,11 @@ private:
    * the duration of a time slot by a m_guardTime set by an attribute.
    */
   Time m_guardTime;
+
+  /**
+   * Container for storing all the TBTP information related to this UT.
+   */
+  Ptr<SatTbtpContainer> m_tbtpContainer;
 };
 
 } // namespace ns3

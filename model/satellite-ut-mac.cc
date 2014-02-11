@@ -35,6 +35,7 @@
 #include "satellite-ut-mac.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+#include "satellite-tbtp-container.h"
 #include "../helper/satellite-wave-form-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -126,6 +127,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
 	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel, numOfRequestClasses);
 	  }
 
+	m_tbtpContainer = CreateObject<SatTbtpContainer> ();
+
   Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
 }
 
@@ -134,6 +137,7 @@ SatUtMac::~SatUtMac ()
   NS_LOG_FUNCTION (this);
 
   m_randomAccess = NULL;
+  m_tbtpContainer = NULL;
 }
 
 void
@@ -142,6 +146,7 @@ SatUtMac::DoDispose (void)
   NS_LOG_FUNCTION (this);
 
   m_timingAdvanceCb.Nullify ();
+  m_tbtpContainer->DoDispose ();
 
   SatMac::DoDispose ();
 }
@@ -151,6 +156,12 @@ void SatUtMac::SetGwAddress (Mac48Address gwAddress)
   NS_LOG_FUNCTION (this);
 
   m_gwAddress = gwAddress;
+}
+
+void SatUtMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
+{
+  m_tbtpContainer->SetMacAddress (nodeInfo->GetMacAddress ());
+  SatMac::SetNodeInfo (nodeInfo);
 }
 
 void
@@ -188,6 +199,9 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
   // The delay compared to Now when to start the transmission of this superframe
   Time startDelay = startTime - Simulator::Now ();
+
+  // Add TBTP to a specific container
+  m_tbtpContainer->Add (startTime, tbtp);
 
   // if the calculated start time of the superframe is already in the past
   if (startTime < Simulator::Now ())
