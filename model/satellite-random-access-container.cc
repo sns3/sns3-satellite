@@ -18,7 +18,6 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 #include "satellite-random-access-container.h"
-#include <set>
 
 NS_LOG_COMPONENT_DEFINE ("SatRandomAccess");
 
@@ -38,6 +37,7 @@ SatRandomAccess::SatRandomAccess () :
   m_uniformRandomVariable (),
   m_randomAccessModel (RA_OFF),
   m_randomAccessConf (),
+  m_numOfRequestClasses (),
 
   /// Slotted ALOHA variables
   m_slottedAlohaMinRandomizationValue (),
@@ -46,28 +46,20 @@ SatRandomAccess::SatRandomAccess () :
   /// CRDSA variables
   m_crdsaBackoffProbability (),
   m_crdsaMaximumBackoffProbability (),
-  m_crdsaMinRandomizationValue (),
-  m_crdsaMaxRandomizationValue (),
-  m_crdsaNumOfInstances (),
   m_crdsaNewData (),
   m_crdsaBackoffReleaseTime (),
-  m_crdsaBackoffTime (),
-  m_crdsaMaxUniquePayloadPerBlock (),
-  m_crdsaMaxConsecutiveBlocksAccessed (),
-  m_crdsaMinIdleBlocks (),
-  m_crdsaIdleBlocksLeft (),
-  m_crdsaNumOfConsecutiveBlocksUsed (),
-  m_crdsaMaxPacketSize ()
+  m_crdsaBackoffTime ()
 {
   NS_LOG_FUNCTION (this);
 
   NS_FATAL_ERROR ("SatRandomAccess::SatRandomAccess - Constructor not in use");
 }
 
-SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel) :
+SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel, uint32_t numOfRequestClasses) :
   m_uniformRandomVariable (),
   m_randomAccessModel (randomAccessModel),
   m_randomAccessConf (randomAccessConf),
+  m_numOfRequestClasses (numOfRequestClasses),
 
   /// Slotted ALOHA variables
   m_slottedAlohaMinRandomizationValue (randomAccessConf->GetSlottedAlohaDefaultMinRandomizationValue ()),
@@ -76,18 +68,9 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Ran
   /// CRDSA variables
   m_crdsaBackoffProbability (randomAccessConf->GetCrdsaDefaultBackoffProbability ()),
   m_crdsaMaximumBackoffProbability (randomAccessConf->GetMaximumCrdsaBackoffProbability ()),
-  m_crdsaMinRandomizationValue (randomAccessConf->GetCrdsaDefaultMinRandomizationValue ()),
-  m_crdsaMaxRandomizationValue (randomAccessConf->GetCrdsaDefaultMaxRandomizationValue ()),
-  m_crdsaNumOfInstances (randomAccessConf->GetCrdsaDefaultNumOfInstances ()),
   m_crdsaNewData (true),
   m_crdsaBackoffReleaseTime (Now ().GetSeconds ()),
-  m_crdsaBackoffTime (randomAccessConf->GetCrdsaDefaultBackoffTime () / 1000),
-  m_crdsaMaxUniquePayloadPerBlock (randomAccessConf->GetCrdsaDefaultMaxUniquePayloadPerBlock ()),
-  m_crdsaMaxConsecutiveBlocksAccessed (randomAccessConf->GetCrdsaDefaultMaxConsecutiveBlocksAccessed()),
-  m_crdsaMinIdleBlocks (randomAccessConf->GetCrdsaDefaultMinIdleBlocks ()),
-  m_crdsaIdleBlocksLeft (0),
-  m_crdsaNumOfConsecutiveBlocksUsed (0),
-  m_crdsaMaxPacketSize (randomAccessConf->GetCrdsaDefaultMaxUniquePayloadPerBlock () * randomAccessConf->GetCrdsaDefaultPayloadBytes ())
+  m_crdsaBackoffTime (randomAccessConf->GetCrdsaDefaultBackoffTime () / 1000)
 {
   NS_LOG_FUNCTION (this);
 
@@ -118,20 +101,28 @@ SatRandomAccess::IsFrameStart ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool isFrameStart = m_uniformRandomVariable->GetInteger (0,1);
+  bool isFrameStart = true;
 
   NS_LOG_INFO ("SatRandomAccess::IsFrameStart: " << isFrameStart);
 
   return isFrameStart;
 }
 
+/*
+The known DAMA capacity condition is different for control and data.
+For control the known DAMA is limited to the SF about to start, i.e.,
+the look ahead is one SF. For data the known DAMA allocation can be
+one or more SF in the future, i.e., the look ahead contains all known
+future DAMA allocations. With CRDSA the control packets have priority
+over data packets.
+*/
 /// TODO: implement this
 bool
 SatRandomAccess::IsDamaAvailable ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool isDamaAvailable = m_uniformRandomVariable->GetInteger (0,1);
+  bool isDamaAvailable = false;
 
   NS_LOG_INFO ("SatRandomAccess::IsDamaAvailable: " << isDamaAvailable);
 
@@ -144,7 +135,7 @@ SatRandomAccess::AreBuffersEmpty ()
 {
   NS_LOG_FUNCTION (this);
 
-  bool areBuffersEmpty = m_uniformRandomVariable->GetInteger (0,1);;
+  bool areBuffersEmpty = m_uniformRandomVariable->GetInteger (0,1);
 
   NS_LOG_INFO ("SatRandomAccess::AreBuffersEmpty: " << areBuffersEmpty);
 
@@ -158,7 +149,7 @@ SatRandomAccess::IsCrdsaFree ()
 
   bool isCrdsaFree = false;
 
-  if ((Now ().GetSeconds () >= m_crdsaBackoffReleaseTime) && (m_crdsaIdleBlocksLeft < 1))
+  if ((Now ().GetSeconds () >= m_crdsaBackoffReleaseTime))
     {
       isCrdsaFree = true;
     }
@@ -194,7 +185,6 @@ SatRandomAccess::SetRandomAccessModel (RandomAccessModel_t randomAccessModel)
   NS_LOG_INFO ("SatRandomAccess::SetRandomAccessModel - Random Access model updated");
 }
 
-/// TODO implement return values!
 SatRandomAccess::RandomAccessResults_s
 SatRandomAccess::DoRandomAccess ()
 {
@@ -245,7 +235,7 @@ SatRandomAccess::DoRandomAccess ()
         {
           NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - At frame start, checking CRDSA backoff & backoff probability");
 
-          if ((m_crdsaBackoffProbability < m_crdsaMaximumBackoffProbability) && IsCrdsaFree ())
+          if ( IsCrdsaFree () && (m_crdsaBackoffProbability < m_crdsaMaximumBackoffProbability))
             {
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Low CRDSA backoff value AND CRDSA is free, evaluating CRDSA");
               results = DoCrdsa ();
@@ -255,7 +245,7 @@ SatRandomAccess::DoRandomAccess ()
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - High CRDSA backoff value OR CRDSA is not free, evaluating Slotted ALOHA");
               results = DoSlottedAloha ();
 
-              CrdsaUpdateIdleBlocks ();
+              CrdsaReduceIdleBlocksFromAllRequestClasses ();
             }
         }
     }
@@ -268,10 +258,14 @@ SatRandomAccess::DoRandomAccess ()
   /// TODO: comment out this code at later stage
   if (results.resultType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
     {
-      std::set<uint32_t>::iterator iter;
-      for (iter = results.crdsaResult.begin (); iter != results.crdsaResult.end (); iter++ )
+      std::map<uint32_t, std::set<uint32_t> >::iterator iterMap;
+      for (iterMap = results.crdsaResult.begin (); iterMap != results.crdsaResult.end (); iterMap++ )
         {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity at slot: " << (*iter));
+          std::set<uint32_t>::iterator iterSet;
+          for (iterSet = iterMap->second.begin(); iterSet != iterMap->second.end(); iterSet++)
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity for request class: " << iterMap->first << " at slot: " << (*iterSet));
+            }
         }
     }
   else if (results.resultType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
@@ -304,11 +298,19 @@ SatRandomAccess::PrintVariables ()
   NS_LOG_INFO ("Backoff time: " << m_crdsaBackoffTime << " seconds");
   NS_LOG_INFO ("Backoff probability: " << m_crdsaBackoffProbability * 100 << " %");
   NS_LOG_INFO ("New data status: " << m_crdsaNewData);
-  NS_LOG_INFO ("Slot randomization: " << m_crdsaNumOfInstances * m_crdsaMaxUniquePayloadPerBlock << " Tx opportunities with range from "<< m_crdsaMinRandomizationValue << " to " << m_crdsaMaxRandomizationValue);
-  NS_LOG_INFO ("Number of instances: " << m_crdsaNumOfInstances);
-  NS_LOG_INFO ("Number of unique payloads per block: " << m_crdsaMaxUniquePayloadPerBlock);
-  NS_LOG_INFO ("Number of consecutive blocks accessed: " << m_crdsaNumOfConsecutiveBlocksUsed << "/" << m_crdsaMaxConsecutiveBlocksAccessed);
-  NS_LOG_INFO ("Number of idle blocks left: " << m_crdsaIdleBlocksLeft << "/" << m_crdsaMinIdleBlocks);
+  NS_LOG_INFO ("Number of unique payloads per block: " << m_randomAccessConf->GetMaxUniquePayloadPerBlock ());
+  NS_LOG_INFO ("Number of consecutive blocks accessed: " << m_randomAccessConf->GetNumOfConsecutiveBlocksUsed () << "/" << m_randomAccessConf->GetMaxConsecutiveBlocksAccessed ());
+
+  for (uint32_t index = 0; index < m_numOfRequestClasses; index++)
+    {
+      NS_LOG_INFO ("---------------");
+      NS_LOG_INFO ("REQUEST CLASS: " << index);
+      NS_LOG_INFO ("Slot randomization: " << m_randomAccessConf->GetRequestClassConfiguration (index)->GetNumOfInstances () * m_randomAccessConf->GetMaxUniquePayloadPerBlock () <<
+                   " Tx opportunities with range from " << m_randomAccessConf->GetRequestClassConfiguration (index)->GetMinRandomizationValue () <<
+                   " to " << m_randomAccessConf->GetRequestClassConfiguration (index)->GetMaxRandomizationValue ());
+      NS_LOG_INFO ("Number of instances: " << m_randomAccessConf->GetRequestClassConfiguration (index)->GetNumOfInstances ());
+      NS_LOG_INFO ("Number of idle blocks left: " << m_randomAccessConf->GetRequestClassConfiguration (index)->GetIdleBlocksLeft () << "/" << m_randomAccessConf->GetRequestClassConfiguration (index)->GetMinIdleBlocks ());
+    }
 }
 
 ///-------------------------------
@@ -351,7 +353,6 @@ SatRandomAccess::DoSlottedAloha ()
 {
   NS_LOG_FUNCTION (this);
 
-  /// TODO: what to return in the case SA is not used, e.g., DAMA is available?
   RandomAccessResults_s results;
   results.resultType = SatRandomAccess::RA_DO_NOTHING;
 
@@ -401,63 +402,17 @@ SatRandomAccess::CrdsaDoVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_crdsaMinRandomizationValue < 0 || m_crdsaMaxRandomizationValue < 0)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - min < 0 || max < 0");
-    }
-
-  if (m_crdsaMinRandomizationValue > m_crdsaMaxRandomizationValue)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - min > max");
-    }
-
-  /// TODO check this
-  if (m_crdsaNumOfInstances < 1 || m_crdsaNumOfInstances > 3)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - instances < 1 || instances > 3");
-    }
-
-  if ( (m_crdsaMaxRandomizationValue - m_crdsaMinRandomizationValue) < m_crdsaNumOfInstances)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - (max - min) < instances");
-    }
-
   if (m_crdsaBackoffTime < 0)
     {
       NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - m_crdsaBackoffTime < 0");
     }
 
-  if (m_crdsaBackoffProbability < 0 || m_crdsaBackoffProbability > 1.0)
+  if (m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0)
     {
       NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0");
     }
 
-  if (m_crdsaMaxUniquePayloadPerBlock < 1)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - m_crdsaMaxUniquePayloadPerBlock < 1");
-    }
-
-  if (m_crdsaMaxConsecutiveBlocksAccessed < 1)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaDoVariableSanityCheck - m_crdsaMaxConsecutiveBlocksAccessed < 1");
-    }
-
   NS_LOG_INFO ("SatRandomAccess::CrdsaDoVariableSanityCheck - Variable sanity check done");
-}
-
-void
-SatRandomAccess::CrdsaUpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances, uint32_t maxUniquePayloadPerBlock)
-{
-  NS_LOG_FUNCTION (this << " min: " << min << " max: " << max << " numOfInstances: " << numOfInstances << " maxUniquePayloadPerBlock: " << maxUniquePayloadPerBlock);
-
-  m_crdsaMinRandomizationValue = min;
-  m_crdsaMaxRandomizationValue = max;
-  m_crdsaNumOfInstances = numOfInstances;
-  m_crdsaMaxUniquePayloadPerBlock = maxUniquePayloadPerBlock;
-
-  CrdsaDoVariableSanityCheck ();
-
-  NS_LOG_INFO ("SatRandomAccess::CrdsaUpdateRandomizationVariables - min: " << min << " max: " << max << " numOfInstances: " << numOfInstances << " maxUniquePayloadPerBlock: " << maxUniquePayloadPerBlock);
 }
 
 void
@@ -501,10 +456,6 @@ SatRandomAccess::CrdsaHasBackoffTimePassed ()
     {
       hasCrdsaBackoffTimePassed = true;
     }
-  else
-    {
-      CrdsaUpdateIdleBlocks ();
-    }
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaHasBackoffTimePassed: " << hasCrdsaBackoffTimePassed);
 
@@ -512,15 +463,42 @@ SatRandomAccess::CrdsaHasBackoffTimePassed ()
 }
 
 void
-SatRandomAccess::CrdsaUpdateIdleBlocks ()
+SatRandomAccess::CrdsaReduceIdleBlocks (uint32_t requestClass)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_crdsaIdleBlocksLeft > 0)
+  uint32_t idleBlocksLeft = m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetIdleBlocksLeft ();
+
+  if (idleBlocksLeft > 0)
     {
-      NS_LOG_INFO ("SatRandomAccess::CrdsaUpdateIdleBlocks - Reducing idle blocks by one");
-      m_crdsaIdleBlocksLeft--;
+      NS_LOG_INFO ("SatRandomAccess::CrdsaReduceIdleBlocks - Reducing request class: " << requestClass << " idle blocks by one");
+      m_randomAccessConf->GetRequestClassConfiguration (requestClass)->SetIdleBlocksLeft (idleBlocksLeft - 1);
     }
+}
+
+void
+SatRandomAccess::CrdsaReduceIdleBlocksFromAllRequestClasses ()
+{
+  NS_LOG_FUNCTION (this);
+
+  for (uint32_t requestClass = 0; requestClass < m_numOfRequestClasses; requestClass++)
+    {
+      CrdsaReduceIdleBlocks (requestClass);
+    }
+}
+
+bool
+SatRandomAccess::CrdsaIsRequestClassFree (uint32_t requestClass)
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetIdleBlocksLeft () > 0)
+    {
+      NS_LOG_INFO ("SatRandomAccess::CrdsaIsRequestClassFree - Request class: " << requestClass << " idle in effect");
+      return false;
+    }
+  NS_LOG_INFO ("SatRandomAccess::CrdsaIsRequestClassFree - Request class: " << requestClass << " free");
+  return true;
 }
 
 bool
@@ -542,38 +520,69 @@ SatRandomAccess::CrdsaDoBackoff ()
 
 
 void
-SatRandomAccess::CrdsaSetInitialBackoffTimer ()
+SatRandomAccess::CrdsaSetBackoffTimer ()
 {
   NS_LOG_FUNCTION (this);
 
   m_crdsaBackoffReleaseTime = Now ().GetSeconds () + m_crdsaBackoffTime;
 
-  CrdsaUpdateIdleBlocks ();
+  CrdsaReduceIdleBlocksFromAllRequestClasses ();
 
-  m_crdsaNumOfConsecutiveBlocksUsed = 0;
-
-  NS_LOG_INFO ("SatRandomAccess::CrdsaSetInitialBackoffTimer - Setting backoff timer");
+  NS_LOG_INFO ("SatRandomAccess::CrdsaSetBackoffTimer - Setting backoff timer");
 }
 
-std::set<uint32_t>
+SatRandomAccess::RandomAccessResults_s
 SatRandomAccess::CrdsaPrepareToTransmit ()
 {
   NS_LOG_FUNCTION (this);
 
-  std::set<uint32_t> txOpportunities;
+  RandomAccessResults_s results;
+  results.resultType = SatRandomAccess::RA_DO_NOTHING;
 
-  NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - Preparing for transmission...");
+  uint32_t limit = m_randomAccessConf->GetMaxUniquePayloadPerBlock ();
 
-  txOpportunities = CrdsaRandomizeTxOpportunities ();
-
-  if (AreBuffersEmpty ())
+  for (uint32_t i = 0; i < limit; i++)
     {
-      m_crdsaNewData = true;
+      /// TODO this needs to be implemented
+      uint32_t candidateRequestClass = m_uniformRandomVariable->GetInteger (0,(m_numOfRequestClasses-1));
+
+      /// TODO implement BREAK if we get no suitable candidates!
+      if (m_uniformRandomVariable->GetValue (0.0,1.0) < 0.2)
+        {
+          NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - No suitable candidates found");
+          break;
+        }
+
+      NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - New Tx candidate from request class: " << candidateRequestClass);
+
+      if (CrdsaIsRequestClassFree (candidateRequestClass))
+        {
+          NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - Preparing for transmission with request class: " << candidateRequestClass);
+
+          std::map<uint32_t,std::set<uint32_t> >::iterator iter = results.crdsaResult.find (candidateRequestClass);
+
+          if (iter == results.crdsaResult.end ())
+            {
+              std::set<uint32_t> emptySet;
+              results.crdsaResult.insert (make_pair(candidateRequestClass, CrdsaRandomizeTxOpportunities (candidateRequestClass,emptySet)));
+            }
+          else
+            {
+              results.crdsaResult.at(candidateRequestClass) = CrdsaRandomizeTxOpportunities (iter->first,iter->second);
+            }
+
+          results.resultType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
+
+          if (AreBuffersEmpty ())
+            {
+              m_crdsaNewData = true;
+            }
+        }
     }
 
-  CrdsaIncreaseConsecutiveBlocksUsed ();
+  CrdsaReduceIdleBlocksFromAllRequestClasses ();
 
-  return txOpportunities;
+  return results;
 }
 
 void
@@ -581,15 +590,20 @@ SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsed ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_crdsaNumOfConsecutiveBlocksUsed++;
+  m_randomAccessConf->SetNumOfConsecutiveBlocksUsed (m_randomAccessConf->GetNumOfConsecutiveBlocksUsed () + 1);
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsed - Increasing the number of used consecutive blocks");
 
-  if (m_crdsaNumOfConsecutiveBlocksUsed >= m_crdsaMaxConsecutiveBlocksAccessed)
+  if (m_randomAccessConf->GetNumOfConsecutiveBlocksUsed () >= m_randomAccessConf->GetMaxConsecutiveBlocksAccessed ())
     {
       NS_LOG_INFO ("SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsed - Maximum number of consecutive blocks reached, forcing idle blocks");
-      m_crdsaIdleBlocksLeft = m_crdsaMinIdleBlocks;
-      m_crdsaNumOfConsecutiveBlocksUsed = 0;
+
+      for (uint32_t index = 0; index < m_numOfRequestClasses; index++)
+        {
+          m_randomAccessConf->GetRequestClassConfiguration (index)->SetIdleBlocksLeft (m_randomAccessConf->GetRequestClassConfiguration (index)->GetMinIdleBlocks ());
+        }
+
+      m_randomAccessConf->SetNumOfConsecutiveBlocksUsed (0);
     }
 }
 
@@ -598,7 +612,6 @@ SatRandomAccess::DoCrdsa ()
 {
   NS_LOG_FUNCTION (this);
 
-  /// TODO: what to return in the case CRDSA is not used?
   RandomAccessResults_s results;
   results.resultType = SatRandomAccess::RA_DO_NOTHING;
 
@@ -628,28 +641,40 @@ SatRandomAccess::DoCrdsa ()
 
               if (CrdsaDoBackoff ())
                 {
-                  CrdsaSetInitialBackoffTimer ();
+                  CrdsaSetBackoffTimer ();
                 }
               else
                 {
-                  results.crdsaResult = CrdsaPrepareToTransmit ();
-                  results.resultType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
+                  results = CrdsaPrepareToTransmit ();
                 }
             }
           else
             {
-              results.crdsaResult = CrdsaPrepareToTransmit ();
-              results.resultType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
+              results = CrdsaPrepareToTransmit ();
+            }
+
+          if (results.resultType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
+            {
+              CrdsaIncreaseConsecutiveBlocksUsed ();
+            }
+          else if (results.resultType == SatRandomAccess::RA_DO_NOTHING)
+            {
+              m_randomAccessConf->SetNumOfConsecutiveBlocksUsed (0);
             }
         }
       else
         {
-          CrdsaUpdateIdleBlocks ();
+          CrdsaReduceIdleBlocksFromAllRequestClasses ();
         }
+    }
+  else
+    {
+      CrdsaReduceIdleBlocksFromAllRequestClasses ();
     }
 
   NS_LOG_INFO ("--------------------------------------");
   NS_LOG_INFO ("------ CRDSA algorithm FINISHED ------");
+  NS_LOG_INFO ("------ Result: " << results.resultType << " ---------------------");
   NS_LOG_INFO ("--------------------------------------");
 
   return results;
@@ -657,22 +682,36 @@ SatRandomAccess::DoCrdsa ()
 
 
 std::set<uint32_t>
-SatRandomAccess::CrdsaRandomizeTxOpportunities ()
+SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t requestClass, std::set<uint32_t> txOpportunities)
 {
   NS_LOG_FUNCTION (this);
 
-  std::set<uint32_t> txOpportunities;
   std::pair<std::set<uint32_t>::iterator,bool> result;
 
-  NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Randomizing TX opportunities");
+  NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Randomizing TX opportunities for request class: " << requestClass);
 
-  while (txOpportunities.size () < (m_crdsaNumOfInstances * m_crdsaMaxUniquePayloadPerBlock))
+  if (CrdsaDoBackoff ())
     {
-      uint32_t slot = m_uniformRandomVariable->GetInteger (m_crdsaMinRandomizationValue, m_crdsaMaxRandomizationValue);
+      CrdsaSetBackoffTimer ();
+    }
+  else
+    {
+      uint32_t successfulInserts = 0;
+      uint32_t instances = m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetNumOfInstances ();
+      while (successfulInserts < instances)
+        {
+          uint32_t slot = m_uniformRandomVariable->GetInteger (m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetMinRandomizationValue (),
+                                                               m_randomAccessConf->GetRequestClassConfiguration (requestClass)->GetMaxRandomizationValue ());
 
-      result = txOpportunities.insert (slot);
+          result = txOpportunities.insert (slot);
 
-      NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Insert successful: " << result.second << " for TX opportunity slot: " << (*result.first));
+          if (result.second)
+            {
+              successfulInserts++;
+            }
+
+          NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Request class: " << requestClass << " insert successful " << result.second << " for TX opportunity slot: " << (*result.first));
+        }
     }
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Randomizing done");

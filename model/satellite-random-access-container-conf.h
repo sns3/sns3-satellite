@@ -24,6 +24,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "satellite-random-access-request-class.h"
+#include <map>
 
 namespace ns3 {
 
@@ -67,24 +69,6 @@ public:
    *
    * \return
    */
-  uint32_t GetCrdsaDefaultMinRandomizationValue () { return m_crdsaMinRandomizationValue; }
-
-  /**
-   *
-   * \return
-   */
-  uint32_t GetCrdsaDefaultMaxRandomizationValue () { return m_crdsaMaxRandomizationValue; }
-
-  /**
-   *
-   * \return
-   */
-  uint32_t GetCrdsaDefaultNumOfInstances () { return m_crdsaNumOfInstances; }
-
-  /**
-   *
-   * \return
-   */
   double GetCrdsaDefaultBackoffTime () { return m_crdsaBackoffTime; }
 
   /**
@@ -95,29 +79,45 @@ public:
 
   /**
    *
+   * \return
    */
-  uint32_t GetCrdsaDefaultMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
-
-  /**
-   *
-   */
-  uint32_t GetCrdsaDefaultMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
-
-  /**
-   *
-   */
-  uint32_t GetCrdsaDefaultMinIdleBlocks () { return m_crdsaMinIdleBlocks; }
-
-  /**
-   *
-   */
-  uint32_t GetCrdsaDefaultPayloadBytes () { return m_crdsaPayloadBytes; }
+  double GetMaximumCrdsaBackoffProbability () { return m_raLogicMaximumCrdsaBackoffProbability; }
 
   /**
    *
    * \return
    */
-  double GetMaximumCrdsaBackoffProbability () { return m_raLogicMaximumCrdsaBackoffProbability; }
+  Ptr<SatRandomAccessRequestClass> GetRequestClassConfiguration (uint32_t requestClass);
+
+  /**
+   *
+   */
+  uint32_t GetMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
+
+  /**
+   *
+   */
+  void SetMaxUniquePayloadPerBlock (uint32_t maxUniquePayloadPerBlock) { m_crdsaMaxUniquePayloadPerBlock = maxUniquePayloadPerBlock; }
+
+  /**
+   *
+   */
+  uint32_t GetMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
+
+  /**
+   *
+   */
+  void SetMaxConsecutiveBlocksAccessed (uint32_t maxConsecutiveBlocksAccessed) { m_crdsaMaxConsecutiveBlocksAccessed = maxConsecutiveBlocksAccessed; }
+
+  /**
+   *
+   */
+  uint32_t GetNumOfConsecutiveBlocksUsed () { return m_crdsaNumOfConsecutiveBlocksUsed; }
+
+  /**
+   *
+   */
+  void SetNumOfConsecutiveBlocksUsed (uint32_t numOfConsecutiveBlocksUsed) { m_crdsaNumOfConsecutiveBlocksUsed = numOfConsecutiveBlocksUsed; }
 
 private:
 
@@ -134,27 +134,22 @@ private:
   /**
    *
    */
-  uint32_t m_crdsaMinRandomizationValue;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxRandomizationValue;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaNumOfInstances;
-
-  /**
-   *
-   */
   uint32_t m_crdsaBackoffTime;
 
   /**
    *
    */
   double m_crdsaBackoffProbability;
+
+  /**
+   *
+   */
+  double m_raLogicMaximumCrdsaBackoffProbability;
+
+  /**
+   *
+   */
+  std::map<uint32_t,Ptr<SatRandomAccessRequestClass> > m_requestClassConf;
 
   /**
    *
@@ -169,17 +164,7 @@ private:
   /**
    *
    */
-  uint32_t m_crdsaMinIdleBlocks;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaPayloadBytes;
-
-  /**
-   *
-   */
-  double m_raLogicMaximumCrdsaBackoffProbability;
+  uint32_t m_crdsaNumOfConsecutiveBlocksUsed;
 };
 
 } // namespace ns3

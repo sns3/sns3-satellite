@@ -24,32 +24,34 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
 
+  uint32_t numOfRequestClasses = 3;
+
   /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> ();
 
-  /// Create random access module with RA_SLOTTED_ALOHA as default
-  Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, SatRandomAccess::RA_SLOTTED_ALOHA);
+  /// Create random access module with RA_CRDSA as default
+  Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, SatRandomAccess::RA_CRDSA, numOfRequestClasses);
 
   /// Run simulation
-  for (uint32_t i = 0; i < 5; i++)
+  for (uint32_t i = 0; i < 49; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess);
     }
 
-  /// Change random access model to RA_CRDSA
-  Simulator::Schedule (Time (300000 + 6*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_CRDSA);
+  /// Change random access model to RA_SLOTTED_ALOHA
+  Simulator::Schedule (Time (300001 + 49*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_SLOTTED_ALOHA);
 
   /// Continue simulation
-  for (uint32_t i = 7; i < 13; i++)
+  for (uint32_t i = 50; i < 99; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess);
     }
 
   /// Change random access model to RA_ANY_AVAILABLE
-  Simulator::Schedule (Time (300000 + 14*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_ANY_AVAILABLE);
+  Simulator::Schedule (Time (300001 + 99*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_ANY_AVAILABLE);
 
   /// Continue simulation
-  for (uint32_t i = 15; i < 21; i++)
+  for (uint32_t i = 100; i < 149; i++)
     {
       Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess);
     }

@@ -70,7 +70,7 @@ public:
   {
     RandomAccessResultType_t resultType;
     double slottedAlohaResult;
-    std::set<uint32_t> crdsaResult;
+    std::map<uint32_t,std::set<uint32_t> > crdsaResult;
   } RandomAccessResults_s;
 
   /**
@@ -81,7 +81,7 @@ public:
   /**
    * \brief Constructor
    */
-  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel);
+  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel, uint32_t numOfRequestClasses);
 
   /**
    * \brief Destructor
@@ -102,14 +102,6 @@ public:
 
   /**
    *
-   * \param min
-   * \param max
-   * \param setSize
-   */
-  void CrdsaUpdateRandomizationVariables (uint32_t min, uint32_t max, uint32_t numOfInstances, uint32_t maxUniquePayloadPerBlock);
-
-  /**
-   *
    * \param backoffProbability
    */
   void CrdsaSetBackoffProbability (double backoffProbability);
@@ -119,24 +111,6 @@ public:
    * \param backoffTime
    */
   void CrdsaSetBackoffTime (double backoffTime);
-
-  /**
-   *
-   * \return
-   */
-  uint32_t CrdsaGetNumOfInstances () { return m_crdsaNumOfInstances; }
-
-  /**
-   *
-   * \return
-   */
-  uint32_t CrdsaGetMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
-
-  /**
-   *
-   * \return
-   */
-  uint32_t CrdsaGetMaxPacketSize () { return m_crdsaMaxPacketSize; }
 
   /**
    *
@@ -221,18 +195,18 @@ private:
    *
    * \return
    */
-  std::set<uint32_t> CrdsaRandomizeTxOpportunities ();
+  std::set<uint32_t> CrdsaRandomizeTxOpportunities (uint32_t requestClass, std::set<uint32_t> txOpportunities);
 
   /**
    *
    * \return
    */
-  std::set<uint32_t> CrdsaPrepareToTransmit ();
+  SatRandomAccess::RandomAccessResults_s CrdsaPrepareToTransmit ();
 
   /**
    *
    */
-  void CrdsaSetInitialBackoffTimer ();
+  void CrdsaSetBackoffTimer ();
 
   /**
    *
@@ -246,8 +220,21 @@ private:
 
   /**
    *
+   * \param requestClass
    */
-  void CrdsaUpdateIdleBlocks ();
+  void CrdsaReduceIdleBlocks (uint32_t requestClass);
+
+  /**
+   *
+   */
+  void CrdsaReduceIdleBlocksFromAllRequestClasses ();
+
+  /**
+   *
+   * \param requestClass
+   * \return
+   */
+  bool CrdsaIsRequestClassFree (uint32_t requestClass);
 
   /**
    *
@@ -263,6 +250,11 @@ private:
    *
    */
   Ptr<SatRandomAccessConf> m_randomAccessConf;
+
+  /**
+   *
+   */
+  uint32_t m_numOfRequestClasses;
 
   /**
    *
@@ -287,21 +279,6 @@ private:
   /**
    *
    */
-  uint32_t m_crdsaMinRandomizationValue;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxRandomizationValue;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaNumOfInstances;
-
-  /**
-   *
-   */
   bool m_crdsaNewData;
 
   /**
@@ -313,36 +290,6 @@ private:
    *
    */
   double m_crdsaBackoffTime;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxUniquePayloadPerBlock;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxConsecutiveBlocksAccessed;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMinIdleBlocks;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaIdleBlocksLeft;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaNumOfConsecutiveBlocksUsed;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxPacketSize;
 };
 
 } // namespace ns3
