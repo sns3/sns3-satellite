@@ -58,10 +58,10 @@ public:
 
   /**
    * Receive a queue event
-   * @param event Queue event from SatQueue
-   * @param id Identifier of the queue
+   * /param event Queue event from SatQueue
+   * /param rcIndex Identifier of the queue
    */
-  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t id);
+  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex);
 
   /**
    * Set a callback to fetch queue statistics

@@ -79,7 +79,14 @@ SatQueue::~SatQueue ()
 void SatQueue::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_queueEventCallback.Nullify ();
+
+  for (EventCallbackContainer_t::iterator it = m_queueEventCallbacks.begin ();
+      it != m_queueEventCallbacks.end ();
+      ++it)
+    {
+      (*it).Nullify ();
+    }
+
   DequeueAll ();
   Queue::DoDispose ();
 }
@@ -117,9 +124,9 @@ SatQueue::DoEnqueue (Ptr<Packet> p)
       return false;
     }
 
-  if (!m_queueEventCallback.IsNull() && m_packets.empty ())
+  if (m_packets.empty ())
     {
-      m_queueEventCallback (SatQueue::FIRST_BUFFERED_PKT, 0);
+      SendEvent (SatQueue::FIRST_BUFFERED_PKT);
     }
 
   m_bytesInQueue += p->GetSize ();
@@ -151,9 +158,9 @@ SatQueue::DoDequeue (void)
 
   m_dequedBytesSinceReset += p->GetSize ();
 
-  if (!m_queueEventCallback.IsNull() && m_packets.empty ())
+  if (m_packets.empty ())
     {
-      m_queueEventCallback (SatQueue::BUFFER_EMPTY, 0);
+      SendEvent (SatQueue::BUFFER_EMPTY);
     }
 
   NS_LOG_LOGIC ("Popped " << p);
@@ -223,10 +230,24 @@ SatQueue::ResetStatistics ()
 }
 
 void
-SatQueue::SetQueueEventCallback (SatQueue::QueueEventCallback cb)
+SatQueue::AddQueueEventCallback (SatQueue::QueueEventCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
-  m_queueEventCallback = cb;
+  m_queueEventCallbacks.push_back (cb);
+}
+
+void
+SatQueue::SendEvent (QueueEvent_t event)
+{
+  for (EventCallbackContainer_t::const_iterator it = m_queueEventCallbacks.begin ();
+      it != m_queueEventCallbacks.end ();
+      ++it)
+    {
+      if (!(*it).IsNull())
+        {
+          (*it)(event, 0);
+        }
+    }
 }
 
 

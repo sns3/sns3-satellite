@@ -28,6 +28,7 @@
 #include "satellite-random-access-container.h"
 #include "satellite-random-access-container-conf.h"
 #include "satellite-tbtp-container.h"
+#include "satellite-queue.h"
 
 namespace ns3 {
 
@@ -109,6 +110,15 @@ public:
    * \param cno Value of the C/N0.
    */
   void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
+
+  /**
+   * Receive a queue event:
+   * - FIRST_BUFFER_RCVD
+   * - BUFFER_EMPTY
+   * /param event Queue event from SatQueue
+   * /param rcIndex Identifier of the queue
+   */
+  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex);
 
   /**
    * Set address of the GW (or its MAC) serving this UT.

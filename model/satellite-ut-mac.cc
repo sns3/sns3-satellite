@@ -36,6 +36,7 @@
 #include "satellite-enums.h"
 #include "satellite-utils.h"
 #include "satellite-tbtp-container.h"
+#include "satellite-queue.h"
 #include "../helper/satellite-wave-form-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -376,6 +377,25 @@ SatUtMac::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId*/, doubl
 
   // TODO: Some estimation algorithm needed to use, now we just save the latest received C/N0 info.
   m_lastCno = cno;
+}
+
+void
+SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex)
+{
+  NS_LOG_FUNCTION (this << event << rcIndex);
+
+  if (event == SatQueue::FIRST_BUFFERED_PKT)
+    {
+      NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
+    }
+  else if (event == SatQueue::BUFFER_EMPTY)
+    {
+      NS_LOG_LOGIC ("BUFFER_EMPTY event received from queue: " << rcIndex);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported queue event received!");
+    }
 }
 
 void

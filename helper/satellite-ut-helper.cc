@@ -314,9 +314,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Create and set control packet queue to LLC
   Ptr<Queue> queue = m_queueFactory.Create<SatQueue> ();
-  SatQueue::QueueEventCallback qEventCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
-  DynamicCast<SatQueue> (queue)->SetQueueEventCallback (qEventCb);
   llc->SetQueue (queue);
+
+  // Callback to Request manager
+  SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
+  DynamicCast<SatQueue> (queue)->AddQueueEventCallback (rmCb);
+
+  // Callback to UT MAC
+  SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+  DynamicCast<SatQueue> (queue)->AddQueueEventCallback (macCb);
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));

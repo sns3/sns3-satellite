@@ -78,15 +78,17 @@ void SatRequestManager::DoDispose ()
 }
 
 void
-SatRequestManager::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t id)
+SatRequestManager::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex)
 {
+  NS_LOG_FUNCTION (this << event << rcIndex);
+
   if (event == SatQueue::FIRST_BUFFERED_PKT)
     {
-      NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << id);
+      NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
     }
   else if (event == SatQueue::BUFFER_EMPTY)
     {
-      NS_LOG_LOGIC ("BUFFER_EMPTY event received from queue: " << id);
+      NS_LOG_LOGIC ("BUFFER_EMPTY event received from queue: " << rcIndex);
     }
   else
     {

@@ -103,10 +103,10 @@ public:
   void ResetStatistics ();
 
   /**
-   * Set queue event callback
+   * Add queue event callback
    * \param cb Callback
    */
-  void SetQueueEventCallback (SatQueue::QueueEventCallback cb);
+  void AddQueueEventCallback (SatQueue::QueueEventCallback cb);
 
 protected:
 
@@ -116,9 +116,13 @@ private:
   virtual Ptr<const Packet> DoPeek (void) const;
 
   /**
-   * The queue enque/deque rate 'getter' callback
+   * Send queue event to all registered callbacks
+   * /param event Queue event
    */
-  QueueEventCallback m_queueEventCallback;
+  void SendEvent (QueueEvent_t event);
+
+  typedef std::vector<QueueEventCallback> EventCallbackContainer_t;
+  EventCallbackContainer_t m_queueEventCallbacks;
 
   std::queue<Ptr<Packet> > m_packets;
   uint32_t m_maxPackets;
