@@ -99,10 +99,10 @@ public:
 
   /**
     * \param utId ID (mac address) of the UT to be added
-    * \param cra  Constant Rate Assignment of the UT to be added.
+    * \param llsConf Lower layer service configuration for the UT to be added.
     * \param beamId ID of the beam where UT is connected.
     */
-  void AddUt (Address utId, double cra, uint32_t beamId);
+  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
 
 private:
 

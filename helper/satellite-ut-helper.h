@@ -47,12 +47,6 @@ class SatUtHelper : public Object
 public:
   typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
 
-  typedef enum
-  {
-    CONSTANT_CRA,
-    RANDOM_CRA,
-  } CraAllocationMode_t;
-
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
@@ -159,17 +153,6 @@ public:
   Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, Ptr<SatRandomAccessConf> randomAccessConf );
 
   /**
-   * \param aName Name of the node
-   * \param beamId  id of the beam
-   * \param fCh forward channel
-   * \param rCh return channel
-   * \param ncc NCC (Network Control Center)
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  Ptr<NetDevice> Install (std::string aName, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc );
-
-  /**
    * Enables creation traces to be written in given file
    * \param stream  stream for creation trace outputs
    * \param cb  callback to connect traces
@@ -203,20 +186,20 @@ private:
      */
     Ptr<SatLinkResults> m_linkResults;
 
-    /*
-     * CRA allocation mode to be used to set intial CRA for UTs.
-     */
-    CraAllocationMode_t m_craAllocMode;
-
     /**
      * \brief Trace callback for creation traces
      */
-    TracedCallback<std::string> m_creation;
+    TracedCallback<std::string> m_creationTrace;
 
     /**
      *
      */
     SatRandomAccess::RandomAccessModel_t m_randomAccessModel;
+
+    /**
+     * Configured lower layer service configuration.
+     */
+    Ptr<SatLowerLayerServiceConf> m_llsConf;
 };
 
 } // namespace ns3

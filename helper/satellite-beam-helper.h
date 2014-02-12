@@ -232,7 +232,7 @@ private:
   /**
    * Trace callback for creation traces
    */
-  TracedCallback<std::string> m_creation;
+  TracedCallback<std::string> m_creationTrace;
 
   /**
    * Flag indicating whether to print detailed information to

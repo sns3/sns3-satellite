@@ -82,7 +82,7 @@ SatBeamHelper::GetTypeId (void)
                      MakeBooleanAccessor(&SatBeamHelper::m_printDetailedInformationToCreationTraces),
                      MakeBooleanChecker ())
       .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatBeamHelper::m_creation))
+                       MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace))
     ;
     return tid;
 }

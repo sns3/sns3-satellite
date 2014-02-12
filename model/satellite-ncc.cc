@@ -57,8 +57,6 @@ SatNcc::GetInstanceTypeId (void) const
 SatNcc::SatNcc ()
 {
   NS_LOG_FUNCTION (this);
-
-  //Simulator::Schedule (Seconds(0.01), &SatNcc::TransmitReady, this);
 }
 
 SatNcc::~SatNcc ()
@@ -107,7 +105,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
 }
 
 void
-SatNcc::AddUt (Address utId, double cra, uint32_t beamId)
+SatNcc::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
@@ -118,7 +116,7 @@ SatNcc::AddUt (Address utId, double cra, uint32_t beamId)
       NS_FATAL_ERROR ( "Beam where tried to add, not found." );
     }
 
-  m_beamSchedulers[beamId]->AddUt (utId, cra);
+  m_beamSchedulers[beamId]->AddUt (utId, llsConf);
 }
 
 } // namespace ns3

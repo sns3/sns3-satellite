@@ -79,9 +79,9 @@ SatHelper::GetTypeId (void)
                                               &SatHelper::GetUtNetworkAddress),
                      MakeIpv4AddressChecker ())
       .AddTraceSource ("Creation", "Creation traces",
-                        MakeTraceSourceAccessor (&SatHelper::m_creation))
+                        MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace))
       .AddTraceSource ("CreationSummary", "Creation summary traces",
-                        MakeTraceSourceAccessor (&SatHelper::m_creationSummary))
+                        MakeTraceSourceAccessor (&SatHelper::m_creationSummaryTrace))
 
     ;
     return tid;
@@ -96,6 +96,14 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
+: m_hasBeamNetworkSet (false),
+  m_hasGwNetworkSet (false),
+  m_hasUtNetworkSet (false),
+  m_scenarioCreated (false),
+  m_detailedCreationTraces (false),
+  m_utsInBeam (0),
+  m_gwUsers (0),
+  m_utUsers (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -288,7 +296,7 @@ SatHelper::CreateSimpleScenario()
 
   DoCreateScenario(beamUserInfos, 1);
 
-  m_creationSummary("*** Simple Scenario Creation Summary ***");
+  m_creationSummaryTrace("*** Simple Scenario Creation Summary ***");
 }
 
 void
@@ -311,7 +319,7 @@ SatHelper::CreateLargerScenario()
 
   DoCreateScenario(beamUserInfos, 1);
 
-  m_creationSummary("*** Larger Scenario Creation Summary ***");
+  m_creationSummaryTrace("*** Larger Scenario Creation Summary ***");
 }
 
 void
@@ -341,7 +349,7 @@ SatHelper::CreateFullScenario()
 
   DoCreateScenario(beamUserInfos, m_gwUsers);
 
-  m_creationSummary("*** Full Scenario Creation Summary ***");
+  m_creationSummaryTrace("*** Full Scenario Creation Summary ***");
 }
 void
 SatHelper::CreateUserDefinedScenario()
@@ -351,7 +359,7 @@ SatHelper::CreateUserDefinedScenario()
   // create as user wants
   DoCreateScenario(m_beamUserInfos, m_gwUsers);
 
-  m_creationSummary("*** User Defined Scenario Creation Summary ***");
+  m_creationSummaryTrace("*** User Defined Scenario Creation Summary ***");
 }
 
 void

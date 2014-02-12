@@ -28,6 +28,7 @@
 #include "satellite-random-access-container.h"
 #include "satellite-random-access-container-conf.h"
 #include "satellite-tbtp-container.h"
+#include "satellite-lower-layer-service.h"
 #include "satellite-queue.h"
 
 namespace ns3 {
@@ -204,9 +205,9 @@ private:
   SendCallback m_txCallback;
 
   /**
-   * The configured Constant Rate Assignment (CRA) for this UT Mac.
+   * The configured lower layer service configuration for this UT MAC.
    */
-  double m_cra;
+  Ptr<SatLowerLayerServiceConf> m_llsConf;
 
   /**
    * The last received C/N0 information from lower layer.

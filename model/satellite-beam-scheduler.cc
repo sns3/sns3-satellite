@@ -21,7 +21,6 @@
 #include <algorithm>
 #include "ns3/log.h"
 #include "ns3/ipv4-l3-protocol.h"
-//#include "ns3/random-variable-stream.h"
 //#include "satellite-dama-entry.h"
 #include "satellite-beam-scheduler.h"
 
@@ -115,12 +114,12 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
 }
 
 void
-SatBeamScheduler::AddUt (Address utId, double cra)
+SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << utId);
 
   UtInfo utInfo;
-  utInfo.m_cra = cra;
+  utInfo.m_llsConf = llsConf;
   utInfo.m_cno = NAN;
 
   std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair (utId, utInfo));

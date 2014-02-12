@@ -301,13 +301,13 @@ private:
   /**
    * Trace callback for creation traces (details)
    */
-  TracedCallback<std::string> m_creation;
+  TracedCallback<std::string> m_creationDetailsTrace;
 
   /**
    * Trace callback for creation traces (summary)
    */
 
-  TracedCallback<std::string> m_creationSummary;
+  TracedCallback<std::string> m_creationSummaryTrace;
 
   /**
    * Stream wrapper used for creation traces

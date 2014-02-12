@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Sami Rantanen <sami.rantanen\magister.fi>
  */
 
 #ifndef SAT_BEAM_USER_INFO_H
@@ -26,7 +26,7 @@
 namespace ns3 {
 
 /**
- * @brief Class that holds information for each beam regarding UTs and their users camped in each beam.
+ * \brief Class that holds information for each beam regarding UTs and their users camped in each beam.
  *
  * Default constructor enables creating an empty information structure.
  * The developer needs to Append individual UTs with individual number of users in each UT by
@@ -48,8 +48,8 @@ public:
    * Constructor for SatBeamUserInfo which allows creating a group of UT information
    * structures with each UT having the same number of users.
    *
-   * @param utCount UT count of the beam (can be added later by method AddUt)
-   * @param userCountPerUt User count of the UTs (can be changed for the specific UT by method SetUtUserCount)
+   * \param utCount UT count of the beam (can be added later by method AddUt)
+   * \param userCountPerUt User count of the UTs (can be changed for the specific UT by method SetUtUserCount)
    */
   SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt);
 
@@ -59,22 +59,22 @@ public:
   virtual ~SatBeamUserInfo () {}
 
   /**
-   * @return number of UTs in beam.
+   * \return number of UTs in beam.
    */
   uint32_t GetUtCount ();
 
   /**
-   * @param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
+   * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
    *
-   * @return number of users in a UT.
+   * \return number of users in a UT.
    */
   uint32_t GetUtUserCount (uint32_t utIndex);
 
   /**
    * Sets user count for the UT with given uIndex.
    *
-   * @param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
-   * @param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
+   * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
+   * \param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
    *                  If this is not called for the UT then default value (1) is used for the UT.
    *
    */
@@ -83,7 +83,7 @@ public:
   /**
    * Appends new UT to end of the list with given user count for the appended UT.
    *
-   * @param userCount Number of users under the appended UT. Minimum value is 1.
+   * \param userCount Number of users under the appended UT. Minimum value is 1.
    */
   void AppendUt (uint32_t userCount);
 

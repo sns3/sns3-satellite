@@ -64,7 +64,7 @@ SatGeoHelper::GetTypeId (void)
                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
      .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatGeoHelper::m_creation))
+                       MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace))
     ;
     return tid;
 }

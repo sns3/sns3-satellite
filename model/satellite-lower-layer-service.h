@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2013 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -30,13 +30,13 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatLowerLayerService class holds information of a satellite lower layer service entry.
+ * The SatLowerLayerService class holds information of a satellite lower layer service DA entry.
  */
-class SatLowerLayerServiceEntry : public Object
+class SatLowerLayerServiceDaEntry : public Object
 {
 public:
-  SatLowerLayerServiceEntry () ;
-  ~SatLowerLayerServiceEntry ();
+  SatLowerLayerServiceDaEntry () ;
+  ~SatLowerLayerServiceDaEntry ();
 
   // methods derived from base classes
   static TypeId GetTypeId (void);
@@ -89,14 +89,21 @@ public:
    *
    * \return Constant service rate [kbps]
    */
-  inline double GetConstantServiceRateInKbps () const {return m_constantServiceRateKbps;}
+  inline double GetConstantServiceRateInKbps () const {return m_constantServiceRateStream->GetValue ();}
 
   /**
-   * Set constant service rate.
+   * Get constant service rate stream.
+   *
+   * \return Constant service rate stream.
+   */
+  inline Ptr<RandomVariableStream> GetConstantServiceRateStream () const { return m_constantServiceRateStream;}
+
+  /**
+   * Set constant service rate stream.
    *
    * \param constantServiceRateKbps Constant service rate [kbps]
    */
-  inline void SetConstantServiceRateInKbps (double constantServiceRateKbps) { m_constantServiceRateKbps = constantServiceRateKbps;}
+  inline void SetConstantServiceRateStream (Ptr<RandomVariableStream> constantServiceRateStream) { m_constantServiceRateStream = constantServiceRateStream;}
 
   /**
    * Get maximum service rate.
@@ -141,13 +148,77 @@ public:
   inline void SetMaximumBacklogInBytes (uint32_t maximumBacklogInBytes) { m_maximumBacklogInBytes = maximumBacklogInBytes;}
 
 private:
-  bool      m_constantAssignmentProvided;
-  bool      m_rbdcAllowed;
-  bool      m_volumeAllowed;
-  double    m_constantServiceRateKbps;
-  double    m_maximumServiceRateKbps;
-  double    m_minimumServiceRateKbps;
-  uint32_t  m_maximumBacklogInBytes;
+  bool                      m_constantAssignmentProvided;
+  bool                      m_rbdcAllowed;
+  bool                      m_volumeAllowed;
+  Ptr<RandomVariableStream> m_constantServiceRateStream;
+  double                    m_maximumServiceRateKbps;
+  double                    m_minimumServiceRateKbps;
+  uint32_t                  m_maximumBacklogInBytes;
+};
+
+
+/**
+ * \ingroup satellite
+ *
+ * The SatLowerLayerService class holds information of a satellite lower layer service RA entry.
+ */
+class SatLowerLayerServiceRaEntry : public Object
+{
+public:
+  SatLowerLayerServiceRaEntry () ;
+  ~SatLowerLayerServiceRaEntry ();
+
+  // methods derived from base classes
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get maximum unique payload per block.
+   *
+   * \return Maximum unique payload per block [bytes]
+   */
+  inline uint32_t GetMaximumUniquePayloadPerBlockInBytes () const {return m_maxUniquePayloadPerBlockInBytes;}
+
+  /**
+   * Set maximum unique payload per block.
+   *
+   * \param maxUniquePayloadPerBlockInBytes Maximum unique payload per block [bytes]
+   */
+  inline void SetMaximumUniquePayloadPerBlockInBytes (uint32_t maxUniquePayloadPerBlockInBytes) { m_maxUniquePayloadPerBlockInBytes = maxUniquePayloadPerBlockInBytes;}
+
+  /**
+   * Get maximum consecutive block accessed.
+   *
+   * \return Maximum consecutive block accessed [bytes]
+   */
+  inline uint32_t GetMaximumConsecutiveBlockAccessedInBytes () const {return m_maxConsecutiveBlockAccessedInBytes;}
+
+  /**
+   * Set maximum consecutive block accessed.
+   *
+   * \param maxConsecutiveBlockAccessedInBytes Maximum consecutive block accessed [bytes]
+   */
+  inline void SetMaximumConsecutiveBlockAccessedInBytes (uint32_t maxConsecutiveBlockAccessedInBytes) { m_maxConsecutiveBlockAccessedInBytes = maxConsecutiveBlockAccessedInBytes;}
+
+  /**
+   * Get minimum idle block.
+   *
+   * \return Minimum idle block [bytes]
+   */
+  inline uint32_t GetMinimumIdleBlockInBytes () const {return m_minimumIdleBlockInBytes;}
+
+  /**
+   * Set minimum idle block.
+   *
+   * \param minimumIdleBlockInBytes Minimum idle block [bytes]
+   */
+  inline void SetMinimumIdleBlockInBytes (uint32_t minimumIdleBlockInBytes) { m_minimumIdleBlockInBytes = minimumIdleBlockInBytes;}
+
+private:
+  uint32_t  m_maxUniquePayloadPerBlockInBytes;
+  uint32_t  m_maxConsecutiveBlockAccessedInBytes;
+  uint32_t  m_minimumIdleBlockInBytes;
 };
 
 /**
@@ -158,7 +229,8 @@ private:
 class SatLowerLayerServiceConf : public Object
 {
 public:
-  static const uint32_t m_maxServices = 4;
+  static const uint32_t m_maxDaServiceEntries = 4;
+  static const uint32_t m_maxRaServiceEntries = 4;
 
   /**
    * Constructor for SatLowerLayerServiceConf.
@@ -175,11 +247,18 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Method to convert number to string
+   * Template method to convert number to string
    * \param number number to convert as string
    * \return number as string
    */
-  static std::string GetNumberAsString (uint32_t number);
+  template <class T>
+  static std::string GetNumberAsString (T number)
+  {
+    std::stringstream ss;   //create a string stream
+    ss << number;           //add number to the stream
+
+    return ss.str();
+  }
 
   /**
    * Method to convert service index to service name.
@@ -190,7 +269,7 @@ public:
   static std::string GetIndexAsServiceName(uint32_t index);
 
   /**
-   * Get state, if constant assignment is provided for a service.
+   * Get state, if constant assignment is provided for a DA service.
    *
    * \param index Index of the service
    * \return Is constant assignment provided [true or false]
@@ -198,7 +277,7 @@ public:
   bool GetConstantAssignmentProvided (uint32_t index) const;
 
   /**
-   * Set state, if constant assignment is provided for a service.
+   * Set state, if constant assignment is provided for a DA service.
    *
    * \param index Index of the service
    * \param constAssignmentProvided Constant assignment provided state [true or false]
@@ -206,7 +285,7 @@ public:
   void SetConstantAssignmentProvided (uint32_t index, bool constAssignmentProvided);
 
   /**
-   * Get state, if RBDC is allowed for a service.
+   * Get state, if RBDC is allowed for a DA service.
    *
    * \param index Index of the service
    * \return Is RBDC allowed [true or false]
@@ -214,7 +293,7 @@ public:
   bool GetRbdcAllowed (uint32_t index) const;
 
   /**
-   * Set state, if RBDC is allowed for a service.
+   * Set state, if RBDC is allowed for a DA service.
    *
    * \param index Index of the service
    * \param bdcAllowed RBDC allowed state [true or false]
@@ -222,7 +301,7 @@ public:
   void SetRbdcAllowed (uint32_t index, bool bdcAllowed);
 
   /**
-   * Get state, if volume is allowed for a service.
+   * Get state, if volume is allowed for a DA service.
    *
    * \param index Index of the service
    * \return Is volume allowed [true or false]
@@ -230,7 +309,7 @@ public:
   bool GetVolumeAllowed (uint32_t index) const;
 
   /**
-   * Set state, if volume is allowed for a service.
+   * Set state, if volume is allowed for a DA service.
    *
    * \param index Index of the service
    * \param volumeAllowed Volume allowed state [true or false]
@@ -238,23 +317,23 @@ public:
   void SetVolumeAllowed (uint32_t index, bool volumeAllowed);
 
   /**
-   * Get constant service rate for a service.
+   * Get constant service rate stream for a DA service.
    *
    * \param index Index of the service
-   * \return Constant service rate [kbps]
+   * \return Constant service rate stream [kbps]
    */
-  double GetConstantServiceRateInKbps (uint32_t index) const;
+  Ptr<RandomVariableStream> GetConstantServiceRateStream (uint32_t index) const;
 
   /**
-   * Set constant service rate for a service.
+   * Set constant service rate stream for a DA service.
    *
    * \param index Index of the service
-   * \param constantServiceRateKbps Constant service rate [kbps]
+   * \param constantServiceRateStream Constant service rate stream [kbps]
    */
-  void SetConstantServiceRateInKbps (uint32_t index, double constantServiceRateKbps);
+  void SetConstantServiceRateStream (uint32_t index, Ptr<RandomVariableStream> constantServiceRateStream);
 
   /**
-   * Get maximum service rate for a service.
+   * Get maximum service rate for a DA service.
    *
    * \param index Index of the service
    * \return Maximum service rate [kbps]
@@ -262,7 +341,7 @@ public:
   double GetMaximumServiceRateInKbps (uint32_t index) const;
 
   /**
-   * Set maximum service rate for a service.
+   * Set maximum service rate for a DA service.
    *
    * \param index Index of the service
    * \param maximumServiceRateKbps Maximum service rate [kbps]
@@ -270,7 +349,7 @@ public:
   void SetMaximumServiceRateInKbps (uint32_t index, double maximumServiceRateKbps);
 
   /**
-   * Get minimum service rate.
+   * Get minimum service rate for a DA service.
    *
    * \param index Index of the service
    * \return Minimum service rate [kbps]
@@ -278,7 +357,7 @@ public:
   double GetMinimumServiceRateInKbps (uint32_t index) const;
 
   /**
-   * Set minimum service rate for a service.
+   * Set minimum service rate for a DA service.
    *
    * \param index Index of the service
    * \param minimumServiceRateKbps Minimum service rate [kbps]
@@ -286,7 +365,7 @@ public:
   void SetMinimumServiceRateInKbps (uint32_t index, double minimumServiceRateKbps);
 
   /**
-   * Get maximum backlog size.
+   * Get maximum backlog size for a DA service.
    *
    * \param index Index of the service
    * \return Maximum backlog size [bytes]
@@ -294,22 +373,71 @@ public:
   uint32_t GetMaximumBacklogInBytes (uint32_t index) const;
 
   /**
-   * Set maximum backlog size for a service.
+   * Set maximum backlog size for a DA service.
    *
    * \param index Index of the service
    * \param maximumBacklogInBytes Maximum backlog size [bytes]
    */
   void SetMaximumBacklogInBytes (uint32_t index, uint32_t maximumBacklogInBytes);
 
+  /**
+   * Get maximum unique payload per block for a RA service.
+   *
+   * \param index Index of the service
+   * \return Maximum unique payload per block [bytes]
+   */
+  uint32_t GetMaximumUniquePayloadPerBlockInBytes (uint32_t index) const;
+
+  /**
+   * Set maximum unique payload per block for a RA service.
+   *
+   * \param index Index of the service
+   * \param maxUniquePayloadPerBlockInBytes Maximum unique payload per block [bytes]
+   */
+  void SetMaximumUniquePayloadPerBlockInBytes (uint32_t index, uint32_t maxUniquePayloadPerBlockInBytes);
+
+  /**
+   * Get maximum consecutive block accessed  for a RA service.
+   *
+   * \param index Index of the service
+   * \return Maximum consecutive block accessed [bytes]
+   */
+  uint32_t GetMaximumConsecutiveBlockAccessedInBytes (uint32_t index) const;
+
+  /**
+   * Set maximum consecutive block accessed for a RA service.
+   *
+   * \param index Index of the service
+   * \param maxConsecutiveBlockAccessedInBytes Maximum consecutive block accessed [bytes]
+   */
+  void SetMaximumConsecutiveBlockAccessedInBytes (uint32_t index, uint32_t maxConsecutiveBlockAccessedInBytes);
+
+  /**
+   * Get minimum idle block for a RA service.
+   *
+   * \param index Index of the service
+   * \return Minimum idle block [bytes]
+   */
+  uint32_t GetMinimumIdleBlockInBytes (uint32_t index) const;
+
+  /**
+   * Set minimum idle block for a RA service.
+   *
+   * \param index Index of the service
+   * \param minimumIdleBlockInBytes Minimum idle block [bytes]
+   */
+  void SetMinimumIdleBlockInBytes (uint32_t index, uint32_t minimumIdleBlockInBytes);
+
   private:
-    uint32_t                                m_dynamicRatePersistence;
-    uint32_t                                m_volumeBacklogPersistence;
-    Time                                    m_defaultControlRandomizationInterval;
-    uint32_t                                m_serviceCount;
-    std::vector<SatLowerLayerServiceEntry>  m_serviceContainer;
-    SatLowerLayerServiceEntry               m_service[m_maxServices];
+    uint32_t                                  m_dynamicRatePersistence;
+    uint32_t                                  m_volumeBacklogPersistence;
+    Time                                      m_defaultControlRandomizationInterval;
+    uint32_t                                  m_daServiceEntryCount;
+    SatLowerLayerServiceDaEntry               m_daServiceEntries[m_maxDaServiceEntries];
+    uint32_t                                  m_raServiceEntryCount;
+    SatLowerLayerServiceRaEntry               m_raServiceEntries[m_maxRaServiceEntries];
 /**
- * SAT_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define service entry
+ * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
  * attribute access method.
  *
  *  Methods defined e.g. when index is 0.
@@ -320,8 +448,8 @@ public:
  *  - GetServ0RbdcAllowed, see @SatLowerLayerServiceEntry::GetRbdcAllowed
  *  - SetServ0VolumeAllowed, see @SatLowerLayerServiceEntry::SetVolumeAllowed
  *  - GetServ0VolumeAllowed, see @SatLowerLayerServiceEntry::GetVolumeAllowed
- *  - SetServ0ConstantServiceRateInKbps, see @SatLowerLayerServiceEntry::SetonstantServiceRateInKbps
- *  - GetServ0ConstantServiceRateInKbps, see @SatLowerLayerServiceEntry::GetonstantServiceRateInKbps
+ *  - SetServ0ConstantServiceRateStream, see @SatLowerLayerServiceEntry::SetonstantServiceRateStream
+ *  - GetServ0ConstantServiceRateStream, see @SatLowerLayerServiceEntry::GetonstantServiceRateStream
  *  - SetServ0MaximumServiceRateInKbps, see @SatLowerLayerServiceEntry::SetMaximumServiceRateInKbps
  *  - GetServ0MaximumServiceRateInKbps, see @SatLowerLayerServiceEntry::GetMaximumServiceRateInKbps
  *  - SetServ0MinimumServiceRateInKbps, see @SatLowerLayerServiceEntry::SetMinimumServiceRateInKbps
@@ -331,40 +459,74 @@ public:
  *
  * \param index Index of the service which attribute access methods are defined
  */
-#define SAT_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
-    inline void SetServ ## index ## ConstantAssignmentProvided (bool value)  \
-      { return SetConstantAssignmentProvided (index, value); } \
-    inline bool GetServ ## index ## ConstantAssignmentProvided () const  \
-      { return GetConstantAssignmentProvided (index); } \
-    inline void SetServ ## index ## RbdcAllowed (bool value)  \
-      { return SetRbdcAllowed (index, value); } \
-    inline bool GetServ ## index ## RbdcAllowed () const  \
-      { return GetRbdcAllowed (index); } \
-    inline void SetServ ## index ## VolumeAllowed (bool value)  \
-      { return SetVolumeAllowed (index, value); } \
-    inline bool GetServ ## index ## VolumeAllowed () const  \
-      { return GetVolumeAllowed (index); } \
-    inline void SetServ ## index ## ConstantServiceRateInKbps (double value)  \
-      { return SetConstantServiceRateInKbps (index, value); } \
-    inline double GetServ ## index ## ConstantServiceRateInKbps () const  \
-      { return GetConstantServiceRateInKbps (index); } \
-    inline void SetServ ## index ## MaximumServiceRateInKbps (double value)  \
-      { return SetMaximumServiceRateInKbps (index, value); } \
-    inline double GetServ ## index ## MaximumServiceRateInKbps () const  \
-      { return GetMaximumServiceRateInKbps (index); } \
-    inline void SetServ ## index ## MinimumServiceRateInKbps (double value)  \
-      { return SetMinimumServiceRateInKbps (index, value); } \
-    inline double GetServ ## index ## MinimumServiceRateInKbps () const  \
-      { return GetMinimumServiceRateInKbps (index); } \
-    inline void SetServ ## index ## MaximumBacklogInBytes (uint32_t value)  \
-      { return SetMaximumBacklogInBytes (index, value); } \
-    inline uint32_t GetServ ## index ## MaximumBacklogInBytes () const  \
-      { return GetMaximumBacklogInBytes (index); }
+#define SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
+  inline void SetServ ## index ## ConstantAssignmentProvided (bool value)  \
+    { return SetConstantAssignmentProvided (index, value); } \
+  inline bool GetServ ## index ## ConstantAssignmentProvided () const  \
+    { return GetConstantAssignmentProvided (index); } \
+  inline void SetServ ## index ## RbdcAllowed (bool value)  \
+    { return SetRbdcAllowed (index, value); } \
+  inline bool GetServ ## index ## RbdcAllowed () const  \
+    { return GetRbdcAllowed (index); } \
+  inline void SetServ ## index ## VolumeAllowed (bool value)  \
+    { return SetVolumeAllowed (index, value); } \
+  inline bool GetServ ## index ## VolumeAllowed () const  \
+    { return GetVolumeAllowed (index); } \
+  inline void SetServ ## index ## ConstantServiceRateStream (Ptr<RandomVariableStream> value)  \
+    { return SetConstantServiceRateStream (index, value); } \
+  inline Ptr<RandomVariableStream> GetServ ## index ## ConstantServiceRateStream () const  \
+    { return GetConstantServiceRateStream (index); } \
+  inline void SetServ ## index ## MaximumServiceRateInKbps (double value)  \
+    { return SetMaximumServiceRateInKbps (index, value); } \
+  inline double GetServ ## index ## MaximumServiceRateInKbps () const  \
+    { return GetMaximumServiceRateInKbps (index); } \
+  inline void SetServ ## index ## MinimumServiceRateInKbps (double value)  \
+    { return SetMinimumServiceRateInKbps (index, value); } \
+  inline double GetServ ## index ## MinimumServiceRateInKbps () const  \
+    { return GetMinimumServiceRateInKbps (index); } \
+  inline void SetServ ## index ## MaximumBacklogInBytes (uint32_t value)  \
+    { return SetMaximumBacklogInBytes (index, value); } \
+  inline uint32_t GetServ ## index ## MaximumBacklogInBytes () const  \
+    { return GetMaximumBacklogInBytes (index); }
 
-    SAT_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
-    SAT_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
-    SAT_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
-    SAT_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
+/**
+ * SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
+ * attribute access method.
+ *
+ *  Methods defined e.g. when index is 0.
+ *
+ *  - SetServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumUniquePayloadPerBlockInBytes
+ *  - GetServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumUniquePayloadPerBlockInBytes
+ *  - SetServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumConsecutiveBlockAccessedInBytes
+ *  - GetServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumConsecutiveBlockAccessedInBytes
+ *  - SetServ0MinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMinimumIdleBlockInBytes
+ *  - GetServ0VMinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlockInBytes
+ *
+ * \param index Index of the service which attribute access methods are defined
+ */
+#define SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
+  inline void SetServ ## index ## MaximumUniquePayloadPerBlockInBytes (double value)  \
+    { return SetMaximumUniquePayloadPerBlockInBytes (index, value); } \
+  inline double GetServ ## index ## MaximumUniquePayloadPerBlockInBytes () const  \
+    { return GetMaximumUniquePayloadPerBlockInBytes (index); } \
+  inline void SetServ ## index ## MaximumConsecutiveBlockAccessedInBytes (double value)  \
+    { return SetMaximumConsecutiveBlockAccessedInBytes (index, value); } \
+  inline double GetServ ## index ## MaximumConsecutiveBlockAccessedInBytes () const  \
+    { return GetMaximumConsecutiveBlockAccessedInBytes (index); } \
+  inline void SetServ ## index ## MinimumIdleBlockInBytes (uint32_t value)  \
+    { return SetMinimumIdleBlockInBytes (index, value); } \
+  inline uint32_t GetServ ## index ## MinimumIdleBlockInBytes () const  \
+    { return GetMinimumIdleBlockInBytes (index); }
+
+    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
+    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
+    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
+    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
+
+    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
+    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
+    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
+    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
 };
 
 } // namespace ns3

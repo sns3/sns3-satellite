@@ -52,7 +52,7 @@ SatUserHelper::GetTypeId (void)
                       MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
                                        SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
       .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatUserHelper::m_creation))
+                       MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace))
     ;
     return tid;
 }

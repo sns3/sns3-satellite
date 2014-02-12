@@ -30,6 +30,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
 #include "ns3/satellite-superframe-sequence.h"
+#include "satellite-lower-layer-service.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -99,9 +100,9 @@ public:
    * Add UT to scheduler.
    *
    * \param utId ID (mac address) of the UT to be added
-   * \param cra CRA value for UT.
+   * \param llsConf Lower layer service configuration for the UT.
    */
-  void AddUt (Address utId, double cra);
+  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * Update UT C/N0 info with the latest value.
@@ -124,11 +125,11 @@ private:
   class UtInfo
   {
     public:
-      double m_cra; // Constant Rate Assignment (CRA)
-      double m_cno; // The latest calculated value of C/N0
+      Ptr<SatLowerLayerServiceConf>  m_llsConf; // Lower layer service configuration for the UT
+      double                         m_cno;     // The latest calculated value of C/N0
 
       UtInfo()
-        : m_cra (NAN),
+        : m_llsConf (0),
           m_cno (NAN)
         {
         }
