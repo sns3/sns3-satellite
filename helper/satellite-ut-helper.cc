@@ -79,7 +79,8 @@ SatUtHelper::GetTypeId (void)
                      "Random Access Model",
                      EnumValue (SatRandomAccess::RA_OFF),
                      MakeEnumAccessor (&SatUtHelper::m_randomAccessModel),
-                     MakeEnumChecker (SatRandomAccess::RA_SLOTTED_ALOHA, "Slotted ALOHA",
+                     MakeEnumChecker (SatRandomAccess::RA_OFF, "RA not in use.",
+                                      SatRandomAccess::RA_SLOTTED_ALOHA, "Slotted ALOHA",
                                       SatRandomAccess::RA_CRDSA, "CRDSA",
                                       SatRandomAccess::RA_ANY_AVAILABLE, "Any available"))
       .AddAttribute ("LowerLayerServiceConf",

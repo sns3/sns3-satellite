@@ -210,7 +210,7 @@ SatLowerLayerServiceConf::GetIndexAsServiceName (uint32_t index)
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetServ ## index ## MaximumConsecutiveBlockAccessedInBytes, \
                                         &SatLowerLayerServiceConf::GetServ ## index ## MaximumConsecutiveBlockAccessedInBytes), \
                   MakeUintegerChecker<uint32_t> ()) \
-  .AddAttribute ( GetIndexAsServiceName (index) + "_RaGetMinimumIdleBlock", \
+  .AddAttribute ( GetIndexAsServiceName (index) + "_RaMinimumIdleBlock", \
                   "Minimum idle block [bytes] for RA  " + GetIndexAsServiceName (index), \
                   UintegerValue (a3), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetServ ## index ## MinimumIdleBlockInBytes, \
