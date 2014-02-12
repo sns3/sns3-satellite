@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -18,29 +18,26 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SAT_DAMA_ENTRY_H
-#define SAT_DAMA_ENTRY_H
+#ifndef SATELLITE_DAMA_ENTRY_H
+#define SATELLITE_DAMA_ENTRY_H
 
 #include <map>
 
-#include "satellite-control-message.h"
+#include "satellite-lower-layer-service.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief class for module Beam Scheduler.
+ * \brief class for module SatDamaEntry.
  *
- * This SatDamaEntry class implements scheduler used to for one specific beam.
+ * This SatDamaEntry class holds information of a satellite DAMA entry.
  * It's is created and used by NCC.
  *
  */
 class SatDamaEntry
 {
 public:
-  typedef uint32_t Cra_t;
-  typedef uint32_t Rc_t;
-
   /**
    * Construct a SatDamaEntry
    *
@@ -59,35 +56,15 @@ public:
 private:
 
   /**
-   * UT identifier: MAC address currently TODO: Something else?
+   * UT identifier (MAC address)
    */
-  Address m_macAddress;
-  /**
-   * Negotiated guaranteed bitrate
-   */
-  Cra_t m_cra;
-
-  /**
-   * Dynamic SRs
-   */
-  std::map<Rc_t, Ptr<SatCapacityReqHeader> > m_capacityRequests;
-
-  /**
-   * Throughput in this superframe
-   */
-  double m_instantaneousThroughput;
-
-  /**
-   * Average throughput in the near past per RC
-   */
-  std::vector<double> m_pastAverageTput;
-
-  /**
-   * Maximum bitrate for this UT (UT class dependent)
-   */
-  double m_maxTput;
+  Address   m_macAddress;
+  uint32_t  m_dynamicRatePersistence;
+  uint32_t  m_volumeBacklogPersistence;
+  uint32_t  m_defaultControlRandomizationInterval;
+  Ptr<SatLowerLayerServiceConf> llsConf;
 };
 
 } // namespace ns3
 
-#endif /* SAT_DAMA_ENTRY_H */
+#endif /* SATELLITE_DAMA_ENTRY_H */

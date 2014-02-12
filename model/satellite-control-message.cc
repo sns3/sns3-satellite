@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -196,13 +196,16 @@ SatControlMessage::GetTypeId (void)
 NS_OBJECT_ENSURE_REGISTERED (SatTbtpMessage);
 
 SatTbtpMessage::SatTbtpMessage ( )
-  : m_superframeSeqId (0)
+  : m_superframeCounter (0),
+    m_superframeSeqId (0),
+    m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
- : m_superframeSeqId (seqId),
+ : m_superframeCounter (0),
+   m_superframeSeqId (seqId),
    m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this);

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -128,8 +128,8 @@ private:
       double m_cno; // The latest calculated value of C/N0
 
       UtInfo()
-        : m_cra (0.0),
-          m_cno (0.0)
+        : m_cra (NAN),
+          m_cno (NAN)
         {
         }
   };
@@ -153,12 +153,12 @@ private:
   uint32_t m_beamId;
 
   /**
-   * Pointer to superframe sequence.
+   * Pointer to super frame sequence.
    */
   Ptr<SatSuperframeSeq> m_superframeSeq;
 
   /**
-   * Counter for superframe sequence.
+   * Counter for super frame sequence.
    */
   uint32_t m_superFrameCounter;
 
@@ -198,7 +198,7 @@ private:
   std::vector<uint32_t>::iterator m_currentCarrier;
 
   /**
-   * Time slot ids of the currently used carrier.
+   * Time slot IDs of the currently used carrier.
    */
   SatFrameConf::SatTimeSlotIdList_t m_timeSlots;
 

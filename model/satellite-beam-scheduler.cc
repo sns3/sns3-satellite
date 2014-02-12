@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -89,7 +89,7 @@ SatBeamScheduler::Send (Ptr<Packet> packet)
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_LOGIC ("p=" << packet );
 
-  m_txCallback(packet, Mac48Address::GetBroadcast (), Ipv4L3Protocol::PROT_NUMBER);
+  m_txCallback (packet, Mac48Address::GetBroadcast (), Ipv4L3Protocol::PROT_NUMBER);
 
   return true;
 }
@@ -106,7 +106,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
   // How many TBTPs is transmitted during RTT?
   uint32_t tbtpsPerRtt = (uint32_t)(ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (0)));
 
-  // Scheduling starts after one empty superframe.
+  // Scheduling starts after one empty super frame.
   m_superFrameCounter = tbtpsPerRtt + 1;
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
@@ -121,9 +121,9 @@ SatBeamScheduler::AddUt (Address utId, double cra)
 
   UtInfo utInfo;
   utInfo.m_cra = cra;
-  utInfo.m_cno = 0.0;
+  utInfo.m_cno = NAN;
 
-  std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair(utId, utInfo));
+  std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair (utId, utInfo));
 
   NS_ASSERT (result.second == true);
 }
@@ -135,7 +135,7 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
 
   // check that UT is added to this scheduler.
   std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
-  NS_ASSERT (result != m_uts.end());
+  NS_ASSERT (result != m_uts.end ());
 
   // TODO: Container for C/N0 values needed, now we just save the latest value.
   m_uts[utId].m_cno = cno;
@@ -161,7 +161,7 @@ SatBeamScheduler::Schedule ()
       Ptr<SatTbtpMessage> tbtpMsg = CreateObject<SatTbtpMessage> ();
       tbtpMsg->SetSuperframeCounter (m_superFrameCounter++);
 
-      // schedule timeslots according to static configuration 0
+      // schedule time slots according to static configuration 0
       // TODO: algorithms for other configurations
       InitializeScheduling ();
       ScheduleUts (tbtpMsg);
@@ -195,7 +195,7 @@ void SatBeamScheduler::ScheduleRandomSlots (Ptr<SatTbtpMessage> header)
   uint32_t frameId = 0;
 
   // find frame for RA entries
-  for ( uint32_t i = 0; ( (i <  m_superframeSeq->GetSuperframeConf (0)->GetFrameCount () ) && (frameConf == NULL) ); i++ )
+  for ( uint32_t i = 0; ( (i <  m_superframeSeq->GetSuperframeConf (0)->GetFrameCount ()) && (frameConf == NULL) ); i++ )
     {
       if ( m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (i)->IsRandomAccess () )
         {
@@ -339,7 +339,7 @@ void SatBeamScheduler::InitializeScheduling ()
       NS_ASSERT (frameConf);
       m_carrierIds.clear ();
 
-      for ( uint32_t i = 0; i < frameConf->GetCarrierCount(); i++ )
+      for ( uint32_t i = 0; i < frameConf->GetCarrierCount (); i++ )
         {
           m_carrierIds.push_back (i);
         }
@@ -356,18 +356,18 @@ void SatBeamScheduler::InitializeScheduling ()
         }
       else
         {
-          m_slotsPerUt = m_totalSlotLeft / m_carrierIds.size();
+          m_slotsPerUt = m_totalSlotLeft / m_carrierIds.size ();
           m_additionalSlots = 0;
         }
 
-      std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end () );
+      std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end ());
 
       m_currentSlot = m_timeSlots.end ();
       m_currentCarrier = m_carrierIds.begin ();
 
       m_timeSlots = frameConf->GetTimeSlotIds (*m_currentCarrier);
 
-      NS_ASSERT (m_timeSlots.size() > 0);
+      NS_ASSERT (m_timeSlots.size () > 0);
 
       m_currentSlot = m_timeSlots.begin ();
     }
