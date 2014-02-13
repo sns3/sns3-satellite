@@ -183,7 +183,7 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   if (m_randomAccessModel != SatRandomAccess::RA_OFF)
     {
-      randomAccessConf = CreateObject<SatRandomAccessConf> ();
+      randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf);
     }
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)

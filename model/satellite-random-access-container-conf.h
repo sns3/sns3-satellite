@@ -24,7 +24,8 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "satellite-random-access-request-class.h"
+#include "satellite-random-access-allocation-channel.h"
+#include "satellite-lower-layer-service.h"
 #include <map>
 
 namespace ns3 {
@@ -43,6 +44,11 @@ public:
   SatRandomAccessConf ();
 
   /**
+   * \brief Constructor
+   */
+  SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf);
+
+  /**
    * \brief Destructor
    */
   virtual ~SatRandomAccessConf ();
@@ -57,114 +63,48 @@ public:
    *
    * \return
    */
-  double GetSlottedAlohaDefaultMinRandomizationValue () { return m_slottedAlohaMinRandomizationValue; }
+  Ptr<SatRandomAccessAllocationChannel> GetAllocationChannelConfiguration (uint32_t allocationChannel);
 
   /**
    *
    * \return
    */
-  double GetSlottedAlohaDefaultMaxRandomizationValue () { return m_slottedAlohaMaxRandomizationValue; }
+  uint32_t GetSlottedAlohaControlRandomizationInterval () { return slottedAlohaControlRandomizationInterval;}
+
+  /**
+   *
+   * \param controlRandomizationInterval
+   */
+  void SetSlottedAlohaControlRandomizationInterval (uint32_t controlRandomizationInterval) { slottedAlohaControlRandomizationInterval = controlRandomizationInterval;}
 
   /**
    *
    * \return
    */
-  double GetCrdsaDefaultBackoffTime () { return m_crdsaBackoffTime; }
-
-  /**
-   *
-   * \return
-   */
-  double GetCrdsaDefaultBackoffProbability () { return m_crdsaBackoffProbability; }
-
-  /**
-   *
-   * \return
-   */
-  double GetMaximumCrdsaBackoffProbability () { return m_crdsaMaximumBackoffProbability; }
-
-  /**
-   *
-   * \return
-   */
-  Ptr<SatRandomAccessRequestClass> GetRequestClassConfiguration (uint32_t requestClass);
+  uint32_t GetNumOfAllocationChannels () { return m_allocationChannelCount; }
 
   /**
    *
    */
-  uint32_t GetMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
-
-  /**
-   *
-   */
-  void SetMaxUniquePayloadPerBlock (uint32_t maxUniquePayloadPerBlock) { m_crdsaMaxUniquePayloadPerBlock = maxUniquePayloadPerBlock; }
-
-  /**
-   *
-   */
-  uint32_t GetMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
-
-  /**
-   *
-   */
-  void SetMaxConsecutiveBlocksAccessed (uint32_t maxConsecutiveBlocksAccessed) { m_crdsaMaxConsecutiveBlocksAccessed = maxConsecutiveBlocksAccessed; }
-
-  /**
-   *
-   */
-  uint32_t GetNumOfConsecutiveBlocksUsed () { return m_crdsaNumOfConsecutiveBlocksUsed; }
-
-  /**
-   *
-   */
-  void SetNumOfConsecutiveBlocksUsed (uint32_t numOfConsecutiveBlocksUsed) { m_crdsaNumOfConsecutiveBlocksUsed = numOfConsecutiveBlocksUsed; }
+  void DoSlottedAlohaVariableSanityCheck ();
 
 private:
 
   /**
    *
    */
-  double m_slottedAlohaMinRandomizationValue;
+  std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
+
+  /**
+   * \brief
+   * in milliseconds
+   */
+  uint32_t slottedAlohaControlRandomizationInterval;
 
   /**
    *
    */
-  double m_slottedAlohaMaxRandomizationValue;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaBackoffTime;
-
-  /**
-   *
-   */
-  double m_crdsaBackoffProbability;
-
-  /**
-   *
-   */
-  double m_crdsaMaximumBackoffProbability;
-
-  /**
-   *
-   */
-  std::map<uint32_t,Ptr<SatRandomAccessRequestClass> > m_requestClassConf;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxUniquePayloadPerBlock;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaMaxConsecutiveBlocksAccessed;
-
-  /**
-   *
-   */
-  uint32_t m_crdsaNumOfConsecutiveBlocksUsed;
+  uint32_t m_allocationChannelCount;
 };
 
 } // namespace ns3

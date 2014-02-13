@@ -32,64 +32,53 @@ SatRandomAccessConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccessConf")
     .SetParent<Object> ()
-    .AddAttribute ("SlottedAlohaMinRandomizationValue",
-                   "Slotted ALOHA randomization minimum value",
-                   DoubleValue (0.5),
-                   MakeDoubleAccessor (&SatRandomAccessConf::m_slottedAlohaMinRandomizationValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("SlottedAlohaMaxRandomizationValue",
-                   "Slotted ALOHA randomization maximum value",
-                   DoubleValue (2.0),
-                   MakeDoubleAccessor (&SatRandomAccessConf::m_slottedAlohaMaxRandomizationValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("CrdsaBackoffTime",
-                   "CRDSA backoff time",
-                   UintegerValue (5),
-                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaBackoffTime),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("CrdsaBackoffProbability",
-                   "CRDSA backoff probability",
-                   DoubleValue (0.00),
-                   MakeDoubleAccessor (&SatRandomAccessConf::m_crdsaBackoffProbability),
-                   MakeDoubleChecker<double> (0.0,1.0))
-    .AddAttribute ("CrdsaMaximumCrdsaBackoffProbability",
-                   "Maximum CRDSA backoff probability for RA logic",
-                   DoubleValue (0.2),
-                   MakeDoubleAccessor (&SatRandomAccessConf::m_crdsaMaximumBackoffProbability),
-                   MakeDoubleChecker<double> (0.0,1.0))
-    .AddAttribute ("CrdsaMaxUniquePayloadPerBlock",
-                   "CRDSA max unique payloads per block",
-                   UintegerValue (3),
-                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxUniquePayloadPerBlock),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("CrdsaMaxConsecutiveBlocksAccessed",
-                   "CRDSA max consecutive blocks accessed",
-                   UintegerValue (4),
-                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaMaxConsecutiveBlocksAccessed),
-                   MakeUintegerChecker<uint32_t> ())
     ;
   return tid;
 }
-
 SatRandomAccessConf::SatRandomAccessConf () :
-  m_slottedAlohaMinRandomizationValue (),
-  m_slottedAlohaMaxRandomizationValue (),
-  m_crdsaBackoffTime (),
-  m_crdsaBackoffProbability (),
-  m_crdsaMaximumBackoffProbability (),
-  m_crdsaMaxUniquePayloadPerBlock (),
-  m_crdsaMaxConsecutiveBlocksAccessed (),
-  m_crdsaNumOfConsecutiveBlocksUsed ()
+  slottedAlohaControlRandomizationInterval (),
+  m_allocationChannelCount ()
+{
+  NS_LOG_FUNCTION (this);
+  NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - Constructor not in use");
+}
+
+SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf) :
+  slottedAlohaControlRandomizationInterval (),
+  m_allocationChannelCount (llsConf->GetRaServiceCount ())
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatRandomAccessRequestClass> defaultConfRequestClass_0 = CreateObject<SatRandomAccessRequestClass> (0,129,2,2,2000);
-  Ptr<SatRandomAccessRequestClass> defaultConfRequestClass_1 = CreateObject<SatRandomAccessRequestClass> (0,79,3,3,1000);
-  Ptr<SatRandomAccessRequestClass> defaultConfRequestClass_2 = CreateObject<SatRandomAccessRequestClass> (0,159,4,4,3000);
+  if (m_allocationChannelCount < 1)
+    {
+      NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - No random access allocation channel");
+    }
 
-  m_requestClassConf.insert (std::make_pair(0,defaultConfRequestClass_0));
-  m_requestClassConf.insert (std::make_pair(1,defaultConfRequestClass_1));
-  m_requestClassConf.insert (std::make_pair(2,defaultConfRequestClass_2));
+  slottedAlohaControlRandomizationInterval = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
+  DoSlottedAlohaVariableSanityCheck ();
+
+  /// TODO this is temporary setup for debugging until all the confs are available
+  for (uint32_t i = 0; i < m_allocationChannelCount; i++)
+    {
+      Ptr<SatRandomAccessAllocationChannel> allocationChannel = CreateObject<SatRandomAccessAllocationChannel> ();
+      m_allocationChannelConf.insert (std::make_pair (i,allocationChannel));
+
+      GetAllocationChannelConfiguration (i)->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
+      GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
+      GetAllocationChannelConfiguration (i)->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
+
+      GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
+      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (79);
+      GetAllocationChannelConfiguration (i)->SetCrdsaMaximumBackoffProbability (0.2);
+
+      GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (2);
+
+      /// TODO these need to be implemented from RA service descriptor
+      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability (0.05);
+      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTime (5);
+
+      GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
+    }
 }
 
 SatRandomAccessConf::~SatRandomAccessConf ()
@@ -97,18 +86,32 @@ SatRandomAccessConf::~SatRandomAccessConf ()
   NS_LOG_FUNCTION (this);
 }
 
-
-Ptr<SatRandomAccessRequestClass>
-SatRandomAccessConf::GetRequestClassConfiguration (uint32_t requestClass)
+Ptr<SatRandomAccessAllocationChannel>
+SatRandomAccessConf::GetAllocationChannelConfiguration (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<uint32_t,Ptr<SatRandomAccessRequestClass> >::iterator iter = m_requestClassConf.find (requestClass);
+  std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> >::iterator iter = m_allocationChannelConf.find (allocationChannel);
 
-  if (iter == m_requestClassConf.end ())
+  if (iter == m_allocationChannelConf.end ())
     {
-      NS_FATAL_ERROR ("SatRandomAccessConf::GetRequestClassConfiguration - Invalid request class");
+      NS_FATAL_ERROR ("SatRandomAccessConf::GetAllocationChannelConfiguration - Invalid allocation channel");
     }
+
   return (iter->second);
 }
+
+void
+SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (slottedAlohaControlRandomizationInterval < 1)
+    {
+      NS_FATAL_ERROR ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - slottedAlohaControlRandomizationInterval < 1");
+    }
+
+  NS_LOG_INFO ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - Variable sanity check done");
+}
+
 } // namespace ns3

@@ -122,10 +122,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
 
 	if (randomAccessConf != NULL && randomAccessModel != SatRandomAccess::RA_OFF)
 	  {
-	    /// TODO implement this when request classes are ready
-	    uint32_t numOfRequestClasses = 3;
-
-	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel, numOfRequestClasses);
+	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
 	  }
 
 	m_tbtpContainer = CreateObject<SatTbtpContainer> ();

@@ -69,7 +69,7 @@ public:
   typedef struct
   {
     RandomAccessResultType_t resultType;
-    double slottedAlohaResult;
+    uint32_t slottedAlohaResult;
     std::map<uint32_t,std::set<uint32_t> > crdsaResult;
   } RandomAccessResults_s;
 
@@ -81,7 +81,7 @@ public:
   /**
    * \brief Constructor
    */
-  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel, uint32_t numOfRequestClasses);
+  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel);
 
   /**
    * \brief Destructor
@@ -100,43 +100,59 @@ public:
    */
   void SetRandomAccessModel (RandomAccessModel_t randomAccessModel);
 
+  /**
+   *
+   * \param allocationChannel
+   * \param crdsaBackoffProbability
+   * \param backoffTime
+   */
+  void CrdsaSetLoadControlParameters (uint32_t allocationChannel,
+                                      double backoffProbability,
+                                      uint32_t backoffTime);
 
   /**
    *
-   * \param backoffProbability
-   * \param backoffTime
+   * \param allocationChannel
    * \param maximumBackoffProbability
    */
-  void CrdsaSetLoadControlParameters (double backoffProbability, double backoffTime, double maximumBackoffProbability);
+  void CrdsaSetMaximumBackoffProbability (uint32_t allocationChannel,
+                                          double maximumBackoffProbability);
 
   /**
    *
-   * \param requestClass
+   * \param allocationChannel
    * \param minRandomizationValue
    * \param maxRandomizationValue
-   * \param minIdleBlocks
    * \param numOfInstances
-   * \param payloadBytes
    */
-  void CrdsaSetMaximumDataRateLimitationParameters (uint32_t requestClass,
-                                                    uint32_t minRandomizationValue,
-                                                    uint32_t maxRandomizationValue,
-                                                    uint32_t minIdleBlocks,
-                                                    uint32_t numOfInstances,
-                                                    uint32_t payloadBytes);
+  void CrdsaSetRandomizationParameters (uint32_t allocationChannel,
+                                        uint32_t minRandomizationValue,
+                                        uint32_t maxRandomizationValue,
+                                        uint32_t numOfInstances);
 
   /**
    *
-   * \param min
-   * \param max
+   * \param allocationChannel
+   * \param maxUniquePayloadPerBlock
+   * \param maxConsecutiveBlocksAccessed
+   * \param minIdleBlocks
    */
-  void SlottedAlohaSetLoadControlVariables (double min, double max);
+  void CrdsaSetMaximumDataRateLimitationParameters (uint32_t allocationChannel,
+                                                    uint32_t maxUniquePayloadPerBlock,
+                                                    uint32_t maxConsecutiveBlocksAccessed,
+                                                    uint32_t minIdleBlocks);
+
+  /**
+   *
+   * \param controlRandomizationInterval
+   */
+  void SlottedAlohaSetControlRandomizationInterval (double controlRandomizationInterval);
 
   /**
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s DoRandomAccess ();
+  SatRandomAccess::RandomAccessResults_s DoRandomAccess (uint32_t allocationChannel);
 
 private:
 
@@ -160,9 +176,17 @@ private:
 
   /**
    *
+   * \param allocationChannel
    * \return
    */
-  bool IsCrdsaFree ();
+  bool IsCrdsaAllocationChannelFree (uint32_t allocationChannel);
+
+  /**
+   *
+   * \param allocationChannel
+   * \return
+   */
+  bool IsCrdsaBackoffProbabilityTooHigh (uint32_t allocationChannel);
 
   /**
    *
@@ -179,7 +203,7 @@ private:
     *
     * \return
     */
-  double SlottedAlohaRandomizeReleaseTime ();
+  uint32_t SlottedAlohaRandomizeReleaseTime ();
 
   /**
    *
@@ -190,19 +214,19 @@ private:
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s DoCrdsa ();
+  SatRandomAccess::RandomAccessResults_s DoCrdsa (uint32_t allocationChannel);
 
   /**
    *
    * \return
    */
-  bool CrdsaHasBackoffTimePassed ();
+  bool CrdsaHasBackoffTimePassed (uint32_t allocationChannel);
 
   /**
    *
    * \return
    */
-  bool CrdsaDoBackoff ();
+  bool CrdsaDoBackoff (uint32_t allocationChannel);
 
   /**
    *
@@ -210,40 +234,39 @@ private:
    * \param txOpportunities
    * \return
    */
-  std::set<uint32_t> CrdsaRandomizeTxOpportunities (uint32_t requestClass, std::set<uint32_t> txOpportunities);
+  std::set<uint32_t> CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std::set<uint32_t> txOpportunities);
 
   /**
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s CrdsaPrepareToTransmit ();
+  SatRandomAccess::RandomAccessResults_s CrdsaPrepareToTransmit (uint32_t allocationChannel);
 
   /**
    *
    */
-  void CrdsaSetBackoffTimer ();
+  void CrdsaSetBackoffTimer (uint32_t allocationChannel);
 
   /**
    *
    */
-  void CrdsaDoVariableSanityCheck ();
+  void CrdsaIncreaseConsecutiveBlocksUsed (uint32_t allocationChannel);
 
   /**
    *
    */
-  void CrdsaIncreaseConsecutiveBlocksUsed ();
+  void CrdsaReduceIdleBlocks (uint32_t allocationChannel);
 
   /**
    *
    */
-  void CrdsaReduceIdleBlocksFromAllRequestClasses ();
+  void CrdsaReduceIdleBlocksForAllAllocationChannels ();
 
   /**
    *
-   * \param requestClass
    * \return
    */
-  bool CrdsaIsRequestClassFree (uint32_t requestClass);
+  bool CrdsaIsAllocationChannelFree (uint32_t allocationChannel);
 
   /**
    *
@@ -263,42 +286,12 @@ private:
   /**
    *
    */
-  uint32_t m_numOfRequestClasses;
-
-  /**
-   *
-   */
-  double m_slottedAlohaMinRandomizationValue;
-
-  /**
-   *
-   */
-  double m_slottedAlohaMaxRandomizationValue;
-
-  /**
-   *
-   */
-  double m_crdsaBackoffProbability;
-
-  /**
-   *
-   */
-  double m_crdsaMaximumBackoffProbability;
+  uint32_t m_numOfAllocationChannels;
 
   /**
    *
    */
   bool m_crdsaNewData;
-
-  /**
-   *
-   */
-  double m_crdsaBackoffReleaseTime;
-
-  /**
-   *
-   */
-  double m_crdsaBackoffTime;
 };
 
 } // namespace ns3
