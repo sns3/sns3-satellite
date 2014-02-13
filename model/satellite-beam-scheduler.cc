@@ -103,7 +103,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb
   m_superFrameCounter = 0;
 
   // How many TBTPs is transmitted during RTT?
-  uint32_t tbtpsPerRtt = (uint32_t)(ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (0)));
+  uint32_t tbtpsPerRtt = (uint32_t)(std::ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (0)));
 
   // Scheduling starts after one empty super frame.
   m_superFrameCounter = tbtpsPerRtt + 1;

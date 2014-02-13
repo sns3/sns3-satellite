@@ -39,12 +39,20 @@ class SatDamaEntry
 {
 public:
   /**
-   * Construct a SatDamaEntry
+   * Default construct a SatDamaEntry.
    *
-   * This is the constructor for the SatDamaEntry
+   * This version of the constructor shall not used.
    *
    */
   SatDamaEntry ();
+
+  /**
+   * Default construct a SatDamaEntry.
+   *
+   * This version of the constructor shall not used.
+   *
+   */
+  SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * Destroy a SatDamaEntry
@@ -53,16 +61,47 @@ public:
    */
   ~SatDamaEntry ();
 
-private:
+  /**
+   * Get current value of the dynamic rate persistence.
+   *
+   * \return Current value of the dynamic rate persistence.
+   */
+  inline uint32_t GetDynamicRatePersistence () const { return m_dynamicRatePersistence;}
 
   /**
-   * UT identifier (MAC address)
+   * Get current value of the volume backlog persistence.
+   *
+   * \return Current value of the volume backlog persistence.
    */
-  Address   m_macAddress;
-  uint32_t  m_dynamicRatePersistence;
-  uint32_t  m_volumeBacklogPersistence;
-  uint32_t  m_defaultControlRandomizationInterval;
-  Ptr<SatLowerLayerServiceConf> llsConf;
+  inline uint32_t GetVolumeBacklogPersistence () const { return m_volumeBacklogPersistence;}
+
+  /**
+   * Reset dynamic rate persistence to the value given in lower layer service configuration.
+   */
+  void ResetDynamicRatePersistence ();
+
+  /**
+   * Decrement dynamic rate persistence.
+   */
+  void DecrementDynamicRatePersistence ();
+
+  /**
+   * Reset volume backlog persistence to the value given in lower layer service configuration.
+   */
+  void ResetVolumeBacklogPersistence ();
+
+  /**
+   * Decrement volume backlog persistence.
+   */
+  void DecrementVolumeBacklogPersistence ();
+
+private:
+
+  uint32_t                      m_dynamicRatePersistence;
+  uint32_t                      m_volumeBacklogPersistence;
+  Ptr<SatLowerLayerServiceConf> m_llsConf;
+  std::vector<double>           m_dynamicRateRequestedInKbps;
+  std::vector<uint32_t>         m_volumeRequestedBytes;
 };
 
 } // namespace ns3
