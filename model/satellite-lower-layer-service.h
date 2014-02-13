@@ -176,49 +176,49 @@ public:
   /**
    * Get maximum unique payload per block.
    *
-   * \return Maximum unique payload per block [bytes]
+   * \return Maximum unique payload per block
    */
-  inline uint32_t GetMaximumUniquePayloadPerBlockInBytes () const {return m_maxUniquePayloadPerBlockInBytes;}
+  inline uint32_t GetMaximumUniquePayloadPerBlock () const {return m_maxUniquePayloadPerBlock;}
 
   /**
    * Set maximum unique payload per block.
    *
-   * \param maxUniquePayloadPerBlockInBytes Maximum unique payload per block [bytes]
+   * \param maxUniquePayloadPerBlock Maximum unique payload per block
    */
-  inline void SetMaximumUniquePayloadPerBlockInBytes (uint32_t maxUniquePayloadPerBlockInBytes) { m_maxUniquePayloadPerBlockInBytes = maxUniquePayloadPerBlockInBytes;}
+  inline void SetMaximumUniquePayloadPerBlock (uint32_t maxUniquePayloadPerBlock) { m_maxUniquePayloadPerBlock = maxUniquePayloadPerBlock;}
 
   /**
    * Get maximum consecutive block accessed.
    *
-   * \return Maximum consecutive block accessed [bytes]
+   * \return Maximum consecutive block accessed
    */
-  inline uint32_t GetMaximumConsecutiveBlockAccessedInBytes () const {return m_maxConsecutiveBlockAccessedInBytes;}
+  inline uint32_t GetMaximumConsecutiveBlockAccessedInBytes () const {return m_maxConsecutiveBlockAccessed;}
 
   /**
    * Set maximum consecutive block accessed.
    *
-   * \param maxConsecutiveBlockAccessedInBytes Maximum consecutive block accessed [bytes]
+   * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed
    */
-  inline void SetMaximumConsecutiveBlockAccessedInBytes (uint32_t maxConsecutiveBlockAccessedInBytes) { m_maxConsecutiveBlockAccessedInBytes = maxConsecutiveBlockAccessedInBytes;}
+  inline void SetMaximumConsecutiveBlockAccessed (uint32_t maxConsecutiveBlockAccessed) { m_maxConsecutiveBlockAccessed = maxConsecutiveBlockAccessed;}
 
   /**
    * Get minimum idle block.
    *
-   * \return Minimum idle block [bytes]
+   * \return Minimum idle block
    */
-  inline uint32_t GetMinimumIdleBlockInBytes () const {return m_minimumIdleBlockInBytes;}
+  inline uint32_t GetMinimumIdleBlock () const {return m_minimumIdleBlock;}
 
   /**
    * Set minimum idle block.
    *
-   * \param minimumIdleBlockInBytes Minimum idle block [bytes]
+   * \param minimumIdleBlock Minimum idle block
    */
-  inline void SetMinimumIdleBlockInBytes (uint32_t minimumIdleBlockInBytes) { m_minimumIdleBlockInBytes = minimumIdleBlockInBytes;}
+  inline void SetMinimumIdleBlock (uint32_t minimumIdleBlock) { m_minimumIdleBlock = minimumIdleBlock;}
 
 private:
-  uint32_t  m_maxUniquePayloadPerBlockInBytes;
-  uint32_t  m_maxConsecutiveBlockAccessedInBytes;
-  uint32_t  m_minimumIdleBlockInBytes;
+  uint32_t  m_maxUniquePayloadPerBlock;
+  uint32_t  m_maxConsecutiveBlockAccessed;
+  uint32_t  m_minimumIdleBlock;
 };
 
 /**
@@ -275,6 +275,20 @@ public:
    * \return service name
    */
   static std::string GetIndexAsRaServiceName(uint32_t index);
+
+  /**
+   * Get count of configured RA services.
+   *
+   * \return count of configured RA services.
+   */
+  inline uint32_t GetRaServiceCount () const { return m_raServiceEntryCount;}
+
+  /**
+   * Get count of configured DA services.
+   *
+   * \return count of configured DA services.
+   */
+  inline uint32_t GetDaServiceCount () const { return m_daServiceEntryCount;}
 
   /**
    * Get configured dynamic rate persistence.
@@ -415,47 +429,47 @@ public:
    * \param index Index of the service
    * \return Maximum unique payload per block [bytes]
    */
-  uint32_t GetRaMaximumUniquePayloadPerBlockInBytes (uint32_t index) const;
+  uint32_t GetRaMaximumUniquePayloadPerBlock (uint32_t index) const;
 
   /**
    * Set maximum unique payload per block for a RA service.
    *
    * \param index Index of the service
-   * \param maxUniquePayloadPerBlockInBytes Maximum unique payload per block [bytes]
+   * \param maxUniquePayloadPerBlock Maximum unique payload per block
    */
-  void SetRaMaximumUniquePayloadPerBlockInBytes (uint32_t index, uint32_t maxUniquePayloadPerBlockInBytes);
+  void SetRaMaximumUniquePayloadPerBlock (uint32_t index, uint32_t maxUniquePayloadPerBlock);
 
   /**
    * Get maximum consecutive block accessed  for a RA service.
    *
    * \param index Index of the service
-   * \return Maximum consecutive block accessed [bytes]
+   * \return Maximum consecutive block accessed
    */
-  uint32_t GetRaMaximumConsecutiveBlockAccessedInBytes (uint32_t index) const;
+  uint32_t GetRaMaximumConsecutiveBlockAccessed (uint32_t index) const;
 
   /**
    * Set maximum consecutive block accessed for a RA service.
    *
    * \param index Index of the service
-   * \param maxConsecutiveBlockAccessedInBytes Maximum consecutive block accessed [bytes]
+   * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed [bytes]
    */
-  void SetRaMaximumConsecutiveBlockAccessedInBytes (uint32_t index, uint32_t maxConsecutiveBlockAccessedInBytes);
+  void SetRaMaximumConsecutiveBlockAccessed (uint32_t index, uint32_t maxConsecutiveBlockAccessed);
 
   /**
    * Get minimum idle block for a RA service.
    *
    * \param index Index of the service
-   * \return Minimum idle block [bytes]
+   * \return Minimum idle block
    */
-  uint32_t GetRaMinimumIdleBlockInBytes (uint32_t index) const;
+  uint32_t GetRaMinimumIdleBlock (uint32_t index) const;
 
   /**
    * Set minimum idle block for a RA service.
    *
    * \param index Index of the service
-   * \param minimumIdleBlockInBytes Minimum idle block [bytes]
+   * \param minimumIdleBlock Minimum idle block
    */
-  void SetRaMinimumIdleBlockInBytes (uint32_t index, uint32_t minimumIdleBlockInBytes);
+  void SetRaMinimumIdleBlock (uint32_t index, uint32_t minimumIdleBlock);
 
   private:
     uint32_t                                  m_dynamicRatePersistence;
@@ -534,18 +548,18 @@ public:
  * \param index Index of the service which attribute access methods are defined
  */
 #define SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
-  inline void SetRaServ ## index ## MaximumUniquePayloadPerBlockInBytes (double value)  \
-    { return SetRaMaximumUniquePayloadPerBlockInBytes (index, value); } \
-  inline double GetRaServ ## index ## MaximumUniquePayloadPerBlockInBytes () const  \
-    { return GetRaMaximumUniquePayloadPerBlockInBytes (index); } \
-  inline void SetRaServ ## index ## MaximumConsecutiveBlockAccessedInBytes (double value)  \
-    { return SetRaMaximumConsecutiveBlockAccessedInBytes (index, value); } \
-  inline double GetRaServ ## index ## MaximumConsecutiveBlockAccessedInBytes () const  \
-    { return GetRaMaximumConsecutiveBlockAccessedInBytes (index); } \
-  inline void SetRaServ ## index ## MinimumIdleBlockInBytes (uint32_t value)  \
-    { return SetRaMinimumIdleBlockInBytes (index, value); } \
-  inline uint32_t GetRaServ ## index ## MinimumIdleBlockInBytes () const  \
-    { return GetRaMinimumIdleBlockInBytes (index); }
+  inline void SetRaServ ## index ## MaximumUniquePayloadPerBlock (uint32_t value)  \
+    { return SetRaMaximumUniquePayloadPerBlock (index, value); } \
+  inline double GetRaServ ## index ## MaximumUniquePayloadPerBlock () const  \
+    { return GetRaMaximumUniquePayloadPerBlock (index); } \
+  inline void SetRaServ ## index ## MaximumConsecutiveBlockAccessed (double value)  \
+    { return SetRaMaximumConsecutiveBlockAccessed (index, value); } \
+  inline double GetRaServ ## index ## MaximumConsecutiveBlockAccessed () const  \
+    { return GetRaMaximumConsecutiveBlockAccessed (index); } \
+  inline void SetRaServ ## index ## MinimumIdleBlock (uint32_t value)  \
+    { return SetRaMinimumIdleBlock (index, value); } \
+  inline uint32_t GetRaServ ## index ## MinimumIdleBlock () const  \
+    { return GetRaMinimumIdleBlock (index); }
 
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);

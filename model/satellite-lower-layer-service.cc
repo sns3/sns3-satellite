@@ -72,9 +72,9 @@ SatLowerLayerServiceDaEntry::GetInstanceTypeId (void) const
 NS_OBJECT_ENSURE_REGISTERED (SatLowerLayerServiceRaEntry);
 
 SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
-: m_maxUniquePayloadPerBlockInBytes (0),
-  m_maxConsecutiveBlockAccessedInBytes (0),
-  m_minimumIdleBlockInBytes (0)
+: m_maxUniquePayloadPerBlock (0),
+  m_maxConsecutiveBlockAccessed (0),
+  m_minimumIdleBlock (0)
 {
    NS_LOG_FUNCTION (this);
 }
@@ -208,20 +208,20 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint32_t index)
    AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                   "Maximum unique payload per block [bytes] for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a1), \
-                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumUniquePayloadPerBlockInBytes, \
-                                       &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlockInBytes), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumUniquePayloadPerBlock, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
                   MakeUintegerChecker<uint32_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumConsecutiveBlockAccessed", \
                   "Maximum consecutive block accessed [bytes] for RA  " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a2), \
-                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumConsecutiveBlockAccessedInBytes, \
-                                        &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumConsecutiveBlockAccessedInBytes), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumConsecutiveBlockAccessed, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumConsecutiveBlockAccessed), \
                   MakeUintegerChecker<uint32_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MinimumIdleBlock", \
                   "Minimum idle block [bytes] for RA  " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a3), \
-                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MinimumIdleBlockInBytes, \
-                                        &SatLowerLayerServiceConf::GetRaServ ## index ## MinimumIdleBlockInBytes), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MinimumIdleBlock, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## MinimumIdleBlock), \
                   MakeUintegerChecker<uint32_t> ())
 
 TypeId
@@ -418,69 +418,69 @@ SatLowerLayerServiceConf::SetDaMaximumBacklogInBytes (uint32_t index, uint32_t m
 }
 
 uint32_t
-SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlockInBytes (uint32_t index) const
+SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint32_t index) const
 {
   if ( index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  return m_raServiceEntries[index].GetMaximumUniquePayloadPerBlockInBytes ();
+  return m_raServiceEntries[index].GetMaximumUniquePayloadPerBlock ();
 }
 
 void
-SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlockInBytes (uint32_t index, uint32_t uniquePayloadPerBlockInBytes)
+SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint32_t index, uint32_t uniquePayloadPerBlock)
 {
   if ( index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  m_raServiceEntries[index].SetMaximumUniquePayloadPerBlockInBytes (uniquePayloadPerBlockInBytes);
+  m_raServiceEntries[index].SetMaximumUniquePayloadPerBlock (uniquePayloadPerBlock);
 }
 
 uint32_t
-SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessedInBytes (uint32_t index) const
+SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint32_t index) const
 {
   if ( index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  return m_raServiceEntries[index].GetMaximumUniquePayloadPerBlockInBytes ();
+  return m_raServiceEntries[index].GetMaximumUniquePayloadPerBlock ();
 }
 
 void
-SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessedInBytes (uint32_t index, uint32_t consecutiveBlockAccessedInBytes)
+SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint32_t index, uint32_t consecutiveBlockAccessed)
 {
   if ( index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  m_raServiceEntries[index].SetMaximumConsecutiveBlockAccessedInBytes (consecutiveBlockAccessedInBytes);
+  m_raServiceEntries[index].SetMaximumConsecutiveBlockAccessed (consecutiveBlockAccessed);
 }
 
 uint32_t
-SatLowerLayerServiceConf::GetRaMinimumIdleBlockInBytes (uint32_t index) const
+SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint32_t index) const
 {
   if ( index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  return m_raServiceEntries[index].GetMinimumIdleBlockInBytes ();
+  return m_raServiceEntries[index].GetMinimumIdleBlock ();
 }
 
 void
-SatLowerLayerServiceConf::SetRaMinimumIdleBlockInBytes (uint32_t index, uint32_t minimumIdleBlockInBytes)
+SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint32_t index, uint32_t minimumIdleBlock)
 {
   if ( index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  m_raServiceEntries[index].SetMinimumIdleBlockInBytes (minimumIdleBlockInBytes);
+  m_raServiceEntries[index].SetMinimumIdleBlock (minimumIdleBlock);
 }
 
 } // namespace ns3
