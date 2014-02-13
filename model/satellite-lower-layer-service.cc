@@ -230,6 +230,16 @@ SatLowerLayerServiceConf::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatLowerLayerServiceConf")
     .SetParent<Object> ()
     .AddConstructor<SatLowerLayerServiceConf> ()
+    .AddAttribute ( "DaServiceCount",
+                    "DA services in use.",
+                     UintegerValue (2),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
+                     MakeUintegerChecker<uint32_t> (SatLowerLayerServiceConf::m_maxDaServiceEntries))
+    .AddAttribute ( "RaServiceCount",
+                    "RA services in use.",
+                     UintegerValue (2),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
+                     MakeUintegerChecker<uint32_t> (SatLowerLayerServiceConf::m_maxRaServiceEntries))
     .AddAttribute ( "DynamicRatePersistence",
                     "Dynamic rate persistence for the lower layer service.",
                      UintegerValue (5),
