@@ -16,10 +16,10 @@ def build(bld):
     obj = bld.create_ns3_program('sat-multi-application-fwd-example', ['satellite', 'traffic'])
     obj.source = 'sat-multi-application-fwd-example.cc'
     
-    obj = bld.create_ns3_program('simple-scenario-p2p', ['satellite', 'netanim', 'flow-monitor'])
+    obj = bld.create_ns3_program('simple-scenario-p2p', ['satellite', 'netanim', 'flow-monitor', 'point-to-point'])
     obj.source = 'simple-scenario-p2p.cc'
     
-    obj = bld.create_ns3_program('larger-scenario-p2p', ['satellite', 'netanim', 'flow-monitor'])
+    obj = bld.create_ns3_program('larger-scenario-p2p', ['satellite', 'netanim', 'flow-monitor', 'point-to-point'])
     obj.source = 'larger-scenario-p2p.cc'
 
     obj = bld.create_ns3_program('sat-link-results-plot', ['satellite'])
@@ -72,4 +72,4 @@ def build(bld):
 
     obj = bld.create_ns3_program('sat-random-access-example', ['satellite'])
     obj.source = 'sat-random-access-example.cc'
-    
+
