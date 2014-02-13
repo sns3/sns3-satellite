@@ -28,7 +28,8 @@
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
 #include "satellite-time-tag.h"
-#include "satellite-generic-encapsulator.h"
+#include "satellite-encapsulator.h"
+#include "satellite-return-link-encapsulator.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-control-message.h"
 #include "satellite-node-info.h"
@@ -64,7 +65,8 @@ SatLlc::SatLlc ()
  m_requestManager (),
  m_encaps (),
  m_decaps (),
- m_controlQueue ()
+ m_controlQueue (),
+ m_controlRcIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -82,7 +84,7 @@ SatLlc::DoDispose ()
 
   if (m_controlQueue)
     {
-      DynamicCast<SatQueue>(m_controlQueue)->DoDispose ();
+      m_controlQueue->DoDispose ();
       m_controlQueue = 0;
     }
 
@@ -90,12 +92,14 @@ SatLlc::DoDispose ()
 
   for ( it = m_encaps.begin(); it != m_encaps.end(); ++it)
     {
+      it->second->DoDispose ();
       it->second = 0;
     }
   m_encaps.clear ();
 
   for ( it = m_decaps.begin(); it != m_decaps.end(); ++it)
     {
+      it->second->DoDispose ();
       it->second = 0;
     }
   m_decaps.clear ();
@@ -109,13 +113,13 @@ SatLlc::DoDispose ()
 }
 
 void
-SatLlc::SetQueue (Ptr<Queue> queue)
+SatLlc::SetQueue (Ptr<SatQueue> queue)
 {
   NS_LOG_FUNCTION (this << queue);
   m_controlQueue = queue;
 }
 
-Ptr<Queue>
+Ptr<SatQueue>
 SatLlc::GetQueue (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -147,6 +151,10 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
         mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
         packet->AddPacketTag (mTag);
 
+        SatRcIndexTag rcTag;
+        rcTag.SetRcIndex (m_controlRcIndex);
+        packet->AddPacketTag (rcTag);
+
         // Enque the control packet
         m_controlQueue->Enqueue (packet);
      }
@@ -156,9 +164,14 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
     }
   else
     {
+      /**
+       * TODO: Here we should do the mapping between ToS and RC indeces! Currently
+       * all the non-control packets are just using RC index 1.
+       */
+      uint32_t rcIndex (1);
+
       // UT: user own mac address
       // GW: use destination address
-      uint32_t rcIndex (0);
       Mac48Address mac = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? m_nodeInfo->GetMacAddress () : Mac48Address::ConvertFrom (dest) );
       EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (mac, rcIndex);
 
@@ -170,7 +183,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
         }
       else
         {
-          NS_FATAL_ERROR ("Mac48Address not found in the encapsulator container!");
+          NS_FATAL_ERROR ("Key: (" << mac << ", " << rcIndex << ") not found in the encapsulator container!");
         }
     }
 
@@ -212,7 +225,7 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
   // Forward the txOpportunity to a certain encapsulator
   else
     {
-      uint32_t rcIndex (0);
+      uint32_t rcIndex (1);
       EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
       EncapContainer_t::iterator it = m_encaps.find (key);
 
@@ -222,7 +235,7 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &byt
         }
       else
         {
-          NS_FATAL_ERROR ("Mac48Address not found in the encapsulator container!");
+          NS_FATAL_ERROR ("Key: (" << macAddr << ", " << rcIndex << ") not found in the encapsulator container!");
         }
     }
   if (packet)
@@ -264,19 +277,28 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
 
   // Receive packet with a decapsulator instance which is handling the
   // packets for this specific id
-  uint32_t rcIndex (0);
-  EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
-  EncapContainer_t::iterator it = m_decaps.find (key);
-
-  // Note: control messages should not be seen at the LLC layer, since
-  // they are received already at the MAC layer.
-  if (it != m_decaps.end ())
+  SatRcIndexTag rcTag;
+  bool mSuccess = packet->PeekPacketTag (rcTag);
+  if (mSuccess)
     {
-      it->second->ReceivePdu (packet);
+      uint32_t rcIndex = rcTag.GetRcIndex ();
+      EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
+      EncapContainer_t::iterator it = m_decaps.find (key);
+
+      // Note: control messages should not be seen at the LLC layer, since
+      // they are received already at the MAC layer.
+      if (it != m_decaps.end ())
+        {
+          it->second->ReceivePdu (packet);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Key: (" << macAddr << ", " << rcIndex << ") not found in the encapsulator container!");
+        }
     }
   else
     {
-      NS_FATAL_ERROR ("Mac48Address not found in the decapsulator container!");
+      NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
 }
 
@@ -298,30 +320,32 @@ SatLlc::AddRequestManager (Ptr<SatRequestManager> rm)
 
 
 void
-SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc)
+SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc, uint32_t rcIndex)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << macAddr << rcIndex);
 
-  uint32_t rcIndex (0);
   EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
   EncapContainer_t::iterator it = m_encaps.find (key);
 
   if (it == m_encaps.end ())
     {
+      // Create a new transmission queue for the encapsulator
+      Ptr<SatQueue> queue = CreateObject<SatQueue> (rcIndex);
+      enc->SetQueue (queue);
+
       m_encaps.insert(std::make_pair (key, enc));
     }
   else
     {
-      NS_FATAL_ERROR ("Encapsulator container already contains this MAC address!");
+      NS_FATAL_ERROR ("Encapsulator container already holds (" << macAddr << ", " << rcIndex << ") key!");
     }
 }
 
 void
-SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec)
+SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec, uint32_t rcIndex)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << macAddr << rcIndex);
 
-  uint32_t rcIndex (0);
   EncapKey_t key = std::make_pair<Mac48Address, uint32_t> (macAddr, rcIndex);
   EncapContainer_t::iterator it = m_decaps.find (key);
 
@@ -331,7 +355,7 @@ SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec)
     }
   else
     {
-      NS_FATAL_ERROR ("Decapsulator container already contains this MAC address!");
+      NS_FATAL_ERROR ("Decapsulator container already holds (" << macAddr << ", " << rcIndex << ") key!");
     }
 }
 
@@ -390,21 +414,23 @@ SatLlc::SetReceiveCallback (SatLlc::ReceiveCallback cb)
 }
 
 
-double
-SatLlc::GetQueueKpis (uint32_t rcIndex)
+void
+SatLlc::SetQueueSatisticsCallbacks ()
 {
-  NS_LOG_FUNCTION (this << rcIndex);
+  // Control queue = rcIndex 0
+  SatRequestManager::QueueCallback queueCb = MakeCallback (&SatQueue::GetQueueStatistics, m_controlQueue);
+  m_requestManager->AddQueueCallback ((uint8_t)(0), queueCb);
 
-  if (rcIndex == 0)
+  for (EncapContainer_t::iterator it = m_encaps.begin ();
+      it != m_encaps.end ();
+      ++it)
     {
-      return DynamicCast<SatQueue> (m_controlQueue)->GetEnqueBitRate();
+      // Set the callback for each RLE queue
+      queueCb = MakeCallback (&SatQueue::GetQueueStatistics, it->second->GetQueue ());
+      m_requestManager->AddQueueCallback (it->first.second, queueCb);
     }
-  else
-    {
-      NS_FATAL_ERROR ("Data queues not supported yet!");
-    }
-  return 0.0;
-}
+ }
+
 
 } // namespace ns3
 

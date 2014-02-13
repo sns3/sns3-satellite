@@ -132,4 +132,79 @@ SatMacTag::Print (std::ostream &os) const
 }
 
 
+NS_OBJECT_ENSURE_REGISTERED (SatRcIndexTag);
+
+
+SatRcIndexTag::SatRcIndexTag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatRcIndexTag::~SatRcIndexTag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+TypeId
+SatRcIndexTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatRcIndexTag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatRcIndexTag> ()
+  ;
+  return tid;
+}
+TypeId
+SatRcIndexTag::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+void
+SatRcIndexTag::SetRcIndex (uint8_t rcIndex)
+{
+  NS_LOG_FUNCTION (this << rcIndex);
+  m_rcIndex = rcIndex;
+}
+
+uint8_t
+SatRcIndexTag::GetRcIndex (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_rcIndex;
+}
+
+uint32_t
+SatRcIndexTag::GetSerializedSize (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return sizeof (uint8_t);
+}
+void
+SatRcIndexTag::Serialize (TagBuffer i) const
+{
+  NS_LOG_FUNCTION (this << &i);
+
+  i.WriteU8 (m_rcIndex);
+}
+
+void
+SatRcIndexTag::Deserialize (TagBuffer i)
+{
+  NS_LOG_FUNCTION (this << &i);
+
+  m_rcIndex = i.ReadU8 ();
+}
+
+void
+SatRcIndexTag::Print (std::ostream &os) const
+{
+  NS_LOG_FUNCTION (this << &os);
+  os << "RCindex=" << m_rcIndex;
+}
+
+
 } // namespace ns3

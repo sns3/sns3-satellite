@@ -29,6 +29,7 @@
 #include "satellite-encap-pdu-status-tag.h"
 #include "satellite-rle-header.h"
 #include "satellite-time-tag.h"
+#include "satellite-queue.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatReturnLinkEncapsulator");
 
@@ -46,11 +47,10 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
   NS_ASSERT (true);
 }
 
-SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest)
+SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex)
    :m_sourceAddress (source),
     m_destAddress (dest),
-    m_maxTxBufferSize (100 * 4095),
-    m_txBufferSize (0),
+    m_rcIndex (rcIndex),
     m_txFragmentId (0),
     m_currRxFragmentId (0),
     m_currRxPacketSize (0),
@@ -76,12 +76,7 @@ SatReturnLinkEncapsulator::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatReturnLinkEncapsulator")
     .SetParent<SatEncapsulator> ()
     .AddConstructor<SatReturnLinkEncapsulator> ()
-    .AddAttribute ("MaxTxBufferSize",
-                   "Maximum size of the transmission buffer (in Bytes)",
-                   UintegerValue (100 * 4095),
-                   MakeUintegerAccessor (&SatReturnLinkEncapsulator::m_maxTxBufferSize),
-                   MakeUintegerChecker<uint32_t> ())
-                   ;
+  ;
   return tid;
 }
 
@@ -89,9 +84,6 @@ void
 SatReturnLinkEncapsulator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-
-  while (!m_txBuffer.empty ()) m_txBuffer.pop_back ();
-  m_txBuffer.clear();
 
   SatEncapsulator::DoDispose ();
 }
@@ -106,38 +98,30 @@ SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("SatReturnLinkEncapsulator received too large HL PDU!");
     }
-  // If the packet still fits into the buffer
-  else if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
+
+  // Store packet arrival time
+  SatTimeTag timeTag (Simulator::Now ());
+  p->AddPacketTag (timeTag);
+
+  // Mark the PDU with FULL_PDU tag
+  SatEncapPduStatusTag tag;
+  tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
+  p->AddPacketTag (tag);
+
+  /**
+   * TODO: This is the place to encapsulate the HL packet
+   * with Addressed Link (AL) header.
+   */
+
+  NS_LOG_LOGIC ("Tx Buffer: New packet added of size: " << p->GetSize ());
+
+  if (!m_txQueue->Enqueue (p))
     {
-      // Store packet arrival time
-      SatTimeTag timeTag (Simulator::Now ());
-      p->AddPacketTag (timeTag);
-
-      // Mark the PDU with FULL_PDU tag
-      SatEncapPduStatusTag tag;
-      tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
-      p->AddPacketTag (tag);
-
-      /**
-       * TODO: This is the place to encapsulate the HL packet
-       * with Addressed Link (AL) header.
-       */
-
-      NS_LOG_LOGIC ("Tx Buffer: New packet added");
-      m_txBuffer.push_back (p);
-      m_txBufferSize += p->GetSize ();
-      NS_LOG_LOGIC ("NumOfBuffers = " << m_txBuffer.size() );
-      NS_LOG_LOGIC ("txBufferSize = " << m_txBufferSize);
-    }
-  else
-    {
-      // Discard full SDU
-      NS_LOG_LOGIC ("TxBuffer is full. SDU discarded");
-      NS_LOG_LOGIC ("MaxTxBufferSize = " << m_maxTxBufferSize);
-      NS_LOG_LOGIC ("txBufferSize    = " << m_txBufferSize);
-      NS_LOG_LOGIC ("packet size     = " << p->GetSize ());
+      NS_LOG_LOGIC ("Packet is dropped!");
     }
 
+  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets() );
+  NS_LOG_LOGIC ("NumBytes = " << m_txQueue->GetNBytes ());
 }
 
 Ptr<Packet>
@@ -149,8 +133,10 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
 
+  NS_LOG_LOGIC ("Queue size before TxOpportunity: " << m_txQueue->GetNBytes());
+
   // No packets in buffer
-  if ( m_txBuffer.size () == 0 )
+  if ( m_txQueue->GetNPackets () == 0 )
     {
       NS_LOG_LOGIC ("No data pending, return NULL packet");
       return packet;
@@ -159,13 +145,13 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   // RLE (PPDU) header
   SatPPduHeader ppduHeader;
 
-  // Take the first PDU from the buffer
-  Ptr<Packet> firstSegment = (*(m_txBuffer.begin ()))->Copy ();
+  // Peek the first PDU from the buffer.
+  Ptr<const Packet> peekSegment = m_txQueue->Peek ();
 
   SatEncapPduStatusTag tag;
-  firstSegment->PeekPacketTag (tag);
+  peekSegment->PeekPacketTag (tag);
 
-  NS_LOG_LOGIC ("Size of the first packet in buffer: " << firstSegment->GetSize ());
+  NS_LOG_LOGIC ("Size of the first packet in buffer: " << peekSegment->GetSize ());
   NS_LOG_LOGIC ("Encapsulation status of the first packet in buffer: " << tag.GetStatus());
 
   // Tx opportunity bytes is not enough
@@ -182,13 +168,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 
   NS_LOG_LOGIC ("Maximum supported segment size: " << maxSegmentSize);
 
-  // Erase the packet from the buffer
-  m_txBufferSize -= (*(m_txBuffer.begin()))->GetSize ();
-  m_txBuffer.erase (m_txBuffer.begin ());
-
   // Fragmentation if the HL PDU does not fit into the burst or
   // the HL packet is too large.
-  if ( firstSegment->GetSize () > maxSegmentSize )
+  if ( peekSegment->GetSize () > maxSegmentSize )
     {
       NS_LOG_LOGIC ("Buffered packet is larger than the maximum segment size!");
 
@@ -203,6 +185,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
             }
 
           maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - headerSize;
+          NS_LOG_LOGIC ("Recalculated maximum supported segment size: " << maxSegmentSize);
 
           // In case we have to fragment a FULL PDU, we need to increase
           // the fragment id.
@@ -219,7 +202,11 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
             }
 
           maxSegmentSize = std::min(bytes, MAX_PPDU_PACKET_SIZE) - headerSize;
+          NS_LOG_LOGIC ("Recalculated maximum supported segment size: " << maxSegmentSize);
         }
+
+      // Now we can take the packe away from the queue
+      Ptr<Packet> firstSegment = m_txQueue->Dequeue ();
 
       // Create a new fragment
       Ptr<Packet> newSegment = firstSegment->CreateFragment (0, maxSegmentSize);
@@ -255,9 +242,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       // If bytes left after fragmentation
       if (firstSegment->GetSize () > 0)
         {
+          NS_LOG_LOGIC ("Returning the remaining " << firstSegment->GetSize () << " bytes to buffer");
           firstSegment->AddPacketTag (oldTag);
-          m_txBuffer.insert (m_txBuffer.begin (), firstSegment);
-          m_txBufferSize += (*(m_txBuffer.begin()))->GetSize ();
+          m_txQueue->PushFront (firstSegment);
         }
       else
         {
@@ -287,6 +274,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
           ppduHeader.SetFragmentId (m_txFragmentId);
         }
 
+      // Take the packe away from the queue
+      Ptr<Packet> firstSegment = m_txQueue->Dequeue ();
+
       ppduHeader.SetEndIndicator ();
       ppduHeader.SetPPduLength (firstSegment->GetSize());
 
@@ -305,8 +295,22 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   mTag.SetSourceAddress (m_sourceAddress);
   packet->AddPacketTag (mTag);
 
-  // Update bytes left
+  SatRcIndexTag rcTag;
+  rcTag.SetRcIndex (m_rcIndex);
+  packet->AddPacketTag (rcTag);
+
+  // Update bytes lefts
   bytesLeft = GetTxBufferSizeInBytes ();
+
+  if (packet)
+    {
+      if (packet->GetSize () > bytes)
+        {
+          NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
+        }
+      NS_LOG_LOGIC ("Created packet size: " << packet->GetSize ());
+    }
+  NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes());
 
   return packet;
 }
@@ -314,7 +318,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 uint32_t
 SatReturnLinkEncapsulator::GetTxBufferSizeInBytes () const
 {
-  return m_txBufferSize;
+  return m_txQueue->GetNBytes ();
 }
 
 void
@@ -441,7 +445,7 @@ SatReturnLinkEncapsulator::GetHolDelay () const
 {
   Time holDelay;
   SatTimeTag timeTag;
-  if (m_txBuffer.front ()->PeekPacketTag(timeTag))
+  if (m_txQueue->Peek ()->PeekPacketTag(timeTag))
     {
       holDelay = Simulator::Now () - timeTag.GetSenderTimestamp ();
     }
@@ -452,7 +456,6 @@ SatReturnLinkEncapsulator::GetHolDelay () const
 
   return holDelay;
 }
-
 
 uint32_t
 SatReturnLinkEncapsulator::GetMinTxOpportunityInBytes () const

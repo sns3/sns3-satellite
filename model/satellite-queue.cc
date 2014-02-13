@@ -34,39 +34,59 @@ NS_OBJECT_ENSURE_REGISTERED (SatQueue);
 TypeId SatQueue::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatQueue")
-    .SetParent<Queue> ()
+    .SetParent<Object> ()
     .AddConstructor<SatQueue> ()
-    .AddAttribute ("Mode",
-                   "Whether to use bytes (see MaxBytes) or packets (see MaxPackets) as the maximum queue size metric.",
-                   EnumValue (QUEUE_MODE_PACKETS),
-                   MakeEnumAccessor (&SatQueue::SetMode),
-                   MakeEnumChecker (QUEUE_MODE_BYTES, "QUEUE_MODE_BYTES",
-                                    QUEUE_MODE_PACKETS, "QUEUE_MODE_PACKETS"))
     .AddAttribute ("MaxPackets",
                    "The maximum number of packets accepted by this SatQueue.",
                    UintegerValue (100),
                    MakeUintegerAccessor (&SatQueue::m_maxPackets),
                    MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("MaxBytes",
-                   "The maximum number of bytes accepted by this SatQueue.",
-                   UintegerValue (100 * 65535),
-                   MakeUintegerAccessor (&SatQueue::m_maxBytes),
-                   MakeUintegerChecker<uint32_t> ())
+    .AddTraceSource ("Enqueue",
+                     "Enqueue a packet in the queue.",
+                     MakeTraceSourceAccessor (&SatQueue::m_traceEnqueue))
+    .AddTraceSource ("Dequeue",
+                     "Dequeue a packet from the queue.",
+                     MakeTraceSourceAccessor (&SatQueue::m_traceDequeue))
+    .AddTraceSource ("Drop",
+                     "Drop a packet stored in the queue.",
+                     MakeTraceSourceAccessor (&SatQueue::m_traceDrop))
   ;
 
   return tid;
 }
 
-SatQueue::SatQueue () :
-  Queue (),
+SatQueue::SatQueue ()
+: Object (),
   m_packets (),
   m_maxPackets (0),
-  m_maxBytes (0),
-  m_bytesInQueue (0),
-  m_mode (QUEUE_MODE_PACKETS),
-  m_enquedBytesSinceReset (0),
-  m_dequedBytesSinceReset (0),
-  m_lastResetTime (0)
+  m_rcIndex (0),
+  m_nBytes (0),
+  m_nTotalReceivedBytes (0),
+  m_nPackets (0),
+  m_nTotalReceivedPackets (0),
+  m_nTotalDroppedBytes (0),
+  m_nTotalDroppedPackets (),
+  m_nEnqueBytesSinceReset (0),
+  m_nDequeBytesSinceReset (0),
+  m_statResetTime (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatQueue::SatQueue (uint32_t rcIndex)
+: Object (),
+  m_packets (),
+  m_maxPackets (0),
+  m_rcIndex (rcIndex),
+  m_nBytes (0),
+  m_nTotalReceivedBytes (0),
+  m_nPackets (0),
+  m_nTotalReceivedPackets (0),
+  m_nTotalDroppedBytes (0),
+  m_nTotalDroppedPackets (),
+  m_nEnqueBytesSinceReset (0),
+  m_nDequeBytesSinceReset (0),
+  m_statResetTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -88,38 +108,31 @@ void SatQueue::DoDispose ()
     }
 
   DequeueAll ();
-  Queue::DoDispose ();
+  Object::DoDispose ();
 }
 
 void
-SatQueue::SetMode (SatQueue::QueueMode mode)
+SatQueue::SetRcIndex (uint32_t rcIndex)
 {
-  NS_LOG_FUNCTION (this << mode);
-  m_mode = mode;
-}
-
-SatQueue::QueueMode
-SatQueue::GetMode (void)
-{
-  NS_LOG_FUNCTION (this);
-  return m_mode;
+  NS_LOG_FUNCTION (this << rcIndex);
+  m_rcIndex = rcIndex;
 }
 
 bool
-SatQueue::DoEnqueue (Ptr<Packet> p)
+SatQueue::IsEmpty () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_packets.empty ();
+}
+
+bool
+SatQueue::Enqueue (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
 
-  if (m_mode == QUEUE_MODE_PACKETS && (m_packets.size () >= m_maxPackets))
+  if (m_packets.size () >= m_maxPackets)
     {
       NS_LOG_LOGIC ("Queue full (at max packets) -- droppping pkt");
-      Drop (p);
-      return false;
-    }
-
-  if (m_mode == QUEUE_MODE_BYTES && (m_bytesInQueue + p->GetSize () >= m_maxBytes))
-    {
-      NS_LOG_LOGIC ("Queue full (packet would exceed max bytes) -- droppping pkt");
       Drop (p);
       return false;
     }
@@ -128,56 +141,55 @@ SatQueue::DoEnqueue (Ptr<Packet> p)
     {
       SendEvent (SatQueue::FIRST_BUFFERED_PKT);
     }
+  else
+    {
+      SendEvent (SatQueue::BUFFERED_PKT);
+    }
 
-  m_bytesInQueue += p->GetSize ();
-  m_packets.push (p);
+  m_nBytes += p->GetSize ();
+  ++m_nPackets;
 
-  m_enquedBytesSinceReset += p->GetSize ();
+  m_nTotalReceivedBytes += p->GetSize ();
+  ++m_nTotalReceivedPackets;
+
+  m_packets.push_back (p);
 
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
-  NS_LOG_LOGIC ("Number bytes " << m_bytesInQueue);
-  NS_LOG_LOGIC ("Number of bytes since last reset: " << m_enquedBytesSinceReset);
+  NS_LOG_LOGIC ("Number bytes " << m_nBytes);
 
   return true;
 }
 
 Ptr<Packet>
-SatQueue::DoDequeue (void)
+SatQueue::Dequeue (void)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_packets.empty ())
+  if (IsEmpty())
     {
       NS_LOG_LOGIC ("Queue empty");
       return 0;
     }
 
   Ptr<Packet> p = m_packets.front ();
-  m_packets.pop ();
-  m_bytesInQueue -= p->GetSize ();
+  m_packets.pop_front ();
 
-  m_dequedBytesSinceReset += p->GetSize ();
-
-  if (m_packets.empty ())
-    {
-      SendEvent (SatQueue::BUFFER_EMPTY);
-    }
+  m_nBytes -= p->GetSize ();
+  --m_nPackets;
 
   NS_LOG_LOGIC ("Popped " << p);
-
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
-  NS_LOG_LOGIC ("Number bytes " << m_bytesInQueue);
-  NS_LOG_LOGIC ("Number of bytes since last reset: " << m_dequedBytesSinceReset);
+  NS_LOG_LOGIC ("Number bytes " << m_nBytes);
 
   return p;
 }
 
 Ptr<const Packet>
-SatQueue::DoPeek (void) const
+SatQueue::Peek (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_packets.empty ())
+  if (IsEmpty ())
     {
       NS_LOG_LOGIC ("Queue empty");
       return 0;
@@ -186,47 +198,41 @@ SatQueue::DoPeek (void) const
   Ptr<Packet> p = m_packets.front ();
 
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
-  NS_LOG_LOGIC ("Number bytes " << m_bytesInQueue);
+  NS_LOG_LOGIC ("Number bytes " << m_nBytes);
 
   return p;
 }
 
-double
-SatQueue::GetEnqueBitRate ()
+void
+SatQueue::PushFront (Ptr<Packet> p)
 {
-  double bitrate (-1.0);
-  if (Simulator::Now () <= m_lastResetTime)
-    {
-      Time duration = Simulator::Now () - m_lastResetTime;
-      bitrate = 8.0 * m_enquedBytesSinceReset / duration.GetSeconds ();
-    }
+  NS_LOG_FUNCTION (this);
+  m_packets.push_front (p);
 
-  NS_LOG_LOGIC ("Enque bitrate: " << bitrate);
-
-  return bitrate;
-}
-
-double
-SatQueue::GetDequeBitRate ()
-{
-  double bitrate (-1.0);
-  if (Simulator::Now () <= m_lastResetTime)
-    {
-      Time duration = Simulator::Now () - m_lastResetTime;
-      bitrate = 8.0 * m_dequedBytesSinceReset / duration.GetSeconds ();
-    }
-
-  NS_LOG_LOGIC ("Deque bitrate: " << bitrate);
-
-  return bitrate;
+  ++m_nPackets;
+  m_nBytes += p->GetSize ();
 }
 
 void
-SatQueue::ResetStatistics ()
+SatQueue::DequeueAll (void)
 {
-  m_enquedBytesSinceReset = 0.0;
-  m_dequedBytesSinceReset = 0.0;
-  m_lastResetTime = Simulator::Now ();
+  NS_LOG_FUNCTION (this);
+  while (!IsEmpty ())
+    {
+      Dequeue ();
+    }
+}
+
+void
+SatQueue::Drop (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this << p);
+
+  m_nTotalDroppedPackets++;
+  m_nTotalDroppedBytes += p->GetSize ();
+
+  NS_LOG_LOGIC ("m_traceDrop (p)");
+  m_traceDrop (p);
 }
 
 void
@@ -245,9 +251,80 @@ SatQueue::SendEvent (QueueEvent_t event)
     {
       if (!(*it).IsNull())
         {
-          (*it)(event, 0);
+          (*it)(event, m_rcIndex);
         }
     }
+}
+
+uint32_t
+SatQueue::GetNPackets () const
+{
+  return m_nPackets;
+}
+
+uint32_t
+SatQueue::GetNBytes () const
+{
+  return m_nBytes;
+}
+
+uint32_t
+SatQueue::GetTotalReceivedBytes () const
+{
+  return m_nTotalReceivedBytes;
+}
+
+uint32_t
+SatQueue::GetTotalReceivedPackets () const
+{
+  return m_nTotalReceivedPackets;
+}
+
+uint32_t
+SatQueue::GetTotalDroppedBytes () const
+{
+  return m_nTotalDroppedBytes;
+}
+
+uint32_t
+SatQueue::GetTotalDroppedPackets () const
+{
+  return m_nTotalDroppedPackets;
+}
+
+SatQueue::QueueStats_t
+SatQueue::GetQueueStatistics (bool reset)
+{
+  QueueStats_t queueStats;
+  Time duration = Simulator::Now () - m_statResetTime;
+  queueStats.m_enqueRate = 8.0 * m_nEnqueBytesSinceReset / duration.GetSeconds ();
+  queueStats.m_dequeRate = 8.0 * m_nDequeBytesSinceReset / duration.GetSeconds ();
+
+  if (reset)
+    {
+      ResetShortTermStatistics ();
+    }
+
+  return queueStats;
+}
+
+void
+SatQueue::ResetStatistics ()
+{
+  m_nBytes = 0;
+  m_nTotalReceivedBytes = 0;
+  m_nPackets = 0;
+  m_nTotalReceivedPackets = 0;
+  m_nTotalDroppedBytes = 0;
+  m_nTotalDroppedPackets = 0;
+}
+
+void
+SatQueue::ResetShortTermStatistics ()
+{
+  m_nEnqueBytesSinceReset = 0;
+  m_nDequeBytesSinceReset = 0;
+  m_statResetTime = Simulator::Now ();
 }
 
 

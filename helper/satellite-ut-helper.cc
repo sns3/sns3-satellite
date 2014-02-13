@@ -127,8 +127,6 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
    m_randomAccessModel (SatRandomAccess::RA_OFF)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
-
-  m_queueFactory.SetTypeId ("ns3::SatQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
@@ -148,22 +146,6 @@ SatUtHelper::Initialize (Ptr<SatLinkResultsDvbS2> lrS2)
     {
       m_linkResults = lrS2;
     }
-}
-
-void 
-SatUtHelper::SetQueue (std::string type,
-                       std::string n1, const AttributeValue &v1,
-                       std::string n2, const AttributeValue &v2,
-                       std::string n3, const AttributeValue &v3,
-                       std::string n4, const AttributeValue &v4)
-{
-  NS_LOG_FUNCTION (this << type << n1 << n2 << n3 << n4 );
-
-  m_queueFactory.SetTypeId (type);
-  m_queueFactory.Set (n1, v1);
-  m_queueFactory.Set (n2, v2);
-  m_queueFactory.Set (n3, v3);
-  m_queueFactory.Set (n4, v4);
 }
 
 void 
@@ -266,8 +248,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Create a request manager and attach it to LLC
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
-  SatRequestManager::QueueCallback queueCb = MakeCallback (&SatLlc::GetQueueKpis, llc);
-  rm->SetQueueCallback (queueCb);
   llc->AddRequestManager (rm);
 
   // Attach the PHY layer to SatNetDevice
@@ -289,34 +269,45 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
-  Ptr<SatReturnLinkEncapsulator> utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr);
+
+  Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
+
+  // Return link
+  uint32_t numSupportedRcs (2);
+  // Creation of encapsulators start always from RC index number 1, since 0
+  // is reserved for control.
+  for (uint32_t rc = 1; rc <= numSupportedRcs; ++rc)
+    {
+      Ptr<SatReturnLinkEncapsulator> utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
+      llc->AddEncap (addr, utEncap, rc); // Tx
+
+      // Create encapsulator and add it to GW's LLC
+      Ptr<SatReturnLinkEncapsulator> gwDecap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
+      gwLlc->AddDecap (addr, gwDecap, rc); // Rx
+      gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, gwLlc));
+    }
+
+  // Forward link
+  Ptr<SatGenericStreamEncapsulator> gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
   Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
   utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-  llc->AddEncap (addr, utEncap); // Tx
-  llc->AddDecap (addr, utDecap); // Rx
-
-  // Create encapsulator and add it to GW's LLC
-  Ptr<SatGenericStreamEncapsulator> gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
-  Ptr<SatReturnLinkEncapsulator> gwDecap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr);
-  Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
-  gwLlc->AddEncap (addr, gwEncap); // Tx
-  gwLlc->AddDecap (addr, gwDecap); // Rx
-  gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, gwLlc));
+  gwLlc->AddEncap (addr, gwEncap, 1); // Tx
+  llc->AddDecap (addr, utDecap, 1); // Rx
 
   // set serving GW MAC address to UT MAC
   mac->SetGwAddress (gwAddr);
 
   // Create and set control packet queue to LLC
-  Ptr<Queue> queue = m_queueFactory.Create<SatQueue> ();
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (0);
   llc->SetQueue (queue);
 
   // Callback to Request manager
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
-  DynamicCast<SatQueue> (queue)->AddQueueEventCallback (rmCb);
+  queue->AddQueueEventCallback (rmCb);
 
   // Callback to UT MAC
   SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
-  DynamicCast<SatQueue> (queue)->AddQueueEventCallback (macCb);
+  queue->AddQueueEventCallback (macCb);
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
@@ -334,6 +325,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   ncc->AddUt (dev->GetAddress (), m_llsConf, beamId);
 
   phy->Initialize();
+
+  llc->SetQueueSatisticsCallbacks ();
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), Mac48Address::ConvertFrom (addr));

@@ -47,14 +47,13 @@ public:
   /**
    * Callback to fetch queue statistics
    */
-  typedef Callback<double, uint32_t> QueueCallback;
+  typedef Callback<SatQueue::QueueStats_t, bool> QueueCallback;
 
   /**
    * \brief Periodically check the buffer status and whether
    * a new CR is needed to be sent.
    */
   void DoPeriodicalEvaluation ();
-
 
   /**
    * Receive a queue event
@@ -67,9 +66,11 @@ public:
    * Set a callback to fetch queue statistics
    * \param cb Callback
    */
-  void SetQueueCallback (SatRequestManager::QueueCallback cb);
+  void AddQueueCallback (uint8_t rcIndex, SatRequestManager::QueueCallback cb);
 
 private:
+
+  typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
 
   /**
    * Do evaluation of the buffer status and decide whether or not
@@ -80,7 +81,7 @@ private:
   /**
    * The queue enque/deque rate getter callback
    */
-  QueueCallback m_queueCallback;
+  CallbackContainer_t m_queueCallbacks;
 
   /**
    * Interval to do the periodical CR evaluation

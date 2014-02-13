@@ -49,9 +49,9 @@ public:
   SatReturnLinkEncapsulator ();
 
   /**
-   * Constuctor
+   * Constructor
    */
-  SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest);
+  SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
   virtual ~SatReturnLinkEncapsulator ();
 
   static TypeId GetTypeId (void);
@@ -137,25 +137,14 @@ private:
   Mac48Address m_destAddress;
 
   /**
-   * Maximum buffer size in bytes
+   * RC index used in this RLE
    */
-  uint32_t m_maxTxBufferSize;
-
-  /**
-   * Buffered bytes
-   */
-  uint32_t m_txBufferSize;
+  uint8_t m_rcIndex;
 
   /**
    * Fragment id used in the packet transmissions
    */
   uint32_t m_txFragmentId;
-
-  /**
-   * Transmission buffer
-   */
-  std::list < Ptr<Packet> > m_txBuffer;
-
   /**
    * Current fragment id in the reassembly process
    */

@@ -121,7 +121,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO("--- Cbr-user-defined-example ---");
   NS_LOG_INFO("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
-  NS_LOG_INFO("  Simulation length: " << interval.GetSeconds ());
+  NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
   NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO("  ");

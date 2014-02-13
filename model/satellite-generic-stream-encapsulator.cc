@@ -272,6 +272,15 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   mTag.SetSourceAddress (m_sourceAddress);
   packet->AddPacketTag (mTag);
 
+  /**
+   * TODO: RC index itself is not valid in forward link. But, instead it could be named
+   * using a more generic name, such as flow id.
+   */
+  uint8_t flowId (1);
+  SatRcIndexTag rcTag;
+  rcTag.SetRcIndex (flowId);
+  packet->AddPacketTag (rcTag);
+
   // Update bytes left
   bytesLeft = GetTxBufferSizeInBytes ();
 

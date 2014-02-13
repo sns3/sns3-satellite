@@ -388,9 +388,9 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex)
     {
       NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
     }
-  else if (event == SatQueue::BUFFER_EMPTY)
+  else if (event == SatQueue::BUFFERED_PKT)
     {
-      NS_LOG_LOGIC ("BUFFER_EMPTY event received from queue: " << rcIndex);
+      NS_LOG_LOGIC ("BUFFERED_PKT event received from queue: " << rcIndex);
     }
   else
     {

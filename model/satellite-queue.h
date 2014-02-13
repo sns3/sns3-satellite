@@ -25,7 +25,8 @@
 #include <queue>
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
-#include "ns3/queue.h"
+#include "ns3/object.h"
+#include "ns3/traced-callback.h"
 
 
 namespace ns3 {
@@ -33,33 +34,40 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatQueue implements a queue utilize in the satellite module.
+ * \brief SatQueue implements a queue utilized in the satellite module.
  * It is utilized in both FWD and RTN links for both control and user data.
- * SatQueue is inherited from Queue class and adds new functionality related to
- *
- * - Statistics (enque bitrate, deque rate)
- * - Triggering (buffer empty, first packet received)
  *
 */
 
-class SatQueue : public Queue
+class SatQueue : public Object
 {
 public:
   static TypeId GetTypeId (void);
+
+  struct QueueStats_t
+  {
+    double m_enqueRate;
+    double m_dequeRate;
+  };
+
+  typedef enum
+  {
+    FIRST_BUFFERED_PKT,
+    BUFFERED_PKT
+  } QueueEvent_t;
 
   /**
    * Default constructor
    */
   SatQueue ();
+
+  /**
+   * Constructor
+   */
+  SatQueue (uint32_t rcIndex);
   ~SatQueue ();
 
   virtual void DoDispose ();
-
-  typedef enum {
-    FIRST_BUFFERED_PKT,
-    BUFFER_EMPTY,
-
-  } QueueEvent_t;
 
   /**
    * Callback to indicate queue related event
@@ -70,37 +78,47 @@ public:
   typedef Callback<void, SatQueue::QueueEvent_t, uint32_t> QueueEventCallback;
 
   /**
-   * Set the operating mode of this device.
-   *
-   * \param mode The operating mode of this device.
-   *
+   * Is the queue empty
+   * \return true if the queue is empty; false otherwise
    */
-  void SetMode (SatQueue::QueueMode mode);
+  virtual bool IsEmpty (void) const;
 
   /**
-   * Get the encapsulation mode of this device.
-   *
-   * \returns The encapsulation mode of this device.
+   * Enque pushes packet to the packet container (back)
+   * \param p Packet
+   * \return bool Was the enque succesfull or not
    */
-  SatQueue::QueueMode GetMode (void);
+  virtual bool Enqueue (Ptr<Packet> p);
 
   /**
-   * Enque bitrate since last reset
-   * \return double Enque rate in bps
+   * Deque takes packet from the packet container (front)
+   * \return p Packet
    */
-  double GetEnqueBitRate ();
+  virtual Ptr<Packet> Dequeue (void);
 
   /**
-   * Deque bitrate since last reset
-   * \return double Enque rate in bps
+   * PushFront pushes a fragmented packet back to the front
+   * of the packet container
+   * \param p Packet
    */
-  double GetDequeBitRate ();
+  virtual void PushFront (Ptr<Packet> p);
 
   /**
-   * Resets the counts for dropped packets, dropped bytes, received packets, and
-   * received bytes.
+   * Get a copy of the item at the front of the queue without removing it
+   * \return 0 if the operation was not successful; the packet otherwise.
    */
-  void ResetStatistics ();
+  virtual Ptr<const Packet> Peek (void) const;
+
+  /**
+   * Flush the queue.
+   */
+  void DequeueAll (void);
+
+  /**
+   * Configured RC index for this queue
+   * \param rcIndex
+   */
+  void SetRcIndex (uint32_t rcIndex);
 
   /**
    * Add queue event callback
@@ -108,12 +126,64 @@ public:
    */
   void AddQueueEventCallback (SatQueue::QueueEventCallback cb);
 
+  /**
+   * \return The number of packets currently stored in the Queue
+   */
+  uint32_t GetNPackets (void) const;
+
+  /**
+   * \return The number of bytes currently occupied by the packets in the Queue
+   */
+  uint32_t GetNBytes (void) const;
+
+  /**
+   * \return The total number of bytes received by this Queue since the
+   * simulation began, or since ResetStatistics was called, according to
+   * whichever happened more recently
+   *
+   */
+  uint32_t GetTotalReceivedBytes (void) const;
+  /**
+   * \return The total number of packets received by this Queue since the
+   * simulation began, or since ResetStatistics was called, according to
+   * whichever happened more recently
+   */
+  uint32_t GetTotalReceivedPackets (void) const;
+  /**
+   * \return The total number of bytes dropped by this Queue since the
+   * simulation began, or since ResetStatistics was called, according to
+   * whichever happened more recently
+   */
+  uint32_t GetTotalDroppedBytes (void) const;
+  /**
+   * \return The total number of bytes dropped by this Queue since the
+   * simulation began, or since ResetStatistics was called, according to
+   * whichever happened more recently
+   */
+  uint32_t GetTotalDroppedPackets (void) const;
+  /**
+   * Resets the counts for dropped packets, dropped bytes, received packets, and
+   * received bytes.
+   */
+  void ResetStatistics (void);
+
+  /**
+   * GetQueueStatistics returns a struct of KPIs
+   * \param reset Reset flag indicating whether the statistics should be reset now
+   * \return QueueStats_t Struct of KPIs
+   */
+  QueueStats_t GetQueueStatistics (bool reset);
+
 protected:
 
+  /**
+   *  \brief Drop a packet
+   *  \param packet packet that was dropped
+   *  This method is called by subclasses to notify parent (this class) of packet drops.
+   */
+  void Drop (Ptr<Packet> packet);
+
 private:
-  virtual bool DoEnqueue (Ptr<Packet> p);
-  virtual Ptr<Packet> DoDequeue (void);
-  virtual Ptr<const Packet> DoPeek (void) const;
 
   /**
    * Send queue event to all registered callbacks
@@ -121,19 +191,52 @@ private:
    */
   void SendEvent (QueueEvent_t event);
 
+  /**
+   * Reset the short term statistics. Short term reflects here e.g. to
+   * superframe duration.
+   */
+  void ResetShortTermStatistics ();
+
   typedef std::vector<QueueEventCallback> EventCallbackContainer_t;
+  typedef std::deque<Ptr<Packet> > PacketContainer_t;
+
+  /**
+   * Container of callbacks for queue related events
+   */
   EventCallbackContainer_t m_queueEventCallbacks;
 
-  std::queue<Ptr<Packet> > m_packets;
+  /**
+   * Packet container
+   */
+  PacketContainer_t m_packets;
+
+  /**
+   * Maximum allowed packets within the packet container
+   */
   uint32_t m_maxPackets;
-  uint32_t m_maxBytes;
-  uint32_t m_bytesInQueue;
-  QueueMode m_mode;
+
+  /**
+   * An unique id for each queue
+   */
+  uint32_t m_rcIndex;
 
   // Statistics
-  uint32_t m_enquedBytesSinceReset;
-  uint32_t m_dequedBytesSinceReset;
-  Time m_lastResetTime;
+  uint32_t m_nBytes;
+  uint32_t m_nTotalReceivedBytes;
+  uint32_t m_nPackets;
+  uint32_t m_nTotalReceivedPackets;
+  uint32_t m_nTotalDroppedBytes;
+  uint32_t m_nTotalDroppedPackets;
+
+  // Short term statistics
+  uint32_t m_nEnqueBytesSinceReset;
+  uint32_t m_nDequeBytesSinceReset;
+  Time m_statResetTime;
+
+  // Trace callbacks
+  TracedCallback<Ptr<const Packet> > m_traceEnqueue;
+  TracedCallback<Ptr<const Packet> > m_traceDequeue;
+  TracedCallback<Ptr<const Packet> > m_traceDrop;
 };
 
 

@@ -88,14 +88,14 @@ public:
    *
    * \param queue Ptr to the attached Net Device object.
    */
-  void SetQueue (Ptr<Queue> queue);
+  void SetQueue (Ptr<SatQueue> queue);
 
   /**
    * Get a copy of the attached Queue.
    *
    * \return Ptr to the queue.
    */
-  Ptr<Queue> GetQueue (void) const;
+  Ptr<SatQueue> GetQueue (void) const;
 
   /**
     *  Called from higher layer (SatNetDevice) to enque packet to LLC
@@ -147,8 +147,9 @@ public:
    * Value = encap entity
    * \param macAddr UT's MAC address
    * \param enc encap entity
+   * \param rcIndex RC index of this encapsulator queue
    */
-  void AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc);
+  void AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc, uint32_t rcIndex);
 
   /**
    * Add an decapsulator entry for the LLC
@@ -156,8 +157,9 @@ public:
    * Value = decap entity
    * \param macAddr UT's MAC address
    * \param dec decap entity
+   * \param rcIndex RC index of this encapsulator queue
    */
-  void AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec);
+  void AddDecap (Mac48Address macAddr, Ptr<SatEncapsulator> dec, uint32_t rcIndex);
 
   /**
    * Set the node info
@@ -173,10 +175,11 @@ public:
   std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
 
   /**
-   * Get the KPIs related to a specific queue
-   * @return
+   * Set queue statistics callbacks
+   * from SatRequestManager
+   * to SatQueue
    */
-  double GetQueueKpis (uint32_t rcIndex);
+  void SetQueueSatisticsCallbacks ();
 
 protected:
   /**
@@ -216,12 +219,15 @@ private:
   /**
    * The Queue which this SatLlc uses as a packet source.
    */
-  Ptr<Queue> m_controlQueue;
+  Ptr<SatQueue> m_controlQueue;
 
   /**
    * The upper layer package receive callback.
    */
   ReceiveCallback m_rxCallback;
+
+
+  uint8_t m_controlRcIndex;
 
 };
 

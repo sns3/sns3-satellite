@@ -32,6 +32,7 @@
 #include "ns3/callback.h"
 #include "ns3/random-variable-stream.h"
 #include "../model/satellite-return-link-encapsulator.h"
+#include "../model/satellite-queue.h"
 
 using namespace ns3;
 
@@ -87,7 +88,10 @@ SatRleTestCase::DoRun (void)
   Mac48Address source = Mac48Address::Allocate();
   Mac48Address dest = Mac48Address::Allocate();
 
-  Ptr<SatReturnLinkEncapsulator> rle = CreateObject<SatReturnLinkEncapsulator> (source, dest);
+  uint8_t rcIndex (0);
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (rcIndex);
+  Ptr<SatReturnLinkEncapsulator> rle = CreateObject<SatReturnLinkEncapsulator> (source, dest, rcIndex);
+  rle->SetQueue (queue);
 
   // Create a receive callback to Receive method of this class.
   rle->SetReceiveCallback (MakeCallback (&SatRleTestCase::Receive, this));

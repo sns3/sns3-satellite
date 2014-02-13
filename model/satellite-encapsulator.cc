@@ -21,7 +21,7 @@
 
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-
+#include "satellite-queue.h"
 #include "satellite-encapsulator.h"
 
 
@@ -40,7 +40,7 @@ SatEncapsulator::SatEncapsulator ()
 SatEncapsulator::~SatEncapsulator ()
 {
   NS_LOG_FUNCTION (this);
-
+  m_txQueue = NULL;
   m_rxCallback.Nullify ();
 }
 
@@ -62,6 +62,11 @@ void
 SatEncapsulator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+  if (m_txQueue)
+    {
+      m_txQueue->DoDispose ();
+    }
+  m_rxCallback.Nullify ();
 }
 
 void
@@ -69,6 +74,18 @@ SatEncapsulator::SetReceiveCallback (ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_rxCallback = cb;
+}
+
+void
+SatEncapsulator::SetQueue (Ptr<SatQueue> queue)
+{
+  m_txQueue = queue;
+}
+
+Ptr<SatQueue>
+SatEncapsulator::GetQueue ()
+{
+  return m_txQueue;
 }
 
 } // namespace ns3

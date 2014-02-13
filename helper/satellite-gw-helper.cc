@@ -225,7 +225,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   dev->SetLlc (llc);
 
   // Create and set queues for Mac modules
-  Ptr<Queue> queue = m_queueFactory.Create<Queue> ();
+  Ptr<SatQueue> queue = CreateObject<SatQueue> ();
   llc->SetQueue (queue);
 
   // Attach the device receive callback to SatNetDevice

@@ -26,6 +26,7 @@
 #include "ns3/traced-value.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/nstime.h"
+#include "satellite-queue.h"
 
 #include "ns3/object.h"
 
@@ -55,6 +56,18 @@ public:
   typedef Callback<void, Ptr<Packet> > ReceiveCallback;
 
   /**
+   * Set the used queue from outside
+   * \param queue Transmission queue
+   */
+  void SetQueue (Ptr<SatQueue> queue);
+
+  /**
+   * Get the queue instance
+   * \param queue
+   */
+  Ptr<SatQueue> GetQueue ();
+
+  /**
    * Method to set receive callback.
     * \param cb callback to invoke whenever a packet has been received and must
     *        be forwarded to the higher layers.
@@ -70,11 +83,20 @@ public:
 
 protected:
 
+  /**
+   * Used queue in satellite encapsulator
+   */
+  Ptr<SatQueue> m_txQueue;
+
+  /**
+   * Receive callback
+   */
   ReceiveCallback m_rxCallback;
 
   /**
    * Used to inform of a PDU delivery
    */
+
   TracedCallback<uint16_t, uint8_t, uint32_t> m_txPdu;
   /**
    * Used to inform of a PDU reception

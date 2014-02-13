@@ -55,6 +55,27 @@ private:
   Address   m_sourceAddress;
 };
 
+class SatRcIndexTag : public Tag
+{
+public:
+
+  SatRcIndexTag ();
+  ~SatRcIndexTag ();
+  void SetRcIndex (uint8_t rcIndex);
+  uint8_t GetRcIndex () const;
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (TagBuffer i) const;
+  virtual void Deserialize (TagBuffer i);
+  virtual void Print (std::ostream &os) const;
+
+private:
+  uint8_t m_rcIndex;
+};
+
+
 } // namespace ns3
 
 #endif /* SATELLITE_MAC_TAG_H */
