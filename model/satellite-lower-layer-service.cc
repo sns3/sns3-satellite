@@ -198,9 +198,9 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint32_t index)
  * for SatLowerLayerServiceConf in method GetTypeId.
  *
  * \param index Index of the service which attributes are added to configuration.
- * \param a1    'Maximum unique payload per block' attribute value [bytes]
- * \param a2    'Maximum consecutive block accessed' attribute value [bytes]
- * \param a3    'Minimum idle block' attribute value [bytes]
+ * \param a1    'Maximum unique payload per block' attribute value
+ * \param a2    'Maximum consecutive block accessed' attribute value
+ * \param a3    'Minimum idle block' attribute value
  *
  * \return TypeId
  */
@@ -234,12 +234,12 @@ SatLowerLayerServiceConf::GetTypeId (void)
                     "DA services in use.",
                      UintegerValue (2),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
-                     MakeUintegerChecker<uint32_t> (SatLowerLayerServiceConf::m_maxDaServiceEntries))
+                     MakeUintegerChecker<uint32_t> (0, SatLowerLayerServiceConf::m_maxDaServiceEntries))
     .AddAttribute ( "RaServiceCount",
                     "RA services in use.",
                      UintegerValue (2),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
-                     MakeUintegerChecker<uint32_t> (SatLowerLayerServiceConf::m_maxRaServiceEntries))
+                     MakeUintegerChecker<uint32_t> (0, SatLowerLayerServiceConf::m_maxRaServiceEntries))
     .AddAttribute ( "DynamicRatePersistence",
                     "Dynamic rate persistence for the lower layer service.",
                      UintegerValue (5),
