@@ -156,13 +156,12 @@ SatFrameConf::GetTimeSlotIds (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair < SatCarrierTimeSlotId_t::const_iterator,
-              SatCarrierTimeSlotId_t::const_iterator> timeSlotRange = m_carrierTimeSlotIds.equal_range (carrierId);
+  std::pair < SatCarrierTimeSlotMap_t::const_iterator,
+              SatCarrierTimeSlotMap_t::const_iterator> timeSlotRange = m_carrierTimeSlotIds.equal_range (carrierId);
 
   SatTimeSlotIdList_t timeSlots;
 
-
-  for (SatCarrierTimeSlotId_t::const_iterator it = timeSlotRange.first; it != timeSlotRange.second; it++)
+  for (SatCarrierTimeSlotMap_t::const_iterator it = timeSlotRange.first; it != timeSlotRange.second; it++)
     {
       timeSlots.push_back (it->second);
     }
@@ -189,8 +188,9 @@ NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf);
 SatSuperframeConf::SatSuperframeConf ()
  : m_usedBandwidthHz (0.0),
    m_durationInSeconds (0.0),
-   m_framesInUse (0),
-   m_configTypeIndex (0)
+   m_frameCount (0),
+   m_configTypeIndex (0),
+   m_carrierCount (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -223,7 +223,19 @@ SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
 {
   NS_LOG_FUNCTION (this);
 
+  // in case of random access frame, store carriers to RA channel container
+  if ( conf->IsRandomAccess () )
+    {
+      uint32_t frameId = m_frames.size ();
+
+      for ( uint32_t i = 0; i < conf->GetCarrierCount (); i++)
+        {
+          m_raChannels.push_back ( std::make_pair (frameId, i) );
+        }
+    }
+
   m_frames.push_back (conf);
+  m_carrierCount += conf->GetCarrierCount ();
 }
 
 Ptr<SatFrameConf>
@@ -239,14 +251,7 @@ SatSuperframeConf::GetCarrierCount () const
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t carrierCount = 0;
-
-  for (uint8_t i = 0; i < m_frames.size (); i++)
-    {
-      carrierCount += m_frames[i]->GetCarrierCount ();
-    }
-
-  return carrierCount;
+  return m_carrierCount;
 }
 
 uint32_t
@@ -309,7 +314,7 @@ SatSuperframeConf::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierB
 }
 
 void
-SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint32_t frameIndex, double bandwidhtHz)
+SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz)
 {
   NS_LOG_FUNCTION (this << frameIndex << bandwidhtHz);
 
@@ -322,7 +327,7 @@ SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint32_t frameIndex, double ban
 }
 
 void
-SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex, double bandwidhtHz)
+SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz)
 {
   NS_LOG_FUNCTION (this << frameIndex << bandwidhtHz);
 
@@ -335,7 +340,7 @@ SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex, dou
 }
 
 void
-SatSuperframeConf::SetFrameCarrierSpacing (uint32_t frameIndex, double spacing)
+SatSuperframeConf::SetFrameCarrierSpacing (uint8_t frameIndex, double spacing)
 {
   NS_LOG_FUNCTION (this << frameIndex << spacing);
 
@@ -348,7 +353,7 @@ SatSuperframeConf::SetFrameCarrierSpacing (uint32_t frameIndex, double spacing)
 }
 
 void
-SatSuperframeConf::SetFrameCarrierRollOff (uint32_t frameIndex, double rollOff)
+SatSuperframeConf::SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff)
 {
   NS_LOG_FUNCTION (this << frameIndex << rollOff);
 
@@ -361,7 +366,7 @@ SatSuperframeConf::SetFrameCarrierRollOff (uint32_t frameIndex, double rollOff)
 }
 
 void
-SatSuperframeConf::SetFrameRandomAccess (uint32_t frameIndex, bool randomAccess)
+SatSuperframeConf::SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess)
 {
   NS_LOG_FUNCTION (this << frameIndex << randomAccess);
 
@@ -374,7 +379,7 @@ SatSuperframeConf::SetFrameRandomAccess (uint32_t frameIndex, bool randomAccess)
 }
 
 double
-SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint32_t frameIndex) const
+SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -387,7 +392,7 @@ SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint32_t frameIndex) const
 }
 
 double
-SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex) const
+SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -400,7 +405,7 @@ SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex) con
 }
 
 double
-SatSuperframeConf::GetFrameCarrierSpacing (uint32_t frameIndex) const
+SatSuperframeConf::GetFrameCarrierSpacing (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -413,7 +418,7 @@ SatSuperframeConf::GetFrameCarrierSpacing (uint32_t frameIndex) const
 }
 
 double
-SatSuperframeConf::GetFrameCarrierRollOff (uint32_t frameIndex) const
+SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -426,7 +431,7 @@ SatSuperframeConf::GetFrameCarrierRollOff (uint32_t frameIndex) const
 }
 
 bool
-SatSuperframeConf::GetFrameRandomAccess (uint32_t frameIndex) const
+SatSuperframeConf::GetFrameIsRandomAccess (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -452,7 +457,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
     {
       case 0:
         {
-          for (uint32_t frameIndex = 0; frameIndex < m_framesInUse; frameIndex++)
+          for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
             {
               // Create BTU conf according to given attributes
               Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameCarrierAllocatedBandwidth[frameIndex],
@@ -512,31 +517,63 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
     }
 }
 
-/**
- * Method to convert number to string
- * \param number number to convert as string
- * \return number as string
- */
-static
-std::string GetNumberAsString (uint32_t number)
+SatFrameConf::SatTimeSlotIdList_t
+SatSuperframeConf::GetRaChannels (uint32_t raChannel)
 {
-  std::stringstream ss;   //create a string stream
-  ss << number;           //add number to the stream
+  NS_LOG_FUNCTION (this);
 
-  return ss.str();
+  SatFrameConf::SatTimeSlotIdList_t timeSlots;
+
+  if ( raChannel < m_raChannels.size ())
+    {
+      uint8_t frameId = m_raChannels[raChannel].first;
+      uint32_t carrierId = m_raChannels[raChannel].second;
+
+      timeSlots = m_frames[frameId]->GetTimeSlotIds (carrierId);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Channel out of range!!!");
+    }
+
+  return timeSlots;
 }
 
-/**
- * Method to convert frame index to frame name.
- *
- * \param index index to convert as frame name
- * \return frame name
- */
-static std::string GetIndexAsFrameName (uint32_t index)
+uint32_t
+SatSuperframeConf::GetRaChannelCount () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_raChannels.size ();
+}
+
+uint8_t
+SatSuperframeConf::GetRaChannelFrameId (uint32_t raChannel) const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint8_t frameId = 0;
+
+  if ( raChannel < m_raChannels.size ())
+    {
+      frameId = m_raChannels[raChannel].first;
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Channel out of range!!!");
+    }
+
+  return frameId;
+}
+
+std::string
+SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
 {
   std::string name = "Frame";
   return name + GetNumberAsString (index);
 }
+
+// macro to call base class converter function with shorter name in macro ADD_FRAME_ATTRIBUTES
+#define GetIndexAsFrameName(index) SatSuperframeConf::GetIndexAsFrameName(index)
 
 // macro to ease definition of attributes for several frames
 #define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, randomAccess ) \

@@ -126,7 +126,7 @@ SatSuperframeSeq::GetDurationInSeconds ( uint8_t seqId ) const
 }
 
 Ptr<SatSuperframeConf>
-SatSuperframeSeq::GetSuperframeConf(uint8_t seqId) const
+SatSuperframeSeq::GetSuperframeConf (uint8_t seqId) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -246,11 +246,13 @@ SatSuperframeSeq::GetTbtpMessage (uint32_t beamId, uint32_t msgId) const
         }
       else
         {
-          NS_FATAL_ERROR ("Dynamic cast to SatTbtpMessage was not successfull!");
+          NS_FATAL_ERROR ("Dynamic cast to SatTbtpMessage was not successful!");
         }
     }
 
   return msg;
 }
+
+
 
 }; // namespace ns3

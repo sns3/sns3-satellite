@@ -61,21 +61,21 @@ public:
   /**
    * Get bandwidth of BTU.
    *
-   * \return The bandwidth of BTU in Hertz.
+   * \return The bandwidth of BTU in hertz.
    */
   inline double GetAllocatedBandwidthHz () const { return m_allocatedBandwidthHz; }
 
   /**
    * Get occupied bandwidth of BTU.
    *
-   * \return The occupied bandwidth of BTU in Hertz.
+   * \return The occupied bandwidth of BTU in hertz.
    */
   inline double GetOccupiedBandwidthHz () const { return m_occupiedBandwidthHz; }
 
   /**
    * Get occupied bandwidth of BTU.
    *
-   * \return The occupied bandwidth of BTU in Hertz.
+   * \return The occupied bandwidth of BTU in hertz.
    */
   inline double GetEffectiveBandwidthHz () const { return m_effectiveBandwidthHz; }
 
@@ -179,6 +179,11 @@ public:
                  SatTimeSlotConfList_t * timeSlots, bool isRandomAccess );
 
   /**
+   * Destructor for SatFrameConf
+   */
+  ~SatFrameConf ();
+
+  /**
    * Add time slot.
    *
    * \param conf  Time slot conf added.
@@ -277,15 +282,16 @@ public:
    */
   SatTimeSlotIdList_t GetTimeSlotIds (uint32_t carrierId) const;
 
+  /**
+   * Get state if frame is random access frame.
+   *
+   * \return Is frame random access frame [true or false]
+   */
   inline bool IsRandomAccess () const { return m_isRandomAccess;}
 
-  /**
-   * Destructor for SatFrameConf
-   */
-  ~SatFrameConf ();
-
 private:
-  typedef std::multimap<uint32_t, uint16_t> SatCarrierTimeSlotId_t;
+  //
+  typedef std::multimap<uint32_t, uint16_t> SatCarrierTimeSlotMap_t;
 
   double    m_bandwidthHz;
   double    m_durationInSeconds;
@@ -295,7 +301,7 @@ private:
   Ptr<SatBtuConf>         m_btu;
   uint32_t                m_carrierCount;
   SatTimeSlotConfList_t   m_timeSlotConfs;
-  SatCarrierTimeSlotId_t  m_carrierTimeSlotIds;
+  SatCarrierTimeSlotMap_t  m_carrierTimeSlotIds;
 };
 
 
@@ -308,8 +314,30 @@ class SatSuperframeConf : public Object
 public:
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
-  static const uint32_t m_maxFrameCount = 10;
+  static const uint8_t m_maxFrameCount = 10;
   static const uint32_t m_maxFrameConfigTypeIndex = 3;
+
+  /**
+   * Template method to convert number to string
+   * \param number number to convert as string
+   * \return number as string
+   */
+  template <class T>
+  static std::string GetNumberAsString (T number)
+  {
+    std::stringstream ss;   //create a string stream
+    ss << number;           //add number to the stream
+
+    return ss.str();
+  }
+
+  /**
+   * Method to convert frame index to frame name.
+   *
+   * \param index index to convert as frame name
+   * \return frame name
+   */
+  static std::string GetIndexAsFrameName(uint32_t index);
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -329,7 +357,7 @@ public:
   /**
    * Get bandwidth of the super frame.
    *
-   * \return The bandwidth of super frame in Hertz.
+   * \return The bandwidth of super frame in hertz.
    */
   inline double GetBandwidthHz () const { return m_usedBandwidthHz; }
 
@@ -400,18 +428,41 @@ public:
   virtual void DoConfigure () = 0;
 
   /**
+   * Get RA channel time slots
+   *
+   * \param raChannel RA channel, which slot are requested
+   * \return RA channel time slots
+   */
+  SatFrameConf::SatTimeSlotIdList_t GetRaChannels (uint32_t raChannel);
+
+  /**
+   * Get the number of the RA channels in super frame configuration.
+   *
+   * \return Number of the RA channels
+   */
+  uint32_t GetRaChannelCount () const;
+
+  /**
+   * Get RA channel frame ID.
+   *
+   * \param raChannel RA channel, which frame ID is requested
+   * \return RA channel frame ID
+   */
+  uint8_t GetRaChannelFrameId (uint32_t raChannel) const;
+
+  /**
    * Set number of frames to be used in super frame.
    *
    * \param frameCount Number of the frames in use
    */
-  inline void SetFrameCount (uint32_t frameCount) { m_framesInUse = frameCount; }
+  inline void SetFrameCount (uint8_t frameCount) { m_frameCount = frameCount; }
 
   /**
    * Get number of frames to be used in super frame.
    *
    * \return Number of the frames in use
    */
-  inline uint32_t GetFrameCount () const { return m_framesInUse; }
+  inline uint8_t GetFrameCount () const { return m_frameCount; }
 
   /**
    * Set frame configuration type to be used in super frame.
@@ -427,23 +478,25 @@ public:
   inline uint32_t GetConfigType () const { return m_configTypeIndex; }
 
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
-  void SetFrameAllocatedBandwidthHz (uint32_t frameIndex, double bandwidhtHz);
-  void SetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex, double bandwidhtHz);
-  void SetFrameCarrierSpacing (uint32_t frameIndex, double spacing);
-  void SetFrameCarrierRollOff (uint32_t frameIndex, double rollOff);
-  void SetFrameRandomAccess (uint32_t frameIndex, bool randomAccess);
+  void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
+  void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
+  void SetFrameCarrierSpacing (uint8_t frameIndex, double spacing);
+  void SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff);
+  void SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess);
 
-  double GetFrameAllocatedBandwidthHz (uint32_t frameIndex) const;
-  double GetFrameCarrierAllocatedBandwidthHz (uint32_t frameIndex) const;
-  double GetFrameCarrierSpacing (uint32_t frameIndex) const;
-  double GetFrameCarrierRollOff (uint32_t frameIndex) const;
-  bool GetFrameRandomAccess (uint32_t frameIndex) const;
+  double GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const;
+  double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
+  double GetFrameCarrierSpacing (uint8_t frameIndex) const;
+  double GetFrameCarrierRollOff (uint8_t frameIndex) const;
+  bool GetFrameIsRandomAccess (uint8_t frameIndex) const;
 
 private:
+  typedef std::pair<uint8_t, uint32_t> RaChannelInfo_t;
+
   double    m_usedBandwidthHz;
   double    m_durationInSeconds;
 
-  uint32_t  m_framesInUse;
+  uint8_t   m_frameCount;
   uint32_t  m_configTypeIndex;
 
   double    m_frameAllocatedBandwidth[m_maxFrameCount];
@@ -452,7 +505,9 @@ private:
   double    m_frameCarrierRollOff[m_maxFrameCount];
   bool      m_frameIsRandomAccess[m_maxFrameCount];
 
-  SatFrameConfList_t m_frames;
+  SatFrameConfList_t            m_frames;
+  std::vector<RaChannelInfo_t>  m_raChannels;
+  uint32_t                      m_carrierCount;
 
 public:
   // macro to ease definition of access methods for frame specific attributes
@@ -476,7 +531,7 @@ public:
     inline void SetFrame ## index ## RandomAccess (bool value)  \
       { return SetFrameRandomAccess (index, value); } \
     inline double GetFrame ## index ## RandomAccess () const      \
-      { return GetFrameRandomAccess (index); }
+      { return GetFrameIsRandomAccess (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines

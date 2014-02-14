@@ -119,12 +119,20 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   NS_LOG_FUNCTION (this << utId);
 
   UtInfo utInfo;
-  utInfo.m_llsConf = llsConf;
+
+  Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
+
+  utInfo.m_damaEntry = damaEntry;
   utInfo.m_cno = NAN;
+
+  // TODO: CAC check needed to add
 
   std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair (utId, utInfo));
 
-  NS_ASSERT (result.second == true);
+  if (result.second == false)
+    {
+      NS_FATAL_ERROR ("UT (Address: " << utId << ") already added to Beam scheduler.");
+    }
 }
 
 void
@@ -154,17 +162,18 @@ SatBeamScheduler::Schedule ()
 {
   NS_LOG_FUNCTION (this);
 
+  // check that there is UTs to schedule
   if ( m_uts.size() > 0 )
     {
+      InitializeScheduling ();
+
       // create TBTP  message
       Ptr<SatTbtpMessage> tbtpMsg = CreateObject<SatTbtpMessage> ();
       tbtpMsg->SetSuperframeCounter (m_superFrameCounter++);
 
       // schedule time slots according to static configuration 0
       // TODO: algorithms for other configurations
-      InitializeScheduling ();
       ScheduleUts (tbtpMsg);
-      ScheduleRandomSlots (tbtpMsg);
 
       uint32_t msgId = m_superframeSeq->AddTbtpMessage (m_beamId, tbtpMsg);
 
@@ -184,35 +193,6 @@ SatBeamScheduler::Schedule ()
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
-}
-
-void SatBeamScheduler::ScheduleRandomSlots (Ptr<SatTbtpMessage> header)
-{
-  NS_LOG_FUNCTION (this);
-
-  Ptr<SatFrameConf> frameConf = NULL;
-  uint32_t frameId = 0;
-
-  // find frame for RA entries
-  for ( uint32_t i = 0; ( (i <  m_superframeSeq->GetSuperframeConf (0)->GetFrameCount ()) && (frameConf == NULL) ); i++ )
-    {
-      if ( m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (i)->IsRandomAccess () )
-        {
-          frameConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (0);
-          frameId = i;
-        }
-   }
-
-  if ( frameConf != NULL )
-    {
-      SatFrameConf::SatTimeSlotIdList_t timeSlots = frameConf->GetTimeSlotIds (0);
-
-      for (SatFrameConf::SatTimeSlotIdList_t::const_iterator it = timeSlots.begin (); it != timeSlots.end (); it++ )
-        {
-          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (frameId, (*it) );
-          header->SetTimeslot (Mac48Address::GetBroadcast (), timeSlotInfo);
-        }
-    }
 }
 
 void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)

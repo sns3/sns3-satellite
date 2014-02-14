@@ -23,6 +23,7 @@
 
 #include <map>
 
+#include "ns3/simple-ref-count.h"
 #include "satellite-lower-layer-service.h"
 
 namespace ns3 {
@@ -35,7 +36,7 @@ namespace ns3 {
  * It's is created and used by NCC.
  *
  */
-class SatDamaEntry
+class SatDamaEntry : public SimpleRefCount<SatDamaEntry>
 {
 public:
   /**

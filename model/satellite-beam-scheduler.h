@@ -30,7 +30,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
 #include "ns3/satellite-superframe-sequence.h"
-#include "satellite-lower-layer-service.h"
+#include "satellite-dama-entry.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -125,14 +125,10 @@ private:
   class UtInfo
   {
     public:
-      Ptr<SatLowerLayerServiceConf>  m_llsConf; // Lower layer service configuration for the UT
-      double                         m_cno;     // The latest calculated value of C/N0
+      Ptr<SatDamaEntry>   m_damaEntry; // dama entry
+      double              m_cno;       // The latest calculated value of C/N0
 
-      UtInfo()
-        : m_llsConf (0),
-          m_cno (NAN)
-        {
-        }
+      UtInfo() : m_cno (NAN) {}
   };
 
   SatBeamScheduler& operator = (const SatBeamScheduler &);
@@ -144,7 +140,6 @@ private:
 
   void InitializeScheduling ();
   void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
-  void ScheduleRandomSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
 
