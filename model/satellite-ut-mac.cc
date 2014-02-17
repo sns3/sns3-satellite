@@ -66,7 +66,7 @@ SatUtMac::GetTypeId (void)
                    TimeValue (MilliSeconds (250)),
                    MakeTimeAccessor (&SatUtMac::m_crInterval),
                    MakeTimeChecker ())
-    .AddAttribute( "FramePduHeaderSize",
+    .AddAttribute ("FramePduHeaderSize",
                    "Frame PDU header size in bytes",
                    UintegerValue (1),
                    MakeUintegerAccessor (&SatUtMac::m_framePduHeaderSizeInBytes),
@@ -123,6 +123,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
 	if (randomAccessConf != NULL && randomAccessModel != SatRandomAccess::RA_OFF)
 	  {
 	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
+	    m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
 	  }
 
 	m_tbtpContainer = CreateObject<SatTbtpContainer> ();
@@ -384,10 +385,20 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex)
   if (event == SatQueue::FIRST_BUFFERED_PKT)
     {
       NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
+
+      if (m_randomAccess != NULL)
+        {
+          DoRandomAccess ();
+        }
     }
   else if (event == SatQueue::BUFFERED_PKT)
     {
       NS_LOG_LOGIC ("BUFFERED_PKT event received from queue: " << rcIndex);
+
+      if (m_randomAccess != NULL)
+        {
+          DoRandomAccess ();
+        }
     }
   else
     {
@@ -523,6 +534,168 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
         break;
       }
   }
+}
+
+void
+SatUtMac::DoRandomAccess ()
+{
+  NS_LOG_FUNCTION (this);
+
+  SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities;
+
+  /// select the RA allocation channel
+  uint32_t allocationChannel = GetNextRandomAccessAllocationChannel ();
+
+  /// run random access algorithm
+  txOpportunities = m_randomAccess->DoRandomAccess (allocationChannel);
+
+  /// process Slotted ALOHA Tx opportunities
+  if (txOpportunities.txOpportunityType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
+    {
+      Time txOpportunity = Time::FromInteger (Now ().GetMilliSeconds () + txOpportunities.slottedAlohaTxOpportunity, Time::MS);
+
+      /// schedule the check for next available RA slot
+      Simulator::Schedule (txOpportunity, &SatUtMac::FindNextAvailableRandomAccessSlot, this, allocationChannel);
+    }
+  /// process CRDSA Tx opportunities
+  else if (txOpportunities.txOpportunityType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
+    {
+      /// schedule CRDSA transmission
+      ScheduleCrdsaTransmission (txOpportunities);
+    }
+}
+
+uint32_t
+SatUtMac::GetNextRandomAccessAllocationChannel ()
+{
+  NS_LOG_FUNCTION (this);
+
+  /// at the moment allocation channel is only randomly selected
+  return m_uniformRandomVariable->GetInteger (0, m_llsConf->GetRaServiceCount ());
+}
+
+void
+SatUtMac::FindNextAvailableRandomAccessSlot (uint32_t allocationChannel)
+{
+  /// TODO find the next slot taking into account the already used time slots in this frame
+  uint32_t usedSlot = 10;
+
+  /// update used slots
+  UpdateUsedRandomAccessSlots (allocationChannel, usedSlot);
+
+  /// TODO schedule transmission from the control queue at the matching slot
+}
+
+void
+SatUtMac::ScheduleCrdsaTransmission (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities)
+{
+  /// TODO schedule CRDSA transmissions
+
+  /// update used slots
+  UpdateUsedRandomAccessSlots (txOpportunities);
+}
+
+void
+SatUtMac::UpdateUsedRandomAccessSlots (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities)
+{
+  std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
+
+  /// TODO this needs to be implemented
+  uint32_t currentFrameId = 5;
+
+  /// remove past RA Tx opportunity information
+  RemovePastRandomAccessSlots (currentFrameId);
+
+  std::pair <uint32_t, uint32_t> key = std::make_pair (currentFrameId, txOpportunities.crdsaTxOpportunities.first);
+
+  iter = m_usedRandomAccessSlots.find (key);
+
+  if (iter == m_usedRandomAccessSlots.end ())
+    {
+      std::pair <std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator, bool> result;
+
+      result = m_usedRandomAccessSlots.insert (std::make_pair (key, txOpportunities.crdsaTxOpportunities.second));
+
+      if (!result.second)
+        {
+          NS_FATAL_ERROR ("SatUtMac::UpdateUsedRandomAccessSlots - Insert failed");
+        }
+    }
+  else
+    {
+      std::set<uint32_t>::iterator setIter;
+      std::pair<std::set<uint32_t>::iterator,bool> result;
+
+      for (setIter = txOpportunities.crdsaTxOpportunities.second.begin (); setIter != txOpportunities.crdsaTxOpportunities.second.end (); setIter++)
+        {
+          result = iter->second.insert (*setIter);
+
+          if (!result.second)
+            {
+              NS_FATAL_ERROR ("SatUtMac::UpdateUsedRandomAccessSlots - Insert failed");
+            }
+        }
+    }
+}
+
+void
+SatUtMac::UpdateUsedRandomAccessSlots (uint32_t allocationChannelId, uint32_t slotId)
+{
+  std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
+
+  /// TODO this needs to be implemented
+  uint32_t currentFrameId = 5;
+
+  /// remove past RA Tx opportunity information
+  RemovePastRandomAccessSlots (currentFrameId);
+
+  std::pair <uint32_t, uint32_t> key = std::make_pair (currentFrameId, allocationChannelId);
+
+  iter = m_usedRandomAccessSlots.find (key);
+
+  if (iter == m_usedRandomAccessSlots.end ())
+    {
+      std::set<uint32_t> txOpportunities;
+      std::pair <std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator, bool> result;
+
+      txOpportunities.insert (slotId);
+
+      result = m_usedRandomAccessSlots.insert (std::make_pair (key, txOpportunities));
+
+      if (!result.second)
+        {
+          NS_FATAL_ERROR ("SatUtMac::UpdateUsedRandomAccessSlots - Insert failed");
+        }
+    }
+  else
+    {
+      std::pair<std::set<uint32_t>::iterator,bool> result;
+      result = iter->second.insert (slotId);
+
+      if (!result.second)
+        {
+          NS_FATAL_ERROR ("SatUtMac::UpdateUsedRandomAccessSlots - Insert failed");
+        }
+    }
+}
+
+void
+SatUtMac::RemovePastRandomAccessSlots (uint32_t currentFrameId)
+{
+  std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
+
+  /// TODO this functionality needs to be checked!
+  for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); )
+    {
+      if (iter->first.first < currentFrameId)
+        {
+          m_usedRandomAccessSlots.erase(iter++);
+        }
+      else
+        {
+          ++iter;
+        }
+    }
 }
 
 } // namespace ns3

@@ -139,6 +139,49 @@ protected:
    void DoDispose (void);
 
 private:
+
+   /**
+    * Do random access evaluation for Tx opportunities
+    */
+   void DoRandomAccess ();
+
+   /**
+    *
+    * \return
+    */
+   uint32_t GetNextRandomAccessAllocationChannel ();
+
+   /**
+    *
+    * \param allocationChannel
+    */
+   void FindNextAvailableRandomAccessSlot (uint32_t allocationChannel);
+
+   /**
+    *
+    * \param results
+    */
+   void ScheduleCrdsaTransmission (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
+
+   /**
+    *
+    * \param txOpportunities
+    */
+   void UpdateUsedRandomAccessSlots (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
+
+   /**
+    *
+    * \param currentFrameId
+    */
+   void RemovePastRandomAccessSlots (uint32_t currentFrameId);
+
+   /**
+    *
+    * \param allocationChannel
+    * \param slot
+    */
+   void UpdateUsedRandomAccessSlots (uint32_t allocationChannel, uint32_t slot);
+
    /**
     * Send capacity request update to GW.
     */
@@ -245,6 +288,16 @@ private:
    * Container for storing all the TBTP information related to this UT.
    */
   Ptr<SatTbtpContainer> m_tbtpContainer;
+
+  /**
+   *
+   */
+  Ptr<UniformRandomVariable> m_uniformRandomVariable;
+
+  /**
+   *
+   */
+  std::map < std::pair<uint32_t, uint32_t>, std::set<uint32_t> > m_usedRandomAccessSlots;
 };
 
 } // namespace ns3

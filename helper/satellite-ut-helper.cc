@@ -221,6 +221,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, randomAccessConf, m_randomAccessModel);
+  mac->SetAttribute ("LowerLayerServiceConf", PointerValue (m_llsConf));
 
   // Set timing advance callback to mac.
   Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();

@@ -52,26 +52,26 @@ public:
   } RandomAccessModel_t;
 
   /**
-   * \enum RandomAccessResultType_t
-   * \brief Random access result types
+   * \enum RandomAccessTxOpportunityType_t
+   * \brief Random access Tx opportunity types
    */
   typedef enum
   {
     RA_DO_NOTHING = 0,
     RA_SLOTTED_ALOHA_TX_OPPORTUNITY = 1,
     RA_CRDSA_TX_OPPORTUNITY = 2,
-  } RandomAccessResultType_t;
+  } RandomAccessTxOpportunityType_t;
 
   /**
-   * \struct RandomAccessResults_s
-   * \brief Random access results
+   * \struct RandomAccessTxOpportunities_s
+   * \brief Random access Tx opportunities
    */
   typedef struct
   {
-    RandomAccessResultType_t resultType;
-    uint32_t slottedAlohaResult;
-    std::map<uint32_t,std::set<uint32_t> > crdsaResult;
-  } RandomAccessResults_s;
+    RandomAccessTxOpportunityType_t txOpportunityType;
+    uint32_t slottedAlohaTxOpportunity;
+    std::pair<uint32_t,std::set<uint32_t> > crdsaTxOpportunities;
+  } RandomAccessTxOpportunities_s;
 
   /**
    * \brief Constructor
@@ -152,7 +152,7 @@ public:
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s DoRandomAccess (uint32_t allocationChannel);
+  SatRandomAccess::RandomAccessTxOpportunities_s DoRandomAccess (uint32_t allocationChannel);
 
 private:
 
@@ -179,13 +179,6 @@ private:
    * \param allocationChannel
    * \return
    */
-  bool IsCrdsaAllocationChannelFree (uint32_t allocationChannel);
-
-  /**
-   *
-   * \param allocationChannel
-   * \return
-   */
   bool IsCrdsaBackoffProbabilityTooHigh (uint32_t allocationChannel);
 
   /**
@@ -197,7 +190,7 @@ private:
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s DoSlottedAloha ();
+  SatRandomAccess::RandomAccessTxOpportunities_s DoSlottedAloha ();
 
   /**
     *
@@ -214,7 +207,7 @@ private:
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s DoCrdsa (uint32_t allocationChannel);
+  SatRandomAccess::RandomAccessTxOpportunities_s DoCrdsa (uint32_t allocationChannel);
 
   /**
    *
@@ -240,7 +233,7 @@ private:
    *
    * \return
    */
-  SatRandomAccess::RandomAccessResults_s CrdsaPrepareToTransmit (uint32_t allocationChannel);
+  SatRandomAccess::RandomAccessTxOpportunities_s CrdsaPrepareToTransmit (uint32_t allocationChannel);
 
   /**
    *

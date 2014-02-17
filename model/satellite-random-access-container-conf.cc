@@ -67,10 +67,14 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
 
+      /// TODO this comes from frame configuration?
       GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (79);
+
+      /// TODO this comes from RA dynamic load control
       GetAllocationChannelConfiguration (i)->SetCrdsaMaximumBackoffProbability (0.2);
 
+      /// TODO from random access traffic method descriptor 6.4.17.26
       GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (2);
 
       /// TODO these need to be implemented from RA service descriptor

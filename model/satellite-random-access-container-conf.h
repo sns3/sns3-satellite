@@ -61,6 +61,7 @@ public:
 
   /**
    *
+   * \param allocationChannel
    * \return
    */
   Ptr<SatRandomAccessAllocationChannel> GetAllocationChannelConfiguration (uint32_t allocationChannel);
@@ -96,8 +97,8 @@ private:
   std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
 
   /**
-   * \brief
-   * in milliseconds
+   * \brief .... in milliseconds
+   *
    */
   uint32_t slottedAlohaControlRandomizationInterval;
 
