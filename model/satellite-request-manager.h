@@ -23,6 +23,7 @@
 
 #include "ns3/object.h"
 #include "satellite-queue.h"
+#include "satellite-lower-layer-service.h"
 
 namespace ns3 {
 
@@ -36,6 +37,7 @@ class SatRequestManager : public Object
 public:
 
   SatRequestManager ();
+  SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf);
   virtual ~SatRequestManager ();
 
   // inherited from Object
@@ -76,12 +78,18 @@ private:
    * Do evaluation of the buffer status and decide whether or not
    * to send CRs
    */
-  void DoEvaluation ();
+  void DoEvaluation (bool periodical);
 
   /**
    * The queue enque/deque rate getter callback
    */
   CallbackContainer_t m_queueCallbacks;
+
+  /**
+  * Lower layer services conf pointer, which holds the configurations
+  * for RCs and capacity allocation categories.
+  */
+  Ptr<SatLowerLayerServiceConf> m_llsConf;
 
   /**
    * Interval to do the periodical CR evaluation

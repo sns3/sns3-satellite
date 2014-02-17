@@ -248,7 +248,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatLlc> llc = CreateObject<SatLlc> ();
 
   // Create a request manager and attach it to LLC
-  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
+  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> (m_llsConf);
   llc->AddRequestManager (rm);
 
   // Attach the PHY layer to SatNetDevice
@@ -274,10 +274,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
 
   // Return link
-  uint32_t numSupportedRcs (2);
-  // Creation of encapsulators start always from RC index number 1, since 0
-  // is reserved for control.
-  for (uint32_t rc = 1; rc <= numSupportedRcs; ++rc)
+  uint32_t rcIndeces = m_llsConf->GetDaServiceCount ();
+  NS_ASSERT (rcIndeces >= 2);
+  for (uint32_t rc = 1; rc <= rcIndeces; ++rc)
     {
       Ptr<SatReturnLinkEncapsulator> utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
       llc->AddEncap (addr, utEncap, rc); // Tx

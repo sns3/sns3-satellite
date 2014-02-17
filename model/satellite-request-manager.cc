@@ -30,16 +30,25 @@ NS_OBJECT_ENSURE_REGISTERED (SatRequestManager);
 
 
 SatRequestManager::SatRequestManager ()
-:m_requestInterval (MilliSeconds (100)),
+:m_llsConf (),
+ m_requestInterval (MilliSeconds (100)),
  m_rcIndex (0)
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (false);
+}
 
+SatRequestManager::SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf)
+:m_llsConf (llsConf),
+ m_requestInterval (MilliSeconds (100)),
+ m_rcIndex (0)
+{
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   // Start the request manager evaluation cycle
   Simulator::Schedule (m_requestInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
 }
+
 
 SatRequestManager::~SatRequestManager ()
 {
@@ -82,6 +91,8 @@ void SatRequestManager::DoDispose ()
     }
   m_queueCallbacks.clear ();
 
+  m_llsConf = NULL;
+
   Object::DoDispose ();
 }
 
@@ -94,7 +105,7 @@ SatRequestManager::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcI
     {
       NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
 
-      DoEvaluation ();
+      //DoEvaluation (false);
     }
   else if (event == SatQueue::BUFFERED_PKT)
     {
@@ -111,28 +122,63 @@ SatRequestManager::DoPeriodicalEvaluation ()
 {
   NS_LOG_FUNCTION (this);
 
-  DoEvaluation ();
+  DoEvaluation (true);
 
   // Schedule next evaluation interval
   Simulator::Schedule (m_requestInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
 }
 
 void
-SatRequestManager::DoEvaluation ()
+SatRequestManager::DoEvaluation (bool periodical)
 {
   NS_LOG_FUNCTION (this);
 
-  /**
-   * TODO: this does not do anything yet!
-   */
-  /*
-  double enqueBitrate (0.0);
-  if (!m_queueCallback.IsNull ())
+  NS_LOG_LOGIC ("---Start request manager evaluation---");
+
+  bool reset = (periodical = true ? true : false);
+
+  // Go through the RC indeces
+  for (uint32_t rc = 0; rc < m_llsConf->GetDaServiceCount(); ++rc)
     {
-      enqueBitrate = m_queueCallback (m_rcIndex);
+      struct SatQueue::QueueStats_t stats = m_queueCallbacks.at(rc)(reset);
+
+      NS_LOG_LOGIC ("Enque bitrate: " << stats.m_enqueRate);
+      NS_LOG_LOGIC ("Deque bitrate: " << stats.m_dequeRate);
+      NS_LOG_LOGIC ("Buffered bytes: " << stats.m_bufferedBytes);
+
+      //m_llsConf->GetDaConstantAssignmentProvided (rc);
+      //m_llsConf->GetDaConstantServiceRateStream (rc);
+
+      // RBDC
+      if (m_llsConf->GetDaRbdcAllowed (rc))
+        {
+          double requestedRate = stats.m_enqueRate;
+          if (requestedRate < m_llsConf->GetDaMinimumServiceRateInKbps (rc))
+            {
+              requestedRate = m_llsConf->GetDaMinimumServiceRateInKbps (rc);
+            }
+          else if (requestedRate > m_llsConf->GetDaMaximumServiceRateInKbps (rc))
+            {
+              requestedRate = m_llsConf->GetDaMaximumServiceRateInKbps (rc);
+            }
+
+          NS_LOG_LOGIC ("RBDC request [kbps]: " << requestedRate);
+        }
+
+      // VBDC
+      if (m_llsConf->GetDaVolumeAllowed (rc))
+        {
+          uint32_t bytes = stats.m_bufferedBytes;
+          if (bytes > m_llsConf->GetDaMaximumBacklogInBytes (rc))
+            {
+              bytes = m_llsConf->GetDaMaximumBacklogInBytes (rc);
+            }
+
+          NS_LOG_LOGIC ("VBDC request [bytes]: " << bytes);
+        }
     }
-  NS_LOG_LOGIC ("Periodically evaluated enque bitrate: " << enqueBitrate);
-  */
+
+  NS_LOG_LOGIC ("---End request manager evaluation---");
 }
 
 

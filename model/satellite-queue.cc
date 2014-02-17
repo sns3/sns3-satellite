@@ -86,7 +86,7 @@ SatQueue::SatQueue (uint32_t rcIndex)
   m_nTotalDroppedPackets (),
   m_nEnqueBytesSinceReset (0),
   m_nDequeBytesSinceReset (0),
-  m_statResetTime (0)
+  m_statResetTime (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -129,6 +129,7 @@ bool
 SatQueue::Enqueue (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
+  NS_LOG_LOGIC ("Enque " << p->GetSize () << " bytes");
 
   if (m_packets.size () >= m_maxPackets)
     {
@@ -151,6 +152,8 @@ SatQueue::Enqueue (Ptr<Packet> p)
 
   m_nTotalReceivedBytes += p->GetSize ();
   ++m_nTotalReceivedPackets;
+
+  m_nEnqueBytesSinceReset += p->GetSize ();
 
   m_packets.push_back (p);
 
@@ -176,6 +179,8 @@ SatQueue::Dequeue (void)
 
   m_nBytes -= p->GetSize ();
   --m_nPackets;
+
+  m_nDequeBytesSinceReset += p->GetSize ();
 
   NS_LOG_LOGIC ("Popped " << p);
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
@@ -211,6 +216,8 @@ SatQueue::PushFront (Ptr<Packet> p)
 
   ++m_nPackets;
   m_nBytes += p->GetSize ();
+
+  m_nEnqueBytesSinceReset += p->GetSize ();
 }
 
 void
@@ -297,14 +304,18 @@ SatQueue::GetQueueStatistics (bool reset)
 {
   QueueStats_t queueStats;
   Time duration = Simulator::Now () - m_statResetTime;
-  queueStats.m_enqueRate = 8.0 * m_nEnqueBytesSinceReset / duration.GetSeconds ();
-  queueStats.m_dequeRate = 8.0 * m_nDequeBytesSinceReset / duration.GetSeconds ();
 
-  if (reset)
+  if (duration.IsPositive())
     {
-      ResetShortTermStatistics ();
-    }
+      queueStats.m_enqueRate = 8.0 * m_nEnqueBytesSinceReset / duration.GetSeconds ();
+      queueStats.m_dequeRate = 8.0 * m_nDequeBytesSinceReset / duration.GetSeconds ();
+      queueStats.m_bufferedBytes = GetNBytes ();
 
+      if (reset)
+        {
+          ResetShortTermStatistics ();
+        }
+    }
   return queueStats;
 }
 

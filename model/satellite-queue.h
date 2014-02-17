@@ -46,8 +46,15 @@ public:
 
   struct QueueStats_t
   {
-    double m_enqueRate;
-    double m_dequeRate;
+    QueueStats_t ()
+    : m_enqueRate (0.0),
+      m_dequeRate (0.0),
+      m_bufferedBytes (0)
+    {
+    }
+    double   m_enqueRate;
+    double   m_dequeRate;
+    uint32_t m_bufferedBytes;
   };
 
   typedef enum
