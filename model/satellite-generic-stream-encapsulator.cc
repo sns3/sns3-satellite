@@ -46,8 +46,6 @@ SatGenericStreamEncapsulator::SatGenericStreamEncapsulator ()
 SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest)
    :m_sourceAddress (source),
     m_destAddress (dest),
-    m_maxTxBufferSize (100 * 4095),
-    m_txBufferSize (0),
     m_maxGsePduSize (4095),
     m_txFragmentId (0),
     m_currRxFragmentId (0),
@@ -72,11 +70,6 @@ SatGenericStreamEncapsulator::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGenericStreamEncapsulator")
     .SetParent<SatEncapsulator> ()
     .AddConstructor<SatGenericStreamEncapsulator> ()
-    .AddAttribute ("MaxTxBufferSize",
-                   "Maximum size of the transmission buffer (in Bytes)",
-                   UintegerValue (100 * 4096),
-                   MakeUintegerAccessor (&SatGenericStreamEncapsulator::m_maxTxBufferSize),
-                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("MaxGsePduSize",
                    "Maximum size of the GSE PDU (in Bytes)",
                    UintegerValue (4096),
@@ -90,9 +83,6 @@ void
 SatGenericStreamEncapsulator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-
-  while (!m_txBuffer.empty ()) m_txBuffer.pop_back ();
-  m_txBuffer.clear();
 
   while (!m_rxBuffer.empty ()) m_rxBuffer.pop_back ();
   m_rxBuffer.clear();
@@ -110,32 +100,25 @@ SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("SatGenericStreamEncapsulator received too large HL PDU!");
     }
-  else if (m_txBufferSize + p->GetSize () <= m_maxTxBufferSize)
-    {
-      // Store packet arrival time
-      SatTimeTag timeTag (Simulator::Now ());
-      p->AddPacketTag (timeTag);
 
-      // Mark the PDU with FULL_PDU tag
-      SatEncapPduStatusTag tag;
-      tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
-      p->AddPacketTag (tag);
+  // Store packet arrival time
+  SatTimeTag timeTag (Simulator::Now ());
+  p->AddPacketTag (timeTag);
 
-      NS_LOG_LOGIC ("Tx Buffer: New packet added");
-      m_txBuffer.push_back (p);
-      m_txBufferSize += p->GetSize ();
-      NS_LOG_LOGIC ("NumOfBuffers = " << m_txBuffer.size() );
-      NS_LOG_LOGIC ("txBufferSize = " << m_txBufferSize);
-    }
-  else
+  // Mark the PDU with FULL_PDU tag
+  SatEncapPduStatusTag tag;
+  tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
+  p->AddPacketTag (tag);
+
+  NS_LOG_LOGIC ("Tx Buffer: New packet added of size: " << p->GetSize ());
+
+  if (!m_txQueue->Enqueue (p))
     {
-      // Discard full SDU
-      NS_LOG_LOGIC ("TxBuffer is full. SDU discarded");
-      NS_LOG_LOGIC ("MaxTxBufferSize = " << m_maxTxBufferSize);
-      NS_LOG_LOGIC ("txBufferSize    = " << m_txBufferSize);
-      NS_LOG_LOGIC ("packet size     = " << p->GetSize ());
+      NS_LOG_LOGIC ("Packet is dropped!");
     }
 
+  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets() );
+  NS_LOG_LOGIC ("NumBytes = " << m_txQueue->GetNBytes ());
 }
 
 Ptr<Packet>
@@ -150,49 +133,49 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   SatGseHeader gseHeader;
 
   // No packets in buffer
-  if ( m_txBuffer.empty () )
+  if ( m_txQueue->GetNPackets () == 0 )
     {
-      NS_LOG_LOGIC ("No data pending");
+      NS_LOG_LOGIC ("No data pending, return NULL packet");
       return packet;
     }
 
-  // Take the first PDU from the buffer
-  Ptr<Packet> nextPacket = (*(m_txBuffer.begin ()))->Copy ();
+  // Peek the first PDU from the buffer.
+  Ptr<const Packet> peekPacket = m_txQueue->Peek ();
 
-  SatEncapPduStatusTag tag;
-  nextPacket->PeekPacketTag (tag);
+  SatEncapPduStatusTag peekTag;
+  peekPacket->PeekPacketTag (peekTag);
 
   // Too small TxOpportunity!
-  if (bytes <= gseHeader.GetGseHeaderSizeInBytes(tag.GetStatus ()))
+  if (bytes <= gseHeader.GetGseHeaderSizeInBytes(peekTag.GetStatus ()))
     {
       NS_LOG_LOGIC ("TX opportunity too small = " << bytes);
       return packet;
     }
 
-  uint32_t maxGsePayload = m_maxGsePduSize - gseHeader.GetGseHeaderSizeInBytes (tag.GetStatus ());
+  uint32_t maxGsePayload = m_maxGsePduSize - gseHeader.GetGseHeaderSizeInBytes (peekTag.GetStatus ());
 
-  if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
+  if (peekTag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
     {
       // The FULL PDU has to fit this BB frame since fragmentation
       // between BB frames is not allowed!
-      if (bytes < CalculateTotalPacketSizeWithHeaders (nextPacket->GetSize ()))
+      if (bytes < CalculateTotalPacketSizeWithHeaders (peekPacket->GetSize ()))
         {
-          NS_LOG_LOGIC ("FULL higher layer packet " << nextPacket->GetSize () <<  " does not fit into this Tx opportunity = " << bytes);
+          NS_LOG_LOGIC ("FULL higher layer packet " << peekPacket->GetSize () <<  " does not fit into this Tx opportunity = " << bytes);
           return packet;
         }
     }
 
-  m_txBufferSize -= (*(m_txBuffer.begin()))->GetSize ();
-  m_txBuffer.erase (m_txBuffer.begin ());
-
   // Fragmentation
-  if ( nextPacket->GetSize () > maxGsePayload)
+  if ( peekPacket->GetSize () > maxGsePayload)
     {
+      // Now we can take the packe away from the queue
+      Ptr<Packet> firstPacket = m_txQueue->Dequeue ();
+
       // Status tag of the old and new segment
       // Note: This is the only place where a PDU is segmented and
       // therefore its status can change
       SatEncapPduStatusTag oldTag, newTag;
-      nextPacket->RemovePacketTag (oldTag);
+      firstPacket->RemovePacketTag (oldTag);
 
       // Create new GSE header
       SatGseHeader gseHeader;
@@ -201,7 +184,7 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
         {
           IncreaseFragmentId ();
           gseHeader.SetStartIndicator ();
-          gseHeader.SetTotalLength (nextPacket->GetSize());
+          gseHeader.SetTotalLength (firstPacket->GetSize());
           newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
           oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
           maxGsePayload = m_maxGsePduSize - gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::START_PDU);
@@ -216,41 +199,44 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       gseHeader.SetFragmentId (m_txFragmentId);
 
       // Create a fragment of correct size
-      packet = nextPacket->CreateFragment (0, maxGsePayload);
+      Ptr<Packet> fragment = firstPacket->CreateFragment (0, maxGsePayload);
 
       // Add proper payload length of the GSE packet
-      gseHeader.SetGsePduLength (packet->GetSize());
+      gseHeader.SetGsePduLength (fragment->GetSize());
 
       // Give back the remaining segment to the transmission buffer
-      nextPacket->RemoveAtStart (maxGsePayload);
+      firstPacket->RemoveAtStart (maxGsePayload);
 
       // Add old tag back to the old packet
-      nextPacket->AddPacketTag (oldTag);
-      m_txBuffer.insert (m_txBuffer.begin (), nextPacket);
-      m_txBufferSize += (*(m_txBuffer.begin()))->GetSize ();
+      firstPacket->AddPacketTag (oldTag);
+
+      // Push remainder packet to the queue
+      m_txQueue->PushFront (firstPacket);
 
       // Put status tag once it has been adjusted
-      packet->AddPacketTag (newTag);
+      fragment->AddPacketTag (newTag);
 
       // Add PDU header
-      packet->AddHeader (gseHeader);
+      fragment->AddHeader (gseHeader);
+
+      // GSE PDU
+      packet = fragment;
     }
   // Just encapsulation
   else
     {
-      // Segment txBuffer.FirstBuffer and
-      // Give back the remaining segment to the transmission buffer
-      packet = nextPacket;
+      // Take the packe away from the queue
+      Ptr<Packet> firstPacket= m_txQueue->Dequeue ();
 
       // Create new GSE header
       SatGseHeader gseHeader;
 
       SatEncapPduStatusTag tag;
-      packet->PeekPacketTag (tag);
+      firstPacket->PeekPacketTag (tag);
 
       if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
         {
-          gseHeader.SetTotalLength (packet->GetSize());
+          gseHeader.SetTotalLength (firstPacket->GetSize());
           gseHeader.SetStartIndicator ();
         }
       // Fragment id is added to all fragmented packets
@@ -259,11 +245,14 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           gseHeader.SetFragmentId (m_txFragmentId);
         }
 
-      gseHeader.SetGsePduLength (nextPacket->GetSize());
+      gseHeader.SetGsePduLength (firstPacket->GetSize());
       gseHeader.SetEndIndicator ();
 
       // Add PDU header
-      packet->AddHeader (gseHeader);
+      firstPacket->AddHeader (gseHeader);
+
+      // GSE PDU
+      packet = firstPacket;
     }
 
   // Add MAC tag to identify the packet in lower layers
@@ -340,7 +329,7 @@ SatGenericStreamEncapsulator::CalculateTotalPacketSizeWithHeaders (uint32_t hlPa
 uint32_t
 SatGenericStreamEncapsulator::GetTxBufferSizeInBytes () const
 {
-  return m_txBufferSize;
+  return m_txQueue->GetNBytes ();
 }
 
 void
@@ -477,7 +466,7 @@ SatGenericStreamEncapsulator::GetHolDelay () const
 {
   Time holDelay;
   SatTimeTag timeTag;
-  if (m_txBuffer.front ()->PeekPacketTag(timeTag))
+  if (m_txQueue->Peek ()->PeekPacketTag(timeTag))
     {
       holDelay = Simulator::Now () - timeTag.GetSenderTimestamp ();
     }

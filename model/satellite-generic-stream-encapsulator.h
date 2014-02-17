@@ -147,16 +147,6 @@ private:
   Mac48Address m_destAddress;
 
   /**
-   * Maximum buffer size in bytes
-   */
-  uint32_t m_maxTxBufferSize;
-
-  /**
-   * Buffered bytes
-   */
-  uint32_t m_txBufferSize;
-
-  /**
    * Maximum GSE PDU size
    */
   uint32_t m_maxGsePduSize;
@@ -165,11 +155,6 @@ private:
    * Fragment id used in the packet transmissions
    */
   uint32_t m_txFragmentId;
-
-  /**
-   * Transmission buffer
-   */
-  std::list < Ptr<Packet> > m_txBuffer;
 
   /**
    * Reception buffer
