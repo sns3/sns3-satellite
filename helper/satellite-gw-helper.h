@@ -30,6 +30,7 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-link-results.h"
+#include "ns3/satellite-mac.h"
 #include "satellite-bbframe-conf.h"
 
 namespace ns3 {
@@ -51,7 +52,8 @@ public:
    * Create a SatGwHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount);
+  SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount,
+               SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb );
 
   virtual ~SatGwHelper () {}
 
@@ -151,18 +153,6 @@ public:
   Ptr<NetDevice> Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
 
   /**
-   * \param aName Name of the node
-   * \param gwId  id of the gw
-   * \param beamId  id of the beam
-   * \param fCh forward channel
-   * \param rCh return channel
-   * \param ncc NCC (Network Control Center)
-   *
-   * Saves you from having to construct a temporary NodeContainer.
-   */
-  Ptr<NetDevice> Install (std::string aName, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
-
-  /**
    * Enables creation traces to be written in given file
    * \param stream  stream for creation trace outputs
    * \param cb  callback to connect traces
@@ -173,6 +163,9 @@ private:
   CarrierBandwidthConverter  m_carrierBandwidthConverter;
   uint32_t m_rtnLinkCarrierCount;
   Ptr<SatBbFrameConf> m_bbFrameConf;
+
+  SatMac::ReadCtrlMsgCallback   m_readCtrlCb;
+  SatMac::WriteCtrlMsgCallback  m_writeCtrlCb;
 
   ObjectFactory m_queueFactory;
   ObjectFactory m_channelFactory;

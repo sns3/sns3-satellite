@@ -151,12 +151,9 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  // Remove the ctrl tag
-                  (*i)->RemovePacketTag (ctrlTag);
-
                   Mac48Address sourceAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
 
-                  ReceiveSignalingPacket (sourceAddress, *i, cType);
+                  ReceiveSignalingPacket (sourceAddress, *i, ctrlTag);
                 }
               else
                 {
@@ -214,31 +211,42 @@ SatGwMac::TransmitTime (uint32_t carrierId)
 }
 
 void
-SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType)
+SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, const SatControlMsgTag &ctrlTag)
 {
-  switch (cType)
+  switch (ctrlTag.GetMsgType ())
   {
     case SatControlMsgTag::SAT_CR_CTRL_MSG:
       {
-        SatCapacityReqHeader cr;
-        if ( packet->RemoveHeader (cr) > 0 )
+        uint32_t msgId = ctrlTag.GetMsgId ();
+        Ptr<SatCrMessage> crMsg = DynamicCast<SatCrMessage> ( m_readCtrlCallback (msgId) );
+
+        if ( crMsg == NULL )
           {
-            m_scheduler->CnoInfoUpdated (sourceAddress, cr.GetCnoEstimate());
+            NS_FATAL_ERROR ("Error in reading CR message from container!!!");
+          }
+
+        m_scheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
+
+        if ( m_crReceiveCallback.IsNull () == false )
+          {
+            m_crReceiveCallback (m_beamId, sourceAddress, crMsg);
           }
         break;
       }
-    case SatControlMsgTag::SAT_RA_CTRL_MSG:
-    case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
-      {
-        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
-        break;
-      }
+
     default:
       {
-        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        NS_FATAL_ERROR ("SatGwMac received a non-supported control packet!");
         break;
       }
   }
+}
+
+void
+SatGwMac::SetCrReceiveCallback (SatGwMac::CrReceiveCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_crReceiveCallback = cb;
 }
 
 } // namespace ns3

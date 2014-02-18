@@ -241,6 +241,16 @@ private:
   bool m_printDetailedInformationToCreationTraces;
 
   /**
+   * Control message store time in container for forward link.
+   */
+  Time m_ctrlMsgStoreTimeFwdLink;
+
+  /**
+   * Control message store in container for return link.
+   */
+  Time m_ctrlMsgStoreTimeRtnLink;
+
+  /**
    * Configured fading model. Set as an attribute.
    */
   SatEnums::FadingModel_t m_fadingModel;

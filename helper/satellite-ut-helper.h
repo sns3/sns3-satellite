@@ -33,6 +33,7 @@
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-ncc.h"
 #include "satellite-superframe-sequence.h"
+#include "ns3/satellite-mac.h"
 #include "ns3/satellite-random-access-container.h"
 #include "ns3/satellite-random-access-container-conf.h"
 
@@ -55,7 +56,8 @@ public:
    * Create a SatUtHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
+  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq,
+               SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb);
   virtual ~SatUtHelper () {}
 
   /*
@@ -140,6 +142,9 @@ private:
     CarrierBandwidthConverter m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
     Ptr<SatSuperframeSeq> m_superframeSeq;
+
+    SatMac::ReadCtrlMsgCallback   m_readCtrlCb;
+    SatMac::WriteCtrlMsgCallback  m_writeCtrlCb;
 
     ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;

@@ -308,13 +308,15 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 }
 
 bool
-SatNetDevice::SendControl (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 {
-  NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
+  NS_LOG_FUNCTION (this << msg << dest);
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
 
   m_packetTrace (Simulator::Now(),
                  SatEnums::PACKET_SENT,
@@ -324,6 +326,13 @@ SatNetDevice::SendControl (Ptr<Packet> packet, const Address& dest, uint16_t pro
                  SatEnums::LL_ND,
                  ld,
                  SatUtils::GetPacketInfo (packet));
+
+  // add CR tag to message and write msg to container in MAC
+  SatControlMsgTag tag;
+  tag.SetMsgType (msg->GetMsgType ());
+  tag.SetMsgId ( m_mac->WriteCtrlMsgToContainer (msg) );
+
+  packet->AddPacketTag (tag);
 
   // ToS 0 = control
   m_llc->Enque (packet, dest, 0);

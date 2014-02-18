@@ -29,6 +29,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/mac48-address.h"
 
+#include "satellite-control-message.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-phy.h"
 #include "satellite-node-info.h"
@@ -75,18 +76,11 @@ public:
 
   /**
    * Callback to send packet to lower layer.
-   * \param Coitainer of the pointers to the packets received
+   * \param Container of the pointers to the packets received
    * \param uint32_t carrierId
    * \param  Time duration
    */
   typedef Callback<void, SatPhy::PacketContainer_t, uint32_t, Time> TransmitCallback;
-
-  /**
-   * Callback to receive packet by upper layer.
-   * \param MAC address related to the received packet connection
-   * \param packet the packet received
-   */
-  typedef Callback<void, Ptr<Packet>, Mac48Address> ReceiveCallback;
 
   /**
    * Method to set transmit callback.
@@ -94,6 +88,13 @@ public:
    * to lower layer (PHY)
    */
   void SetTransmitCallback (SatMac::TransmitCallback cb);
+
+  /**
+   * Callback to receive packet by upper layer.
+   * \param MAC address related to the received packet connection
+   * \param packet the packet received
+   */
+  typedef Callback<void, Ptr<Packet>, Mac48Address> ReceiveCallback;
 
   /**
    * Method to set receive callback.
@@ -118,10 +119,46 @@ public:
   void SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb);
 
   /**
+   * Callback to read control messages from container storing control messages.
+   * Real length of the control messages are simulated in a packet, but not structure.
+   * \param uint32_t ID of the message to read.
+   * \return Pointer to read packet. (NULL if not found).
+   */
+  typedef Callback<Ptr<SatControlMessage>, uint32_t> ReadCtrlMsgCallback;
+
+  /**
+   * Method to set read control message callback.
+   * \param cb callback to invoke whenever a control message is wanted to read.
+   */
+  void SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb);
+
+  /**
+   * Callback to write control messages to container storing control messages.
+   * Real length of the control messages are simulated in a packet, but not structure.
+   * \param Pointer to the message to be written.
+   * \return uint32_t ID of the written message.
+   */
+  typedef Callback<uint32_t, Ptr<SatControlMessage> > WriteCtrlMsgCallback;
+
+  /**
+   * Method to set write control message callback.
+   * \param cb callback to invoke whenever a control message is wanted to write.
+   */
+  void SetWriteCtrlCallback (SatMac::WriteCtrlMsgCallback cb);
+
+  /**
    * Set the node info
    * \param nodeInfo containing node specific information
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
+
+  /**
+   * Write control message to container.
+   *
+   * \param msg Control message to write to container.
+   * \return Id of the written message.
+   */
+  uint32_t WriteCtrlMsgToContainer (Ptr<SatControlMessage> msg);
 
 private:
   SatMac& operator = (const SatMac &);
@@ -146,6 +183,16 @@ protected:
    * The upper layer package receive callback.
    */
   SatMac::ReceiveCallback m_rxCallback;
+
+  /**
+   * The read control message callback.
+   */
+  SatMac::ReadCtrlMsgCallback m_readCtrlCallback;
+
+  /**
+   * The write control message callback.
+   */
+  SatMac::WriteCtrlMsgCallback m_writeCtrlCallback;
 
   /**
    * Callback to notify the txOpportunity to upper layer

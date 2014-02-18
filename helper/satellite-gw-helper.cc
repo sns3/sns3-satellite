@@ -82,14 +82,25 @@ SatGwHelper::GetInstanceTypeId (void) const
 }
 
 SatGwHelper::SatGwHelper ()
+ : m_rtnLinkCarrierCount (0),
+   m_interferenceModel (),
+   m_errorModel (),
+   m_symbolRate (0.0)
 {
   // this default constructor should be never called
-  NS_ASSERT (false);
+  NS_FATAL_ERROR ("Default constructor not supported!!!");
 }
 
-SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount)
+SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount,
+                          SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb )
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
-   m_rtnLinkCarrierCount (rtnLinkCarrierCount)
+   m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+   m_readCtrlCb (readCb),
+   m_writeCtrlCb (writeCb),
+   m_interferenceModel (),
+   m_errorModel (),
+   m_symbolRate (0.0)
+
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 
@@ -202,6 +213,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
+  mac->SetReadCtrlCallback (m_readCtrlCb);
+  mac->SetWriteCtrlCallback (m_writeCtrlCb);
+  mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
@@ -266,16 +280,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   mac->StartScheduling ();
 
   return dev;
-}
-
-Ptr<NetDevice>
-SatGwHelper::Install (std::string aName, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
-{
-  NS_LOG_FUNCTION (this << aName << beamId << fCh << rCh );
-
-  Ptr<Node> a = Names::Find<Node> (aName);
-
-  return Install (a, gwId, beamId, fCh, rCh, ncc);
 }
 
 void

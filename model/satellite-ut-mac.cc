@@ -92,7 +92,7 @@ SatUtMac::SatUtMac ()
  : SatMac (),
    m_superframeSeq (),
    m_timingAdvanceCb (0),
-   m_txCallback (0),
+   m_ctrlCallback (0),
    m_llsConf (0),
    m_lastCno (NAN),
    m_gwAddress (),
@@ -110,7 +110,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
  : SatMac (beamId),
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
-   m_txCallback (0),
+   m_ctrlCallback (0),
    m_llsConf (0),
    m_lastCno (NAN),
    m_gwAddress (),
@@ -172,11 +172,11 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
 }
 
 void
-SatUtMac::SetTxCallback (SatUtMac::SendCallback cb)
+SatUtMac::SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
 
-  m_txCallback = cb;
+  m_ctrlCallback = cb;
 }
 
 void
@@ -410,25 +410,15 @@ void
 SatUtMac::SendCapacityReq ()
 {
 
-  if ( m_txCallback.IsNull () == false )
+  if ( m_ctrlCallback.IsNull () == false )
     {
-      Ptr<Packet> packet = Create<Packet> ();
-
-      // add tag to message
-      SatControlMsgTag tag;
-      tag.SetMsgType (SatControlMsgTag::SAT_CR_CTRL_MSG);
-      packet->AddPacketTag (tag);
-
-      // add TBTP specific header to message
-      SatCapacityReqHeader header;
-      header.SetReqType (SatCapacityReqHeader::SAT_RBDC_CR);
-
+      // create CR specific message
+      Ptr<SatCrMessage> crMsg = CreateObject<SatCrMessage> ();
+      crMsg->SetReqType (SatCrMessage::SAT_RBDC_CR);
       // TODO: estimated value of C/N0 must be used instead of last received value
-      header.SetCnoEstimate (m_lastCno);
+      crMsg->SetCnoEstimate (m_lastCno);
 
-      packet->AddHeader (header);
-
-      m_txCallback (packet, m_gwAddress, Ipv4L3Protocol::PROT_NUMBER);
+      m_ctrlCallback (crMsg, m_gwAddress);
 
       Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
     }
@@ -512,7 +502,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
       {
         uint32_t tbtpId = ctrlTag.GetMsgId ();
 
-        Ptr<SatTbtpMessage> tbtp = m_superframeSeq->GetTbtpMessage (m_beamId, tbtpId);
+        Ptr<SatTbtpMessage> tbtp = DynamicCast<SatTbtpMessage> (m_readCtrlCallback (tbtpId));
 
         if ( tbtp == NULL )
           {

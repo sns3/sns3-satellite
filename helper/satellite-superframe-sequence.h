@@ -137,22 +137,6 @@ public:
   double GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
-   *
-   * \param beamId  ID of the beam, where added TBTP is assigned.
-   * \param tbtpMsg Pointer to TBTP message to add.
-   * \return ID assigned to added TBTP message.
-   */
-  uint32_t AddTbtpMessage (uint32_t beamId, Ptr<SatTbtpMessage> tbtpMsg);
-
-  /**
-   *
-   * \param beamId  ID of the beam, which TBTP is requested.
-   * \param msgId   ID assigned to added TBTP message.
-   * \return Pointer to TBTP message.
-   */
-  Ptr<SatTbtpMessage> GetTbtpMessage (uint32_t beamId, uint32_t msgId) const;
-
-  /**
    * Get target duration for sequence.
    * \return target duration for sequence
    */
@@ -173,16 +157,6 @@ private:
    * Waveform configurations
    */
   Ptr<SatWaveformConf> m_wfConf;
-
-  /**
-   * Map to store TBTP containers.
-   */
-  TbtpMap_t tbtpContainers;
-
-  /**
-   * Time to store TBTP messages in container. (time used to calculate number of TBTP messages to store).
-   */
-  Time m_tbtpStoreTime;
 
   /**
    * Target duration time for sequence.

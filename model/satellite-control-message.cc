@@ -295,7 +295,7 @@ SatTbtpMessage::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
   m_frameIds.insert (info->GetFrameId ());
 }
 
-uint32_t SatTbtpMessage::GetSizeinBytes ()
+uint32_t SatTbtpMessage::GetSizeInBytes () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -374,11 +374,106 @@ void SatTbtpMessage::Dump () const
 
 }
 
-// TBTP message container
+NS_OBJECT_ENSURE_REGISTERED (SatCrMessage);
+
+TypeId
+SatCrMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatCrMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatCrMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatCrMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatCrMessage::SatCrMessage ()
+ : m_reqType (SatCrMessage::SAT_UNKNOWN_CR),
+   m_requestedRate (0.0),
+   m_cno (NAN)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatCrMessage::~SatCrMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatCrMessage::SetReqType (SatCrRequestType_t type)
+{
+  NS_LOG_FUNCTION (this << type);
+  m_reqType = type;
+}
+
+double
+SatCrMessage::GetRequestedRate (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_requestedRate;
+}
+
+void
+SatCrMessage::SetRequestedRate (double rate)
+{
+  NS_LOG_FUNCTION (this << rate);
+  m_requestedRate = rate;
+}
+
+double
+SatCrMessage::GetCnoEstimate (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_cno;
+}
+
+void
+SatCrMessage::SetCnoEstimate (double cno)
+{
+  NS_LOG_FUNCTION (this << cno);
+  m_cno = cno;
+}
+
+SatCrMessage::SatCrRequestType_t
+SatCrMessage::GetReqType (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_reqType;
+}
+
+uint32_t
+SatCrMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  //TODO: real size is needed to calculate
+  return 20;
+}
+
+// Control message container
 
 SatControlMsgContainer::SatControlMsgContainer ()
- :m_id (0),
-  m_maxMsgCount (50)
+ : m_id (0),
+   m_storeTime (MilliSeconds (300)),
+   m_deleteOnRead (false)
+
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatControlMsgContainer::SatControlMsgContainer (Time storeTime, bool deleteOnRead)
+ : m_id (0),
+   m_storeTime (storeTime),
+   m_deleteOnRead (deleteOnRead)
+
 {
   NS_LOG_FUNCTION (this);
 }
@@ -394,143 +489,76 @@ SatControlMsgContainer::Add (Ptr<SatControlMessage> ctrlMsg)
 {
   NS_LOG_FUNCTION (this << ctrlMsg);
 
-  // If limit to store msgs are reached, remove first msg from map before adding the new one
-  if ( m_ctrlMsgs.size () >= m_maxMsgCount )
-    {
-      m_ctrlMsgs.erase (m_ctrlMsgs.begin ()->first );
-    }
+  Time now = Simulator::Now ();
 
-  std::pair<CtrlMsgMap_t::iterator, bool> result = m_ctrlMsgs.insert (std::make_pair (m_id, ctrlMsg));
+  CtrlMsgMapValue_t mapValue = std::make_pair (now, ctrlMsg);
+
+  std::pair<CtrlMsgMap_t::iterator, bool> result = m_ctrlMsgs.insert (std::make_pair (m_id, mapValue));
 
   if ( result.second == false )
     {
       NS_FATAL_ERROR ("Control message can't added.");
     }
 
+  if ( m_storeTimeout.IsExpired ()  )
+    {
+      m_storeTimeout = Simulator::Schedule (m_storeTime, &SatControlMsgContainer::EraseFirst, this);
+    }
+
   return m_id++;
 }
 
 Ptr<SatControlMessage>
-SatControlMsgContainer::Get (uint32_t id) const
+SatControlMsgContainer::Get (uint32_t id)
 {
   NS_LOG_FUNCTION (this << id);
 
   Ptr<SatControlMessage> msg = NULL;
 
-  CtrlMsgMap_t::const_iterator it = m_ctrlMsgs.find (id);
+  CtrlMsgMap_t::iterator it = m_ctrlMsgs.find (id);
 
   if ( it != m_ctrlMsgs.end () )
     {
-      msg = it->second;
+      msg = it->second.second;
+
+      if (m_deleteOnRead)
+        {
+          if ( it == m_ctrlMsgs.begin () )
+            {
+              if (m_storeTimeout.IsRunning () )
+                {
+                  m_storeTimeout.Cancel ();
+                }
+
+              EraseFirst ();
+            }
+          else
+            {
+              m_ctrlMsgs.erase (it);
+            }
+        }
     }
 
   return msg;
 }
 
-void SatControlMsgContainer::SetMaxMsgCount (uint32_t maxMsgCount)
-{
-  NS_LOG_FUNCTION (this << maxMsgCount);
-
-  m_maxMsgCount = maxMsgCount;
-}
-
-
-NS_OBJECT_ENSURE_REGISTERED (SatCapacityReqHeader);
-
-TypeId
-SatCapacityReqHeader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatCapacityReqHeader")
-    .SetParent<Tag> ()
-    .AddConstructor<SatCapacityReqHeader> ()
-  ;
-  return tid;
-}
-
-TypeId
-SatCapacityReqHeader::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
-}
-
-SatCapacityReqHeader::SatCapacityReqHeader ()
-{
-  NS_LOG_FUNCTION (this);
-}
-
-SatCapacityReqHeader::~SatCapacityReqHeader ()
-{
-  NS_LOG_FUNCTION (this);
-}
-
 void
-SatCapacityReqHeader::SetReqType (SatCrRequestType_t type)
-{
-  NS_LOG_FUNCTION (this << type);
-  m_reqType = type;
-}
-
-double
-SatCapacityReqHeader::GetRequestedRate (void) const
+SatControlMsgContainer::EraseFirst ()
 {
   NS_LOG_FUNCTION (this);
-  return m_requestedRate;
-}
 
-void
-SatCapacityReqHeader::SetRequestedRate (double rate)
-{
-  NS_LOG_FUNCTION (this << rate);
-  m_requestedRate = rate;
-}
+  CtrlMsgMap_t::iterator first = m_ctrlMsgs.begin ();
+  m_ctrlMsgs.erase (first);
 
-double
-SatCapacityReqHeader::GetCnoEstimate (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_cno;
-}
+  first = m_ctrlMsgs.begin ();
 
-void
-SatCapacityReqHeader::SetCnoEstimate (double cno)
-{
-  NS_LOG_FUNCTION (this << cno);
-  m_cno = cno;
-}
+  if ( first != m_ctrlMsgs.end () )
+    {
+      Time storedMoment = first->second.first;
+      Time elapsedTime = Simulator::Now () - storedMoment;
 
-SatCapacityReqHeader::SatCrRequestType_t
-SatCapacityReqHeader::GetReqType (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_reqType;
-}
-
-void SatCapacityReqHeader::Print (std::ostream &os)  const
-{
-  os << "M Type= CR";
-}
-
-uint32_t SatCapacityReqHeader::GetSerializedSize (void) const
-{
- return ( sizeof (m_reqType) + sizeof (m_requestedRate) + sizeof (m_cno) );
-}
-
-void SatCapacityReqHeader::Serialize (Buffer::Iterator start) const
-{
-  start.WriteU32 (m_reqType);
-  start.Write ((uint8_t const*) &m_requestedRate, sizeof (m_requestedRate));
-  start.Write ((uint8_t const*) &m_cno, sizeof (m_cno));
-}
-
-uint32_t SatCapacityReqHeader::Deserialize (Buffer::Iterator start)
-{
-  m_reqType = (SatCrRequestType_t) start.ReadU32();
-  start.Read ((uint8_t *) &m_requestedRate, sizeof (m_requestedRate));
-  start.Read ((uint8_t *) &m_cno, sizeof (m_cno));
-
-  return GetSerializedSize();
+      m_storeTimeout = Simulator::Schedule (m_storeTime - elapsedTime, &SatControlMsgContainer::EraseFirst, this);
+    }
 }
 
 }; // namespace ns3

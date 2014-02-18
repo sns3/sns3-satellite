@@ -71,9 +71,12 @@ void
 SatMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_txCallback.Nullify();
-  m_rxCallback.Nullify();
-  m_txOpportunityCallback.Nullify();
+  m_txCallback.Nullify ();
+  m_rxCallback.Nullify ();
+  m_txOpportunityCallback.Nullify ();
+  m_readCtrlCallback.Nullify ();
+  m_writeCtrlCallback.Nullify ();
+
   Object::DoDispose ();
 }
 
@@ -85,6 +88,20 @@ SatMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   m_nodeInfo = nodeInfo;
 }
 
+uint32_t
+SatMac::WriteCtrlMsgToContainer (Ptr<SatControlMessage> msg)
+{
+  NS_LOG_FUNCTION (this << msg);
+
+  uint32_t id = 0;
+
+  if ( m_writeCtrlCallback.IsNull () == false )
+    {
+      id = m_writeCtrlCallback (msg);
+    }
+
+  return id;
+}
 
 void
 SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration)
@@ -115,5 +132,18 @@ SatMac::SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb)
   m_txOpportunityCallback = cb;
 }
 
+void
+SatMac::SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_readCtrlCallback = cb;
+}
+
+void
+SatMac::SetWriteCtrlCallback (SatMac::WriteCtrlMsgCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_writeCtrlCallback = cb;
+}
 
 } // namespace ns3

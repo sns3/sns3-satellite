@@ -90,6 +90,20 @@ public:
    */
   void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
+  /**
+   * Callback to receive capacity request (CR) messages.
+   * \param uint32_t The beam ID.
+   * \param Address Address of the sender UT.
+   * \param Ptr<SatControlMessage> Pointer to the received CR message.
+   */
+  typedef Callback<void, uint32_t, Address, Ptr<SatCrMessage> > CrReceiveCallback;
+
+  /**
+   * Method to set read control message callback.
+   * \param cb callback to invoke whenever a control message is wanted to read.
+   */
+  void SetCrReceiveCallback (SatGwMac::CrReceiveCallback cb);
+
 private:
 
   SatGwMac& operator = (const SatGwMac &);
@@ -111,11 +125,12 @@ private:
   /**
    * Signaling packet receiver, which handles all the signaling packet
    * receptions.
+   *
    * \param sourceAddress Address of the packet sender.
    * \param packet Received signaling packet
    * \param cType Control message type
    */
-  void ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, SatControlMsgTag::SatControlMsgType_t cType);
+  void ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, const SatControlMsgTag &ctrlTag);
 
   /**
    * Scheduler for the forward link.
@@ -133,6 +148,11 @@ private:
    * the duration of a BB frame by a m_guardTime set by an attribute.
    */
   Time m_guardTime;
+
+  /**
+   * Capacity request receive callback.
+   */
+  SatGwMac::CrReceiveCallback  m_crReceiveCallback;
 };
 
 } // namespace ns3

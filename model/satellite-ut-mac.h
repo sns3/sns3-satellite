@@ -87,17 +87,15 @@ public:
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
   /**
-     * \param packet     the packet send
-     * \param address    Packet destination address
-     * \param protocol   protocol number to send packet.
-     */
-  typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
+   * \param msg        the message send
+   * \param address    Packet destination address
+   */
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
 
   /**
    * \param cb callback to send control messages.
-   *
    */
-  void SetTxCallback (SatUtMac::SendCallback cb);
+  void SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb);
 
   /**
    * Update C/N0 information from lower layer.
@@ -245,7 +243,7 @@ private:
   /**
    * Callback to send control messages.
   */
-  SendCallback m_txCallback;
+  SendCtrlCallback m_ctrlCallback;
 
   /**
    * The configured lower layer service configuration for this UT MAC.

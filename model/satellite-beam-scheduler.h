@@ -74,12 +74,11 @@ public:
   void Receive (Ptr<Packet> p);
 
   /**
-   * \param packet     the packet send
+   * \param msg        the message send
    * \param address    Packet destination address
-   * \param protocol   protocol number to send packet.
    * \return Result of sending, true success or false failure
    */
-  typedef Callback<bool, Ptr<Packet>, const Address&, uint16_t > SendCallback;
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlMsgCallback;
 
   /**
    * \param id    Id of the TBTP message to add.
@@ -94,7 +93,7 @@ public:
    * \param seq Superframe sequence.
    * \parma tbtpCb  TBTP message add callback.
    */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb, Ptr<SatSuperframeSeq> seq);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq);
 
   /**
    * Add UT to scheduler.
@@ -113,6 +112,14 @@ public:
   void UpdateUtCno (Address utId, double cno);
 
   /**
+   * Receive capacity requests from UTs.
+   *
+   * \param utId Id of the UT (address).
+   * \param crMsg Pointer to the CR message
+   */
+  void UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg);
+
+  /**
    * Estimate UT's C/N0 value for next transmission.
    *
    * \param utId Id of the UT (address).
@@ -121,12 +128,14 @@ public:
   double EstimateUtCno (Address utId);
 
 private:
+
   // UT information
   class UtInfo
   {
     public:
-      Ptr<SatDamaEntry>   m_damaEntry; // dama entry
-      double              m_cno;       // The latest calculated value of C/N0
+      Ptr<SatDamaEntry>           m_damaEntry;    // dama entry
+      double                      m_cno;          // The latest calculated value of C/N0
+      std::vector<Ptr<Packet> >   m_crContainer;  // received CRs since last scheduling round.
 
       UtInfo() : m_cno (NAN) {}
   };
@@ -135,9 +144,10 @@ private:
   SatBeamScheduler (const SatBeamScheduler &);
 
   void DoDispose (void);
-  bool Send ( Ptr<Packet> packet );
+  bool Send ( Ptr<SatControlMessage> packet );
   void Schedule ();
 
+  void UpdateDamaEntries ();
   void InitializeScheduling ();
   void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
@@ -159,9 +169,9 @@ private:
   uint32_t m_superFrameCounter;
 
   /**
-   * The TBTP send callback.
+   * The control message send callback.
    */
-  SatBeamScheduler::SendCallback m_txCallback;
+  SatBeamScheduler::SendCtrlMsgCallback m_txCallback;
 
   /**
    * The TBTP send callback.
@@ -228,6 +238,8 @@ private:
    * advance compared to the expected receive time.
    */
   Time m_rttEstimate;
+
+
 };
 
 } // namespace ns3

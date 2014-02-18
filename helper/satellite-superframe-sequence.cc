@@ -47,11 +47,7 @@ SatSuperframeSeq::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeSeq")
     .SetParent<Object> ()
     .AddConstructor<SatSuperframeSeq> ()
-    .AddAttribute ("MinTbtpStoreTime", "Minimum time to store sent TBTPs.",
-                    TimeValue (MilliSeconds (300)),
-                    MakeTimeAccessor (&SatSuperframeSeq::m_tbtpStoreTime),
-                    MakeTimeChecker ())
-    .AddAttribute ("TargerDuration", "Target duration time.",
+    .AddAttribute ("TargetDuration", "Target duration time.",
                     TimeValue (MilliSeconds (100)),
                     MakeTimeAccessor (&SatSuperframeSeq::m_targetDuration),
                     MakeTimeChecker ())
@@ -193,66 +189,5 @@ SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBa
 
   return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );
 }
-
-uint32_t
-SatSuperframeSeq::AddTbtpMessage (uint32_t beamId, Ptr<SatTbtpMessage> tbtpMsg)
-{
-  NS_LOG_FUNCTION (this << beamId << tbtpMsg);
-
-  TbtpMap_t::const_iterator it = tbtpContainers.find (beamId);
-
-  // create container, if not exist
-  if ( it == tbtpContainers.end () )
-    {
-      Ptr<SatControlMsgContainer> tbtpCont = Create<SatControlMsgContainer> ();
-
-      // calculate maximum number of messages to store based on given time to store and superframe duration.
-      uint32_t storeCount  = (uint32_t) (m_tbtpStoreTime.GetSeconds() / m_superframe[0]->GetDurationInSeconds() );
-
-      // store at least two messages always.
-      if (storeCount < 2)
-        {
-          storeCount = 2;
-        }
-
-      tbtpCont->SetMaxMsgCount (storeCount);
-
-      std::pair<TbtpMap_t::const_iterator, bool> result = tbtpContainers.insert (std::make_pair (beamId, tbtpCont));
-
-      if ( result.second == false )
-        {
-          NS_FATAL_ERROR ("TBTP container creation failed!!!");
-        }
-    }
-
-  return tbtpContainers[beamId]->Add (tbtpMsg);
-}
-
-Ptr<SatTbtpMessage>
-SatSuperframeSeq::GetTbtpMessage (uint32_t beamId, uint32_t msgId) const
-{
-  NS_LOG_FUNCTION (this << beamId);
-
-  Ptr<SatTbtpMessage> msg = NULL;
-
-  TbtpMap_t::const_iterator it = tbtpContainers.find (beamId);
-
-  if ( it != tbtpContainers.end () )
-    {
-      msg = DynamicCast<SatTbtpMessage> (tbtpContainers.at (beamId)->Get (msgId));
-      if (msg)
-        {
-          return msg;
-        }
-      else
-        {
-          NS_FATAL_ERROR ("Dynamic cast to SatTbtpMessage was not successful!");
-        }
-    }
-
-  return msg;
-}
-
-
 
 }; // namespace ns3

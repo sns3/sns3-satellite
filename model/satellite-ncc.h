@@ -75,7 +75,7 @@ public:
   void Receive (Ptr<Packet> p, uint32_t beamId);
 
   /**
-   * Update C/N0 information from UT.
+   * Update UT specific C/N0 information.
    *
    * The SatNcc receives C/N0 information of packet receptions from UTs
    * to take into account when making schedule decisions.
@@ -87,7 +87,19 @@ public:
    */
   void UtCnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
 
-  typedef SatBeamScheduler::SendCallback SendCallback;
+  /**
+   * Capacity request receiver.
+   *
+   * The SatNcc receives Capacity Rrequest (CR) messages from UTs
+   * to take into account when making schedule decisions.
+   *
+   * \param beamId  The id of the beam where C/N0 is from.
+   * \param utId  The id of the UT. (sender address)
+   * \param crMsg Pointer to received Capacity Request
+   */
+  void UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg);
+
+  typedef SatBeamScheduler::SendCtrlMsgCallback SendCallback;
 
   /**
     * \param beamId ID of the beam which for callback is set

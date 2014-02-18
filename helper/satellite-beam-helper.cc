@@ -65,22 +65,30 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
                                        SatEnums::FADING_TRACE, "FadingTrace",
                                        SatEnums::FADING_MARKOV, "FadingMarkov"))
-       .AddAttribute ("PropagationDelayModel",
+      .AddAttribute ("PropagationDelayModel",
                       "Propagation delay model",
                       EnumValue (SatEnums::PD_CONSTANT_SPEED),
                       MakeEnumAccessor (&SatBeamHelper::m_propagationDelayModel),
                       MakeEnumChecker (SatEnums::PD_CONSTANT_SPEED, "ConstantSpeed",
                                        SatEnums::PD_CONSTANT, "Constant"))
-        .AddAttribute ("ConstantPropagationDelayInSeconds",
-                       "Constant propagation delay in seconds",
-                       DoubleValue (0.13),
-                       MakeDoubleAccessor(&SatBeamHelper::m_constantPropagationDelay),
-                       MakeDoubleChecker<double> ())
+      .AddAttribute ("ConstantPropagationDelayInSeconds",
+                     "Constant propagation delay in seconds",
+                      DoubleValue (0.13),
+                      MakeDoubleAccessor(&SatBeamHelper::m_constantPropagationDelay),
+                      MakeDoubleChecker<double> ())
       .AddAttribute ("PrintDetailedInformationToCreationTraces",
                      "Print detailed information to creation traces",
                      BooleanValue (true),
                      MakeBooleanAccessor(&SatBeamHelper::m_printDetailedInformationToCreationTraces),
                      MakeBooleanChecker ())
+      .AddAttribute ("CtrlMsgStoreTimeInFwdLink", "Time to store a control message in container for forward link.",
+                      TimeValue (MilliSeconds (300)),
+                      MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeFwdLink),
+                      MakeTimeChecker ())
+      .AddAttribute ("CtrlMsgStoreTimeInRtnLink", "Time to store a control message in container for return link.",
+                      TimeValue (MilliSeconds (1500)),
+                      MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeRtnLink),
+                      MakeTimeChecker ())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace))
     ;
@@ -126,10 +134,20 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
+  // create link specific control message containers
+  Ptr<SatControlMsgContainer> rtnCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeRtnLink, true);
+  Ptr<SatControlMsgContainer> fwdCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeFwdLink, false);
+
+  SatMac::ReadCtrlMsgCallback rtnReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, rtnCtrlMsgContainer );
+  SatMac::WriteCtrlMsgCallback rtnWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, rtnCtrlMsgContainer );
+
+  SatMac::ReadCtrlMsgCallback fwdReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, fwdCtrlMsgContainer );
+  SatMac::WriteCtrlMsgCallback fwdWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, fwdCtrlMsgContainer );
+
   // create needed low level satellite helpers
   m_geoHelper = CreateObject<SatGeoHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount);
-  m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount);
-  m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, seq );
+  m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, rtnReadCtrlCb, fwdWriteCtrlCb);
+  m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb );
 
   // Two usage of link results is two-fold: on the other hand they are needed in the
   // packet reception for packet decoding, but on the other hand they are utilized in
@@ -309,7 +327,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
   // add beam to NCC
-  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControl, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq );
+  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq );
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,

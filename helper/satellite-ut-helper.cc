@@ -117,10 +117,13 @@ SatUtHelper::SatUtHelper ()
   NS_FATAL_ERROR ("SatUtHelper::SatUtHelper - Constructor not in use");
 }
 
-SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
+SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq,
+                          SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
    m_superframeSeq (seq),
+   m_readCtrlCb (readCb),
+   m_writeCtrlCb (writeCb),
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
@@ -222,6 +225,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, randomAccessConf, m_randomAccessModel);
   mac->SetAttribute ("LowerLayerServiceConf", PointerValue (m_llsConf));
+  mac->SetReadCtrlCallback (m_readCtrlCb);
+  mac->SetWriteCtrlCallback (m_writeCtrlCb);
 
   // Set timing advance callback to mac.
   Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
@@ -230,8 +235,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
   mac->SetTimingAdvanceCallback (timingCb);
 
-  SatUtMac::SendCallback txCb = MakeCallback (&SatNetDevice::SendControl, dev);
-  mac->SetTxCallback (txCb);
+  SatUtMac::SendCtrlCallback ctrlCb = MakeCallback (&SatNetDevice::SendControlMsg, dev);
+  mac->SetCtrlMsgCallback (ctrlCb);
 
   // Attach the Mac layer C/N0 updates receiver to Phy
   SatPhy::CnoCallback cnoCb = MakeCallback (&SatUtMac::CnoUpdated, mac);

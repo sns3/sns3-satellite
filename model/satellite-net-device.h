@@ -28,6 +28,7 @@
 #include "ns3/net-device.h"
 #include "ns3/mac48-address.h"
 #include "ns3/traced-callback.h"
+#include "satellite-control-message.h"
 #include "satellite-enums.h"
 
 namespace ns3 {
@@ -125,7 +126,7 @@ public:
   virtual bool IsBridge (void) const;
   virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
   virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
-  bool SendControl (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+  bool SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest);
   virtual Ptr<Node> GetNode (void) const;
   virtual void SetNode (Ptr<Node> node);
   virtual bool NeedsArp (void) const;

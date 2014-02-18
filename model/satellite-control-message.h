@@ -27,6 +27,7 @@
 #include "ns3/header.h"
 #include "ns3/object.h"
 #include "ns3/nstime.h"
+#include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "satellite-mac-tag.h"
 
@@ -102,106 +103,6 @@ private:
   uint32_t             m_msgId;
 };
 
-// TODO: CR is needed to change as packet
-/**
- * \ingroup satellite
- * \brief The packet header for the Capacity request messages.
- * (Tagged by SatControlMsgTag with type value SAT_CR_CTRL_MSG)
- */
-
-class SatCapacityReqHeader : public Header
-{
-public:
-
-  /**
-   * \brief Definition for different types of Capacity Request (CR) messages.
-   */
-  typedef enum
-  {
-    SAT_UNKNOWN_CR,
-    SAT_RBDC_CR,
-    SAT_VBDC_CR
-  } SatCrRequestType_t;
-
-  /**
-   * Constructor for SatCapacityReqHeader
-   */
-  SatCapacityReqHeader ();
-
-  /**
-   * Destructor for SatCapacityReqHeader
-   */
-  ~SatCapacityReqHeader ();
-
-  /**
-   * Get type of the CR message.
-   *
-   * \return The type of the CR message
-   */
-  SatCrRequestType_t GetReqType () const;
-
-  /**
-   * Set type of the CR message. In construction phase initialized
-   * to value SAT_UNKNOWN_CR.
-   *
-   * \param type Type of the CR message
-   */
-  void SetReqType (SatCrRequestType_t type);
-
-  /**
-   * Get rate of the CR.
-   *
-   * \return Rate of the CR
-   */
-  double GetRequestedRate () const;
-
-  /**
-   * Set rate of the CR.
-   *
-   * \param rate The rate of the CR.
-   */
-  void SetRequestedRate (double rate);
-
-  /**
-   * Get C/N0 estimate.
-   *
-   * \return Estimate of the C/N0.
-   */
-  double GetCnoEstimate () const;
-
-  /**
-   * Set C/N0 estimate.
-   *
-   * \param cno The estimate of the C/N0.
-   */
-  void SetCnoEstimate (double cno);
-
-  // methods derived from base classes
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual void Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
-
-private:
-  /**
-   * Type of the this Capacity Request
-   */
-  SatCrRequestType_t m_reqType;
-
-  /**
-   * Requested rate.
-   */
-  double m_requestedRate;
-
-  /**
-   * C/N0 estimate.
-   */
-  double m_cno;
-};
-
-
 /**
  * \ingroup satellite
  * \brief Abstract satellite control message class
@@ -215,12 +116,12 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Default constructor for SatTbtpHeader. Set sequence id to 0.
+   * Default constructor for SatControlMessage.
    */
   SatControlMessage () {};
 
   /**
-   * Destructor for SatTbtpHeader
+   * Destructor for  Set sequence id to 0.
    */
   ~SatControlMessage () {};
 
@@ -229,7 +130,14 @@ public:
    *
    * \return Real size of the control message.
    */
-  virtual uint32_t GetSizeinBytes () = 0;
+  virtual uint32_t GetSizeInBytes () const = 0;
+
+  /**
+   * Get message specific type.
+   *
+   * \return Message specific type
+   */
+  virtual SatControlMsgTag::SatControlMsgType_t GetMsgType () const = 0;
 
 private:
 
@@ -345,6 +253,13 @@ public:
   ~SatTbtpMessage ();
 
   /**
+   * Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_TBTP_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_TBTP_CTRL_MSG; }
+
+  /**
    * Set counter of the super frame in this TBTP message.
    *
    * \param counter The super frame counter.
@@ -386,7 +301,7 @@ public:
    *
    * \return Real size of the TBTP message.
    */
-  virtual uint32_t GetSizeinBytes ();
+  virtual uint32_t GetSizeInBytes () const;
 
   /**
    * Dump all the contents of the TBTP
@@ -409,11 +324,124 @@ private:
   const TimeSlotInfoContainer_t m_emptySlotContainer;
 };
 
+// TODO: CR is needed to change as packet
+/**
+ * \ingroup satellite
+ * \brief The packet header for the Capacity request messages.
+ * (Tagged by SatControlMsgTag with type value SAT_CR_CTRL_MSG)
+ */
+
+class SatCrMessage : public SatControlMessage
+{
+public:
+
+  /**
+   * \brief Definition for different types of Capacity Request (CR) messages.
+   */
+  typedef enum
+  {
+    SAT_UNKNOWN_CR,
+    SAT_RBDC_CR,
+    SAT_VBDC_CR
+  } SatCrRequestType_t;
+
+  /**
+   * Constructor for SatCrMessage
+   */
+  SatCrMessage ();
+
+  /**
+   * Destructor for SatCrMessage
+   */
+  ~SatCrMessage ();
+
+  // methods derived from base classes
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_CR_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CR_CTRL_MSG; }
+
+  /**
+   * Get type of the CR message.
+   *
+   * \return The type of the CR message
+   */
+  SatCrRequestType_t GetReqType () const;
+
+  /**
+   * Set type of the CR message. In construction phase initialized
+   * to value SAT_UNKNOWN_CR.
+   *
+   * \param type Type of the CR message
+   */
+  void SetReqType (SatCrRequestType_t type);
+
+  /**
+   * Get rate of the CR.
+   *
+   * \return Rate of the CR
+   */
+  double GetRequestedRate () const;
+
+  /**
+   * Set rate of the CR.
+   *
+   * \param rate The rate of the CR.
+   */
+  void SetRequestedRate (double rate);
+
+  /**
+   * Get C/N0 estimate.
+   *
+   * \return Estimate of the C/N0.
+   */
+  double GetCnoEstimate () const;
+
+  /**
+   * Set C/N0 estimate.
+   *
+   * \param cno The estimate of the C/N0.
+   */
+  void SetCnoEstimate (double cno);
+
+  /**
+   * Get real size of the CR message, which can be used to e.g. simulate real size.
+   *
+   * \return Real size of the CR message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  /**
+   * Type of the this Capacity Request
+   */
+  SatCrRequestType_t m_reqType;
+
+  /**
+   * Requested rate.
+   */
+  double m_requestedRate;
+
+  /**
+   * C/N0 estimate.
+   */
+  double m_cno;
+};
+
 /**
  * \ingroup satellite
  * \brief The container to store control messages. It assigns ID for added messages.
- * ID is used when message is requested. Count of stored messages can be configured
- * through attribute in creation time.
+ * ID is used when message is requested.
+ *
+ * Message are deleted after set store time expired for a message. Message is deleted already when read,
+ * if this functionality is enabled in creation time.
+ *
+ * Container is needed to store control messages which content are not wanted to simulate inside packet.
  *
  */
 class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
@@ -423,6 +451,11 @@ public:
    * Default constructor for SatControlMsgContainer.
    */
   SatControlMsgContainer ();
+
+  /**
+   * Default constructor for SatControlMsgContainer.
+   */
+  SatControlMsgContainer (Time m_storeTime, bool deleteOnRead);
 
   /**
    * Destructor for SatControlMsgContainer
@@ -445,21 +478,35 @@ public:
    * \param Id of the message to get.
    * \return Pointer to message.
    */
-  Ptr<SatControlMessage> Get (uint32_t id) const;
-
-  /**
-   * Set value for maximum number of messages to store in container.
-   *
-   * \param Maximum number of messages to store in container.
-   */
-  void SetMaxMsgCount (uint32_t maxMsgCount);
+  Ptr<SatControlMessage> Get (uint32_t id);
 
 private:
 
-  typedef std::map<uint32_t, Ptr<SatControlMessage> > CtrlMsgMap_t;
+  /**
+   * Erase first item from container. Schedules a new erase call to this function with time left
+   * for next item in list (if container is not empty).
+   */
+  void EraseFirst ();
+
+  typedef std::pair<Time, Ptr<SatControlMessage> > CtrlMsgMapValue_t;
+  typedef std::map<uint32_t, CtrlMsgMapValue_t > CtrlMsgMap_t;
   CtrlMsgMap_t   m_ctrlMsgs;
   uint32_t       m_id;
-  uint32_t       m_maxMsgCount;
+  EventId        m_storeTimeout;
+
+  /**
+   * Time to store a message in container.
+   *
+   * If m_deleteOnRead is set false, the message
+   * is always deleted only when this time is elapsed.
+   */
+  Time m_storeTime;
+
+  /**
+   * Flag to tell, if message is deleted from container when read (get).
+   */
+  bool m_deleteOnRead;
+
 };
 
 

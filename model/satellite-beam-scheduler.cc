@@ -83,18 +83,18 @@ SatBeamScheduler::Receive (Ptr<Packet> packet)
 }
 
 bool
-SatBeamScheduler::Send (Ptr<Packet> packet)
+SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 {
-  NS_LOG_FUNCTION (this << packet);
-  NS_LOG_LOGIC ("p=" << packet );
+  NS_LOG_FUNCTION (this << msg);
+  NS_LOG_LOGIC ("p=" << msg );
 
-  m_txCallback (packet, Mac48Address::GetBroadcast (), Ipv4L3Protocol::PROT_NUMBER);
+  m_txCallback (msg, Mac48Address::GetBroadcast ());
 
   return true;
 }
 
 void
-SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCallback cb, Ptr<SatSuperframeSeq> seq)
+SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
   m_beamId = beamId;
@@ -148,6 +148,19 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
   m_uts[utId].m_cno = cno;
 }
 
+void
+SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
+{
+  NS_LOG_FUNCTION (this << utId << crMsg);
+
+  // check that UT is added to this scheduler.
+  std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
+  NS_ASSERT (result != m_uts.end ());
+
+  // TODO: Container for C/N0 values needed, now we just save the latest value.
+  //m_uts[utId].m_cno = cno;
+}
+
 double
 SatBeamScheduler::EstimateUtCno (Address utId)
 {
@@ -175,18 +188,7 @@ SatBeamScheduler::Schedule ()
       // TODO: algorithms for other configurations
       ScheduleUts (tbtpMsg);
 
-      uint32_t msgId = m_superframeSeq->AddTbtpMessage (m_beamId, tbtpMsg);
-
-      Ptr<Packet> packet = Create<Packet> (tbtpMsg->GetSizeinBytes ());
-
-      // add TBTP tag to message
-      SatControlMsgTag tag;
-      tag.SetMsgType (SatControlMsgTag::SAT_TBTP_CTRL_MSG);
-      tag.SetMsgId (msgId);
-
-      packet->AddPacketTag (tag);
-
-      Send (packet);
+      Send (tbtpMsg);
 
       NS_LOG_LOGIC ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
     }
@@ -286,6 +288,12 @@ SatBeamScheduler::GetNextTimeSlot ()
     }
 
   return timeSlotId;
+}
+
+void
+SatBeamScheduler::UpdateDamaEntries ()
+{
+  NS_LOG_FUNCTION (this);
 }
 
 void SatBeamScheduler::InitializeScheduling ()
