@@ -134,12 +134,16 @@ private:
   class UtInfo
   {
     public:
-      Ptr<SatDamaEntry>           m_damaEntry;    // dama entry
-      double                      m_cno;          // The latest calculated value of C/N0
-      std::vector<Ptr<Packet> >   m_crContainer;  // received CRs since last scheduling round.
+      typedef std::vector< Ptr<SatCrMessage> > CrContainer_t;
+
+      Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
+      double                m_cno;          // The latest calculated value of C/N0
+      CrContainer_t         m_crContainer;  // received CRs since last scheduling round.
 
       UtInfo() : m_cno (NAN) {}
   };
+
+  typedef std::map<Address, UtInfo> UtInfoMap_t;
 
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);
@@ -183,7 +187,7 @@ private:
   /**
    * Set to store UTs in beam.
    */
-  std::map<Address, UtInfo> m_uts;
+  UtInfoMap_t m_uts;
 
   /**
    * Iterator of the current UT to schedule
@@ -193,7 +197,7 @@ private:
   /**
    * Iterator of the UT scheduled first
    */
-  std::map<Address, UtInfo>::iterator m_firstUt;
+  UtInfoMap_t::iterator m_firstUt;
 
   /**
    * Shuffled list of carrier ids.

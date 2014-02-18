@@ -177,7 +177,7 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
   NS_ASSERT (result != m_uts.end ());
 
   // TODO: Container for C/N0 values needed, now we just save the latest value.
-  //m_uts[utId].m_cno = cno;
+  m_uts[utId].m_crContainer.push_back (crMsg);
 }
 
 double
@@ -197,6 +197,8 @@ SatBeamScheduler::Schedule ()
   // check that there is UTs to schedule
   if ( m_uts.size() > 0 )
     {
+      UpdateDamaEntries ();
+
       InitializeScheduling ();
 
       // create TBTP  message
@@ -328,6 +330,23 @@ void
 SatBeamScheduler::UpdateDamaEntries ()
 {
   NS_LOG_FUNCTION (this);
+
+  for (UtInfoMap_t::iterator it = m_uts.begin (); it != m_uts.end (); it ++ )
+    {
+      // estimate C/N0
+      EstimateUtCno (it->first);
+
+      // process received CRs
+      for ( UtInfo::CrContainer_t::const_iterator crIt = it->second.m_crContainer.begin (); crIt != it->second.m_crContainer.end (); crIt++ )
+        {
+          // TODO: Update SatDamaEntry (RC_index, CC) when CR message content is implemented
+        }
+            
+      // clear container when CRs processed
+      it->second.m_crContainer.clear ();
+      
+      // TODO: calculate requested bytes per SF for each (RC_index, CC)
+    }
 }
 
 void SatBeamScheduler::InitializeScheduling ()
