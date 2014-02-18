@@ -433,7 +433,7 @@ public:
    * \param raChannel RA channel, which slot are requested
    * \return RA channel time slots
    */
-  SatFrameConf::SatTimeSlotIdList_t GetRaChannels (uint32_t raChannel);
+  SatFrameConf::SatTimeSlotIdList_t GetRaSlots (uint32_t raChannel);
 
   /**
    * Get the number of the RA channels in super frame configuration.

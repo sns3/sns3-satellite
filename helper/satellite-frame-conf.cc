@@ -468,12 +468,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
               Ptr<SatWaveform> defaultWaveForm = waveFormConf->GetWaveform (defaultWaveFormId);
 
               double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRateInBauds ());
-              uint32_t slotCount = targetDuration.GetSeconds() / timeSlotDuration;
-
-              if ( slotCount == 0 )
-                {
-                  slotCount = 1;
-                }
+              uint32_t slotCount = std::max<uint32_t> (1 ,(targetDuration.GetSeconds() / timeSlotDuration ));
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
               m_durationInSeconds = slotCount * timeSlotDuration;
@@ -518,7 +513,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 }
 
 SatFrameConf::SatTimeSlotIdList_t
-SatSuperframeConf::GetRaChannels (uint32_t raChannel)
+SatSuperframeConf::GetRaSlots (uint32_t raChannel)
 {
   NS_LOG_FUNCTION (this);
 

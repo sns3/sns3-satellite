@@ -101,7 +101,7 @@ SatTbtpContainer::HasScheduledTimeSlots () const
        * If there are at least one time slot scheduled, return true.
        * Otherwise return false.
        */
-      SatTbtpMessage::TimeSlotInfoContainer_t slots;
+      SatTbtpMessage::DaTimeSlotInfoContainer_t slots;
       for (TbtpMap_t::const_reverse_iterator it = m_tbtps.rbegin ();
           it != m_tbtps.rend ();
           ++it)
@@ -109,7 +109,7 @@ SatTbtpContainer::HasScheduledTimeSlots () const
           // TBTP in the future
           if (it->first > Simulator::Now ())
             {
-              slots = it->second->GetTimeslots(m_address);
+              slots = it->second->GetDaTimeslots (m_address);
               if (!slots.empty ())
                 {
                   return true;
@@ -119,7 +119,7 @@ SatTbtpContainer::HasScheduledTimeSlots () const
           // TBTP in the past or Now()
           else
             {
-              slots = it->second->GetTimeslots(m_address);
+              slots = it->second->GetDaTimeslots (m_address);
               if (!slots.empty ())
                 {
                   return true;

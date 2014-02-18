@@ -154,58 +154,22 @@ private:
 class SatTbtpMessage : public SatControlMessage
 {
 public:
+  static const uint16_t maximumTimeSlotId = 2047;
+
   /**
-   * Time slot info class used to stored time slots in TBTP.
+   * Container for DA time slot information.
+   *
+   * Stored information is pair, which member first holds frame id
+   * and member second holds time slot id.
    */
-  class TbtpTimeSlotInfo : public SimpleRefCount<SatTbtpMessage::TbtpTimeSlotInfo>
-  {
-  public:
-    static const uint16_t maximumTimeSlotId = 2047;
+  typedef std::vector< std::pair<uint8_t, uint16_t> >  DaTimeSlotInfoContainer_t;
 
-    /**
-     * Default Constructor for TbtpTimeSlotInfo
-     */
-    TbtpTimeSlotInfo ();
-
-    /**
-     * Constructor for TbtpTimeSlotInfo
-     *
-     * \param frameId     The id of the frame where time slot belongs to
-     * \param timeSlotId  The id of the time slot
-     */
-    TbtpTimeSlotInfo (uint8_t frameId, uint16_t timeSlotId);
-
-    /**
-     * Destructor for TbtpTimeSlotInfo
-     */
-    ~TbtpTimeSlotInfo ();
-
-    /**
-     * Get the id of the frame
-     *
-     * \return frame id
-     */
-    inline uint8_t GetFrameId() { return m_frameId; }
-
-    /**
-     * Get the id of the time slot
-     *
-     * \return time slot id
-     */
-    inline uint16_t GetTimeSlotId() { return m_timeSlotId; }
-
-    // methods derived from base classes
-    void Print (std::ostream &os) const;
-    uint32_t GetSerializedSize (void) const;
-    void Serialize (Buffer::Iterator start) const;
-    uint32_t Deserialize (Buffer::Iterator start);
-
-  private:
-    uint8_t   m_frameId;
-    uint16_t  m_timeSlotId;
-  };
-
-  typedef std::vector< Ptr<SatTbtpMessage::TbtpTimeSlotInfo> > TimeSlotInfoContainer_t;
+  /**
+   * Container for RA channel information
+   *
+   * Stored information is index of the RA channel.
+   */
+  typedef std::set< uint8_t >  RaChannelInfoContainer_t;
 
   /**
    * Size of message body without frame info and slot assignment info
@@ -281,20 +245,37 @@ public:
   inline uint32_t GetSuperframeCounter () {return m_superframeCounter;}
 
   /**
-   * Get the information of the time slots
+   * Get the information of the DA time slots.
    *
    * \param utId  id of the UT which time slot information is requested
-   * \return vector containing time slot info
+   * \return vector containing DA time slot info
    */
-  const TimeSlotInfoContainer_t& GetTimeslots (Address utId);
+  const DaTimeSlotInfoContainer_t& GetDaTimeslots (Address utId);
 
   /**
-   * Set a time slot information
+   * Set a DA time slot information
    *
    * \param utId  id of the UT which time slot information is set
-   * \param info  information of the time slot info
+   * \param frameID  Frame ID of the time slot
+   * \param timeSlotId Id of the time slot
    */
-  void SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info);
+  void SetDaTimeslot (Mac48Address utId, uint8_t frameId, uint16_t timeSlotId);
+
+  /**
+   * Get the information of the RA channels.
+   *
+   * \return vector containing RA channels.
+   */
+  const RaChannelInfoContainer_t GetRaChannels () const;
+
+  /**
+   * Set a RA time slot information
+   *
+   * \param raChannel  raChannel index
+   * \param frameID  Frame ID of ra channel
+   * \param timeSlotCount Timeslots in channel
+   */
+  void SetRaChannel (uint32_t raChannel, uint8_t frameId, uint16_t timeSlotCount);
 
   /**
    * Get real size of the TBTP message, which can be used to e.g. simulate real size.
@@ -310,18 +291,20 @@ public:
 
 private:
 
-  typedef std::map<Address, TimeSlotInfoContainer_t > TimeSlotMap_t;
+  typedef std::map <uint8_t, uint16_t >  RaChannelMap_t;
+  typedef std::map<Address, DaTimeSlotInfoContainer_t > DaTimeSlotMap_t;
 
-  TimeSlotMap_t     m_timeSlots;
+  DaTimeSlotMap_t   m_daTimeSlots;
+  RaChannelMap_t    m_raChannels;
   uint32_t          m_superframeCounter;
   uint8_t           m_superframeSeqId;
   uint8_t           m_assignmentFormat;
   std::set<uint8_t> m_frameIds;
 
   /**
-   * Empty slot container to be returned if there are not time slots
+   * Empty DA slot container to be returned if there are not DA time slots
    */
-  const TimeSlotInfoContainer_t m_emptySlotContainer;
+  const DaTimeSlotInfoContainer_t m_emptyDaSlotContainer;
 };
 
 // TODO: CR is needed to change as packet

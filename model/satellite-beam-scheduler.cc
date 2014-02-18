@@ -187,6 +187,7 @@ SatBeamScheduler::Schedule ()
       // schedule time slots according to static configuration 0
       // TODO: algorithms for other configurations
       ScheduleUts (tbtpMsg);
+      AddRaChannels (tbtpMsg);
 
       Send (tbtpMsg);
 
@@ -225,6 +226,21 @@ void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
     }
 }
 
+void
+SatBeamScheduler::AddRaChannels (Ptr<SatTbtpMessage> header)
+{
+  Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (0);
+
+  for (uint32_t i = 0; i < superFrameConf->GetRaChannelCount (); i++)
+    {
+      uint8_t frameId = superFrameConf->GetRaChannelFrameId (i);
+      Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (frameId);
+      uint16_t timeSlotCount = frameConf->GetTimeSlotCount() / frameConf->GetCarrierCount();
+
+      header->SetRaChannel (i, superFrameConf->GetRaChannelFrameId (i), timeSlotCount);
+    }
+}
+
 uint32_t
 SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
 {
@@ -244,8 +260,7 @@ SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
 
       while ( timeSlotForUt )
         {
-          Ptr<SatTbtpMessage::TbtpTimeSlotInfo > timeSlotInfo = Create<SatTbtpMessage::TbtpTimeSlotInfo> (m_currentFrame, GetNextTimeSlot () );
-          header->SetTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), timeSlotInfo);
+          header->SetDaTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), m_currentFrame, GetNextTimeSlot ());
 
           timeSlotForUt--;
         }

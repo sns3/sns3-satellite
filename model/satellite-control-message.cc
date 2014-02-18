@@ -121,62 +121,6 @@ SatControlMsgTag::GetMsgId () const
   return m_msgId;
 }
 
-// TBTP time slot information
-
-SatTbtpMessage::TbtpTimeSlotInfo::TbtpTimeSlotInfo ()
-  : m_frameId(0),
-    m_timeSlotId(0)
-{
-  NS_LOG_FUNCTION (this);
-}
-
-
-SatTbtpMessage::TbtpTimeSlotInfo::TbtpTimeSlotInfo (uint8_t frameId, uint16_t timeSlotId)
-  : m_frameId(frameId)
-{
-  NS_LOG_FUNCTION (this);
-
-  if (timeSlotId > maximumTimeSlotId)
-    {
-      NS_FATAL_ERROR ("Timeslot ID is out or range!!!");
-    }
-
-  m_timeSlotId = timeSlotId;
-}
-
-SatTbtpMessage::TbtpTimeSlotInfo::~TbtpTimeSlotInfo()
-{
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SatTbtpMessage::TbtpTimeSlotInfo::Print (std::ostream &os)  const
-{
-  os << "Frame ID= " << m_frameId << ", Time Slot ID= " << m_timeSlotId;
-}
-
-uint32_t
-SatTbtpMessage::TbtpTimeSlotInfo::GetSerializedSize (void) const
-{
-  return ( sizeof(m_frameId)  + sizeof(m_timeSlotId) );
-}
-
-void
-SatTbtpMessage::TbtpTimeSlotInfo::Serialize (Buffer::Iterator start) const
-{
-   start.WriteU8 (m_frameId);
-   start.WriteU16 (m_timeSlotId);
-}
-
-uint32_t
-SatTbtpMessage::TbtpTimeSlotInfo::Deserialize (Buffer::Iterator start)
-{
-  m_frameId = start.ReadU8 ();
-  m_timeSlotId = start.ReadU16 ();
-
-  return GetSerializedSize();
-}
-
 // Control message
 
 NS_OBJECT_ENSURE_REGISTERED (SatControlMessage);
@@ -216,7 +160,7 @@ SatTbtpMessage::~SatTbtpMessage ()
   NS_LOG_FUNCTION (this);
 
   m_frameIds.clear ();
-  m_timeSlots.clear ();
+  m_daTimeSlots.clear ();
 }
 
 TypeId
@@ -242,35 +186,35 @@ SatTbtpMessage::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-const SatTbtpMessage::TimeSlotInfoContainer_t&
-SatTbtpMessage::GetTimeslots (Address utId)
+const SatTbtpMessage::DaTimeSlotInfoContainer_t&
+SatTbtpMessage::GetDaTimeslots (Address utId)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  TimeSlotMap_t::const_iterator it = m_timeSlots.find (utId);
+  DaTimeSlotMap_t::const_iterator it = m_daTimeSlots.find (utId);
 
-  if ( it != m_timeSlots.end () )
+  if ( it != m_daTimeSlots.end () )
     {
       return it->second;
     }
 
-  return m_emptySlotContainer;
+  return m_emptyDaSlotContainer;
 }
 
 void
-SatTbtpMessage::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
+SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, uint16_t timeSlotId)
 {
-  NS_LOG_FUNCTION (this << utId << info);
+  NS_LOG_FUNCTION (this << utId << frameId << timeSlotId);
 
   // find container for the UT from map
-  TimeSlotMap_t::iterator it = m_timeSlots.find (utId);
+  DaTimeSlotMap_t::iterator it = m_daTimeSlots.find (utId);
 
   // If not found, add new UT container to map,
   // otherwise use container found from map
-  if ( it == m_timeSlots.end () )
+  if ( it == m_daTimeSlots.end () )
     {
-      TimeSlotInfoContainer_t slotInfos;
-      std::pair<TimeSlotMap_t::iterator, bool> result = m_timeSlots.insert (std::make_pair (utId, slotInfos));
+      DaTimeSlotInfoContainer_t slotInfos;
+      std::pair<DaTimeSlotMap_t::iterator, bool> result = m_daTimeSlots.insert (std::make_pair (utId, slotInfos));
 
       if ( result.second )
         {
@@ -278,22 +222,66 @@ SatTbtpMessage::SetTimeslot (Mac48Address utId, Ptr<TbtpTimeSlotInfo> info)
         }
       else
         {
-          it = m_timeSlots.end ();
+          it = m_daTimeSlots.end ();
         }
     }
 
   // container creation for UT has failed, so we need to crash
-  if (it == m_timeSlots.end ())
+  if (it == m_daTimeSlots.end ())
     {
       NS_FATAL_ERROR ("Cannot insert slot to container!!!");
     }
 
   // store time slot info to user specific container
-  it->second.push_back (info);
+  it->second.push_back (std::make_pair (frameId, timeSlotId) );
 
   // store frame ID to count used frames
-  m_frameIds.insert (info->GetFrameId ());
+  m_frameIds.insert (frameId);
 }
+
+const SatTbtpMessage::RaChannelInfoContainer_t
+SatTbtpMessage::GetRaChannels () const
+{
+  NS_LOG_FUNCTION (this);
+
+  SatTbtpMessage::RaChannelInfoContainer_t channels;
+
+  for (RaChannelMap_t::const_iterator it = m_raChannels.begin (); it != m_raChannels.end (); it++)
+    {
+      channels.insert (it->second);
+    }
+
+  return channels;
+}
+
+void
+SatTbtpMessage::SetRaChannel (uint32_t raChannel, uint8_t frameId, uint16_t timeSlotCount)
+{
+  NS_LOG_FUNCTION (this << raChannel << frameId << timeSlotCount);
+
+  // find index for the RA channel from map
+  RaChannelMap_t::iterator it = m_raChannels.find (raChannel);
+
+  // If not found, add RA channel to map,
+  // otherwise raise error
+  if ( it == m_raChannels.end () )
+    {
+      std::pair<RaChannelMap_t::iterator, bool> result = m_raChannels.insert (std::make_pair (raChannel, timeSlotCount));
+
+      if ( result.second == false )
+        {
+          NS_FATAL_ERROR ("RA channel insertion failed!!!");
+        }
+    }
+  else
+    {
+      NS_FATAL_ERROR ("RA channel already exists in the container!!!");
+    }
+
+  // store frame ID to count used frames
+  m_frameIds.insert (frameId);
+}
+
 
 uint32_t SatTbtpMessage::GetSizeInBytes () const
 {
@@ -346,7 +334,17 @@ uint32_t SatTbtpMessage::GetSizeInBytes () const
       break;
   }
 
-  sizeInBytes += (m_timeSlots.size () * assignmentBodySizeInBytes);
+  // add size of DA time slots
+  for (DaTimeSlotMap_t::const_iterator it = m_daTimeSlots.begin (); it != m_daTimeSlots.end (); it++ )
+    {
+      sizeInBytes += (it->second.size () * assignmentBodySizeInBytes);
+    }
+
+  // add size of RA time slots
+  for (RaChannelMap_t::const_iterator it = m_raChannels.begin (); it != m_raChannels.end (); it++ )
+    {
+      sizeInBytes += (it->second * assignmentBodySizeInBytes);
+    }
 
   return sizeInBytes;
 
@@ -358,16 +356,16 @@ void SatTbtpMessage::Dump () const
       ", superframe sequence id: " << m_superframeSeqId <<
       ", assignment format: " << m_assignmentFormat << std::endl;
 
-  for (TimeSlotMap_t::const_iterator mit = m_timeSlots.begin ();
-      mit != m_timeSlots.end ();
+  for (DaTimeSlotMap_t::const_iterator mit = m_daTimeSlots.begin ();
+      mit != m_daTimeSlots.end ();
       ++mit)
     {
       std::cout << "UT: " << mit->first << ": ";
-      for (TimeSlotInfoContainer_t::const_iterator sit = mit->second.begin ();
+      for (DaTimeSlotInfoContainer_t::const_iterator sit = mit->second.begin ();
           sit != mit->second.end ();
           ++sit)
         {
-          std::cout << (*sit)->GetTimeSlotId () << " ";
+          std::cout << sit->second << " ";
         }
       std::cout << std::endl;
     }

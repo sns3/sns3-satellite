@@ -150,6 +150,7 @@ private:
   void UpdateDamaEntries ();
   void InitializeScheduling ();
   void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
+  void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
 

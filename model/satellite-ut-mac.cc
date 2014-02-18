@@ -218,7 +218,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
   //tbtp->Dump ();
 
-  SatTbtpMessage::TimeSlotInfoContainer_t slots = tbtp->GetTimeslots (m_nodeInfo->GetMacAddress ());
+  SatTbtpMessage::DaTimeSlotInfoContainer_t slots = tbtp->GetDaTimeslots (m_nodeInfo->GetMacAddress ());
 
   if ( !slots.empty ())
     {
@@ -227,22 +227,22 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
       uint8_t frameId = 0;
 
       // schedule time slots
-      for ( SatTbtpMessage::TimeSlotInfoContainer_t::iterator it = slots.begin (); it != slots.end (); it++ )
+      for ( SatTbtpMessage::DaTimeSlotInfoContainer_t::iterator it = slots.begin (); it != slots.end (); it++ )
         {
           // Store frame id from first slot and check later that frame id is same
           // If frame id changes in TBTP for same UT, raise error.
           if ( it == slots.begin () )
             {
-              frameId = (*it)->GetFrameId ();
+              frameId = it->first;
             }
-          else if ( frameId != (*it)->GetFrameId ())
+          else if ( frameId != it->first )
             {
               NS_FATAL_ERROR ("Error in TBTP: slot allocate from different frames for same UT!!!");
             }
 
           Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
           Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
-          Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( (*it)->GetTimeSlotId () );
+          Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( it->second );
 
           // Start time
           Time slotDelay = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());
