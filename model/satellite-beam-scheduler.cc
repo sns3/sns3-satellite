@@ -20,8 +20,8 @@
 
 #include <algorithm>
 #include "ns3/log.h"
+#include "ns3/double.h"
 #include "ns3/ipv4-l3-protocol.h"
-//#include "satellite-dama-entry.h"
 #include "satellite-beam-scheduler.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
@@ -108,12 +108,26 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   // Scheduling starts after one empty super frame.
   m_superFrameCounter = tbtpsPerRtt + 1;
 
+  // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
+  // this part of implementation is needed to change
+  m_raChRandomIndex = CreateObject<UniformRandomVariable> ();
+  m_raChRandomIndex->SetAttribute("Min", DoubleValue (0));
+
+  uint32_t raChCount = m_superframeSeq->GetSuperframeConf (0)->GetRaChannelCount ();
+
+  if ( raChCount < 1 )
+    {
+      NS_FATAL_ERROR ("RA channels not configured in used!!!");
+    }
+
+  m_raChRandomIndex->SetAttribute("Max", DoubleValue (raChCount - 1));
+
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
   Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
 }
 
-void
+uint32_t
 SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << utId);
@@ -133,6 +147,11 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
     {
       NS_FATAL_ERROR ("UT (Address: " << utId << ") already added to Beam scheduler.");
     }
+
+  m_superframeSeq->GetSuperframeConf (0)->GetRaChannelCount ();
+
+  // return random RA channel index for the UT.
+  return m_raChRandomIndex->GetInteger ();
 }
 
 void

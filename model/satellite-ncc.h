@@ -113,8 +113,10 @@ public:
     * \param utId ID (mac address) of the UT to be added
     * \param llsConf Lower layer service configuration for the UT to be added.
     * \param beamId ID of the beam where UT is connected.
+    *
+    * \return RA channel index assigned to added UT.
     */
-  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
+  uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
 
 private:
 

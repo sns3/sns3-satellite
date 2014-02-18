@@ -100,8 +100,9 @@ public:
    *
    * \param utId ID (mac address) of the UT to be added
    * \param llsConf Lower layer service configuration for the UT.
+   * \return Index of the RA channel allocated to added UT
    */
-  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf);
+  uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * Update UT C/N0 info with the latest value.
@@ -240,7 +241,10 @@ private:
    */
   Time m_rttEstimate;
 
-
+  /**
+   * Random variable stream to select RA channel for a UT.
+   */
+  Ptr<RandomVariableStream> m_raChRandomIndex;
 };
 
 } // namespace ns3

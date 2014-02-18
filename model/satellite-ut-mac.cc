@@ -150,17 +150,37 @@ SatUtMac::DoDispose (void)
   SatMac::DoDispose ();
 }
 
-void SatUtMac::SetGwAddress (Mac48Address gwAddress)
+void
+SatUtMac::SetGwAddress (Mac48Address gwAddress)
 {
   NS_LOG_FUNCTION (this);
 
   m_gwAddress = gwAddress;
 }
 
-void SatUtMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
+void
+SatUtMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
+  NS_LOG_FUNCTION (this << nodeInfo);
+
   m_tbtpContainer->SetMacAddress (nodeInfo->GetMacAddress ());
   SatMac::SetNodeInfo (nodeInfo);
+}
+
+void
+SatUtMac::SetRaChannel (uint32_t raChannel)
+{
+  NS_LOG_FUNCTION (this << raChannel);
+
+  m_raChannel = raChannel;
+}
+
+uint32_t
+SatUtMac::GetRaChannel () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_raChannel;
 }
 
 void

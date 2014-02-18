@@ -132,6 +132,20 @@ public:
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
+  /**
+   * Set RA channel assigned for this UT.
+   *
+   * \param raChannel RA channel assigned to this UT.
+   */
+  void SetRaChannel (uint32_t raChannel);
+
+  /**
+   * Get RA channel assigned for this UT.
+   *
+   * \return RA channel assigned to this UT.
+   */
+  uint32_t GetRaChannel () const;
+
 protected:
 
    void DoDispose (void);
@@ -296,6 +310,11 @@ private:
    *
    */
   std::map < std::pair<uint32_t, uint32_t>, std::set<uint32_t> > m_usedRandomAccessSlots;
+
+  /**
+   * RA channel assigned to the UT.
+   */
+  uint32_t    m_raChannel;
 };
 
 } // namespace ns3
