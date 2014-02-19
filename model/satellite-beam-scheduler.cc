@@ -113,14 +113,15 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_raChRandomIndex = CreateObject<UniformRandomVariable> ();
   m_raChRandomIndex->SetAttribute("Min", DoubleValue (0));
 
-  uint32_t raChCount = m_superframeSeq->GetSuperframeConf (0)->GetRaChannelCount ();
+  // by default we give index 0, even if there is no RA channels configured.
+  uint32_t maxIndex = 0;
 
-  if ( raChCount < 1 )
+  if ( m_superframeSeq->GetSuperframeConf (0)->GetRaChannelCount () > 0 )
     {
-      NS_FATAL_ERROR ("RA channels not configured in used!!!");
+      maxIndex = m_superframeSeq->GetSuperframeConf (0)->GetRaChannelCount () - 1;
     }
 
-  m_raChRandomIndex->SetAttribute("Max", DoubleValue (raChCount - 1));
+  m_raChRandomIndex->SetAttribute("Max", DoubleValue (maxIndex));
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
