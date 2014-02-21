@@ -255,8 +255,12 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      TimeValue ( MilliSeconds (50)),
                      MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
                      MakeTimeChecker ())
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (0, true, true, true, 100.0, 200.0, 50.0, 1000)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (1, true, false, true, 100.0, 200.0, 50.0, 1000)
+
+    /*
+     * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
+     */
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (0, true, false, false, 100.0, 200.0, 50.0, 1000)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (1, false, false, true, 50.0, 512.0, 100.0, 2000)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, true, true, false, 100.0, 200.0, 50.0, 1000)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, true, false, false, 100.0, 200.0, 50.0, 1000)
 
@@ -339,7 +343,7 @@ SatLowerLayerServiceConf::SetDaVolumeAllowed (uint32_t index, bool volumeAllowed
   m_daServiceEntries[index].SetVolumeAllowed (volumeAllowed);
 }
 
-double
+uint32_t
 SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint32_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
@@ -373,7 +377,7 @@ SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint32_t index, Ptr<Ra
   m_daServiceEntries[index].SetConstantServiceRateStream (constantServiceRateStream);
 }
 
-double
+uint32_t
 SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint32_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
@@ -385,7 +389,7 @@ SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint32_t index, double maximumServiceRateKbps)
+SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint32_t index, uint32_t maximumServiceRateKbps)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -395,7 +399,7 @@ SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint32_t index, double 
   m_daServiceEntries[index].SetMaximumServiceRateInKbps (maximumServiceRateKbps);
 }
 
-double
+uint32_t
 SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint32_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
@@ -407,7 +411,7 @@ SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint32_t index, double minimumServiceRateKbps)
+SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint32_t index, uint32_t minimumServiceRateKbps)
 {
   if ( index >= m_maxDaServiceEntries)
     {

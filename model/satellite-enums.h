@@ -218,6 +218,18 @@ public:
   } SatBbFrameType_t;
 
 
+  /**
+   * \brief Definition for different types of Capacity Request (CR) messages.
+   */
+  typedef enum
+  {
+    DA_UNKNOWN,
+    DA_RBDC,
+    DA_VBDC,
+    DA_AVBDC
+  } SatCapacityAllocationCategory_t;
+
+
   static inline void GetAvailableBbFrameTypes (std::vector<SatBbFrameType_t>& frameTypes)
   {
     frameTypes.push_back (SHORT_FRAME);

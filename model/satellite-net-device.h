@@ -181,6 +181,16 @@ private:
                  > m_packetTrace;
 
   /**
+   * Traced callback for all packets received to be transmitted
+   */
+  TracedCallback<Ptr<const Packet> > m_txTrace;
+
+  /**
+   * Traced callback for all received packets
+   */
+  TracedCallback<Ptr<const Packet> > m_rxTrace;
+
+  /**
    * The trace source fired when the phy layer drops a packet it has received
    * due to the error model being active.  Although SatNetDevice doesn't
    * really have a Phy model, we choose this trace source name for alignment

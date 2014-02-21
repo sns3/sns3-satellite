@@ -75,7 +75,13 @@ SatNetDevice::GetTypeId (void)
      .AddTraceSource ("PacketTrace",
                       "Packet event trace",
                       MakeTraceSourceAccessor (&SatNetDevice::m_packetTrace))
-                    ;
+     .AddTraceSource ("Tx",
+                      "A packet to be sent",
+                      MakeTraceSourceAccessor (&SatNetDevice::m_txTrace))
+     .AddTraceSource ("Rx",
+                      "A packet received",
+                      MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace))
+                      ;
   return tid;
 }
 
@@ -108,6 +114,8 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
                  SatEnums::LL_ND,
                  ld,
                  SatUtils::GetPacketInfo (packet));
+
+  m_rxTrace (packet);
 
   m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
@@ -280,6 +288,8 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
+  m_txTrace (packet);
+
   Classify (packet, dest, protocolNumber);
 
   return true;
@@ -301,6 +311,8 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
                  SatEnums::LL_ND,
                  ld,
                  SatUtils::GetPacketInfo (packet));
+
+  m_txTrace (packet);
 
   Classify (packet, dest, protocolNumber);
 

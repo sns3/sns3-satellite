@@ -61,11 +61,6 @@ SatUtMac::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatUtMac::m_llsConf),
                    MakePointerChecker<SatLowerLayerServiceConf> ())
-    .AddAttribute ("CrUpdatePeriod",
-                   "Capacity request update period.",
-                   TimeValue (MilliSeconds (250)),
-                   MakeTimeAccessor (&SatUtMac::m_crInterval),
-                   MakeTimeChecker ())
     .AddAttribute ("FramePduHeaderSize",
                    "Frame PDU header size in bytes",
                    UintegerValue (1),
@@ -94,9 +89,7 @@ SatUtMac::SatUtMac ()
    m_timingAdvanceCb (0),
    m_ctrlCallback (0),
    m_llsConf (0),
-   m_lastCno (NAN),
    m_gwAddress (),
-   m_crInterval (MilliSeconds (100)),
    m_framePduHeaderSizeInBytes (1),
    m_guardTime (MicroSeconds (1))
 {
@@ -112,9 +105,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
    m_timingAdvanceCb (0),
    m_ctrlCallback (0),
    m_llsConf (0),
-   m_lastCno (NAN),
    m_gwAddress (),
-   m_crInterval (MilliSeconds (100)),
    m_framePduHeaderSizeInBytes (1),
    m_guardTime (MicroSeconds (1))
 {
@@ -127,8 +118,6 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
 	  }
 
 	m_tbtpContainer = CreateObject<SatTbtpContainer> ();
-
-  Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
 }
 
 SatUtMac::~SatUtMac ()
@@ -389,16 +378,7 @@ SatUtMac::Transmit (double durationInSecs, uint32_t payloadBytes, uint32_t carri
 }
 
 void
-SatUtMac::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId*/, double cno)
-{
-  NS_LOG_FUNCTION (this << beamId << cno);
-
-  // TODO: Some estimation algorithm needed to use, now we just save the latest received C/N0 info.
-  m_lastCno = cno;
-}
-
-void
-SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex)
+SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 {
   NS_LOG_FUNCTION (this << event << rcIndex);
 
@@ -423,24 +403,6 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex)
   else
     {
       NS_FATAL_ERROR ("Unsupported queue event received!");
-    }
-}
-
-void
-SatUtMac::SendCapacityReq ()
-{
-
-  if ( m_ctrlCallback.IsNull () == false )
-    {
-      // create CR specific message
-      Ptr<SatCrMessage> crMsg = CreateObject<SatCrMessage> ();
-      crMsg->SetReqType (SatCrMessage::SAT_RBDC_CR);
-      // TODO: estimated value of C/N0 must be used instead of last received value
-      crMsg->SetCnoEstimate (m_lastCno);
-
-      m_ctrlCallback (crMsg, m_gwAddress);
-
-      Simulator::Schedule (m_crInterval, &SatUtMac::SendCapacityReq, this);
     }
 }
 

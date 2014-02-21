@@ -21,9 +21,12 @@
 #ifndef SATELLITE_REQUEST_MANAGER_H_
 #define SATELLITE_REQUEST_MANAGER_H_
 
+#include <deque>
 #include "ns3/object.h"
 #include "satellite-queue.h"
 #include "satellite-lower-layer-service.h"
+#include "satellite-control-message.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -52,17 +55,25 @@ public:
   typedef Callback<SatQueue::QueueStats_t, bool> QueueCallback;
 
   /**
-   * \brief Periodically check the buffer status and whether
-   * a new CR is needed to be sent.
+   * \param msg        the message send
+   * \param address    Packet destination address
    */
-  void DoPeriodicalEvaluation ();
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
+
+  typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> PendingRequestKey_t;
+
+  /**
+   * Key = pair of RC index and CAC
+   * Value = deque of values
+   */
+  typedef std::map<PendingRequestKey_t, std::deque<uint32_t> > PendingRequestsContainer_t;
 
   /**
    * Receive a queue event
    * /param event Queue event from SatQueue
    * /param rcIndex Identifier of the queue
    */
-  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex);
+  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
    * Set a callback to fetch queue statistics
@@ -70,9 +81,38 @@ public:
    */
   void AddQueueCallback (uint8_t rcIndex, SatRequestManager::QueueCallback cb);
 
+  /**
+   * \param cb callback to send control messages.
+   */
+  void SetCtrlMsgCallback (SatRequestManager::SendCtrlCallback cb);
+
+  /**
+   * GW address needed for CR transmission
+   */
+  void SetGwAddress (Mac48Address address);
+
+  /**
+   * Update C/N0 information from lower layer.
+   *
+   * The SatUtMac receives C/N0 information of packet receptions from GW
+   * to update this information to serving GW periodically.
+   *
+   * \param beamId  The id of the beam where C/N0 is from.
+   * \param gwId  The id of the GW.
+   * \param utId  The id (address) of the UT.
+   * \param cno Value of the C/N0.
+   */
+  void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
+
 private:
 
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
+
+  /**
+   * \brief Periodically check the buffer status and whether
+   * a new CR is needed to be sent.
+   */
+  void DoPeriodicalEvaluation ();
 
   /**
    * Do evaluation of the buffer status and decide whether or not
@@ -81,9 +121,51 @@ private:
   void DoEvaluation (bool periodical);
 
   /**
+   * Do RBDC calculation for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \return uint32_t Requested bytes
+   */
+  uint32_t DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats);
+
+  /**
+   * Do VBDC calculation for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \return uint32_t Requested bytes
+   */
+  uint32_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats);
+
+  uint32_t GetPendingSum (uint8_t rc, SatEnums::SatCapacityAllocationCategory_t cac) const;
+
+  void UpdatePendingCounters (uint8_t rc, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value);
+
+  /**
+   * Send the capacity request control msg via txCallback to
+   * SatNetDevice
+   */
+  void SendCapacityRequest (Ptr<SatCrMessage> crMsg);
+
+  /**
    * The queue enque/deque rate getter callback
    */
   CallbackContainer_t m_queueCallbacks;
+
+  /**
+   * Callback to send control messages.
+  */
+  SendCtrlCallback m_ctrlCallback;
+
+  /**
+   * GW address
+   */
+  Mac48Address m_gwAddress;
+
+  /**
+   * The last received C/N0 information from lower layer
+   * in linear format.
+   */
+  double m_lastCno;
 
   /**
   * Lower layer services conf pointer, which holds the configurations
@@ -94,13 +176,38 @@ private:
   /**
    * Interval to do the periodical CR evaluation
    */
-  Time m_requestInterval;
+  Time m_evaluationInterval;
 
   /**
-   * RC index to check the queue status. Note, that is is not final
-   * implementation.
+   * Round trip time estimate. Used to estimate the amount of
+   * capacity requests on the air.
    */
-  uint32_t m_rcIndex;
+  Time m_rttEstimate;
+
+  /**
+   * Maximum values to take into account in estimation of capacity
+   * requests on the air. Calculated based on m_rttEstimate and
+   * evaluation period.
+   */
+  uint32_t m_maxPendingCrEntries;
+
+  /**
+   * Gain value K utilized for RBDC/VBDC calculation
+   */
+  double m_gainValueK;
+
+  // Key = RC index
+  // Value -> Key   = Time when the request was sent
+  // Value -> Value = Requested bitrate or bytes
+  PendingRequestsContainer_t m_pendingRequests;
+
+  static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBPS = 2;
+  static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBPS = 32;
+  static const uint32_t M_RBDC_QUANTIZATION_THRESHOLD_KBPS = 512;
+
+  static const uint32_t M_VBDC_QUANTIZATION_STEP_SMALL = 1;
+  static const uint32_t M_VBDC_QUANTIZATION_STEP_LARGE = 16;
+  static const uint32_t M_VBDC_QUANTIZATION_THRESHOLD_BYTES = 255;
 
 };
 

@@ -30,6 +30,7 @@
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "satellite-mac-tag.h"
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -307,10 +308,9 @@ private:
   const DaTimeSlotInfoContainer_t m_emptyDaSlotContainer;
 };
 
-// TODO: CR is needed to change as packet
 /**
  * \ingroup satellite
- * \brief The packet header for the Capacity request messages.
+ * \brief Capacity request message
  * (Tagged by SatControlMsgTag with type value SAT_CR_CTRL_MSG)
  */
 
@@ -318,15 +318,11 @@ class SatCrMessage : public SatControlMessage
 {
 public:
 
-  /**
-   * \brief Definition for different types of Capacity Request (CR) messages.
-   */
   typedef enum
   {
-    SAT_UNKNOWN_CR,
-    SAT_RBDC_CR,
-    SAT_VBDC_CR
-  } SatCrRequestType_t;
+    CR_BLOCK_SMALL,
+    CR_BLOCK_LARGE
+  } SatCrBlockSize_t;
 
   /**
    * Constructor for SatCrMessage
@@ -342,6 +338,9 @@ public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
+  typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> RequestDescriptor_t;
+  typedef std::map<RequestDescriptor_t, uint32_t > RequestContainer_t;
+
   /**
    * Get type of the message.
    *
@@ -350,70 +349,80 @@ public:
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CR_CTRL_MSG; }
 
   /**
-   * Get type of the CR message.
-   *
-   * \return The type of the CR message
+   * Add a control element to capacity request
    */
-  SatCrRequestType_t GetReqType () const;
+  void AddControlElement (uint8_t rcIndex, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value);
 
   /**
-   * Set type of the CR message. In construction phase initialized
-   * to value SAT_UNKNOWN_CR.
-   *
-   * \param type Type of the CR message
+   * Get the capacity request content
+   * \return RequestContainer_t Capacity request container
    */
-  void SetReqType (SatCrRequestType_t type);
+  const RequestContainer_t GetCapacityRequestContent () const;
 
   /**
-   * Get rate of the CR.
-   *
-   * \return Rate of the CR
+   * The number of capacity request elements
+   * \return uint32_t Number of CR elements
    */
-  double GetRequestedRate () const;
-
-  /**
-   * Set rate of the CR.
-   *
-   * \param rate The rate of the CR.
-   */
-  void SetRequestedRate (double rate);
+  uint32_t GetNumCapacityRequestElements () const;
 
   /**
    * Get C/N0 estimate.
-   *
    * \return Estimate of the C/N0.
    */
   double GetCnoEstimate () const;
 
   /**
    * Set C/N0 estimate.
-   *
    * \param cno The estimate of the C/N0.
    */
   void SetCnoEstimate (double cno);
 
   /**
    * Get real size of the CR message, which can be used to e.g. simulate real size.
-   *
    * \return Real size of the CR message.
    */
   virtual uint32_t GetSizeInBytes () const;
 
-private:
   /**
-   * Type of the this Capacity Request
+   * Has the CR non-zero content
+   * \return bool Flag to indicate whether the CR has non-zero content
    */
-  SatCrRequestType_t m_reqType;
+  bool HasNonZeroContent () const;
+
+private:
+
+  RequestContainer_t m_requestData;
 
   /**
-   * Requested rate.
+   * Control element size is defined by attribute. Note that according to
+   * specifications the valid values are
+   * - SMALL = 2 bytes
+   * - LARGE = 3 bytes
    */
-  double m_requestedRate;
+  SatCrBlockSize_t m_crBlockSizeType;
 
   /**
    * C/N0 estimate.
    */
-  double m_cno;
+  double m_forwardLinkCNo;
+
+  /**
+   * The CR could hold zero samples.
+   */
+  bool m_hasNonZeroContent;
+
+  /**
+   * Type field of the CR control element
+   */
+  static const uint32_t CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES = 1;
+
+  /**
+   * RCST_status + power headroom = 1 Byte
+   * CNI = 1 Byte
+   * Least margin transmission mode request = 1 Byte
+   */
+  static const uint32_t CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES = 3;
+
 };
 
 /**

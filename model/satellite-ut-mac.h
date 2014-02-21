@@ -98,26 +98,13 @@ public:
   void SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb);
 
   /**
-   * Update C/N0 information from lower layer.
-   *
-   * The SatUtMac receives C/N0 information of packet receptions from GW
-   * to update this information to serving GW periodically.
-   *
-   * \param beamId  The id of the beam where C/N0 is from.
-   * \param gwId  The id of the GW.
-   * \param utId  The id (address) of the UT.
-   * \param cno Value of the C/N0.
-   */
-  void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
-
-  /**
    * Receive a queue event:
    * - FIRST_BUFFER_RCVD
    * - BUFFER_EMPTY
    * /param event Queue event from SatQueue
    * /param rcIndex Identifier of the queue
    */
-  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint32_t rcIndex);
+  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
    * Set address of the GW (or its MAC) serving this UT.
@@ -195,11 +182,6 @@ private:
    void UpdateUsedRandomAccessSlots (uint32_t allocationChannel, uint32_t slot);
 
    /**
-    * Send capacity request update to GW.
-    */
-   void SendCapacityReq ();
-
-   /**
     *  Schedules time slots according to received TBTP message.
     *
     * \param tbtp Pointer to TBTP message.
@@ -265,19 +247,9 @@ private:
   Ptr<SatLowerLayerServiceConf> m_llsConf;
 
   /**
-   * The last received C/N0 information from lower layer.
-   */
-  double m_lastCno;
-
-  /**
    * Serving GW's address.
    */
   Mac48Address m_gwAddress;
-
-  /**
-   * Interval to send capacity requests.
-   */
-  Time m_crInterval;
 
   /**
    * Frame PDU header size in bytes. Note, that this is explicitly

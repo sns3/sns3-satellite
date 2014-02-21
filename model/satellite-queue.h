@@ -47,14 +47,16 @@ public:
   struct QueueStats_t
   {
     QueueStats_t ()
-    : m_enqueRate (0.0),
-      m_dequeRate (0.0),
-      m_bufferedBytes (0)
+    : m_incomingRateKbps (0.0),
+      m_outgoingRateKbps (0.0),
+      m_volumeInBytes (0),
+      m_queueSizeBytes (0)
     {
     }
-    double   m_enqueRate;
-    double   m_dequeRate;
-    uint32_t m_bufferedBytes;
+    double   m_incomingRateKbps;
+    double   m_outgoingRateKbps;
+    uint32_t m_volumeInBytes;
+    uint32_t m_queueSizeBytes;
   };
 
   typedef enum
@@ -71,7 +73,7 @@ public:
   /**
    * Constructor
    */
-  SatQueue (uint32_t rcIndex);
+  SatQueue (uint8_t rcIndex);
   ~SatQueue ();
 
   virtual void DoDispose ();
@@ -82,7 +84,7 @@ public:
    * \param uint32_t Queue id
    * \return void
    */
-  typedef Callback<void, SatQueue::QueueEvent_t, uint32_t> QueueEventCallback;
+  typedef Callback<void, SatQueue::QueueEvent_t, uint8_t> QueueEventCallback;
 
   /**
    * Is the queue empty
@@ -225,7 +227,7 @@ private:
   /**
    * An unique id for each queue
    */
-  uint32_t m_rcIndex;
+  uint8_t m_rcIndex;
 
   // Statistics
   uint32_t m_nBytes;

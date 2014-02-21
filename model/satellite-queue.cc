@@ -73,7 +73,7 @@ SatQueue::SatQueue ()
   NS_LOG_FUNCTION (this);
 }
 
-SatQueue::SatQueue (uint32_t rcIndex)
+SatQueue::SatQueue (uint8_t rcIndex)
 : Object (),
   m_packets (),
   m_maxPackets (0),
@@ -307,9 +307,10 @@ SatQueue::GetQueueStatistics (bool reset)
 
   if (duration.IsPositive())
     {
-      queueStats.m_enqueRate = 8.0 * m_nEnqueBytesSinceReset / duration.GetSeconds ();
-      queueStats.m_dequeRate = 8.0 * m_nDequeBytesSinceReset / duration.GetSeconds ();
-      queueStats.m_bufferedBytes = GetNBytes ();
+      queueStats.m_incomingRateKbps = 8.0 * m_nEnqueBytesSinceReset / 1000.0 / duration.GetSeconds ();
+      queueStats.m_outgoingRateKbps = 8.0 * m_nDequeBytesSinceReset / 1000.0 / duration.GetSeconds ();
+      queueStats.m_volumeInBytes = m_nEnqueBytesSinceReset;
+      queueStats.m_queueSizeBytes = GetNBytes ();
 
       if (reset)
         {

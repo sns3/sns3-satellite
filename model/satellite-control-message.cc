@@ -21,7 +21,9 @@
 #include <map>
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
+#include "ns3/enum.h"
 #include "ns3/address-utils.h"
+#include "satellite-enums.h"
 
 #include "satellite-control-message.h"
 
@@ -380,6 +382,12 @@ SatCrMessage::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatCrMessage")
     .SetParent<SatControlMessage> ()
     .AddConstructor<SatCrMessage> ()
+    .AddAttribute ("CrBlockType",
+                   "Capacity request control block size type",
+                   EnumValue (SatCrMessage::CR_BLOCK_SMALL),
+                   MakeEnumAccessor (&SatCrMessage::m_crBlockSizeType),
+                   MakeEnumChecker (SatCrMessage::CR_BLOCK_SMALL, "Small",
+                                    SatCrMessage::CR_BLOCK_LARGE, "Large"))
   ;
   return tid;
 }
@@ -393,9 +401,9 @@ SatCrMessage::GetInstanceTypeId (void) const
 }
 
 SatCrMessage::SatCrMessage ()
- : m_reqType (SatCrMessage::SAT_UNKNOWN_CR),
-   m_requestedRate (0.0),
-   m_cno (NAN)
+ :m_crBlockSizeType (SatCrMessage::CR_BLOCK_SMALL),
+  m_forwardLinkCNo (NAN),
+  m_hasNonZeroContent (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -406,45 +414,45 @@ SatCrMessage::~SatCrMessage ()
 }
 
 void
-SatCrMessage::SetReqType (SatCrRequestType_t type)
+SatCrMessage::AddControlElement (uint8_t rcIndex, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value)
 {
-  NS_LOG_FUNCTION (this << type);
-  m_reqType = type;
+  NS_LOG_FUNCTION (this << rcIndex << cac << value);
+
+  RequestDescriptor_t p = std::make_pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rcIndex, cac);
+  m_requestData.insert (std::make_pair<RequestDescriptor_t, uint32_t> (p, value));
+
+  if (value > 0)
+    {
+      m_hasNonZeroContent = true;
+    }
 }
 
-double
-SatCrMessage::GetRequestedRate (void) const
+
+const SatCrMessage::RequestContainer_t
+SatCrMessage::GetCapacityRequestContent () const
 {
-  NS_LOG_FUNCTION (this);
-  return m_requestedRate;
+  return m_requestData;
 }
 
-void
-SatCrMessage::SetRequestedRate (double rate)
+uint32_t
+SatCrMessage::GetNumCapacityRequestElements () const
 {
-  NS_LOG_FUNCTION (this << rate);
-  m_requestedRate = rate;
+
+  return m_requestData.size ();
 }
 
 double
 SatCrMessage::GetCnoEstimate (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_cno;
+  return m_forwardLinkCNo;
 }
 
 void
 SatCrMessage::SetCnoEstimate (double cno)
 {
   NS_LOG_FUNCTION (this << cno);
-  m_cno = cno;
-}
-
-SatCrMessage::SatCrRequestType_t
-SatCrMessage::GetReqType (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_reqType;
+  m_forwardLinkCNo = cno;
 }
 
 uint32_t
@@ -452,8 +460,22 @@ SatCrMessage::GetSizeInBytes () const
 {
   NS_LOG_FUNCTION (this);
 
-  //TODO: real size is needed to calculate
-  return 20;
+  /**
+   * CR_BLOCK_SMALL = 2
+   * CR_BLOCK_LARGE = 3
+   */
+  uint32_t crBlockSizeInBytes = (m_crBlockSizeType == SatCrMessage::CR_BLOCK_SMALL ? 2 : 3);
+
+  uint32_t size (CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES +
+                 CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES +
+                 m_requestData.size () * crBlockSizeInBytes);
+  return size;
+}
+
+
+bool SatCrMessage::HasNonZeroContent () const
+{
+  return m_hasNonZeroContent;
 }
 
 // Control message container

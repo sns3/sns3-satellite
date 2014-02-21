@@ -238,15 +238,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatUtMac::SendCtrlCallback ctrlCb = MakeCallback (&SatNetDevice::SendControlMsg, dev);
   mac->SetCtrlMsgCallback (ctrlCb);
 
-  // Attach the Mac layer C/N0 updates receiver to Phy
-  SatPhy::CnoCallback cnoCb = MakeCallback (&SatUtMac::CnoUpdated, mac);
-
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
 
-  // Attach the NCC C/N0 update to Phy
-
-  phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
   phy->SetAttribute ("ReceiveCb", CallbackValue(recCb));
 
   // Create Logical Link Control (LLC) layer
@@ -265,6 +259,10 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
 
+  // Attach the Mac layer C/N0 updates receiver to Phy
+  SatPhy::CnoCallback cnoCb = MakeCallback (&SatRequestManager::CnoUpdated, rm);
+  phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
+
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
@@ -281,7 +279,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Return link
   uint32_t rcIndeces = m_llsConf->GetDaServiceCount ();
   NS_ASSERT (rcIndeces >= 2);
-  for (uint32_t rc = 1; rc <= rcIndeces; ++rc)
+  for (uint8_t rc = 1; rc <= rcIndeces; ++rc)
     {
       Ptr<SatReturnLinkEncapsulator> utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
       llc->AddEncap (addr, utEncap, rc); // Tx
