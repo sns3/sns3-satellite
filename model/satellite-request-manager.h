@@ -23,6 +23,7 @@
 
 #include <deque>
 #include "ns3/object.h"
+#include "ns3/callback.h"
 #include "satellite-queue.h"
 #include "satellite-lower-layer-service.h"
 #include "satellite-control-message.h"
@@ -55,18 +56,24 @@ public:
   typedef Callback<SatQueue::QueueStats_t, bool> QueueCallback;
 
   /**
+   * Control msg sending callback
    * \param msg        the message send
    * \param address    Packet destination address
+   * \return bool
    */
   typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
 
-  typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> PendingRequestKey_t;
+  /**
+   * Container for the pending request key
+   */
+  typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> ContainerKey_t;
 
   /**
+   * Container for the pending requests
    * Key = pair of RC index and CAC
    * Value = deque of values
    */
-  typedef std::map<PendingRequestKey_t, std::deque<uint32_t> > PendingRequestsContainer_t;
+  typedef std::map<ContainerKey_t, std::deque<uint32_t> > PendingRequestsContainer_t;
 
   /**
    * Receive a queue event
@@ -136,8 +143,21 @@ private:
    */
   uint32_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats);
 
+  /**
+   * Calculate the pending requests related to a specific
+   * RC and CAC
+   * \param rc Request class index
+   * \param cac Capacity allocation category
+   * \return uint32_t Pending sum in kbps or Bytes
+   */
   uint32_t GetPendingSum (uint8_t rc, SatEnums::SatCapacityAllocationCategory_t cac) const;
 
+  /**
+   * Update the pending counters with new request information
+   * \param rc Request class index
+   * \param cac Capacity allocation category
+   * \param value Requested value in kbps or Bytes
+   */
   void UpdatePendingCounters (uint8_t rc, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value);
 
   /**

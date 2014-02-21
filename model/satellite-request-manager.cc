@@ -282,13 +282,13 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
   if (reqRbdc <= M_RBDC_QUANTIZATION_THRESHOLD_KBPS)
       {
         crRbdc =
-            (uint32_t)(round(reqRbdc / M_RBDC_QUANTIZATION_STEP_SMALL_KBPS) * M_RBDC_QUANTIZATION_STEP_SMALL_KBPS);
+            (uint32_t)(floor(reqRbdc / M_RBDC_QUANTIZATION_STEP_SMALL_KBPS) * M_RBDC_QUANTIZATION_STEP_SMALL_KBPS);
       }
   // 512 - 8160 kbps  -> 32 kbps resolution
   else
     {
       crRbdc =
-          (uint32_t)(round(reqRbdc / M_RBDC_QUANTIZATION_STEP_LARGE_KBPS) * M_RBDC_QUANTIZATION_STEP_LARGE_KBPS);
+          (uint32_t)(floor(reqRbdc / M_RBDC_QUANTIZATION_STEP_LARGE_KBPS) * M_RBDC_QUANTIZATION_STEP_LARGE_KBPS);
     }
 
   NS_LOG_LOGIC("Quantized RBDC bitrate: " << crRbdc << " kbps");
@@ -337,13 +337,13 @@ SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
   if (rcVbdc <= M_VBDC_QUANTIZATION_THRESHOLD_BYTES)
       {
         rcVbdc =
-            (uint32_t)(round(rcVbdc / M_VBDC_QUANTIZATION_STEP_SMALL) * M_VBDC_QUANTIZATION_STEP_SMALL);
+            (uint32_t)(floor(rcVbdc / M_VBDC_QUANTIZATION_STEP_SMALL) * M_VBDC_QUANTIZATION_STEP_SMALL);
       }
   // 256 - 4080 kbps  -> 16 kbps resolution
   else
     {
       rcVbdc =
-          (uint32_t)(round(rcVbdc / M_VBDC_QUANTIZATION_STEP_LARGE) * M_VBDC_QUANTIZATION_STEP_LARGE);
+          (uint32_t)(floor(rcVbdc / M_VBDC_QUANTIZATION_STEP_LARGE) * M_VBDC_QUANTIZATION_STEP_LARGE);
     }
 
   NS_LOG_LOGIC("Quantized VBDC volume: " << rcVbdc << " Bytes");
@@ -361,7 +361,7 @@ SatRequestManager::GetPendingSum (uint8_t rc, SatEnums::SatCapacityAllocationCat
   uint32_t value (0);
 
   // Make a key
-  PendingRequestKey_t key = std::make_pair <uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rc, cac);
+  ContainerKey_t key = std::make_pair <uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rc, cac);
 
   // Check if the key is found
   if (m_pendingRequests.find (key) != m_pendingRequests.end ())
@@ -388,7 +388,7 @@ SatRequestManager::UpdatePendingCounters (uint8_t rc, SatEnums::SatCapacityAlloc
   NS_LOG_FUNCTION (this << rc << cac << value);
 
   // Make a key
-  PendingRequestKey_t key = std::make_pair <uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rc, cac);
+  ContainerKey_t key = std::make_pair <uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rc, cac);
 
   // Check if the key is found
   if (m_pendingRequests.find (key) != m_pendingRequests.end ())
@@ -402,7 +402,7 @@ SatRequestManager::UpdatePendingCounters (uint8_t rc, SatEnums::SatCapacityAlloc
 
       std::deque<uint32_t> valueCont;
       valueCont.push_back (value);
-      m_pendingRequests.insert (std::make_pair<PendingRequestKey_t, std::deque<uint32_t> > (key, valueCont));
+      m_pendingRequests.insert (std::make_pair<ContainerKey_t, std::deque<uint32_t> > (key, valueCont));
     }
 
   // If there are too many entries, pop front
