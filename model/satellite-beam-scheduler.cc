@@ -54,7 +54,10 @@ SatBeamScheduler::SatBeamScheduler ()
     m_currentFrame (0),
     m_totalSlotLeft (0),
     m_additionalSlots (0),
-    m_slotsPerUt (0)
+    m_slotsPerUt (0),
+    m_craBasedBytes (0),
+    m_rbdcBasedBytes (0),
+    m_vbdcBasedBytes (0)
 {
   NS_LOG_FUNCTION (this);
   m_currentUt = m_uts.end ();
@@ -332,21 +335,37 @@ SatBeamScheduler::UpdateDamaEntries ()
 {
   NS_LOG_FUNCTION (this);
 
+  // reset requested bytes per SF for each (RC_index, CC)
+  m_craBasedBytes = 0;
+  m_rbdcBasedBytes = 0;
+  m_vbdcBasedBytes = 0;
+
   for (UtInfoMap_t::iterator it = m_uts.begin (); it != m_uts.end (); it ++ )
     {
       // estimate C/N0
       EstimateUtCno (it->first);
 
+      Ptr<SatDamaEntry> damaEntry = it->second.m_damaEntry;
+
       // process received CRs
       for ( UtInfo::CrContainer_t::const_iterator crIt = it->second.m_crContainer.begin (); crIt != it->second.m_crContainer.end (); crIt++ )
         {
           // TODO: Update SatDamaEntry (RC_index, CC) when CR message content is implemented
+          //damaEntry->UpdateDynamicRateInKbps (RC_index, value from CR);
+          //damaEntry->UpdateVolumeBacklogInBytes (RC_index, value from CR);
         }
             
       // clear container when CRs processed
       it->second.m_crContainer.clear ();
+
+      // calculate (update) requested bytes per SF for each (RC_index, CC)
+      m_craBasedBytes += damaEntry->GetCraBasedBytes (m_superframeSeq->GetDurationInSeconds (0));
+      m_rbdcBasedBytes += damaEntry->GetRbdcBasedBytes (m_superframeSeq->GetDurationInSeconds (0));
+      m_vbdcBasedBytes += damaEntry->GetVbdcBasedBytes ();
       
-      // TODO: calculate requested bytes per SF for each (RC_index, CC)
+      // decrease persistence values
+      damaEntry->DecrementDynamicRatePersistence ();
+      damaEntry->DecrementVolumeBacklogPersistence ();
     }
 }
 

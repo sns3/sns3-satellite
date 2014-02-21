@@ -120,14 +120,6 @@ public:
    */
   void UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg);
 
-  /**
-   * Estimate UT's C/N0 value for next transmission.
-   *
-   * \param utId Id of the UT (address).
-   * \return Estimated C/N0 value. Zero means that no estimation is done.
-   */
-  double EstimateUtCno (Address utId);
-
 private:
 
   // UT information
@@ -158,6 +150,14 @@ private:
   void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
+
+  /**
+   * Estimate UT's C/N0 value for next transmission.
+   *
+   * \param utId Id of the UT (address).
+   * \return Estimated C/N0 value. Zero means that no estimation is done.
+   */
+  double EstimateUtCno (Address utId);
 
   /**
    * ID of the beam
@@ -249,6 +249,21 @@ private:
    * Random variable stream to select RA channel for a UT.
    */
   Ptr<RandomVariableStream> m_raChRandomIndex;
+
+  /**
+   * CRA bytes for the super frame scheduled next
+   */
+  uint32_t  m_craBasedBytes;
+
+  /**
+   * RBDC bytes for the super frame scheduled next
+   */
+  uint32_t  m_rbdcBasedBytes;
+
+  /**
+   * VBDC bytes for the super frame scheduled next
+   */
+  uint32_t  m_vbdcBasedBytes;
 };
 
 } // namespace ns3

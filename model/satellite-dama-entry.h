@@ -63,18 +63,59 @@ public:
   ~SatDamaEntry ();
 
   /**
-   * Get current value of the dynamic rate persistence.
+   * Get CRA based bytes with given duration.
    *
-   * \return Current value of the dynamic rate persistence.
+   * \param durationInSeconds of the transmission in seconds
+   * \return Rate based bytes with given duration.
    */
-  inline uint32_t GetDynamicRatePersistence () const { return m_dynamicRatePersistence;}
+  uint32_t GetCraBasedBytes (double durationInSeconds) const;
 
   /**
-   * Get current value of the volume backlog persistence.
+   * Get RBDC based bytes with given duration.
    *
-   * \return Current value of the volume backlog persistence.
+   * \param durationInSeconds of the transmission in seconds
+   * \return Rate based bytes with given duration.
    */
-  inline uint32_t GetVolumeBacklogPersistence () const { return m_volumeBacklogPersistence;}
+  uint32_t GetRbdcBasedBytes (double durationInSeconds) const;
+
+  /**
+   * Get VBDC based bytes.
+   *
+   * \return Volume based bytes with given duration.
+   */
+  uint32_t GetVbdcBasedBytes () const;
+
+  /**
+   * Get current value of the dynamic rate requested.
+   *
+   * \param index Index of RC, which dynamic rate is requested.
+   * \return Current value of the dynamic rate requested in kbps.
+   */
+  double GetDynamicRateInKbps (uint32_t index) const;
+
+  /**
+   * Update dynamic rate request of a RC.
+   *
+   * \param index Index of RC, which dynamic rate is updated.
+   * \param rateInKbps Dynamic rate value [kbps] for update
+   */
+  void UpdateDynamicRateInKbps (uint32_t index, double rateInKbps);
+
+  /**
+   * Get current value of the volume backlog requested.
+   *
+   * \param index Index of RC, which volume backlog  is requested.
+   * \return Current value of the volume backlog requested in bytes.
+   */
+  uint32_t GetVolumeBacklogInBytes (uint32_t index) const;
+
+  /**
+   * Update volume backlog request a RC.
+   *
+   * \param index Index of RC, which volume backlog is updated.
+   * \param volumeInBytes Volume backlog value [bytes] for update
+   */
+  void UpdateVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes);
 
   /**
    * Reset dynamic rate persistence to the value given in lower layer service configuration.
@@ -97,12 +138,11 @@ public:
   void DecrementVolumeBacklogPersistence ();
 
 private:
-
-  uint32_t                      m_dynamicRatePersistence;
-  uint32_t                      m_volumeBacklogPersistence;
-  Ptr<SatLowerLayerServiceConf> m_llsConf;
-  std::vector<double>           m_dynamicRateRequestedInKbps;
-  std::vector<uint32_t>         m_volumeRequestedBytes;
+  uint32_t                        m_dynamicRatePersistence;
+  uint32_t                        m_volumeBacklogPersistence;
+  Ptr<SatLowerLayerServiceConf>   m_llsConf;
+  std::vector<double>             m_dynamicRateRequestedInKbps;
+  std::vector<uint32_t>           m_volumeBacklogRequestedInBytes;
 };
 
 } // namespace ns3

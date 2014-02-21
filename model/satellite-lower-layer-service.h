@@ -320,28 +320,12 @@ public:
   bool GetDaConstantAssignmentProvided (uint32_t index) const;
 
   /**
-   * Set state, if constant assignment is provided for a DA service.
-   *
-   * \param index Index of the service
-   * \param constAssignmentProvided Constant assignment provided state [true or false]
-   */
-  void SetDaConstantAssignmentProvided (uint32_t index, bool constAssignmentProvided);
-
-  /**
    * Get state, if RBDC is allowed for a DA service.
    *
    * \param index Index of the service
    * \return Is RBDC allowed [true or false]
    */
   bool GetDaRbdcAllowed (uint32_t index) const;
-
-  /**
-   * Set state, if RBDC is allowed for a DA service.
-   *
-   * \param index Index of the service
-   * \param bdcAllowed RBDC allowed state [true or false]
-   */
-  void SetDaRbdcAllowed (uint32_t index, bool bdcAllowed);
 
   /**
    * Get state, if volume is allowed for a DA service.
@@ -352,28 +336,12 @@ public:
   bool GetDaVolumeAllowed (uint32_t index) const;
 
   /**
-   * Set state, if volume is allowed for a DA service.
+   * Get constant service rate for a DA service.
    *
    * \param index Index of the service
-   * \param volumeAllowed Volume allowed state [true or false]
+   * \return Constant service rate [kbps]
    */
-  void SetDaVolumeAllowed (uint32_t index, bool volumeAllowed);
-
-  /**
-   * Get constant service rate stream for a DA service.
-   *
-   * \param index Index of the service
-   * \return Constant service rate stream [kbps]
-   */
-  Ptr<RandomVariableStream> GetDaConstantServiceRateStream (uint32_t index) const;
-
-  /**
-   * Set constant service rate stream for a DA service.
-   *
-   * \param index Index of the service
-   * \param constantServiceRateStream Constant service rate stream [kbps]
-   */
-  void SetDaConstantServiceRateStream (uint32_t index, Ptr<RandomVariableStream> constantServiceRateStream);
+  double GetDaConstantServiceRateInKbps (uint32_t index) const;
 
   /**
    * Get maximum service rate for a DA service.
@@ -384,28 +352,12 @@ public:
   double GetDaMaximumServiceRateInKbps (uint32_t index) const;
 
   /**
-   * Set maximum service rate for a DA service.
-   *
-   * \param index Index of the service
-   * \param maximumServiceRateKbps Maximum service rate [kbps]
-   */
-  void SetDaMaximumServiceRateInKbps (uint32_t index, double maximumServiceRateKbps);
-
-  /**
    * Get minimum service rate for a DA service.
    *
    * \param index Index of the service
    * \return Minimum service rate [kbps]
    */
   double GetDaMinimumServiceRateInKbps (uint32_t index) const;
-
-  /**
-   * Set minimum service rate for a DA service.
-   *
-   * \param index Index of the service
-   * \param minimumServiceRateKbps Minimum service rate [kbps]
-   */
-  void SetDaMinimumServiceRateInKbps (uint32_t index, double minimumServiceRateKbps);
 
   /**
    * Get maximum backlog size for a DA service.
@@ -416,28 +368,12 @@ public:
   uint32_t GetDaMaximumBacklogInBytes (uint32_t index) const;
 
   /**
-   * Set maximum backlog size for a DA service.
-   *
-   * \param index Index of the service
-   * \param maximumBacklogInBytes Maximum backlog size [bytes]
-   */
-  void SetDaMaximumBacklogInBytes (uint32_t index, uint32_t maximumBacklogInBytes);
-
-  /**
    * Get maximum unique payload per block for a RA service.
    *
    * \param index Index of the service
    * \return Maximum unique payload per block [bytes]
    */
   uint32_t GetRaMaximumUniquePayloadPerBlock (uint32_t index) const;
-
-  /**
-   * Set maximum unique payload per block for a RA service.
-   *
-   * \param index Index of the service
-   * \param maxUniquePayloadPerBlock Maximum unique payload per block
-   */
-  void SetRaMaximumUniquePayloadPerBlock (uint32_t index, uint32_t maxUniquePayloadPerBlock);
 
   /**
    * Get maximum consecutive block accessed  for a RA service.
@@ -448,28 +384,12 @@ public:
   uint32_t GetRaMaximumConsecutiveBlockAccessed (uint32_t index) const;
 
   /**
-   * Set maximum consecutive block accessed for a RA service.
-   *
-   * \param index Index of the service
-   * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed [bytes]
-   */
-  void SetRaMaximumConsecutiveBlockAccessed (uint32_t index, uint32_t maxConsecutiveBlockAccessed);
-
-  /**
    * Get minimum idle block for a RA service.
    *
    * \param index Index of the service
    * \return Minimum idle block
    */
   uint32_t GetRaMinimumIdleBlock (uint32_t index) const;
-
-  /**
-   * Set minimum idle block for a RA service.
-   *
-   * \param index Index of the service
-   * \param minimumIdleBlock Minimum idle block
-   */
-  void SetRaMinimumIdleBlock (uint32_t index, uint32_t minimumIdleBlock);
 
   private:
     uint32_t                                  m_dynamicRatePersistence;
@@ -502,6 +422,95 @@ public:
  *
  * \param index Index of the service which attribute access methods are defined
  */
+
+  /**
+   * Get constant service rate stream for a DA service.
+   *
+   * \param index Index of the service
+   * \return Constant service rate stream [kbps]
+   */
+  Ptr<RandomVariableStream> GetDaConstantServiceRateStream (uint32_t index) const;
+
+  /**
+   * Set state, if constant assignment is provided for a DA service.
+   *
+   * \param index Index of the service
+   * \param constAssignmentProvided Constant assignment provided state [true or false]
+   */
+  void SetDaConstantAssignmentProvided (uint32_t index, bool constAssignmentProvided);
+
+  /**
+   * Set state, if RBDC is allowed for a DA service.
+   *
+   * \param index Index of the service
+   * \param bdcAllowed RBDC allowed state [true or false]
+   */
+  void SetDaRbdcAllowed (uint32_t index, bool bdcAllowed);
+
+  /**
+   * Set state, if volume is allowed for a DA service.
+   *
+   * \param index Index of the service
+   * \param volumeAllowed Volume allowed state [true or false]
+   */
+  void SetDaVolumeAllowed (uint32_t index, bool volumeAllowed);
+
+  /**
+   * Set constant service rate stream for a DA service.
+   *
+   * \param index Index of the service
+   * \param constantServiceRateStream Constant service rate stream [kbps]
+   */
+  void SetDaConstantServiceRateStream (uint32_t index, Ptr<RandomVariableStream> constantServiceRateStream);
+
+  /**
+   * Set maximum service rate for a DA service.
+   *
+   * \param index Index of the service
+   * \param maximumServiceRateKbps Maximum service rate [kbps]
+   */
+  void SetDaMaximumServiceRateInKbps (uint32_t index, double maximumServiceRateKbps);
+
+  /**
+   * Set minimum service rate for a DA service.
+   *
+   * \param index Index of the service
+   * \param minimumServiceRateKbps Minimum service rate [kbps]
+   */
+  void SetDaMinimumServiceRateInKbps (uint32_t index, double minimumServiceRateKbps);
+
+  /**
+   * Set maximum backlog size for a DA service.
+   *
+   * \param index Index of the service
+   * \param maximumBacklogInBytes Maximum backlog size [bytes]
+   */
+  void SetDaMaximumBacklogInBytes (uint32_t index, uint32_t maximumBacklogInBytes);
+
+  /**
+   * Set maximum unique payload per block for a RA service.
+   *
+   * \param index Index of the service
+   * \param maxUniquePayloadPerBlock Maximum unique payload per block
+   */
+  void SetRaMaximumUniquePayloadPerBlock (uint32_t index, uint32_t maxUniquePayloadPerBlock);
+
+  /**
+   * Set maximum consecutive block accessed for a RA service.
+   *
+   * \param index Index of the service
+   * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed [bytes]
+   */
+  void SetRaMaximumConsecutiveBlockAccessed (uint32_t index, uint32_t maxConsecutiveBlockAccessed);
+
+  /**
+   * Set minimum idle block for a RA service.
+   *
+   * \param index Index of the service
+   * \param minimumIdleBlock Minimum idle block
+   */
+  void SetRaMinimumIdleBlock (uint32_t index, uint32_t minimumIdleBlock);
+
 #define SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
   inline void SetDaServ ## index ## ConstantAssignmentProvided (bool value)  \
     { return SetDaConstantAssignmentProvided (index, value); } \

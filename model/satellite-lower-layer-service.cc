@@ -339,6 +339,18 @@ SatLowerLayerServiceConf::SetDaVolumeAllowed (uint32_t index, bool volumeAllowed
   m_daServiceEntries[index].SetVolumeAllowed (volumeAllowed);
 }
 
+double
+SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint32_t index) const
+{
+  if ( index >= m_maxDaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_daServiceEntries[index].GetConstantServiceRateInKbps ();
+}
+
+
 Ptr<RandomVariableStream>
 SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint32_t index) const
 {
