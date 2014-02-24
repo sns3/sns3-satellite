@@ -58,18 +58,28 @@ public:
   /** ATTACH TO MAPS */
 
   /**
-   * \brief Attach MAC address to the Trace ID maps and give it a running trace ID
+   * \brief Attach MAC address to the Trace ID maps and give it a running
+   *        trace ID (starting from 1)
    * \param mac MAC address
    * \return the trace ID assigned to the given MAC address
    */
   uint32_t AttachMacToTraceId (Address mac);
 
   /**
-   * \brief Attach MAC address to the UT ID maps and give it a running UT ID
+   * \brief Attach MAC address to the UT ID maps and give it a running
+   *        UT ID (starting from 1)
    * \param mac MAC address
-   * \return the trace ID assigned to the given MAC address
+   * \return the UT ID assigned to the given MAC address
    */
   uint32_t AttachMacToUtId (Address mac);
+
+  /**
+   * \brief Attach MAC address to the UT user ID maps and give it a running
+   *        UT user ID (starting from 1)
+   * \param mac MAC address
+   * \return the UT user ID assigned to the given MAC address
+   */
+  uint32_t AttachMacToUtUserId (Address mac);
 
   /**
    * \brief Attach MAC address to the beam ID maps
@@ -84,6 +94,14 @@ public:
    * \param gwID GW ID
    */
   void AttachMacToGwId (Address mac, uint32_t gwId);
+
+  /**
+   * \brief Attach MAC address to the GW user ID maps and give it a running
+   *        GW user ID (starting from 1)
+   * \param mac MAC address
+   * \return the GW user ID assigned to the given MAC address
+   */
+  uint32_t AttachMacToGwUserId (Address mac);
 
   /** ID GETTERS */
 
@@ -102,6 +120,13 @@ public:
   int32_t GetUtIdWithMac (Address mac);
 
   /**
+   * \brief Function for getting the UT user ID with MAC. Returns -1 if the MAC is not in the map
+   * \param mac MAC address
+   * \return UT user ID
+   */
+  int32_t GetUtUserIdWithMac (Address mac);
+
+  /**
    * \brief Function for getting the beam ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return beam ID
@@ -114,6 +139,13 @@ public:
    * \return GW ID
    */
   int32_t GetGwIdWithMac (Address mac);
+
+  /**
+   * \brief Function for getting the GW user ID with MAC. Returns -1 if the MAC is not in the map
+   * \param mac MAC address
+   * \return GW user ID
+   */
+  int32_t GetGwUserIdWithMac (Address mac);
 
   /**
    * \brief Function for printing out the trace map
@@ -153,6 +185,16 @@ private:
   uint32_t m_utIdIndex;
 
   /**
+   * \brief Running UT user index number
+   */
+  uint32_t m_utUserIdIndex;
+
+  /**
+   * \brief Running GW user index number
+   */
+  uint32_t m_gwUserIdIndex;
+
+  /**
    * \brief Map for MAC to trace ID conversion
    */
   std::map <Address, uint32_t> m_macToTraceIdMap;
@@ -163,6 +205,11 @@ private:
   std::map <Address, uint32_t> m_macToUtIdMap;
 
   /**
+   * \brief Map for MAC to UT user ID conversion
+   */
+  std::map <Address, uint32_t> m_macToUtUserIdMap;
+
+  /**
    * \brief Map for MAC to beam ID conversion
    */
   std::map <Address, uint32_t> m_macToBeamIdMap;
@@ -171,6 +218,11 @@ private:
    * \brief Map for MAC to GW ID conversion
    */
   std::map <Address, uint32_t> m_macToGwIdMap;
+
+  /**
+   * \brief Map for MAC to GW user ID conversion
+   */
+  std::map <Address, uint32_t> m_macToGwUserIdMap;
 
   /**
    * \brief Is map printing enabled or not
