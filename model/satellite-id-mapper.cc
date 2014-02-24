@@ -17,7 +17,11 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
+
 #include "satellite-id-mapper.h"
+#include <ns3/log.h>
+#include <ns3/node.h>
+#include <ns3/address.h>
 #include <sstream>
 
 NS_LOG_COMPONENT_DEFINE ("SatIdMapper");
@@ -120,6 +124,8 @@ SatIdMapper::Reset ()
 
   m_enableMapPrint = false;
 }
+
+// ATTACH TO MAPS
 
 uint32_t
 SatIdMapper::AttachMacToTraceId (Address mac)
@@ -317,6 +323,35 @@ SatIdMapper::GetGwUserIdWithMac (Address mac)
     }
 
   return iter->second;
+}
+
+// MAC GETTERS
+
+Address
+SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG (utNode->GetNDevices () >= 3,
+                 "UT node " << utNode << " is invalid");
+  /*
+   * Assuming that device #0 is for loopback device, device #1 is for subscriber
+   * network device, and device #2 is for satellite beam device.
+   */
+  Ptr<NetDevice> dev = utNode->GetDevice (1);
+  return dev->GetAddress ();
+}
+
+Address
+SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG (utUserNode->GetNDevices () >= 2,
+                 "UT user node " << utUserNode << " is invalid");
+  // assuming that #0 is for loopback device and #1 is for subscriber network device
+  Ptr<NetDevice> dev = utUserNode->GetDevice (1);
+  return dev->GetAddress ();
 }
 
 std::string

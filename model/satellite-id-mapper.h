@@ -20,10 +20,14 @@
 #ifndef SATELLITE_ID_MAPPER_H
 #define SATELLITE_ID_MAPPER_H
 
-#include "satellite-enums.h"
-#include "ns3/mac48-address.h"
+#include <ns3/object.h>
+#include <map>
 
 namespace ns3 {
+
+
+class Node;
+class Address;
 
 /**
  * \ingroup satellite
@@ -55,7 +59,7 @@ public:
    */
   void DoDispose ();
 
-  /** ATTACH TO MAPS */
+  /* ATTACH TO MAPS */
 
   /**
    * \brief Attach MAC address to the Trace ID maps and give it a running
@@ -103,7 +107,7 @@ public:
    */
   uint32_t AttachMacToGwUserId (Address mac);
 
-  /** ID GETTERS */
+  /* ID GETTERS */
 
   /**
    * \brief Function for getting the trace ID with MAC. Returns -1 if the MAC is not in the map
@@ -146,6 +150,22 @@ public:
    * \return GW user ID
    */
   int32_t GetGwUserIdWithMac (Address mac);
+
+  /* MAC GETTERS */
+
+  /**
+   * \param utNode pointer to a UT node, will causes an error if it is not a
+   *               valid UT node
+   * \return MAC address of the UT node's satellite beam network device
+   */
+  Address GetUtMacWithNode (Ptr<Node> utNode);
+
+  /**
+   * \param utUserNode pointer to a UT user node, will causes an error if it is
+   *                   not a valid UT user node
+   * \return MAC address of the UT user node's subscriber network device
+   */
+  Address GetUtUserMacWithNode (Ptr<Node> utUserNode);
 
   /**
    * \brief Function for printing out the trace map
