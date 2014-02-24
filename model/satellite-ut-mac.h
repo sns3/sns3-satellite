@@ -140,44 +140,45 @@ protected:
 private:
 
    /**
-    * Do random access evaluation for Tx opportunities
+    * \brief Do random access evaluation for Tx opportunities
+    * \param randomAccessTriggerType
     */
-   void DoRandomAccess ();
+   void DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAccessTriggerType);
 
    /**
-    *
-    * \return
+    * \brief Function for selecting the allocation channel for the current RA evaluation
+    * \return allocation channel ID
     */
    uint32_t GetNextRandomAccessAllocationChannel ();
 
    /**
-    *
-    * \param allocationChannel
+    * \brief Function for identifying the next available random acess slot
+    * \param allocationChannel allocation channel
     */
    void FindNextAvailableRandomAccessSlot (uint32_t allocationChannel);
 
    /**
-    *
-    * \param results
+    * \brief Function for scheduling the CRDSA transmissions
+    * \param txOpportunities Tx opportunities
     */
    void ScheduleCrdsaTransmission (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
 
    /**
-    *
-    * \param txOpportunities
+    * \brief Function for updating the used RA slots
+    * \param txOpportunities Tx opportunities
     */
    void UpdateUsedRandomAccessSlots (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
 
    /**
-    *
-    * \param currentFrameId
+    * \brief Function for removing the past used RA slots
+    * \param currentFrameId current frame ID
     */
    void RemovePastRandomAccessSlots (uint32_t currentFrameId);
 
    /**
-    *
-    * \param allocationChannel
-    * \param slot
+    * \brief Function for updating the used RA slots
+    * \param allocationChannel allocation channel
+    * \param slot RA slot
     */
    void UpdateUsedRandomAccessSlots (uint32_t allocationChannel, uint32_t slot);
 
@@ -257,8 +258,8 @@ private:
    */
   uint32_t m_framePduHeaderSizeInBytes;
 
-  /**
-  *
+ /**
+  * \brief RA main module
   */ 
   Ptr<SatRandomAccess> m_randomAccess;
 
@@ -274,12 +275,12 @@ private:
   Ptr<SatTbtpContainer> m_tbtpContainer;
 
   /**
-   *
+   * \brief Uniform random variable distribution generator
    */
   Ptr<UniformRandomVariable> m_uniformRandomVariable;
 
   /**
-   *
+   * \brief A container for storing the used RA slots in each frame and allocation channel
    */
   std::map < std::pair<uint32_t, uint32_t>, std::set<uint32_t> > m_usedRandomAccessSlots;
 

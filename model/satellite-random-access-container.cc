@@ -82,40 +82,6 @@ SatRandomAccess::~SatRandomAccess ()
 
 /// TODO: implement this
 bool
-SatRandomAccess::IsFrameStart ()
-{
-  NS_LOG_FUNCTION (this);
-
-  bool isFrameStart = true;
-
-  NS_LOG_INFO ("SatRandomAccess::IsFrameStart: " << isFrameStart);
-
-  return isFrameStart;
-}
-
-/*
-The known DAMA capacity condition is different for control and data.
-For control the known DAMA is limited to the SF about to start, i.e.,
-the look ahead is one SF. For data the known DAMA allocation can be
-one or more SF in the future, i.e., the look ahead contains all known
-future DAMA allocations. With CRDSA the control packets have priority
-over data packets.
-*/
-/// TODO: implement this
-bool
-SatRandomAccess::IsDamaAvailable ()
-{
-  NS_LOG_FUNCTION (this);
-
-  bool isDamaAvailable = false;
-
-  NS_LOG_INFO ("SatRandomAccess::IsDamaAvailable: " << isDamaAvailable);
-
-  return isDamaAvailable;
-}
-
-/// TODO: implement this
-bool
 SatRandomAccess::AreBuffersEmpty ()
 {
   NS_LOG_FUNCTION (this);
@@ -150,7 +116,7 @@ SatRandomAccess::SetRandomAccessModel (RandomAccessModel_t randomAccessModel)
 }
 
 SatRandomAccess::RandomAccessTxOpportunities_s
-SatRandomAccess::DoRandomAccess (uint32_t allocationChannel)
+SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTriggerType_t triggerType)
 {
   NS_LOG_FUNCTION (this);
 
@@ -164,40 +130,38 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel)
   NS_LOG_INFO ("------------------------------------");
 
   /// Do CRDSA
-  if (m_randomAccessModel == RA_CRDSA)
+  if (m_randomAccessModel == RA_CRDSA && triggerType == RA_CRDSA_TRIGGER)
     {
-      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only CRDSA enabled, check frame start");
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only CRDSA enabled && CRDSA trigger, evaluating CRDSA");
 
-      if (IsFrameStart ())
-        {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - At the frame start, evaluating CRDSA");
-
-          txOpportunities = DoCrdsa (allocationChannel);
-        }
+      txOpportunities = DoCrdsa (allocationChannel);
     }
   /// Do Slotted ALOHA
-  else if (m_randomAccessModel == RA_SLOTTED_ALOHA)
+  else if (m_randomAccessModel == RA_SLOTTED_ALOHA && triggerType == RA_SLOTTED_ALOHA_TRIGGER)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only SA enabled, evaluating Slotted ALOHA");
 
       txOpportunities = DoSlottedAloha ();
     }
-  /// Frame start is a known trigger for CRDSA, which has higher priority than SA.
-  /// As such SA will not be used at frame start unless:
+  /// Frame start is a known trigger for CRDSA
+  /// If SA is triggered at frame start, both SA and CRDSA will be evaluated.
+  /// TODO: This approach is not optimal and should be improved in the future
+
+  /// When CRDSA is triggered, if the following conditions are fulfilled, SA shall be used instead of CRDSA
   /// 1) CRDSA back off probability is higher than the parameterized value
   /// 2) CRDSA back off is in effect
   else if (m_randomAccessModel == RA_ANY_AVAILABLE)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - All RA models enabled");
 
-      if (!IsFrameStart ())
+      if (triggerType == RA_SLOTTED_ALOHA_TRIGGER)
         {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Not at frame start, evaluating Slotted ALOHA");
+          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Evaluating Slotted ALOHA");
           txOpportunities = DoSlottedAloha ();
         }
       else
         {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - At frame start, checking CRDSA backoff & backoff probability");
+          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Checking CRDSA backoff & backoff probability");
 
           if (CrdsaHasBackoffTimePassed (allocationChannel) && !IsCrdsaBackoffProbabilityTooHigh (allocationChannel))
             {
@@ -315,7 +279,7 @@ SatRandomAccess::DoSlottedAloha ()
   NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Checking if we have DAMA allocations");
 
   /// Check if we have known DAMA allocations
-  if (!IsDamaAvailable ())
+  if (!m_isDamaAvailableCb ())
     {
       NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - No DAMA -> Running Slotted ALOHA");
 
@@ -629,7 +593,7 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
     {
       NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Backoff period over, checking DAMA status...");
 
-      if (!IsDamaAvailable ())
+      if (!m_isDamaAvailableCb ())
         {
           NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No DAMA, checking buffer status...");
 
@@ -711,6 +675,14 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std:
   NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Randomizing done");
 
   return txOpportunities;
+}
+
+void
+SatRandomAccess::SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCallback callback)
+{
+  NS_LOG_FUNCTION (this << &callback);
+
+  m_isDamaAvailableCb = callback;
 }
 
 } // namespace ns3

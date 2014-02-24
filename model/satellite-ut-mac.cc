@@ -113,13 +113,14 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
 {
 	NS_LOG_FUNCTION (this);
 
-	if (randomAccessConf != NULL && randomAccessModel != SatRandomAccess::RA_OFF)
-	  {
-	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
-	    m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
-	  }
+  m_tbtpContainer = CreateObject<SatTbtpContainer> ();
 
-	m_tbtpContainer = CreateObject<SatTbtpContainer> ();
+  if (randomAccessConf != NULL && randomAccessModel != SatRandomAccess::RA_OFF)
+	  {
+      m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
+	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
+	    m_randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
+	  }
 }
 
 SatUtMac::~SatUtMac ()
@@ -395,27 +396,17 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 {
   NS_LOG_FUNCTION (this << event << rcIndex);
 
-  if (event == SatQueue::FIRST_BUFFERED_PKT)
+  if (rcIndex == 0)
     {
-      NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
-
-      if (m_randomAccess != NULL)
+      if (event == SatQueue::FIRST_BUFFERED_PKT || event == SatQueue::BUFFERED_PKT)
         {
-          DoRandomAccess ();
-        }
-    }
-  else if (event == SatQueue::BUFFERED_PKT)
-    {
-      NS_LOG_LOGIC ("BUFFERED_PKT event received from queue: " << rcIndex);
+          NS_LOG_LOGIC ("Buffered packet event received from queue: " << rcIndex);
 
-      if (m_randomAccess != NULL)
-        {
-          DoRandomAccess ();
+          if (m_randomAccess != NULL)
+            {
+              DoRandomAccess (SatRandomAccess::RA_SLOTTED_ALOHA_TRIGGER);
+            }
         }
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported queue event received!");
     }
 }
 
@@ -485,7 +476,6 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
     }
 }
 
-
 void
 SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 {
@@ -522,7 +512,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 }
 
 void
-SatUtMac::DoRandomAccess ()
+SatUtMac::DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAccessTriggerType)
 {
   NS_LOG_FUNCTION (this);
 
@@ -532,7 +522,7 @@ SatUtMac::DoRandomAccess ()
   uint32_t allocationChannel = GetNextRandomAccessAllocationChannel ();
 
   /// run random access algorithm
-  txOpportunities = m_randomAccess->DoRandomAccess (allocationChannel);
+  txOpportunities = m_randomAccess->DoRandomAccess (allocationChannel, randomAccessTriggerType);
 
   /// process Slotted ALOHA Tx opportunities
   if (txOpportunities.txOpportunityType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)

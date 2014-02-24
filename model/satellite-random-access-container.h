@@ -40,6 +40,11 @@ class SatRandomAccess : public Object
 public:
 
   /**
+   * \return
+   */
+  typedef Callback<bool> IsDamaAvailableCallback;
+
+  /**
    * \enum RandomAccessModel_t
    * \brief Random access models
    */
@@ -50,6 +55,16 @@ public:
     RA_CRDSA = 2,
     RA_ANY_AVAILABLE = 3
   } RandomAccessModel_t;
+
+  /**
+   * \enum RandomAccessTriggerType_t
+   * \brief Random access trigger types
+   */
+  typedef enum
+  {
+    RA_SLOTTED_ALOHA_TRIGGER = 0,
+    RA_CRDSA_TRIGGER = 1
+  } RandomAccessTriggerType_t;
 
   /**
    * \enum RandomAccessTxOpportunityType_t
@@ -152,21 +167,15 @@ public:
    *
    * \return
    */
-  SatRandomAccess::RandomAccessTxOpportunities_s DoRandomAccess (uint32_t allocationChannel);
+  SatRandomAccess::RandomAccessTxOpportunities_s DoRandomAccess (uint32_t allocationChannel, RandomAccessTriggerType_t triggerType);
+
+  /**
+   *
+   * \param callback
+   */
+  void SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCallback callback);
 
 private:
-
-  /**
-   *
-   * \return
-   */
-  bool IsFrameStart ();
-
-  /**
-   *
-   * \return
-   */
-  bool IsDamaAvailable ();
 
   /**
    *
@@ -285,6 +294,20 @@ private:
    *
    */
   bool m_crdsaNewData;
+
+  /**
+  The known DAMA capacity condition is different for control and data.
+  For control the known DAMA is limited to the SF about to start, i.e.,
+  the look ahead is one SF. For data the known DAMA allocation can be
+  one or more SF in the future, i.e., the look ahead contains all known
+  future DAMA allocations. With CRDSA the control packets have priority
+  over data packets.
+  */
+
+  /**
+   * Callback for ...
+   */
+  IsDamaAvailableCallback m_isDamaAvailableCb;
 };
 
 } // namespace ns3

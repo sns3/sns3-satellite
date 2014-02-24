@@ -29,16 +29,22 @@ main (int argc, char *argv[])
   /// Load default lower layer service configuration
   Ptr<SatLowerLayerServiceConf> llsConf = CreateObject<SatLowerLayerServiceConf>  ();
 
+  /// Create default TBTP container
+  Ptr<SatTbtpContainer> tbtpContainer = CreateObject<SatTbtpContainer> ();
+
   /// Load default random access configuration
   Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (llsConf);
 
   /// Create random access module with RA_CRDSA as default
   Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, SatRandomAccess::RA_CRDSA);
 
+  /// Set callbacks
+  randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, tbtpContainer));
+
   /// Run simulation
   for (uint32_t i = 0; i < 49; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel, SatRandomAccess::RA_CRDSA_TRIGGER);
     }
 
   /// Change random access model to RA_SLOTTED_ALOHA
@@ -47,7 +53,7 @@ main (int argc, char *argv[])
   /// Continue simulation
   for (uint32_t i = 50; i < 99; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel, SatRandomAccess::RA_SLOTTED_ALOHA_TRIGGER);
     }
 
   /// Change random access model to RA_ANY_AVAILABLE
@@ -56,7 +62,7 @@ main (int argc, char *argv[])
   /// Continue simulation
   for (uint32_t i = 100; i < 149; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel);
+      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel, SatRandomAccess::RA_CRDSA_TRIGGER);
     }
 
   Simulator::Run ();
