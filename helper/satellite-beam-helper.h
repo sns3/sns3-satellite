@@ -142,14 +142,20 @@ public:
   Ptr<Node> Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
 
   /**
-   * \return A container having all GW nodes in satellite network.
+   * \return container having all GW nodes in satellite network.
    */
-  NodeContainer GetGwNodes ();
+  NodeContainer GetGwNodes () const;
 
   /**
-   * \return A container having all UT nodes in satellite network.
+   * \return container having all UT nodes in satellite network.
    */
-  NodeContainer GetUtNodes ();
+  NodeContainer GetUtNodes () const;
+
+  /**
+   * \param beamId beam ID
+   * \return container having all UT nodes of a specific beam.
+   */
+  NodeContainer GetUtNodes (uint32_t beamId) const;
 
   /**
    * Enables creation traces to be written in given file

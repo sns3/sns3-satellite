@@ -372,13 +372,14 @@ SatBeamHelper::GetGeoSatNode()
 }
 
 NodeContainer
-SatBeamHelper::GetGwNodes()
+SatBeamHelper::GetGwNodes() const
 {
   NS_LOG_FUNCTION (this);
 
   NodeContainer gwNodes;
 
-  for (std::map<uint32_t, Ptr<Node> >::iterator i = m_gwNode.begin (); i != m_gwNode.end (); i++)
+  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = m_gwNode.begin ();
+       i != m_gwNode.end (); ++i)
     {
       gwNodes.Add (i->second);
     }
@@ -387,13 +388,35 @@ SatBeamHelper::GetGwNodes()
 }
 
 NodeContainer
-SatBeamHelper::GetUtNodes ()
+SatBeamHelper::GetUtNodes () const
 {
   NS_LOG_FUNCTION (this);
 
   NodeContainer utNodes;
 
-  for (std::map<uint32_t, Ptr<Node> >::iterator i = m_utNode.begin (); i != m_utNode.end (); i++)
+  for (std::multimap<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+       i != m_utNode.end (); ++i)
+    {
+      utNodes.Add (i->second);
+    }
+
+  return utNodes;
+}
+
+NodeContainer
+SatBeamHelper::GetUtNodes (uint32_t beamId) const
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer utNodes;
+
+  // find all entries with the specified beamId
+  std::pair <std::multimap<uint32_t, Ptr<Node> >::const_iterator,
+             std::multimap<uint32_t, Ptr<Node> >::const_iterator> range;
+  range = m_utNode.equal_range (beamId);
+
+  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = range.first;
+       i != range.second; ++i)
     {
       utNodes.Add (i->second);
     }
