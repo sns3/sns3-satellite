@@ -116,6 +116,14 @@ public:
   void UpdateVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes);
 
   /**
+   * Set volume backlog request a RC.
+   *
+   * \param index Index of RC, which volume backlog is updated.
+   * \param volumeInBytes Volume backlog value [bytes] to set
+   */
+  void SetVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes);
+
+  /**
    * Reset dynamic rate persistence to the value given in lower layer service configuration.
    */
   void ResetDynamicRatePersistence ();

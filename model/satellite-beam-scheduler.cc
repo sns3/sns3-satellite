@@ -377,11 +377,30 @@ SatBeamScheduler::UpdateDamaEntries ()
       Ptr<SatDamaEntry> damaEntry = it->second.m_damaEntry;
 
       // process received CRs
-      for ( UtInfo::CrContainer_t::const_iterator crIt = it->second.m_crContainer.begin (); crIt != it->second.m_crContainer.end (); crIt++ )
+      for ( UtInfo::CrMsgContainer_t::const_iterator crIt = it->second.m_crContainer.begin (); crIt != it->second.m_crContainer.end (); crIt++ )
         {
-          // TODO: Update SatDamaEntry (RC_index, CC) when CR message content is implemented
-          //damaEntry->UpdateDynamicRateInKbps (RC_index, value from CR);
-          //damaEntry->UpdateVolumeBacklogInBytes (RC_index, value from CR);
+          SatCrMessage::RequestContainer_t crContent = (*crIt)->GetCapacityRequestContent ();
+
+          for ( SatCrMessage::RequestContainer_t::const_iterator aCrIt = crContent.begin (); aCrIt != crContent.end (); aCrIt++ )
+            {
+              switch (aCrIt->first.second)
+              {
+                case SatEnums::DA_RBDC:
+                  damaEntry->UpdateDynamicRateInKbps (aCrIt->first.first, aCrIt->second);
+                  break;
+
+                case SatEnums::DA_VBDC:
+                  damaEntry->UpdateVolumeBacklogInBytes(aCrIt->first.first, aCrIt->second);
+                  break;
+
+                case SatEnums::DA_AVBDC:
+                  damaEntry->SetVolumeBacklogInBytes(aCrIt->first.first, aCrIt->second);
+                  break;
+
+                default:
+                  break;
+              }
+            }
         }
             
       // clear container when CRs processed

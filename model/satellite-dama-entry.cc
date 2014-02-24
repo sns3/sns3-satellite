@@ -60,7 +60,10 @@ SatDamaEntry::GetCraBasedBytes (double duration) const
 
   for ( uint32_t i = 0; i < m_llsConf->GetDaServiceCount (); i++)
     {
-      totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration) / 8;
+      if (m_llsConf->GetDaConstantAssignmentProvided (i))
+        {
+          totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration) / 8;
+        }
     }
 
   return totalBytes;
@@ -153,7 +156,18 @@ SatDamaEntry::UpdateVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes
 
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
-      m_volumeBacklogRequestedInBytes[index] += volumeInBytes;
+      SetVolumeBacklogInBytes (index, m_volumeBacklogRequestedInBytes[index] + volumeInBytes);
+    }
+}
+
+void
+SatDamaEntry::SetVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes)
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( m_llsConf->GetDaVolumeAllowed (index) )
+    {
+      m_volumeBacklogRequestedInBytes[index] = volumeInBytes;
 
       if ( m_volumeBacklogRequestedInBytes[index] > m_llsConf->GetDaMaximumBacklogInBytes (index))
         {

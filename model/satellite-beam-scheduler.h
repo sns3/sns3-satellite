@@ -127,11 +127,11 @@ private:
   class UtInfo
   {
     public:
-      typedef std::vector< Ptr<SatCrMessage> > CrContainer_t;
+      typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
 
       Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
       Ptr<SatCnoEstimator>  m_cnoEstimator; // Estimator for C/N0
-      CrContainer_t         m_crContainer;  // received CRs since last scheduling round.
+      CrMsgContainer_t      m_crContainer;  // received CRs since last scheduling round.
 
       UtInfo() {}
   };
