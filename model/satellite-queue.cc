@@ -217,7 +217,7 @@ SatQueue::PushFront (Ptr<Packet> p)
   ++m_nPackets;
   m_nBytes += p->GetSize ();
 
-  m_nEnqueBytesSinceReset += p->GetSize ();
+  m_nDequeBytesSinceReset -= p->GetSize ();
 }
 
 void
@@ -310,6 +310,7 @@ SatQueue::GetQueueStatistics (bool reset)
       queueStats.m_incomingRateKbps = 8.0 * m_nEnqueBytesSinceReset / 1000.0 / duration.GetSeconds ();
       queueStats.m_outgoingRateKbps = 8.0 * m_nDequeBytesSinceReset / 1000.0 / duration.GetSeconds ();
       queueStats.m_volumeInBytes = m_nEnqueBytesSinceReset;
+      queueStats.m_volumeInBytes = m_nDequeBytesSinceReset;
       queueStats.m_queueSizeBytes = GetNBytes ();
 
       if (reset)

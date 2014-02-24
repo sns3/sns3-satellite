@@ -91,7 +91,8 @@ SatUtMac::SatUtMac ()
    m_llsConf (0),
    m_gwAddress (),
    m_framePduHeaderSizeInBytes (1),
-   m_guardTime (MicroSeconds (1))
+   m_guardTime (MicroSeconds (1)),
+   m_raChannel (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -107,7 +108,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
    m_llsConf (0),
    m_gwAddress (),
    m_framePduHeaderSizeInBytes (1),
-   m_guardTime (MicroSeconds (1))
+   m_guardTime (MicroSeconds (1)),
+   m_raChannel (0)
 {
 	NS_LOG_FUNCTION (this);
 
@@ -187,6 +189,17 @@ SatUtMac::SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb)
 
   m_ctrlCallback = cb;
 }
+
+/*
+void
+SatUtMac::CalculateSuperFrameStartTime (uint8_t superFrameSeqId) const
+{
+  double superframeDuration = m_superframeSeq->GetDurationInSeconds (superFrameSeqId);
+  Time expectedReceiveTime = Seconds (superframeDuration * tbtp->GetSuperframeCounter ());
+  Time twoWayPropagationDelay = m_timingAdvanceCb ();
+  Time startTime = expectedReceiveTime - twoWayPropagationDelay;
+}
+*/
 
 void
 SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)

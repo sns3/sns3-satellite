@@ -50,12 +50,14 @@ public:
     : m_incomingRateKbps (0.0),
       m_outgoingRateKbps (0.0),
       m_volumeInBytes (0),
+      m_volumeOutBytes (0),
       m_queueSizeBytes (0)
     {
     }
     double   m_incomingRateKbps;
     double   m_outgoingRateKbps;
     uint32_t m_volumeInBytes;
+    uint32_t m_volumeOutBytes;
     uint32_t m_queueSizeBytes;
   };
 

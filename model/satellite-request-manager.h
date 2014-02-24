@@ -64,16 +64,11 @@ public:
   typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
 
   /**
-   * Container for the pending request key
-   */
-  typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> ContainerKey_t;
-
-  /**
-   * Container for the pending requests
+   * Container for the pending RBDC requests
    * Key = pair of RC index and CAC
    * Value = deque of values
    */
-  typedef std::map<ContainerKey_t, std::deque<uint32_t> > PendingRequestsContainer_t;
+  typedef std::vector<std::deque<uint32_t> > PendingRbdcRequestsContainer_t;
 
   /**
    * Receive a queue event
@@ -139,26 +134,24 @@ private:
    * Do VBDC calculation for a RC
    * \param rc Request class index
    * \param stats Queue statistics
-   * \return uint32_t Requested bytes
+   * \param &vbdcBytes Reference to vbdcBytes
+   * \return SatCapacityAllocationCategory_t Capacity allocation category
    */
-  uint32_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats);
+  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &vbdcBytes);
 
   /**
-   * Calculate the pending requests related to a specific
-   * RC and CAC
+   * Calculate the pending RBDC requests related to a specific RC
    * \param rc Request class index
-   * \param cac Capacity allocation category
    * \return uint32_t Pending sum in kbps or Bytes
    */
-  uint32_t GetPendingSum (uint8_t rc, SatEnums::SatCapacityAllocationCategory_t cac) const;
+  uint32_t GetPendingRbdcSum (uint8_t rc) const;
 
   /**
-   * Update the pending counters with new request information
+   * Update the pending RBDC counters with new request information
    * \param rc Request class index
-   * \param cac Capacity allocation category
    * \param value Requested value in kbps or Bytes
    */
-  void UpdatePendingCounters (uint8_t rc, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value);
+  void UpdatePendingRbdcCounters (uint8_t rc, uint32_t value);
 
   /**
    * Send the capacity request control msg via txCallback to
@@ -196,7 +189,7 @@ private:
   /**
    * Interval to do the periodical CR evaluation
    */
-  double m_evaluationInterval;
+  double m_evaluationIntervalInSeconds;
 
   /**
    * Round trip time estimate. Used to estimate the amount of
@@ -219,7 +212,12 @@ private:
   // Key = RC index
   // Value -> Key   = Time when the request was sent
   // Value -> Value = Requested bitrate or bytes
-  PendingRequestsContainer_t m_pendingRequests;
+  PendingRbdcRequestsContainer_t m_pendingRbdcRequests;
+
+  /**
+   * Pending VBDC counter for each RC index
+   */
+  std::vector<uint32_t> m_pendingVbdcCounters;
 
   static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBPS = 2;
   static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBPS = 32;
