@@ -26,6 +26,8 @@
 #include "ns3/csma-helper.h"
 #include "../model/ideal-net-device.h"
 #include "satellite-user-helper.h"
+#include <ns3/singleton.h>
+#include <ns3/satellite-id-mapper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
 
@@ -150,11 +152,18 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
   Ipv4InterfaceContainer addresses = m_ipv4Ut.Assign (nd);
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
-  // Set default route for users toward satellite (UTs address).
   for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
     {
+      // Add the user's MAC address to the global mapper
+      NS_ASSERT_MSG ((*i)->GetNDevices () == 2,
+                     "Failed to get the device to subscriber network in UT user " << *i);
+      Ptr<NetDevice> dev = (*i)->GetDevice (1); // index 0 is typically for loopback
+      Singleton<SatIdMapper>::Get ()->AttachMacToUtUserId (dev->GetAddress ());
+
       // Get IPv4 protocol implementations
       Ptr<Ipv4> ipv4 = (*i)->GetObject<Ipv4> ();
+
+      // Set default route for users toward satellite (UTs address)
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
       routing->SetDefaultRoute (addresses.GetAddress(0), 1);
       NS_LOG_INFO ("SatUserHelper::InstallUt, User default route: " << addresses.GetAddress(0) );
@@ -197,11 +206,18 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
   routingRouter->SetDefaultRoute(addresses.GetAddress(1), lastRouterIf);
   NS_LOG_INFO ("SatUserHelper::InstallGw, Router default route: " << addresses.GetAddress(1) );
 
-  // Set default route toward router (GW) for users
   for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
     {
+      // Add the user's MAC address to the global mapper
+      NS_ASSERT_MSG ((*i)->GetNDevices () == 2,
+                     "Failed to get the device to backbone network in GW user " << *i);
+      Ptr<NetDevice> dev = (*i)->GetDevice (1); // index 0 is typically for loopback
+      Singleton<SatIdMapper>::Get ()->AttachMacToGwUserId (dev->GetAddress ());
+
       // Get IPv4 protocol implementations
       Ptr<Ipv4> ipv4 = (*i)->GetObject<Ipv4> ();
+
+      // Set default route toward router (GW) for users
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
       routing->SetDefaultRoute (addresses.GetAddress(0), 1);
       NS_LOG_INFO ("SatUserHelper::InstallGw, User default route: " << addresses.GetAddress(0));
