@@ -31,6 +31,7 @@
 #include "ns3/mac48-address.h"
 #include "ns3/satellite-superframe-sequence.h"
 #include "satellite-dama-entry.h"
+#include "satellite-cno-estimator.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -129,35 +130,13 @@ private:
       typedef std::vector< Ptr<SatCrMessage> > CrContainer_t;
 
       Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
-      double                m_cno;          // The latest calculated value of C/N0
+      Ptr<SatCnoEstimator>  m_cnoEstimator; // Estimator for C/N0
       CrContainer_t         m_crContainer;  // received CRs since last scheduling round.
 
-      UtInfo() : m_cno (NAN) {}
+      UtInfo() {}
   };
 
   typedef std::map<Address, UtInfo> UtInfoMap_t;
-
-  SatBeamScheduler& operator = (const SatBeamScheduler &);
-  SatBeamScheduler (const SatBeamScheduler &);
-
-  void DoDispose (void);
-  bool Send ( Ptr<SatControlMessage> packet );
-  void Schedule ();
-
-  void UpdateDamaEntries ();
-  void InitializeScheduling ();
-  void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
-  void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
-  uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
-  uint16_t GetNextTimeSlot ();
-
-  /**
-   * Estimate UT's C/N0 value for next transmission.
-   *
-   * \param utId Id of the UT (address).
-   * \return Estimated C/N0 value. Zero means that no estimation is done.
-   */
-  double EstimateUtCno (Address utId);
 
   /**
    * ID of the beam
@@ -264,6 +243,36 @@ private:
    * VBDC bytes for the super frame scheduled next
    */
   uint32_t  m_vbdcBasedBytes;
+
+  /**
+   * Mode used for C/N0 estimator.
+   */
+  SatCnoEstimator::EstimationMode_t m_cnoEstimatorMode;
+
+  /**
+   * Time window for C/N0 estimation.
+   */
+  Time m_cnoEstimationWindow;
+
+  SatBeamScheduler& operator = (const SatBeamScheduler &);
+  SatBeamScheduler (const SatBeamScheduler &);
+
+  void DoDispose (void);
+  bool Send ( Ptr<SatControlMessage> packet );
+  void Schedule ();
+
+  void UpdateDamaEntries ();
+  void InitializeScheduling ();
+  void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
+  void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
+  uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
+  uint16_t GetNextTimeSlot ();
+
+  /**
+   * Create estimator for the UT according to set attributes.
+   * \return pointer to created estimator
+   */
+  Ptr<SatCnoEstimator> CreateCnoEstimator ();
 };
 
 } // namespace ns3

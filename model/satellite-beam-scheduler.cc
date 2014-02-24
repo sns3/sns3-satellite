@@ -21,6 +21,7 @@
 #include <algorithm>
 #include "ns3/log.h"
 #include "ns3/double.h"
+#include "ns3/enum.h"
 #include "ns3/ipv4-l3-protocol.h"
 #include "satellite-beam-scheduler.h"
 
@@ -41,6 +42,20 @@ SatBeamScheduler::GetTypeId (void)
                    TimeValue (MilliSeconds (560)),
                    MakeTimeAccessor (&SatBeamScheduler::m_rttEstimate),
                    MakeTimeChecker ())
+    .AddAttribute ("CnoEstimationMode",
+                   "Mode of the C/N0 estimator",
+                   EnumValue (SatCnoEstimator::LAST),
+                   MakeEnumAccessor (&SatBeamScheduler::m_cnoEstimatorMode),
+                   MakeEnumChecker (SatCnoEstimator::LAST, "Last value in window used.",
+                                    SatCnoEstimator::MINIMUM, "Minimum value in window used.",
+                                    SatCnoEstimator::AVERAGE, "Average value in window used."))
+    .AddAttribute( "CnoEstimationWindow",
+                   "Time window for C/N0 estimation.",
+                   TimeValue (MilliSeconds (500)),
+                   MakeTimeAccessor (&SatBeamScheduler::m_cnoEstimationWindow),
+                   MakeTimeChecker ())
+
+
   ;
   return tid;
 }
@@ -57,7 +72,8 @@ SatBeamScheduler::SatBeamScheduler ()
     m_slotsPerUt (0),
     m_craBasedBytes (0),
     m_rbdcBasedBytes (0),
-    m_vbdcBasedBytes (0)
+    m_vbdcBasedBytes (0),
+    m_cnoEstimatorMode (SatCnoEstimator::LAST)
 {
   NS_LOG_FUNCTION (this);
   m_currentUt = m_uts.end ();
@@ -141,7 +157,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
   utInfo.m_damaEntry = damaEntry;
-  utInfo.m_cno = NAN;
+  utInfo.m_cnoEstimator = CreateCnoEstimator ();
 
   // TODO: CAC check needed to add
 
@@ -167,8 +183,7 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
   std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
   NS_ASSERT (result != m_uts.end ());
 
-  // TODO: Container for C/N0 values needed, now we just save the latest value.
-  m_uts[utId].m_cno = cno;
+  m_uts[utId].m_cnoEstimator->AddSample (cno);
 }
 
 void
@@ -184,13 +199,28 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
   m_uts[utId].m_crContainer.push_back (crMsg);
 }
 
-double
-SatBeamScheduler::EstimateUtCno (Address utId)
+Ptr<SatCnoEstimator>
+SatBeamScheduler::CreateCnoEstimator ()
 {
-  NS_LOG_FUNCTION (this << utId);
+  NS_LOG_FUNCTION (this);
 
-  // TODO: Estimation logic needed to implement. Now we just return the latest value calculated by lower layer (Phy).
-  return m_uts[utId].m_cno;
+  Ptr<SatCnoEstimator> estimator = NULL;
+
+  switch (m_cnoEstimatorMode)
+  {
+    case SatCnoEstimator::LAST:
+    case SatCnoEstimator::MINIMUM:
+    case SatCnoEstimator::AVERAGE:
+      estimator = Create<SatBasicCnoEstimator> (m_cnoEstimatorMode, m_cnoEstimationWindow);
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Not supported C/N0 estimation mode!!!");
+      break;
+
+  }
+
+  return estimator;
 }
 
 void
@@ -342,8 +372,7 @@ SatBeamScheduler::UpdateDamaEntries ()
 
   for (UtInfoMap_t::iterator it = m_uts.begin (); it != m_uts.end (); it ++ )
     {
-      // estimate C/N0
-      EstimateUtCno (it->first);
+      // estimation of the C/N0 is done when scheduling UT
 
       Ptr<SatDamaEntry> damaEntry = it->second.m_damaEntry;
 

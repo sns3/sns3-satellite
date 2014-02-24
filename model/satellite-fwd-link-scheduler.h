@@ -41,6 +41,7 @@
 #include "satellite-phy.h"
 #include "satellite-bbframe.h"
 #include "satellite-bbframe-container.h"
+#include "satellite-cno-estimator.h"
 #include "ns3/satellite-bbframe-conf.h"
 
 namespace ns3 {
@@ -176,6 +177,7 @@ public:
   void CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate);
 
 private:
+  typedef std::map<Mac48Address, Ptr<SatCnoEstimator> > CnoEstimatorMap_t;
 
   SatFwdLinkScheduler& operator = (const SatFwdLinkScheduler &);
   SatFwdLinkScheduler (const SatFwdLinkScheduler &);
@@ -255,6 +257,12 @@ private:
   void SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject> >& so);
 
   /**
+   * Create estimator for the UT according to set attributes.
+   * \return pointer to created estimator
+   */
+  Ptr<SatCnoEstimator> CreateCnoEstimator ();
+
+  /**
    * Dummy frame
    */
   Ptr<SatBbFrame> m_dummyFrame;
@@ -317,9 +325,20 @@ private:
   SatFwdLinkScheduler::SchedContextCallback m_schedContextCallback;
 
   /**
-   * C/N0 estimation per UT.
+   * C/N0 estimator per UT.
    */
-  std::map<Mac48Address, double> m_cnoInfo;
+  CnoEstimatorMap_t m_cnoEstimatorContainer;
+
+  /**
+   * Mode used for C/N0 estimator.
+   */
+  SatCnoEstimator::EstimationMode_t m_cnoEstimatorMode;
+
+  /**
+   * Time window for C/N0 estimation.
+   */
+  Time m_cnoEstimationWindow;
+
 
  };
 

@@ -134,12 +134,28 @@ SatFwdLinkScheduler::GetTypeId (void)
                     MakeEnumChecker (SatFwdLinkScheduler::NO_SORT, "No sorting",
                                      SatFwdLinkScheduler::BUFFERING_DELAY_SORT, "Sorting by delay in buffer",
                                      SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "Sorting by load in buffer"))
+    .AddAttribute ("CnoEstimationMode",
+                   "Mode of the C/N0 estimator",
+                   EnumValue (SatCnoEstimator::LAST),
+                   MakeEnumAccessor (&SatFwdLinkScheduler::m_cnoEstimatorMode),
+                   MakeEnumChecker (SatCnoEstimator::LAST, "Last value in window used.",
+                                    SatCnoEstimator::MINIMUM, "Minimum value in window used.",
+                                    SatCnoEstimator::AVERAGE, "Average value in window used."))
+    .AddAttribute( "CnoEstimationWindow",
+                   "Time window for C/N0 estimation.",
+                   TimeValue (MilliSeconds (500)),
+                   MakeTimeAccessor (&SatFwdLinkScheduler::m_cnoEstimationWindow),
+                   MakeTimeChecker ())
+
 
   ;
   return tid;
 }
 
 SatFwdLinkScheduler::SatFwdLinkScheduler ()
+: m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
+  m_bbFrameUsageMode (SatFwdLinkScheduler::NORMAL_FRAMES),
+  m_cnoEstimatorMode (SatCnoEstimator::LAST)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
@@ -147,7 +163,10 @@ SatFwdLinkScheduler::SatFwdLinkScheduler ()
 
 SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address)
  : m_macAddress (address),
-   m_bbFrameConf (conf)
+   m_bbFrameConf (conf),
+   m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
+   m_bbFrameUsageMode (SatFwdLinkScheduler::NORMAL_FRAMES),
+   m_cnoEstimatorMode (SatCnoEstimator::LAST)
 {
   NS_LOG_FUNCTION (this);
 
@@ -188,7 +207,7 @@ SatFwdLinkScheduler::DoDispose ()
   m_txOpportunityCallback.Nullify ();
   m_dummyFrame = NULL;
   m_bbFrameContainer = NULL;
-  m_cnoInfo.clear ();
+  m_cnoEstimatorContainer.clear ();
 }
 
 void
@@ -231,19 +250,22 @@ SatFwdLinkScheduler::CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate)
 {
   NS_LOG_FUNCTION (this << utAddress << cnoEstimate);
 
-  /*
-   * If value is not valid then remove possible previous value from list with UT address.
-   * In valid case override previous value.
-   *
-  */
-  if (isnan (cnoEstimate))
+  CnoEstimatorMap_t::const_iterator it = m_cnoEstimatorContainer.find (utAddress);
+
+  if ( it == m_cnoEstimatorContainer.end ())
     {
-      m_cnoInfo.erase (utAddress);
+      Ptr<SatCnoEstimator> estimator = CreateCnoEstimator ();
+
+      std::pair<CnoEstimatorMap_t::const_iterator, bool> result = m_cnoEstimatorContainer.insert (std::make_pair (utAddress, estimator));
+      it = result.first;
+
+      if ( result.second == false )
+        {
+          NS_FATAL_ERROR ("Estimator cannot be added to container!!!");
+        }
     }
-  else
-    {
-      m_cnoInfo[utAddress] = cnoEstimate;
-    }
+
+  it->second->AddSample (cnoEstimate);
 }
 
 void
@@ -262,59 +284,55 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
   NS_LOG_FUNCTION (this);
 
   uint32_t frameBytes = 0;
-  Ptr<SatBbFrame> frame;
+  Ptr<SatBbFrame> frame = NULL;
+  uint32_t priorityClass = 0;
 
   // Get scheduling objects from LLC
   std::vector< Ptr<SatSchedulingObject> > so =  GetSchedulingObjects ();
 
-  if ( so.empty () == false )
+  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin () ;it != so.end(); it++ )
     {
-      uint32_t priorityClass;
+      uint32_t currentObBytes = (*it)->GetBufferedBytes ();
+      double cno = GetSchedulingObjectCno (*it);
+      uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
+      priorityClass = (*it)->GetPriority ();
 
-      for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin () ;it != so.end(); it++ )
+      while ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ) &&
+               (currentObBytes > 0) )
         {
-          uint32_t currentObBytes = (*it)->GetBufferedBytes ();
-          double cno = GetSchedulingObjectCno (*it);
-          uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
-          priorityClass = (*it)->GetPriority ();
-
-          while ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ) &&
-                   (currentObBytes > 0) )
+          if ( frame == NULL )
             {
-              if ( frame == NULL )
+              frame = CreateFrame (cno, currentObBytes);
+              frameBytes = frame->GetBytesLeft ();
+            }
+          else if ( CnoMatchWithFrame ( cno, frame ) == false )
+            {
+              // finish with this frame if MODCOD is more robust than we are currently using
+              // TODO: we need to check rest of object left in list too
+              AddFrameToContainer (priorityClass, frame);
+              frame = NULL;
+            }
+          else
+            {
+              if ( frameBytes < currentObMinReqBytes )
                 {
-                  frame = CreateFrame (cno, currentObBytes);
-                  frameBytes = frame->GetBytesLeft ();
-                }
-              else if ( CnoMatchWithFrame ( cno, frame ) == false )
-                {
-                  // finish with this frame if MODCOD is more robust than we are currently using
-                  // TODO: we need to check rest of object left in list too
                   AddFrameToContainer (priorityClass, frame);
                   frame = NULL;
                 }
               else
                 {
-                  if ( frameBytes < currentObMinReqBytes )
-                    {
-                      AddFrameToContainer (priorityClass, frame);
-                      frame = NULL;
-                    }
-                  else
-                    {
-                      uint32_t bytesLeft = 0;
+                  uint32_t bytesLeft = 0;
 
-                      frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft);
-                      currentObBytes = bytesLeft;
-                    }
+                  frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft);
+                  currentObBytes = bytesLeft;
                 }
             }
         }
+    }
 
-      if ( frame )
-        {
-          AddFrameToContainer (priorityClass, frame);
-        }
+  if ( frame )
+    {
+      AddFrameToContainer (priorityClass, frame);
     }
 }
 
@@ -462,11 +480,11 @@ SatFwdLinkScheduler::GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob)
 
   double cno = NAN;
 
-  std::map<Mac48Address, double>::const_iterator it = m_cnoInfo.find (ob->GetMacAddress ());
+  CnoEstimatorMap_t::const_iterator it = m_cnoEstimatorContainer.find (ob->GetMacAddress ());
 
-  if ( it != m_cnoInfo.end () )
+  if ( it != m_cnoEstimatorContainer.end () )
     {
-      cno = it->second;
+      cno = it->second->GetCnoEstimation ();
     }
 
   return cno;
@@ -511,5 +529,30 @@ SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> fram
 
   return frameBytesLeft;
 }
+
+Ptr<SatCnoEstimator>
+SatFwdLinkScheduler::CreateCnoEstimator ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatCnoEstimator> estimator = NULL;
+
+  switch (m_cnoEstimatorMode)
+  {
+    case SatCnoEstimator::LAST:
+    case SatCnoEstimator::MINIMUM:
+    case SatCnoEstimator::AVERAGE:
+      estimator = Create<SatBasicCnoEstimator> (m_cnoEstimatorMode, m_cnoEstimationWindow);
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Not supported C/N0 estimation mode!!!");
+      break;
+
+  }
+
+  return estimator;
+}
+
 
 } // namespace ns3

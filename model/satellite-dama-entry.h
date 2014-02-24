@@ -48,9 +48,7 @@ public:
   SatDamaEntry ();
 
   /**
-   * Default construct a SatDamaEntry.
-   *
-   * This version of the constructor shall not used.
+   * Actual construct a SatDamaEntry.
    *
    */
   SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf);
