@@ -347,12 +347,27 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   return gwNode;
 }
 
-Ptr<Node>
-SatBeamHelper::GetGwNode (uint32_t id)
+uint32_t
+SatBeamHelper::GetGwId (uint32_t beamId) const
 {
-  NS_LOG_FUNCTION (this << id);
+  std::map<uint32_t, uint32_t>::const_iterator i = m_beam.find (beamId);
 
-  std::map<uint32_t, Ptr<Node> >::iterator gwIterator = m_gwNode.find (id);
+  if (i == m_beam.end ())
+    {
+      return 0;
+    }
+  else
+    {
+      return i->second;
+    }
+}
+
+Ptr<Node>
+SatBeamHelper::GetGwNode (uint32_t gwId) const
+{
+  NS_LOG_FUNCTION (this << gwId);
+
+  std::map<uint32_t, Ptr<Node> >::const_iterator gwIterator = m_gwNode.find (gwId);
   Ptr<Node> node = NULL;
 
   if ( gwIterator != m_gwNode.end () )

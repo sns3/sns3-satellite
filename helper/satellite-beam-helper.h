@@ -142,6 +142,13 @@ public:
   Ptr<Node> Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
 
   /**
+   * \param beamId beam ID
+   * \return the ID of the GW serving the specified beam, or zero if the ID is
+   *         invalid
+   */
+  uint32_t GetGwId (uint32_t beamId) const;
+
+  /**
    * \return container having all GW nodes in satellite network.
    */
   NodeContainer GetGwNodes () const;
@@ -178,10 +185,10 @@ public:
    * Gets GW node according to given id.
    * In case that GW is not found NULL is returned.
    *
-   * \param id ID of the GW
+   * \param gwId ID of the GW
    * \return pointer to found GW node or NULL.
    */
-  Ptr<Node> GetGwNode (uint32_t id);
+  Ptr<Node> GetGwNode (uint32_t gwId) const;
 
   /**
    * Gets Geo Satellite node.
