@@ -154,10 +154,16 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
 
   for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
     {
+      // Add the user and the UT as a new entry to the UT map
+      std::pair<std::map<Ptr<Node>, Ptr<Node> >::iterator, bool> ret
+        = m_utMap.insert (std::make_pair (*i, ut));
+      NS_ASSERT (ret.second);
+
       // Add the user's MAC address to the global mapper
       NS_ASSERT_MSG ((*i)->GetNDevices () == 2,
                      "Failed to get the device to subscriber network in UT user " << *i);
-      Ptr<NetDevice> dev = (*i)->GetDevice (1); // index 0 is typically for loopback
+      // assuming that #0 is for loopback device and #1 is for subscriber network device
+      Ptr<NetDevice> dev = (*i)->GetDevice (1);
       Singleton<SatIdMapper>::Get ()->AttachMacToUtUserId (dev->GetAddress ());
 
       // Get IPv4 protocol implementations
@@ -211,7 +217,8 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
       // Add the user's MAC address to the global mapper
       NS_ASSERT_MSG ((*i)->GetNDevices () == 2,
                      "Failed to get the device to backbone network in GW user " << *i);
-      Ptr<NetDevice> dev = (*i)->GetDevice (1); // index 0 is typically for loopback
+      // assuming that #0 is for loopback device and #1 is for backbone network device
+      Ptr<NetDevice> dev = (*i)->GetDevice (1);
       Singleton<SatIdMapper>::Get ()->AttachMacToGwUserId (dev->GetAddress ());
 
       // Get IPv4 protocol implementations
@@ -259,6 +266,22 @@ SatUserHelper::GetUtUserCount () const
   NS_LOG_FUNCTION (this);
 
   return m_utUsers.GetN ();
+}
+
+Ptr<Node>
+SatUserHelper::GetUtNode (Ptr<Node> utUserNode) const
+{
+  std::map<Ptr<Node>, Ptr<Node> >::const_iterator it
+    = m_utMap.find (utUserNode);
+
+  if (it == m_utMap.end ())
+    {
+      return 0;
+    }
+  else
+    {
+      return it->second;
+    }
 }
 
 void

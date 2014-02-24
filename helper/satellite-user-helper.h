@@ -200,6 +200,13 @@ public:
   uint32_t GetUtUserCount () const;
 
   /**
+   * \param pointer to the UT user node
+   * \return a pointer to the UT node which serves the specified UT user node,
+   *         or zero if the UT user node is invalid
+   */
+  Ptr<Node> GetUtNode (Ptr<Node> utUserNode) const;
+
+  /**
    * Enables creation traces to be written in given file
    *
    * \param stream  stream for creation trace outputs
@@ -259,11 +266,24 @@ private:
 
   NodeContainer     m_gwUsers;
   NodeContainer     m_utUsers;
-
   NetworkType       m_backboneNetworkType;
   NetworkType       m_subscriberNetworkType;
 
   Ptr<Node>         m_router;
+
+  /**
+   * \brief Container of UT users and their corresponding UT.
+   *
+   * The data structure is a map which each key is a pointer to the UT user
+   * node. The corresponding value is a pointer to the UT node which serves the
+   * corresponding UT user node.
+   *
+   * The member is redundant, in a sense that #m_utUsers also stores the same
+   * set of pointers to UT users. This approach is taken to preserve the
+   * ordering of the node pointers in #m_utUsers, which is difficult to be
+   * replicated as a map.
+   */
+  std::map<Ptr<Node>, Ptr<Node> > m_utMap;
 
   /**
    * Trace callback for creation traces
