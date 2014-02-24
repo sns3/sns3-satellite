@@ -131,10 +131,10 @@ SatIdMapper::AttachMacToTraceId (Address mac)
 
   if (resultMacToTraceId.second == false)
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToTraceId - MAC to Trace ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToTraceId - MAC to Trace ID failed");
     }
 
-  NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToTraceId - Added MAC " << mac << " with Trace ID " << m_traceIdIndex);
+  NS_LOG_INFO ("SatIdMapper::AttachMacToTraceId - Added MAC " << mac << " with Trace ID " << m_traceIdIndex);
 
   m_traceIdIndex++;
   return ret;
@@ -150,10 +150,10 @@ SatIdMapper::AttachMacToUtId (Address mac)
 
   if (resultMacToUtId.second == false)
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToUtId - MAC to UT ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToUtId - MAC to UT ID failed");
     }
 
-  NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToUtId - Added MAC " << mac << " with UT ID " << m_utIdIndex);
+  NS_LOG_INFO ("SatIdMapper::AttachMacToUtId - Added MAC " << mac << " with UT ID " << m_utIdIndex);
 
   m_utIdIndex++;
   return ret;
@@ -169,10 +169,10 @@ SatIdMapper::AttachMacToUtUserId (Address mac)
 
   if (resultMacToUtUserId.second == false)
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToUtUserId - MAC to UT user ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToUtUserId - MAC to UT user ID failed");
     }
 
-  NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToUtUserId - Added MAC " << mac << " with UT user ID " << m_utUserIdIndex);
+  NS_LOG_INFO ("SatIdMapper::AttachMacToUtUserId - Added MAC " << mac << " with UT user ID " << m_utUserIdIndex);
 
   m_utUserIdIndex++;
   return ret;
@@ -187,10 +187,10 @@ SatIdMapper::AttachMacToBeamId (Address mac, uint32_t beamId)
 
   if (resultMacToBeamId.second == false)
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToBeamId - MAC to beam ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToBeamId - MAC to beam ID failed");
     }
 
-  NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToBeamId - Added MAC " << mac << " with beam ID " << beamId);
+  NS_LOG_INFO ("SatIdMapper::AttachMacToBeamId - Added MAC " << mac << " with beam ID " << beamId);
 }
 
 void
@@ -202,10 +202,10 @@ SatIdMapper::AttachMacToGwId (Address mac, uint32_t gwId)
 
   if (resultMacToGwId.second == false)
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToGwId - MAC to GW ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToGwId - MAC to GW ID failed");
     }
 
-  NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToGwId - Added MAC " << mac << " with GW ID " << gwId);
+  NS_LOG_INFO ("SatIdMapper::AttachMacToGwId - Added MAC " << mac << " with GW ID " << gwId);
 }
 
 uint32_t
@@ -218,10 +218,10 @@ SatIdMapper::AttachMacToGwUserId (Address mac)
 
   if (resultMacToGwUserId.second == false)
     {
-      NS_FATAL_ERROR ("SatMacIdMacMapper::AttachMacToGwUserId - MAC to GW user ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToGwUserId - MAC to GW user ID failed");
     }
 
-  NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToGwUserId - Added MAC " << mac << " with GW user ID " << m_gwUserIdIndex);
+  NS_LOG_INFO ("SatIdMapper::AttachMacToGwUserId - Added MAC " << mac << " with GW user ID " << m_gwUserIdIndex);
 
   m_gwUserIdIndex++;
   return ret;
