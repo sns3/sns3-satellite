@@ -36,7 +36,7 @@ SatRequestManager::SatRequestManager ()
 :m_gwAddress (),
  m_lastCno (NAN),
  m_llsConf (),
- m_evaluationInterval (MilliSeconds (100)),
+ m_evaluationInterval (100.0),
  m_rttEstimate (MilliSeconds (560)),
  m_maxPendingCrEntries (0),
  m_gainValueK (1/100),
@@ -46,11 +46,11 @@ SatRequestManager::SatRequestManager ()
   NS_ASSERT (false);
 }
 
-SatRequestManager::SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf)
+SatRequestManager::SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf, double evaluationInterval)
 :m_gwAddress (),
  m_lastCno (NAN),
  m_llsConf (llsConf),
- m_evaluationInterval (MilliSeconds (100)),
+ m_evaluationInterval (evaluationInterval),
  m_rttEstimate (MilliSeconds (560)),
  m_maxPendingCrEntries (0),
  m_gainValueK (1/100),
@@ -58,13 +58,13 @@ SatRequestManager::SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf)
 {
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
-  m_gainValueK = 1 / (2 * m_evaluationInterval.GetSeconds ());
-  m_maxPendingCrEntries = (uint32_t)(std::floor(m_rttEstimate.GetSeconds () / m_evaluationInterval.GetSeconds ()));
+  m_gainValueK = 1 / (2 * m_evaluationInterval);
+  m_maxPendingCrEntries = (uint32_t)(std::floor(m_rttEstimate.GetSeconds () / m_evaluationInterval));
 
   NS_LOG_LOGIC ("Gain value: " << m_gainValueK << ", maxPendinCrEntries: " << m_maxPendingCrEntries);
 
   // Start the request manager evaluation cycle
-  Simulator::Schedule (m_evaluationInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
+  Simulator::Schedule (Time::FromDouble(m_evaluationInterval, Time::S), &SatRequestManager::DoPeriodicalEvaluation, this);
 }
 
 
@@ -79,11 +79,6 @@ SatRequestManager::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatRequestManager")
     .SetParent<Object> ()
     .AddConstructor<SatRequestManager> ()
-    .AddAttribute( "PeriodicalEvaluationInterval",
-                   "Periodical request manager evaluation interval",
-                    TimeValue (MilliSeconds (100)),
-                    MakeTimeAccessor (&SatRequestManager::m_evaluationInterval),
-                    MakeTimeChecker ())
     .AddAttribute( "RttEstimate",
                    "Round trip time estimate for request manager",
                    TimeValue (MilliSeconds (560)),
@@ -150,7 +145,7 @@ SatRequestManager::DoPeriodicalEvaluation ()
   DoEvaluation (true);
 
   // Schedule next evaluation interval
-  Simulator::Schedule (m_evaluationInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
+  Simulator::Schedule (Time::FromDouble(m_evaluationInterval, Time::S), &SatRequestManager::DoPeriodicalEvaluation, this);
 }
 
 void
@@ -248,9 +243,9 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
   NS_LOG_FUNCTION (this << rc);
 
   // Calculate the raw RBDC request
-  double coefficient = m_gainValueK / m_evaluationInterval.GetSeconds ();
-  double thisRbdc = stats.m_incomingRateKbps * m_evaluationInterval.GetSeconds ();
-  double previousRbdc = GetPendingSum (rc, SatEnums::DA_RBDC) * m_evaluationInterval.GetSeconds ();
+  double coefficient = m_gainValueK / m_evaluationInterval;
+  double thisRbdc = stats.m_incomingRateKbps * m_evaluationInterval;
+  double previousRbdc = GetPendingSum (rc, SatEnums::DA_RBDC) * m_evaluationInterval;
 
   double reqRbdc (stats.m_incomingRateKbps);
   if (stats.m_queueSizeBytes > (thisRbdc + previousRbdc))

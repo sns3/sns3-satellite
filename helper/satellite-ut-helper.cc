@@ -247,7 +247,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatLlc> llc = CreateObject<SatLlc> ();
 
   // Create a request manager and attach it to LLC
-  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> (m_llsConf);
+  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> (m_llsConf, m_superframeSeq->GetDurationInSeconds (0));
   llc->AddRequestManager (rm);
 
   // Attach the PHY layer to SatNetDevice

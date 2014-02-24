@@ -41,7 +41,7 @@ class SatRequestManager : public Object
 public:
 
   SatRequestManager ();
-  SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf);
+  SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf, double evaluationInterval);
   virtual ~SatRequestManager ();
 
   // inherited from Object
@@ -196,7 +196,7 @@ private:
   /**
    * Interval to do the periodical CR evaluation
    */
-  Time m_evaluationInterval;
+  double m_evaluationInterval;
 
   /**
    * Round trip time estimate. Used to estimate the amount of
