@@ -60,14 +60,16 @@ public:
   /**
    * \brief Attach MAC address to the Trace ID maps and give it a running trace ID
    * \param mac MAC address
+   * \return the trace ID assigned to the given MAC address
    */
-  void AttachMacToTraceId (Address mac);
+  uint32_t AttachMacToTraceId (Address mac);
 
   /**
    * \brief Attach MAC address to the UT ID maps and give it a running UT ID
    * \param mac MAC address
+   * \return the trace ID assigned to the given MAC address
    */
-  void AttachMacToUtId (Address mac);
+  uint32_t AttachMacToUtId (Address mac);
 
   /**
    * \brief Attach MAC address to the beam ID maps

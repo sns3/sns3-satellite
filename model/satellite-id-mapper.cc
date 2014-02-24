@@ -103,11 +103,12 @@ SatIdMapper::Reset ()
   m_enableMapPrint = false;
 }
 
-void
+uint32_t
 SatIdMapper::AttachMacToTraceId (Address mac)
 {
   NS_LOG_FUNCTION (this);
 
+  const uint32_t ret = m_traceIdIndex;
   std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToTraceId = m_macToTraceIdMap.insert (std::make_pair (mac, m_traceIdIndex));
 
   if (resultMacToTraceId.second == false)
@@ -118,13 +119,15 @@ SatIdMapper::AttachMacToTraceId (Address mac)
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToTraceId - Added MAC " << mac << " with Trace ID " << m_traceIdIndex);
 
   m_traceIdIndex++;
+  return ret;
 }
 
-void
+uint32_t
 SatIdMapper::AttachMacToUtId (Address mac)
 {
   NS_LOG_FUNCTION (this);
 
+  const uint32_t ret = m_utIdIndex;
   std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToUtId = m_macToUtIdMap.insert (std::make_pair (mac, m_utIdIndex));
 
   if (resultMacToUtId.second == false)
@@ -135,6 +138,7 @@ SatIdMapper::AttachMacToUtId (Address mac)
   NS_LOG_INFO ("SatMacIdMacMapper::AttachMacToUtId - Added MAC " << mac << " with UT ID " << m_utIdIndex);
 
   m_utIdIndex++;
+  return ret;
 }
 
 void
