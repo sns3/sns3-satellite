@@ -74,6 +74,25 @@ SatRandomAccess::~SatRandomAccess ()
 
   m_uniformRandomVariable = NULL;
   m_randomAccessConf = NULL;
+
+  if (!m_isDamaAvailableCb.IsNull ())
+    {
+      m_isDamaAvailableCb.Nullify ();
+    }
+}
+
+void
+SatRandomAccess::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_uniformRandomVariable = NULL;
+  m_randomAccessConf = NULL;
+
+  if (!m_isDamaAvailableCb.IsNull ())
+    {
+      m_isDamaAvailableCb.Nullify ();
+    }
 }
 
 ///---------------------------------------

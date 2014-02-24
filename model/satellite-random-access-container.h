@@ -175,6 +175,13 @@ public:
    */
   void SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCallback callback);
 
+protected:
+
+  /**
+   *
+   */
+  void DoDispose ();
+
 private:
 
   /**
