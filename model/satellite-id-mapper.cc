@@ -22,6 +22,7 @@
 #include <ns3/log.h>
 #include <ns3/node.h>
 #include <ns3/address.h>
+#include <ns3/satellite-net-device.h>
 #include <sstream>
 
 NS_LOG_COMPONENT_DEFINE ("SatIdMapper");
@@ -236,11 +237,11 @@ SatIdMapper::AttachMacToGwUserId (Address mac)
 // ID GETTERS
 
 int32_t
-SatIdMapper::GetTraceIdWithMac (Address mac)
+SatIdMapper::GetTraceIdWithMac (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter = m_macToTraceIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iter = m_macToTraceIdMap.find (mac);
 
   if (iter == m_macToTraceIdMap.end ())
     {
@@ -251,11 +252,11 @@ SatIdMapper::GetTraceIdWithMac (Address mac)
 }
 
 int32_t
-SatIdMapper::GetUtIdWithMac (Address mac)
+SatIdMapper::GetUtIdWithMac (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter = m_macToUtIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iter = m_macToUtIdMap.find (mac);
 
   if (iter == m_macToUtIdMap.end ())
     {
@@ -266,11 +267,11 @@ SatIdMapper::GetUtIdWithMac (Address mac)
 }
 
 int32_t
-SatIdMapper::GetUtUserIdWithMac (Address mac)
+SatIdMapper::GetUtUserIdWithMac (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter = m_macToUtUserIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iter = m_macToUtUserIdMap.find (mac);
 
   if (iter == m_macToUtUserIdMap.end ())
     {
@@ -281,11 +282,11 @@ SatIdMapper::GetUtUserIdWithMac (Address mac)
 }
 
 int32_t
-SatIdMapper::GetBeamIdWithMac (Address mac)
+SatIdMapper::GetBeamIdWithMac (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter = m_macToBeamIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iter = m_macToBeamIdMap.find (mac);
 
   if (iter == m_macToBeamIdMap.end ())
     {
@@ -296,11 +297,11 @@ SatIdMapper::GetBeamIdWithMac (Address mac)
 }
 
 int32_t
-SatIdMapper::GetGwIdWithMac (Address mac)
+SatIdMapper::GetGwIdWithMac (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter = m_macToGwIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iter = m_macToGwIdMap.find (mac);
 
   if (iter == m_macToGwIdMap.end ())
     {
@@ -311,11 +312,11 @@ SatIdMapper::GetGwIdWithMac (Address mac)
 }
 
 int32_t
-SatIdMapper::GetGwUserIdWithMac (Address mac)
+SatIdMapper::GetGwUserIdWithMac (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter = m_macToGwUserIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iter = m_macToGwUserIdMap.find (mac);
 
   if (iter == m_macToGwUserIdMap.end ())
     {
@@ -328,7 +329,7 @@ SatIdMapper::GetGwUserIdWithMac (Address mac)
 // NODE GETTERS
 
 Address
-SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode)
+SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -344,7 +345,7 @@ SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode)
 }
 
 Address
-SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode)
+SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -356,7 +357,7 @@ SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode)
 }
 
 std::string
-SatIdMapper::GetMacInfo (Address mac)
+SatIdMapper::GetMacInfo (Address mac) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -365,7 +366,7 @@ SatIdMapper::GetMacInfo (Address mac)
 
   out << mac << " ";
 
-  std::map<Address, uint32_t>::iterator iterTrace = m_macToTraceIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iterTrace = m_macToTraceIdMap.find (mac);
 
   if (!(iterTrace == m_macToTraceIdMap.end ()))
     {
@@ -373,7 +374,7 @@ SatIdMapper::GetMacInfo (Address mac)
       isInMap = true;
     }
 
-  std::map<Address, uint32_t>::iterator iterBeam = m_macToBeamIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iterBeam = m_macToBeamIdMap.find (mac);
 
   if (!(iterBeam == m_macToBeamIdMap.end ()))
     {
@@ -381,7 +382,7 @@ SatIdMapper::GetMacInfo (Address mac)
       isInMap = true;
     }
 
-  std::map<Address, uint32_t>::iterator iterUt = m_macToUtIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iterUt = m_macToUtIdMap.find (mac);
 
   if (!(iterUt == m_macToUtIdMap.end ()))
     {
@@ -389,7 +390,7 @@ SatIdMapper::GetMacInfo (Address mac)
       isInMap = true;
     }
 
-  std::map<Address, uint32_t>::iterator iterGw = m_macToGwIdMap.find (mac);
+  std::map<Address, uint32_t>::const_iterator iterGw = m_macToGwIdMap.find (mac);
 
   if (!(iterGw == m_macToGwIdMap.end ()))
     {
@@ -410,13 +411,13 @@ SatIdMapper::GetMacInfo (Address mac)
 }
 
 void
-SatIdMapper::PrintTraceMap ()
+SatIdMapper::PrintTraceMap () const
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, uint32_t>::iterator iter;
+  std::map<Address, uint32_t>::const_iterator iter;
 
-  for (iter = m_macToTraceIdMap.begin(); iter != m_macToTraceIdMap.end(); iter++)
+  for (iter = m_macToTraceIdMap.begin(); iter != m_macToTraceIdMap.end(); ++iter)
     {
       std::cout << GetMacInfo (iter->first) << std::endl;
     }

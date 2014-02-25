@@ -114,42 +114,42 @@ public:
    * \param mac MAC address
    * \return Trace ID
    */
-  int32_t GetTraceIdWithMac (Address mac);
+  int32_t GetTraceIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the UT ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return UT ID
    */
-  int32_t GetUtIdWithMac (Address mac);
+  int32_t GetUtIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the UT user ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return UT user ID
    */
-  int32_t GetUtUserIdWithMac (Address mac);
+  int32_t GetUtUserIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the beam ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return beam ID
    */
-  int32_t GetBeamIdWithMac (Address mac);
+  int32_t GetBeamIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the GW ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return GW ID
    */
-  int32_t GetGwIdWithMac (Address mac);
+  int32_t GetGwIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the GW user ID with MAC. Returns -1 if the MAC is not in the map
    * \param mac MAC address
    * \return GW user ID
    */
-  int32_t GetGwUserIdWithMac (Address mac);
+  int32_t GetGwUserIdWithMac (Address mac) const;
 
   /* MAC GETTERS */
 
@@ -158,7 +158,7 @@ public:
    * \return MAC address of the UT node's satellite beam network device
    * \warning Undefined behaviour when the pointed node is not a valid UT node.
    */
-  Address GetUtMacWithNode (Ptr<Node> utNode);
+  Address GetUtMacWithNode (Ptr<Node> utNode) const;
 
   /**
    * \param utUserNode pointer to a UT user node
@@ -166,19 +166,19 @@ public:
    * \warning Undefined behaviour when the pointed node is not a valid UT user
    *          node.
    */
-  Address GetUtUserMacWithNode (Ptr<Node> utUserNode);
+  Address GetUtUserMacWithNode (Ptr<Node> utUserNode) const;
 
   /**
    * \brief Function for printing out the trace map
    */
-  void PrintTraceMap ();
+  void PrintTraceMap () const;
 
   /**
    * \brief Function for getting the IDs related to a MAC address in an info string
    * \param mac MAC address
    * \return info string
    */
-  std::string GetMacInfo (Address mac);
+  std::string GetMacInfo (Address mac) const;
 
   /**
    * \brief Function for resetting the variables
