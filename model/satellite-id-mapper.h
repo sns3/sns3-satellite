@@ -154,16 +154,17 @@ public:
   /* MAC GETTERS */
 
   /**
-   * \param utNode pointer to a UT node, will causes an error if it is not a
-   *               valid UT node
+   * \param utNode pointer to a UT node
    * \return MAC address of the UT node's satellite beam network device
+   * \warning Undefined behaviour when the pointed node is not a valid UT node.
    */
   Address GetUtMacWithNode (Ptr<Node> utNode);
 
   /**
-   * \param utUserNode pointer to a UT user node, will causes an error if it is
-   *                   not a valid UT user node
+   * \param utUserNode pointer to a UT user node
    * \return MAC address of the UT user node's subscriber network device
+   * \warning Undefined behaviour when the pointed node is not a valid UT user
+   *          node.
    */
   Address GetUtUserMacWithNode (Ptr<Node> utUserNode);
 

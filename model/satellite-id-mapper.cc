@@ -339,6 +339,7 @@ SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode)
    * network device, and device #2 is for satellite beam device.
    */
   Ptr<NetDevice> dev = utNode->GetDevice (2);
+  NS_ASSERT (dev->GetObject<SatNetDevice> () != 0);
   return dev->GetAddress ();
 }
 
