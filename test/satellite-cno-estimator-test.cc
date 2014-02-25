@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-interference-test.cc
+ * \file satellite-cno-estimator.cc
  * \ingroup satellite
- * \brief Test cases to unit test Satellite Interference Models.
+ * \brief Test cases to unit test Satellite C/N0 estimator.
  */
 
 // Include a header file from your module to test.
@@ -49,7 +49,7 @@ public:
   // get C/N0 estimation.
   void GetCnoEstimation ();
 
-  // reset C/N0 estimation.
+  // create C/N0 estimator.
   void CreateEstimator (SatCnoEstimator::EstimationMode_t mode, Time window);
 
 protected:
@@ -287,7 +287,7 @@ SatBasicEstimatorAverageTestCase::DoRun (void)
 
 /**
  * \ingroup satellite
- * \brief Test suite for Satellite interference unit test cases.
+ * \brief Test suite for Satellite C/N0 estimator unit test cases.
  */
 class SatBasicCnoEstimatorTestSuite : public TestSuite
 {

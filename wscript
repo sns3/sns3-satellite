@@ -122,6 +122,7 @@ def build(bld):
         'test/link-results-test.cc',
         'test/performance-memory-test.cc',
         'test/satellite-antenna-pattern-test.cc',
+        'test/satellite-control-msg-container-test.cc',
         'test/satellite-cno-estimator-test.cc',
         'test/satellite-fading-trace-test.cc',
         'test/satellite-fsl-test.cc',
