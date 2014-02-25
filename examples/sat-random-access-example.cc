@@ -40,6 +40,8 @@ main (int argc, char *argv[])
 
   /// Set callbacks
   randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, tbtpContainer));
+  /// TODO fix this once the buffer check has been implemented
+  randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, tbtpContainer));
 
   /// Run simulation
   for (uint32_t i = 0; i < 49; i++)

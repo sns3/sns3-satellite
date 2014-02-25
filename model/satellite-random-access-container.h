@@ -45,6 +45,11 @@ public:
   typedef Callback<bool> IsDamaAvailableCallback;
 
   /**
+   * \return
+   */
+  typedef Callback<bool> AreBuffersEmptyCallback;
+
+  /**
    * \enum RandomAccessModel_t
    * \brief Random access models
    */
@@ -175,6 +180,12 @@ public:
    */
   void SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCallback callback);
 
+  /**
+   *
+   * \param callback
+   */
+  void SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCallback callback);
+
 protected:
 
   /**
@@ -183,12 +194,6 @@ protected:
   void DoDispose ();
 
 private:
-
-  /**
-   *
-   * \return
-   */
-  bool AreBuffersEmpty ();
 
   /**
    *
@@ -315,6 +320,11 @@ private:
    * Callback for ...
    */
   IsDamaAvailableCallback m_isDamaAvailableCb;
+
+  /**
+   * Callback for ...
+   */
+  AreBuffersEmptyCallback m_areBuffersEmptyCb;
 };
 
 } // namespace ns3

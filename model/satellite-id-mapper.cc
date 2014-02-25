@@ -325,7 +325,7 @@ SatIdMapper::GetGwUserIdWithMac (Address mac)
   return iter->second;
 }
 
-// MAC GETTERS
+// NODE GETTERS
 
 Address
 SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode)
@@ -338,7 +338,7 @@ SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode)
    * Assuming that device #0 is for loopback device, device #1 is for subscriber
    * network device, and device #2 is for satellite beam device.
    */
-  Ptr<NetDevice> dev = utNode->GetDevice (1);
+  Ptr<NetDevice> dev = utNode->GetDevice (2);
   return dev->GetAddress ();
 }
 

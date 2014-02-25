@@ -79,6 +79,11 @@ SatRandomAccess::~SatRandomAccess ()
     {
       m_isDamaAvailableCb.Nullify ();
     }
+
+  if (!m_areBuffersEmptyCb.IsNull ())
+    {
+      m_areBuffersEmptyCb.Nullify ();
+    }
 }
 
 void
@@ -93,24 +98,16 @@ SatRandomAccess::DoDispose ()
     {
       m_isDamaAvailableCb.Nullify ();
     }
+
+  if (!m_areBuffersEmptyCb.IsNull ())
+    {
+      m_areBuffersEmptyCb.Nullify ();
+    }
 }
 
 ///---------------------------------------
 /// General random access related methods
 ///---------------------------------------
-
-/// TODO: implement this
-bool
-SatRandomAccess::AreBuffersEmpty ()
-{
-  NS_LOG_FUNCTION (this);
-
-  bool areBuffersEmpty = m_uniformRandomVariable->GetInteger (0,1);
-
-  NS_LOG_INFO ("SatRandomAccess::AreBuffersEmpty: " << areBuffersEmpty);
-
-  return areBuffersEmpty;
-}
 
 void
 SatRandomAccess::SetRandomAccessModel (RandomAccessModel_t randomAccessModel)
@@ -118,16 +115,6 @@ SatRandomAccess::SetRandomAccessModel (RandomAccessModel_t randomAccessModel)
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("SatRandomAccess::SetRandomAccessModel - Setting Random Access model to: " << randomAccessModel);
-
-  if (randomAccessModel == RA_CRDSA || randomAccessModel == RA_ANY_AVAILABLE)
-    {
-      NS_LOG_INFO ("SatRandomAccess::SetRandomAccessModel - CRDSA model in use");
-    }
-
-  if (randomAccessModel == RA_SLOTTED_ALOHA || randomAccessModel == RA_ANY_AVAILABLE)
-    {
-      NS_LOG_INFO ("SatRandomAccess::SetRandomAccessModel - Slotted ALOHA model in use");
-    }
 
   m_randomAccessModel = randomAccessModel;
 
@@ -526,7 +513,10 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   RandomAccessTxOpportunities_s txOpportunities;
   txOpportunities.txOpportunityType = SatRandomAccess::RA_DO_NOTHING;
 
-  uint32_t limit = m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ();
+  /// TODO GetNumOfCandidates needs to be implemented
+  /// TODO this needs to take payloadBytes for each waveform into account
+  uint32_t limit = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
+                             m_uniformRandomVariable->GetInteger (0,10));
 
   for (uint32_t i = 0; i < limit; i++)
     {
@@ -537,17 +527,6 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
         }
       else
         {
-          /// TODO this needs to be implemented
-          /// TODO this needs to take payloadBytes foe each waveform into account!
-          //uint32_t candidateRequestClass = m_uniformRandomVariable->GetInteger (0,(m_numOfRequestClasses-1));
-
-          /// TODO implement BREAK if we get no suitable candidates
-          if (m_uniformRandomVariable->GetValue (0.0,1.0) < 0.2)
-            {
-              NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - No suitable candidates found");
-              break;
-            }
-
           NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - New Tx candidate for allocation channel: " << allocationChannel);
 
           if (CrdsaIsAllocationChannelFree (allocationChannel))
@@ -558,7 +537,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
               txOpportunities.crdsaTxOpportunities = std::make_pair(allocationChannel, CrdsaRandomizeTxOpportunities (allocationChannel,emptySet));
               txOpportunities.txOpportunityType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
 
-              if (AreBuffersEmpty ())
+              if (m_areBuffersEmptyCb ())
                 {
                   m_crdsaNewData = true;
                 }
@@ -702,6 +681,14 @@ SatRandomAccess::SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCal
   NS_LOG_FUNCTION (this << &callback);
 
   m_isDamaAvailableCb = callback;
+}
+
+void
+SatRandomAccess::SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCallback callback)
+{
+  NS_LOG_FUNCTION (this << &callback);
+
+  m_areBuffersEmptyCb = callback;
 }
 
 } // namespace ns3

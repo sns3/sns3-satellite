@@ -120,6 +120,9 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
       m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
 	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
 	    m_randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
+
+	    /// TODO fix this once the buffer check has been implemented
+	    m_randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
 	  }
 }
 
