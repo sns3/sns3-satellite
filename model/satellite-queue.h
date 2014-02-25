@@ -185,6 +185,16 @@ public:
    */
   QueueStats_t GetQueueStatistics (bool reset);
 
+  /**
+   * Method checks how many packets are smaller or equal in size than the
+   * maximum packets size threshold specified as an argument. Note, that each
+   * queue is gone through from the front up until there is first packet larger
+   * than threshold.
+   * \param maxPacketSize Maximum packet size threshold in Bytes
+   * \return uint32_t Number of packets
+   */
+  uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
+
 protected:
 
   /**

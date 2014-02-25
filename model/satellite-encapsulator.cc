@@ -88,4 +88,5 @@ SatEncapsulator::GetQueue ()
   return m_txQueue;
 }
 
+
 } // namespace ns3

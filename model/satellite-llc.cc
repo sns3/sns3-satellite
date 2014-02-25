@@ -335,7 +335,6 @@ SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatEncapsulator> enc, uint32_t rcInd
       // Callback to Request manager
       SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, m_requestManager);
       queue->AddQueueEventCallback (rmCb);
-
       enc->SetQueue (queue);
 
       m_encaps.insert(std::make_pair (key, enc));
@@ -436,6 +435,40 @@ SatLlc::SetQueueSatisticsCallbacks ()
     }
  }
 
+
+uint32_t
+SatLlc::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
+{
+  uint32_t packets (0);
+  m_controlQueue->GetNumSmallerPackets (maxPacketSizeBytes);
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+      it != m_encaps.end ();
+      ++it)
+    {
+      packets += it->second->GetQueue()->GetNumSmallerPackets (maxPacketSizeBytes);
+    }
+  return packets;
+}
+
+bool
+SatLlc::BuffersEmpty () const
+{
+  if (!m_controlQueue->IsEmpty ())
+    {
+      return false;
+    }
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+      it != m_encaps.end ();
+      ++it)
+    {
+      if (!(it->second->GetQueue ()->IsEmpty ()))
+        {
+          return false;
+        }
+    }
+  return true;
+}
 
 } // namespace ns3
 

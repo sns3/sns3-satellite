@@ -39,13 +39,22 @@ NS_OBJECT_ENSURE_REGISTERED (SatReturnLinkEncapsulator);
 
 
 SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
-:MAX_FRAGMENT_ID (8),
+:m_sourceAddress (),
+ m_destAddress (),
+ m_rcIndex (0),
+ m_txFragmentId (0),
+ m_currRxFragmentId (0),
+ m_currRxPacketSize (0),
+ m_currRxPacketFragmentBytes (0),
+ m_minTxOpportunity (0),
+ MAX_FRAGMENT_ID (8),
  MAX_PPDU_PACKET_SIZE (2048),
  MAX_HL_PDU_PACKET_SIZE (4096)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (true);
 }
+
 
 SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex)
    :m_sourceAddress (source),
@@ -55,6 +64,7 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48
     m_currRxFragmentId (0),
     m_currRxPacketSize (0),
     m_currRxPacketFragmentBytes (0),
+    m_minTxOpportunity (0),
     MAX_FRAGMENT_ID (8),
     MAX_PPDU_PACKET_SIZE (2048),
     MAX_HL_PDU_PACKET_SIZE (4096)

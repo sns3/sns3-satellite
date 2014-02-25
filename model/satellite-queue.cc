@@ -340,6 +340,25 @@ SatQueue::ResetShortTermStatistics ()
   m_statResetTime = Simulator::Now ();
 }
 
+uint32_t
+SatQueue::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
+{
+  uint32_t packets (0);
+  for (PacketContainer_t::const_iterator it = m_packets.begin ();
+      it != m_packets.end ();
+      ++it)
+    {
+      if ((*it)->GetSize() <= maxPacketSizeBytes)
+        {
+          ++packets;
+        }
+      else
+        {
+          break;
+        }
+    }
+  return packets;
+}
 
 } // namespace ns3
 
