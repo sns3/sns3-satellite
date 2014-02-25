@@ -190,4 +190,18 @@ SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBa
   return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );
 }
 
+Time
+SatSuperframeSeq::GetSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const
+{
+  uint32_t count = (uint32_t)(ceil((Simulator::Now () + timingAdvance).GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
+  return GetSuperFrameTxTimeWithCount (superFrameSeqId, count, timingAdvance);
+}
+
+Time
+SatSuperframeSeq::GetSuperFrameTxTimeWithCount (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const
+{
+  return (Seconds (superFrameCount * GetDurationInSeconds (superFrameSeqId)) - timingAdvance);
+}
+
+
 }; // namespace ns3

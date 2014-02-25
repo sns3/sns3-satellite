@@ -191,16 +191,14 @@ SatUtMac::SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb)
   m_ctrlCallback = cb;
 }
 
-/*
-void
-SatUtMac::CalculateSuperFrameStartTime (uint8_t superFrameSeqId) const
+
+Time
+SatUtMac::GetSuperFrameTxTime (uint8_t superFrameSeqId) const
 {
-  double superframeDuration = m_superframeSeq->GetDurationInSeconds (superFrameSeqId);
-  Time expectedReceiveTime = Seconds (superframeDuration * tbtp->GetSuperframeCounter ());
-  Time twoWayPropagationDelay = m_timingAdvanceCb ();
-  Time startTime = expectedReceiveTime - twoWayPropagationDelay;
+  Time timingAdvance = m_timingAdvanceCb ();
+  Time txTime = m_superframeSeq->GetSuperFrameTxTime (superFrameSeqId, timingAdvance);
+  return txTime;
 }
-*/
 
 void
 SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
@@ -214,19 +212,17 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * send the time slots at different times so that the transmissions are received at the GW
    * at correct time.
    */
-  double superframeDuration = m_superframeSeq->GetDurationInSeconds (tbtp->GetSuperframeSeqId ());
-  Time expectedReceiveTime = Seconds (superframeDuration * tbtp->GetSuperframeCounter ());
-  Time twoWayPropagationDelay = m_timingAdvanceCb ();
-  Time startTime = expectedReceiveTime - twoWayPropagationDelay;
+  Time timingAdvance = m_timingAdvanceCb ();
+  Time txTime = m_superframeSeq->GetSuperFrameTxTimeWithCount (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
 
   // The delay compared to Now when to start the transmission of this superframe
-  Time startDelay = startTime - Simulator::Now ();
+  Time startDelay = txTime - Simulator::Now ();
 
   // Add TBTP to a specific container
-  m_tbtpContainer->Add (startTime, tbtp);
+  m_tbtpContainer->Add (txTime, tbtp);
 
   // if the calculated start time of the superframe is already in the past
-  if (startTime < Simulator::Now ())
+  if (txTime < Simulator::Now ())
     {
       NS_FATAL_ERROR ("UT: " << m_nodeInfo->GetMacAddress () << " received TBTP " << tbtp->GetSuperframeCounter () << ", which should have been sent already in the past");
     }
@@ -234,9 +230,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
   // Schedule superframe start
   Simulator::Schedule (startDelay, &SatUtMac::SuperFrameStart, this, tbtp->GetSuperframeSeqId ());
 
-  NS_LOG_LOGIC ("Expected receive time for the superframe: " << expectedReceiveTime.GetSeconds ());
-  NS_LOG_LOGIC ("Calculated propagation delay between UT and GW: " << twoWayPropagationDelay.GetSeconds ());
-  NS_LOG_LOGIC ("Time to start sending the superframe for this UT: " << startTime.GetSeconds ());
+  NS_LOG_LOGIC ("Time to start sending the superframe for this UT: " << txTime.GetSeconds ());
   NS_LOG_LOGIC ("Waiting delay before the superframe start: " << startDelay.GetSeconds ());
 
   //tbtp->Dump ();

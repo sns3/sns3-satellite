@@ -142,6 +142,25 @@ public:
    */
   inline Time GetTargetDuration () const { return m_targetDuration; }
 
+  /**
+   * Get the tx time for the next superframe taking into account the UT specific
+   * timing advance
+   * \param superFrameSeqId Superframe sequence id
+   * \param timingAdvance Timing advance for a given UT
+   * \return Time Transmission time
+   */
+  Time GetSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const;
+
+  /**
+   * Get the tx time for the next superframe taking into account the UT specific
+   * timing advance
+   * \param superFrameSeqId Superframe sequence id
+   * \param superFrameCount Used superframe count for calculation
+   * \param timingAdvance Timing advance for a given UT
+   * \return Time Transmission time
+   */
+  Time GetSuperFrameTxTimeWithCount (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const;
+
 private:
   typedef std::map<uint32_t, Ptr<SatControlMsgContainer> > TbtpMap_t;
 

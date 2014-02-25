@@ -98,6 +98,13 @@ public:
   void SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb);
 
   /**
+   * Get Tx time for the next possible superframe.
+   * \param superFrameSeqId Superframe sequence id
+   * \return Time Time to transmit
+   */
+  Time GetSuperFrameTxTime (uint8_t superFrameSeqId) const;
+
+  /**
    * Receive a queue event:
    * - FIRST_BUFFER_RCVD
    * - BUFFER_EMPTY
