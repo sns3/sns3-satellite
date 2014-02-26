@@ -25,7 +25,7 @@
 #include <map>
 #include "ns3/event-id.h"
 #include "ns3/mac48-address.h"
-#include "satellite-encapsulator.h"
+#include "satellite-base-encapsulator.h"
 
 
 namespace ns3 {
@@ -39,7 +39,7 @@ namespace ns3 {
  * are located at both UT (encapsulation, fragmentation, packing) and
  * GW (decapsulation, defragmentation, reassembly).
  */
-class SatReturnLinkEncapsulator : public SatEncapsulator
+class SatReturnLinkEncapsulator : public SatBaseEncapsulator
 {
 public:
 
@@ -82,38 +82,13 @@ public:
    * \param p packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
-
-  /**
-   * Get the buffered packets for this encapsulator
-   * \return uint32_t buffered bytes
-   */
-  virtual uint32_t GetTxBufferSizeInBytes () const;
   
-  /**
-   * Get Head-of-Line packet buffering delay.
-   * \return Time HoL buffering delay
-   */
-  virtual Time GetHolDelay () const;
-
   /**
    * Get minimum Tx opportunity in bytes, which takes the
    * assumed header sizes into account.
    * \return uint32_t minimum tx opportunity
    */
   virtual uint32_t GetMinTxOpportunityInBytes () const;
-
-  /**
-   * Callback to send packet to lower layer.
-    * \param Ptr<Packet> the packet received
-    */
-  typedef Callback<void, Ptr<Packet> > ReceiveCallback;
-
-  /**
-   * Method to set receive callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    */
-  void SetReceiveCallback (ReceiveCallback cb);
 
 private:
 
@@ -123,23 +98,7 @@ private:
    */
   void IncreaseFragmentId ();
 
-
-  void Reassemble ();
-
   void Reset ();
-
-  /**
-   * Source and destination mac addresses. Used to tag the Frame PDU
-   * so that lower layers are capable of passing the packet to the
-   * correct destination.
-   */
-  Mac48Address m_sourceAddress;
-  Mac48Address m_destAddress;
-
-  /**
-   * RC index used in this RLE
-   */
-  uint8_t m_rcIndex;
 
   /**
    * Fragment id used in the packet transmissions

@@ -44,7 +44,7 @@ public:
   /**
    * Default constructor
    */
-  SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint32_t priority);
+  SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint32_t flowId);
 
   /**
    * Destructor

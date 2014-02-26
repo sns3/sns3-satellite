@@ -38,14 +38,22 @@ NS_OBJECT_ENSURE_REGISTERED (SatGenericStreamEncapsulator);
 
 
 SatGenericStreamEncapsulator::SatGenericStreamEncapsulator ()
+:SatBaseEncapsulator (),
+ m_maxGsePduSize (4095),
+ m_txFragmentId (0),
+ m_currRxFragmentId (0),
+ m_currRxPacketSize (0),
+ m_currRxPacketFragmentBytes (0),
+ m_minGseTxOpportunity (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (true);
 }
 
-SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest)
-   :m_sourceAddress (source),
-    m_destAddress (dest),
+
+
+SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
+   :SatBaseEncapsulator (source, dest, flowId),
     m_maxGsePduSize (4095),
     m_txFragmentId (0),
     m_currRxFragmentId (0),
@@ -68,7 +76,7 @@ TypeId
 SatGenericStreamEncapsulator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatGenericStreamEncapsulator")
-    .SetParent<SatEncapsulator> ()
+    .SetParent<SatBaseEncapsulator> ()
     .AddConstructor<SatGenericStreamEncapsulator> ()
     .AddAttribute ("MaxGsePduSize",
                    "Maximum size of the GSE PDU (in Bytes)",
@@ -87,7 +95,7 @@ SatGenericStreamEncapsulator::DoDispose ()
   while (!m_rxBuffer.empty ()) m_rxBuffer.pop_back ();
   m_rxBuffer.clear();
 
-  SatEncapsulator::DoDispose ();
+  SatBaseEncapsulator::DoDispose ();
 }
 
 void
@@ -279,6 +287,8 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 void
 SatGenericStreamEncapsulator::IncreaseFragmentId ()
 {
+  NS_LOG_FUNCTION (this);
+
   ++m_txFragmentId;
   if (m_txFragmentId >= MAX_FRAGMENT_ID)
     {
@@ -325,12 +335,6 @@ SatGenericStreamEncapsulator::CalculateTotalPacketSizeWithHeaders (uint32_t hlPa
   return totalPacketSize;
 }
 
-
-uint32_t
-SatGenericStreamEncapsulator::GetTxBufferSizeInBytes () const
-{
-  return m_txQueue->GetNBytes ();
-}
 
 void
 SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
@@ -447,6 +451,8 @@ SatGenericStreamEncapsulator::Reassemble ()
 
 void SatGenericStreamEncapsulator::Reset ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_currRxFragmentId = 0;
   m_currRxPacketSize = 0;
   m_currRxPacketFragment = 0;
@@ -454,34 +460,11 @@ void SatGenericStreamEncapsulator::Reset ()
 }
 
 
-void
-SatGenericStreamEncapsulator::SetReceiveCallback (ReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_rxCallback = cb;
-}
-
-Time
-SatGenericStreamEncapsulator::GetHolDelay () const
-{
-  Time holDelay;
-  SatTimeTag timeTag;
-  if (m_txQueue->Peek ()->PeekPacketTag(timeTag))
-    {
-      holDelay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatTimeTag not found in the packet!");
-    }
-
-  return holDelay;
-}
-
-
 uint32_t
 SatGenericStreamEncapsulator::GetMinTxOpportunityInBytes () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_minGseTxOpportunity;
 }
 

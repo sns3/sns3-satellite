@@ -65,30 +65,6 @@ public:
   void Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2);
 
   /**
-   * Each point to point net device must have a queue to pass packets through.
-   * This method allows one to set the type of the queue that is automatically
-   * created when the device is created and attached to a node.
-   *
-   * \param type the type of queue
-   * \param n1 the name of the attribute to set on the queue
-   * \param v1 the value of the attribute to set on the queue
-   * \param n2 the name of the attribute to set on the queue
-   * \param v2 the value of the attribute to set on the queue
-   * \param n3 the name of the attribute to set on the queue
-   * \param v3 the value of the attribute to set on the queue
-   * \param n4 the name of the attribute to set on the queue
-   * \param v4 the value of the attribute to set on the queue
-   *
-   * Set the type of queue to create and associated to each
-   * SatNetDevice created through SatGwHelper::Install.
-   */
-  void SetQueue (std::string type,
-                 std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
-                 std::string n2 = "", const AttributeValue &v2 = EmptyAttributeValue (),
-                 std::string n3 = "", const AttributeValue &v3 = EmptyAttributeValue (),
-                 std::string n4 = "", const AttributeValue &v4 = EmptyAttributeValue ());
-
-  /**
    * Set an attribute value to be propagated to each NetDevice created by the
    * helper.
    *
@@ -167,7 +143,6 @@ private:
   SatMac::ReadCtrlMsgCallback   m_readCtrlCb;
   SatMac::WriteCtrlMsgCallback  m_writeCtrlCb;
 
-  ObjectFactory m_queueFactory;
   ObjectFactory m_channelFactory;
   ObjectFactory m_deviceFactory;
 

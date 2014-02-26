@@ -38,6 +38,7 @@
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
+#include "../model/satellite-base-encapsulator.h"
 #include "../model/satellite-generic-stream-encapsulator.h"
 #include "../model/satellite-return-link-encapsulator.h"
 #include "../model/satellite-net-device.h"
@@ -276,31 +277,55 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
 
-  // Return link
+  // --- RETURN LINK ENCAPSULATORS ---
   uint32_t rcIndeces = m_llsConf->GetDaServiceCount ();
   NS_ASSERT (rcIndeces >= 2);
+
+  // Control messages are using flow id (RC index) 0. No need for decapsulator for
+  // RC index 0 at the GW, since control messages are terminated already at lower
+  // layer.
+  uint8_t controlFlowId (0);
+  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, controlFlowId);
+  llc->AddEncap (addr, utEncap, controlFlowId); // Tx
+  Ptr<SatReturnLinkEncapsulator> gwDecap;
+
   for (uint8_t rc = 1; rc <= rcIndeces; ++rc)
     {
-      Ptr<SatReturnLinkEncapsulator> utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
+      utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
       llc->AddEncap (addr, utEncap, rc); // Tx
 
       // Create encapsulator and add it to GW's LLC
-      Ptr<SatReturnLinkEncapsulator> gwDecap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
+      gwDecap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
       gwLlc->AddDecap (addr, gwDecap, rc); // Rx
       gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, gwLlc));
     }
 
-  // Forward link
-  Ptr<SatGenericStreamEncapsulator> gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
-  Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr);
-  utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
+  // --- FORWARD LINK ENCAPSULATORS ---
+
+  // Control messages are using flow id (RC index) 0. Forward link is using only one container
+  // for control messages, which is configured to send packets to broadcast address.
+  Ptr<SatBaseEncapsulator> gwEncap;
+
+  // Create control container for each LLC only once.
+  if (!gwLlc->ControlEncapsulatorCreated ())
+    {
+      gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), controlFlowId);
+      gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, controlFlowId); // Tx
+    }
+
+  // User data
+  gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, 1);
   gwLlc->AddEncap (addr, gwEncap, 1); // Tx
+
+  Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, 1);
+  utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
   llc->AddDecap (addr, utDecap, 1); // Rx
 
   // set serving GW MAC address to UT MAC and RM
   mac->SetGwAddress (gwAddr);
   rm->SetGwAddress (gwAddr);
 
+  /*
   // Create and set control packet queue to LLC
   Ptr<SatQueue> queue = CreateObject<SatQueue> (0);
   llc->SetQueue (queue);
@@ -312,6 +337,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Callback to UT MAC
   SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
   queue->AddQueueEventCallback (macCb);
+   */
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));

@@ -104,7 +104,6 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 
-  m_queueFactory.SetTypeId ("ns3::SatQueue");
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
@@ -130,22 +129,6 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDv
 
   m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate);
   m_bbFrameConf->InitializeCNoRequirements (lrS2);
-}
-
-void 
-SatGwHelper::SetQueue (std::string type,
-                              std::string n1, const AttributeValue &v1,
-                              std::string n2, const AttributeValue &v2,
-                              std::string n3, const AttributeValue &v3,
-                              std::string n4, const AttributeValue &v4)
-{
-  NS_LOG_FUNCTION (this << type << n1 << n2 << n3 <<  n4  );
-
-  m_queueFactory.SetTypeId (type);
-  m_queueFactory.Set (n1, v1);
-  m_queueFactory.Set (n2, v2);
-  m_queueFactory.Set (n3, v3);
-  m_queueFactory.Set (n4, v4);
 }
 
 void 
@@ -237,10 +220,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
-
-  // Create and set queues for Mac modules
-  Ptr<SatQueue> queue = CreateObject<SatQueue> ();
-  llc->SetQueue (queue);
 
   // Attach the device receive callback to SatNetDevice
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));

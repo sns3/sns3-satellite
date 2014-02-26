@@ -39,10 +39,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatReturnLinkEncapsulator);
 
 
 SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
-:m_sourceAddress (),
- m_destAddress (),
- m_rcIndex (0),
- m_txFragmentId (0),
+:m_txFragmentId (0),
  m_currRxFragmentId (0),
  m_currRxPacketSize (0),
  m_currRxPacketFragmentBytes (0),
@@ -56,10 +53,8 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
 }
 
 
-SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex)
-   :m_sourceAddress (source),
-    m_destAddress (dest),
-    m_rcIndex (rcIndex),
+SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
+   :SatBaseEncapsulator (source, dest, flowId),
     m_txFragmentId (0),
     m_currRxFragmentId (0),
     m_currRxPacketSize (0),
@@ -84,7 +79,7 @@ TypeId
 SatReturnLinkEncapsulator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatReturnLinkEncapsulator")
-    .SetParent<SatEncapsulator> ()
+    .SetParent<SatBaseEncapsulator> ()
     .AddConstructor<SatReturnLinkEncapsulator> ()
   ;
   return tid;
@@ -95,7 +90,7 @@ SatReturnLinkEncapsulator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  SatEncapsulator::DoDispose ();
+  SatBaseEncapsulator::DoDispose ();
 }
 
 void
@@ -306,7 +301,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   packet->AddPacketTag (mTag);
 
   SatRcIndexTag rcTag;
-  rcTag.SetRcIndex (m_rcIndex);
+  rcTag.SetRcIndex (m_flowId);
   packet->AddPacketTag (rcTag);
 
   // Update bytes lefts
@@ -325,11 +320,6 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
   return packet;
 }
 
-uint32_t
-SatReturnLinkEncapsulator::GetTxBufferSizeInBytes () const
-{
-  return m_txQueue->GetNBytes ();
-}
 
 void
 SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
@@ -423,10 +413,11 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
     }
 }
 
-
 void
 SatReturnLinkEncapsulator::IncreaseFragmentId ()
 {
+  NS_LOG_FUNCTION (this);
+
   ++m_txFragmentId;
   if (m_txFragmentId >= MAX_FRAGMENT_ID)
     {
@@ -437,39 +428,19 @@ SatReturnLinkEncapsulator::IncreaseFragmentId ()
 
 void SatReturnLinkEncapsulator::Reset ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_currRxFragmentId = 0;
   m_currRxPacketSize = 0;
   m_currRxPacketFragment = 0;
   m_currRxPacketFragmentBytes = 0;
 }
 
-void
-SatReturnLinkEncapsulator::SetReceiveCallback (ReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_rxCallback = cb;
-}
-
-Time
-SatReturnLinkEncapsulator::GetHolDelay () const
-{
-  Time holDelay;
-  SatTimeTag timeTag;
-  if (m_txQueue->Peek ()->PeekPacketTag(timeTag))
-    {
-      holDelay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatTimeTag not found in the packet!");
-    }
-
-  return holDelay;
-}
-
 uint32_t
 SatReturnLinkEncapsulator::GetMinTxOpportunityInBytes () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_minTxOpportunity;
 }
 

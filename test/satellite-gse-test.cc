@@ -87,9 +87,9 @@ SatGseTestCase::DoRun (void)
   Mac48Address source = Mac48Address::Allocate();
   Mac48Address dest = Mac48Address::Allocate();
 
-  uint8_t rcIndex (0);
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (rcIndex);
-  Ptr<SatGenericStreamEncapsulator> gse = CreateObject<SatGenericStreamEncapsulator> (source, dest);
+  uint8_t flowId (0);
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (flowId);
+  Ptr<SatGenericStreamEncapsulator> gse = CreateObject<SatGenericStreamEncapsulator> (source, dest, flowId);
   gse->SetQueue (queue);
 
   // Create a receive callback to Receive method of this class.

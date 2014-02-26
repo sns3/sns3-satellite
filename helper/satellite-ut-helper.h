@@ -24,7 +24,6 @@
 #include <string>
 
 #include "ns3/object-factory.h"
-#include "ns3/queue.h"
 #include "ns3/output-stream-wrapper.h"
 #include "ns3/net-device-container.h"
 #include "ns3/node-container.h"
@@ -146,7 +145,6 @@ private:
     SatMac::ReadCtrlMsgCallback   m_readCtrlCb;
     SatMac::WriteCtrlMsgCallback  m_writeCtrlCb;
 
-    ObjectFactory m_queueFactory;
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;
 

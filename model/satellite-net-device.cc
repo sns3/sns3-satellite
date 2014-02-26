@@ -343,11 +343,14 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
   SatControlMsgTag tag;
   tag.SetMsgType (msg->GetMsgType ());
   tag.SetMsgId ( m_mac->WriteCtrlMsgToContainer (msg) );
-
   packet->AddPacketTag (tag);
 
-  // ToS 0 = control
-  m_llc->Enque (packet, dest, 0);
+  /**
+   * By default, the IP header will have a ToS value of 0. This is why ToS value 0
+   * shall be mapped by default to user data RC index, and control ToS shall be set to
+   * some other value, e.g. 10.
+   */
+  m_llc->Enque (packet, dest, 10);
 
   return true;
 }

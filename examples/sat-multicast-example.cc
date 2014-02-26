@@ -34,7 +34,7 @@ main (int argc, char *argv[])
   /// UT users 2,3,5
   bool enableMulticastGroup_2 = true;
 
-  uint32_t MULTICAST_RC_INDEX (10);
+  uint32_t MCAST_FLOW_ID (10);
 
   /// Enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -222,18 +222,19 @@ main (int argc, char *argv[])
                                    outputDevicesGW1);
 
        // TODO: this has to be dynamically managed!
-      uint32_t MULTICAST_RC_INDEX (10);
+      uint32_t MCAST_FLOW_ID (10);
 
       /// Create and add encapsulators for the multicast group
       for (uint32_t i = 0; i < outputDevicesGW1.GetN (); i++)
         {
           encapsulator =
               CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW1.Get (i)->GetAddress ()),
-                                                          multicastMacGroup_1);
+                                                          multicastMacGroup_1,
+                                                          MCAST_FLOW_ID);
           llc = DynamicCast<SatNetDevice> (outputDevicesGW1.Get (i))->GetLlc ();
           llc->AddEncap (multicastMacGroup_1,
                          encapsulator,
-                         MULTICAST_RC_INDEX);
+                         MCAST_FLOW_ID);
         }
 
       NS_LOG_INFO ("--- GW 1 ---");
@@ -267,11 +268,12 @@ main (int argc, char *argv[])
         {
           encapsulator =
               CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW3.Get (i)->GetAddress ()),
-                                                          multicastMacGroup_1);
+                                                          multicastMacGroup_1,
+                                                          MCAST_FLOW_ID);
           llc = DynamicCast<SatNetDevice> (outputDevicesGW3.Get (i))->GetLlc ();
           llc->AddEncap (multicastMacGroup_1,
                          encapsulator,
-                         MULTICAST_RC_INDEX);
+                         MCAST_FLOW_ID);
         }
 
       NS_LOG_INFO ("--- GW 3 ---");
@@ -304,11 +306,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_1);
+                                                                 multicastMacGroup_1,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_1,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
 
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
@@ -343,11 +346,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_1);
+                                                                 multicastMacGroup_1,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_1,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
 
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
@@ -382,11 +386,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_1);
+                                                                 multicastMacGroup_1,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_1,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
 
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
@@ -421,11 +426,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_1);
+                                                                 multicastMacGroup_1,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_1,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
 
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
@@ -509,11 +515,12 @@ main (int argc, char *argv[])
         {
           encapsulator =
               CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW1.Get (i)->GetAddress ()),
-                                                          multicastMacGroup_2);
+                                                          multicastMacGroup_2,
+                                                          MCAST_FLOW_ID);
           llc = DynamicCast<SatNetDevice> (outputDevicesGW1.Get (i))->GetLlc ();
           llc->AddEncap (multicastMacGroup_2,
                          encapsulator,
-                         MULTICAST_RC_INDEX);
+                         MCAST_FLOW_ID);
         }
 
       NS_LOG_INFO ("--- GW 1 ---");
@@ -547,11 +554,12 @@ main (int argc, char *argv[])
         {
           encapsulator =
               CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (outputDevicesGW3.Get (i)->GetAddress ()),
-                                                          multicastMacGroup_2);
+                                                          multicastMacGroup_2,
+                                                          MCAST_FLOW_ID);
           llc = DynamicCast<SatNetDevice> (outputDevicesGW3.Get (i))->GetLlc ();
           llc->AddEncap (multicastMacGroup_2,
                          encapsulator,
-                         MULTICAST_RC_INDEX);
+                         MCAST_FLOW_ID);
         }
 
       NS_LOG_INFO ("--- GW 3 ---");
@@ -584,11 +592,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_2);
+                                                                 multicastMacGroup_2,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_2,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
 
@@ -622,11 +631,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_2);
+                                                                 multicastMacGroup_2,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_2,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
 
@@ -647,11 +657,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_2);
+                                                                 multicastMacGroup_2,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_2,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
 
@@ -685,11 +696,12 @@ main (int argc, char *argv[])
 
       /// Create and add decapsulator for the multicast group
       decapsulator = CreateObject<SatGenericStreamEncapsulator> (Mac48Address::ConvertFrom (sourceDevice->GetAddress ()),
-                                                                 multicastMacGroup_2);
+                                                                 multicastMacGroup_2,
+                                                                 MCAST_FLOW_ID);
       llc = DynamicCast<SatNetDevice> (inputDevice)->GetLlc ();
       llc->AddDecap (multicastMacGroup_2,
                      decapsulator,
-                     MULTICAST_RC_INDEX);
+                     MCAST_FLOW_ID);
       decapsulator->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu,
                                                       llc));
 
