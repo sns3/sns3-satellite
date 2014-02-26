@@ -46,12 +46,10 @@ SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel () :
   m_crdsaMaxUniquePayloadPerBlock (),
   m_crdsaMaxConsecutiveBlocksAccessed (),
   m_crdsaNumOfConsecutiveBlocksUsed (0),
-  m_crdsaBackoffReleaseTime (0)
+  m_crdsaBackoffReleaseTime (0),
+  m_crdsaPayloadBytes ()
 {
   NS_LOG_FUNCTION (this);
-
-  /// TODO add here init from lower layer service conf
-
 }
 
 SatRandomAccessAllocationChannel::~SatRandomAccessAllocationChannel ()
@@ -97,6 +95,11 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
   if (m_crdsaMaximumBackoffProbability < 0.0 || m_crdsaMaximumBackoffProbability > 1.0)
     {
       NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaMaximumBackoffProbability < 0.0 || m_crdsaMaximumBackoffProbability > 1.0");
+    }
+
+  if (m_crdsaPayloadBytes < 1)
+    {
+      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaPayloadBytes < 1");
     }
 
   NS_LOG_INFO ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - Variable sanity check done");

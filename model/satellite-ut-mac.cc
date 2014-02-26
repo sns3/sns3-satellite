@@ -203,6 +203,14 @@ SatUtMac::GetSuperFrameTxTime (uint8_t superFrameSeqId) const
   return txTime;
 }
 
+Time
+SatUtMac::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
+{
+  Time timingAdvance = m_timingAdvanceCb ();
+  Time txTime = m_superframeSeq->GetCurrentSuperFrameStartTime (superFrameSeqId, timingAdvance);
+  return txTime;
+}
+
 void
 SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 {
@@ -524,7 +532,7 @@ SatUtMac::DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAcces
   /// process Slotted ALOHA Tx opportunities
   if (txOpportunities.txOpportunityType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
     {
-      Time txOpportunity = Time::FromInteger (Now ().GetMilliSeconds () + txOpportunities.slottedAlohaTxOpportunity, Time::MS);
+      Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
 
       /// schedule the check for next available RA slot
       Simulator::Schedule (txOpportunity, &SatUtMac::FindNextAvailableRandomAccessSlot, this, allocationChannel);
@@ -550,6 +558,8 @@ void
 SatUtMac::FindNextAvailableRandomAccessSlot (uint32_t allocationChannel)
 {
   /// TODO find the next slot taking into account the already used time slots in this frame
+
+  Time currentSuperframeStartTime = GetCurrentSuperFrameStartTime (0);
   uint32_t usedSlot = 10;
 
   /// update used slots

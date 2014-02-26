@@ -188,6 +188,16 @@ public:
   /**
    *
    */
+  uint32_t GetCrdsaPayloadBytes () { return m_crdsaPayloadBytes; }
+
+  /**
+   *
+   */
+  void SetCrdsaPayloadBytes (uint32_t payloadBytes) { m_crdsaPayloadBytes = payloadBytes; }
+
+  /**
+   *
+   */
   void DoCrdsaVariableSanityCheck ();
 
 private:
@@ -251,6 +261,11 @@ private:
    *
    */
   double m_crdsaBackoffReleaseTime;
+
+  /**
+   *
+   */
+  uint32_t m_crdsaPayloadBytes;
 };
 
 } // namespace ns3

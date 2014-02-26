@@ -84,6 +84,11 @@ SatRandomAccess::~SatRandomAccess ()
     {
       m_areBuffersEmptyCb.Nullify ();
     }
+
+  if (!m_numOfCandidatePacketsCb.IsNull ())
+    {
+      m_numOfCandidatePacketsCb.Nullify ();
+    }
 }
 
 void
@@ -102,6 +107,11 @@ SatRandomAccess::DoDispose ()
   if (!m_areBuffersEmptyCb.IsNull ())
     {
       m_areBuffersEmptyCb.Nullify ();
+    }
+
+  if (!m_numOfCandidatePacketsCb.IsNull ())
+    {
+      m_numOfCandidatePacketsCb.Nullify ();
     }
 }
 
@@ -358,6 +368,24 @@ SatRandomAccess::CrdsaSetMaximumBackoffProbability (uint32_t allocationChannel,
 }
 
 void
+SatRandomAccess::CrdsaSetPayloadBytes (uint32_t allocationChannel,
+                                       uint32_t payloadBytes)
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_randomAccessModel == RA_CRDSA || m_randomAccessModel == RA_ANY_AVAILABLE)
+    {
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaPayloadBytes (payloadBytes);
+
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->DoCrdsaVariableSanityCheck ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetMaximumBackoffProbability - Wrong random access model in use");
+    }
+}
+
+void
 SatRandomAccess::CrdsaSetRandomizationParameters (uint32_t allocationChannel,
                                                   uint32_t minRandomizationValue,
                                                   uint32_t maxRandomizationValue,
@@ -513,10 +541,8 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   RandomAccessTxOpportunities_s txOpportunities;
   txOpportunities.txOpportunityType = SatRandomAccess::RA_DO_NOTHING;
 
-  /// TODO GetNumOfCandidates needs to be implemented
-  /// TODO this needs to take payloadBytes for each waveform into account
   uint32_t limit = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
-                             m_uniformRandomVariable->GetInteger (0,10));
+                             m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
 
   for (uint32_t i = 0; i < limit; i++)
     {
@@ -643,7 +669,6 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
   return txOpportunities;
 }
 
-
 std::set<uint32_t>
 SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std::set<uint32_t> txOpportunities)
 {
@@ -689,6 +714,14 @@ SatRandomAccess::SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCal
   NS_LOG_FUNCTION (this << &callback);
 
   m_areBuffersEmptyCb = callback;
+}
+
+void
+SatRandomAccess::SetNumOfCandidatePacketsCallback (SatRandomAccess::NumOfCandidatePacketsCallback callback)
+{
+  NS_LOG_FUNCTION (this << &callback);
+
+  m_numOfCandidatePacketsCb = callback;
 }
 
 } // namespace ns3

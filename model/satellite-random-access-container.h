@@ -50,6 +50,11 @@ public:
   typedef Callback<bool> AreBuffersEmptyCallback;
 
   /**
+   * \return
+   */
+  typedef Callback<uint32_t,uint32_t> NumOfCandidatePacketsCallback;
+
+  /**
    * \enum RandomAccessModel_t
    * \brief Random access models
    */
@@ -141,6 +146,13 @@ public:
   /**
    *
    * \param allocationChannel
+   * \param payloadBytes
+   */
+  void CrdsaSetPayloadBytes (uint32_t allocationChannel,
+                             uint32_t payloadBytes);
+  /**
+   *
+   * \param allocationChannel
    * \param minRandomizationValue
    * \param maxRandomizationValue
    * \param numOfInstances
@@ -185,6 +197,12 @@ public:
    * \param callback
    */
   void SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCallback callback);
+
+  /**
+   *
+   * \param callback
+   */
+  void SetNumOfCandidatePacketsCallback (SatRandomAccess::NumOfCandidatePacketsCallback callback);
 
 protected:
 
@@ -325,6 +343,11 @@ private:
    * Callback for ...
    */
   AreBuffersEmptyCallback m_areBuffersEmptyCb;
+
+  /**
+   * Callback for ...
+   */
+  NumOfCandidatePacketsCallback m_numOfCandidatePacketsCb;
 };
 
 } // namespace ns3

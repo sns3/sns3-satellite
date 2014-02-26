@@ -152,6 +152,15 @@ public:
   Time GetSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const;
 
   /**
+   * Get the start tx time for the current superframe taking into account the UT specific
+   * timing advance
+   * \param superFrameSeqId Superframe sequence id
+   * \param timingAdvance Timing advance for a given UT
+   * \return Time Transmission time
+   */
+  Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId, Time timingAdvance) const;
+
+  /**
    * Get the tx time for the next superframe taking into account the UT specific
    * timing advance
    * \param superFrameSeqId Superframe sequence id

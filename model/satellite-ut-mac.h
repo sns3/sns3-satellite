@@ -147,6 +147,13 @@ protected:
 private:
 
    /**
+    * Get start time for the current superframe.
+    * \param superFrameSeqId Superframe sequence id
+    * \return Time Time to transmit
+    */
+   Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
+
+   /**
     * \brief Do random access evaluation for Tx opportunities
     * \param randomAccessTriggerType
     */
