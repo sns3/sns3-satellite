@@ -85,7 +85,7 @@ private:
    *
    * \return the pointer to interference event as a reference of the addition
    */
-  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
+  virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
 
   /**
    * Calculates interference power for the given reference
@@ -95,7 +95,7 @@ private:
    *
    * \return Final calculated power value at end of receiving
    */
-  virtual double DoCalculate (Ptr<SatInterference::Event> event);
+  virtual double DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Resets current interference.
@@ -107,14 +107,14 @@ private:
    *
    * \param event Interference reference event of receiver
    */
-  virtual void DoNotifyRxStart (Ptr<SatInterference::Event> event);
+  virtual void DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Notifies that RX is ended by a receiver.
    *
    * \param event Interference reference event of receiver
    */
-  virtual void DoNotifyRxEnd (Ptr<SatInterference::Event> event);
+  virtual void DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    *
@@ -142,7 +142,7 @@ private:
   /**
    * \brief interference change list
    */
-  InterferenceChanges m_changes;
+  InterferenceChanges m_interferenceChanges;
 
   /**
    * \brief notified interference event IDs
@@ -150,9 +150,10 @@ private:
   std::set <uint32_t> m_events;
 
   /**
-   * \brief First power value for interference. Sum of negative values in list m_changes, which positive value is not in list
+   * \brief Residual power value for interference.
+   * Sum of negative values in list m_changes, which positive value is not in list.
    */
-  long double m_firstPowerW;
+  long double m_residualPowerW;
 
   /**
    * \brief flag to indicate that at least one receiving is on

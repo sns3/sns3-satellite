@@ -277,7 +277,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // set scheduler to Mac
   mac->SetAttribute("Scheduler", PointerValue (fdwLinkScheduler));
 
-  mac->StartScheduling ();
+  mac->StartPeriodicSending ();
 
   return dev;
 }

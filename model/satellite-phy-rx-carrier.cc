@@ -218,7 +218,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           bool ownAddressFound = false;
           Mac48Address source;
           Mac48Address dest;
-          Ptr<SatInterference::Event> interferenceEvent;
+          Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
 
           for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
                 ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)

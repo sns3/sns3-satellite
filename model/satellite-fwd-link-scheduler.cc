@@ -189,7 +189,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   dummyPacket->AddPacketTag (tag);
 
   // Add dummy packet to dummy frame
-  m_dummyFrame->AddTransmitData (dummyPacket);
+  m_dummyFrame->AddPayload (dummyPacket);
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
 }
@@ -303,7 +303,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
           if ( frame == NULL )
             {
               frame = CreateFrame (cno, currentObBytes);
-              frameBytes = frame->GetBytesLeft ();
+              frameBytes = frame->GetSpaceLeftInBytes ();
             }
           else if ( CnoMatchWithFrame ( cno, frame ) == false )
             {
@@ -519,9 +519,9 @@ SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> fram
 
   if ( p )
     {
-      frameBytesLeft = frame->AddTransmitData (p);
+      frameBytesLeft = frame->AddPayload (p);
     }
-  else if ( frame->GetBytesLeft () == frame->GetSizeInBytes () )
+  else if ( frame->GetSpaceLeftInBytes () == frame->GetMaxSpaceInBytes () )
     {
       NS_FATAL_ERROR ("Packet does not fit in empty BB Frame. Control package too long or fragmentation problem in user package!!!");
     }

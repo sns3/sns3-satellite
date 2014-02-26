@@ -62,17 +62,17 @@ SatConstantInterference::Set (double power)
   m_power = power;
 }
 
-Ptr<SatInterference::Event>
+Ptr<SatInterference::InterferenceChangeEvent>
 SatConstantInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
-  Ptr<SatInterference::Event> event;
-  event = Create<SatInterference::Event> (0, duration, power, rxAddress);
+  Ptr<SatInterference::InterferenceChangeEvent> event;
+  event = Create<SatInterference::InterferenceChangeEvent> (0, duration, power, rxAddress);
 
   return event;
 }
 
 double
-SatConstantInterference::DoCalculate (Ptr<SatInterference::Event> event)
+SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_ASSERT (m_rxing);
 
@@ -85,12 +85,12 @@ SatConstantInterference::DoReset (void)
   // does nothing
 }
 void
-SatConstantInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
+SatConstantInterference::DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   m_rxing = true;
 }
 void
-SatConstantInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
+SatConstantInterference::DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   m_rxing = false;
 }

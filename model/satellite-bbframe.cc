@@ -28,9 +28,9 @@ namespace ns3 {
 
 SatBbFrame::SatBbFrame ()
  : m_modCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4),
-   m_freeBytes (0),
-   m_totalBytes (0),
-   m_containsControlData (false),
+   m_spaceInBytes (0),
+   m_maxSpaceInBytes (0),
+   m_containsControlPdu (false),
    m_frameType ()
 {
   NS_LOG_FUNCTION (this);
@@ -40,7 +40,7 @@ SatBbFrame::SatBbFrame ()
 
 SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf)
   :m_modCod (modCod),
-   m_containsControlData (false),
+   m_containsControlPdu (false),
    m_frameType (type)
 {
   NS_LOG_FUNCTION (this << modCod << type);
@@ -49,15 +49,15 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
   {
     case SatEnums::SHORT_FRAME:
     case SatEnums::NORMAL_FRAME:
-      m_freeBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
-      m_totalBytes = m_freeBytes;
+      m_spaceInBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
+      m_maxSpaceInBytes = m_spaceInBytes;
       m_duration = conf->GetBbFrameLength (modCod, type);
       break;
 
     case SatEnums::DUMMY_FRAME:
       // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
-      m_freeBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
-      m_totalBytes = m_freeBytes;
+      m_spaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
+      m_maxSpaceInBytes = m_spaceInBytes;
       m_duration = conf->GetDummyBbFrameLength ();
       break;
 
@@ -66,7 +66,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
       break;
   }
 
-  m_freeBytes = m_totalBytes;
+  m_spaceInBytes = m_maxSpaceInBytes;
 }
 
 SatBbFrame::~SatBbFrame ()
@@ -78,20 +78,20 @@ const SatBbFrame::SatBbFrameData&
 SatBbFrame::GetTransmitData ()
 {
   NS_LOG_FUNCTION (this);
-  return frameData;
+  return framePayload;
 }
 
 uint32_t
-SatBbFrame::AddTransmitData (Ptr<Packet> data)
+SatBbFrame::AddPayload (Ptr<Packet> data)
 {
   NS_LOG_FUNCTION (this);
 
   uint32_t dataLengthInBytes = data->GetSize ();
 
-  if ( dataLengthInBytes <= m_freeBytes )
+  if ( dataLengthInBytes <= m_spaceInBytes )
     {
-      frameData.push_back (data);
-      m_freeBytes -= dataLengthInBytes;
+      framePayload.push_back (data);
+      m_spaceInBytes -= dataLengthInBytes;
     }
   else
     {
@@ -99,21 +99,21 @@ SatBbFrame::AddTransmitData (Ptr<Packet> data)
       NS_ASSERT (0);
     }
 
-  return GetBytesLeft();
+  return GetSpaceLeftInBytes();
 }
 
 uint32_t
-SatBbFrame::GetBytesLeft () const
+SatBbFrame::GetSpaceLeftInBytes () const
 {
   NS_LOG_FUNCTION (this);
-  return m_freeBytes;
+  return m_spaceInBytes;
 }
 
 uint32_t
-SatBbFrame::GetSizeInBytes () const
+SatBbFrame::GetMaxSpaceInBytes () const
 {
   NS_LOG_FUNCTION (this);
-  return m_totalBytes;
+  return m_maxSpaceInBytes;
 }
 
 } // namespace ns3

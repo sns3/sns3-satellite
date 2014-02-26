@@ -26,7 +26,7 @@ NS_LOG_COMPONENT_DEFINE ("SatInterference");
 
 namespace ns3 {
 
-SatInterference::Event::Event (uint32_t id, Time rxDuration, double rxPower, Address terrestrialAddress)
+SatInterference::InterferenceChangeEvent::InterferenceChangeEvent (uint32_t id, Time rxDuration, double rxPower, Address terrestrialAddress)
   : m_startTime (Simulator::Now ()),
     m_endTime (m_startTime + rxDuration),
     m_rxPower (rxPower),
@@ -34,42 +34,42 @@ SatInterference::Event::Event (uint32_t id, Time rxDuration, double rxPower, Add
     m_terrestrialAddress (terrestrialAddress)
 {
 }
-SatInterference::Event::~Event ()
+SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent ()
 {
 }
 
 uint32_t
-SatInterference::Event::GetId (void) const
+SatInterference::InterferenceChangeEvent::GetId (void) const
 {
   return m_id;
 }
 
 Time
-SatInterference::Event::GetDuration (void) const
+SatInterference::InterferenceChangeEvent::GetDuration (void) const
 {
   return m_endTime - m_startTime;
 }
 
 Time
-SatInterference::Event::GetStartTime (void) const
+SatInterference::InterferenceChangeEvent::GetStartTime (void) const
 {
   return m_startTime;
 }
 
 Time
-SatInterference::Event::GetEndTime (void) const
+SatInterference::InterferenceChangeEvent::GetEndTime (void) const
 {
   return m_endTime;
 }
 
 double
-SatInterference::Event::GetRxPower (void) const
+SatInterference::InterferenceChangeEvent::GetRxPower (void) const
 {
   return m_rxPower;
 }
 
 Address
-SatInterference::Event::GetTerrestrialNodeAddress (void) const
+SatInterference::InterferenceChangeEvent::GetTerrestrialNodeAddress (void) const
 {
   return m_terrestrialAddress;
 }
@@ -102,14 +102,14 @@ SatInterference::~SatInterference ()
 
 }
 
-Ptr<SatInterference::Event>
+Ptr<SatInterference::InterferenceChangeEvent>
 SatInterference::Add (Time duration, double power, Address rxAddress)
 {
   return DoAdd(duration, power, rxAddress);
 }
 
 double
-SatInterference::Calculate (Ptr<SatInterference::Event> event)
+SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   return DoCalculate (event);
 }
@@ -121,13 +121,13 @@ SatInterference::Reset (void)
 }
 
 void
-SatInterference::NotifyRxStart (Ptr<SatInterference::Event> event)
+SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   DoNotifyRxStart(event);
 }
 
 void
-SatInterference::NotifyRxEnd (Ptr<SatInterference::Event> event)
+SatInterference::NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   DoNotifyRxEnd(event);
 }

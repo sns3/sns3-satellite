@@ -79,7 +79,7 @@ SatConstantInterferenceTestCase::DoRun (void)
   interference->Set (100);
 
   // just test that we can call add. However, It shouldn't have any effect on interference.
-  Ptr<SatInterference::Event> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Ptr<SatInterference::InterferenceChangeEvent> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
 
   // Test event setting with constant interference (base class SatInterference can't be instantiate)
   NS_TEST_ASSERT_MSG_EQ (event->GetDuration (), Time (10), "Event duration is incorrect");
@@ -136,7 +136,7 @@ public:
 private:
   virtual void DoRun (void);
   Ptr<SatPerPacketInterference> m_interference;
-  Ptr<SatInterference::Event> m_rxEvent[4];
+  Ptr<SatInterference::InterferenceChangeEvent> m_rxEvent[4];
   uint32_t  m_rxIndex;
   double finalPower[4];
 };
@@ -161,7 +161,7 @@ SatPerPacketInterferenceTestCase::~SatPerPacketInterferenceTestCase ()
 void
 SatPerPacketInterferenceTestCase::AddInterference (Time duration, double power, Address rxAddress)
 {
-  Ptr<SatInterference::Event> event =  m_interference->Add (duration, power, rxAddress);
+  Ptr<SatInterference::InterferenceChangeEvent> event =  m_interference->Add (duration, power, rxAddress);
 }
 
 void

@@ -190,7 +190,7 @@ private:
   /**
    * \brief Interference event
    */
-  Ptr<SatInterference::Event> m_interferenceEvent;
+  Ptr<SatInterference::InterferenceChangeEvent> m_interferenceEvent;
 
   /**
    * \brief Link results used for error modeling

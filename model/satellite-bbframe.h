@@ -37,7 +37,7 @@ namespace ns3 {
  * Holds information of a BB Frame for forward link scheduling.
  *
  */
-class SatBbFrame :  public SimpleRefCount<SatBbFrame>
+class SatBbFrame : public SimpleRefCount<SatBbFrame>
 {
 public:
 
@@ -68,30 +68,30 @@ public:
   const SatBbFrameData& GetTransmitData ();
 
   /**
-   * Add data to transmit buffer of this BB Frame info
+   * Add payload (packet) to transmit buffer of this BB Frame info
    *
-   * \param packet        Pointer to packet wanted to add transmit buffer
+   * \param packet  Pointer to packet wanted to add to transmit buffer
    * \return Free bytes left in transmit buffer
    */
-  uint32_t AddTransmitData (Ptr<Packet> packet);
+  uint32_t AddPayload (Ptr<Packet> packet);
 
   /**
-   * Check whether the buffer contains control messages
+   * Check whether the buffer contains control messages (PDUs)
    * \return boolean
    */
-  bool ContainsControlData () const;
+  bool ContainsControlPdu () const;
 
   /**
-   * Get free bytes in transmit buffer.
+   * Get space left in BB frame transmit buffer in bytes.
    * \return free bytes in transmit buffer
    */
-  uint32_t GetBytesLeft () const ;
+  uint32_t GetSpaceLeftInBytes () const ;
 
   /**
-   * Get the size of the transmit buffer in bytes.
-   * \return the size of the transmit buffer
+   * Get the maximum size of the BB Frame transmit buffer in bytes.
+   * \return the maximum size of the BB Frame transmit buffer
    */
-  uint32_t GetSizeInBytes () const ;
+  uint32_t GetMaxSpaceInBytes () const ;
 
   /**
    * Get duration of the frame transmission.
@@ -114,10 +114,10 @@ public:
 private:
 
   SatEnums::SatModcod_t m_modCod;
-  uint32_t m_freeBytes;
-  uint32_t m_totalBytes;
-  bool m_containsControlData;
-  SatBbFrameData frameData;
+  uint32_t m_spaceInBytes;
+  uint32_t m_maxSpaceInBytes;
+  bool m_containsControlPdu;
+  SatBbFrameData framePayload;
   Time m_duration;
   SatEnums::SatBbFrameType_t m_frameType;
 };

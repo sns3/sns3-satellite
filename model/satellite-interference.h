@@ -37,23 +37,23 @@ class SatInterference : public Object
 public:
 
   /**
-   * Event for identifying interferences (receiving)
+   * Event for identifying interference change events (receiving)
    */
-  class Event : public SimpleRefCount<SatInterference::Event>
+  class InterferenceChangeEvent : public SimpleRefCount<SatInterference::InterferenceChangeEvent>
   {
   public:
     /**
       * Constructor of Event for satellite interference
-      * \param id indentifier of the event
+      * \param id identifier of the event
       * \param duration duration of the interference event
       * \param rxPower  RX power of interference
       */
-    Event (uint32_t id, Time duration, double rxPower, Address terrestrialAddress);
+    InterferenceChangeEvent (uint32_t id, Time duration, double rxPower, Address terrestrialAddress);
 
     /**
      * Destructor of Event for satellite interference
      */
-    ~Event ();
+    ~InterferenceChangeEvent ();
 
     /**
       * \return id identifier of the event
@@ -116,7 +116,7 @@ public:
    *
    * \return the pointer to interference event as a reference of the addition
    */
-  Ptr<SatInterference::Event> Add (Time rxDuration, double rxPower, Address rxAddress);
+  Ptr<SatInterference::InterferenceChangeEvent> Add (Time rxDuration, double rxPower, Address rxAddress);
 
   /**
    * Calculates interference power for the given reference
@@ -127,7 +127,7 @@ public:
    *
    * \return Calculated power value at end of receiving
    */
-  double Calculate (Ptr<SatInterference::Event> event );
+  double Calculate (Ptr<SatInterference::InterferenceChangeEvent> event );
 
   /**
    * Resets current interference.
@@ -138,13 +138,13 @@ public:
    * Notifies that RX is started by a receiver.
    * \param event Interference reference event of receiver
    */
-  virtual void NotifyRxStart (Ptr<SatInterference::Event> event);
+  virtual void NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Notifies that RX is ended by a receiver.
    * \param event Interference reference event of receiver
    */
-  virtual void NotifyRxEnd (Ptr<SatInterference::Event> event);
+  virtual void NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
 
 private:
   /**
@@ -158,19 +158,18 @@ private:
    *
    * Concrete subclasses of this base class must implement this method.
    */
-  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower, Address rxAddress) = 0;
+  virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress) = 0;
 
   /**
    * Calculates interference power for the given reference
    * Sets final power at end time to finalPower.
    *
    * \param event Reference event which for interference is calculated.
-   *
    * \return Final power value at end of receiving
    *
    * Concrete subclasses of this base class must implement this method.
    */
-  virtual double DoCalculate (Ptr<SatInterference::Event> event) = 0;
+  virtual double DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
   /**
    * Resets current interference.
@@ -186,7 +185,7 @@ private:
    *
    * \param event Interference reference event of receiver
    */
-  virtual void DoNotifyRxStart (Ptr<SatInterference::Event> event) = 0;
+  virtual void DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
   /**
    * Notifies that RX is ended by a receiver.
@@ -195,7 +194,7 @@ private:
    *
    * \param event Interference reference event of receiver
    */
-  virtual void DoNotifyRxEnd (Ptr<SatInterference::Event> event) = 0;
+  virtual void DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
   SatInterference (const SatInterference &o);
   SatInterference &operator = (const SatInterference &o);

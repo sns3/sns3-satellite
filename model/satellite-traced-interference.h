@@ -86,7 +86,7 @@ private:
    *
    * \return the pointer to interference event as a reference of the addition
    */
-  virtual Ptr<SatInterference::Event> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
+  virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
   /**
    * Calculates interference power for the given reference
    * Sets final power at end time to finalPower.
@@ -98,7 +98,7 @@ private:
    *
    * \return Final power value at end of receiving
    */
-  virtual double DoCalculate (Ptr<SatInterference::Event> event);
+  virtual double DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Resets current interference.
@@ -110,14 +110,14 @@ private:
    *
    * \param event Interference reference event of receiver (ignored in this implementation)
    */
-  virtual void DoNotifyRxStart (Ptr<SatInterference::Event> event);
+  virtual void DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Notifies that RX is ended by a receiver.
    *
    * \param event Interference reference event of receiver (ignored in this implementation)
    */
-  virtual void DoNotifyRxEnd (Ptr<SatInterference::Event> event);
+  virtual void DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    *

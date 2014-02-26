@@ -97,7 +97,7 @@ SatGeoFeederPhy::GetTypeId (void)
     .AddAttribute( "ExtNoisePowerDensityDbwhz",
                    "Other system interference, C over I in dB.",
                     DoubleValue (-207.0),
-                    MakeDoubleAccessor (&SatGeoFeederPhy::m_extNoisePowerDensityDbwhz),
+                    MakeDoubleAccessor (&SatGeoFeederPhy::m_extNoisePowerDensityDbwHz),
                     MakeDoubleChecker<double> ())
     .AddAttribute( "ImIfCOverIDb",
                    "Adjacent channel interference, C over I in dB.",
@@ -148,7 +148,7 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
                                              converter,
                                              carrierCount);
 
-  carrierConf->SetAttribute ("ExtNoiseDensityDbwhz", DoubleValue (m_extNoisePowerDensityDbwhz) );
+  carrierConf->SetAttribute ("ExtNoiseDensityDbwhz", DoubleValue (m_extNoisePowerDensityDbwHz) );
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoFeederPhy::CalculateSinr, this));
 

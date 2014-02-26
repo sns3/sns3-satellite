@@ -77,19 +77,19 @@ SatTracedInterference::~SatTracedInterference ()
   Reset ();
 }
 
-Ptr<SatInterference::Event>
+Ptr<SatInterference::InterferenceChangeEvent>
 SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatInterference::Event> event;
-  event = Create<SatInterference::Event> (0, duration, power, rxAddress);
+  Ptr<SatInterference::InterferenceChangeEvent> event;
+  event = Create<SatInterference::InterferenceChangeEvent> (0, duration, power, rxAddress);
 
   return event;
 }
 
 double
-SatTracedInterference::DoCalculate (Ptr<SatInterference::Event> event)
+SatTracedInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
 
@@ -105,7 +105,7 @@ SatTracedInterference::DoReset (void)
 }
 
 void
-SatTracedInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
+SatTracedInterference::DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
 
@@ -113,7 +113,7 @@ SatTracedInterference::DoNotifyRxStart (Ptr<SatInterference::Event> event)
 }
 
 void
-SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::Event> event)
+SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
 

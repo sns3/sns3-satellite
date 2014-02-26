@@ -79,9 +79,9 @@ public:
   ~SatGwMac ();
 
   /**
-   * Starts scheduling of the sending. Called when MAC is wanted to take care of scheduling.
+   * Starts sending packets periodically. Called when MAC is wanted to take care of periodic sending.
    */
-  void StartScheduling();
+  void StartPeriodicSending ();
 
   /**
    * Receive packet from lower layer.
@@ -112,15 +112,15 @@ private:
   void DoDispose (void);
 
   /**
-   * Start Sending a Packet Down the Wire.
+   * Start sending a Packet Down the Wire.
    *
-   * The TransmitStart method is the method that is used internally in the
-   * SatGwMac to begin the process of sending a packet out on the phy layer.'
+   * The StartTransmission method is used internally in the
+   * SatGwMac to begin the process of sending a packet out on the PHY layer.
    *
    * \param carrierId id of the carrier.
    * \returns true if success, false on failure
    */
-  void TransmitTime (uint32_t carrierId);
+  void StartTransmission (uint32_t carrierId);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet
@@ -135,7 +135,7 @@ private:
   /**
    * Scheduler for the forward link.
    */
-  Ptr<SatFwdLinkScheduler> m_scheduler;
+  Ptr<SatFwdLinkScheduler> m_fwdScheduler;
 
   /**
    * Flag indicating if Dummy Frames are sent or not.

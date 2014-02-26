@@ -85,7 +85,7 @@ private:
   /**
    * Configured external noise power.
    */
-  double m_extNoisePowerDensityDbwhz;
+  double m_extNoisePowerDensityDbwHz;
 
   /**
    * Configured Intermodulation interference in dB.

@@ -55,7 +55,7 @@ SatGwMac::GetTypeId (void)
     .AddAttribute ("Scheduler",
                    "Forward link scheduler used by this Sat GW MAC.",
                    PointerValue (),
-                   MakePointerAccessor (&SatGwMac::m_scheduler),
+                   MakePointerAccessor (&SatGwMac::m_fwdScheduler),
                    MakePointerChecker<SatFwdLinkScheduler> ())
     .AddAttribute ("GuardTime",
                    "Guard time in forward link",
@@ -68,7 +68,7 @@ SatGwMac::GetTypeId (void)
 
 SatGwMac::SatGwMac ()
  : SatMac (),
-   m_scheduler (),
+   m_fwdScheduler (),
    m_dummyFrameSendingEnabled (false),
    m_guardTime (MicroSeconds (1))
 {
@@ -77,7 +77,7 @@ SatGwMac::SatGwMac ()
 
 SatGwMac::SatGwMac (uint32_t beamId)
  : SatMac (beamId),
-   m_scheduler (),
+   m_fwdScheduler (),
    m_dummyFrameSendingEnabled (false),
    m_guardTime (MicroSeconds (1))
 {
@@ -97,15 +97,15 @@ SatGwMac::DoDispose ()
 }
 
 void
-SatGwMac::StartScheduling()
+SatGwMac::StartPeriodicSending()
 {
-  if ( m_scheduler == NULL )
+  if ( m_fwdScheduler == NULL )
     {
       NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
     }
 
   // Note, carrierId currently set by default to 0
-  Simulator::Schedule (Seconds (0), &SatGwMac::TransmitTime, this, 0);
+  Simulator::Schedule (Seconds (0), &SatGwMac::StartTransmission, this, 0);
 }
 
 void
@@ -174,11 +174,11 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 }
 
 void
-SatGwMac::TransmitTime (uint32_t carrierId)
+SatGwMac::StartTransmission (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatBbFrame> bbFrame = m_scheduler->GetNextFrame ();
+  Ptr<SatBbFrame> bbFrame = m_fwdScheduler->GetNextFrame ();
 
   if ( bbFrame == NULL )
     {
@@ -207,7 +207,7 @@ SatGwMac::TransmitTime (uint32_t carrierId)
       SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - m_guardTime );
     }
 
-  Simulator::Schedule (txDuration, &SatGwMac::TransmitTime, this, 0);
+  Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);
 }
 
 void
@@ -225,7 +225,7 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
             NS_FATAL_ERROR ("Error in reading CR message from container!!!");
           }
 
-        m_scheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
+        m_fwdScheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
 
         if ( m_crReceiveCallback.IsNull () == false )
           {
