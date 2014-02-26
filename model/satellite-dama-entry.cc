@@ -42,8 +42,8 @@ SatDamaEntry::SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf)
   ResetDynamicRatePersistence ();
   ResetVolumeBacklogPersistence ();
 
-  m_dynamicRateRequestedInKbps = std::vector<double> (m_llsConf->GetDaServiceCount (), 0.0);
-  m_volumeBacklogRequestedInBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
+  m_dynamicRateRequestedInKbps = std::vector<uint16_t> (m_llsConf->GetDaServiceCount (), 0.0);
+  m_volumeBacklogRequestedInBytes = std::vector<uint8_t> (m_llsConf->GetDaServiceCount (), 0);
 }
 
 SatDamaEntry::~SatDamaEntry ()
@@ -58,7 +58,7 @@ SatDamaEntry::GetCraBasedBytes (double duration) const
 
   uint32_t totalBytes = 0;
 
-  for ( uint32_t i = 0; i < m_llsConf->GetDaServiceCount (); i++)
+  for ( uint8_t i = 0; i < m_llsConf->GetDaServiceCount (); i++)
     {
       if (m_llsConf->GetDaConstantAssignmentProvided (i))
         {
@@ -76,7 +76,7 @@ SatDamaEntry::GetRbdcBasedBytes (double duration) const
 
   uint32_t totalBytes = 0;
 
-  for ( uint32_t i = 0; i < m_dynamicRateRequestedInKbps.size (); i++)
+  for ( uint8_t i = 0; i < m_dynamicRateRequestedInKbps.size (); i++)
     {
       totalBytes += (1000.0 * m_dynamicRateRequestedInKbps[i] * duration) / 8;
     }
@@ -89,7 +89,7 @@ SatDamaEntry::GetVbdcBasedBytes () const
 {
   uint32_t totalBytes = 0;
 
-  for ( uint32_t i = 0; i < m_volumeBacklogRequestedInBytes.size (); i++)
+  for ( uint8_t i = 0; i < m_volumeBacklogRequestedInBytes.size (); i++)
     {
       totalBytes +=  m_volumeBacklogRequestedInBytes[i];
     }
@@ -97,8 +97,8 @@ SatDamaEntry::GetVbdcBasedBytes () const
   return totalBytes;
 }
 
-double
-SatDamaEntry::GetDynamicRateInKbps (uint32_t index) const
+uint16_t
+SatDamaEntry::GetDynamicRateInKbps (uint8_t index) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -111,7 +111,7 @@ SatDamaEntry::GetDynamicRateInKbps (uint32_t index) const
 }
 
 void
-SatDamaEntry::UpdateDynamicRateInKbps (uint32_t index, double rateInKbps)
+SatDamaEntry::UpdateDynamicRateInKbps (uint8_t index, uint16_t rateInKbps)
 {
   NS_LOG_FUNCTION (this);
 
@@ -136,8 +136,8 @@ SatDamaEntry::UpdateDynamicRateInKbps (uint32_t index, double rateInKbps)
     }
 }
 
-uint32_t
-SatDamaEntry::GetVolumeBacklogInBytes (uint32_t index) const
+uint8_t
+SatDamaEntry::GetVolumeBacklogInBytes (uint8_t index) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -150,7 +150,7 @@ SatDamaEntry::GetVolumeBacklogInBytes (uint32_t index) const
 }
 
 void
-SatDamaEntry::UpdateVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes)
+SatDamaEntry::UpdateVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes)
 {
   NS_LOG_FUNCTION (this);
 
@@ -161,7 +161,7 @@ SatDamaEntry::UpdateVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes
 }
 
 void
-SatDamaEntry::SetVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes)
+SatDamaEntry::SetVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes)
 {
   NS_LOG_FUNCTION (this);
 

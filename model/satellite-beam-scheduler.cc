@@ -381,20 +381,20 @@ SatBeamScheduler::UpdateDamaEntries ()
         {
           SatCrMessage::RequestContainer_t crContent = (*crIt)->GetCapacityRequestContent ();
 
-          for ( SatCrMessage::RequestContainer_t::const_iterator aCrIt = crContent.begin (); aCrIt != crContent.end (); aCrIt++ )
+          for ( SatCrMessage::RequestContainer_t::const_iterator descriptorIt = crContent.begin (); descriptorIt != crContent.end (); descriptorIt++ )
             {
-              switch (aCrIt->first.second)
+              switch (descriptorIt->first.second)
               {
                 case SatEnums::DA_RBDC:
-                  damaEntry->UpdateDynamicRateInKbps (aCrIt->first.first, aCrIt->second);
+                  damaEntry->UpdateDynamicRateInKbps (descriptorIt->first.first, descriptorIt->second);
                   break;
 
                 case SatEnums::DA_VBDC:
-                  damaEntry->UpdateVolumeBacklogInBytes(aCrIt->first.first, aCrIt->second);
+                  damaEntry->UpdateVolumeBacklogInBytes(descriptorIt->first.first, descriptorIt->second);
                   break;
 
                 case SatEnums::DA_AVBDC:
-                  damaEntry->SetVolumeBacklogInBytes(aCrIt->first.first, aCrIt->second);
+                  damaEntry->SetVolumeBacklogInBytes(descriptorIt->first.first, descriptorIt->second);
                   break;
 
                 default:

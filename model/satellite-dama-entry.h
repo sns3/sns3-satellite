@@ -89,7 +89,7 @@ public:
    * \param index Index of RC, which dynamic rate is requested.
    * \return Current value of the dynamic rate requested in kbps.
    */
-  double GetDynamicRateInKbps (uint32_t index) const;
+  uint16_t GetDynamicRateInKbps (uint8_t index) const;
 
   /**
    * Update dynamic rate request of a RC.
@@ -97,7 +97,7 @@ public:
    * \param index Index of RC, which dynamic rate is updated.
    * \param rateInKbps Dynamic rate value [kbps] for update
    */
-  void UpdateDynamicRateInKbps (uint32_t index, double rateInKbps);
+  void UpdateDynamicRateInKbps (uint8_t index, uint16_t rateInKbps);
 
   /**
    * Get current value of the volume backlog requested.
@@ -105,7 +105,7 @@ public:
    * \param index Index of RC, which volume backlog  is requested.
    * \return Current value of the volume backlog requested in bytes.
    */
-  uint32_t GetVolumeBacklogInBytes (uint32_t index) const;
+  uint8_t GetVolumeBacklogInBytes (uint8_t index) const;
 
   /**
    * Update volume backlog request a RC.
@@ -113,7 +113,7 @@ public:
    * \param index Index of RC, which volume backlog is updated.
    * \param volumeInBytes Volume backlog value [bytes] for update
    */
-  void UpdateVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes);
+  void UpdateVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes);
 
   /**
    * Set volume backlog request a RC.
@@ -121,7 +121,7 @@ public:
    * \param index Index of RC, which volume backlog is updated.
    * \param volumeInBytes Volume backlog value [bytes] to set
    */
-  void SetVolumeBacklogInBytes (uint32_t index, uint32_t volumeInBytes);
+  void SetVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes);
 
   /**
    * Reset dynamic rate persistence to the value given in lower layer service configuration.
@@ -144,11 +144,11 @@ public:
   void DecrementVolumeBacklogPersistence ();
 
 private:
-  uint32_t                        m_dynamicRatePersistence;
-  uint32_t                        m_volumeBacklogPersistence;
+  uint8_t                         m_dynamicRatePersistence;
+  uint8_t                         m_volumeBacklogPersistence;
   Ptr<SatLowerLayerServiceConf>   m_llsConf;
-  std::vector<double>             m_dynamicRateRequestedInKbps;
-  std::vector<uint32_t>           m_volumeBacklogRequestedInBytes;
+  std::vector<uint16_t>           m_dynamicRateRequestedInKbps;
+  std::vector<uint8_t>            m_volumeBacklogRequestedInBytes;
 };
 
 } // namespace ns3

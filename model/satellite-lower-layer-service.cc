@@ -32,8 +32,6 @@ NS_LOG_COMPONENT_DEFINE ("SatLowerLayerServ");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatLowerLayerServiceDaEntry);
-
  SatLowerLayerServiceDaEntry::SatLowerLayerServiceDaEntry ()
   : m_constantAssignmentProvided (false),
     m_rbdcAllowed (false),
@@ -51,25 +49,6 @@ SatLowerLayerServiceDaEntry::~SatLowerLayerServiceDaEntry ()
    NS_LOG_FUNCTION (this);
 }
 
-TypeId
-SatLowerLayerServiceDaEntry::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatLowerLayerServiceDaEntry")
-    .SetParent<Object> ()
-    .AddConstructor<SatLowerLayerServiceDaEntry> ()
-  ;
-  return tid;
-}
-
-TypeId
-SatLowerLayerServiceDaEntry::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
-}
-
-NS_OBJECT_ENSURE_REGISTERED (SatLowerLayerServiceRaEntry);
 
 SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
 : m_maxUniquePayloadPerBlock (0),
@@ -82,24 +61,6 @@ SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
 SatLowerLayerServiceRaEntry::~SatLowerLayerServiceRaEntry ()
 {
    NS_LOG_FUNCTION (this);
-}
-
-TypeId
-SatLowerLayerServiceRaEntry::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatLowerLayerServiceRaEntry")
-    .SetParent<Object> ()
-    .AddConstructor<SatLowerLayerServiceRaEntry> ()
-  ;
-  return tid;
-}
-
-TypeId
-SatLowerLayerServiceRaEntry::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatLowerLayerServiceConf);
@@ -120,17 +81,17 @@ SatLowerLayerServiceConf::~SatLowerLayerServiceConf ()
 }
 
 std::string
-SatLowerLayerServiceConf::GetIndexAsDaServiceName (uint32_t index)
+SatLowerLayerServiceConf::GetIndexAsDaServiceName (uint8_t index)
 {
   std::string name = "Service";
-  return name + GetNumberAsString<uint32_t> (index);
+  return name + GetNumberAsString<uint8_t> (index);
 }
 
 std::string
-SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint32_t index)
+SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
 {
   std::string name = "Service";
-  return name + GetNumberAsString<uint32_t> (index);
+  return name + GetNumberAsString<uint8_t> (index);
 }
 
 /**
@@ -169,28 +130,28 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint32_t index)
                   MakeBooleanChecker ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) + "_ConstantServiceRate", \
                   "A RandomVariableStream for constant service rate [kbps] for DA " + GetIndexAsDaServiceName (index), \
-                  StringValue ("ns3::ConstantRandomVariable[Constant=" + GetNumberAsString<double> (a4) + "]"), \
+                  StringValue ("ns3::ConstantRandomVariable[Constant=" + GetNumberAsString<uint16_t> (a4) + "]"), \
                   MakePointerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## ConstantServiceRateStream, \
                                        &SatLowerLayerServiceConf::GetDaServ ## index ## ConstantServiceRateStream), \
                   MakePointerChecker<RandomVariableStream> ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) + "_MaximumServiceRate", \
                   "Maximum service rate [kbps] for DA " + GetIndexAsDaServiceName (index), \
-                  DoubleValue (a5), \
-                  MakeDoubleAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumServiceRateInKbps, \
+                  UintegerValue (a5), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumServiceRateInKbps, \
                                       &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumServiceRateInKbps), \
-                  MakeDoubleChecker<double> ()) \
+                  MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) +  "_MinimumServiceRate", \
                   "Minimum service rate [kbps] for DA " + GetIndexAsDaServiceName (index), \
-                  DoubleValue (a6), \
-                  MakeDoubleAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MinimumServiceRateInKbps, \
+                  UintegerValue (a6), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MinimumServiceRateInKbps, \
                                       &SatLowerLayerServiceConf::GetDaServ ## index ## MinimumServiceRateInKbps), \
-                  MakeDoubleChecker<double> ()) \
+                  MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) +  "_MaximumBacklogSize", \
                   "Maximum backlog size [bytes] for DA " + GetIndexAsDaServiceName (index), \
                   UintegerValue (a7), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumBacklogInBytes, \
                                       &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumBacklogInBytes), \
-                  MakeUintegerChecker<uint32_t> ())
+                  MakeUintegerChecker<uint8_t> ())
 
 
 /**
@@ -210,19 +171,19 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint32_t index)
                   UintegerValue (a1), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumUniquePayloadPerBlock, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
-                  MakeUintegerChecker<uint32_t> ()) \
+                  MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumConsecutiveBlockAccessed", \
                   "Maximum consecutive block accessed [bytes] for RA  " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a2), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumConsecutiveBlockAccessed, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumConsecutiveBlockAccessed), \
-                  MakeUintegerChecker<uint32_t> ()) \
+                  MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MinimumIdleBlock", \
                   "Minimum idle block [bytes] for RA  " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a3), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MinimumIdleBlock, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MinimumIdleBlock), \
-                  MakeUintegerChecker<uint32_t> ())
+                  MakeUintegerChecker<uint8_t> ())
 
 TypeId
 SatLowerLayerServiceConf::GetTypeId (void)
@@ -234,27 +195,27 @@ SatLowerLayerServiceConf::GetTypeId (void)
                     "DA services in use.",
                      UintegerValue (2),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
-                     MakeUintegerChecker<uint32_t> (0, SatLowerLayerServiceConf::m_maxDaServiceEntries))
+                     MakeUintegerChecker<uint8_t> (0, SatLowerLayerServiceConf::m_maxDaServiceEntries))
     .AddAttribute ( "RaServiceCount",
                     "RA services in use.",
                      UintegerValue (2),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
-                     MakeUintegerChecker<uint32_t> (0, SatLowerLayerServiceConf::m_maxRaServiceEntries))
+                     MakeUintegerChecker<uint8_t> (0, SatLowerLayerServiceConf::m_maxRaServiceEntries))
     .AddAttribute ( "DynamicRatePersistence",
                     "Dynamic rate persistence for the lower layer service.",
                      UintegerValue (5),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_dynamicRatePersistence),
-                     MakeUintegerChecker<uint32_t> ())
+                     MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "VolumeBacklogPersistence",
                     "Volume backlog persistence for the lower layer service",
                      UintegerValue (5),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_volumeBacklogPersistence),
-                     MakeUintegerChecker<uint32_t> ())
+                     MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "DefaultControlRandomizationInterval",
                     "Default control randomization interval for the lower layer service",
                      TimeValue ( MilliSeconds (50)),
                      MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
-                     MakeTimeChecker ())
+                     MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
 
     /*
      * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
@@ -280,7 +241,7 @@ SatLowerLayerServiceConf::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint32_t index) const
+bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -291,7 +252,7 @@ bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint32_t index) 
 }
 
 void
-SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint32_t index, bool constAssignmentProvided)
+SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint8_t index, bool constAssignmentProvided)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -302,7 +263,7 @@ SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint32_t index, bool 
 }
 
 bool
-SatLowerLayerServiceConf::GetDaRbdcAllowed (uint32_t index) const
+SatLowerLayerServiceConf::GetDaRbdcAllowed (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -312,7 +273,7 @@ SatLowerLayerServiceConf::GetDaRbdcAllowed (uint32_t index) const
   return m_daServiceEntries[index].GetRbdcAllowed ();
 }
 
-void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint32_t index, bool bdcAllowed)
+void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint8_t index, bool bdcAllowed)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -322,7 +283,7 @@ void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint32_t index, bool bdcAllowed
   m_daServiceEntries[index].SetRbdcAllowed (bdcAllowed);
 }
 
-bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint32_t index) const
+bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -333,7 +294,7 @@ bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaVolumeAllowed (uint32_t index, bool volumeAllowed)
+SatLowerLayerServiceConf::SetDaVolumeAllowed (uint8_t index, bool volumeAllowed)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -343,8 +304,8 @@ SatLowerLayerServiceConf::SetDaVolumeAllowed (uint32_t index, bool volumeAllowed
   m_daServiceEntries[index].SetVolumeAllowed (volumeAllowed);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint32_t index) const
+uint16_t
+SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -356,7 +317,7 @@ SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint32_t index) const
 
 
 Ptr<RandomVariableStream>
-SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint32_t index) const
+SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -367,7 +328,7 @@ SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint32_t index, Ptr<RandomVariableStream> constantServiceRateStream)
+SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint8_t index, Ptr<RandomVariableStream> constantServiceRateStream)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -377,8 +338,8 @@ SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint32_t index, Ptr<Ra
   m_daServiceEntries[index].SetConstantServiceRateStream (constantServiceRateStream);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint32_t index) const
+uint16_t
+SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -389,7 +350,7 @@ SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint32_t index, uint32_t maximumServiceRateKbps)
+SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint8_t index, uint16_t maximumServiceRateKbps)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -399,8 +360,8 @@ SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint32_t index, uint32_
   m_daServiceEntries[index].SetMaximumServiceRateInKbps (maximumServiceRateKbps);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint32_t index) const
+uint16_t
+SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -411,7 +372,7 @@ SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint32_t index, uint32_t minimumServiceRateKbps)
+SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t minimumServiceRateKbps)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -421,8 +382,8 @@ SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint32_t index, uint32_
   m_daServiceEntries[index].SetMinimumServiceRateInKbps (minimumServiceRateKbps);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetDaMaximumBacklogInBytes (uint32_t index) const
+uint8_t
+SatLowerLayerServiceConf::GetDaMaximumBacklogInBytes (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -433,7 +394,7 @@ SatLowerLayerServiceConf::GetDaMaximumBacklogInBytes (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetDaMaximumBacklogInBytes (uint32_t index, uint32_t maximumBacklogInBytes)
+SatLowerLayerServiceConf::SetDaMaximumBacklogInBytes (uint8_t index, uint8_t maximumBacklogInBytes)
 {
   if ( index >= m_maxDaServiceEntries)
     {
@@ -443,8 +404,8 @@ SatLowerLayerServiceConf::SetDaMaximumBacklogInBytes (uint32_t index, uint32_t m
   m_daServiceEntries[index].SetMaximumBacklogInBytes (maximumBacklogInBytes);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint32_t index) const
+uint8_t
+SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint8_t index) const
 {
   if ( index >= m_maxRaServiceEntries)
     {
@@ -455,7 +416,7 @@ SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint32_t index) con
 }
 
 void
-SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint32_t index, uint32_t uniquePayloadPerBlock)
+SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint8_t index, uint8_t uniquePayloadPerBlock)
 {
   if ( index >= m_maxRaServiceEntries)
     {
@@ -465,8 +426,8 @@ SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint32_t index, uin
   m_raServiceEntries[index].SetMaximumUniquePayloadPerBlock (uniquePayloadPerBlock);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint32_t index) const
+uint8_t
+SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint8_t index) const
 {
   if ( index >= m_maxRaServiceEntries)
     {
@@ -477,7 +438,7 @@ SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint32_t index) 
 }
 
 void
-SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint32_t index, uint32_t consecutiveBlockAccessed)
+SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint8_t index, uint8_t consecutiveBlockAccessed)
 {
   if ( index >= m_maxRaServiceEntries)
     {
@@ -487,8 +448,8 @@ SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint32_t index, 
   m_raServiceEntries[index].SetMaximumConsecutiveBlockAccessed (consecutiveBlockAccessed);
 }
 
-uint32_t
-SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint32_t index) const
+uint8_t
+SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint8_t index) const
 {
   if ( index >= m_maxRaServiceEntries)
     {
@@ -499,7 +460,7 @@ SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint32_t index) const
 }
 
 void
-SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint32_t index, uint32_t minimumIdleBlock)
+SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumIdleBlock)
 {
   if ( index >= m_maxRaServiceEntries)
     {

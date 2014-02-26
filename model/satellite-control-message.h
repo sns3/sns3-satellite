@@ -339,7 +339,7 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> RequestDescriptor_t;
-  typedef std::map<RequestDescriptor_t, uint32_t > RequestContainer_t;
+  typedef std::map<RequestDescriptor_t, uint16_t > RequestContainer_t;
 
   /**
    * Get type of the message.
