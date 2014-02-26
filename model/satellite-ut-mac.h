@@ -59,7 +59,7 @@ public:
    * \param randomAccessConf
    * \param randomAccessModel
    */
-  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAccessConf> randomAccessConf, SatRandomAccess::RandomAccessModel_t randomAccessModel);
+  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId);
 
   /**
    * Destroy a SatUtMac
@@ -139,6 +139,12 @@ public:
    * \return RA channel assigned to this UT.
    */
   uint32_t GetRaChannel () const;
+
+  /**
+   *
+   * \param randomAccess
+   */
+  void SetRandomAccess (Ptr<SatRandomAccess> randomAccess);
 
 protected:
 
@@ -301,7 +307,7 @@ private:
   /**
    * RA channel assigned to the UT.
    */
-  uint32_t    m_raChannel;
+  uint32_t m_raChannel;
 };
 
 } // namespace ns3

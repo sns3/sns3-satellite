@@ -223,7 +223,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, randomAccessConf, m_randomAccessModel);
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId);
   mac->SetAttribute ("LowerLayerServiceConf", PointerValue (m_llsConf));
   mac->SetReadCtrlCallback (m_readCtrlCb);
   mac->SetWriteCtrlCallback (m_writeCtrlCb);
@@ -341,6 +341,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
+
+  if (m_randomAccessModel != SatRandomAccess::RA_OFF)
+    {
+      Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_randomAccessModel);
+      randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));
+      randomAccess->SetNumOfCandidatePacketsCallback (MakeCallback(&SatLlc::GetNumSmallerPackets, llc));
+      mac->SetRandomAccess (randomAccess);
+    }
 
   return dev;
 }

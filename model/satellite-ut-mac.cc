@@ -91,6 +91,7 @@ SatUtMac::SatUtMac ()
    m_llsConf (0),
    m_gwAddress (),
    m_framePduHeaderSizeInBytes (1),
+   m_randomAccess (NULL),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0)
 {
@@ -100,7 +101,7 @@ SatUtMac::SatUtMac ()
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAccessConf> randomAccessConf, SatRandomAccess::RandomAccessModel_t randomAccessModel)
+SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
  : SatMac (beamId),
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
@@ -113,17 +114,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, Ptr<SatRandomAcc
 {
 	NS_LOG_FUNCTION (this);
 
+  m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
   m_tbtpContainer = CreateObject<SatTbtpContainer> ();
-
-  if (randomAccessConf != NULL && randomAccessModel != SatRandomAccess::RA_OFF)
-	  {
-      m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
-	    m_randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, randomAccessModel);
-	    m_randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
-
-	    /// TODO fix this once the buffer check has been implemented
-	    m_randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
-	  }
 }
 
 SatUtMac::~SatUtMac ()
@@ -176,6 +168,15 @@ SatUtMac::GetRaChannel () const
   NS_LOG_FUNCTION (this);
 
   return m_raChannel;
+}
+
+void
+SatUtMac::SetRandomAccess (Ptr<SatRandomAccess> randomAccess)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_randomAccess = randomAccess;
+  m_randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
 }
 
 void
