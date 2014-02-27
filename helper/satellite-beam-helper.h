@@ -165,6 +165,11 @@ public:
   NodeContainer GetUtNodes (uint32_t beamId) const;
 
   /**
+   * \return a list of beam IDs which are currently activated.
+   */
+  std::list<uint32_t> GetBeams () const;
+
+  /**
    * Enables creation traces to be written in given file
    * \param stream  stream for creation trace outputs
    * \param cb  callback to connect traces

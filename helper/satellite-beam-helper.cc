@@ -439,6 +439,20 @@ SatBeamHelper::GetUtNodes (uint32_t beamId) const
   return utNodes;
 }
 
+std::list<uint32_t>
+SatBeamHelper::GetBeams () const
+{
+  std::list<uint32_t> ret;
+
+  for (std::map<uint32_t, uint32_t>::const_iterator it = m_beam.begin ();
+       it != m_beam.end (); ++it)
+    {
+      ret.push_back (it->first);
+    }
+
+  return ret;
+}
+
 void
 SatBeamHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
