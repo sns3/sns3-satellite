@@ -113,7 +113,7 @@ public:
    * \param index Index of RC, which volume backlog is updated.
    * \param volumeInBytes Volume backlog value [bytes] for update
    */
-  void UpdateVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes);
+  void UpdateVolumeBacklogInBytes (uint8_t index, uint32_t volumeInBytes);
 
   /**
    * Set volume backlog request a RC.
@@ -121,7 +121,7 @@ public:
    * \param index Index of RC, which volume backlog is updated.
    * \param volumeInBytes Volume backlog value [bytes] to set
    */
-  void SetVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes);
+  void SetVolumeBacklogInBytes (uint8_t index, uint32_t volumeInBytes);
 
   /**
    * Reset dynamic rate persistence to the value given in lower layer service configuration.
@@ -148,7 +148,7 @@ private:
   uint8_t                         m_volumeBacklogPersistence;
   Ptr<SatLowerLayerServiceConf>   m_llsConf;
   std::vector<uint16_t>           m_dynamicRateRequestedInKbps;
-  std::vector<uint8_t>            m_volumeBacklogRequestedInBytes;
+  std::vector<uint32_t>           m_volumeBacklogRequestedInBytes;
 };
 
 } // namespace ns3

@@ -220,16 +220,16 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
         uint32_t msgId = ctrlTag.GetMsgId ();
         Ptr<SatCrMessage> crMsg = DynamicCast<SatCrMessage> ( m_readCtrlCallback (msgId) );
 
-        if ( crMsg == NULL )
+        // Control message NOT found in container anymore, so silently ignore it.
+        // TODO: Should we crash or just silently ignore it.
+        if ( crMsg != NULL )
           {
-            NS_FATAL_ERROR ("Error in reading CR message from container!!!");
-          }
+            m_fwdScheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
 
-        m_fwdScheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
-
-        if ( m_crReceiveCallback.IsNull () == false )
-          {
-            m_crReceiveCallback (m_beamId, sourceAddress, crMsg);
+            if ( m_crReceiveCallback.IsNull () == false )
+              {
+                m_crReceiveCallback (m_beamId, sourceAddress, crMsg);
+              }
           }
         break;
       }

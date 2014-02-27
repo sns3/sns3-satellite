@@ -351,9 +351,9 @@ SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint3
   NS_LOG_LOGIC("Raw VBDC bytes: " << rcVbdc << " rcVbdc");
 
   // Check DA volume allowed
-  if ( (rcVbdc + m_pendingVbdcCounters.at (rc)) > (1000 * m_llsConf->GetDaMaximumBacklogInBytes (rc)) )
+  if ( (rcVbdc + m_pendingVbdcCounters.at (rc)) > (1000 * m_llsConf->GetDaMaximumBacklogInKbytes (rc)) )
     {
-      rcVbdc = 1000 * m_llsConf->GetDaMaximumBacklogInBytes (rc) - m_pendingVbdcCounters.at (rc);
+      rcVbdc = 1000 * m_llsConf->GetDaMaximumBacklogInKbytes (rc) - m_pendingVbdcCounters.at (rc);
     }
 
   NS_LOG_LOGIC("Raw VBDC bytes after taking the pending requests into account: " << rcVbdc << " Bytes");

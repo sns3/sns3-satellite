@@ -29,6 +29,103 @@ NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
 
 namespace ns3 {
 
+bool SatBeamScheduler::CompareCno (UtInfoItem_t first, UtInfoItem_t second)
+{
+  double cnoFirst = first.second->GetCnoEstimation ();
+  double cnoSecond = second.second->GetCnoEstimation ();
+  double result = true;
+
+  if ( !isnan (cnoFirst) )
+    {
+       if ( isnan (cnoSecond) )
+         {
+           result = false;
+         }
+       else
+         {
+           result = (cnoFirst < cnoSecond);
+         }
+    }
+
+  return result;
+}
+
+// UtInfo class declarations for SatBeamScheduler
+SatBeamScheduler::UtInfo::UtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator )
+ : m_damaEntry (damaEntry),
+   m_cnoEstimator (cnoEstimator)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+Ptr<SatDamaEntry>
+SatBeamScheduler::UtInfo::GetDamaEntry ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_damaEntry;
+}
+
+void
+SatBeamScheduler::UtInfo::UpdateDamaEntriesFromCrs ()
+{
+  NS_LOG_FUNCTION (this);
+
+  for ( CrMsgContainer_t::const_iterator crIt = m_crContainer.begin (); crIt != m_crContainer.end (); crIt++ )
+    {
+      SatCrMessage::RequestContainer_t crContent = (*crIt)->GetCapacityRequestContent ();
+
+      for ( SatCrMessage::RequestContainer_t::const_iterator descriptorIt = crContent.begin (); descriptorIt != crContent.end (); descriptorIt++ )
+        {
+          switch (descriptorIt->first.second)
+          {
+            case SatEnums::DA_RBDC:
+              m_damaEntry->UpdateDynamicRateInKbps (descriptorIt->first.first, descriptorIt->second);
+              break;
+
+            case SatEnums::DA_VBDC:
+              m_damaEntry->UpdateVolumeBacklogInBytes (descriptorIt->first.first, descriptorIt->second);
+              break;
+
+            case SatEnums::DA_AVBDC:
+              m_damaEntry->SetVolumeBacklogInBytes (descriptorIt->first.first, descriptorIt->second);
+              break;
+
+            default:
+              break;
+          }
+        }
+    }
+        // clear container when CRs processed
+    m_crContainer.clear ();
+}
+
+double
+SatBeamScheduler::UtInfo::GetCnoEstimation ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_cnoEstimator->GetCnoEstimation ();
+}
+
+void
+SatBeamScheduler::UtInfo::AddCnoSample (double sample)
+{
+  NS_LOG_FUNCTION (this << sample);
+
+  m_cnoEstimator->AddSample (sample);
+}
+
+void
+SatBeamScheduler::UtInfo::AddCrMsg (Ptr<SatCrMessage> crMsg)
+{
+  NS_LOG_FUNCTION (crMsg);
+
+  m_crContainer.push_back (crMsg);
+}
+
+// SatBeamScheduler
+
 NS_OBJECT_ENSURE_REGISTERED (SatBeamScheduler);
 
 TypeId 
@@ -51,7 +148,7 @@ SatBeamScheduler::GetTypeId (void)
                                     SatCnoEstimator::AVERAGE, "Average value in window used."))
     .AddAttribute( "CnoEstimationWindow",
                    "Time window for C/N0 estimation.",
-                   TimeValue (MilliSeconds (500)),
+                   TimeValue (MilliSeconds (1000)),
                    MakeTimeAccessor (&SatBeamScheduler::m_cnoEstimationWindow),
                    MakeTimeChecker ())
 
@@ -76,8 +173,7 @@ SatBeamScheduler::SatBeamScheduler ()
     m_cnoEstimatorMode (SatCnoEstimator::LAST)
 {
   NS_LOG_FUNCTION (this);
-  m_currentUt = m_uts.end ();
-  m_firstUt = m_uts.end ();
+  m_currentUt = m_utSortedInfos.end ();
   m_currentCarrier = m_carrierIds.end ();
   m_currentSlot = m_timeSlots.end ();
 }
@@ -130,7 +226,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
   // this part of implementation is needed to change
   m_raChRandomIndex = CreateObject<UniformRandomVariable> ();
-  m_raChRandomIndex->SetAttribute("Min", DoubleValue (0));
+  m_raChRandomIndex->SetAttribute ("Min", DoubleValue (0));
 
   // by default we give index 0, even if there is no RA channels configured.
   uint32_t maxIndex = 0;
@@ -152,18 +248,20 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  UtInfo utInfo;
-
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
+  Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
 
-  utInfo.m_damaEntry = damaEntry;
-  utInfo.m_cnoEstimator = CreateCnoEstimator ();
+  Ptr<UtInfo> utInfo = Create<UtInfo> (damaEntry, cnoEstimator);
 
   // TODO: CAC check needed to add
 
-  std::pair<std::map<Address, UtInfo>::iterator, bool > result = m_uts.insert (std::make_pair (utId, utInfo));
+  std::pair<UtInfoMap_t::iterator, bool > result = m_utInfos.insert (std::make_pair (utId, utInfo));
 
-  if (result.second == false)
+  if (result.second)
+    {
+      m_utSortedInfos.push_back (std::make_pair (utId, utInfo));
+    }
+  else
     {
       NS_FATAL_ERROR ("UT (Address: " << utId << ") already added to Beam scheduler.");
     }
@@ -180,10 +278,10 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
   NS_LOG_FUNCTION (this << utId << cno);
 
   // check that UT is added to this scheduler.
-  std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
-  NS_ASSERT (result != m_uts.end ());
+  UtInfoMap_t::iterator result = m_utInfos.find (utId);
+  NS_ASSERT (result != m_utInfos.end ());
 
-  m_uts[utId].m_cnoEstimator->AddSample (cno);
+  m_utInfos[utId]->AddCnoSample (cno);
 }
 
 void
@@ -192,11 +290,10 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
   NS_LOG_FUNCTION (this << utId << crMsg);
 
   // check that UT is added to this scheduler.
-  std::map<Address, UtInfo>::iterator result = m_uts.find (utId);
-  NS_ASSERT (result != m_uts.end ());
+  UtInfoMap_t::iterator result = m_utInfos.find (utId);
+  NS_ASSERT (result != m_utInfos.end ());
 
-  // TODO: Container for C/N0 values needed, now we just save the latest value.
-  m_uts[utId].m_crContainer.push_back (crMsg);
+  m_utInfos[utId]->AddCrMsg (crMsg);
 }
 
 Ptr<SatCnoEstimator>
@@ -229,11 +326,11 @@ SatBeamScheduler::Schedule ()
   NS_LOG_FUNCTION (this);
 
   // check that there is UTs to schedule
-  if ( m_uts.size() > 0 )
+  if ( m_utInfos.size() > 0 )
     {
       UpdateDamaEntries ();
 
-      InitializeScheduling ();
+      DoPreResourceAllocation ();
 
       // create TBTP  message
       Ptr<SatTbtpMessage> tbtpMsg = CreateObject<SatTbtpMessage> ();
@@ -259,25 +356,11 @@ void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
 
   bool UtsOrSlotsLeft = true;
 
-  // TODO: UT C/N0 estimation utilization missing still
-  // EstimateUtCno (m_currentUt->first);
-
-  while (UtsOrSlotsLeft)
+  while ( (UtsOrSlotsLeft) && m_currentUt == m_utSortedInfos.begin () )
     {
       UtsOrSlotsLeft = AddUtTimeSlots (header);
 
       m_currentUt++;
-
-      // check if we have reached end of the UT list
-      if ( m_currentUt == m_uts.end () )
-        {
-          m_currentUt = m_uts.begin ();
-        }
-
-      if ( m_currentUt == m_firstUt )
-        {
-          UtsOrSlotsLeft = false;
-        }
     }
 }
 
@@ -370,41 +453,14 @@ SatBeamScheduler::UpdateDamaEntries ()
   m_rbdcBasedBytes = 0;
   m_vbdcBasedBytes = 0;
 
-  for (UtInfoMap_t::iterator it = m_uts.begin (); it != m_uts.end (); it ++ )
+  for (UtInfoMap_t::iterator it = m_utInfos.begin (); it != m_utInfos.end (); it ++ )
     {
       // estimation of the C/N0 is done when scheduling UT
 
-      Ptr<SatDamaEntry> damaEntry = it->second.m_damaEntry;
+      Ptr<SatDamaEntry> damaEntry = it->second->GetDamaEntry ();
 
       // process received CRs
-      for ( UtInfo::CrMsgContainer_t::const_iterator crIt = it->second.m_crContainer.begin (); crIt != it->second.m_crContainer.end (); crIt++ )
-        {
-          SatCrMessage::RequestContainer_t crContent = (*crIt)->GetCapacityRequestContent ();
-
-          for ( SatCrMessage::RequestContainer_t::const_iterator descriptorIt = crContent.begin (); descriptorIt != crContent.end (); descriptorIt++ )
-            {
-              switch (descriptorIt->first.second)
-              {
-                case SatEnums::DA_RBDC:
-                  damaEntry->UpdateDynamicRateInKbps (descriptorIt->first.first, descriptorIt->second);
-                  break;
-
-                case SatEnums::DA_VBDC:
-                  damaEntry->UpdateVolumeBacklogInBytes(descriptorIt->first.first, descriptorIt->second);
-                  break;
-
-                case SatEnums::DA_AVBDC:
-                  damaEntry->SetVolumeBacklogInBytes(descriptorIt->first.first, descriptorIt->second);
-                  break;
-
-                default:
-                  break;
-              }
-            }
-        }
-            
-      // clear container when CRs processed
-      it->second.m_crContainer.clear ();
+      it->second->UpdateDamaEntriesFromCrs ();
 
       // calculate (update) requested bytes per SF for each (RC_index, CC)
       m_craBasedBytes += damaEntry->GetCraBasedBytes (m_superframeSeq->GetDurationInSeconds (0));
@@ -417,20 +473,16 @@ SatBeamScheduler::UpdateDamaEntries ()
     }
 }
 
-void SatBeamScheduler::InitializeScheduling ()
+void SatBeamScheduler::DoPreResourceAllocation ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_firstUt = m_uts.end();
-
-  if ( m_uts.size () > 0 )
+  if ( m_utInfos.size () > 0 )
     {
-      if ( m_currentUt == m_uts.end () )
-        {
-          m_currentUt = m_uts.begin ();
-        }
+      // sort UTs according to C/N0
+      std::sort (m_utSortedInfos.begin (), m_utSortedInfos.end (), CompareCno);
 
-      m_firstUt = m_currentUt;
+      m_currentUt = m_utSortedInfos.begin ();
 
       Ptr<SatFrameConf> frameConf = NULL;
 
@@ -457,10 +509,10 @@ void SatBeamScheduler::InitializeScheduling ()
       NS_ASSERT (m_totalSlotLeft > 0);
 
       // no full carrier available for every UT
-      if ( m_carrierIds.size() < m_uts.size () )
+      if ( m_carrierIds.size() < m_utInfos.size () )
         {
-          m_slotsPerUt = m_totalSlotLeft / m_uts.size ();
-          m_additionalSlots = m_totalSlotLeft %  m_uts.size ();   // how many slot stay over
+          m_slotsPerUt = m_totalSlotLeft / m_utInfos.size ();
+          m_additionalSlots = m_totalSlotLeft %  m_utInfos.size ();   // how many slot stay over
         }
       else
         {

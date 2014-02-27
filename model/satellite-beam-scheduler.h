@@ -123,20 +123,31 @@ public:
 
 private:
 
-  // UT information
-  class UtInfo
+  // UT information helper class for SatBeamScheduler
+  class UtInfo : public SimpleRefCount<UtInfo>
   {
     public:
+      UtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator );
+
+      Ptr<SatDamaEntry> GetDamaEntry ();
+
+      void UpdateDamaEntriesFromCrs ();
+      void AddCnoSample (double sample);
+      double GetCnoEstimation ();
+      void AddCrMsg (Ptr<SatCrMessage> crMsg);
+
+    private:
       typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
 
       Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
       Ptr<SatCnoEstimator>  m_cnoEstimator; // Estimator for C/N0
       CrMsgContainer_t      m_crContainer;  // received CRs since last scheduling round.
 
-      UtInfo() {}
   };
 
-  typedef std::map<Address, UtInfo> UtInfoMap_t;
+  typedef std::pair<Address, Ptr<UtInfo> >   UtInfoItem_t;
+  typedef std::map<Address, Ptr<UtInfo> >    UtInfoMap_t;
+  typedef std::vector<UtInfoItem_t>          UtSortedInfoContainer_t;
 
   /**
    * ID of the beam
@@ -164,19 +175,19 @@ private:
   SatBeamScheduler::TbtpAddCallback m_tbtpAddCb;
 
   /**
-   * Set to store UTs in beam.
+   * Map to store UT information in beam for updating purposes.
    */
-  UtInfoMap_t m_uts;
+  UtInfoMap_t m_utInfos;
+
+  /**
+   * Container including all UT address and UT info pair for sorting purposes.
+   */
+  UtSortedInfoContainer_t  m_utSortedInfos;
 
   /**
    * Iterator of the current UT to schedule
    */
-  std::map<Address, UtInfo>::iterator m_currentUt;
-
-  /**
-   * Iterator of the UT scheduled first
-   */
-  UtInfoMap_t::iterator m_firstUt;
+  UtSortedInfoContainer_t::iterator m_currentUt;
 
   /**
    * Shuffled list of carrier ids.
@@ -262,11 +273,12 @@ private:
   void Schedule ();
 
   void UpdateDamaEntries ();
-  void InitializeScheduling ();
+  void DoPreResourceAllocation ();
   void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
   void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
+  static bool CompareCno (UtInfoItem_t first, UtInfoItem_t second);
 
   /**
    * Create estimator for the UT according to set attributes.

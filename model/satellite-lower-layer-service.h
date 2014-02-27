@@ -51,7 +51,7 @@ private:
   Ptr<RandomVariableStream> m_constantServiceRateStream;
   uint16_t                  m_maximumServiceRateKbps;
   uint16_t                  m_minimumServiceRateKbps;
-  uint8_t                   m_maximumBacklogInBytes;
+  uint8_t                   m_maximumBacklogInKbytes;
 
   /**
    * Get state, if constant assignment is provided.
@@ -98,7 +98,7 @@ private:
   /**
    * Get constant service rate.
    *
-   * \return Constant service rate [kbps]
+   * \return Constant service rate [KBps]
    */
   inline uint16_t GetConstantServiceRateInKbps () const {return m_constantServiceRateStream->GetInteger();}
 
@@ -112,51 +112,51 @@ private:
   /**
    * Set constant service rate stream.
    *
-   * \param constantServiceRateKbps Constant service rate [kbps]
+   * \param constantServiceRateKbps Constant service rate [KBps]
    */
   inline void SetConstantServiceRateStream (Ptr<RandomVariableStream> constantServiceRateStream) { m_constantServiceRateStream = constantServiceRateStream;}
 
   /**
    * Get maximum service rate.
    *
-   * \return Maximum service rate [kbps]
+   * \return Maximum service rate [KBps]
    */
   inline uint16_t GetMaximumServiceRateInKbps () const {return m_maximumServiceRateKbps;}
 
   /**
    * Set maximum service rate.
    *
-   * \param maximumServiceRateKbps Maximum service rate [kbps]
+   * \param maximumServiceRateKbps Maximum service rate [KBps]
    */
   inline void SetMaximumServiceRateInKbps (uint16_t maximumServiceRateKbps) { m_maximumServiceRateKbps = maximumServiceRateKbps;}
 
   /**
    * Get minimum service rate.
    *
-   * \return Minimum service rate [kbps]
+   * \return Minimum service rate [KBps]
    */
   inline uint16_t GetMinimumServiceRateInKbps () const {return m_minimumServiceRateKbps;}
 
   /**
    * Set minimum service rate.
    *
-   * \param minimumServiceRateKbps Minimum service rate [kbps]
+   * \param minimumServiceRateKbps Minimum service rate [KBps]
    */
   inline void SetMinimumServiceRateInKbps (uint16_t minimumServiceRateKbps) { m_minimumServiceRateKbps = minimumServiceRateKbps;}
 
   /**
    * Get maximum backlog size.
    *
-   * \return Maximum backlog size [bytes]
+   * \return Maximum backlog size [KBytes]
    */
-  inline uint8_t GetMaximumBacklogInBytes () const {return m_maximumBacklogInBytes;}
+  inline uint8_t GetMaximumBacklogInKbytes () const {return m_maximumBacklogInKbytes;}
 
   /**
    * Set maximum backlog size.
    *
-   * \param maximumBacklogInBytes Maximum backlog size [bytes]
+   * \param maximumBacklogInBytes Maximum backlog size [KBytes]
    */
-  inline void SetMaximumBacklogInBytes (uint8_t maximumBacklogInBytes) { m_maximumBacklogInBytes = maximumBacklogInBytes;}
+  inline void SetMaximumBacklogInKbytes (uint8_t maximumBacklogInKbytes) { m_maximumBacklogInKbytes = maximumBacklogInKbytes;}
 };
 
 /**
@@ -315,7 +315,7 @@ public:
    * Get constant service rate for a DA service.
    *
    * \param index Index of the service
-   * \return Constant service rate [kbps]
+   * \return Constant service rate [KBps]
    */
   uint16_t GetDaConstantServiceRateInKbps (uint8_t index) const;
 
@@ -323,7 +323,7 @@ public:
    * Get constant service rate stream for a DA service.
    *
    * \param index Index of the service
-   * \return Constant service rate stream [kbps]
+   * \return Constant service rate stream [KBps]
    */
   Ptr<RandomVariableStream> GetDaConstantServiceRateStream (uint8_t index) const;
 
@@ -331,7 +331,7 @@ public:
    * Get maximum service rate for a DA service.
    *
    * \param index Index of the service
-   * \return Maximum service rate [kbps]
+   * \return Maximum service rate [KBps]
    */
   uint16_t GetDaMaximumServiceRateInKbps (uint8_t index) const;
 
@@ -339,7 +339,7 @@ public:
    * Get minimum service rate for a DA service.
    *
    * \param index Index of the service
-   * \return Minimum service rate [kbps]
+   * \return Minimum service rate [KBps]
    */
   uint16_t GetDaMinimumServiceRateInKbps (uint8_t index) const;
 
@@ -347,15 +347,15 @@ public:
    * Get maximum backlog size for a DA service.
    *
    * \param index Index of the service
-   * \return Maximum backlog size [bytes]
+   * \return Maximum backlog size [KBytes]
    */
-  uint8_t GetDaMaximumBacklogInBytes (uint8_t index) const;
+  uint8_t GetDaMaximumBacklogInKbytes (uint8_t index) const;
 
   /**
    * Get maximum unique payload per block for a RA service.
    *
    * \param index Index of the service
-   * \return Maximum unique payload per block [bytes]
+   * \return Maximum unique payload per block
    */
   uint8_t GetRaMaximumUniquePayloadPerBlock (uint8_t index) const;
 
@@ -441,7 +441,7 @@ private:
    * Set constant service rate stream for a DA service.
    *
    * \param index Index of the service
-   * \param constantServiceRateStream Constant service rate stream [kbps]
+   * \param constantServiceRateStream Constant service rate stream [KBps]
    */
   void SetDaConstantServiceRateStream (uint8_t index, Ptr<RandomVariableStream> constantServiceRateStream);
 
@@ -449,7 +449,7 @@ private:
    * Set maximum service rate for a DA service.
    *
    * \param index Index of the service
-   * \param maximumServiceRateKbps Maximum service rate [kbps]
+   * \param maximumServiceRateKbps Maximum service rate [KBps]
    */
   void SetDaMaximumServiceRateInKbps (uint8_t index, uint16_t maximumServiceRateKbps);
 
@@ -457,7 +457,7 @@ private:
    * Set minimum service rate for a DA service.
    *
    * \param index Index of the service
-   * \param minimumServiceRateKbps Minimum service rate [kbps]
+   * \param minimumServiceRateKbps Minimum service rate [KBps]
    */
   void SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t minimumServiceRateKbps);
 
@@ -465,9 +465,9 @@ private:
    * Set maximum backlog size for a DA service.
    *
    * \param index Index of the service
-   * \param maximumBacklogInBytes Maximum backlog size [bytes]
+   * \param maximumBacklogInKbytes Maximum backlog size [KBytes]
    */
-  void SetDaMaximumBacklogInBytes (uint8_t index, uint8_t maximumBacklogInBytes);
+  void SetDaMaximumBacklogInKbytes (uint8_t index, uint8_t maximumBacklogInKbytes);
 
   /**
    * Set maximum unique payload per block for a RA service.
@@ -481,7 +481,7 @@ private:
    * Set maximum consecutive block accessed for a RA service.
    *
    * \param index Index of the service
-   * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed [bytes]
+   * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed
    */
   void SetRaMaximumConsecutiveBlockAccessed (uint8_t index, uint8_t maxConsecutiveBlockAccessed);
 
@@ -512,8 +512,8 @@ private:
  *  - GetDaServ0MaximumServiceRateInKbps, see @SatLowerLayerServiceEntry::GetMaximumServiceRateInKbps
  *  - SetDaServ0MinimumServiceRateInKbps, see @SatLowerLayerServiceEntry::SetMinimumServiceRateInKbps
  *  - GetDaServ0MinimumServiceRateInKbps, see @SatLowerLayerServiceEntry::GetMinimumServiceRateInKbps
- *  - SetDaServ0MaximumBacklogSizeInBytes, see @SatLowerLayerServiceEntry::SetMaximumBacklogSizeInBytes
- *  - GetDaServ0MaximumBacklogSizeInBytes, see @SatLowerLayerServiceEntry::GetMaximumBacklogSizeInBytes
+ *  - SetDaServ0MaximumBacklogSizeInBytes, see @SatLowerLayerServiceEntry::SetMaximumBacklogSizeInKbytes
+ *  - GetDaServ0MaximumBacklogSizeInBytes, see @SatLowerLayerServiceEntry::GetMaximumBacklogSizeInKbytes
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -542,10 +542,10 @@ private:
     { return SetDaMinimumServiceRateInKbps (index, value); } \
   inline uint16_t GetDaServ ## index ## MinimumServiceRateInKbps () const  \
     { return GetDaMinimumServiceRateInKbps (index); } \
-  inline void SetDaServ ## index ## MaximumBacklogInBytes (uint8_t value)  \
-    { return SetDaMaximumBacklogInBytes (index, value); } \
-  inline uint8_t GetDaServ ## index ## MaximumBacklogInBytes () const  \
-    { return GetDaMaximumBacklogInBytes (index); }
+  inline void SetDaServ ## index ## MaximumBacklogInKbytes (uint8_t value)  \
+    { return SetDaMaximumBacklogInKbytes (index, value); } \
+  inline uint8_t GetDaServ ## index ## MaximumBacklogInKbytes () const  \
+    { return GetDaMaximumBacklogInKbytes (index); }
 
 /**
  * SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
@@ -553,12 +553,12 @@ private:
  *
  *  Methods defined e.g. when index is 0.
  *
- *  - SetRaServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumUniquePayloadPerBlockInBytes
- *  - GetRaServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumUniquePayloadPerBlockInBytes
- *  - SetRaServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumConsecutiveBlockAccessedInBytes
- *  - GetRaServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumConsecutiveBlockAccessedInBytes
- *  - SetRaServ0MinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMinimumIdleBlockInBytes
- *  - GetRaServ0VMinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlockInBytes
+ *  - SetRaServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumUniquePayloadPerBlock
+ *  - GetRaServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumUniquePayloadPerBlock
+ *  - SetRaServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumConsecutiveBlockAccessed
+ *  - GetRaServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumConsecutiveBlockAccessed
+ *  - SetRaServ0MinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMinimumIdleBlock
+ *  - GetRaServ0VMinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlock
  *
  * \param index Index of the service which attribute access methods are defined
  */

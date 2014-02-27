@@ -43,7 +43,7 @@ SatDamaEntry::SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf)
   ResetVolumeBacklogPersistence ();
 
   m_dynamicRateRequestedInKbps = std::vector<uint16_t> (m_llsConf->GetDaServiceCount (), 0.0);
-  m_volumeBacklogRequestedInBytes = std::vector<uint8_t> (m_llsConf->GetDaServiceCount (), 0);
+  m_volumeBacklogRequestedInBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
 }
 
 SatDamaEntry::~SatDamaEntry ()
@@ -150,7 +150,7 @@ SatDamaEntry::GetVolumeBacklogInBytes (uint8_t index) const
 }
 
 void
-SatDamaEntry::UpdateVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes)
+SatDamaEntry::UpdateVolumeBacklogInBytes (uint8_t index, uint32_t volumeInBytes)
 {
   NS_LOG_FUNCTION (this);
 
@@ -161,7 +161,7 @@ SatDamaEntry::UpdateVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes)
 }
 
 void
-SatDamaEntry::SetVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes)
+SatDamaEntry::SetVolumeBacklogInBytes (uint8_t index, uint32_t volumeInBytes)
 {
   NS_LOG_FUNCTION (this);
 
@@ -169,9 +169,9 @@ SatDamaEntry::SetVolumeBacklogInBytes (uint8_t index, uint8_t volumeInBytes)
     {
       m_volumeBacklogRequestedInBytes[index] = volumeInBytes;
 
-      if ( m_volumeBacklogRequestedInBytes[index] > m_llsConf->GetDaMaximumBacklogInBytes (index))
+      if ( m_volumeBacklogRequestedInBytes[index] > (1000 * m_llsConf->GetDaMaximumBacklogInKbytes (index)))
         {
-          m_volumeBacklogRequestedInBytes[index] = m_llsConf->GetDaMaximumBacklogInBytes (index);
+          m_volumeBacklogRequestedInBytes[index] = (1000 * m_llsConf->GetDaMaximumBacklogInKbytes (index));
         }
 
       ResetVolumeBacklogPersistence ();

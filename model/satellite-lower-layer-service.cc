@@ -39,7 +39,7 @@ namespace ns3 {
     m_constantServiceRateStream (0),
     m_maximumServiceRateKbps (0.0),
     m_minimumServiceRateKbps (0.0),
-    m_maximumBacklogInBytes (0)
+    m_maximumBacklogInKbytes (0)
 {
    NS_LOG_FUNCTION (this);
 }
@@ -48,7 +48,6 @@ SatLowerLayerServiceDaEntry::~SatLowerLayerServiceDaEntry ()
 {
    NS_LOG_FUNCTION (this);
 }
-
 
 SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
 : m_maxUniquePayloadPerBlock (0),
@@ -74,8 +73,8 @@ SatLowerLayerServiceConf::SatLowerLayerServiceConf ()
 {
    NS_LOG_FUNCTION (this);
 
-   NS_ASSERT ( m_minRaServiceEntries < m_maxRaServiceEntries);
-   NS_ASSERT ( m_minDaServiceEntries < m_maxDaServiceEntries);
+   NS_ASSERT ( m_minRaServiceEntries <= m_maxRaServiceEntries);
+   NS_ASSERT ( m_minDaServiceEntries <= m_maxDaServiceEntries);
 }
 
 SatLowerLayerServiceConf::~SatLowerLayerServiceConf ()
@@ -105,10 +104,10 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a1    'Constant assignment provided' attribute value [true or false]
  * \param a2    'RBDC allowed' attribute value [true or false]
  * \param a3    'Volume allowed' attribute value [true or false]
- * \param a4    'Constant service rate' attribute value [kbps]
- * \param a5    'Maximum service rate' attribute value [kbps]
- * \param a6    'Minimum service rate' attribute value [kbps]
- * \param a7    'Maximum backlog size' attribute value [bytes]
+ * \param a4    'Constant service rate' attribute value [KBps]
+ * \param a5    'Maximum service rate' attribute value [KBps]
+ * \param a6    'Minimum service rate' attribute value [KBps]
+ * \param a7    'Maximum backlog size' attribute value [KBytes]
  *
  * \return TypeId
  */
@@ -152,8 +151,8 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
   .AddAttribute ( GetIndexAsDaServiceName (index) +  "_MaximumBacklogSize", \
                   "Maximum backlog size [bytes] for DA " + GetIndexAsDaServiceName (index), \
                   UintegerValue (a7), \
-                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumBacklogInBytes, \
-                                        &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumBacklogInBytes), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumBacklogInKbytes, \
+                                        &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumBacklogInKbytes), \
                   MakeUintegerChecker<uint8_t> ())
 
 
@@ -386,25 +385,25 @@ SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t
 }
 
 uint8_t
-SatLowerLayerServiceConf::GetDaMaximumBacklogInBytes (uint8_t index) const
+SatLowerLayerServiceConf::GetDaMaximumBacklogInKbytes (uint8_t index) const
 {
   if ( index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  return m_daServiceEntries[index].GetMaximumBacklogInBytes ();
+  return m_daServiceEntries[index].GetMaximumBacklogInKbytes ();
 }
 
 void
-SatLowerLayerServiceConf::SetDaMaximumBacklogInBytes (uint8_t index, uint8_t maximumBacklogInBytes)
+SatLowerLayerServiceConf::SetDaMaximumBacklogInKbytes (uint8_t index, uint8_t maximumBacklogInKbytes)
 {
   if ( index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  m_daServiceEntries[index].SetMaximumBacklogInBytes (maximumBacklogInBytes);
+  m_daServiceEntries[index].SetMaximumBacklogInKbytes (maximumBacklogInKbytes);
 }
 
 uint8_t
