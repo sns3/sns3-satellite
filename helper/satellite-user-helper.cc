@@ -161,7 +161,7 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
 
       // Add the user's MAC address to the global mapper
       NS_ASSERT_MSG ((*i)->GetNDevices () == 2,
-                     "Failed to get the device to subscriber network in UT user " << *i);
+                     "Failed to get the device to subscriber network in UT user node " << (*i)->GetId ());
       // assuming that #0 is for loopback device and #1 is for subscriber network device
       Ptr<NetDevice> dev = (*i)->GetDevice (1);
       Singleton<SatIdMapper>::Get ()->AttachMacToUtUserId (dev->GetAddress ());
@@ -216,7 +216,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
     {
       // Add the user's MAC address to the global mapper
       NS_ASSERT_MSG ((*i)->GetNDevices () == 2,
-                     "Failed to get the device to backbone network in GW user " << *i);
+                     "Failed to get the device to backbone network in GW user node " << (*i)->GetId ());
       // assuming that #0 is for loopback device and #1 is for backbone network device
       Ptr<NetDevice> dev = (*i)->GetDevice (1);
       Singleton<SatIdMapper>::Get ()->AttachMacToGwUserId (dev->GetAddress ());

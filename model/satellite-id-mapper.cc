@@ -334,7 +334,7 @@ SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode) const
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT_MSG (utNode->GetNDevices () >= 3,
-                 "UT node " << utNode << " is invalid");
+                 "Node " << utNode->GetId () << " is not a valid UT");
   /*
    * Assuming that device #0 is for loopback device, device #1 is for subscriber
    * network device, and device #2 is for satellite beam device.
@@ -350,7 +350,7 @@ SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode) const
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT_MSG (utUserNode->GetNDevices () >= 2,
-                 "UT user node " << utUserNode << " is invalid");
+                 "Node " << utUserNode->GetId () << " is not a valid UT user");
   // assuming that #0 is for loopback device and #1 is for subscriber network device
   Ptr<NetDevice> dev = utUserNode->GetDevice (1);
   return dev->GetAddress ();
