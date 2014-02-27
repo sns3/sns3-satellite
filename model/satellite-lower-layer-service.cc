@@ -73,6 +73,9 @@ SatLowerLayerServiceConf::SatLowerLayerServiceConf ()
    m_raServiceEntryCount (0)
 {
    NS_LOG_FUNCTION (this);
+
+   NS_ASSERT ( m_minRaServiceEntries < m_maxRaServiceEntries);
+   NS_ASSERT ( m_minDaServiceEntries < m_maxDaServiceEntries);
 }
 
 SatLowerLayerServiceConf::~SatLowerLayerServiceConf ()
@@ -138,19 +141,19 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                   "Maximum service rate [kbps] for DA " + GetIndexAsDaServiceName (index), \
                   UintegerValue (a5), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumServiceRateInKbps, \
-                                      &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumServiceRateInKbps), \
+                                        &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumServiceRateInKbps), \
                   MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) +  "_MinimumServiceRate", \
                   "Minimum service rate [kbps] for DA " + GetIndexAsDaServiceName (index), \
                   UintegerValue (a6), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MinimumServiceRateInKbps, \
-                                      &SatLowerLayerServiceConf::GetDaServ ## index ## MinimumServiceRateInKbps), \
+                                        &SatLowerLayerServiceConf::GetDaServ ## index ## MinimumServiceRateInKbps), \
                   MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) +  "_MaximumBacklogSize", \
                   "Maximum backlog size [bytes] for DA " + GetIndexAsDaServiceName (index), \
                   UintegerValue (a7), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumBacklogInBytes, \
-                                      &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumBacklogInBytes), \
+                                        &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumBacklogInBytes), \
                   MakeUintegerChecker<uint8_t> ())
 
 
@@ -195,12 +198,12 @@ SatLowerLayerServiceConf::GetTypeId (void)
                     "DA services in use.",
                      UintegerValue (2),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
-                     MakeUintegerChecker<uint8_t> (0, SatLowerLayerServiceConf::m_maxDaServiceEntries))
+                     MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minDaServiceEntries, SatLowerLayerServiceConf::m_maxDaServiceEntries))
     .AddAttribute ( "RaServiceCount",
                     "RA services in use.",
                      UintegerValue (2),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
-                     MakeUintegerChecker<uint8_t> (0, SatLowerLayerServiceConf::m_maxRaServiceEntries))
+                     MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minRaServiceEntries, SatLowerLayerServiceConf::m_maxRaServiceEntries))
     .AddAttribute ( "DynamicRatePersistence",
                     "Dynamic rate persistence for the lower layer service.",
                      UintegerValue (5),
@@ -213,17 +216,17 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "DefaultControlRandomizationInterval",
                     "Default control randomization interval for the lower layer service",
-                     TimeValue ( MilliSeconds (50)),
+                     TimeValue (MilliSeconds (50)),
                      MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
                      MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
 
     /*
      * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
      */
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (0, true, false, false, 50.0, 200.0, 50.0, 100)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (1, false, false, true, 50.0, 512.0, 100.0, 100)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, true, true, false, 100.0, 200.0, 50.0, 100)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, true, false, false, 100.0, 200.0, 50.0, 100)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (0, true, false, false, 50, 200, 50, 100)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (1, false, false, true, 50, 512, 100, 100)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, true, true, false, 100, 200, 50, 100)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, true, false, false, 100, 200, 50, 100)
 
     .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 500, 500, 500)
     .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 500, 500, 500)

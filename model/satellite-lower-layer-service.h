@@ -231,6 +231,10 @@ private:
 class SatLowerLayerServiceConf : public Object
 {
 public:
+
+  static const uint8_t m_minDaServiceEntries = 2;
+  static const uint8_t m_minRaServiceEntries = 1;
+
   static const uint8_t m_maxDaServiceEntries = 4;
   static const uint8_t m_maxRaServiceEntries = 4;
 
