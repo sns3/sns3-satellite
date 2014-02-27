@@ -572,6 +572,8 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       uint32_t frameOffset = 0;
       Time superframeStartTime;
 
+      uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
+
       /// search for the next available slot
       /// if there is no free slots in the current frame, look for it in the following frames
       while (!result.first)
@@ -579,19 +581,14 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
           superframeStartTime = GetCurrentSuperFrameStartTime (0)
               + Seconds (frameOffset * frameConf->GetDurationInSeconds ());
 
-          result = SearchFrameForAvailableSlot (superframeStartTime, frameId, timeSlotCount);
+          result = SearchFrameForAvailableSlot (superframeStartTime, frameConf, timeSlotCount, superFrameId, allocationChannel);
 
           if (!result.first)
             {
               frameOffset++;
+              superFrameId++;
             }
         }
-
-      /// TODO this needs to be implemented
-      uint32_t superFrameId = 0;
-
-      /// update used slots
-      UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, result.second);
 
       /// time slot configuration
       Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( result.second );
@@ -612,7 +609,11 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 }
 
 std::pair<bool,uint32_t>
-SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime, uint8_t frameId, uint32_t timeSlotCount)
+SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime,
+                                       Ptr<SatFrameConf> frameConf,
+                                       uint32_t timeSlotCount,
+                                       uint32_t superFrameId,
+                                       uint32_t allocationChannel)
 {
   Time opportunityOffset = Now () - superframeStartTime;
 
@@ -621,35 +622,37 @@ SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime, uint8_t frameId
       NS_FATAL_ERROR ("SatUtMac::FindNextAvailableRandomAccessSlot - Invalid Tx opportunity time");
     }
 
-  return FindNextAvailableRandomAccessSlot (opportunityOffset, frameId, timeSlotCount);
+  return FindNextAvailableRandomAccessSlot (opportunityOffset, frameConf, timeSlotCount, superFrameId, allocationChannel);
 }
 
 std::pair<bool,uint32_t>
-SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset, uint8_t frameId, uint32_t timeSlotCount)
+SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
+                                             Ptr<SatFrameConf> frameConf,
+                                             uint32_t timeSlotCount,
+                                             uint32_t superFrameId,
+                                             uint32_t allocationChannel)
 {
   Ptr<SatTimeSlotConf> slotConf;
-  uint32_t slot;
+  uint32_t slotId;
   bool availableSlotFound = false;
 
   /// iterate through slots in this frame
-  for (slot = 0; slot < timeSlotCount; slot++)
+  for (slotId = 0; slotId < timeSlotCount; slotId++)
     {
-      slotConf = m_superframeSeq->GetSuperframeConf (0)->GetFrameConf (frameId)->GetTimeSlotConf (slot);
+      slotConf = frameConf->GetTimeSlotConf (slotId);
 
       /// if slot offset is equal or larger than Tx opportunity offset, i.e., the slot is in the future
       if (slotConf->GetStartTimeInSeconds () >= opportunityOffset.GetSeconds ())
         {
-          /// if slot is available
-
-          /// TODO this needs to be implemented
-          if (1)
+          /// if slot is available, set the slot as used and continue with the transmission
+          if (UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, slotId))
             {
               availableSlotFound = true;
               break;
             }
         }
     }
-  return std::make_pair(availableSlotFound, slot);
+  return std::make_pair(availableSlotFound, slotId);
 }
 
 void
@@ -657,8 +660,7 @@ SatUtMac::ScheduleCrdsaTransmission (SatRandomAccess::RandomAccessTxOpportunitie
 {
   /// TODO schedule CRDSA transmissions
 
-  /// TODO this needs to be implemented
-  uint32_t superFrameId = 0;
+  uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
   /// update used slots
   UpdateUsedRandomAccessSlots (superFrameId, txOpportunities);
@@ -704,10 +706,11 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, SatRandomAccess::R
     }
 }
 
-void
+bool
 SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannelId, uint32_t slotId)
 {
   std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
+  bool isSlotFree = false;
 
   /// remove past RA Tx opportunity information
   RemovePastRandomAccessSlots (superFrameId);
@@ -725,9 +728,9 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
 
       result = m_usedRandomAccessSlots.insert (std::make_pair (key, txOpportunities));
 
-      if (!result.second)
+      if (result.second)
         {
-          NS_FATAL_ERROR ("SatUtMac::UpdateUsedRandomAccessSlots - Insert failed");
+          isSlotFree = true;
         }
     }
   else
@@ -735,11 +738,12 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
       std::pair<std::set<uint32_t>::iterator,bool> result;
       result = iter->second.insert (slotId);
 
-      if (!result.second)
+      if (result.second)
         {
-          NS_FATAL_ERROR ("SatUtMac::UpdateUsedRandomAccessSlots - Insert failed");
+          isSlotFree = true;
         }
     }
+  return isSlotFree;
 }
 
 void
@@ -752,7 +756,7 @@ SatUtMac::RemovePastRandomAccessSlots (uint32_t superFrameId)
     {
       if (iter->first.first < superFrameId)
         {
-          m_usedRandomAccessSlots.erase(iter++);
+          m_usedRandomAccessSlots.erase (iter++);
         }
       else
         {

@@ -200,8 +200,14 @@ SatSuperframeSeq::GetSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvan
 Time
 SatSuperframeSeq::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId, Time timingAdvance) const
 {
-  uint32_t count = (uint32_t)(floor((Simulator::Now () + timingAdvance).GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
+  uint32_t count = GetCurrentSuperFrameCount (superFrameSeqId, timingAdvance);
   return GetSuperFrameTxTimeWithCount (superFrameSeqId, count, timingAdvance);
+}
+
+uint32_t
+SatSuperframeSeq::GetCurrentSuperFrameCount (uint8_t superFrameSeqId, Time timingAdvance) const
+{
+  return (uint32_t)(floor((Simulator::Now () + timingAdvance).GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
 }
 
 Time

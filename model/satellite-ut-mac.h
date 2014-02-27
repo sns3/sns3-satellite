@@ -201,26 +201,48 @@ private:
     * \param superFrameId super frame ID
     * \param allocationChannel allocation channel
     * \param slot RA slot
+    * \return
     */
-   void UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannel, uint32_t slot);
+   bool UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannel, uint32_t slot);
 
    /**
     *
     * \param opportunityOffset
-    * \param frameId
+    * \param frameConf
     * \param timeSlotCount
+    * \param superFrameId
+    * \param allocationChannel
     * \return
     */
-   std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset, uint8_t frameId, uint32_t timeSlotCount);
+   std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
+                                                               Ptr<SatFrameConf> frameConf,
+                                                               uint32_t timeSlotCount,
+                                                               uint32_t superFrameId,
+                                                               uint32_t allocationChannel);
 
    /**
     *
     * \param superframeStartTime
-    * \param frameId
+    * \param frameConf
     * \param timeSlotCount
+    * \param superFrameId
+    * \param allocationChannel
     * \return
     */
-   std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime, uint8_t frameId, uint32_t timeSlotCount);
+   std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
+                                                         Ptr<SatFrameConf> frameConf,
+                                                         uint32_t timeSlotCount,
+                                                         uint32_t superFrameId,
+                                                         uint32_t allocationChannel);
+
+   /**
+    *
+    * \param superFrameId
+    * \param allocationChannelId
+    * \param slotId
+    * \return
+    */
+   bool IsRandomAccessSlotAvailable (uint32_t superFrameId, uint32_t allocationChannelId, uint32_t slotId);
 
    /**
     *  Schedules time slots according to received TBTP message.
