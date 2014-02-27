@@ -1,7 +1,7 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'flow-monitor'])
+    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'flow-monitor'])
     module.source = [
         'model/cbr-application.cc',
         'model/geo-coordinate.cc',
@@ -109,6 +109,7 @@ def build(bld):
         'helper/satellite-geo-helper.cc',
         'helper/satellite-gw-helper.cc',
         'helper/satellite-helper.cc',
+        'helper/satellite-stats-helper.cc',
         'helper/satellite-superframe-sequence.cc',
         'helper/satellite-user-helper.cc',
         'helper/satellite-ut-helper.cc',
@@ -248,6 +249,7 @@ def build(bld):
         'helper/satellite-geo-helper.h',
         'helper/satellite-gw-helper.h',
         'helper/satellite-helper.h',
+        'helper/satellite-stats-helper.h',
         'helper/satellite-superframe-sequence.h',
         'helper/satellite-user-helper.h',
         'helper/satellite-ut-helper.h',
