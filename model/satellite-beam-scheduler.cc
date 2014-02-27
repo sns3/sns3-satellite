@@ -51,7 +51,7 @@ bool SatBeamScheduler::CompareCno (UtInfoItem_t first, UtInfoItem_t second)
 }
 
 // UtInfo class declarations for SatBeamScheduler
-SatBeamScheduler::UtInfo::UtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator )
+SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator )
  : m_damaEntry (damaEntry),
    m_cnoEstimator (cnoEstimator)
 {
@@ -59,7 +59,7 @@ SatBeamScheduler::UtInfo::UtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstima
 }
 
 Ptr<SatDamaEntry>
-SatBeamScheduler::UtInfo::GetDamaEntry ()
+SatBeamScheduler::SatUtInfo::GetDamaEntry ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -67,7 +67,7 @@ SatBeamScheduler::UtInfo::GetDamaEntry ()
 }
 
 void
-SatBeamScheduler::UtInfo::UpdateDamaEntriesFromCrs ()
+SatBeamScheduler::SatUtInfo::UpdateDamaEntriesFromCrs ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -101,7 +101,7 @@ SatBeamScheduler::UtInfo::UpdateDamaEntriesFromCrs ()
 }
 
 double
-SatBeamScheduler::UtInfo::GetCnoEstimation ()
+SatBeamScheduler::SatUtInfo::GetCnoEstimation ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -109,7 +109,7 @@ SatBeamScheduler::UtInfo::GetCnoEstimation ()
 }
 
 void
-SatBeamScheduler::UtInfo::AddCnoSample (double sample)
+SatBeamScheduler::SatUtInfo::AddCnoSample (double sample)
 {
   NS_LOG_FUNCTION (this << sample);
 
@@ -117,7 +117,7 @@ SatBeamScheduler::UtInfo::AddCnoSample (double sample)
 }
 
 void
-SatBeamScheduler::UtInfo::AddCrMsg (Ptr<SatCrMessage> crMsg)
+SatBeamScheduler::SatUtInfo::AddCrMsg (Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (crMsg);
 
@@ -251,7 +251,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
   Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
 
-  Ptr<UtInfo> utInfo = Create<UtInfo> (damaEntry, cnoEstimator);
+  Ptr<SatUtInfo> utInfo = Create<SatUtInfo> (damaEntry, cnoEstimator);
 
   // TODO: CAC check needed to add
 
@@ -356,7 +356,7 @@ void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
 
   bool UtsOrSlotsLeft = true;
 
-  while ( (UtsOrSlotsLeft) && m_currentUt == m_utSortedInfos.begin () )
+  while ( (UtsOrSlotsLeft) && m_currentUt != m_utSortedInfos.end () )
     {
       UtsOrSlotsLeft = AddUtTimeSlots (header);
 

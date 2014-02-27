@@ -123,11 +123,26 @@ public:
 
 private:
 
+  class SatFrameInfo
+  {
+    uint8_t   m_frameId;
+
+    uint32_t  m_craPreAllocatedSymbols;
+    uint32_t  m_rbdcPreAllocatedSymbols;
+    uint32_t  m_vbdcPreAllocatedSymbols;
+
+    uint32_t  m_craTotalAvailableSymbols;
+    uint32_t  m_rbdcTotalAvailableSymbols;
+    uint32_t  m_vbdcTotalAvailableSymbols;
+
+    uint32_t  m_maxSymbolsPerUt;
+  };
+
   // UT information helper class for SatBeamScheduler
-  class UtInfo : public SimpleRefCount<UtInfo>
+  class SatUtInfo : public SimpleRefCount<SatUtInfo>
   {
     public:
-      UtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator );
+      SatUtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator );
 
       Ptr<SatDamaEntry> GetDamaEntry ();
 
@@ -145,8 +160,8 @@ private:
 
   };
 
-  typedef std::pair<Address, Ptr<UtInfo> >   UtInfoItem_t;
-  typedef std::map<Address, Ptr<UtInfo> >    UtInfoMap_t;
+  typedef std::pair<Address, Ptr<SatUtInfo> >   UtInfoItem_t;
+  typedef std::map<Address, Ptr<SatUtInfo> >    UtInfoMap_t;
   typedef std::vector<UtInfoItem_t>          UtSortedInfoContainer_t;
 
   /**
