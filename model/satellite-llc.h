@@ -176,7 +176,7 @@ public:
    * from SatRequestManager
    * to SatQueue
    */
-  void SetQueueSatisticsCallbacks ();
+  void SetQueueStatisticsCallbacks ();
 
   /**
    * Method checks how many packets are smaller or equal in size than the

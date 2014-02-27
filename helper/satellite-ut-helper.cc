@@ -359,7 +359,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   phy->Initialize();
 
-  llc->SetQueueSatisticsCallbacks ();
+  llc->SetQueueStatisticsCallbacks ();
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), Mac48Address::ConvertFrom (addr));

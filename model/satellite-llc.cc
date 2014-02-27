@@ -370,7 +370,7 @@ SatLlc::SetReceiveCallback (SatLlc::ReceiveCallback cb)
 
 
 void
-SatLlc::SetQueueSatisticsCallbacks ()
+SatLlc::SetQueueStatisticsCallbacks ()
 {
   // Control queue = rcIndex 0
   SatRequestManager::QueueCallback queueCb;

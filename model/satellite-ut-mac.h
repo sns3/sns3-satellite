@@ -172,10 +172,10 @@ private:
    uint32_t GetNextRandomAccessAllocationChannel ();
 
    /**
-    * \brief Function for identifying the next available random acess slot
+    * \brief Function for scheduling the Slotted ALOHA transmissions
     * \param allocationChannel allocation channel
     */
-   void FindNextAvailableRandomAccessSlot (uint32_t allocationChannel);
+   void ScheduleSlottedAlohaTransmission (uint32_t allocationChannel);
 
    /**
     * \brief Function for scheduling the CRDSA transmissions
@@ -185,22 +185,42 @@ private:
 
    /**
     * \brief Function for updating the used RA slots
+    * \param superFrameId super frame ID
     * \param txOpportunities Tx opportunities
     */
-   void UpdateUsedRandomAccessSlots (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
+   void UpdateUsedRandomAccessSlots (uint32_t superFrameId, SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
 
    /**
     * \brief Function for removing the past used RA slots
-    * \param currentFrameId current frame ID
+    * \param superFrameId super frame ID
     */
-   void RemovePastRandomAccessSlots (uint32_t currentFrameId);
+   void RemovePastRandomAccessSlots (uint32_t superFrameId);
 
    /**
     * \brief Function for updating the used RA slots
+    * \param superFrameId super frame ID
     * \param allocationChannel allocation channel
     * \param slot RA slot
     */
-   void UpdateUsedRandomAccessSlots (uint32_t allocationChannel, uint32_t slot);
+   void UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannel, uint32_t slot);
+
+   /**
+    *
+    * \param opportunityOffset
+    * \param frameId
+    * \param timeSlotCount
+    * \return
+    */
+   std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset, uint8_t frameId, uint32_t timeSlotCount);
+
+   /**
+    *
+    * \param superframeStartTime
+    * \param frameId
+    * \param timeSlotCount
+    * \return
+    */
+   std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime, uint8_t frameId, uint32_t timeSlotCount);
 
    /**
     *  Schedules time slots according to received TBTP message.
