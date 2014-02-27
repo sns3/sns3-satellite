@@ -133,7 +133,7 @@ SatQueue::Enqueue (Ptr<Packet> p)
 
   if (m_packets.size () >= m_maxPackets)
     {
-      NS_LOG_LOGIC ("Queue full (at max packets) -- droppping pkt");
+      NS_LOG_LOGIC ("Queue full (at max packets) -- dropping pkt");
       Drop (p);
       return false;
     }
@@ -159,6 +159,7 @@ SatQueue::Enqueue (Ptr<Packet> p)
 
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
   NS_LOG_LOGIC ("Number bytes " << m_nBytes);
+  m_traceEnqueue (p);
 
   return true;
 }
@@ -185,6 +186,7 @@ SatQueue::Dequeue (void)
   NS_LOG_LOGIC ("Popped " << p);
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
   NS_LOG_LOGIC ("Number bytes " << m_nBytes);
+  m_traceDequeue (p);
 
   return p;
 }
