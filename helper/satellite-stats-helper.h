@@ -35,6 +35,8 @@ namespace ns3 {
 
 // SATELLITE STATS HELPER /////////////////////////////////////////////////////
 
+class SatHelper;
+class Node;
 class Probe;
 class DataCollectionObject;
 
@@ -44,7 +46,6 @@ class DataCollectionObject;
 class SatStatsHelper : public SimpleRefCount<SatStatsHelper>
 {
 public:
-
   /**
    * \enum IdentifierType_t
    * \brief
@@ -52,12 +53,16 @@ public:
   typedef enum
   {
     IDENTIFIER_GLOBAL = 0,
-    IDENTIFIER_UT_USER,
-    IDENTIFIER_UT,
+    IDENTIFIER_GW,
     IDENTIFIER_BEAM,
-    IDENTIFIER_GW
+    IDENTIFIER_UT,
+    IDENTIFIER_UT_USER
   } IdentifierType_t;
 
+  /**
+   * \param identifierType
+   * \return
+   */
   static std::string GetIdentiferTypeName (IdentifierType_t identifierType);
 
   /**
@@ -68,51 +73,290 @@ public:
   {
     OUTPUT_NONE = 0,
     OUTPUT_SCALAR_FILE,
-    OUTPUT_TRACE_FILE,
-    OUTPUT_PDF_FILE,     // probability distribution function
-    OUTPUT_CDF_FILE,     // cumulative distribution function
+    OUTPUT_SCATTER_FILE,
+    OUTPUT_HISTOGRAM_FILE,
+    OUTPUT_PDF_FILE,        // probability distribution function
+    OUTPUT_CDF_FILE,        // cumulative distribution function
     OUTPUT_SCALAR_PLOT,
-    OUTPUT_TRACE_PLOT,
-    OUTPUT_PDF_PLOT,     // probability distribution function
-    OUTPUT_CDF_PLOT,     // cumulative distribution function
+    OUTPUT_SCATTER_PLOT,
+    OUTPUT_HISTOGRAM_PLOT,
+    OUTPUT_PDF_PLOT,        // probability distribution function
+    OUTPUT_CDF_PLOT,        // cumulative distribution function
   } OutputType_t;
 
+  /**
+   * \param outputType
+   * \return
+   */
   static std::string GetOutputTypeName (OutputType_t outputType);
 
-  SatStatsHelper ();
+  /**
+   * \brief
+   * \param satHelper
+   */
+  SatStatsHelper (Ptr<const SatHelper> satHelper);
 
+  /// Destructor.
   virtual ~SatStatsHelper ();
 
-  void SetName (std::string);
+  /**
+   * \brief Install probes, collectors, and aggregators.
+   *
+   * Behaviour should be implemented by child class in DoInstall().
+   */
+  void Install ();
 
+  /**
+   * \param name
+   */
+  void SetName (std::string name);
+
+  /**
+   * \return
+   */
   std::string GetName () const;
 
+  /**
+   * \param identifierType
+   * \warning Does not have any effect if invoked after Install().
+   */
   void SetIdentifierType (IdentifierType_t identifierType);
 
+  /**
+   * \return
+   */
   IdentifierType_t GetIdentifierType () const;
 
+  /**
+   * \param outputType
+   * \warning Does not have any effect if invoked after Install().
+   */
   void SetOutputType (OutputType_t outputType);
 
+  /**
+   * \return
+   */
   OutputType_t GetOutputType () const;
 
+  /**
+   * \return
+   */
+  Ptr<const SatHelper> GetSatHelper () const;
+
+  /**
+   * \return
+   */
+  Ptr<DataCollectionObject> GetAggregator () const;
+
+  /**
+   * \brief
+   * \param ut
+   * \return
+   */
+  static uint32_t GetUtId (Ptr<Node> ut);
+
+  /**
+   * \brief
+   * \param utUser
+   * \return
+   */
   static uint32_t GetUtUserId (Ptr<Node> utUser);
 
 protected:
+  /**
+   * \brief
+   */
+  virtual void DoInstall () = 0;
 
-  std::list<Ptr<Probe> > m_probes;
+  ///
+  typedef std::map<uint32_t, Ptr<DataCollectionObject> > CollectorMap_t;
 
-  // key: identifier ID
-  std::map<uint32_t, Ptr<DataCollectionObject> > m_collectors;
+  /**
+   * \brief Create the aggregator according to the output type.
+   */
+  virtual void CreateAggregator ();
 
-  Ptr<DataCollectionObject> m_aggregator;
+  /**
+   * \brief
+   * \param collectorMap a map of collectors where the newly created collectors
+   *                     will be inserted into.
+   * \return number of collectors created.
+   */
+  virtual uint32_t CreateTerminalCollectors (CollectorMap_t &collectorMap) const;
+
+  /**
+   * \brief Create a collector for each identifier.
+   * \param collectorTypeId the type of collector to be created.
+   * \param collectorMap a map of collectors where the newly created collectors
+   *                     will be inserted into.
+   * \return number of collectors created.
+   *
+   * The currently active identifier type (as returned by GetIdentifierType()
+   * and indicated by the `IdentifierType` attribute) determines the number of
+   * collectors created by this method. The active identifier type can be
+   * modified by invoking the SetIdentifierType() method or modifying the
+   * `IdentifierType` attribute.
+   */
+  virtual uint32_t CreateCollectors (std::string collectorTypeId,
+                                     CollectorMap_t &collectorMap) const;
+
+  /**
+   * \brief Create a new probe and connect it to a specified object and
+   *        collector.
+   * \param objectTypeId
+   * \param objectTraceSourceName
+   * \param probeName
+   * \param probeTypeId
+   * \param probeTraceSourceName
+   * \param identifier
+   * \param collectorMap
+   * \param collectorTraceSink
+   * \return pointer to the newly created probe, connected to the specified
+   *         object and the right connector, or zero if failure happens.
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  Ptr<Probe> InstallProbe (Ptr<Object> object,
+                           std::string objectTypeId,
+                           std::string objectTraceSourceName,
+                           std::string probeName,
+                           std::string probeTypeId,
+                           std::string probeTraceSourceName,
+                           uint32_t identifier,
+                           CollectorMap_t &collectorMap,
+                           R (C::*collectorTraceSink) (P1, P2)) const;
+
+  /**
+   * \brief
+   * \param sourceCollectorMap
+   * \param sourceCollectorTypeId
+   * \param traceSourceName
+   * \param targetCollectorMap
+   * \param targetCollectorTypeId
+   * \param traceSink
+   * \return
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  bool ConnectCollectorToCollector (CollectorMap_t &sourceCollectorMap,
+                                    std::string sourceCollectorTypeId,
+                                    std::string traceSourceName,
+                                    CollectorMap_t &targetCollectorMap,
+                                    std::string targetCollectorTypeId,
+                                    R (C::*traceSink) (P1, P2)) const;
+
+  /**
+   * \brief
+   * \param sourceCollectorMap
+   * \param sourceCollectorTypeId
+   * \param traceSourceName
+   * \param targetCollector
+   * \param targetCollectorTypeId
+   * \param traceSink
+   * \return
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  bool ConnectCollectorToCollector (CollectorMap_t &sourceCollectorMap,
+                                    std::string sourceCollectorTypeId,
+                                    std::string traceSourceName,
+                                    Ptr<DataCollectionObject> targetCollector,
+                                    std::string targetCollectorTypeId,
+                                    R (C::*traceSink) (P1, P2)) const;
+
+  /**
+   * \brief
+   * \param sourceCollector
+   * \param sourceCollectorTypeId
+   * \param traceSourceName
+   * \param targetCollectorMap
+   * \param targetCollectorTypeId
+   * \param traceSink
+   * \return
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  bool ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
+                                    std::string sourceCollectorTypeId,
+                                    std::string traceSourceName,
+                                    CollectorMap_t &targetCollectorMap,
+                                    std::string targetCollectorTypeId,
+                                    R (C::*traceSink) (P1, P2)) const;
+
+  /**
+   * \brief
+   * \param sourceCollector
+   * \param sourceCollectorTypeId
+   * \param traceSourceName
+   * \param targetCollector
+   * \param targetCollectorTypeId
+   * \param traceSink
+   * \return
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  bool ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
+                                    std::string sourceCollectorTypeId,
+                                    std::string traceSourceName,
+                                    Ptr<DataCollectionObject> targetCollector,
+                                    std::string targetCollectorTypeId,
+                                    R (C::*traceSink) (P1, P2)) const;
+
+  /*
+  template<typename R, typename C, typename P1, typename V1>
+  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
+                                     std::string collectorTraceSourceName,
+                                     R (C::*aggregatorTraceSink) (P1, V1));
+  template<typename R, typename C, typename P1, typename V1, typename V2>
+  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
+                                     std::string collectorTraceSourceName,
+                                     R (C::*aggregatorTraceSink) (P1, V1, V2));
+  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3>
+  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
+                                     std::string collectorTraceSourceName,
+                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3));
+  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3, typename V4>
+  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
+                                     std::string collectorTraceSourceName,
+                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3, V4));
+  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3, typename V4, typename V5>
+  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
+                                     std::string collectorTraceSourceName,
+                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3, V4, V5));
+  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3, typename V4, typename V5, typename V6>
+  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
+                                     std::string collectorTraceSourceName,
+                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3, V4, V5, V6));
+  */
+
+  /**
+   * \param utUserNode
+   * \return
+   */
+  virtual uint32_t GetUtUserIdentifier (Ptr<Node> utUserNode) const;
+
+  /**
+   * \param utNode
+   * \return
+   */
+  virtual uint32_t GetUtIdentifier (Ptr<Node> utNode) const;
+
+  /**
+   * \param beamId
+   * \return
+   */
+  virtual uint32_t GetBeamIdentifier (uint32_t beamId) const;
+
+  /**
+   * \param gwNode
+   * \return
+   */
+  virtual uint32_t GetGwIdentifier (Ptr<Node> gwNode) const;
 
 private:
+  std::string                m_name;            ///<
+  IdentifierType_t           m_identifierType;  ///<
+  OutputType_t               m_outputType;      ///<
+  bool                       m_isInstalled;     ///<
+  Ptr<const SatHelper>       m_satHelper;       ///<
+  Ptr<DataCollectionObject>  m_aggregator;      ///<
 
-  std::string m_name;
-
-  IdentifierType_t m_identifierType;
-
-  OutputType_t m_outputType;
+  // TODO: Add support for more than one aggregators.
 
 }; // end of class SatStatsHelper
 
@@ -120,6 +364,8 @@ private:
 // SATELLITE STATS FWD THROUGHPUT HELPER //////////////////////////////////////
 
 class SatHelper;
+class Probe;
+class DataCollectionObject;
 
 /**
  * \brief
@@ -127,16 +373,25 @@ class SatHelper;
 class SatStatsFwdThroughputHelper : public SatStatsHelper
 {
 public:
+  /**
+   * \brief
+   * \param satHelper
+   */
+  SatStatsFwdThroughputHelper (Ptr<const SatHelper> satHelper);
 
-  SatStatsFwdThroughputHelper ();
-
+  /// Destructor.
   virtual ~SatStatsFwdThroughputHelper ();
 
-  void Connect (Ptr<const SatHelper> satHelper);
+protected:
+  // inherited from SatStatsHelper base class
+  virtual void DoInstall ();
 
 private:
+  std::list<Ptr<Probe> > m_probes;
 
-
+  // key: identifier ID
+  CollectorMap_t m_intervalRateCollectors;
+  CollectorMap_t m_outputCollectors;
 
 }; // end of class SatStatsFwdThroughputHelper
 
@@ -171,14 +426,23 @@ class SatHelper;
 class SatStatsHelperContainer : public Object
 {
 public:
-
+  /**
+   * \brief
+   * \param satHelper
+   */
   SatStatsHelperContainer (Ptr<const SatHelper> satHelper);
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
 
-  void SetName (std::string);
+  /**
+   * \param name
+   */
+  void SetName (std::string name);
 
+  /**
+   * \return
+   */
   std::string GetName () const;
 
   void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
@@ -189,10 +453,13 @@ public:
 
   //void AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
+  /**
+   * \param outputType
+   * \return
+   */
   static std::string GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType);
 
 protected:
-
   // Inherited from Object base class
   virtual void DoDispose ();
 
