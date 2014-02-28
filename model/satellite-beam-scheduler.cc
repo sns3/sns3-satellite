@@ -164,7 +164,7 @@ SatBeamScheduler::SatBeamScheduler ()
     m_txCallback (0),
     m_tbtpAddCb (0),
     m_currentFrame (0),
-    m_totalSlotLeft (0),
+    m_totalSlotsLeft (0),
     m_additionalSlots (0),
     m_slotsPerUt (0),
     m_craBasedBytes (0),
@@ -384,7 +384,7 @@ SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
 {
   NS_LOG_FUNCTION (this);
 
-  if ( m_totalSlotLeft )
+  if ( m_totalSlotsLeft )
     {
       uint32_t timeSlotForUt = m_slotsPerUt;
 
@@ -394,7 +394,7 @@ SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
           timeSlotForUt++;
         }
 
-      m_totalSlotLeft -= timeSlotForUt;
+      m_totalSlotsLeft -= timeSlotForUt;
 
       while ( timeSlotForUt )
         {
@@ -404,7 +404,7 @@ SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> header)
         }
     }
 
-  return m_totalSlotLeft;
+  return m_totalSlotsLeft;
 }
 
 uint16_t
@@ -477,6 +477,8 @@ void SatBeamScheduler::DoPreResourceAllocation ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_totalSlotsLeft = 0;
+
   if ( m_utInfos.size () > 0 )
     {
       // sort UTs according to C/N0
@@ -496,40 +498,43 @@ void SatBeamScheduler::DoPreResourceAllocation ()
             }
         }
 
-      NS_ASSERT (frameConf);
-      m_carrierIds.clear ();
-
-      for ( uint32_t i = 0; i < frameConf->GetCarrierCount (); i++ )
+      // If DAMA entry found, initialize scheduling
+      if (frameConf)
         {
-          m_carrierIds.push_back (i);
+          m_totalSlotsLeft = frameConf->GetTimeSlotCount ();
+
+          NS_ASSERT (m_totalSlotsLeft);
+
+          m_carrierIds.clear ();
+
+          for ( uint32_t i = 0; i < frameConf->GetCarrierCount (); i++ )
+            {
+              m_carrierIds.push_back (i);
+            }
+
+          // no full carrier available for every UT
+          if ( m_carrierIds.size() < m_utInfos.size () )
+            {
+              m_slotsPerUt = m_totalSlotsLeft / m_utInfos.size ();
+              m_additionalSlots = m_totalSlotsLeft %  m_utInfos.size ();   // how many slot stay over
+            }
+          else
+            {
+              m_slotsPerUt = m_totalSlotsLeft / m_carrierIds.size ();
+              m_additionalSlots = 0;
+            }
+
+          std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end ());
+
+          m_currentSlot = m_timeSlots.end ();
+          m_currentCarrier = m_carrierIds.begin ();
+
+          m_timeSlots = frameConf->GetTimeSlotIds (*m_currentCarrier);
+
+          NS_ASSERT (m_timeSlots.size () > 0);
+
+          m_currentSlot = m_timeSlots.begin ();
         }
-
-      m_totalSlotLeft = frameConf->GetTimeSlotCount ();
-
-      NS_ASSERT (m_totalSlotLeft > 0);
-
-      // no full carrier available for every UT
-      if ( m_carrierIds.size() < m_utInfos.size () )
-        {
-          m_slotsPerUt = m_totalSlotLeft / m_utInfos.size ();
-          m_additionalSlots = m_totalSlotLeft %  m_utInfos.size ();   // how many slot stay over
-        }
-      else
-        {
-          m_slotsPerUt = m_totalSlotLeft / m_carrierIds.size ();
-          m_additionalSlots = 0;
-        }
-
-      std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end ());
-
-      m_currentSlot = m_timeSlots.end ();
-      m_currentCarrier = m_carrierIds.begin ();
-
-      m_timeSlots = frameConf->GetTimeSlotIds (*m_currentCarrier);
-
-      NS_ASSERT (m_timeSlots.size () > 0);
-
-      m_currentSlot = m_timeSlots.begin ();
     }
 }
 

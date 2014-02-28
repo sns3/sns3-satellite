@@ -122,22 +122,6 @@ public:
   void UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg);
 
 private:
-
-  class SatFrameInfo
-  {
-    uint8_t   m_frameId;
-
-    uint32_t  m_craPreAllocatedSymbols;
-    uint32_t  m_rbdcPreAllocatedSymbols;
-    uint32_t  m_vbdcPreAllocatedSymbols;
-
-    uint32_t  m_craTotalAvailableSymbols;
-    uint32_t  m_rbdcTotalAvailableSymbols;
-    uint32_t  m_vbdcTotalAvailableSymbols;
-
-    uint32_t  m_maxSymbolsPerUt;
-  };
-
   // UT information helper class for SatBeamScheduler
   class SatUtInfo : public SimpleRefCount<SatUtInfo>
   {
@@ -162,7 +146,7 @@ private:
 
   typedef std::pair<Address, Ptr<SatUtInfo> >   UtInfoItem_t;
   typedef std::map<Address, Ptr<SatUtInfo> >    UtInfoMap_t;
-  typedef std::vector<UtInfoItem_t>          UtSortedInfoContainer_t;
+  typedef std::vector<UtInfoItem_t>             UtSortedInfoContainer_t;
 
   /**
    * ID of the beam
@@ -217,12 +201,12 @@ private:
   /**
    * Time slot IDs of the currently used carrier.
    */
-  SatFrameConf::SatTimeSlotIdList_t m_timeSlots;
+  SatFrameConf::SatTimeSlotIdContainer_t m_timeSlots;
 
   /**
    * Iterator of the currently used time slot id for time slot id list.
    */
-  SatFrameConf::SatTimeSlotIdList_t::iterator m_currentSlot;
+  SatFrameConf::SatTimeSlotIdContainer_t::iterator m_currentSlot;
 
   /**
    * Current frame id scheduled.
@@ -232,7 +216,7 @@ private:
   /**
    * Counter for total time slots left for scheduling
    */
-  uint32_t m_totalSlotLeft;
+  uint32_t m_totalSlotsLeft;
 
   /**
    * Counter for time slots left when there is even number of slots available for UTs

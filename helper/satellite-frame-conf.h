@@ -156,8 +156,8 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
-  typedef std::map<uint16_t, Ptr<SatTimeSlotConf> > SatTimeSlotConfList_t;
-  typedef std::vector<uint16_t> SatTimeSlotIdList_t;
+  typedef std::map<uint16_t, Ptr<SatTimeSlotConf> > SatTimeSlotConfContainer_t;
+  typedef std::vector<uint16_t>                     SatTimeSlotIdContainer_t;
 
   static const uint16_t maxTimeSlotCount = 2048;
   static const uint16_t maxTimeSlotIndex = maxTimeSlotCount - 1;
@@ -176,7 +176,7 @@ public:
    * \param timeSlots         Time slot of the frame.
    */
   SatFrameConf ( double bandwidthHz, double durationInSeconds, Ptr<SatBtuConf> btu,
-                 SatTimeSlotConfList_t * timeSlots, bool isRandomAccess );
+                 SatTimeSlotConfContainer_t * timeSlots, bool isRandomAccess );
 
   /**
    * Destructor for SatFrameConf
@@ -280,7 +280,7 @@ public:
    * \param carrierId Id of the carrier which time slots are requested.
    * \return  List (map) containing timeslots.
    */
-  SatTimeSlotIdList_t GetTimeSlotIds (uint32_t carrierId) const;
+  SatTimeSlotIdContainer_t GetTimeSlotIds (uint32_t carrierId) const;
 
   /**
    * Get state if frame is random access frame.
@@ -300,7 +300,7 @@ private:
 
   Ptr<SatBtuConf>         m_btu;
   uint32_t                m_carrierCount;
-  SatTimeSlotConfList_t   m_timeSlotConfs;
+  SatTimeSlotConfContainer_t   m_timeSlotConfs;
   SatCarrierTimeSlotMap_t  m_carrierTimeSlotIds;
 };
 
@@ -433,7 +433,7 @@ public:
    * \param raChannel RA channel, which slot are requested
    * \return RA channel time slots
    */
-  SatFrameConf::SatTimeSlotIdList_t GetRaSlots (uint32_t raChannel);
+  SatFrameConf::SatTimeSlotIdContainer_t GetRaSlots (uint32_t raChannel);
 
   /**
    * Get the number of the RA channels in super frame configuration.

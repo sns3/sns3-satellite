@@ -101,7 +101,7 @@ SatFrameConf::SatFrameConf ()
 }
 
 SatFrameConf::SatFrameConf ( double bandwidthHz, double durationInSeconds,
-                             Ptr<SatBtuConf> btu, SatTimeSlotConfList_t * timeSlots, bool isRandomAccess)
+                             Ptr<SatBtuConf> btu, SatTimeSlotConfContainer_t * timeSlots, bool isRandomAccess)
   : m_bandwidthHz (bandwidthHz),
     m_durationInSeconds (durationInSeconds),
     m_nextTimeSlotId (0),
@@ -118,7 +118,7 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, double durationInSeconds,
 
       if ( m_timeSlotConfs.empty () == false )
         {
-          SatTimeSlotConfList_t::iterator lastSlot = m_timeSlotConfs.end ()--;
+          SatTimeSlotConfContainer_t::iterator lastSlot = m_timeSlotConfs.end ()--;
           m_nextTimeSlotId = lastSlot->first + 1;
         }
     }
@@ -144,14 +144,14 @@ SatFrameConf::GetTimeSlotConf (uint16_t index) const
 {
   NS_LOG_FUNCTION (this);
 
-  SatTimeSlotConfList_t::const_iterator foundTimeSlot = m_timeSlotConfs.find (index);
+  SatTimeSlotConfContainer_t::const_iterator foundTimeSlot = m_timeSlotConfs.find (index);
 
   NS_ASSERT (foundTimeSlot != m_timeSlotConfs.end () );
 
   return foundTimeSlot->second;
 }
 
-SatFrameConf::SatTimeSlotIdList_t
+SatFrameConf::SatTimeSlotIdContainer_t
 SatFrameConf::GetTimeSlotIds (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
@@ -159,7 +159,7 @@ SatFrameConf::GetTimeSlotIds (uint32_t carrierId) const
   std::pair < SatCarrierTimeSlotMap_t::const_iterator,
               SatCarrierTimeSlotMap_t::const_iterator> timeSlotRange = m_carrierTimeSlotIds.equal_range (carrierId);
 
-  SatTimeSlotIdList_t timeSlots;
+  SatTimeSlotIdContainer_t timeSlots;
 
   for (SatCarrierTimeSlotMap_t::const_iterator it = timeSlotRange.first; it != timeSlotRange.second; it++)
     {
@@ -174,7 +174,7 @@ SatFrameConf::AddTimeSlotConf (Ptr<SatTimeSlotConf> conf)
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<SatTimeSlotConfList_t::const_iterator, bool> result = m_timeSlotConfs.insert (std::make_pair (m_nextTimeSlotId, conf) );
+  std::pair<SatTimeSlotConfContainer_t::const_iterator, bool> result = m_timeSlotConfs.insert (std::make_pair (m_nextTimeSlotId, conf) );
   NS_ASSERT (result.second == true);
 
   m_carrierTimeSlotIds.insert (std::make_pair (conf->GetCarrierId(), m_nextTimeSlotId));
@@ -475,7 +475,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
               // Created one frame to be used utilizing earlier created BTU
               Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], m_durationInSeconds,
-                                                                  btuConf, (SatFrameConf::SatTimeSlotConfList_t *) NULL, m_frameIsRandomAccess[frameIndex] );
+                                                                  btuConf, (SatFrameConf::SatTimeSlotConfContainer_t *) NULL, m_frameIsRandomAccess[frameIndex] );
 
               // Created time slots for every carrier and add them to frame configuration
               for (uint32_t i = 0; i < frameConf->GetCarrierCount (); i++)
@@ -512,12 +512,12 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
     }
 }
 
-SatFrameConf::SatTimeSlotIdList_t
+SatFrameConf::SatTimeSlotIdContainer_t
 SatSuperframeConf::GetRaSlots (uint32_t raChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  SatFrameConf::SatTimeSlotIdList_t timeSlots;
+  SatFrameConf::SatTimeSlotIdContainer_t timeSlots;
 
   if ( raChannel < m_raChannels.size ())
     {
