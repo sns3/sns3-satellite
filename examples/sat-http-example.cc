@@ -122,6 +122,13 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO ("  ");
 
+  LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
+  LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
+  LogComponentEnable ("PacketDataRateCollector", LOG_PREFIX_ALL);
+  LogComponentEnable ("PacketDataRateCollector", LOG_LEVEL_ALL);
+  Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();
 

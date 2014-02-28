@@ -54,9 +54,9 @@ main (int argc, char *argv[])
     }
 
   // enable info logs
-  LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  LogComponentEnable ("sat-cbr-example", LOG_LEVEL_INFO);
+  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  //LogComponentEnable ("sat-cbr-example", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
@@ -111,6 +111,15 @@ main (int argc, char *argv[])
   ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
+
+  LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
+  LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
+  LogComponentEnable ("PacketDataRateCollector", LOG_PREFIX_ALL);
+  LogComponentEnable ("PacketDataRateCollector", LOG_LEVEL_ALL);
+  LogComponentEnable ("GnuplotAggregator", LOG_PREFIX_ALL);
+  LogComponentEnable ("GnuplotAggregator", LOG_LEVEL_ALL);
+  Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
