@@ -222,9 +222,6 @@ main (int argc, char *argv[])
                                    inputDevice,
                                    outputDevicesGW1);
 
-       // TODO: this has to be dynamically managed!
-      uint32_t MCAST_FLOW_ID (10);
-
       /// Create and add encapsulators for the multicast group
       for (uint32_t i = 0; i < outputDevicesGW1.GetN (); i++)
         {
