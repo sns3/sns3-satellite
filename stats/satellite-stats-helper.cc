@@ -340,6 +340,8 @@ SatStatsHelper::CreateTerminalCollectors (CollectorMap_t &collectorMap) const
       NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
       break;
   }
+
+  return 0;
 }
 
 

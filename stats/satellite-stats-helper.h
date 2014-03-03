@@ -206,7 +206,7 @@ protected:
   /**
    * \brief Create a new probe and connect it to a specified object and
    *        collector.
-   * \param objectTypeId
+   * \param object
    * \param objectTraceSourceName
    * \param probeName
    * \param probeTypeId
@@ -216,10 +216,11 @@ protected:
    * \param collectorTraceSink
    * \return pointer to the newly created probe, connected to the specified
    *         object and the right connector, or zero if failure happens.
+   *
+   * Assuming collectors are already created in the collectorMap.
    */
   template<typename R, typename C, typename P1, typename P2>
   Ptr<Probe> InstallProbe (Ptr<Object> object,
-                           std::string objectTypeId,
                            std::string objectTraceSourceName,
                            std::string probeName,
                            std::string probeTypeId,
@@ -231,73 +232,57 @@ protected:
   /**
    * \brief
    * \param sourceCollectorMap
-   * \param sourceCollectorTypeId
    * \param traceSourceName
    * \param targetCollectorMap
-   * \param targetCollectorTypeId
    * \param traceSink
    * \return
    */
   template<typename R, typename C, typename P1, typename P2>
   bool ConnectCollectorToCollector (CollectorMap_t &sourceCollectorMap,
-                                    std::string sourceCollectorTypeId,
                                     std::string traceSourceName,
                                     CollectorMap_t &targetCollectorMap,
-                                    std::string targetCollectorTypeId,
                                     R (C::*traceSink) (P1, P2)) const;
 
   /**
    * \brief
    * \param sourceCollectorMap
-   * \param sourceCollectorTypeId
    * \param traceSourceName
    * \param targetCollector
-   * \param targetCollectorTypeId
    * \param traceSink
    * \return
    */
   template<typename R, typename C, typename P1, typename P2>
   bool ConnectCollectorToCollector (CollectorMap_t &sourceCollectorMap,
-                                    std::string sourceCollectorTypeId,
                                     std::string traceSourceName,
                                     Ptr<DataCollectionObject> targetCollector,
-                                    std::string targetCollectorTypeId,
                                     R (C::*traceSink) (P1, P2)) const;
 
   /**
    * \brief
    * \param sourceCollector
-   * \param sourceCollectorTypeId
    * \param traceSourceName
    * \param targetCollectorMap
-   * \param targetCollectorTypeId
    * \param traceSink
    * \return
    */
   template<typename R, typename C, typename P1, typename P2>
   bool ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
-                                    std::string sourceCollectorTypeId,
                                     std::string traceSourceName,
                                     CollectorMap_t &targetCollectorMap,
-                                    std::string targetCollectorTypeId,
                                     R (C::*traceSink) (P1, P2)) const;
 
   /**
    * \brief
    * \param sourceCollector
-   * \param sourceCollectorTypeId
    * \param traceSourceName
    * \param targetCollector
-   * \param targetCollectorTypeId
    * \param traceSink
    * \return
    */
   template<typename R, typename C, typename P1, typename P2>
   bool ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
-                                    std::string sourceCollectorTypeId,
                                     std::string traceSourceName,
                                     Ptr<DataCollectionObject> targetCollector,
-                                    std::string targetCollectorTypeId,
                                     R (C::*traceSink) (P1, P2)) const;
 
   /*
@@ -369,7 +354,6 @@ private:
 template<typename R, typename C, typename P1, typename P2>
 Ptr<Probe>
 SatStatsHelper::InstallProbe (Ptr<Object> object,
-                              std::string objectTypeId,
                               std::string objectTraceSourceName,
                               std::string probeName,
                               std::string probeTypeId,
@@ -378,31 +362,19 @@ SatStatsHelper::InstallProbe (Ptr<Object> object,
                               SatStatsHelper::CollectorMap_t &collectorMap,
                               R (C::*collectorTraceSink) (P1, P2)) const
 {
-//  NS_LOG_FUNCTION (this << object << objectTypeId << objectTraceSourceName
-//                        << probeName << probeTypeId << probeTraceSourceName
-//                        << identifier);
-
-  // Confirm that the object has the right type and the specified trace source.
-  TypeId objectTid = TypeId::LookupByName (objectTypeId);
-  NS_ASSERT (object->GetObject<Object> (objectTid));
-  //NS_ASSERT (objectTid.LookupTraceSourceByName (objectTraceSourceName) != 0);
-
-  // Create the probe.
+  // Confirm that the probe type contains the trace source.
   TypeId probeTid = TypeId::LookupByName (probeTypeId);
   NS_ASSERT (probeTid.LookupTraceSourceByName (probeTraceSourceName) != 0);
+
+  // Create the probe.
   ObjectFactory factory;
   factory.SetTypeId (probeTid);
   factory.Set ("Name", StringValue (probeName));
   Ptr<Probe> probe = factory.Create ()->GetObject<Probe> (probeTid);
-//  NS_LOG_INFO (this << " created probe " << probeName);
 
-  // Connect the probe to the object.
+  // Connect the object to the probe.
   if (probe->ConnectByObject (objectTraceSourceName, object))
     {
-//      NS_LOG_INFO (this << " probe " << probeName << " is connected with "
-//                        << objectTypeId << "::" << objectTraceSourceName
-//                        << " (" << object << ")");
-
       // Connect the probe to the right collector.
       SatStatsHelper::CollectorMap_t::iterator it = collectorMap.find (identifier);
       NS_ASSERT_MSG (it != collectorMap.end (),
@@ -414,22 +386,15 @@ SatStatsHelper::InstallProbe (Ptr<Object> object,
                                              MakeCallback (collectorTraceSink,
                                                            collector)))
         {
-//          NS_LOG_INFO (this << " probe " << probeName << " is connected with"
-//                            << " collector " << collector->GetName ());
           return probe;
         }
       else
         {
-//          NS_LOG_WARN (this << " unable to connect probe " << probeName
-//                            << " to collector " << collector->GetName ());
           return 0;
         }
     }
   else
     {
-//      NS_LOG_WARN (this << " unable to connect probe " << probeName << " to "
-//                        << objectTypeId << "::" << objectTraceSourceName
-//                        << " (" << object << ")");
       return 0;
     }
 
@@ -439,10 +404,8 @@ SatStatsHelper::InstallProbe (Ptr<Object> object,
 template<typename R, typename C, typename P1, typename P2>
 bool
 SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sourceCollectorMap,
-                                             std::string sourceCollectorTypeId,
                                              std::string traceSourceName,
                                              SatStatsHelper::CollectorMap_t &targetCollectorMap,
-                                             std::string targetCollectorTypeId,
                                              R (C::*traceSink) (P1, P2)) const
 {
   NS_ASSERT (sourceCollectorMap.size () == targetCollectorMap.size ());
@@ -455,12 +418,8 @@ SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sou
       NS_ASSERT_MSG (it2 != targetCollectorMap.end (),
                      "Unable to find target collector with identifier " << identifier);
 
-      if (!ConnectCollectorToCollector (it1->second,
-                                        sourceCollectorTypeId,
-                                        traceSourceName,
-                                        it2->second,
-                                        targetCollectorTypeId,
-                                        traceSink))
+      if (!ConnectCollectorToCollector (it1->second, traceSourceName,
+                                        it2->second, traceSink))
         {
           return false;
         }
@@ -473,21 +432,15 @@ SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sou
 template<typename R, typename C, typename P1, typename P2>
 bool
 SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sourceCollectorMap,
-                                             std::string sourceCollectorTypeId,
                                              std::string traceSourceName,
                                              Ptr<DataCollectionObject> targetCollector,
-                                             std::string targetCollectorTypeId,
                                              R (C::*traceSink) (P1, P2)) const
 {
   for (SatStatsHelper::CollectorMap_t::iterator it = sourceCollectorMap.begin ();
        it != sourceCollectorMap.end (); ++it)
     {
-      if (!ConnectCollectorToCollector (it->second,
-                                        sourceCollectorTypeId,
-                                        traceSourceName,
-                                        targetCollector,
-                                        targetCollectorTypeId,
-                                        traceSink))
+      if (!ConnectCollectorToCollector (it->second, traceSourceName,
+                                        targetCollector, traceSink))
         {
           return false;
         }
@@ -500,21 +453,15 @@ SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sou
 template<typename R, typename C, typename P1, typename P2>
 bool
 SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
-                                             std::string sourceCollectorTypeId,
                                              std::string traceSourceName,
                                              SatStatsHelper::CollectorMap_t &targetCollectorMap,
-                                             std::string targetCollectorTypeId,
                                              R (C::*traceSink) (P1, P2)) const
 {
   for (SatStatsHelper::CollectorMap_t::iterator it = targetCollectorMap.begin ();
        it != targetCollectorMap.end (); ++it)
     {
-      if (!ConnectCollectorToCollector (sourceCollector,
-                                        sourceCollectorTypeId,
-                                        traceSourceName,
-                                        it->second,
-                                        targetCollectorTypeId,
-                                        traceSink))
+      if (!ConnectCollectorToCollector (sourceCollector, traceSourceName,
+                                        it->second, traceSink))
         {
           return false;
         }
@@ -527,25 +474,11 @@ SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCol
 template<typename R, typename C, typename P1, typename P2>
 bool
 SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
-                                             std::string sourceCollectorTypeId,
                                              std::string traceSourceName,
                                              Ptr<DataCollectionObject> targetCollector,
-                                             std::string targetCollectorTypeId,
                                              R (C::*traceSink) (P1, P2)) const
 {
-//  NS_LOG_FUNCTION (this << sourceCollector->GetName () << traceSourceName
-//                        << targetCollector->GetName ());
-
-  // Confirm that the source has the right type and the specified trace source.
-  TypeId sourceTid = TypeId::LookupByName (sourceCollectorTypeId);
-  NS_ASSERT (sourceCollector->GetObject<DataCollectionObject> (sourceTid));
-  NS_ASSERT (sourceTid.LookupTraceSourceByName (traceSourceName) != 0);
-
-  // Confirm that the target has the right type.
-  //TypeId targetTid = TypeId::LookupByName (targetCollectorTypeId);
-  //NS_ASSERT (targetCollector->GetObject<DataCollectionObject> (targetTid));
   Ptr<C> target = targetCollector->GetObject<C> ();
-
   return sourceCollector->TraceConnectWithoutContext (traceSourceName,
                                                       MakeCallback (traceSink,
                                                                     target));

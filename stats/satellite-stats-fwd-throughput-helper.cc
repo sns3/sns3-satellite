@@ -69,7 +69,6 @@ SatStatsFwdThroughputHelper::DoInstall ()
           std::ostringstream probeName;
           probeName << utUserId << "-" << i;
           Ptr<Probe> probe = InstallProbe ((*it)->GetApplication (i),
-                                           "ns3::Application",
                                            "Rx",
                                            probeName.str (),
                                            "ns3::ApplicationPacketProbe",
