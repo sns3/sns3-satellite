@@ -29,7 +29,6 @@
 #include "satellite-mac-tag.h"
 #include "satellite-time-tag.h"
 #include "satellite-base-encapsulator.h"
-#include "satellite-return-link-encapsulator.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-control-message.h"
 #include "satellite-node-info.h"
@@ -57,7 +56,6 @@ SatLlc::GetTypeId (void)
 
 SatLlc::SatLlc ()
 :m_nodeInfo (),
- m_requestManager (),
  m_encaps (),
  m_decaps (),
  m_controlFlowIndex (0)
@@ -92,11 +90,6 @@ SatLlc::DoDispose ()
     }
   m_decaps.clear ();
 
-  if (m_requestManager)
-    {
-      m_requestManager->DoDispose ();
-      m_requestManager = 0;
-    }
   Object::DoDispose ();
 }
 
@@ -145,56 +138,9 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
 Ptr<Packet>
 SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft )
 {
-  NS_LOG_FUNCTION (this << macAddr << bytes);
+  NS_LOG_FUNCTION (this << bytes << macAddr << bytesLeft);
 
   Ptr<Packet> packet;
-
-  /**
-   * TODO: This is not the final implementation! The NotifyTxOpportunity
-   * will be enhanced with the flow id which to serve. The decision is passed
-   * then to the scheduler (UT/NCC or forward link).
-   */
-  EncapKey_t key;
-  // Check whether there are some control messages
-  if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
-    {
-      key = std::make_pair<Mac48Address, uint8_t> (macAddr, m_controlFlowIndex);
-    }
-  else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
-    {
-      key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), m_controlFlowIndex);
-    }
-
-  EncapContainer_t::iterator it = m_encaps.find (key);
-
-  if (!it->second->GetQueue ()->IsEmpty())
-    {
-      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
-    }
-
-  key = std::make_pair<Mac48Address, uint8_t> (macAddr, 1);
-  it = m_encaps.find (key);
-  if (!packet)
-    {
-      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
-    }
-
-  if (packet)
-    {
-      SatEnums::SatLinkDir_t ld =
-          (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
-
-      // Add packet trace entry:
-      m_packetTrace (Simulator::Now(),
-                     SatEnums::PACKET_SENT,
-                     m_nodeInfo->GetNodeType (),
-                     m_nodeInfo->GetNodeId (),
-                     m_nodeInfo->GetMacAddress (),
-                     SatEnums::LL_LLC,
-                     ld,
-                     SatUtils::GetPacketInfo (packet));
-    }
-
   return packet;
 }
 
@@ -258,14 +204,6 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)
 }
 
 void
-SatLlc::AddRequestManager (Ptr<SatRequestManager> rm)
-{
-  NS_LOG_FUNCTION (this);
-  m_requestManager = rm;
-}
-
-
-void
 SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t flowId)
 {
   NS_LOG_FUNCTION (this << macAddr << flowId);
@@ -299,19 +237,6 @@ SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> dec, uint8_t fl
     {
       NS_FATAL_ERROR ("Decapsulator container already holds (" << macAddr << ", " << flowId << ") key!");
     }
-}
-
-bool
-SatLlc::ControlEncapsulatorCreated () const
-{
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), m_controlFlowIndex);
-  EncapContainer_t::const_iterator it = m_encaps.find (key);
-  if (it != m_encaps.end ())
-    {
-      return true;
-    }
-
-  return false;
 }
 
 void
@@ -360,35 +285,6 @@ SatLlc::SetReceiveCallback (SatLlc::ReceiveCallback cb)
   m_rxCallback = cb;
 }
 
-
-void
-SatLlc::SetQueueStatisticsCallbacks ()
-{
-  // Control queue = rcIndex 0
-  SatRequestManager::QueueCallback queueCb;
-  for (EncapContainer_t::iterator it = m_encaps.begin ();
-      it != m_encaps.end ();
-      ++it)
-    {
-      // Set the callback for each RLE queue
-      queueCb = MakeCallback (&SatQueue::GetQueueStatistics, it->second->GetQueue ());
-      m_requestManager->AddQueueCallback (it->first.second, queueCb);
-    }
- }
-
-
-uint32_t
-SatLlc::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
-{
-  uint32_t packets (0);
-  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
-      it != m_encaps.end ();
-      ++it)
-    {
-      packets += it->second->GetQueue()->GetNumSmallerPackets (maxPacketSizeBytes);
-    }
-  return packets;
-}
 
 bool
 SatLlc::BuffersEmpty () const

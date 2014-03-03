@@ -22,29 +22,26 @@
 #define SATELLITE_LLC_H_
 
 #include <vector>
+#include <map>
 #include "ns3/object.h"
-#include "ns3/queue.h"
 #include "ns3/traced-callback.h"
-#include "ns3/uinteger.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/ptr.h"
 #include "ns3/mac48-address.h"
 
 #include "satellite-node-info.h"
-#include "satellite-scheduling-object.h"
 #include "satellite-base-encapsulator.h"
-#include "satellite-request-manager.h"
+#include "satellite-scheduling-object.h"
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatLlc class holds the UT specific SatBaseEncapsulator instances, which are responsible
- * of fragmentation, defragmentation, encapsulation and decapsulation. Packets are enqued by
- * the SatNetDevice by using the Enque () method and classified to a correct encapsulator object or
- * to a global control queue. Fragmentation is not allowed for control packets. Lower layer (MAC)
- * requests the packets by using the NotifyTxOpportunity () method.
+ * \brief SatLlc base class holds the UT specific SatBaseEncapsulator instances, which are responsible
+ * of fragmentation, defragmentation, encapsulation and decapsulation. Encapsulator class is thus
+ * capable of working in both transmission and reception side of the system. The SatLlc base class holds
+ * base pointers of the encapsulators, but the actual encapsulator types depend on the simulation direction:
  *
  * At GW:
  * - Encapsulators are of type SatGenericStreamEncapsulator
@@ -56,7 +53,15 @@ namespace ns3 {
  * - Decapsulators are of type SatGenericStreamEncapsulator
  * - There is only one encapsulator and one decapsulator
  *
+ * Fragmentation is not allowed for control packets, thus the basic functionality of just buffering
+ * control packets without encapsulation, decapsulation, fragmentation and packing is implemented to the
+ * SatBaseEncapsulator class.
+ *
+ *  A proper version of the SatLlc is inherited: SatUtLlc at the UT and SatGwLlc at the GW. There is no
+ *  LLC layer at the satellite.
  */
+
+
 class SatLlc : public Object
 {
 public:
@@ -72,7 +77,7 @@ public:
    *
    * This is the destructor for the SatLlc.
    */
-  ~SatLlc ();
+  virtual ~SatLlc ();
 
   typedef std::pair<Mac48Address, uint8_t> EncapKey_t;
   typedef std::map<EncapKey_t, Ptr<SatBaseEncapsulator> > EncapContainer_t;
@@ -126,12 +131,6 @@ public:
   void SetReceiveCallback (SatLlc::ReceiveCallback cb);
 
   /**
-   * Add a request manager for UT's LLC instance.
-   * @param rm Ptr to request manager
-   */
-  void AddRequestManager (Ptr<SatRequestManager> rm);
-
-  /**
    * Add an encapsulator entry for the LLC
    * Key = UT's MAC address
    * Value = encap entity
@@ -152,13 +151,6 @@ public:
   void AddDecap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> dec, uint8_t flowId);
 
   /**
-   * Is control encapsulator already created. Only one control encapsulator
-   * for flow id 0 and broadcast address is needed.
-   * \return bool Flag indicating whether control encapsulator exists
-   */
-  bool ControlEncapsulatorCreated () const;
-
-  /**
    * Set the node info
    * \param nodeInfo containing node specific information
    */
@@ -169,30 +161,13 @@ public:
    * Scheduling objects may be used at the MAC layer to assist in scheduling.
    * \return vector of scheduling object pointers
    */
-  std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
-
-  /**
-   * Set queue statistics callbacks
-   * from SatRequestManager
-   * to SatQueue
-   */
-  void SetQueueStatisticsCallbacks ();
-
-  /**
-   * Method checks how many packets are smaller or equal in size than the
-   * maximum packets size threshold specified as an argument. Note, that each
-   * queue is gone through from the front up until there is first packet larger
-   * than threshold.
-   * \param maxPacketSize Maximum packet size threshold in Bytes
-   * \return uint32_t Number of packets
-   */
-  uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
+  virtual std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
 
   /**
    * Are buffers empty
    * \return bool Boolean to indicate whether the buffers are empty or not.
    */
-  bool BuffersEmpty () const;
+  virtual bool BuffersEmpty () const;
 
 protected:
   /**
@@ -226,13 +201,6 @@ protected:
    */
   Ptr<SatNodeInfo> m_nodeInfo;
 
-private:
-
-  /**
-   * Request manager handling the capacity requests
-   */
-  Ptr<SatRequestManager> m_requestManager;
-
   // Map of encapsulator base pointers
   EncapContainer_t m_encaps;
 
@@ -248,6 +216,8 @@ private:
    * Flow index used for control traffic
    */
   uint8_t m_controlFlowIndex;
+
+private:
 
 };
 

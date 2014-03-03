@@ -27,7 +27,7 @@
 #include "ns3/config.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
-#include "../model/satellite-llc.h"
+#include "../model/satellite-gw-llc.h"
 #include "../model/satellite-gw-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-geo-net-device.h"
@@ -216,7 +216,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   dev->SetMac (mac);
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
+  Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
 
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);

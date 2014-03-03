@@ -31,7 +31,8 @@
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mobility-observer.h"
-#include "../model/satellite-llc.h"
+#include "../model/satellite-gw-llc.h"
+#include "../model/satellite-ut-llc.h"
 #include "../model/satellite-ut-mac.h"
 #include "../model/satellite-net-device.h"
 #include "../model/satellite-ut-phy.h"
@@ -244,7 +245,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetAttribute ("ReceiveCb", CallbackValue(recCb));
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatLlc> llc = CreateObject<SatLlc> ();
+  Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
 
   // Create a request manager and attach it to LLC, and set control message callback to RM
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> (m_llsConf, m_superframeSeq->GetDurationInSeconds (0));
@@ -323,7 +324,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatBaseEncapsulator> gwEncap;
 
   // Create control container for each LLC only once.
-  if (!gwLlc->ControlEncapsulatorCreated ())
+  Ptr<SatGwLlc> gatewayLlc = DynamicCast<SatGwLlc> (gwLlc);
+  if (gatewayLlc && !gatewayLlc->ControlEncapsulatorCreated ())
     {
       queue = CreateObject<SatQueue> (controlFlowId);
       gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), controlFlowId);
@@ -377,7 +379,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
     {
       Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_randomAccessModel);
       randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));
-      randomAccess->SetNumOfCandidatePacketsCallback (MakeCallback(&SatLlc::GetNumSmallerPackets, llc));
+      randomAccess->SetNumOfCandidatePacketsCallback (MakeCallback(&SatUtLlc::GetNumSmallerPackets, llc));
       mac->SetRandomAccess (randomAccess);
     }
 
