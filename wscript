@@ -111,11 +111,13 @@ def build(bld):
         'helper/satellite-geo-helper.cc',
         'helper/satellite-gw-helper.cc',
         'helper/satellite-helper.cc',
-        'helper/satellite-stats-helper.cc',
         'helper/satellite-superframe-sequence.cc',
         'helper/satellite-user-helper.cc',
         'helper/satellite-ut-helper.cc',
         'helper/satellite-wave-form-conf.cc',
+        'stats/satellite-stats-helper.cc',
+        'stats/satellite-stats-fwd-throughput-helper.cc',
+        'stats/satellite-stats-helper-container.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('satellite')
@@ -253,11 +255,13 @@ def build(bld):
         'helper/satellite-geo-helper.h',
         'helper/satellite-gw-helper.h',
         'helper/satellite-helper.h',
-        'helper/satellite-stats-helper.h',
         'helper/satellite-superframe-sequence.h',
         'helper/satellite-user-helper.h',
         'helper/satellite-ut-helper.h',
         'helper/satellite-wave-form-conf.h',
+        'stats/satellite-stats-helper.h',
+        'stats/satellite-stats-fwd-throughput-helper.h',
+        'stats/satellite-stats-helper-container.h',
         ]
 
     if (bld.env['ENABLE_EXAMPLES']):

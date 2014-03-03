@@ -25,8 +25,14 @@
 #include <ns3/ptr.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/object.h>
+#include <ns3/type-id.h>
+#include <ns3/object-factory.h>
+#include <ns3/string.h>
+#include <ns3/callback.h>
+#include <ns3/log.h>
 #include <ns3/node-container.h>
-#include <list>
+#include <ns3/data-collection-object.h>
+#include <ns3/probe.h>
 #include <map>
 
 
@@ -36,9 +42,6 @@ namespace ns3 {
 // SATELLITE STATS HELPER /////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class Probe;
-class DataCollectionObject;
 
 /**
  * \brief Abstract class
@@ -361,117 +364,192 @@ private:
 }; // end of class SatStatsHelper
 
 
-// SATELLITE STATS FWD THROUGHPUT HELPER //////////////////////////////////////
+// TEMPLATE METHOD DEFINITIONS ////////////////////////////////////////////////
 
-class SatHelper;
-class Probe;
-class DataCollectionObject;
-
-/**
- * \brief
- */
-class SatStatsFwdThroughputHelper : public SatStatsHelper
+template<typename R, typename C, typename P1, typename P2>
+Ptr<Probe>
+SatStatsHelper::InstallProbe (Ptr<Object> object,
+                              std::string objectTypeId,
+                              std::string objectTraceSourceName,
+                              std::string probeName,
+                              std::string probeTypeId,
+                              std::string probeTraceSourceName,
+                              uint32_t    identifier,
+                              SatStatsHelper::CollectorMap_t &collectorMap,
+                              R (C::*collectorTraceSink) (P1, P2)) const
 {
-public:
-  /**
-   * \brief
-   * \param satHelper
-   */
-  SatStatsFwdThroughputHelper (Ptr<const SatHelper> satHelper);
+//  NS_LOG_FUNCTION (this << object << objectTypeId << objectTraceSourceName
+//                        << probeName << probeTypeId << probeTraceSourceName
+//                        << identifier);
 
-  /// Destructor.
-  virtual ~SatStatsFwdThroughputHelper ();
+  // Confirm that the object has the right type and the specified trace source.
+  TypeId objectTid = TypeId::LookupByName (objectTypeId);
+  NS_ASSERT (object->GetObject<Object> (objectTid));
+  //NS_ASSERT (objectTid.LookupTraceSourceByName (objectTraceSourceName) != 0);
 
-protected:
-  // inherited from SatStatsHelper base class
-  virtual void DoInstall ();
+  // Create the probe.
+  TypeId probeTid = TypeId::LookupByName (probeTypeId);
+  NS_ASSERT (probeTid.LookupTraceSourceByName (probeTraceSourceName) != 0);
+  ObjectFactory factory;
+  factory.SetTypeId (probeTid);
+  factory.Set ("Name", StringValue (probeName));
+  Ptr<Probe> probe = factory.Create ()->GetObject<Probe> (probeTid);
+//  NS_LOG_INFO (this << " created probe " << probeName);
 
-private:
-  std::list<Ptr<Probe> > m_probes;
+  // Connect the probe to the object.
+  if (probe->ConnectByObject (objectTraceSourceName, object))
+    {
+//      NS_LOG_INFO (this << " probe " << probeName << " is connected with "
+//                        << objectTypeId << "::" << objectTraceSourceName
+//                        << " (" << object << ")");
 
-  // key: identifier ID
-  CollectorMap_t m_intervalRateCollectors;
-  CollectorMap_t m_outputCollectors;
+      // Connect the probe to the right collector.
+      SatStatsHelper::CollectorMap_t::iterator it = collectorMap.find (identifier);
+      NS_ASSERT_MSG (it != collectorMap.end (),
+                     "Unable to find collector with identifier " << identifier);
+      Ptr<C> collector = it->second->GetObject<C> ();
+      NS_ASSERT (collector != 0);
 
-}; // end of class SatStatsFwdThroughputHelper
+      if (probe->TraceConnectWithoutContext (probeTraceSourceName,
+                                             MakeCallback (collectorTraceSink,
+                                                           collector)))
+        {
+//          NS_LOG_INFO (this << " probe " << probeName << " is connected with"
+//                            << " collector " << collector->GetName ());
+          return probe;
+        }
+      else
+        {
+//          NS_LOG_WARN (this << " unable to connect probe " << probeName
+//                            << " to collector " << collector->GetName ());
+          return 0;
+        }
+    }
+  else
+    {
+//      NS_LOG_WARN (this << " unable to connect probe " << probeName << " to "
+//                        << objectTypeId << "::" << objectTraceSourceName
+//                        << " (" << object << ")");
+      return 0;
+    }
+
+} // end of `InstallProbe`
 
 
-// SATELLITE STATS HELPER CONTAINER ///////////////////////////////////////////
-
-class SatHelper;
-
-/**
- * \brief Container of SatStatsHelper instances.
- *
- * The container is initially empty. SatStatsHelper instances can be added into
- * the container using attributes or class methods.
- *
- * The names of these attributes and class methods follow the convention below:
- * - identifier (e.g., per UT user, per UT, per beam, per GW, etc.)
- * -
- *
- * The value of the attributes and the arguments of the class methods are the
- * desired output type (e.g., files, plots, etc.). For now, the only viable
- * output type is file.
- *
- * The output files will be named in certain pattern using the name set in
- * `Name` attribute or SetName method. The default name is "stat", which for
- * example will produce output files with the names
- * `stat-per-ut-throughput-scalar.txt`, `stat-per-ut-throughput-trace.txt`, etc.
- *
- * There are tons of those attributes and class methods, because we aim to
- * accommodate enabling specific statistics with one primitive operation (i.e.,
- * setting an attribute to true.
- */
-class SatStatsHelperContainer : public Object
+template<typename R, typename C, typename P1, typename P2>
+bool
+SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sourceCollectorMap,
+                                             std::string sourceCollectorTypeId,
+                                             std::string traceSourceName,
+                                             SatStatsHelper::CollectorMap_t &targetCollectorMap,
+                                             std::string targetCollectorTypeId,
+                                             R (C::*traceSink) (P1, P2)) const
 {
-public:
-  /**
-   * \brief
-   * \param satHelper
-   */
-  SatStatsHelperContainer (Ptr<const SatHelper> satHelper);
+  NS_ASSERT (sourceCollectorMap.size () == targetCollectorMap.size ());
 
-  // inherited from ObjectBase base class
-  static TypeId GetTypeId ();
+  for (SatStatsHelper::CollectorMap_t::iterator it1 = sourceCollectorMap.begin ();
+       it1 != sourceCollectorMap.end (); ++it1)
+    {
+      const uint32_t identifier = it1->first;
+      SatStatsHelper::CollectorMap_t::iterator it2 = targetCollectorMap.find (identifier);
+      NS_ASSERT_MSG (it2 != targetCollectorMap.end (),
+                     "Unable to find target collector with identifier " << identifier);
 
-  /**
-   * \param name
-   */
-  void SetName (std::string name);
+      if (!ConnectCollectorToCollector (it1->second,
+                                        sourceCollectorTypeId,
+                                        traceSourceName,
+                                        it2->second,
+                                        targetCollectorTypeId,
+                                        traceSink))
+        {
+          return false;
+        }
+    }
 
-  /**
-   * \return
-   */
-  std::string GetName () const;
+  return true;
+}
 
-  void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
-  //void AddPerUtFwdThroughput (SatStatsHelper::OutputType_t outputType);
+template<typename R, typename C, typename P1, typename P2>
+bool
+SatStatsHelper::ConnectCollectorToCollector (SatStatsHelper::CollectorMap_t &sourceCollectorMap,
+                                             std::string sourceCollectorTypeId,
+                                             std::string traceSourceName,
+                                             Ptr<DataCollectionObject> targetCollector,
+                                             std::string targetCollectorTypeId,
+                                             R (C::*traceSink) (P1, P2)) const
+{
+  for (SatStatsHelper::CollectorMap_t::iterator it = sourceCollectorMap.begin ();
+       it != sourceCollectorMap.end (); ++it)
+    {
+      if (!ConnectCollectorToCollector (it->second,
+                                        sourceCollectorTypeId,
+                                        traceSourceName,
+                                        targetCollector,
+                                        targetCollectorTypeId,
+                                        traceSink))
+        {
+          return false;
+        }
+    }
 
-  //void AddPerBeamFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  return true;
+}
 
-  //void AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
-  /**
-   * \param outputType
-   * \return
-   */
-  static std::string GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType);
+template<typename R, typename C, typename P1, typename P2>
+bool
+SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
+                                             std::string sourceCollectorTypeId,
+                                             std::string traceSourceName,
+                                             SatStatsHelper::CollectorMap_t &targetCollectorMap,
+                                             std::string targetCollectorTypeId,
+                                             R (C::*traceSink) (P1, P2)) const
+{
+  for (SatStatsHelper::CollectorMap_t::iterator it = targetCollectorMap.begin ();
+       it != targetCollectorMap.end (); ++it)
+    {
+      if (!ConnectCollectorToCollector (sourceCollector,
+                                        sourceCollectorTypeId,
+                                        traceSourceName,
+                                        it->second,
+                                        targetCollectorTypeId,
+                                        traceSink))
+        {
+          return false;
+        }
+    }
 
-protected:
-  // Inherited from Object base class
-  virtual void DoDispose ();
+  return true;
+}
 
-private:
 
-  Ptr<const SatHelper> m_satHelper;
+template<typename R, typename C, typename P1, typename P2>
+bool
+SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCollector,
+                                             std::string sourceCollectorTypeId,
+                                             std::string traceSourceName,
+                                             Ptr<DataCollectionObject> targetCollector,
+                                             std::string targetCollectorTypeId,
+                                             R (C::*traceSink) (P1, P2)) const
+{
+//  NS_LOG_FUNCTION (this << sourceCollector->GetName () << traceSourceName
+//                        << targetCollector->GetName ());
 
-  std::string m_name;
+  // Confirm that the source has the right type and the specified trace source.
+  TypeId sourceTid = TypeId::LookupByName (sourceCollectorTypeId);
+  NS_ASSERT (sourceCollector->GetObject<DataCollectionObject> (sourceTid));
+  NS_ASSERT (sourceTid.LookupTraceSourceByName (traceSourceName) != 0);
 
-  std::list<Ptr<const SatStatsHelper> > m_stats;
+  // Confirm that the target has the right type.
+  //TypeId targetTid = TypeId::LookupByName (targetCollectorTypeId);
+  //NS_ASSERT (targetCollector->GetObject<DataCollectionObject> (targetTid));
+  Ptr<C> target = targetCollector->GetObject<C> ();
 
-}; // end of class StatStatsHelperContainer
+  return sourceCollector->TraceConnectWithoutContext (traceSourceName,
+                                                      MakeCallback (traceSink,
+                                                                    target));
+}
 
 
 } // end of namespace ns3
