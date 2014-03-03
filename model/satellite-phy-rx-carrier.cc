@@ -220,8 +220,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           Mac48Address dest;
           Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
 
-          for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
-                ((i != rxParams->m_packetBuffer.end ()) && (ownAddressFound == false) ); i++)
+          for ( SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
+                ((i != rxParams->m_packetsInBurst.end ()) && (ownAddressFound == false) ); i++)
             {
               SatMacTag tag;
               (*i)->PeekPacketTag (tag);

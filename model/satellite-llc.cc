@@ -275,14 +275,6 @@ SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t fl
 
   if (it == m_encaps.end ())
     {
-      // Create a new transmission queue for the encapsulator
-      Ptr<SatQueue> queue = CreateObject<SatQueue> (flowId);
-
-      // Callback to Request manager
-      SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, m_requestManager);
-      queue->AddQueueEventCallback (rmCb);
-      enc->SetQueue (queue);
-
       m_encaps.insert(std::make_pair (key, enc));
     }
   else

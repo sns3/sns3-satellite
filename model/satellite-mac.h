@@ -33,6 +33,7 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-phy.h"
 #include "satellite-node-info.h"
+#include "satellite-queue.h"
 
 
 namespace ns3 {
@@ -159,6 +160,15 @@ public:
    * \return Id of the written message.
    */
   uint32_t WriteCtrlMsgToContainer (Ptr<SatControlMessage> msg);
+
+  /**
+   * Receive a queue event:
+   * - FIRST_BUFFER_RCVD
+   * - BUFFER_EMPTY
+   * /param event Queue event from SatQueue
+   * /param flowIndex Identifier of the queue
+   */
+  virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t flowIndex);
 
 private:
   SatMac& operator = (const SatMac &);

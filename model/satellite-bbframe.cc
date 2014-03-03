@@ -51,14 +51,14 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
     case SatEnums::NORMAL_FRAME:
       m_spaceInBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
       m_maxSpaceInBytes = m_spaceInBytes;
-      m_duration = conf->GetBbFrameLength (modCod, type);
+      m_duration = conf->GetBbFrameDuration (modCod, type);
       break;
 
     case SatEnums::DUMMY_FRAME:
       // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
       m_spaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
       m_maxSpaceInBytes = m_spaceInBytes;
-      m_duration = conf->GetDummyBbFrameLength ();
+      m_duration = conf->GetDummyBbFrameDuration ();
       break;
 
     default:

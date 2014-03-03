@@ -65,7 +65,7 @@ public:
    * this is transmit buffer including packet pointers.
    */
 
-  TransmitBuffer_t m_packetBuffer;
+  TransmitBuffer_t m_packetsInBurst;
 
   /**
    * The beam for the packet transmission

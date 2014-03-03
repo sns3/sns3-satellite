@@ -286,12 +286,28 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // layer.
   uint8_t controlFlowId (0);
   Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, controlFlowId);
+
+  // Create queue event callbacks to MAC and RM
+  SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+  SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
+
+  // Create a queue
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (controlFlowId);
+  queue->AddQueueEventCallback (macCb);
+  queue->AddQueueEventCallback (rmCb);
+  utEncap->SetQueue (queue);
   llc->AddEncap (addr, utEncap, controlFlowId); // Tx
+
   Ptr<SatReturnLinkEncapsulator> gwDecap;
 
   for (uint8_t rc = 1; rc <= rcIndeces; ++rc)
     {
       utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
+
+      queue = CreateObject<SatQueue> (rc);
+      queue->AddQueueEventCallback (macCb);
+      queue->AddQueueEventCallback (rmCb);
+      utEncap->SetQueue (queue);
       llc->AddEncap (addr, utEncap, rc); // Tx
 
       // Create encapsulator and add it to GW's LLC
@@ -309,35 +325,24 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create control container for each LLC only once.
   if (!gwLlc->ControlEncapsulatorCreated ())
     {
+      queue = CreateObject<SatQueue> (controlFlowId);
       gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), controlFlowId);
+      gwEncap->SetQueue (queue);
       gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, controlFlowId); // Tx
     }
 
   // User data
+  queue = CreateObject<SatQueue> (1);
   gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, 1);
+  gwEncap->SetQueue (queue);
   gwLlc->AddEncap (addr, gwEncap, 1); // Tx
 
   Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, 1);
   utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
   llc->AddDecap (addr, utDecap, 1); // Rx
 
-  // set serving GW MAC address to UT MAC and RM
-  mac->SetGwAddress (gwAddr);
+  // set serving GW MAC address to RM
   rm->SetGwAddress (gwAddr);
-
-  /*
-  // Create and set control packet queue to LLC
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (0);
-  llc->SetQueue (queue);
-
-  // Callback to Request manager
-  SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
-  queue->AddQueueEventCallback (rmCb);
-
-  // Callback to UT MAC
-  SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
-  queue->AddQueueEventCallback (macCb);
-   */
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));

@@ -111,7 +111,7 @@ public:
    * /param event Queue event from SatQueue
    * /param rcIndex Identifier of the queue
    */
-  void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
+  virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
    * Set address of the GW (or its MAC) serving this UT.
@@ -308,11 +308,6 @@ private:
    * The configured lower layer service configuration for this UT MAC.
    */
   Ptr<SatLowerLayerServiceConf> m_llsConf;
-
-  /**
-   * Serving GW's address.
-   */
-  Mac48Address m_gwAddress;
 
   /**
    * Frame PDU header size in bytes. Note, that this is explicitly

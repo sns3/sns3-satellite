@@ -46,9 +46,9 @@ SatSignalParameters::SatSignalParameters () :
 
 SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
 {
-  for ( TransmitBuffer_t::const_iterator i = p.m_packetBuffer.begin(); i != p.m_packetBuffer.end(); i++  )
+  for ( TransmitBuffer_t::const_iterator i = p.m_packetsInBurst.begin (); i != p.m_packetsInBurst.end (); i++  )
     {
-      m_packetBuffer.push_back ((*i)->Copy ());
+      m_packetsInBurst.push_back ((*i)->Copy ());
     }
 
   m_beamId = p.m_beamId;

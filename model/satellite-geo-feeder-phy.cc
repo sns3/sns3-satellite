@@ -188,7 +188,7 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
                  m_nodeInfo->GetMacAddress (),
                  SatEnums::LL_PHY,
                  SatEnums::LD_RETURN,
-                 SatUtils::GetPacketInfo (txParams->m_packetBuffer));
+                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
 
   // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
   // and antenna gain getting at receiver (UT or GW)
@@ -212,9 +212,9 @@ SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams)
                  m_nodeInfo->GetMacAddress (),
                  SatEnums::LL_PHY,
                  SatEnums::LD_FORWARD,
-                 SatUtils::GetPacketInfo (rxParams->m_packetBuffer));
+                 SatUtils::GetPacketInfo (rxParams->m_packetsInBurst));
 
-  m_rxCallback ( rxParams->m_packetBuffer, rxParams);
+  m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
 }
 
 double

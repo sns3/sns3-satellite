@@ -104,10 +104,17 @@ SatMac::WriteCtrlMsgToContainer (Ptr<SatControlMessage> msg)
 }
 
 void
+SatMac::ReceiveQueueEvent (SatQueue::QueueEvent_t /*event*/, uint8_t /*flowIndex*/)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
 SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration)
 {
-  // Use call back to send packet to lower layer
+  NS_LOG_FUNCTION (this);
 
+  // Use call back to send packet to lower layer
   m_txCallback (packets, carrierId, duration);
 }
 

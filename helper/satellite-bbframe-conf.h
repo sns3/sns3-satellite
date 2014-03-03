@@ -79,7 +79,7 @@ public:
   void SetCNoRequirement (double cnoRequirement);
 
   /**
-   * Get C/No requirement corresponding a given PER target
+   * Get C/No requirement corresponding a given BLER target
    * \return C/No threshold in linear format
    */
   double GetCNoRequirement () const;
@@ -147,23 +147,23 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Initialize the C/No requirements for a given PER target
+   * Initialize the C/No requirements for a given BLER target
    * \param linkResults DVB-S2 link results
    */
   void InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults );
 
   /**
-   * Get the dummy frame length in Time
+   * Get the dummy frame duration in Time
    * \return The dummy BBFrame length in Time
    */
-  Time GetDummyBbFrameLength () const;
+  Time GetDummyBbFrameDuration () const;
 
   /**
-   * Get the BB frame frame length
+   * Get the BB frame frame duration
    * \param modcod MODCOD
    * \param frameType BB frame type: short, normal
    */
-  Time GetBbFrameLength (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
+  Time GetBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
    * Get the BB frame payload in bits
@@ -198,13 +198,13 @@ private:
   uint32_t CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
-   * Calculate the BBFrame length in Time
+   * Calculate the BBFrame duration in Time
    * \param modcod Used MODCOD in the BBFrame
    * \param frameType Used BBFrame type (short OR normal)
    * \param symbolRate The symbol rate of the scheduled carrier
    * \return The BBFrame length in Time
    */
-  Time CalculateBbFrameLength (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
+  Time CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
    * Symbol rate
@@ -237,10 +237,10 @@ private:
   uint32_t m_dummyFrameInSlots;
 
   /**
-   * Packet error rate target for the waveforms. Default value
+   * Block error rate target for the waveforms. Default value
    * set as an attribute to 10^(-5).
    */
-  double m_perTarget;
+  double m_targetBler;
 
   /**
    * Flag to indicate whether ACM is enabled or disabled. If ACM is
@@ -259,8 +259,8 @@ private:
    */
   SatEnums::SatModcod_t m_defaultModCod;
 
-  std::map<uint32_t, uint32_t> m_payloadsShortFrame;
-  std::map<uint32_t, uint32_t> m_payloadsNormalFrame;
+  std::map<uint32_t, uint32_t> m_shortFramePayloadBits;
+  std::map<uint32_t, uint32_t> m_normalFramePayloadBits;
 
   /**
    * Available "waveforms", i.e. MODCOD + BBFrame combinations

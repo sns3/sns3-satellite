@@ -27,6 +27,8 @@ namespace ns3 {
 
 
 SatBbFrameContainer::SatBbFrameContainer ()
+: m_priorityClassCount (2),
+  m_totalDuration (Seconds (0))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor of SatBbFrameContainer not supported.");

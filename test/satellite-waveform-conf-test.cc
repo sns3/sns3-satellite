@@ -177,7 +177,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
           ++it)
         {
           // Get BBFrame length in Time
-          Time l = bbFrameConf->GetBbFrameLength ((*it), frameTypes[i]);
+          Time l = bbFrameConf->GetBbFrameDuration ((*it), frameTypes[i]);
 
           // Get BBFrame payload in bits
           uint32_t p = bbFrameConf->GetBbFramePayloadBits (*it, frameTypes[i]);

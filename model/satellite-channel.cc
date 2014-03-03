@@ -47,7 +47,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
- : m_phyList (),
+ : m_rxMode (SatChannel::ALL_BEAMS),
+   m_phyList (),
    m_channelType (SatEnums::UNKNOWN_CH),
    m_carrierFreqConverter (),
    m_freqId (),
@@ -486,7 +487,7 @@ SatChannel::GetSourceAddress (Ptr<SatSignalParameters> rxParams)
 {
   SatMacTag tag;
 
-  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetBuffer.begin ();
+  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
 
   if (*i == NULL)
   {

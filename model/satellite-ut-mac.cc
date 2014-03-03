@@ -89,7 +89,6 @@ SatUtMac::SatUtMac ()
    m_timingAdvanceCb (0),
    m_ctrlCallback (0),
    m_llsConf (0),
-   m_gwAddress (),
    m_framePduHeaderSizeInBytes (1),
    m_randomAccess (NULL),
    m_guardTime (MicroSeconds (1)),
@@ -107,7 +106,6 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
    m_timingAdvanceCb (0),
    m_ctrlCallback (0),
    m_llsConf (0),
-   m_gwAddress (),
    m_framePduHeaderSizeInBytes (1),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0)
@@ -135,14 +133,6 @@ SatUtMac::DoDispose (void)
   m_tbtpContainer->DoDispose ();
 
   SatMac::DoDispose ();
-}
-
-void
-SatUtMac::SetGwAddress (Mac48Address gwAddress)
-{
-  NS_LOG_FUNCTION (this);
-
-  m_gwAddress = gwAddress;
 }
 
 void

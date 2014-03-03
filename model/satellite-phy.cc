@@ -272,7 +272,7 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration )
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
   txParams->m_phyTx = m_phyTx;
-  txParams->m_packetBuffer = p;
+  txParams->m_packetsInBurst = p;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_sinr = 0;
@@ -319,12 +319,12 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
                  m_nodeInfo->GetMacAddress (),
                  SatEnums::LL_PHY,
                  ld,
-                 SatUtils::GetPacketInfo (rxParams->m_packetBuffer));
+                 SatUtils::GetPacketInfo (rxParams->m_packetsInBurst));
 
   // If there was a PHY error, packet dropped here
   if (!phyError)
     {
-      m_rxCallback ( rxParams->m_packetBuffer, rxParams);
+      m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
     }
 }
 
