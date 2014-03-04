@@ -33,6 +33,7 @@
 #include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
+#include <ns3/gnuplot-aggregator.h>
 #include <sstream>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsFwdThroughputHelper");
@@ -168,6 +169,8 @@ SatStatsFwdThroughputHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
+  // TODO: Add collectors to convert bytes to kilobytes.
+
   switch (GetOutputType ())
     {
     case OUTPUT_NONE:
@@ -180,10 +183,8 @@ SatStatsFwdThroughputHelper::DoInstall ()
                                          "MultiFileMode", BooleanValue (false));
         CreateCollectors ("ns3::ScalarCollector",
                           m_terminalCollectors,
-                          "InputDataType",
-                          EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
-                          "OutputType",
-                          EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
+                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
+                          "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
         ConnectCollectorsToAggregator (m_terminalCollectors,
                                        "Output",
                                        m_aggregator,
@@ -200,8 +201,7 @@ SatStatsFwdThroughputHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         CreateCollectors ("ns3::IntervalRateCollector",
                           m_terminalCollectors,
-                          "InputDataType",
-                          EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
         ConnectCollectorsToAggregator (m_terminalCollectors,
                                        "OutputWithTime",
                                        m_aggregator,
@@ -215,8 +215,42 @@ SatStatsFwdThroughputHelper::DoInstall ()
     case OUTPUT_HISTOGRAM_FILE:
     case OUTPUT_PDF_FILE:
     case OUTPUT_CDF_FILE:
+      break;
+
     case OUTPUT_SCALAR_PLOT:
+      // TODO: Add support for boxes in Gnuplot.
+      break;
+
     case OUTPUT_SCATTER_PLOT:
+      {
+        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        //plot->SetTitle ("");
+        plotAggregator->SetLegend ("Time (in seconds)",
+                                   "Received throughput (in bytes per second)");
+        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+
+        CreateCollectors ("ns3::IntervalRateCollector",
+                          m_terminalCollectors,
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+
+        for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
+             it != m_terminalCollectors.end (); ++it)
+          {
+            const std::string context = it->second->GetName ();
+            plotAggregator->Add2dDataset (context, context);
+          }
+
+        m_aggregator = plotAggregator;
+        ConnectCollectorsToAggregator (m_terminalCollectors,
+                                       "OutputWithTime",
+                                       m_aggregator,
+                                       &GnuplotAggregator::Write2d);
+        InstallProbes (GetSatHelper ()->GetUtUsers (),
+                       m_terminalCollectors,
+                       &IntervalRateCollector::TraceSinkUinteger32);
+        break;
+      }
+
     case OUTPUT_HISTOGRAM_PLOT:
     case OUTPUT_PDF_PLOT:
     case OUTPUT_CDF_PLOT:

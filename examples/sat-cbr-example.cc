@@ -117,8 +117,9 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
   LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
-  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
