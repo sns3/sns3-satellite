@@ -76,32 +76,6 @@ private:
                       CollectorMap_t &collectorMap,
                       R (C::*collectorTraceSink) (P1, P2));
 
-  /**
-   * \brief Connect the collectors to the aggregator.
-   * \param collectorMap
-   * \param collectorTraceSourceName
-   * \param aggregator
-   * \param aggregatorTraceSink
-   */
-  template<typename R, typename C, typename P1, typename V1>
-  void ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
-                                      std::string collectorTraceSourceName,
-                                      Ptr<DataCollectionObject> aggregator,
-                                      R (C::*aggregatorTraceSink) (P1, V1)) const;
-
-  /**
-   * \brief Connect the collectors to the aggregator.
-   * \param collectorMap
-   * \param collectorTraceSourceName
-   * \param aggregator
-   * \param aggregatorTraceSink
-   */
-  template<typename R, typename C, typename P1, typename V1, typename V2>
-  void ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
-                                      std::string collectorTraceSourceName,
-                                      Ptr<DataCollectionObject> aggregator,
-                                      R (C::*aggregatorTraceSink) (P1, V1, V2)) const;
-
 }; // end of class SatStatsFwdThroughputHelper
 
 

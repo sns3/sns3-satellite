@@ -306,6 +306,33 @@ protected:
                                     Ptr<DataCollectionObject> targetCollector,
                                     R (C::*traceSink) (P1, P2)) const;
 
+
+  /**
+   * \brief Connect the collectors to the aggregator.
+   * \param collectorMap
+   * \param collectorTraceSourceName
+   * \param aggregator
+   * \param aggregatorTraceSink
+   */
+  template<typename R, typename C, typename P1, typename V1>
+  bool ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
+                                      std::string collectorTraceSourceName,
+                                      Ptr<DataCollectionObject> aggregator,
+                                      R (C::*aggregatorTraceSink) (P1, V1)) const;
+
+  /**
+   * \brief Connect the collectors to the aggregator.
+   * \param collectorMap
+   * \param collectorTraceSourceName
+   * \param aggregator
+   * \param aggregatorTraceSink
+   */
+  template<typename R, typename C, typename P1, typename V1, typename V2>
+  bool ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
+                                      std::string collectorTraceSourceName,
+                                      Ptr<DataCollectionObject> aggregator,
+                                      R (C::*aggregatorTraceSink) (P1, V1, V2)) const;
+
   // IDENTIFIER RELATED METHODS ///////////////////////////////////////////////
 
   /**
@@ -497,6 +524,63 @@ SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCol
   return sourceCollector->TraceConnectWithoutContext (traceSourceName,
                                                       MakeCallback (traceSink,
                                                                     target));
+}
+
+
+template<typename R, typename C, typename P1, typename V1>
+bool
+SatStatsHelper::ConnectCollectorsToAggregator (SatStatsHelper::CollectorMap_t &collectorMap,
+                                               std::string collectorTraceSourceName,
+                                               Ptr<DataCollectionObject> aggregator,
+                                               R (C::*aggregatorTraceSink) (P1, V1)) const
+{
+  for (SatStatsHelper::CollectorMap_t::iterator it = collectorMap.begin ();
+       it != collectorMap.end (); ++it)
+    {
+      Ptr<DataCollectionObject> collector = it->second;
+      NS_ASSERT (it->second != 0);
+      const std::string context = collector->GetName ();
+      Ptr<C> target = aggregator->GetObject<C> ();
+      NS_ASSERT (target != 0);
+      if (!collector->TraceConnect (collectorTraceSourceName,
+                                    context,
+                                    MakeCallback (aggregatorTraceSink,
+                                                  target)))
+        {
+          return false;
+        }
+    }
+
+  return true;
+}
+
+
+template<typename R, typename C, typename P1, typename V1, typename V2>
+bool
+SatStatsHelper::ConnectCollectorsToAggregator (SatStatsHelper::CollectorMap_t &collectorMap,
+                                               std::string collectorTraceSourceName,
+                                               Ptr<DataCollectionObject> aggregator,
+                                               R (C::*aggregatorTraceSink) (P1, V1, V2)) const
+{
+  // The following code is exactly the same as the previous function's code.
+  for (SatStatsHelper::CollectorMap_t::iterator it = collectorMap.begin ();
+       it != collectorMap.end (); ++it)
+    {
+      Ptr<DataCollectionObject> collector = it->second;
+      NS_ASSERT (it->second != 0);
+      const std::string context = collector->GetName ();
+      Ptr<C> target = aggregator->GetObject<C> ();
+      NS_ASSERT (target != 0);
+      if (!collector->TraceConnect (collectorTraceSourceName,
+                                    context,
+                                    MakeCallback (aggregatorTraceSink,
+                                                  target)))
+        {
+          return false;
+        }
+    }
+
+  return true;
 }
 
 
