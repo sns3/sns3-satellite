@@ -247,33 +247,46 @@ KpiHelper::Print ()
   std::map<Ipv4Address, ClientCounter_t>::const_iterator it2;
   for (it2 = m_clientCounters.begin (); it2 != m_clientCounters.end (); ++it2)
     {
-      NS_ASSERT (it2->second.appStop.GetSeconds () > 0);
-      NS_ASSERT (it2->second.appStart.GetSeconds () > 0);
-      NS_ASSERT (it2->second.appStop.GetSeconds () > it2->second.appStart.GetSeconds ());
+      if (it2->second.appStop.GetSeconds () > 0 && it2->second.appStart.GetSeconds () > 0)
+        {
+          NS_ASSERT (it2->second.appStop.GetSeconds () > it2->second.appStart.GetSeconds ());
 
-      Time length = it2->second.appStop - it2->second.appStart;
-      const double userThroughput = GetKbps (it2->second.rxBytes, length);
-      sumUserTroughputs += userThroughput;
-      std::cout << std::setw (16) << AddressToString (it2->first)
-                << std::setw (16) << it2->second.txPackets
-                << std::setw (16) << it2->second.txBytes
-                << std::setw (16) << it2->second.rxPackets
-                << std::setw (16) << it2->second.rxBytes
-                << std::setw (16) << it2->second.rxIpLevelPackets
-                << std::setw (16) << userThroughput
-                << std::endl;
-      sumTxBytes += it2->second.txBytes;
-      sumRxBytes += it2->second.rxBytes;
-      sumTxPackets += it2->second.txPackets;
-      sumRxPackets += it2->second.rxPackets;
-      sumRxIpLevelPackets += it2->second.rxIpLevelPackets;
-      sumPacketDelaySecond += it2->second.sumPacketDelay;
+          Time length = it2->second.appStop - it2->second.appStart;
+          const double userThroughput = GetKbps (it2->second.rxBytes, length);
+          sumUserTroughputs += userThroughput;
+          std::cout << std::setw (16) << AddressToString (it2->first)
+                    << std::setw (16) << it2->second.txPackets
+                    << std::setw (16) << it2->second.txBytes
+                    << std::setw (16) << it2->second.rxPackets
+                    << std::setw (16) << it2->second.rxBytes
+                    << std::setw (16) << it2->second.rxIpLevelPackets
+                    << std::setw (16) << userThroughput
+                    << std::endl;
+          sumTxBytes += it2->second.txBytes;
+          sumRxBytes += it2->second.rxBytes;
+          sumTxPackets += it2->second.txPackets;
+          sumRxPackets += it2->second.rxPackets;
+          sumRxIpLevelPackets += it2->second.rxIpLevelPackets;
+          sumPacketDelaySecond += it2->second.sumPacketDelay;
+        }
     }
 
   // PRINT FOOTER
-  const double sumThroughput = GetKbps (sumRxBytes, Simulator::Now ());
-  const double avgErrorRatio = (sumTxPackets - sumRxPackets) / (double)(sumTxPackets);
-  const double avgDelaySecond = sumPacketDelaySecond.GetSeconds () / sumRxIpLevelPackets;
+  double sumThroughput = 0;
+  double avgErrorRatio = 0;
+  double avgDelaySecond = 0;
+  sumThroughput = GetKbps (sumRxBytes, Simulator::Now ());
+
+  if (sumTxPackets > 0)
+    {
+      avgErrorRatio = (sumTxPackets - sumRxPackets) / (double)(sumTxPackets);
+    }
+
+  if (sumRxIpLevelPackets > 0)
+    {
+      avgDelaySecond = sumPacketDelaySecond.GetSeconds () / sumRxIpLevelPackets;
+    }
+
   std::cout << "-------------------------------------------------------------------------" << std::endl;
   std::cout << std::setw (16) << "SumTxBytes [B]"
             << std::setw (16) << "SumRxBytes [B]"
@@ -292,7 +305,6 @@ KpiHelper::Print ()
             << std::endl;
 
   std::cout << "-------------------------------------------------------------------------" << std::endl;
-
 }
 
 void

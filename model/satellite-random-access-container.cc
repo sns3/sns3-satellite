@@ -213,7 +213,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTrigger
     }
   else if (txOpportunities.txOpportunityType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
     {
-      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " seconds");
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " milliseconds");
     }
   else if (txOpportunities.txOpportunityType == SatRandomAccess::RA_DO_NOTHING)
     {
