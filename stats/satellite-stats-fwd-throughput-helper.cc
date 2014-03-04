@@ -21,12 +21,16 @@
 
 #include "satellite-stats-fwd-throughput-helper.h"
 #include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/string.h>
+#include <ns3/boolean.h>
 #include <ns3/node-container.h>
 #include <ns3/application.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/data-collection-object.h>
 #include <ns3/probe.h>
 #include <ns3/application-packet-probe.h>
+#include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <sstream>
@@ -49,17 +53,16 @@ SatStatsFwdThroughputHelper::~SatStatsFwdThroughputHelper ()
 }
 
 
+template<typename R, typename C, typename P1, typename P2>
 void
-SatStatsFwdThroughputHelper::DoInstall ()
+SatStatsFwdThroughputHelper::InstallProbes (NodeContainer userNodes,
+                                            CollectorMap_t &collectorMap,
+                                            R (C::*collectorTraceSink) (P1, P2))
 {
   NS_LOG_FUNCTION (this);
 
-  // Create interval rate collectors.
-  CreateCollectors ("ns3::IntervalRateCollector", m_intervalRateCollectors);
-
-  // Create a probe for each UT user's application inside the container.
-  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
-  for (NodeContainer::Iterator it = utUsers.Begin (); it != utUsers.End (); ++it)
+  for (NodeContainer::Iterator it = userNodes.Begin ();
+       it != userNodes.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
       const uint32_t identifier = GetUtUserIdentifier (*it);
@@ -74,60 +77,154 @@ SatStatsFwdThroughputHelper::DoInstall ()
                                            "ns3::ApplicationPacketProbe",
                                            "OutputBytes",
                                            identifier,
-                                           m_intervalRateCollectors,
-                                           &IntervalRateCollector::TraceSinkUinteger32);
+                                           collectorMap,
+                                           collectorTraceSink);
           if (probe != 0)
             {
+              NS_LOG_INFO (this << " created probe " << probeName
+                                << ", connected to collector " << identifier);
               m_probes.push_back (probe);
+            }
+          else
+            {
+              NS_LOG_WARN (this << " unable to create probe " << probeName
+                                << " nor connect it to collector " << identifier);
             }
         }
     }
+}
 
-  CreateAggregator ();
 
-  // Connect the terminal collectors to the aggregator and the interval collectors.
-  for (SatStatsHelper::CollectorMap_t::iterator it = m_intervalRateCollectors.begin ();
-       it != m_intervalRateCollectors.end (); ++it)
+template<typename R, typename C, typename P1, typename V1>
+void
+SatStatsFwdThroughputHelper::ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
+                                                            std::string collectorTraceSourceName,
+                                                            Ptr<DataCollectionObject> aggregator,
+                                                            R (C::*aggregatorTraceSink) (P1, V1)) const
+{
+  NS_LOG_FUNCTION (this);
+
+  for (SatStatsHelper::CollectorMap_t::iterator it = collectorMap.begin ();
+       it != collectorMap.end (); ++it)
     {
       Ptr<DataCollectionObject> collector = it->second;
       NS_ASSERT (it->second != 0);
       const std::string context = collector->GetName ();
+      Ptr<C> target = aggregator->GetObject<C> ();
+      NS_ASSERT (target != 0);
+      if (collector->TraceConnect (collectorTraceSourceName,
+                                   context,
+                                   MakeCallback (aggregatorTraceSink,
+                                                 target)))
+        {
+          NS_LOG_INFO (this << " succesfully connected collector " << context
+                            << " to aggregator");
+        }
+      else
+        {
+          NS_LOG_WARN (this << " unable to connect collector " << context
+                            << " to aggregator");
+        }
+    }
+}
 
-      switch (GetOutputType ())
+
+template<typename R, typename C, typename P1, typename V1, typename V2>
+void
+SatStatsFwdThroughputHelper::ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
+                                                            std::string collectorTraceSourceName,
+                                                            Ptr<DataCollectionObject> aggregator,
+                                                            R (C::*aggregatorTraceSink) (P1, V1, V2)) const
+{
+  NS_LOG_FUNCTION (this);
+
+  for (SatStatsHelper::CollectorMap_t::iterator it = collectorMap.begin ();
+       it != collectorMap.end (); ++it)
+    {
+      Ptr<DataCollectionObject> collector = it->second;
+      NS_ASSERT (it->second != 0);
+      const std::string context = collector->GetName ();
+      Ptr<C> target = aggregator->GetObject<C> ();
+      NS_ASSERT (target != 0);
+      if (collector->TraceConnect (collectorTraceSourceName,
+                                   context,
+                                   MakeCallback (aggregatorTraceSink,
+                                                 target)))
+        {
+          NS_LOG_INFO (this << " succesfully connected collector " << context
+                            << " to aggregator");
+        }
+      else
+        {
+          NS_LOG_WARN (this << " unable to connect collector " << context
+                            << " to aggregator");
+        }
+    }
+}
+
+
+void
+SatStatsFwdThroughputHelper::DoInstall ()
+{
+  NS_LOG_FUNCTION (this);
+
+  switch (GetOutputType ())
+    {
+    case OUTPUT_NONE:
+      break;
+
+    case OUTPUT_SCALAR_FILE:
       {
-        case OUTPUT_NONE:
-        case OUTPUT_SCALAR_FILE:
-          break;
-
-        case OUTPUT_SCATTER_FILE:
-          {
-            Ptr<MultiFileAggregator> aggregator
-              = GetAggregator ()->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (aggregator != 0);
-            bool ret = collector->TraceConnect ("OutputWithTime",
-                                                context,
-                                                MakeCallback (&MultiFileAggregator::Write2d,
-                                                              aggregator));
-            NS_ASSERT_MSG (ret,
-                           "Failed to connect collector " << context
-                                                          << " to aggregator");
-            break;
-          }
-
-        case OUTPUT_HISTOGRAM_FILE:
-        case OUTPUT_PDF_FILE:
-        case OUTPUT_CDF_FILE:
-        case OUTPUT_SCALAR_PLOT:
-        case OUTPUT_SCATTER_PLOT:
-        case OUTPUT_HISTOGRAM_PLOT:
-        case OUTPUT_PDF_PLOT:
-        case OUTPUT_CDF_PLOT:
-          break;
-
-        default:
-          NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
-          break;
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName () + ".txt"),
+                                         "MultiFileMode", BooleanValue (false));
+        CreateCollectors ("ns3::ScalarCollector",
+                          m_terminalCollectors,
+                          "InputDataType",
+                          EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
+                          "OutputType",
+                          EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
+        ConnectCollectorsToAggregator (m_terminalCollectors,
+                                       "Output",
+                                       m_aggregator,
+                                       &MultiFileAggregator::Write1d);
+        InstallProbes (GetSatHelper ()->GetUtUsers (),
+                       m_terminalCollectors,
+                       &ScalarCollector::TraceSinkUinteger32);
+        break;
       }
+
+    case OUTPUT_SCATTER_FILE:
+      {
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName ()));
+        CreateCollectors ("ns3::IntervalRateCollector",
+                          m_terminalCollectors,
+                          "InputDataType",
+                          EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+        ConnectCollectorsToAggregator (m_terminalCollectors,
+                                       "OutputWithTime",
+                                       m_aggregator,
+                                       &MultiFileAggregator::Write2d);
+        InstallProbes (GetSatHelper ()->GetUtUsers (),
+                       m_terminalCollectors,
+                       &IntervalRateCollector::TraceSinkUinteger32);
+        break;
+      }
+
+    case OUTPUT_HISTOGRAM_FILE:
+    case OUTPUT_PDF_FILE:
+    case OUTPUT_CDF_FILE:
+    case OUTPUT_SCALAR_PLOT:
+    case OUTPUT_SCATTER_PLOT:
+    case OUTPUT_HISTOGRAM_PLOT:
+    case OUTPUT_PDF_PLOT:
+    case OUTPUT_CDF_PLOT:
+      break;
+
+    default:
+      NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
+      break;
     }
 
 } // end of `void DoInstall ();`

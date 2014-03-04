@@ -128,10 +128,11 @@ main (int argc, char *argv[])
 
   LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
   LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("PacketDataRateCollector", LOG_PREFIX_ALL);
-  LogComponentEnable ("PacketDataRateCollector", LOG_LEVEL_ALL);
+  LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
+  LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();

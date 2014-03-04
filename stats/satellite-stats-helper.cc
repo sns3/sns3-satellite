@@ -38,19 +38,19 @@ namespace ns3 {
 
 
 std::string // static
-SatStatsHelper::GetIdentiferTypeName (IdentifierType_t identifierType)
+SatStatsHelper::GetIdentiferTypeName (SatStatsHelper::IdentifierType_t identifierType)
 {
   switch (identifierType)
     {
-    case IDENTIFIER_GLOBAL:
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
       return "IDENTIFIER_GLOBAL";
-    case IDENTIFIER_GW:
+    case SatStatsHelper::IDENTIFIER_GW:
       return "IDENTIFIER_GW";
-    case IDENTIFIER_BEAM:
+    case SatStatsHelper::IDENTIFIER_BEAM:
       return "IDENTIFIER_BEAM";
-    case IDENTIFIER_UT:
+    case SatStatsHelper::IDENTIFIER_UT:
       return "IDENTIFIER_UT";
-    case IDENTIFIER_UT_USER:
+    case SatStatsHelper::IDENTIFIER_UT_USER:
       return "IDENTIFIER_UT_USER";
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
@@ -63,31 +63,31 @@ SatStatsHelper::GetIdentiferTypeName (IdentifierType_t identifierType)
 
 
 std::string // static
-SatStatsHelper::GetOutputTypeName (OutputType_t outputType)
+SatStatsHelper::GetOutputTypeName (SatStatsHelper::OutputType_t outputType)
 {
   switch (outputType)
     {
-    case OUTPUT_NONE:
+    case SatStatsHelper::OUTPUT_NONE:
       return "OUTPUT_NONE";
-    case OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
       return "OUTPUT_SCALAR_FILE";
-    case OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
       return "OUTPUT_SCATTER_FILE";
-    case OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
       return "OUTPUT_HISTOGRAM_FILE";
-    case OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
       return "OUTPUT_PDF_FILE";
-    case OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
       return "OUTPUT_CDF_FILE";
-    case OUTPUT_SCALAR_PLOT:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       return "OUTPUT_SCALAR_PLOT";
-    case OUTPUT_SCATTER_PLOT:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       return "OUTPUT_SCATTER_PLOT";
-    case OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
       return "OUTPUT_HISTOGRAM_PLOT";
-    case OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
       return "OUTPUT_PDF_PLOT";
-    case OUTPUT_CDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
       return "OUTPUT_CDF_PLOT";
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
@@ -101,8 +101,8 @@ SatStatsHelper::GetOutputTypeName (OutputType_t outputType)
 
 SatStatsHelper::SatStatsHelper (Ptr<const SatHelper> satHelper)
   : m_name ("stat"),
-    m_identifierType (IDENTIFIER_GLOBAL),
-    m_outputType (OUTPUT_SCATTER_FILE),
+    m_identifierType (SatStatsHelper::IDENTIFIER_GLOBAL),
+    m_outputType (SatStatsHelper::OUTPUT_SCATTER_FILE),
     m_isInstalled (false),
     m_satHelper (satHelper)
 {
@@ -150,7 +150,7 @@ SatStatsHelper::GetName () const
 
 
 void
-SatStatsHelper::SetIdentifierType (IdentifierType_t identifierType)
+SatStatsHelper::SetIdentifierType (SatStatsHelper::IdentifierType_t identifierType)
 {
   NS_LOG_FUNCTION (this << GetIdentiferTypeName (identifierType));
 
@@ -175,7 +175,7 @@ SatStatsHelper::GetIdentifierType () const
 
 
 void
-SatStatsHelper::SetOutputType (OutputType_t outputType)
+SatStatsHelper::SetOutputType (SatStatsHelper::OutputType_t outputType)
 {
   if (m_isInstalled && (m_outputType != outputType))
     {
@@ -201,13 +201,6 @@ Ptr<const SatHelper>
 SatStatsHelper::GetSatHelper () const
 {
   return m_satHelper;
-}
-
-
-Ptr<DataCollectionObject>
-SatStatsHelper::GetAggregator () const
-{
-  return m_aggregator;
 }
 
 
@@ -249,105 +242,36 @@ SatStatsHelper::GetUtUserId (Ptr<Node> utUser)
 }
 
 
-void
-SatStatsHelper::CreateAggregator ()
+Ptr<DataCollectionObject>
+SatStatsHelper::CreateAggregator (std::string aggregatorTypeId,
+                                  std::string n1, const AttributeValue &v1,
+                                  std::string n2, const AttributeValue &v2,
+                                  std::string n3, const AttributeValue &v3,
+                                  std::string n4, const AttributeValue &v4,
+                                  std::string n5, const AttributeValue &v5)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << aggregatorTypeId);
 
-  switch (m_outputType)
-  {
-    case OUTPUT_NONE:
-      NS_LOG_WARN (this << " output type is not set yet; no aggregator is installed.");
-      m_aggregator = 0;
-      break;
-
-    case OUTPUT_SCALAR_FILE:
-    case OUTPUT_SCATTER_FILE:
-    case OUTPUT_HISTOGRAM_FILE:
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_CDF_FILE:
-      {
-        const std::string fileName = GetName ();
-        Ptr<MultiFileAggregator> multiFile = CreateObject<MultiFileAggregator> (fileName);
-        m_aggregator = multiFile;
-        break;
-      }
-
-    case OUTPUT_SCALAR_PLOT:
-    case OUTPUT_SCATTER_PLOT:
-    case OUTPUT_HISTOGRAM_PLOT:
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_PLOT:
-      m_aggregator = 0;  // TODO
-      break;
-
-    default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
-      break;
-  }
-}
-
-
-uint32_t
-SatStatsHelper::CreateTerminalCollectors (CollectorMap_t &collectorMap) const
-{
-  NS_LOG_FUNCTION (this);
-
-  NS_ASSERT_MSG (collectorMap.size () == 0,
-                 "The provided collector map is not empty");
-
-  // Create the collectors according to the output type and connect them to the aggregator.
-  switch (m_outputType)
-  {
-    case OUTPUT_NONE:
-      NS_LOG_WARN (this << " output type is not set yet; no collector is installed.");
-      return 0;
-
-    case OUTPUT_SCALAR_FILE:
-    case OUTPUT_SCALAR_PLOT:
-      return 0;  // TODO
-      break;
-
-    case OUTPUT_SCATTER_FILE:
-    case OUTPUT_SCATTER_PLOT:
-      {
-        const uint32_t n = CreateCollectors ("ns3::ScatterCollector",
-                                             collectorMap);
-        NS_LOG_INFO (this << " created " << n << " terminal ScatterCollector(s)"
-                          << " for " << GetIdentiferTypeName (GetIdentifierType())
-                          << " identifier");
-        NS_ASSERT (collectorMap.size () == n);
-        return n;
-        break;
-      }
-
-    case OUTPUT_HISTOGRAM_FILE:
-    case OUTPUT_HISTOGRAM_PLOT:
-      return 0;  // TODO
-      break;
-
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_PDF_PLOT:
-      return 0;  // TODO
-      break;
-
-    case OUTPUT_CDF_FILE:
-    case OUTPUT_CDF_PLOT:
-      return 0;  // TODO
-      break;
-
-    default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
-      break;
-  }
-
-  return 0;
+  TypeId tid = TypeId::LookupByName (aggregatorTypeId);
+  ObjectFactory factory;
+  factory.SetTypeId (tid);
+  factory.Set (n1, v1);
+  factory.Set (n2, v2);
+  factory.Set (n3, v3);
+  factory.Set (n4, v4);
+  factory.Set (n5, v5);
+  return factory.Create ()->GetObject<DataCollectionObject> ();
 }
 
 
 uint32_t
 SatStatsHelper::CreateCollectors (std::string collectorTypeId,
-                                  SatStatsHelper::CollectorMap_t &collectorMap) const
+                                  SatStatsHelper::CollectorMap_t &collectorMap,
+                                  std::string n1, const AttributeValue &v1,
+                                  std::string n2, const AttributeValue &v2,
+                                  std::string n3, const AttributeValue &v3,
+                                  std::string n4, const AttributeValue &v4,
+                                  std::string n5, const AttributeValue &v5) const
 {
   NS_LOG_FUNCTION (this << collectorTypeId);
 
@@ -355,10 +279,15 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
   TypeId tid = TypeId::LookupByName (collectorTypeId);
   ObjectFactory factory;
   factory.SetTypeId (tid);
+  factory.Set (n1, v1);
+  factory.Set (n2, v2);
+  factory.Set (n3, v3);
+  factory.Set (n4, v4);
+  factory.Set (n5, v5);
 
   switch (GetIdentifierType ())
     {
-    case IDENTIFIER_GLOBAL:
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
       {
         factory.Set ("Name", StringValue ("global"));
         collectorMap[0] = factory.Create ()->GetObject<DataCollectionObject> ();
@@ -366,11 +295,11 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
         break;
       }
 
-    case IDENTIFIER_GW:
+    case SatStatsHelper::IDENTIFIER_GW:
       // TODO
       break;
 
-    case IDENTIFIER_BEAM:
+    case SatStatsHelper::IDENTIFIER_BEAM:
       {
         std::list<uint32_t> beams = m_satHelper->GetBeamHelper ()->GetBeams ();
         for (std::list<uint32_t>::const_iterator it = beams.begin ();
@@ -386,7 +315,7 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
         break;
       }
 
-    case IDENTIFIER_UT:
+    case SatStatsHelper::IDENTIFIER_UT:
       {
         NodeContainer uts = m_satHelper->GetBeamHelper ()->GetUtNodes ();
         for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
@@ -401,7 +330,7 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
         break;
       }
 
-    case IDENTIFIER_UT_USER:
+    case SatStatsHelper::IDENTIFIER_UT_USER:
       {
         NodeContainer utUsers = m_satHelper->GetUtUsers ();
         for (NodeContainer::Iterator it = utUsers.Begin ();
@@ -436,13 +365,13 @@ SatStatsHelper::GetUtUserIdentifier (Ptr<Node> utUserNode) const
 {
   switch (m_identifierType)
     {
-    case IDENTIFIER_GLOBAL:
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
       return 0;
 
-    case IDENTIFIER_GW:
+    case SatStatsHelper::IDENTIFIER_GW:
       return 0; // TODO
 
-    case IDENTIFIER_BEAM:
+    case SatStatsHelper::IDENTIFIER_BEAM:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
         NS_ASSERT_MSG (utNode != 0,
@@ -453,7 +382,7 @@ SatStatsHelper::GetUtUserIdentifier (Ptr<Node> utUserNode) const
         return satIdMapper->GetBeamIdWithMac (utMac);
       }
 
-    case IDENTIFIER_UT:
+    case SatStatsHelper::IDENTIFIER_UT:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
         NS_ASSERT_MSG (utNode != 0,
@@ -462,7 +391,7 @@ SatStatsHelper::GetUtUserIdentifier (Ptr<Node> utUserNode) const
         return GetUtId (utNode);
       }
 
-    case IDENTIFIER_UT_USER:
+    case SatStatsHelper::IDENTIFIER_UT_USER:
       return GetUtUserId (utUserNode);
 
     default:
@@ -479,25 +408,25 @@ SatStatsHelper::GetUtIdentifier (Ptr<Node> utNode) const
 {
   switch (m_identifierType)
     {
-    case IDENTIFIER_GLOBAL:
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
       return 0;
 
-    case IDENTIFIER_GW:
+    case SatStatsHelper::IDENTIFIER_GW:
       return 0; // TODO
 
-    case IDENTIFIER_BEAM:
+    case SatStatsHelper::IDENTIFIER_BEAM:
       {
         const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
         return satIdMapper->GetBeamIdWithMac (utMac);
       }
 
-    case IDENTIFIER_UT:
+    case SatStatsHelper::IDENTIFIER_UT:
       {
         return GetUtId (utNode);
       }
 
-    case IDENTIFIER_UT_USER:
+    case SatStatsHelper::IDENTIFIER_UT_USER:
       return 0;
 
     default:
@@ -514,17 +443,17 @@ SatStatsHelper::GetBeamIdentifier (uint32_t beamId) const
 {
   switch (m_identifierType)
     {
-    case IDENTIFIER_GLOBAL:
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
       return 0;
 
-    case IDENTIFIER_GW:
+    case SatStatsHelper::IDENTIFIER_GW:
       return 0; // TODO
 
-    case IDENTIFIER_BEAM:
+    case SatStatsHelper::IDENTIFIER_BEAM:
       return beamId;
 
-    case IDENTIFIER_UT:
-    case IDENTIFIER_UT_USER:
+    case SatStatsHelper::IDENTIFIER_UT:
+    case SatStatsHelper::IDENTIFIER_UT_USER:
       return 0;
 
     default:

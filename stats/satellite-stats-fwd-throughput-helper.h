@@ -53,11 +53,54 @@ protected:
   virtual void DoInstall ();
 
 private:
+  ///
   std::list<Ptr<Probe> > m_probes;
 
   // key: identifier ID
-  SatStatsHelper::CollectorMap_t m_intervalRateCollectors;
-  SatStatsHelper::CollectorMap_t m_outputCollectors;
+  SatStatsHelper::CollectorMap_t m_terminalCollectors;
+
+  ///
+  Ptr<DataCollectionObject> m_aggregator;
+
+  /**
+   * \brief Create a probe for each user node's application and connect it to
+   *        a collector.
+   * \param userNodes
+   * \param collectorMap
+   * \param collectorTraceSink
+   *
+   * Add the created probes to #m_probes.
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  void InstallProbes (NodeContainer userNodes,
+                      CollectorMap_t &collectorMap,
+                      R (C::*collectorTraceSink) (P1, P2));
+
+  /**
+   * \brief Connect the collectors to the aggregator.
+   * \param collectorMap
+   * \param collectorTraceSourceName
+   * \param aggregator
+   * \param aggregatorTraceSink
+   */
+  template<typename R, typename C, typename P1, typename V1>
+  void ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
+                                      std::string collectorTraceSourceName,
+                                      Ptr<DataCollectionObject> aggregator,
+                                      R (C::*aggregatorTraceSink) (P1, V1)) const;
+
+  /**
+   * \brief Connect the collectors to the aggregator.
+   * \param collectorMap
+   * \param collectorTraceSourceName
+   * \param aggregator
+   * \param aggregatorTraceSink
+   */
+  template<typename R, typename C, typename P1, typename V1, typename V2>
+  void ConnectCollectorsToAggregator (CollectorMap_t &collectorMap,
+                                      std::string collectorTraceSourceName,
+                                      Ptr<DataCollectionObject> aggregator,
+                                      R (C::*aggregatorTraceSink) (P1, V1, V2)) const;
 
 }; // end of class SatStatsFwdThroughputHelper
 

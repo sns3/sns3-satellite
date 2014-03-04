@@ -147,11 +147,6 @@ public:
   Ptr<const SatHelper> GetSatHelper () const;
 
   /**
-   * \return
-   */
-  Ptr<DataCollectionObject> GetAggregator () const;
-
-  /**
    * \brief
    * \param ut
    * \return
@@ -176,22 +171,49 @@ protected:
 
   /**
    * \brief Create the aggregator according to the output type.
+   * \param aggregatorTypeId the type of aggregator to be created.
+   * \param n1 the name of the attribute to be set on the aggregator created.
+   * \param v1 the value of the attribute to be set on the aggregator created.
+   * \param n2 the name of the attribute to be set on the aggregator created.
+   * \param v2 the value of the attribute to be set on the aggregator created.
+   * \param n3 the name of the attribute to be set on the aggregator created.
+   * \param v3 the value of the attribute to be set on the aggregator created.
+   * \param n4 the name of the attribute to be set on the aggregator created.
+   * \param v4 the value of the attribute to be set on the aggregator created.
+   * \param n5 the name of the attribute to be set on the aggregator created.
+   * \param v5 the value of the attribute to be set on the aggregator created.
+   * \return the created aggregator.
+   *
+   * The created aggregator is stored in #m_aggregator. It can be retrieved
+   * from outside using GetAggregator().
    */
-  virtual void CreateAggregator ();
-
-  /**
-   * \brief
-   * \param collectorMap a map of collectors where the newly created collectors
-   *                     will be inserted into.
-   * \return number of collectors created.
-   */
-  virtual uint32_t CreateTerminalCollectors (CollectorMap_t &collectorMap) const;
+  virtual Ptr<DataCollectionObject> CreateAggregator (std::string aggregatorTypeId,
+                                                      std::string n1 = "",
+                                                      const AttributeValue &v1 = EmptyAttributeValue (),
+                                                      std::string n2 = "",
+                                                      const AttributeValue &v2 = EmptyAttributeValue (),
+                                                      std::string n3 = "",
+                                                      const AttributeValue &v3 = EmptyAttributeValue (),
+                                                      std::string n4 = "",
+                                                      const AttributeValue &v4 = EmptyAttributeValue (),
+                                                      std::string n5 = "",
+                                                      const AttributeValue &v5 = EmptyAttributeValue ());
 
   /**
    * \brief Create a collector for each identifier.
    * \param collectorTypeId the type of collector to be created.
    * \param collectorMap a map of collectors where the newly created collectors
    *                     will be inserted into.
+   * \param n1 the name of the attribute to be set on each collector created.
+   * \param v1 the value of the attribute to be set on each collector created.
+   * \param n2 the name of the attribute to be set on each collector created.
+   * \param v2 the value of the attribute to be set on each collector created.
+   * \param n3 the name of the attribute to be set on each collector created.
+   * \param v3 the value of the attribute to be set on each collector created.
+   * \param n4 the name of the attribute to be set on each collector created.
+   * \param v4 the value of the attribute to be set on each collector created.
+   * \param n5 the name of the attribute to be set on each collector created.
+   * \param v5 the value of the attribute to be set on each collector created.
    * \return number of collectors created.
    *
    * The currently active identifier type (as returned by GetIdentifierType()
@@ -199,9 +221,22 @@ protected:
    * collectors created by this method. The active identifier type can be
    * modified by invoking the SetIdentifierType() method or modifying the
    * `IdentifierType` attribute.
+   *
+   * This method automatically assigns a name to each collector. Therefore
+   * setting the `Name` attribute using the argument would not have any effect.
    */
   virtual uint32_t CreateCollectors (std::string collectorTypeId,
-                                     CollectorMap_t &collectorMap) const;
+                                     CollectorMap_t &collectorMap,
+                                     std::string n1 = "",
+                                     const AttributeValue &v1 = EmptyAttributeValue (),
+                                     std::string n2 = "",
+                                     const AttributeValue &v2 = EmptyAttributeValue (),
+                                     std::string n3 = "",
+                                     const AttributeValue &v3 = EmptyAttributeValue (),
+                                     std::string n4 = "",
+                                     const AttributeValue &v4 = EmptyAttributeValue (),
+                                     std::string n5 = "",
+                                     const AttributeValue &v5 = EmptyAttributeValue ()) const;
 
   /**
    * \brief Create a new probe and connect it to a specified object and
@@ -285,33 +320,6 @@ protected:
                                     Ptr<DataCollectionObject> targetCollector,
                                     R (C::*traceSink) (P1, P2)) const;
 
-  /*
-  template<typename R, typename C, typename P1, typename V1>
-  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
-                                     std::string collectorTraceSourceName,
-                                     R (C::*aggregatorTraceSink) (P1, V1));
-  template<typename R, typename C, typename P1, typename V1, typename V2>
-  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
-                                     std::string collectorTraceSourceName,
-                                     R (C::*aggregatorTraceSink) (P1, V1, V2));
-  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3>
-  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
-                                     std::string collectorTraceSourceName,
-                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3));
-  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3, typename V4>
-  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
-                                     std::string collectorTraceSourceName,
-                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3, V4));
-  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3, typename V4, typename V5>
-  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
-                                     std::string collectorTraceSourceName,
-                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3, V4, V5));
-  template<typename R, typename C, typename P1, typename V1, typename V2, typename V3, typename V4, typename V5, typename V6>
-  void ConnectCollectorToAggregator (CollectorMap_t &collectorMap,
-                                     std::string collectorTraceSourceName,
-                                     R (C::*aggregatorTraceSink) (P1, V1, V2, V3, V4, V5, V6));
-  */
-
   /**
    * \param utUserNode
    * \return
@@ -342,9 +350,6 @@ private:
   OutputType_t               m_outputType;      ///<
   bool                       m_isInstalled;     ///<
   Ptr<const SatHelper>       m_satHelper;       ///<
-  Ptr<DataCollectionObject>  m_aggregator;      ///<
-
-  // TODO: Add support for more than one aggregators.
 
 }; // end of class SatStatsHelper
 
@@ -479,6 +484,7 @@ SatStatsHelper::ConnectCollectorToCollector (Ptr<DataCollectionObject> sourceCol
                                              R (C::*traceSink) (P1, P2)) const
 {
   Ptr<C> target = targetCollector->GetObject<C> ();
+  NS_ASSERT (target != 0);
   return sourceCollector->TraceConnectWithoutContext (traceSourceName,
                                                       MakeCallback (traceSink,
                                                                     target));
