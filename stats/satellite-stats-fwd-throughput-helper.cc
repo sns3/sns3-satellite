@@ -66,7 +66,7 @@ SatStatsFwdThroughputHelper::InstallProbes (NodeContainer userNodes,
        it != userNodes.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
-      const uint32_t identifier = GetUtUserIdentifier (*it);
+      const uint32_t identifier = GetIdentifierForUtUser (*it);
 
       for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
         {

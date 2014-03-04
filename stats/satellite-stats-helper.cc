@@ -204,44 +204,6 @@ SatStatsHelper::GetSatHelper () const
 }
 
 
-uint32_t // static
-SatStatsHelper::GetUtId (Ptr<Node> ut)
-{
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-
-  const Address addr = satIdMapper->GetUtMacWithNode (ut);
-  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
-                 "Node " << ut->GetId ()
-                         << " does not have any valid Mac48Address");
-
-  const int32_t utId = satIdMapper->GetUtIdWithMac (addr);
-  NS_ASSERT_MSG (utId != -1,
-                 "Node " << ut->GetId ()
-                         << " is not found in the global list of UTs");
-
-  return utId;
-}
-
-
-uint32_t // static
-SatStatsHelper::GetUtUserId (Ptr<Node> utUser)
-{
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-
-  const Address addr = satIdMapper->GetUtUserMacWithNode (utUser);
-  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
-                 "Node " << utUser->GetId ()
-                         << " does not have any valid Mac48Address");
-
-  const int32_t utUserId = satIdMapper->GetUtUserIdWithMac (addr);
-  NS_ASSERT_MSG (utUserId != -1,
-                 "Node " << utUser->GetId ()
-                         << " is not found in the global list of UT users");
-
-  return utUserId;
-}
-
-
 Ptr<DataCollectionObject>
 SatStatsHelper::CreateAggregator (std::string aggregatorTypeId,
                                   std::string n1, const AttributeValue &v1,
@@ -296,8 +258,19 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
       }
 
     case SatStatsHelper::IDENTIFIER_GW:
-      // TODO
-      break;
+      {
+        NodeContainer gws = m_satHelper->GetBeamHelper ()->GetGwNodes ();
+        for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+          {
+            const uint32_t gwId = GetGwId (*it);
+            std::ostringstream name;
+            name << "gw-" << gwId;
+            factory.Set ("Name", StringValue (name.str ()));
+            collectorMap[gwId] = factory.Create ()->GetObject<DataCollectionObject> (tid);
+            n++;
+          }
+        break;
+      }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
@@ -320,7 +293,7 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
         NodeContainer uts = m_satHelper->GetBeamHelper ()->GetUtNodes ();
         for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
-            const uint32_t utId = SatStatsHelper::GetUtId (*it);
+            const uint32_t utId = GetUtId (*it);
             std::ostringstream name;
             name << "ut-" << utId;
             factory.Set ("Name", StringValue (name.str ()));
@@ -336,7 +309,7 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
         for (NodeContainer::Iterator it = utUsers.Begin ();
              it != utUsers.End (); ++it)
           {
-            const uint32_t utUserId = SatStatsHelper::GetUtUserId (*it);
+            const uint32_t utUserId = GetUtUserId (*it);
             std::ostringstream name;
             name << "ut-user-" << utUserId;
             factory.Set ("Name", StringValue (name.str ()));
@@ -360,8 +333,92 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
 } // end of `CreateCollectors`
 
 
+// IDENTIFIER RELATED METHODS /////////////////////////////////////////////////
+
 uint32_t
-SatStatsHelper::GetUtUserIdentifier (Ptr<Node> utUserNode) const
+SatStatsHelper::GetUtUserId (Ptr<Node> utUserNode) const
+{
+  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+
+  const Address addr = satIdMapper->GetUtUserMacWithNode (utUserNode);
+  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
+                 "Node " << utUserNode->GetId ()
+                         << " does not have any valid Mac48Address");
+
+  const int32_t utUserId = satIdMapper->GetUtUserIdWithMac (addr);
+  NS_ASSERT_MSG (utUserId != -1,
+                 "Node " << utUserNode->GetId ()
+                         << " is not found in the global list of UT users");
+
+  return utUserId;
+}
+
+
+uint32_t
+SatStatsHelper::GetUtId (Ptr<Node> utNode) const
+{
+  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+
+  const Address addr = satIdMapper->GetUtMacWithNode (utNode);
+  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
+                 "Node " << utNode->GetId ()
+                         << " does not have any valid Mac48Address");
+
+  const int32_t utId = satIdMapper->GetUtIdWithMac (addr);
+  NS_ASSERT_MSG (utId != -1,
+                 "Node " << utNode->GetId ()
+                         << " is not found in the global list of UTs");
+
+  return utId;
+}
+
+
+uint32_t
+SatStatsHelper::GetGwId (Ptr<Node> gwNode) const
+{
+  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+
+  const Address addr = satIdMapper->GetGwMacWithNode (gwNode);
+  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
+                 "Node " << gwNode->GetId ()
+                         << " does not have any valid Mac48Address");
+
+  const int32_t gwId = satIdMapper->GetGwIdWithMac (addr);
+  NS_ASSERT_MSG (gwId != -1,
+                 "Node " << gwNode->GetId ()
+                         << " is not found in the global list of GWs");
+
+  return gwId;
+
+  /*
+  const uint32_t findNodeId = gwNode->GetId ();
+  NS_LOG_DEBUG (this << " sequential search of GW ID for node " << findNodeId);
+
+  for (uint32_t gwId = 1; gwId <= 5;
+  Ptr<Node> pickNode = m_satHelper->GetBeamHelper ()->GetGwNode (gwId);
+  NS_ASSERT (pickNode != 0);
+  uint32_t pickNodeId = pickNode->GetId ();
+  NS_LOG_DEBUG (this << " node " << pickNodeId << " is GW " << gwId);
+
+  while ((pickNode != 0) && (pickNodeId != findNodeId))
+    {
+      gwId++;
+      pickNode = m_satHelper->GetBeamHelper ()->GetGwNode (gwId);
+      NS_ASSERT (pickNode != 0);
+      pickNodeId = pickNode->GetId ();
+      NS_LOG_DEBUG (this << " node " << pickNodeId << " is GW " << gwId);
+    }
+
+  NS_ASSERT_MSG ((pickNode != 0) && (pickNodeId == findNodeId),
+                 "GW node " << findNodeId
+                            << " is not found in the global list of GWs");
+  return gwId;
+  */
+}
+
+
+uint32_t
+SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 {
   switch (m_identifierType)
     {
@@ -369,24 +426,44 @@ SatStatsHelper::GetUtUserIdentifier (Ptr<Node> utUserNode) const
       return 0;
 
     case SatStatsHelper::IDENTIFIER_GW:
-      return 0; // TODO
+      {
+        Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
+        NS_ASSERT_MSG (utNode != 0,
+                       "UT user node " << utUserNode->GetId ()
+                                       << " is not attached to any UT node");
+        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+        NS_ASSERT_MSG (beamId != -1,
+                       "UT user node " << utUserNode->GetId ()
+                                       << " is not attached to any beam");
+        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+        NS_ASSERT_MSG (gwId != 0,
+                       "UT user node " << utUserNode->GetId ()
+                                       << " is not attached to any GW");
+        return gwId;
+      }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
         NS_ASSERT_MSG (utNode != 0,
-                       "UT user node " << utUserNode
+                       "UT user node " << utUserNode->GetId ()
                                        << " is not attached to any UT node");
         const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-        return satIdMapper->GetBeamIdWithMac (utMac);
+        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+        NS_ASSERT_MSG (beamId != -1,
+                       "UT user node " << utUserNode->GetId ()
+                                       << " is not attached to any beam");
+        return beamId;
       }
 
     case SatStatsHelper::IDENTIFIER_UT:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
         NS_ASSERT_MSG (utNode != 0,
-                       "UT user node " << utUserNode
+                       "UT user node " << utUserNode->GetId ()
                                        << " is not attached to any UT node");
         return GetUtId (utNode);
       }
@@ -404,7 +481,7 @@ SatStatsHelper::GetUtUserIdentifier (Ptr<Node> utUserNode) const
 
 
 uint32_t
-SatStatsHelper::GetUtIdentifier (Ptr<Node> utNode) const
+SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 {
   switch (m_identifierType)
     {
@@ -412,13 +489,29 @@ SatStatsHelper::GetUtIdentifier (Ptr<Node> utNode) const
       return 0;
 
     case SatStatsHelper::IDENTIFIER_GW:
-      return 0; // TODO
+      {
+        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+        NS_ASSERT_MSG (beamId != -1,
+                       "UT node " << utNode->GetId ()
+                                  << " is not attached to any beam");
+        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+        NS_ASSERT_MSG (gwId != 0,
+                       "UT node " << utNode->GetId ()
+                                  << " is not attached to any GW");
+        return gwId;
+      }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
         const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-        return satIdMapper->GetBeamIdWithMac (utMac);
+        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+        NS_ASSERT_MSG (beamId != -1,
+                       "UT node " << utNode->GetId ()
+                                  << " is not attached to any beam");
+        return beamId;
       }
 
     case SatStatsHelper::IDENTIFIER_UT:
@@ -439,7 +532,7 @@ SatStatsHelper::GetUtIdentifier (Ptr<Node> utNode) const
 
 
 uint32_t
-SatStatsHelper::GetBeamIdentifier (uint32_t beamId) const
+SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
 {
   switch (m_identifierType)
     {
@@ -447,7 +540,12 @@ SatStatsHelper::GetBeamIdentifier (uint32_t beamId) const
       return 0;
 
     case SatStatsHelper::IDENTIFIER_GW:
-      return 0; // TODO
+      {
+        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+        NS_ASSERT_MSG (gwId != 0,
+                       "Beam " << beamId << " is not attached to any GW");
+        return gwId;
+      }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       return beamId;
@@ -466,11 +564,11 @@ SatStatsHelper::GetBeamIdentifier (uint32_t beamId) const
 
 
 uint32_t
-SatStatsHelper::GetGwIdentifier (Ptr<Node> gwNode) const
+SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
 {
   if (m_identifierType == IDENTIFIER_GW)
     {
-      return 0; // TODO
+      return GetGwId (gwNode);
     }
   else
     {

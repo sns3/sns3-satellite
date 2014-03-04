@@ -79,7 +79,11 @@ public:
 
   //void AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
-  //void AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief

@@ -117,6 +117,9 @@ main (int argc, char *argv[])
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+  stats->AddPerGwFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerGwFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerGwFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);

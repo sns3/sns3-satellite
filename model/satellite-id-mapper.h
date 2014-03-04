@@ -151,7 +151,14 @@ public:
    */
   int32_t GetGwUserIdWithMac (Address mac) const;
 
-  /* MAC GETTERS */
+  /* NODE GETTERS */
+
+  /**
+   * \param gwNode pointer to a GW node
+   * \return MAC address of the GW node's first satellite beam network device
+   * \warning Undefined behaviour when the pointed node is not a valid GW node.
+   */
+  Address GetGwMacWithNode (Ptr<Node> utNode) const;
 
   /**
    * \param utNode pointer to a UT node

@@ -329,6 +329,23 @@ SatIdMapper::GetGwUserIdWithMac (Address mac) const
 // NODE GETTERS
 
 Address
+SatIdMapper::GetGwMacWithNode (Ptr<Node> gwNode) const
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG (gwNode->GetNDevices () >= 3,
+                 "Node " << gwNode->GetId () << " is not a valid GW");
+  /*
+   * Assuming that device #0 is for loopback device, device #(N-1) is for
+   * backbone network device, and devices #1 until #(N-2) are for satellite
+   * beam device.
+   */
+  Ptr<NetDevice> dev = gwNode->GetDevice (1);
+  NS_ASSERT (dev->GetObject<SatNetDevice> () != 0);
+  return dev->GetAddress ();
+}
+
+Address
 SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode) const
 {
   NS_LOG_FUNCTION (this);

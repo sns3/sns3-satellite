@@ -146,20 +146,6 @@ public:
    */
   Ptr<const SatHelper> GetSatHelper () const;
 
-  /**
-   * \brief
-   * \param ut
-   * \return
-   */
-  static uint32_t GetUtId (Ptr<Node> ut);
-
-  /**
-   * \brief
-   * \param utUser
-   * \return
-   */
-  static uint32_t GetUtUserId (Ptr<Node> utUser);
-
 protected:
   /**
    * \brief
@@ -320,29 +306,52 @@ protected:
                                     Ptr<DataCollectionObject> targetCollector,
                                     R (C::*traceSink) (P1, P2)) const;
 
+  // IDENTIFIER RELATED METHODS ///////////////////////////////////////////////
+
+  /**
+   * \brief
+   * \param utUserNode
+   * \return
+   */
+  virtual uint32_t GetUtUserId (Ptr<Node> utUserNode) const;
+
+  /**
+   * \brief
+   * \param utNode
+   * \return
+   */
+  virtual uint32_t GetUtId (Ptr<Node> utNode) const;
+
+  /**
+   * \brief
+   * \param gwNode
+   * \return
+   */
+  virtual uint32_t GetGwId (Ptr<Node> gwNode) const;
+
   /**
    * \param utUserNode
    * \return
    */
-  virtual uint32_t GetUtUserIdentifier (Ptr<Node> utUserNode) const;
+  virtual uint32_t GetIdentifierForUtUser (Ptr<Node> utUserNode) const;
 
   /**
    * \param utNode
    * \return
    */
-  virtual uint32_t GetUtIdentifier (Ptr<Node> utNode) const;
+  virtual uint32_t GetIdentifierForUt (Ptr<Node> utNode) const;
 
   /**
    * \param beamId
    * \return
    */
-  virtual uint32_t GetBeamIdentifier (uint32_t beamId) const;
+  virtual uint32_t GetIdentifierForBeam (uint32_t beamId) const;
 
   /**
    * \param gwNode
    * \return
    */
-  virtual uint32_t GetGwIdentifier (Ptr<Node> gwNode) const;
+  virtual uint32_t GetIdentifierForGw (Ptr<Node> gwNode) const;
 
 private:
   std::string                m_name;            ///<
