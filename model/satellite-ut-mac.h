@@ -179,16 +179,26 @@ private:
 
    /**
     * \brief Function for scheduling the CRDSA transmissions
+    * \param allocationChannel RA allocation channel
     * \param txOpportunities Tx opportunities
     */
-   void ScheduleCrdsaTransmission (SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
+   void ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
 
    /**
-    * \brief Function for updating the used RA slots
-    * \param superFrameId super frame ID
-    * \param txOpportunities Tx opportunities
+    *
     */
-   void UpdateUsedRandomAccessSlots (uint32_t superFrameId, SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
+   void CreateCrdsaPacketInstances (Ptr<Packet> packet, uint32_t allocationChannel, std::set<uint32_t> slots);
+
+   /**
+    *
+    * \return
+    */
+   Ptr<Packet> FetchPacketForRandomAccess ();
+
+   /**
+    *
+    */
+   void TransmitRandomAccessPacket ();
 
    /**
     * \brief Function for removing the past used RA slots
@@ -201,7 +211,7 @@ private:
     * \param superFrameId super frame ID
     * \param allocationChannel allocation channel
     * \param slot RA slot
-    * \return
+    * \return was the update successful
     */
    bool UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannel, uint32_t slot);
 
@@ -266,7 +276,7 @@ private:
     * \param payloadBytes payload in bytes
     * \param carrierId Carrier id used for the transmission
     */
-   void ScheduleTxOpportunity (Time transmitDelay, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+   void ScheduleDaTxOpportunity (Time transmitDelay, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
@@ -276,7 +286,15 @@ private:
     * \param payloadBytes payload in bytes
     * \param carrierId Carrier id used for the transmission
     */
-   void Transmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+   void DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+
+   /**
+    *
+    * \param packets
+    * \param durationInSecs
+    * \param carrierId
+    */
+   void TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet

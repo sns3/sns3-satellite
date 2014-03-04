@@ -11,8 +11,16 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Example for Random Access module.
+* \brief  Example of Random Access usage in satellite network.
+*         The scripts is using CBR application in user defined scenario,
+*         which means that user can change the scenario size quite to be
+*         whatever between 1 and full scenario (72 beams). Currently it
+*         is configured to using only one beam. CBR application is sending
+*         packets in RTN link, i.e. from UT side to GW side. Packet trace
+*         and KpiHelper are enabled by default. End user may change the
+*         number of UTs and end users from the command line.
 *
+*         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
@@ -20,54 +28,110 @@ NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
 int
 main (int argc, char *argv[])
 {
-  /// Enable info logs
+  uint32_t beamId = 1;
+  uint32_t endUsersPerUt (1);
+  uint32_t utsPerBeam (1);
+  uint32_t packetSize (128);
+  Time interval (Seconds(1.0));
+  Time simLength (Seconds(20.0));
+  Time appStartTime = Seconds(0.1);
+
+  // enable info logs
   LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
 
-  uint32_t allocationChannel = 0;
+  // read command line parameters given by user
+  CommandLine cmd;
+  cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.Parse (argc, argv);
 
-  /// Load default lower layer service configuration
-  Ptr<SatLowerLayerServiceConf> llsConf = CreateObject<SatLowerLayerServiceConf>  ();
+  // Configure error model
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
+  //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
-  /// Create default TBTP container
-  Ptr<SatTbtpContainer> tbtpContainer = CreateObject<SatTbtpContainer> ();
+  // Enable Random Access
+  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatRandomAccess::RA_SLOTTED_ALOHA));
 
-  /// Load default random access configuration
-  Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (llsConf);
+  // Create reference system, two options:
+  // - "Scenario72"
+  // - "Scenario98"
+  std::string scenarioName = "Scenario72";
+  //std::string scenarioName = "Scenario98";
 
-  /// Create random access module with RA_CRDSA as default
-  Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, SatRandomAccess::RA_CRDSA);
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  /// Set callbacks
-  randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, tbtpContainer));
-  /// TODO fix this once the buffer check has been implemented
-  randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, tbtpContainer));
+  // create user defined scenario
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
+  std::map<uint32_t, SatBeamUserInfo > beamMap;
+  beamMap[beamId] = beamInfo;
+  helper->SetBeamUserInfo (beamMap);
+  helper->EnablePacketTrace ();
 
-  /// Run simulation
-  for (uint32_t i = 0; i < 49; i++)
+  helper->CreateScenario (SatHelper::USER_DEFINED);
+
+  // get users
+  NodeContainer utUsers = helper->GetUtUsers();
+  NodeContainer gwUsers = helper->GetGwUsers();
+
+  // >>> Start of actual test using Full scenario >>>
+
+  // port used for packet delivering
+  uint16_t port = 9; // Discard port (RFC 863)
+
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
+  cbrHelper.SetAttribute("Interval", TimeValue (interval));
+  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
+
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
+
+  // initialized time values for simulation
+  uint32_t maxTransmitters = utUsers.GetN ();
+
+  ApplicationContainer gwApps;
+  ApplicationContainer utApps;
+
+  Time cbrStartDelay = appStartTime;
+
+  // Cbr and Sink applications creation
+  for ( uint32_t i = 0; i < maxTransmitters; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel, SatRandomAccess::RA_CRDSA_TRIGGER);
+      cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+
+      utApps.Add(cbrHelper.Install (utUsers.Get (i)));
+      gwApps.Add(sinkHelper.Install (gwUsers.Get (0)));
+
+      cbrStartDelay += Seconds (0.05);
+
+      utApps.Get(i)->SetStartTime (cbrStartDelay);
+      utApps.Get(i)->SetStopTime (simLength);
     }
 
-  /// Change random access model to RA_SLOTTED_ALOHA
-  Simulator::Schedule (Time (300001 + 49*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_SLOTTED_ALOHA);
+  // Add the created applications to CbrKpiHelper
+  CbrKpiHelper kpiHelper (KpiHelper::KPI_RTN);
+  kpiHelper.AddSink (gwApps);
+  kpiHelper.AddSender (utApps);
 
-  /// Continue simulation
-  for (uint32_t i = 50; i < 99; i++)
-    {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel, SatRandomAccess::RA_SLOTTED_ALOHA_TRIGGER);
-    }
+  utApps.Start (appStartTime);
+  utApps.Stop (simLength);
 
-  /// Change random access model to RA_ANY_AVAILABLE
-  Simulator::Schedule (Time (300001 + 99*500000), &SatRandomAccess::SetRandomAccessModel, randomAccess, SatRandomAccess::RA_ANY_AVAILABLE);
+  NS_LOG_INFO("--- Cbr-user-defined-example ---");
+  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
+  NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
+  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO("  ");
 
-  /// Continue simulation
-  for (uint32_t i = 100; i < 149; i++)
-    {
-      Simulator::Schedule (Time (300000 + i*500000), &SatRandomAccess::DoRandomAccess, randomAccess, allocationChannel, SatRandomAccess::RA_CRDSA_TRIGGER);
-    }
-
+  Simulator::Stop (simLength);
   Simulator::Run ();
+
+  kpiHelper.Print ();
+
   Simulator::Destroy ();
 
   return 0;

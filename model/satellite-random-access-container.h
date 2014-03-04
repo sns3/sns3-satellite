@@ -95,7 +95,8 @@ public:
   {
     RandomAccessTxOpportunityType_t txOpportunityType;
     uint32_t slottedAlohaTxOpportunity;
-    std::pair<uint32_t,std::set<uint32_t> > crdsaTxOpportunities;
+    std::vector <std::set<uint32_t> > crdsaTxOpportunities;
+    uint32_t allocationChannel;
   } RandomAccessTxOpportunities_s;
 
   /**
@@ -262,11 +263,11 @@ private:
 
   /**
    *
-   * \param requestClass
-   * \param txOpportunities
+   * \param allocationChannel
+   * \param slots
    * \return
    */
-  std::set<uint32_t> CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std::set<uint32_t> txOpportunities);
+  std::pair <std::set<uint32_t>, std::set<uint32_t> > CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std::pair <std::set<uint32_t>, std::set<uint32_t> > slots);
 
   /**
    *

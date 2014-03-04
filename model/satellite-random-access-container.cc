@@ -202,10 +202,13 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTrigger
   /// TODO: comment out this code at later stage
   if (txOpportunities.txOpportunityType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
     {
-      std::set<uint32_t>::iterator iterSet;
-      for (iterSet = txOpportunities.crdsaTxOpportunities.second.begin(); iterSet != txOpportunities.crdsaTxOpportunities.second.end(); iterSet++)
+      for (uint32_t i = 0; i < txOpportunities.crdsaTxOpportunities.size (); i++)
         {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity for allocation channel: " << txOpportunities.crdsaTxOpportunities.first << " at slot: " << (*iterSet));
+          std::set<uint32_t>::iterator iterSet;
+          for (iterSet = txOpportunities.crdsaTxOpportunities[i].begin(); iterSet != txOpportunities.crdsaTxOpportunities[i].end(); iterSet++)
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity for unique packet: " << i << " at slot: " << (*iterSet));
+            }
         }
     }
   else if (txOpportunities.txOpportunityType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
@@ -224,6 +227,8 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTrigger
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Random Access FINISHED ------");
   NS_LOG_INFO ("------------------------------------");
+
+  txOpportunities.allocationChannel = allocationChannel;
 
   return txOpportunities;
 }
@@ -541,10 +546,15 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   RandomAccessTxOpportunities_s txOpportunities;
   txOpportunities.txOpportunityType = SatRandomAccess::RA_DO_NOTHING;
 
-  uint32_t limit = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
-                             m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
+  uint32_t maxUniquePackets = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
+                                        m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
 
-  for (uint32_t i = 0; i < limit; i++)
+  /// TODO slots.first can be updated to take into account the reserved RA slots from MAC.
+  /// This is needed with, e.g., multiple allocation channels
+  std::pair <std::set<uint32_t>, std::set<uint32_t> > slots;
+  uint32_t actualUniquePackets = 0;
+
+  for (uint32_t i = 0; i < maxUniquePackets; i++)
     {
       if (CrdsaDoBackoff (allocationChannel))
         {
@@ -559,9 +569,14 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
             {
               NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - Preparing for transmission with allocation channel: " << allocationChannel);
 
-              std::set<uint32_t> emptySet;
-              txOpportunities.crdsaTxOpportunities = std::make_pair(allocationChannel, CrdsaRandomizeTxOpportunities (allocationChannel,emptySet));
-              txOpportunities.txOpportunityType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
+              /// randomize instance slots for this unique packet
+              slots = CrdsaRandomizeTxOpportunities (allocationChannel,slots);
+
+              /// save the packet specific Tx opportunities into a vector
+              txOpportunities.crdsaTxOpportunities.push_back (slots.second);
+
+              /// increase the number of randomized unique packets
+              actualUniquePackets++;
 
               if (m_areBuffersEmptyCb ())
                 {
@@ -570,6 +585,9 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
             }
         }
     }
+
+  /// save the rest of the CRDSA Tx opportunity results
+  txOpportunities.txOpportunityType = SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY;
 
   CrdsaReduceIdleBlocks (allocationChannel);
 
@@ -669,12 +687,16 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
   return txOpportunities;
 }
 
-std::set<uint32_t>
-SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std::set<uint32_t> txOpportunities)
+std::pair <std::set<uint32_t>, std::set<uint32_t> >
+SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std::pair <std::set<uint32_t>, std::set<uint32_t> > slots)
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<std::set<uint32_t>::iterator,bool> result;
+  std::pair<std::set<uint32_t>::iterator,bool> resultAllSlotsInFrame;
+  std::pair<std::set<uint32_t>::iterator,bool> resultThisUniquePacket;
+
+  std::set<uint32_t> emptySet;
+  slots.second = emptySet;
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Randomizing TX opportunities for allocation channel: " << allocationChannel);
 
@@ -685,19 +707,26 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std:
       uint32_t slot = m_uniformRandomVariable->GetInteger (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMinRandomizationValue (),
                                                            m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxRandomizationValue ());
 
-      result = txOpportunities.insert (slot);
+      resultAllSlotsInFrame = slots.first.insert (slot);
 
-      if (result.second)
+      if (resultAllSlotsInFrame.second)
         {
           successfulInserts++;
+
+          resultThisUniquePacket = slots.second.insert (slot);
+
+          if (resultAllSlotsInFrame.second)
+            {
+              NS_FATAL_ERROR ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Slots out of sync, this should never happen");
+            }
         }
 
-      NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Allocation channel: " << allocationChannel << " insert successful " << result.second << " for TX opportunity slot: " << (*result.first));
+      NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Allocation channel: " << allocationChannel << " insert successful " << resultAllSlotsInFrame.second << " for TX opportunity slot: " << (*resultAllSlotsInFrame.first));
     }
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Randomizing done");
 
-  return txOpportunities;
+  return slots;
 }
 
 void
