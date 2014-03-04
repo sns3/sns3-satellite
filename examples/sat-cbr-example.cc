@@ -112,11 +112,17 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
 
-  LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
-  LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
-  LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
-  LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
+  //LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
+  //LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
+  //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
+  //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+  stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);

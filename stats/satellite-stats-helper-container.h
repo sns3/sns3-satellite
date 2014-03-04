@@ -77,13 +77,27 @@ public:
    */
   std::string GetName () const;
 
-  void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
-
-  //void AddPerUtFwdThroughput (SatStatsHelper::OutputType_t outputType);
-
-  //void AddPerBeamFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  //void AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
   //void AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerBeamFwdThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtFwdThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType

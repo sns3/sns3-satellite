@@ -60,9 +60,38 @@ SatStatsHelperContainer::GetTypeId ()
                    MakeStringAccessor (&SatStatsHelperContainer::SetName,
                                        &SatStatsHelperContainer::GetName),
                    MakeStringChecker ())
-    .AddAttribute ("PerUtUserFwdThroughputScalar",
-                   "Enable the scalar output of "
-                   "per UT user forward link throughput statistics",
+    .AddAttribute ("PerBeamFwdThroughput",
+                   "Enable the output of per beam forward link throughput statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFwdThroughput),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    .AddAttribute ("PerUtFwdThroughput",
+                   "Enable the output of per UT forward link throughput statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtFwdThroughput),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    .AddAttribute ("PerUtUserFwdThroughput",
+                   "Enable the output of per UT user forward link throughput statistics",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
                    MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtUserFwdThroughput),
                    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
@@ -106,6 +135,44 @@ SatStatsHelperContainer::GetName () const
 
 
 void
+SatStatsHelperContainer::AddPerBeamFwdThroughput (
+  SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdThroughputHelper> stat = Create<SatStatsFwdThroughputHelper> (m_satHelper);
+      stat->SetName (m_name + "-per-beam-fwd-throughput"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
+SatStatsHelperContainer::AddPerUtFwdThroughput (
+  SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdThroughputHelper> stat = Create<SatStatsFwdThroughputHelper> (m_satHelper);
+      stat->SetName (m_name + "-per-ut-fwd-throughput"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
 SatStatsHelperContainer::AddPerUtUserFwdThroughput (
   SatStatsHelper::OutputType_t outputType)
 {
@@ -123,25 +190,6 @@ SatStatsHelperContainer::AddPerUtUserFwdThroughput (
     }
 }
 
-/*
-void
-SatStatsHelperContainer::AddPerBeamFwdThroughput (
-  SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdThroughputHelper> stat = Create<SatStatsFwdThroughputHelper> ();
-      stat->SetName (m_name + "-per-ut-user-fwd-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
-      stat->SetOutputType (outputType);
-      stat->Connect (m_satHelper);
-      m_stats.push_back (stat);
-    }
-}
-*/
 
 std::string // static
 SatStatsHelperContainer::GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType)
