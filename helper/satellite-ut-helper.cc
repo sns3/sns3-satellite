@@ -353,7 +353,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
   // Attach the LLC Tx opportunity callback to SatMac
-  mac->SetTxOpportunityCallback (MakeCallback (&SatLlc::NotifyTxOpportunity, llc));
+  mac->SetTxOpportunityCallback (MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
 
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));

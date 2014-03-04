@@ -104,6 +104,21 @@ public:
    */
   void SetCrReceiveCallback (SatGwMac::CrReceiveCallback cb);
 
+  /**
+   * Callback to notify upper layer about Tx opportunity.
+   * \param uint32_t payload size in bytes
+   * \param Mac48Address address
+   * \return packet Packet to be transmitted to PHY
+   */
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint32_t& > TxOpportunityCallback;
+
+  /**
+   * Method to set Tx opportunity callback.
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
+  void SetTxOpportunityCallback (SatGwMac::TxOpportunityCallback cb);
+
 private:
 
   SatGwMac& operator = (const SatGwMac &);
@@ -153,6 +168,13 @@ private:
    * Capacity request receive callback.
    */
   SatGwMac::CrReceiveCallback  m_crReceiveCallback;
+
+  /**
+   * Callback to notify the txOpportunity to upper layer
+   * Returns a packet
+   * Attributes: payload in bytes
+   */
+  SatGwMac::TxOpportunityCallback m_txOpportunityCallback;
 };
 
 } // namespace ns3

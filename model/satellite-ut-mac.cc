@@ -87,6 +87,7 @@ SatUtMac::SatUtMac ()
    m_superframeSeq (),
    m_timingAdvanceCb (0),
    m_ctrlCallback (0),
+   m_txOpportunityCallback (0),
    m_llsConf (0),
    m_framePduHeaderSizeInBytes (1),
    m_randomAccess (NULL),
@@ -104,6 +105,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
    m_ctrlCallback (0),
+   m_txOpportunityCallback (0),
    m_llsConf (0),
    m_framePduHeaderSizeInBytes (1),
    m_guardTime (MicroSeconds (1)),
@@ -129,6 +131,7 @@ SatUtMac::DoDispose (void)
   NS_LOG_FUNCTION (this);
 
   m_timingAdvanceCb.Nullify ();
+  m_txOpportunityCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
 
   SatMac::DoDispose ();
@@ -184,6 +187,12 @@ SatUtMac::SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb)
   m_ctrlCallback = cb;
 }
 
+void
+SatUtMac::SetTxOpportunityCallback (SatUtMac::TxOpportunityCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_txOpportunityCallback = cb;
+}
 
 Time
 SatUtMac::GetSuperFrameTxTime (uint8_t superFrameSeqId) const
@@ -297,6 +306,23 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
   Simulator::Schedule (transmitDelay, &SatUtMac::DedicatedAccessTransmit, this, durationInSecs, payloadBytes, carrierId);
 }
 
+Ptr<Packet>
+SatUtMac::DoScheduling (uint32_t payloadBytes, int rcIndex)
+{
+  /**
+   * TODO: DoScheduling is responsible of fetching the packet from upper layer. It may
+   * obey the given RC index or decide by itself which RC index to serve. Note, that the
+   * RC index is currently set to be 1 always, thus UT scheduler is not capable of scheduling
+   * any other RC indices.
+   */
+
+  uint8_t rc = (rcIndex < 0) ? (uint8_t)(1) : (uint8_t)(rcIndex);
+
+  // TxOpportunity
+  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), rc);
+  return p;
+}
+
 void
 SatUtMac::DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
 {
@@ -317,7 +343,6 @@ SatUtMac::DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes,
    * configured frame PDU header size.
    */
   uint32_t payloadLeft = payloadBytes - m_framePduHeaderSizeInBytes;
-  uint32_t bytesLeftInBuffer (0);
 
   // Packet container to be sent to lower layers.
   // Packet container models FPDU.
@@ -328,12 +353,12 @@ SatUtMac::DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes,
    * - The payload is filled to the max OR
    * - The LLC returns NULL packet
    */
+
   while (payloadLeft > 0)
     {
       NS_LOG_LOGIC ("Tx opportunity: payloadLeft: " << payloadLeft);
 
-      // TxOpportunity
-      Ptr<Packet> p = m_txOpportunityCallback (payloadLeft, m_nodeInfo->GetMacAddress (), bytesLeftInBuffer);
+      Ptr<Packet> p = DoScheduling (payloadLeft);
 
       // A valid packet received
       if ( p )

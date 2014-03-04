@@ -98,6 +98,22 @@ public:
   void SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb);
 
   /**
+   * Callback to notify upper layer about Tx opportunity.
+   * \param uint32_t payload size in bytes
+   * \param Mac48Address address
+   * \param uint8_t RC index
+   * \return packet Packet to be transmitted to PHY
+   */
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t> TxOpportunityCallback;
+
+  /**
+   * Method to set Tx opportunity callback.
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
+  void SetTxOpportunityCallback (SatUtMac::TxOpportunityCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -158,6 +174,16 @@ private:
     * \return Time Time to transmit
     */
    Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
+
+   /**
+    * UT scheduling is responsible of selecting with which RC index to
+    * use when requesting packets from higher layer. If RC index is set,
+    * then it just utilizes it.
+    * \param payloadBytes
+    * \param rcIndex RC index as int
+    * @return Ptr<Packet> Packet fetched from higher layer
+    */
+   Ptr<Packet> DoScheduling (uint32_t payloadBytes, int rcIndex = -1);
 
    /**
     * \brief Do random access evaluation for Tx opportunities
@@ -321,6 +347,13 @@ private:
    * Callback to send control messages.
   */
   SendCtrlCallback m_ctrlCallback;
+
+  /**
+   * Callback to notify the txOpportunity to upper layer
+   * Returns a packet
+   * Attributes: payload in bytes
+   */
+  SatUtMac::TxOpportunityCallback m_txOpportunityCallback;
 
   /**
    * The configured lower layer service configuration for this UT MAC.

@@ -71,40 +71,24 @@ SatUtLlc::DoDispose ()
 
 
 Ptr<Packet>
-SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft)
+SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex)
 {
   NS_LOG_FUNCTION (this << macAddr << bytes);
 
   Ptr<Packet> packet;
-
-  /**
-   * TODO: This is not the final implementation! The NotifyTxOpportunity
-   * will be enhanced with the flow id which to serve. The decision is passed
-   * then to the scheduler (UT/NCC or forward link).
-   */
-  EncapKey_t key;
-  // Check whether there are some control messages
-  if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
-    {
-      key = std::make_pair<Mac48Address, uint8_t> (macAddr, m_controlFlowIndex);
-    }
-  else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
-    {
-      key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), m_controlFlowIndex);
-    }
+  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, rcIndex);
 
   EncapContainer_t::iterator it = m_encaps.find (key);
 
-  if (!it->second->GetQueue ()->IsEmpty())
+  uint32_t bytesLeft (0);
+
+  if (it != m_encaps.end ())
     {
       packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
     }
-
-  key = std::make_pair<Mac48Address, uint8_t> (macAddr, 1);
-  it = m_encaps.find (key);
-  if (!packet)
+  else
     {
-      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
+      NS_FATAL_ERROR ("Key: (" << macAddr << ", " << rcIndex << ") not found in the encapsulator container!");
     }
 
   if (packet)

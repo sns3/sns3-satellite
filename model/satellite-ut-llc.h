@@ -54,10 +54,10 @@ public:
     *
     * \param macAddr Mac address of the UT with tx opportunity
     * \param bytes Size of the Tx opportunity
-    * \param &bytesLeft Bytes left after TxOpportunity
+    * \param rcIndex RC index
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex);
 
   /**
    * Add a request manager for UT's LLC instance.

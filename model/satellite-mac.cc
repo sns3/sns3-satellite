@@ -73,7 +73,6 @@ SatMac::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_txCallback.Nullify ();
   m_rxCallback.Nullify ();
-  m_txOpportunityCallback.Nullify ();
   m_readCtrlCallback.Nullify ();
   m_writeCtrlCallback.Nullify ();
 
@@ -130,13 +129,6 @@ SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_rxCallback = cb;
-}
-
-void
-SatMac::SetTxOpportunityCallback (SatMac::TxOpportunityCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_txOpportunityCallback = cb;
 }
 
 void

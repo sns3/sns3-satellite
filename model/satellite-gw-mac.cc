@@ -93,6 +93,9 @@ void
 SatGwMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_txOpportunityCallback.Nullify ();
+
   SatMac::DoDispose ();
 }
 
