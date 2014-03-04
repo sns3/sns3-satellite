@@ -58,7 +58,7 @@ SatGwLlc::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  Object::DoDispose ();
+  SatLlc::DoDispose ();
 }
 
 
