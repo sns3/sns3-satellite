@@ -381,8 +381,6 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, double durationInS
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::TransmitRandomAccessPacket");
-
   // If there are packets to send
   if (!packets.empty ())
     {
@@ -400,7 +398,7 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 {
   NS_LOG_FUNCTION (this << event << rcIndex);
 
-  NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - Queue: " << rcIndex);
+  NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - Queue: " << (uint32_t)rcIndex);
 
   if (rcIndex == 0)
     {
