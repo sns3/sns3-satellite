@@ -60,6 +60,21 @@ SatStatsHelperContainer::GetTypeId ()
                    MakeStringAccessor (&SatStatsHelperContainer::SetName,
                                        &SatStatsHelperContainer::GetName),
                    MakeStringChecker ())
+    .AddAttribute ("GlobalFwdThroughput",
+                   "Enable the output of per GW forward link throughput statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFwdThroughput),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
     .AddAttribute ("PerGwFwdThroughput",
                    "Enable the output of per GW forward link throughput statistics",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
@@ -150,8 +165,25 @@ SatStatsHelperContainer::GetName () const
 
 
 void
-SatStatsHelperContainer::AddPerGwFwdThroughput (
-  SatStatsHelper::OutputType_t outputType)
+SatStatsHelperContainer::AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdThroughputHelper> stat = Create<SatStatsFwdThroughputHelper> (m_satHelper);
+      stat->SetName (m_name + "-global-fwd-throughput"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
+SatStatsHelperContainer::AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType)
 {
   NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
 
@@ -169,8 +201,7 @@ SatStatsHelperContainer::AddPerGwFwdThroughput (
 
 
 void
-SatStatsHelperContainer::AddPerBeamFwdThroughput (
-  SatStatsHelper::OutputType_t outputType)
+SatStatsHelperContainer::AddPerBeamFwdThroughput (SatStatsHelper::OutputType_t outputType)
 {
   NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
 
@@ -188,8 +219,7 @@ SatStatsHelperContainer::AddPerBeamFwdThroughput (
 
 
 void
-SatStatsHelperContainer::AddPerUtFwdThroughput (
-  SatStatsHelper::OutputType_t outputType)
+SatStatsHelperContainer::AddPerUtFwdThroughput (SatStatsHelper::OutputType_t outputType)
 {
   NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
 
@@ -207,8 +237,7 @@ SatStatsHelperContainer::AddPerUtFwdThroughput (
 
 
 void
-SatStatsHelperContainer::AddPerUtUserFwdThroughput (
-  SatStatsHelper::OutputType_t outputType)
+SatStatsHelperContainer::AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType)
 {
   NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
 

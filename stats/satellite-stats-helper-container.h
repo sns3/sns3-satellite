@@ -77,7 +77,11 @@ public:
    */
   std::string GetName () const;
 
-  //void AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief

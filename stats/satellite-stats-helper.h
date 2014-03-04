@@ -154,6 +154,7 @@ protected:
 
   ///
   typedef std::map<uint32_t, Ptr<DataCollectionObject> > CollectorMap_t;
+  // TODO: Make a separate class SatStatsCollectors.
 
   /**
    * \brief Create the aggregator according to the output type.
