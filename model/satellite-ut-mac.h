@@ -281,6 +281,11 @@ private:
    bool IsRandomAccessSlotAvailable (uint32_t superFrameId, uint32_t allocationChannelId, uint32_t slotId);
 
    /**
+    *
+    */
+   void PrintUsedRandomAccessSlots ();
+
+   /**
     *  Schedules time slots according to received TBTP message.
     *
     * \param tbtp Pointer to TBTP message.

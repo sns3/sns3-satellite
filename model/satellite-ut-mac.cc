@@ -303,6 +303,8 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
 {
   NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << durationInSecs << payloadBytes << carrierId);
 
+  NS_LOG_INFO ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
+
   Simulator::Schedule (transmitDelay, &SatUtMac::DedicatedAccessTransmit, this, durationInSecs, payloadBytes, carrierId);
 }
 
@@ -329,6 +331,7 @@ SatUtMac::DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes,
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId);
   NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
+  NS_LOG_INFO ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
   /**
    * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
    * should be passed with txOpportunity to higher layer, so that it knows which RC_index
@@ -562,12 +565,16 @@ SatUtMac::DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAcces
     {
       Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
 
+      NS_LOG_INFO ("SatUtMac::DoRandomAccess - Processing Slotted ALOHA results, time: " << Now ().GetSeconds () << " seconds, Tx evaluation @: " << (Now () + txOpportunity).GetSeconds () << " seconds");
+
       /// schedule the check for next available RA slot
       Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
     }
   /// process CRDSA Tx opportunities
   else if (txOpportunities.txOpportunityType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
     {
+      NS_LOG_INFO ("SatUtMac::DoRandomAccess - Processing CRDSA results");
+
       /// schedule CRDSA transmission
       ScheduleCrdsaTransmission (allocationChannel, txOpportunities);
     }
@@ -580,8 +587,8 @@ SatUtMac::GetNextRandomAccessAllocationChannel ()
 
   NS_LOG_INFO ("SatUtMac::GetNextRandomAccessAllocationChannel");
 
-  /// at the moment allocation channel is only randomly selected
-  return m_uniformRandomVariable->GetInteger (0, m_llsConf->GetRaServiceCount ());
+  /// TODO at the moment only allocation channel 0 is supported
+  return 0;
 }
 
 void
@@ -589,14 +596,14 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission");
+  NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - AC: " << allocationChannel);
 
   /// check if we have known DAMA allocations
   /// TODO this functionality checks the current and all known future frames for DAMA allocation
   /// it might be better to check only the current frame or a limited subset of frames
-  if ( m_tbtpContainer->HasScheduledTimeSlots () )
+  if ( !m_tbtpContainer->HasScheduledTimeSlots () )
     {
-      NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - No DAMA");
+      NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission @ " << Now ().GetSeconds () << " - No known DAMA, selecting a slot for Slotted ALOHA");
 
       Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
       uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
@@ -620,6 +627,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
           if (!result.first)
             {
+              NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - Increasing frame offset!");
               frameOffset++;
               superFrameId++;
             }
@@ -629,7 +637,8 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( result.second );
 
       /// start time
-      Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+      Time slotStartTime = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+      Time startTime = slotStartTime - Now ();
 
       /// duration
       Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
@@ -638,9 +647,22 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       /// carrier
       uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
+      NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - Starting to schedule @ " << Now ().GetSeconds () <<
+                   ", SF ID: " << superFrameId <<
+                   " slot: " << result.second <<
+                   " SF start: " << superframeStartTime.GetSeconds () <<
+                   " Tx start: " << (Now () + startTime).GetSeconds () <<
+                   " duration: " << duration <<
+                   " carrier ID: " << carrierId <<
+                   " payload in bytes: " << wf->GetPayloadInBytes ());
+
       /// schedule transmission
       /// TODO this might have to be changed
-      Simulator::Schedule (slotDelay, &SatUtMac::DedicatedAccessTransmit, this, duration, wf->GetPayloadInBytes (), carrierId);
+      Simulator::Schedule (startTime, &SatUtMac::DedicatedAccessTransmit, this, duration, wf->GetPayloadInBytes (), carrierId);
+    }
+  else
+    {
+      NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission @ " << Now ().GetSeconds () << " - UT has known DAMA, aborting Slotted ALOHA");
     }
 }
 
@@ -653,9 +675,9 @@ SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime,
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::SearchFrameForAvailableSlot");
-
   Time opportunityOffset = Now () - superframeStartTime;
+
+  NS_LOG_INFO ("SatUtMac::SearchFrameForAvailableSlot - offset: " << opportunityOffset.GetSeconds ());
 
   if (opportunityOffset.IsNegative ())
     {
@@ -685,6 +707,10 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
     {
       slotConf = frameConf->GetTimeSlotConf (slotId);
 
+      NS_LOG_INFO ("SatUtMac::FindNextAvailableRandomAccessSlot - Slot: " << slotId <<
+                   " slot offset: " << slotConf->GetStartTimeInSeconds () <<
+                   " opportunity offset: " << opportunityOffset.GetSeconds ());
+
       /// if slot offset is equal or larger than Tx opportunity offset, i.e., the slot is in the future
       if (slotConf->GetStartTimeInSeconds () >= opportunityOffset.GetSeconds ())
         {
@@ -696,6 +722,12 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
             }
         }
     }
+
+  NS_LOG_INFO ("SatUtMac::FindNextAvailableRandomAccessSlot - Success: " << availableSlotFound
+                                                            << " SF: " << superFrameId
+                                                            << " AC: " << allocationChannel
+                                                            << " slot: " << slotId << "/" << timeSlotCount);
+
   return std::make_pair(availableSlotFound, slotId);
 }
 
@@ -704,7 +736,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission");
+  NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - AC: " << allocationChannel);
 
   /// get current superframe ID
   uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
@@ -754,7 +786,7 @@ SatUtMac::CreateCrdsaPacketInstances (Ptr<Packet> packet, uint32_t allocationCha
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances");
+  NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - AC: " << allocationChannel);
 
   Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
   uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
@@ -805,7 +837,7 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::UpdateUsedRandomAccessSlots");
+  NS_LOG_INFO ("SatUtMac::UpdateUsedRandomAccessSlots - SF: " << superFrameId << " AC: " << allocationChannelId << " slot: " << slotId);
 
   std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
   bool isSlotFree = false;
@@ -829,6 +861,7 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
       if (result.second)
         {
           isSlotFree = true;
+          NS_LOG_INFO ("SatUtMac::UpdateUsedRandomAccessSlots - No saved SF, slot " << slotId << " saved in SF " << superFrameId);
         }
     }
   else
@@ -839,6 +872,7 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
       if (result.second)
         {
           isSlotFree = true;
+          NS_LOG_INFO ("SatUtMac::UpdateUsedRandomAccessSlots - Saved SF exist, slot " << slotId << " saved in SF " << superFrameId);
         }
     }
   return isSlotFree;
@@ -849,7 +883,9 @@ SatUtMac::RemovePastRandomAccessSlots (uint32_t superFrameId)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::RemovePastRandomAccessSlots");
+  NS_LOG_INFO ("SatUtMac::RemovePastRandomAccessSlots - SF: " << superFrameId);
+
+  //PrintUsedRandomAccessSlots ();
 
   std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
 
@@ -863,6 +899,28 @@ SatUtMac::RemovePastRandomAccessSlots (uint32_t superFrameId)
       else
         {
           ++iter;
+        }
+    }
+
+  //PrintUsedRandomAccessSlots ();
+}
+
+void
+SatUtMac::PrintUsedRandomAccessSlots ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatUtMac::PrintUsedRandomAccessSlots");
+
+  std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
+
+  for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); iter++)
+    {
+      std::set<uint32_t>::iterator iterSet;
+
+      for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
+        {
+          std::cout << "SF: " << iter->first.first << " AC: " << iter->first.second << " slot: " << *iterSet << std::endl;
         }
     }
 }

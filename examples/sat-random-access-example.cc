@@ -32,9 +32,9 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
   uint32_t packetSize (128);
-  Time interval (Seconds(0.05));
-  Time simLength (Seconds(0.20));
-  Time appStartTime = Seconds(0.05);
+  Time interval (Seconds(0.01));
+  Time simLength (Seconds(0.75));
+  Time appStartTime = Seconds(0.01);
 
   // enable info logs
   LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
