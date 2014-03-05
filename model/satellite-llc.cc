@@ -260,18 +260,12 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
     {
       uint32_t buf = cit->second->GetTxBufferSizeInBytes ();
 
-      uint32_t prio (0);
-      if (cit->first.second != 0)
-        {
-          prio = 1;
-        }
-
       if (buf > 0)
         {
           holDelay = cit->second->GetHolDelay ();
           uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
           Ptr<SatSchedulingObject> so =
-              Create<SatSchedulingObject> (cit->first.first, buf, minTxOpportunityInBytes, holDelay, prio);
+              Create<SatSchedulingObject> (cit->first.first, buf, minTxOpportunityInBytes, holDelay, cit->first.second);
           schedObjects.push_back (so);
         }
     }

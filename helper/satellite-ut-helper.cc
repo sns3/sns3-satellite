@@ -47,6 +47,7 @@
 #include "../model/satellite-enums.h"
 #include "../model/satellite-request-manager.h"
 #include "../model/satellite-queue.h"
+#include "../model/satellite-ut-scheduler.h"
 #include "satellite-ut-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -237,8 +238,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
   mac->SetTimingAdvanceCallback (timingCb);
 
-  mac->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
-
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
 
@@ -352,9 +351,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
-  // Attach the LLC Tx opportunity callback to SatMac
-  mac->SetTxOpportunityCallback (MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
-
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
@@ -367,6 +363,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->Initialize();
 
   llc->SetQueueStatisticsCallbacks ();
+
+  // Create UT scheduler for MAC and connect callbacks to LLC
+  Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> ();
+  utScheduler->SetTxOpportunityCallback(MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
+  utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  mac->SetAttribute("Scheduler", PointerValue (utScheduler));
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), Mac48Address::ConvertFrom (addr));

@@ -37,6 +37,7 @@
 #include "satellite-utils.h"
 #include "satellite-tbtp-container.h"
 #include "satellite-queue.h"
+#include "satellite-ut-scheduler.h"
 #include "../helper/satellite-wave-form-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -70,6 +71,11 @@ SatUtMac::GetTypeId (void)
                    TimeValue (MicroSeconds (1)),
                    MakeTimeAccessor (&SatUtMac::m_guardTime),
                    MakeTimeChecker ())
+    .AddAttribute ("Scheduler",
+                   "UT scheduler used by this Sat UT MAC.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatUtMac::m_utScheduler),
+                   MakePointerChecker<SatUtScheduler> ())
   ;
   return tid;
 }
@@ -86,8 +92,6 @@ SatUtMac::SatUtMac ()
  : SatMac (),
    m_superframeSeq (),
    m_timingAdvanceCb (0),
-   m_ctrlCallback (0),
-   m_txOpportunityCallback (0),
    m_llsConf (0),
    m_framePduHeaderSizeInBytes (1),
    m_randomAccess (NULL),
@@ -104,8 +108,6 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
  : SatMac (beamId),
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
-   m_ctrlCallback (0),
-   m_txOpportunityCallback (0),
    m_llsConf (0),
    m_framePduHeaderSizeInBytes (1),
    m_guardTime (MicroSeconds (1)),
@@ -131,8 +133,9 @@ SatUtMac::DoDispose (void)
   NS_LOG_FUNCTION (this);
 
   m_timingAdvanceCb.Nullify ();
-  m_txOpportunityCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
+  m_utScheduler->DoDispose ();
+  m_utScheduler = NULL;
 
   SatMac::DoDispose ();
 }
@@ -143,6 +146,7 @@ SatUtMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   NS_LOG_FUNCTION (this << nodeInfo);
 
   m_tbtpContainer->SetMacAddress (nodeInfo->GetMacAddress ());
+  m_utScheduler->SetNodeInfo (nodeInfo);
   SatMac::SetNodeInfo (nodeInfo);
 }
 
@@ -177,21 +181,6 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_timingAdvanceCb = cb;
-}
-
-void
-SatUtMac::SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-
-  m_ctrlCallback = cb;
-}
-
-void
-SatUtMac::SetTxOpportunityCallback (SatUtMac::TxOpportunityCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_txOpportunityCallback = cb;
 }
 
 Time
@@ -305,28 +294,11 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
 
   NS_LOG_INFO ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1);
-}
-
-Ptr<Packet>
-SatUtMac::DoScheduling (uint32_t payloadBytes, int rcIndex)
-{
-  /**
-   * TODO: DoScheduling is responsible of fetching the packet from upper layer. It may
-   * obey the given RC index or decide by itself which RC index to serve. Note, that the
-   * RC index is currently set to be 1 always, thus UT scheduler is not capable of scheduling
-   * any other RC indices.
-   */
-
-  uint8_t rc = (rcIndex < 0) ? (uint8_t)(1) : (uint8_t)(rcIndex);
-
-  // TxOpportunity
-  Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), rc);
-  return p;
+  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1, SatUtScheduler::LOOSE);
 }
 
 void
-SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex)
+SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
   NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
@@ -361,7 +333,7 @@ SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t car
     {
       NS_LOG_LOGIC ("Tx opportunity: payloadLeft: " << payloadLeft);
 
-      Ptr<Packet> p = DoScheduling (payloadLeft, rcIndex);
+      Ptr<Packet> p = m_utScheduler->DoScheduling (payloadLeft, rcIndex, policy);
 
       // A valid packet received
       if ( p )
@@ -658,7 +630,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       /// schedule transmission
       /// TODO get rid of the hard coded RC index 0
-      Simulator::Schedule (startTime, &SatUtMac::DoTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0);
+      Simulator::Schedule (startTime, &SatUtMac::DoTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0, SatUtScheduler::STRICT);
     }
   else
     {

@@ -30,6 +30,7 @@
 #include "satellite-tbtp-container.h"
 #include "satellite-lower-layer-service.h"
 #include "satellite-queue.h"
+#include "satellite-ut-scheduler.h"
 
 namespace ns3 {
 
@@ -85,33 +86,6 @@ public:
    *
    */
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
-
-  /**
-   * \param msg        the message send
-   * \param address    Packet destination address
-   */
-  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
-
-  /**
-   * \param cb callback to send control messages.
-   */
-  void SetCtrlMsgCallback (SatUtMac::SendCtrlCallback cb);
-
-  /**
-   * Callback to notify upper layer about Tx opportunity.
-   * \param uint32_t payload size in bytes
-   * \param Mac48Address address
-   * \param uint8_t RC index
-   * \return packet Packet to be transmitted to PHY
-   */
-  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t> TxOpportunityCallback;
-
-  /**
-   * Method to set Tx opportunity callback.
-   * \param cb callback to invoke whenever a packet has been received and must
-   *        be forwarded to the higher layers.
-   */
-  void SetTxOpportunityCallback (SatUtMac::TxOpportunityCallback cb);
 
   /**
    * Get Tx time for the next possible superframe.
@@ -174,16 +148,6 @@ private:
     * \return Time Time to transmit
     */
    Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
-
-   /**
-    * UT scheduling is responsible of selecting with which RC index to
-    * use when requesting packets from higher layer. If RC index is set,
-    * then it just utilizes it.
-    * \param payloadBytes
-    * \param rcIndex RC index as int
-    * @return Ptr<Packet> Packet fetched from higher layer
-    */
-   Ptr<Packet> DoScheduling (uint32_t payloadBytes, int rcIndex = -1);
 
    /**
     * \brief Do random access evaluation for Tx opportunities
@@ -318,7 +282,7 @@ private:
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index as int
     */
-   void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1);
+   void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     *
@@ -348,18 +312,6 @@ private:
    * Callback for getting the timing advance information
    */
   TimingAdvanceCallback m_timingAdvanceCb;
-
-  /**
-   * Callback to send control messages.
-  */
-  SendCtrlCallback m_ctrlCallback;
-
-  /**
-   * Callback to notify the txOpportunity to upper layer
-   * Returns a packet
-   * Attributes: payload in bytes
-   */
-  SatUtMac::TxOpportunityCallback m_txOpportunityCallback;
 
   /**
    * The configured lower layer service configuration for this UT MAC.
@@ -402,6 +354,11 @@ private:
    * RA channel assigned to the UT.
    */
   uint32_t m_raChannel;
+
+  /**
+   * UT scheduler
+   */
+  Ptr<SatUtScheduler> m_utScheduler;
 };
 
 } // namespace ns3
