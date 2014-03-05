@@ -316,8 +316,9 @@ private:
     * \param durationInSecs duration of the burst
     * \param payloadBytes payload in bytes
     * \param carrierId Carrier id used for the transmission
+    * \param rcIndex RC index as int
     */
-   void DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+   void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1);
 
    /**
     *

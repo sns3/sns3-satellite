@@ -305,7 +305,7 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
 
   NS_LOG_INFO ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DedicatedAccessTransmit, this, durationInSecs, payloadBytes, carrierId);
+  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1);
 }
 
 Ptr<Packet>
@@ -326,12 +326,12 @@ SatUtMac::DoScheduling (uint32_t payloadBytes, int rcIndex)
 }
 
 void
-SatUtMac::DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId)
+SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex)
 {
-  NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId);
-  NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
+  NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
+  NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
-  NS_LOG_INFO ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
+  NS_LOG_INFO ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
   /**
    * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
    * should be passed with txOpportunity to higher layer, so that it knows which RC_index
@@ -361,7 +361,7 @@ SatUtMac::DedicatedAccessTransmit (double durationInSecs, uint32_t payloadBytes,
     {
       NS_LOG_LOGIC ("Tx opportunity: payloadLeft: " << payloadLeft);
 
-      Ptr<Packet> p = DoScheduling (payloadLeft);
+      Ptr<Packet> p = DoScheduling (payloadLeft, rcIndex);
 
       // A valid packet received
       if ( p )
@@ -657,8 +657,8 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
                    " payload in bytes: " << wf->GetPayloadInBytes ());
 
       /// schedule transmission
-      /// TODO this might have to be changed
-      Simulator::Schedule (startTime, &SatUtMac::DedicatedAccessTransmit, this, duration, wf->GetPayloadInBytes (), carrierId);
+      /// TODO get rid of the hard coded RC index 0
+      Simulator::Schedule (startTime, &SatUtMac::DoTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0);
     }
   else
     {
