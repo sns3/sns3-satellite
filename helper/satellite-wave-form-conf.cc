@@ -37,16 +37,24 @@ namespace ns3 {
 
 
 SatWaveform::SatWaveform ()
+:m_waveformId (0),
+ m_modulatedBits (0),
+ m_codingRate (0.0),
+ m_payloadBytes (0),
+ m_lengthInSymbols (0),
+ m_ebnoRequirement (0.0)
 {
   NS_ASSERT (true);
 }
+
 
 SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols)
 :m_waveformId (wfId),
  m_modulatedBits (modulatedBits),
  m_codingRate (codingRate),
  m_payloadBytes (payloadBytes),
- m_lengthInSymbols (lengthInSymbols)
+ m_lengthInSymbols (lengthInSymbols),
+ m_ebnoRequirement (0.0)
 {
 
 }
@@ -135,12 +143,31 @@ NS_OBJECT_ENSURE_REGISTERED (SatWaveformConf);
 
 
 SatWaveformConf::SatWaveformConf ()
+:m_waveforms (),
+ m_targetBLER (0.00001),
+ m_acmEnabled (false),
+ m_defaultWfId (3),
+ m_minWfId (0),
+ m_maxWfId (23)
 {
   // default constructor should not be used
   NS_ASSERT (false);
 }
 
+/**
+ * Minimum and maximum waveform ids. Note, that currently it is
+ * assumed that all the wfs between min and max are valid!
+ */
+uint32_t m_minWfId;
+uint32_t m_maxWfId;
+
 SatWaveformConf::SatWaveformConf (std::string filePathName)
+:m_waveforms (),
+ m_targetBLER (0.00001),
+ m_acmEnabled (false),
+ m_defaultWfId (3),
+ m_minWfId (0),
+ m_maxWfId (23)
 {
   NS_LOG_FUNCTION (this);
   ReadFromFile (filePathName);
@@ -293,7 +320,7 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
   bool success (false);
 
   // If ACM is disabled, return the default waveform
-  if (!m_acmEnabled)
+  if (!m_acmEnabled || isnan (cno))
     {
       wfId = m_defaultWfId;
       success = true;
