@@ -81,6 +81,8 @@ SatUtScheduler::SetTxOpportunityCallback (SatUtScheduler::TxOpportunityCallback 
 Ptr<Packet>
 SatUtScheduler::DoScheduling (uint32_t payloadBytes, int rcIndex, SatCompliancePolicy_t policy)
 {
+  NS_LOG_FUNCTION (this << payloadBytes << rcIndex);
+
   /**
    * TODO: DoScheduling is responsible of fetching the packet from upper layer. It may
    * obey the given RC index or decide by itself which RC index to serve. Note, that the
@@ -135,6 +137,8 @@ SatUtScheduler::DoScheduling (uint32_t payloadBytes, int rcIndex, SatComplianceP
 void
 SatUtScheduler::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
+  NS_LOG_FUNCTION (this);
+
   m_nodeInfo = nodeInfo;
 }
 

@@ -223,10 +223,10 @@ public:
    */
   typedef enum
   {
-    DA_UNKNOWN,
-    DA_RBDC,
-    DA_VBDC,
-    DA_AVBDC
+    DA_UNKNOWN = 0,
+    DA_RBDC = 1,
+    DA_VBDC = 2,
+    DA_AVBDC = 3
   } SatCapacityAllocationCategory_t;
 
 

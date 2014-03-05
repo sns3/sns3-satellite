@@ -28,6 +28,7 @@
 #include "satellite-lower-layer-service.h"
 #include "satellite-control-message.h"
 #include "satellite-enums.h"
+#include "satellite-node-info.h"
 
 namespace ns3 {
 
@@ -92,6 +93,12 @@ public:
    * GW address needed for CR transmission
    */
   void SetGwAddress (Mac48Address address);
+
+  /**
+   * Set the node info of this UT
+   * \param nodeInfo Node information
+   */
+  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
    * Update C/N0 information from lower layer.
@@ -218,6 +225,16 @@ private:
    * Pending VBDC counter for each RC index
    */
   std::vector<uint32_t> m_pendingVbdcCounters;
+
+  /**
+   * Trace callback used for CR tracing:
+   */
+  TracedCallback< Time, Mac48Address, Ptr<SatCrMessage> > m_crTrace;
+
+  /**
+   * Node information
+   */
+  Ptr<SatNodeInfo> m_nodeInfo;
 
   static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBPS = 2;
   static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBPS = 32;

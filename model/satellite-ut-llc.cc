@@ -41,6 +41,11 @@ SatUtLlc::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtLlc")
     .SetParent<SatLlc> ()
     .AddConstructor<SatUtLlc> ()
+    .AddAttribute ("SatRequestManager",
+                   "The Satellite request manager attached to this UT LLC.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatUtLlc::GetRequestManager),
+                   MakePointerChecker<SatRequestManager> ())
   ;
   return tid;
 }
@@ -111,10 +116,16 @@ SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcI
 }
 
 void
-SatUtLlc::AddRequestManager (Ptr<SatRequestManager> rm)
+SatUtLlc::SetRequestManager (Ptr<SatRequestManager> rm)
 {
   NS_LOG_FUNCTION (this);
   m_requestManager = rm;
+}
+
+Ptr<SatRequestManager>
+SatUtLlc::GetRequestManager () const
+{
+  return m_requestManager;
 }
 
 void
@@ -143,6 +154,15 @@ SatUtLlc::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
       packets += it->second->GetQueue()->GetNumSmallerPackets (maxPacketSizeBytes);
     }
   return packets;
+}
+
+void
+SatUtLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
+{
+  NS_LOG_FUNCTION (this << nodeInfo);
+
+  m_requestManager->SetNodeInfo (nodeInfo);
+  SatLlc::SetNodeInfo (nodeInfo);
 }
 
 } // namespace ns3

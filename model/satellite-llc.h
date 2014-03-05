@@ -154,7 +154,7 @@ public:
    * Set the node info
    * \param nodeInfo containing node specific information
    */
-  void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
+  virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
    * Create and fill the scheduling objects based on LLC layer information.

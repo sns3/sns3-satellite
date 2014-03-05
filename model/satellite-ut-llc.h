@@ -60,10 +60,16 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex);
 
   /**
-   * Add a request manager for UT's LLC instance.
+   * Set a request manager for UT's LLC instance.
    * @param rm Ptr to request manager
    */
-  void AddRequestManager (Ptr<SatRequestManager> rm);
+  void SetRequestManager (Ptr<SatRequestManager> rm);
+
+  /**
+   * Getter for the request manager
+   * \return Ptr<SatRequestManager>
+   */
+  Ptr<SatRequestManager> GetRequestManager () const;
 
   /**
    * Set queue statistics callbacks
@@ -81,6 +87,12 @@ public:
    * \return uint32_t Number of packets
    */
   virtual uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
+
+  /**
+   * Set the node info
+   * \param nodeInfo containing node specific information
+   */
+  virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 protected:
   /**

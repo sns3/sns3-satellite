@@ -22,6 +22,7 @@
 #include "ns3/log.h"
 #include "ns3/double.h"
 #include "ns3/simulator.h"
+#include "ns3/nstime.h"
 #include "satellite-request-manager.h"
 #include "satellite-enums.h"
 
@@ -87,6 +88,9 @@ SatRequestManager::GetTypeId (void)
                    TimeValue (MilliSeconds (560)),
                    MakeTimeAccessor (&SatRequestManager::m_rttEstimate),
                    MakeTimeChecker ())
+    .AddTraceSource ("CrTrace",
+                     "Capacity request trace",
+                     MakeTraceSourceAccessor (&SatRequestManager::m_crTrace))
   ;
   return tid;
 }
@@ -231,6 +235,15 @@ SatRequestManager::SetGwAddress (Mac48Address address)
   NS_LOG_FUNCTION (this << address);
   m_gwAddress = address;
 }
+
+void
+SatRequestManager::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_nodeInfo = nodeInfo;
+}
+
 
 void
 SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId*/, double cno)
@@ -430,6 +443,9 @@ SatRequestManager::SendCapacityRequest (Ptr<SatCrMessage> crMsg)
   if ( !m_ctrlCallback.IsNull ())
     {
       NS_LOG_LOGIC ("Send capacity request to GW: " << m_gwAddress);
+
+      m_crTrace (Simulator::Now (), m_nodeInfo->GetMacAddress (), crMsg);
+
       crMsg->SetCnoEstimate (m_lastCno);
       m_ctrlCallback (crMsg, m_gwAddress);
     }

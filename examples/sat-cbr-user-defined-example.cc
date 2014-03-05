@@ -27,6 +27,25 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-user-defined-example");
 
+// callback called when packet is received by phy RX carrier
+static void CrTraceCb (Time now, Mac48Address addr, Ptr<SatCrMessage> crMsg)
+{
+
+  NS_LOG_INFO ( "General info: " << Simulator::Now().GetSeconds () << " "
+                << addr << " "
+                << crMsg->GetNumCapacityRequestElements () << " "
+                << crMsg->GetSizeInBytes () << " "
+                << crMsg->GetCnoEstimate () );
+
+  SatCrMessage::RequestContainer_t c = crMsg->GetCapacityRequestContent ();
+  for (SatCrMessage::RequestContainer_t::const_iterator it = c.begin ();
+      it != c.end ();
+      ++it)
+    {
+      NS_LOG_INFO ( "CR component: " << (uint32_t)(it->first.first) << " " << it->first.second << " " << it->second);
+    }
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -66,6 +85,9 @@ main (int argc, char *argv[])
   helper->EnablePacketTrace ();
 
   helper->CreateScenario (SatHelper::USER_DEFINED);
+
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/CrTrace",
+                                 MakeCallback (&CrTraceCb));
 
   // enable info logs
   //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
