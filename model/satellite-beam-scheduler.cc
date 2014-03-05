@@ -29,11 +29,12 @@ NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
 
 namespace ns3 {
 
-bool SatBeamScheduler::CompareCno (UtInfoItem_t first, UtInfoItem_t second)
+bool SatBeamScheduler::CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second)
 {
+  double result = false;
+
   double cnoFirst = first.second->GetCnoEstimation ();
   double cnoSecond = second.second->GetCnoEstimation ();
-  double result = true;
 
   if ( !isnan (cnoFirst) )
     {
@@ -53,7 +54,10 @@ bool SatBeamScheduler::CompareCno (UtInfoItem_t first, UtInfoItem_t second)
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator )
  : m_damaEntry (damaEntry),
-   m_cnoEstimator (cnoEstimator)
+   m_cnoEstimator (cnoEstimator),
+   m_isAllocated (false),
+   m_frameId (0),
+   m_waveformId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -64,6 +68,32 @@ SatBeamScheduler::SatUtInfo::GetDamaEntry ()
   NS_LOG_FUNCTION (this);
 
   return m_damaEntry;
+}
+
+void
+SatBeamScheduler::SatUtInfo::SetAllocated (uint8_t frameId, uint32_t waveformId)
+{
+  NS_LOG_FUNCTION (this << frameId << waveformId) ;
+
+  m_frameId = frameId;
+  m_waveformId = waveformId;
+  m_isAllocated = true;
+}
+
+void
+SatBeamScheduler::SatUtInfo::SetDeallocated ()
+{
+  NS_LOG_FUNCTION (this) ;
+
+  m_isAllocated = false;
+}
+
+bool
+SatBeamScheduler::SatUtInfo::IsAllocated () const
+{
+  NS_LOG_FUNCTION (this) ;
+
+  return m_isAllocated;
 }
 
 void
@@ -173,6 +203,7 @@ SatBeamScheduler::SatBeamScheduler ()
     m_cnoEstimatorMode (SatCnoEstimator::LAST)
 {
   NS_LOG_FUNCTION (this);
+
   m_currentUt = m_utSortedInfos.end ();
   m_currentCarrier = m_carrierIds.end ();
   m_currentSlot = m_timeSlots.end ();
@@ -237,6 +268,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute("Max", DoubleValue (maxIndex));
+  m_frameHelper = Create<SatFrameHelper> (m_superframeSeq->GetSuperframeConf (0), m_superframeSeq->GetWaveformConf () );
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
@@ -485,6 +517,26 @@ void SatBeamScheduler::DoPreResourceAllocation ()
       std::sort (m_utSortedInfos.begin (), m_utSortedInfos.end (), CompareCno);
 
       m_currentUt = m_utSortedInfos.begin ();
+
+      for (UtSortedInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
+        {
+          it->second->SetDeallocated ();
+
+          Ptr<SatDamaEntry> damaEntry = it->second->GetDamaEntry ();
+          double frameDurationInSeconds = m_superframeSeq->GetSuperframeConf (0)->GetDurationInSeconds ();
+
+          SatFrameHelper::SatFrameAllocReq  allocReq ( damaEntry->GetCraBasedBytes (frameDurationInSeconds),
+                                                       damaEntry->GetMinRbdcBasedBytes (frameDurationInSeconds),
+                                                       damaEntry->GetRbdcBasedBytes (frameDurationInSeconds),
+                                                       allocReq.m_vbdcBytes = damaEntry->GetVbdcBasedBytes () );
+
+          SatFrameHelper::SatFrameAllocResp allocResp;
+
+          if (m_frameHelper->AllocateToFrame (it->second->GetCnoEstimation (), allocReq, allocResp) )
+            {
+              it->second->SetAllocated (allocResp.m_frameId, allocResp.m_waveformId);
+            }
+        }
 
       Ptr<SatFrameConf> frameConf = NULL;
 

@@ -32,6 +32,7 @@
 #include "ns3/satellite-superframe-sequence.h"
 #include "satellite-dama-entry.h"
 #include "satellite-cno-estimator.h"
+#include "satellite-frame-helper.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -134,6 +135,9 @@ private:
       void AddCnoSample (double sample);
       double GetCnoEstimation ();
       void AddCrMsg (Ptr<SatCrMessage> crMsg);
+      void SetAllocated (uint8_t frameId, uint32_t waveformId);
+      void SetDeallocated ();
+      bool IsAllocated () const;
 
     private:
       typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
@@ -141,6 +145,9 @@ private:
       Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
       Ptr<SatCnoEstimator>  m_cnoEstimator; // Estimator for C/N0
       CrMsgContainer_t      m_crContainer;  // received CRs since last scheduling round.
+      bool                  m_isAllocated;  // Flag indicating, if UT is allocated to a frame
+      uint8_t               m_frameId;      // Id of the allocated frame
+      uint32_t              m_waveformId;   // Id of the waveform selected for the allocated frame
 
   };
 
@@ -264,6 +271,11 @@ private:
    */
   Time m_cnoEstimationWindow;
 
+  /**
+   * Frame helper to maintain load information of the frame and its configuration.
+   */
+  Ptr<SatFrameHelper>  m_frameHelper;
+
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);
 
@@ -277,7 +289,7 @@ private:
   void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
   uint16_t GetNextTimeSlot ();
-  static bool CompareCno (UtInfoItem_t first, UtInfoItem_t second);
+  static bool CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second);
 
   /**
    * Create estimator for the UT according to set attributes.

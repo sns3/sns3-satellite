@@ -60,7 +60,7 @@ public:
   uint32_t GetWaveformId () const;
 
   /**
-   * Get payload of a waveform in bits
+   * Get payload of a waveform in bytes
    * \return payload in bytes
    */
   uint32_t GetPayloadInBytes () const;

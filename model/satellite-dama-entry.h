@@ -69,6 +69,14 @@ public:
   uint32_t GetCraBasedBytes (double durationInSeconds) const;
 
   /**
+   * Get minimum RBDC based bytes with given duration.
+   *
+   * \param durationInSeconds of the transmission in seconds
+   * \return Rate based bytes with given duration.
+   */
+  uint32_t GetMinRbdcBasedBytes (double durationInSeconds) const;
+
+  /**
    * Get RBDC based bytes with given duration.
    *
    * \param durationInSeconds of the transmission in seconds
