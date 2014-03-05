@@ -54,16 +54,113 @@ SatStatsFwdThroughputHelper::~SatStatsFwdThroughputHelper ()
 }
 
 
-template<typename R, typename C, typename P1, typename P2>
 void
-SatStatsFwdThroughputHelper::InstallProbes (NodeContainer userNodes,
-                                            CollectorMap_t &collectorMap,
-                                            R (C::*collectorTraceSink) (P1, P2))
+SatStatsFwdThroughputHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
-  for (NodeContainer::Iterator it = userNodes.Begin ();
-       it != userNodes.End (); ++it)
+  // TODO: Add collectors to convert bytes to kilobytes.
+
+  switch (GetOutputType ())
+    {
+    case SatStatsHelper::OUTPUT_NONE:
+      break;
+
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+      {
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName () + ".txt"),
+                                         "MultiFileMode", BooleanValue (false));
+        CreateCollectors ("ns3::ScalarCollector",
+                          m_terminalCollectors,
+                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
+                          "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
+        ConnectCollectorsToAggregator (m_terminalCollectors,
+                                       "Output",
+                                       m_aggregator,
+                                       &MultiFileAggregator::Write1d);
+        InstallProbes (m_terminalCollectors,
+                       &ScalarCollector::TraceSinkUinteger32);
+        break;
+      }
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+      {
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName ()));
+        CreateCollectors ("ns3::IntervalRateCollector",
+                          m_terminalCollectors,
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+        ConnectCollectorsToAggregator (m_terminalCollectors,
+                                       "OutputWithTime",
+                                       m_aggregator,
+                                       &MultiFileAggregator::Write2d);
+        InstallProbes (m_terminalCollectors,
+                       &IntervalRateCollector::TraceSinkUinteger32);
+        break;
+      }
+
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+      break;
+
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+      // TODO: Add support for boxes in Gnuplot.
+      break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+      {
+        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        //plot->SetTitle ("");
+        plotAggregator->SetLegend ("Time (in seconds)",
+                                   "Received throughput (in bytes per second)");
+        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+
+        CreateCollectors ("ns3::IntervalRateCollector",
+                          m_terminalCollectors,
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+
+        for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
+             it != m_terminalCollectors.end (); ++it)
+          {
+            const std::string context = it->second->GetName ();
+            plotAggregator->Add2dDataset (context, context);
+          }
+
+        m_aggregator = plotAggregator;
+        ConnectCollectorsToAggregator (m_terminalCollectors,
+                                       "OutputWithTime",
+                                       m_aggregator,
+                                       &GnuplotAggregator::Write2d);
+        InstallProbes (m_terminalCollectors,
+                       &IntervalRateCollector::TraceSinkUinteger32);
+        break;
+      }
+
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
+      break;
+
+    default:
+      NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
+      break;
+    }
+
+} // end of `void DoInstall ();`
+
+
+template<typename R, typename C, typename P1, typename P2>
+void
+SatStatsFwdThroughputHelper::InstallProbes (CollectorMap_t &collectorMap,
+                                            R (C::*collectorTraceSink) (P1, P2))
+{
+  NS_LOG_FUNCTION (this);
+  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
+
+  for (NodeContainer::Iterator it = utUsers.Begin();
+       it != utUsers.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
       const uint32_t identifier = GetIdentifierForUtUser (*it);
@@ -94,106 +191,6 @@ SatStatsFwdThroughputHelper::InstallProbes (NodeContainer userNodes,
         }
     }
 }
-
-
-void
-SatStatsFwdThroughputHelper::DoInstall ()
-{
-  NS_LOG_FUNCTION (this);
-
-  // TODO: Add collectors to convert bytes to kilobytes.
-
-  switch (GetOutputType ())
-    {
-    case OUTPUT_NONE:
-      break;
-
-    case OUTPUT_SCALAR_FILE:
-      {
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName () + ".txt"),
-                                         "MultiFileMode", BooleanValue (false));
-        CreateCollectors ("ns3::ScalarCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
-                          "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "Output",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write1d);
-        InstallProbes (GetSatHelper ()->GetUtUsers (),
-                       m_terminalCollectors,
-                       &ScalarCollector::TraceSinkUinteger32);
-        break;
-      }
-
-    case OUTPUT_SCATTER_FILE:
-      {
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()));
-        CreateCollectors ("ns3::IntervalRateCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputWithTime",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write2d);
-        InstallProbes (GetSatHelper ()->GetUtUsers (),
-                       m_terminalCollectors,
-                       &IntervalRateCollector::TraceSinkUinteger32);
-        break;
-      }
-
-    case OUTPUT_HISTOGRAM_FILE:
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_CDF_FILE:
-      break;
-
-    case OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
-      break;
-
-    case OUTPUT_SCATTER_PLOT:
-      {
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Received throughput (in bytes per second)");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-
-        CreateCollectors ("ns3::IntervalRateCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
-
-        for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
-             it != m_terminalCollectors.end (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-
-        m_aggregator = plotAggregator;
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputWithTime",
-                                       m_aggregator,
-                                       &GnuplotAggregator::Write2d);
-        InstallProbes (GetSatHelper ()->GetUtUsers (),
-                       m_terminalCollectors,
-                       &IntervalRateCollector::TraceSinkUinteger32);
-        break;
-      }
-
-    case OUTPUT_HISTOGRAM_PLOT:
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_PLOT:
-      break;
-
-    default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
-      break;
-    }
-
-} // end of `void DoInstall ();`
 
 
 } // end of namespace ns3

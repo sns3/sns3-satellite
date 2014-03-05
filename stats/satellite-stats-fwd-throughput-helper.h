@@ -53,6 +53,17 @@ protected:
   virtual void DoInstall ();
 
 private:
+  /**
+   * \brief Create a probe for each UT user node's application and connect it
+   *        to a collector.
+   * \param collectorTraceSink
+   *
+   * Add the created probes to #m_probes.
+   */
+  template<typename R, typename C, typename P1, typename P2>
+  void InstallProbes (CollectorMap_t &collectorMap,
+                      R (C::*collectorTraceSink) (P1, P2));
+
   ///
   std::list<Ptr<Probe> > m_probes;
 
@@ -61,20 +72,6 @@ private:
 
   ///
   Ptr<DataCollectionObject> m_aggregator;
-
-  /**
-   * \brief Create a probe for each user node's application and connect it to
-   *        a collector.
-   * \param userNodes
-   * \param collectorMap
-   * \param collectorTraceSink
-   *
-   * Add the created probes to #m_probes.
-   */
-  template<typename R, typename C, typename P1, typename P2>
-  void InstallProbes (NodeContainer userNodes,
-                      CollectorMap_t &collectorMap,
-                      R (C::*collectorTraceSink) (P1, P2));
 
 }; // end of class SatStatsFwdThroughputHelper
 

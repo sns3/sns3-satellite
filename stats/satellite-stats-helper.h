@@ -49,6 +49,9 @@ class SatHelper;
 class SatStatsHelper : public SimpleRefCount<SatStatsHelper>
 {
 public:
+
+  // COMMON ENUM DATA TYPES ///////////////////////////////////////////////////
+
   /**
    * \enum IdentifierType_t
    * \brief
@@ -93,6 +96,8 @@ public:
    */
   static std::string GetOutputTypeName (OutputType_t outputType);
 
+  // CONSTRUCTOR AND DESTRUCTOR ///////////////////////////////////////////////
+
   /**
    * \brief
    * \param satHelper
@@ -102,12 +107,16 @@ public:
   /// Destructor.
   virtual ~SatStatsHelper ();
 
+  // PUBLIC METHODS ///////////////////////////////////////////////////////////
+
   /**
    * \brief Install probes, collectors, and aggregators.
    *
    * Behaviour should be implemented by child class in DoInstall().
    */
   void Install ();
+
+  // SETTER AND GETTER METHODS ////////////////////////////////////////////////
 
   /**
    * \param name
@@ -382,11 +391,11 @@ protected:
   virtual uint32_t GetIdentifierForGw (Ptr<Node> gwNode) const;
 
 private:
-  std::string                m_name;            ///<
-  IdentifierType_t           m_identifierType;  ///<
-  OutputType_t               m_outputType;      ///<
-  bool                       m_isInstalled;     ///<
-  Ptr<const SatHelper>       m_satHelper;       ///<
+  std::string           m_name;            ///<
+  IdentifierType_t      m_identifierType;  ///<
+  OutputType_t          m_outputType;      ///<
+  bool                  m_isInstalled;     ///<
+  Ptr<const SatHelper>  m_satHelper;       ///<
 
 }; // end of class SatStatsHelper
 
