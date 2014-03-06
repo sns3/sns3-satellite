@@ -34,7 +34,6 @@
 #include "satellite-traced-interference.h"
 #include "satellite-mac-tag.h"
 #include "satellite-mac.h"
-#include "satellite-rx-error-tag.h"
 #include "ns3/singleton.h"
 #include "satellite-composite-sinr-output-trace-container.h"
 #include "satellite-phy-tx.h"

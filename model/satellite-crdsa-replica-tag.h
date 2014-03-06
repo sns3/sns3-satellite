@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -18,38 +18,40 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#ifndef SATELLITE_RX_ERROR_TAG_H
-#define SATELLITE_RX_ERROR_TAG_H
+#ifndef SATELLITE_CRDSA_REPLICA_TAG_H
+#define SATELLITE_CRDSA_REPLICA_TAG_H
 
 #include "ns3/tag.h"
+#include <vector>
 
 namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements a tag that carries information whether the packet was received correctly
+ * \brief This class implements a tag that carries information about the slot IDs of CRDSA packet replicas
  */
-class SatRxErrorTag : public Tag
+class SatCrdsaReplicaTag : public Tag
 {
 public:
 
-  SatRxErrorTag ();
-  ~SatRxErrorTag ();
+  SatCrdsaReplicaTag ();
+  ~SatCrdsaReplicaTag ();
 
-  void SetError (bool error);
-  bool GetError (void) const;
+  void AddSlotId (uint16_t slotId);
+  std::vector<uint16_t> GetSlotIds (void);
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
   virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
+  virtual void Serialize (TagBuffer buffer) const;
+  virtual void Deserialize (TagBuffer buffer);
   virtual void Print (std::ostream &os) const;
 
 private:
-  bool m_error;
+  std::vector<uint16_t> m_slotIds;
+  uint8_t m_numOfIds;
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_RX_ERROR_TAG_H */
+#endif /* SATELLITE_CRDSA_REPLICA_TAG_H */

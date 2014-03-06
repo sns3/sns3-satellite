@@ -177,18 +177,7 @@ private:
    /**
     *
     */
-   void CreateCrdsaPacketInstances (Ptr<Packet> packet, uint32_t allocationChannel, std::set<uint32_t> slots);
-
-   /**
-    *
-    * \return
-    */
-   Ptr<Packet> FetchPacketForRandomAccess ();
-
-   /**
-    *
-    */
-   void TransmitRandomAccessPacket ();
+   void CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint32_t> slots);
 
    /**
     * \brief Function for removing the past used RA slots
@@ -283,6 +272,16 @@ private:
     * \param rcIndex RC index as int
     */
    void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+
+   /**
+    *
+    * \param payloadBytes
+    * \param rcIndex
+    * \param policy
+    * \return
+    */
+   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
+
 
    /**
     *

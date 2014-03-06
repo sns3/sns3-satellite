@@ -39,6 +39,7 @@
 #include "satellite-queue.h"
 #include "satellite-ut-scheduler.h"
 #include "../helper/satellite-wave-form-conf.h"
+#include "satellite-crdsa-replica-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
 
@@ -303,7 +304,14 @@ SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t car
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
   NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
-  NS_LOG_INFO ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
+  TransmitPackets (FetchPackets (payloadBytes, rcIndex, policy), durationInSecs, carrierId);
+}
+
+SatPhy::PacketContainer_t
+SatUtMac::FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+{
+  NS_LOG_FUNCTION (this);
+
   /**
    * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
    * should be passed with txOpportunity to higher layer, so that it knows which RC_index
@@ -373,7 +381,7 @@ SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t car
   NS_LOG_LOGIC ("The Frame PDU holds " << packets.size () << " packets");
   NS_LOG_LOGIC ("FPDU size:" << payloadBytes - payloadLeft);
 
-  TransmitPackets (packets, durationInSecs, carrierId);
+  return packets;
 }
 
 void
@@ -610,7 +618,12 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       /// start time
       Time slotStartTime = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
-      Time startTime = slotStartTime - Now ();
+      Time offset = slotStartTime - Now ();
+
+      if (offset.IsNegative ())
+        {
+          NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid transmit time");
+        }
 
       /// duration
       Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
@@ -623,14 +636,14 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
                    ", SF ID: " << superFrameId <<
                    " slot: " << result.second <<
                    " SF start: " << superframeStartTime.GetSeconds () <<
-                   " Tx start: " << (Now () + startTime).GetSeconds () <<
+                   " Tx start: " << (Now () + offset).GetSeconds () <<
                    " duration: " << duration <<
                    " carrier ID: " << carrierId <<
                    " payload in bytes: " << wf->GetPayloadInBytes ());
 
       /// schedule transmission
       /// TODO get rid of the hard coded RC index 0
-      Simulator::Schedule (startTime, &SatUtMac::DoTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0, SatUtScheduler::STRICT);
+      Simulator::Schedule (offset, &SatUtMac::DoTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0, SatUtScheduler::STRICT);
     }
   else
     {
@@ -679,9 +692,9 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
     {
       slotConf = frameConf->GetTimeSlotConf (slotId);
 
-      NS_LOG_INFO ("SatUtMac::FindNextAvailableRandomAccessSlot - Slot: " << slotId <<
-                   " slot offset: " << slotConf->GetStartTimeInSeconds () <<
-                   " opportunity offset: " << opportunityOffset.GetSeconds ());
+      //NS_LOG_INFO ("SatUtMac::FindNextAvailableRandomAccessSlot - Slot: " << slotId <<
+      //             " slot offset: " << slotConf->GetStartTimeInSeconds () <<
+      //             " opportunity offset: " << opportunityOffset.GetSeconds ());
 
       /// if slot offset is equal or larger than Tx opportunity offset, i.e., the slot is in the future
       if (slotConf->GetStartTimeInSeconds () >= opportunityOffset.GetSeconds ())
@@ -711,20 +724,12 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
   NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - AC: " << allocationChannel);
 
   /// get current superframe ID
+  /// TODO get rid of the hard coded 0
   uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
   /// loop through the unique packets
   for (uint32_t i = 0; i < txOpportunities.crdsaTxOpportunities.size (); i++)
     {
-      /// TODO get the next packet
-      Ptr<Packet> packet = FetchPacketForRandomAccess ();
-
-      /// if no suitable packet, break
-      if (packet == NULL)
-        {
-          break;
-        }
-
       std::set<uint32_t>::iterator iterSet;
 
       /// loop through the replicas
@@ -739,22 +744,12 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
         }
 
       /// create replicas and schedule the packets
-      CreateCrdsaPacketInstances (packet, allocationChannel, txOpportunities.crdsaTxOpportunities[i]);
+      CreateCrdsaPacketInstances (allocationChannel, txOpportunities.crdsaTxOpportunities[i]);
     }
 }
 
-Ptr<Packet>
-SatUtMac::FetchPacketForRandomAccess ()
-{
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("SatUtMac::FetchPacketForRandomAccess");
-
-  return NULL;
-}
-
 void
-SatUtMac::CreateCrdsaPacketInstances (Ptr<Packet> packet, uint32_t allocationChannel, std::set<uint32_t> slots)
+SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint32_t> slots)
 {
   NS_LOG_FUNCTION (this);
 
@@ -763,45 +758,82 @@ SatUtMac::CreateCrdsaPacketInstances (Ptr<Packet> packet, uint32_t allocationCha
   Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
   uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+
   Time superframeStartTime = GetCurrentSuperFrameStartTime (0);
 
-  std::vector < std::pair< uint32_t,Ptr<Packet> > > replicas;
-  std::set<uint32_t>::iterator iterSet;
+  /// get the slot payload
+  uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (m_raChannel);
 
-  /// create replicas
-  for (iterSet = slots.begin(); iterSet != slots.end(); iterSet++)
+  /// get the next packet
+  Ptr<Packet> packet = m_utScheduler->DoScheduling (payloadBytes, -1, SatUtScheduler::LOOSE);
+
+  if ( packet )
     {
-      replicas.push_back (std::make_pair(*iterSet,packet->Copy ()));
+      std::vector < std::pair< uint16_t,Ptr<Packet> > > replicas;
+      std::vector < SatCrdsaReplicaTag > tags;
+      std::set<uint32_t>::iterator iterSet;
+
+      /// create replicas
+      for (iterSet = slots.begin(); iterSet != slots.end(); iterSet++)
+        {
+          replicas.push_back (std::make_pair(*iterSet,packet->Copy ()));
+        }
+
+      /// create replica slot ID tags
+      for (uint32_t i = 0; i < replicas.size (); i++)
+        {
+          SatCrdsaReplicaTag replicaTag;
+
+          for (uint32_t j = 0; j < replicas.size (); j++)
+            {
+              if (i != j)
+                {
+                  replicaTag.AddSlotId (replicas[j].first);
+                }
+            }
+          tags.push_back (replicaTag);
+        }
+
+      /// loop through the replicas
+      for (uint32_t i = 0; i < replicas.size (); i++)
+        {
+          /// create packet container
+          SatPhy::PacketContainer_t packets;
+
+          /// get packet
+          Ptr<Packet> packet = replicas[i].second;
+
+          /// attach the replica tag
+          packet->AddPacketTag (tags[i]);
+
+          /// push the replica into the container
+          packets.push_back (packet);
+
+          /// time slot configuration
+          Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( replicas[i].first );
+
+          /// start time
+          Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+          Time offset = slotDelay - Now ();
+
+          if (offset.IsNegative ())
+            {
+              NS_FATAL_ERROR ("SatUtMac::CreateCrdsaPacketInstances - Invalid transmit time");
+            }
+
+          /// duration
+          Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
+          double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+
+          /// carrier
+          uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
+
+          /// schedule transmission
+          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, packets, duration, carrierId);
+        }
+      replicas.clear ();
+      tags.clear ();
     }
-
-  /// TODO add tags
-
-  /// loop through the replicas
-  for (uint32_t i = 0; i < replicas.size (); i++)
-    {
-      /// create packet container
-      SatPhy::PacketContainer_t packets;
-
-      /// push the replica into the container
-      packets.push_back (replicas[i].second);
-
-      /// time slot configuration
-      Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( replicas[i].first );
-
-      /// start time
-      Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
-
-      /// duration
-      Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-      double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-
-      /// carrier
-      uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
-
-      /// schedule transmission
-      Simulator::Schedule (slotDelay, &SatUtMac::TransmitPackets, this, packets, duration, carrierId);
-    }
-  replicas.clear ();
 }
 
 bool
