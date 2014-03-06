@@ -168,7 +168,7 @@ SatFrameHelper::SatFrameHelper (Ptr<SatSuperframeConf> superFrameConf, Ptr<SatWa
 }
 
 void
-SatFrameHelper::ResetCounters ()
+SatFrameHelper::RemoveAllocations ()
 {
   NS_LOG_FUNCTION (this);
 

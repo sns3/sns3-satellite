@@ -452,6 +452,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
   DoConfigure ();
 
   // make actual configuration
+  m_waveFormConf = waveFormConf;
 
   switch (m_configTypeIndex)
     {
@@ -464,8 +465,8 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
                                                              m_frameCarrierRollOff[frameIndex], m_frameCarrierSpacing[frameIndex] );
 
               // get default waveform
-              uint32_t defaultWaveFormId = waveFormConf->GetDefaultWaveformId ();
-              Ptr<SatWaveform> defaultWaveForm = waveFormConf->GetWaveform (defaultWaveFormId);
+              uint32_t defaultWaveFormId = m_waveFormConf->GetDefaultWaveformId ();
+              Ptr<SatWaveform> defaultWaveForm = m_waveFormConf->GetWaveform (defaultWaveFormId);
 
               double timeSlotDuration = defaultWaveForm->GetBurstDurationInSeconds (btuConf->GetSymbolRateInBauds ());
               uint32_t slotCount = std::max<uint32_t> (1 ,(targetDuration.GetSeconds() / timeSlotDuration ));
@@ -558,6 +559,32 @@ SatSuperframeConf::GetRaChannelFrameId (uint32_t raChannel) const
     }
 
   return frameId;
+}
+
+uint32_t
+SatSuperframeConf::GetRaChannelPayloadInBytes (uint32_t raChannel) const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t payloadInBytes = 0;
+
+
+  if ( raChannel < m_raChannels.size ())
+    {
+      uint8_t frameId = m_raChannels[raChannel].first;
+      Ptr<SatTimeSlotConf> timeSlotConf = m_frames[frameId]->GetTimeSlotConf (0);
+      Ptr<SatWaveform> waveform = m_waveFormConf->GetWaveform( timeSlotConf->GetWaveFormId ());
+
+      payloadInBytes = waveform->GetPayloadInBytes ();
+
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Channel out of range!!!");
+    }
+
+  return payloadInBytes;
+
 }
 
 std::string

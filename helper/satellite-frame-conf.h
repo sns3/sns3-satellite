@@ -451,6 +451,13 @@ public:
   uint8_t GetRaChannelFrameId (uint32_t raChannel) const;
 
   /**
+   * Get the payload of the RA channel in bytes.
+   *
+   * \return Payload of the RA channel [bytes]
+   */
+  uint32_t GetRaChannelPayloadInBytes (uint32_t raChannel) const;
+
+  /**
    * Set number of frames to be used in super frame.
    *
    * \param frameCount Number of the frames in use
@@ -508,6 +515,7 @@ private:
   SatFrameConfList_t            m_frames;
   std::vector<RaChannelInfo_t>  m_raChannels;
   uint32_t                      m_carrierCount;
+  Ptr<SatWaveformConf>          m_waveFormConf;
 
 public:
   // macro to ease definition of access methods for frame specific attributes

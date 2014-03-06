@@ -127,12 +127,17 @@ public:
 
   /**
    * Allocate to the frame.
-   * @param cno C/N0 estimation to use in allocation
-   * @param allocReq  Allocation request parameters for CCs
-   * @param allocResp Frame information when allocation is successful
-   * @return true when allocation is successful, false otherwise
+   * \param cno C/N0 estimation to use in allocation
+   * \param allocReq  Allocation request parameters for CCs
+   * \param allocResp Frame information when allocation is successful
+   * \return true when allocation is successful, false otherwise
    */
   bool AllocateToFrame (double cno, SatFrameAllocReq &allocReq, SatFrameAllocResp &allocResp);
+
+  /**
+   * Remove allocations from all frames maintained by frame helper.
+   */
+  void RemoveAllocations ();
 
 private:
 
@@ -194,11 +199,6 @@ private:
 
   FrameInfoContainer_t  m_frameInfos;
   Ptr<SatWaveformConf>  m_waveformConf;
-
-  /**
-   * Reset load counters.
-   */
-  void ResetCounters ();
 
   /**
    *

@@ -518,6 +518,8 @@ void SatBeamScheduler::DoPreResourceAllocation ()
 
       m_currentUt = m_utSortedInfos.begin ();
 
+      m_frameHelper->RemoveAllocations ();
+
       for (UtSortedInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
         {
           it->second->SetDeallocated ();
