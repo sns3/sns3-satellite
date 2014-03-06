@@ -274,6 +274,17 @@ private:
    void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
+    * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
+    * returns a PDU, send it to lower layer.
+    *
+    * \param durationInSecs duration of the burst
+    * \param payloadBytes payload in bytes
+    * \param carrierId Carrier id used for the transmission
+    * \param rcIndex RC index as int
+    */
+   void DoSlottedAlohaTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+
+   /**
     *
     * \param payloadBytes
     * \param rcIndex

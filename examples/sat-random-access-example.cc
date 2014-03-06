@@ -33,7 +33,7 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (1);
   uint32_t packetSize (128);
   Time interval (Seconds(0.01));
-  Time simLength (Seconds(0.75));
+  Time simLength (Seconds(2.00));
   Time appStartTime = Seconds(0.01);
 
   // enable info logs

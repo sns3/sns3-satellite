@@ -293,18 +293,48 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
 {
   NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << durationInSecs << payloadBytes << carrierId);
 
-  NS_LOG_INFO ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
+  NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1, SatUtScheduler::LOOSE);
+  //Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1, SatUtScheduler::LOOSE);
 }
 
 void
 SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
-  NS_LOG_LOGIC ("Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
+  NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
   TransmitPackets (FetchPackets (payloadBytes, rcIndex, policy), durationInSecs, carrierId);
+}
+
+void
+SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+{
+  NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
+  NS_LOG_INFO ("SatUtMac::DoSlottedAlohaTransmit - Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
+
+  SatPhy::PacketContainer_t packets;
+
+  Ptr<Packet> packet = m_utScheduler->DoScheduling (payloadBytes, rcIndex, policy);
+
+  if ( packet )
+    {
+      NS_LOG_LOGIC ("Received a PPDU of size: " << packet->GetSize ());
+
+      // Add packet trace entry:
+      m_packetTrace (Simulator::Now(),
+                     SatEnums::PACKET_SENT,
+                     m_nodeInfo->GetNodeType (),
+                     m_nodeInfo->GetNodeId (),
+                     m_nodeInfo->GetMacAddress (),
+                     SatEnums::LL_MAC,
+                     SatEnums::LD_RETURN,
+                     SatUtils::GetPacketInfo (packet));
+
+      packets.push_back (packet);
+
+      TransmitPackets (packets, durationInSecs, carrierId);
+    }
 }
 
 SatPhy::PacketContainer_t
@@ -392,6 +422,8 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, double durationInS
   // If there are packets to send
   if (!packets.empty ())
     {
+      NS_LOG_INFO ("SatUtMac::TransmitPackets - Transmitting " << packets.size () << " packets, duration: " << durationInSecs << ", carrier: " << carrierId);
+
       // Decrease a guard time from time slot duration.
       Time duration (Time::FromDouble(durationInSecs, Time::S) - m_guardTime);
       NS_LOG_LOGIC ("Duration double: " << durationInSecs << " duration time: " << duration.GetSeconds ());
@@ -643,7 +675,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       /// schedule transmission
       /// TODO get rid of the hard coded RC index 0
-      Simulator::Schedule (offset, &SatUtMac::DoTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0, SatUtScheduler::STRICT);
+      Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0, SatUtScheduler::STRICT);
     }
   else
     {

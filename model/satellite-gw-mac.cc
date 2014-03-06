@@ -102,6 +102,8 @@ SatGwMac::DoDispose ()
 void
 SatGwMac::StartPeriodicSending()
 {
+  NS_LOG_FUNCTION (this);
+
   if ( m_fwdScheduler == NULL )
     {
       NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
@@ -216,6 +218,8 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 void
 SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, const SatControlMsgTag &ctrlTag)
 {
+  NS_LOG_FUNCTION (this);
+
   switch (ctrlTag.GetMsgType ())
   {
     case SatControlMsgTag::SAT_CR_CTRL_MSG:
