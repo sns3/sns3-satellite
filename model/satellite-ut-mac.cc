@@ -295,7 +295,7 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
 
   NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
-  //Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1, SatUtScheduler::LOOSE);
+  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1, SatUtScheduler::LOOSE);
 }
 
 void
