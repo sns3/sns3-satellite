@@ -116,7 +116,10 @@ main (int argc, char *argv[])
   //LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
+  //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_PREFIX_ALL);
+  //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
@@ -132,6 +135,22 @@ main (int argc, char *argv[])
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+
+  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);

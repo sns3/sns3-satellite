@@ -77,6 +77,8 @@ public:
    */
   std::string GetName () const;
 
+  // FORWARD THROUGHPUT STATISTICS ////////////////////////////////////////////
+
   /**
    * \brief
    * \param outputType
@@ -106,6 +108,38 @@ public:
    * \param outputType
    */
   void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
+
+  // RETURN THROUGHPUT STATISTICS /////////////////////////////////////////////
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddGlobalRtnThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerGwRtnThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerBeamRtnThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtRtnThroughput (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtUserRtnThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType

@@ -548,7 +548,7 @@ SatStatsHelper::ConnectCollectorsToAggregator (SatStatsHelper::CollectorMap_t &c
        it != collectorMap.end (); ++it)
     {
       Ptr<DataCollectionObject> collector = it->second;
-      NS_ASSERT (it->second != 0);
+      NS_ASSERT (collector != 0);
       const std::string context = collector->GetName ();
       Ptr<C> target = aggregator->GetObject<C> ();
       NS_ASSERT (target != 0);
@@ -577,7 +577,7 @@ SatStatsHelper::ConnectCollectorsToAggregator (SatStatsHelper::CollectorMap_t &c
        it != collectorMap.end (); ++it)
     {
       Ptr<DataCollectionObject> collector = it->second;
-      NS_ASSERT (it->second != 0);
+      NS_ASSERT (collector != 0);
       const std::string context = collector->GetName ();
       Ptr<C> target = aggregator->GetObject<C> ();
       NS_ASSERT (target != 0);

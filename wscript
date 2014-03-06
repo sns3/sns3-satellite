@@ -119,6 +119,7 @@ def build(bld):
         'helper/satellite-wave-form-conf.cc',
         'stats/satellite-stats-helper.cc',
         'stats/satellite-stats-fwd-throughput-helper.cc',
+        'stats/satellite-stats-rtn-throughput-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
 
@@ -265,6 +266,7 @@ def build(bld):
         'helper/satellite-wave-form-conf.h',
         'stats/satellite-stats-helper.h',
         'stats/satellite-stats-fwd-throughput-helper.h',
+        'stats/satellite-stats-rtn-throughput-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]
 
