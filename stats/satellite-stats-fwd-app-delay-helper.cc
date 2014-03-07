@@ -112,7 +112,7 @@ SatStatsFwdAppDelayHelper::DoInstall ()
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Received throughput (in bytes per second)");
+                                   "Packet delay (in seconds)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
         // TODO Should use TransparentCollector.
