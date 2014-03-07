@@ -91,9 +91,6 @@ main (int argc, char *argv[])
   // remove next line from comments to run real time simulation
   // GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
-  Config::SetDefault ("ns3::SatUserHelper::BackboneNetworkType",
-                      EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
-
   // Create reference system, two options:
   // - "Scenario72"
   // - "Scenario98"
@@ -128,11 +125,29 @@ main (int argc, char *argv[])
 
   //LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
+  //LogComponentEnable ("SatStatsFwdAppDelayHelper", LOG_PREFIX_ALL);
+  //LogComponentEnable ("SatStatsFwdAppDelayHelper", LOG_LEVEL_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
   //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -150,6 +165,22 @@ main (int argc, char *argv[])
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
+  stats->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerGwRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerGwRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerGwRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+
   stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
@@ -166,12 +197,14 @@ main (int argc, char *argv[])
   stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
+  /*
   // Output config store to txt format.
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.txt"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("RawText"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureAttributes ();
+  */
 
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();

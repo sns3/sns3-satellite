@@ -129,11 +129,27 @@ main (int argc, char *argv[])
 
   //LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
+  //LogComponentEnable ("SatStatsFwdAppDelayHelper", LOG_PREFIX_ALL);
+  //LogComponentEnable ("SatStatsFwdAppDelayHelper", LOG_LEVEL_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
   //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
-  //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_PREFIX_ALL);
-  //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_LEVEL_ALL);
   Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
+
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -151,28 +167,14 @@ main (int argc, char *argv[])
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-
+  /*
   // Output config store to txt format.
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.txt"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("RawText"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureAttributes ();
+  */
 
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();
