@@ -729,6 +729,15 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std:
   return slots;
 }
 
+/**
+TODO The known DAMA capacity condition is different for control and data.
+For control the known DAMA is limited to the SF about to start, i.e.,
+the look ahead is one SF. For data the known DAMA allocation can be
+one or more SF in the future, i.e., the look ahead contains all known
+future DAMA allocations. With CRDSA the control packets have priority
+over data packets.
+*/
+
 void
 SatRandomAccess::SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCallback callback)
 {
