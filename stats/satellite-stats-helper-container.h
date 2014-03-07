@@ -141,6 +141,38 @@ public:
    */
   void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
+  // RETURN LINK APPLICATION-LEVEL PACKET DELAY STATISTICS ////////////////////
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddGlobalRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerGwRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerBeamRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtUserRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+
   // RETURN LINK THROUGHPUT STATISTICS ////////////////////////////////////////
 
   /**
