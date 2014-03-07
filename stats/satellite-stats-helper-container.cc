@@ -24,6 +24,7 @@
 #include <ns3/enum.h>
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-stats-fwd-app-delay-helper.h>
 #include <ns3/satellite-stats-fwd-throughput-helper.h>
 #include <ns3/satellite-stats-rtn-throughput-helper.h>
 
@@ -61,7 +62,83 @@ SatStatsHelperContainer::GetTypeId ()
                    MakeStringAccessor (&SatStatsHelperContainer::SetName,
                                        &SatStatsHelperContainer::GetName),
                    MakeStringChecker ())
-    // FORWARD THROUGHPUT STATISTICS ATTRIBUTE ////////////////////////////////
+    // FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS /////////////////
+    .AddAttribute ("GlobalFwdAppDelay",
+                   "Enable the output of per GW forward link application-level delay statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFwdAppDelay),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    .AddAttribute ("PerGwFwdAppDelay",
+                   "Enable the output of per GW forward link application-level delay statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFwdAppDelay),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    .AddAttribute ("PerBeamFwdAppDelay",
+                   "Enable the output of per beam forward link application-level delay statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFwdAppDelay),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    .AddAttribute ("PerUtFwdAppDelay",
+                   "Enable the output of per UT forward link application-level delay statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtFwdAppDelay),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    .AddAttribute ("PerUtUserFwdAppDelay",
+                   "Enable the output of per UT user forward link application-level delay statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtUserFwdAppDelay),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCALAR_PLOT,    "SCALAR_PLOT",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    // FORWARD LINK THROUGHPUT STATISTICS ATTRIBUTE ///////////////////////////
     .AddAttribute ("GlobalFwdThroughput",
                    "Enable the output of per GW forward link throughput statistics",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
@@ -137,7 +214,7 @@ SatStatsHelperContainer::GetTypeId ()
                                     SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
                                     SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
                                     SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    // RETURN THROUGHPUT STATISTICS ATTRIBUTE /////////////////////////////////
+    // RETURN LINK THROUGHPUT STATISTICS ATTRIBUTE ////////////////////////////
     .AddAttribute ("GlobalRtnThroughput",
                    "Enable the output of per GW return link throughput statistics",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
@@ -242,6 +319,100 @@ SatStatsHelperContainer::GetName () const
 }
 
 
+// FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS /////////////////////
+
+void
+SatStatsHelperContainer::AddGlobalFwdAppDelay (SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
+      stat->SetName (m_name + "-global-fwd-app-delay"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
+SatStatsHelperContainer::AddPerGwFwdAppDelay (SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
+      stat->SetName (m_name + "-per-gw-fwd-app-delay"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
+SatStatsHelperContainer::AddPerBeamFwdAppDelay (SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
+      stat->SetName (m_name + "-per-beam-fwd-app-delay"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
+SatStatsHelperContainer::AddPerUtFwdAppDelay (SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
+      stat->SetName (m_name + "-per-ut-fwd-app-delay"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+void
+SatStatsHelperContainer::AddPerUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+
+  if (outputType != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
+      stat->SetName (m_name + "-per-ut-user-fwd-app-delay"
+                            + GetOutputTypeSuffix (outputType));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
+      stat->SetOutputType (outputType);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
+
+
+// FORWARD LINK THROUGHPUT STATISTICS /////////////////////////////////////////
+
 void
 SatStatsHelperContainer::AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType)
 {
@@ -331,6 +502,8 @@ SatStatsHelperContainer::AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t
     }
 }
 
+
+// RETURN LINK THROUGHPUT STATISTICS //////////////////////////////////////////
 
 void
 SatStatsHelperContainer::AddGlobalRtnThroughput (SatStatsHelper::OutputType_t outputType)

@@ -77,7 +77,39 @@ public:
    */
   std::string GetName () const;
 
-  // FORWARD THROUGHPUT STATISTICS ////////////////////////////////////////////
+  // FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS ///////////////////
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddGlobalFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerGwFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerBeamFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  /**
+   * \brief
+   * \param outputType
+   */
+  void AddPerUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+
+  // FORWARD LINK THROUGHPUT STATISTICS ///////////////////////////////////////
 
   /**
    * \brief
@@ -109,7 +141,7 @@ public:
    */
   void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
 
-  // RETURN THROUGHPUT STATISTICS /////////////////////////////////////////////
+  // RETURN LINK THROUGHPUT STATISTICS ////////////////////////////////////////
 
   /**
    * \brief
