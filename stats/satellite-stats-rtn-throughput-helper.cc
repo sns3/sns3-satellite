@@ -33,6 +33,7 @@
 #include <ns3/packet.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/data-collection-object.h>
+#include <ns3/unit-conversion-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
@@ -62,8 +63,6 @@ SatStatsRtnThroughputHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO: Add collectors to convert bytes to kilobytes.
-
   switch (GetOutputType ())
     {
     case OUTPUT_NONE:
@@ -76,12 +75,19 @@ SatStatsRtnThroughputHelper::DoInstall ()
                                          "MultiFileMode", BooleanValue (false));
         CreateCollectors ("ns3::ScalarCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
+                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE),
                           "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
         ConnectCollectorsToAggregator (m_terminalCollectors,
                                        "Output",
                                        m_aggregator,
                                        &MultiFileAggregator::Write1d);
+        CreateCollectors ("ns3::UnitConversionCollector",
+                          m_conversionCollectors,
+                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        ConnectCollectorToCollector (m_conversionCollectors,
+                                     "Output",
+                                     m_terminalCollectors,
+                                     &ScalarCollector::TraceSinkDouble);
         break;
       }
 
@@ -91,11 +97,18 @@ SatStatsRtnThroughputHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         CreateCollectors ("ns3::IntervalRateCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
         ConnectCollectorsToAggregator (m_terminalCollectors,
                                        "OutputWithTime",
                                        m_aggregator,
                                        &MultiFileAggregator::Write2d);
+        CreateCollectors ("ns3::UnitConversionCollector",
+                          m_conversionCollectors,
+                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        ConnectCollectorToCollector (m_conversionCollectors,
+                                     "Output",
+                                     m_terminalCollectors,
+                                     &IntervalRateCollector::TraceSinkDouble);
         break;
       }
 
@@ -113,12 +126,12 @@ SatStatsRtnThroughputHelper::DoInstall ()
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Received throughput (in bytes per second)");
+                                   "Received throughput (in kilobits per second)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
         CreateCollectors ("ns3::IntervalRateCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
 
         for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
              it != m_terminalCollectors.end (); ++it)
@@ -132,6 +145,13 @@ SatStatsRtnThroughputHelper::DoInstall ()
                                        "OutputWithTime",
                                        m_aggregator,
                                        &GnuplotAggregator::Write2d);
+        CreateCollectors ("ns3::UnitConversionCollector",
+                          m_conversionCollectors,
+                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        ConnectCollectorToCollector (m_conversionCollectors,
+                                     "Output",
+                                     m_terminalCollectors,
+                                     &IntervalRateCollector::TraceSinkDouble);
         break;
       }
 
@@ -157,6 +177,7 @@ SatStatsRtnThroughputHelper::DoInstall ()
   // Connect to trace sources at GW user node's applications.
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
+  // TODO: Maybe UT users should also be included.
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsRtnThroughputHelper::ApplicationPacketCallback,
                     this);
@@ -192,6 +213,7 @@ SatStatsRtnThroughputHelper::ApplicationPacketCallback (Ptr<const Packet> packet
 
   if (InetSocketAddress::IsMatchingType (from))
     {
+      // Determine the identifier associated with the sender address.
       const Address ipv4Addr = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
       std::map<const Address, uint32_t>::const_iterator it1 = m_identifierMap.find (ipv4Addr);
 
@@ -204,55 +226,17 @@ SatStatsRtnThroughputHelper::ApplicationPacketCallback (Ptr<const Packet> packet
         }
       else
         {
-          SatStatsHelper::CollectorMap_t::iterator it2 = m_terminalCollectors.find (it1->second);
-          NS_ASSERT_MSG (it2 != m_terminalCollectors.end (),
+          // Find the collector with the right identifier.
+          SatStatsHelper::CollectorMap_t::iterator it2 = m_conversionCollectors.find (it1->second);
+          NS_ASSERT_MSG (it2 != m_conversionCollectors.end (),
                          "Unable to find collector with identifier " << it1->second);
+          Ptr<UnitConversionCollector> collector = it2->second->GetObject<UnitConversionCollector> ();
+          NS_ASSERT (collector != 0);
 
-          // TODO: Write TransparentCollector to avoid the following switch block.
-          switch (GetOutputType ())
-            {
-            case OUTPUT_NONE:
-              break;
-
-            case OUTPUT_SCALAR_FILE:
-            case OUTPUT_SCALAR_PLOT:
-              {
-                Ptr<ScalarCollector> collector = it2->second->GetObject<ScalarCollector> ();
-                NS_ASSERT (collector != 0);
-                collector->TraceSinkUinteger32 (0, packet->GetSize ());
-                break;
-              }
-
-            case OUTPUT_SCATTER_FILE:
-            case OUTPUT_SCATTER_PLOT:
-              {
-                Ptr<IntervalRateCollector> collector = it2->second->GetObject<IntervalRateCollector> ();
-                NS_ASSERT (collector != 0);
-                collector->TraceSinkUinteger32 (0, packet->GetSize ());
-                break;
-              }
-
-            case OUTPUT_HISTOGRAM_FILE:
-            case OUTPUT_HISTOGRAM_PLOT:
-              break;
-
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-              break;
-
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              break;
-
-            default:
-              NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
-              break;
-
-            } // end of `switch (GetOutputType ())`
-
-        } // end of `else of if (it1 == m_identifierMap.end ())`
-
-    } // end of `if (InetSocketAddress::IsMatchingType (from))`
+          // Pass the sample to the collector.
+          collector->TraceSinkUinteger32 (0, packet->GetSize ());
+        }
+    }
   else
     {
       NS_LOG_WARN (this << " discarding packet " << packet

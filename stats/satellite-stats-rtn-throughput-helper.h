@@ -84,6 +84,9 @@ private:
   // TODO: Write SaveIpv6Address() method.
 
   // key: identifier ID
+  SatStatsHelper::CollectorMap_t m_conversionCollectors;
+
+  // key: identifier ID
   SatStatsHelper::CollectorMap_t m_terminalCollectors;
 
   ///

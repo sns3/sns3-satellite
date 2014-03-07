@@ -29,8 +29,8 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/data-collection-object.h>
 #include <ns3/probe.h>
+#include <ns3/unit-conversion-collector.h>
 #include <ns3/scalar-collector.h>
-#include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/gnuplot-aggregator.h>
 #include <sstream>
@@ -85,16 +85,15 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       {
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()));
-        // TODO Should use TransparentCollector.
-        CreateCollectors ("ns3::IntervalRateCollector",
+        CreateCollectors ("ns3::UnitConversionCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
+                          "ConversionType", EnumValue (UnitConversionCollector::TRANSPARENT));
         ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputWithTime",
+                                       "OutputTimeValue",
                                        m_aggregator,
                                        &MultiFileAggregator::Write2d);
         InstallProbes (m_terminalCollectors,
-                       &IntervalRateCollector::TraceSinkDouble);
+                       &UnitConversionCollector::TraceSinkDouble);
         break;
       }
 
@@ -115,10 +114,9 @@ SatStatsFwdAppDelayHelper::DoInstall ()
                                    "Packet delay (in seconds)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
-        // TODO Should use TransparentCollector.
-        CreateCollectors ("ns3::IntervalRateCollector",
+        CreateCollectors ("ns3::UnitConversionCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
+                          "ConversionType", EnumValue (UnitConversionCollector::TRANSPARENT));
 
         for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
              it != m_terminalCollectors.end (); ++it)
@@ -129,11 +127,11 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
         m_aggregator = plotAggregator;
         ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputWithTime",
+                                       "OutputTimeValue",
                                        m_aggregator,
                                        &GnuplotAggregator::Write2d);
         InstallProbes (m_terminalCollectors,
-                       &IntervalRateCollector::TraceSinkDouble);
+                       &UnitConversionCollector::TraceSinkDouble);
         break;
       }
 

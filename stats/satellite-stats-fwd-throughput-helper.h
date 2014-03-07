@@ -68,6 +68,9 @@ private:
   std::list<Ptr<Probe> > m_probes;
 
   // key: identifier ID
+  SatStatsHelper::CollectorMap_t m_conversionCollectors;
+
+  // key: identifier ID
   SatStatsHelper::CollectorMap_t m_terminalCollectors;
 
   ///

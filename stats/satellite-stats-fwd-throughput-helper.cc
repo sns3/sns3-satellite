@@ -30,6 +30,7 @@
 #include <ns3/data-collection-object.h>
 #include <ns3/probe.h>
 #include <ns3/application-packet-probe.h>
+#include <ns3/unit-conversion-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
@@ -59,8 +60,6 @@ SatStatsFwdThroughputHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO: Add collectors to convert bytes to kilobytes.
-
   switch (GetOutputType ())
     {
     case SatStatsHelper::OUTPUT_NONE:
@@ -73,14 +72,21 @@ SatStatsFwdThroughputHelper::DoInstall ()
                                          "MultiFileMode", BooleanValue (false));
         CreateCollectors ("ns3::ScalarCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER),
+                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE),
                           "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
         ConnectCollectorsToAggregator (m_terminalCollectors,
                                        "Output",
                                        m_aggregator,
                                        &MultiFileAggregator::Write1d);
-        InstallProbes (m_terminalCollectors,
-                       &ScalarCollector::TraceSinkUinteger32);
+        CreateCollectors ("ns3::UnitConversionCollector",
+                          m_conversionCollectors,
+                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        ConnectCollectorToCollector (m_conversionCollectors,
+                                     "Output",
+                                     m_terminalCollectors,
+                                     &ScalarCollector::TraceSinkDouble);
+        InstallProbes (m_conversionCollectors,
+                       &UnitConversionCollector::TraceSinkUinteger32);
         break;
       }
 
@@ -90,13 +96,20 @@ SatStatsFwdThroughputHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         CreateCollectors ("ns3::IntervalRateCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
         ConnectCollectorsToAggregator (m_terminalCollectors,
                                        "OutputWithTime",
                                        m_aggregator,
                                        &MultiFileAggregator::Write2d);
-        InstallProbes (m_terminalCollectors,
-                       &IntervalRateCollector::TraceSinkUinteger32);
+        CreateCollectors ("ns3::UnitConversionCollector",
+                          m_conversionCollectors,
+                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        ConnectCollectorToCollector (m_conversionCollectors,
+                                     "Output",
+                                     m_terminalCollectors,
+                                     &IntervalRateCollector::TraceSinkDouble);
+        InstallProbes (m_conversionCollectors,
+                       &UnitConversionCollector::TraceSinkUinteger32);
         break;
       }
 
@@ -114,12 +127,12 @@ SatStatsFwdThroughputHelper::DoInstall ()
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Received throughput (in bytes per second)");
+                                   "Received throughput (in kilobits per second)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
         CreateCollectors ("ns3::IntervalRateCollector",
                           m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
 
         for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
              it != m_terminalCollectors.end (); ++it)
@@ -133,8 +146,15 @@ SatStatsFwdThroughputHelper::DoInstall ()
                                        "OutputWithTime",
                                        m_aggregator,
                                        &GnuplotAggregator::Write2d);
-        InstallProbes (m_terminalCollectors,
-                       &IntervalRateCollector::TraceSinkUinteger32);
+        CreateCollectors ("ns3::UnitConversionCollector",
+                          m_conversionCollectors,
+                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        ConnectCollectorToCollector (m_conversionCollectors,
+                                     "Output",
+                                     m_terminalCollectors,
+                                     &IntervalRateCollector::TraceSinkDouble);
+        InstallProbes (m_conversionCollectors,
+                       &UnitConversionCollector::TraceSinkUinteger32);
         break;
       }
 
