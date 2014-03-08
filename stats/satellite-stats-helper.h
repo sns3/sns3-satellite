@@ -33,6 +33,7 @@
 #include <ns3/node-container.h>
 #include <ns3/data-collection-object.h>
 #include <ns3/probe.h>
+#include <ns3/collector-map.h>
 #include <map>
 
 
@@ -42,6 +43,7 @@ namespace ns3 {
 // SATELLITE STATS HELPER /////////////////////////////////////////////////////
 
 class SatHelper;
+class CollectorMap;
 
 /**
  * \brief Abstract class
@@ -235,6 +237,13 @@ protected:
                                      const AttributeValue &v5 = EmptyAttributeValue ()) const;
 
   /**
+   * \brief
+   * \param collectorMap
+   * \return number of collectors created.
+   */
+  uint32_t CreateCollectorPerIdentifier (CollectorMap &collectorMap) const;
+
+  /**
    * \brief Create a new probe and connect it to a specified object and
    *        collector.
    * \param object
@@ -259,6 +268,32 @@ protected:
                            uint32_t identifier,
                            CollectorMap_t &collectorMap,
                            R (C::*collectorTraceSink) (P1, P2)) const;
+
+  /**
+   * \brief Create a new probe and connect it to a specified object and
+   *        collector.
+   * \param object
+   * \param objectTraceSourceName
+   * \param probeName
+   * \param probeTypeId
+   * \param probeTraceSourceName
+   * \param identifier
+   * \param collectorMap
+   * \param collectorTraceSink
+   * \return pointer to the newly created probe, connected to the specified
+   *         object and the right connector, or zero if failure happens.
+   *
+   * Assuming collectors are already created in the collectorMap.
+   */
+  template<typename R, typename C, typename P>
+  Ptr<Probe> InstallProbe (Ptr<Object> object,
+                           std::string objectTraceSourceName,
+                           std::string probeName,
+                           std::string probeTypeId,
+                           std::string probeTraceSourceName,
+                           uint32_t identifier,
+                           CollectorMap &collectorMap,
+                           R (C::*collectorTraceSink) (P, P)) const;
 
   /**
    * \brief
@@ -436,6 +471,55 @@ SatStatsHelper::InstallProbe (Ptr<Object> object,
       if (probe->TraceConnectWithoutContext (probeTraceSourceName,
                                              MakeCallback (collectorTraceSink,
                                                            collector)))
+        {
+          return probe;
+        }
+      else
+        {
+          return 0;
+        }
+    }
+  else
+    {
+      return 0;
+    }
+
+} // end of `InstallProbe`
+
+
+template<typename R, typename C, typename P>
+Ptr<Probe>
+SatStatsHelper::InstallProbe (Ptr<Object> object,
+                              std::string objectTraceSourceName,
+                              std::string probeName,
+                              std::string probeTypeId,
+                              std::string probeTraceSourceName,
+                              uint32_t    identifier,
+                              CollectorMap &collectorMap,
+                              R (C::*collectorTraceSink) (P, P)) const
+{
+  // Confirm that the probe type contains the trace source.
+  TypeId probeTid = TypeId::LookupByName (probeTypeId);
+  NS_ASSERT (probeTid.LookupTraceSourceByName (probeTraceSourceName) != 0);
+
+  // Create the probe.
+  ObjectFactory factory;
+  factory.SetTypeId (probeTid);
+  factory.Set ("Name", StringValue (probeName));
+  Ptr<Probe> probe = factory.Create ()->GetObject<Probe> (probeTid);
+
+  // Connect the object to the probe.
+  if (probe->ConnectByObject (objectTraceSourceName, object))
+    {
+      // Connect the probe to the right collector.
+      Ptr<DataCollectionObject> collector = collectorMap.Get (identifier);
+      NS_ASSERT_MSG (collector != 0,
+                     "Unable to find collector with identifier " << identifier);
+      Ptr<C> c = collector->GetObject<C> ();
+      NS_ASSERT (c != 0);
+
+      if (probe->TraceConnectWithoutContext (probeTraceSourceName,
+                                             MakeCallback (collectorTraceSink, c)))
         {
           return probe;
         }

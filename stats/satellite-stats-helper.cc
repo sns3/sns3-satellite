@@ -27,6 +27,7 @@
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
 #include <ns3/singleton.h>
+#include <ns3/collector-map.h>
 #include <ns3/scatter-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <sstream>
@@ -331,6 +332,97 @@ SatStatsHelper::CreateCollectors (std::string collectorTypeId,
   return n;
 
 } // end of `CreateCollectors`
+
+
+uint32_t
+SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
+{
+  uint32_t n = 0;
+
+  switch (GetIdentifierType ())
+    {
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
+      {
+        collectorMap.SetAttribute ("Name", StringValue ("global"));
+        collectorMap.Create (0);
+        n++;
+        break;
+      }
+
+    case SatStatsHelper::IDENTIFIER_GW:
+      {
+        NodeContainer gws = m_satHelper->GetBeamHelper ()->GetGwNodes ();
+        for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+          {
+            const uint32_t gwId = GetGwId (*it);
+            std::ostringstream name;
+            name << "gw-" << gwId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (gwId);
+            n++;
+          }
+        break;
+      }
+
+    case SatStatsHelper::IDENTIFIER_BEAM:
+      {
+        std::list<uint32_t> beams = m_satHelper->GetBeamHelper ()->GetBeams ();
+        for (std::list<uint32_t>::const_iterator it = beams.begin ();
+             it != beams.end (); ++it)
+          {
+            const uint32_t beamId = (*it);
+            std::ostringstream name;
+            name << "beam-" << beamId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (beamId);
+            n++;
+          }
+        break;
+      }
+
+    case SatStatsHelper::IDENTIFIER_UT:
+      {
+        NodeContainer uts = m_satHelper->GetBeamHelper ()->GetUtNodes ();
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+          {
+            const uint32_t utId = GetUtId (*it);
+            std::ostringstream name;
+            name << "ut-" << utId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (utId);
+            n++;
+          }
+        break;
+      }
+
+    case SatStatsHelper::IDENTIFIER_UT_USER:
+      {
+        NodeContainer utUsers = m_satHelper->GetUtUsers ();
+        for (NodeContainer::Iterator it = utUsers.Begin ();
+             it != utUsers.End (); ++it)
+          {
+            const uint32_t utUserId = GetUtUserId (*it);
+            std::ostringstream name;
+            name << "ut-user-" << utUserId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (utUserId);
+            n++;
+          }
+        break;
+      }
+
+    default:
+      NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
+      break;
+    }
+
+  NS_LOG_INFO (this << " created " << n << " instance(s)"
+                    << " for " << GetIdentiferTypeName (GetIdentifierType ()));
+
+  return n;
+
+} // end of `uint32_t CreateCollectorPerIdentifier (CollectorMap);`
+
 
 
 // IDENTIFIER RELATED METHODS /////////////////////////////////////////////////
