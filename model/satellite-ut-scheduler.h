@@ -154,6 +154,12 @@ public:
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
+  /**
+   * Set control RC index
+   * \param rcIndex RC index for control messages
+   */
+  void SetControlRcIndex (uint8_t rcIndex);
+
 private:
 
   /**
@@ -194,11 +200,6 @@ private:
   Ptr<SatNodeInfo> m_nodeInfo;
 
   /**
-   * Control msg RC index. By default this is always 0.
-   */
-  uint8_t m_controlMsgRcIndex;
-
-  /**
    * Frame PDU header size. Frame PDU
    */
   uint32_t m_framePduHeaderSizeInBytes;
@@ -215,6 +216,11 @@ private:
    * Available RC indices for scheduling
    */
   std::vector<uint8_t> m_rcIndices;
+
+  /**
+   * RC index used for control
+   */
+  uint8_t m_controlRcIndex;
 };
 
 

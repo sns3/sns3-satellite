@@ -91,6 +91,11 @@ SatUtHelper::GetTypeId (void)
                      PointerValue (),
                      MakePointerAccessor (&SatUtHelper::m_llsConf),
                      MakePointerChecker<SatLowerLayerServiceConf> ())
+       .AddAttribute ("ControlFlowIndex",
+                      "Control flow index.",
+                      UintegerValue (0),
+                      MakeUintegerAccessor (&SatUtHelper::m_controlFlowIndex),
+                      MakeUintegerChecker <uint8_t> ())
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace))
     ;
@@ -112,7 +117,9 @@ SatUtHelper::SatUtHelper ()
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
-   m_randomAccessModel (SatRandomAccess::RA_OFF)
+   m_randomAccessModel (SatRandomAccess::RA_OFF),
+   m_llsConf (),
+   m_controlFlowIndex (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -130,7 +137,9 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
-   m_randomAccessModel (SatRandomAccess::RA_OFF)
+   m_randomAccessModel (SatRandomAccess::RA_OFF),
+   m_llsConf (),
+   m_controlFlowIndex (0)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
@@ -283,19 +292,18 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Control messages are using flow id (RC index) 0. No need for decapsulator for
   // RC index 0 at the GW, since control messages are terminated already at lower
   // layer.
-  uint8_t controlFlowId (0);
-  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, controlFlowId);
+  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, m_controlFlowIndex);
 
   // Create queue event callbacks to MAC and RM
   SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
   // Create a queue
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (controlFlowId);
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (m_controlFlowIndex);
   queue->AddQueueEventCallback (macCb);
   queue->AddQueueEventCallback (rmCb);
   utEncap->SetQueue (queue);
-  llc->AddEncap (addr, utEncap, controlFlowId); // Tx
+  llc->AddEncap (addr, utEncap, m_controlFlowIndex); // Tx
 
   Ptr<SatReturnLinkEncapsulator> gwDecap;
 
@@ -325,10 +333,10 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatGwLlc> gatewayLlc = DynamicCast<SatGwLlc> (gwLlc);
   if (gatewayLlc && !gatewayLlc->ControlEncapsulatorCreated ())
     {
-      queue = CreateObject<SatQueue> (controlFlowId);
-      gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), controlFlowId);
+      queue = CreateObject<SatQueue> (m_controlFlowIndex);
+      gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), m_controlFlowIndex);
       gwEncap->SetQueue (queue);
-      gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, controlFlowId); // Tx
+      gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, m_controlFlowIndex); // Tx
     }
 
   // User data
@@ -367,6 +375,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);
   utScheduler->SetTxOpportunityCallback(MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
   utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  utScheduler->SetControlRcIndex (m_controlFlowIndex);
   mac->SetAttribute("Scheduler", PointerValue (utScheduler));
 
   // Create a node info to all the protocol layers

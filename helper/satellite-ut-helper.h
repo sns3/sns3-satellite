@@ -179,6 +179,11 @@ private:
      * Configured lower layer service configuration.
      */
     Ptr<SatLowerLayerServiceConf> m_llsConf;
+
+    /**
+     * Flow index used for control messages
+     */
+    uint8_t m_controlFlowIndex;
 };
 
 } // namespace ns3

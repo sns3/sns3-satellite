@@ -175,8 +175,6 @@ SatRequestManager::DoEvaluation (bool periodical)
       NS_LOG_LOGIC ("Outgoing kbitrate: " << stats.m_outgoingRateKbps);
       NS_LOG_LOGIC ("Volume in bytes: " << stats.m_volumeInBytes);
       NS_LOG_LOGIC ("Total queue size: " << stats.m_queueSizeBytes);
-
-
       NS_LOG_LOGIC ("Evaluating the needs for RC: " << rc);
 
       // RBDC

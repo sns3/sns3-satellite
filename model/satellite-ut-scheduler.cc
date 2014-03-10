@@ -37,11 +37,6 @@ SatUtScheduler::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtScheduler")
     .SetParent<Object> ()
     .AddConstructor<SatUtScheduler> ()
-    .AddAttribute ("ControlMsgRcIndex",
-                   "Control message RC index",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&SatUtScheduler::m_controlMsgRcIndex),
-                   MakeUintegerChecker<uint8_t> ())
     .AddAttribute ("FramePduHeaderSize",
                    "Frame PDU header size in bytes",
                    UintegerValue (1),
@@ -64,8 +59,8 @@ SatUtScheduler::SatUtScheduler ()
  m_txOpportunityCallback (),
  m_llsConf (),
  m_nodeInfo (),
- m_controlMsgRcIndex (0),
- m_framePduHeaderSizeInBytes (1)
+ m_framePduHeaderSizeInBytes (1),
+ m_controlRcIndex (0)
 {
 
 }
@@ -75,8 +70,8 @@ SatUtScheduler::SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls)
  m_txOpportunityCallback (),
  m_llsConf (lls),
  m_nodeInfo (),
- m_controlMsgRcIndex (0),
- m_framePduHeaderSizeInBytes (1)
+ m_framePduHeaderSizeInBytes (1),
+m_controlRcIndex (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -177,7 +172,7 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
   uint32_t schedBytes (0);
 
   // User data packets are encapsulated within Frame PDU
-  if (rcIndex != m_controlMsgRcIndex)
+  if (rcIndex != m_controlRcIndex)
     {
       payloadBytes -= m_framePduHeaderSizeInBytes;
     }
@@ -205,7 +200,7 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
 
   // If no packets were scheduled, return the frame PDU
   // header size
-  if (schedBytes == 0 && rcIndex != m_controlMsgRcIndex)
+  if (schedBytes == 0 && rcIndex != m_controlRcIndex)
     {
       payloadBytes += m_framePduHeaderSizeInBytes;
     }
@@ -219,6 +214,12 @@ SatUtScheduler::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   NS_LOG_FUNCTION (this);
 
   m_nodeInfo = nodeInfo;
+}
+
+void
+SatUtScheduler::SetControlRcIndex (uint8_t rcIndex)
+{
+  m_controlRcIndex = rcIndex;
 }
 
 std::vector<uint8_t>

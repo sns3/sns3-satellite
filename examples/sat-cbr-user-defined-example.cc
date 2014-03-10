@@ -92,7 +92,7 @@ main (int argc, char *argv[])
   // enable info logs
   //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
+  //LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
