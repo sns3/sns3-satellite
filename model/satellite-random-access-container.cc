@@ -89,6 +89,8 @@ SatRandomAccess::~SatRandomAccess ()
     {
       m_numOfCandidatePacketsCb.Nullify ();
     }
+  m_crdsaAllocationChannels.clear ();
+  m_slottedAlohaAllocationChannels.clear ();
 }
 
 void
@@ -113,6 +115,8 @@ SatRandomAccess::DoDispose ()
     {
       m_numOfCandidatePacketsCb.Nullify ();
     }
+  m_crdsaAllocationChannels.clear ();
+  m_slottedAlohaAllocationChannels.clear ();
 }
 
 ///---------------------------------------
@@ -131,10 +135,68 @@ SatRandomAccess::SetRandomAccessModel (RandomAccessModel_t randomAccessModel)
   NS_LOG_INFO ("SatRandomAccess::SetRandomAccessModel - Random Access model updated");
 }
 
+void
+SatRandomAccess::AddCrdsaAllocationChannel (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::pair<std::set<uint32_t>::iterator,bool> result = m_crdsaAllocationChannels.insert (allocationChannel);
+
+  if (!result.second)
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::AddCrdsaAllocationChannel - insert failed, this allocation channel is already set");
+    }
+}
+
+void
+SatRandomAccess::AddSlottedAlohaAllocationChannel (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::pair<std::set<uint32_t>::iterator,bool> result = m_slottedAlohaAllocationChannels.insert (allocationChannel);
+
+  if (!result.second)
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::AddSlottedAlohaAllocationChannel - insert failed, this allocation channel is already set");
+    }
+}
+
+bool
+SatRandomAccess::IsCrdsaAllocationChannel (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::set<uint32_t>::iterator iter;
+  iter = m_crdsaAllocationChannels.find (allocationChannel);
+
+  if (iter == m_crdsaAllocationChannels.end())
+    {
+      return false;
+    }
+  return true;
+}
+
+bool
+SatRandomAccess::IsSlottedAlohaAllocationChannel (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::set<uint32_t>::iterator iter;
+  iter = m_slottedAlohaAllocationChannels.find (allocationChannel);
+
+  if (iter == m_slottedAlohaAllocationChannels.end())
+    {
+      return false;
+    }
+  return true;
+}
+
 SatRandomAccess::RandomAccessTxOpportunities_s
 SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTriggerType_t triggerType)
 {
   NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess, AC: " << allocationChannel << " trigger: " << triggerType);
 
   /// return variable initialization
   RandomAccessTxOpportunities_s txOpportunities;
@@ -160,8 +222,8 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTrigger
       txOpportunities = DoSlottedAloha ();
     }
   /// Frame start is a known trigger for CRDSA
-  /// If SA is triggered at frame start, both SA and CRDSA will be evaluated.
-  /// TODO: This approach is not optimal and should be improved in the future
+  /// If SA is triggered by a buffer arrival at frame start, both SA and CRDSA will be evaluated.
+  /// TODO: Although the possibility is remote, this approach is not optimal and should be improved in the future
 
   /// When CRDSA is triggered, if the following conditions are fulfilled, SA shall be used instead of CRDSA
   /// 1) CRDSA back off probability is higher than the parameterized value
@@ -192,10 +254,6 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, RandomAccessTrigger
               CrdsaReduceIdleBlocksForAllAllocationChannels ();
             }
         }
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid random access model");
     }
 
   /// For debugging purposes
@@ -550,7 +608,8 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
                                         m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
 
   /// TODO slots.first can be updated to take into account the reserved RA slots from MAC.
-  /// This is needed with, e.g., multiple allocation channels
+  /// This should be done by including the list of used slots in this SF as a parameter for the
+  /// random access algorithm call. This functionality is needed with, e.g., multiple allocation channels
   std::pair <std::set<uint32_t>, std::set<uint32_t> > slots;
   uint32_t actualUniquePackets = 0;
 

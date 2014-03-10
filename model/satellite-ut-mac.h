@@ -309,6 +309,11 @@ private:
    */
   void ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag);
 
+  /**
+   * \brief Function which is executed at every frame start.
+   */
+  void DoFrameStart ();
+
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
 

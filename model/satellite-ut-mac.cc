@@ -168,6 +168,10 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_timingAdvanceCb = cb;
+
+  /// schedule the next frame start
+  /// TODO get rid of hard coded superframe sequence ID 0
+  Simulator::Schedule (GetSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
 }
 
 Time
@@ -929,6 +933,23 @@ SatUtMac::PrintUsedRandomAccessSlots ()
           std::cout << "SF: " << iter->first.first << " AC: " << iter->first.second << " slot: " << *iterSet << std::endl;
         }
     }
+}
+
+void
+SatUtMac::DoFrameStart ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatUtMac::DoFrameStart");
+
+  if (m_randomAccess != NULL)
+    {
+      /// execute CRDSA trigger
+      DoRandomAccess (SatRandomAccess::RA_CRDSA_TRIGGER);
+    }
+
+  /// schedule the next frame start
+  Simulator::Schedule (GetSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
 }
 
 } // namespace ns3
