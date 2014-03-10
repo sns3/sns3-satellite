@@ -24,12 +24,16 @@
 #include <ns3/satellite-beam-helper.h>
 #include <ns3/satellite-user-helper.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/singleton.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
-#include <ns3/singleton.h>
+#include <ns3/node-container.h>
 #include <ns3/collector-map.h>
-#include <ns3/scatter-collector.h>
-#include <ns3/multi-file-aggregator.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/log.h>
+#include <ns3/type-id.h>
+#include <ns3/object-factory.h>
+#include <ns3/string.h>
 #include <sstream>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelper");
@@ -225,113 +229,6 @@ SatStatsHelper::CreateAggregator (std::string aggregatorTypeId,
   factory.Set (n5, v5);
   return factory.Create ()->GetObject<DataCollectionObject> ();
 }
-
-
-uint32_t
-SatStatsHelper::CreateCollectors (std::string collectorTypeId,
-                                  SatStatsHelper::CollectorMap_t &collectorMap,
-                                  std::string n1, const AttributeValue &v1,
-                                  std::string n2, const AttributeValue &v2,
-                                  std::string n3, const AttributeValue &v3,
-                                  std::string n4, const AttributeValue &v4,
-                                  std::string n5, const AttributeValue &v5) const
-{
-  NS_LOG_FUNCTION (this << collectorTypeId);
-
-  uint32_t n = 0;
-  TypeId tid = TypeId::LookupByName (collectorTypeId);
-  ObjectFactory factory;
-  factory.SetTypeId (tid);
-  factory.Set (n1, v1);
-  factory.Set (n2, v2);
-  factory.Set (n3, v3);
-  factory.Set (n4, v4);
-  factory.Set (n5, v5);
-
-  switch (GetIdentifierType ())
-    {
-    case SatStatsHelper::IDENTIFIER_GLOBAL:
-      {
-        factory.Set ("Name", StringValue ("global"));
-        collectorMap[0] = factory.Create ()->GetObject<DataCollectionObject> ();
-        n++;
-        break;
-      }
-
-    case SatStatsHelper::IDENTIFIER_GW:
-      {
-        NodeContainer gws = m_satHelper->GetBeamHelper ()->GetGwNodes ();
-        for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
-          {
-            const uint32_t gwId = GetGwId (*it);
-            std::ostringstream name;
-            name << "gw-" << gwId;
-            factory.Set ("Name", StringValue (name.str ()));
-            collectorMap[gwId] = factory.Create ()->GetObject<DataCollectionObject> (tid);
-            n++;
-          }
-        break;
-      }
-
-    case SatStatsHelper::IDENTIFIER_BEAM:
-      {
-        std::list<uint32_t> beams = m_satHelper->GetBeamHelper ()->GetBeams ();
-        for (std::list<uint32_t>::const_iterator it = beams.begin ();
-             it != beams.end (); ++it)
-          {
-            const uint32_t beamId = (*it);
-            std::ostringstream name;
-            name << "beam-" << beamId;
-            factory.Set ("Name", StringValue (name.str ()));
-            collectorMap[beamId] = factory.Create ()->GetObject<DataCollectionObject> (tid);
-            n++;
-          }
-        break;
-      }
-
-    case SatStatsHelper::IDENTIFIER_UT:
-      {
-        NodeContainer uts = m_satHelper->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
-          {
-            const uint32_t utId = GetUtId (*it);
-            std::ostringstream name;
-            name << "ut-" << utId;
-            factory.Set ("Name", StringValue (name.str ()));
-            collectorMap[utId] = factory.Create ()->GetObject<DataCollectionObject> (tid);
-            n++;
-          }
-        break;
-      }
-
-    case SatStatsHelper::IDENTIFIER_UT_USER:
-      {
-        NodeContainer utUsers = m_satHelper->GetUtUsers ();
-        for (NodeContainer::Iterator it = utUsers.Begin ();
-             it != utUsers.End (); ++it)
-          {
-            const uint32_t utUserId = GetUtUserId (*it);
-            std::ostringstream name;
-            name << "ut-user-" << utUserId;
-            factory.Set ("Name", StringValue (name.str ()));
-            collectorMap[utUserId] = factory.Create ()->GetObject<DataCollectionObject> (tid);
-            n++;
-          }
-        break;
-      }
-
-    default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
-      break;
-    }
-
-  NS_LOG_INFO (this << " created " << n << " instance(s)"
-                    << " of " << collectorTypeId
-                    << " for " << GetIdentiferTypeName (GetIdentifierType ()));
-
-  return n;
-
-} // end of `CreateCollectors`
 
 
 uint32_t

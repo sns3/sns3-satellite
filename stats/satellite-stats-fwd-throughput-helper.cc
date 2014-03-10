@@ -182,48 +182,6 @@ SatStatsFwdThroughputHelper::DoInstall ()
 } // end of `void DoInstall ();`
 
 
-template<typename R, typename C, typename P1, typename P2>
-void
-SatStatsFwdThroughputHelper::InstallProbes (CollectorMap_t &collectorMap,
-                                            R (C::*collectorTraceSink) (P1, P2))
-{
-  NS_LOG_FUNCTION (this);
-  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
-
-  for (NodeContainer::Iterator it = utUsers.Begin();
-       it != utUsers.End (); ++it)
-    {
-      const int32_t utUserId = GetUtUserId (*it);
-      const uint32_t identifier = GetIdentifierForUtUser (*it);
-
-      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
-        {
-          std::ostringstream probeName;
-          probeName << utUserId << "-" << i;
-          Ptr<Probe> probe = InstallProbe ((*it)->GetApplication (i),
-                                           "Rx",
-                                           probeName.str (),
-                                           "ns3::ApplicationPacketProbe",
-                                           "OutputBytes",
-                                           identifier,
-                                           collectorMap,
-                                           collectorTraceSink);
-          if (probe != 0)
-            {
-              NS_LOG_INFO (this << " created probe " << probeName
-                                << ", connected to collector " << identifier);
-              m_probes.push_back (probe);
-            }
-          else
-            {
-              NS_LOG_WARN (this << " unable to create probe " << probeName
-                                << " nor connect it to collector " << identifier);
-            }
-        }
-    }
-}
-
-
 template<typename R, typename C, typename P>
 void
 SatStatsFwdThroughputHelper::InstallProbes (CollectorMap &collectorMap,

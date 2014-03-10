@@ -54,9 +54,9 @@ main (int argc, char *argv[])
     }
 
   // enable info logs
-  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  //LogComponentEnable ("sat-cbr-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-cbr-example", LOG_LEVEL_INFO);
 
   // remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));

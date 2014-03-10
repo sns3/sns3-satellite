@@ -70,45 +70,56 @@ SatStatsRtnThroughputHelper::DoInstall ()
 
     case OUTPUT_SCALAR_FILE:
       {
+        // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName () + ".txt"),
                                          "MultiFileMode", BooleanValue (false));
-        CreateCollectors ("ns3::ScalarCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE),
-                          "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "Output",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write1d);
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_conversionCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
-        ConnectCollectorToCollector (m_conversionCollectors,
-                                     "Output",
-                                     m_terminalCollectors,
-                                     &ScalarCollector::TraceSinkDouble);
+
+        // Setup terminal collectors.
+        m_terminalCollectors.SetType ("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write1d);
+
+        // Setup conversion collectors.
+        m_conversionCollectors.SetType ("ns3::UnitConversionCollector");
+        m_conversionCollectors.SetAttribute ("ConversionType",
+                                             EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        CreateCollectorPerIdentifier (m_conversionCollectors);
+        m_conversionCollectors.ConnectToCollector ("Output",
+                                                   m_terminalCollectors,
+                                                   &ScalarCollector::TraceSinkDouble);
         break;
       }
 
     case OUTPUT_SCATTER_FILE:
       {
+        // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()));
-        CreateCollectors ("ns3::IntervalRateCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputWithTime",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write2d);
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_conversionCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
-        ConnectCollectorToCollector (m_conversionCollectors,
-                                     "Output",
-                                     m_terminalCollectors,
-                                     &IntervalRateCollector::TraceSinkDouble);
+
+        // Setup terminal collectors.
+        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write2d);
+
+        // Setup conversion collectors.
+        m_conversionCollectors.SetType ("ns3::UnitConversionCollector");
+        m_conversionCollectors.SetAttribute ("ConversionType",
+                                             EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        CreateCollectorPerIdentifier (m_conversionCollectors);
+        m_conversionCollectors.ConnectToCollector ("Output",
+                                                   m_terminalCollectors,
+                                                   &IntervalRateCollector::TraceSinkDouble);
         break;
       }
 
@@ -123,35 +134,37 @@ SatStatsRtnThroughputHelper::DoInstall ()
 
     case OUTPUT_SCATTER_PLOT:
       {
+        // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Received throughput (in kilobits per second)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = plotAggregator;
 
-        CreateCollectors ("ns3::IntervalRateCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
-
-        for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
-             it != m_terminalCollectors.end (); ++it)
+        // Setup terminal collectors.
+        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
           {
             const std::string context = it->second->GetName ();
             plotAggregator->Add2dDataset (context, context);
           }
+        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
+                                                  m_aggregator,
+                                                  &GnuplotAggregator::Write2d);
 
-        m_aggregator = plotAggregator;
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputWithTime",
-                                       m_aggregator,
-                                       &GnuplotAggregator::Write2d);
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_conversionCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
-        ConnectCollectorToCollector (m_conversionCollectors,
-                                     "Output",
-                                     m_terminalCollectors,
-                                     &IntervalRateCollector::TraceSinkDouble);
+        // Setup conversion collectors.
+        m_conversionCollectors.SetType ("ns3::UnitConversionCollector");
+        m_conversionCollectors.SetAttribute ("ConversionType",
+                                             EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        CreateCollectorPerIdentifier (m_conversionCollectors);
+        m_conversionCollectors.ConnectToCollector ("Output",
+                                                   m_terminalCollectors,
+                                                   &IntervalRateCollector::TraceSinkDouble);
         break;
       }
 
@@ -227,14 +240,14 @@ SatStatsRtnThroughputHelper::ApplicationPacketCallback (Ptr<const Packet> packet
       else
         {
           // Find the collector with the right identifier.
-          SatStatsHelper::CollectorMap_t::iterator it2 = m_conversionCollectors.find (it1->second);
-          NS_ASSERT_MSG (it2 != m_conversionCollectors.end (),
+          Ptr<DataCollectionObject> collector = m_conversionCollectors.Get (it1->second);
+          NS_ASSERT_MSG (collector != 0,
                          "Unable to find collector with identifier " << it1->second);
-          Ptr<UnitConversionCollector> collector = it2->second->GetObject<UnitConversionCollector> ();
-          NS_ASSERT (collector != 0);
+          Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
+          NS_ASSERT (c != 0);
 
           // Pass the sample to the collector.
-          collector->TraceSinkUinteger32 (0, packet->GetSize ());
+          c->TraceSinkUinteger32 (0, packet->GetSize ());
         }
     }
   else
