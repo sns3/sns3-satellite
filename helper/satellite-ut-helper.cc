@@ -227,7 +227,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId);
-  mac->SetAttribute ("LowerLayerServiceConf", PointerValue (m_llsConf));
   mac->SetReadCtrlCallback (m_readCtrlCb);
   mac->SetWriteCtrlCallback (m_writeCtrlCb);
 
@@ -365,7 +364,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetQueueStatisticsCallbacks ();
 
   // Create UT scheduler for MAC and connect callbacks to LLC
-  Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> ();
+  Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);
   utScheduler->SetTxOpportunityCallback(MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
   utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
   mac->SetAttribute("Scheduler", PointerValue (utScheduler));

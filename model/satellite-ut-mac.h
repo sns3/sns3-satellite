@@ -271,7 +271,7 @@ private:
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index as int
     */
-   void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, uint32_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
@@ -292,7 +292,6 @@ private:
     * \return
     */
    SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
-
 
    /**
     *
@@ -322,17 +321,6 @@ private:
    * Callback for getting the timing advance information
    */
   TimingAdvanceCallback m_timingAdvanceCb;
-
-  /**
-   * The configured lower layer service configuration for this UT MAC.
-   */
-  Ptr<SatLowerLayerServiceConf> m_llsConf;
-
-  /**
-   * Frame PDU header size in bytes. Note, that this is explicitly
-   * modeled but is assumed as overhead to the time slot payload.
-   */
-  uint32_t m_framePduHeaderSizeInBytes;
 
  /**
   * \brief RA main module

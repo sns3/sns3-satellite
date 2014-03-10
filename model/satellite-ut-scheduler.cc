@@ -18,6 +18,7 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include <algorithm>
 #include "ns3/log.h"
 #include "ns3/object.h"
 #include "ns3/callback.h"
@@ -36,16 +37,57 @@ SatUtScheduler::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtScheduler")
     .SetParent<Object> ()
     .AddConstructor<SatUtScheduler> ()
+    .AddAttribute ("ControlMsgRcIndex",
+                   "Control message RC index",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&SatUtScheduler::m_controlMsgRcIndex),
+                   MakeUintegerChecker<uint8_t> ())
+    .AddAttribute ("FramePduHeaderSize",
+                   "Frame PDU header size in bytes",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&SatUtScheduler::m_framePduHeaderSizeInBytes),
+                   MakeUintegerChecker<uint32_t> ())
   ;
   return tid;
 }
 
-SatUtScheduler::SatUtScheduler (void)
-:m_schedContextCallback (),
- m_txOpportunityCallback (),
- m_nodeInfo ()
+TypeId
+SatUtScheduler::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatUtScheduler::SatUtScheduler ()
+:m_schedContextCallback (),
+ m_txOpportunityCallback (),
+ m_llsConf (),
+ m_nodeInfo (),
+ m_controlMsgRcIndex (0),
+ m_framePduHeaderSizeInBytes (1)
+{
+
+}
+
+SatUtScheduler::SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls)
+:m_schedContextCallback (),
+ m_txOpportunityCallback (),
+ m_llsConf (lls),
+ m_nodeInfo (),
+ m_controlMsgRcIndex (0),
+ m_framePduHeaderSizeInBytes (1)
+{
+  NS_LOG_FUNCTION (this);
+
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
+
+  m_utScheduledByteCounters = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
+
+  for (uint32_t i = 0; i < m_llsConf->GetDaServiceCount (); ++i)
+    {
+      m_rcIndices.push_back (i);
+    }
 }
 
 
@@ -61,6 +103,9 @@ SatUtScheduler::DoDispose ()
 
   m_schedContextCallback.Nullify ();
   m_txOpportunityCallback.Nullify ();
+  m_llsConf = NULL;
+  m_nodeInfo = NULL;
+
   Object::DoDispose ();
 }
 
@@ -74,64 +119,98 @@ SatUtScheduler::SetSchedContextCallback (SatUtScheduler::SchedContextCallback cb
 void
 SatUtScheduler::SetTxOpportunityCallback (SatUtScheduler::TxOpportunityCallback cb)
 {
+  NS_LOG_LOGIC (this << &cb);
+
   NS_LOG_FUNCTION (this << &cb);
   m_txOpportunityCallback = cb;
 }
 
-Ptr<Packet>
-SatUtScheduler::DoScheduling (uint32_t payloadBytes, int rcIndex, SatCompliancePolicy_t policy)
+
+void
+SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, uint8_t rcIndex, SatCompliancePolicy_t policy)
+{
+  NS_LOG_FUNCTION (this << payloadBytes << rcIndex << policy);
+
+  NS_LOG_LOGIC ("UT scheduling RC: " << rcIndex << " with " << payloadBytes << " bytes");
+
+  // Schedule the requested RC index
+  DoSchedulingForRcIndex (packets, payloadBytes, rcIndex);
+
+  // If we still have bytes left and the
+  // scheduling policy is loose
+  if (payloadBytes > 0 && policy == LOOSE)
+    {
+      std::vector<uint8_t> rcIndices = GetPrioritizedRcIndexOrder ();
+
+      for (std::vector<uint8_t>::const_iterator it = rcIndices.begin ();
+          it != rcIndices.end ();
+          ++it)
+        {
+          // No use asking the given RC index again
+          if (*it != rcIndex)
+            {
+              NS_LOG_LOGIC ("UT scheduling RC: " << rcIndex << " with " << payloadBytes << " bytes");
+
+              // Schedule the requested RC index
+              uint32_t bytes = DoSchedulingForRcIndex (packets, payloadBytes, *it);
+
+              // If the UT was scheduled update the payload counters
+              if (bytes > 0)
+                {
+                  m_utScheduledByteCounters.at (*it) = m_utScheduledByteCounters.at (*it) + bytes;
+                }
+            }
+
+          if (payloadBytes == 0)
+            {
+              break;
+            }
+        }
+    }
+}
+
+uint32_t
+SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint32_t &payloadBytes, uint8_t rcIndex)
 {
   NS_LOG_FUNCTION (this << payloadBytes << rcIndex);
 
-  /**
-   * TODO: DoScheduling is responsible of fetching the packet from upper layer. It may
-   * obey the given RC index or decide by itself which RC index to serve. Note, that the
-   * RC index is currently set to be 1 always, thus UT scheduler is not capable of scheduling
-   * any other RC indices.
-   */
+  uint32_t schedBytes (0);
 
-  Ptr<Packet> packet;
-  std::vector< Ptr<SatSchedulingObject> > schedulingObjects = m_schedContextCallback ();
-  if (schedulingObjects.empty ())
+  // User data packets are encapsulated within Frame PDU
+  if (rcIndex != m_controlMsgRcIndex)
     {
-      NS_LOG_LOGIC ("No packets buffered in LLC");
-      return packet;
+      payloadBytes -= m_framePduHeaderSizeInBytes;
     }
 
-  if (rcIndex > 0)
+  while (payloadBytes > 0)
     {
-      Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), (uint8_t)(rcIndex));
+      Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), rcIndex);
       if (p)
         {
-          NS_LOG_LOGIC ("Created a packet from the wanted RC index queue, size: " << packet->GetSize ());
-          return p;
+          NS_LOG_LOGIC ("Created a packet from RC: " << rcIndex << " size: " << p->GetSize ());
+
+          packets.push_back (p);
+
+          NS_ASSERT (payloadBytes >= p->GetSize ());
+
+          schedBytes += p->GetSize ();
+          payloadBytes -= p->GetSize ();
         }
-      else if (policy == STRICT)
+      // LLC returned NULL packet
+      else
         {
-          NS_LOG_LOGIC ("Using STRICT compliance policy and no packet was found!");
-          return packet;
+          break;
         }
-      // Else continue scheduling from other RC indeces
     }
 
-  /**
-   * Go through the scheduling objects and try to schedule
-   * TODO: Here we should implement some simple scheduler fairness principle so that
-   * unintended allocations would go bitwise fairly between different RC indices.
-   */
-  std::vector< Ptr<SatSchedulingObject> >::iterator it = schedulingObjects.begin ();
-  for ( ; it != schedulingObjects.end (); ++it)
+  // If no packets were scheduled, return the frame PDU
+  // header size
+  if (schedBytes == 0 && rcIndex != m_controlMsgRcIndex)
     {
-      if (payloadBytes >= (*it)->GetMinTxOpportunityInBytes ())
-        {
-          packet = m_txOpportunityCallback (payloadBytes, (*it)->GetMacAddress (), (*it)->GetPriority ());
-          NS_LOG_LOGIC ("Created a packet from RC index: " << (*it)->GetPriority () << ", size: " << packet->GetSize ());
-          return packet;
-        }
+      payloadBytes += m_framePduHeaderSizeInBytes;
     }
 
-  // Return NULL
-  return packet;
+  return schedBytes;
 }
 
 void
@@ -140,6 +219,16 @@ SatUtScheduler::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   NS_LOG_FUNCTION (this);
 
   m_nodeInfo = nodeInfo;
+}
+
+std::vector<uint8_t>
+SatUtScheduler::GetPrioritizedRcIndexOrder ()
+{
+  NS_LOG_FUNCTION (this);
+
+  std::sort (m_rcIndices.begin (), m_rcIndices.end (), SortByMetric (m_utScheduledByteCounters));
+
+  return m_rcIndices;
 }
 
 } // namespace ns3

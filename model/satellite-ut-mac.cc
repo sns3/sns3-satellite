@@ -57,16 +57,6 @@ SatUtMac::GetTypeId (void)
                     PointerValue (),
                     MakePointerAccessor (&SatUtMac::m_superframeSeq),
                     MakePointerChecker<SatSuperframeSeq> ())
-    .AddAttribute ("LowerLayerServiceConf",
-                   "Pointer to lower layer service configuration.",
-                   PointerValue (),
-                   MakePointerAccessor (&SatUtMac::m_llsConf),
-                   MakePointerChecker<SatLowerLayerServiceConf> ())
-    .AddAttribute ("FramePduHeaderSize",
-                   "Frame PDU header size in bytes",
-                   UintegerValue (1),
-                   MakeUintegerAccessor (&SatUtMac::m_framePduHeaderSizeInBytes),
-                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("GuardTime",
                    "Guard time in return link",
                    TimeValue (MicroSeconds (1)),
@@ -93,8 +83,6 @@ SatUtMac::SatUtMac ()
  : SatMac (),
    m_superframeSeq (),
    m_timingAdvanceCb (0),
-   m_llsConf (0),
-   m_framePduHeaderSizeInBytes (1),
    m_randomAccess (NULL),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0)
@@ -109,8 +97,6 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
  : SatMac (beamId),
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
-   m_llsConf (0),
-   m_framePduHeaderSizeInBytes (1),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0)
 {
@@ -295,11 +281,12 @@ SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, uin
 
   NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, -1, SatUtScheduler::LOOSE);
+  uint32_t rcIndex (0);
+  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, payloadBytes, carrierId, rcIndex, SatUtScheduler::LOOSE);
 }
 
 void
-SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, uint32_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
   NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
@@ -315,23 +302,26 @@ SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, uint32_t payloadBytes, 
 
   SatPhy::PacketContainer_t packets;
 
-  Ptr<Packet> packet = m_utScheduler->DoScheduling (payloadBytes, rcIndex, policy);
+  m_utScheduler->DoScheduling (packets, payloadBytes, rcIndex, policy);
 
-  if ( packet )
+  if ( !packets.empty () )
     {
-      NS_LOG_LOGIC ("Received a PPDU of size: " << packet->GetSize ());
+      NS_LOG_LOGIC ("Number of packets sent in a slotted ALOHA slot: " << packets.size ());
 
-      // Add packet trace entry:
-      m_packetTrace (Simulator::Now(),
-                     SatEnums::PACKET_SENT,
-                     m_nodeInfo->GetNodeType (),
-                     m_nodeInfo->GetNodeId (),
-                     m_nodeInfo->GetMacAddress (),
-                     SatEnums::LL_MAC,
-                     SatEnums::LD_RETURN,
-                     SatUtils::GetPacketInfo (packet));
-
-      packets.push_back (packet);
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+          it != packets.end ();
+          ++it)
+        {
+          // Add packet trace entry:
+          m_packetTrace (Simulator::Now(),
+                         SatEnums::PACKET_SENT,
+                         m_nodeInfo->GetNodeType (),
+                         m_nodeInfo->GetNodeId (),
+                         m_nodeInfo->GetMacAddress (),
+                         SatEnums::LL_MAC,
+                         SatEnums::LD_RETURN,
+                         SatUtils::GetPacketInfo (*it));
+        }
 
       TransmitPackets (packets, durationInSecs, carrierId);
     }
@@ -347,37 +337,26 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatC
    * should be passed with txOpportunity to higher layer, so that it knows which RC_index
    * (= queue) to serve.
    */
-   
-  NS_ASSERT (payloadBytes > m_framePduHeaderSizeInBytes);
-
-  /**
-   * The frame PDU header is taken into account as an overhead,
-   * thus the payload size of the time slot is reduced by a
-   * configured frame PDU header size.
-   */
-  uint32_t payloadLeft = payloadBytes - m_framePduHeaderSizeInBytes;
 
   // Packet container to be sent to lower layers.
   // Packet container models FPDU.
   SatPhy::PacketContainer_t packets;
 
-  /**
-   * Get new PPDUs from higher layer (LLC) until
-   * - The payload is filled to the max OR
-   * - The LLC returns NULL packet
-   */
+  NS_ASSERT (payloadBytes > 0);
 
-  while (payloadLeft > 0)
+  NS_LOG_LOGIC ("Tx opportunity: payloadBytes: " << payloadBytes);
+
+  m_utScheduler->DoScheduling (packets, payloadBytes, rcIndex, policy);
+
+  // A valid packet received
+  if ( !packets.empty () )
     {
-      NS_LOG_LOGIC ("Tx opportunity: payloadLeft: " << payloadLeft);
+      NS_LOG_LOGIC ("Number of packets: " << packets.size ());
 
-      Ptr<Packet> p = m_utScheduler->DoScheduling (payloadLeft, rcIndex, policy);
-
-      // A valid packet received
-      if ( p )
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+          it != packets.end ();
+          ++it)
         {
-          NS_LOG_LOGIC ("Received a PPDU of size: " << p->GetSize ());
-
           // Add packet trace entry:
           m_packetTrace (Simulator::Now(),
                          SatEnums::PACKET_SENT,
@@ -386,30 +365,11 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatC
                          m_nodeInfo->GetMacAddress (),
                          SatEnums::LL_MAC,
                          SatEnums::LD_RETURN,
-                         SatUtils::GetPacketInfo (p));
-
-          packets.push_back (p);
-        }
-      // LLC returned a NULL packet, break the loop
-      else
-        {
-          break;
-        }
-
-      // Update the payloadLeft counter
-      if (payloadLeft >= p->GetSize ())
-        {
-          payloadLeft -= p->GetSize ();
-        }
-      else
-        {
-          NS_FATAL_ERROR ("The PPDU was too big for the time slot!");
+                         SatUtils::GetPacketInfo (*it));
         }
     }
 
-  NS_ASSERT (payloadLeft >= 0);
   NS_LOG_LOGIC ("The Frame PDU holds " << packets.size () << " packets");
-  NS_LOG_LOGIC ("FPDU size:" << payloadBytes - payloadLeft);
 
   return packets;
 }
@@ -622,7 +582,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
       uint32_t timeSlotCount = frameConf->GetTimeSlotCount ();
 
-      std::pair<bool, uint32_t> result = std::make_pair (false,0);
+      std::pair<bool, uint32_t> result = std::make_pair (false, 0);
       uint32_t frameOffset = 0;
       Time superframeStartTime;
 
@@ -675,7 +635,8 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       /// schedule transmission
       /// TODO get rid of the hard coded RC index 0
-      Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, 0, SatUtScheduler::STRICT);
+      uint8_t rcIndex (0);
+      Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf->GetPayloadInBytes (), carrierId, rcIndex, SatUtScheduler::STRICT);
     }
   else
     {
@@ -797,18 +758,27 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (m_raChannel);
 
   /// get the next packet
-  Ptr<Packet> packet = m_utScheduler->DoScheduling (payloadBytes, -1, SatUtScheduler::LOOSE);
+  SatPhy::PacketContainer_t uniq;
+  uint8_t rcIndex (0);
+  m_utScheduler->DoScheduling (uniq, payloadBytes, rcIndex, SatUtScheduler::LOOSE);
 
-  if ( packet )
+  if ( !uniq.empty () )
     {
-      std::vector < std::pair< uint16_t,Ptr<Packet> > > replicas;
+      std::vector < std::pair< uint16_t, std::vector<Ptr<Packet> > > > replicas;
       std::vector < SatCrdsaReplicaTag > tags;
       std::set<uint32_t>::iterator iterSet;
 
       /// create replicas
       for (iterSet = slots.begin(); iterSet != slots.end(); iterSet++)
         {
-          replicas.push_back (std::make_pair(*iterSet,packet->Copy ()));
+          SatPhy::PacketContainer_t rep;
+          SatPhy::PacketContainer_t::const_iterator it = uniq.begin ();
+
+          for ( ; it != uniq.end (); ++it)
+            {
+              rep.push_back ((*it)->Copy ());
+            }
+          replicas.push_back (std::make_pair(*iterSet, rep));
         }
 
       /// create replica slot ID tags
@@ -833,7 +803,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           SatPhy::PacketContainer_t packets;
 
           /// get packet
-          Ptr<Packet> packet = replicas[i].second;
+          Ptr<Packet> packet = replicas[i].second.front ();
 
           /// attach the replica tag
           packet->AddPacketTag (tags[i]);
