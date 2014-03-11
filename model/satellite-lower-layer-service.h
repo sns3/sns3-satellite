@@ -197,7 +197,7 @@ private:
    *
    * \return Maximum consecutive block accessed
    */
-  inline uint8_t GetMaximumConsecutiveBlockAccessedInBytes () const {return m_maxConsecutiveBlockAccessed;}
+  inline uint8_t GetMaximumConsecutiveBlockAccessed () const {return m_maxConsecutiveBlockAccessed;}
 
   /**
    * Set maximum consecutive block accessed.

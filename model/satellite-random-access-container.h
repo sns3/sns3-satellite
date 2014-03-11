@@ -299,6 +299,17 @@ private:
   void CrdsaReduceIdleBlocksForAllAllocationChannels ();
 
   /**
+   * \brief Function for resetting the number of consecutive blocks to zero for all allocation channels
+   */
+  void CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+
+  /**
+   * \brief Function for resetting the number of consecutive blocks to zero for a specific allocation channel
+   * \param allocationChannel allocation channel
+   */
+  void CrdsaResetConsecutiveBlocksUsed (uint32_t allocationChannel);
+
+  /**
    * \brief Function for checking if the allocation channel is free
    * \param allocationChannel allocation channel
    * \return Is the allocation channel free

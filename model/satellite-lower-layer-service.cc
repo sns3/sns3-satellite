@@ -175,13 +175,13 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumConsecutiveBlockAccessed", \
-                  "Maximum consecutive block accessed [bytes] for RA  " + GetIndexAsRaServiceName (index), \
+                  "Maximum consecutive block accessed for RA  " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a2), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumConsecutiveBlockAccessed, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumConsecutiveBlockAccessed), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MinimumIdleBlock", \
-                  "Minimum idle block [bytes] for RA  " + GetIndexAsRaServiceName (index), \
+                  "Minimum idle block for RA  " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a3), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MinimumIdleBlock, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MinimumIdleBlock), \
@@ -227,10 +227,10 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, true, true, false, 100, 200, 50, 100)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, true, false, false, 100, 200, 50, 100)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 500, 500, 500)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 500, 500, 500)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 500, 500, 500)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 500, 500, 500)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 500, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 500, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 500, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 500, 6, 2)
   ;
   return tid;
 }
@@ -436,7 +436,7 @@ SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint8_t index) c
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
-  return m_raServiceEntries[index].GetMaximumUniquePayloadPerBlock ();
+  return m_raServiceEntries[index].GetMaximumConsecutiveBlockAccessed ();
 }
 
 void

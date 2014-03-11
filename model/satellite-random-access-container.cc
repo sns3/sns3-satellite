@@ -255,7 +255,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
           NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid Slotted ALOHA allocation channel, evaluating Slotted ALOHA");
           txOpportunities = DoSlottedAloha ();
         }
-      else if (IsCrdsaAllocationChannel (allocationChannel))
+      else if (triggerType == SatEnums::RA_CRDSA_TRIGGER && IsCrdsaAllocationChannel (allocationChannel))
         {
           NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff & backoff probability");
 
@@ -270,6 +270,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
               txOpportunities = DoSlottedAloha ();
 
               CrdsaReduceIdleBlocksForAllAllocationChannels ();
+              CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
             }
         }
     }
@@ -570,6 +571,25 @@ SatRandomAccess::CrdsaReduceIdleBlocksForAllAllocationChannels ()
     }
 }
 
+void
+SatRandomAccess::CrdsaResetConsecutiveBlocksUsed (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaNumOfConsecutiveBlocksUsed (0);
+}
+
+void
+SatRandomAccess::CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ()
+{
+  NS_LOG_FUNCTION (this);
+
+  for (uint32_t i = 0; i < m_numOfAllocationChannels; i++)
+    {
+      CrdsaResetConsecutiveBlocksUsed (i);
+    }
+}
+
 bool
 SatRandomAccess::CrdsaIsAllocationChannelFree (uint32_t allocationChannel)
 {
@@ -686,7 +706,7 @@ SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsed (uint32_t allocationChannel)
 
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaIdleBlocksLeft (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMinIdleBlocks ());
 
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaNumOfConsecutiveBlocksUsed (0);
+      CrdsaResetConsecutiveBlocksUsed (allocationChannel);
     }
 }
 
@@ -743,17 +763,20 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
             }
           else if (txOpportunities.txOpportunityType == SatEnums::RA_DO_NOTHING)
             {
-              m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaNumOfConsecutiveBlocksUsed (0);
+              CrdsaReduceIdleBlocks (allocationChannel);
+              CrdsaResetConsecutiveBlocksUsed (allocationChannel);
             }
         }
       else
         {
           CrdsaReduceIdleBlocks (allocationChannel);
+          CrdsaResetConsecutiveBlocksUsed (allocationChannel);
         }
     }
   else
     {
       CrdsaReduceIdleBlocks (allocationChannel);
+      CrdsaResetConsecutiveBlocksUsed (allocationChannel);
     }
 
   NS_LOG_INFO ("--------------------------------------");

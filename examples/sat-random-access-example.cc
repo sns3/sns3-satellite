@@ -33,7 +33,7 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (1);
   uint32_t packetSize (128);
   Time interval (Seconds(0.01));
-  Time simLength (Seconds(2.00));
+  Time simLength (Seconds(1.00));
   Time appStartTime = Seconds(0.01);
 
   // enable info logs
@@ -54,7 +54,7 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
   // Enable Random Access
-  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_SLOTTED_ALOHA));
+  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
 
   // Create reference system, two options:
   // - "Scenario72"
