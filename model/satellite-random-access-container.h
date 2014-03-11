@@ -27,6 +27,7 @@
 #include "satellite-random-access-container-conf.h"
 #include "ns3/random-variable-stream.h"
 #include <set>
+#include "satellite-enums.h"
 
 namespace ns3 {
 
@@ -62,47 +63,12 @@ public:
   typedef Callback<uint32_t,uint32_t> NumOfCandidatePacketsCallback;
 
   /**
-   * \enum RandomAccessModel_t
-   * \brief The defined random access models. These define the implemented algorithms
-   */
-  typedef enum
-  {
-    RA_OFF = 0,
-    RA_SLOTTED_ALOHA = 1,
-    RA_CRDSA = 2,
-    RA_ANY_AVAILABLE = 3
-  } RandomAccessModel_t;
-
-  /**
-   * \enum RandomAccessTriggerType_t
-   * \brief The defined random access trigger types. These help determine
-   * which algorithm to use if multiple algorithms are enabled
-   */
-  typedef enum
-  {
-    RA_SLOTTED_ALOHA_TRIGGER = 0,
-    RA_CRDSA_TRIGGER = 1
-  } RandomAccessTriggerType_t;
-
-  /**
-   * \enum RandomAccessTxOpportunityType_t
-   * \brief Random access Tx opportunity types. These are used to define to which algorithm
-   * the results provided by this module applies to
-   */
-  typedef enum
-  {
-    RA_DO_NOTHING = 0,
-    RA_SLOTTED_ALOHA_TX_OPPORTUNITY = 1,
-    RA_CRDSA_TX_OPPORTUNITY = 2,
-  } RandomAccessTxOpportunityType_t;
-
-  /**
    * \struct RandomAccessTxOpportunities_s
    * \brief Random access Tx opportunities. This struct contains the algorithm results from this module
    */
   typedef struct
   {
-    RandomAccessTxOpportunityType_t txOpportunityType;
+    SatEnums::RandomAccessTxOpportunityType_t txOpportunityType;
     uint32_t slottedAlohaTxOpportunity;
     std::vector <std::set<uint32_t> > crdsaTxOpportunities;
     uint32_t allocationChannel;
@@ -116,7 +82,7 @@ public:
   /**
    * \brief Constructor
    */
-  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, RandomAccessModel_t randomAccessModel);
+  SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, SatEnums::RandomAccessModel_t randomAccessModel);
 
   /**
    * \brief Destructor
@@ -133,7 +99,7 @@ public:
    * \brief Function for setting the used random access model
    * \param randomAccessModel random access model
    */
-  void SetRandomAccessModel (RandomAccessModel_t randomAccessModel);
+  void SetRandomAccessModel (SatEnums::RandomAccessModel_t randomAccessModel);
 
   /**
    * \brief Function for setting the load control parameters
@@ -197,7 +163,7 @@ public:
    * \param triggerType RA trigger type
    * \return RA algorithm results (Tx opportunities)
    */
-  SatRandomAccess::RandomAccessTxOpportunities_s DoRandomAccess (uint32_t allocationChannel, RandomAccessTriggerType_t triggerType);
+  SatRandomAccess::RandomAccessTxOpportunities_s DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAccessTriggerType_t triggerType);
 
   /**
    * \brief Function for setting the IsDamaAvailable callback
@@ -361,7 +327,7 @@ private:
   /**
    * \brief The used random access model
    */
-  RandomAccessModel_t m_randomAccessModel;
+  SatEnums::RandomAccessModel_t m_randomAccessModel;
 
   /**
    * \brief A pointer to random access configuration

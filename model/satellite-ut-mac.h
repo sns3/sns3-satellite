@@ -153,7 +153,7 @@ private:
     * \brief Do random access evaluation for Tx opportunities
     * \param randomAccessTriggerType
     */
-   void DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAccessTriggerType);
+   void DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTriggerType);
 
    /**
     * \brief Function for selecting the allocation channel for the current RA evaluation

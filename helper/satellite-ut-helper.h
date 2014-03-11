@@ -173,7 +173,7 @@ private:
     /**
      *
      */
-    SatRandomAccess::RandomAccessModel_t m_randomAccessModel;
+    SatEnums::RandomAccessModel_t m_randomAccessModel;
 
     /**
      * Configured lower layer service configuration.

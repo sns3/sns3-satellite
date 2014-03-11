@@ -462,6 +462,119 @@ public:
     return "";
   };
 
+  /**
+   * \enum RandomAccessTriggerType_t
+   * \brief The defined random access trigger types. These help determine
+   * which algorithm to use if multiple algorithms are enabled
+   */
+  typedef enum
+  {
+    RA_SLOTTED_ALOHA_TRIGGER = 0,
+    RA_CRDSA_TRIGGER = 1
+  } RandomAccessTriggerType_t;
+
+  static inline std::string GetRandomAccessTriggerTypeName (RandomAccessTriggerType_t triggerType)
+  {
+    switch (triggerType)
+    {
+      case RA_SLOTTED_ALOHA_TRIGGER:
+        {
+          return "SLOTTED_ALOHA_TRIGGER";
+        }
+      case RA_CRDSA_TRIGGER:
+        {
+          return "RA_CRDSA_TRIGGER";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetRandomAccessTriggerTypeName - Invalid trigger type");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetRandomAccessTriggerTypeName - Invalid trigger type");
+    return "";
+  };
+
+  /**
+   * \enum RandomAccessModel_t
+   * \brief The defined random access models. These define the implemented algorithms
+   */
+  typedef enum
+  {
+    RA_OFF = 0,
+    RA_SLOTTED_ALOHA = 1,
+    RA_CRDSA = 2,
+    RA_ANY_AVAILABLE = 3
+  } RandomAccessModel_t;
+
+  static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)
+  {
+    switch (model)
+    {
+      case RA_OFF:
+        {
+          return "RA_OFF";
+        }
+      case RA_SLOTTED_ALOHA:
+        {
+          return "RA_SLOTTED_ALOHA";
+        }
+      case RA_CRDSA:
+        {
+          return "RA_CRDSA";
+        }
+      case RA_ANY_AVAILABLE:
+        {
+          return "RA_ANY_AVAILABLE";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetRandomAccessModelName - Invalid model");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetRandomAccessModelName - Invalid model");
+    return "";
+  };
+
+  /**
+   * \enum RandomAccessTxOpportunityType_t
+   * \brief Random access Tx opportunity types. These are used to define to which algorithm
+   * the results provided by this module applies to
+   */
+  typedef enum
+  {
+    RA_DO_NOTHING = 0,
+    RA_SLOTTED_ALOHA_TX_OPPORTUNITY = 1,
+    RA_CRDSA_TX_OPPORTUNITY = 2,
+  } RandomAccessTxOpportunityType_t;
+
+  static inline std::string GetRandomAccessOpportunityTypeName (RandomAccessTxOpportunityType_t opportunityType)
+  {
+    switch (opportunityType)
+    {
+      case RA_DO_NOTHING:
+        {
+          return "RA_DO_NOTHING";
+        }
+      case RA_SLOTTED_ALOHA_TX_OPPORTUNITY:
+        {
+          return "RA_SLOTTED_ALOHA_TX_OPPORTUNITY";
+        }
+      case RA_CRDSA_TX_OPPORTUNITY:
+        {
+          return "RA_CRDSA_TX_OPPORTUNITY";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetRandomAccessOpportunityTypeName - Invalid opportunity type");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetRandomAccessOpportunityTypeName - Invalid opportunity type");
+    return "";
+  };
+
 private:
 
   /**

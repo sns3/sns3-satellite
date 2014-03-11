@@ -80,12 +80,12 @@ SatUtHelper::GetTypeId (void)
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
       .AddAttribute ("RandomAccessModel",
                      "Random Access Model",
-                     EnumValue (SatRandomAccess::RA_OFF),
+                     EnumValue (SatEnums::RA_OFF),
                      MakeEnumAccessor (&SatUtHelper::m_randomAccessModel),
-                     MakeEnumChecker (SatRandomAccess::RA_OFF, "RA not in use.",
-                                      SatRandomAccess::RA_SLOTTED_ALOHA, "Slotted ALOHA",
-                                      SatRandomAccess::RA_CRDSA, "CRDSA",
-                                      SatRandomAccess::RA_ANY_AVAILABLE, "Any available"))
+                     MakeEnumChecker (SatEnums::RA_OFF, "RA not in use.",
+                                      SatEnums::RA_SLOTTED_ALOHA, "Slotted ALOHA",
+                                      SatEnums::RA_CRDSA, "CRDSA",
+                                      SatEnums::RA_ANY_AVAILABLE, "Any available"))
       .AddAttribute ("LowerLayerServiceConf",
                      "Pointer to lower layer service configuration.",
                      PointerValue (),
@@ -117,7 +117,7 @@ SatUtHelper::SatUtHelper ()
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
-   m_randomAccessModel (SatRandomAccess::RA_OFF),
+   m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
    m_controlFlowIndex (0)
 {
@@ -137,7 +137,7 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
-   m_randomAccessModel (SatRandomAccess::RA_OFF),
+   m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
    m_controlFlowIndex (0)
 {
@@ -196,7 +196,7 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   Ptr<SatRandomAccessConf> randomAccessConf = NULL;
 
-  if (m_randomAccessModel != SatRandomAccess::RA_OFF)
+  if (m_randomAccessModel != SatEnums::RA_OFF)
     {
       randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf);
     }
@@ -385,11 +385,21 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
 
-  if (m_randomAccessModel != SatRandomAccess::RA_OFF)
+  if (m_randomAccessModel != SatEnums::RA_OFF)
     {
+      /// create RA module with defaults
       Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_randomAccessModel);
+
+      /// attach callbacks
       randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));
       randomAccess->SetNumOfCandidatePacketsCallback (MakeCallback(&SatUtLlc::GetNumSmallerPackets, llc));
+
+      /// define which allocation channels should be used with each of the random access models
+      /// TODO get rid of the hard coded allocation channel 0
+      randomAccess->AddCrdsaAllocationChannel (0);
+      randomAccess->AddSlottedAlohaAllocationChannel (0);
+
+      /// attach the RA module
       mac->SetRandomAccess (randomAccess);
     }
 

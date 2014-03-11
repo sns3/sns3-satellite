@@ -414,6 +414,7 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 
   NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - Queue: " << (uint32_t)rcIndex);
 
+  /// TODO this assumes that RC index 0 is the one and only control RC index
   if (rcIndex == 0)
     {
       if (event == SatQueue::FIRST_BUFFERED_PKT || event == SatQueue::BUFFERED_PKT)
@@ -424,7 +425,7 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
             {
               NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - Doing Slotted ALOHA");
 
-              DoRandomAccess (SatRandomAccess::RA_SLOTTED_ALOHA_TRIGGER);
+              DoRandomAccess (SatEnums::RA_SLOTTED_ALOHA_TRIGGER);
             }
         }
     }
@@ -532,7 +533,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 }
 
 void
-SatUtMac::DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAccessTriggerType)
+SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTriggerType)
 {
   NS_LOG_FUNCTION (this);
 
@@ -547,7 +548,7 @@ SatUtMac::DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAcces
   txOpportunities = m_randomAccess->DoRandomAccess (allocationChannel, randomAccessTriggerType);
 
   /// process Slotted ALOHA Tx opportunities
-  if (txOpportunities.txOpportunityType == SatRandomAccess::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
+  if (txOpportunities.txOpportunityType == SatEnums::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
     {
       Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
 
@@ -557,7 +558,7 @@ SatUtMac::DoRandomAccess (SatRandomAccess::RandomAccessTriggerType_t randomAcces
       Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
     }
   /// process CRDSA Tx opportunities
-  else if (txOpportunities.txOpportunityType == SatRandomAccess::RA_CRDSA_TX_OPPORTUNITY)
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_CRDSA_TX_OPPORTUNITY)
     {
       NS_LOG_INFO ("SatUtMac::DoRandomAccess - Processing CRDSA results");
 
@@ -731,7 +732,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
   NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - AC: " << allocationChannel);
 
   /// get current superframe ID
-  /// TODO get rid of the hard coded 0
+  /// TODO get rid of the hard coded superframe sequence 0
   uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
   /// loop through the unique packets
@@ -955,7 +956,7 @@ SatUtMac::DoFrameStart ()
   if (m_randomAccess != NULL)
     {
       /// execute CRDSA trigger
-      DoRandomAccess (SatRandomAccess::RA_CRDSA_TRIGGER);
+      DoRandomAccess (SatEnums::RA_CRDSA_TRIGGER);
     }
 
   /// schedule the next frame start
