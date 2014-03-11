@@ -29,6 +29,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/data-collection-object.h>
 #include <ns3/probe.h>
+#include <ns3/application-delay-probe.h>
 #include <ns3/unit-conversion-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
@@ -65,17 +66,23 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
       {
+        // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName () + ".txt"),
                                          "MultiFileMode", BooleanValue (false));
-        CreateCollectors ("ns3::ScalarCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE),
-                          "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "Output",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write1d);
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write1d);
+
+        // Setup probes.
         InstallProbes (m_terminalCollectors,
                        &ScalarCollector::TraceSinkDouble);
         break;
@@ -83,15 +90,20 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
       {
+        // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()));
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_terminalCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::TRANSPARENT));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputTimeValue",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write2d);
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute ("ConversionType",
+                                           EnumValue (UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write2d);
+
+        // Setup probes.
         InstallProbes (m_terminalCollectors,
                        &UnitConversionCollector::TraceSinkDouble);
         break;
@@ -108,28 +120,30 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
+        // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Packet delay (in seconds)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = plotAggregator;
 
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_terminalCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::TRANSPARENT));
-
-        for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
-             it != m_terminalCollectors.end (); ++it)
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute ("ConversionType",
+                                           EnumValue (UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
           {
             const std::string context = it->second->GetName ();
             plotAggregator->Add2dDataset (context, context);
           }
+        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
+                                                  m_aggregator,
+                                                  &GnuplotAggregator::Write2d);
 
-        m_aggregator = plotAggregator;
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputTimeValue",
-                                       m_aggregator,
-                                       &GnuplotAggregator::Write2d);
+        // Setup probes.
         InstallProbes (m_terminalCollectors,
                        &UnitConversionCollector::TraceSinkDouble);
         break;
@@ -148,46 +162,57 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 } // end of `void DoInstall ();`
 
 
-template<typename R, typename C, typename P1, typename P2>
+template<typename R, typename C, typename P>
 void
-SatStatsFwdAppDelayHelper::InstallProbes (CollectorMap_t &collectorMap,
-                                          R (C::*collectorTraceSink) (P1, P2))
+SatStatsFwdAppDelayHelper::InstallProbes (CollectorMap &collectorMap,
+                                          R (C::*collectorTraceSink) (P, P))
 {
   NS_LOG_FUNCTION (this);
   NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
 
-  for (NodeContainer::Iterator it = utUsers.Begin();
-       it != utUsers.End (); ++it)
+  for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
       const uint32_t identifier = GetIdentifierForUtUser (*it);
 
       for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
         {
+          // Create the probe.
           std::ostringstream probeName;
           probeName << utUserId << "-" << i;
-          Ptr<Probe> probe = InstallProbe ((*it)->GetApplication (i),
-                                           "RxDelay",
-                                           probeName.str (),
-                                           "ns3::ApplicationDelayProbe",
-                                           "OutputSeconds",
-                                           identifier,
-                                           collectorMap,
-                                           collectorTraceSink);
-          if (probe != 0)
+          Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
+          probe->SetName (probeName.str ());
+
+          // Connect the object to the probe.
+          if (probe->ConnectByObject ("RxDelay", (*it)->GetApplication (i)))
             {
-              NS_LOG_INFO (this << " created probe " << probeName
-                                << ", connected to collector " << identifier);
-              m_probes.push_back (probe);
+              // Connect the probe to the right collector.
+              if (collectorMap.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                 "OutputSeconds",
+                                                 identifier,
+                                                 collectorTraceSink))
+                {
+                  NS_LOG_INFO (this << " created probe " << probeName
+                                    << ", connected to collector " << identifier);
+                  m_probes.push_back (probe->GetObject<Probe> ());
+                }
+              else
+                {
+                  NS_LOG_WARN (this << " unable to connect probe " << probeName
+                                    << " to collector " << identifier);
+                }
             }
           else
             {
-              NS_LOG_WARN (this << " unable to create probe " << probeName
-                                << " nor connect it to collector " << identifier);
+              NS_LOG_WARN (this << " unable to connect probe " << probeName
+                                << " to the source application");
             }
-        }
-    }
-}
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (it = utUsers.Begin(); it != utUsers.End (); ++it)`
+
+} // end of `void InstallProbes (CollectorMap, R (C::*) (P, P));`
 
 
 } // end of namespace ns3

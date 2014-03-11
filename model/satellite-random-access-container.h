@@ -217,6 +217,18 @@ public:
    */
   void SetNumOfCandidatePacketsCallback (SatRandomAccess::NumOfCandidatePacketsCallback callback);
 
+  /**
+   *
+   * \param allocationChannel
+   */
+  void AddSlottedAlohaAllocationChannel (uint32_t allocationChannel);
+
+  /**
+   *
+   * \param allocationChannel
+   */
+  void AddCrdsaAllocationChannel (uint32_t allocationChannel);
+
 protected:
 
   /**
@@ -328,6 +340,20 @@ private:
   bool CrdsaIsAllocationChannelFree (uint32_t allocationChannel);
 
   /**
+   *
+   * \param allocationChannel
+   * \return
+   */
+  bool IsCrdsaAllocationChannel (uint32_t allocationChannel);
+
+  /**
+   *
+   * \param allocationChannel
+   * \return
+   */
+  bool IsSlottedAlohaAllocationChannel (uint32_t allocationChannel);
+
+  /**
    * \brief Uniform random variable object
    */
   Ptr<UniformRandomVariable> m_uniformRandomVariable;
@@ -367,6 +393,16 @@ private:
     * \brief Callback for packets matching the size conditions for RA
    */
   NumOfCandidatePacketsCallback m_numOfCandidatePacketsCb;
+
+  /**
+   * \brief Defines the allocation channels which are enabled for Slotted ALOHA
+   */
+  std::set<uint32_t> m_slottedAlohaAllocationChannels;
+
+  /**
+   * \brief Defines the allocation channels which are enabled for CRDSA
+   */
+  std::set<uint32_t> m_crdsaAllocationChannels;
 };
 
 } // namespace ns3

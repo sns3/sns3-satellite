@@ -62,18 +62,6 @@ private:
    *
    * Add the created probes to #m_probes.
    */
-  template<typename R, typename C, typename P1, typename P2>
-  void InstallProbes (CollectorMap_t &collectorMap,
-                      R (C::*collectorTraceSink) (P1, P2));
-
-  /**
-   * \brief Create a probe for each UT user node's application and connect it
-   *        to a collector.
-   * \param collectorMap
-   * \param collectorTraceSink
-   *
-   * Add the created probes to #m_probes.
-   */
   template<typename R, typename C, typename P>
   void InstallProbes (CollectorMap &collectorMap,
                       R (C::*collectorTraceSink) (P, P));

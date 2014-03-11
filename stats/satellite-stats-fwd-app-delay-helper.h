@@ -24,6 +24,7 @@
 
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
+#include <ns3/collector-map.h>
 #include <list>
 
 
@@ -56,19 +57,20 @@ private:
   /**
    * \brief Create a probe for each UT user node's application and connect it
    *        to a collector.
+   * \param collectorMap
    * \param collectorTraceSink
    *
    * Add the created probes to #m_probes.
    */
-  template<typename R, typename C, typename P1, typename P2>
-  void InstallProbes (CollectorMap_t &collectorMap,
-                      R (C::*collectorTraceSink) (P1, P2));
+  template<typename R, typename C, typename P>
+  void InstallProbes (CollectorMap &collectorMap,
+                      R (C::*collectorTraceSink) (P, P));
 
   ///
   std::list<Ptr<Probe> > m_probes;
 
-  // key: identifier ID
-  SatStatsHelper::CollectorMap_t m_terminalCollectors;
+  ///
+  CollectorMap m_terminalCollectors;
 
   ///
   Ptr<DataCollectionObject> m_aggregator;

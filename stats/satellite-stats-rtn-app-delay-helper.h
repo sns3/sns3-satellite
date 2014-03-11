@@ -25,6 +25,7 @@
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
 #include <ns3/address.h>
+#include <ns3/collector-map.h>
 #include <map>
 
 namespace ns3 {
@@ -82,8 +83,8 @@ private:
 
   // TODO: Write SaveIpv6Address() method.
 
-  // key: identifier ID
-  SatStatsHelper::CollectorMap_t m_terminalCollectors;
+  ///
+  CollectorMap m_terminalCollectors;
 
   ///
   Ptr<DataCollectionObject> m_aggregator;

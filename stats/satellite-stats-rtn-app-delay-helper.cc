@@ -69,31 +69,38 @@ SatStatsRtnAppDelayHelper::DoInstall ()
 
     case OUTPUT_SCALAR_FILE:
       {
+        // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName () + ".txt"),
                                          "MultiFileMode", BooleanValue (false));
-        CreateCollectors ("ns3::ScalarCollector",
-                          m_terminalCollectors,
-                          "InputDataType", EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE),
-                          "OutputType", EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "Output",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write1d);
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write1d);
         break;
       }
 
     case OUTPUT_SCATTER_FILE:
       {
+        // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()));
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_terminalCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::TRANSPARENT));
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputTimeValue",
-                                       m_aggregator,
-                                       &MultiFileAggregator::Write2d);
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute ("ConversionType",
+                                           EnumValue (UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write2d);
         break;
       }
 
@@ -108,28 +115,28 @@ SatStatsRtnAppDelayHelper::DoInstall ()
 
     case OUTPUT_SCATTER_PLOT:
       {
+        // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Packet delay (in seconds)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = plotAggregator;
 
-        CreateCollectors ("ns3::UnitConversionCollector",
-                          m_terminalCollectors,
-                          "ConversionType", EnumValue (UnitConversionCollector::TRANSPARENT));
-
-        for (SatStatsHelper::CollectorMap_t::const_iterator it = m_terminalCollectors.begin ();
-             it != m_terminalCollectors.end (); ++it)
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute ("ConversionType",
+                                           EnumValue (UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
           {
             const std::string context = it->second->GetName ();
             plotAggregator->Add2dDataset (context, context);
           }
-
-        m_aggregator = plotAggregator;
-        ConnectCollectorsToAggregator (m_terminalCollectors,
-                                       "OutputTimeValue",
-                                       m_aggregator,
-                                       &GnuplotAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
+                                                  m_aggregator,
+                                                  &GnuplotAggregator::Write2d);
         break;
       }
 
@@ -203,8 +210,8 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
       else
         {
           // Find the collector with the right identifier.
-          SatStatsHelper::CollectorMap_t::iterator it2 = m_terminalCollectors.find (it1->second);
-          NS_ASSERT_MSG (it2 != m_terminalCollectors.end (),
+          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it1->second);
+          NS_ASSERT_MSG (collector != 0,
                          "Unable to find collector with identifier " << it1->second);
 
           // TODO: Utilize TransparentCollector to avoid the following switch block.
@@ -216,18 +223,18 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
             case OUTPUT_SCALAR_FILE:
             case OUTPUT_SCALAR_PLOT:
               {
-                Ptr<ScalarCollector> collector = it2->second->GetObject<ScalarCollector> ();
-                NS_ASSERT (collector != 0);
-                collector->TraceSinkDouble (0.0, delay.GetSeconds ());
+                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
+                NS_ASSERT (c != 0);
+                c->TraceSinkDouble (0.0, delay.GetSeconds ());
                 break;
               }
 
             case OUTPUT_SCATTER_FILE:
             case OUTPUT_SCATTER_PLOT:
               {
-                Ptr<UnitConversionCollector> collector = it2->second->GetObject<UnitConversionCollector> ();
-                NS_ASSERT (collector != 0);
-                collector->TraceSinkDouble (0.0, delay.GetSeconds ());
+                Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
+                NS_ASSERT (c != 0);
+                c->TraceSinkDouble (0.0, delay.GetSeconds ());
                 break;
               }
 
