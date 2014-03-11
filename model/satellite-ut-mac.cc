@@ -67,6 +67,9 @@ SatUtMac::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatUtMac::m_utScheduler),
                    MakePointerChecker<SatUtScheduler> ())
+    .AddTraceSource ("DaResourcesTrace",
+                     "Assigned dedicated access resources in return link to this UT.",
+                     MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace))
   ;
   return tid;
 }
@@ -223,6 +226,8 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
   SatTbtpMessage::DaTimeSlotInfoContainer_t slots = tbtp->GetDaTimeslots (m_nodeInfo->GetMacAddress ());
 
+  uint32_t payloadSumInSuperFrame (0);
+
   if ( !slots.empty ())
     {
       NS_LOG_LOGIC ("TBTP contains " << slots.size () << " timeslots for UT: " << m_nodeInfo->GetMacAddress ());
@@ -259,8 +264,13 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
           ScheduleDaTxOpportunity (slotDelay, duration, wf->GetPayloadInBytes (), carrierId);
+
+          payloadSumInSuperFrame += wf->GetPayloadInBytes ();
         }
     }
+
+  // Assigned TBTP resources
+  m_tbtpResourcesTrace (Simulator::Now (), slots.size (), payloadSumInSuperFrame);
 }
 
 void

@@ -357,6 +357,14 @@ private:
    * UT scheduler
    */
   Ptr<SatUtScheduler> m_utScheduler;
+
+  /**
+   * Traced callback for assigned TBTP resources for this UT
+   * \param Time      Time now
+   * \param uint32_t  Number of slots in superframe
+   * \param uint32_t  Assigned resources in Bytes in superframe
+   */
+  TracedCallback< Time, uint32_t, uint32_t > m_tbtpResourcesTrace;
 };
 
 } // namespace ns3
