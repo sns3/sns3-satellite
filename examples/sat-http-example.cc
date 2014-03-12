@@ -24,7 +24,6 @@
 #include <ns3/internet-module.h>
 #include <ns3/satellite-module.h>
 #include <ns3/traffic-module.h>
-#include <ns3/config-store-module.h>
 
 using namespace ns3;
 
@@ -122,89 +121,6 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Scenario used: " << scenario);
   NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO ("  ");
-
-  //LogComponentEnable ("SatStatsHelper", LOG_PREFIX_ALL);
-  //LogComponentEnable ("SatStatsHelper", LOG_LEVEL_ALL);
-  //LogComponentEnable ("SatStatsFwdAppDelayHelper", LOG_PREFIX_ALL);
-  //LogComponentEnable ("SatStatsFwdAppDelayHelper", LOG_LEVEL_ALL);
-  //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_PREFIX_ALL);
-  //LogComponentEnable ("SatStatsFwdThroughputHelper", LOG_LEVEL_ALL);
-  //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_PREFIX_ALL);
-  //LogComponentEnable ("SatStatsRtnThroughputHelper", LOG_LEVEL_ALL);
-  Ptr<SatStatsHelperContainer> stats = CreateObject<SatStatsHelperContainer> (helper);
-
-  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerGwFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-
-  stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddGlobalFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerGwFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerGwFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerGwFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerBeamFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtUserFwdThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-
-  stats->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerGwRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerGwRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerGwRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-
-  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddGlobalRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerGwRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerBeamRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  stats->AddPerUtUserRtnThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-
-  /*
-  // Output config store to txt format.
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.txt"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("RawText"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureAttributes ();
-  */
 
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();
