@@ -257,32 +257,32 @@ private:
     * Schdules one Tx opportunity, i.e. time slot.
     * \param transmitDelay time when transmit possibility starts
     * \param durationInSecs duration of the burst
-    * \param payloadBytes payload in bytes
+    * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
     */
-   void ScheduleDaTxOpportunity (Time transmitDelay, double durationInSecs, uint32_t payloadBytes, uint32_t carrierId);
+   void ScheduleDaTxOpportunity (Time transmitDelay, double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId);
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
     * returns a PDU, send it to lower layer.
     *
     * \param durationInSecs duration of the burst
-    * \param payloadBytes payload in bytes
+    * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index as int
     */
-   void DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, uint32_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint32_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
     * returns a PDU, send it to lower layer.
     *
     * \param durationInSecs duration of the burst
-    * \param payloadBytes payload in bytes
+    * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index as int
     */
-   void DoSlottedAlohaTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     *

@@ -192,12 +192,6 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 
   Time txDuration = bbFrame->GetDuration ();
 
-  /// TODO this needs to be modified
-  SatSignalParameters::txInfo_s txInfo;
-  txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
-  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
-  txInfo.waveformId = 13;
-
   // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
   if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
     {
@@ -211,6 +205,11 @@ SatGwMac::StartTransmission (uint32_t carrierId)
                      SatEnums::LD_FORWARD,
                      SatUtils::GetPacketInfo (bbFrame->GetTransmitData ()));
                      
+      SatSignalParameters::txInfo_s txInfo;
+      txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
+      txInfo.modCod = bbFrame->GetModcod ();
+      txInfo.waveformId = 0;
+
       /* TODO: The carrierId should be acquired from somewhere. Now
        * we assume only one carrier in forward link, so it is safe to use 0.
        */

@@ -87,7 +87,8 @@ public:
    */
   typedef enum
   {
-    SAT_MODCOD_QPSK_1_TO_2 = 0,
+    SAT_NONVALID_MODCOD = 0,
+    SAT_MODCOD_QPSK_1_TO_2,
     SAT_MODCOD_QPSK_2_TO_3,
     SAT_MODCOD_QPSK_3_TO_4,
     SAT_MODCOD_QPSK_3_TO_5,
@@ -147,6 +148,8 @@ public:
   {
     switch (modcod)
     {
+      case SAT_NONVALID_MODCOD:
+        return "SAT_NONVALID_MODCOD";
       case SAT_MODCOD_QPSK_1_TO_2:
         return "QPSK_1_TO_2";
       case SAT_MODCOD_QPSK_2_TO_3:
