@@ -34,6 +34,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/data-collection-object.h>
 #include <ns3/unit-conversion-collector.h>
+#include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/gnuplot-aggregator.h>
@@ -105,6 +106,25 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     case OUTPUT_HISTOGRAM_FILE:
+      {
+        // Setup aggregator.
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName ()));
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::DistributionCollector");
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write2d);
+        break;
+      }
+
     case OUTPUT_PDF_FILE:
     case OUTPUT_CDF_FILE:
       break;
@@ -141,6 +161,35 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     case OUTPUT_HISTOGRAM_PLOT:
+      {
+        // Setup aggregator.
+        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        //plot->SetTitle ("");
+        plotAggregator->SetLegend ("Packet delay (in seconds)",
+                                   "Frequency");
+        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = plotAggregator;
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::DistributionCollector");
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
+          {
+            const std::string context = it->second->GetName ();
+            plotAggregator->Add2dDataset (context, context);
+          }
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &GnuplotAggregator::Write2d);
+        break;
+      }
+
     case OUTPUT_PDF_PLOT:
     case OUTPUT_CDF_PLOT:
       break;
@@ -214,7 +263,6 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
           NS_ASSERT_MSG (collector != 0,
                          "Unable to find collector with identifier " << it1->second);
 
-          // TODO: Utilize TransparentCollector to avoid the following switch block.
           switch (GetOutputType ())
             {
             case OUTPUT_NONE:
@@ -240,7 +288,12 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
 
             case OUTPUT_HISTOGRAM_FILE:
             case OUTPUT_HISTOGRAM_PLOT:
-              break;
+              {
+                Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
+                NS_ASSERT (c != 0);
+                c->TraceSinkDouble (0.0, delay.GetSeconds ());
+                break;
+              }
 
             case OUTPUT_PDF_FILE:
             case OUTPUT_PDF_PLOT:

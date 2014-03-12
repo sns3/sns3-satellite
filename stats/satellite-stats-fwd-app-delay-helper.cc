@@ -31,6 +31,7 @@
 #include <ns3/probe.h>
 #include <ns3/application-delay-probe.h>
 #include <ns3/unit-conversion-collector.h>
+#include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/gnuplot-aggregator.h>
@@ -110,6 +111,29 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+      {
+        // Setup aggregator.
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName ()));
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::DistributionCollector");
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::Write2d);
+
+        // Setup probes.
+        InstallProbes (m_terminalCollectors,
+                       &DistributionCollector::TraceSinkDouble);
+        break;
+      }
+
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_FILE:
       break;
@@ -150,6 +174,39 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+      {
+        // Setup aggregator.
+        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        //plot->SetTitle ("");
+        plotAggregator->SetLegend ("Packet delay (in seconds)",
+                                   "Frequency");
+        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = plotAggregator;
+
+        // Setup collectors.
+        m_terminalCollectors.SetType ("ns3::DistributionCollector");
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
+          {
+            const std::string context = it->second->GetName ();
+            plotAggregator->Add2dDataset (context, context);
+          }
+        m_terminalCollectors.ConnectToAggregator ("Output",
+                                                  m_aggregator,
+                                                  &GnuplotAggregator::Write2d);
+
+        // Setup probes.
+        InstallProbes (m_terminalCollectors,
+                       &DistributionCollector::TraceSinkDouble);
+        break;
+      }
+
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       break;
