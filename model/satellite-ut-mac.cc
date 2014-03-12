@@ -609,7 +609,12 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       std::pair<bool, uint32_t> result = std::make_pair (false, 0);
       uint32_t frameOffset = 0;
-      Time superframeStartTime;
+      Time superframeStartTime = GetCurrentSuperFrameStartTime (0);
+
+      if ( Now () < superframeStartTime )
+        {
+          NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid SF start time");
+        }
 
       uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
@@ -617,8 +622,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       /// if there is no free slots in the current frame, look for it in the following frames
       while (!result.first)
         {
-          superframeStartTime = GetCurrentSuperFrameStartTime (0)
-              + Seconds (frameOffset * frameConf->GetDurationInSeconds ());
+          superframeStartTime += Seconds (frameOffset * frameConf->GetDurationInSeconds ());
 
           result = SearchFrameForAvailableSlot (superframeStartTime, frameConf, timeSlotCount, superFrameId, allocationChannel);
 
@@ -639,7 +643,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       if (offset.IsNegative ())
         {
-          NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid transmit time");
+          NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid transmit time: " << offset.GetSeconds ());
         }
 
       /// duration
@@ -739,11 +743,11 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - AC: " << allocationChannel);
-
   /// get current superframe ID
   /// TODO get rid of the hard coded superframe sequence 0
   uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
+
+  NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - AC: " << allocationChannel << ", SF: " << superFrameId << ", num of opportunities: " << txOpportunities.crdsaTxOpportunities.size ());
 
   /// loop through the unique packets
   for (uint32_t i = 0; i < txOpportunities.crdsaTxOpportunities.size (); i++)
@@ -762,6 +766,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
         }
 
       /// create replicas and schedule the packets
+      NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - Creating replicas for packet " << i);
       CreateCrdsaPacketInstances (allocationChannel, txOpportunities.crdsaTxOpportunities[i]);
     }
 }
@@ -777,7 +782,10 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
-  Time superframeStartTime = GetCurrentSuperFrameStartTime (0);
+  /// TODO fix this to Now ()
+  Time superframeStartTime = GetSuperFrameTxTime (0);
+
+  NS_LOG_INFO ("Now: " << Now ().GetSeconds () << " used SF start: " << superframeStartTime.GetSeconds ());
 
   /// get the slot payload
   uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (m_raChannel);
@@ -845,7 +853,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
           if (offset.IsNegative ())
             {
-              NS_FATAL_ERROR ("SatUtMac::CreateCrdsaPacketInstances - Invalid transmit time");
+              NS_FATAL_ERROR ("SatUtMac::CreateCrdsaPacketInstances - Invalid transmit time: " << offset.GetSeconds ());
             }
 
           /// duration
@@ -862,6 +870,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
           /// schedule transmission
           Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
+          NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Scheduled a replica with offset " << offset.GetSeconds ());
         }
       replicas.clear ();
       tags.clear ();
@@ -966,7 +975,7 @@ SatUtMac::DoFrameStart ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatUtMac::DoFrameStart");
+  NS_LOG_INFO ("SatUtMac::DoFrameStart: " << Now ().GetSeconds ());
 
   if (m_randomAccess != NULL)
     {
@@ -975,7 +984,7 @@ SatUtMac::DoFrameStart ()
     }
 
   /// schedule the next frame start
-  Simulator::Schedule (GetSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
+  Simulator::Schedule (Now () - GetSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatUtMac::DoFrameStart, this);
 }
 
 } // namespace ns3

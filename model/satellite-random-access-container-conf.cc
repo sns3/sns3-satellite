@@ -82,7 +82,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTime (5);
 
       /// TODO this comes from waveform configuration
-      GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (100);
+      GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (10000);
 
       GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
     }

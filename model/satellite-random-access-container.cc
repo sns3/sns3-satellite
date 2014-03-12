@@ -642,8 +642,14 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   RandomAccessTxOpportunities_s txOpportunities;
   txOpportunities.txOpportunityType = SatEnums::RA_DO_NOTHING;
 
-  uint32_t maxUniquePackets = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
-                                        m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
+  //uint32_t maxUniquePackets = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
+  //                                      m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
+
+  uint32_t maxUniquePackets = m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ();
+
+  //NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - Max unique packets: " << maxUniquePackets
+  //             << " Max unique payloads per block: " << m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ()
+  //             << " Num of candidate packets: " << m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
 
   /// TODO slots.first can be updated to take into account the reserved RA slots from MAC.
   /// This should be done by including the list of used slots in this SF as a parameter for the
@@ -679,12 +685,12 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
                 {
                   m_crdsaNewData = true;
                 }
+
+              /// save the rest of the CRDSA Tx opportunity results
+              txOpportunities.txOpportunityType = SatEnums::RA_CRDSA_TX_OPPORTUNITY;
             }
         }
     }
-
-  /// save the rest of the CRDSA Tx opportunity results
-  txOpportunities.txOpportunityType = SatEnums::RA_CRDSA_TX_OPPORTUNITY;
 
   CrdsaReduceIdleBlocks (allocationChannel);
 
@@ -815,7 +821,7 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std:
 
           resultThisUniquePacket = slots.second.insert (slot);
 
-          if (resultAllSlotsInFrame.second)
+          if (!resultAllSlotsInFrame.second)
             {
               NS_FATAL_ERROR ("SatRandomAccess::CrdsaRandomizeTxOpportunities - Slots out of sync, this should never happen");
             }

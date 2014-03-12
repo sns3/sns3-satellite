@@ -169,7 +169,7 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  */
 #define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3) \
    AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
-                  "Maximum unique payload per block [bytes] for RA " + GetIndexAsRaServiceName (index), \
+                  "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a1), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumUniquePayloadPerBlock, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
@@ -227,10 +227,10 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, true, true, false, 100, 200, 50, 100)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, true, false, false, 100, 200, 50, 100)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 500, 6, 2)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 500, 6, 2)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 500, 6, 2)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 500, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 3, 6, 2)
   ;
   return tid;
 }
