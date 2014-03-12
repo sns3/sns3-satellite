@@ -575,6 +575,43 @@ public:
     return "";
   };
 
+  /**
+   * \enum PacketType_t
+   * \brief Packet types. These are used determine Rx side actions
+   */
+  typedef enum
+  {
+    DEDICATED_ACCESS_PACKET = 0,
+    SLOTTED_ALOHA_PACKET = 1,
+    CRDSA_PACKET = 2,
+  } PacketType_t;
+
+  static inline std::string GetPacketTypeName (PacketType_t packetType)
+  {
+    switch (packetType)
+    {
+      case DEDICATED_ACCESS_PACKET:
+        {
+          return "DEDICATED_ACCESS_PACKET";
+        }
+      case SLOTTED_ALOHA_PACKET:
+        {
+          return "SLOTTED_ALOHA_PACKET";
+        }
+      case CRDSA_PACKET:
+        {
+          return "CRDSA_PACKET";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetPacketTypeName - Invalid packet type");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetPacketTypeName - Invalid packet type");
+    return "";
+  };
+
 private:
 
   /**

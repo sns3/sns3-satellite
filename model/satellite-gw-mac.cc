@@ -109,7 +109,7 @@ SatGwMac::StartPeriodicSending()
       NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
     }
 
-  // Note, carrierId currently set by default to 0
+  /// TODO Note, carrierId currently set by default to 0
   Simulator::Schedule (Seconds (0), &SatGwMac::StartTransmission, this, 0);
 }
 
@@ -192,6 +192,12 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 
   Time txDuration = bbFrame->GetDuration ();
 
+  /// TODO this needs to be modified
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
+  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  txInfo.waveformId = 13;
+
   // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
   if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
     {
@@ -209,7 +215,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
        * we assume only one carrier in forward link, so it is safe to use 0.
        */
       // Decrease a guard time from BB frame duration.
-      SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - m_guardTime );
+      SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - m_guardTime, txInfo);
     }
 
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);

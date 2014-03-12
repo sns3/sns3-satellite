@@ -39,6 +39,17 @@ class SatPhyTx;
 class SatSignalParameters : public Object
 {
 public:
+
+  /**
+   * \brief Struct for storing the packet specific Tx information
+   */
+  typedef struct
+  {
+    SatEnums::PacketType_t packetType;
+    SatEnums::SatModcod_t modCod;
+    uint32_t waveformId;
+  } txInfo_s;
+
   /**
    * Buffer for transmissions. Buffer just holds data as pointer to packets.
    * Real length of buffer is simulated by duration of the PDU transmission.
@@ -116,14 +127,9 @@ public:
   SatEnums::ChannelType_t m_channelType;
 
   /**
-   * \brief ModCod
+   * \brief Transmission information including packet type, modcod and waveform ID
    */
-  SatEnums::SatModcod_t m_modCod;
-
-  /**
-   * \brief Waveform ID
-   */
-  uint32_t m_waveformId;
+  txInfo_s m_txInfo;
 };
 
 

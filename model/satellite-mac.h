@@ -81,7 +81,7 @@ public:
    * \param uint32_t carrierId
    * \param  Time duration
    */
-  typedef Callback<void, SatPhy::PacketContainer_t, uint32_t, Time> TransmitCallback;
+  typedef Callback<void, SatPhy::PacketContainer_t, uint32_t, Time, SatSignalParameters::txInfo_s> TransmitCallback;
 
   /**
    * Method to set transmit callback.
@@ -167,7 +167,7 @@ protected:
    * Send packet to lower layer by using a callback
    * \param packets Packets to be sent.
    */
-  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration);
+  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s);
 
   /**
    * The lower layer packet transmit callback.

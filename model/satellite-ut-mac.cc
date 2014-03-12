@@ -305,7 +305,13 @@ SatUtMac::DoTransmit (double durationInSecs, uint32_t payloadBytes, uint32_t car
   NS_LOG_FUNCTION (this << durationInSecs << payloadBytes << carrierId << rcIndex);
   NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << payloadBytes << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
-  TransmitPackets (FetchPackets (payloadBytes, rcIndex, policy), durationInSecs, carrierId);
+  /// TODO this needs to be modified
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
+  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  txInfo.waveformId = 13;
+
+  TransmitPackets (FetchPackets (payloadBytes, rcIndex, policy), durationInSecs, carrierId, txInfo);
 }
 
 void
@@ -317,6 +323,12 @@ SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, uint32_t payloadBytes, 
   SatPhy::PacketContainer_t packets;
 
   m_utScheduler->DoScheduling (packets, payloadBytes, rcIndex, policy);
+
+  /// TODO this needs to be modified
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.packetType = SatEnums::SLOTTED_ALOHA_PACKET;
+  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  txInfo.waveformId = 13;
 
   if ( !packets.empty () )
     {
@@ -337,7 +349,7 @@ SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, uint32_t payloadBytes, 
                          SatUtils::GetPacketInfo (*it));
         }
 
-      TransmitPackets (packets, durationInSecs, carrierId);
+      TransmitPackets (packets, durationInSecs, carrierId, txInfo);
     }
 }
 
@@ -389,7 +401,7 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatC
 }
 
 void
-SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId)
+SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this);
 
@@ -403,7 +415,7 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, double durationInS
       NS_LOG_LOGIC ("Duration double: " << durationInSecs << " duration time: " << duration.GetSeconds ());
       NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds () << " duration: " << duration.GetSeconds ());
 
-      SendPacket (packets, carrierId, duration);
+      SendPacket (packets, carrierId, duration, txInfo);
     }
 }
 
@@ -777,6 +789,12 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   uint8_t rcIndex (0);
   m_utScheduler->DoScheduling (uniq, payloadBytes, rcIndex, SatUtScheduler::LOOSE);
 
+  /// TODO this needs to be modified
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.packetType = SatEnums::CRDSA_PACKET;
+  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  txInfo.waveformId = 13;
+
   if ( !uniq.empty () )
     {
       std::vector < std::pair< uint16_t, std::vector<Ptr<Packet> > > > replicas;
@@ -846,7 +864,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
           /// schedule transmission
-          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, packets, duration, carrierId);
+          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
         }
       replicas.clear ();
       tags.clear ();

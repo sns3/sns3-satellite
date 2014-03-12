@@ -292,8 +292,9 @@ public:
    * \param p packet to be sent
    * \param carrierId Carrier id for the packet transmission
    * \param duration the packet transmission duration (from MAC layer)
+   * \param txInfo Tx information (e.g. packet type, modcod, waveform ID)
    */
-  virtual void SendPdu (PacketContainer_t, uint32_t carrierId, Time duration);
+  virtual void SendPdu (PacketContainer_t, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)

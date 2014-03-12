@@ -109,12 +109,12 @@ SatMac::ReceiveQueueEvent (SatQueue::QueueEvent_t /*event*/, uint8_t /*flowIndex
 }
 
 void
-SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration)
+SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this);
 
   // Use call back to send packet to lower layer
-  m_txCallback (packets, carrierId, duration);
+  m_txCallback (packets, carrierId, duration, txInfo);
 }
 
 void

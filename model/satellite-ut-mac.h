@@ -298,8 +298,9 @@ private:
     * \param packets
     * \param durationInSecs
     * \param carrierId
+    * \param txInfo
     */
-   void TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId);
+   void TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet

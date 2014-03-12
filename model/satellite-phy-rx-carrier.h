@@ -30,6 +30,7 @@
 #include "satellite-channel.h"
 #include "satellite-interference.h"
 #include "satellite-phy-rx-carrier-conf.h"
+#include <map>
 
 namespace ns3 {
 
@@ -43,6 +44,17 @@ namespace ns3 {
 class SatPhyRxCarrier : public Object
 {
 public:
+
+  /**
+   * \brief Struct for storing the packet specific Rx parameters
+   */
+  typedef struct
+  {
+    Ptr<SatSignalParameters> rxParams;
+    Mac48Address destAddress;
+    Mac48Address sourceAddress;
+    Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
+  } rxParams_s;
 
   /**
    * \brief
@@ -133,14 +145,16 @@ private:
   /**
    * \brief Function for checking the SINR against the link results
    * \param cSinr composite SINR
+   * \param rxParams Rx parameters
    * \return result of the check
    */
-  bool CheckAgainstLinkResults (double cSinr);
+  bool CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters> rxParams);
 
   /**
    * \brief
+   * \param key
    */
-  void EndRxData ();
+  void EndRxData (uint32_t key);
 
   /**
    * \brief
@@ -159,6 +173,23 @@ private:
   double CalculateCompositeSinr(double sinr1, double sinr2);
 
   /**
+   *
+   *\param packetType
+   */
+  void IncreaseNumOfRxState (SatEnums::PacketType_t packetType);
+
+  /**
+   *
+   * \param packetType
+   */
+  void DecreaseNumOfRxState (SatEnums::PacketType_t packetType);
+
+  /**
+   *
+   */
+  void CheckRxStateSanity ();
+
+  /**
    * \brief
    */
   State m_state;
@@ -166,7 +197,7 @@ private:
   /**
    * \brief
    */
-  Ptr<SatSignalParameters> m_rxParams;
+  bool m_receivingDedicatedAccess;
 
   /**
    * \brief
@@ -186,11 +217,6 @@ private:
    * - Traced
    */
   Ptr<SatInterference> m_satInterference;
-
-  /**
-   * \brief Interference event
-   */
-  Ptr<SatInterference::InterferenceChangeEvent> m_interferenceEvent;
 
   /**
    * \brief Link results used for error modeling
@@ -238,16 +264,6 @@ private:
   Mac48Address m_ownAddress;
 
   /**
-   * \brief Destination address of the packet in m_rxParams.
-   */
-  Mac48Address m_destAddress;
-
-  /**
-   * \brief Source address of the packet in m_rxParams.
-   */
-  Mac48Address m_sourceAddress;
-
-  /**
    * \brief Receiving mode.
    */
   SatPhyRxCarrierConf::RxMode m_rxMode;
@@ -286,16 +302,6 @@ private:
      m_packetTrace;
 
   /**
-   * \brief Rx start time
-   */
-  Time m_startRxTime;
-
-  /**
-   * \brief Amount of bits to contain a byte
-   */
-  uint32_t m_bitsToContainByte;
-
-  /**
    * \brief Enable composite SINR output tracing
    */
   bool m_enableCompositeSinrOutputTrace;
@@ -310,6 +316,21 @@ private:
    * information, such as node id and address.
    */
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * \brief Contains information about how many ongoing Rx events there are
+   */
+  uint32_t m_numOfOngoingRx;
+
+  /**
+   * \brief Running counter for received packets
+   */
+  uint32_t m_rxPacketCounter;
+
+  /**
+   * \brief A map of Rx params
+   */
+  std::map <uint32_t, rxParams_s> m_rxParamsMap;
 };
 
 }

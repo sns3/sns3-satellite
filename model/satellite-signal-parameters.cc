@@ -37,9 +37,7 @@ SatSignalParameters::SatSignalParameters () :
   m_rxPower_W (),
   m_phyTx (),
   m_sinr (),
-  m_channelType (),
-  m_modCod (),
-  m_waveformId ()
+  m_channelType ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -60,8 +58,9 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_sinr = p.m_sinr;
   m_channelType = p.m_channelType;
   m_carrierFreq_hz = p.m_carrierFreq_hz;
-  m_modCod = p.m_modCod;
-  m_waveformId = p.m_waveformId;
+  m_txInfo.modCod = p.m_txInfo.modCod;
+  m_txInfo.waveformId = p.m_txInfo.waveformId;
+  m_txInfo.packetType = p.m_txInfo.packetType;
 }
 
 Ptr<SatSignalParameters>
