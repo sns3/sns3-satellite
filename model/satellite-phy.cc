@@ -277,7 +277,9 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   txParams->m_carrierId = carrierId;
   txParams->m_sinr = 0;
   txParams->m_txPower_W = m_eirpWoGainW;
-  txParams->m_txInfo = txInfo;
+  txParams->m_txInfo.modCod = txInfo.modCod;
+  txParams->m_txInfo.waveformId = txInfo.waveformId;
+  txParams->m_txInfo.packetType = txInfo.packetType;
 
   m_phyTx->StartTx (txParams);
 }
