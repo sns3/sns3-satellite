@@ -106,8 +106,9 @@ public:
     * \param cb callback to invoke whenever a TBTP is ready for sending and must
     *        be forwarded to the Beam UTs.
     * \param seq Super frame sequence
+    * \param maxRcCount Maximum number of RCs in use.
     */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t macRcCount);
 
   /**
     * \param utId ID (mac address) of the UT to be added

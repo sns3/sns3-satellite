@@ -32,7 +32,7 @@
 #include "ns3/satellite-superframe-sequence.h"
 #include "satellite-dama-entry.h"
 #include "satellite-cno-estimator.h"
-#include "satellite-frame-helper.h"
+#include "satellite-frame-allocator.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -93,9 +93,9 @@ public:
    * \param cb callback to invoke whenever a TBTP is ready for sending and must
    *        be forwarded to the Beam UTs.
    * \param seq Superframe sequence.
-   * \parma tbtpCb  TBTP message add callback.
+   * \param maxRcCount Maximum number of the RCs in use.
    */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount);
 
   /**
    * Add UT to scheduler.
@@ -153,7 +153,7 @@ private:
 
   typedef std::pair<Address, Ptr<SatUtInfo> >   UtInfoItem_t;
   typedef std::map<Address, Ptr<SatUtInfo> >    UtInfoMap_t;
-  typedef std::vector<UtInfoItem_t>             UtSortedInfoContainer_t;
+  typedef std::list<UtInfoItem_t>               UtSortedInfoContainer_t;
 
   /**
    * ID of the beam
@@ -272,9 +272,9 @@ private:
   Time m_cnoEstimationWindow;
 
   /**
-   * Frame helper to maintain load information of the frame and its configuration.
+   * Frame allocator to maintain load information of the frame and its configuration.
    */
-  Ptr<SatFrameHelper>  m_frameHelper;
+  Ptr<SatFrameAllocator>  m_frameAllocator;
 
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);

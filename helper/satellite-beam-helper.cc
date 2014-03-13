@@ -25,6 +25,7 @@
 #include "ns3/ipv4-interface.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/enum.h"
+#include "ns3/pointer.h"
 #include "ns3/config.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-phy.h"
@@ -327,7 +328,11 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
   // add beam to NCC
-  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq );
+  PointerValue llsConf = PointerValue ();
+  m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
+
+  uint8_t rcMaxCount = llsConf.Get<SatLowerLayerServiceConf> ()->GetDaServiceCount ();
+  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq, rcMaxCount );
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,

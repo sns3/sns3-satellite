@@ -638,11 +638,13 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
 // macro to ease definition of attributes for several super frames
 #define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, frameConfigTypeIndex) \
   .AddAttribute ("FrameCount", "The number of frames in super frame.", \
+                  TypeId::ATTR_CONSTRUCT, \
 		              UintegerValue (frameCount), \
 		              MakeUintegerAccessor (&SatSuperframeConf::SetFrameCount, \
 		                                    &SatSuperframeConf::GetFrameCount), \
 		              MakeUintegerChecker<uint32_t> (1, SatSuperframeConf::m_maxFrameCount)) \
   .AddAttribute ("FrameConfigTypeIndex", "Index of the frame configuration type used for super frame.", \
+                  TypeId::ATTR_CONSTRUCT, \
                   UintegerValue (frameConfigTypeIndex), \
                   MakeUintegerAccessor (&SatSuperframeConf::SetConfigType, \
                                         &SatSuperframeConf::GetConfigType), \
@@ -669,7 +671,7 @@ SatSuperframeConf0::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, 0)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e6, 1.25e5, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (0, 12.5e6, 1.25e6, 0.20, 0.30, false)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true)
     ADD_FRAME_ATTRIBUTES (2, 1.25e6, 1.25e5, 0.20, 0.30, false)
     ADD_FRAME_ATTRIBUTES (3, 1.25e6, 1.25e5, 0.20, 0.30, false)

@@ -51,6 +51,14 @@ SatDamaEntry::~SatDamaEntry ()
   NS_LOG_FUNCTION (this);
 }
 
+uint8_t
+SatDamaEntry::GetRcCount () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_llsConf->GetDaServiceCount ();
+}
+
 uint32_t
 SatDamaEntry::GetCraBasedBytes (double duration) const
 {
@@ -114,7 +122,33 @@ SatDamaEntry::GetVbdcBasedBytes () const
 }
 
 uint16_t
-SatDamaEntry::GetDynamicRateInKbps (uint8_t index) const
+SatDamaEntry::GetCraInKbps (uint8_t index) const
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( index >= m_llsConf->GetDaServiceCount ())
+    {
+       NS_FATAL_ERROR ("RC index requested is out of range!!!");
+    }
+
+  return m_llsConf->GetDaConstantServiceRateInKbps (index);
+}
+
+uint16_t
+SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( index >= m_llsConf->GetDaServiceCount ())
+    {
+       NS_FATAL_ERROR ("RC index requested is out of range!!!");
+    }
+
+  return m_llsConf->GetDaMinimumServiceRateInKbps (index);
+}
+
+uint16_t
+SatDamaEntry::GetRbdcInKbps (uint8_t index) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -127,7 +161,7 @@ SatDamaEntry::GetDynamicRateInKbps (uint8_t index) const
 }
 
 void
-SatDamaEntry::UpdateDynamicRateInKbps (uint8_t index, uint16_t rateInKbps)
+SatDamaEntry::UpdateRbdcInKbps (uint8_t index, uint16_t rateInKbps)
 {
   NS_LOG_FUNCTION (this);
 
@@ -153,7 +187,7 @@ SatDamaEntry::UpdateDynamicRateInKbps (uint8_t index, uint16_t rateInKbps)
 }
 
 uint8_t
-SatDamaEntry::GetVolumeBacklogInBytes (uint8_t index) const
+SatDamaEntry::GetVbdcInBytes (uint8_t index) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -166,18 +200,18 @@ SatDamaEntry::GetVolumeBacklogInBytes (uint8_t index) const
 }
 
 void
-SatDamaEntry::UpdateVolumeBacklogInBytes (uint8_t index, uint32_t volumeInBytes)
+SatDamaEntry::UpdateVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 {
   NS_LOG_FUNCTION (this);
 
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
-      SetVolumeBacklogInBytes (index, m_volumeBacklogRequestedInBytes[index] + volumeInBytes);
+      SetVbdcInBytes (index, m_volumeBacklogRequestedInBytes[index] + volumeInBytes);
     }
 }
 
 void
-SatDamaEntry::SetVolumeBacklogInBytes (uint8_t index, uint32_t volumeInBytes)
+SatDamaEntry::SetVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 {
   NS_LOG_FUNCTION (this);
 

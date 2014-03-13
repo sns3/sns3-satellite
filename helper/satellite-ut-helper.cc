@@ -367,7 +367,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // set RA channel given by NCC to MAC
   mac->SetRaChannel (raChannel);
 
-  phy->Initialize();
+  phy->Initialize ();
 
   llc->SetQueueStatisticsCallbacks ();
 

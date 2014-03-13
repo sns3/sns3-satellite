@@ -110,15 +110,15 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntriesFromCrs ()
           switch (descriptorIt->first.second)
           {
             case SatEnums::DA_RBDC:
-              m_damaEntry->UpdateDynamicRateInKbps (descriptorIt->first.first, descriptorIt->second);
+              m_damaEntry->UpdateRbdcInKbps (descriptorIt->first.first, descriptorIt->second);
               break;
 
             case SatEnums::DA_VBDC:
-              m_damaEntry->UpdateVolumeBacklogInBytes (descriptorIt->first.first, descriptorIt->second);
+              m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second);
               break;
 
             case SatEnums::DA_AVBDC:
-              m_damaEntry->SetVolumeBacklogInBytes (descriptorIt->first.first, descriptorIt->second);
+              m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second);
               break;
 
             default:
@@ -240,9 +240,10 @@ SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 }
 
 void
-SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq)
+SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
+
   m_beamId = beamId;
   m_txCallback = cb;
   m_superframeSeq = seq;
@@ -268,7 +269,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute("Max", DoubleValue (maxIndex));
-  m_frameHelper = Create<SatFrameHelper> (m_superframeSeq->GetSuperframeConf (0), m_superframeSeq->GetWaveformConf () );
+  m_frameAllocator = CreateObject<SatFrameAllocator> (m_superframeSeq->GetSuperframeConf (0), m_superframeSeq->GetWaveformConf (), maxRcCount);
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
@@ -514,27 +515,35 @@ void SatBeamScheduler::DoPreResourceAllocation ()
   if ( m_utInfos.size () > 0 )
     {
       // sort UTs according to C/N0
-      std::sort (m_utSortedInfos.begin (), m_utSortedInfos.end (), CompareCno);
+      m_utSortedInfos.sort (CompareCno);
 
       m_currentUt = m_utSortedInfos.begin ();
 
-      m_frameHelper->RemoveAllocations ();
+      m_frameAllocator->RemoveAllocations ();
 
       for (UtSortedInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
         {
           it->second->SetDeallocated ();
 
           Ptr<SatDamaEntry> damaEntry = it->second->GetDamaEntry ();
-          double frameDurationInSeconds = m_superframeSeq->GetSuperframeConf (0)->GetDurationInSeconds ();
+          SatFrameAllocator::SatFrameAllocReqItemContainer_t allocReqContainer;
 
-          SatFrameHelper::SatFrameAllocReq  allocReq ( damaEntry->GetCraBasedBytes (frameDurationInSeconds),
-                                                       damaEntry->GetMinRbdcBasedBytes (frameDurationInSeconds),
-                                                       damaEntry->GetRbdcBasedBytes (frameDurationInSeconds),
-                                                       allocReq.m_vbdcBytes = damaEntry->GetVbdcBasedBytes () );
+          for (uint8_t i = 0; i < damaEntry->GetRcCount (); i++ )
+            {
+              SatFrameAllocator::SatFrameAllocReqItem rcAllocReq;
 
-          SatFrameHelper::SatFrameAllocResp allocResp;
+              rcAllocReq.m_craInKbps = damaEntry->GetCraInKbps (i);
+              rcAllocReq.m_minRbdcInKbps = damaEntry->GetMinRbdcInKbps (i);
+              rcAllocReq.m_rbdcInKbps = damaEntry->GetRbdcInKbps (i);
+              rcAllocReq.m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
-          if (m_frameHelper->AllocateToFrame (it->second->GetCnoEstimation (), allocReq, allocResp) )
+              allocReqContainer.push_back (rcAllocReq);
+            }
+
+          SatFrameAllocator::SatFrameAllocReq allocReq (allocReqContainer);
+          SatFrameAllocator::SatFrameAllocResp allocResp;
+
+          if (m_frameAllocator->AllocateToFrame (it->second->GetCnoEstimation (), allocReq, allocResp) )
             {
               it->second->SetAllocated (allocResp.m_frameId, allocResp.m_waveformId);
             }
