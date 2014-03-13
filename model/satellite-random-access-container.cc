@@ -642,14 +642,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   RandomAccessTxOpportunities_s txOpportunities;
   txOpportunities.txOpportunityType = SatEnums::RA_DO_NOTHING;
 
-  //uint32_t maxUniquePackets = std::min (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock (),
-  //                                      m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
-
   uint32_t maxUniquePackets = m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ();
-
-  //NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - Max unique packets: " << maxUniquePackets
-  //             << " Max unique payloads per block: " << m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ()
-  //             << " Num of candidate packets: " << m_numOfCandidatePacketsCb (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaPayloadBytes ()));
 
   /// TODO slots.first can be updated to take into account the reserved RA slots from MAC.
   /// This should be done by including the list of used slots in this SF as a parameter for the

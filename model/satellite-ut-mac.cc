@@ -782,10 +782,9 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
-  /// TODO fix this to Now ()
-  Time superframeStartTime = GetSuperFrameTxTime (0);
-
-  NS_LOG_INFO ("Now: " << Now ().GetSeconds () << " used SF start: " << superframeStartTime.GetSeconds ());
+  /// CRDSA is evaluated only at the frame start
+  /// TODO this might have to be updated when a proper mobility model is added
+  Time superframeStartTime = Now ();
 
   /// get the slot payload
   uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (m_raChannel);
@@ -984,6 +983,7 @@ SatUtMac::DoFrameStart ()
     }
 
   /// schedule the next frame start
+  /// TODO this needs to be modified when a proper mobility model is added as the timing advance will not be constant
   Simulator::Schedule (Now () - GetSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatUtMac::DoFrameStart, this);
 }
 
