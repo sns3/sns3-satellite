@@ -197,7 +197,7 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
     }
   else
     {
-      NS_FATAL_ERROR ("CRAs don't fit to frame CAC or configuration error???");
+      //NS_FATAL_ERROR ("CRAs don't fit to frame CAC or configuration error???");
     }
 }
 
@@ -354,7 +354,7 @@ SatFrameAllocator::SatFrameInfo::UpdateAllocReq (SatFrameAllocInfo &req)
 
   if ( (m_maxSymbolsPerCarrier - req.m_craSymbols) < 0 )
     {
-      NS_FATAL_ERROR ("CRA does not fit in to carrier. Error in configuration or CAC?");
+      //NS_FATAL_ERROR ("CRA does not fit in to carrier. Error in configuration or CAC?");
     }
   else if ( (m_maxSymbolsPerCarrier - req.m_craSymbols - req.m_minRbdcSymbols) < 0 )
     {
