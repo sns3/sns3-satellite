@@ -48,6 +48,11 @@ public:
   static const double SPEED_OF_LIGHT = 299792458.0;
 
   /**
+   * Number of bits in a byte
+   */
+  static const uint32_t BITS_PER_BYTE = 8;
+
+  /**
    * Converts radians to degrees
    *
    * \param radian value to convert as radians
@@ -338,6 +343,20 @@ public:
     return 0.0;
   }
 
+  /**
+   * Simple linear interpolation
+   * y = y0 + (y1-y0)*(x-x0)/(x1-x0)
+   * http://en.wikipedia.org/wiki/Linear_interpolation
+   */
+  static inline double Interpolate (double x, double x0, double x1, double y0, double y1)
+  {
+    double dX = x1 - x0;
+    double dY = y1 - y0;
+    double relX = x - x0;
+    double relY = (dY / dX) * relX;
+    return y0 + relY;
+  }
+  
 private:
   /**
    * Destructor

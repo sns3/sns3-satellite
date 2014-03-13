@@ -19,11 +19,12 @@
  *
  */
 
-#include "ns3/log.h"
-#include "ns3/fatal-error.h"
 #include <cmath>
 
+#include "ns3/log.h"
+#include "ns3/fatal-error.h"
 #include "satellite-look-up-table.h"
+#include "satellite-utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLookUpTable");
 
@@ -121,7 +122,7 @@ SatLookUpTable::GetBler (double esNoDb) const
       double esno = esNoDb;
       double esno0 = m_esNoDb[i - 1];
       double esno1 = m_esNoDb[i];
-      double bler = Interpolate (esno, esno0, esno1, m_bler[i - 1], m_bler[i]);
+      double bler = SatUtils::Interpolate (esno, esno0, esno1, m_bler[i - 1], m_bler[i]);
       NS_LOG_LOGIC (this << " Interpolate: " << esno << " to BLER = " << bler << "(sinr0: " << esno0 << ", sinr1: " << esno1 << ", bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ")");
 
       return bler;
@@ -160,7 +161,7 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
     {
       if (blerTarget >= m_bler[i])
         {
-          sinr = Interpolate (blerTarget, m_bler[i-1], m_bler[i], m_esNoDb[i-1], m_esNoDb[i]);
+          sinr = SatUtils::Interpolate (blerTarget, m_bler[i-1], m_bler[i], m_esNoDb[i-1], m_esNoDb[i]);
           NS_LOG_LOGIC (this << " Interpolate: " << blerTarget << " to SINR = " << sinr << "(bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ", sinr0: " << m_esNoDb[i-1] << ", sinr1: " << m_esNoDb[i] << ")");
           return sinr;
         }
@@ -168,19 +169,6 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
 
   return sinr;
 } // end of double SatLookUpTable::GetSinr (double bler) const
-
-
-double
-SatLookUpTable::Interpolate (double x, double x0, double x1, double y0, double y1)
-{
-  NS_LOG_FUNCTION (x << x0 << x1 << y0 << y1);
-
-  double dX = x1 - x0;
-  double dY = y1 - y0;
-  double relX = x - x0;
-  double relY = (dY / dX) * relX;
-  return y0 + relY;
-}
 
 
 void

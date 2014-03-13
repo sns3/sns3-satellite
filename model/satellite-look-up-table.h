@@ -50,14 +50,6 @@ private:
   virtual void DoDispose ();
   void Load (std::string linkResultPath);
 
-  /**
-   * \brief Simple linear interpolation
-   *
-   * y = y0 + (y1-y0)*(x-x0)/(x1-x0)
-   * http://en.wikipedia.org/wiki/Linear_interpolation
-   */
-  static double Interpolate (double x, double x0, double x1, double y0, double y1);
-
   std::vector<double> m_esNoDb;
   std::vector<double> m_bler;
   std::ifstream *m_ifs;
