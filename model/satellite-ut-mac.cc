@@ -177,6 +177,14 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
   Simulator::Schedule (GetSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
 }
 
+void
+SatUtMac::SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_assignedDaResourcesCallback = cb;
+}
+
 Time
 SatUtMac::GetSuperFrameTxTime (uint8_t superFrameSeqId) const
 {
@@ -274,7 +282,14 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
     }
 
   // Assigned TBTP resources
-  m_tbtpResourcesTrace (Simulator::Now (), slots.size (), payloadSumInSuperFrame);
+  m_tbtpResourcesTrace (Simulator::Now (), payloadSumInSuperFrame);
+
+  /**
+   * TODO: The amount of assigned resources from TBTP should be calculated for each
+   * RC index separately. Request manager needs this information for VBDC. This waits
+   * for the time slots to be stamped with proper RC index.
+   */
+  m_assignedDaResourcesCallback ((uint8_t)(1), payloadSumInSuperFrame);
 }
 
 void
@@ -284,10 +299,10 @@ SatUtMac::SuperFrameStart (uint8_t superframeSeqId)
   NS_LOG_LOGIC ("Superframe start time at: " << Simulator::Now ().GetSeconds () << " for UT: " << m_nodeInfo->GetMacAddress ());
 
   /**
-   * Here some functionality may be added for UT related to the superframe start time.
+   * Here some functionality may be added for UT related to the superframe start time
    */
 }
-
+   
 void
 SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId)
 {
@@ -350,7 +365,6 @@ SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> wavefo
       TransmitPackets (packets, durationInSecs, carrierId, txInfo);
     }
 }
-
 SatPhy::PacketContainer_t
 SatUtMac::FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {

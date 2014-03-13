@@ -213,6 +213,9 @@ public:
    */
   void Dump (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
+  inline uint32_t GetMinWfId () {return m_minWfId;};
+  inline uint32_t GetMaxWfId () {return m_maxWfId;};
+
   /**
    * Static variables defining the available burst lengths
    */

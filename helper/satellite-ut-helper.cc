@@ -28,6 +28,7 @@
 #include "ns3/string.h"
 #include "ns3/callback.h"
 #include "ns3/config.h"
+#include "ns3/nstime.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mobility-observer.h"
@@ -255,9 +256,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
 
   // Create a request manager and attach it to LLC, and set control message callback to RM
-  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> (m_llsConf, m_superframeSeq->GetDurationInSeconds (0));
+  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
+  rm->SetAttribute ("EvaluationIntervalInSeconds", TimeValue(Time::FromDouble(m_superframeSeq->GetDurationInSeconds (0), Time::S)));
+  rm->Initialize (m_llsConf);
   llc->SetRequestManager (rm);
   rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+
+  // Set TBTP callback to UT MAC
+  mac->SetAssignedDaResourcesCallback (MakeCallback (&SatRequestManager::AssignedDaResources, rm));
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);

@@ -23,6 +23,7 @@
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
 #include "satellite-queue.h"
+#include "satellite-utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatQueue");
 
@@ -309,10 +310,10 @@ SatQueue::GetQueueStatistics (bool reset)
 
   if (duration.IsPositive())
     {
-      queueStats.m_incomingRateKbps = 8.0 * m_nEnqueBytesSinceReset / 1000.0 / duration.GetSeconds ();
-      queueStats.m_outgoingRateKbps = 8.0 * m_nDequeBytesSinceReset / 1000.0 / duration.GetSeconds ();
+      queueStats.m_incomingRateKbps = SatUtils::BITS_PER_BYTE * m_nEnqueBytesSinceReset / 1000.0 / duration.GetSeconds ();
+      queueStats.m_outgoingRateKbps = SatUtils::BITS_PER_BYTE * m_nDequeBytesSinceReset / 1000.0 / duration.GetSeconds ();
       queueStats.m_volumeInBytes = m_nEnqueBytesSinceReset;
-      queueStats.m_volumeInBytes = m_nDequeBytesSinceReset;
+      queueStats.m_volumeOutBytes = m_nDequeBytesSinceReset;
       queueStats.m_queueSizeBytes = GetNBytes ();
 
       if (reset)

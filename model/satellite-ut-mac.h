@@ -88,6 +88,20 @@ public:
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
   /**
+   * Callback for informing the amount of dedicated access
+   * bytes received from TBTP
+   * \param uint8_t   RC index
+   * \param uint32_t  Sum of bytes in this superframe
+   */
+  typedef Callback<void, uint8_t, uint32_t> AssignedDaResourcesCallback;
+
+  /**
+   * \param cb callback to invoke whenever TBTP is received.
+   *
+   */
+  void SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -328,6 +342,11 @@ private:
    */
   TimingAdvanceCallback m_timingAdvanceCb;
 
+  /**
+   * Callback for informing the assigned TBTP resources
+   */
+  AssignedDaResourcesCallback m_assignedDaResourcesCallback;
+
  /**
   * \brief RA main module
   */ 
@@ -367,10 +386,9 @@ private:
   /**
    * Traced callback for assigned TBTP resources for this UT
    * \param Time      Time now
-   * \param uint32_t  Number of slots in superframe
    * \param uint32_t  Assigned resources in Bytes in superframe
    */
-  TracedCallback< Time, uint32_t, uint32_t > m_tbtpResourcesTrace;
+  TracedCallback< Time, uint32_t > m_tbtpResourcesTrace;
 };
 
 } // namespace ns3

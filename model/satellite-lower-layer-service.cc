@@ -149,7 +149,7 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                                         &SatLowerLayerServiceConf::GetDaServ ## index ## MinimumServiceRateInKbps), \
                   MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) +  "_MaximumBacklogSize", \
-                  "Maximum backlog size [bytes] for DA " + GetIndexAsDaServiceName (index), \
+                  "Maximum backlog size [Kbytes] for DA " + GetIndexAsDaServiceName (index), \
                   UintegerValue (a7), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## MaximumBacklogInKbytes, \
                                         &SatLowerLayerServiceConf::GetDaServ ## index ## MaximumBacklogInKbytes), \

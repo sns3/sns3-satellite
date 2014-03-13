@@ -42,8 +42,9 @@ class SatRequestManager : public Object
 public:
 
   SatRequestManager ();
-  SatRequestManager (Ptr<SatLowerLayerServiceConf> llsConf, double evaluationInterval);
   virtual ~SatRequestManager ();
+
+  void Initialize (Ptr<SatLowerLayerServiceConf> llsConf);
 
   // inherited from Object
   static TypeId GetTypeId (void);
@@ -113,6 +114,17 @@ public:
    */
   void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
 
+  /**
+   * Sat UT MAC informs that certain amount of resources have been received
+   * in TBTP.
+   */
+  void AssignedDaResources (uint8_t rcIndex, uint32_t bytes);
+
+  /**
+   * Resynchronize
+   */
+  void ReSynchronizeVbdc ();
+
 private:
 
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
@@ -166,6 +178,8 @@ private:
    */
   void SendCapacityRequest (Ptr<SatCrMessage> crMsg);
 
+  void Reset ();
+
   /**
    * The queue enque/deque rate getter callback
    */
@@ -196,7 +210,7 @@ private:
   /**
    * Interval to do the periodical CR evaluation
    */
-  double m_evaluationIntervalInSeconds;
+  Time m_evaluationInterval;
 
   /**
    * Round trip time estimate. Used to estimate the amount of
@@ -227,14 +241,34 @@ private:
   std::vector<uint32_t> m_pendingVbdcCounters;
 
   /**
-   * Trace callback used for CR tracing:
+   * Periodical VBDC resynchronization timer in superframes.
    */
-  TracedCallback< Time, Mac48Address, Ptr<SatCrMessage> > m_crTrace;
+  uint32_t m_vbdcResynchronizationTimer;
+  uint32_t m_vbdcResynchronizationCount;
 
   /**
    * Node information
    */
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * Dedicated assignments received within the previous superframe
+   */
+  std::vector<uint32_t> m_assignedDaResources;
+
+  /**
+   * Trace callback used for CR tracing:
+   */
+  TracedCallback< Time, Mac48Address, Ptr<SatCrMessage> > m_crTrace;
+
+  /**
+   * Traced callbacks for all sent RBDC and VBDC capacity requests.
+   * Note, that the RC indices are not identified! Thus, if you have
+   * two RC indices using the same CAC, the requests may be mixed up
+   * at the receiving side.
+   */
+  TracedCallback< uint32_t> m_rbdcTrace;
+  TracedCallback< uint32_t> m_vbdcTrace;
 
   static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBPS = 2;
   static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBPS = 32;
@@ -242,7 +276,7 @@ private:
 
   static const uint32_t M_VBDC_QUANTIZATION_STEP_SMALL = 1;
   static const uint32_t M_VBDC_QUANTIZATION_STEP_LARGE = 16;
-  static const uint32_t M_VBDC_QUANTIZATION_THRESHOLD_BYTES = 255;
+  static const uint32_t M_VBDC_QUANTIZATION_THRESHOLD_KBYTES = 255;
 
 };
 
