@@ -11,7 +11,7 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  Example of Random Access usage in satellite network.
+* \brief  Example of Random Access CRDSA usage in satellite network.
 *         The scripts is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
 *         whatever between 1 and full scenario (72 beams). Currently it
@@ -20,10 +20,10 @@ using namespace ns3;
 *         and KpiHelper are enabled by default. End user may change the
 *         number of UTs and end users from the command line.
 *
-*         execute command -> ./waf --run "sat-random-access-example --PrintHelp"
+*         execute command -> ./waf --run "sat-random-access-crdsa-example --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
+NS_LOG_COMPONENT_DEFINE ("sat-random-access-crdsa-example");
 
 int
 main (int argc, char *argv[])
@@ -53,8 +53,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
-  // Enable Random Access with all available modules
-  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
+  // Enable Random Access with CRDSA
+  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_CRDSA));
 
   // Create reference system, two options:
   // - "Scenario72"

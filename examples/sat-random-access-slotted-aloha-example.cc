@@ -11,7 +11,7 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  Example of Random Access usage in satellite network.
+* \brief  Example of Random Access Slotted ALOHA usage in satellite network.
 *         The scripts is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
 *         whatever between 1 and full scenario (72 beams). Currently it
@@ -20,10 +20,10 @@ using namespace ns3;
 *         and KpiHelper are enabled by default. End user may change the
 *         number of UTs and end users from the command line.
 *
-*         execute command -> ./waf --run "sat-random-access-example --PrintHelp"
+*         execute command -> ./waf --run "sat-random-access-slotted-aloha-example --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
+NS_LOG_COMPONENT_DEFINE ("sat-random-access-slotted-aloha-example");
 
 int
 main (int argc, char *argv[])
@@ -37,7 +37,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds(0.01);
 
   // enable info logs
-  LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-random-access-slotted-aloha-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
 
@@ -53,8 +53,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
-  // Enable Random Access with all available modules
-  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
+  // Enable Random Access with Slotted ALOHA
+  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_SLOTTED_ALOHA));
 
   // Create reference system, two options:
   // - "Scenario72"
