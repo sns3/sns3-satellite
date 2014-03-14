@@ -392,8 +392,8 @@ private:
   template <class T>
   static std::string GetNumberAsString (T number)
   {
-    std::stringstream ss;   //create a string stream
-    ss << number;           //add number to the stream
+    std::stringstream ss;   // create a string stream
+    ss << (double) number;  // add number to the stream as double always to show number correctly in outputs
 
     return ss.str();
   }
