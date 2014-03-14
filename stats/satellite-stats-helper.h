@@ -37,7 +37,16 @@ class CollectorMap;
 class DataCollectionObject;
 
 /**
- * \brief Abstract class
+ * \ingroup satellite
+ * \defgroup satstats Satellite Statistics
+ *
+ * Data Collection Framework (DCF) implementation on Satellite module. For
+ * usage in simulation script, see SatStatsHelperContainer.
+ */
+
+/**
+ * \ingroup satstats
+ * \brief Abstract class.
  */
 class SatStatsHelper : public SimpleRefCount<SatStatsHelper>
 {

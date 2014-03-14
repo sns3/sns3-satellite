@@ -35,6 +35,7 @@ class DataCollectionObject;
 class Time;
 
 /**
+ * \ingroup satstats
  * \brief
  */
 class SatStatsRtnAppDelayHelper : public SatStatsHelper

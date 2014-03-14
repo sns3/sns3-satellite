@@ -35,6 +35,7 @@ class DataCollectionObject;
 class Packet;
 
 /**
+ * \ingroup satstats
  * \brief
  */
 class SatStatsRtnThroughputHelper : public SatStatsHelper

@@ -35,6 +35,7 @@ class Probe;
 class DataCollectionObject;
 
 /**
+ * \ingroup satstats
  * \brief
  */
 class SatStatsFwdAppDelayHelper : public SatStatsHelper
