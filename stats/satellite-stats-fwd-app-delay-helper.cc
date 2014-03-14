@@ -111,6 +111,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -118,8 +120,17 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -134,12 +145,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
         break;
       }
 
-    case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-      break;
-
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
+      /// \todo Add support for boxes in Gnuplot.
       break;
 
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
@@ -174,6 +181,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
@@ -185,8 +194,17 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -206,10 +224,6 @@ SatStatsFwdAppDelayHelper::DoInstall ()
                        &DistributionCollector::TraceSinkDouble);
         break;
       }
-
-    case SatStatsHelper::OUTPUT_PDF_PLOT:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      break;
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");

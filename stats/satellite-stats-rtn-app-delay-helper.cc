@@ -106,6 +106,8 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     case OUTPUT_HISTOGRAM_FILE:
+    case OUTPUT_PDF_FILE:
+    case OUTPUT_CDF_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -113,8 +115,17 @@ SatStatsRtnAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -125,12 +136,8 @@ SatStatsRtnAppDelayHelper::DoInstall ()
         break;
       }
 
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_CDF_FILE:
-      break;
-
     case OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
+      /// \todo Add support for boxes in Gnuplot.
       break;
 
     case OUTPUT_SCATTER_PLOT:
@@ -161,6 +168,8 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     case OUTPUT_HISTOGRAM_PLOT:
+    case OUTPUT_PDF_PLOT:
+    case OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
@@ -172,8 +181,17 @@ SatStatsRtnAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -189,10 +207,6 @@ SatStatsRtnAppDelayHelper::DoInstall ()
                                                   &GnuplotAggregator::Write2d);
         break;
       }
-
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_PLOT:
-      break;
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
@@ -211,7 +225,6 @@ SatStatsRtnAppDelayHelper::DoInstall ()
   // Connect to trace sources at GW user node's applications.
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  // TODO: Maybe UT users should also be included.
   Callback<void, Time, const Address &> callback
     = MakeCallback (&SatStatsRtnAppDelayHelper::ApplicationDelayCallback, this);
 
@@ -288,20 +301,16 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
 
             case OUTPUT_HISTOGRAM_FILE:
             case OUTPUT_HISTOGRAM_PLOT:
+            case OUTPUT_PDF_FILE:
+            case OUTPUT_PDF_PLOT:
+            case OUTPUT_CDF_FILE:
+            case OUTPUT_CDF_PLOT:
               {
                 Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
                 NS_ASSERT (c != 0);
                 c->TraceSinkDouble (0.0, delay.GetSeconds ());
                 break;
               }
-
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-              break;
-
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              break;
 
             default:
               NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");

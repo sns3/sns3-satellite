@@ -234,6 +234,7 @@ SatStatsHelper::CreateAggregator (std::string aggregatorTypeId,
 uint32_t
 SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 {
+  NS_LOG_FUNCTION (this);
   uint32_t n = 0;
 
   switch (GetIdentifierType ())

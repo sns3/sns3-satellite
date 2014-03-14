@@ -126,7 +126,7 @@ SatStatsFwdThroughputHelper::DoInstall ()
       break;
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
+      /// \todo Add support for boxes in Gnuplot.
       break;
 
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:

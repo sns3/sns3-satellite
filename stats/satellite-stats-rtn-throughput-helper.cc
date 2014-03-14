@@ -129,7 +129,7 @@ SatStatsRtnThroughputHelper::DoInstall ()
       break;
 
     case OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
+      /// \todo Add support for boxes in Gnuplot.
       break;
 
     case OUTPUT_SCATTER_PLOT:
@@ -190,7 +190,6 @@ SatStatsRtnThroughputHelper::DoInstall ()
   // Connect to trace sources at GW user node's applications.
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  // TODO: Maybe UT users should also be included.
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsRtnThroughputHelper::ApplicationPacketCallback,
                     this);
