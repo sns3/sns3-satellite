@@ -108,9 +108,6 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
           // calculate how many symbols left over
           double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols - m_preAllocatedVdbcSymbols;
 
-          // update total counters of the UT allocations
-          //SatFrameAllocInfoItem totalReqs = UpdateTotalRequests ();
-
           // sort RCs according to VBDC requests
           CcReqCompare vbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_VBDC);
           m_rcAllocs.sort (vbdcCompare);
@@ -131,14 +128,11 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
       // calculate how many symbols left over
       double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols;
 
-      // update total counters of the UT allocations
-      //SatFrameAllocInfoItem totalReqs = UpdateTotalRequests ();
-
       // sort RCs according to VBDC requests
       CcReqCompare vbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_VBDC);
       m_rcAllocs.sort (vbdcCompare);
 
-      // do share by adding a share to all RC/VBDC allocations
+      // do share by setting a share to all RC/VBDC allocations
       for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
         {
           double symbolsToAdd = symbolsLeft / m_rcAllocs.size ();
@@ -153,14 +147,11 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
       // calculate how many symbols left over
       double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedMinRdbcSymbols;
 
-      // update total counters of the UT allocations
-      //SatFrameAllocInfoItem totalReqs = UpdateTotalRequests ();
-
       // sort RCs according to RBDC requests
       CcReqCompare rbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_RBDC);
       m_rcAllocs.sort (rbdcCompare);
 
-      // do share by adding a share to all RC/RBDC allocations
+      // do share by setting a share to all RC/RBDC allocations
       for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
         {
           m_utAllocs.at (it->first).second.m_vbdcSymbols = 0;
@@ -177,14 +168,11 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
       // calculate how many symbols left over
       double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols;
 
-      // update total counters of the UT allocations
-      //SatFrameAllocInfoItem totalReqs = UpdateTotalRequests ();
-
       // sort RCs according to RBDC requests
       CcReqCompare minRbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_MIN_RBDC);
       m_rcAllocs.sort (minRbdcCompare);
 
-      // do share by adding a share to all RC/Minimum RBDC allocations
+      // do share by setting a share to all RC/Minimum RBDC and RC/RBDC allocations
       for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
         {
           m_utAllocs.at (it->first).second.m_vbdcSymbols = 0;
@@ -360,7 +348,7 @@ SatFrameAllocator::SatFrameInfo::UpdateAllocReq (SatFrameAllocInfo &req)
     {
       double minRbdcSymbolsLeft = m_maxSymbolsPerCarrier - req.m_craSymbols;
 
-      // share symbols left between min RBDC requests in RCs in relation of the request
+      // share symbols left between minimum RBDC requests in RCs in relation of the request
       for (SatFrameAllocInfoItemContainer_t::iterator it = req.m_allocInfoPerRc.begin (); it != req.m_allocInfoPerRc.end (); it++)
         {
           it->m_vbdcSymbols = 0.0;
@@ -473,7 +461,6 @@ SatFrameAllocator::AllocateSymbols ()
 
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
-
       it->second.AllocateSymbols (m_targetLoad, m_fcaEnabled);
     }
 }
@@ -493,7 +480,7 @@ SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatF
     {
       uint32_t waveFormId = 0;
 
-      if ( m_waveformConf->GetBestWaveformId ( cno, it->second.GetMaxSymbolsPerCarrier (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
+      if ( m_waveformConf->GetBestWaveformId ( cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
         {
           supportedFrames.insert (std::make_pair (it->first, waveFormId));
         }

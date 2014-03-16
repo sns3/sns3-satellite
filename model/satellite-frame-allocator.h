@@ -301,6 +301,13 @@ private:
        */
       double GetDurationInSeconds () const { return m_frameConf->GetDurationInSeconds (); }
 
+      /**
+       * Get frame symbol rate in bauds.
+       *
+       * \return Frame symbol rate in bauds.
+       */
+      double GetSymbolRateInBauds () const { return m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();}
+
     private:
       // first = request, second = allocation
       typedef std::pair<SatFrameAllocInfo, SatFrameAllocInfo> UtAllocItem_t;
