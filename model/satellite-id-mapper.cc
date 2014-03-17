@@ -350,20 +350,22 @@ SatIdMapper::GetGwMacWithNode (Ptr<Node> gwNode) const
             }
           else
             {
-              NS_LOG_WARN (this << "Device 1 of Node " << gwNode->GetId ()
+              NS_LOG_WARN (this << " Device 1 of Node " << gwNode->GetId ()
                                 << " is not have a valid Mac48Address");
               return Address (); // returns an invalid address
             }
         }
       else
         {
-          NS_LOG_WARN ("Node " << gwNode->GetId () << " is not a valid GW");
+          NS_LOG_WARN (this << " Node " << gwNode->GetId ()
+                            << " is not a valid GW");
           return Address (); // returns an invalid address
         }
     }
   else
     {
-      NS_LOG_WARN ("Node " << gwNode->GetId () << " is not a valid GW");
+      NS_LOG_WARN (this << " Node " << gwNode->GetId ()
+                        << " is not a valid GW");
       return Address (); // returns an invalid address
     }
 }
@@ -389,20 +391,22 @@ SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode) const
             }
           else
             {
-              NS_LOG_WARN (this << "Device 2 of Node " << utNode->GetId ()
+              NS_LOG_WARN (this << " Device 2 of Node " << utNode->GetId ()
                                 << " is not have a valid Mac48Address");
               return Address (); // returns an invalid address
             }
         }
       else
         {
-          NS_LOG_WARN ("Node " << utNode->GetId () << " is not a valid UT");
+          NS_LOG_WARN (this << " Node " << utNode->GetId ()
+                            << " is not a valid UT");
           return Address (); // returns an invalid address
         }
     }
   else
     {
-      NS_LOG_WARN ("Node " << utNode->GetId () << " is not a valid UT");
+      NS_LOG_WARN (this << " Node " << utNode->GetId ()
+                        << " is not a valid UT");
       return Address (); // returns an invalid address
     }
 }
@@ -427,14 +431,15 @@ SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode) const
         }
       else
         {
-          NS_LOG_WARN (this << "Device 1 of Node " << utUserNode->GetId ()
+          NS_LOG_WARN (this << " Device 1 of Node " << utUserNode->GetId ()
                             << " is not have a valid Mac48Address");
           return Address (); // returns an invalid address
         }
     }
   else
     {
-      NS_LOG_WARN ("Node " << utUserNode->GetId () << " is not a valid UT user");
+      NS_LOG_WARN (this << " Node " << utUserNode->GetId ()
+                        << " is not a valid UT user");
       return Address (); // returns an invalid address
     }
 }

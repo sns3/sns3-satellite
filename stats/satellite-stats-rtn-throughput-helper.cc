@@ -274,7 +274,7 @@ SatStatsRtnThroughputHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 
   if (ipv4 == 0)
     {
-      NS_LOG_LOGIC (this << "Node " << utUserNode->GetId ()
+      NS_LOG_LOGIC (this << " Node " << utUserNode->GetId ()
                          << " does not support IPv4 protocol");
     }
   else if (ipv4->GetNInterfaces () >= 2)
@@ -292,7 +292,7 @@ SatStatsRtnThroughputHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
     }
   else
     {
-      NS_LOG_WARN (this << "Node " << utUserNode->GetId ()
+      NS_LOG_WARN (this << " Node " << utUserNode->GetId ()
                         << " is not a valid UT user");
     }
 }

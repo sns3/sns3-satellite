@@ -128,7 +128,8 @@ SatStatsHelper::Install ()
 
   if (m_outputType == SatStatsHelper::OUTPUT_NONE)
     {
-      NS_LOG_WARN ("Skipping statistics installation because of OUTPUT_NONE output type is selected.");
+      NS_LOG_WARN (this << " Skipping statistics installation"
+                        << " because OUTPUT_NONE output type is selected.");
     }
   else
     {
@@ -342,7 +343,7 @@ SatStatsHelper::GetUtUserId (Ptr<Node> utUserNode) const
 
   if (addr.IsInvalid ())
     {
-      NS_LOG_WARN (this << "Node " << utUserNode->GetId ()
+      NS_LOG_WARN (this << " Node " << utUserNode->GetId ()
                         << " does not have any valid Mac48Address");
     }
   else
@@ -351,7 +352,7 @@ SatStatsHelper::GetUtUserId (Ptr<Node> utUserNode) const
 
       if (utUserId < 0)
         {
-          NS_LOG_WARN (this << "Node " << utUserNode->GetId ()
+          NS_LOG_WARN (this << " Node " << utUserNode->GetId ()
                             << " is not found in the global list of UT users");
         }
       else
@@ -373,7 +374,7 @@ SatStatsHelper::GetUtId (Ptr<Node> utNode) const
 
   if (addr.IsInvalid ())
     {
-      NS_LOG_WARN (this << "Node " << utNode->GetId ()
+      NS_LOG_WARN (this << " Node " << utNode->GetId ()
                         << " does not have any valid Mac48Address");
     }
   else
@@ -382,7 +383,7 @@ SatStatsHelper::GetUtId (Ptr<Node> utNode) const
 
       if (utId < 0)
         {
-          NS_LOG_WARN (this << "Node " << utNode->GetId ()
+          NS_LOG_WARN (this << " Node " << utNode->GetId ()
                             << " is not found in the global list of UTs");
         }
       else
@@ -404,7 +405,7 @@ SatStatsHelper::GetGwId (Ptr<Node> gwNode) const
 
   if (addr.IsInvalid ())
     {
-      NS_LOG_WARN (this << "Node " << gwNode->GetId ()
+      NS_LOG_WARN (this << " Node " << gwNode->GetId ()
                         << " does not have any valid Mac48Address");
     }
   else
@@ -413,7 +414,7 @@ SatStatsHelper::GetGwId (Ptr<Node> gwNode) const
 
       if (gwId < 0)
         {
-          NS_LOG_WARN (this << "Node " << gwNode->GetId ()
+          NS_LOG_WARN (this << " Node " << gwNode->GetId ()
                             << " is not found in the global list of GWs");
         }
       else
@@ -443,7 +444,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
         if (utNode == 0)
           {
-            NS_LOG_WARN (this << "UT user node " << utUserNode->GetId ()
+            NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
           }
         else
@@ -474,7 +475,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
         if (utNode == 0)
           {
-            NS_LOG_WARN (this << "UT user node " << utUserNode->GetId ()
+            NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
           }
         else
@@ -501,7 +502,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
         if (utNode == 0)
           {
-            NS_LOG_WARN (this << "UT user node " << utUserNode->GetId ()
+            NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
           }
         else
@@ -517,8 +518,10 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
       break;
 
     default:
-      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
-                        << " is not valid for a UT user. Assigning identifier 0 to this UT user.");
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a UT user."
+                        << " Assigning identifier 0 to this UT user.");
       break;
     }
 
@@ -580,8 +583,10 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
       break;
 
     default:
-      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
-                        << " is not valid for a UT. Assigning identifier 0 to this UT.");
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a UT."
+                        << " Assigning identifier 0 to this UT.");
       break;
     }
 
@@ -614,8 +619,10 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
       break;
 
     default:
-      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
-                        << " is not valid for a beam. Assigning identifier 0 to this beam.");
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a beam."
+                        << " Assigning identifier 0 to this beam.");
       break;
     }
 
@@ -636,8 +643,10 @@ SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
     }
   else
     {
-      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
-                        << " is not valid for a GW. Assigning identifier 0 to this GW.");
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a GW."
+                        << " Assigning identifier 0 to this GW.");
       return 0;
     }
 }
