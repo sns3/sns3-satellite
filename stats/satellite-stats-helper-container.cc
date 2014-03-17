@@ -52,6 +52,92 @@ SatStatsHelperContainer::DoDispose ()
 }
 
 
+#define ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
+  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE", \
+                   SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE", \
+                   SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE", \
+                   SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
+
+#define ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
+  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE", \
+                   SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE", \
+                   SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE", \
+                   SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE", \
+                   SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE", \
+                   SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE", \
+                   SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT", \
+                   SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT", \
+                   SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT", \
+                   SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+
+#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, shortName, longName) \
+  .AddAttribute (shortName, \
+                 std::string ("Enable the output of ") + longName, \
+                 EnumValue (SatStatsHelper::OUTPUT_NONE), \
+                 MakeEnumAccessor (&SatStatsHelperContainer::Add ## id), \
+
+#define ADD_SAT_STATS_ATTRIBUTES_BASIC_SET(id, shortName, longName) \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id, \
+                                std::string ("Global") + shortName, \
+                                std::string ("global ") + longName) \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id, \
+                                std::string ("PerGw") + shortName, \
+                                std::string ("per GW ") + longName) \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id, \
+                                std::string ("PerBeam") + shortName, \
+                                std::string ("per beam ") + longName) \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id, \
+                                std::string ("PerUt") + shortName, \
+                                std::string ("per UT ") + longName) \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
+
+#define ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET(id, shortName, longName) \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id, \
+                                std::string ("Global") + shortName, \
+                                std::string ("global ") + longName) \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id, \
+                                std::string ("PerGw") + shortName, \
+                                std::string ("per GW ") + longName) \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id, \
+                                std::string ("PerBeam") + shortName, \
+                                std::string ("per beam ") + longName) \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id, \
+                                std::string ("PerUt") + shortName, \
+                                std::string ("per UT ") + longName) \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
+/*
+ * Attributes of this class are defined using pre-processing macros above. The
+ * following is the complete list of names of created attributes:
+ * - GlobalFwdAppDelay
+ * - PerGwFwdAppDelay
+ * - PerBeamFwdAppDelay
+ * - PerUtFwdAppDelay
+ * - PerUtUserFwdAppDelay
+ * - GlobalFwdAppThroughput
+ * - PerGwFwdAppThroughput
+ * - PerBeamFwdAppThroughput
+ * - PerUtFwdAppThroughput
+ * - PerUtUserFwdAppThroughput
+ * - GlobalRtnAppDelay
+ * - PerGwRtnAppDelay
+ * - PerBeamRtnAppDelay
+ * - PerUtRtnAppDelay
+ * - PerUtUserRtnAppDelay
+ * - GlobalRtnAppThroughput
+ * - PerGwRtnAppThroughput
+ * - PerBeamRtnAppThroughput
+ * - PerUtRtnAppThroughput
+ * - PerUtUserRtnAppThroughput
+ * Also check the Doxygen documentation of this class for more information.
+ */
+
 TypeId // static
 SatStatsHelperContainer::GetTypeId ()
 {
@@ -63,230 +149,34 @@ SatStatsHelperContainer::GetTypeId ()
                    MakeStringAccessor (&SatStatsHelperContainer::SetName,
                                        &SatStatsHelperContainer::GetName),
                    MakeStringChecker ())
+
     // FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS /////////////////
-    .AddAttribute ("GlobalFwdAppDelay",
-                   "Enable the output of per GW forward link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFwdAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerGwFwdAppDelay",
-                   "Enable the output of per GW forward link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFwdAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerBeamFwdAppDelay",
-                   "Enable the output of per beam forward link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFwdAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerUtFwdAppDelay",
-                   "Enable the output of per UT forward link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtFwdAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerUtUserFwdAppDelay",
-                   "Enable the output of per UT user forward link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtUserFwdAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppDelay, "FwdAppDelay",
+                                               "forward link application-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppDelay, "PerUtUserFwdAppDelay",
+                                  "per UT user forward link application-level delay statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
     // FORWARD LINK APPLICATION-LEVEL THROUGHPUT STATISTICS ATTRIBUTE /////////
-    .AddAttribute ("GlobalFwdAppThroughput",
-                   "Enable the output of per GW forward link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFwdAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerGwFwdAppThroughput",
-                   "Enable the output of per GW forward link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFwdAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerBeamFwdAppThroughput",
-                   "Enable the output of per beam forward link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFwdAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerUtFwdAppThroughput",
-                   "Enable the output of per UT forward link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtFwdAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerUtUserFwdAppThroughput",
-                   "Enable the output of per UT user forward link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtUserFwdAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput, "FwdAppThroughput",
+                                        "forward link application-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppThroughput, "PerUtUserFwdAppThroughput",
+                                  "per UT user forward link application-level throughput statistics")
+    ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
+
     // RETURN LINK APPLICATION-LEVEL PACKET DELAY STATISTICS //////////////////
-    .AddAttribute ("GlobalRtnAppDelay",
-                   "Enable the output of per GW return link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalRtnAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerGwRtnAppDelay",
-                   "Enable the output of per GW return link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwRtnAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerBeamRtnAppDelay",
-                   "Enable the output of per beam return link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamRtnAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerUtRtnAppDelay",
-                   "Enable the output of per UT return link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtRtnAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-    .AddAttribute ("PerUtUserRtnAppDelay",
-                   "Enable the output of per UT user return link application-level delay statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtUserRtnAppDelay),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppDelay, "RtnAppDelay",
+                                               "return link application-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppDelay, "PerUtUserRtnAppDelay",
+                                  "per UT user return link application-level delay statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
     // RETURN LINK APPLICATION-LEVEL THROUGHPUT STATISTICS ATTRIBUTE //////////
-    .AddAttribute ("GlobalRtnAppThroughput",
-                   "Enable the output of per GW return link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalRtnAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerGwRtnAppThroughput",
-                   "Enable the output of per GW return link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwRtnAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerBeamRtnAppThroughput",
-                   "Enable the output of per beam return link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamRtnAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerUtRtnAppThroughput",
-                   "Enable the output of per UT return link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtRtnAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-    .AddAttribute ("PerUtUserRtnAppThroughput",
-                   "Enable the output of per UT user return link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtUserRtnAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
-                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput, "RtnAppThroughput",
+                                        "return link application-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppThroughput, "PerUtUserRtnAppThroughput",
+                                  "per UT user return link application-level throughput statistics")
+    ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
   ;
   return tid;
 }
