@@ -39,6 +39,7 @@
 #include "../model/satellite-link-results.h"
 #include "../model/satellite-node-info.h"
 #include "../model/satellite-enums.h"
+#include "../model/satellite-channel-estimation-error-container.h"
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -69,7 +70,13 @@ SatGwHelper::GetTypeId (void)
                       MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                        SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                        SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddTraceSource ("Creation", "Creation traces",
+      .AddAttribute ("EnableChannelEstimationError",
+                     "Enable channel estimation error in return link receiver at GW.",
+                     BooleanValue (true),
+                     MakeBooleanAccessor (&SatGwHelper::m_enableChannelEstimationError),
+                     MakeBooleanChecker ())
+      .AddTraceSource ("Creation",
+                       "Creation traces",
                         MakeTraceSourceAccessor (&SatGwHelper::m_creationTrace))
     ;
     return tid;
@@ -85,22 +92,25 @@ SatGwHelper::SatGwHelper ()
  : m_rtnLinkCarrierCount (0),
    m_interferenceModel (),
    m_errorModel (),
-   m_symbolRate (0.0)
+   m_symbolRate (0.0),
+   m_enableChannelEstimationError (false)
 {
   // this default constructor should be never called
   NS_FATAL_ERROR ("Default constructor not supported!!!");
 }
 
-SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount,
-                          SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb )
+SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+                          uint32_t rtnLinkCarrierCount,
+                          SatMac::ReadCtrlMsgCallback readCb,
+                          SatMac::WriteCtrlMsgCallback writeCb )
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
    m_readCtrlCb (readCb),
    m_writeCtrlCb (writeCb),
    m_interferenceModel (),
    m_errorModel (),
-   m_symbolRate (0.0)
-
+   m_symbolRate (0.0),
+   m_enableChannelEstimationError (false)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 
@@ -189,7 +199,32 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   params.m_txCh = fCh;
   params.m_rxCh = rCh;
 
-  Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params, m_errorModel, m_linkResults, m_interferenceModel, m_carrierBandwidthConverter, m_rtnLinkCarrierCount);
+  /**
+   * Channel estimation errors
+   */
+  Ptr<SatChannelEstimationErrorContainer> cec;
+  // Not enabled, create only base class
+  if (!m_enableChannelEstimationError)
+    {
+      cec = Create<SatSimpleChannelEstimationErrorContainer> ();
+    }
+  // Create SatFwdLinkChannelEstimationErrorContainer
+  else
+    {
+      /**
+       * TODO: Fetch the minimum and maximum waveform ids from
+       * SatWaveformConf!
+       */
+      cec = Create<SatRtnLinkChannelEstimationErrorContainer> (3, 22);
+    }
+
+  Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
+                                              m_errorModel,
+                                              m_linkResults,
+                                              m_interferenceModel,
+                                              m_carrierBandwidthConverter,
+                                              m_rtnLinkCarrierCount,
+                                              cec);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

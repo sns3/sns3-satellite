@@ -25,6 +25,7 @@
 #include "ns3/boolean.h"
 #include "satellite-utils.h"
 #include "satellite-phy-rx-carrier-conf.h"
+#include "satellite-channel-estimation-error-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierConf");
 
@@ -35,37 +36,37 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
 : m_ifModel (),
   m_errorModel (),
-  m_linkResults (),
   m_rxTemperatureK (),
-  m_rxExtNoiseDensityDbwhz (),
   m_rxAciIfWrtNoise (),
   m_rxMode (),
-  m_enableIntfOutputTrace (false),
   m_carrierCount (),
   m_carrierBandwidthConverter (),
   m_channelType (),
+  m_channelEstimationError (),
   m_sinrCalculate (),
-  m_constantErrorRate ()
+  m_constantErrorRate (),
+  m_linkResults (),
+  m_rxExtNoiseDensityDbwhz (0),
+  m_enableIntfOutputTrace (false)
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf ( double rxTemperatureDbk, ErrorModel errorModel, InterferenceModel ifModel,
-                                           RxMode rxMode, SatEnums::ChannelType_t chType,
-                                           CarrierBandwidthConverter converter, uint32_t carrierCount)
- : m_ifModel (ifModel),
-   m_errorModel (errorModel),
-   m_linkResults (),
-   m_rxTemperatureK (SatUtils::DbToLinear (rxTemperatureDbk)),
-   m_rxExtNoiseDensityDbwhz (0),
-   m_rxAciIfWrtNoise (0),
-   m_rxMode (rxMode),
-   m_enableIntfOutputTrace (false),
-   m_carrierCount (carrierCount),
-   m_carrierBandwidthConverter (converter),
-   m_channelType (chType),
+SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
+ : m_ifModel (createParams.m_ifModel),
+   m_errorModel (createParams.m_errorModel),
+   m_rxTemperatureK (SatUtils::DbToLinear (createParams.m_rxTemperatureK)),
+   m_rxAciIfWrtNoise (createParams.m_aciIfWrtNoisePercent),
+   m_rxMode (createParams.m_rxMode),
+   m_carrierCount (createParams.m_carrierCount),
+   m_carrierBandwidthConverter (createParams.m_converter),
+   m_channelType (createParams.m_chType),
+   m_channelEstimationError (createParams.m_cec),
    m_sinrCalculate (),
-   m_constantErrorRate (0.0)
+   m_constantErrorRate (0.0),
+   m_linkResults (),
+   m_rxExtNoiseDensityDbwhz (0),
+   m_enableIntfOutputTrace (false)
 {
 
 }
@@ -189,6 +190,12 @@ double
 SatPhyRxCarrierConf::GetConstantErrorRate () const
 {
   return m_constantErrorRate;
+}
+
+Ptr<SatChannelEstimationErrorContainer>
+SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer () const
+{
+  return m_channelEstimationError;
 }
 
 } // namespace ns3

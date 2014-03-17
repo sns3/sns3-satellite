@@ -34,6 +34,7 @@
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
+#include "../model/satellite-channel-estimation-error-container.h"
 #include "satellite-geo-helper.h"
 #include "satellite-helper.h"
 
@@ -77,7 +78,16 @@ SatGeoHelper::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
+
 SatGeoHelper::SatGeoHelper()
+:m_nodeId (0),
+ m_carrierBandwidthConverter (),
+ m_fwdLinkCarrierCount (),
+ m_rtnLinkCarrierCount (),
+ m_deviceCount (0),
+ m_deviceFactory (),
+ m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+ m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT)
 {
   NS_LOG_FUNCTION (this );
 
@@ -86,10 +96,14 @@ SatGeoHelper::SatGeoHelper()
 }
 
 SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount)
-  : m_carrierBandwidthConverter (bandwidthConverterCb),
-    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-    m_deviceCount(0)
+: m_nodeId (0),
+  m_carrierBandwidthConverter (bandwidthConverterCb),
+  m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+  m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+  m_deviceCount(0),
+  m_deviceFactory (),
+  m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
@@ -180,14 +194,25 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   params.m_txCh = uf;
   params.m_rxCh = ur;
 
-  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params, m_rtnLinkInterferenceModel,
-                                                         m_carrierBandwidthConverter, m_rtnLinkCarrierCount);
+  /**
+   * Simple channel estimation, which does not do actually anything
+   */
+  Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
+
+  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
+                                                         m_rtnLinkInterferenceModel,
+                                                         m_carrierBandwidthConverter,
+                                                         m_rtnLinkCarrierCount,
+                                                         cec);
 
   params.m_txCh = fr;
   params.m_rxCh = ff;
 
-  Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params, m_fwdLinkInterferenceModel,
-                                                             m_carrierBandwidthConverter, m_fwdLinkCarrierCount);
+  Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,
+                                                             m_fwdLinkInterferenceModel,
+                                                             m_carrierBandwidthConverter,
+                                                             m_fwdLinkCarrierCount,
+                                                             cec);
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

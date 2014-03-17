@@ -25,6 +25,7 @@
 
 #include "satellite-channel.h"
 #include "satellite-link-results.h"
+#include "satellite-channel-estimation-error-container.h"
 
 namespace ns3 {
 
@@ -80,23 +81,40 @@ public:
   };
 
   /**
-   * Default constructor for SatPhyRxCarrierConf.
-   */
-  SatPhyRxCarrierConf ();
-
-  /**
-   * Constructor for SatPhyRxCarrierConf.
+   * \brief Struct for storing the information for SatPhyRxCarrierConf.
    * \param rxTemperatureK RX noise temperature in Kelvins
+   * \param aciIfWrtNoisePercent Adjacent channel interference wrt noise in percents
    * \param errorModel Used error model
    * \param ifModel Used interference model
    * \param rxMode RX mode used in carrier
    * \param chType RX channel type
    * \param converter Bandwidth converter
    * \param carrierCount carrier count
+   * \param cec Channel estimation error container
    */
-  SatPhyRxCarrierConf ( double rxTemperatureK, ErrorModel errorModel, InterferenceModel ifModel,
-                        RxMode rxMode, SatEnums::ChannelType_t chType, CarrierBandwidthConverter converter,
-                        uint32_t carrierCount);
+  typedef struct
+  {
+    double                                  m_rxTemperatureK;
+    double                                  m_aciIfWrtNoisePercent;
+    ErrorModel                              m_errorModel;
+    InterferenceModel                       m_ifModel;
+    RxMode                                  m_rxMode;
+    SatEnums::ChannelType_t                 m_chType;
+    CarrierBandwidthConverter               m_converter;
+    uint32_t                                m_carrierCount;
+    Ptr<SatChannelEstimationErrorContainer> m_cec;
+  } RxCarrierCreateParams_s;
+
+  /**
+   * Default constructor for SatPhyRxCarrierConf.
+   */
+  SatPhyRxCarrierConf (RxCarrierCreateParams_s p);
+
+  /**
+   * Constructor for SatPhyRxCarrierConf.
+   * \param
+   */
+  SatPhyRxCarrierConf ( );
 
   /**
    * Destructor for SatPhyRxCarrierConf.
@@ -203,6 +221,8 @@ public:
    */
   inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator ) {m_sinrCalculate = sinrCalculator;}
 
+  Ptr<SatChannelEstimationErrorContainer> GetChannelEstimatorErrorContainer () const;
+
 private:
 
   /*
@@ -213,18 +233,19 @@ private:
    */
   InterferenceModel m_ifModel;
   ErrorModel m_errorModel;
-  Ptr<SatLinkResults> m_linkResults;
   double m_rxTemperatureK;
-  double m_rxExtNoiseDensityDbwhz;
   double m_rxAciIfWrtNoise;
   RxMode m_rxMode;
-  bool m_enableIntfOutputTrace;
   uint32_t m_carrierCount;
   CarrierBandwidthConverter m_carrierBandwidthConverter;
   SatEnums::ChannelType_t m_channelType;
+  Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
   SinrCalculatorCallback m_sinrCalculate;
   double m_constantErrorRate;
- };
+  Ptr<SatLinkResults> m_linkResults;
+  double m_rxExtNoiseDensityDbwhz;
+  bool m_enableIntfOutputTrace;
+};
 
 } // namespace ns3
 

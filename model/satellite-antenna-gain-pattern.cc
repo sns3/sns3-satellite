@@ -57,6 +57,19 @@ SatAntennaGainPattern::GetInstanceTypeId (void) const
 
 
 SatAntennaGainPattern::SatAntennaGainPattern ()
+:m_antennaPattern (),
+ m_validPositions (),
+ m_minAcceptableAntennaGainInDb (40.0),
+ m_uniformRandomVariable (),
+ m_latitudes (),
+ m_longitudes (),
+ m_minLat (0.0),
+ m_minLon (0.0),
+ m_maxLat (0.0),
+ m_maxLon (0.0),
+ m_latInterval (0.0),
+ m_lonInterval (0.0),
+ m_nanStrings ()
 {
   // Do nothing here
 }

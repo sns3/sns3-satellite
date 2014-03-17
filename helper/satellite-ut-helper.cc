@@ -49,6 +49,7 @@
 #include "../model/satellite-request-manager.h"
 #include "../model/satellite-queue.h"
 #include "../model/satellite-ut-scheduler.h"
+#include "../model/satellite-channel-estimation-error-container.h"
 #include "satellite-ut-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -97,7 +98,13 @@ SatUtHelper::GetTypeId (void)
                       UintegerValue (0),
                       MakeUintegerAccessor (&SatUtHelper::m_controlFlowIndex),
                       MakeUintegerChecker <uint8_t> ())
-      .AddTraceSource ("Creation", "Creation traces",
+       .AddAttribute ("EnableChannelEstimationError",
+                      "Enable channel estimation error in forward link receiver at UT.",
+                      BooleanValue (true),
+                      MakeBooleanAccessor (&SatUtHelper::m_enableChannelEstimationError),
+                      MakeBooleanChecker ())
+      .AddTraceSource ("Creation",
+                       "Creation traces",
                        MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace))
     ;
     return tid;
@@ -120,7 +127,8 @@ SatUtHelper::SatUtHelper ()
    m_linkResults (),
    m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
-   m_controlFlowIndex (0)
+   m_controlFlowIndex (0),
+   m_enableChannelEstimationError (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -128,8 +136,11 @@ SatUtHelper::SatUtHelper ()
   NS_FATAL_ERROR ("SatUtHelper::SatUtHelper - Constructor not in use");
 }
 
-SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq,
-                          SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb)
+SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+                          uint32_t fwdLinkCarrierCount,
+                          Ptr<SatSuperframeSeq> seq,
+                          SatMac::ReadCtrlMsgCallback readCb,
+                          SatMac::WriteCtrlMsgCallback writeCb)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
    m_superframeSeq (seq),
@@ -140,7 +151,8 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, u
    m_linkResults (),
    m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
-   m_controlFlowIndex (0)
+   m_controlFlowIndex (0),
+   m_enableChannelEstimationError (false)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
@@ -229,8 +241,28 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
 
-  Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params, m_errorModel, m_linkResults, m_interferenceModel,
-                                              m_carrierBandwidthConverter, m_fwdLinkCarrierCount);
+  /**
+   * Channel estimation errors
+   */
+  Ptr<SatChannelEstimationErrorContainer> cec;
+  // Not enabled, create only base class
+  if (!m_enableChannelEstimationError)
+    {
+      cec = Create<SatSimpleChannelEstimationErrorContainer> ();
+    }
+  // Create SatFwdLinkChannelEstimationErrorContainer
+  else
+    {
+      cec = Create<SatFwdLinkChannelEstimationErrorContainer> ();
+    }
+
+  Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
+                                              m_errorModel,
+                                              m_linkResults,
+                                              m_interferenceModel,
+                                              m_carrierBandwidthConverter,
+                                              m_fwdLinkCarrierCount,
+                                              cec);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

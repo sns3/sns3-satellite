@@ -120,6 +120,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    * was received successfully or not
    */
   m_uniformVariable = CreateObject<UniformRandomVariable> ();
+
+  // Configured channel estimation error
+  m_channelEstimationError = carrierConf->GetChannelEstimatorErrorContainer ();
 }
 
 
@@ -367,6 +370,25 @@ SatPhyRxCarrier::EndRxData (uint32_t key)
     {
       /// calculate composite SINR
       cSinr = CalculateCompositeSinr (sinr, iter->second.rxParams->m_sinr);
+
+      /**
+       * Channel estimation error. Channel estimation error works in dB domain, thus we need
+       * to do linear-to-db and db-to-linear conversions here.
+       */
+      // Forward link
+      if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
+        {
+          cSinr = SatUtils::LinearToDb (m_channelEstimationError->AddError (SatUtils::DbToLinear(cSinr)));
+        }
+      // Return link
+      else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
+        {
+          cSinr = SatUtils::LinearToDb (m_channelEstimationError->AddError (SatUtils::DbToLinear(cSinr), iter->second.rxParams->m_txInfo.waveformId));
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
+        }
 
       /// composite sinr output trace
       if (m_enableCompositeSinrOutputTrace)

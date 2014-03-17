@@ -32,6 +32,7 @@
 #include "satellite-channel.h"
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel-estimation-error-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoFeederPhy");
 
@@ -117,6 +118,9 @@ SatGeoFeederPhy::GetInstanceTypeId (void) const
 }
 
 SatGeoFeederPhy::SatGeoFeederPhy (void)
+:m_extNoisePowerDensityDbwHz (-207.0),
+ m_imInterferenceCOverIDb (27.0),
+ m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoFeederPhy default constructor is not allowed to use");
@@ -125,7 +129,8 @@ SatGeoFeederPhy::SatGeoFeederPhy (void)
 SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
                                   InterferenceModel ifModel,
                                   CarrierBandwidthConverter converter,
-                                  uint32_t carrierCount)
+                                  uint32_t carrierCount,
+                                  Ptr<SatChannelEstimationErrorContainer> cec)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
@@ -139,14 +144,17 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   // Configure the SatPhyRxCarrier instances
   // Note, that in GEO satellite, there is no need for error modeling.
 
-  Ptr<SatPhyRxCarrierConf> carrierConf =
-          CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
-                                             SatPhyRxCarrierConf::EM_NONE,
-                                             ifModel,
-                                             SatPhyRxCarrierConf::TRANSPARENT,
-                                             SatEnums::FORWARD_FEEDER_CH,
-                                             converter,
-                                             carrierCount);
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
+  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  p.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
+  p.m_ifModel = ifModel;
+  p.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+  p.m_chType = SatEnums::FORWARD_FEEDER_CH;
+  p.m_converter = converter;
+  p.m_carrierCount = carrierCount;
+  p.m_cec = cec;
+
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
 
   carrierConf->SetAttribute ("ExtNoiseDensityDbwhz", DoubleValue (m_extNoisePowerDensityDbwHz) );
 

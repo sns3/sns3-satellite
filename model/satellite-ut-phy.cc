@@ -31,6 +31,7 @@
 #include "satellite-channel.h"
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel-estimation-error-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtPhy");
 
@@ -110,13 +111,20 @@ SatUtPhy::GetInstanceTypeId (void) const
 }
 
 SatUtPhy::SatUtPhy (void)
+:m_otherSysInterferenceCOverIDb (24.7),
+ m_otherSysInterferenceCOverI (SatUtils::DbToLinear(m_otherSysInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatUtPhy default constructor is not allowed to use");
 }
 
-SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params, ErrorModel errorModel, Ptr<SatLinkResults> linkResults,
-                    InterferenceModel ifModel, CarrierBandwidthConverter converter, uint32_t carrierCount)
+SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
+                    ErrorModel errorModel,
+                    Ptr<SatLinkResults> linkResults,
+                    InterferenceModel ifModel,
+                    CarrierBandwidthConverter converter,
+                    uint32_t carrierCount,
+                    Ptr<SatChannelEstimationErrorContainer> cec)
   : SatPhy(params)
 {
   NS_LOG_FUNCTION (this);
@@ -125,14 +133,17 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params, ErrorModel errorModel, Ptr<S
 
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
 
-  Ptr<SatPhyRxCarrierConf> carrierConf =
-              CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
-                                                 errorModel,
-                                                 ifModel,
-                                                 SatPhyRxCarrierConf::NORMAL,
-                                                 SatEnums::FORWARD_USER_CH,
-                                                 converter,
-                                                 carrierCount);
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
+  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  p.m_errorModel = errorModel;
+  p.m_ifModel = ifModel;
+  p.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  p.m_chType = SatEnums::FORWARD_USER_CH;
+  p.m_converter = converter;
+  p.m_carrierCount = carrierCount;
+  p.m_cec = cec;
+
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
 
   if (linkResults)
     {

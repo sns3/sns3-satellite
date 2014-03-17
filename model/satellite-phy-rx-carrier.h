@@ -331,6 +331,11 @@ private:
    * \brief A map of Rx params
    */
   std::map <uint32_t, rxParams_s> m_rxParamsMap;
+
+  /**
+   * Channel estimation error container
+   */
+  Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
 };
 
 }

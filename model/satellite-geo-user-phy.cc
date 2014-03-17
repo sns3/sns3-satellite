@@ -32,6 +32,7 @@
 #include "satellite-channel.h"
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel-estimation-error-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoUserPhy");
 
@@ -117,6 +118,10 @@ SatGeoUserPhy::GetInstanceTypeId (void) const
 }
 
 SatGeoUserPhy::SatGeoUserPhy (void)
+:m_aciInterferenceCOverIDb (17.0),
+ m_otherSysInterferenceCOverIDb (27.5),
+ m_aciInterferenceCOverI (SatUtils::DbToLinear (m_aciInterferenceCOverIDb)),
+ m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoUserPhy default constructor is not allowed to use");
@@ -125,7 +130,8 @@ SatGeoUserPhy::SatGeoUserPhy (void)
 SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
                               InterferenceModel ifModel,
                               CarrierBandwidthConverter converter,
-                              uint32_t carrierCount)
+                              uint32_t carrierCount,
+                              Ptr<SatChannelEstimationErrorContainer> cec)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
@@ -137,14 +143,17 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
   m_aciInterferenceCOverI = SatUtils::DbToLinear (m_aciInterferenceCOverIDb);
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
 
-  Ptr<SatPhyRxCarrierConf> carrierConf =
-            CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
-                                               SatPhyRxCarrierConf::EM_NONE,
-                                               ifModel,
-                                               SatPhyRxCarrierConf::TRANSPARENT,
-                                               SatEnums::RETURN_USER_CH,
-                                               converter,
-                                               carrierCount);
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
+  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  p.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
+  p.m_ifModel = ifModel;
+  p.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+  p.m_chType = SatEnums::RETURN_USER_CH;
+  p.m_converter = converter;
+  p.m_carrierCount = carrierCount;
+  p.m_cec = cec;
+
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoUserPhy::CalculateSinr, this));
 

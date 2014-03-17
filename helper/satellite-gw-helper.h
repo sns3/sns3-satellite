@@ -169,6 +169,12 @@ private:
   TracedCallback<std::string> m_creationTrace;
 
   double m_symbolRate;
+
+  /**
+   * Enable channel estimation error modeling at forward link
+   * receiver (= UT).
+   */
+  bool m_enableChannelEstimationError;
 };
 
 } // namespace ns3

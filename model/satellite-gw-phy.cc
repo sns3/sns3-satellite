@@ -31,6 +31,7 @@
 #include "satellite-channel.h"
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel-estimation-error-container.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGwPhy");
@@ -117,14 +118,25 @@ SatGwPhy::GetInstanceTypeId (void) const
 }
 
 SatGwPhy::SatGwPhy (void)
+:m_aciIfWrtNoisePercent (10.0),
+ m_imInterferenceCOverIDb (22.0),
+ m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGwPhy default constructor is not allowed to use");
 }
 
-SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params, ErrorModel errorModel, Ptr<SatLinkResults> linkResults,
-                    InterferenceModel ifModel, CarrierBandwidthConverter converter, uint32_t carrierCount)
-  : SatPhy (params)
+SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
+                    ErrorModel errorModel,
+                    Ptr<SatLinkResults> linkResults,
+                    InterferenceModel ifModel,
+                    CarrierBandwidthConverter converter,
+                    uint32_t carrierCount,
+                    Ptr<SatChannelEstimationErrorContainer> cec)
+  : SatPhy (params),
+    m_aciIfWrtNoisePercent (10.0),
+    m_imInterferenceCOverIDb (22.0),
+    m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
 
@@ -132,14 +144,17 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params, ErrorModel errorModel, Ptr<Sa
 
   m_imInterferenceCOverI = SatUtils::DbToLinear (m_imInterferenceCOverIDb);
 
-  Ptr<SatPhyRxCarrierConf> carrierConf =
-              CreateObject<SatPhyRxCarrierConf> (SatPhy::GetRxNoiseTemperatureDbk(),
-                                                 errorModel,
-                                                 ifModel,
-                                                 SatPhyRxCarrierConf::NORMAL,
-                                                 SatEnums::RETURN_FEEDER_CH,
-                                                 converter,
-                                                 carrierCount);
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
+  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  p.m_errorModel = errorModel;
+  p.m_ifModel = ifModel;
+  p.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  p.m_chType = SatEnums::RETURN_FEEDER_CH;
+  p.m_converter = converter;
+  p.m_carrierCount = carrierCount;
+  p.m_cec = cec;
+
+	Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
 
   carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoisePercent) );
 

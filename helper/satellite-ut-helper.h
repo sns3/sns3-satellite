@@ -184,6 +184,12 @@ private:
      * Flow index used for control messages
      */
     uint8_t m_controlFlowIndex;
+
+    /**
+     * Enable channel estimation error modeling at forward link
+     * receiver (= UT).
+     */
+    bool m_enableChannelEstimationError;
 };
 
 } // namespace ns3

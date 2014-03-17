@@ -28,6 +28,7 @@
 #include "ns3/address.h"
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-channel-estimation-error-container.h"
 
 namespace ns3 {
 
@@ -46,8 +47,13 @@ public:
    */
   SatUtPhy (void);
 
-  SatUtPhy (SatPhy::CreateParam_t & params, SatPhy::ErrorModel errorModel, Ptr<SatLinkResults> linkResults,
-            SatPhy::InterferenceModel ifModel, SatPhy::CarrierBandwidthConverter converter, uint32_t carrierCount);
+  SatUtPhy (SatPhy::CreateParam_t & params,
+            SatPhy::ErrorModel errorModel,
+            Ptr<SatLinkResults> linkResults,
+            SatPhy::InterferenceModel ifModel,
+            SatPhy::CarrierBandwidthConverter converter,
+            uint32_t carrierCount,
+            Ptr<SatChannelEstimationErrorContainer> cec);
 
   virtual ~SatUtPhy ();
 
