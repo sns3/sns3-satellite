@@ -110,37 +110,37 @@ public:
    */
   void AddPerUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType);
 
-  // FORWARD LINK THROUGHPUT STATISTICS ///////////////////////////////////////
+  // FORWARD LINK APPLICATION-LEVEL THROUGHPUT STATISTICS /////////////////////
 
   /**
    * \brief
    * \param outputType
    */
-  void AddGlobalFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerGwFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerGwFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerBeamFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerBeamFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerUtFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerUtFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerUtUserFwdThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerUtUserFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   // RETURN LINK APPLICATION-LEVEL PACKET DELAY STATISTICS ////////////////////
 
@@ -174,37 +174,37 @@ public:
    */
   void AddPerUtUserRtnAppDelay (SatStatsHelper::OutputType_t outputType);
 
-  // RETURN LINK THROUGHPUT STATISTICS ////////////////////////////////////////
+  // RETURN LINK APPLICATION-LEVEL THROUGHPUT STATISTICS //////////////////////
 
   /**
    * \brief
    * \param outputType
    */
-  void AddGlobalRtnThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerGwRtnThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerGwRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerBeamRtnThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerBeamRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerUtRtnThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerUtRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \brief
    * \param outputType
    */
-  void AddPerUtUserRtnThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddPerUtUserRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType

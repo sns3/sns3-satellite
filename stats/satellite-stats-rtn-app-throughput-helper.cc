@@ -19,7 +19,7 @@
  *
  */
 
-#include "satellite-stats-rtn-throughput-helper.h"
+#include "satellite-stats-rtn-app-throughput-helper.h"
 #include <ns3/log.h>
 #include <ns3/enum.h>
 #include <ns3/string.h>
@@ -40,26 +40,26 @@
 #include <ns3/gnuplot-aggregator.h>
 #include <sstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsRtnThroughputHelper");
+NS_LOG_COMPONENT_DEFINE ("SatStatsRtnAppThroughputHelper");
 
 
 namespace ns3 {
 
-SatStatsRtnThroughputHelper::SatStatsRtnThroughputHelper (Ptr<const SatHelper> satHelper)
+SatStatsRtnAppThroughputHelper::SatStatsRtnAppThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsRtnThroughputHelper::~SatStatsRtnThroughputHelper ()
+SatStatsRtnAppThroughputHelper::~SatStatsRtnAppThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 void
-SatStatsRtnThroughputHelper::DoInstall ()
+SatStatsRtnAppThroughputHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -196,7 +196,7 @@ SatStatsRtnThroughputHelper::DoInstall ()
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
   Callback<void, Ptr<const Packet>, const Address &> callback
-    = MakeCallback (&SatStatsRtnThroughputHelper::ApplicationPacketCallback,
+    = MakeCallback (&SatStatsRtnAppThroughputHelper::ApplicationPacketCallback,
                     this);
 
   for (NodeContainer::Iterator it = gwUsers.Begin ();
@@ -223,8 +223,8 @@ SatStatsRtnThroughputHelper::DoInstall ()
 
 
 void
-SatStatsRtnThroughputHelper::ApplicationPacketCallback (Ptr<const Packet> packet,
-                                                        const Address &from)
+SatStatsRtnAppThroughputHelper::ApplicationPacketCallback (Ptr<const Packet> packet,
+                                                           const Address &from)
 {
   //NS_LOG_FUNCTION (this << packet->GetSize () << from);
 
@@ -267,7 +267,7 @@ SatStatsRtnThroughputHelper::ApplicationPacketCallback (Ptr<const Packet> packet
 
 
 void
-SatStatsRtnThroughputHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
+SatStatsRtnAppThroughputHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 {
   NS_LOG_FUNCTION (this << utUserNode->GetId ());
 

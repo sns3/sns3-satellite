@@ -19,7 +19,7 @@
  *
  */
 
-#include "satellite-stats-fwd-throughput-helper.h"
+#include "satellite-stats-fwd-app-throughput-helper.h"
 #include <ns3/log.h>
 #include <ns3/enum.h>
 #include <ns3/string.h>
@@ -37,26 +37,26 @@
 #include <ns3/gnuplot-aggregator.h>
 #include <sstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsFwdThroughputHelper");
+NS_LOG_COMPONENT_DEFINE ("SatStatsFwdAppThroughputHelper");
 
 
 namespace ns3 {
 
-SatStatsFwdThroughputHelper::SatStatsFwdThroughputHelper (Ptr<const SatHelper> satHelper)
+SatStatsFwdAppThroughputHelper::SatStatsFwdAppThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsFwdThroughputHelper::~SatStatsFwdThroughputHelper ()
+SatStatsFwdAppThroughputHelper::~SatStatsFwdAppThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 void
-SatStatsFwdThroughputHelper::DoInstall ()
+SatStatsFwdAppThroughputHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -189,8 +189,8 @@ SatStatsFwdThroughputHelper::DoInstall ()
 
 template<typename R, typename C, typename P>
 void
-SatStatsFwdThroughputHelper::InstallProbes (CollectorMap &collectorMap,
-                                            R (C::*collectorTraceSink) (P, P))
+SatStatsFwdAppThroughputHelper::InstallProbes (CollectorMap &collectorMap,
+                                               R (C::*collectorTraceSink) (P, P))
 {
   NS_LOG_FUNCTION (this);
   NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
