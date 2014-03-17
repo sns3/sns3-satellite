@@ -125,8 +125,16 @@ void
 SatStatsHelper::Install ()
 {
   NS_LOG_FUNCTION (this);
-  DoInstall (); // this method is supposed to be implemented by the child class
-  m_isInstalled = true;
+
+  if (m_outputType == SatStatsHelper::OUTPUT_NONE)
+    {
+      NS_LOG_WARN ("Skipping statistics installation because of OUTPUT_NONE output type is selected.");
+    }
+  else
+    {
+      DoInstall (); // this method is supposed to be implemented by the child class
+      m_isInstalled = true;
+    }
 }
 
 
@@ -319,7 +327,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 
   return n;
 
-} // end of `uint32_t CreateCollectorPerIdentifier (CollectorMap);`
+} // end of `uint32_t CreateCollectorPerIdentifier (CollectorMap &);`
 
 
 
@@ -328,228 +336,290 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 uint32_t
 SatStatsHelper::GetUtUserId (Ptr<Node> utUserNode) const
 {
+  uint32_t ret = 0;
   const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-
   const Address addr = satIdMapper->GetUtUserMacWithNode (utUserNode);
-  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
-                 "Node " << utUserNode->GetId ()
-                         << " does not have any valid Mac48Address");
 
-  const int32_t utUserId = satIdMapper->GetUtUserIdWithMac (addr);
-  NS_ASSERT_MSG (utUserId != -1,
-                 "Node " << utUserNode->GetId ()
-                         << " is not found in the global list of UT users");
+  if (addr.IsInvalid ())
+    {
+      NS_LOG_WARN (this << "Node " << utUserNode->GetId ()
+                        << " does not have any valid Mac48Address");
+    }
+  else
+    {
+      const int32_t utUserId = satIdMapper->GetUtUserIdWithMac (addr);
 
-  return utUserId;
+      if (utUserId < 0)
+        {
+          NS_LOG_WARN (this << "Node " << utUserNode->GetId ()
+                            << " is not found in the global list of UT users");
+        }
+      else
+        {
+          ret = utUserId;
+        }
+    }
+
+  return ret;
 }
 
 
 uint32_t
 SatStatsHelper::GetUtId (Ptr<Node> utNode) const
 {
+  uint32_t ret = 0;
   const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-
   const Address addr = satIdMapper->GetUtMacWithNode (utNode);
-  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
-                 "Node " << utNode->GetId ()
-                         << " does not have any valid Mac48Address");
 
-  const int32_t utId = satIdMapper->GetUtIdWithMac (addr);
-  NS_ASSERT_MSG (utId != -1,
-                 "Node " << utNode->GetId ()
-                         << " is not found in the global list of UTs");
+  if (addr.IsInvalid ())
+    {
+      NS_LOG_WARN (this << "Node " << utNode->GetId ()
+                        << " does not have any valid Mac48Address");
+    }
+  else
+    {
+      const int32_t utId = satIdMapper->GetUtIdWithMac (addr);
 
-  return utId;
+      if (utId < 0)
+        {
+          NS_LOG_WARN (this << "Node " << utNode->GetId ()
+                            << " is not found in the global list of UTs");
+        }
+      else
+        {
+          ret = utId;
+        }
+    }
+
+  return ret;
 }
 
 
 uint32_t
 SatStatsHelper::GetGwId (Ptr<Node> gwNode) const
 {
+  uint32_t ret = 0;
   const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-
   const Address addr = satIdMapper->GetGwMacWithNode (gwNode);
-  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
-                 "Node " << gwNode->GetId ()
-                         << " does not have any valid Mac48Address");
 
-  const int32_t gwId = satIdMapper->GetGwIdWithMac (addr);
-  NS_ASSERT_MSG (gwId != -1,
-                 "Node " << gwNode->GetId ()
-                         << " is not found in the global list of GWs");
-
-  return gwId;
-
-  /*
-  const uint32_t findNodeId = gwNode->GetId ();
-  NS_LOG_DEBUG (this << " sequential search of GW ID for node " << findNodeId);
-
-  for (uint32_t gwId = 1; gwId <= 5;
-  Ptr<Node> pickNode = m_satHelper->GetBeamHelper ()->GetGwNode (gwId);
-  NS_ASSERT (pickNode != 0);
-  uint32_t pickNodeId = pickNode->GetId ();
-  NS_LOG_DEBUG (this << " node " << pickNodeId << " is GW " << gwId);
-
-  while ((pickNode != 0) && (pickNodeId != findNodeId))
+  if (addr.IsInvalid ())
     {
-      gwId++;
-      pickNode = m_satHelper->GetBeamHelper ()->GetGwNode (gwId);
-      NS_ASSERT (pickNode != 0);
-      pickNodeId = pickNode->GetId ();
-      NS_LOG_DEBUG (this << " node " << pickNodeId << " is GW " << gwId);
+      NS_LOG_WARN (this << "Node " << gwNode->GetId ()
+                        << " does not have any valid Mac48Address");
+    }
+  else
+    {
+      const int32_t gwId = satIdMapper->GetGwIdWithMac (addr);
+
+      if (gwId < 0)
+        {
+          NS_LOG_WARN (this << "Node " << gwNode->GetId ()
+                            << " is not found in the global list of GWs");
+        }
+      else
+        {
+          ret = gwId;
+        }
     }
 
-  NS_ASSERT_MSG ((pickNode != 0) && (pickNodeId == findNodeId),
-                 "GW node " << findNodeId
-                            << " is not found in the global list of GWs");
-  return gwId;
-  */
+  return ret;
 }
 
 
 uint32_t
 SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 {
+  uint32_t ret = 0;
+
   switch (m_identifierType)
     {
     case SatStatsHelper::IDENTIFIER_GLOBAL:
-      return 0;
+      ret = 0;
+      break;
 
     case SatStatsHelper::IDENTIFIER_GW:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
-        NS_ASSERT_MSG (utNode != 0,
-                       "UT user node " << utUserNode->GetId ()
-                                       << " is not attached to any UT node");
-        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-        NS_ASSERT_MSG (beamId != -1,
-                       "UT user node " << utUserNode->GetId ()
-                                       << " is not attached to any beam");
-        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
-        NS_ASSERT_MSG (gwId != 0,
-                       "UT user node " << utUserNode->GetId ()
-                                       << " is not attached to any GW");
-        return gwId;
+
+        if (utNode == 0)
+          {
+            NS_LOG_WARN (this << "UT user node " << utUserNode->GetId ()
+                              << " is not attached to any UT node");
+          }
+        else
+          {
+            const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+            const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+            if (!utMac.IsInvalid ())
+              {
+                const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+                NS_ASSERT_MSG (beamId != -1,
+                               "UT user node " << utUserNode->GetId ()
+                                               << " is not attached to any beam");
+                const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+                NS_ASSERT_MSG (gwId != 0,
+                               "UT user node " << utUserNode->GetId ()
+                                               << " is not attached to any GW");
+                ret = gwId;
+              }
+          }
+
+        break;
       }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
-        NS_ASSERT_MSG (utNode != 0,
-                       "UT user node " << utUserNode->GetId ()
-                                       << " is not attached to any UT node");
-        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-        NS_ASSERT_MSG (beamId != -1,
-                       "UT user node " << utUserNode->GetId ()
-                                       << " is not attached to any beam");
-        return beamId;
+
+        if (utNode == 0)
+          {
+            NS_LOG_WARN (this << "UT user node " << utUserNode->GetId ()
+                              << " is not attached to any UT node");
+          }
+        else
+          {
+            const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+            const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+            if (!utMac.IsInvalid ())
+              {
+                const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+                NS_ASSERT_MSG (beamId != -1,
+                               "UT user node " << utUserNode->GetId ()
+                                               << " is not attached to any beam");
+                ret = beamId;
+              }
+          }
+
+        break;
       }
 
     case SatStatsHelper::IDENTIFIER_UT:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
-        NS_ASSERT_MSG (utNode != 0,
-                       "UT user node " << utUserNode->GetId ()
-                                       << " is not attached to any UT node");
-        return GetUtId (utNode);
+
+        if (utNode == 0)
+          {
+            NS_LOG_WARN (this << "UT user node " << utUserNode->GetId ()
+                              << " is not attached to any UT node");
+          }
+        else
+          {
+            ret = GetUtId (utNode);
+          }
+
+        break;
       }
 
     case SatStatsHelper::IDENTIFIER_UT_USER:
-      return GetUtUserId (utUserNode);
+      ret = GetUtUserId (utUserNode);
+      break;
 
     default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
+      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a UT user. Assigning identifier 0 to this UT user.");
       break;
     }
 
-  return 0;
+  return ret;
 }
 
 
 uint32_t
 SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 {
+  uint32_t ret = 0;
+
   switch (m_identifierType)
     {
     case SatStatsHelper::IDENTIFIER_GLOBAL:
-      return 0;
+      ret = 0;
+      break;
 
     case SatStatsHelper::IDENTIFIER_GW:
       {
         const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-        NS_ASSERT_MSG (beamId != -1,
-                       "UT node " << utNode->GetId ()
-                                  << " is not attached to any beam");
-        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
-        NS_ASSERT_MSG (gwId != 0,
-                       "UT node " << utNode->GetId ()
-                                  << " is not attached to any GW");
-        return gwId;
+
+        if (!utMac.IsInvalid ())
+          {
+            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (beamId != -1,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any beam");
+            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+            NS_ASSERT_MSG (gwId != 0,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any GW");
+            ret = gwId;
+          }
+
+        break;
       }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
         const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-        const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-        NS_ASSERT_MSG (beamId != -1,
-                       "UT node " << utNode->GetId ()
-                                  << " is not attached to any beam");
-        return beamId;
+
+        if (!utMac.IsInvalid ())
+          {
+            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (beamId != -1,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any beam");
+            ret = beamId;
+          }
+
+        break;
       }
 
     case SatStatsHelper::IDENTIFIER_UT:
-      {
-        return GetUtId (utNode);
-      }
-
-    case SatStatsHelper::IDENTIFIER_UT_USER:
-      return 0;
+      ret = GetUtId (utNode);
+      break;
 
     default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
+      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a UT. Assigning identifier 0 to this UT.");
       break;
     }
 
-  return 0;
+  return ret;
 }
 
 
 uint32_t
 SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
 {
+  uint32_t ret = 0;
+
   switch (m_identifierType)
     {
     case SatStatsHelper::IDENTIFIER_GLOBAL:
-      return 0;
+      ret = 0;
+      break;
 
     case SatStatsHelper::IDENTIFIER_GW:
       {
         const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
         NS_ASSERT_MSG (gwId != 0,
                        "Beam " << beamId << " is not attached to any GW");
-        return gwId;
+        ret = gwId;
+        break;
       }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
-      return beamId;
-
-    case SatStatsHelper::IDENTIFIER_UT:
-    case SatStatsHelper::IDENTIFIER_UT_USER:
-      return 0;
+      ret = beamId;
+      break;
 
     default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
+      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a beam. Assigning identifier 0 to this beam.");
       break;
     }
 
-  return 0;
+  return ret;
 }
 
 
@@ -560,8 +630,14 @@ SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
     {
       return GetGwId (gwNode);
     }
+  else if (m_identifierType == IDENTIFIER_GLOBAL)
+    {
+      return 0;
+    }
   else
     {
+      NS_LOG_WARN (this << "Identifier type " << GetIdentiferTypeName (m_identifierType)
+                        << " is not valid for a GW. Assigning identifier 0 to this GW.");
       return 0;
     }
 }

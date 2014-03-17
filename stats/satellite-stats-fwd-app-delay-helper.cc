@@ -45,7 +45,7 @@ namespace ns3 {
 SatStatsFwdAppDelayHelper::SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << satHelper);
 }
 
 
@@ -63,6 +63,7 @@ SatStatsFwdAppDelayHelper::DoInstall ()
   switch (GetOutputType ())
     {
     case SatStatsHelper::OUTPUT_NONE:
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
@@ -147,6 +148,7 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       /// \todo Add support for boxes in Gnuplot.
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
@@ -244,6 +246,8 @@ SatStatsFwdAppDelayHelper::InstallProbes (CollectorMap &collectorMap,
   for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
+      NS_ASSERT_MSG (utUserId > 0,
+                     "Node " << (*it)->GetId () << " is not a valid UT user");
       const uint32_t identifier = GetIdentifierForUtUser (*it);
 
       for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)

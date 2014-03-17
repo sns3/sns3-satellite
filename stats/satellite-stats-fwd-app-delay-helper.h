@@ -36,15 +36,25 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Produce forward link application-level delay statistics from a
+ *        satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdAppDelayHelper> s = Create<SatStatsFwdAppDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
  */
 class SatStatsFwdAppDelayHelper : public SatStatsHelper
 {
 public:
-  /**
-   * \brief
-   * \param satHelper
-   */
+  // inherited from SatStatsHelper base class
   SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
@@ -58,22 +68,29 @@ private:
   /**
    * \brief Create a probe for each UT user node's application and connect it
    *        to a collector.
-   * \param collectorMap
-   * \param collectorTraceSink
+   * \param collectorMap list of collectors which the created probes will be
+   *                     connected to.
+   * \param collectorTraceSink a pointer to a function of the collector which
+   *                           acts as a trace sink.
    *
-   * Add the created probes to #m_probes.
+   * The collector's trace sink function must be an accessible (e.g., public)
+   * class method which accepts two input arguments of same type and returns
+   * nothing. For example, it is specified as
+   * `&IntervalRateCollector::TraceSinkDouble`.
+   *
+   * The created probes will be added to #m_probes.
    */
   template<typename R, typename C, typename P>
   void InstallProbes (CollectorMap &collectorMap,
                       R (C::*collectorTraceSink) (P, P));
 
-  ///
+  /// Maintains a list of probes created by this helper.
   std::list<Ptr<Probe> > m_probes;
 
-  ///
+  /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
 
-  ///
+  /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsFwdAppDelayHelper

@@ -331,46 +331,112 @@ SatIdMapper::GetGwUserIdWithMac (Address mac) const
 Address
 SatIdMapper::GetGwMacWithNode (Ptr<Node> gwNode) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << gwNode->GetId ());
 
-  NS_ASSERT_MSG (gwNode->GetNDevices () >= 3,
-                 "Node " << gwNode->GetId () << " is not a valid GW");
-  /*
-   * Assuming that device #0 is for loopback device, device #(N-1) is for
-   * backbone network device, and devices #1 until #(N-2) are for satellite
-   * beam device.
-   */
-  Ptr<NetDevice> dev = gwNode->GetDevice (1);
-  NS_ASSERT (dev->GetObject<SatNetDevice> () != 0);
-  return dev->GetAddress ();
+  if (gwNode->GetNDevices () >= 3)
+    {
+      /*
+       * Assuming that device #0 is for loopback device, device #(N-1) is for
+       * backbone network device, and devices #1 until #(N-2) are for satellite
+       * beam device.
+       */
+      Ptr<NetDevice> dev = gwNode->GetDevice (1);
+
+      if (dev->GetObject<SatNetDevice> () != 0)
+        {
+          if (Mac48Address::IsMatchingType (dev->GetAddress ()))
+            {
+              return dev->GetAddress ();
+            }
+          else
+            {
+              NS_LOG_WARN (this << "Device 1 of Node " << gwNode->GetId ()
+                                << " is not have a valid Mac48Address");
+              return Address (); // returns an invalid address
+            }
+        }
+      else
+        {
+          NS_LOG_WARN ("Node " << gwNode->GetId () << " is not a valid GW");
+          return Address (); // returns an invalid address
+        }
+    }
+  else
+    {
+      NS_LOG_WARN ("Node " << gwNode->GetId () << " is not a valid GW");
+      return Address (); // returns an invalid address
+    }
 }
 
 Address
 SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << utNode->GetId ());
 
-  NS_ASSERT_MSG (utNode->GetNDevices () >= 3,
-                 "Node " << utNode->GetId () << " is not a valid UT");
-  /*
-   * Assuming that device #0 is for loopback device, device #1 is for subscriber
-   * network device, and device #2 is for satellite beam device.
-   */
-  Ptr<NetDevice> dev = utNode->GetDevice (2);
-  NS_ASSERT (dev->GetObject<SatNetDevice> () != 0);
-  return dev->GetAddress ();
+  if (utNode->GetNDevices () >= 3)
+    {
+      /*
+       * Assuming that device #0 is for loopback device, device #1 is for
+       * subscriber network device, and device #2 is for satellite beam device.
+       */
+      Ptr<NetDevice> dev = utNode->GetDevice (2);
+
+      if (dev->GetObject<SatNetDevice> () != 0)
+        {
+          if (Mac48Address::IsMatchingType (dev->GetAddress ()))
+            {
+              return dev->GetAddress ();
+            }
+          else
+            {
+              NS_LOG_WARN (this << "Device 2 of Node " << utNode->GetId ()
+                                << " is not have a valid Mac48Address");
+              return Address (); // returns an invalid address
+            }
+        }
+      else
+        {
+          NS_LOG_WARN ("Node " << utNode->GetId () << " is not a valid UT");
+          return Address (); // returns an invalid address
+        }
+    }
+  else
+    {
+      NS_LOG_WARN ("Node " << utNode->GetId () << " is not a valid UT");
+      return Address (); // returns an invalid address
+    }
 }
 
 Address
 SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << utUserNode->GetId ());
 
-  NS_ASSERT_MSG (utUserNode->GetNDevices () >= 2,
-                 "Node " << utUserNode->GetId () << " is not a valid UT user");
-  // assuming that #0 is for loopback device and #1 is for subscriber network device
-  Ptr<NetDevice> dev = utUserNode->GetDevice (1);
-  return dev->GetAddress ();
+  if (utUserNode->GetNDevices () >= 2)
+    {
+      /*
+       * Assuming that #0 is for loopback device and #1 is for subscriber
+       * network device.
+       */
+      Ptr<NetDevice> dev = utUserNode->GetDevice (1);
+      NS_ASSERT (dev != 0);
+
+      if (Mac48Address::IsMatchingType (dev->GetAddress ()))
+        {
+          return dev->GetAddress ();
+        }
+      else
+        {
+          NS_LOG_WARN (this << "Device 1 of Node " << utUserNode->GetId ()
+                            << " is not have a valid Mac48Address");
+          return Address (); // returns an invalid address
+        }
+    }
+  else
+    {
+      NS_LOG_WARN ("Node " << utUserNode->GetId () << " is not a valid UT user");
+      return Address (); // returns an invalid address
+    }
 }
 
 std::string
