@@ -99,7 +99,8 @@ SatStatsFwdThroughputHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()));
+                                         "OutputFileName", StringValue (GetName ()),
+                                         "GeneralHeading", StringValue ("% time_sec throughput_kbps"));
 
         // Setup terminal collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");

@@ -94,7 +94,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()));
+                                         "OutputFileName", StringValue (GetName ()),
+                                         "GeneralHeading", StringValue ("% time_sec delay_sec"));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -117,7 +118,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()));
+                                         "OutputFileName", StringValue (GetName ()),
+                                         "GeneralHeading", StringValue ("% delay_sec freq"));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
@@ -139,6 +141,9 @@ SatStatsFwdAppDelayHelper::DoInstall ()
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
                                                   &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator ("OutputString",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::AddContextHeading);
 
         // Setup probes.
         InstallProbes (m_terminalCollectors,
