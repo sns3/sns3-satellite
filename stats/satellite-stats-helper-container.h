@@ -33,6 +33,7 @@ namespace ns3 {
 class SatHelper;
 
 /**
+ * \ingroup satstats
  * \brief Container of SatStatsHelper instances.
  *
  * The container is initially empty. SatStatsHelper instances can be added into

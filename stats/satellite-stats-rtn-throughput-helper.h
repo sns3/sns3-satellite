@@ -35,24 +35,36 @@ class DataCollectionObject;
 class Packet;
 
 /**
- * \brief
+ * \ingroup satstats
+ * \brief Produce return link application-level throughput statistics from a
+ *        satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnThroughputHelper> s = Create<SatStatsRtnThroughputHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
  */
 class SatStatsRtnThroughputHelper : public SatStatsHelper
 {
 public:
-  /**
-   * \brief
-   * \param satHelper
-   */
+  // inherited from SatStatsHelper base class
   SatStatsRtnThroughputHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
   virtual ~SatStatsRtnThroughputHelper ();
 
   /**
-   * \brief
-   * \param packet
-   * \param from
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param packet received packet data.
+   * \param from the InetSocketAddress of the sender of the packet.
    */
   void ApplicationPacketCallback (Ptr<const Packet> packet,
                                   const Address &from);
@@ -63,37 +75,27 @@ protected:
 
 private:
   /**
-   * \brief Save the MAC address and the proper identifier from the given UT
-   *        user node.
-   * \param utUserNode
+   * \brief Save the IPv4 address and the proper identifier from the given
+   *        UT user node.
+   * \param utUserNode a UT user node.
    *
-   * Saved in #m_identifierMap member variable.
-   *
-   * This method is not used at the moment.
-   */
-  void SaveMacAddressAndIdentifier (Ptr<Node> utUserNode);
-
-  /**
-   * \brief Save the IPv4 address and the proper identifier from the given UT
-   *        user node.
-   * \param utUserNode
-   *
-   * Saved in #m_identifierMap member variable.
+   * Any addresses found in the given node will be saved in the
+   * #m_identifierMap member variable.
    */
   void SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode);
 
-  // TODO: Write SaveIpv6Address() method.
+  /// \todo Write SaveIpv6Address() method.
 
-  ///
+  /// Maintains a list of first-level collectors created by this helper.
   CollectorMap m_conversionCollectors;
 
-  ///
+  /// Maintains a list of second-level collectors created by this helper.
   CollectorMap m_terminalCollectors;
 
-  ///
+  /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
-  // key: UT user address
+  /// Map of Ipv4Address and the identifier associated with it.
   std::map<const Address, uint32_t> m_identifierMap;
 
 }; // end of class SatStatsRtnThroughputHelper

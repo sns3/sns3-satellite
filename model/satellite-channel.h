@@ -34,8 +34,6 @@
 
 namespace ns3 {
 
-class SatPhyRx;
-
 /**
  * \ingroup satellite
  *

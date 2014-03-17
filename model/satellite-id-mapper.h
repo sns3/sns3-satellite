@@ -155,25 +155,26 @@ public:
 
   /**
    * \param gwNode pointer to a GW node
-   * \return MAC address of the GW node's first satellite beam network device
-   * \warning Undefined behaviour when the pointed node is not a valid GW node.
+   * \return the MAC address of the GW node's first satellite beam network
+   *         device, or an invalid address if such device is not found.
    */
   Address GetGwMacWithNode (Ptr<Node> utNode) const;
 
   /**
    * \param utNode pointer to a UT node
-   * \return MAC address of the UT node's satellite beam network device
-   * \warning Undefined behaviour when the pointed node is not a valid UT node.
+   * \return MAC address of the UT node's satellite beam network device, or an
+   *         invalid address if such device is not found.
    */
   Address GetUtMacWithNode (Ptr<Node> utNode) const;
 
   /**
    * \param utUserNode pointer to a UT user node
-   * \return MAC address of the UT user node's subscriber network device
-   * \warning Undefined behaviour when the pointed node is not a valid UT user
-   *          node.
+   * \return MAC address of the UT user node's subscriber network device, or an
+   *         invalid address if such device is not found.
    */
   Address GetUtUserMacWithNode (Ptr<Node> utUserNode) const;
+
+  /* PRINT RELATED METHODS */
 
   /**
    * \brief Function for printing out the trace map

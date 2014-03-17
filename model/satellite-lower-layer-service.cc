@@ -85,14 +85,14 @@ SatLowerLayerServiceConf::~SatLowerLayerServiceConf ()
 std::string
 SatLowerLayerServiceConf::GetIndexAsDaServiceName (uint8_t index)
 {
-  std::string name = "Service";
+  std::string name = "DaService";
   return name + GetNumberAsString<uint8_t> (index);
 }
 
 std::string
 SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
 {
-  std::string name = "Service";
+  std::string name = "RaService";
   return name + GetNumberAsString<uint8_t> (index);
 }
 

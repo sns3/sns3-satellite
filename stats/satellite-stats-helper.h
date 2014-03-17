@@ -37,7 +37,16 @@ class CollectorMap;
 class DataCollectionObject;
 
 /**
- * \brief Abstract class
+ * \ingroup satellite
+ * \defgroup satstats Satellite Statistics
+ *
+ * Data Collection Framework (DCF) implementation on Satellite module. For
+ * usage in simulation script, see SatStatsHelperContainer.
+ */
+
+/**
+ * \ingroup satstats
+ * \brief Abstract class.
  */
 class SatStatsHelper : public SimpleRefCount<SatStatsHelper>
 {
@@ -196,21 +205,24 @@ protected:
   /**
    * \brief
    * \param utUserNode
-   * \return
+   * \return the ID previously assigned to the UT user, or zero if the UT user
+   *         is not assigned to any ID.
    */
   virtual uint32_t GetUtUserId (Ptr<Node> utUserNode) const;
 
   /**
    * \brief
    * \param utNode
-   * \return
+   * \return the ID previously assigned to the UT, or zero if the UT is not
+   *         assigned to any ID.
    */
   virtual uint32_t GetUtId (Ptr<Node> utNode) const;
 
   /**
    * \brief
    * \param gwNode
-   * \return
+   * \return the ID previously assigned to the GW, or zero if the GW is not
+   *         assigned to any ID.
    */
   virtual uint32_t GetGwId (Ptr<Node> gwNode) const;
 

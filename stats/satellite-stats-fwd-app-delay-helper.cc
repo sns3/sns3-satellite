@@ -45,7 +45,7 @@ namespace ns3 {
 SatStatsFwdAppDelayHelper::SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << satHelper);
 }
 
 
@@ -63,6 +63,7 @@ SatStatsFwdAppDelayHelper::DoInstall ()
   switch (GetOutputType ())
     {
     case SatStatsHelper::OUTPUT_NONE:
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
@@ -111,6 +112,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -118,8 +121,17 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -134,12 +146,9 @@ SatStatsFwdAppDelayHelper::DoInstall ()
         break;
       }
 
-    case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-      break;
-
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
+      /// \todo Add support for boxes in Gnuplot.
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
@@ -174,6 +183,8 @@ SatStatsFwdAppDelayHelper::DoInstall ()
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
@@ -185,8 +196,17 @@ SatStatsFwdAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -207,10 +227,6 @@ SatStatsFwdAppDelayHelper::DoInstall ()
         break;
       }
 
-    case SatStatsHelper::OUTPUT_PDF_PLOT:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      break;
-
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
       break;
@@ -230,6 +246,8 @@ SatStatsFwdAppDelayHelper::InstallProbes (CollectorMap &collectorMap,
   for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
+      NS_ASSERT_MSG (utUserId > 0,
+                     "Node " << (*it)->GetId () << " is not a valid UT user");
       const uint32_t identifier = GetIdentifierForUtUser (*it);
 
       for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)

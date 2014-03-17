@@ -48,7 +48,7 @@ namespace ns3 {
 SatStatsRtnAppDelayHelper::SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << satHelper);
 }
 
 
@@ -66,6 +66,7 @@ SatStatsRtnAppDelayHelper::DoInstall ()
   switch (GetOutputType ())
     {
     case OUTPUT_NONE:
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
     case OUTPUT_SCALAR_FILE:
@@ -106,6 +107,8 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     case OUTPUT_HISTOGRAM_FILE:
+    case OUTPUT_PDF_FILE:
+    case OUTPUT_CDF_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -113,8 +116,17 @@ SatStatsRtnAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -125,12 +137,9 @@ SatStatsRtnAppDelayHelper::DoInstall ()
         break;
       }
 
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_CDF_FILE:
-      break;
-
     case OUTPUT_SCALAR_PLOT:
-      // TODO: Add support for boxes in Gnuplot.
+      /// \todo Add support for boxes in Gnuplot.
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
     case OUTPUT_SCATTER_PLOT:
@@ -161,6 +170,8 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     case OUTPUT_HISTOGRAM_PLOT:
+    case OUTPUT_PDF_PLOT:
+    case OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
@@ -172,8 +183,17 @@ SatStatsRtnAppDelayHelper::DoInstall ()
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (DistributionCollector::OUTPUT_TYPE_HISTOGRAM));
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
         m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
         m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
         m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
@@ -189,10 +209,6 @@ SatStatsRtnAppDelayHelper::DoInstall ()
                                                   &GnuplotAggregator::Write2d);
         break;
       }
-
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_PLOT:
-      break;
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
@@ -211,7 +227,6 @@ SatStatsRtnAppDelayHelper::DoInstall ()
   // Connect to trace sources at GW user node's applications.
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  // TODO: Maybe UT users should also be included.
   Callback<void, Time, const Address &> callback
     = MakeCallback (&SatStatsRtnAppDelayHelper::ApplicationDelayCallback, this);
 
@@ -288,20 +303,16 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
 
             case OUTPUT_HISTOGRAM_FILE:
             case OUTPUT_HISTOGRAM_PLOT:
+            case OUTPUT_PDF_FILE:
+            case OUTPUT_PDF_PLOT:
+            case OUTPUT_CDF_FILE:
+            case OUTPUT_CDF_PLOT:
               {
                 Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
                 NS_ASSERT (c != 0);
                 c->TraceSinkDouble (0.0, delay.GetSeconds ());
                 break;
               }
-
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-              break;
-
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              break;
 
             default:
               NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
@@ -324,42 +335,19 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
 
 
 void
-SatStatsRtnAppDelayHelper::SaveMacAddressAndIdentifier (Ptr<Node> utUserNode)
-{
-  NS_LOG_FUNCTION (this << utUserNode->GetId ());
-  NS_ASSERT_MSG (utUserNode->GetNDevices () >= 2,
-                 "Node " << utUserNode->GetId () << " is not a valid UT user");
-
-  // Assuming that #0 is for loopback device and #1 is for subscriber network device.
-  Ptr<NetDevice> dev = utUserNode->GetDevice (1);
-  const Address addr = dev->GetAddress ();
-  NS_ASSERT_MSG (Mac48Address::IsMatchingType (addr),
-                 "Node " << utUserNode->GetId () << " device #1 "
-                         << "does not have any valid Mac48Address");
-
-  // Save the address.
-  const uint32_t identifier = GetIdentifierForUtUser (utUserNode);
-  m_identifierMap[addr] = identifier;
-  NS_LOG_INFO (this << " associated address " << addr
-                    << " with identifier " << identifier);
-}
-
-
-void
 SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 {
   NS_LOG_FUNCTION (this << utUserNode->GetId ());
 
   Ptr<Ipv4> ipv4 = utUserNode->GetObject<Ipv4> ();
+
   if (ipv4 == 0)
     {
       NS_LOG_LOGIC (this << "Node " << utUserNode->GetId ()
                          << " does not support IPv4 protocol");
     }
-  else
+  else if (ipv4->GetNInterfaces () >= 2)
     {
-      NS_ASSERT_MSG (ipv4->GetNInterfaces () >= 2,
-                     "Node " << utUserNode->GetId () << " is not a valid UT user");
       const uint32_t identifier = GetIdentifierForUtUser (utUserNode);
 
       // Assuming that #0 is for loopback interface and #1 is for subscriber network interface.
@@ -370,6 +358,11 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
           NS_LOG_INFO (this << " associated address " << addr
                             << " with identifier " << identifier);
         }
+    }
+  else
+    {
+      NS_LOG_WARN (this << "Node " << utUserNode->GetId ()
+                        << " is not a valid UT user");
     }
 }
 

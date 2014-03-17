@@ -998,7 +998,8 @@ SatUtMac::DoFrameStart ()
 
   /// schedule the next frame start
   /// TODO this needs to be modified when a proper mobility model is added as the timing advance will not be constant
-  Simulator::Schedule (Now () - GetSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatUtMac::DoFrameStart, this);
+  // Commented out so far because something wrong with calculation. Some cases scheduled with zero and cause infinite loop.
+  //Simulator::Schedule (Now () - GetSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatUtMac::DoFrameStart, this);
 }
 
 } // namespace ns3

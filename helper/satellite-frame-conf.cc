@@ -472,7 +472,15 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
               uint32_t slotCount = std::max<uint32_t> (1 ,(targetDuration.GetSeconds() / timeSlotDuration ));
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
-              m_durationInSeconds = slotCount * timeSlotDuration;
+
+              double frameDurationInSeconds = slotCount * timeSlotDuration;
+
+              // if frame duration is greater than current super frame duration, set it as super frame duration
+              // super frame must last as long as the longest frame
+              if ( frameDurationInSeconds > m_durationInSeconds )
+                {
+                  m_durationInSeconds = frameDurationInSeconds;
+                }
 
               // Created one frame to be used utilizing earlier created BTU
               Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], m_durationInSeconds,
@@ -638,11 +646,13 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
 // macro to ease definition of attributes for several super frames
 #define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, frameConfigTypeIndex) \
   .AddAttribute ("FrameCount", "The number of frames in super frame.", \
+                  TypeId::ATTR_CONSTRUCT, \
 		              UintegerValue (frameCount), \
 		              MakeUintegerAccessor (&SatSuperframeConf::SetFrameCount, \
 		                                    &SatSuperframeConf::GetFrameCount), \
 		              MakeUintegerChecker<uint32_t> (1, SatSuperframeConf::m_maxFrameCount)) \
   .AddAttribute ("FrameConfigTypeIndex", "Index of the frame configuration type used for super frame.", \
+                  TypeId::ATTR_CONSTRUCT, \
                   UintegerValue (frameConfigTypeIndex), \
                   MakeUintegerAccessor (&SatSuperframeConf::SetConfigType, \
                                         &SatSuperframeConf::GetConfigType), \
@@ -669,7 +679,7 @@ SatSuperframeConf0::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, 0)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e6, 1.25e5, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (0, 12.5e6, 1.25e6, 0.20, 0.30, false)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true)
     ADD_FRAME_ATTRIBUTES (2, 1.25e6, 1.25e5, 0.20, 0.30, false)
     ADD_FRAME_ATTRIBUTES (3, 1.25e6, 1.25e5, 0.20, 0.30, false)
