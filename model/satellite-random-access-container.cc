@@ -274,6 +274,14 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
             }
         }
     }
+  else if (m_randomAccessModel != SatEnums::RA_SLOTTED_ALOHA && triggerType == SatEnums::RA_SLOTTED_ALOHA_TRIGGER)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Slotted ALOHA is disabled");
+    }
+  else if (m_randomAccessModel != SatEnums::RA_CRDSA && triggerType == SatEnums::RA_CRDSA_TRIGGER)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is disabled");
+    }
 
   /// For debugging purposes
   /// TODO: comment out this code at later stage

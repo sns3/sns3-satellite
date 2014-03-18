@@ -57,6 +57,31 @@ public:
   } rxParams_s;
 
   /**
+   * \brief Struct for storing the CRDSA packet specific Rx parameters
+   */
+  typedef struct
+  {
+    Ptr<SatSignalParameters> rxParams;
+    Mac48Address destAddress;
+    Mac48Address sourceAddress;
+    std::vector<uint16_t> otherReplicas;
+    bool hasCollision;
+  } crdsaPacketRxParams_s;
+
+  /**
+   * \brief Struct for storing the CRDSA packet specific Rx parameters
+   */
+  typedef struct
+  {
+    Ptr<SatSignalParameters> rxParams;
+    double cSinr;
+    double ifPower;
+    Mac48Address destAddress;
+    Mac48Address sourceAddress;
+    bool phyError;
+  } crdsaCombinedPacketRxParams_s;
+
+  /**
    * \brief
    * \param carrierId
    * \param carrierConf
@@ -157,6 +182,23 @@ private:
   void EndRxData (uint32_t key);
 
   /**
+   *
+   * \param key
+   */
+  void EndRxDataTransparent (uint32_t key);
+
+  /**
+   *
+   * \param key
+   */
+  void EndRxDataNormal (uint32_t key);
+
+  /**
+   *
+   */
+  void DoFrameEnd ();
+
+  /**
    * \brief
    * \param rxPowerW
    * \param iPowerW
@@ -188,6 +230,47 @@ private:
    *
    */
   void CheckRxStateSanity ();
+
+  /**
+   * \brief
+   * \param
+   */
+  void AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s rxParams);
+
+  /**
+   * \brief
+   * \return
+   */
+  std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> > ProcessFrame ();
+
+  /**
+   *
+   * \return
+   */
+  std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > FindReplicas ();
+
+  /**
+   *
+   * \param replicas
+   * \return
+   */
+  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s ProcessReplicas (std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas);
+
+  /**
+   *
+   * \param cSinr
+   * \param rxParams
+   * \param interferenceEvent
+   * \return
+   */
+  bool ProcessSlottedAlohaCollisions (double cSinr,
+                                      Ptr<SatSignalParameters> rxParams,
+                                      Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
+
+  /**
+   * \brief
+   */
+  std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> m_crdsaPacketContainer;
 
   /**
    * \brief
@@ -333,9 +416,14 @@ private:
   std::map <uint32_t, rxParams_s> m_rxParamsMap;
 
   /**
-   * Channel estimation error container
+   * \brief Channel estimation error container
    */
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
+
+  /**
+   *
+   */
+  bool m_dropCollidingRandomAccessPackets;
 };
 
 }

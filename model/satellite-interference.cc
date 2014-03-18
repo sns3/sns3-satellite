@@ -94,9 +94,12 @@ SatInterference::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatInterference::SatInterference ()
+SatInterference::SatInterference () :
+  m_currentlyReceiving (0)
 {
+
 }
+
 SatInterference::~SatInterference ()
 {
 
@@ -105,31 +108,74 @@ SatInterference::~SatInterference ()
 Ptr<SatInterference::InterferenceChangeEvent>
 SatInterference::Add (Time duration, double power, Address rxAddress)
 {
-  return DoAdd(duration, power, rxAddress);
+  return DoAdd (duration, power, rxAddress);
 }
 
 double
 SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
+  if (m_currentlyReceiving > 1)
+    {
+      std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator iter;
+
+      for (iter = m_packetCollisions.begin (); iter != m_packetCollisions.end (); iter++)
+        {
+          iter->second = true;
+        }
+    }
+
   return DoCalculate (event);
 }
 
 void
 SatInterference::Reset (void)
 {
-  DoReset();
+  m_packetCollisions.clear ();
+  m_currentlyReceiving = 0;
+
+  DoReset ();
 }
 
 void
 SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  DoNotifyRxStart(event);
+  m_currentlyReceiving++;
+
+  std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator,bool> result;
+  result = m_packetCollisions.insert (std::make_pair(event,false));
+
+  if (!result.second)
+    {
+      NS_FATAL_ERROR ("SatConstantInterference::DoAdd - Event already exists");
+    }
+
+  DoNotifyRxStart (event);
 }
 
 void
 SatInterference::NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  DoNotifyRxEnd(event);
+  if (m_currentlyReceiving > 0)
+    {
+      m_currentlyReceiving--;
+    }
+
+  m_packetCollisions.erase (event);
+
+  DoNotifyRxEnd (event);
+}
+
+bool
+SatInterference::HasCollision (Ptr<SatInterference::InterferenceChangeEvent> event)
+{
+  std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator result = m_packetCollisions.find (event);
+
+  if (result == m_packetCollisions.end ())
+    {
+      NS_FATAL_ERROR ("SatConstantInterference::DoHasCollision - Event not found");
+    }
+
+  return result->second;
 }
 
 }

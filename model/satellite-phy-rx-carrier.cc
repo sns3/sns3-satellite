@@ -37,6 +37,7 @@
 #include "ns3/singleton.h"
 #include "satellite-composite-sinr-output-trace-container.h"
 #include "satellite-phy-tx.h"
+#include "satellite-crdsa-replica-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -54,7 +55,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_channelType (carrierConf->GetChannelType ()),
    m_enableCompositeSinrOutputTrace (false),
    m_numOfOngoingRx (0),
-   m_rxPacketCounter (0)
+   m_rxPacketCounter (0),
+   m_dropCollidingRandomAccessPackets (false)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -157,6 +159,14 @@ SatPhyRxCarrier::DoDispose ()
   m_cnoCallback.Nullify();
   m_sinrCalculate.Nullify();
   m_satInterference = NULL;
+  m_uniformVariable = NULL;
+
+  for (uint32_t i = 0; i < m_crdsaPacketContainer.size (); i++)
+    {
+      m_crdsaPacketContainer[i].rxParams = NULL;
+    }
+
+  m_crdsaPacketContainer.clear ();
 
   Object::DoDispose ();
 }
@@ -327,12 +337,22 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 void
 SatPhyRxCarrier::EndRxData (uint32_t key)
 {
-  /**
-   * For code comments:
-   * 1st link is the link from ground to satellite
-   * 2nd link is the link from satellite to ground
-   */
+  NS_LOG_FUNCTION (this);
+  NS_LOG_LOGIC (this << " state: " << m_state);
 
+  if (m_rxMode == SatPhyRxCarrierConf::NORMAL)
+    {
+      EndRxDataNormal (key);
+    }
+  else
+    {
+      EndRxDataTransparent (key);
+    }
+}
+
+void
+SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
+{
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC (this << " state: " << m_state);
 
@@ -349,25 +369,75 @@ SatPhyRxCarrier::EndRxData (uint32_t key)
 
   double ifPower = m_satInterference->Calculate (iter->second.interferenceEvent);
 
-  /// in 1st link: calculates sinr for 1st link
-  /// in 2nd link: calculates sinr for 2nd link
+  /// calculates sinr for 1st link
   double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W, ifPower );
 
-  /// in 1st link: initializes composite sinr with 1st link sinr
-  /// in 2nd link: initializes composite sinr with 2st link sinr. This value will be replaced in the following block
+  /// initializes composite sinr with 1st link sinr
   double cSinr = sinr;
 
-  NS_ASSERT( ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && iter->second.rxParams->m_sinr == 0  ) ||
-             ( m_rxMode == SatPhyRxCarrierConf::NORMAL && iter->second.rxParams->m_sinr != 0  ) );
+  NS_ASSERT (m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && iter->second.rxParams->m_sinr == 0);
 
   /// PHY transmission decoded successfully. Note, that at transparent satellite,
   /// all the transmissions are not decoded.
   bool phyError (false);
 
-  /// in 1st link: does not enter this block
-  /// in 2nd link: calculates composite sinr
-  if (m_rxMode == SatPhyRxCarrierConf::NORMAL)
+  /// save 1st link sinr value for 2nd link composite sinr calculations
+  iter->second.rxParams->m_sinr = sinr;
+
+  /// uses 1st link sinr
+  m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, ifPower, cSinr);
+
+  m_satInterference->NotifyRxEnd (iter->second.interferenceEvent);
+
+  /// Send packet upwards
+  m_rxCallback ( iter->second.rxParams, phyError );
+
+  /// uses 1st link sinr
+  if (!m_cnoCallback.IsNull ())
     {
+      double cno = cSinr * m_rxBandwidthHz;
+      m_cnoCallback (iter->second.rxParams->m_beamId, iter->second.sourceAddress, m_ownAddress, cno);
+    }
+
+  /// erase the used Rx params
+  iter->second.rxParams = NULL;
+  iter->second.interferenceEvent = NULL;
+  m_rxParamsMap.erase (key);
+}
+
+void
+SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_LOGIC (this << " state: " << m_state);
+
+  NS_ASSERT (m_state == RX);
+
+  std::map<uint32_t,rxParams_s>::iterator iter = m_rxParamsMap.find (key);
+
+  if (iter == m_rxParamsMap.end ())
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::EndRxData - No matching Rx params found");
+    }
+
+  DecreaseNumOfRxState (iter->second.rxParams->m_txInfo.packetType);
+
+  NS_ASSERT (m_rxMode == SatPhyRxCarrierConf::NORMAL && iter->second.rxParams->m_sinr != 0);
+
+  double ifPower = m_satInterference->Calculate (iter->second.interferenceEvent);
+
+  if (iter->second.rxParams->m_txInfo.packetType != SatEnums::CRDSA_PACKET)
+    {
+      /// calculates sinr for 2nd link
+      double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W, ifPower );
+
+      /// initializes composite sinr with 2st link sinr. This value will be replaced in the following block
+      double cSinr = sinr;
+
+      /// PHY transmission decoded successfully. Note, that at transparent satellite,
+      /// all the transmissions are not decoded.
+      bool phyError (false);
+
       /// calculate composite SINR
       cSinr = CalculateCompositeSinr (sinr, iter->second.rxParams->m_sinr);
 
@@ -396,35 +466,140 @@ SatPhyRxCarrier::EndRxData (uint32_t key)
           DoCompositeSinrOutputTrace (cSinr);
         }
 
-      /// check against link results
-      phyError = CheckAgainstLinkResults (cSinr,iter->second.rxParams);
+      if (iter->second.rxParams->m_txInfo.packetType == SatEnums::SLOTTED_ALOHA_PACKET)
+        {
+          /// check for slotted aloha packet collisions
+          phyError = ProcessSlottedAlohaCollisions (cSinr, iter->second.rxParams, iter->second.interferenceEvent);
+        }
+      else
+        {
+          /// check against link results
+          phyError = CheckAgainstLinkResults (cSinr, iter->second.rxParams);
+        }
+
+      /// save 2nd link sinr value
+      iter->second.rxParams->m_sinr = sinr;
+
+      /// uses composite sinr
+      m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, ifPower, cSinr);
+
+      /// send packet upwards
+      m_rxCallback ( iter->second.rxParams, phyError );
+      /// uses composite sinr
+
+      if (!m_cnoCallback.IsNull ())
+        {
+          double cno = cSinr * m_rxBandwidthHz;
+          m_cnoCallback (iter->second.rxParams->m_beamId, iter->second.sourceAddress, m_ownAddress, cno);
+        }
+
+      iter->second.rxParams = NULL;
+     }
+  else
+    {
+      NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - CRDSA packet received");
+      SatPhyRxCarrier::crdsaPacketRxParams_s params;
+
+      params.destAddress = iter->second.destAddress;
+      params.sourceAddress = iter->second.sourceAddress;
+      params.rxParams = iter->second.rxParams;
+
+      /// check for collisions
+      params.hasCollision = m_satInterference->HasCollision (iter->second.interferenceEvent);
+
+      AddCrdsaPacket (params);
     }
-
-  /// in 1st link: save 1st link sinr value for 2nd link composite sinr calculations
-  /// in 2nd link: save 2nd link sinr value
-  iter->second.rxParams->m_sinr = sinr;
-
-  /// in 1st link: uses 1st link sinr
-  /// in 2nd link: uses composite sinr
-  m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, ifPower, cSinr);
 
   m_satInterference->NotifyRxEnd (iter->second.interferenceEvent);
 
-  /// Send packet upwards
-  m_rxCallback ( iter->second.rxParams, phyError );
-
-  /// in 1st link: uses 1st link sinr
-  /// in 2nd link: uses composite sinr
-  if (!m_cnoCallback.IsNull ())
-    {
-      double cno = cSinr * m_rxBandwidthHz;
-      m_cnoCallback (iter->second.rxParams->m_beamId, iter->second.sourceAddress, m_ownAddress, cno);
-    }
-
   /// erase the used Rx params
-  iter->second.rxParams = NULL;
   iter->second.interferenceEvent = NULL;
   m_rxParamsMap.erase (key);
+}
+
+bool
+SatPhyRxCarrier::ProcessSlottedAlohaCollisions (double cSinr, Ptr<SatSignalParameters> rxParams, Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions");
+
+  bool phyError = false;
+
+  if (m_dropCollidingRandomAccessPackets)
+    {
+      /// check whether the packet has collided. This mode is intended to be used with constant interference and traced interference
+      phyError = m_satInterference->HasCollision (interferenceEvent);
+    }
+  else
+    {
+      /// check cSinr against link results
+      phyError = CheckAgainstLinkResults (cSinr,rxParams);
+    }
+  return phyError;
+}
+
+void
+SatPhyRxCarrier::DoFrameEnd ()
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_LOGIC ("SatPhyRxCarrier::DoFrameEnd");
+
+  if (m_crdsaPacketContainer.size () > 0)
+    {
+      std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s, bool> > results = ProcessFrame ();
+
+      if (m_crdsaPacketContainer.size () > 0)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
+        }
+
+      for (uint32_t i = 0; i < results.size (); i++)
+        {
+          /// uses composite sinr
+          m_packetTrace (results[i].first.rxParams,
+                         m_ownAddress,
+                         results[i].first.destAddress,
+                         results[i].first.ifPower,
+                         results[i].first.cSinr);
+
+          /// send packet upwards
+          m_rxCallback (results[i].first.rxParams,
+                        results[i].second);
+
+          /// uses composite sinr
+          if (!m_cnoCallback.IsNull ())
+            {
+              double cno = results[i].first.cSinr * m_rxBandwidthHz;
+              m_cnoCallback (results[i].first.rxParams->m_beamId,
+                             results[i].first.sourceAddress,
+                             m_ownAddress,
+                             cno);
+            }
+
+          results[i].first.rxParams = NULL;
+        }
+
+      results.clear ();
+    }
+
+  /// schedule the next frame end
+  /// TODO this needs to be modified when a proper mobility model is
+  /// added as the timing advance will not be constant. Additionally,
+  /// a proper timing specific class should be implemented for a
+  /// functionality like this
+  /*
+  Time nextStartTime = Now () - GetSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0));
+
+  if (nextStartTime > Now ())
+    {
+      Simulator::Schedule (nextStartTime, &SatPhyRxCarrier::DoFrameEnd, this);
+    }
+  else
+    {
+      nextStartTime += Seconds (m_superframeSeq->GetDurationInSeconds (0));
+      Simulator::Schedule (nextStartTime, &SatPhyRxCarrier::DoFrameEnd, this);
+    }
+   */
 }
 
 void
@@ -588,6 +763,10 @@ SatPhyRxCarrier::CalculateCompositeSinr (double sinr1, double sinr2)
 void
 SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::IncreaseNumOfRxState - Time: " << Now ().GetSeconds ());
+
   m_numOfOngoingRx++;
   ChangeState (RX);
 
@@ -602,6 +781,10 @@ SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
 void
 SatPhyRxCarrier::DecreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::DecreaseNumOfRxState - Time: " << Now ().GetSeconds ());
+
   if (m_numOfOngoingRx > 0)
     {
       m_numOfOngoingRx--;
@@ -623,6 +806,10 @@ SatPhyRxCarrier::DecreaseNumOfRxState (SatEnums::PacketType_t packetType)
 void
 SatPhyRxCarrier::CheckRxStateSanity ()
 {
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::CheckRxStateSanity - Time: " << Now ().GetSeconds ());
+
   if (m_numOfOngoingRx > 0 && m_state == IDLE)
     {
       NS_FATAL_ERROR ("SatPhyRxCarrier::CheckStateSanity - State mismatch");
@@ -632,6 +819,167 @@ SatPhyRxCarrier::CheckRxStateSanity ()
     {
       NS_FATAL_ERROR ("SatPhyRxCarrier::CheckStateSanity - State mismatch");
     }
+}
+
+/// CRDSA receiver functionality
+
+void
+SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPacket)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::AddCrdsaPacket - Time: " << Now ().GetSeconds ());
+
+  uint32_t slotId = 0;
+
+  if (crdsaPacket.rxParams->m_packetsInBurst.size () > 0)
+    {
+      SatCrdsaReplicaTag replicaTag;
+
+      /// the tag is in the first packet
+      bool result = crdsaPacket.rxParams->m_packetsInBurst[0]->PeekPacketTag (replicaTag);
+
+      if (!result)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - First packet did not contain a CRDSA replica tag");
+        }
+
+      std::vector<uint16_t> slotIds = replicaTag.GetSlotIds ();
+
+      if (slotIds.size () < 1)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - The tag did not contain any slot IDs");
+        }
+
+      /// The first slot ID is this replicas own slot ID
+      slotId = slotIds[0];
+
+      if (crdsaPacket.otherReplicas.size () > 0)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - Vector for packet replicas should be empty at this point");
+        }
+
+      for (uint32_t i = 1; i < slotIds.size (); i++)
+        {
+          crdsaPacket.otherReplicas.push_back (slotIds[i]);
+        }
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - CRDSA reception with 0 packets");
+    }
+
+  std::pair<std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator,bool> result;
+
+  result = m_crdsaPacketContainer.insert (std::make_pair(slotId,crdsaPacket));
+
+  NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - Packet in slot " << slotId << " was added to the CRDSA packet container");
+
+  /// TODO this is for debugging purposes, it should be removed at later point
+  for (uint32_t i = 0; i < crdsaPacket.otherReplicas.size (); i++)
+    {
+      NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - A replica of the packet is in slot " << crdsaPacket.otherReplicas[i]);
+    }
+}
+
+std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> >
+SatPhyRxCarrier::ProcessFrame ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessFrame - Time: " << Now ().GetSeconds ());
+
+  std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> > combinedPacketsForFrame;
+
+  while (m_crdsaPacketContainer.size () > 0)
+    {
+      /// find all replicas for a single unique packet
+      std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas = FindReplicas ();
+
+      /// process replicas
+      SatPhyRxCarrier::crdsaCombinedPacketRxParams_s combinedPacket = ProcessReplicas (replicas);
+
+      /// add combined packet to the result vector
+      std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> processedPacket = std::make_pair (combinedPacket, combinedPacket.phyError);
+
+      combinedPacketsForFrame.push_back (processedPacket);
+    }
+
+  return combinedPacketsForFrame;
+}
+
+std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> >
+SatPhyRxCarrier::FindReplicas ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::FindReplicas - Time: " << Now ().GetSeconds ());
+
+  std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas;
+  std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator crdsaPacket = m_crdsaPacketContainer.begin ();
+
+  if (crdsaPacket != m_crdsaPacketContainer.end ())
+    {
+      replicas.push_back (*crdsaPacket);
+
+      m_crdsaPacketContainer.erase (crdsaPacket);
+    }
+
+  for (uint32_t i = 0; i < crdsaPacket->second.otherReplicas.size (); i++)
+    {
+      std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter;
+      iter = m_crdsaPacketContainer.find (crdsaPacket->second.otherReplicas[i]);
+
+      if (iter != m_crdsaPacketContainer.end ())
+        {
+          replicas.push_back (*iter);
+
+          m_crdsaPacketContainer.erase (iter);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::FindReplicas - Replica was not found");
+        }
+    }
+
+  return replicas;
+}
+
+SatPhyRxCarrier::crdsaCombinedPacketRxParams_s
+SatPhyRxCarrier::ProcessReplicas (std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessReplicas - Time: " << Now ().GetSeconds ());
+
+  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s combinedPacket;
+
+  /// TODO these need to be calculated
+  combinedPacket.cSinr = 10;
+  combinedPacket.ifPower = 5;
+  combinedPacket.destAddress = replicas[0].second.destAddress;
+  combinedPacket.sourceAddress = replicas[0].second.sourceAddress;
+  combinedPacket.rxParams = replicas[0].second.rxParams;
+  combinedPacket.phyError = true;
+
+  if (m_dropCollidingRandomAccessPackets)
+    {
+      for (uint32_t i = 0; i < replicas.size (); i++)
+        {
+          if (!replicas[i].second.hasCollision)
+            {
+              combinedPacket.phyError = false;
+            }
+        }
+    }
+
+  for (uint32_t i = 0; i < replicas.size (); i++)
+    {
+      replicas[replicas.size () - 1].second.rxParams = NULL;
+      replicas.pop_back ();
+    }
+
+  return combinedPacket;
 }
 
 }

@@ -92,7 +92,14 @@ private:
   SatConstantInterference (const SatConstantInterference &o);
   SatConstantInterference &operator = (const SatConstantInterference &o);
 
+  /**
+   *
+   */
   double m_power;
+
+  /**
+   *
+   */
   bool m_rxing;
 };
 

@@ -146,6 +146,13 @@ public:
    */
   virtual void NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
 
+  /**
+   * Checks whether the packet has collided. Used by random access
+   * \param event Interference reference event of receiver
+   * \return has the packet collided
+   */
+  virtual bool HasCollision (Ptr<SatInterference::InterferenceChangeEvent> event);
+
 private:
   /**
    * Adds interference power to interference object.
@@ -198,6 +205,16 @@ private:
 
   SatInterference (const SatInterference &o);
   SatInterference &operator = (const SatInterference &o);
+
+  /**
+   *
+   */
+  std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool> m_packetCollisions;
+
+  /**
+   *
+   */
+  uint32_t m_currentlyReceiving;
 };
 
 } // namespace ns3

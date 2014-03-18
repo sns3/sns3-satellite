@@ -316,8 +316,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
 
   Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
-
   PrintTraceInfo ();
+
   Simulator::Destroy ();
 }
 
@@ -460,6 +460,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
   PrintTraceInfo ();
+
   Simulator::Destroy ();
 }
 
@@ -605,6 +606,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
   PrintTraceInfo ();
+
   Simulator::Destroy ();
 }
 
@@ -723,6 +725,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Simulator::Stop (Seconds (1.0));
   Simulator::Run ();
   PrintTraceInfo ();
+
   Simulator::Destroy ();
 }
 
@@ -743,31 +746,30 @@ SatPerPacketIfTestSuite::SatPerPacketIfTestSuite ()
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("DummyFrames.",
                                                     SatEnums::FADING_OFF,
                                                     true),
-               TestCase::QUICK);
+                                                    TestCase::QUICK);
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV,
                                                     false),
-               TestCase::QUICK);
+                                                    TestCase::QUICK);
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading, DummyFrames.",
                                                     SatEnums::FADING_MARKOV,
                                                     true),
-               TestCase::QUICK);
-
+                                                    TestCase::QUICK);
   AddTestCase (new SatPerPacketFwdLinkFullTestCase, TestCase::EXTENSIVE);
+
   AddTestCase (new SatPerPacketFwdLinkFullTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV,
                                                     false),
-               TestCase::EXTENSIVE);
-
+                                                    TestCase::EXTENSIVE);
   AddTestCase (new SatPerPacketRtnLinkUserTestCase, TestCase::QUICK);
   AddTestCase (new SatPerPacketRtnLinkUserTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV),
-               TestCase::QUICK);
+                                                    TestCase::QUICK);
 
   AddTestCase (new SatPerPacketRtnLinkFullTestCase, TestCase::EXTENSIVE);
   AddTestCase (new SatPerPacketRtnLinkFullTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV),
-               TestCase::EXTENSIVE);
+                                                    TestCase::EXTENSIVE);
 }
 
 // Do allocate an instance of this TestSuite

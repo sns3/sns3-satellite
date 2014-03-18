@@ -48,7 +48,9 @@ SatConstantInterference::SatConstantInterference ()
   : m_power (0.0),
     m_rxing (false)
 {
+
 }
+
 SatConstantInterference::~SatConstantInterference ()
 {
   Reset ();
@@ -82,17 +84,20 @@ SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEve
 void
 SatConstantInterference::DoReset (void)
 {
-  // does nothing
+  m_rxing = false;
 }
+
 void
 SatConstantInterference::DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   m_rxing = true;
 }
+
 void
 SatConstantInterference::DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   m_rxing = false;
 }
+
 }
 // namespace ns3
