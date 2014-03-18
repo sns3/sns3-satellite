@@ -44,6 +44,10 @@ namespace ns3 {
  * - AddPerBeamFwdAppThroughput
  * - AddPerUtFwdAppThroughput
  * - AddPerUtUserFwdAppThroughput
+ * - AddGlobalFwdDevThroughput
+ * - AddPerGwFwdDevThroughput
+ * - AddPerBeamFwdDevThroughput
+ * - AddPerUtFwdDevThroughput
  * - AddGlobalRtnAppDelay
  * - AddPerGwRtnAppDelay
  * - AddPerBeamRtnAppDelay
@@ -121,6 +125,9 @@ public:
 
   // Forward link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppThroughput)
+
+  // Forward link device-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevThroughput)
 
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)

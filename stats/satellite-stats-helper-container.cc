@@ -26,6 +26,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-fwd-app-delay-helper.h>
 #include <ns3/satellite-stats-fwd-app-throughput-helper.h>
+#include <ns3/satellite-stats-fwd-dev-throughput-helper.h>
 #include <ns3/satellite-stats-rtn-app-delay-helper.h>
 #include <ns3/satellite-stats-rtn-app-throughput-helper.h>
 
@@ -66,6 +67,10 @@ SatStatsHelperContainer::DoDispose ()
  * - PerBeamFwdAppThroughput
  * - PerUtFwdAppThroughput
  * - PerUtUserFwdAppThroughput
+ * - GlobalFwdDevThroughput
+ * - PerGwFwdDevThroughput
+ * - PerBeamFwdDevThroughput
+ * - PerUtFwdDevThroughput
  * - GlobalRtnAppDelay
  * - PerGwRtnAppDelay
  * - PerBeamRtnAppDelay
@@ -157,6 +162,10 @@ SatStatsHelperContainer::GetTypeId ()
                                   "per UT user forward link application-level throughput statistics")
     ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
 
+    // Forward link device-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDevThroughput,
+                                        "forward link device-level throughput statistics")
+
     // Return link application-level packet delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppDelay,
                                                "return link application-level delay statistics")
@@ -213,6 +222,10 @@ SatStatsHelperContainer::GetName () const
  * - AddPerBeamFwdAppThroughput
  * - AddPerUtFwdAppThroughput
  * - AddPerUtUserFwdAppThroughput
+ * - AddGlobalFwdDevThroughput
+ * - AddPerGwFwdDevThroughput
+ * - AddPerBeamFwdDevThroughput
+ * - AddPerUtFwdDevThroughput
  * - AddGlobalRtnAppDelay
  * - AddPerGwRtnAppDelay
  * - AddPerBeamRtnAppDelay
@@ -329,6 +342,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (FwdAppThroughput, "fwd-app-throughput")
+
+// Forward link device-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdDevThroughput, "fwd-dev-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdDevThroughput, "fwd-dev-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdDevThroughput, "fwd-dev-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdDevThroughput, "fwd-dev-throughput")
 
 // Return link application-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
