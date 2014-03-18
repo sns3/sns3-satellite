@@ -30,38 +30,76 @@
 
 namespace ns3 {
 
+/*
+ * The macro definitions following this comment block are used to declare the
+ * majority of methods in this class. Below is the list of the class methods
+ * created using this C++ pre-processing approach.
+ * - AddGlobalFwdAppDelay
+ * - AddPerGwFwdAppDelay
+ * - AddPerBeamFwdAppDelay
+ * - AddPerUtFwdAppDelay
+ * - AddPerUtUserFwdAppDelay
+ * - AddGlobalFwdAppThroughput
+ * - AddPerGwFwdAppThroughput
+ * - AddPerBeamFwdAppThroughput
+ * - AddPerUtFwdAppThroughput
+ * - AddPerUtUserFwdAppThroughput
+ * - AddGlobalRtnAppDelay
+ * - AddPerGwRtnAppDelay
+ * - AddPerBeamRtnAppDelay
+ * - AddPerUtRtnAppDelay
+ * - AddPerUtUserRtnAppDelay
+ * - AddGlobalRtnAppThroughput
+ * - AddPerGwRtnAppThroughput
+ * - AddPerBeamRtnAppThroughput
+ * - AddPerUtRtnAppThroughput
+ * - AddPerUtUserRtnAppThroughput
+ * Also check the Doxygen documentation of this class for more information.
+ */
+
+#define SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION(id)                         \
+  void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
+  void AddPerGw ## id (SatStatsHelper::OutputType_t outputType);              \
+  void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);            \
+  void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);
+
+#define SAT_STATS_FULL_SCOPE_METHOD_DECLARATION(id)                           \
+  void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
+  void AddPerGw ## id (SatStatsHelper::OutputType_t outputType);              \
+  void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);            \
+  void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);              \
+  void AddPerUtUser ## id (SatStatsHelper::OutputType_t outputType);
+
 class SatHelper;
 
 /**
  * \ingroup satstats
  * \brief Container of SatStatsHelper instances.
  *
- * The container is initially empty. SatStatsHelper instances can be added into
- * the container using attributes or class methods.
+ * The container is initially empty upon creation. SatStatsHelper instances can
+ * be added into the container using attributes or class methods.
  *
  * The names of these attributes and class methods follow the convention below:
- * - identifier (e.g., per UT user, per UT, per beam, per GW, etc.)
- * -
+ * - identifier (e.g., per UT user, per UT, per beam, per GW, etc.);
+ * - direction (forward link or return link, if relevant); and
+ * - name of statistics.
  *
  * The value of the attributes and the arguments of the class methods are the
- * desired output type (e.g., files, plots, etc.). For now, the only viable
- * output type is file.
+ * desired output type (e.g., scalar, scatter, histogram, files, plots, etc.).
  *
- * The output files will be named in certain pattern using the name set in
- * `Name` attribute or SetName method. The default name is "stat", which for
- * example will produce output files with the names
- * `stat-per-ut-throughput-scalar.txt`, `stat-per-ut-throughput-trace.txt`, etc.
- *
- * There are tons of those attributes and class methods, because we aim to
- * accommodate enabling specific statistics with one primitive operation (i.e.,
- * setting an attribute to true.
+ * The output files will be named in a certain pattern using the name set in
+ * the `Name` attribute or SetName() method. The default name is "stat", e.g.,
+ * which will produce output files with the names such as
+ * `stat-per-ut-fwd-app-delay-scalar-0.txt`,
+ * `stat-per-ut-fwd-app-delay-cdf-ut-1.txt`, etc.
  */
 class SatStatsHelperContainer : public Object
 {
 public:
   /**
-   * \brief
-   * \param satHelper
+   * \brief Creates a new instance of container.
+   * \param satHelper the satellite module helper which would be used to learn
+   *                  the topology of the simulation.
    */
   SatStatsHelperContainer (Ptr<const SatHelper> satHelper);
 
@@ -69,146 +107,31 @@ public:
   static TypeId GetTypeId ();
 
   /**
-   * \param name
+   * \param name a string prefix to be prepended on every output file name.
    */
   void SetName (std::string name);
 
   /**
-   * \return
+   * \return a string prefix prepended on every output file name.
    */
   std::string GetName () const;
 
-  // FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS ///////////////////
+  // Forward link application-level packet delay statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppDelay)
+
+  // Forward link application-level throughput statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppThroughput)
+
+  // Return link application-level packet delay statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
+
+  // Return link application-level throughput statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)
 
   /**
-   * \brief
-   * \param outputType
-   */
-  void AddGlobalFwdAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerGwFwdAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerBeamFwdAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtFwdAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  // FORWARD LINK APPLICATION-LEVEL THROUGHPUT STATISTICS /////////////////////
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddGlobalFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerGwFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerBeamFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtUserFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  // RETURN LINK APPLICATION-LEVEL PACKET DELAY STATISTICS ////////////////////
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddGlobalRtnAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerGwRtnAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerBeamRtnAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtRtnAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtUserRtnAppDelay (SatStatsHelper::OutputType_t outputType);
-
-  // RETURN LINK APPLICATION-LEVEL THROUGHPUT STATISTICS //////////////////////
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddGlobalRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerGwRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerBeamRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \brief
-   * \param outputType
-   */
-  void AddPerUtUserRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
-
-  /**
-   * \param outputType
-   * \return
+   * \param outputType an arbitrary output type.
+   * \return a string suffix to be appended at the end of the corresponding
+   *         output file for this output type.
    */
   static std::string GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType);
 
@@ -217,11 +140,13 @@ protected:
   virtual void DoDispose ();
 
 private:
-
+  /// Satellite module helper for reference.
   Ptr<const SatHelper> m_satHelper;
 
+  /// Prefix of every SatStatsHelper instance names and every output file.
   std::string m_name;
 
+  /// Maintains the active SatStatsHelper instances which have created.
   std::list<Ptr<const SatStatsHelper> > m_stats;
 
 }; // end of class StatStatsHelperContainer

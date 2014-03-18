@@ -52,69 +52,10 @@ SatStatsHelperContainer::DoDispose ()
 }
 
 
-#define ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
-  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE", \
-                   SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE", \
-                   SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE", \
-                   SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
-
-#define ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
-  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE", \
-                   SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE", \
-                   SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE", \
-                   SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE", \
-                   SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE", \
-                   SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE", \
-                   SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT", \
-                   SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT", \
-                   SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT", \
-                   SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
-
-#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, shortName, longName) \
-  .AddAttribute (shortName, \
-                 std::string ("Enable the output of ") + longName, \
-                 EnumValue (SatStatsHelper::OUTPUT_NONE), \
-                 MakeEnumAccessor (&SatStatsHelperContainer::Add ## id), \
-
-#define ADD_SAT_STATS_ATTRIBUTES_BASIC_SET(id, shortName, longName) \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id, \
-                                std::string ("Global") + shortName, \
-                                std::string ("global ") + longName) \
-  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id, \
-                                std::string ("PerGw") + shortName, \
-                                std::string ("per GW ") + longName) \
-  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id, \
-                                std::string ("PerBeam") + shortName, \
-                                std::string ("per beam ") + longName) \
-  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id, \
-                                std::string ("PerUt") + shortName, \
-                                std::string ("per UT ") + longName) \
-  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
-
-#define ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET(id, shortName, longName) \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id, \
-                                std::string ("Global") + shortName, \
-                                std::string ("global ") + longName) \
-  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id, \
-                                std::string ("PerGw") + shortName, \
-                                std::string ("per GW ") + longName) \
-  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id, \
-                                std::string ("PerBeam") + shortName, \
-                                std::string ("per beam ") + longName) \
-  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER \
-  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id, \
-                                std::string ("PerUt") + shortName, \
-                                std::string ("per UT ") + longName) \
-  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-
 /*
- * Attributes of this class are defined using pre-processing macros above. The
- * following is the complete list of names of created attributes:
+ * The macro definitions following this comment block are used to define most
+ * attributes of this class. Below is the list of attributes created using this
+ * C++ pre-processing approach.
  * - GlobalFwdAppDelay
  * - PerGwFwdAppDelay
  * - PerBeamFwdAppDelay
@@ -138,6 +79,58 @@ SatStatsHelperContainer::DoDispose ()
  * Also check the Doxygen documentation of this class for more information.
  */
 
+#define ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                    \
+  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",             \
+                   SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",      \
+                   SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",     \
+                   SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
+
+#define ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                             \
+  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",             \
+                   SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",      \
+                   SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",     \
+                   SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",   \
+                   SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",         \
+                   SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",         \
+                   SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",     \
+                   SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",   \
+                   SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",         \
+                   SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+
+#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, desc)                                \
+  .AddAttribute (#id,                                                         \
+                 std::string ("Enable the output of ") + desc,                \
+                 EnumValue (SatStatsHelper::OUTPUT_NONE),                     \
+                 MakeEnumAccessor (&SatStatsHelperContainer::Add ## id),      \
+
+#define ADD_SAT_STATS_ATTRIBUTES_BASIC_SET(id, desc)                          \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id,                                 \
+                                std::string ("global ") + desc)               \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                                  \
+                                std::string ("per GW ") + desc)               \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                                \
+                                std::string ("per beam ") + desc)             \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                                  \
+                                std::string ("per UT ") + desc)               \
+  ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
+
+#define ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET(id, desc)                   \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id,                                 \
+                                std::string ("global ") + desc)               \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                                  \
+                                std::string ("per GW ") + desc)               \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                                \
+                                std::string ("per beam ") + desc)             \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                                  \
+                                std::string ("per UT ") + desc)               \
+  ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
 TypeId // static
 SatStatsHelperContainer::GetTypeId ()
 {
@@ -150,31 +143,31 @@ SatStatsHelperContainer::GetTypeId ()
                                        &SatStatsHelperContainer::GetName),
                    MakeStringChecker ())
 
-    // FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS /////////////////
-    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppDelay, "FwdAppDelay",
+    // Forward link application-level packet delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppDelay,
                                                "forward link application-level delay statistics")
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppDelay, "PerUtUserFwdAppDelay",
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppDelay,
                                   "per UT user forward link application-level delay statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
-    // FORWARD LINK APPLICATION-LEVEL THROUGHPUT STATISTICS ATTRIBUTE /////////
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput, "FwdAppThroughput",
+    // Forward link application-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput,
                                         "forward link application-level throughput statistics")
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppThroughput, "PerUtUserFwdAppThroughput",
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppThroughput,
                                   "per UT user forward link application-level throughput statistics")
     ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
 
-    // RETURN LINK APPLICATION-LEVEL PACKET DELAY STATISTICS //////////////////
-    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppDelay, "RtnAppDelay",
+    // Return link application-level packet delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppDelay,
                                                "return link application-level delay statistics")
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppDelay, "PerUtUserRtnAppDelay",
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppDelay,
                                   "per UT user return link application-level delay statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
-    // RETURN LINK APPLICATION-LEVEL THROUGHPUT STATISTICS ATTRIBUTE //////////
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput, "RtnAppThroughput",
+    // Return link application-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput,
                                         "return link application-level throughput statistics")
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppThroughput, "PerUtUserRtnAppThroughput",
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppThroughput,
                                   "per UT user return link application-level throughput statistics")
     ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
   ;
@@ -206,372 +199,150 @@ SatStatsHelperContainer::GetName () const
 }
 
 
-// FORWARD LINK APPLICATION-LEVEL PACKET DELAY STATISTICS /////////////////////
+/*
+ * The macro definitions following this comment block are used to declare the
+ * majority of methods in this class. Below is the list of the class methods
+ * created using this C++ pre-processing approach.
+ * - AddGlobalFwdAppDelay
+ * - AddPerGwFwdAppDelay
+ * - AddPerBeamFwdAppDelay
+ * - AddPerUtFwdAppDelay
+ * - AddPerUtUserFwdAppDelay
+ * - AddGlobalFwdAppThroughput
+ * - AddPerGwFwdAppThroughput
+ * - AddPerBeamFwdAppThroughput
+ * - AddPerUtFwdAppThroughput
+ * - AddPerUtUserFwdAppThroughput
+ * - AddGlobalRtnAppDelay
+ * - AddPerGwRtnAppDelay
+ * - AddPerBeamRtnAppDelay
+ * - AddPerUtRtnAppDelay
+ * - AddPerUtUserRtnAppDelay
+ * - AddGlobalRtnAppThroughput
+ * - AddPerGwRtnAppThroughput
+ * - AddPerBeamRtnAppThroughput
+ * - AddPerUtRtnAppThroughput
+ * - AddPerUtUserRtnAppThroughput
+ * Also check the Doxygen documentation of this class for more information.
+ */
 
-void
-SatStatsHelperContainer::AddGlobalFwdAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-global-fwd-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
+#define SAT_STATS_GLOBAL_METHOD_DEFINITION(id, name)                          \
+void                                                                          \
+SatStatsHelperContainer::AddGlobal ## id (SatStatsHelper::OutputType_t type)  \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+      stat->SetName (m_name + "-global-" + name                               \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);            \
+      stat->SetOutputType (type);                                             \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
 }
 
-
-void
-SatStatsHelperContainer::AddPerGwFwdAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-gw-fwd-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
+#define SAT_STATS_PER_GW_METHOD_DEFINITION(id, name)                          \
+void                                                                          \
+SatStatsHelperContainer::AddPerGw ## id (SatStatsHelper::OutputType_t type)   \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+      stat->SetName (m_name + "-per-gw-" + name                               \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);                \
+      stat->SetOutputType (type);                                             \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
 }
 
-
-void
-SatStatsHelperContainer::AddPerBeamFwdAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-beam-fwd-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
+#define SAT_STATS_PER_BEAM_METHOD_DEFINITION(id, name)                        \
+void                                                                          \
+SatStatsHelperContainer::AddPerBeam ## id (SatStatsHelper::OutputType_t type) \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+      stat->SetName (m_name + "-per-beam-" + name                             \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);              \
+      stat->SetOutputType (type);                                             \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
 }
 
-
-void
-SatStatsHelperContainer::AddPerUtFwdAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-fwd-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
+#define SAT_STATS_PER_UT_METHOD_DEFINITION(id, name)                          \
+void                                                                          \
+SatStatsHelperContainer::AddPerUt ## id (SatStatsHelper::OutputType_t type)   \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+      stat->SetName (m_name + "-per-ut-" + name                               \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                \
+      stat->SetOutputType (type);                                             \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
 }
 
-
-void
-SatStatsHelperContainer::AddPerUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppDelayHelper> stat = Create<SatStatsFwdAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-user-fwd-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
+#define SAT_STATS_PER_UT_USER_METHOD_DEFINITION(id, name)                     \
+void                                                                          \
+SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+      stat->SetName (m_name + "-per-ut-user_" + name                          \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \
+      stat->SetOutputType (type);                                             \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
 }
 
+// Forward link application-level packet delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppDelay, "fwd-app-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdAppDelay, "fwd-app-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdAppDelay, "fwd-app-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdAppDelay, "fwd-app-delay")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION (FwdAppDelay, "fwd-app-delay")
 
-// FORWARD LINK THROUGHPUT STATISTICS /////////////////////////////////////////
+// Forward link application-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdAppThroughput, "fwd-app-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION (FwdAppThroughput, "fwd-app-throughput")
 
-void
-SatStatsHelperContainer::AddGlobalFwdAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
+// Return link application-level packet delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppDelay, "rtn-app-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppDelay, "rtn-app-delay")
 
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppThroughputHelper> stat = Create<SatStatsFwdAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-global-fwd-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerGwFwdAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppThroughputHelper> stat = Create<SatStatsFwdAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-gw-fwd-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerBeamFwdAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppThroughputHelper> stat = Create<SatStatsFwdAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-beam-fwd-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerUtFwdAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppThroughputHelper> stat = Create<SatStatsFwdAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-fwd-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerUtUserFwdAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsFwdAppThroughputHelper> stat = Create<SatStatsFwdAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-user-fwd-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-// RETURN LINK APPLICATION-LEVEL PACKET DELAY STATISTICS //////////////////////
-
-void
-SatStatsHelperContainer::AddGlobalRtnAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppDelayHelper> stat = Create<SatStatsRtnAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-global-rtn-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerGwRtnAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppDelayHelper> stat = Create<SatStatsRtnAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-gw-rtn-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerBeamRtnAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppDelayHelper> stat = Create<SatStatsRtnAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-beam-rtn-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerUtRtnAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppDelayHelper> stat = Create<SatStatsRtnAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-rtn-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerUtUserRtnAppDelay (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppDelayHelper> stat = Create<SatStatsRtnAppDelayHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-user-rtn-app-delay"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-// RETURN LINK THROUGHPUT STATISTICS //////////////////////////////////////////
-
-void
-SatStatsHelperContainer::AddGlobalRtnAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppThroughputHelper> stat = Create<SatStatsRtnAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-global-rtn-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerGwRtnAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppThroughputHelper> stat = Create<SatStatsRtnAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-gw-rtn-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerBeamRtnAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppThroughputHelper> stat = Create<SatStatsRtnAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-beam-rtn-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerUtRtnAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppThroughputHelper> stat = Create<SatStatsRtnAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-rtn-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
-
-
-void
-SatStatsHelperContainer::AddPerUtUserRtnAppThroughput (SatStatsHelper::OutputType_t outputType)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (outputType));
-
-  if (outputType != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppThroughputHelper> stat = Create<SatStatsRtnAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-per-ut-user-rtn-app-throughput"
-                            + GetOutputTypeSuffix (outputType));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
-      stat->SetOutputType (outputType);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
+// Return link application-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppThroughput, "rtn-app-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppThroughput, "rtn-app-throughput")
 
 
 std::string // static
