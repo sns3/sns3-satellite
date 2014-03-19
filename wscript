@@ -6,6 +6,7 @@ def build(bld):
         'model/cbr-application.cc',
         'model/geo-coordinate.cc',
         'model/ideal-net-device.cc',
+        'model/satellite-address-tag.cc',
         'model/satellite-antenna-gain-pattern.cc',
         'model/satellite-antenna-gain-pattern-container.cc',
         'model/satellite-arp-cache.cc',
@@ -126,6 +127,7 @@ def build(bld):
         'stats/satellite-stats-fwd-dev-throughput-helper.cc',
         'stats/satellite-stats-rtn-app-delay-helper.cc',
         'stats/satellite-stats-rtn-app-throughput-helper.cc',
+        'stats/satellite-stats-rtn-dev-throughput-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
 
@@ -158,6 +160,7 @@ def build(bld):
         'model/cbr-application.h',
         'model/geo-coordinate.h',
         'model/ideal-net-device.h',
+        'model/satellite-address-tag.h',
         'model/satellite-antenna-gain-pattern.h',
         'model/satellite-antenna-gain-pattern-container.h',        
         'model/satellite-arp-cache.h',
@@ -280,6 +283,7 @@ def build(bld):
         'stats/satellite-stats-fwd-dev-throughput-helper.h',
         'stats/satellite-stats-rtn-app-delay-helper.h',
         'stats/satellite-stats-rtn-app-throughput-helper.h',
+        'stats/satellite-stats-rtn-dev-throughput-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]
 

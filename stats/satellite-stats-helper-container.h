@@ -58,6 +58,10 @@ namespace ns3 {
  * - AddPerBeamRtnAppThroughput
  * - AddPerUtRtnAppThroughput
  * - AddPerUtUserRtnAppThroughput
+ * - AddGlobalRtnDevThroughput
+ * - AddPerGwRtnDevThroughput
+ * - AddPerBeamRtnDevThroughput
+ * - AddPerUtRtnDevThroughput
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -134,6 +138,9 @@ public:
 
   // Return link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)
+
+  // Return link device-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevThroughput)
 
   /**
    * \param outputType an arbitrary output type.

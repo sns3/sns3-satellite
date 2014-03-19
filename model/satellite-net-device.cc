@@ -30,12 +30,13 @@
 
 #include "virtual-channel.h"
 #include "satellite-net-device.h"
-#include "satellite-phy.h"
-#include "satellite-mac.h"
-#include "satellite-llc.h"
-#include "satellite-channel.h"
-#include "satellite-utils.h"
-#include "satellite-node-info.h"
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-llc.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-address-tag.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -81,7 +82,7 @@ SatNetDevice::GetTypeId (void)
      .AddTraceSource ("Rx",
                       "A packet received",
                       MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace))
-                      ;
+  ;
   return tid;
 }
 
@@ -115,7 +116,32 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
-  m_rxTrace (packet);
+  // Invoke the `Rx` trace source.
+  SatAddressTag tag;
+  bool isTagged = false;
+  ByteTagIterator it = packet->GetByteTagIterator ();
+
+  while (!isTagged && it.HasNext ())
+    {
+      ByteTagIterator::Item item = it.Next ();
+      if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+        {
+          NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                             << " start=" << item.GetStart ()
+                             << " end=" << item.GetEnd ());
+          item.GetTag (tag);
+          isTagged = true;
+        }
+    }
+
+  if (isTagged)
+    {
+      m_rxTrace (packet, tag.GetSourceAddress ());
+    }
+  else
+    {
+      m_rxTrace (packet, Address ()); // provide an invalid source address.
+    }
 
   m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
@@ -275,6 +301,9 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 {
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
 
+  // Add a SatAddressTag tag with this device's address as the source address.
+  packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
@@ -298,6 +327,9 @@ bool
 SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
+
+  // Add a SatAddressTag tag with this device's address as the source address.
+  packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =

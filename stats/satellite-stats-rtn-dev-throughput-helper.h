@@ -19,24 +19,24 @@
  *
  */
 
-#ifndef SATELLITE_STATS_FWD_DEV_THROUGHPUT_HELPER_H
-#define SATELLITE_STATS_FWD_DEV_THROUGHPUT_HELPER_H
+#ifndef SATELLITE_STATS_RTN_DEV_THROUGHPUT_HELPER_H
+#define SATELLITE_STATS_RTN_DEV_THROUGHPUT_HELPER_H
 
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
+#include <ns3/address.h>
 #include <ns3/collector-map.h>
-#include <list>
-
+#include <map>
 
 namespace ns3 {
 
 class SatHelper;
-class Probe;
 class DataCollectionObject;
+class Packet;
 
 /**
  * \ingroup satstats
- * \brief Produce forward link device-level throughput statistics from a
+ * \brief Produce return link device-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -44,21 +44,30 @@ class DataCollectionObject;
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFwdDevThroughputHelper> s = Create<SatStatsFwdDevThroughputHelper> (satHelper);
+ * Ptr<SatStatsRtnDevThroughputHelper> s = Create<SatStatsRtnDevThroughputHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsFwdDevThroughputHelper : public SatStatsHelper
+class SatStatsRtnDevThroughputHelper : public SatStatsHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsFwdDevThroughputHelper (Ptr<const SatHelper> satHelper);
+  SatStatsRtnDevThroughputHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
-  virtual ~SatStatsFwdDevThroughputHelper ();
+  virtual ~SatStatsRtnDevThroughputHelper ();
+
+  /**
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param packet received packet data.
+   * \param from the address of the sender of the packet.
+   */
+  void ApplicationPacketCallback (Ptr<const Packet> packet,
+                                  const Address &from);
 
 protected:
   // inherited from SatStatsHelper base class
@@ -66,26 +75,14 @@ protected:
 
 private:
   /**
-   * \brief Create a probe for each UT satellite device and connect it
-   *        to a collector.
-   * \param collectorMap list of collectors which the created probes will be
-   *                     connected to.
-   * \param collectorTraceSink a pointer to a function of the collector which
-   *                           acts as a trace sink.
+   * \brief Save the MAC address and the proper identifier from the given
+   *        UT node.
+   * \param utNode a UT node.
    *
-   * The collector's trace sink function must be an accessible (e.g., public)
-   * class method which accepts two input arguments of same type and returns
-   * nothing. For example, it is specified as
-   * `&IntervalRateCollector::TraceSinkDouble`.
-   *
-   * The created probes will be added to #m_probes.
+   * The address of the given node will be saved in the #m_identifierMap
+   * member variable.
    */
-  template<typename R, typename C, typename P>
-  void InstallProbes (CollectorMap &collectorMap,
-                      R (C::*collectorTraceSink) (P, P));
-
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
   /// Maintains a list of first-level collectors created by this helper.
   CollectorMap m_conversionCollectors;
@@ -96,10 +93,13 @@ private:
   /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
-}; // end of class SatStatsFwdDevThroughputHelper
+  /// Map of Mac48Address and the identifier associated with it.
+  std::map<const Address, uint32_t> m_identifierMap;
+
+}; // end of class SatStatsRtnDevThroughputHelper
 
 
 } // end of namespace ns3
 
 
-#endif /* SATELLITE_STATS_FWD_DEV_THROUGHPUT_HELPER_H */
+#endif /* SATELLITE_STATS_RTN_DEV_THROUGHPUT_HELPER_H */

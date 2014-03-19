@@ -186,9 +186,10 @@ private:
   TracedCallback<Ptr<const Packet> > m_txTrace;
 
   /**
-   * Traced callback for all received packets
+   * Traced callback for all received packets, including the address of the
+   * senders.
    */
-  TracedCallback<Ptr<const Packet> > m_rxTrace;
+  TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
 
   /**
    * The trace source fired when the phy layer drops a packet it has received

@@ -324,6 +324,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
     }
 
   NS_LOG_INFO (this << " created " << n << " instance(s)"
+                    << " of " << collectorMap.GetType ().GetName ()
                     << " for " << GetIdentiferTypeName (GetIdentifierType ()));
 
   return n;

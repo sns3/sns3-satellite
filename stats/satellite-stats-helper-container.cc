@@ -29,6 +29,7 @@
 #include <ns3/satellite-stats-fwd-dev-throughput-helper.h>
 #include <ns3/satellite-stats-rtn-app-delay-helper.h>
 #include <ns3/satellite-stats-rtn-app-throughput-helper.h>
+#include <ns3/satellite-stats-rtn-dev-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
@@ -81,6 +82,10 @@ SatStatsHelperContainer::DoDispose ()
  * - PerBeamRtnAppThroughput
  * - PerUtRtnAppThroughput
  * - PerUtUserRtnAppThroughput
+ * - GlobalRtnDevThroughput
+ * - PerGwRtnDevThroughput
+ * - PerBeamRtnDevThroughput
+ * - PerUtRtnDevThroughput
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -179,6 +184,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppThroughput,
                                   "per UT user return link application-level throughput statistics")
     ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
+
+    // Return link device-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevThroughput,
+                                        "return link device-level throughput statistics")
   ;
   return tid;
 }
@@ -236,6 +245,10 @@ SatStatsHelperContainer::GetName () const
  * - AddPerBeamRtnAppThroughput
  * - AddPerUtRtnAppThroughput
  * - AddPerUtUserRtnAppThroughput
+ * - GlobalRtnDevThroughput
+ * - PerGwRtnDevThroughput
+ * - PerBeamRtnDevThroughput
+ * - PerUtRtnDevThroughput
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -362,6 +375,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppThroughput, "rtn-app-throughput")
+
+// Return link device-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnDevThroughput, "rtn-dev-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
 
 
 std::string // static
