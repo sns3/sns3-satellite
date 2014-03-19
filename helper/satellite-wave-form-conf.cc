@@ -40,6 +40,7 @@ SatWaveform::SatWaveform ()
 :m_waveformId (0),
  m_modulatedBits (0),
  m_codingRate (0.0),
+ m_modCod (SatEnums::SAT_NONVALID_MODCOD),
  m_payloadBytes (0),
  m_lengthInSymbols (0),
  m_ebnoRequirement (0.0)
@@ -48,10 +49,11 @@ SatWaveform::SatWaveform ()
 }
 
 
-SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols)
+SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols)
 :m_waveformId (wfId),
  m_modulatedBits (modulatedBits),
  m_codingRate (codingRate),
+ m_modCod (modcod),
  m_payloadBytes (payloadBytes),
  m_lengthInSymbols (lengthInSymbols),
  m_ebnoRequirement (0.0)
@@ -65,6 +67,11 @@ SatWaveform::GetWaveformId () const
   return m_waveformId;
 }
 
+SatEnums::SatModcod_t
+SatWaveform::GetModCod () const
+{
+  return m_modCod;
+}
 
 uint32_t
 SatWaveform::GetPayloadInBytes () const
@@ -259,8 +266,11 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
 
       double dCodingRate = double(output[0]) / output[1];
 
+      // Convert modulated bits and coding rate to MODCOD enum
+      SatEnums::SatModcod_t modcod = ConvertToModCod (modulatedBits, output[0], output[1]);
+
       // Create new waveform and insert it to the waveform map
-      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, payloadBytes, durationInSymbols);
+      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, modcod, payloadBytes, durationInSymbols);
       m_waveforms.insert (std::make_pair (wfIndex, wf));
 
       // get next row
@@ -365,6 +375,112 @@ SatWaveformConf::Dump (double carrierBandwidthInHz, double symbolRateInBaud) con
       it->second->Dump (carrierBandwidthInHz, symbolRateInBaud);
     }
 }
+
+SatEnums::SatModcod_t
+SatWaveformConf::GetModCod (uint32_t wfId) const
+{
+  NS_LOG_FUNCTION (this << wfId);
+  NS_ASSERT(m_minWfId <= wfId && wfId <= m_maxWfId);
+
+  std::map< uint32_t, Ptr<SatWaveform> >::const_iterator it = m_waveforms.find (wfId);
+
+  if (it != m_waveforms.end ())
+    {
+      return m_waveforms.at(wfId)->GetModCod ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Waveform id: " << wfId << " not found in the waveform container!");
+    }
+
+  return SatEnums::SAT_NONVALID_MODCOD;
+}
+
+
+SatEnums::SatModcod_t
+SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNumerator, uint32_t codingRateDenominator) const
+{
+  switch (modulatedBits)
+  {
+    // QPSK
+    case 2:
+      {
+        if (codingRateNumerator == 1 && codingRateDenominator == 3)
+          {
+            return SatEnums::SAT_MODCOD_QPSK_1_TO_3;
+          }
+        else if (codingRateNumerator == 1 && codingRateDenominator == 2)
+          {
+            return SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+          }
+        else if (codingRateNumerator == 2 && codingRateDenominator == 3)
+          {
+            return SatEnums::SAT_MODCOD_QPSK_2_TO_3;
+          }
+        else if (codingRateNumerator == 3 && codingRateDenominator == 4)
+          {
+            return SatEnums::SAT_MODCOD_QPSK_3_TO_4;
+          }
+        else if (codingRateNumerator == 5 && codingRateDenominator == 6)
+          {
+            return SatEnums::SAT_MODCOD_QPSK_5_TO_6;
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported coding rate numerator: " << codingRateNumerator << ", denominator: " << codingRateDenominator);
+          }
+        break;
+      }
+    // 8PSK
+    case 3:
+      {
+        if (codingRateNumerator == 2 && codingRateDenominator == 3)
+          {
+            return SatEnums::SAT_MODCOD_8PSK_2_TO_3;
+          }
+        else if (codingRateNumerator == 3 && codingRateDenominator == 4)
+          {
+            return SatEnums::SAT_MODCOD_8PSK_3_TO_4;
+          }
+        else if (codingRateNumerator == 5 && codingRateDenominator == 6)
+          {
+            return SatEnums::SAT_MODCOD_8PSK_5_TO_6;
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported coding rate numerator: " << codingRateNumerator << ", denominator: " << codingRateDenominator);
+          }
+        break;
+
+      }
+    // 16 QAM
+    case 4:
+      {
+        if (codingRateNumerator == 3 && codingRateDenominator == 4)
+          {
+            return SatEnums::SAT_MODCOD_16QAM_3_TO_4;
+          }
+        else if (codingRateNumerator == 5 && codingRateDenominator == 6)
+          {
+            return SatEnums::SAT_MODCOD_16QAM_5_TO_6;
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported coding rate numerator: " << codingRateNumerator << ", denominator: " << codingRateDenominator);
+          }
+
+        break;
+
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported modulated bits:" << modulatedBits);
+        break;
+      }
+  }
+  return SatEnums::SAT_NONVALID_MODCOD;
+}
+
 
 
 }; // namespace ns3

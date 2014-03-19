@@ -322,7 +322,7 @@ SatUtMac::DoTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t
 
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
-  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  txInfo.modCod = waveform->GetModCod ();
   txInfo.waveformId = waveform->GetWaveformId ();
 
   TransmitPackets (FetchPackets (waveform->GetPayloadInBytes (), rcIndex, policy), durationInSecs, carrierId, txInfo);
@@ -359,7 +359,7 @@ SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> wavefo
 
       SatSignalParameters::txInfo_s txInfo;
       txInfo.packetType = SatEnums::SLOTTED_ALOHA_PACKET;
-      txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+      txInfo.modCod = waveform->GetModCod ();
       txInfo.waveformId = waveform->GetWaveformId ();
 
       TransmitPackets (packets, durationInSecs, carrierId, txInfo);
@@ -901,8 +901,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
           SatSignalParameters::txInfo_s txInfo;
           txInfo.packetType = SatEnums::CRDSA_PACKET;
-          /// TODO this needs to be modified
-          txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+          txInfo.modCod = wf->GetModCod ();
           txInfo.waveformId = wf->GetWaveformId ();
 
           /// schedule transmission

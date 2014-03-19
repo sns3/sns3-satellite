@@ -152,7 +152,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
   bbFrameConf->InitializeCNoRequirements (lr);
 
   std::vector<SatEnums::SatModcod_t> modcods;
-  SatEnums::GetAvailableModcods (modcods);
+  SatEnums::GetAvailableModcodsFwdLink (modcods);
 
   /**
    * Available BBFrames. Note that SHORT_FRAME is not yet supported, since

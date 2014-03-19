@@ -160,7 +160,7 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
 
   // Available MODCODs
   std::vector<SatEnums::SatModcod_t> modcods;
-  SatEnums::GetAvailableModcods (modcods);
+  SatEnums::GetAvailableModcodsFwdLink (modcods);
 
   // Available frame types
   std::vector<SatEnums::SatBbFrameType_t> frameTypes;

@@ -51,13 +51,19 @@ public:
    * \param payloadBytes payload in bytes
    * \param lengthInSymbols duration in symbols
    */
-  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, uint32_t payloadBytes, uint32_t lengthInSymbols);
+  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols);
 
   /**
    * Get waveform id
    * \return payload in bits
    */
   uint32_t GetWaveformId () const;
+
+  /**
+   * Get MODCOD enum
+   * \return SatModCod_t MODCOD enum
+   */
+  SatEnums::SatModcod_t GetModCod () const;
 
   /**
    * Get payload of a waveform in bytes
@@ -136,6 +142,11 @@ private:
   double m_codingRate;
 
   /**
+   * MODCOD enum
+   */
+  SatEnums::SatModcod_t m_modCod;
+
+  /**
    * Payload in bytes
    */
   uint32_t m_payloadBytes;
@@ -188,6 +199,13 @@ public:
   Ptr<SatWaveform> GetWaveform (uint32_t wfId) const;
 
   /**
+   * Get MODCOD enum corresponding to a waveform id
+   * \param wfId Waveform id
+   * \return SatModcod_t MODCOD enum
+   */
+  SatEnums::SatModcod_t GetModCod (uint32_t wfId) const;
+
+  /**
    * Get default waveform id
    * \return SatWaveform id of the conf holding all the details of the default wf
    */
@@ -229,6 +247,15 @@ private:
    * \param filePathName path and file name
    */
   void ReadFromFile (std::string filePathName);
+
+  /**
+   * Convert modulated bits and coding rate to a MODCOD enum
+   * \param modulatedBits Modulated bits of the MODCOD
+   * \param codingRateNumerator Coding rate numerator of the MODCOD
+   * \param codingRateDenominator Coding rate denominator of the MODCOD
+   * \return SatEnums::SatModcod_t MODCOD enum
+   */
+  SatEnums::SatModcod_t ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNumerator, uint32_t codingRateDenominator) const;
 
   /**
    * Container of the waveforms

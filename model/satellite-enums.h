@@ -88,6 +88,7 @@ public:
   typedef enum
   {
     SAT_NONVALID_MODCOD = 0,
+    SAT_MODCOD_QPSK_1_TO_3,
     SAT_MODCOD_QPSK_1_TO_2,
     SAT_MODCOD_QPSK_2_TO_3,
     SAT_MODCOD_QPSK_3_TO_4,
@@ -108,6 +109,8 @@ public:
     SAT_MODCOD_16APSK_5_TO_6,
     SAT_MODCOD_16APSK_8_TO_9,
     SAT_MODCOD_16APSK_9_TO_10,
+    SAT_MODCOD_16QAM_3_TO_4,
+    SAT_MODCOD_16QAM_5_TO_6,
     SAT_MODCOD_32APSK_3_TO_4,
     SAT_MODCOD_32APSK_4_TO_5,
     SAT_MODCOD_32APSK_5_TO_6,
@@ -115,7 +118,7 @@ public:
   } SatModcod_t;
 
 
-  static inline void GetAvailableModcods (std::vector<SatModcod_t>& modcods)
+  static inline void GetAvailableModcodsFwdLink (std::vector<SatModcod_t>& modcods)
   {
     modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
     modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
@@ -143,6 +146,20 @@ public:
     modcods.push_back (SAT_MODCOD_32APSK_8_TO_9);
   };
 
+  static inline void GetAvailableModcodsRtnLink (std::vector<SatModcod_t>& modcods)
+  {
+    modcods.push_back (SAT_MODCOD_QPSK_1_TO_3);
+    modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
+    modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
+    modcods.push_back (SAT_MODCOD_QPSK_3_TO_4);
+    modcods.push_back (SAT_MODCOD_QPSK_4_TO_5);
+    modcods.push_back (SAT_MODCOD_QPSK_5_TO_6);;
+    modcods.push_back (SAT_MODCOD_8PSK_2_TO_3);
+    modcods.push_back (SAT_MODCOD_8PSK_3_TO_4);
+    modcods.push_back (SAT_MODCOD_8PSK_5_TO_6);
+    modcods.push_back (SAT_MODCOD_16QAM_3_TO_4);
+    modcods.push_back (SAT_MODCOD_16QAM_5_TO_6);
+  };
 
   static inline std::string GetModcodTypeName (SatModcod_t modcod)
   {
@@ -150,6 +167,8 @@ public:
     {
       case SAT_NONVALID_MODCOD:
         return "SAT_NONVALID_MODCOD";
+      case SAT_MODCOD_QPSK_1_TO_3:
+        return "QPSK_1_TO_3";
       case SAT_MODCOD_QPSK_1_TO_2:
         return "QPSK_1_TO_2";
       case SAT_MODCOD_QPSK_2_TO_3:
@@ -190,6 +209,10 @@ public:
         return "16APSK_8_TO_9";
       case SAT_MODCOD_16APSK_9_TO_10:
         return "16APSK_9_TO_10";
+      case SAT_MODCOD_16QAM_3_TO_4:
+        return "16QAM_3_TO_4";
+      case SAT_MODCOD_16QAM_5_TO_6:
+        return "16QAM_5_TO_6";
       case SAT_MODCOD_32APSK_3_TO_4:
         return "32APSK_3_TO_4";
       case SAT_MODCOD_32APSK_4_TO_5:
