@@ -106,7 +106,7 @@ public:
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
    */
-  Time GetSuperFrameTxTime (uint8_t superFrameSeqId) const;
+  Time GetNextSuperFrameTxTime (uint8_t superFrameSeqId) const;
 
   /**
    * Receive a queue event:

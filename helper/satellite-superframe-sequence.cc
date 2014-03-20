@@ -190,31 +190,73 @@ SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBa
   return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );
 }
 
-Time
-SatSuperframeSeq::GetSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const
+uint32_t
+SatSuperframeSeq::GetCurrentSuperFrameCount (uint8_t superFrameSeqId) const
 {
-  uint32_t count = (uint32_t)(ceil((Simulator::Now () + timingAdvance).GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
-  return GetSuperFrameTxTimeWithCount (superFrameSeqId, count, timingAdvance);
+  NS_LOG_LOGIC (this << superFrameSeqId);
+
+  return (uint32_t)(floor(Simulator::Now ().GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
+}
+
+uint32_t
+SatSuperframeSeq::GetNextSuperFrameCount (uint8_t superFrameSeqId) const
+{
+  NS_LOG_LOGIC (this << superFrameSeqId);
+
+  return GetCurrentSuperFrameCount (superFrameSeqId) + 1;
 }
 
 Time
-SatSuperframeSeq::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId, Time timingAdvance) const
+SatSuperframeSeq::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
 {
-  uint32_t count = GetCurrentSuperFrameCount (superFrameSeqId, timingAdvance);
-  return GetSuperFrameTxTimeWithCount (superFrameSeqId, count, timingAdvance);
+  uint32_t count = GetCurrentSuperFrameCount (superFrameSeqId);
+  return Seconds (count * GetDurationInSeconds (superFrameSeqId));
+}
+
+Time
+SatSuperframeSeq::GetNextSuperFrameStartTime (uint8_t superFrameSeqId) const
+{
+  uint32_t count = GetNextSuperFrameCount (superFrameSeqId);
+  return Seconds (count * GetDurationInSeconds (superFrameSeqId));
+}
+
+Time
+SatSuperframeSeq::GetSuperFrameTxTime (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const
+{
+  return (Seconds (superFrameCount * GetDurationInSeconds (superFrameSeqId)) - timingAdvance);
 }
 
 uint32_t
 SatSuperframeSeq::GetCurrentSuperFrameCount (uint8_t superFrameSeqId, Time timingAdvance) const
 {
-  return (uint32_t)(floor((Simulator::Now () + timingAdvance).GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
+  NS_LOG_FUNCTION (this << superFrameSeqId << timingAdvance.GetSeconds ());
+
+  Time earliestRxTime = Simulator::Now () + timingAdvance;
+  return (uint32_t)(floor(earliestRxTime.GetSeconds () / GetDurationInSeconds (superFrameSeqId)));
+}
+
+uint32_t
+SatSuperframeSeq::GetNextSuperFrameCount (uint8_t superFrameSeqId, Time timingAdvance) const
+{
+  NS_LOG_FUNCTION (this << superFrameSeqId << timingAdvance.GetSeconds ());
+
+  return GetCurrentSuperFrameCount (superFrameSeqId, timingAdvance) + 1;
 }
 
 Time
-SatSuperframeSeq::GetSuperFrameTxTimeWithCount (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const
+SatSuperframeSeq::GetCurrentSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const
 {
-  return (Seconds (superFrameCount * GetDurationInSeconds (superFrameSeqId)) - timingAdvance);
+  NS_LOG_FUNCTION (this << superFrameSeqId << timingAdvance.GetSeconds ());
+
+  return Seconds (GetCurrentSuperFrameCount (superFrameSeqId, timingAdvance) * GetDurationInSeconds (superFrameSeqId));
 }
 
+Time
+SatSuperframeSeq::GetNextSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const
+{
+  NS_LOG_FUNCTION (this << superFrameSeqId << timingAdvance.GetSeconds ());
+
+  return Seconds (GetNextSuperFrameCount (superFrameSeqId, timingAdvance) * GetDurationInSeconds (superFrameSeqId));
+}
 
 }; // namespace ns3

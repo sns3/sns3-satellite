@@ -101,10 +101,12 @@ SatGwHelper::SatGwHelper ()
 
 SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
                           uint32_t rtnLinkCarrierCount,
+                          Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
                           SatMac::WriteCtrlMsgCallback writeCb )
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+   m_superframeSeq (seq),
    m_readCtrlCb (readCb),
    m_writeCtrlCb (writeCb),
    m_interferenceModel (),
@@ -211,11 +213,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Create SatFwdLinkChannelEstimationErrorContainer
   else
     {
-      /**
-       * TODO: Fetch the minimum and maximum waveform ids from
-       * SatWaveformConf!
-       */
-      cec = Create<SatRtnLinkChannelEstimationErrorContainer> (3, 22);
+      uint32_t minWfId = m_superframeSeq->GetWaveformConf ()->GetMinWfId ();
+      uint32_t maxWfId = m_superframeSeq->GetWaveformConf ()->GetMaxWfId ();
+      cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
     }
 
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,

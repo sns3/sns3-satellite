@@ -247,13 +247,12 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_beamId = beamId;
   m_txCallback = cb;
   m_superframeSeq = seq;
-  m_superFrameCounter = 0;
 
   // How many TBTPs is transmitted during RTT?
   uint32_t tbtpsPerRtt = (uint32_t)(std::ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (0)));
 
   // Scheduling starts after one empty super frame.
-  m_superFrameCounter = tbtpsPerRtt + 1;
+  m_superFrameCounter = m_superframeSeq->GetNextSuperFrameCount (0) + tbtpsPerRtt;
 
   // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
   // this part of implementation is needed to change
@@ -273,7 +272,18 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
-  Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (0)), &SatBeamScheduler::Schedule, this);
+  Time delay;
+
+  if (m_superframeSeq->GetNextSuperFrameStartTime (0) > Now ())
+    {
+      delay = m_superframeSeq->GetNextSuperFrameStartTime (0) - Now ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Trying to schedule a superframe in the past!");
+    }
+
+  Simulator::Schedule (delay, &SatBeamScheduler::Schedule, this);
 }
 
 uint32_t

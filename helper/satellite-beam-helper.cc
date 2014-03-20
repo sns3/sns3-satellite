@@ -147,7 +147,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   // create needed low level satellite helpers
   m_geoHelper = CreateObject<SatGeoHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount);
-  m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, rtnReadCtrlCb, fwdWriteCtrlCb);
+  m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb);
   m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb );
 
   // Two usage of link results is two-fold: on the other hand they are needed in the

@@ -174,7 +174,7 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
 
   /// schedule the next frame start
   /// TODO get rid of hard coded superframe sequence ID 0
-  Simulator::Schedule (GetSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
+  Simulator::Schedule (GetNextSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
 }
 
 void
@@ -186,10 +186,10 @@ SatUtMac::SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback 
 }
 
 Time
-SatUtMac::GetSuperFrameTxTime (uint8_t superFrameSeqId) const
+SatUtMac::GetNextSuperFrameTxTime (uint8_t superFrameSeqId) const
 {
   Time timingAdvance = m_timingAdvanceCb ();
-  Time txTime = m_superframeSeq->GetSuperFrameTxTime (superFrameSeqId, timingAdvance);
+  Time txTime = m_superframeSeq->GetNextSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
 }
 
@@ -197,7 +197,7 @@ Time
 SatUtMac::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
 {
   Time timingAdvance = m_timingAdvanceCb ();
-  Time txTime = m_superframeSeq->GetCurrentSuperFrameStartTime (superFrameSeqId, timingAdvance);
+  Time txTime = m_superframeSeq->GetCurrentSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
 }
 
@@ -214,7 +214,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * at correct time.
    */
   Time timingAdvance = m_timingAdvanceCb ();
-  Time txTime = m_superframeSeq->GetSuperFrameTxTimeWithCount (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
+  Time txTime = m_superframeSeq->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
 
   // The delay compared to Now when to start the transmission of this superframe
   Time startDelay = txTime - Simulator::Now ();
@@ -1019,12 +1019,24 @@ SatUtMac::DoFrameStart ()
       DoRandomAccess (SatEnums::RA_CRDSA_TRIGGER);
     }
 
+  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (0);
+
+  if (Now () >= nextSuperFrameTxTime)
+    {
+      NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
+    }
+
+  Time schedulingDelay = nextSuperFrameTxTime - Now ();
+
+  Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+
+  /*
   /// schedule the next frame start
   /// TODO this needs to be modified when a proper mobility model is
   /// added as the timing advance will not be constant. Additionally,
   /// a proper timing specific class should be implemented for a
   /// functionality like this
-  Time nextStartTime = Now () - GetSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0));
+  Time nextStartTime = Now () - GetNextSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0));
 
   if (nextStartTime > Now () + m_timingAdvanceCb ())
     {
@@ -1035,7 +1047,7 @@ SatUtMac::DoFrameStart ()
       nextStartTime += Seconds (m_superframeSeq->GetDurationInSeconds (0));
       Simulator::Schedule (nextStartTime, &SatUtMac::DoFrameStart, this);
     }
-
+  */
 }
 
 } // namespace ns3

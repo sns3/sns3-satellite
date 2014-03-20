@@ -143,40 +143,73 @@ public:
   inline Time GetTargetDuration () const { return m_targetDuration; }
 
   /**
-   * Get the tx time for the next superframe taking into account the UT specific
-   * timing advance
-   * \param superFrameSeqId Superframe sequence id
-   * \param timingAdvance Timing advance for a given UT
-   * \return Time Transmission time
+   * Returns currently running superframe count
+   * \param superFrameSeqId
+   * \return uint32_t Superframe count
    */
-  Time GetSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const;
+  uint32_t GetCurrentSuperFrameCount (uint8_t superFrameSeqId) const;
 
   /**
-   * Get the start tx time for the current superframe taking into account the UT specific
-   * timing advance
-   * \param superFrameSeqId Superframe sequence id
-   * \param timingAdvance Timing advance for a given UT
-   * \return Time Transmission time
+   * Returns currently running superframe start time
+   * \param superFrameSeqId
+   * \return Time Superframe start time
    */
-  Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId, Time timingAdvance) const;
+  Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
 
   /**
-   * Get the tx time for the next superframe taking into account the UT specific
-   * timing advance
-   * \param superFrameSeqId Superframe sequence id
-   * \param superFrameCount Used superframe count for calculation
-   * \param timingAdvance Timing advance for a given UT
-   * \return Time Transmission time
+   * Returns next superframe count
+   * \param superFrameSeqId
+   * \return uint32_t Superframe count
    */
-  Time GetSuperFrameTxTimeWithCount (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const;
+  uint32_t GetNextSuperFrameCount (uint8_t superFrameSeqId) const;
 
   /**
-   * Get the current superframe count taking into account the UT specific timing advance
-   * \param superFrameSeqId Superframe sequence id
-   * \param timingAdvance Timing advance for a given UT
-   * \return Superframe count
+   * Returns next superframe start time
+   * \param superFrameSeqId
+   * \return Time Superframe start time
+   */
+  Time GetNextSuperFrameStartTime (uint8_t superFrameSeqId) const;
+
+  /**
+   * Returns superframe transmission time for a UT with a certain timing advance
+   * \param superFrameSeqId Superframe sequence d
+   * \param superFrameCount Superframe count
+   * \param timingAdvance A propagation delay between sender and receiver
+   * \return Time Superframe tx time
+   */
+  Time GetSuperFrameTxTime (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const;
+
+  /**
+   * Returns superframe count for current superframe with a certain timing advance
+   * \param superFrameSeqId Superframe sequence d
+   * \param timingAdvance A propagation delay between sender and receiver
+   * \return uint32_t Superframe count
    */
   uint32_t GetCurrentSuperFrameCount (uint8_t superFrameSeqId, Time timingAdvance) const;
+
+  /**
+   * Returns superframe count for next superframe with a certain timing advance
+   * \param superFrameSeqId Superframe sequence d
+   * \param timingAdvance A propagation delay between sender and receiver
+   * \return uint32_t Superframe count
+   */
+  uint32_t GetNextSuperFrameCount (uint8_t superFrameSeqId, Time timingAdvance) const;
+
+  /**
+   * Returns superframe transmission time for current superframe with a certain timing advance
+   * \param superFrameSeqId Superframe sequence d
+   * \param timingAdvance A propagation delay between sender and receiver
+   * \return Time Superframe tx time
+   */
+  Time GetCurrentSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const;
+
+  /**
+   * Returns superframe transmission time for next superframe with a certain timing advance
+   * \param superFrameSeqId Superframe sequence d
+   * \param timingAdvance A propagation delay between sender and receiver
+   * \return Time Superframe tx time
+   */
+  Time GetNextSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const;
 
 private:
   typedef std::map<uint32_t, Ptr<SatControlMsgContainer> > TbtpMap_t;
