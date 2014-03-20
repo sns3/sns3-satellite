@@ -362,6 +362,9 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 
   Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
 
+  // Add a SatAddressTag tag with this device's address as the source address.
+  packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
   m_packetTrace (Simulator::Now(),
                  SatEnums::PACKET_SENT,
                  m_nodeInfo->GetNodeType (),
