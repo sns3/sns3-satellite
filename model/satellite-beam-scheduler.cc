@@ -23,6 +23,8 @@
 #include "ns3/double.h"
 #include "ns3/enum.h"
 #include "ns3/ipv4-l3-protocol.h"
+#include "ns3/singleton.h"
+#include "satellite-rtn-link-time.h"
 #include "satellite-beam-scheduler.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
@@ -252,7 +254,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   uint32_t tbtpsPerRtt = (uint32_t)(std::ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (0)));
 
   // Scheduling starts after one empty super frame.
-  m_superFrameCounter = m_superframeSeq->GetNextSuperFrameCount (0) + tbtpsPerRtt;
+  m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (0) + tbtpsPerRtt;
 
   // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
   // this part of implementation is needed to change
@@ -273,10 +275,11 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
   Time delay;
+  Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
 
-  if (m_superframeSeq->GetNextSuperFrameStartTime (0) > Now ())
+  if (txTime > Now ())
     {
-      delay = m_superframeSeq->GetNextSuperFrameStartTime (0) - Now ();
+      delay = txTime - Now ();
     }
   else
     {

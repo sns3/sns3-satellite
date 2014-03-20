@@ -27,7 +27,9 @@
 #include "ns3/csma-helper.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/mobility-helper.h"
+#include "ns3/singleton.h"
 #include "../model/satellite-position-allocator.h"
+#include "../model/satellite-rtn-link-time.h"
 #include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
@@ -146,6 +148,9 @@ SatHelper::SatHelper (std::string scenarioName)
                                               m_satConf->GetRtnLinkCarrierCount(),
                                               m_satConf->GetFwdLinkCarrierCount(),
                                               m_satConf->GetSuperframeSeq());
+
+  Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get ();
+  rtnTime->Initialize (m_satConf->GetSuperframeSeq ());
 
   SatBeamHelper::CarrierFreqConverter converterCb = MakeCallback (&SatConf::GetCarrierFrequencyHz, m_satConf);
   m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );

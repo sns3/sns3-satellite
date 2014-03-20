@@ -32,12 +32,14 @@
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
 #include "ns3/ipv4-l3-protocol.h"
+#include "ns3/singleton.h"
 #include "satellite-ut-mac.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
 #include "satellite-tbtp-container.h"
 #include "satellite-queue.h"
 #include "satellite-ut-scheduler.h"
+#include "satellite-rtn-link-time.h"
 #include "../helper/satellite-wave-form-conf.h"
 #include "satellite-crdsa-replica-tag.h"
 
@@ -189,7 +191,7 @@ Time
 SatUtMac::GetNextSuperFrameTxTime (uint8_t superFrameSeqId) const
 {
   Time timingAdvance = m_timingAdvanceCb ();
-  Time txTime = m_superframeSeq->GetNextSuperFrameTxTime (superFrameSeqId, timingAdvance);
+  Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
 }
 
@@ -197,7 +199,7 @@ Time
 SatUtMac::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
 {
   Time timingAdvance = m_timingAdvanceCb ();
-  Time txTime = m_superframeSeq->GetCurrentSuperFrameTxTime (superFrameSeqId, timingAdvance);
+  Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
 }
 
@@ -214,7 +216,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * at correct time.
    */
   Time timingAdvance = m_timingAdvanceCb ();
-  Time txTime = m_superframeSeq->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
+  Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
 
   // The delay compared to Now when to start the transmission of this superframe
   Time startDelay = txTime - Simulator::Now ();
@@ -630,7 +632,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
           NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid SF start time");
         }
 
-      uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
+      uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
       /// search for the next available slot
       /// if there is no free slots in the current frame, look for it in the following frames
@@ -759,7 +761,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 
   /// get current superframe ID
   /// TODO get rid of the hard coded superframe sequence 0
-  uint32_t superFrameId = m_superframeSeq->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
+  uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
   NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - Time: " << Now ().GetSeconds () << " AC: " << allocationChannel << ", SF: " << superFrameId << ", num of opportunities: " << txOpportunities.crdsaTxOpportunities.size ());
 
