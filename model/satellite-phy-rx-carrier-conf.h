@@ -163,11 +163,11 @@ public:
    * Get configured bandwidth
    *
    * \param carrierId   Id of the carrier
-   * \param bandwidhtType Type of the bandwidth
+   * \param bandwidthType Type of the bandwidth
    *
    * \return Bandwidth of the requested carrier.
    */
-  double GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType ) const;
+  double GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType ) const;
 
   /**
    * Get configured RX noise temperature

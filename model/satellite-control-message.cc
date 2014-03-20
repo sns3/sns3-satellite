@@ -204,9 +204,9 @@ SatTbtpMessage::GetDaTimeslots (Address utId)
 }
 
 void
-SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, uint16_t timeSlotId)
+SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSlotConf> conf)
 {
-  NS_LOG_FUNCTION (this << utId << frameId << timeSlotId);
+  NS_LOG_FUNCTION (this << utId << frameId << conf);
 
   // find container for the UT from map
   DaTimeSlotMap_t::iterator it = m_daTimeSlots.find (utId);
@@ -215,8 +215,7 @@ SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, uint16_t time
   // otherwise use container found from map
   if ( it == m_daTimeSlots.end () )
     {
-      DaTimeSlotInfoContainer_t slotInfos;
-      std::pair<DaTimeSlotMap_t::iterator, bool> result = m_daTimeSlots.insert (std::make_pair (utId, slotInfos));
+      std::pair<DaTimeSlotMap_t::iterator, bool> result = m_daTimeSlots.insert (std::make_pair (utId, DaTimeSlotInfoContainer_t()));
 
       if ( result.second )
         {
@@ -235,7 +234,7 @@ SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, uint16_t time
     }
 
   // store time slot info to user specific container
-  it->second.push_back (std::make_pair (frameId, timeSlotId) );
+  it->second.push_back (std::make_pair (frameId, conf) );
 
   // store frame ID to count used frames
   m_frameIds.insert (frameId);

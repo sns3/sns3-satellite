@@ -107,7 +107,7 @@ public:
    */
   SatTimeSlotConf ();
 
-  /**FRAME_ATTRIBUTE_ACCESSOR_DEFINE
+  /**
    * Constructor for SatTimeSlotConf
    *
    * \param startTimeInSeconds  Start time of time slot in side frame.
@@ -156,8 +156,10 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
-  typedef std::map<uint16_t, Ptr<SatTimeSlotConf> > SatTimeSlotConfContainer_t;
-  typedef std::vector<uint16_t>                     SatTimeSlotIdContainer_t;
+
+  typedef std::vector<Ptr<SatTimeSlotConf> >              SatTimeSlotConfContainer_t;
+  typedef std::map<uint32_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
+
 
   static const uint16_t maxTimeSlotCount = 2048;
   static const uint16_t maxTimeSlotIndex = maxTimeSlotCount - 1;
@@ -170,13 +172,13 @@ public:
   /**
    * Constructor for SatFrameConf.
    *
-   * \param bandwidthHz       Bandwidth of the frame in Hertz
+   * \param bandwidthHz       Bandwidth of the frame in hertz
    * \param durationInSeconds Duration of the frame in seconds
-   * \param btu               BTU conf of the frame
+   * \param btu               BTU configuration of the frame
    * \param timeSlots         Time slot of the frame.
    */
   SatFrameConf ( double bandwidthHz, double durationInSeconds, Ptr<SatBtuConf> btu,
-                 SatTimeSlotConfContainer_t * timeSlots, bool isRandomAccess );
+                 SatTimeSlotConfMap_t& timeSlots, bool isRandomAccess );
 
   /**
    * Destructor for SatFrameConf
@@ -190,6 +192,14 @@ public:
    * \return ID of the added timeslot.
    */
   uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
+
+  /**
+   * Get time slot conf of the frame. Possible values for id are from 0 to 2047.
+   *
+   * \param index Id of the time slot requested.
+   * \return      The requested time slot conf of frame.
+   */
+  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
 
   /**
    * Get bandwidth of the frame.
@@ -264,23 +274,15 @@ public:
    *
    * \return      The requested time slot count of frame.
    */
-  inline uint32_t GetTimeSlotCount () const { return m_timeSlotConfs.size(); }
+  uint16_t GetTimeSlotCount () const;
 
   /**
-   * Get time slot conf of the frame. Possible values for id are from 0 to 2047.
-   *
-   * \param index Id of the time slot requested.
-   * \return      The requested time slot conf of frame.
-   */
-  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
-
-  /**
-   * Get time slot ids of the specific carrier.
+   * Get time slot of the specific carrier.
    *
    * \param carrierId Id of the carrier which time slots are requested.
-   * \return  List (map) containing timeslots.
+   * \return  Container containing time slots.
    */
-  SatTimeSlotIdContainer_t GetTimeSlotIds (uint32_t carrierId) const;
+  SatTimeSlotConfContainer_t GetTimeSlotConfs (uint32_t carrierId) const;
 
   /**
    * Get state if frame is random access frame.
@@ -290,18 +292,13 @@ public:
   inline bool IsRandomAccess () const { return m_isRandomAccess;}
 
 private:
-  //
-  typedef std::multimap<uint32_t, uint16_t> SatCarrierTimeSlotMap_t;
-
   double    m_bandwidthHz;
   double    m_durationInSeconds;
-  uint16_t  m_nextTimeSlotId;
   bool      m_isRandomAccess;
 
-  Ptr<SatBtuConf>         m_btu;
-  uint32_t                m_carrierCount;
-  SatTimeSlotConfContainer_t   m_timeSlotConfs;
-  SatCarrierTimeSlotMap_t  m_carrierTimeSlotIds;
+  Ptr<SatBtuConf>                 m_btu;
+  uint32_t                        m_carrierCount;
+  SatTimeSlotConfMap_t            m_timeSlotConfMap;
 };
 
 
@@ -433,7 +430,7 @@ public:
    * \param raChannel RA channel, which slot are requested
    * \return RA channel time slots
    */
-  SatFrameConf::SatTimeSlotIdContainer_t GetRaSlots (uint32_t raChannel);
+  SatFrameConf::SatTimeSlotConfContainer_t GetRaSlots (uint32_t raChannel);
 
   /**
    * Get the number of the RA channels in super frame configuration.
@@ -485,8 +482,8 @@ public:
   inline uint32_t GetConfigType () const { return m_configTypeIndex; }
 
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
-  void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
-  void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz);
+  void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
+  void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
   void SetFrameCarrierSpacing (uint8_t frameIndex, double spacing);
   void SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff);
   void SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess);

@@ -264,7 +264,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
           Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
           Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
-          Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( it->second );
+          Ptr<SatTimeSlotConf> timeSlotConf = it->second;
 
           // Start time
           Time slotDelay = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());

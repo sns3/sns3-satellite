@@ -52,7 +52,7 @@ SatBtuConf::SatBtuConf (double bandwidthHz, double rollOff, double spacing)
   NS_ASSERT ( (rollOff >= 0.00 ) && ( rollOff < 1.00 ) );
 
   m_occupiedBandwidthHz = m_allocatedBandwidthHz / (rollOff + 1.00);
-  m_effectiveBandwidthHz = m_allocatedBandwidthHz / (rollOff + spacing + 1.00);
+  m_effectiveBandwidthHz = m_allocatedBandwidthHz / ((spacing + 1.00) * (rollOff + 1.00));
 
   m_lengthInSeconds = 1 / m_effectiveBandwidthHz;
 }
@@ -91,37 +91,26 @@ SatTimeSlotConf::~SatTimeSlotConf ()
 SatFrameConf::SatFrameConf ()
  : m_bandwidthHz (0.0),
    m_durationInSeconds (0.0),
-   m_nextTimeSlotId (0),
    m_isRandomAccess (false),
    m_btu (0),
    m_carrierCount (0)
 {
   // default constructor should not be used
+
   NS_ASSERT (false);
 }
 
 SatFrameConf::SatFrameConf ( double bandwidthHz, double durationInSeconds,
-                             Ptr<SatBtuConf> btu, SatTimeSlotConfContainer_t * timeSlots, bool isRandomAccess)
+                             Ptr<SatBtuConf> btu, SatTimeSlotConfMap_t &timeSlots, bool isRandomAccess)
   : m_bandwidthHz (bandwidthHz),
     m_durationInSeconds (durationInSeconds),
-    m_nextTimeSlotId (0),
     m_isRandomAccess (isRandomAccess),
     m_btu (btu)
 {
   NS_LOG_FUNCTION (this);
 
   m_carrierCount = bandwidthHz / btu->GetAllocatedBandwidthHz ();
-
-  if ( timeSlots != NULL )
-    {
-      m_timeSlotConfs = *timeSlots;
-
-      if ( m_timeSlotConfs.empty () == false )
-        {
-          SatTimeSlotConfContainer_t::iterator lastSlot = m_timeSlotConfs.end ()--;
-          m_nextTimeSlotId = lastSlot->first + 1;
-        }
-    }
+  m_timeSlotConfMap = timeSlots;
 }
 
 SatFrameConf::~SatFrameConf ()
@@ -139,32 +128,61 @@ SatFrameConf::GetCarrierFrequencyHz (uint32_t carrierId) const
   return ( (carrierBandwidthHz * carrierId) + ( carrierBandwidthHz / 2.0 ) );
 }
 
+uint16_t
+SatFrameConf::GetTimeSlotCount () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint16_t slotCount = 0;
+
+  if ( m_timeSlotConfMap.empty () == false )
+    {
+      slotCount = m_timeSlotConfMap.size () * m_timeSlotConfMap.begin ()->second.size ();
+    }
+
+  return slotCount;
+}
+
 Ptr<SatTimeSlotConf>
 SatFrameConf::GetTimeSlotConf (uint16_t index) const
 {
   NS_LOG_FUNCTION (this);
 
-  SatTimeSlotConfContainer_t::const_iterator foundTimeSlot = m_timeSlotConfs.find (index);
+  Ptr<SatTimeSlotConf> foundTimeSlot = NULL;
+  uint32_t carrierId = index / m_timeSlotConfMap.size ();
+  uint16_t timeSlotIndex = index % m_timeSlotConfMap.size ();
 
-  NS_ASSERT (foundTimeSlot != m_timeSlotConfs.end () );
+  SatTimeSlotConfMap_t::const_iterator foundCarrier = m_timeSlotConfMap.find (carrierId);
 
-  return foundTimeSlot->second;
+  if ( foundCarrier != m_timeSlotConfMap.end () && timeSlotIndex < foundCarrier->second.size () )
+    {
+      foundTimeSlot = foundCarrier->second[timeSlotIndex];
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Index is invalid!!!");
+    }
+
+  return foundTimeSlot;
 }
 
-SatFrameConf::SatTimeSlotIdContainer_t
-SatFrameConf::GetTimeSlotIds (uint32_t carrierId) const
+SatFrameConf::SatTimeSlotConfContainer_t
+SatFrameConf::GetTimeSlotConfs (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair < SatCarrierTimeSlotMap_t::const_iterator,
-              SatCarrierTimeSlotMap_t::const_iterator> timeSlotRange = m_carrierTimeSlotIds.equal_range (carrierId);
+  SatTimeSlotConfContainer_t timeSlots;
 
-  SatTimeSlotIdContainer_t timeSlots;
+  SatTimeSlotConfMap_t::const_iterator it = m_timeSlotConfMap.find (carrierId);
 
-  for (SatCarrierTimeSlotMap_t::const_iterator it = timeSlotRange.first; it != timeSlotRange.second; it++)
-    {
-      timeSlots.push_back (it->second);
-    }
+    if ( it != m_timeSlotConfMap.end () )
+      {
+        timeSlots = it->second;
+      }
+    else
+      {
+        NS_FATAL_ERROR ("Carrier not found!!!");
+      }
 
   return timeSlots;
 }
@@ -174,13 +192,39 @@ SatFrameConf::AddTimeSlotConf (Ptr<SatTimeSlotConf> conf)
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<SatTimeSlotConfContainer_t::const_iterator, bool> result = m_timeSlotConfs.insert (std::make_pair (m_nextTimeSlotId, conf) );
-  NS_ASSERT (result.second == true);
+  NS_LOG_FUNCTION (this << conf);
 
-  m_carrierTimeSlotIds.insert (std::make_pair (conf->GetCarrierId(), m_nextTimeSlotId));
+  // find container for the Carrier from map
+  SatTimeSlotConfMap_t::iterator it = m_timeSlotConfMap.find (conf->GetCarrierId ());
 
-  return m_nextTimeSlotId++;
+  // If not found, add new Carrier container to map,
+  // otherwise use container found from map
+  if ( it == m_timeSlotConfMap.end () )
+    {
+      std::pair<SatTimeSlotConfMap_t::iterator, bool> result = m_timeSlotConfMap.insert (std::make_pair (conf->GetCarrierId (), SatTimeSlotConfContainer_t()));
+
+      if ( result.second )
+        {
+          it = result.first;
+        }
+      else
+        {
+          it = m_timeSlotConfMap.end ();
+        }
+    }
+
+  // container creation for carrier has failed, so we need to crash
+  if (it == m_timeSlotConfMap.end ())
+    {
+      NS_FATAL_ERROR ("Cannot insert slot to container!!!");
+    }
+
+  // store time slot info to carrier specific container
+  it->second.push_back (conf);
+
+  return 0;
 }
+
 NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf);
 
 // Super frame configuration interface.
@@ -314,29 +358,29 @@ SatSuperframeConf::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierB
 }
 
 void
-SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz)
+SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
-  NS_LOG_FUNCTION (this << frameIndex << bandwidhtHz);
+  NS_LOG_FUNCTION (this << frameIndex << bandwidthHz);
 
   if ( frameIndex >= m_maxFrameCount )
     {
       NS_FATAL_ERROR ("Frame index out of range!!!");
     }
 
-  m_frameAllocatedBandwidth[frameIndex] = bandwidhtHz;
+  m_frameAllocatedBandwidth[frameIndex] = bandwidthHz;
 }
 
 void
-SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidhtHz)
+SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
-  NS_LOG_FUNCTION (this << frameIndex << bandwidhtHz);
+  NS_LOG_FUNCTION (this << frameIndex << bandwidthHz);
 
   if ( frameIndex >= m_maxFrameCount )
     {
       NS_FATAL_ERROR ("Frame index out of range!!!");
     }
 
-  m_frameCarrierAllocatedBandwidth[frameIndex] = bandwidhtHz;
+  m_frameCarrierAllocatedBandwidth[frameIndex] = bandwidthHz;
 }
 
 void
@@ -484,7 +528,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
               // Created one frame to be used utilizing earlier created BTU
               Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], m_durationInSeconds,
-                                                                  btuConf, (SatFrameConf::SatTimeSlotConfContainer_t *) NULL, m_frameIsRandomAccess[frameIndex] );
+                                                                  btuConf, SatFrameConf::SatTimeSlotConfMap_t (), m_frameIsRandomAccess[frameIndex] );
 
               // Created time slots for every carrier and add them to frame configuration
               for (uint32_t i = 0; i < frameConf->GetCarrierCount (); i++)
@@ -521,19 +565,19 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
     }
 }
 
-SatFrameConf::SatTimeSlotIdContainer_t
+SatFrameConf::SatTimeSlotConfContainer_t
 SatSuperframeConf::GetRaSlots (uint32_t raChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  SatFrameConf::SatTimeSlotIdContainer_t timeSlots;
+  SatFrameConf::SatTimeSlotConfContainer_t timeSlots;
 
   if ( raChannel < m_raChannels.size ())
     {
       uint8_t frameId = m_raChannels[raChannel].first;
       uint32_t carrierId = m_raChannels[raChannel].second;
 
-      timeSlots = m_frames[frameId]->GetTimeSlotIds (carrierId);
+      timeSlots = m_frames[frameId]->GetTimeSlotConfs (carrierId);
     }
   else
     {
@@ -580,11 +624,10 @@ SatSuperframeConf::GetRaChannelPayloadInBytes (uint32_t raChannel) const
   if ( raChannel < m_raChannels.size ())
     {
       uint8_t frameId = m_raChannels[raChannel].first;
-      Ptr<SatTimeSlotConf> timeSlotConf = m_frames[frameId]->GetTimeSlotConf (0);
+      Ptr<SatTimeSlotConf> timeSlotConf = (*m_frames[frameId]->GetTimeSlotConfs (0).begin ());
       Ptr<SatWaveform> waveform = m_waveFormConf->GetWaveform( timeSlotConf->GetWaveFormId ());
 
       payloadInBytes = waveform->GetPayloadInBytes ();
-
     }
   else
     {
@@ -625,15 +668,15 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                 std::string ("The roll-off factor for ") + GetIndexAsFrameName(index), \
                 TypeId::ATTR_CONSTRUCT, \
                 DoubleValue (carrierSpacing), \
-                MakeDoubleAccessor (&SatSuperframeConf::SetFrame ## index ## CarrierSpacing, \
-                                    &SatSuperframeConf::GetFrame ## index ## CarrierSpacing), \
+                MakeDoubleAccessor (&SatSuperframeConf::SetFrame ## index ## CarrierRollOff, \
+                                    &SatSuperframeConf::GetFrame ## index ## CarrierRollOff), \
                 MakeDoubleChecker<double> (0.00, 1.00)) \
 .AddAttribute ( GetIndexAsFrameName(index) + std::string ("_CarrierSpacing"), \
                 std::string ("The carrier spacing factor for ") + GetIndexAsFrameName(index), \
                 TypeId::ATTR_CONSTRUCT, \
                 DoubleValue (carrierRollOff), \
-                MakeDoubleAccessor (&SatSuperframeConf::SetFrame ## index ## CarrierRollOff, \
-                                    &SatSuperframeConf::GetFrame ## index ## CarrierRollOff), \
+                MakeDoubleAccessor (&SatSuperframeConf::SetFrame ## index ## CarrierSpacing, \
+                                    &SatSuperframeConf::GetFrame ## index ## CarrierSpacing), \
                 MakeDoubleChecker<double> (0.00, 1.00)) \
 .AddAttribute ( GetIndexAsFrameName(index) + std::string ("_RandomAccessFrame"), \
                 std::string ("Flag to tell if ") + GetIndexAsFrameName(index) + std::string (" is used for random access"), \

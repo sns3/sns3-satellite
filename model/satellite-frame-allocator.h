@@ -18,12 +18,13 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SAT_FRAME_HELPER_H
-#define SAT_FRAME_HELPER_H
+#ifndef SAT_FRAME_ALLOCATOR_H
+#define SAT_FRAME_ALLOCATOR_H
 
 #include "ns3/simple-ref-count.h"
 #include "ns3/address.h"
 #include "ns3/satellite-frame-conf.h"
+#include "satellite-control-message.h"
 
 namespace ns3 {
 
@@ -105,7 +106,17 @@ public:
        m_minRbdcSymbols (0.0),
        m_rbdcSymbols (0.0),
        m_vbdcSymbols (0.0)
-    {}
+    {
+    }
+
+    SatFrameAllocInfo (uint8_t countOfRcs)
+     : m_craSymbols (0.0),
+       m_minRbdcSymbols (0.0),
+       m_rbdcSymbols (0.0),
+       m_vbdcSymbols (0.0)
+    {
+      m_allocInfoPerRc = SatFrameAllocInfoItemContainer_t (countOfRcs, SatFrameAllocInfoItem ());
+    }
 
     /**
      * Construct SatFrameAllocReqInSymbols from SatFrameAllocReq.
@@ -140,7 +151,7 @@ public:
         }
     }
 
-    SatFrameAllocInfoItem UpdateTotalReqs ()
+    SatFrameAllocInfoItem UpdateTotalCounts ()
     {
       m_craSymbols = 0.0;
       m_minRbdcSymbols = 0.0;
@@ -153,10 +164,10 @@ public:
         {
           SatFrameAllocInfoItem  reqInSymbols;
 
-          m_craSymbols += reqInSymbols.m_craSymbols;
-          m_minRbdcSymbols += reqInSymbols.m_minRbdcSymbols;
-          m_rbdcSymbols += reqInSymbols.m_rbdcSymbols;
-          m_vbdcSymbols += reqInSymbols.m_vbdcSymbols;
+          m_craSymbols += it->m_craSymbols;
+          m_minRbdcSymbols += it->m_minRbdcSymbols;
+          m_rbdcSymbols += it->m_rbdcSymbols;
+          m_vbdcSymbols += it->m_vbdcSymbols;
         }
 
       totalReqs.m_craSymbols = m_craSymbols;
@@ -165,7 +176,11 @@ public:
       totalReqs.m_vbdcSymbols = m_vbdcSymbols;
 
       return totalReqs;
+    }
 
+    double GetTotalSymbols ()
+    {
+      return (m_craSymbols + m_minRbdcSymbols + m_rbdcSymbols + m_vbdcSymbols);
     }
   };
 
@@ -187,7 +202,7 @@ public:
   };
 
   /**
-   * Construct SatFrameHelper
+   * Construct SatFrameAllocator
    * \param superFrameConf Super frame configuration
    * \param waveformConf Waveform configuration
    * \param maxRcCount Maximum number of the RCs
@@ -195,7 +210,7 @@ public:
   SatFrameAllocator (Ptr<SatSuperframeConf> superFrameConf, Ptr<SatWaveformConf> waveformConf, uint8_t maxRcCount);
 
   /**
-   * Destruct SatFrameHelper
+   * Destruct SatFrameAllocator
    */
   ~SatFrameAllocator ();
 
@@ -223,11 +238,18 @@ public:
    */
   void AllocateSymbols ();
 
+  /**
+   * Generate time slot for the UT/RC.
+   *
+   * \param tbtp TBTP message to add generated time slots.
+   */
+  void GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp);
+
 
 private:
 
   /**
-   * SatFrameInfo is used by SatFrameHelper to maintain information of a specific frame.
+   * SatFrameInfo is used by SatFrameAllocator to maintain information of a specific frame.
    */
   class SatFrameInfo
   {
@@ -260,11 +282,25 @@ private:
       void AllocateSymbols (double targetLoad, bool fcaEnabled);
 
       /**
+       * Generate time slots for UT/RC.
+       *
+       * \param tbtp TBTP message to add generated time slots.
+       */
+      void GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp);
+
+      /**
        * Get frame load by requested CC
        * \param ccLevel CC of the request
        * \return Load of the requested CC.
        */
       double GetCcLoad (CcLevel_t ccLevel);
+
+      /**
+       * Accept UT/RC requests of the frame according to given CC level.
+       *
+       * \param ccLevel CC level for the acceptance
+       */
+      void AcceptRequests (CcLevel_t ccLevel);
 
       /**
        * Allocate symbols to this frame, if criteria are fulfilled
@@ -274,7 +310,7 @@ private:
        * \param req Requested symbols
        * \return true allocation done, otherwise false
        */
-      bool Allocate (CcLevel_t ccLevel, Address address, SatFrameAllocInfo &req);
+      bool Allocate (CcLevel_t ccLevel, Address address, double cno, SatFrameAllocInfo &req);
 
       /**
        * Update RC/CC requested according to carrier limit
@@ -309,8 +345,12 @@ private:
       double GetSymbolRateInBauds () const { return m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();}
 
     private:
-      // first = request, second = allocation
-      typedef std::pair<SatFrameAllocInfo, SatFrameAllocInfo> UtAllocItem_t;
+      typedef struct
+      {
+        double              m_cno;
+        SatFrameAllocInfo   m_request;
+        SatFrameAllocInfo   m_allocation;
+      } UtAllocItem_t;
 
       // first = UT address, second = RC index
       typedef std::pair<Address, uint8_t>                     RcAllocItem_t;
@@ -340,15 +380,16 @@ private:
               switch (m_ccReqType)
               {
                 case CC_TYPE_MIN_RBDC:
-                  result = m_utAllocContainer.at(rcAlloc1.first).first.m_vbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).first.m_minRbdcSymbols;
+                  result = m_utAllocContainer.at(rcAlloc1.first).m_request.m_minRbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).m_request.m_minRbdcSymbols;
                   break;
 
                 case CC_TYPE_RBDC:
-                  result = m_utAllocContainer.at(rcAlloc1.first).first.m_rbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).first.m_rbdcSymbols;
+                  result = m_utAllocContainer.at(rcAlloc1.first).m_request.m_rbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).m_request.m_rbdcSymbols;
                   break;
 
                 case CC_TYPE_VBDC:
-                  result = m_utAllocContainer.at(rcAlloc1.first).first.m_vbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).first.m_vbdcSymbols;break;
+                  result = m_utAllocContainer.at(rcAlloc1.first).m_request.m_vbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).m_request.m_vbdcSymbols;
+                  break;
 
                 default:
                   NS_FATAL_ERROR ("Invalid CC type!!!");
@@ -402,10 +443,10 @@ private:
    * \param frames Information of the possibles frames to allocate.
    * \return
    */
-  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp, const SupportedFrameInfo_t &frames);
+  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp, const SupportedFrameInfo_t &frames);
 
 };
 
 } // namespace ns3
 
-#endif /* SAT_FRAME_HELPER_H */
+#endif /* SAT_FRAME_ALLOCATOR_H */

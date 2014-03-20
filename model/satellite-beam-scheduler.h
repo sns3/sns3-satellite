@@ -135,9 +135,6 @@ private:
       void AddCnoSample (double sample);
       double GetCnoEstimation ();
       void AddCrMsg (Ptr<SatCrMessage> crMsg);
-      void SetAllocated (uint8_t frameId, uint32_t waveformId);
-      void SetDeallocated ();
-      bool IsAllocated () const;
 
     private:
       typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
@@ -145,15 +142,14 @@ private:
       Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
       Ptr<SatCnoEstimator>  m_cnoEstimator; // Estimator for C/N0
       CrMsgContainer_t      m_crContainer;  // received CRs since last scheduling round.
-      bool                  m_isAllocated;  // Flag indicating, if UT is allocated to a frame
-      uint8_t               m_frameId;      // Id of the allocated frame
-      uint32_t              m_waveformId;   // Id of the waveform selected for the allocated frame
 
   };
 
   typedef std::pair<Address, Ptr<SatUtInfo> >   UtInfoItem_t;
   typedef std::map<Address, Ptr<SatUtInfo> >    UtInfoMap_t;
   typedef std::list<UtInfoItem_t>               UtSortedInfoContainer_t;
+
+  static const uint8_t  m_currentSequence = 0;  // only sequence 0 supported currently
 
   /**
    * ID of the beam
@@ -206,14 +202,14 @@ private:
   std::vector<uint32_t>::iterator m_currentCarrier;
 
   /**
-   * Time slot IDs of the currently used carrier.
+   * Time slot confs of the currently used carrier.
    */
-  SatFrameConf::SatTimeSlotIdContainer_t m_timeSlots;
+  SatFrameConf::SatTimeSlotConfContainer_t m_timeSlots;
 
   /**
    * Iterator of the currently used time slot id for time slot id list.
    */
-  SatFrameConf::SatTimeSlotIdContainer_t::iterator m_currentSlot;
+  SatFrameConf::SatTimeSlotConfContainer_t::iterator m_currentSlot;
 
   /**
    * Current frame id scheduled.
@@ -288,7 +284,7 @@ private:
   void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
   void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
   uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
-  uint16_t GetNextTimeSlot ();
+  Ptr<SatTimeSlotConf> GetNextTimeSlot ();
   static bool CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second);
 
   /**

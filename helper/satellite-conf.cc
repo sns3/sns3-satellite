@@ -268,28 +268,28 @@ SatConf::GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId
 }
 
 double
-SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType )
+SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType )
 {
-  NS_LOG_FUNCTION (this << chType << carrierId);
+  NS_LOG_FUNCTION (this << chType << carrierId << bandwidthType);
 
   double carrierBandwidthHz = 0.0;
 
   switch (chType)
   {
     case SatEnums::FORWARD_FEEDER_CH:
-      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidthType);
       break;
 
     case SatEnums::FORWARD_USER_CH:
-      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidthType);
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
-      carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidthType);
       break;
 
     case SatEnums::RETURN_USER_CH:
-      carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidhtType);
+      carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidthType);
       break;
 
     default:

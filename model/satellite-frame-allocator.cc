@@ -18,13 +18,14 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include <algorithm>
 #include <limits>
 #include "ns3/log.h"
 #include "ns3/double.h"
 #include "ns3/boolean.h"
 #include "satellite-frame-allocator.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatFrameHelper");
+NS_LOG_COMPONENT_DEFINE ("SatFrameAllocator");
 
 namespace ns3 {
 
@@ -63,7 +64,7 @@ SatFrameAllocator::SatFrameInfo::UpdateTotalRequests ()
 
   for (UtAllocContainer_t::iterator it = m_utAllocs.begin (); it != m_utAllocs.end (); it++)
     {
-      SatFrameAllocInfoItem utReqs = it->second.first.UpdateTotalReqs ();
+      SatFrameAllocInfoItem utReqs = it->second.m_request.UpdateTotalCounts ();
 
       totalReqs.m_craSymbols += utReqs.m_craSymbols;
       totalReqs.m_minRbdcSymbols += utReqs.m_minRbdcSymbols;
@@ -72,6 +73,42 @@ SatFrameAllocator::SatFrameInfo::UpdateTotalRequests ()
     }
 
   return totalReqs;
+}
+
+void
+SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
+{
+  NS_LOG_FUNCTION (this);
+
+  // sort UTs using random method.
+  std::vector<Address> uts;
+
+  for (UtAllocContainer_t::const_iterator it = m_utAllocs.begin (); it != m_utAllocs.end (); it++)
+    {
+      uts.push_back (it->first);
+    }
+
+  std::random_shuffle (uts.begin (), uts.end ());
+
+  // sort available carriers using random methods.
+  std::vector<uint32_t> carriers;
+
+  for ( uint32_t i = 0; i < m_frameConf->GetCarrierCount (); i++ )
+    {
+      carriers.push_back (i);
+    }
+
+  std::random_shuffle (carriers.begin (), carriers.end ());
+
+  std::vector<uint32_t>::const_iterator currentCarrier = carriers.begin ();
+
+  for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
+    {
+      // sort RCs in UT using random method.
+      std::random_shuffle (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.begin (), m_utAllocs[*it].m_allocation.m_allocInfoPerRc.end ());
+
+      // generate slots here
+    }
 }
 
 void
@@ -88,11 +125,6 @@ SatFrameAllocator::SatFrameInfo::AllocateSymbols (double targetLoad, bool fcaEna
     {
       NS_FATAL_ERROR ("target load must be between 0 and 1.");
     }
-
-  m_preAllocatedCraSymbols = 0;
-  m_preAllocatedMinRdbcSymbols = 0;
-  m_preAllocatedRdbcSymbols = 0;
-  m_preAllocatedVdbcSymbols = 0;
 }
 
 void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
@@ -106,18 +138,29 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
           // share additional VBDC resources
 
           // calculate how many symbols left over
-          double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols - m_preAllocatedVdbcSymbols;
+          double vbdcSymbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols - m_preAllocatedVdbcSymbols;
+
+          m_preAllocatedVdbcSymbols += vbdcSymbolsLeft;
 
           // sort RCs according to VBDC requests
           CcReqCompare vbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_VBDC);
           m_rcAllocs.sort (vbdcCompare);
 
+          AcceptRequests (CC_LEVEL_CRA_RBDC_VBDC);
+
+          uint32_t rcAllocsLeft = m_rcAllocs.size ();
+
           // do share by adding a share to all RC/VBDC allocations
-          for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
+          for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (vbdcSymbolsLeft > 0); it++)
             {
-              double symbolsToAdd = symbolsLeft / m_rcAllocs.size ();
-              m_utAllocs.at (it->first).second.m_vbdcSymbols += symbolsToAdd;
-              symbolsLeft -= symbolsToAdd;
+              double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
+              double symbolsToAdd = std::min<double> (freeUtSymbols, (vbdcSymbolsLeft / rcAllocsLeft));
+
+              m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols += symbolsToAdd;
+              m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
+
+              vbdcSymbolsLeft -= symbolsToAdd;
+              rcAllocsLeft--;
             }
         }
     }
@@ -126,18 +169,28 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
       // share VBDC resources
 
       // calculate how many symbols left over
-      double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols;
+      double vbdcSymbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols;
+      m_preAllocatedVdbcSymbols = vbdcSymbolsLeft;
 
       // sort RCs according to VBDC requests
       CcReqCompare vbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_VBDC);
       m_rcAllocs.sort (vbdcCompare);
 
+      AcceptRequests (CC_LEVEL_CRA_RBDC);
+
+      uint32_t rcAllocsLeft = m_rcAllocs.size ();
+
       // do share by setting a share to all RC/VBDC allocations
-      for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
+      for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (vbdcSymbolsLeft > 0); it++)
         {
-          double symbolsToAdd = symbolsLeft / m_rcAllocs.size ();
-          m_utAllocs.at (it->first).second.m_vbdcSymbols = symbolsToAdd;
-          symbolsLeft -= symbolsToAdd;
+          double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
+          double symbolsToAdd = std::min<double> (freeUtSymbols, (vbdcSymbolsLeft / rcAllocsLeft));
+
+          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols = symbolsToAdd;
+          m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
+
+          vbdcSymbolsLeft -= symbolsToAdd;
+          rcAllocsLeft--;
         }
     }
   else if ( (m_preAllocatedCraSymbols + m_preAllocatedMinRdbcSymbols) <= m_availableSymbolsInFrame )
@@ -145,20 +198,30 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
       // share RBDC resources
 
       // calculate how many symbols left over
-      double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedMinRdbcSymbols;
+      double rbdcSymbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedMinRdbcSymbols;
+
+      m_preAllocatedVdbcSymbols = 0;
+      m_preAllocatedRdbcSymbols = rbdcSymbolsLeft;
 
       // sort RCs according to RBDC requests
       CcReqCompare rbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_RBDC);
       m_rcAllocs.sort (rbdcCompare);
 
-      // do share by setting a share to all RC/RBDC allocations
-      for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
-        {
-          m_utAllocs.at (it->first).second.m_vbdcSymbols = 0;
+      AcceptRequests (CC_LEVEL_CRA_MIN_RBDC);
 
-          double symbolsToAdd = symbolsLeft / m_rcAllocs.size ();
-          m_utAllocs.at (it->first).second.m_rbdcSymbols = symbolsToAdd;
-          symbolsLeft -= symbolsToAdd;
+      uint32_t rcAllocsLeft = m_rcAllocs.size ();
+
+      // do share by setting a share to all RC/RBDC allocations
+      for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (rbdcSymbolsLeft > 0); it++)
+        {
+          double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
+          double symbolsToAdd = std::min<double> (freeUtSymbols, (rbdcSymbolsLeft / rcAllocsLeft));
+
+          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_rbdcSymbols = symbolsToAdd + m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols;
+          m_utAllocs.at (it->first).m_allocation.m_rbdcSymbols += symbolsToAdd + m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols;
+
+          rbdcSymbolsLeft -= symbolsToAdd;
+          rcAllocsLeft--;
         }
     }
   else if ( (m_preAllocatedCraSymbols) <= m_availableSymbolsInFrame )
@@ -166,26 +229,123 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
       // share minimum RBDC resources
 
       // calculate how many symbols left over
-      double symbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols;
+      double minRbdcSymbolsLeft = m_availableSymbolsInFrame - m_preAllocatedCraSymbols;
+
+      m_preAllocatedVdbcSymbols = 0;
+      m_preAllocatedRdbcSymbols = minRbdcSymbolsLeft;
+      m_preAllocatedMinRdbcSymbols = minRbdcSymbolsLeft;
 
       // sort RCs according to RBDC requests
       CcReqCompare minRbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_MIN_RBDC);
       m_rcAllocs.sort (minRbdcCompare);
 
-      // do share by setting a share to all RC/Minimum RBDC and RC/RBDC allocations
-      for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (symbolsLeft > 0); it++)
-        {
-          m_utAllocs.at (it->first).second.m_vbdcSymbols = 0;
+      AcceptRequests (CC_LEVEL_CRA);
 
-          double symbolsToAdd = symbolsLeft / m_rcAllocs.size ();
-          m_utAllocs.at (it->first).second.m_minRbdcSymbols = symbolsToAdd;
-          m_utAllocs.at (it->first).second.m_rbdcSymbols = symbolsToAdd;
-          symbolsLeft -= symbolsToAdd;
+      uint32_t rcAllocsLeft = m_rcAllocs.size ();
+
+      // do share by setting a share to all RC/Minimum RBDC and RC/RBDC allocations
+      for (RcAllocContainer_t::iterator it = m_rcAllocs.begin (); it != m_rcAllocs.end () && (minRbdcSymbolsLeft > 0); it++)
+        {
+          double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
+          double symbolsToAdd = std::min<double> (freeUtSymbols, (minRbdcSymbolsLeft / rcAllocsLeft));
+
+          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols = symbolsToAdd;
+          m_utAllocs.at (it->first).m_allocation.m_minRbdcSymbols += symbolsToAdd;
+
+          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_rbdcSymbols = symbolsToAdd;
+          m_utAllocs.at (it->first).m_allocation.m_rbdcSymbols += symbolsToAdd;
+
+          minRbdcSymbolsLeft -= symbolsToAdd;
+          rcAllocsLeft--;
         }
     }
   else
     {
       NS_FATAL_ERROR ("CRAs don't fit to frame CAC or configuration error???");
+    }
+}
+
+void
+SatFrameAllocator::SatFrameInfo::AcceptRequests (CcLevel_t ccLevel)
+{
+  NS_LOG_FUNCTION (this);
+
+  for ( UtAllocContainer_t::iterator it = m_utAllocs.begin (); it != m_utAllocs.end (); it++ )
+    {
+      // accept first UT level total requests by updating allocation counters
+      switch (ccLevel)
+      {
+        case SatFrameInfo::CC_LEVEL_CRA:
+          it->second.m_allocation.m_craSymbols = it->second.m_request.m_craSymbols;
+          it->second.m_allocation.m_minRbdcSymbols = 0.0;
+          it->second.m_allocation.m_rbdcSymbols = 0.0;
+          it->second.m_allocation.m_vbdcSymbols = 0.0;
+          break;
+
+        case SatFrameInfo::CC_LEVEL_CRA_MIN_RBDC:
+          it->second.m_allocation.m_craSymbols = it->second.m_request.m_craSymbols;
+          it->second.m_allocation.m_minRbdcSymbols = it->second.m_request.m_minRbdcSymbols;
+          it->second.m_allocation.m_rbdcSymbols = 0.0;
+          it->second.m_allocation.m_vbdcSymbols = 0.0;
+          break;
+
+        case SatFrameInfo::CC_LEVEL_CRA_RBDC:
+          it->second.m_allocation.m_craSymbols = it->second.m_request.m_craSymbols;
+          it->second.m_allocation.m_minRbdcSymbols = it->second.m_request.m_minRbdcSymbols;
+          it->second.m_allocation.m_rbdcSymbols = it->second.m_request.m_rbdcSymbols;
+          it->second.m_allocation.m_vbdcSymbols = 0.0;
+          break;
+
+        case SatFrameInfo::CC_LEVEL_CRA_RBDC_VBDC:
+          it->second.m_allocation.m_craSymbols = it->second.m_request.m_craSymbols;
+          it->second.m_allocation.m_minRbdcSymbols = it->second.m_request.m_minRbdcSymbols;
+          it->second.m_allocation.m_rbdcSymbols = it->second.m_request.m_rbdcSymbols;
+          it->second.m_allocation.m_vbdcSymbols = it->second.m_request.m_vbdcSymbols;
+          break;
+
+        default:
+          NS_FATAL_ERROR ("Not supported CC level!!!");
+          break;
+      }
+
+      // accept first RC specific requests by updating allocation counters
+      for ( uint32_t i = 0; i < it->second.m_request.m_allocInfoPerRc.size (); i++ )
+        {
+          switch (ccLevel)
+          {
+            case SatFrameInfo::CC_LEVEL_CRA:
+              it->second.m_allocation.m_allocInfoPerRc[i].m_craSymbols = it->second.m_request.m_allocInfoPerRc[i].m_craSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_minRbdcSymbols = 0.0;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_rbdcSymbols = 0.0;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_vbdcSymbols = 0.0;
+              break;
+
+            case SatFrameInfo::CC_LEVEL_CRA_MIN_RBDC:
+              it->second.m_allocation.m_allocInfoPerRc[i].m_craSymbols = it->second.m_request.m_allocInfoPerRc[i].m_craSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_minRbdcSymbols = it->second.m_request.m_allocInfoPerRc[i].m_minRbdcSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_rbdcSymbols = 0.0;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_vbdcSymbols = 0.0;
+              break;
+
+            case SatFrameInfo::CC_LEVEL_CRA_RBDC:
+              it->second.m_allocation.m_allocInfoPerRc[i].m_craSymbols = it->second.m_request.m_allocInfoPerRc[i].m_craSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_minRbdcSymbols = it->second.m_request.m_allocInfoPerRc[i].m_minRbdcSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_rbdcSymbols = it->second.m_request.m_allocInfoPerRc[i].m_rbdcSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_vbdcSymbols = 0.0;
+              break;
+
+            case SatFrameInfo::CC_LEVEL_CRA_RBDC_VBDC:
+              it->second.m_allocation.m_allocInfoPerRc[i].m_craSymbols = it->second.m_request.m_allocInfoPerRc[i].m_craSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_minRbdcSymbols = it->second.m_request.m_allocInfoPerRc[i].m_minRbdcSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_rbdcSymbols = it->second.m_request.m_allocInfoPerRc[i].m_rbdcSymbols;
+              it->second.m_allocation.m_allocInfoPerRc[i].m_vbdcSymbols = it->second.m_request.m_allocInfoPerRc[i].m_vbdcSymbols;
+              break;
+
+            default:
+              NS_FATAL_ERROR ("Not supported CC level!!!");
+              break;
+          }
+        }
     }
 }
 
@@ -219,7 +379,7 @@ SatFrameAllocator::SatFrameInfo::GetCcLoad (CcLevel_t ccLevel)
 }
 
 bool
-SatFrameAllocator::SatFrameInfo::Allocate (CcLevel_t ccLevel, Address address, SatFrameAllocInfo &req)
+SatFrameAllocator::SatFrameInfo::Allocate (CcLevel_t ccLevel, Address address, double cno, SatFrameAllocInfo &req)
 {
   NS_LOG_FUNCTION (this);
 
@@ -322,7 +482,11 @@ SatFrameAllocator::SatFrameInfo::Allocate (CcLevel_t ccLevel, Address address, S
       UpdateAllocReq (req);
 
       // add request and empty allocation info container
-      UtAllocItem_t utAlloc (req, SatFrameAllocInfo ());
+      UtAllocItem_t utAlloc;
+      utAlloc.m_request = req;
+      utAlloc.m_allocation = SatFrameAllocInfo (req.m_allocInfoPerRc.size ());
+      utAlloc.m_cno = cno;
+
       m_utAllocs.insert (std::make_pair (address, utAlloc));
 
       for (uint8_t i = 0; i < req.m_allocInfoPerRc.size (); i++)
@@ -348,6 +512,11 @@ SatFrameAllocator::SatFrameInfo::UpdateAllocReq (SatFrameAllocInfo &req)
     {
       double minRbdcSymbolsLeft = m_maxSymbolsPerCarrier - req.m_craSymbols;
 
+      // update UT total request
+      req.m_minRbdcSymbols = minRbdcSymbolsLeft;
+      req.m_rbdcSymbols = minRbdcSymbolsLeft;
+      req.m_vbdcSymbols = 0;
+
       // share symbols left between minimum RBDC requests in RCs in relation of the request
       for (SatFrameAllocInfoItemContainer_t::iterator it = req.m_allocInfoPerRc.begin (); it != req.m_allocInfoPerRc.end (); it++)
         {
@@ -360,6 +529,10 @@ SatFrameAllocator::SatFrameInfo::UpdateAllocReq (SatFrameAllocInfo &req)
     {
       double rbdcSymbolsLeft = m_maxSymbolsPerCarrier - req.m_craSymbols - req.m_minRbdcSymbols;
       double rbdcReqOverMinRbdc = req.m_rbdcSymbols - req.m_minRbdcSymbols;
+
+      // update UT total request
+      req.m_rbdcSymbols = rbdcSymbolsLeft;
+      req.m_vbdcSymbols = 0;
 
       if (rbdcReqOverMinRbdc > 0)
         {
@@ -376,6 +549,7 @@ SatFrameAllocator::SatFrameInfo::UpdateAllocReq (SatFrameAllocInfo &req)
   else if ( (m_maxSymbolsPerCarrier - req.m_craSymbols - req.m_rbdcSymbols - req.m_vbdcSymbols) < 0 )
     {
       double vbdcSymbolsLeft = m_maxSymbolsPerCarrier - req.m_craSymbols - req.m_rbdcSymbols;
+      req.m_vbdcSymbols = vbdcSymbolsLeft;
 
       // share symbols left over RBDC between VBDC requests in RCs in relation of the request
       for (SatFrameAllocInfoItemContainer_t::iterator it = req.m_allocInfoPerRc.begin (); it != req.m_allocInfoPerRc.end (); it++)
@@ -391,7 +565,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatFrameAllocator);
 TypeId
 SatFrameAllocator::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatFrameHelper")
+    static TypeId tid = TypeId ("ns3::SatFrameAllocator")
       .SetParent<Object> ()
       .AddAttribute ("TargetLoad",
                      "Target load limits upper bound of the symbols in a frame.",
@@ -455,6 +629,17 @@ SatFrameAllocator::RemoveAllocations ()
 }
 
 void
+SatFrameAllocator::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
+{
+  NS_LOG_FUNCTION (this);
+
+  for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
+    {
+      it->second.GenerateTimeSlots (tbtp);
+    }
+}
+
+void
 SatFrameAllocator::AllocateSymbols ()
 {
   NS_LOG_FUNCTION (this);
@@ -489,22 +674,22 @@ SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatF
   if ( supportedFrames.empty () == false )
     {
       // allocate with CC level CRA + RBDC + VBDC
-      allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC_VBDC, allocReq, allocResp, supportedFrames );
+      allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC_VBDC, cno, allocReq, allocResp, supportedFrames );
 
       if ( allocated == false )
         {
           // allocate with CC level CRA + RBDC
-          allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC, allocReq, allocResp, supportedFrames );
+          allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC, cno, allocReq, allocResp, supportedFrames );
 
           if ( allocated == false )
             {
               // allocate with CC level CRA + MIM RBDC
-              allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_MIN_RBDC, allocReq, allocResp, supportedFrames );
+              allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_MIN_RBDC, cno, allocReq, allocResp, supportedFrames );
 
               if ( allocated == false )
                 {
                   // allocate with CC level CRA
-                  allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA, allocReq, allocResp, supportedFrames );
+                  allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA, cno, allocReq, allocResp, supportedFrames );
                 }
             }
         }
@@ -514,7 +699,7 @@ SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatF
 }
 
 bool
-SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp, const SupportedFrameInfo_t &frames)
+SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp, const SupportedFrameInfo_t &frames)
 {
   double loadInSymbols = 0;
   uint8_t selectedFrame = 0;
@@ -545,7 +730,7 @@ SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameA
   // convert bytes to symbols based on wave form
   SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq.m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)), frameDuration );
 
-  if (m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq.m_address, reqSymbols))
+  if (m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq.m_address, cno, reqSymbols))
     {
       // initialize needed information for the selected frame
       allocResp.m_frameId = selectedFrame;

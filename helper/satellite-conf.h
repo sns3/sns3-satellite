@@ -176,10 +176,10 @@ public:
     *
     * \param chType    Type of channel.
     * \param carrierId Id of the carrier.
-    * \param bandwidhtType Type of the bandwidth.
+    * \param bandwidthType Type of the bandwidth.
     * \return bandwidth value
     */
-   double GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidhtType );
+   double GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType );
 
    /**
     * Definition for beam ID index (column) in m_conf

@@ -29,8 +29,10 @@
 #include "ns3/nstime.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
+
 #include "satellite-mac-tag.h"
 #include "satellite-enums.h"
+#include "ns3/satellite-frame-conf.h"
 
 namespace ns3 {
 
@@ -163,7 +165,7 @@ public:
    * Stored information is pair, which member first holds frame id
    * and member second holds time slot id.
    */
-  typedef std::vector< std::pair<uint8_t, uint16_t> >  DaTimeSlotInfoContainer_t;
+  typedef std::vector< std::pair<uint8_t, Ptr<SatTimeSlotConf> > >  DaTimeSlotInfoContainer_t;
 
   /**
    * Container for RA channel information
@@ -260,7 +262,7 @@ public:
    * \param frameID  Frame ID of the time slot
    * \param timeSlotId Id of the time slot
    */
-  void SetDaTimeslot (Mac48Address utId, uint8_t frameId, uint16_t timeSlotId);
+  void SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSlotConf> conf);
 
   /**
    * Get the information of the RA channels.
