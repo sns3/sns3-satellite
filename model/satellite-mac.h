@@ -38,6 +38,8 @@
 
 namespace ns3 {
 
+class Packet;
+
 /**
  * \ingroup satellite
   * \brief Base Mac class for Sat Net Devices.
@@ -170,6 +172,12 @@ protected:
   void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s);
 
   /**
+   * Invoke the `Rx` trace source for each received packet.
+   * \param packets Container of the pointers to the packets received.
+   */
+  void RxTraces (SatPhy::PacketContainer_t packets);
+
+  /**
    * The lower layer packet transmit callback.
    */
   SatMac::TransmitCallback m_txCallback;
@@ -190,7 +198,7 @@ protected:
   SatMac::WriteCtrlMsgCallback m_writeCtrlCallback;
 
   /**
-   * Trace callback used for packet tracing:
+   * Trace callback used for packet tracing.
    */
   TracedCallback< Time,
                   SatEnums::SatPacketEvent_t,
@@ -201,6 +209,12 @@ protected:
                   SatEnums::SatLinkDir_t,
                   std::string
                   > m_packetTrace;
+
+  /**
+   * Traced callback for all received packets, including the address of the
+   * senders.
+   */
+  TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
 
   /**
    * Node info containing node related information, such as

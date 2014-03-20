@@ -18,15 +18,16 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/mac48-address.h"
-#include "ns3/trace-source-accessor.h"
-#include "ns3/uinteger.h"
-#include "ns3/nstime.h"
-#include "ns3/pointer.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/packet.h>
+#include <ns3/trace-source-accessor.h>
+#include <ns3/uinteger.h>
+#include <ns3/nstime.h>
+#include <ns3/pointer.h>
+#include <ns3/satellite-mac-tag.h>
+#include <ns3/satellite-address-tag.h>
 #include "satellite-mac.h"
-#include "satellite-mac-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatMac");
 
@@ -43,6 +44,9 @@ SatMac::GetTypeId (void)
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatMac::m_packetTrace))
+    .AddTraceSource ("Rx",
+                     "A packet received",
+                     MakeTraceSourceAccessor (&SatMac::m_rxTrace))
   ;
   return tid;
 }
@@ -115,6 +119,42 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
 
   // Use call back to send packet to lower layer
   m_txCallback (packets, carrierId, duration, txInfo);
+}
+
+void
+SatMac::RxTraces (SatPhy::PacketContainer_t packets)
+{
+  NS_LOG_FUNCTION (this);
+
+  for (SatPhy::PacketContainer_t::const_iterator it1 = packets.begin ();
+       it1 != packets.end (); ++it1)
+    {
+      SatAddressTag tag;
+      bool isTagged = false;
+      ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+
+      while (!isTagged && it2.HasNext ())
+        {
+          ByteTagIterator::Item item = it2.Next ();
+          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+            {
+              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                 << " start=" << item.GetStart ()
+                                 << " end=" << item.GetEnd ());
+              item.GetTag (tag);
+              isTagged = true;
+            }
+        }
+
+      if (isTagged)
+        {
+          m_rxTrace (*it1, tag.GetSourceAddress ());
+        }
+      else
+        {
+          m_rxTrace (*it1, Address ()); // provide an invalid source address.
+        }
+    }
 }
 
 void

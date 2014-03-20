@@ -125,9 +125,11 @@ def build(bld):
         'stats/satellite-stats-fwd-app-delay-helper.cc',
         'stats/satellite-stats-fwd-app-throughput-helper.cc',
         'stats/satellite-stats-fwd-dev-throughput-helper.cc',
+        'stats/satellite-stats-fwd-mac-throughput-helper.cc',
         'stats/satellite-stats-rtn-app-delay-helper.cc',
         'stats/satellite-stats-rtn-app-throughput-helper.cc',
         'stats/satellite-stats-rtn-dev-throughput-helper.cc',
+        'stats/satellite-stats-rtn-mac-throughput-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
 
@@ -281,9 +283,11 @@ def build(bld):
         'stats/satellite-stats-fwd-app-delay-helper.h',
         'stats/satellite-stats-fwd-app-throughput-helper.h',
         'stats/satellite-stats-fwd-dev-throughput-helper.h',
+        'stats/satellite-stats-fwd-mac-throughput-helper.h',
         'stats/satellite-stats-rtn-app-delay-helper.h',
         'stats/satellite-stats-rtn-app-throughput-helper.h',
         'stats/satellite-stats-rtn-dev-throughput-helper.h',
+        'stats/satellite-stats-rtn-mac-throughput-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]
 

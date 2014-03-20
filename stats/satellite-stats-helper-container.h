@@ -48,6 +48,10 @@ namespace ns3 {
  * - AddPerGwFwdDevThroughput
  * - AddPerBeamFwdDevThroughput
  * - AddPerUtFwdDevThroughput
+ * - AddGlobalFwdMacThroughput
+ * - AddPerGwFwdMacThroughput
+ * - AddPerBeamFwdMacThroughput
+ * - AddPerUtFwdMacThroughput
  * - AddGlobalRtnAppDelay
  * - AddPerGwRtnAppDelay
  * - AddPerBeamRtnAppDelay
@@ -62,6 +66,10 @@ namespace ns3 {
  * - AddPerGwRtnDevThroughput
  * - AddPerBeamRtnDevThroughput
  * - AddPerUtRtnDevThroughput
+ * - AddGlobalRtnMacThroughput
+ * - AddPerGwRtnMacThroughput
+ * - AddPerBeamRtnMacThroughput
+ * - AddPerUtRtnMacThroughput
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -133,6 +141,9 @@ public:
   // Forward link device-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevThroughput)
 
+  // Forward link MAC-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacThroughput)
+
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
 
@@ -141,6 +152,9 @@ public:
 
   // Return link device-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevThroughput)
+
+  // Return link MAC-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacThroughput)
 
   /**
    * \param outputType an arbitrary output type.

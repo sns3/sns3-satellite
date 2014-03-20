@@ -472,6 +472,9 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                  SatEnums::LD_FORWARD,
                  SatUtils::GetPacketInfo (packets));
 
+  // Invoke the `Rx` trace source.
+  RxTraces (packets);
+
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
       // Remove packet tag

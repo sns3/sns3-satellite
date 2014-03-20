@@ -27,9 +27,11 @@
 #include <ns3/satellite-stats-fwd-app-delay-helper.h>
 #include <ns3/satellite-stats-fwd-app-throughput-helper.h>
 #include <ns3/satellite-stats-fwd-dev-throughput-helper.h>
+#include <ns3/satellite-stats-fwd-mac-throughput-helper.h>
 #include <ns3/satellite-stats-rtn-app-delay-helper.h>
 #include <ns3/satellite-stats-rtn-app-throughput-helper.h>
 #include <ns3/satellite-stats-rtn-dev-throughput-helper.h>
+#include <ns3/satellite-stats-rtn-mac-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
@@ -72,6 +74,10 @@ SatStatsHelperContainer::DoDispose ()
  * - PerGwFwdDevThroughput
  * - PerBeamFwdDevThroughput
  * - PerUtFwdDevThroughput
+ * - GlobalFwdMacThroughput
+ * - PerGwFwdMacThroughput
+ * - PerBeamFwdMacThroughput
+ * - PerUtFwdMacThroughput
  * - GlobalRtnAppDelay
  * - PerGwRtnAppDelay
  * - PerBeamRtnAppDelay
@@ -86,6 +92,10 @@ SatStatsHelperContainer::DoDispose ()
  * - PerGwRtnDevThroughput
  * - PerBeamRtnDevThroughput
  * - PerUtRtnDevThroughput
+ * - GlobalRtnMacThroughput
+ * - PerGwRtnMacThroughput
+ * - PerBeamRtnMacThroughput
+ * - PerUtRtnMacThroughput
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -171,6 +181,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDevThroughput,
                                         "forward link device-level throughput statistics")
 
+    // Forward link MAC-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdMacThroughput,
+                                        "forward link MAC-level throughput statistics")
+
     // Return link application-level packet delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppDelay,
                                                "return link application-level delay statistics")
@@ -188,6 +202,11 @@ SatStatsHelperContainer::GetTypeId ()
     // Return link device-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevThroughput,
                                         "return link device-level throughput statistics")
+
+    // Return link MAC-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnMacThroughput,
+                                        "return link MAC-level throughput statistics")
+
   ;
   return tid;
 }
@@ -235,6 +254,10 @@ SatStatsHelperContainer::GetName () const
  * - AddPerGwFwdDevThroughput
  * - AddPerBeamFwdDevThroughput
  * - AddPerUtFwdDevThroughput
+ * - AddGlobalFwdMacThroughput
+ * - AddPerGwFwdMacThroughput
+ * - AddPerBeamFwdMacThroughput
+ * - AddPerUtFwdMacThroughput
  * - AddGlobalRtnAppDelay
  * - AddPerGwRtnAppDelay
  * - AddPerBeamRtnAppDelay
@@ -245,10 +268,14 @@ SatStatsHelperContainer::GetName () const
  * - AddPerBeamRtnAppThroughput
  * - AddPerUtRtnAppThroughput
  * - AddPerUtUserRtnAppThroughput
- * - GlobalRtnDevThroughput
- * - PerGwRtnDevThroughput
- * - PerBeamRtnDevThroughput
- * - PerUtRtnDevThroughput
+ * - AddGlobalRtnDevThroughput
+ * - AddPerGwRtnDevThroughput
+ * - AddPerBeamRtnDevThroughput
+ * - AddPerUtRtnDevThroughput
+ * - AddGlobalRtnMacThroughput
+ * - AddPerGwRtnMacThroughput
+ * - AddPerBeamRtnMacThroughput
+ * - AddPerUtRtnMacThroughput
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -362,6 +389,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdDevThroughput, "fwd-dev-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdDevThroughput, "fwd-dev-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdDevThroughput, "fwd-dev-throughput")
 
+// Forward link MAC-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdMacThroughput, "fwd-mac-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdMacThroughput, "fwd-mac-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdMacThroughput, "fwd-mac-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdMacThroughput, "fwd-mac-throughput")
+
 // Return link application-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
@@ -381,6 +414,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnDevThroughput, "rtn-dev-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
+
+// Return link MAC-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnMacThroughput, "rtn-mac-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnMacThroughput, "rtn-mac-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnMacThroughput, "rtn-mac-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnMacThroughput, "rtn-mac-throughput")
 
 
 std::string // static
