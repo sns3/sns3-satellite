@@ -24,14 +24,9 @@
 #include <ns3/enum.h>
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-stats-throughput-helper.h>
 #include <ns3/satellite-stats-fwd-app-delay-helper.h>
-#include <ns3/satellite-stats-fwd-app-throughput-helper.h>
-#include <ns3/satellite-stats-fwd-dev-throughput-helper.h>
-#include <ns3/satellite-stats-fwd-mac-throughput-helper.h>
 #include <ns3/satellite-stats-rtn-app-delay-helper.h>
-#include <ns3/satellite-stats-rtn-app-throughput-helper.h>
-#include <ns3/satellite-stats-rtn-dev-throughput-helper.h>
-#include <ns3/satellite-stats-rtn-mac-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
