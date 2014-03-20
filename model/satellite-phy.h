@@ -351,6 +351,12 @@ protected:
                   > m_packetTrace;
 
   /**
+   * Traced callback for all received packets, including the address of the
+   * senders.
+   */
+  TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
+
+  /**
    * Node info containing node related information, such as
    * node type, node id and MAC address (of the SatNetDevice)
    */

@@ -34,42 +34,11 @@ namespace ns3 {
  * The macro definitions following this comment block are used to declare the
  * majority of methods in this class. Below is the list of the class methods
  * created using this C++ pre-processing approach.
- * - AddGlobalFwdAppDelay
- * - AddPerGwFwdAppDelay
- * - AddPerBeamFwdAppDelay
- * - AddPerUtFwdAppDelay
- * - AddPerUtUserFwdAppDelay
- * - AddGlobalFwdAppThroughput
- * - AddPerGwFwdAppThroughput
- * - AddPerBeamFwdAppThroughput
- * - AddPerUtFwdAppThroughput
- * - AddPerUtUserFwdAppThroughput
- * - AddGlobalFwdDevThroughput
- * - AddPerGwFwdDevThroughput
- * - AddPerBeamFwdDevThroughput
- * - AddPerUtFwdDevThroughput
- * - AddGlobalFwdMacThroughput
- * - AddPerGwFwdMacThroughput
- * - AddPerBeamFwdMacThroughput
- * - AddPerUtFwdMacThroughput
- * - AddGlobalRtnAppDelay
- * - AddPerGwRtnAppDelay
- * - AddPerBeamRtnAppDelay
- * - AddPerUtRtnAppDelay
- * - AddPerUtUserRtnAppDelay
- * - AddGlobalRtnAppThroughput
- * - AddPerGwRtnAppThroughput
- * - AddPerBeamRtnAppThroughput
- * - AddPerUtRtnAppThroughput
- * - AddPerUtUserRtnAppThroughput
- * - AddGlobalRtnDevThroughput
- * - AddPerGwRtnDevThroughput
- * - AddPerBeamRtnDevThroughput
- * - AddPerUtRtnDevThroughput
- * - AddGlobalRtnMacThroughput
- * - AddPerGwRtnMacThroughput
- * - AddPerBeamRtnMacThroughput
- * - AddPerUtRtnMacThroughput
+ *
+ * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
+ * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ *
  * Also check the Doxygen documentation of this class for more information.
  */
 
@@ -144,6 +113,9 @@ public:
   // Forward link MAC-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacThroughput)
 
+  // Forward link PHY-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyThroughput)
+
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
 
@@ -155,6 +127,9 @@ public:
 
   // Return link MAC-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacThroughput)
+
+  // Return link PHY-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
 
   /**
    * \param outputType an arbitrary output type.

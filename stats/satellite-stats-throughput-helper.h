@@ -61,12 +61,12 @@ public:
    * \brief Receive inputs from trace sources and determine the right collector
    *        to forward the inputs to.
    * \param packet received packet data.
-   * \param from the InetSocketAddress of the sender of the packet.
+   * \param from the address of the sender of the packet.
    *
-   * Used in return link statistics.
+   * Used in return link statistics. DoInstallProbes() is expected to connect
+   * the right trace sources to this method.
    */
-  virtual void ApplicationPacketCallback (Ptr<const Packet> packet,
-                                          const Address &from);
+  virtual void RxCallback (Ptr<const Packet> packet, const Address &from);
 
 protected:
   // inherited from SatStatsHelper base class
@@ -84,7 +84,8 @@ protected:
    * The address of the given node will be saved in the #m_identifierMap
    * member variable.
    *
-   * Used in return link statistics.
+   * Used in return link statistics. DoInstallProbes() is expected to pass the
+   * the UT node of interest into this method.
    */
   virtual void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
@@ -224,6 +225,47 @@ private:
 }; // end of class SatStatsFwdMacThroughputHelper
 
 
+// FORWARD LINK PHY-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward link PHY-level throughput statistics from a
+ *        satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdPhyThroughputHelper> s = Create<SatStatsFwdPhyThroughputHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ *
+ * \todo This statistics include control messages.
+ */
+class SatStatsFwdPhyThroughputHelper : public SatStatsThroughputHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdPhyThroughputHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsFwdPhyThroughputHelper ();
+
+protected:
+  // inherited from SatStatsThroughputHelper base class
+  virtual void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdPhyThroughputHelper
+
+
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
 /**
@@ -258,8 +300,7 @@ public:
    * \param packet received packet data.
    * \param from the InetSocketAddress of the sender of the packet.
    */
-  virtual void ApplicationPacketCallback (Ptr<const Packet> packet,
-                                          const Address &from);
+  void Ipv4Callback (Ptr<const Packet> packet, const Address &from);
 
 protected:
   // inherited from SatStatsThroughputHelper base class
@@ -351,6 +392,43 @@ protected:
   virtual void DoInstallProbes ();
 
 }; // end of class SatStatsRtnMacThroughputHelper
+
+
+// RETURN LINK PHY-LEVEL //////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return link PHY-level throughput statistics from a
+ *        satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnPhyThroughputHelper> s = Create<SatStatsRtnPhyThroughputHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ *
+ * \todo This statistics does not include control messages.
+ */
+class SatStatsRtnPhyThroughputHelper : public SatStatsThroughputHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnPhyThroughputHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsRtnPhyThroughputHelper ();
+
+protected:
+  // inherited from SatStatsThroughputHelper base class
+  virtual void DoInstallProbes ();
+
+}; // end of class SatStatsRtnPhyThroughputHelper
 
 
 } // end of namespace ns3

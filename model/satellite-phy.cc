@@ -18,22 +18,23 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/double.h"
-#include "ns3/uinteger.h"
-#include "ns3/pointer.h"
-#include "ns3/node.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/double.h>
+#include <ns3/uinteger.h>
+#include <ns3/pointer.h>
+#include <ns3/node.h>
 
-#include "satellite-utils.h"
 #include "satellite-phy.h"
-#include "satellite-phy-rx.h"
-#include "satellite-phy-tx.h"
-#include "satellite-channel.h"
-#include "satellite-mac.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-node-info.h"
-#include "satellite-enums.h"
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-signal-parameters.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-address-tag.h>
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhy");
@@ -102,6 +103,9 @@ SatPhy::GetTypeId (void)
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatPhy::m_packetTrace))
+    .AddTraceSource ("Rx",
+                     "A packet received",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxTrace))
   ;
   return tid;
 }
@@ -324,7 +328,42 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
   if (!phyError)
     {
       m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
-    }
+
+      // Invoke the `Rx` trace source.
+      SatSignalParameters::TransmitBuffer_t::const_iterator it1;
+      for (it1 = rxParams->m_packetsInBurst.begin ();
+           it1 != rxParams->m_packetsInBurst.end (); ++it1)
+        {
+          SatAddressTag tag;
+          bool isTagged = false;
+          ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+
+          while (!isTagged && it2.HasNext ())
+            {
+              ByteTagIterator::Item item = it2.Next ();
+              if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+                {
+                  NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                     << " start=" << item.GetStart ()
+                                     << " end=" << item.GetEnd ());
+                  item.GetTag (tag);
+                  isTagged = true;
+                }
+            }
+
+          if (isTagged)
+            {
+              m_rxTrace (*it1, tag.GetSourceAddress ());
+            }
+          else
+            {
+              m_rxTrace (*it1, Address ()); // provide an invalid source address.
+            }
+
+        } // end of `for (it1 = rxParams->m_packetsInBurst)`
+
+    } // end of `if (!phyError)`
+
 }
 
 void
