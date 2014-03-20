@@ -221,7 +221,17 @@ public:
    */
   inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator ) {m_sinrCalculate = sinrCalculator;}
 
+  /**
+   *
+   * \return
+   */
   Ptr<SatChannelEstimationErrorContainer> GetChannelEstimatorErrorContainer () const;
+
+  /**
+   *
+   * \return
+   */
+  bool AreCollidingRandomAccessPacketsAlwaysDropped () const;
 
 private:
 
@@ -245,6 +255,7 @@ private:
   Ptr<SatLinkResults> m_linkResults;
   double m_rxExtNoiseDensityDbwhz;
   bool m_enableIntfOutputTrace;
+  bool m_alwaysDropCollidingRandomAccessPackets;
 };
 
 } // namespace ns3

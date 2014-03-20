@@ -31,6 +31,7 @@
 #include "satellite-interference.h"
 #include "satellite-phy-rx-carrier-conf.h"
 #include <map>
+#include <list>
 
 namespace ns3 {
 
@@ -64,8 +65,10 @@ public:
     Ptr<SatSignalParameters> rxParams;
     Mac48Address destAddress;
     Mac48Address sourceAddress;
-    std::vector<uint16_t> otherReplicas;
+    uint16_t ownSlotId;
+    std::vector<uint16_t> slotIdsForOtherReplicas;
     bool hasCollision;
+    bool packetHasBeenProcessed;
   } crdsaPacketRxParams_s;
 
   /**
@@ -79,6 +82,8 @@ public:
     Mac48Address destAddress;
     Mac48Address sourceAddress;
     bool phyError;
+    uint16_t ownSlotId;
+    std::vector<uint16_t> slotIdsForOtherReplicas;
   } crdsaCombinedPacketRxParams_s;
 
   /**
@@ -241,20 +246,38 @@ private:
    * \brief
    * \return
    */
-  std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> > ProcessFrame ();
+  std::vector<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s> ProcessFrame ();
 
   /**
    *
+   * \param packet
+   * \param numOfPacketsForThisSlot
    * \return
    */
-  std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > FindReplicas ();
+  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
+                                                                             uint32_t numOfPacketsForThisSlot);
 
   /**
    *
-   * \param replicas
+   * \param
+   */
+  void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s);
+
+  /**
+   *
+   * \param packet
+   * \param iter
    * \return
    */
-  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s ProcessReplicas (std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas);
+  bool IsReplica (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
+
+  /**
+   *
+   * \param packet
+   * \param iter
+   * \return
+   */
+  bool HaveSameSlotIds (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
 
   /**
    *
@@ -270,7 +293,7 @@ private:
   /**
    * \brief
    */
-  std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> m_crdsaPacketContainer;
+  std::map<uint32_t, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> > m_crdsaPacketContainer;
 
   /**
    * \brief
@@ -413,7 +436,7 @@ private:
   /**
    * \brief A map of Rx params
    */
-  std::map <uint32_t, rxParams_s> m_rxParamsMap;
+  std::map <uint32_t, SatPhyRxCarrier::rxParams_s> m_rxParamsMap;
 
   /**
    * \brief Channel estimation error container

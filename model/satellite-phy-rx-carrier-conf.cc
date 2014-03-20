@@ -47,7 +47,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_constantErrorRate (),
   m_linkResults (),
   m_rxExtNoiseDensityDbwhz (0),
-  m_enableIntfOutputTrace (false)
+  m_enableIntfOutputTrace (false),
+  m_alwaysDropCollidingRandomAccessPackets (false)
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
@@ -66,7 +67,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
    m_constantErrorRate (0.0),
    m_linkResults (),
    m_rxExtNoiseDensityDbwhz (0),
-   m_enableIntfOutputTrace (false)
+   m_enableIntfOutputTrace (false),
+   m_alwaysDropCollidingRandomAccessPackets (false)
 {
 
 }
@@ -91,11 +93,16 @@ SatPhyRxCarrierConf::GetTypeId (void)
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableIntfOutputTrace),
                     MakeBooleanChecker ())
+    .AddAttribute( "AlwaysDropCollidingRandomAccessPackets",
+                   "Always drop colliding random access packets regardless of link result mapping",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatPhyRxCarrierConf::m_alwaysDropCollidingRandomAccessPackets),
+                    MakeBooleanChecker ())
     .AddAttribute( "ConstantErrorRatio",
                    "Constant error ratio",
-                   DoubleValue (0.01),
-                   MakeDoubleAccessor (&SatPhyRxCarrierConf::m_constantErrorRate),
-                   MakeDoubleChecker<double> ())
+                    DoubleValue (0.01),
+                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_constantErrorRate),
+                    MakeDoubleChecker<double> ())
     .AddConstructor<SatPhyRxCarrierConf> ()
   ;
   return tid;
@@ -196,6 +203,12 @@ Ptr<SatChannelEstimationErrorContainer>
 SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer () const
 {
   return m_channelEstimationError;
+}
+
+bool
+SatPhyRxCarrierConf::AreCollidingRandomAccessPacketsAlwaysDropped () const
+{
+  return m_alwaysDropCollidingRandomAccessPackets;
 }
 
 } // namespace ns3

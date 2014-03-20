@@ -33,13 +33,14 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (1);
   uint32_t packetSize (128);
   Time interval (Seconds(0.01));
-  Time simLength (Seconds(1.00));
+  Time simLength (Seconds(0.60));
   Time appStartTime = Seconds(0.01);
 
   // enable info logs
   LogComponentEnable ("sat-random-access-slotted-aloha-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
 
   // read command line parameters given by user
   CommandLine cmd;

@@ -56,7 +56,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_enableCompositeSinrOutputTrace (false),
    m_numOfOngoingRx (0),
    m_rxPacketCounter (0),
-   m_dropCollidingRandomAccessPackets (false)
+   m_dropCollidingRandomAccessPackets (carrierConf->AreCollidingRandomAccessPacketsAlwaysDropped ())
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -161,11 +161,17 @@ SatPhyRxCarrier::DoDispose ()
   m_satInterference = NULL;
   m_uniformVariable = NULL;
 
-  for (uint32_t i = 0; i < m_crdsaPacketContainer.size (); i++)
-    {
-      m_crdsaPacketContainer[i].rxParams = NULL;
-    }
+  std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter;
 
+  for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
+    {
+      std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList;
+      for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
+        {
+          iterList->rxParams = NULL;
+        }
+      iter->second.clear ();
+    }
   m_crdsaPacketContainer.clear ();
 
   Object::DoDispose ();
@@ -506,6 +512,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
       /// check for collisions
       params.hasCollision = m_satInterference->HasCollision (iter->second.interferenceEvent);
+      params.packetHasBeenProcessed = false;
 
       AddCrdsaPacket (params);
     }
@@ -546,7 +553,7 @@ SatPhyRxCarrier::DoFrameEnd ()
 
   if (m_crdsaPacketContainer.size () > 0)
     {
-      std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s, bool> > results = ProcessFrame ();
+      std::vector<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s> results = ProcessFrame ();
 
       if (m_crdsaPacketContainer.size () > 0)
         {
@@ -556,27 +563,27 @@ SatPhyRxCarrier::DoFrameEnd ()
       for (uint32_t i = 0; i < results.size (); i++)
         {
           /// uses composite sinr
-          m_packetTrace (results[i].first.rxParams,
+          m_packetTrace (results[i].rxParams,
                          m_ownAddress,
-                         results[i].first.destAddress,
-                         results[i].first.ifPower,
-                         results[i].first.cSinr);
+                         results[i].destAddress,
+                         results[i].ifPower,
+                         results[i].cSinr);
 
           /// send packet upwards
-          m_rxCallback (results[i].first.rxParams,
-                        results[i].second);
+          m_rxCallback (results[i].rxParams,
+                        results[i].phyError);
 
           /// uses composite sinr
           if (!m_cnoCallback.IsNull ())
             {
-              double cno = results[i].first.cSinr * m_rxBandwidthHz;
-              m_cnoCallback (results[i].first.rxParams->m_beamId,
-                             results[i].first.sourceAddress,
+              double cno = results[i].cSinr * m_rxBandwidthHz;
+              m_cnoCallback (results[i].rxParams->m_beamId,
+                             results[i].sourceAddress,
                              m_ownAddress,
                              cno);
             }
 
-          results[i].first.rxParams = NULL;
+          results[i].rxParams = NULL;
         }
 
       results.clear ();
@@ -830,8 +837,6 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
 
   NS_LOG_LOGIC ("SatPhyRxCarrier::AddCrdsaPacket - Time: " << Now ().GetSeconds ());
 
-  uint32_t slotId = 0;
-
   if (crdsaPacket.rxParams->m_packetsInBurst.size () > 0)
     {
       SatCrdsaReplicaTag replicaTag;
@@ -852,16 +857,16 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
         }
 
       /// The first slot ID is this replicas own slot ID
-      slotId = slotIds[0];
+      crdsaPacket.ownSlotId = slotIds[0];
 
-      if (crdsaPacket.otherReplicas.size () > 0)
+      if (crdsaPacket.slotIdsForOtherReplicas.size () > 0)
         {
           NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - Vector for packet replicas should be empty at this point");
         }
 
       for (uint32_t i = 1; i < slotIds.size (); i++)
         {
-          crdsaPacket.otherReplicas.push_back (slotIds[i]);
+          crdsaPacket.slotIdsForOtherReplicas.push_back (slotIds[i]);
         }
     }
   else
@@ -869,117 +874,278 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
       NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - CRDSA reception with 0 packets");
     }
 
-  std::pair<std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator,bool> result;
+  std::map<uint32_t, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator result;
 
-  result = m_crdsaPacketContainer.insert (std::make_pair(slotId,crdsaPacket));
+  result = m_crdsaPacketContainer.find (crdsaPacket.ownSlotId);
 
-  NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - Packet in slot " << slotId << " was added to the CRDSA packet container");
+  if (result == m_crdsaPacketContainer.end ())
+    {
+      std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> tempList;
+      tempList.push_back (crdsaPacket);
+      m_crdsaPacketContainer.insert (std::make_pair (crdsaPacket.ownSlotId, tempList));
+    }
+  else
+    {
+      result->second.push_back (crdsaPacket);
+    }
+
+  NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - Packet in slot " << crdsaPacket.ownSlotId << " was added to the CRDSA packet container");
 
   /// TODO this is for debugging purposes, it should be removed at later point
-  for (uint32_t i = 0; i < crdsaPacket.otherReplicas.size (); i++)
+  for (uint32_t i = 0; i < crdsaPacket.slotIdsForOtherReplicas.size (); i++)
     {
-      NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - A replica of the packet is in slot " << crdsaPacket.otherReplicas[i]);
+      NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - A replica of the packet is in slot " << crdsaPacket.slotIdsForOtherReplicas[i]);
     }
 }
 
-std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> >
+std::vector<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s>
 SatPhyRxCarrier::ProcessFrame ()
 {
   NS_LOG_FUNCTION (this);
 
   NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessFrame - Time: " << Now ().GetSeconds ());
 
-  std::vector<std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> > combinedPacketsForFrame;
+  std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter;
+  std::vector<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s> combinedPacketsForFrame;
+  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s processedPacket;
 
-  while (m_crdsaPacketContainer.size () > 0)
+  bool nothingToProcess = true;
+
+  do
     {
-      /// find all replicas for a single unique packet
-      std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas = FindReplicas ();
+      /// reset the flag
+      nothingToProcess = true;
 
-      /// process replicas
-      SatPhyRxCarrier::crdsaCombinedPacketRxParams_s combinedPacket = ProcessReplicas (replicas);
+      /// go through the packets
+      for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
+        {
+          if (iter->second.size () < 1)
+            {
+              NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessFrame - This should not happen");
+            }
 
-      /// add combined packet to the result vector
-      std::pair<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s,bool> processedPacket = std::make_pair (combinedPacket, combinedPacket.phyError);
+          std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList;
 
-      combinedPacketsForFrame.push_back (processedPacket);
+          for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
+            {
+              if (!iterList->packetHasBeenProcessed)
+                {
+                  /// process the received packet
+                  processedPacket = ProcessReceivedCrdsaPacket (*iterList, iter->second.size ());
+
+                  /// mark the packet as processed
+                  iterList->packetHasBeenProcessed = true;
+
+                  /// packet successfully received
+                  if (!processedPacket.phyError)
+                    {
+                      nothingToProcess = false;
+
+                      /// break the cycle
+                      break;
+                    }
+                }
+            }
+
+          /// successfully received packet found
+          if (!nothingToProcess)
+            {
+              break;
+            }
+        }
+
+      if (!nothingToProcess)
+        {
+          /// find and remove replicas of the received packet
+          FindAndRemoveReplicas (processedPacket);
+
+          /// save the the received packet
+          combinedPacketsForFrame.push_back (processedPacket);
+        }
+    } while (!nothingToProcess);
+
+  if (m_crdsaPacketContainer.size () > 0)
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessFrame - All packets were not processed");
     }
 
   return combinedPacketsForFrame;
 }
 
-std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> >
-SatPhyRxCarrier::FindReplicas ()
-{
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_LOGIC ("SatPhyRxCarrier::FindReplicas - Time: " << Now ().GetSeconds ());
-
-  std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas;
-  std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator crdsaPacket = m_crdsaPacketContainer.begin ();
-
-  if (crdsaPacket != m_crdsaPacketContainer.end ())
-    {
-      replicas.push_back (*crdsaPacket);
-
-      m_crdsaPacketContainer.erase (crdsaPacket);
-    }
-
-  for (uint32_t i = 0; i < crdsaPacket->second.otherReplicas.size (); i++)
-    {
-      std::map<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter;
-      iter = m_crdsaPacketContainer.find (crdsaPacket->second.otherReplicas[i]);
-
-      if (iter != m_crdsaPacketContainer.end ())
-        {
-          replicas.push_back (*iter);
-
-          m_crdsaPacketContainer.erase (iter);
-        }
-      else
-        {
-          NS_FATAL_ERROR ("SatPhyRxCarrier::FindReplicas - Replica was not found");
-        }
-    }
-
-  return replicas;
-}
-
 SatPhyRxCarrier::crdsaCombinedPacketRxParams_s
-SatPhyRxCarrier::ProcessReplicas (std::vector<std::pair<uint32_t,SatPhyRxCarrier::crdsaPacketRxParams_s> > replicas)
+SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s packet, uint32_t numOfPacketsForThisSlot)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessReplicas - Time: " << Now ().GetSeconds ());
+  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessSuccessfullyReceivedCrdsaPacket - Time: " << Now ().GetSeconds ());
 
-  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s combinedPacket;
+  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s processedPacket;
+
+  /// copy variable values
+  processedPacket.destAddress = packet.destAddress;
+  processedPacket.sourceAddress = packet.sourceAddress;
+  processedPacket.rxParams = packet.rxParams;
+  processedPacket.ownSlotId = packet.ownSlotId;
+
+  for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
+    {
+      processedPacket.slotIdsForOtherReplicas.push_back (packet.slotIdsForOtherReplicas[i]);
+    }
 
   /// TODO these need to be calculated
-  combinedPacket.cSinr = 10;
-  combinedPacket.ifPower = 5;
-  combinedPacket.destAddress = replicas[0].second.destAddress;
-  combinedPacket.sourceAddress = replicas[0].second.sourceAddress;
-  combinedPacket.rxParams = replicas[0].second.rxParams;
-  combinedPacket.phyError = true;
+  processedPacket.cSinr = 10;
+  processedPacket.ifPower = 5;
 
   if (m_dropCollidingRandomAccessPackets)
     {
-      for (uint32_t i = 0; i < replicas.size (); i++)
+      /// there is a collision
+      if (numOfPacketsForThisSlot > 1)
         {
-          if (!replicas[i].second.hasCollision)
+          /// not possible to have a successful reception
+          processedPacket.phyError = true;
+        }
+      else
+        {
+          /// check against link results
+          processedPacket.phyError = CheckAgainstLinkResults (processedPacket.cSinr,processedPacket.rxParams);
+        }
+    }
+  else
+    {
+      /// check against link results
+      processedPacket.phyError = CheckAgainstLinkResults (processedPacket.cSinr,processedPacket.rxParams);
+    }
+
+  packet.slotIdsForOtherReplicas.clear ();
+
+  return processedPacket;
+}
+
+void
+SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::FindAndRemoveReplicas - Time: " << Now ().GetSeconds ());
+
+  for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
+    {
+      /// get the vector of packets for processing
+      std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter;
+      iter = m_crdsaPacketContainer.find (packet.slotIdsForOtherReplicas[i]);
+
+      if (iter == m_crdsaPacketContainer.end ())
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - This should not happen");
+        }
+
+      std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList;
+
+      bool replicaFound = false;
+
+      /// TODO this functionality needs to be checked
+      for (iterList = iter->second.begin (); iterList != iter->second.end (); )
+        {
+          /// release packets in this slot for re-processing
+          iterList->packetHasBeenProcessed = false;
+
+          /// check for the same UT & same slots
+          if (IsReplica (packet, iterList))
             {
-              combinedPacket.phyError = false;
+              /// replica found for removal
+              replicaFound = true;
+              iter->second.erase (iterList++);
             }
+          else
+            {
+              ++iterList;
+            }
+        }
+
+      if (iter->second.size () < 1)
+        {
+          m_crdsaPacketContainer.erase (iter);
+        }
+
+      if (!replicaFound)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Replica not found");
+        }
+    }
+}
+
+bool
+SatPhyRxCarrier::IsReplica (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::IsReplica - Time: " << Now ().GetSeconds ());
+
+  bool isReplica = false;
+
+  if (iter->sourceAddress == packet.sourceAddress)
+    {
+      if (HaveSameSlotIds (packet, iter))
+        {
+          isReplica = true;
+        }
+    }
+  return isReplica;
+}
+
+bool
+SatPhyRxCarrier::HaveSameSlotIds (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatPhyRxCarrier::HaveSameSlotIds - Time: " << Now ().GetSeconds ());
+
+  std::set<uint16_t> firstSet;
+  std::set<uint16_t> secondSet;
+  std::set<uint16_t>::iterator firstSetIterator;
+  std::set<uint16_t>::iterator secondSetIterator;
+  bool HaveSameSlotIds = true;
+
+  firstSet.insert (packet.ownSlotId);
+  secondSet.insert (iter->ownSlotId);
+
+  /// sanity check
+  if (iter->slotIdsForOtherReplicas.size () != packet.slotIdsForOtherReplicas.size ())
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::HaveSameSlotIds - The amount of replicas does not match");
+    }
+
+  /// form sets
+  for (uint32_t i = 0; i < iter->slotIdsForOtherReplicas.size (); i++)
+    {
+      firstSet.insert (packet.slotIdsForOtherReplicas[i]);
+      secondSet.insert (iter->slotIdsForOtherReplicas[i]);
+    }
+
+  uint32_t numOfMatchingSlots = 0;
+
+  /// compare sets
+  for (firstSetIterator = firstSet.begin (); firstSetIterator != firstSet.end (); firstSetIterator++)
+    {
+      secondSetIterator = secondSet.find (*firstSetIterator);
+
+      if (secondSetIterator == secondSet.end ())
+        {
+          HaveSameSlotIds = false;
+        }
+      else
+        {
+          numOfMatchingSlots++;
         }
     }
 
-  for (uint32_t i = 0; i < replicas.size (); i++)
+  /// sanity check
+  if (!HaveSameSlotIds && numOfMatchingSlots > 0)
     {
-      replicas[replicas.size () - 1].second.rxParams = NULL;
-      replicas.pop_back ();
+      NS_FATAL_ERROR ("SatPhyRxCarrier::HaveSameSlotIds - Partially overlapping CRDSA slots");
     }
 
-  return combinedPacket;
+  return HaveSameSlotIds;
 }
 
 }
