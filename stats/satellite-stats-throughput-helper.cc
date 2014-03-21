@@ -336,8 +336,14 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes ()
             }
           else
             {
+              /*
+               * We're being tolerant here by only logging a warning, because
+               * not every kind of Application is equipped with the expected
+               * Rx trace source.
+               */
               NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                << " to the source application");
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
@@ -409,6 +415,11 @@ SatStatsFwdDevThroughputHelper::DoInstallProbes ()
             }
 
         } // end of `if (probe->ConnectByObject ("Rx", dev))`
+      else
+        {
+          NS_FATAL_ERROR ("Error connecting to Rx trace source of SatNetDevice"
+                          << " at node ID " << (*it)->GetId () << " device #2");
+        }
 
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
@@ -487,6 +498,11 @@ SatStatsFwdMacThroughputHelper::DoInstallProbes ()
                 }
 
             } // end of `if (probe->ConnectByObject ("Rx", satMac))`
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to Rx trace source of SatMac"
+                              << " at node ID " << (*it)->GetId () << " device #2");
+            }
 
         } // end of else of `if (satDev == 0)`
 
@@ -567,6 +583,11 @@ SatStatsFwdPhyThroughputHelper::DoInstallProbes ()
                 }
 
             } // end of `if (probe->ConnectByObject ("Rx", satPhy))`
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to Rx trace source of SatPhy"
+                              << " at node ID " << (*it)->GetId () << " device #2");
+            }
 
         } // end of else of `if (satDev == 0)`
 
@@ -623,6 +644,11 @@ SatStatsRtnAppThroughputHelper::DoInstallProbes ()
             }
           else
             {
+              /*
+               * We're being tolerant here by only logging a warning, because
+               * not every kind of Application is equipped with the expected
+               * Rx trace source.
+               */
               NS_LOG_WARN (this << " unable to connect with node ID " << (*it)->GetId ()
                                 << " application #" << i);
             }
@@ -763,9 +789,9 @@ SatStatsRtnDevThroughputHelper::DoInstallProbes ()
             }
           else
             {
-              NS_LOG_WARN (this << " unable to connect with node ID "
-                                << (*it)->GetId ()
-                                << " device #" << i);
+              NS_FATAL_ERROR ("Error connecting to Rx trace source of SatNetDevice"
+                              << " at node ID " << (*it)->GetId ()
+                              << " device #" << i);
             }
         }
     }
@@ -837,9 +863,9 @@ SatStatsRtnMacThroughputHelper::DoInstallProbes ()
                 }
               else
                 {
-                  NS_LOG_WARN (this << " unable to connect with node ID "
-                                    << (*it)->GetId ()
-                                    << " device #" << i);
+                  NS_FATAL_ERROR ("Error connecting to Rx trace source of SatMac"
+                                  << " at node ID " << (*it)->GetId ()
+                                  << " device #" << i);
                 }
 
             } // end of else of `if (satDev == 0)`
@@ -915,9 +941,9 @@ SatStatsRtnPhyThroughputHelper::DoInstallProbes ()
                 }
               else
                 {
-                  NS_LOG_WARN (this << " unable to connect with node ID "
-                                    << (*it)->GetId ()
-                                    << " device #" << i);
+                  NS_FATAL_ERROR ("Error connecting to Rx trace source of SatPhy"
+                                  << " at node ID " << (*it)->GetId ()
+                                  << " device #" << i);
                 }
 
             } // end of else of `if (satDev == 0)`
