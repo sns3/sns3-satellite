@@ -100,13 +100,13 @@ public:
   Time m_duration;
 
   /**
-   * The TX power in Watt. Equivalent Isotropically Radiated Power (EIRP).
+   * The TX power in Watts. Equivalent Isotropically Radiated Power (EIRP).
    *
    */
   double m_txPower_W;
 
   /**
-   * The RX power in Watt.
+   * The RX power in Watts.
    *
    */
   double m_rxPower_W;
@@ -127,9 +127,45 @@ public:
   SatEnums::ChannelType_t m_channelType;
 
   /**
-   * \brief Transmission information including packet type, modcod and waveform ID
+   * Transmission information including packet type, modcod and waveform ID
    */
   txInfo_s m_txInfo;
+
+  /**
+   * The RX power in the satellite in Watts.
+   *
+   */
+  double m_rxPowerInSatellite_W;
+
+  /**
+   * Interference power (I)
+   */
+  double m_ifPower_W;
+
+  /**
+   * Interference power in the satellite (I)
+   */
+  double m_ifPowerInSatellite_W;
+
+  /**
+   * Rx noise power in satellite
+   */
+  double m_rxNoisePowerInSatellite_W;
+
+  /**
+   * ACI interference power in satellite
+   */
+  double m_rxAciIfPowerInSatellite_W;
+
+  /**
+   * RX external noise power in satellite
+   */
+  double m_rxExtNoisePowerInSatellite_W;
+
+  /**
+   * Callback for SINR calculation
+   */
+  Callback<double, double> m_sinrCalculate;
 };
 
 

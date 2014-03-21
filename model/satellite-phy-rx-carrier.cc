@@ -373,13 +373,23 @@ SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
 
   DecreaseNumOfRxState (iter->second.rxParams->m_txInfo.packetType);
 
-  double ifPower = m_satInterference->Calculate (iter->second.interferenceEvent);
+  iter->second.rxParams->m_ifPower_W = m_satInterference->Calculate (iter->second.interferenceEvent);
+
+  /// save values for CRDSA receiver
+  iter->second.rxParams->m_ifPowerInSatellite_W = iter->second.rxParams->m_ifPower_W;
+  iter->second.rxParams->m_rxPowerInSatellite_W = iter->second.rxParams->m_rxPower_W;
+  iter->second.rxParams->m_rxNoisePowerInSatellite_W = m_rxNoisePowerW;
+  iter->second.rxParams->m_rxAciIfPowerInSatellite_W = m_rxAciIfPowerW;
+  iter->second.rxParams->m_rxExtNoisePowerInSatellite_W = m_rxExtNoisePowerW;
+  iter->second.rxParams->m_sinrCalculate = m_sinrCalculate;
 
   /// calculates sinr for 1st link
-  double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W, ifPower );
-
-  /// initializes composite sinr with 1st link sinr
-  double cSinr = sinr;
+  double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W,
+                                iter->second.rxParams->m_ifPower_W,
+                                m_rxNoisePowerW,
+                                m_rxAciIfPowerW,
+                                m_rxExtNoisePowerW,
+                                m_sinrCalculate);
 
   NS_ASSERT (m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && iter->second.rxParams->m_sinr == 0);
 
@@ -391,7 +401,7 @@ SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
   iter->second.rxParams->m_sinr = sinr;
 
   /// uses 1st link sinr
-  m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, ifPower, cSinr);
+  m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, sinr);
 
   m_satInterference->NotifyRxEnd (iter->second.interferenceEvent);
 
@@ -401,7 +411,7 @@ SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
   /// uses 1st link sinr
   if (!m_cnoCallback.IsNull ())
     {
-      double cno = cSinr * m_rxBandwidthHz;
+      double cno = sinr * m_rxBandwidthHz;
       m_cnoCallback (iter->second.rxParams->m_beamId, iter->second.sourceAddress, m_ownAddress, cno);
     }
 
@@ -430,22 +440,24 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
   NS_ASSERT (m_rxMode == SatPhyRxCarrierConf::NORMAL && iter->second.rxParams->m_sinr != 0);
 
-  double ifPower = m_satInterference->Calculate (iter->second.interferenceEvent);
+  iter->second.rxParams->m_ifPower_W = m_satInterference->Calculate (iter->second.interferenceEvent);
 
   if (iter->second.rxParams->m_txInfo.packetType != SatEnums::CRDSA_PACKET)
     {
       /// calculates sinr for 2nd link
-      double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W, ifPower );
-
-      /// initializes composite sinr with 2st link sinr. This value will be replaced in the following block
-      double cSinr = sinr;
+      double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W,
+                                    iter->second.rxParams->m_ifPower_W,
+                                    m_rxNoisePowerW,
+                                    m_rxAciIfPowerW,
+                                    m_rxExtNoisePowerW,
+                                    m_sinrCalculate);
 
       /// PHY transmission decoded successfully. Note, that at transparent satellite,
       /// all the transmissions are not decoded.
       bool phyError (false);
 
       /// calculate composite SINR
-      cSinr = CalculateCompositeSinr (sinr, iter->second.rxParams->m_sinr);
+      double cSinr = CalculateCompositeSinr (sinr, iter->second.rxParams->m_sinr);
 
       /**
        * Channel estimation error. Channel estimation error works in dB domain, thus we need
@@ -487,7 +499,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       iter->second.rxParams->m_sinr = sinr;
 
       /// uses composite sinr
-      m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, ifPower, cSinr);
+      m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, cSinr);
 
       /// send packet upwards
       m_rxCallback ( iter->second.rxParams, phyError );
@@ -730,21 +742,26 @@ SatPhyRxCarrier::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 double
-SatPhyRxCarrier::CalculateSinr (double rxPowerW, double ifPowerW)
+SatPhyRxCarrier::CalculateSinr (double rxPowerW,
+                                double ifPowerW,
+                                double rxNoisePowerW,
+                                double rxAciIfPowerW,
+                                double rxExtNoisePowerW,
+                                SatPhyRxCarrierConf::SinrCalculatorCallback sinrCalculate)
 {
   NS_LOG_FUNCTION (this << rxPowerW <<  ifPowerW);
 
-  if (  m_rxNoisePowerW <= 0 )
+  if (rxNoisePowerW <= 0.0)
     {
       NS_FATAL_ERROR ("Noise power must be greater than zero!!!");
     }
 
   // Calculate first SINR based on co-channel interference, Adjacent channel interference, noise and external noise
   // NOTE! ACI noise power and Ext noise power are set 0 by default and given as attributes by PHY object when used.
-  double sinr = rxPowerW / (ifPowerW +  m_rxNoisePowerW + m_rxAciIfPowerW + m_rxExtNoisePowerW);
+  double sinr = rxPowerW / (ifPowerW +  rxNoisePowerW + rxAciIfPowerW + rxExtNoisePowerW);
 
   // Call PHY calculator to composite C over I interference configured to PHY.
-  double finalSinr = m_sinrCalculate (sinr);
+  double finalSinr = sinrCalculate (sinr);
 
   return (finalSinr);
 }
@@ -754,17 +771,17 @@ SatPhyRxCarrier::CalculateCompositeSinr (double sinr1, double sinr2)
 {
   NS_LOG_FUNCTION (this << sinr1 << sinr2 );
 
-  if (  sinr1 <= 0 )
+  if (sinr1 <= 0.0)
     {
       NS_FATAL_ERROR ("SINR 1 must be greater than zero!!!");
     }
 
-  if (  sinr2 <= 0 )
+  if (sinr2 <= 0.0)
     {
       NS_FATAL_ERROR ("SINR 2 must be greater than zero!!!");
     }
 
-  return 1 / ( (1 / sinr1) + (1 / sinr2) );
+  return 1.0 / ( (1.0 / sinr1) + (1.0 / sinr2) );
 }
 
 void

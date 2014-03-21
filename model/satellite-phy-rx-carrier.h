@@ -204,12 +204,20 @@ private:
   void DoFrameEnd ();
 
   /**
-   * \brief
+   *
    * \param rxPowerW
-   * \param iPowerW
+   * \param ifPowerW
+   * \param rxNoisePowerW
+   * \param rxAciIfPowerW
+   * \param rxExtNoisePowerW
    * \return
    */
-  double CalculateSinr(double rxPowerW, double iPowerW);
+  double CalculateSinr (double rxPowerW,
+                        double ifPowerW,
+                        double rxNoisePowerW,
+                        double rxAciIfPowerW,
+                        double rxExtNoisePowerW,
+                        SatPhyRxCarrierConf::SinrCalculatorCallback sinrCalculate);
 
   /**
    * \brief
