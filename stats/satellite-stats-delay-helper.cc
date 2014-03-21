@@ -436,13 +436,137 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
             }
           else
             {
+              /*
+               * We're being tolerant here by only logging a warning, because
+               * not every kind of Application is equipped with the expected
+               * Rx trace source.
+               */
               NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                << " to the source application");
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
 
     } // end of `for (it = utUsers.Begin(); it != utUsers.End (); ++it)`
+
+} // end of `void DoInstallProbes ();`
+
+
+// FORWARD LINK PHY-LEVEL /////////////////////////////////////////////////////
+
+SatStatsFwdPhyDelayHelper::SatStatsFwdPhyDelayHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsDelayHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsFwdPhyDelayHelper::~SatStatsFwdPhyDelayHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+void
+SatStatsFwdPhyDelayHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+
+  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+    {
+      const int32_t utId = GetUtId (*it);
+      NS_ASSERT_MSG (utId > 0,
+                     "Node " << (*it)->GetId () << " is not a valid UT");
+      const uint32_t identifier = GetIdentifierForUt (*it);
+
+      // Create the probe.
+      std::ostringstream probeName;
+      probeName << utId;
+      Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
+      probe->SetName (probeName.str ());
+
+      /*
+       * Assuming that device #0 is for loopback device, device #1 is for
+       * subscriber network device, and device #2 is for satellite beam device.
+       */
+      NS_ASSERT ((*it)->GetNDevices () >= 3);
+      Ptr<NetDevice> dev = (*it)->GetDevice (2);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+
+      if (satDev == 0)
+        {
+          NS_LOG_WARN (this << " Node " << (*it)->GetId ()
+                            << " is not a valid UT");
+        }
+      else
+        {
+          Ptr<SatPhy> satPhy = satDev->GetPhy ();
+          NS_ASSERT (satPhy != 0);
+
+          // Connect the object to the probe.
+          if (probe->ConnectByObject ("RxDelay", satPhy))
+            {
+              // Connect the probe to the right collector.
+              bool ret = false;
+              switch (GetOutputType ())
+                {
+                case SatStatsHelper::OUTPUT_SCALAR_FILE:
+                case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                               "OutputSeconds",
+                                                               identifier,
+                                                               &ScalarCollector::TraceSinkDouble);
+                  break;
+
+                case SatStatsHelper::OUTPUT_SCATTER_FILE:
+                case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                               "OutputSeconds",
+                                                               identifier,
+                                                               &UnitConversionCollector::TraceSinkDouble);
+                  break;
+
+                case OUTPUT_HISTOGRAM_FILE:
+                case OUTPUT_HISTOGRAM_PLOT:
+                case OUTPUT_PDF_FILE:
+                case OUTPUT_PDF_PLOT:
+                case OUTPUT_CDF_FILE:
+                case OUTPUT_CDF_PLOT:
+                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                               "OutputSeconds",
+                                                               identifier,
+                                                               &DistributionCollector::TraceSinkDouble);
+                  break;
+
+                default:
+                  NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
+                  break;
+                }
+
+              if (ret)
+                {
+                  NS_LOG_INFO (this << " created probe " << probeName
+                                    << ", connected to collector " << identifier);
+                  m_probes.push_back (probe->GetObject<Probe> ());
+                }
+              else
+                {
+                  NS_LOG_WARN (this << " unable to connect probe " << probeName
+                                    << " to collector " << identifier);
+                }
+
+            } // end of `if (probe->ConnectByObject ("Rx", satPhy))`
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to Rx trace source of SatPhy"
+                              << " at node ID " << (*it)->GetId () << " device #2");
+            }
+
+        }
+
+    } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
 } // end of `void DoInstallProbes ();`
 
@@ -495,6 +619,11 @@ SatStatsRtnAppDelayHelper::DoInstallProbes ()
             }
           else
             {
+              /*
+               * We're being tolerant here by only logging a warning, because
+               * not every kind of Application is equipped with the expected
+               * Rx trace source.
+               */
               NS_LOG_WARN (this << " unable to connect with node ID " << (*it)->GetId ()
                                 << " application #" << i);
             }
@@ -612,6 +741,84 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
                         << " is not a valid UT user");
     }
 }
+
+
+// RETURN LINK PHY-LEVEL //////////////////////////////////////////////////////
+
+SatStatsRtnPhyDelayHelper::SatStatsRtnPhyDelayHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsDelayHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsRtnPhyDelayHelper::~SatStatsRtnPhyDelayHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+void
+SatStatsRtnPhyDelayHelper::DoInstallProbes ()
+{
+  // Create a map of UT addresses and identifiers.
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      SaveAddressAndIdentifier (*it);
+    }
+
+  // Connect to trace sources at GW nodes.
+
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  Callback<void, Time, const Address &> callback
+    = MakeCallback (&SatStatsRtnPhyDelayHelper::RxDelayCallback, this);
+
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    {
+      NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
+                         << " has " << (*it)->GetNDevices () << " devices");
+      /*
+       * Assuming that device #0 is for loopback device, device #(N-1) is for
+       * backbone network device, and devices #1 until #(N-2) are for satellite
+       * beam device.
+       */
+      for (uint32_t i = 1; i <= (*it)->GetNDevices ()-2; i++)
+        {
+          Ptr<NetDevice> dev = (*it)->GetDevice (i);
+          Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+
+          if (satDev == 0)
+            {
+              NS_LOG_WARN (this << " Node " << (*it)->GetId ()
+                                << " is not a valid GW");
+            }
+          else
+            {
+              Ptr<SatPhy> satPhy = satDev->GetPhy ();
+              NS_ASSERT (satPhy != 0);
+
+              // Connect the object to the probe.
+              if (satPhy->TraceConnectWithoutContext ("RxDelay", callback))
+                {
+                  NS_LOG_INFO (this << " successfully connected with node ID "
+                                    << (*it)->GetId ()
+                                    << " device #" << i);
+                }
+              else
+                {
+                  NS_FATAL_ERROR ("Error connecting to Rx trace source of SatPhy"
+                                  << " at node ID " << (*it)->GetId ()
+                                  << " device #" << i);
+                }
+
+            } // end of else of `if (satDev == 0)`
+
+        } // end of `for (uint32_t i = 1; i <= (*it)->GetNDevices ()-2; i++)`
+
+    } // end of `for (NodeContainer::Iterator it = gws)`
+
+} // end of `void DoInstallProbes ();`
 
 
 } // end of namespace ns3

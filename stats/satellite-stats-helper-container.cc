@@ -56,6 +56,7 @@ SatStatsHelperContainer::DoDispose ()
  * C++ pre-processing approach.
  *
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
+ * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Phy] Delay
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -133,6 +134,10 @@ SatStatsHelperContainer::GetTypeId ()
                                   "per UT user forward link application-level delay statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
+    // Forward link PHY-level packet delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdPhyDelay,
+                                        "forward link PHY-level delay statistics")
+
     // Forward link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput,
                                         "forward link application-level throughput statistics")
@@ -158,6 +163,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppDelay,
                                   "per UT user return link application-level delay statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
+    // Return link PHY-level packet delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyDelay,
+                                        "return link PHY-level delay statistics")
 
     // Return link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput,
@@ -212,6 +221,7 @@ SatStatsHelperContainer::GetName () const
  * created using this C++ pre-processing approach.
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -315,6 +325,12 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdAppDelay, "fwd-app-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdAppDelay, "fwd-app-delay")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (FwdAppDelay, "fwd-app-delay")
 
+// Forward link PHY-level packet delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdPhyDelay, "fwd-phy-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
+
 // Forward link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
@@ -346,6 +362,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppDelay, "rtn-app-delay")
+
+// Return link PHY-level packet delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnPhyDelay, "rtn-phy-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
 
 // Return link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")

@@ -144,6 +144,45 @@ private:
 }; // end of class SatStatsFwdAppDelayHelper
 
 
+// FORWARD LINK PHY-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward link PHY-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdPhyDelayHelper> s = Create<SatStatsFwdPhyDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdPhyDelayHelper : public SatStatsDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdPhyDelayHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsFwdPhyDelayHelper ();
+
+protected:
+  // inherited from SatStatsDelayHelper base class
+  virtual void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdPhyDelayHelper
+
+
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
 /**
@@ -200,7 +239,42 @@ private:
 }; // end of class SatStatsRtnAppDelayHelper
 
 
+// RETURN LINK PHY-LEVEL //////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return link PHY-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnPhyDelayHelper> s = Create<SatStatsRtnPhyDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnPhyDelayHelper : public SatStatsDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnPhyDelayHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsRtnPhyDelayHelper ();
+
+protected:
+  // inherited from SatStatsDelayHelper base class
+  virtual void DoInstallProbes ();
+
+}; // end of class SatStatsRtnPhyDelayHelper
+
+
 } // end of namespace ns3
 
 
-#endif /* SATELLITE_STATS_FWD_APP_DELAY_HELPER_H */
+#endif /* SATELLITE_STATS_DELAY_HELPER_H */
