@@ -18,12 +18,17 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/tag.h"
-#include "ns3/uinteger.h"
-
 #include "satellite-time-tag.h"
 
 namespace ns3 {
+
+/*
+ * There are 4 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
+ * and SatDevTimeTag. Except of the name difference, they share exactly the
+ * same definitions.
+ */
+
+// LLC ////////////////////////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatTimeTag);
 
@@ -33,10 +38,8 @@ SatTimeTag::SatTimeTag ()
   // Nothing to do here
 }
 
-
 SatTimeTag::SatTimeTag (Time senderTimestamp)
   : m_senderTimestamp (senderTimestamp)
-
 {
   // Nothing to do here
 }
@@ -74,7 +77,7 @@ SatTimeTag::Deserialize (TagBuffer i)
 {
   int64_t senderTimestamp;
   i.Read ((uint8_t *)&senderTimestamp, 8);
-  m_senderTimestamp   = NanoSeconds (senderTimestamp);
+  m_senderTimestamp = NanoSeconds (senderTimestamp);
 }
 
 void
@@ -82,6 +85,232 @@ SatTimeTag::Print (std::ostream &os) const
 {
   os << m_senderTimestamp;
 }
+
+Time
+SatTimeTag::GetSenderTimestamp (void) const
+{
+  return m_senderTimestamp;
+}
+
+void
+SatTimeTag::SetSenderTimestamp (Time senderTimestamp)
+{
+  this->m_senderTimestamp = senderTimestamp;
+}
+
+
+// PHY ////////////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatPhyTimeTag);
+
+SatPhyTimeTag::SatPhyTimeTag ()
+  : m_senderTimestamp (Seconds (0))
+{
+  // Nothing to do here
+}
+
+SatPhyTimeTag::SatPhyTimeTag (Time senderTimestamp)
+  : m_senderTimestamp (senderTimestamp)
+{
+  // Nothing to do here
+}
+
+TypeId
+SatPhyTimeTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatPhyTimeTag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatPhyTimeTag> ();
+  return tid;
+}
+
+TypeId
+SatPhyTimeTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+SatPhyTimeTag::GetSerializedSize (void) const
+{
+  return sizeof(Time);
+}
+
+void
+SatPhyTimeTag::Serialize (TagBuffer i) const
+{
+  int64_t senderTimestamp = m_senderTimestamp.GetNanoSeconds ();
+  i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
+}
+
+void
+SatPhyTimeTag::Deserialize (TagBuffer i)
+{
+  int64_t senderTimestamp;
+  i.Read ((uint8_t *)&senderTimestamp, 8);
+  m_senderTimestamp = NanoSeconds (senderTimestamp);
+}
+
+void
+SatPhyTimeTag::Print (std::ostream &os) const
+{
+  os << m_senderTimestamp;
+}
+
+Time
+SatPhyTimeTag::GetSenderTimestamp (void) const
+{
+  return m_senderTimestamp;
+}
+
+void
+SatPhyTimeTag::SetSenderTimestamp (Time senderTimestamp)
+{
+  this->m_senderTimestamp = senderTimestamp;
+}
+
+
+// MAC ////////////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatMacTimeTag);
+
+SatMacTimeTag::SatMacTimeTag ()
+  : m_senderTimestamp (Seconds (0))
+{
+  // Nothing to do here
+}
+
+SatMacTimeTag::SatMacTimeTag (Time senderTimestamp)
+  : m_senderTimestamp (senderTimestamp)
+{
+  // Nothing to do here
+}
+
+TypeId
+SatMacTimeTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatMacTimeTag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatMacTimeTag> ();
+  return tid;
+}
+
+TypeId
+SatMacTimeTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+SatMacTimeTag::GetSerializedSize (void) const
+{
+  return sizeof(Time);
+}
+
+void
+SatMacTimeTag::Serialize (TagBuffer i) const
+{
+  int64_t senderTimestamp = m_senderTimestamp.GetNanoSeconds ();
+  i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
+}
+
+void
+SatMacTimeTag::Deserialize (TagBuffer i)
+{
+  int64_t senderTimestamp;
+  i.Read ((uint8_t *)&senderTimestamp, 8);
+  m_senderTimestamp = NanoSeconds (senderTimestamp);
+}
+
+void
+SatMacTimeTag::Print (std::ostream &os) const
+{
+  os << m_senderTimestamp;
+}
+
+Time
+SatMacTimeTag::GetSenderTimestamp (void) const
+{
+  return m_senderTimestamp;
+}
+
+void
+SatMacTimeTag::SetSenderTimestamp (Time senderTimestamp)
+{
+  this->m_senderTimestamp = senderTimestamp;
+}
+
+
+// DEV ////////////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatDevTimeTag);
+
+SatDevTimeTag::SatDevTimeTag ()
+  : m_senderTimestamp (Seconds (0))
+{
+  // Nothing to do here
+}
+
+SatDevTimeTag::SatDevTimeTag (Time senderTimestamp)
+  : m_senderTimestamp (senderTimestamp)
+{
+  // Nothing to do here
+}
+
+TypeId
+SatDevTimeTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatDevTimeTag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatDevTimeTag> ();
+  return tid;
+}
+
+TypeId
+SatDevTimeTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+SatDevTimeTag::GetSerializedSize (void) const
+{
+  return sizeof(Time);
+}
+
+void
+SatDevTimeTag::Serialize (TagBuffer i) const
+{
+  int64_t senderTimestamp = m_senderTimestamp.GetNanoSeconds ();
+  i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
+}
+
+void
+SatDevTimeTag::Deserialize (TagBuffer i)
+{
+  int64_t senderTimestamp;
+  i.Read ((uint8_t *)&senderTimestamp, 8);
+  m_senderTimestamp = NanoSeconds (senderTimestamp);
+}
+
+void
+SatDevTimeTag::Print (std::ostream &os) const
+{
+  os << m_senderTimestamp;
+}
+
+Time
+SatDevTimeTag::GetSenderTimestamp (void) const
+{
+  return m_senderTimestamp;
+}
+
+void
+SatDevTimeTag::SetSenderTimestamp (Time senderTimestamp)
+{
+  this->m_senderTimestamp = senderTimestamp;
+}
+
 
 } // namespace ns3
 

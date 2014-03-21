@@ -21,19 +21,22 @@
 #ifndef SATELLITE_TIME_TAG_H
 #define SATELLITE_TIME_TAG_H
 
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
+#include <ns3/tag.h>
+#include <ns3/nstime.h>
 
 
 namespace ns3 {
 
-class Tag;
+/*
+ * There are 4 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
+ * and SatDevTimeTag. Except of the name difference, they share exactly the
+ * same definitions.
+ */
 
 /**
  * \ingroup satellite
- * \brief Time tag used to identify the time when packet is
- * enqued.
- *
+ * \brief Time tag used to identify the time when packet is enqueued at LLC
+ *        level.
  */
 class SatTimeTag : public Tag
 {
@@ -49,20 +52,98 @@ public:
   virtual uint32_t  GetSerializedSize () const;
   virtual void Print (std::ostream &os) const;
 
-  Time  GetSenderTimestamp (void) const
-  {
-    return m_senderTimestamp;
-  }
-
-  void  SetSenderTimestamp (Time senderTimestamp)
-  {
-    this->m_senderTimestamp = senderTimestamp;
-  }
+  Time GetSenderTimestamp (void) const;
+  void SetSenderTimestamp (Time senderTimestamp);
 
 private:
   Time m_senderTimestamp;
 
 };
+
+
+/**
+ * \ingroup satellite
+ * \brief Time tag used to identify the time when packet is enqueued at PHY
+ *        level.
+ */
+class SatPhyTimeTag : public Tag
+{
+public:
+  static TypeId  GetTypeId (void);
+  virtual TypeId  GetInstanceTypeId (void) const;
+
+  SatPhyTimeTag ();
+  SatPhyTimeTag (Time senderTimestamp);
+
+  virtual void  Serialize (TagBuffer i) const;
+  virtual void  Deserialize (TagBuffer i);
+  virtual uint32_t  GetSerializedSize () const;
+  virtual void Print (std::ostream &os) const;
+
+  Time GetSenderTimestamp (void) const;
+  void SetSenderTimestamp (Time senderTimestamp);
+
+private:
+  Time m_senderTimestamp;
+
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief Time tag used to identify the time when packet is enqueued at MAC
+ *        level.
+ */
+class SatMacTimeTag : public Tag
+{
+public:
+  static TypeId  GetTypeId (void);
+  virtual TypeId  GetInstanceTypeId (void) const;
+
+  SatMacTimeTag ();
+  SatMacTimeTag (Time senderTimestamp);
+
+  virtual void  Serialize (TagBuffer i) const;
+  virtual void  Deserialize (TagBuffer i);
+  virtual uint32_t  GetSerializedSize () const;
+  virtual void Print (std::ostream &os) const;
+
+  Time GetSenderTimestamp (void) const;
+  void SetSenderTimestamp (Time senderTimestamp);
+
+private:
+  Time m_senderTimestamp;
+
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief Time tag used to identify the time when packet is enqueued at device
+ *        level.
+ */
+class SatDevTimeTag : public Tag
+{
+public:
+  static TypeId  GetTypeId (void);
+  virtual TypeId  GetInstanceTypeId (void) const;
+
+  SatDevTimeTag ();
+  SatDevTimeTag (Time senderTimestamp);
+
+  virtual void  Serialize (TagBuffer i) const;
+  virtual void  Deserialize (TagBuffer i);
+  virtual uint32_t  GetSerializedSize () const;
+  virtual void Print (std::ostream &os) const;
+
+  Time GetSenderTimestamp (void) const;
+  void SetSenderTimestamp (Time senderTimestamp);
+
+private:
+  Time m_senderTimestamp;
+
+};
+
 
 } //namespace ns3
 
