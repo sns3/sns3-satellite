@@ -149,8 +149,8 @@ SatFrameConf::GetTimeSlotConf (uint16_t index) const
   NS_LOG_FUNCTION (this);
 
   Ptr<SatTimeSlotConf> foundTimeSlot = NULL;
-  uint32_t carrierId = index / m_timeSlotConfMap.size ();
-  uint16_t timeSlotIndex = index % m_timeSlotConfMap.size ();
+  uint32_t carrierId = index / m_timeSlotConfMap.begin ()->second.size ();
+  uint16_t timeSlotIndex = index % m_timeSlotConfMap.begin ()->second.size ();
 
   SatTimeSlotConfMap_t::const_iterator foundCarrier = m_timeSlotConfMap.find (carrierId);
 
