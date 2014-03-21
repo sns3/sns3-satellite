@@ -123,8 +123,7 @@ def build(bld):
         'helper/satellite-ut-helper.cc',
         'helper/satellite-wave-form-conf.cc',
         'stats/satellite-stats-helper.cc',
-        'stats/satellite-stats-fwd-app-delay-helper.cc',
-        'stats/satellite-stats-rtn-app-delay-helper.cc',
+        'stats/satellite-stats-delay-helper.cc',
         'stats/satellite-stats-throughput-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
@@ -277,8 +276,7 @@ def build(bld):
         'helper/satellite-ut-helper.h',
         'helper/satellite-wave-form-conf.h',
         'stats/satellite-stats-helper.h',
-        'stats/satellite-stats-fwd-app-delay-helper.h',
-        'stats/satellite-stats-rtn-app-delay-helper.h',
+        'stats/satellite-stats-delay-helper.h',
         'stats/satellite-stats-throughput-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]

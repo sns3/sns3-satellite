@@ -19,57 +19,69 @@
  *
  */
 
-#include "satellite-stats-rtn-app-delay-helper.h"
 #include <ns3/log.h>
 #include <ns3/nstime.h>
 #include <ns3/enum.h>
 #include <ns3/string.h>
 #include <ns3/boolean.h>
 #include <ns3/callback.h>
+
 #include <ns3/node-container.h>
-#include <ns3/inet-socket-address.h>
 #include <ns3/application.h>
+#include <ns3/inet-socket-address.h>
 #include <ns3/ipv4.h>
+#include <ns3/mac48-address.h>
 #include <ns3/net-device.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-phy.h>
+
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/singleton.h>
+
 #include <ns3/data-collection-object.h>
+#include <ns3/probe.h>
+#include <ns3/application-delay-probe.h>
 #include <ns3/unit-conversion-collector.h>
 #include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/gnuplot-aggregator.h>
-#include <sstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsRtnAppDelayHelper");
+#include <sstream>
+#include "satellite-stats-delay-helper.h"
+
+NS_LOG_COMPONENT_DEFINE ("SatStatsDelayHelper");
 
 
 namespace ns3 {
 
-SatStatsRtnAppDelayHelper::SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHelper)
+SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsRtnAppDelayHelper::~SatStatsRtnAppDelayHelper ()
+SatStatsDelayHelper::~SatStatsDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 void
-SatStatsRtnAppDelayHelper::DoInstall ()
+SatStatsDelayHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
   switch (GetOutputType ())
     {
-    case OUTPUT_NONE:
+    case SatStatsHelper::OUTPUT_NONE:
       NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
-    case OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -89,7 +101,7 @@ SatStatsRtnAppDelayHelper::DoInstall ()
         break;
       }
 
-    case OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -107,9 +119,9 @@ SatStatsRtnAppDelayHelper::DoInstall ()
         break;
       }
 
-    case OUTPUT_HISTOGRAM_FILE:
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -142,12 +154,12 @@ SatStatsRtnAppDelayHelper::DoInstall ()
         break;
       }
 
-    case OUTPUT_SCALAR_PLOT:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       /// \todo Add support for boxes in Gnuplot.
       NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
       break;
 
-    case OUTPUT_SCATTER_PLOT:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
@@ -174,9 +186,9 @@ SatStatsRtnAppDelayHelper::DoInstall ()
         break;
       }
 
-    case OUTPUT_HISTOGRAM_PLOT:
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_PLOT:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
@@ -216,78 +228,56 @@ SatStatsRtnAppDelayHelper::DoInstall ()
       }
 
     default:
-      NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
+      NS_FATAL_ERROR ("SatStatsDelayHelper - Invalid output type");
       break;
-
-    } // end of switch (GetOutputType ())
-
-  // Create a map of UT user addresses and identifiers.
-  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
-  for (NodeContainer::Iterator it = utUsers.Begin ();
-       it != utUsers.End (); ++it)
-    {
-      SaveIpv4AddressAndIdentifier (*it);
     }
 
-  // Connect to trace sources at GW user node's applications.
-
-  NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  Callback<void, Time, const Address &> callback
-    = MakeCallback (&SatStatsRtnAppDelayHelper::ApplicationDelayCallback, this);
-
-  for (NodeContainer::Iterator it = gwUsers.Begin ();
-       it != gwUsers.End (); ++it)
-    {
-      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
-        {
-          Ptr<Application> app = (*it)->GetApplication (i);
-
-          if (app->TraceConnectWithoutContext ("RxDelay", callback))
-            {
-              NS_LOG_INFO (this << " successfully connected with node ID " << (*it)->GetId ()
-                                << " application #" << i);
-            }
-          else
-            {
-              NS_LOG_WARN (this << " unable to connect with node ID " << (*it)->GetId ()
-                                << " application #" << i);
-            }
-        }
-    }
+  // Setup probes and connect them to the collectors.
+  InstallProbes ();
 
 } // end of `void DoInstall ();`
 
 
 void
-SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
-                                                     const Address &from)
+SatStatsDelayHelper::InstallProbes ()
 {
-  //NS_LOG_FUNCTION (this << Time.GetSeconds () << from);
+  // The method below is supposed to be implemented by the child class.
+  DoInstallProbes ();
+}
 
-  if (InetSocketAddress::IsMatchingType (from))
+
+void
+SatStatsDelayHelper::RxDelayCallback (Time delay, const Address &from)
+{
+  //NS_LOG_FUNCTION (this << packet->GetSize () << from);
+
+  if (from.IsInvalid ())
+    {
+      NS_LOG_WARN (this << " discarding a packet delay of " << delay.GetSeconds ()
+                        << " from statistics collection because of"
+                        << " invalid sender address");
+    }
+  else
     {
       // Determine the identifier associated with the sender address.
-      const Address ipv4Addr = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
-      std::map<const Address, uint32_t>::const_iterator it1 = m_identifierMap.find (ipv4Addr);
+      const Address addr = Mac48Address::ConvertFrom (from);
+      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (addr);
 
-      if (it1 == m_identifierMap.end ())
+      if (it == m_identifierMap.end ())
         {
           NS_LOG_WARN (this << " discarding a packet delay of " << delay.GetSeconds ()
                             << " from statistics collection because of"
-                            << " unknown sender IPV4 address " << ipv4Addr);
+                            << " unknown sender address " << addr);
         }
       else
         {
           // Find the collector with the right identifier.
-          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it1->second);
+          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
           NS_ASSERT_MSG (collector != 0,
-                         "Unable to find collector with identifier " << it1->second);
+                         "Unable to find collector with identifier " << it->second);
 
           switch (GetOutputType ())
             {
-            case OUTPUT_NONE:
-              break;
-
             case OUTPUT_SCALAR_FILE:
             case OUTPUT_SCALAR_PLOT:
               {
@@ -320,7 +310,259 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
               }
 
             default:
-              NS_FATAL_ERROR ("SatStatsHelper - Invalid output type");
+              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
+              break;
+
+            } // end of `switch (GetOutputType ())`
+
+        } // end of `if (it == m_identifierMap.end ())`
+
+    } // end of else of `if (from.IsInvalid ())`
+
+} // end of `void RxDelayCallback (Time, const Address);`
+
+
+void
+SatStatsDelayHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
+{
+  NS_LOG_FUNCTION (this << utNode->GetId ());
+
+  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+  const Address addr = satIdMapper->GetUtMacWithNode (utNode);
+
+  if (addr.IsInvalid ())
+    {
+      NS_LOG_WARN (this << " Node " << utNode->GetId ()
+                        << " is not a valid UT");
+    }
+  else
+    {
+      const uint32_t identifier = GetIdentifierForUt (utNode);
+      m_identifierMap[addr] = identifier;
+      NS_LOG_INFO (this << " associated address " << addr
+                        << " with identifier " << identifier);
+
+    }
+}
+
+
+// FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
+
+SatStatsFwdAppDelayHelper::SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsDelayHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsFwdAppDelayHelper::~SatStatsFwdAppDelayHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+void
+SatStatsFwdAppDelayHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
+
+  for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End (); ++it)
+    {
+      const int32_t utUserId = GetUtUserId (*it);
+      NS_ASSERT_MSG (utUserId > 0,
+                     "Node " << (*it)->GetId () << " is not a valid UT user");
+      const uint32_t identifier = GetIdentifierForUtUser (*it);
+
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          // Create the probe.
+          std::ostringstream probeName;
+          probeName << utUserId << "-" << i;
+          Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
+          probe->SetName (probeName.str ());
+
+          // Connect the object to the probe.
+          if (probe->ConnectByObject ("RxDelay", (*it)->GetApplication (i)))
+            {
+              // Connect the probe to the right collector.
+              bool ret = false;
+              switch (GetOutputType ())
+                {
+                case SatStatsHelper::OUTPUT_SCALAR_FILE:
+                case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                               "OutputSeconds",
+                                                               identifier,
+                                                               &ScalarCollector::TraceSinkDouble);
+                  break;
+
+                case SatStatsHelper::OUTPUT_SCATTER_FILE:
+                case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                               "OutputSeconds",
+                                                               identifier,
+                                                               &UnitConversionCollector::TraceSinkDouble);
+                  break;
+
+                case OUTPUT_HISTOGRAM_FILE:
+                case OUTPUT_HISTOGRAM_PLOT:
+                case OUTPUT_PDF_FILE:
+                case OUTPUT_PDF_PLOT:
+                case OUTPUT_CDF_FILE:
+                case OUTPUT_CDF_PLOT:
+                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                               "OutputSeconds",
+                                                               identifier,
+                                                               &DistributionCollector::TraceSinkDouble);
+                  break;
+
+                default:
+                  NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
+                  break;
+                }
+
+              if (ret)
+                {
+                  NS_LOG_INFO (this << " created probe " << probeName
+                                    << ", connected to collector " << identifier);
+                  m_probes.push_back (probe->GetObject<Probe> ());
+                }
+              else
+                {
+                  NS_LOG_WARN (this << " unable to connect probe " << probeName
+                                    << " to collector " << identifier);
+                }
+            }
+          else
+            {
+              NS_LOG_WARN (this << " unable to connect probe " << probeName
+                                << " to the source application");
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (it = utUsers.Begin(); it != utUsers.End (); ++it)`
+
+} // end of `void DoInstallProbes ();`
+
+
+// RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
+
+SatStatsRtnAppDelayHelper::SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsDelayHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsRtnAppDelayHelper::~SatStatsRtnAppDelayHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+void
+SatStatsRtnAppDelayHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Create a map of UT user addresses and identifiers.
+  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
+  for (NodeContainer::Iterator it = utUsers.Begin ();
+       it != utUsers.End (); ++it)
+    {
+      SaveIpv4AddressAndIdentifier (*it);
+    }
+
+  // Connect to trace sources at GW user node's applications.
+
+  NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
+  Callback<void, Time, const Address &> callback
+    = MakeCallback (&SatStatsRtnAppDelayHelper::Ipv4Callback, this);
+
+  for (NodeContainer::Iterator it = gwUsers.Begin ();
+       it != gwUsers.End (); ++it)
+    {
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+
+          if (app->TraceConnectWithoutContext ("RxDelay", callback))
+            {
+              NS_LOG_INFO (this << " successfully connected with node ID " << (*it)->GetId ()
+                                << " application #" << i);
+            }
+          else
+            {
+              NS_LOG_WARN (this << " unable to connect with node ID " << (*it)->GetId ()
+                                << " application #" << i);
+            }
+        }
+    }
+
+} // end of `void DoInstallProbes ();`
+
+
+void
+SatStatsRtnAppDelayHelper::Ipv4Callback (Time delay, const Address &from)
+{
+  //NS_LOG_FUNCTION (this << Time.GetSeconds () << from);
+
+  if (InetSocketAddress::IsMatchingType (from))
+    {
+      // Determine the identifier associated with the sender address.
+      const Address ipv4Addr = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
+      std::map<const Address, uint32_t>::const_iterator it1 = m_identifierMap.find (ipv4Addr);
+
+      if (it1 == m_identifierMap.end ())
+        {
+          NS_LOG_WARN (this << " discarding a packet delay of " << delay.GetSeconds ()
+                            << " from statistics collection because of"
+                            << " unknown sender IPV4 address " << ipv4Addr);
+        }
+      else
+        {
+          // Find the collector with the right identifier.
+          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it1->second);
+          NS_ASSERT_MSG (collector != 0,
+                         "Unable to find collector with identifier " << it1->second);
+
+          switch (GetOutputType ())
+            {
+            case OUTPUT_SCALAR_FILE:
+            case OUTPUT_SCALAR_PLOT:
+              {
+                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
+                NS_ASSERT (c != 0);
+                c->TraceSinkDouble (0.0, delay.GetSeconds ());
+                break;
+              }
+
+            case OUTPUT_SCATTER_FILE:
+            case OUTPUT_SCATTER_PLOT:
+              {
+                Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
+                NS_ASSERT (c != 0);
+                c->TraceSinkDouble (0.0, delay.GetSeconds ());
+                break;
+              }
+
+            case OUTPUT_HISTOGRAM_FILE:
+            case OUTPUT_HISTOGRAM_PLOT:
+            case OUTPUT_PDF_FILE:
+            case OUTPUT_PDF_PLOT:
+            case OUTPUT_CDF_FILE:
+            case OUTPUT_CDF_PLOT:
+              {
+                Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
+                NS_ASSERT (c != 0);
+                c->TraceSinkDouble (0.0, delay.GetSeconds ());
+                break;
+              }
+
+            default:
+              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
               break;
 
             } // end of `switch (GetOutputType ())`
@@ -336,7 +578,7 @@ SatStatsRtnAppDelayHelper::ApplicationDelayCallback (Time delay,
                         << " without valid InetSocketAddress");
     }
 
-} // end of `void ApplicationDelayCallback (Time, const Address);`
+} // end of `void Ipv4Callback (Time, const Address);`
 
 
 void
@@ -373,4 +615,3 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 
 
 } // end of namespace ns3
-

@@ -36,6 +36,8 @@ namespace ns3 {
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
+class Node;
+class Packet;
 class DataCollectionObject;
 
 /**

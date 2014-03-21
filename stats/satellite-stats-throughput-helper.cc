@@ -252,7 +252,7 @@ SatStatsThroughputHelper::RxCallback (Ptr<const Packet> packet,
         }
     }
 
-} // end of `void ApplicationPacketCallback (Ptr<const Packet>, const Address);`
+} // end of `void RxCallback (Ptr<const Packet>, const Address);`
 
 
 void
@@ -673,7 +673,7 @@ SatStatsRtnAppThroughputHelper::Ipv4Callback (Ptr<const Packet> packet,
                         << " without valid InetSocketAddress");
     }
 
-} // end of `void ApplicationPacketCallback (Ptr<const Packet>, const Address);`
+} // end of `void Ipv4Callback (Ptr<const Packet>, const Address);`
 
 
 void
