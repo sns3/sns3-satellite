@@ -267,8 +267,11 @@ private:
        * Construct frame info
        *
        * \param frameConf Frame configuration for the frame info
+       * \param waveformConf Waveform configuration
+       * \param frameId Id of the frame
+       * \param m_configTypeIndex Index of the configuration type (0-2 supported)
        */
-      SatFrameInfo (Ptr<SatFrameConf> frameConf);
+      SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, uint32_t m_configTypeIndex);
 
       /**
        * Reset load counters in frame info.
@@ -288,6 +291,16 @@ private:
        * \param tbtp TBTP message to add generated time slots.
        */
       void GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp);
+
+      /**
+       * Create time slot according to configuration type.
+       *
+       * \param carrierId Id of the carrier into create timeslot
+       * \param carrierSymbols Symbols left in carrier
+       * \param utSymbols Symbols left for the UT
+       * \return Create time slot configuration
+       */
+      Ptr<SatTimeSlotConf> CreateTimeSlot (uint32_t carrierId, uint32_t &carrierSymbols, uint32_t &utSymbols);
 
       /**
        * Get frame load by requested CC
@@ -414,7 +427,10 @@ private:
       double  m_preAllocatedRdbcSymbols;
       double  m_preAllocatedVdbcSymbols;
 
-      double  m_maxSymbolsPerCarrier;
+      double    m_maxSymbolsPerCarrier;
+      uint32_t  m_configTypeIndex;
+      uint8_t   m_frameId;
+      uint32_t  m_timeSlotSymbols;  // for configuration 0
 
       Ptr<SatFrameConf>   m_frameConf;
       UtAllocContainer_t  m_utAllocs;

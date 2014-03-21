@@ -354,9 +354,8 @@ SatBeamScheduler::Schedule ()
       Ptr<SatTbtpMessage> tbtpMsg = CreateObject<SatTbtpMessage> ();
       tbtpMsg->SetSuperframeCounter (m_superFrameCounter++);
 
-      // schedule time slots according to static configuration 0
-      // TODO: algorithms for other configurations
-      ScheduleUts (tbtpMsg);
+      m_frameAllocator->GenerateTimeSlots (tbtpMsg);
+
       AddRaChannels (tbtpMsg);
 
       Send (tbtpMsg);
@@ -366,20 +365,6 @@ SatBeamScheduler::Schedule ()
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule ( m_superframeSeq->GetDuration (m_currentSequence), &SatBeamScheduler::Schedule, this);
-}
-
-void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
-{
-  NS_LOG_FUNCTION (this);
-
-  bool UtsOrSlotsLeft = true;
-
-  while ( (UtsOrSlotsLeft) && m_currentUt != m_utSortedInfos.end () )
-    {
-      UtsOrSlotsLeft = AddUtTimeSlots (header);
-
-      m_currentUt++;
-    }
 }
 
 void
@@ -395,70 +380,6 @@ SatBeamScheduler::AddRaChannels (Ptr<SatTbtpMessage> header)
 
       header->SetRaChannel (i, superFrameConf->GetRaChannelFrameId (i), timeSlotCount);
     }
-}
-
-uint32_t
-SatBeamScheduler::AddUtTimeSlots (Ptr<SatTbtpMessage> tbtp)
-{
-  NS_LOG_FUNCTION (this);
-
-  if ( m_totalSlotsLeft )
-    {
-      uint32_t timeSlotForUt = m_slotsPerUt;
-
-      if ( m_additionalSlots > 0 )
-        {
-          m_additionalSlots--;
-          timeSlotForUt++;
-        }
-
-      m_totalSlotsLeft -= timeSlotForUt;
-
-      while ( timeSlotForUt )
-        {
-          tbtp->SetDaTimeslot (Mac48Address::ConvertFrom (m_currentUt->first), m_currentFrame, GetNextTimeSlot ());
-
-          timeSlotForUt--;
-        }
-    }
-
-  return m_totalSlotsLeft;
-}
-
-Ptr<SatTimeSlotConf>
-SatBeamScheduler::GetNextTimeSlot ()
-{
-  NS_LOG_FUNCTION (this);
-
-  NS_ASSERT (m_currentSlot != m_timeSlots.end ());
-  NS_ASSERT (m_currentCarrier != m_carrierIds.end ());
-
-  Ptr<SatFrameConf> frameConf = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetFrameConf (m_currentFrame);
-
-  Ptr<SatTimeSlotConf> timeSlotConf = *m_currentSlot;
-
-  m_currentSlot++;
-
-  if ( m_currentSlot == m_timeSlots.end () )
-    {
-      m_currentCarrier++;
-
-      if ( m_currentCarrier != m_carrierIds.end () )
-        {
-          m_timeSlots = frameConf->GetTimeSlotConfs (*m_currentCarrier);
-
-          if ( m_timeSlots.size() > 0 )
-            {
-              m_currentSlot = m_timeSlots.begin ();
-            }
-          else
-            {
-              m_currentSlot = m_timeSlots.end ();
-            }
-        }
-    }
-
-  return timeSlotConf;
 }
 
 void
@@ -524,62 +445,14 @@ void SatBeamScheduler::DoPreResourceAllocation ()
             }
 
           SatFrameAllocator::SatFrameAllocReq allocReq (allocReqContainer);
+          allocReq.m_address = it->first;
+
           SatFrameAllocator::SatFrameAllocResp allocResp;
 
           m_frameAllocator->AllocateToFrame (it->second->GetCnoEstimation (), allocReq, allocResp);
         }
 
       m_frameAllocator->AllocateSymbols ();
-
-      Ptr<SatFrameConf> frameConf = NULL;
-
-      // find frame for DAMA entries
-      for ( uint32_t i = 0; ( (i <  m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetFrameCount () ) && (frameConf == NULL) ); i++ )
-        {
-          if ( m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetFrameConf (i)->IsRandomAccess () == false )
-            {
-              frameConf = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetFrameConf (0);
-              m_currentFrame = i;
-            }
-        }
-
-      // If DAMA entry found, initialize scheduling
-      if (frameConf)
-        {
-          m_totalSlotsLeft = frameConf->GetTimeSlotCount ();
-
-          NS_ASSERT (m_totalSlotsLeft);
-
-          m_carrierIds.clear ();
-
-          for ( uint32_t i = 0; i < frameConf->GetCarrierCount (); i++ )
-            {
-              m_carrierIds.push_back (i);
-            }
-
-          // no full carrier available for every UT
-          if ( m_carrierIds.size() < m_utInfos.size () )
-            {
-              m_slotsPerUt = m_totalSlotsLeft / m_utInfos.size ();
-              m_additionalSlots = m_totalSlotsLeft %  m_utInfos.size ();   // how many slot stay over
-            }
-          else
-            {
-              m_slotsPerUt = m_totalSlotsLeft / m_carrierIds.size ();
-              m_additionalSlots = 0;
-            }
-
-          std::random_shuffle (m_carrierIds.begin (), m_carrierIds.end ());
-
-          m_currentSlot = m_timeSlots.end ();
-          m_currentCarrier = m_carrierIds.begin ();
-
-          m_timeSlots = frameConf->GetTimeSlotConfs (*m_currentCarrier);
-
-          NS_ASSERT (m_timeSlots.size () > 0);
-
-          m_currentSlot = m_timeSlots.begin ();
-        }
     }
 }
 

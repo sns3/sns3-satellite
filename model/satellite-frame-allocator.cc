@@ -29,13 +29,23 @@ NS_LOG_COMPONENT_DEFINE ("SatFrameAllocator");
 
 namespace ns3 {
 
-SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf)
-  : m_frameConf (frameConf)
+SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, uint32_t configTypeIndex)
+  : m_configTypeIndex (configTypeIndex),
+    m_frameId (frameId),
+    m_timeSlotSymbols (0),
+    m_frameConf (frameConf)
+
 {
   NS_LOG_FUNCTION (this);
 
   m_maxSymbolsPerCarrier = m_frameConf->GetBtuConf ()->GetSymbolRateInBauds () * m_frameConf->GetDuration ().GetSeconds ();
   m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_frameConf->GetCarrierCount ();
+
+  if ( configTypeIndex == 0 )
+    {
+      Ptr<SatWaveform> waveform = waveformConf->GetWaveform (m_frameConf->GetTimeSlotConf (0)->GetWaveFormId () );
+      m_timeSlotSymbols = waveform->GetBurstLengthInSymbols ();
+    }
 
   ResetCounters ();
 }
@@ -101,6 +111,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
   std::random_shuffle (carriers.begin (), carriers.end ());
 
   std::vector<uint32_t>::const_iterator currentCarrier = carriers.begin ();
+  uint32_t carrierSymbolsLeft = m_maxSymbolsPerCarrier;
 
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
@@ -108,7 +119,74 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
       std::random_shuffle (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.begin (), m_utAllocs[*it].m_allocation.m_allocInfoPerRc.end ());
 
       // generate slots here
+
+      uint32_t utSymbolsLeft = m_utAllocs[*it].m_allocation.GetTotalSymbols ();
+
+      while ( utSymbolsLeft > 0 )
+        {
+          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, carrierSymbolsLeft, utSymbolsLeft );
+
+          if ( timeSlot )
+            {
+              tbtp->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
+            }
+          else if ( carrierSymbolsLeft <= 0)
+            {
+              carrierSymbolsLeft = m_maxSymbolsPerCarrier;
+              currentCarrier++;
+            }
+        }
     }
+}
+
+Ptr<SatTimeSlotConf>
+SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint32_t carrierId, uint32_t &carrierSymbols, uint32_t &utSymbols)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatTimeSlotConf> timeSlotConf = NULL;
+
+  uint32_t symbolsInUse = std::min<uint32_t> (carrierSymbols, utSymbols);
+
+  switch (m_configTypeIndex)
+  {
+    case 0:
+      {
+        if (symbolsInUse < m_timeSlotSymbols)
+          {
+            if (carrierSymbols < utSymbols)
+              {
+                carrierSymbols -= symbolsInUse;
+              }
+
+            utSymbols -= symbolsInUse;
+          }
+        else
+          {
+            uint16_t index = (carrierId * m_frameConf->GetTimeSlotCount ()/m_frameConf->GetCarrierCount ()) + (m_maxSymbolsPerCarrier - carrierSymbols) / m_timeSlotSymbols;
+            timeSlotConf = m_frameConf->GetTimeSlotConf (index);
+
+            carrierSymbols -= m_timeSlotSymbols;
+            utSymbols -= m_timeSlotSymbols;
+          }
+      }
+      break;
+
+    case 1:
+      // TODO: configuration 1 time slot generation
+      break;
+
+    case 2:
+      // TODO: configuration 2 time slot generation
+      break;
+
+    case 3:
+    default:
+      NS_FATAL_ERROR ("Not supported configuration type!!!");
+      break;
+  }
+
+  return timeSlotConf;
 }
 
 void
@@ -598,11 +676,11 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatSuperframeConf> superFrameConf, Ptr
 {
   NS_LOG_FUNCTION (this);
 
-  for (uint32_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
+  for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
     {
       if (superFrameConf->GetFrameConf (i)->IsRandomAccess () == false )
         {
-          std::pair<FrameInfoContainer_t::const_iterator, bool> result = m_frameInfos.insert ( std::make_pair( i, SatFrameInfo (superFrameConf->GetFrameConf (i))));
+          std::pair<FrameInfoContainer_t::const_iterator, bool> result = m_frameInfos.insert ( std::make_pair( i, SatFrameInfo (superFrameConf->GetFrameConf (i), waveformConf, i, superFrameConf->GetConfigType ())));
 
           if ( result.second == false )
             {

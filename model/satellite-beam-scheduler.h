@@ -281,10 +281,7 @@ private:
 
   void UpdateDamaEntries ();
   void DoPreResourceAllocation ();
-  void ScheduleUts (Ptr<SatTbtpMessage> tbtpMsg);
   void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
-  uint32_t AddUtTimeSlots (Ptr<SatTbtpMessage> tbtpMsg);
-  Ptr<SatTimeSlotConf> GetNextTimeSlot ();
   static bool CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second);
 
   /**
