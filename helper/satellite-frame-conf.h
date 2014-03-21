@@ -173,11 +173,11 @@ public:
    * Constructor for SatFrameConf.
    *
    * \param bandwidthHz       Bandwidth of the frame in hertz
-   * \param durationInSeconds Duration of the frame in seconds
+   * \param durationInSeconds Duration of the frame
    * \param btu               BTU configuration of the frame
    * \param timeSlots         Time slot of the frame.
    */
-  SatFrameConf ( double bandwidthHz, double durationInSeconds, Ptr<SatBtuConf> btu,
+  SatFrameConf ( double bandwidthHz, Time durationInSeconds, Ptr<SatBtuConf> btu,
                  SatTimeSlotConfMap_t& timeSlots, bool isRandomAccess );
 
   /**
@@ -211,9 +211,9 @@ public:
   /**
    * Get duration of frame.
    *
-   * \return The duration of frame in seconds.
+   * \return The duration of frame.
    */
-  inline double GetDurationInSeconds () const { return m_durationInSeconds; }
+  inline Time GetDuration () const { return m_duration; }
 
   /**
    * Get carrier center frequency in frame.
@@ -293,7 +293,7 @@ public:
 
 private:
   double    m_bandwidthHz;
-  double    m_durationInSeconds;
+  Time      m_duration;
   bool      m_isRandomAccess;
 
   Ptr<SatBtuConf>                 m_btu;
@@ -363,7 +363,7 @@ public:
    *
    * \return The duration of super frame in seconds.
    */
-  inline double GetDurationInSeconds () const { return m_durationInSeconds; }
+  inline Time GetDuration () const { return m_duration; }
 
   /**
    * Get frame conf of the super frame.
@@ -498,7 +498,7 @@ private:
   typedef std::pair<uint8_t, uint32_t> RaChannelInfo_t;
 
   double    m_usedBandwidthHz;
-  double    m_durationInSeconds;
+  Time      m_duration;
 
   uint8_t   m_frameCount;
   uint32_t  m_configTypeIndex;

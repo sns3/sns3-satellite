@@ -111,14 +111,14 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
   return m_superframe[seqId]->GetCarrierCount();
 }
 
-double
-SatSuperframeSeq::GetDurationInSeconds ( uint8_t seqId ) const
+Time
+SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
 {
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT ( seqId < m_superframe.size() );
 
-  return m_superframe[seqId]->GetDurationInSeconds();
+  return m_superframe[seqId]->GetDuration();
 }
 
 Ptr<SatSuperframeConf>

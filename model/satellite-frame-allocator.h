@@ -123,8 +123,9 @@ public:
      *
      * \param req Frame allocation request parameters
      * \param waveForm  Waveform to use in allocation.
+     * \param frameDuration Frame duration
      */
-    SatFrameAllocInfo (SatFrameAllocReqItemContainer_t &req, Ptr<SatWaveform> waveForm, double frameDuration)
+    SatFrameAllocInfo (SatFrameAllocReqItemContainer_t &req, Ptr<SatWaveform> waveForm, Time frameDuration)
     : m_craSymbols (0.0),
       m_minRbdcSymbols (0.0),
       m_rbdcSymbols (0.0),
@@ -137,10 +138,10 @@ public:
         {
           SatFrameAllocInfoItem  reqInSymbols;
 
-          reqInSymbols.m_craSymbols  = bitInSymbols * (it->m_craInKbps * 1000.0) * frameDuration;
-          reqInSymbols.m_minRbdcSymbols = bitInSymbols * it->m_minRbdcInKbps * frameDuration;
-          reqInSymbols.m_rbdcSymbols = bitInSymbols * it->m_rbdcInKbps * frameDuration;
-          reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes * frameDuration;
+          reqInSymbols.m_craSymbols  = bitInSymbols * (it->m_craInKbps * 1000.0) * frameDuration.GetSeconds ();
+          reqInSymbols.m_minRbdcSymbols = bitInSymbols * it->m_minRbdcInKbps * frameDuration.GetSeconds ();
+          reqInSymbols.m_rbdcSymbols = bitInSymbols * it->m_rbdcInKbps * frameDuration.GetSeconds ();
+          reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes * frameDuration.GetSeconds ();
 
           m_craSymbols += reqInSymbols.m_craSymbols;
           m_minRbdcSymbols += reqInSymbols.m_minRbdcSymbols;
@@ -331,11 +332,11 @@ private:
       double GetMaxSymbolsPerCarrier () const { return m_maxSymbolsPerCarrier; }
 
       /**
-       * Get frame duration in seconds.
+       * Get frame duration.
        *
-       * \return Frame duration in seconds.
+       * \return Frame duration.
        */
-      double GetDurationInSeconds () const { return m_frameConf->GetDurationInSeconds (); }
+      Time GetDuration () const { return m_frameConf->GetDuration (); }
 
       /**
        * Get frame symbol rate in bauds.

@@ -641,7 +641,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       /// if there is no free slots in the current frame, look for it in the following frames
       while (!result.first)
         {
-          superframeStartTime += Seconds (frameOffset * frameConf->GetDurationInSeconds ());
+          superframeStartTime += Seconds (frameOffset * frameConf->GetDuration ().GetSeconds ());
 
           result = SearchFrameForAvailableSlot (superframeStartTime, frameConf, timeSlotCount, superFrameId, allocationChannel);
 

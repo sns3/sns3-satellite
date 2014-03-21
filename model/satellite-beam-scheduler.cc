@@ -223,7 +223,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_superFrameCounter = 0;
 
   // How many TBTPs is transmitted during RTT?
-  uint32_t tbtpsPerRtt = (uint32_t)(std::ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDurationInSeconds (m_currentSequence)));
+  uint32_t tbtpsPerRtt = (uint32_t)(std::ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDuration (m_currentSequence).GetSeconds()));
 
   // Scheduling starts after one empty super frame.
   m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (m_currentSequence) + tbtpsPerRtt;
@@ -365,7 +365,7 @@ SatBeamScheduler::Schedule ()
     }
 
   // re-schedule next TBTP sending (call of this function)
-  Simulator::Schedule (Seconds (m_superframeSeq->GetDurationInSeconds (m_currentSequence)), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule ( m_superframeSeq->GetDuration (m_currentSequence), &SatBeamScheduler::Schedule, this);
 }
 
 void SatBeamScheduler::ScheduleUts (Ptr<SatTbtpMessage> header)
@@ -481,8 +481,8 @@ SatBeamScheduler::UpdateDamaEntries ()
       it->second->UpdateDamaEntriesFromCrs ();
 
       // calculate (update) requested bytes per SF for each (RC_index, CC)
-      m_craBasedBytes += damaEntry->GetCraBasedBytes (m_superframeSeq->GetDurationInSeconds (m_currentSequence));
-      m_rbdcBasedBytes += damaEntry->GetRbdcBasedBytes (m_superframeSeq->GetDurationInSeconds (m_currentSequence));
+      m_craBasedBytes += damaEntry->GetCraBasedBytes (m_superframeSeq->GetDuration (m_currentSequence).GetSeconds ());
+      m_rbdcBasedBytes += damaEntry->GetRbdcBasedBytes (m_superframeSeq->GetDuration (m_currentSequence).GetSeconds ());
       m_vbdcBasedBytes += damaEntry->GetVbdcBasedBytes ();
       
       // decrease persistence values

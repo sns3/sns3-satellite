@@ -34,7 +34,7 @@ SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf)
 {
   NS_LOG_FUNCTION (this);
 
-  m_maxSymbolsPerCarrier = m_frameConf->GetBtuConf ()->GetSymbolRateInBauds () * m_frameConf->GetDurationInSeconds ();
+  m_maxSymbolsPerCarrier = m_frameConf->GetBtuConf ()->GetSymbolRateInBauds () * m_frameConf->GetDuration ().GetSeconds ();
   m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_frameConf->GetCarrierCount ();
 
   ResetCounters ();
@@ -725,7 +725,7 @@ SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cn
         }
     }
 
-  double frameDuration = m_frameInfos.at (selectedFrame).GetDurationInSeconds ();
+  Time frameDuration = m_frameInfos.at (selectedFrame).GetDuration ();
 
   // convert bytes to symbols based on wave form
   SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq.m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)), frameDuration );

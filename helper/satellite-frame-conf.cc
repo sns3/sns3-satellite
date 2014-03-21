@@ -90,7 +90,7 @@ SatTimeSlotConf::~SatTimeSlotConf ()
 
 SatFrameConf::SatFrameConf ()
  : m_bandwidthHz (0.0),
-   m_durationInSeconds (0.0),
+   m_duration (0.0),
    m_isRandomAccess (false),
    m_btu (0),
    m_carrierCount (0)
@@ -100,10 +100,10 @@ SatFrameConf::SatFrameConf ()
   NS_ASSERT (false);
 }
 
-SatFrameConf::SatFrameConf ( double bandwidthHz, double durationInSeconds,
+SatFrameConf::SatFrameConf ( double bandwidthHz, Time durationInSeconds,
                              Ptr<SatBtuConf> btu, SatTimeSlotConfMap_t &timeSlots, bool isRandomAccess)
   : m_bandwidthHz (bandwidthHz),
-    m_durationInSeconds (durationInSeconds),
+    m_duration (durationInSeconds),
     m_isRandomAccess (isRandomAccess),
     m_btu (btu)
 {
@@ -231,7 +231,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf);
 
 SatSuperframeConf::SatSuperframeConf ()
  : m_usedBandwidthHz (0.0),
-   m_durationInSeconds (0.0),
+   m_duration (0.0),
    m_frameCount (0),
    m_configTypeIndex (0),
    m_carrierCount (0)
@@ -517,17 +517,17 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
 
-              double frameDurationInSeconds = slotCount * timeSlotDuration;
+              Time frameDuration = Seconds ( slotCount * timeSlotDuration );
 
               // if frame duration is greater than current super frame duration, set it as super frame duration
               // super frame must last as long as the longest frame
-              if ( frameDurationInSeconds > m_durationInSeconds )
+              if ( frameDuration > m_duration )
                 {
-                  m_durationInSeconds = frameDurationInSeconds;
+                  m_duration = frameDuration;
                 }
 
               // Created one frame to be used utilizing earlier created BTU
-              Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], m_durationInSeconds,
+              Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], m_duration,
                                                                   btuConf, SatFrameConf::SatTimeSlotConfMap_t (), m_frameIsRandomAccess[frameIndex] );
 
               // Created time slots for every carrier and add them to frame configuration

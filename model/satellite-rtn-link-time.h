@@ -54,7 +54,7 @@ public:
    * \param superFrameSeqId
    * \return double Superframe duration
    */
-  double GetSuperFrameDuration (uint8_t superFrameSeqId) const;
+  Time GetSuperFrameDuration (uint8_t superFrameSeqId) const;
 
   /**
    * Returns currently running superframe count

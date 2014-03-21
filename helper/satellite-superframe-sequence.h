@@ -113,9 +113,9 @@ public:
    *
    * \param seqId Sequence id of the super frame which duration is requested.
    *
-   * \return The super frame duration in seconds.
+   * \return The super frame duration.
    */
-  double GetDurationInSeconds ( uint8_t seqId ) const;
+  Time GetDuration ( uint8_t seqId ) const;
 
   /**
    * Get the center frequency of the requested carrier.
