@@ -660,7 +660,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       Time slotStartTime = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
       Time offset = slotStartTime - Now ();
 
-      if (offset.IsNegative ())
+      if (offset.IsStrictlyNegative())
         {
           NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid transmit time: " << offset.GetSeconds ());
         }
@@ -705,7 +705,7 @@ SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime,
 
   NS_LOG_INFO ("SatUtMac::SearchFrameForAvailableSlot - Time: " << Now ().GetSeconds () << " offset: " << opportunityOffset.GetSeconds ());
 
-  if (opportunityOffset.IsNegative ())
+  if (opportunityOffset.IsStrictlyNegative())
     {
       NS_FATAL_ERROR ("SatUtMac::FindNextAvailableRandomAccessSlot - Invalid Tx opportunity time");
     }
@@ -892,7 +892,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
           Time offset = slotDelay - Now ();
 
-          if (offset < 0)
+          if (offset.IsStrictlyNegative ())
             {
               NS_FATAL_ERROR ("SatUtMac::CreateCrdsaPacketInstances - Invalid transmit time: " << offset.GetSeconds ());
             }
