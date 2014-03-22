@@ -67,16 +67,18 @@ SatBtuConf::~SatBtuConf ()
 SatTimeSlotConf::SatTimeSlotConf ()
 : m_startTimeInSeconds (0.0),
   m_waveFormId (0),
-  m_frameCarrierId (0)
+  m_frameCarrierId (0),
+  m_rcIndex (0)
 {
   // default constructor should not be used
   NS_ASSERT (false);
 }
 
-SatTimeSlotConf::SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint32_t frameCarrierId)
+SatTimeSlotConf::SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint16_t frameCarrierId)
   : m_startTimeInSeconds (startTimeInSeconds),
     m_waveFormId (waveFormId),
-    m_frameCarrierId (frameCarrierId)
+    m_frameCarrierId (frameCarrierId),
+    m_rcIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -119,7 +121,7 @@ SatFrameConf::~SatFrameConf ()
 }
 
 double
-SatFrameConf::GetCarrierFrequencyHz (uint32_t carrierId) const
+SatFrameConf::GetCarrierFrequencyHz (uint16_t carrierId) const
 {
   NS_ASSERT (carrierId < m_carrierCount );
 
@@ -167,7 +169,7 @@ SatFrameConf::GetTimeSlotConf (uint16_t index) const
 }
 
 SatFrameConf::SatTimeSlotConfContainer_t
-SatFrameConf::GetTimeSlotConfs (uint32_t carrierId) const
+SatFrameConf::GetTimeSlotConfs (uint16_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
 

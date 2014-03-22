@@ -33,6 +33,7 @@ SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<
   : m_configTypeIndex (configTypeIndex),
     m_frameId (frameId),
     m_timeSlotSymbols (0),
+    m_rcBasedAllocation (false),
     m_frameConf (frameConf)
 
 {
@@ -101,22 +102,24 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
   std::random_shuffle (uts.begin (), uts.end ());
 
   // sort available carriers using random methods.
-  std::vector<uint32_t> carriers;
+  std::vector<uint16_t> carriers;
 
-  for ( uint32_t i = 0; i < m_frameConf->GetCarrierCount (); i++ )
+  for ( uint16_t i = 0; i < m_frameConf->GetCarrierCount (); i++ )
     {
       carriers.push_back (i);
     }
 
   std::random_shuffle (carriers.begin (), carriers.end ());
 
-  std::vector<uint32_t>::const_iterator currentCarrier = carriers.begin ();
+  std::vector<uint16_t>::const_iterator currentCarrier = carriers.begin ();
   uint32_t carrierSymbolsLeft = m_maxSymbolsPerCarrier;
 
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
       // sort RCs in UT using random method.
       std::random_shuffle (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.begin (), m_utAllocs[*it].m_allocation.m_allocInfoPerRc.end ());
+      uint8_t currentRc = 0;
+      uint32_t rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[currentRc].GetTotalSymbols ();
 
       // generate slots here
 
@@ -124,10 +127,11 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
       while ( utSymbolsLeft > 0 )
         {
-          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, carrierSymbolsLeft, utSymbolsLeft );
+          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, carrierSymbolsLeft, utSymbolsLeft, rcSymbolsLeft );
 
           if ( timeSlot )
             {
+              timeSlot->SetRcIndex (currentRc);
               tbtp->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
             }
           else if ( carrierSymbolsLeft <= 0)
@@ -135,12 +139,18 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
               carrierSymbolsLeft = m_maxSymbolsPerCarrier;
               currentCarrier++;
             }
+
+          if ( rcSymbolsLeft <= 0)
+            {
+              currentRc++;
+              rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[currentRc].GetTotalSymbols ();
+            }
         }
     }
 }
 
 Ptr<SatTimeSlotConf>
-SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint32_t carrierId, uint32_t &carrierSymbols, uint32_t &utSymbols)
+SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, uint32_t &carrierSymbols, uint32_t &utSymbols, uint32_t &rcSymbols)
 {
   NS_LOG_FUNCTION (this);
 
@@ -152,7 +162,13 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint32_t carrierId, uint32_t &c
   {
     case 0:
       {
-        if (symbolsInUse < m_timeSlotSymbols)
+        if ( m_rcBasedAllocation && (rcSymbols < symbolsInUse) && (rcSymbols < m_timeSlotSymbols))
+          {
+            carrierSymbols -= rcSymbols;
+            utSymbols -= rcSymbols;
+            rcSymbols = 0;
+          }
+        else if (symbolsInUse < m_timeSlotSymbols)
           {
             if (carrierSymbols < utSymbols)
               {
@@ -160,6 +176,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint32_t carrierId, uint32_t &c
               }
 
             utSymbols -= symbolsInUse;
+            rcSymbols -= symbolsInUse;
           }
         else
           {

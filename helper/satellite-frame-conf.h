@@ -114,7 +114,7 @@ public:
    * \param waveFormId          Wave form id of time slot
    * \param carrierId           Carrier id of time slot
    */
-  SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint32_t carrierId);
+  SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint16_t carrierId);
 
   /**
    * Destructor for SatTimeSlotConf
@@ -140,12 +140,28 @@ public:
    *
    * \return The carrier id of time slot.
    */
-  inline uint32_t GetCarrierId () const { return m_frameCarrierId; }
+  inline uint16_t GetCarrierId () const { return m_frameCarrierId; }
+
+  /**
+   * Set RC index of the time slot.
+   *
+   * \param RC index of the time slot.
+   */
+  inline void SetRcIndex (uint8_t rcIndex) { m_rcIndex = rcIndex; }
+
+  /**
+   * Get RC index of the time slot.
+   *
+   * \return RC index of the time slot.
+   */
+  inline uint8_t GetRcIndex () { return m_rcIndex; }
 
 private:
   double  m_startTimeInSeconds;
   uint32_t m_waveFormId;
-  uint32_t m_frameCarrierId;
+  uint16_t m_frameCarrierId;
+  uint8_t  m_rcIndex;
+
 };
 
 /**
@@ -158,7 +174,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
 public:
 
   typedef std::vector<Ptr<SatTimeSlotConf> >              SatTimeSlotConfContainer_t;
-  typedef std::map<uint32_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
+  typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
 
 
   static const uint16_t maxTimeSlotCount = 2048;
@@ -188,8 +204,8 @@ public:
   /**
    * Add time slot.
    *
-   * \param conf  Time slot conf added.
-   * \return ID of the added timeslot.
+   * \param conf  Time slot configuration added.
+   * \return ID of the added time slot.
    */
   uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
 
@@ -197,7 +213,7 @@ public:
    * Get time slot conf of the frame. Possible values for id are from 0 to 2047.
    *
    * \param index Id of the time slot requested.
-   * \return      The requested time slot conf of frame.
+   * \return      The requested time slot configuration of frame.
    */
   Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
 
@@ -220,7 +236,7 @@ public:
    *
    * \return The carrier bandwidth in frame in hertz.
    */
-  double GetCarrierFrequencyHz ( uint32_t carrierId ) const;
+  double GetCarrierFrequencyHz ( uint16_t carrierId ) const;
 
   /**
    * Get carrier bandwidth in frame.
@@ -267,7 +283,7 @@ public:
    *
    * \return The carrier count of the frame.
    */
-  inline uint32_t GetCarrierCount () { return m_carrierCount; }
+  inline uint16_t GetCarrierCount () { return m_carrierCount; }
 
   /**
    * Get time slot count of the frame.
@@ -282,7 +298,7 @@ public:
    * \param carrierId Id of the carrier which time slots are requested.
    * \return  Container containing time slots.
    */
-  SatTimeSlotConfContainer_t GetTimeSlotConfs (uint32_t carrierId) const;
+  SatTimeSlotConfContainer_t GetTimeSlotConfs (uint16_t carrierId) const;
 
   /**
    * Get state if frame is random access frame.
@@ -297,7 +313,7 @@ private:
   bool      m_isRandomAccess;
 
   Ptr<SatBtuConf>                 m_btu;
-  uint32_t                        m_carrierCount;
+  uint16_t                        m_carrierCount;
   SatTimeSlotConfMap_t            m_timeSlotConfMap;
 };
 

@@ -64,6 +64,8 @@ public:
        m_minRbdcSymbols (0.0),
        m_rbdcSymbols (0.0),
        m_vbdcSymbols (0.0) {}
+
+    double GetTotalSymbols () { return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);}
   };
 
   typedef std::vector<SatFrameAllocReqItem>   SatFrameAllocReqItemContainer_t;
@@ -181,7 +183,7 @@ public:
 
     double GetTotalSymbols ()
     {
-      return (m_craSymbols + m_minRbdcSymbols + m_rbdcSymbols + m_vbdcSymbols);
+      return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);
     }
   };
 
@@ -298,9 +300,10 @@ private:
        * \param carrierId Id of the carrier into create timeslot
        * \param carrierSymbols Symbols left in carrier
        * \param utSymbols Symbols left for the UT
+       * \param rcSymbols Symbols left for RC
        * \return Create time slot configuration
        */
-      Ptr<SatTimeSlotConf> CreateTimeSlot (uint32_t carrierId, uint32_t &carrierSymbols, uint32_t &utSymbols);
+      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, uint32_t& carrierSymbols, uint32_t& utSymbols, uint32_t& rcSymbols);
 
       /**
        * Get frame load by requested CC
@@ -431,6 +434,7 @@ private:
       uint32_t  m_configTypeIndex;
       uint8_t   m_frameId;
       uint32_t  m_timeSlotSymbols;  // for configuration 0
+      bool      m_rcBasedAllocation;
 
       Ptr<SatFrameConf>   m_frameConf;
       UtAllocContainer_t  m_utAllocs;
