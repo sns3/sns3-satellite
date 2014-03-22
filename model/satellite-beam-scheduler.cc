@@ -137,11 +137,6 @@ SatBeamScheduler::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatBeamScheduler")
     .SetParent<Object> ()
     .AddConstructor<SatBeamScheduler> ()
-    .AddAttribute( "RttEstimate",
-                   "Round trip time estimate for NCC scheduling",
-                   TimeValue (MilliSeconds (560)),
-                   MakeTimeAccessor (&SatBeamScheduler::m_rttEstimate),
-                   MakeTimeChecker ())
     .AddAttribute ("CnoEstimationMode",
                    "Mode of the C/N0 estimator",
                    EnumValue (SatCnoEstimator::LAST),
@@ -154,8 +149,16 @@ SatBeamScheduler::GetTypeId (void)
                    TimeValue (MilliSeconds (1000)),
                    MakeTimeAccessor (&SatBeamScheduler::m_cnoEstimationWindow),
                    MakeTimeChecker ())
-
-
+    .AddAttribute( "MaxTwoWayPropagationDelay",
+                   "Maximum two way propagation delay between GW and UT.",
+                   TimeValue (MilliSeconds (560)),
+                   MakeTimeAccessor (&SatBeamScheduler::m_maxTwoWayPropagationDelay),
+                   MakeTimeChecker ())
+    .AddAttribute( "MaxTBTPTxAndProcessingDelay",
+                   "Maximum TBTP transmission and processing delay at the GW.",
+                   TimeValue (MilliSeconds (100)),
+                   MakeTimeAccessor (&SatBeamScheduler::m_maxTBTPTxAndProcessingDelay),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -220,13 +223,18 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_beamId = beamId;
   m_txCallback = cb;
   m_superframeSeq = seq;
-  m_superFrameCounter = 0;
 
-  // How many TBTPs is transmitted during RTT?
-  uint32_t tbtpsPerRtt = (uint32_t)(std::ceil (m_rttEstimate.GetSeconds () / m_superframeSeq->GetDuration (m_currentSequence).GetSeconds()));
+  /**
+   * Calculating to start time for superframe counts to start the scheduling from.
+   * The offset is calculated by estimating the maximum delay between GW and UT,
+   * so that the sent TBTP will be received by UT in time to be able to still send
+   * the packet in time.
+   */
+  Time totalDelay = m_maxTwoWayPropagationDelay + m_maxTBTPTxAndProcessingDelay;
+  uint32_t sfCountOffset = (uint32_t)(totalDelay.GetInteger () / seq->GetDuration (0).GetInteger () + 1);
 
   // Scheduling starts after one empty super frame.
-  m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (m_currentSequence) + tbtpsPerRtt;
+  m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (m_currentSequence) + sfCountOffset;
 
   // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
   // this part of implementation is needed to change

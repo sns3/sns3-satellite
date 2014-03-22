@@ -232,12 +232,6 @@ private:
   uint32_t m_slotsPerUt;
 
   /**
-   * Round trip time estimate to be used in scheduling the TBTPs well in
-   * advance compared to the expected receive time.
-   */
-  Time m_rttEstimate;
-
-  /**
    * Random variable stream to select RA channel for a UT.
    */
   Ptr<RandomVariableStream> m_raChRandomIndex;
@@ -271,6 +265,20 @@ private:
    * Frame allocator to maintain load information of the frame and its configuration.
    */
   Ptr<SatFrameAllocator>  m_frameAllocator;
+
+  /**
+   * Maximum two-way propagation delay estimate between GW-SAT-UT-SAT-GW.
+   * This is used to estimate how much time into the future the scheduler
+   * has to schedule the supreframes.
+   */
+  Time m_maxTwoWayPropagationDelay;
+
+  /**
+   * Maximum TBTP tx and processing delay estimate at the GW (scheduler).
+   * This is used to estimate how much time into the future the scheduler
+   * has to schedule the supreframes.
+   */
+  Time m_maxTBTPTxAndProcessingDelay;
 
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);
