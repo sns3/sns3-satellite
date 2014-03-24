@@ -125,8 +125,7 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
   for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
        it != packets.end (); ++it)
     {
-      SatMacTimeTag tag (Simulator::Now ());
-      (*it)->AddPacketTag (tag);
+      (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
     }
 
   // Use call back to send packet to lower layer

@@ -24,13 +24,13 @@
 #include <stdint.h>
 #include <string>
 
-#include "ns3/simulator.h"
-#include "ns3/net-device.h"
-#include "ns3/mac48-address.h"
-#include "ns3/traced-callback.h"
-#include "satellite-control-message.h"
-#include "satellite-enums.h"
-#include "satellite-packet-classifier.h"
+#include <ns3/nstime.h>
+#include <ns3/simulator.h>
+#include <ns3/net-device.h>
+#include <ns3/mac48-address.h>
+#include <ns3/traced-callback.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-packet-classifier.h>
 
 namespace ns3 {
 
@@ -42,6 +42,7 @@ class Node;
 class ErrorModel;
 class VirtualChannel;
 class SatNodeInfo;
+class SatControlMessage;
 
 /**
  * \defgroup satellite Satellite Models
@@ -202,6 +203,12 @@ private:
    * senders.
    */
   TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
+
+  /**
+   * Traced callback for all received packets, including delay information and
+   * the address of the senders.
+   */
+  TracedCallback<Time, const Address &> m_rxDelayTrace;
 
   /**
    * The trace source fired when the phy layer drops a packet it has received

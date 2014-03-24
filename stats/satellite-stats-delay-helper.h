@@ -144,6 +144,45 @@ private:
 }; // end of class SatStatsFwdAppDelayHelper
 
 
+// FORWARD LINK DEVICE-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward link device-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdDevDelayHelper> s = Create<SatStatsFwdDevDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdDevDelayHelper : public SatStatsDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdDevDelayHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsFwdDevDelayHelper ();
+
+protected:
+  // inherited from SatStatsDelayHelper base class
+  virtual void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdDevDelayHelper
+
+
 // FORWARD LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
@@ -276,6 +315,41 @@ private:
   /// \todo Write SaveIpv6Address() method.
 
 }; // end of class SatStatsRtnAppDelayHelper
+
+
+// RETURN LINK DEVICE-LEVEL //////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return link device-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnDevDelayHelper> s = Create<SatStatsRtnDevDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnDevDelayHelper : public SatStatsDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnDevDelayHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsRtnDevDelayHelper ();
+
+protected:
+  // inherited from SatStatsDelayHelper base class
+  virtual void DoInstallProbes ();
+
+}; // end of class SatStatsRtnDevDelayHelper
 
 
 // RETURN LINK MAC-LEVEL //////////////////////////////////////////////

@@ -34,9 +34,11 @@
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-llc.h>
 #include <ns3/satellite-channel.h>
+#include <ns3/satellite-control-message.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-node-info.h>
 #include <ns3/satellite-address-tag.h>
+#include <ns3/satellite-time-tag.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -82,6 +84,9 @@ SatNetDevice::GetTypeId (void)
      .AddTraceSource ("Rx",
                       "A packet received",
                       MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace))
+     .AddTraceSource ("RxDelay",
+                      "A packet is received with delay information",
+                      MakeTraceSourceAccessor (&SatNetDevice::m_rxDelayTrace))
   ;
   return tid;
 }
@@ -116,33 +121,42 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
-  // Invoke the `Rx` trace source.
-  SatAddressTag tag;
-  bool isTagged = false;
+  /*
+   * Invoke the `Rx` and `RxDelay` trace sources. We look at the packet's tags
+   * for information, but cannot remove the tags because the packet is a const.
+   */
+
+  Address addr; // invalid address.
+  bool isTaggedWithAddress = false;
   ByteTagIterator it = packet->GetByteTagIterator ();
 
-  while (!isTagged && it.HasNext ())
+  while (!isTaggedWithAddress && it.HasNext ())
     {
       ByteTagIterator::Item item = it.Next ();
+
       if (item.GetTypeId () == SatAddressTag::GetTypeId ())
         {
           NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
                              << " start=" << item.GetStart ()
                              << " end=" << item.GetEnd ());
-          item.GetTag (tag);
-          isTagged = true;
+          SatAddressTag addrTag;
+          item.GetTag (addrTag);
+          addr = addrTag.GetSourceAddress ();
+          isTaggedWithAddress = true; // this will exit the while loop.
         }
     }
 
-  if (isTagged)
+  m_rxTrace (packet, addr);
+
+  SatDevTimeTag timeTag;
+  if (packet->PeekPacketTag (timeTag))
     {
-      m_rxTrace (packet, tag.GetSourceAddress ());
-    }
-  else
-    {
-      m_rxTrace (packet, Address ()); // provide an invalid source address.
+      NS_LOG_DEBUG (this << " contains a SatDevTimeTag tag");
+      m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
+                      addr);
     }
 
+  // Pass the packet to the upper layer.
   m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
 
@@ -318,6 +332,9 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
   // Add a SatAddressTag tag with this device's address as the source address.
   packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
 
+  // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+  packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
@@ -346,6 +363,9 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
   // Add a SatAddressTag tag with this device's address as the source address.
   packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
 
+  // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+  packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
@@ -372,14 +392,17 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 {
   NS_LOG_FUNCTION (this << msg << dest);
 
-  // Add packet trace entry:
-  SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
-
   Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
 
   // Add a SatAddressTag tag with this device's address as the source address.
   packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
+  // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+  packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
 
   m_packetTrace (Simulator::Now(),
                  SatEnums::PACKET_SENT,

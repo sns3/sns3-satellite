@@ -56,7 +56,7 @@ SatStatsHelperContainer::DoDispose ()
  * C++ pre-processing approach.
  *
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Mac,Phy] Delay
+ * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -134,6 +134,10 @@ SatStatsHelperContainer::GetTypeId ()
                                   "per UT user forward link application-level delay statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
+    // Forward link device-level packet delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDevDelay,
+                                        "forward link device-level delay statistics")
+
     // Forward link MAC-level packet delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdMacDelay,
                                         "forward link MAC-level delay statistics")
@@ -167,6 +171,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppDelay,
                                   "per UT user return link application-level delay statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
+    // Return link device-level packet delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevDelay,
+                                        "return link device-level delay statistics")
 
     // Return link MAC-level packet delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnMacDelay,
@@ -229,7 +237,7 @@ SatStatsHelperContainer::GetName () const
  * created using this C++ pre-processing approach.
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Mac,Phy] Delay
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -333,6 +341,12 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdAppDelay, "fwd-app-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdAppDelay, "fwd-app-delay")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (FwdAppDelay, "fwd-app-delay")
 
+// Forward link device-level packet delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdDevDelay, "fwd-dev-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdDevDelay, "fwd-dev-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdDevDelay, "fwd-dev-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdDevDelay, "fwd-dev-delay")
+
 // Forward link MAC-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdMacDelay, "fwd-mac-delay")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdMacDelay, "fwd-mac-delay")
@@ -376,6 +390,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppDelay, "rtn-app-delay")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppDelay, "rtn-app-delay")
+
+// Return link device-level packet delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnDevDelay, "rtn-dev-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnDevDelay, "rtn-dev-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnDevDelay, "rtn-dev-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnDevDelay, "rtn-dev-delay")
 
 // Return link MAC-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnMacDelay, "rtn-mac-delay")

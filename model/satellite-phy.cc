@@ -265,8 +265,7 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   // Add a SatPhyTimeTag tag for packet delay computation at the receiver end.
   for (PacketContainer_t::const_iterator it = p.begin (); it != p.end (); ++it)
     {
-      SatPhyTimeTag tag (Simulator::Now ());
-      (*it)->AddPacketTag (tag);
+      (*it)->AddPacketTag (SatPhyTimeTag (Simulator::Now ()));
     }
 
   // Add packet trace entry:
@@ -335,13 +334,30 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
                  ld,
                  SatUtils::GetPacketInfo (rxParams->m_packetsInBurst));
 
-  // If there was a PHY error, packet dropped here
-  if (!phyError)
+  if (phyError)
     {
-      m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
+      // If there was a PHY error, the packet is dropped here.
+      NS_LOG_LOGIC (this << " dropped " << rxParams->m_packetsInBurst.size ()
+                         << " packets because of PHY error.");
+    }
+  else
+    {
+      // Pass the packet to the upper layer.
+      m_rxCallback (rxParams->m_packetsInBurst, rxParams);
+
+      /*
+       * Notice that here we put the callback to upper layer before the callback
+       * to the Rx and RxDelay trace sources. This solves a weird problem where
+       * the call to m_rxDelayTrace below does not hit the intended callback.
+       *
+       * This "hack" makes PHY trace to be fired after MAC and LLC traces, which
+       * is not supposed to be. But this flaw doesn't affect the statistical
+       * output at all, because both sides are still executed within the same
+       * simulation time.
+       */
 
       // Invoke the `Rx` and `RxDelay` trace sources.
-      SatSignalParameters::PacketsInBurst_t::const_iterator it1;
+      SatSignalParameters::PacketsInBurst_t::iterator it1;
       for (it1 = rxParams->m_packetsInBurst.begin ();
            it1 != rxParams->m_packetsInBurst.end (); ++it1)
         {
@@ -377,7 +393,7 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 
         } // end of `for (it1 = rxParams->m_packetsInBurst)`
 
-    } // end of `if (!phyError)`
+    } // end of else of `if (phyError)`
 
 }
 
