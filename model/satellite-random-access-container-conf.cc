@@ -57,7 +57,6 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
   slottedAlohaControlRandomizationInterval = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
   DoSlottedAlohaVariableSanityCheck ();
 
-  /// TODO this is temporary setup for debugging until all the configurations are available
   for (uint32_t i = 0; i < m_allocationChannelCount; i++)
     {
       Ptr<SatRandomAccessAllocationChannel> allocationChannel = CreateObject<SatRandomAccessAllocationChannel> ();

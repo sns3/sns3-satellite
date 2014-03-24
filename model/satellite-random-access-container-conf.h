@@ -33,7 +33,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for random access configuration
+ * \brief Class for random access configuration. This class holds the non allocation channel specific
+ * random access configuration in addition to the allocation channel configuration objects
  */
 class SatRandomAccessConf : public Object
 {
@@ -60,50 +61,50 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   *
-   * \param allocationChannel
-   * \return
+   * \brief Function for returning the allocation channel specific RA configuration
+   * \param allocationChannel allocation channel ID
+   * \return allocation channel configuration
    */
   Ptr<SatRandomAccessAllocationChannel> GetAllocationChannelConfiguration (uint32_t allocationChannel);
 
   /**
-   *
-   * \return
+   * \brief Function for getting the Slotted ALOHA control randomization interval
+   * \return control randomization interval
    */
   uint32_t GetSlottedAlohaControlRandomizationInterval () { return slottedAlohaControlRandomizationInterval;}
 
   /**
-   *
-   * \param controlRandomizationInterval
+   * \brief Function for setting the Slotted ALOHA control randomization interval
+   * \param controlRandomizationInterval control randomization interval
    */
   void SetSlottedAlohaControlRandomizationInterval (uint32_t controlRandomizationInterval) { slottedAlohaControlRandomizationInterval = controlRandomizationInterval;}
 
   /**
-   *
-   * \return
+   * \brief Function for getting the number of available allocation channels
+   * \return number of allocation channels
    */
   uint32_t GetNumOfAllocationChannels () { return m_allocationChannelCount; }
 
   /**
-   *
+   * \brief Function for checking the Slotted ALOHA variable sanity
    */
   void DoSlottedAlohaVariableSanityCheck ();
 
 private:
 
   /**
-   *
+   * \brief Map containing the allocation channel configurations
    */
   std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
 
   /**
-   * \brief .... in milliseconds
+   * \brief Slotted ALOHA control randomization interval in milliseconds
    *
    */
   uint32_t slottedAlohaControlRandomizationInterval;
 
   /**
-   *
+   * \brief Number of available allocation channels
    */
   uint32_t m_allocationChannelCount;
 };

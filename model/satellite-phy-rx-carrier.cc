@@ -1251,7 +1251,7 @@ SatPhyRxCarrier::HaveSameSlotIds (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
         }
     }
 
-  NS_LOG_INFO ("SatPhyRxCarrier::HaveSameSlotIds - Different slot IDs found: " << HaveSameSlotIds
+  NS_LOG_INFO ("SatPhyRxCarrier::HaveSameSlotIds - Are slot IDs identical: " << HaveSameSlotIds
                << ", number of matching slots: " << numOfMatchingSlots);
 
   /// sanity check

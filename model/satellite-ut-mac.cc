@@ -1043,25 +1043,6 @@ SatUtMac::DoFrameStart ()
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
 
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
-
-  /*
-  /// schedule the next frame start
-  /// TODO this needs to be modified when a proper mobility model is
-  /// added as the timing advance will not be constant. Additionally,
-  /// a proper timing specific class should be implemented for a
-  /// functionality like this
-  Time nextStartTime = Now () - GetNextSuperFrameTxTime (0) + Seconds (m_superframeSeq->GetDurationInSeconds (0));
-
-  if (nextStartTime > Now () + m_timingAdvanceCb ())
-    {
-      Simulator::Schedule (nextStartTime, &SatUtMac::DoFrameStart, this);
-    }
-  else
-    {
-      nextStartTime += Seconds (m_superframeSeq->GetDurationInSeconds (0));
-      Simulator::Schedule (nextStartTime, &SatUtMac::DoFrameStart, this);
-    }
-  */
 }
 
 } // namespace ns3
