@@ -32,8 +32,8 @@ namespace ns3 {
 SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, uint32_t configTypeIndex)
   : m_configTypeIndex (configTypeIndex),
     m_frameId (frameId),
-    m_timeSlotSymbols (0),
     m_rcBasedAllocation (false),
+    m_waveformConf (waveformConf),
     m_frameConf (frameConf)
 
 {
@@ -42,11 +42,7 @@ SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<
   m_maxSymbolsPerCarrier = m_frameConf->GetBtuConf ()->GetSymbolRateInBauds () * m_frameConf->GetDuration ().GetSeconds ();
   m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_frameConf->GetCarrierCount ();
 
-  if ( configTypeIndex == 0 )
-    {
-      Ptr<SatWaveform> waveform = waveformConf->GetWaveform (m_frameConf->GetTimeSlotConf (0)->GetWaveFormId () );
-      m_timeSlotSymbols = waveform->GetBurstLengthInSymbols ();
-    }
+  m_burstLenghts = waveformConf->GetSupportedBurstLengths ();
 
   ResetCounters ();
 }
@@ -127,7 +123,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
       while ( utSymbolsLeft > 0 )
         {
-          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, carrierSymbolsLeft, utSymbolsLeft, rcSymbolsLeft );
+          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, carrierSymbolsLeft, utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno );
 
           if ( timeSlot )
             {
@@ -150,66 +146,119 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
 }
 
 Ptr<SatTimeSlotConf>
-SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, uint32_t &carrierSymbols, uint32_t &utSymbols, uint32_t &rcSymbols)
+SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, uint32_t& carrierSymbols, uint32_t& utSymbols, uint32_t& rcSymbols, double cno)
 {
   NS_LOG_FUNCTION (this);
 
   Ptr<SatTimeSlotConf> timeSlotConf = NULL;
-
   uint32_t symbolsInUse = std::min<uint32_t> (carrierSymbols, utSymbols);
 
-  switch (m_configTypeIndex)
-  {
-    case 0:
-      {
-        if ( m_rcBasedAllocation && (rcSymbols < symbolsInUse) && (rcSymbols < m_timeSlotSymbols))
+  if ( m_rcBasedAllocation && (rcSymbols < symbolsInUse) )
+    {
+      carrierSymbols -= rcSymbols;
+      utSymbols -= rcSymbols;
+      rcSymbols = 0;
+    }
+  else
+    {
+      uint32_t timeSlotSymbols = GetOptimalBurtsLengthInSymbols (symbolsInUse);
+
+      if ( timeSlotSymbols == 0 )
+        {
+          if (carrierSymbols < utSymbols)
+            {
+              carrierSymbols -= symbolsInUse;
+            }
+
+          utSymbols -= symbolsInUse;
+          rcSymbols -= symbolsInUse;
+        }
+      else
+        {
+          switch (m_configTypeIndex)
           {
-            carrierSymbols -= rcSymbols;
-            utSymbols -= rcSymbols;
-            rcSymbols = 0;
-          }
-        else if (symbolsInUse < m_timeSlotSymbols)
-          {
-            if (carrierSymbols < utSymbols)
+            case 0:
               {
-                carrierSymbols -= symbolsInUse;
+                uint16_t index = (carrierId * m_frameConf->GetTimeSlotCount ()/m_frameConf->GetCarrierCount ()) + ((m_maxSymbolsPerCarrier - carrierSymbols) / timeSlotSymbols);
+                timeSlotConf = m_frameConf->GetTimeSlotConf (index);
+
+                carrierSymbols -= timeSlotSymbols;
+                utSymbols -= timeSlotSymbols;
               }
+              break;
 
-            utSymbols -= symbolsInUse;
-            rcSymbols -= symbolsInUse;
+            case 1:
+            case 2:
+              {
+                uint32_t waveformId = 0;
+                bool waveformFound = m_waveformConf->GetBestWaveformId (cno, m_frameConf->GetDuration ().GetSeconds (), waveformId, timeSlotSymbols );
+
+                if ( waveformFound )
+                  {
+                    double startTime = (m_maxSymbolsPerCarrier - carrierSymbols) * m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();
+                    timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, timeSlotSymbols);
+                  }
+              }
+              break;
+
+            case 3:
+            default:
+              NS_FATAL_ERROR ("Not supported configuration type!!!");
+              break;
           }
-        else
-          {
-            uint16_t index = (carrierId * m_frameConf->GetTimeSlotCount ()/m_frameConf->GetCarrierCount ()) + (m_maxSymbolsPerCarrier - carrierSymbols) / m_timeSlotSymbols;
-            timeSlotConf = m_frameConf->GetTimeSlotConf (index);
-
-            carrierSymbols -= m_timeSlotSymbols;
-            utSymbols -= m_timeSlotSymbols;
-          }
-      }
-      break;
-
-    case 1:
-      // TODO: configuration 1 time slot generation
-      break;
-
-    case 2:
-      // TODO: configuration 2 time slot generation
-      break;
-
-    case 3:
-    default:
-      NS_FATAL_ERROR ("Not supported configuration type!!!");
-      break;
-  }
+        }
+    }
 
   return timeSlotConf;
+}
+
+uint32_t
+SatFrameAllocator::SatFrameInfo::GetOptimalBurtsLengthInSymbols (uint32_t symbolsInUse)
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t burstLenght = 0;
+
+  switch (m_configTypeIndex)
+    {
+      case 0:
+      case 1:
+        if (symbolsInUse >= m_waveformConf->GetDefaultBurstLenght ())
+          {
+            burstLenght = m_waveformConf->GetDefaultBurstLenght ();
+          }
+        break;
+
+      case 2:
+        {
+          for (SatWaveformConf::BurstLengthContainer_t::const_iterator it = m_burstLenghts.begin (); it != m_burstLenghts.end (); it++)
+            {
+              if ( symbolsInUse >= *it )
+                {
+                  // burst length is shorter than earlier accepted burst length
+                  if (*it < burstLenght)
+                    {
+                      burstLenght = *it;
+                    }
+                }
+            }
+        }
+        break;
+
+      case 3:
+      default:
+        NS_FATAL_ERROR ("Not supported configuration type!!!");
+        break;
+    }
+
+  return burstLenght;
+
 }
 
 void
 SatFrameAllocator::SatFrameInfo::AllocateSymbols (double targetLoad, bool fcaEnabled)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << targetLoad << fcaEnabled);
 
   if ( (targetLoad >= 0)  && (targetLoad <= 1) )
     {
@@ -760,10 +809,30 @@ SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatF
     {
       uint32_t waveFormId = 0;
 
-      if ( m_waveformConf->GetBestWaveformId ( cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
-        {
-          supportedFrames.insert (std::make_pair (it->first, waveFormId));
-        }
+      switch ( it->second.GetConfigTypeIndex () )
+      {
+        case 0:
+          supportedFrames.insert (std::make_pair (it->first, m_waveformConf->GetDefaultWaveformId ()));
+          break;
+
+        case 1:
+            if ( m_waveformConf->GetBestWaveformId ( cno, it->second.GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLenght ()))
+              {
+                supportedFrames.insert (std::make_pair (it->first, waveFormId));
+              }
+          break;
+
+        case 2:
+          if ( m_waveformConf->GetBestWaveformId ( cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
+            {
+              supportedFrames.insert (std::make_pair (it->first, waveFormId));
+            }
+          break;
+
+        default:
+          NS_FATAL_ERROR ("Not supported configuration type");
+          break;
+      }
     }
 
   if ( supportedFrames.empty () == false )

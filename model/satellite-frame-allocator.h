@@ -295,17 +295,6 @@ private:
       void GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp);
 
       /**
-       * Create time slot according to configuration type.
-       *
-       * \param carrierId Id of the carrier into create timeslot
-       * \param carrierSymbols Symbols left in carrier
-       * \param utSymbols Symbols left for the UT
-       * \param rcSymbols Symbols left for RC
-       * \return Create time slot configuration
-       */
-      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, uint32_t& carrierSymbols, uint32_t& utSymbols, uint32_t& rcSymbols);
-
-      /**
        * Get frame load by requested CC
        * \param ccLevel CC of the request
        * \return Load of the requested CC.
@@ -360,6 +349,14 @@ private:
        * \return Frame symbol rate in bauds.
        */
       double GetSymbolRateInBauds () const { return m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();}
+
+
+      /**
+       * Get configuration type index
+       *
+       *  \return configuration type index of the frame.
+       **/
+      inline uint32_t GetConfigTypeIndex () const { return m_configTypeIndex; }
 
     private:
       typedef struct
@@ -433,8 +430,10 @@ private:
       double    m_maxSymbolsPerCarrier;
       uint32_t  m_configTypeIndex;
       uint8_t   m_frameId;
-      uint32_t  m_timeSlotSymbols;  // for configuration 0
       bool      m_rcBasedAllocation;
+
+      SatWaveformConf::BurstLengthContainer_t m_burstLenghts;
+      Ptr<SatWaveformConf> m_waveformConf;
 
       Ptr<SatFrameConf>   m_frameConf;
       UtAllocContainer_t  m_utAllocs;
@@ -445,10 +444,30 @@ private:
        * \param fcaEnabled FCA (free capacity allocation) enable status
        */
       void ShareSymbols (bool fcaEnabled);
+
+      /**
+       * Get optimal burst length in symbols.
+       *
+       * \param symbolsInUse Symbols in use to create time slot.
+       * \return Optimal time slot symbols for the symbols in use and left symbols in carrier.
+       */
+      uint32_t GetOptimalBurtsLengthInSymbols (uint32_t symbolsInUse);
+
+      /**
+       * Create time slot according to configuration type.
+       *
+       * \param carrierId Id of the carrier into create timeslot
+       * \param carrierSymbols Symbols left in carrier
+       * \param utSymbols Symbols left for the UT
+       * \param rcSymbols Symbols left for RC
+       * \param cno Estimated C/N0 of the UT.
+       * \return Create time slot configuration
+       */
+      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, uint32_t& carrierSymbols, uint32_t& utSymbols, uint32_t& rcSymbols, double cno);
   };
 
   typedef std::map<uint8_t, SatFrameInfo> FrameInfoContainer_t;
-  typedef std::map <uint8_t, uint32_t>    SupportedFrameInfo_t;
+  typedef std::map<uint8_t, uint32_t>     SupportedFrameInfo_t;
 
   FrameInfoContainer_t  m_frameInfos;
   Ptr<SatWaveformConf>  m_waveformConf;

@@ -167,6 +167,7 @@ private:
 class SatWaveformConf : public Object
 {
 public:
+  typedef std::vector<uint32_t> BurstLengthContainer_t;
   /**
    * Default constructor, which is not to be used
    */
@@ -207,9 +208,21 @@ public:
 
   /**
    * Get default waveform id
-   * \return SatWaveform id of the conf holding all the details of the default wf
+   * \return SatWaveform id of the configuration holding all the details of the default wf
    */
   uint32_t GetDefaultWaveformId () const;
+
+  /**
+   * Get default burst length
+   * \return Configured default burst length.
+   */
+  inline uint32_t GetDefaultBurstLenght () const { return GetWaveform (m_defaultWfId)->GetBurstLengthInSymbols (); }
+
+  /**
+   * Get supported burst lengths.
+   * \return Supported burst lengths.
+   */
+  inline const BurstLengthContainer_t& GetSupportedBurstLengths () const { return m_supportedBurstLengthsInSymbols;}
 
   /**
    * Get the best waveform id based on UT's C/No and C/No thresholds
@@ -285,6 +298,11 @@ private:
    */
   uint32_t m_minWfId;
   uint32_t m_maxWfId;
+
+  /**
+   * Container to store supported burst lengths.
+   */
+  BurstLengthContainer_t  m_supportedBurstLengthsInSymbols;
 };
 
 } // namespace ns3

@@ -154,7 +154,7 @@ SatWaveformConf::SatWaveformConf ()
  m_targetBLER (0.00001),
  m_acmEnabled (false),
  m_defaultWfId (3),
- m_minWfId (0),
+  m_minWfId (0),
  m_maxWfId (23)
 {
   // default constructor should not be used
@@ -178,6 +178,9 @@ SatWaveformConf::SatWaveformConf (std::string filePathName)
 {
   NS_LOG_FUNCTION (this);
   ReadFromFile (filePathName);
+
+  m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
+  m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
 }
 
 TypeId
