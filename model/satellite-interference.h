@@ -47,8 +47,9 @@ public:
       * \param id identifier of the event
       * \param duration duration of the interference event
       * \param rxPower  RX power of interference
+      * \param satEarthStationAddress Address of the related earth station
       */
-    InterferenceChangeEvent (uint32_t id, Time duration, double rxPower, Address terrestrialAddress);
+    InterferenceChangeEvent (uint32_t id, Time duration, double rxPower, Address satEarthStationAddress);
 
     /**
      * Destructor of Event for satellite interference
@@ -83,14 +84,14 @@ public:
     /**
       * \return Terrestrial node MAC address of the interference event
       */
-    Address GetTerrestrialNodeAddress (void) const;
+    Address GetSatEarthStationAddress (void) const;
 
   private:
     Time m_startTime;
     Time m_endTime;
     double m_rxPower;
     uint32_t m_id;
-    Address m_terrestrialAddress;
+    Address m_satEarthStationAddress;
   };
 
   static TypeId GetTypeId (void);

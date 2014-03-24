@@ -79,9 +79,9 @@ public:
   ~SatGwMac ();
 
   /**
-   * Starts sending packets periodically. Called when MAC is wanted to take care of periodic sending.
+   * Starts periodical transmissions. Called when MAC is wanted to take care of periodic sending.
    */
-  void StartPeriodicSending ();
+  void StartPeriodicTransmissions ();
 
   /**
    * Receive packet from lower layer.

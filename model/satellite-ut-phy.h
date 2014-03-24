@@ -36,7 +36,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatUtPhy models the physical layer of the satellite system (UT, GW, satellite)
+ * The SatUtPhy models the physical layer of the User Terminal of the satellite system.
  */
 class SatUtPhy : public SatPhy
 {

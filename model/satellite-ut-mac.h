@@ -38,8 +38,13 @@ namespace ns3 {
  * \ingroup satellite
   * \brief UT specific Mac class for Sat Net Devices.
  *
- * This SatUtMac class specializes the Mac class with UT characteristics.
- * The class implements UT specific scheduler and will implement Ut specif queus later..
+ * This SatUtMac class specializes the MAC class with UT characteristics. UT MAC
+ * receives BB frames intended for it (including at least one packet intended for it)
+ * from the forward link and disassembles the GSE PDUs from the BB frame. BB frame may
+ * hold also TBTP messages from GW (forward link) including allocations for the UT.
+ * UT schedules the tx opportunities to LLC via UT scheduler. UT forwards a container
+ * of packets to the PHY layer. Packet container models the Frame PDU, including one or
+ * more RLE PDUs.
  *
  */
 class SatUtMac : public SatMac

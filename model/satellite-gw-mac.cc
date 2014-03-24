@@ -100,7 +100,7 @@ SatGwMac::DoDispose ()
 }
 
 void
-SatGwMac::StartPeriodicSending()
+SatGwMac::StartPeriodicTransmissions()
 {
   NS_LOG_FUNCTION (this);
 
@@ -206,7 +206,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
                      m_nodeInfo->GetMacAddress (),
                      SatEnums::LL_MAC,
                      SatEnums::LD_FORWARD,
-                     SatUtils::GetPacketInfo (bbFrame->GetTransmitData ()));
+                     SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
                      
       SatSignalParameters::txInfo_s txInfo;
       txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
@@ -217,7 +217,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
        * we assume only one carrier in forward link, so it is safe to use 0.
        */
       // Decrease a guard time from BB frame duration.
-      SendPacket (bbFrame->GetTransmitData (), carrierId, txDuration - m_guardTime, txInfo);
+      SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
     }
 
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);

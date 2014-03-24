@@ -487,7 +487,7 @@ SatChannel::GetSourceAddress (Ptr<SatSignalParameters> rxParams)
 {
   SatMacTag tag;
 
-  SatSignalParameters::TransmitBuffer_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
+  SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
 
   if (*i == NULL)
   {

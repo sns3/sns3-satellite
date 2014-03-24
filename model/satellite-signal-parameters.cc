@@ -51,7 +51,7 @@ SatSignalParameters::SatSignalParameters () :
 
 SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
 {
-  for ( TransmitBuffer_t::const_iterator i = p.m_packetsInBurst.begin (); i != p.m_packetsInBurst.end (); i++  )
+  for ( PacketsInBurst_t::const_iterator i = p.m_packetsInBurst.begin (); i != p.m_packetsInBurst.end (); i++  )
     {
       m_packetsInBurst.push_back ((*i)->Copy ());
     }

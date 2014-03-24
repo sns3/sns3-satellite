@@ -53,10 +53,8 @@ public:
   /**
    * Buffer for transmissions. Buffer just holds data as pointer to packets.
    * Real length of buffer is simulated by duration of the PDU transmission.
-   *
-   * NOTE! In case of return link this buffer includes only one packet pointer.
    */
-  typedef std::vector< Ptr<Packet> > TransmitBuffer_t;
+  typedef std::vector< Ptr<Packet> > PacketsInBurst_t;
   
   /**
    * default constructor
@@ -76,7 +74,7 @@ public:
    * this is transmit buffer including packet pointers.
    */
 
-  TransmitBuffer_t m_packetsInBurst;
+  PacketsInBurst_t m_packetsInBurst;
 
   /**
    * The beam for the packet transmission

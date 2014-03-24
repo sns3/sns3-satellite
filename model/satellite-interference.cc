@@ -26,12 +26,12 @@ NS_LOG_COMPONENT_DEFINE ("SatInterference");
 
 namespace ns3 {
 
-SatInterference::InterferenceChangeEvent::InterferenceChangeEvent (uint32_t id, Time rxDuration, double rxPower, Address terrestrialAddress)
+SatInterference::InterferenceChangeEvent::InterferenceChangeEvent (uint32_t id, Time rxDuration, double rxPower, Address satEarthStationAddress)
   : m_startTime (Simulator::Now ()),
     m_endTime (m_startTime + rxDuration),
     m_rxPower (rxPower),
     m_id (id),
-    m_terrestrialAddress (terrestrialAddress)
+    m_satEarthStationAddress (satEarthStationAddress)
 {
 }
 SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent ()
@@ -69,9 +69,9 @@ SatInterference::InterferenceChangeEvent::GetRxPower (void) const
 }
 
 Address
-SatInterference::InterferenceChangeEvent::GetTerrestrialNodeAddress (void) const
+SatInterference::InterferenceChangeEvent::GetSatEarthStationAddress (void) const
 {
-  return m_terrestrialAddress;
+  return m_satEarthStationAddress;
 }
 /****************************************************************
  *       The actual SatInterference

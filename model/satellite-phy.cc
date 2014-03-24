@@ -330,7 +330,7 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
       m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
 
       // Invoke the `Rx` trace source.
-      SatSignalParameters::TransmitBuffer_t::const_iterator it1;
+      SatSignalParameters::PacketsInBurst_t::const_iterator it1;
       for (it1 = rxParams->m_packetsInBurst.begin ();
            it1 != rxParams->m_packetsInBurst.end (); ++it1)
         {

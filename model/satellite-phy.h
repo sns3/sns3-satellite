@@ -42,7 +42,13 @@ class SatMac;
 /**
  * \ingroup satellite
  *
- * The SatPhy models the physical layer of the satellite system (UT, GW, satellite)
+ * The SatPhy models the physical layer of the satellite system (UT, GW, satellite).
+ * SatPhy is the base class implementing the commonalities between different satellite
+ * nodes. Actual implementations are located in:
+ * - SatUtPhy
+ * - SatGwPhy
+ * - SatGeoFeederPhy
+ * - SatGeoUserPhy
  */
 class SatPhy : public Object
 {
@@ -50,7 +56,7 @@ public:
   typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
   typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;
-  typedef SatSignalParameters::TransmitBuffer_t PacketContainer_t;
+  typedef SatSignalParameters::PacketsInBurst_t PacketContainer_t;
 
   /**
    * \param  the container of pointers to packets received

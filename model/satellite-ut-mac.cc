@@ -382,12 +382,6 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, uint8_t rcIndex, SatUtScheduler::
 {
   NS_LOG_FUNCTION (this);
 
-  /**
-   * TODO: the TBTP should hold also the RC_index for each time slot. Here, the RC_index
-   * should be passed with txOpportunity to higher layer, so that it knows which RC_index
-   * (= queue) to serve.
-   */
-
   // Packet container to be sent to lower layers.
   // Packet container models FPDU.
   SatPhy::PacketContainer_t packets;
@@ -450,7 +444,7 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 
   NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - Time: " << Now ().GetSeconds () << " Queue: " << (uint32_t)rcIndex);
 
-  /// TODO this assumes that RC index 0 is the one and only control RC index
+  // Check only the queue events from the control queue
   if (rcIndex == SatEnums::CONTROL_FID)
     {
       if (event == SatQueue::FIRST_BUFFERED_PKT || event == SatQueue::BUFFERED_PKT)

@@ -196,7 +196,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
       std::vector<double> tempVector;
       tempVector.push_back (Now ().GetSeconds());
       tempVector.push_back (ifPowerW / m_rxBandwidth_Hz);
-      Singleton<SatInterferenceOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (event->GetTerrestrialNodeAddress (), m_channelType), tempVector);
+      Singleton<SatInterferenceOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (event->GetSatEarthStationAddress (), m_channelType), tempVector);
     }
 
   return ifPowerW;

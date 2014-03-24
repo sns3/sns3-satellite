@@ -41,7 +41,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 {
 public:
 
-  typedef std::vector<Ptr<Packet > > SatBbFrameData;
+  typedef std::vector<Ptr<Packet > > SatBbFramePayload_t;
 
   /**
    * Default constructor. Constructs BB frame with default ModCod and default frame type.
@@ -65,7 +65,7 @@ public:
    * Get the data in the BB Frame info as container of the packet pointers.
    * \return Container having data as packet pointers.
    */
-  const SatBbFrameData& GetTransmitData ();
+  const SatBbFramePayload_t& GetPayload ();
 
   /**
    * Add payload (packet) to transmit buffer of this BB Frame info
@@ -85,13 +85,13 @@ public:
    * Get space left in BB frame transmit buffer in bytes.
    * \return free bytes in transmit buffer
    */
-  uint32_t GetSpaceLeftInBytes () const ;
+  uint32_t GetSpaceLeftInBytes () const;
 
   /**
    * Get the maximum size of the BB Frame transmit buffer in bytes.
    * \return the maximum size of the BB Frame transmit buffer
    */
-  uint32_t GetMaxSpaceInBytes () const ;
+  uint32_t GetMaxSpaceInBytes () const;
 
   /**
    * Get duration of the frame transmission.
@@ -117,7 +117,7 @@ private:
   uint32_t m_spaceInBytes;
   uint32_t m_maxSpaceInBytes;
   bool m_containsControlPdu;
-  SatBbFrameData framePayload;
+  SatBbFramePayload_t m_framePayload;
   Time m_duration;
   SatEnums::SatBbFrameType_t m_frameType;
 };

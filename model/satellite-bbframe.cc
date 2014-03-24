@@ -74,11 +74,11 @@ SatBbFrame::~SatBbFrame ()
   NS_LOG_FUNCTION (this);
 }
 
-const SatBbFrame::SatBbFrameData&
-SatBbFrame::GetTransmitData ()
+const SatBbFrame::SatBbFramePayload_t&
+SatBbFrame::GetPayload ()
 {
   NS_LOG_FUNCTION (this);
-  return framePayload;
+  return m_framePayload;
 }
 
 uint32_t
@@ -90,7 +90,7 @@ SatBbFrame::AddPayload (Ptr<Packet> data)
 
   if ( dataLengthInBytes <= m_spaceInBytes )
     {
-      framePayload.push_back (data);
+      m_framePayload.push_back (data);
       m_spaceInBytes -= dataLengthInBytes;
     }
   else

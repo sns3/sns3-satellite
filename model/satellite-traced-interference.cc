@@ -93,7 +93,7 @@ SatTracedInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent
 {
   NS_LOG_FUNCTION (this);
 
-  m_power = m_rxBandwidth_Hz * Singleton<SatInterferenceInputTraceContainer>::Get ()->GetInterferenceDensity (std::make_pair (event->GetTerrestrialNodeAddress (),m_channelType));
+  m_power = m_rxBandwidth_Hz * Singleton<SatInterferenceInputTraceContainer>::Get ()->GetInterferenceDensity (std::make_pair (event->GetSatEarthStationAddress (),m_channelType));
 
   return m_power;
 }
