@@ -69,22 +69,10 @@ public:
     std::vector<uint16_t> slotIdsForOtherReplicas;
     bool hasCollision;
     bool packetHasBeenProcessed;
-  } crdsaPacketRxParams_s;
-
-  /**
-   * \brief Struct for storing the CRDSA packet specific Rx parameters
-   */
-  typedef struct
-  {
-    Ptr<SatSignalParameters> rxParams;
     double cSinr;
     double ifPower;
-    Mac48Address destAddress;
-    Mac48Address sourceAddress;
     bool phyError;
-    uint16_t ownSlotId;
-    std::vector<uint16_t> slotIdsForOtherReplicas;
-  } crdsaCombinedPacketRxParams_s;
+  } crdsaPacketRxParams_s;
 
   /**
    * \brief
@@ -254,7 +242,7 @@ private:
    * \brief
    * \return
    */
-  std::vector<SatPhyRxCarrier::crdsaCombinedPacketRxParams_s> ProcessFrame ();
+  std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> ProcessFrame ();
 
   /**
    *
@@ -262,14 +250,14 @@ private:
    * \param numOfPacketsForThisSlot
    * \return
    */
-  SatPhyRxCarrier::crdsaCombinedPacketRxParams_s ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
-                                                                             uint32_t numOfPacketsForThisSlot);
+  SatPhyRxCarrier::crdsaPacketRxParams_s ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
+                                                                     uint32_t numOfPacketsForThisSlot);
 
   /**
    *
    * \param
    */
-  void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s);
+  void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s);
 
   /**
    *
@@ -277,7 +265,7 @@ private:
    * \param iter
    * \return
    */
-  bool IsReplica (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
+  bool IsReplica (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
 
   /**
    *
@@ -285,7 +273,7 @@ private:
    * \param iter
    * \return
    */
-  bool HaveSameSlotIds (SatPhyRxCarrier::crdsaCombinedPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
+  bool HaveSameSlotIds (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
 
   /**
    *
@@ -297,6 +285,13 @@ private:
   bool ProcessSlottedAlohaCollisions (double cSinr,
                                       Ptr<SatSignalParameters> rxParams,
                                       Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
+
+  /**
+   *
+   * \param packet
+   * \param successfullyReceivedPacket
+   */
+  void ReduceCrdsaPacketInterference (Ptr<SatSignalParameters> packet, Ptr<SatSignalParameters> successfullyReceivedPacket);
 
   /**
    * \brief

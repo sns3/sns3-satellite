@@ -176,7 +176,16 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
 
   /// schedule the next frame start
   /// TODO get rid of hard coded superframe sequence ID 0
-  Simulator::Schedule (GetNextSuperFrameTxTime (0), &SatUtMac::DoFrameStart, this);
+  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (0);
+
+  if (Now () >= nextSuperFrameTxTime)
+    {
+      NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
+    }
+
+  Time schedulingDelay = nextSuperFrameTxTime - Now ();
+
+  Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
 }
 
 void
