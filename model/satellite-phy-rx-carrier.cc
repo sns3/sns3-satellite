@@ -968,19 +968,19 @@ SatPhyRxCarrier::ProcessFrame ()
                   NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Found a packet ready for processing");
 
                   /// process the received packet
-                  processedPacket = ProcessReceivedCrdsaPacket (*iterList, iter->second.size ());
+                  *iterList = ProcessReceivedCrdsaPacket (*iterList, iter->second.size ());
 
-                  /// mark the packet as processed
-                  iterList->packetHasBeenProcessed = true;
-
-                  NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Packet error: " << processedPacket.phyError);
+                  NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Packet error: " << iterList->phyError);
 
                   /// packet successfully received
-                  if (!processedPacket.phyError)
+                  if (!iterList->phyError)
                     {
                       NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Packet successfully received, breaking the slot iteration");
 
                       nothingToProcess = false;
+
+                      /// save packet for processing outside the loop
+                      processedPacket = *iterList;
 
                       /// remove the successfully received packet from the container
                       iter->second.erase (iterList);
@@ -1028,7 +1028,9 @@ SatPhyRxCarrier::ProcessFrame ()
         {
           std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList = iter->second.begin ();
 
-          NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Processing unsuccessfully received packet in slot: " << iterList->ownSlotId);
+          NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Processing unsuccessfully received packet in slot: " << iterList->ownSlotId
+                       << " packet phy error: " << iterList->phyError
+                       << " packet has been processed: " << iterList->packetHasBeenProcessed);
 
           if (!iterList->packetHasBeenProcessed || !iterList->phyError)
             {
@@ -1040,6 +1042,15 @@ SatPhyRxCarrier::ProcessFrame ()
 
           /// save the the received packet
           combinedPacketsForFrame.push_back (*iterList);
+
+          /// remove the packet from the container
+          iter->second.erase (iterList);
+
+          /// remove the empty slot container
+          if (iter->second.empty ())
+            {
+              m_crdsaPacketContainer.erase (iter);
+            }
         }
     } while (m_crdsaPacketContainer.size () > 0);
 
@@ -1058,23 +1069,14 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Processing a packet in slot: " << packet.ownSlotId <<
                " number of packets in this slot: " << numOfPacketsForThisSlot);
 
-  SatPhyRxCarrier::crdsaPacketRxParams_s processedPacket;
-
-  /// copy variable values
-  processedPacket.destAddress = packet.destAddress;
-  processedPacket.sourceAddress = packet.sourceAddress;
-  processedPacket.rxParams = packet.rxParams;
-  processedPacket.ownSlotId = packet.ownSlotId;
-
   for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
     {
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Replica in slot: " << packet.slotIdsForOtherReplicas[i]);
-      processedPacket.slotIdsForOtherReplicas.push_back (packet.slotIdsForOtherReplicas[i]);
     }
 
   /// TODO these need to be calculated
-  processedPacket.cSinr = 10;
-  processedPacket.ifPower = 5;
+  packet.cSinr = 10;
+  packet.ifPower = 5;
 
   if (m_dropCollidingRandomAccessPackets)
     {
@@ -1085,26 +1087,27 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
         {
           NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Multiple packets in this slot, successful reception is not possible");
           /// not possible to have a successful reception
-          processedPacket.phyError = true;
+          packet.phyError = true;
         }
       else
         {
           NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Only packet in this slot, checking against link results");
           /// check against link results
-          processedPacket.phyError = CheckAgainstLinkResults (processedPacket.cSinr,processedPacket.rxParams);
+          packet.phyError = CheckAgainstLinkResults (packet.cSinr,packet.rxParams);
         }
-      NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Strict collision detection error: " << processedPacket.phyError);
+      NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Strict collision detection error: " << packet.phyError);
     }
   else
     {
       /// check against link results
-      processedPacket.phyError = CheckAgainstLinkResults (processedPacket.cSinr,processedPacket.rxParams);
-      NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Check against link results, phy error: " << processedPacket.phyError);
+      packet.phyError = CheckAgainstLinkResults (packet.cSinr,packet.rxParams);
+      NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Check against link results, phy error: " << packet.phyError);
     }
 
-  packet.slotIdsForOtherReplicas.clear ();
+  /// mark the packet as processed
+  packet.packetHasBeenProcessed = true;
 
-  return processedPacket;
+  return packet;
 }
 
 void
