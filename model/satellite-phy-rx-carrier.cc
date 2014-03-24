@@ -1095,7 +1095,7 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
           /// check against link results
           packet.phyError = CheckAgainstLinkResults (packet.cSinr,packet.rxParams);
         }
-      NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Strict collision detection error: " << packet.phyError);
+      NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Strict collision detection, phy error: " << packet.phyError);
     }
   else
     {
@@ -1108,23 +1108,6 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
   packet.packetHasBeenProcessed = true;
 
   return packet;
-}
-
-void
-SatPhyRxCarrier::ReduceCrdsaPacketInterference (Ptr<SatSignalParameters> packet, Ptr<SatSignalParameters> successfullyReceivedPacket)
-{
-  NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::ReduceCrdsaPacketInterference - Time: " << Now ().GetSeconds ());
-
-  NS_LOG_INFO ("SatPhyRxCarrier::ReduceCrdsaPacketInterference");
-
-  packet->m_ifPowerInSatellite_W -= successfullyReceivedPacket->m_ifPowerInSatellite_W;
-  packet->m_ifPower_W -= successfullyReceivedPacket->m_ifPower_W;
-
-  if (packet->m_ifPower_W < 0 || packet->m_ifPowerInSatellite_W < 0)
-    {
-      NS_FATAL_ERROR ("SatPhyRxCarrier::ReducePacketInterference - Negative interference power");
-    }
 }
 
 void
@@ -1147,20 +1130,18 @@ SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s p
         }
 
       std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList;
+      SatPhyRxCarrier::crdsaPacketRxParams_s removedPacket;
 
       bool replicaFound = false;
 
-      /// TODO this functionality needs to be checked
       for (iterList = iter->second.begin (); iterList != iter->second.end (); )
         {
-          /// release packets in this slot for re-processing
-          iterList->packetHasBeenProcessed = false;
-
           /// check for the same UT & same slots
           if (IsReplica (packet, iterList))
             {
               /// replica found for removal
               replicaFound = true;
+              removedPacket = *iterList;
               iter->second.erase (iterList++);
             }
           else
@@ -1169,15 +1150,33 @@ SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s p
             }
         }
 
+      if (!replicaFound)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Replica not found");
+        }
+
       if (iter->second.empty ())
         {
           NS_LOG_INFO ("SatPhyRxCarrier::FindAndRemoveReplicas - No other packets in this slot, erasing the slot container");
           m_crdsaPacketContainer.erase (iter);
         }
-
-      if (!replicaFound)
+      else
         {
-          NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Replica not found");
+          for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
+            {
+              /// release packets in this slot for re-processing
+              iterList->packetHasBeenProcessed = false;
+
+              /// reduce interference power for the colliding packets
+              iterList->rxParams->m_ifPowerInSatellite_W -= removedPacket.rxParams->m_ifPowerInSatellite_W;
+              iterList->rxParams->m_ifPower_W -= removedPacket.rxParams->m_ifPower_W;
+
+              /// sanity check
+              if (iterList->rxParams->m_ifPower_W < 0 || iterList->rxParams->m_ifPowerInSatellite_W < 0)
+                {
+                  NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Negative interference power");
+                }
+            }
         }
     }
 }

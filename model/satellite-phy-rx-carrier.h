@@ -287,13 +287,6 @@ private:
                                       Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
 
   /**
-   *
-   * \param packet
-   * \param successfullyReceivedPacket
-   */
-  void ReduceCrdsaPacketInterference (Ptr<SatSignalParameters> packet, Ptr<SatSignalParameters> successfullyReceivedPacket);
-
-  /**
    * \brief
    */
   std::map<uint32_t, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> > m_crdsaPacketContainer;
