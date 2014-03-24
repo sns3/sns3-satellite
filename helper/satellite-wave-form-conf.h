@@ -216,7 +216,7 @@ public:
    * Get default burst length
    * \return Configured default burst length.
    */
-  inline uint32_t GetDefaultBurstLenght () const { return GetWaveform (m_defaultWfId)->GetBurstLengthInSymbols (); }
+  inline uint32_t GetDefaultBurstLength () const { return GetWaveform (m_defaultWfId)->GetBurstLengthInSymbols (); }
 
   /**
    * Get supported burst lengths.

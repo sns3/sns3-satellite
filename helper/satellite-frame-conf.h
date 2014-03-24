@@ -327,6 +327,17 @@ class SatSuperframeConf : public Object
 public:
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
+  /**
+   * Enum for configuration types
+   */
+  typedef enum
+  {
+    CONFIG_TYPE_0,//!< Configuration type 0
+    CONFIG_TYPE_1,//!< Configuration type 1
+    CONFIG_TYPE_2,//!< Configuration type 2
+    CONFIG_TYPE_3 //!< Configuration type 3
+  } ConfigType_t;
+
   static const uint8_t m_maxFrameCount = 10;
   static const uint32_t m_maxFrameConfigTypeIndex = 3;
 
@@ -489,13 +500,13 @@ public:
    *
    * \param configType index of the frame configuration type
    */
-  inline void SetConfigType (uint32_t index) { m_configTypeIndex = index; }
+  inline void SetConfigType (SatSuperframeConf::ConfigType_t type) { m_configType = type; }
 
   /**
    * Get frame configuration type to be used in super frame.
-   * \return index of the frame configuration type
+   * \return the frame configuration type
    */
-  inline uint32_t GetConfigType () const { return m_configTypeIndex; }
+  inline SatSuperframeConf::ConfigType_t GetConfigType () const { return m_configType; }
 
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
   void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
@@ -516,8 +527,8 @@ private:
   double    m_usedBandwidthHz;
   Time      m_duration;
 
-  uint8_t   m_frameCount;
-  uint32_t  m_configTypeIndex;
+  uint8_t       m_frameCount;
+  ConfigType_t  m_configType;
 
   double    m_frameAllocatedBandwidth[m_maxFrameCount];
   double    m_frameCarrierAllocatedBandwidth[m_maxFrameCount];

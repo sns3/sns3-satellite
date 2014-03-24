@@ -257,12 +257,16 @@ private:
   class SatFrameInfo
   {
     public:
-      typedef enum
+
+    /**
+     * Enum for CC levels
+     */
+    typedef enum
       {
-        CC_LEVEL_CRA,
-        CC_LEVEL_CRA_MIN_RBDC,
-        CC_LEVEL_CRA_RBDC,
-        CC_LEVEL_CRA_RBDC_VBDC,
+        CC_LEVEL_CRA,          //!< CC level CRA
+        CC_LEVEL_CRA_MIN_RBDC, //!< CC level CRA + Minimum RBDC
+        CC_LEVEL_CRA_RBDC,     //!< CC level CRA + RBDC
+        CC_LEVEL_CRA_RBDC_VBDC,//!< CC level CRA + RBDC + VBDC
       } CcLevel_t;
 
       /**
@@ -271,9 +275,9 @@ private:
        * \param frameConf Frame configuration for the frame info
        * \param waveformConf Waveform configuration
        * \param frameId Id of the frame
-       * \param m_configTypeIndex Index of the configuration type (0-2 supported)
+       * \param m_configType Type of the configuration (0-2 supported)
        */
-      SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, uint32_t m_configTypeIndex);
+      SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, SatSuperframeConf::ConfigType_t m_configType);
 
       /**
        * Reset load counters in frame info.
@@ -352,11 +356,11 @@ private:
 
 
       /**
-       * Get configuration type index
+       * Get configuration type.
        *
-       *  \return configuration type index of the frame.
+       *  \return Configuration type of the frame.
        **/
-      inline uint32_t GetConfigTypeIndex () const { return m_configTypeIndex; }
+      inline uint32_t GetConfigType () const { return m_configType; }
 
     private:
       typedef struct
@@ -427,10 +431,10 @@ private:
       double  m_preAllocatedRdbcSymbols;
       double  m_preAllocatedVdbcSymbols;
 
-      double    m_maxSymbolsPerCarrier;
-      uint32_t  m_configTypeIndex;
-      uint8_t   m_frameId;
-      bool      m_rcBasedAllocation;
+      double                            m_maxSymbolsPerCarrier;
+      SatSuperframeConf::ConfigType_t   m_configType;
+      uint8_t                           m_frameId;
+      bool                              m_rcBasedAllocation;
 
       SatWaveformConf::BurstLengthContainer_t m_burstLenghts;
       Ptr<SatWaveformConf> m_waveformConf;
@@ -448,22 +452,24 @@ private:
       /**
        * Get optimal burst length in symbols.
        *
-       * \param symbolsInUse Symbols in use to create time slot.
-       * \return Optimal time slot symbols for the symbols in use and left symbols in carrier.
+       * \param symbolsToUse Symbols can be used for time slot.
+       * \param rcSymbolsLeft Symbols left for RC.
+       * \return Optimal burst length for the symbols to allocate.
        */
-      uint32_t GetOptimalBurtsLengthInSymbols (uint32_t symbolsInUse);
+      uint32_t GetOptimalBurtsLengthInSymbols (int64_t symbolsToUse, int64_t rcSymbolsLeft);
 
       /**
        * Create time slot according to configuration type.
        *
-       * \param carrierId Id of the carrier into create timeslot
-       * \param carrierSymbols Symbols left in carrier
-       * \param utSymbols Symbols left for the UT
-       * \param rcSymbols Symbols left for RC
+       * \param carrierId Id of the carrier into create time slot
+       * \param utSymbolsToUse Symbols possible to allocated for the UT
+       * \param carrierSymbolsToUse Symbols possible to allocate to carrier
+       * \param utSymbolsLeft Symbols left for the UT
+       * \param rcSymbolsLeft Symbols left for RC
        * \param cno Estimated C/N0 of the UT.
        * \return Create time slot configuration
        */
-      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, uint32_t& carrierSymbols, uint32_t& utSymbols, uint32_t& rcSymbols, double cno);
+      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno);
   };
 
   typedef std::map<uint8_t, SatFrameInfo> FrameInfoContainer_t;
