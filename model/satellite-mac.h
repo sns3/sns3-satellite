@@ -217,6 +217,12 @@ protected:
   TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
 
   /**
+   * Traced callback for all received packets, including delay information and
+   * the address of the senders.
+   */
+  TracedCallback<Time, const Address &> m_rxDelayTrace;
+
+  /**
    * Node info containing node related information, such as
    * node type, node id and MAC address (of the SatNetDevice)
    */

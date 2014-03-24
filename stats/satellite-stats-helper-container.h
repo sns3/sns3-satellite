@@ -36,7 +36,7 @@ namespace ns3 {
  * created using this C++ pre-processing approach.
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Phy] Delay
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -105,6 +105,9 @@ public:
   // Forward link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppDelay)
 
+  // Forward link MAC-level packet delay statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacDelay)
+
   // Forward link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyDelay)
 
@@ -122,6 +125,9 @@ public:
 
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
+
+  // Return link MAC-level packet delay statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacDelay)
 
   // Return link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyDelay)
