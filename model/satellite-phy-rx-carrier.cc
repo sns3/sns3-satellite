@@ -950,7 +950,7 @@ SatPhyRxCarrier::ProcessFrame ()
       /// go through the packets
       for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
         {
-          NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Iterating packets in slot: " << iter->first);
+          NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Iterating slot: " << iter->first);
 
           if (iter->second.size () < 1)
             {
@@ -988,6 +988,10 @@ SatPhyRxCarrier::ProcessFrame ()
                       /// break the cycle
                       break;
                     }
+                }
+              else
+                {
+                  NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - This packet has already been processed");
                 }
             }
 
@@ -1069,14 +1073,28 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Processing a packet in slot: " << packet.ownSlotId <<
                " number of packets in this slot: " << numOfPacketsForThisSlot);
 
+  /// TODO this is for debugging and can be removed later
   for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
     {
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Replica in slot: " << packet.slotIdsForOtherReplicas[i]);
     }
 
-  /// TODO these need to be calculated
-  packet.cSinr = 10;
-  packet.ifPower = 5;
+  double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
+                                         packet.rxParams->m_ifPowerInSatellite_W,
+                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
+                                         packet.rxParams->m_rxAciIfPowerInSatellite_W,
+                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
+                                         packet.rxParams->m_sinrCalculate);
+
+  double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
+                                packet.rxParams->m_ifPower_W,
+                                m_rxExtNoisePowerW,
+                                m_rxAciIfPowerW,
+                                m_rxExtNoisePowerW,
+                                m_sinrCalculate);
+
+  packet.cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+  packet.ifPower = packet.rxParams->m_ifPower_W;
 
   if (m_dropCollidingRandomAccessPackets)
     {
