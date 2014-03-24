@@ -259,8 +259,8 @@ private:
    */
   SatEnums::SatModcod_t m_defaultModCod;
 
-  std::map<uint32_t, uint32_t> m_shortFramePayloadSlots;
-  std::map<uint32_t, uint32_t> m_normalFramePayloadSlots;
+  std::map<uint32_t, uint32_t> m_shortFramePayloadInSlots;
+  std::map<uint32_t, uint32_t> m_normalFramePayloadInSlots;
 
   /**
    * Available "waveforms", i.e. MODCOD + BBFrame combinations

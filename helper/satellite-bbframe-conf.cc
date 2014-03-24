@@ -132,8 +132,8 @@ SatBbFrameConf::SatBbFrameConf ()
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-  m_shortFramePayloadSlots (),
-  m_normalFramePayloadSlots (),
+  m_shortFramePayloadInSlots (),
+  m_normalFramePayloadInSlots (),
   m_waveforms ()
 {
   NS_LOG_FUNCTION (this);
@@ -150,8 +150,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-  m_shortFramePayloadSlots (),
-  m_normalFramePayloadSlots (),
+  m_shortFramePayloadInSlots (),
+  m_normalFramePayloadInSlots (),
   m_waveforms ()
 {
   ObjectBase::ConstructSelf(AttributeConstructionList ());
@@ -159,8 +159,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   // Initialize the payloads
   for (uint32_t i = 0; i < 4; ++i)
     {
-      m_normalFramePayloadSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][1]));
-      m_shortFramePayloadSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
+      m_normalFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][1]));
+      m_shortFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
     }
 
   // Available MODCODs
@@ -314,12 +314,12 @@ SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEn
   {
     case SatEnums::SHORT_FRAME:
       {
-        dataSlots = m_shortFramePayloadSlots.at (modulatedBits);
+        dataSlots = m_shortFramePayloadInSlots.at (modulatedBits);
         break;
       }
     case SatEnums::NORMAL_FRAME:
       {
-        dataSlots = m_normalFramePayloadSlots.at (modulatedBits);
+        dataSlots = m_normalFramePayloadInSlots.at (modulatedBits);
         break;
       }
     default:
@@ -344,12 +344,12 @@ SatBbFrameConf::CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums
   {
     case SatEnums::SHORT_FRAME:
       {
-        dataSlots = m_shortFramePayloadSlots.at (modulatedBits);
+        dataSlots = m_shortFramePayloadInSlots.at (modulatedBits);
         break;
       }
     case SatEnums::NORMAL_FRAME:
       {
-        dataSlots = m_normalFramePayloadSlots.at (modulatedBits);
+        dataSlots = m_normalFramePayloadInSlots.at (modulatedBits);
         break;
       }
     default:
