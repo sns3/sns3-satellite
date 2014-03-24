@@ -63,17 +63,17 @@ static void PrintSoContent (std::string context, std::vector< Ptr<SatSchedulingO
 #endif
 
 bool
-SatFwdLinkScheduler::CompareSoPriority (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
+SatFwdLinkScheduler::CompareSoFlowId (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
 {
-  return (bool) (obj1->GetPriority () < obj2->GetPriority ());
+  return (bool) (obj1->GetFlowId () < obj2->GetFlowId ());
 }
 
 bool
 SatFwdLinkScheduler::CompareSoPriorityLoad (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
 {
-  bool result = CompareSoPriority (obj1, obj2);
+  bool result = CompareSoFlowId (obj1, obj2);
 
-  if ( obj1->GetPriority() == obj2->GetPriority() )
+  if ( obj1->GetFlowId () == obj2->GetFlowId () )
     {
       result = (bool) ( obj1->GetBufferedBytes() > obj2->GetBufferedBytes() );
     }
@@ -84,9 +84,9 @@ SatFwdLinkScheduler::CompareSoPriorityLoad (Ptr<SatSchedulingObject> obj1, Ptr<S
 bool
 SatFwdLinkScheduler::CompareSoPriorityHol (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2)
 {
-  bool result = CompareSoPriority (obj1, obj2);
+  bool result = CompareSoFlowId (obj1, obj2);
 
-  if ( obj1->GetPriority() == obj2->GetPriority() )
+  if ( obj1->GetFlowId () == obj2->GetFlowId () )
     {
       result = (bool) ( obj1->GetHolDelay() > obj2->GetHolDelay() );
     }
@@ -285,7 +285,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
 
   uint32_t frameBytes = 0;
   Ptr<SatBbFrame> frame = NULL;
-  uint32_t priorityClass = 0;
+  uint8_t flowId = 0;
 
   // Get scheduling objects from LLC
   std::vector< Ptr<SatSchedulingObject> > so =  GetSchedulingObjects ();
@@ -295,7 +295,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       double cno = GetSchedulingObjectCno (*it);
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
-      priorityClass = (*it)->GetPriority ();
+      flowId = (*it)->GetFlowId ();
 
       while ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ) &&
                (currentObBytes > 0) )
@@ -309,21 +309,21 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
             {
               // finish with this frame if MODCOD is more robust than we are currently using
               // TODO: we need to check rest of object left in list too
-              AddFrameToContainer (priorityClass, frame);
+              AddFrameToContainer (flowId, frame);
               frame = NULL;
             }
           else
             {
               if ( frameBytes < currentObMinReqBytes )
                 {
-                  AddFrameToContainer (priorityClass, frame);
+                  AddFrameToContainer (flowId, frame);
                   frame = NULL;
                 }
               else
                 {
                   uint32_t bytesLeft = 0;
 
-                  frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), bytesLeft);
+                  frameBytes = AddPacketToFrame (frameBytes, frame, (*it)->GetMacAddress (), (*it)->GetFlowId (), bytesLeft);
                   currentObBytes = bytesLeft;
                 }
             }
@@ -332,7 +332,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
 
   if ( frame )
     {
-      AddFrameToContainer (priorityClass, frame);
+      AddFrameToContainer (flowId, frame);
     }
 }
 
@@ -369,7 +369,7 @@ SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject
       switch (m_additionalSortCriteria)
         {
           case SatFwdLinkScheduler::NO_SORT:
-            std::sort (so.begin (), so.end (), CompareSoPriority);
+            std::sort (so.begin (), so.end (), CompareSoFlowId);
             break;
 
           case SatFwdLinkScheduler::BUFFERING_DELAY_SORT:
@@ -491,13 +491,13 @@ SatFwdLinkScheduler::GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob)
 }
 
 bool
-SatFwdLinkScheduler::AddFrameToContainer (uint32_t priorityClass, Ptr<SatBbFrame> frame )
+SatFwdLinkScheduler::AddFrameToContainer (uint8_t flowId, Ptr<SatBbFrame> frame )
 {
   NS_LOG_FUNCTION (this);
 
   bool limitReached = false;
 
-  m_bbFrameContainer->AddFrame (priorityClass, frame);
+  m_bbFrameContainer->AddFrame (flowId, frame);
 
   if ( m_bbFrameContainer->GetTotalDuration () >= m_schedulingStopThresholdTime )
     {
@@ -508,14 +508,14 @@ SatFwdLinkScheduler::AddFrameToContainer (uint32_t priorityClass, Ptr<SatBbFrame
 }
 
 uint32_t
-SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint32_t &bytesLeft )
+SatFwdLinkScheduler::AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint8_t flowId, uint32_t &bytesLeft )
 {
   NS_LOG_FUNCTION (this);
 
   uint32_t frameBytesLeft = 0;
 
   bytesLeft = 0;
-  Ptr<Packet> p = m_txOpportunityCallback (bytesToReq, address, bytesLeft);
+  Ptr<Packet> p = m_txOpportunityCallback (bytesToReq, address, flowId, bytesLeft);
 
   if ( p )
     {

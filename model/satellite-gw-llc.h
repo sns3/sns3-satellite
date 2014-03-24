@@ -53,10 +53,11 @@ public:
     *
     * \param macAddr Mac address of the UT with tx opportunity
     * \param bytes Size of the Tx opportunity
+    * \param flowId Flow identifier
     * \param &bytesLeft Bytes left after TxOpportunity
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft);
 
   /**
    * Is control encapsulator already created. Only one control encapsulator

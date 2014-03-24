@@ -85,7 +85,7 @@ public:
    * \param obj2 Second object to compare
    * \return true if first object priority is considered to be higher that second object, false otherwise
    */
-  static bool CompareSoPriority (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
+  static bool CompareSoFlowId (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
 
   /**
    * Compares to scheduling objects priorities and load
@@ -149,9 +149,10 @@ public:
    * Callback to notify upper layer about Tx opportunity.
    * \param Mac48Address address
    * \param uint32_t payload size in bytes
+   * \param uint8_t Flow identifier
    * \return packet Packet to be transmitted to PHY
    */
-  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint32_t& > TxOpportunityCallback;
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t& > TxOpportunityCallback;
 
   /**
    * Method to set Tx opportunity callback.
@@ -220,22 +221,23 @@ private:
 
   /**
    *
-   * \param priorityClass Priority class of the frame
+   * \param flowId Higher layer flow id of the frame
    * \param frame Frame to add.
    * \return true if container scheduling limit is reached, false otherwise
    */
-  bool AddFrameToContainer (uint32_t priorityClass, Ptr<SatBbFrame> frame );
+  bool AddFrameToContainer (uint8_t flowId, Ptr<SatBbFrame> frame );
 
   /**
    *
    * \param bytesToReq
    * \param frame
    * \param address
+   * \param flowId
    * \param bytesLeft
    * \param control
    * \return
    */
-  uint32_t AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint32_t &bytesLeft);
+  uint32_t AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint8_t flowId, uint32_t &bytesLeft);
 
   /**
    *  Handles periodic timer timeouts.

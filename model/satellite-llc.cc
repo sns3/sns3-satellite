@@ -57,8 +57,7 @@ SatLlc::GetTypeId (void)
 SatLlc::SatLlc ()
 :m_nodeInfo (),
  m_encaps (),
- m_decaps (),
- m_controlFlowIndex (0)
+ m_decaps ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -94,14 +93,12 @@ SatLlc::DoDispose ()
 }
 
 bool
-SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t tos)
+SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
   NS_LOG_FUNCTION (this << packet << dest);
   NS_LOG_LOGIC ("p=" << packet );
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
-
-  uint32_t flowId = TosToFlowIndex (tos);
 
   // UT: user own mac address
   // GW: use destination address
@@ -172,7 +169,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
       EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
       EncapContainer_t::iterator it = m_decaps.find (key);
 
-      if (flowId == 0)
+      if (flowId == SatEnums::CONTROL_FID)
         {
           NS_FATAL_ERROR ("Control messages should be terminated already at lower layer!");
         }
@@ -294,26 +291,6 @@ SatLlc::BuffersEmpty () const
     }
   return true;
 }
-
-uint8_t
-SatLlc::TosToFlowIndex (uint8_t tos) const
-{
-  switch (tos)
-  {
-    // ToS 10 is converted to 0 flow id
-    case 10:
-      {
-        return 0;
-      }
-    // Otherwise we map all to flow id 1
-    default:
-      {
-        return 1;
-      }
-  }
-  return 0;
-}
-
 
 } // namespace ns3
 

@@ -50,6 +50,7 @@
 #include "../model/satellite-queue.h"
 #include "../model/satellite-ut-scheduler.h"
 #include "../model/satellite-channel-estimation-error-container.h"
+#include "../model/satellite-packet-classifier.h"
 #include "satellite-ut-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -93,11 +94,6 @@ SatUtHelper::GetTypeId (void)
                      PointerValue (),
                      MakePointerAccessor (&SatUtHelper::m_llsConf),
                      MakePointerChecker<SatLowerLayerServiceConf> ())
-       .AddAttribute ("ControlFlowIndex",
-                      "Control flow index.",
-                      UintegerValue (0),
-                      MakeUintegerAccessor (&SatUtHelper::m_controlFlowIndex),
-                      MakeUintegerChecker <uint8_t> ())
        .AddAttribute ("EnableChannelEstimationError",
                       "Enable channel estimation error in forward link receiver at UT.",
                       BooleanValue (true),
@@ -127,7 +123,6 @@ SatUtHelper::SatUtHelper ()
    m_linkResults (),
    m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
-   m_controlFlowIndex (0),
    m_enableChannelEstimationError (false)
 {
   NS_LOG_FUNCTION (this);
@@ -151,7 +146,6 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
    m_linkResults (),
    m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
-   m_controlFlowIndex (0),
    m_enableChannelEstimationError (false)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
@@ -241,6 +235,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
 
+  // Create a packet classifier
+  Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
+
   /**
    * Channel estimation errors
    */
@@ -306,6 +303,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
 
+  // Attach the packet classifier
+  dev->SetPacketClassifier (classifier);
+
   // Attach the Mac layer C/N0 updates receiver to Phy
   SatPhy::CnoCallback cnoCb = MakeCallback (&SatRequestManager::CnoUpdated, rm);
   phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
@@ -324,28 +324,26 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
 
   // --- RETURN LINK ENCAPSULATORS ---
-  uint32_t rcIndeces = m_llsConf->GetDaServiceCount ();
-  NS_ASSERT (rcIndeces >= 2);
 
   // Control messages are using flow id (RC index) 0. No need for decapsulator for
   // RC index 0 at the GW, since control messages are terminated already at lower
   // layer.
-  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, m_controlFlowIndex);
+  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
 
   // Create queue event callbacks to MAC and RM
   SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
   // Create a queue
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (m_controlFlowIndex);
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
   queue->AddQueueEventCallback (macCb);
   queue->AddQueueEventCallback (rmCb);
   utEncap->SetQueue (queue);
-  llc->AddEncap (addr, utEncap, m_controlFlowIndex); // Tx
+  llc->AddEncap (addr, utEncap, SatEnums::CONTROL_FID); // Tx
 
   Ptr<SatReturnLinkEncapsulator> gwDecap;
 
-  for (uint8_t rc = 1; rc <= rcIndeces; ++rc)
+  for (uint8_t rc = 1; rc < SatEnums::NUM_FIDS; ++rc)
     {
       utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
 
@@ -371,21 +369,24 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatGwLlc> gatewayLlc = DynamicCast<SatGwLlc> (gwLlc);
   if (gatewayLlc && !gatewayLlc->ControlEncapsulatorCreated ())
     {
-      queue = CreateObject<SatQueue> (m_controlFlowIndex);
-      gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), m_controlFlowIndex);
+      queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
+      gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID);
       gwEncap->SetQueue (queue);
-      gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, m_controlFlowIndex); // Tx
+      gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, SatEnums::CONTROL_FID); // Tx
     }
 
   // User data
-  queue = CreateObject<SatQueue> (1);
-  gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, 1);
-  gwEncap->SetQueue (queue);
-  gwLlc->AddEncap (addr, gwEncap, 1); // Tx
+  for (uint8_t fid = 1; fid < SatEnums::NUM_FIDS; ++fid)
+    {
+      queue = CreateObject<SatQueue> (fid);
+      gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
+      gwEncap->SetQueue (queue);
+      gwLlc->AddEncap (addr, gwEncap, fid); // Tx
 
-  Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, 1);
-  utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-  llc->AddDecap (addr, utDecap, 1); // Rx
+      Ptr<SatGenericStreamEncapsulator> utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
+      utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
+      llc->AddDecap (addr, utDecap, fid); // Rx
+    }
 
   // set serving GW MAC address to RM
   rm->SetGwAddress (gwAddr);
@@ -413,7 +414,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);
   utScheduler->SetTxOpportunityCallback(MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
   utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
-  utScheduler->SetControlRcIndex (m_controlFlowIndex);
   mac->SetAttribute("Scheduler", PointerValue (utScheduler));
 
   // Create a node info to all the protocol layers

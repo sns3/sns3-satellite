@@ -213,6 +213,20 @@ SatNetDevice::GetLlc (void) const
 }
 
 void
+SatNetDevice::SetPacketClassifier (Ptr<SatPacketClassifier> classifier)
+{
+  NS_LOG_FUNCTION (this);
+  m_classifier = classifier;
+}
+
+Ptr<SatPacketClassifier>
+SatNetDevice::GetPacketClassifier () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_classifier;
+}
+
+void
 SatNetDevice::SetAddress (Address address)
 {
   NS_LOG_FUNCTION (this << address);
@@ -319,7 +333,8 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 
   m_txTrace (packet);
 
-  Classify (packet, dest, protocolNumber);
+  uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
+  m_llc->Enque (packet, dest, flowId);
 
   return true;
 }
@@ -346,7 +361,8 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 
   m_txTrace (packet);
 
-  Classify (packet, dest, protocolNumber);
+  uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
+  m_llc->Enque (packet, dest, flowId);
 
   return true;
 }
@@ -380,23 +396,11 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
   tag.SetMsgId ( m_mac->WriteCtrlMsgToContainer (msg) );
   packet->AddPacketTag (tag);
 
-  /**
-   * By default, the IP header will have a ToS value of 0. This is why ToS value 0
-   * shall be mapped by default to user data RC index, and control ToS shall be set to
-   * some other value, e.g. 10.
-   */
-  m_llc->Enque (packet, dest, 10);
+  uint8_t flowId = m_classifier->Classify (packet, dest);
+
+  m_llc->Enque (packet, dest, flowId);
 
   return true;
-}
-
-void
-SatNetDevice::Classify (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
-{
-  Ipv4Header ipv4Header;
-  packet->PeekHeader (ipv4Header);
-
-  m_llc->Enque (packet, dest, ipv4Header.GetTos ());
 }
 
 Ptr<Node> 
@@ -437,6 +441,7 @@ SatNetDevice::DoDispose (void)
   m_receiveErrorModel = 0;
   m_llc->Dispose ();
   m_llc = 0;
+  m_classifier = 0;
 
   NetDevice::DoDispose ();
 }

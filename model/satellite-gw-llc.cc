@@ -63,46 +63,26 @@ SatGwLlc::DoDispose ()
 
 
 Ptr<Packet>
-SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft )
+SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft)
 {
   NS_LOG_FUNCTION (this << macAddr << bytes);
 
   Ptr<Packet> packet;
-
-  /**
-   * TODO: This is not the final implementation! The NotifyTxOpportunity
-   * will be enhanced with the flow id which to serve. The decision is passed
-   * then to the scheduler (UT/NCC or forward link).
-   */
-  EncapKey_t key;
-  // Check whether there are some control messages
-  if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
-    {
-      key = std::make_pair<Mac48Address, uint8_t> (macAddr, m_controlFlowIndex);
-    }
-  else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
-    {
-      key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), m_controlFlowIndex);
-    }
-
+  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
   EncapContainer_t::iterator it = m_encaps.find (key);
 
-  if (!it->second->GetQueue ()->IsEmpty())
+  if (it != m_encaps.end ())
     {
       packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
     }
-
-  key = std::make_pair<Mac48Address, uint8_t> (macAddr, 1);
-  it = m_encaps.find (key);
-  if (!packet)
+  else
     {
-      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
+      NS_FATAL_ERROR ("Encapsulator not found for macAddr: " << macAddr << ", flowId: " << flowId);
     }
 
   if (packet)
     {
-      SatEnums::SatLinkDir_t ld =
-          (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+      SatEnums::SatLinkDir_t ld = SatEnums::LD_FORWARD;
 
       // Add packet trace entry:
       m_packetTrace (Simulator::Now(),
@@ -122,7 +102,7 @@ SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &b
 bool
 SatGwLlc::ControlEncapsulatorCreated () const
 {
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), m_controlFlowIndex);
+  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
   EncapContainer_t::const_iterator it = m_encaps.find (key);
   if (it != m_encaps.end ())
     {

@@ -272,9 +272,10 @@ private:
     * \param transmitDelay time when transmit possibility starts
     * \param durationInSecs duration of the burst
     * \param waveform waveform
+    * \param rcIndex Primary RC index to be scheduled
     * \param carrierId Carrier id used for the transmission
     */
-   void ScheduleDaTxOpportunity (Time transmitDelay, double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId);
+   void ScheduleDaTxOpportunity (Time transmitDelay, double durationInSecs, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId);
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
@@ -283,9 +284,9 @@ private:
     * \param durationInSecs duration of the burst
     * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
-    * \param rcIndex RC index as int
+    * \param rcIndex RC index
     */
-   void DoTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint32_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
@@ -296,7 +297,7 @@ private:
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index as int
     */
-   void DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, int rcIndex = -1, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     *
@@ -305,7 +306,7 @@ private:
     * \param policy
     * \return
     */
-   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, int rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
+   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
 
    /**
     *

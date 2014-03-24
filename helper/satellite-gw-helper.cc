@@ -40,6 +40,7 @@
 #include "../model/satellite-node-info.h"
 #include "../model/satellite-enums.h"
 #include "../model/satellite-channel-estimation-error-container.h"
+#include "../model/satellite-packet-classifier.h"
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -201,6 +202,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   params.m_txCh = fCh;
   params.m_rxCh = rCh;
 
+  // Create a packet classifier
+  Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
+
   /**
    * Channel estimation errors
    */
@@ -255,6 +259,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
+
+  // Attach the packet classifier
+  dev->SetPacketClassifier (classifier);
 
   // Attach the device receive callback to SatNetDevice
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));

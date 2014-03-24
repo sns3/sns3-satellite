@@ -190,10 +190,10 @@ public:
 private:
 
   /**
-   * Calculate the BBrame higher layer payload in bytes
+   * Calculate the BBrame higher layer payload in bits
    * \param modcod Used MODCOD in the BBFrame
    * \param frameType Used BBFrame type (short OR normal)
-   * \return The maximum payload in bytes
+   * \return The maximum payload in bits
    */
   uint32_t CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
@@ -259,8 +259,8 @@ private:
    */
   SatEnums::SatModcod_t m_defaultModCod;
 
-  std::map<uint32_t, uint32_t> m_shortFramePayloadBits;
-  std::map<uint32_t, uint32_t> m_normalFramePayloadBits;
+  std::map<uint32_t, uint32_t> m_shortFramePayloadSlots;
+  std::map<uint32_t, uint32_t> m_normalFramePayloadSlots;
 
   /**
    * Available "waveforms", i.e. MODCOD + BBFrame combinations

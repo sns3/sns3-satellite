@@ -243,6 +243,19 @@ public:
     DUMMY_FRAME = 2
   } SatBbFrameType_t;
 
+  /**
+   * \enum SatFlowId_t
+   *
+   * \brief Lower layer flow identifiers
+   */
+  typedef enum
+  {
+    CONTROL_FID = 0,
+    BE_FID = 1,
+    AF_FID = 2,
+    EF_FID = 3,
+    NUM_FIDS = 4
+  } SatFlowId_t;
 
   /**
    * \brief Definition for different types of Capacity Request (CR) messages.

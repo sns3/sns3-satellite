@@ -195,7 +195,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .AddConstructor<SatLowerLayerServiceConf> ()
     .AddAttribute ( "DaServiceCount",
                     "DA services in use.",
-                     UintegerValue (2),
+                     UintegerValue (4),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
                      MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minDaServiceEntries, SatLowerLayerServiceConf::m_maxDaServiceEntries))
     .AddAttribute ( "RaServiceCount",

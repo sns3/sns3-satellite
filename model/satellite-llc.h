@@ -93,10 +93,10 @@ public:
     *
     * \param packet packet sent from above down to SatMac
     * \param dest Destination MAC address of the packet
-    * \param tos Type-of-Service of the IPv4 header
+    * \param flowId Flow identifier
     * \return whether the Send operation succeeded
     */
-  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t tos);
+  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
 
   /**
     *  Called from lower layer (MAC) to inform a tx
@@ -176,13 +176,6 @@ protected:
   void DoDispose ();
 
   /**
-   * Convert IP header Type-of-Service to a lower layer flow index
-   * \param tos Type-of-Service
-   * @return uint32_t Flow identifier
-   */
-  uint8_t TosToFlowIndex (uint8_t tos) const;
-
-  /**
    * Trace callback used for packet tracing:
    */
   TracedCallback<Time,
@@ -211,11 +204,6 @@ protected:
    * The upper layer package receive callback.
    */
   ReceiveCallback m_rxCallback;
-
-  /**
-   * Flow index used for control traffic
-   */
-  uint8_t m_controlFlowIndex;
 
 private:
 

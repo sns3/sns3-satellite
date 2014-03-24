@@ -154,12 +154,6 @@ public:
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
-  /**
-   * Set control RC index
-   * \param rcIndex RC index for control messages
-   */
-  void SetControlRcIndex (uint8_t rcIndex);
-
 private:
 
   /**
@@ -217,10 +211,6 @@ private:
    */
   std::vector<uint8_t> m_rcIndices;
 
-  /**
-   * RC index used for control
-   */
-  uint8_t m_controlRcIndex;
 };
 
 

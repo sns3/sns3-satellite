@@ -30,6 +30,7 @@
 #include "ns3/traced-callback.h"
 #include "satellite-control-message.h"
 #include "satellite-enums.h"
+#include "satellite-packet-classifier.h"
 
 namespace ns3 {
 
@@ -71,7 +72,7 @@ public:
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
-   * Get a copy of the attached Phy.
+   * Get a Phy pointer
    *
    * \returns Ptr to the SatPhy object.
    */
@@ -84,7 +85,7 @@ public:
    void SetMac (Ptr<SatMac> mac);
 
    /**
-    * Get a copy of the attached Mac.
+    * Get a Mac pointer
     *
     * \returns Ptr to the SatMac object.
     */
@@ -97,13 +98,25 @@ public:
     void SetLlc (Ptr<SatLlc> llc);
 
     /**
-     * Get a copy of the attached Llc.
+     * Get Llc pointer
      *
      * \returns Ptr to the SatLlc object.
      */
     Ptr<SatLlc> GetLlc (void) const;
 
-  /**
+    /**
+     * Set the packet classifier class
+     * @param classifier
+     */
+    void SetPacketClassifier (Ptr<SatPacketClassifier> classifier);
+
+    /**
+     * Get a pointer to packet classifier class
+     * \return Ptr<SatPacketClassifier Packet classifier
+     */
+    Ptr<SatPacketClassifier> GetPacketClassifier () const;
+
+    /**
    * Attach a receive ErrorModel to the SatNetDevice.
    * \param em Ptr to the ErrorModel.
    */
@@ -148,12 +161,11 @@ public:
 protected:
   virtual void DoDispose (void);
 
-  virtual void Classify (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-
 private:
   Ptr<SatPhy> m_phy;
   Ptr<SatMac> m_mac;
   Ptr<SatLlc> m_llc;
+  Ptr<SatPacketClassifier> m_classifier;
   NetDevice::ReceiveCallback m_rxCallback;
   NetDevice::PromiscReceiveCallback m_promiscCallback;
   Ptr<Node> m_node;

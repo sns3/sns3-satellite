@@ -117,9 +117,43 @@ main (int argc, char *argv[])
   NodeContainer utCbrUsers;
   NodeContainer utOnOffUsers;
 
+  /* DSCP values
+
+  BE:
+  DscpDefault = 0x00,
+
+  AF:
+  DSCP_CS1 = 0x20,
+  DSCP_AF11 = 0x28,
+  DSCP_AF12 = 0x30,
+  DSCP_AF13 = 0x38,
+
+  DSCP_CS2 = 0x40,
+  DSCP_AF21 = 0x48,
+  DSCP_AF22 = 0x50,
+  DSCP_AF23 = 0x58,
+
+  DSCP_CS3 = 0x60,
+  DSCP_AF31 = 0x68,
+  DSCP_AF32 = 0x70,
+  DSCP_AF33 = 0x78,
+
+  DSCP_CS4 = 0x80,
+  DSCP_AF41 = 0x88,
+  DSCP_AF42 = 0x90,
+  DSCP_AF43 = 0x98,
+
+  EF:
+  DSCP_CS5 = 0xA0,
+  DSCP_EF = 0xB8,
+
+  DSCP_CS6 = 0xC0,
+  DSCP_CS7 = 0xE0
+  */
+
   // ToS fields of applications
-  uint8_t onOffTos (3);
-  uint8_t cbrTos (4);
+  uint8_t onOffTos (0x28);
+  uint8_t cbrTos (0xB8);
 
   // Divide the users into CBR and On-Off users and set the ToS values.
   for (NodeContainer::Iterator i = utUsers.Begin();  i != utUsers.End(); i++)

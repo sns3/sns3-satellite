@@ -59,8 +59,7 @@ SatUtScheduler::SatUtScheduler ()
  m_txOpportunityCallback (),
  m_llsConf (),
  m_nodeInfo (),
- m_framePduHeaderSizeInBytes (1),
- m_controlRcIndex (0)
+ m_framePduHeaderSizeInBytes (1)
 {
 
 }
@@ -70,8 +69,7 @@ SatUtScheduler::SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls)
  m_txOpportunityCallback (),
  m_llsConf (lls),
  m_nodeInfo (),
- m_framePduHeaderSizeInBytes (1),
-m_controlRcIndex (0)
+ m_framePduHeaderSizeInBytes (1)
 {
   NS_LOG_FUNCTION (this);
 
@@ -79,7 +77,7 @@ m_controlRcIndex (0)
 
   m_utScheduledByteCounters = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
 
-  for (uint32_t i = 0; i < m_llsConf->GetDaServiceCount (); ++i)
+  for (uint32_t i = 0; i < SatEnums::NUM_FIDS; ++i)
     {
       m_rcIndices.push_back (i);
     }
@@ -172,7 +170,7 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
   uint32_t schedBytes (0);
 
   // User data packets are encapsulated within Frame PDU
-  if (rcIndex != m_controlRcIndex)
+  if (rcIndex != SatEnums::CONTROL_FID)
     {
       payloadBytes -= m_framePduHeaderSizeInBytes;
     }
@@ -200,7 +198,7 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
 
   // If no packets were scheduled, return the frame PDU
   // header size
-  if (schedBytes == 0 && rcIndex != m_controlRcIndex)
+  if (schedBytes == 0 && rcIndex != SatEnums::CONTROL_FID)
     {
       payloadBytes += m_framePduHeaderSizeInBytes;
     }
@@ -214,12 +212,6 @@ SatUtScheduler::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   NS_LOG_FUNCTION (this);
 
   m_nodeInfo = nodeInfo;
-}
-
-void
-SatUtScheduler::SetControlRcIndex (uint8_t rcIndex)
-{
-  m_controlRcIndex = rcIndex;
 }
 
 std::vector<uint8_t>

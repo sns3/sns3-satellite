@@ -44,7 +44,7 @@ public:
   /**
    * Default constructor
    */
-  SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint32_t flowId);
+  SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint8_t flowId);
 
   /**
    * Destructor
@@ -53,13 +53,13 @@ public:
 
   /**
    * Get the MAC address of this object
-   * \return MAC address
+   * \return Mac48Address MAC address
    */
   Mac48Address GetMacAddress () const;
 
   /**
    * Get buffered bytes of this object
-   * \return buffered bytes
+   * \return uint32_t buffered bytes
    */
   uint32_t GetBufferedBytes () const;
 
@@ -70,15 +70,16 @@ public:
   uint32_t GetMinTxOpportunityInBytes () const;
 
   /**
-   * Get the priority of the object
-   * \return Priority of the object
+   * Get the flow identifier of the scheduling object. This may be used
+   * as priority as well.
+   * \return uint8_t Flow identifier
    */
-  uint32_t GetPriority () const;
+  uint8_t GetFlowId () const;
 
   /**
    * Get HOL delay of the object.
    *
-   * \return HOL delay of the object.
+   * \return Time HOL delay of the object.
    */
   Time GetHolDelay () const;
 
@@ -88,7 +89,7 @@ private:
   uint32_t m_bufferedBytes;
   uint32_t m_minTxOpportunity;
   Time m_holDelay;
-  uint32_t m_priority;
+  uint8_t m_flowId;
 
 };
 

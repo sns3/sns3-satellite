@@ -181,11 +181,6 @@ private:
     Ptr<SatLowerLayerServiceConf> m_llsConf;
 
     /**
-     * Flow index used for control messages
-     */
-    uint8_t m_controlFlowIndex;
-
-    /**
      * Enable channel estimation error modeling at forward link
      * receiver (= UT).
      */

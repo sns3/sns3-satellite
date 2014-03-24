@@ -98,8 +98,7 @@ SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcI
 
   if (packet)
     {
-      SatEnums::SatLinkDir_t ld =
-          (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+      SatEnums::SatLinkDir_t ld = SatEnums::LD_RETURN;
 
       // Add packet trace entry:
       m_packetTrace (Simulator::Now(),

@@ -53,6 +53,11 @@ const uint32_t payloadConf[4][3] = { { 2, 360, 90 },
 
 
 SatDvbS2Waveform::SatDvbS2Waveform ()
+:m_modcod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+ m_frameType (SatEnums::NORMAL_FRAME),
+ m_frameLength (Seconds (0.0)),
+ m_payloadBits (0),
+ m_cnoRequirement (0.0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (true);
@@ -127,8 +132,8 @@ SatBbFrameConf::SatBbFrameConf ()
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-  m_shortFramePayloadBits (),
-  m_normalFramePayloadBits (),
+  m_shortFramePayloadSlots (),
+  m_normalFramePayloadSlots (),
   m_waveforms ()
 {
   NS_LOG_FUNCTION (this);
@@ -145,8 +150,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-  m_shortFramePayloadBits (),
-  m_normalFramePayloadBits (),
+  m_shortFramePayloadSlots (),
+  m_normalFramePayloadSlots (),
   m_waveforms ()
 {
   ObjectBase::ConstructSelf(AttributeConstructionList ());
@@ -154,8 +159,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   // Initialize the payloads
   for (uint32_t i = 0; i < 4; ++i)
     {
-      m_normalFramePayloadBits.insert (std::make_pair (payloadConf[i][0], payloadConf[i][1]));
-      m_shortFramePayloadBits.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
+      m_normalFramePayloadSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][1]));
+      m_shortFramePayloadSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
     }
 
   // Available MODCODs
@@ -309,12 +314,12 @@ SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEn
   {
     case SatEnums::SHORT_FRAME:
       {
-        dataSlots = m_shortFramePayloadBits.at (modulatedBits);
+        dataSlots = m_shortFramePayloadSlots.at (modulatedBits);
         break;
       }
     case SatEnums::NORMAL_FRAME:
       {
-        dataSlots = m_normalFramePayloadBits.at (modulatedBits);
+        dataSlots = m_normalFramePayloadSlots.at (modulatedBits);
         break;
       }
     default:
@@ -323,7 +328,7 @@ SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEn
         break;
       }
   }
-  return dataSlots * m_symbolsPerSlot * modulatedBits * SatUtils::GetCodingRate (modcod);
+  return (uint32_t)(dataSlots * m_symbolsPerSlot * modulatedBits * SatUtils::GetCodingRate (modcod));
 }
 
 
@@ -339,12 +344,12 @@ SatBbFrameConf::CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums
   {
     case SatEnums::SHORT_FRAME:
       {
-        dataSlots = m_shortFramePayloadBits.at (modulatedBits);
+        dataSlots = m_shortFramePayloadSlots.at (modulatedBits);
         break;
       }
     case SatEnums::NORMAL_FRAME:
       {
-        dataSlots = m_normalFramePayloadBits.at (modulatedBits);
+        dataSlots = m_normalFramePayloadSlots.at (modulatedBits);
         break;
       }
     default:
