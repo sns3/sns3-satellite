@@ -155,6 +155,11 @@ public:
   /**
    * \return
    */
+  bool IsInstalled () const;
+
+  /**
+   * \return
+   */
   Ptr<const SatHelper> GetSatHelper () const;
 
 protected:

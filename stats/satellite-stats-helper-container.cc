@@ -25,6 +25,7 @@
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
+#include <ns3/satellite-stats-queue-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
@@ -57,6 +58,7 @@ SatStatsHelperContainer::DoDispose ()
  *
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
+ * - [Global,PerGw,PerBeam,PerUt] RtnQueue [Bytes,Packets]
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -184,6 +186,14 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyDelay,
                                         "return link PHY-level delay statistics")
 
+    // Return link queue size (in bytes) statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnQueueBytes,
+                                        "return link queue size (in bytes) statistics")
+
+    // Return link queue size (in number of packets) statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnQueuePackets,
+                                        "return link queue size (in number of packets) statistics")
+
     // Return link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput,
                                         "return link application-level throughput statistics")
@@ -238,6 +248,7 @@ SatStatsHelperContainer::GetName () const
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
+ * - Add [Global,PerGw,PerBeam,PerUt] RtnQueue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -408,6 +419,18 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
+
+// Return link queue size (in bytes) statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnQueueBytes, "rtn-queue-bytes")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnQueueBytes, "rtn-queue-bytes")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnQueueBytes, "rtn-queue-bytes")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnQueueBytes, "rtn-queue-bytes")
+
+// Return link queue size (in number of packets) statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnQueuePackets, "rtn-queue-packets")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
 
 // Return link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")

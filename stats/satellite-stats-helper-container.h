@@ -37,6 +37,7 @@ namespace ns3 {
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
+ * - Add [Global,PerGw,PerBeam,PerUt] RtnQueue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -137,6 +138,12 @@ public:
 
   // Return link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyDelay)
+
+  // Return link queue size (in bytes) statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueueBytes)
+
+  // Return link queue size (in number of packets) statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueuePackets)
 
   // Return link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)

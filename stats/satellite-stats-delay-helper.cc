@@ -670,7 +670,7 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
                               << " at node ID " << (*it)->GetId () << " device #2");
             }
 
-        }
+        } // end of else of `if (satDev == 0)`
 
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
@@ -788,7 +788,7 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
                               << " at node ID " << (*it)->GetId () << " device #2");
             }
 
-        }
+        } // end of else of `if (satDev == 0)`
 
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 

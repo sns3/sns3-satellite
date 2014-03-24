@@ -191,6 +191,8 @@ SatStatsHelper::GetIdentifierType () const
 void
 SatStatsHelper::SetOutputType (SatStatsHelper::OutputType_t outputType)
 {
+  NS_LOG_FUNCTION (this << GetOutputTypeName (outputType));
+
   if (m_isInstalled && (m_outputType != outputType))
     {
       NS_LOG_WARN (this << " cannot modify the current output type"
@@ -208,6 +210,13 @@ SatStatsHelper::OutputType_t
 SatStatsHelper::GetOutputType () const
 {
   return m_outputType;
+}
+
+
+bool
+SatStatsHelper::IsInstalled () const
+{
+  return m_isInstalled;
 }
 
 

@@ -292,6 +292,89 @@ SatLlc::BuffersEmpty () const
   return true;
 }
 
+uint32_t
+SatLlc::GetNBytesInQueue (Mac48Address utAddress) const
+{
+  NS_LOG_FUNCTION (this << utAddress);
+
+  uint32_t sum = 0;
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end (); ++it)
+    {
+      if (it->first.first == utAddress)
+        {
+          NS_ASSERT (it->second != 0);
+          Ptr<SatQueue> queue = it->second->GetQueue ();
+          NS_ASSERT (queue != 0);
+          sum += queue->GetNBytes ();
+        }
+    }
+
+  return sum;
+}
+
+uint32_t
+SatLlc::GetNPacketsInQueue (Mac48Address utAddress) const
+{
+  NS_LOG_FUNCTION (this << utAddress);
+
+  uint32_t sum = 0;
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end (); ++it)
+    {
+      if (it->first.first == utAddress)
+        {
+          NS_ASSERT (it->second != 0);
+          Ptr<SatQueue> queue = it->second->GetQueue ();
+          NS_ASSERT (queue != 0);
+          sum += queue->GetNPackets ();
+        }
+    }
+
+  return sum;
+}
+
+uint32_t
+SatLlc::GetNBytesInQueue () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t sum = 0;
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end (); ++it)
+    {
+      NS_ASSERT (it->second != 0);
+      Ptr<SatQueue> queue = it->second->GetQueue ();
+      NS_ASSERT (queue != 0);
+      sum += queue->GetNBytes ();
+    }
+
+  return sum;
+}
+
+uint32_t
+SatLlc::GetNPacketsInQueue () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t sum = 0;
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end (); ++it)
+    {
+      NS_ASSERT (it->second != 0);
+      Ptr<SatQueue> queue = it->second->GetQueue ();
+      NS_ASSERT (queue != 0);
+      sum += queue->GetNPackets ();
+    }
+
+  return sum;
+}
+
+
 } // namespace ns3
 
 

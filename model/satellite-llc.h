@@ -169,6 +169,30 @@ public:
    */
   virtual bool BuffersEmpty () const;
 
+  /**
+   * \param utAddress the MAC address that identifies a particular UT node.
+   * \return Number of bytes currently queued in the encapsulator(s)
+   *         associated with the UT.
+   */
+  virtual uint32_t GetNBytesInQueue (Mac48Address utAddress) const;
+
+  /**
+   * \param utAddress the MAC address that identifies a particular UT node.
+   * \return Number of packets currently queued in the encapsulator(s)
+   *         associated with the UT.
+   */
+  virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
+
+  /**
+   * \return Total number of bytes currently queued in all the encapsulators.
+   */
+  virtual uint32_t GetNBytesInQueue () const;
+
+  /**
+   * \return Total number of packets currently queued in all the encapsulators.
+   */
+  virtual uint32_t GetNPacketsInQueue () const;
+
 protected:
   /**
    * \brief
