@@ -31,6 +31,7 @@
 #include "satellite-lower-layer-service.h"
 #include "satellite-queue.h"
 #include "satellite-ut-scheduler.h"
+#include <ns3/traced-value.h>
 
 namespace ns3 {
 
@@ -390,11 +391,9 @@ private:
   Ptr<SatUtScheduler> m_utScheduler;
 
   /**
-   * Traced callback for assigned TBTP resources for this UT
-   * \param Time      Time now
-   * \param uint32_t  Assigned resources in Bytes in superframe
+   * Assigned TBTP resources in superframe for this UT (in bytes).
    */
-  TracedCallback< Time, uint32_t > m_tbtpResourcesTrace;
+  TracedCallback<uint32_t> m_tbtpResourcesTrace;
 };
 
 } // namespace ns3

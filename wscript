@@ -125,6 +125,7 @@ def build(bld):
         'stats/satellite-stats-helper.cc',
         'stats/satellite-stats-delay-helper.cc',
         'stats/satellite-stats-queue-helper.cc',
+        'stats/satellite-stats-resources-granted-helper.cc',
         'stats/satellite-stats-throughput-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
@@ -279,6 +280,7 @@ def build(bld):
         'stats/satellite-stats-helper.h',
         'stats/satellite-stats-delay-helper.h',
         'stats/satellite-stats-queue-helper.h',
+        'stats/satellite-stats-resources-granted-helper.h',
         'stats/satellite-stats-throughput-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]

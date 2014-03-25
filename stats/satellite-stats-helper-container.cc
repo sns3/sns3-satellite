@@ -26,6 +26,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
+#include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
@@ -61,6 +62,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -220,6 +222,10 @@ SatStatsHelperContainer::GetTypeId ()
     // Return link PHY-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyThroughput,
                                         "return link PHY-level throughput statistics")
+
+    // Resources granted statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (ResourcesGranted,
+                                        "resources granted statistics")
   ;
   return tid;
 }
@@ -259,6 +265,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -476,6 +483,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
+
+// Resources granted statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (ResourcesGranted, "resources-granted")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
 
 
 std::string // static

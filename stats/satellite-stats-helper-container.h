@@ -40,6 +40,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -162,6 +163,9 @@ public:
 
   // Return link PHY-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
+
+  // Resources granted statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (ResourcesGranted)
 
   /**
    * \param outputType an arbitrary output type.
