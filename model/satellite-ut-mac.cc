@@ -874,12 +874,6 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           /// get packet
           Ptr<Packet> packet = replicas[i].second.front ();
 
-          /// TODO this is for debugging, it should be removed
-          for (uint32_t j = 0; j < tags[i].GetSlotIds().size(); j++)
-            {
-              NS_LOG_INFO ("tag " << j << ": " << tags[i].GetSlotIds().at (j));
-            }
-
           /// attach the replica tag
           packet->AddPacketTag (tags[i]);
 

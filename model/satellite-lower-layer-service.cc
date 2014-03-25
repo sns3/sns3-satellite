@@ -52,7 +52,10 @@ SatLowerLayerServiceDaEntry::~SatLowerLayerServiceDaEntry ()
 SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
 : m_maxUniquePayloadPerBlock (0),
   m_maxConsecutiveBlockAccessed (0),
-  m_minimumIdleBlock (0)
+  m_minimumIdleBlock (0),
+  m_backOffTimeInMilliSeconds (0),
+  m_backOffProbability (0),
+  m_numberOfInstances (0)
 {
    NS_LOG_FUNCTION (this);
 }
@@ -164,10 +167,13 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a1    'Maximum unique payload per block' attribute value
  * \param a2    'Maximum consecutive block accessed' attribute value
  * \param a3    'Minimum idle block' attribute value
+ * \param a4    'Back off time in milliseconds' attribute value
+ * \param a5    'Back off probability' attribute value
+ * \param a6    'Number of instances' attribute value
  *
  * \return TypeId
  */
-#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3) \
+#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6) \
    AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                   "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a1), \
@@ -185,6 +191,24 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                   UintegerValue (a3), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MinimumIdleBlock, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MinimumIdleBlock), \
+                  MakeUintegerChecker<uint8_t> ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_BackOffTimeInMilliSeconds", \
+                  "Back off time in milliseconds for RA  " + GetIndexAsRaServiceName (index), \
+                  UintegerValue (a4), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## BackOffTimeInMilliSeconds, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## BackOffTimeInMilliSeconds), \
+                  MakeUintegerChecker<uint16_t> ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_BackOffProbability", \
+                  "Back off probability for RA  " + GetIndexAsRaServiceName (index), \
+                  UintegerValue (a5), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## BackOffProbability, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## BackOffProbability), \
+                  MakeUintegerChecker<uint16_t> ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_NumberOfInstances", \
+                  "Number of instances for RA  " + GetIndexAsRaServiceName (index), \
+                  UintegerValue (a6), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## NumberOfInstances, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## NumberOfInstances), \
                   MakeUintegerChecker<uint8_t> ())
 
 TypeId
@@ -227,10 +251,10 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, true, true, false, 100, 200, 50, 100)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, true, false, false, 100, 200, 50, 100)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 6, 2)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 6, 2)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 3, 6, 2)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 10000, 3)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 6, 2, 50, 10000, 3)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 6, 2, 50, 10000, 3)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 3, 6, 2, 50, 10000, 3)
   ;
   return tid;
 }
@@ -472,6 +496,70 @@ SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumI
   m_raServiceEntries[index].SetMinimumIdleBlock (minimumIdleBlock);
 }
 
+uint16_t
+SatLowerLayerServiceConf::GetRaBackOffTimeInMilliSeconds (uint8_t index) const
+{
+  if ( index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetBackOffTimeInMilliSeconds ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds)
+{
+  if ( index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetBackOffTimeInMilliSeconds (backOffTimeInMilliSeconds);
+}
+
+uint16_t
+SatLowerLayerServiceConf::GetRaBackOffProbability (uint8_t index) const
+{
+  if ( index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetBackOffProbability ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaBackOffProbability (uint8_t index, uint16_t backOffProbability)
+{
+  if ( index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetBackOffProbability (backOffProbability);
+}
+
+uint8_t
+SatLowerLayerServiceConf::GetRaNumberOfInstances (uint8_t index) const
+{
+  if ( index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetNumberOfInstances ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaNumberOfInstances (uint8_t index, uint8_t numberOfInstances)
+{
+  if ( index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetNumberOfInstances (numberOfInstances);
+}
+
 } // namespace ns3
-
-

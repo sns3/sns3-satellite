@@ -177,6 +177,9 @@ private:
   uint8_t  m_maxUniquePayloadPerBlock;
   uint8_t  m_maxConsecutiveBlockAccessed;
   uint8_t  m_minimumIdleBlock;
+  uint16_t m_backOffTimeInMilliSeconds;
+  uint16_t m_backOffProbability;
+  uint8_t m_numberOfInstances;
 
   /**
    * Get maximum unique payload per block.
@@ -219,6 +222,48 @@ private:
    * \param minimumIdleBlock Minimum idle block
    */
   inline void SetMinimumIdleBlock (uint8_t minimumIdleBlock) { m_minimumIdleBlock = minimumIdleBlock;}
+
+  /**
+   * Get back off time in milliseconds.
+   *
+   * \return Back off time
+   */
+  inline uint16_t GetBackOffTimeInMilliSeconds () const {return m_backOffTimeInMilliSeconds;}
+
+  /**
+   * Set back off time in milliseconds.
+   *
+   * \param backOffTimeInMilliSeconds Back off time
+   */
+  inline void SetBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) { m_backOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
+
+  /**
+   * Get back off probability.
+   *
+   * \return Back off probability
+   */
+  inline uint16_t GetBackOffProbability () const {return m_backOffProbability;}
+
+  /**
+   * Set back off probability.
+   *
+   * \param backOffProbability Back off probability
+   */
+  inline void SetBackOffProbability (uint16_t backOffProbability) { m_backOffProbability = backOffProbability;}
+
+  /**
+   * Get number of instances.
+   *
+   * \return Number of instances
+   */
+  inline uint8_t GetNumberOfInstances () const {return m_numberOfInstances;}
+
+  /**
+   * Set number of instances.
+   *
+   * \param numberOfInstances Number of instances
+   */
+  inline void SetNumberOfInstances (uint8_t numberOfInstances) { m_numberOfInstances = numberOfInstances;}
 };
 
 /**
@@ -375,6 +420,30 @@ public:
    */
   uint8_t GetRaMinimumIdleBlock (uint8_t index) const;
 
+  /**
+   * Get back off time in milliseconds.
+   *
+   * \param index Index of the service
+   * \return Back off time
+   */
+  uint16_t GetRaBackOffTimeInMilliSeconds (uint8_t index) const;
+
+  /**
+   * Get back off probability.
+   *
+   * \param index Index of the service
+   * \return Back off probability
+   */
+  uint16_t GetRaBackOffProbability (uint8_t index) const;
+
+  /**
+   * Get number of instances.
+   *
+   * \param index Index of the service
+   * \return Number of instances
+   */
+  uint8_t GetRaNumberOfInstances (uint8_t index) const;
+
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
@@ -493,6 +562,29 @@ private:
    */
   void SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumIdleBlock);
 
+  /**
+   * Set back off time in milliseconds.
+   *
+   * \param index Index of the service
+   * \param backOffTimeInMilliSeconds Back off time
+   */
+  void SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds);
+
+  /**
+   * Set back off probability.
+   *
+   * \param index Index of the service
+   * \param backOffProbability Back off probability
+   */
+  void SetRaBackOffProbability (uint8_t index, uint16_t backOffProbability);
+
+  /**
+   * Set number of instances.
+   *
+   * \param index Index of the service
+   * \param numberOfInstances Number of instances
+   */
+  void SetRaNumberOfInstances (uint8_t index, uint8_t numberOfInstances);
 
 /**
  * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
@@ -553,12 +645,18 @@ private:
  *
  *  Methods defined e.g. when index is 0.
  *
- *  - SetRaServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumUniquePayloadPerBlock
- *  - GetRaServ0MaximumUniquePayloadPerBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumUniquePayloadPerBlock
- *  - SetRaServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::SetMaximumConsecutiveBlockAccessed
- *  - GetRaServ0MaximumConsecutiveBlockAccessedInBytes, see @SatLowerLayerServiceRaEntry::GetMaximumConsecutiveBlockAccessed
- *  - SetRaServ0MinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::SetMinimumIdleBlock
- *  - GetRaServ0VMinimumIdleBlockInBytes, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlock
+ *  - SetRaServ0MaximumUniquePayloadPerBlock, see @SatLowerLayerServiceRaEntry::SetMaximumUniquePayloadPerBlock
+ *  - GetRaServ0MaximumUniquePayloadPerBlock, see @SatLowerLayerServiceRaEntry::GetMaximumUniquePayloadPerBlock
+ *  - SetRaServ0MaximumConsecutiveBlockAccessed, see @SatLowerLayerServiceRaEntry::SetMaximumConsecutiveBlockAccessed
+ *  - GetRaServ0MaximumConsecutiveBlockAccessed, see @SatLowerLayerServiceRaEntry::GetMaximumConsecutiveBlockAccessed
+ *  - SetRaServ0MinimumIdleBlock, see @SatLowerLayerServiceRaEntry::SetMinimumIdleBlock
+ *  - GetRaServ0VMinimumIdleBlock, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlock
+ *  - SetRaServ0BackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::SetBackOffTimeInMilliSeconds
+ *  - GetRaServ0VBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetBackOffTimeInMilliSeconds
+ *  - SetRaServ0BackOffProbability, see @SatLowerLayerServiceRaEntry::SetBackOffProbability
+ *  - GetRaServ0VBackOffProbability, see @SatLowerLayerServiceRaEntry::GetBackOffProbability
+ *  - SetRaServ0NumberOfInstances, see @SatLowerLayerServiceRaEntry::SetNumberOfInstances
+ *  - GetRaServ0VNumberOfInstances, see @SatLowerLayerServiceRaEntry::GetNumberOfInstances
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -574,9 +672,21 @@ private:
   inline void SetRaServ ## index ## MinimumIdleBlock (uint8_t value)  \
     { return SetRaMinimumIdleBlock (index, value); } \
   inline uint8_t GetRaServ ## index ## MinimumIdleBlock () const  \
-    { return GetRaMinimumIdleBlock (index); }
+    { return GetRaMinimumIdleBlock (index); } \
+  inline void SetRaServ ## index ## BackOffTimeInMilliSeconds (uint16_t value)  \
+    { return SetRaBackOffTimeInMilliSeconds (index, value); } \
+  inline uint16_t GetRaServ ## index ## BackOffTimeInMilliSeconds () const  \
+    { return GetRaBackOffTimeInMilliSeconds (index); } \
+  inline void SetRaServ ## index ## BackOffProbability (uint16_t value)  \
+    { return SetRaBackOffProbability (index, value); } \
+  inline uint16_t GetRaServ ## index ## BackOffProbability () const  \
+    { return GetRaBackOffProbability (index); } \
+  inline void SetRaServ ## index ## NumberOfInstances (uint8_t value)  \
+    { return SetRaNumberOfInstances (index, value); } \
+  inline uint8_t GetRaServ ## index ## NumberOfInstances () const  \
+    { return GetRaNumberOfInstances (index); }
 
-    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
+  SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);

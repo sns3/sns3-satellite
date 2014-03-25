@@ -65,6 +65,9 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
+      GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
+      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability ((llsConf->GetRaBackOffProbability (i) - 1) * (1 / (std::pow(2,16) - 2)));
+      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
 
       /// TODO this comes from frame configuration?
       GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
@@ -72,13 +75,6 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
 
       /// TODO this comes from RA dynamic load control
       GetAllocationChannelConfiguration (i)->SetCrdsaMaximumBackoffProbability (0.2);
-
-      /// TODO from random access traffic method descriptor 6.4.17.26
-      GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (2);
-
-      /// TODO these need to be implemented from RA service descriptor
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability (0.05);
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (5);
 
       /// TODO this comes from waveform configuration
       GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (10000);
