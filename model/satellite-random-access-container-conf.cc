@@ -36,7 +36,7 @@ SatRandomAccessConf::GetTypeId (void)
   return tid;
 }
 SatRandomAccessConf::SatRandomAccessConf () :
-  slottedAlohaControlRandomizationInterval (),
+  m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
   m_allocationChannelCount ()
 {
   NS_LOG_FUNCTION (this);
@@ -44,7 +44,7 @@ SatRandomAccessConf::SatRandomAccessConf () :
 }
 
 SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf) :
-  slottedAlohaControlRandomizationInterval (),
+  m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
   m_allocationChannelCount (llsConf->GetRaServiceCount ())
 {
   NS_LOG_FUNCTION (this);
@@ -54,7 +54,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
       NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - No random access allocation channel");
     }
 
-  slottedAlohaControlRandomizationInterval = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
+  m_slottedAlohaControlRandomizationIntervalInMilliSeconds = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
   DoSlottedAlohaVariableSanityCheck ();
 
   for (uint32_t i = 0; i < m_allocationChannelCount; i++)
@@ -78,7 +78,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
 
       /// TODO these need to be implemented from RA service descriptor
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability (0.05);
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTime (5);
+      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (5);
 
       /// TODO this comes from waveform configuration
       GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (10000);
@@ -112,9 +112,9 @@ SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (slottedAlohaControlRandomizationInterval < 1)
+  if (m_slottedAlohaControlRandomizationIntervalInMilliSeconds < 1)
     {
-      NS_FATAL_ERROR ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - slottedAlohaControlRandomizationInterval < 1");
+      NS_FATAL_ERROR ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - m_slottedAlohaControlRandomizationIntervalInMilliSeconds < 1");
     }
 
   NS_LOG_INFO ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - Variable sanity check done");

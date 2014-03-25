@@ -109,7 +109,7 @@ public:
    */
   void CrdsaSetLoadControlParameters (uint32_t allocationChannel,
                                       double backoffProbability,
-                                      uint32_t backoffTime);
+                                      uint32_t backoffTimeInMilliSeconds);
 
   /**
    * \brief Function for setting the maximum backoff probability
@@ -154,7 +154,7 @@ public:
    * \brief Function for setting the Slotted ALOHA control randomization interval
    * \param controlRandomizationInterval control randomization interval
    */
-  void SlottedAlohaSetControlRandomizationInterval (double controlRandomizationInterval);
+  void SlottedAlohaSetControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds);
 
   /**
    * \brief Main function of this module. This will be called from outside and it is responsible

@@ -71,13 +71,13 @@ public:
    * \brief Function for getting the Slotted ALOHA control randomization interval
    * \return control randomization interval
    */
-  uint32_t GetSlottedAlohaControlRandomizationInterval () { return slottedAlohaControlRandomizationInterval;}
+  uint32_t GetSlottedAlohaControlRandomizationIntervalInMilliSeconds () { return m_slottedAlohaControlRandomizationIntervalInMilliSeconds;}
 
   /**
    * \brief Function for setting the Slotted ALOHA control randomization interval
    * \param controlRandomizationInterval control randomization interval
    */
-  void SetSlottedAlohaControlRandomizationInterval (uint32_t controlRandomizationInterval) { slottedAlohaControlRandomizationInterval = controlRandomizationInterval;}
+  void SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds) { m_slottedAlohaControlRandomizationIntervalInMilliSeconds = controlRandomizationIntervalInMilliSeconds;}
 
   /**
    * \brief Function for getting the number of available allocation channels
@@ -101,7 +101,7 @@ private:
    * \brief Slotted ALOHA control randomization interval in milliseconds
    *
    */
-  uint32_t slottedAlohaControlRandomizationInterval;
+  uint32_t m_slottedAlohaControlRandomizationIntervalInMilliSeconds;
 
   /**
    * \brief Number of available allocation channels

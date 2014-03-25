@@ -56,25 +56,25 @@ public:
    * \brief Function for getting the CRDSA backoff time
    * \return CRDSA  backoff time
    */
-  uint32_t GetCrdsaBackoffTime () { return m_crdsaBackoffTime; }
+  uint32_t GetCrdsaBackoffTimeInMilliSeconds () { return m_crdsaBackoffTimeInMilliSeconds; }
 
   /**
    * \brief Function for setting the CRDSA backoff time
    * \param crdsaBackoffTime CRDSA backoff time
    */
-  void SetCrdsaBackoffTime (uint32_t crdsaBackoffTime) { m_crdsaBackoffTime = crdsaBackoffTime; }
+  void SetCrdsaBackoffTimeInMilliSeconds (uint32_t crdsaBackoffTimeInMilliSeconds) { m_crdsaBackoffTimeInMilliSeconds = crdsaBackoffTimeInMilliSeconds; }
 
   /**
    * \brief Function for getting the CRDSA backoff release time
    * \return CRDSA backoff release time
    */
-  double GetCrdsaBackoffReleaseTime () { return m_crdsaBackoffReleaseTime; }
+  Time GetCrdsaBackoffReleaseTime () { return m_crdsaBackoffReleaseTime; }
 
   /**
    * \brief Function for setting the CRDSA backoff release time
    * \param crdsaBackoffReleaseTime CRDSA  backoff time
    */
-  void SetCrdsaBackoffReleaseTime (double crdsaBackoffReleaseTime) { m_crdsaBackoffReleaseTime = crdsaBackoffReleaseTime; }
+  void SetCrdsaBackoffReleaseTime (Time crdsaBackoffReleaseTime) { m_crdsaBackoffReleaseTime = crdsaBackoffReleaseTime; }
 
   /**
    * \brief Function for getting the CRDSA backoff probability
@@ -243,7 +243,7 @@ private:
   /**
    * \brief CRDSA backoff time
    */
-  uint32_t m_crdsaBackoffTime;
+  uint32_t m_crdsaBackoffTimeInMilliSeconds;
 
   /**
    * \brief CRDSA backoff probability
@@ -273,7 +273,7 @@ private:
   /**
    * \brief CRDSA backoff release time
    */
-  double m_crdsaBackoffReleaseTime;
+  Time m_crdsaBackoffReleaseTime;
 
   /**
    * \brief CRDSA maximum payload in bytes

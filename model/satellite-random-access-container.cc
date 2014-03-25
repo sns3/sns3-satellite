@@ -332,8 +332,8 @@ SatRandomAccess::PrintVariables ()
   for (uint32_t index = 0; index < m_numOfAllocationChannels; index++)
     {
       NS_LOG_INFO ("ALLOCATION CHANNEL: " << index);
-      NS_LOG_INFO ("Backoff release at: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffReleaseTime () << " seconds");
-      NS_LOG_INFO ("Backoff time: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffTime () << " milliseconds");
+      NS_LOG_INFO ("Backoff release at: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffReleaseTime ().GetSeconds () << " seconds");
+      NS_LOG_INFO ("Backoff time: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffTimeInMilliSeconds () << " milliseconds");
       NS_LOG_INFO ("Backoff probability: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffProbability () * 100 << " %");
       NS_LOG_INFO ("Slot randomization: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaNumOfInstances () * m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaMaxUniquePayloadPerBlock () <<
                    " Tx opportunities with range from " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaMinRandomizationValue () <<
@@ -350,13 +350,13 @@ SatRandomAccess::PrintVariables ()
 ///-------------------------------
 
 void
-SatRandomAccess::SlottedAlohaSetControlRandomizationInterval (double controlRandomizationInterval)
+SatRandomAccess::SlottedAlohaSetControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds)
 {
-  NS_LOG_FUNCTION (this << controlRandomizationInterval);
+  NS_LOG_FUNCTION (this << controlRandomizationIntervalInMilliSeconds);
 
   if (m_randomAccessModel == SatEnums::RA_SLOTTED_ALOHA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
     {
-      m_randomAccessConf->SetSlottedAlohaControlRandomizationInterval (controlRandomizationInterval);
+      m_randomAccessConf->SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (controlRandomizationIntervalInMilliSeconds);
 
       m_randomAccessConf->DoSlottedAlohaVariableSanityCheck ();
     }
@@ -365,7 +365,7 @@ SatRandomAccess::SlottedAlohaSetControlRandomizationInterval (double controlRand
       NS_FATAL_ERROR ("SatRandomAccess::SlottedAlohaSetRandomizationParameters - Wrong random access model in use");
     }
 
-  NS_LOG_INFO ("SatRandomAccess::SlottedAlohaSetRandomizationParameters - new control randomization interval : " << controlRandomizationInterval);
+  NS_LOG_INFO ("SatRandomAccess::SlottedAlohaSetRandomizationParameters - new control randomization interval : " << controlRandomizationIntervalInMilliSeconds);
 }
 
 SatRandomAccess::RandomAccessTxOpportunities_s
@@ -379,7 +379,7 @@ SatRandomAccess::DoSlottedAloha ()
   NS_LOG_INFO ("---------------------------------------------");
   NS_LOG_INFO ("------ Running Slotted ALOHA algorithm ------");
   NS_LOG_INFO ("---------------------------------------------");
-  NS_LOG_INFO ("Slotted ALOHA control randomization interval: " << m_randomAccessConf->GetSlottedAlohaControlRandomizationInterval () << " milliseconds");
+  NS_LOG_INFO ("Slotted ALOHA control randomization interval: " << m_randomAccessConf->GetSlottedAlohaControlRandomizationIntervalInMilliSeconds () << " milliseconds");
   NS_LOG_INFO ("---------------------------------------------");
 
   NS_LOG_INFO ("SatRandomAccess::DoSlottedAloha - Checking if we have DAMA allocations");
@@ -408,7 +408,7 @@ SatRandomAccess::SlottedAlohaRandomizeReleaseTime ()
 
   NS_LOG_INFO ("SatRandomAccess::SlottedAlohaRandomizeReleaseTime - Randomizing the release time...");
 
-  uint32_t releaseTime = m_uniformRandomVariable->GetInteger (0, m_randomAccessConf->GetSlottedAlohaControlRandomizationInterval ());
+  uint32_t releaseTime = m_uniformRandomVariable->GetInteger (0, m_randomAccessConf->GetSlottedAlohaControlRandomizationIntervalInMilliSeconds ());
 
   NS_LOG_INFO ("SatRandomAccess::SlottedAlohaRandomizeReleaseTime - TX opportunity in the next slot after " << releaseTime << " milliseconds");
 
@@ -422,14 +422,14 @@ SatRandomAccess::SlottedAlohaRandomizeReleaseTime ()
 void
 SatRandomAccess::CrdsaSetLoadControlParameters (uint32_t allocationChannel,
                                                 double backoffProbability,
-                                                uint32_t backoffTime)
+                                                uint32_t backoffTimeInMilliSeconds)
 {
   NS_LOG_FUNCTION (this);
 
   if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffProbability (backoffProbability);
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffTime (backoffTime);
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffTimeInMilliSeconds (backoffTimeInMilliSeconds);
 
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->DoCrdsaVariableSanityCheck ();
     }
@@ -634,8 +634,8 @@ SatRandomAccess::CrdsaSetBackoffTimer (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffReleaseTime (Now ().GetSeconds ()
-                                                                                                         + (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffTime () / 1000));
+  m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffReleaseTime (Now ()
+                      + MilliSeconds (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffTimeInMilliSeconds ()));
 
   CrdsaReduceIdleBlocks (allocationChannel);
 
