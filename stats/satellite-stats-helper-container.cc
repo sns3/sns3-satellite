@@ -58,7 +58,7 @@ SatStatsHelperContainer::DoDispose ()
  *
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - [Global,PerGw,PerBeam,PerUt] RtnQueue [Bytes,Packets]
+ * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -147,6 +147,14 @@ SatStatsHelperContainer::GetTypeId ()
     // Forward link PHY-level packet delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdPhyDelay,
                                         "forward link PHY-level delay statistics")
+
+    // Forward link queue size (in bytes) statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdQueueBytes,
+                                        "forward link queue size (in bytes) statistics")
+
+    // Forward link queue size (in number of packets) statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdQueuePackets,
+                                        "forward link queue size (in number of packets) statistics")
 
     // Forward link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput,
@@ -248,7 +256,7 @@ SatStatsHelperContainer::GetName () const
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - Add [Global,PerGw,PerBeam,PerUt] RtnQueue [Bytes,Packets]
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  *
@@ -369,6 +377,18 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
+
+// Forward link queue size (in bytes) statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdQueueBytes, "fwd-queue-bytes")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdQueueBytes, "fwd-queue-bytes")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdQueueBytes, "fwd-queue-bytes")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdQueueBytes, "fwd-queue-bytes")
+
+// Forward link queue size (in number of packets) statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdQueuePackets, "fwd-queue-packets")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdQueuePackets, "fwd-queue-packets")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdQueuePackets, "fwd-queue-packets")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdQueuePackets, "fwd-queue-packets")
 
 // Forward link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")

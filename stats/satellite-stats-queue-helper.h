@@ -165,61 +165,64 @@ private:
 
 class SatLlc;
 
-///**
-// * \ingroup satstats
-// * \brief
-// */
-//class SatStatsFwdQueueHelper : public SatStatsQueueHelper
-//{
-//public:
-//  // inherited from SatStatsHelper base class
-//  SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper);
-//
-//  /// Destructor.
-//  virtual ~SatStatsFwdQueueHelper ();
-//
-//protected:
-//  // inherited from SatStatsQueueHelper base class
-//  virtual void DoEnlistSource ();
-//  virtual void DoPoll ();
-//
-//private:
-//  /// Maintains a list of UT LLC and its identifier.
-//  std::list<std::pair<Ptr<SatLlc>, uint32_t> > m_llc;
-//
-//}; // end of class SatStatsFwdQueueHelper
-//
-//
-///**
-// * \ingroup satstats
-// * \brief
-// */
-//class SatStatsFwdQueueBytesHelper : public SatStatsFwdQueueHelper
-//{
-//public:
-//  // inherited from SatStatsHelper base class
-//  SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper);
-//
-//  /// Destructor.
-//  virtual ~SatStatsFwdQueueBytesHelper ();
-//
-//}; // end of class SatStatsFwdQueueBytesHelper
-//
-//
-///**
-// * \ingroup satstats
-// * \brief
-// */
-//class SatStatsFwdQueuePacketsHelper : public SatStatsFwdQueueHelper
-//{
-//public:
-//  // inherited from SatStatsHelper base class
-//  SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper);
-//
-//  /// Destructor.
-//  virtual ~SatStatsFwdQueuePacketsHelper ();
-//
-//}; // end of class SatStatsFwdQueuePacketsHelper
+/**
+ * \ingroup satstats
+ * \brief
+ */
+class SatStatsFwdQueueHelper : public SatStatsQueueHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsFwdQueueHelper ();
+
+protected:
+  // inherited from SatStatsQueueHelper base class
+  virtual void DoEnlistSource ();
+  virtual void DoPoll ();
+
+private:
+  ///
+  typedef std::list<std::pair<Mac48Address, uint32_t> > ListOfUt_t;
+
+  /// Maintains a list of GW LLC, its UT address, and its identifier.
+  std::list<std::pair<Ptr<SatLlc>, ListOfUt_t> > m_llc;
+
+}; // end of class SatStatsFwdQueueHelper
+
+
+/**
+ * \ingroup satstats
+ * \brief
+ */
+class SatStatsFwdQueueBytesHelper : public SatStatsFwdQueueHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsFwdQueueBytesHelper ();
+
+}; // end of class SatStatsFwdQueueBytesHelper
+
+
+/**
+ * \ingroup satstats
+ * \brief
+ */
+class SatStatsFwdQueuePacketsHelper : public SatStatsFwdQueueHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsFwdQueuePacketsHelper ();
+
+}; // end of class SatStatsFwdQueuePacketsHelper
 
 
 // RETURN LINK ////////////////////////////////////////////////////////////////

@@ -31,6 +31,8 @@
 #include <ns3/net-device.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-llc.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-phy-rx.h>
 
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
@@ -436,9 +438,151 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
+SatStatsFwdQueueHelper::SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsQueueHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsFwdQueueHelper::~SatStatsFwdQueueHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+void
+SatStatsFwdQueueHelper::DoEnlistSource ()
+{
+  NS_LOG_FUNCTION (this);
+
+  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  for (NodeContainer::Iterator it1 = gws.Begin(); it1 != gws.End (); ++it1)
+    {
+      NS_LOG_DEBUG (this << " Node ID " << (*it1)->GetId ()
+                         << " has " << (*it1)->GetNDevices () << " devices");
+      /*
+       * Assuming that device #0 is for loopback device, device #(N-1) is for
+       * backbone network device, and devices #1 until #(N-2) are for satellite
+       * beam device.
+       */
+      for (uint32_t i = 1; i <= (*it1)->GetNDevices ()-2; i++)
+        {
+          Ptr<NetDevice> dev = (*it1)->GetDevice (i);
+          Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+
+          if (satDev == 0)
+            {
+              NS_LOG_WARN (this << " Node " << (*it1)->GetId ()
+                                << " is not a valid GW");
+            }
+          else
+            {
+              // Get the beam ID of this device.
+              Ptr<SatPhy> satPhy = satDev->GetPhy ();
+              NS_ASSERT (satPhy != 0);
+              Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
+              NS_ASSERT (satPhyRx != 0);
+              const uint32_t beamId = satPhyRx->GetBeamId ();
+              NS_LOG_DEBUG (this << " enlisting UT from beam ID " << beamId);
+
+              // Go through the UTs of this beam.
+              ListOfUt_t listOfUt;
+              NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (beamId);
+              for (NodeContainer::Iterator it2 = uts.Begin();
+                   it2 != uts.End (); ++it2)
+                {
+                  const Address addr = satIdMapper->GetUtMacWithNode (*it2);
+                  const Mac48Address mac48Addr = Mac48Address::ConvertFrom (addr);
+
+                  if (addr.IsInvalid ())
+                    {
+                      NS_LOG_WARN (this << " Node " << (*it2)->GetId ()
+                                        << " is not a valid UT");
+                    }
+                  else
+                    {
+                      const uint32_t identifier = GetIdentifierForUt (*it2);
+                      listOfUt.push_back (std::make_pair (mac48Addr, identifier));
+                    }
+                }
+
+              // Add an entry to the LLC list.
+              Ptr<SatLlc> satLlc = satDev->GetLlc ();
+              NS_ASSERT (satLlc != 0);
+              m_llc.push_back (std::make_pair (satLlc, listOfUt));
+
+            } // end of else of `if (satDev == 0)`
+
+        } // end of `for (uint32_t i = 1; i <= (*it)->GetNDevices ()-2; i++)`
+
+    } // end of `for (it1 = gws.Begin(); it1 != gws.End (); ++it1)`
+
+} // end of `void DoInstall ();`
+
+
+void
+SatStatsFwdQueueHelper::DoPoll ()
+{
+  //NS_LOG_FUNCTION (this);
+
+  // Go through the LLC list.
+  std::list<std::pair<Ptr<SatLlc>, ListOfUt_t> >::const_iterator it1;
+  for (it1 = m_llc.begin (); it1 != m_llc.end (); ++it1)
+    {
+      for (ListOfUt_t::const_iterator it2 = it1->second.begin ();
+           it2 != it1->second.end (); ++it2)
+        {
+          const Mac48Address addr = it2->first;
+          const uint32_t identifier = it2->second;
+          if (GetUnitType () == SatStatsQueueHelper::UNIT_BYTES)
+            {
+              PushToCollector (identifier,
+                               it1->first->GetNBytesInQueue (addr));
+            }
+          else
+            {
+              NS_ASSERT (GetUnitType () == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
+              PushToCollector (identifier,
+                               it1->first->GetNPacketsInQueue (addr));
+            }
+        }
+    }
+}
+
+
 // FORWARD LINK IN BYTES //////////////////////////////////////////////////////
 
+SatStatsFwdQueueBytesHelper::SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsFwdQueueHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetUnitType (SatStatsQueueHelper::UNIT_BYTES);
+}
+
+
+SatStatsFwdQueueBytesHelper::~SatStatsFwdQueueBytesHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
 // FORWARD LINK IN PACKETS ////////////////////////////////////////////////////
+
+SatStatsFwdQueuePacketsHelper::SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsFwdQueueHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetUnitType (SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
+}
+
+
+SatStatsFwdQueuePacketsHelper::~SatStatsFwdQueuePacketsHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
 
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
