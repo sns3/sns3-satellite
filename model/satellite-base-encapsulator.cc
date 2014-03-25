@@ -126,24 +126,26 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
     {
       // Peek the first PDU from the buffer.
       packet = m_txQueue->Dequeue ();
+
+      if (!packet)
+        {
+          NS_FATAL_ERROR ("Packet not dequeued from txQueue even though the peek PDU should have been fit!");
+        }
+
+      // Add MAC tag to identify the packet in lower layers
+      SatMacTag mTag;
+      mTag.SetDestAddress (m_destAddress);
+      mTag.SetSourceAddress (m_sourceAddress);
+      packet->AddPacketTag (mTag);
+
+      SatRcIndexTag rcTag;
+      rcTag.SetRcIndex (m_flowId);
+      packet->AddPacketTag (rcTag);
+
+      // Update bytes left
+      bytesLeft = m_txQueue->GetNBytes ();
     }
-  else
-    {
-      NS_FATAL_ERROR ("Packet of size: " << peekPacket->GetSize () << " does not fit into allocation of: " << bytes << " Bytes!");
-    }
 
-  // Add MAC tag to identify the packet in lower layers
-  SatMacTag mTag;
-  mTag.SetDestAddress (m_destAddress);
-  mTag.SetSourceAddress (m_sourceAddress);
-  packet->AddPacketTag (mTag);
-
-  SatRcIndexTag rcTag;
-  rcTag.SetRcIndex (m_flowId);
-  packet->AddPacketTag (rcTag);
-
-  // Update bytes left
-  bytesLeft = m_txQueue->GetNBytes ();
   return packet;
 }
 

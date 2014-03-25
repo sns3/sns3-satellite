@@ -91,15 +91,15 @@ public:
     SAT_MODCOD_QPSK_1_TO_3,
     SAT_MODCOD_QPSK_1_TO_2,
     SAT_MODCOD_QPSK_2_TO_3,
-    SAT_MODCOD_QPSK_3_TO_4,
     SAT_MODCOD_QPSK_3_TO_5,
+    SAT_MODCOD_QPSK_3_TO_4,
     SAT_MODCOD_QPSK_4_TO_5,
     SAT_MODCOD_QPSK_5_TO_6,
     SAT_MODCOD_QPSK_8_TO_9,
     SAT_MODCOD_QPSK_9_TO_10,
     SAT_MODCOD_8PSK_2_TO_3,
-    SAT_MODCOD_8PSK_3_TO_4,
     SAT_MODCOD_8PSK_3_TO_5,
+    SAT_MODCOD_8PSK_3_TO_4,
     SAT_MODCOD_8PSK_5_TO_6,
     SAT_MODCOD_8PSK_8_TO_9,
     SAT_MODCOD_8PSK_9_TO_10,
@@ -120,17 +120,22 @@ public:
 
   static inline void GetAvailableModcodsFwdLink (std::vector<SatModcod_t>& modcods)
   {
+    /**
+     * Note that the order of MODCODs have a meaning in ACM.
+     * The MODCODs should be in decreasing order based on
+     * coding rate.
+     */
     modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
     modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
-    modcods.push_back (SAT_MODCOD_QPSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_QPSK_3_TO_5);
+    modcods.push_back (SAT_MODCOD_QPSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_QPSK_4_TO_5);
     modcods.push_back (SAT_MODCOD_QPSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_QPSK_8_TO_9);
     modcods.push_back (SAT_MODCOD_QPSK_9_TO_10);
     modcods.push_back (SAT_MODCOD_8PSK_2_TO_3);
-    modcods.push_back (SAT_MODCOD_8PSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_8PSK_3_TO_5);
+    modcods.push_back (SAT_MODCOD_8PSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_8PSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_8PSK_8_TO_9);
     modcods.push_back (SAT_MODCOD_8PSK_9_TO_10);
@@ -148,6 +153,11 @@ public:
 
   static inline void GetAvailableModcodsRtnLink (std::vector<SatModcod_t>& modcods)
   {
+    /**
+     * Note that the order of MODCODs have a meaning in ACM.
+     * The MODCODs should be in decreasing order based on
+     * coding rate.
+     */
     modcods.push_back (SAT_MODCOD_QPSK_1_TO_3);
     modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
     modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);

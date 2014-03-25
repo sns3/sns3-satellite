@@ -163,7 +163,7 @@ private:
    * \param rc Request class index
    * \return uint32_t Pending sum in kbps or Bytes
    */
-  uint32_t GetPendingRbdcSum (uint8_t rc) const;
+  uint32_t GetPendingRbdcSumKbps (uint8_t rc) const;
 
   /**
    * Update the pending RBDC counters with new request information
@@ -233,12 +233,12 @@ private:
   // Key = RC index
   // Value -> Key   = Time when the request was sent
   // Value -> Value = Requested bitrate or bytes
-  PendingRbdcRequestsContainer_t m_pendingRbdcRequests;
+  PendingRbdcRequestsContainer_t m_pendingRbdcRequestsKbps;
 
   /**
    * Pending VBDC counter for each RC index
    */
-  std::vector<uint32_t> m_pendingVbdcCounters;
+  std::vector<uint32_t> m_pendingVbdcBytes;
 
   /**
    * Periodical VBDC resynchronization timer in superframes.
@@ -254,7 +254,7 @@ private:
   /**
    * Dedicated assignments received within the previous superframe
    */
-  std::vector<uint32_t> m_assignedDaResources;
+  std::vector<uint32_t> m_assignedDaResourcesBytes;
 
   /**
    * Trace callback used for CR tracing:
