@@ -633,7 +633,7 @@ SatSuperframeConf::GetRaChannelPayloadInBytes (uint32_t raChannel) const
     }
   else
     {
-      NS_FATAL_ERROR ("Channel out of range!!!");
+      NS_FATAL_ERROR ("Channel " << raChannel << " out of range!!!");
     }
 
   return payloadInBytes;

@@ -43,7 +43,7 @@ SatRandomAccessConf::SatRandomAccessConf () :
   NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - Constructor not in use");
 }
 
-SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf) :
+SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> superframeSeq) :
   m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
   m_allocationChannelCount (llsConf->GetRaServiceCount ())
 {
@@ -68,16 +68,11 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf)
       GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability ((llsConf->GetRaBackOffProbability (i) - 1) * (1 / (std::pow(2,16) - 2)));
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
-
-      /// TODO this comes from frame configuration?
+      /// TODO Get rid of the hard coded 0
+      GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (superframeSeq->GetSuperframeConf (0)->GetRaChannelPayloadInBytes (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (79);
-
-      /// TODO this comes from RA dynamic load control
       GetAllocationChannelConfiguration (i)->SetCrdsaMaximumBackoffProbability (0.2);
-
-      /// TODO this comes from waveform configuration
-      GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (10000);
 
       GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
     }

@@ -26,6 +26,7 @@
 #include "ns3/simulator.h"
 #include "satellite-random-access-allocation-channel.h"
 #include "satellite-lower-layer-service.h"
+#include "ns3/satellite-superframe-sequence.h"
 #include <map>
 
 namespace ns3 {
@@ -47,7 +48,7 @@ public:
   /**
    * \brief Constructor
    */
-  SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf);
+  SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> m_superframeSeq);
 
   /**
    * \brief Destructor

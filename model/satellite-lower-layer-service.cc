@@ -224,7 +224,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minDaServiceEntries, SatLowerLayerServiceConf::m_maxDaServiceEntries))
     .AddAttribute ( "RaServiceCount",
                     "RA services in use.",
-                     UintegerValue (2),
+                     UintegerValue (1),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
                      MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minRaServiceEntries, SatLowerLayerServiceConf::m_maxRaServiceEntries))
     .AddAttribute ( "DynamicRatePersistence",
