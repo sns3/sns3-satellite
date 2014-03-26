@@ -181,7 +181,10 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
             carrierSymbolsToUse -= symbolsToUse;
           }
 
-        utSymbolsToUse -= symbolsToUse;
+        if ( rcSymbolsLeft > 0)
+          {
+            utSymbolsToUse -= symbolsToUse;
+          }
       }
     else
       {
@@ -317,6 +320,8 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
 
   if ( (m_preAllocatedCraSymbols + m_preAllocatedRdbcSymbols + m_preAllocatedVdbcSymbols) <= m_availableSymbolsInFrame )
     {
+      AcceptRequests (CC_LEVEL_CRA_RBDC_VBDC);
+
       if ( fcaEnabled )
         {
           // share additional VBDC resources
@@ -329,8 +334,6 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
           // sort RCs according to VBDC requests
           CcReqCompare vbdcCompare = CcReqCompare (m_utAllocs, CcReqCompare::CC_TYPE_VBDC);
           m_rcAllocs.sort (vbdcCompare);
-
-          AcceptRequests (CC_LEVEL_CRA_RBDC_VBDC);
 
           uint32_t rcAllocsLeft = m_rcAllocs.size ();
 
@@ -758,7 +761,7 @@ SatFrameAllocator::GetTypeId (void)
                       MakeDoubleChecker<double> ())
       .AddAttribute ("FcaEnabled",
                      "Free capacity allocation (FCA) enable status.",
-                      BooleanValue (true),
+                      BooleanValue (false),
                       MakeBooleanAccessor (&SatFrameAllocator::m_fcaEnabled),
                       MakeBooleanChecker ())
 
