@@ -66,6 +66,16 @@ public:
        m_vbdcSymbols (0.0) {}
 
     double GetTotalSymbols () { return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);}
+
+    void SetTotalSymbols (double symbols)
+    {
+      if ( symbols <= 0)
+        {
+          m_craSymbols = 0.0;
+          m_rbdcSymbols = 0.0;
+          m_vbdcSymbols = 0.0;
+        }
+    }
   };
 
   typedef std::vector<SatFrameAllocReqItem>   SatFrameAllocReqItemContainer_t;

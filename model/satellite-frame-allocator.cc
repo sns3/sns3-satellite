@@ -119,10 +119,20 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
+
       // sort RCs in UT using random method.
-      std::random_shuffle (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.begin (), m_utAllocs[*it].m_allocation.m_allocInfoPerRc.end ());
-      uint8_t currentRc = 0;
-      int64_t rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[currentRc].GetTotalSymbols ();
+      std::vector<uint32_t> rcIndeces;
+
+      for (uint32_t i = 0; i < m_utAllocs[*it].m_allocation.m_allocInfoPerRc.size (); i++)
+        {
+          rcIndeces.push_back (i);
+        }
+
+      std::random_shuffle (rcIndeces.begin (), rcIndeces.end ());
+
+      std::vector<uint32_t>::const_iterator currentRcIndex = rcIndeces.begin ();
+
+      int64_t rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
 
       // generate slots here
 
@@ -145,7 +155,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
                   tbtpToFill = newTbtp;
                 }
 
-              timeSlot->SetRcIndex (currentRc);
+              timeSlot->SetRcIndex (*currentRcIndex);
               tbtpToFill->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
             }
 
@@ -157,8 +167,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
           if ( rcSymbolsLeft <= 0)
             {
-              currentRc++;
-              rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[currentRc].GetTotalSymbols ();
+              currentRcIndex++;
+              rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
             }
         }
     }
@@ -260,7 +270,7 @@ SatFrameAllocator::SatFrameInfo::GetOptimalBurtsLengthInSymbols (int64_t symbols
     {
       case 0:
       case 1:
-        if (symbolsToUse >= m_waveformConf->GetDefaultBurstLength ())
+        if ( (rcSymbolsLeft > 0) && (symbolsToUse >= m_waveformConf->GetDefaultBurstLength ()))
           {
             burstLength = m_waveformConf->GetDefaultBurstLength ();
           }
