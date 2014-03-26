@@ -119,7 +119,6 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
-
       // sort RCs in UT using random method.
       std::vector<uint32_t> rcIndeces;
 
@@ -168,7 +167,11 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
           if ( rcSymbolsLeft <= 0)
             {
               currentRcIndex++;
-              rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
+
+              if ( currentRcIndex != rcIndeces.end () )
+                {
+                  rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
+                }
             }
         }
     }
