@@ -61,9 +61,9 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_crdsaMinRandomizationValue < 0 || m_crdsaMaxRandomizationValue < 0)
+  if (m_crdsaMinRandomizationValue < 0 || m_crdsaMaxRandomizationValue < 1)
     {
-      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - min < 0 || max < 0");
+      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - min < 0 || max < 1");
     }
 
   if (m_crdsaMinRandomizationValue > m_crdsaMaxRandomizationValue)

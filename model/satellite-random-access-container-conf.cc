@@ -31,8 +31,7 @@ TypeId
 SatRandomAccessConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccessConf")
-    .SetParent<Object> ()
-    ;
+    .SetParent<Object> ();
   return tid;
 }
 SatRandomAccessConf::SatRandomAccessConf () :
@@ -70,8 +69,11 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
       /// TODO Get rid of the hard coded 0
       GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (superframeSeq->GetSuperframeConf (0)->GetRaChannelPayloadInBytes (i));
+      /// TODO this assumes that the slot IDs for each allocation channel start at 0
       GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (79);
+      /// TODO this assumes that the slot IDs for each allocation channel start at 0
+      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount(i) - 1);
+
       GetAllocationChannelConfiguration (i)->SetCrdsaMaximumBackoffProbability (0.2);
 
       GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
