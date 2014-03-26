@@ -180,6 +180,7 @@ private:
   uint16_t m_backOffTimeInMilliSeconds;
   uint16_t m_backOffProbability;
   uint8_t m_numberOfInstances;
+  double m_maximumBackOffProbability;
 
   /**
    * Get maximum unique payload per block.
@@ -264,6 +265,20 @@ private:
    * \param numberOfInstances Number of instances
    */
   inline void SetNumberOfInstances (uint8_t numberOfInstances) { m_numberOfInstances = numberOfInstances;}
+
+  /**
+   * Get maximum back off probability.
+   *
+   * \return Maximum back off probability
+   */
+  inline double GetMaximumBackOffProbability () const {return m_maximumBackOffProbability;}
+
+  /**
+   * Set maximum back off probability.
+   *
+   * \param maximumBackOffProbability Maximum back off probability
+   */
+  inline void SetMaximumBackOffProbability (double maximumBackOffProbability) { m_maximumBackOffProbability = maximumBackOffProbability;}
 };
 
 /**
@@ -444,6 +459,14 @@ public:
    */
   uint8_t GetRaNumberOfInstances (uint8_t index) const;
 
+  /**
+   * Get maximum back off probability.
+   *
+   * \param index Index of the service
+   * \return Maximu back off probability
+   */
+  double GetRaMaximumBackOffProbability (uint8_t index) const;
+
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
@@ -586,6 +609,14 @@ private:
    */
   void SetRaNumberOfInstances (uint8_t index, uint8_t numberOfInstances);
 
+  /**
+   * Set maximum back off probability.
+   *
+   * \param index Index of the service
+   * \param maximumBackOffProbability Maximum back off probability
+   */
+  void SetRaMaximumBackOffProbability (uint8_t index, double maximumBackOffProbability);
+
 /**
  * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
  * attribute access method.
@@ -657,6 +688,8 @@ private:
  *  - GetRaServ0VBackOffProbability, see @SatLowerLayerServiceRaEntry::GetBackOffProbability
  *  - SetRaServ0NumberOfInstances, see @SatLowerLayerServiceRaEntry::SetNumberOfInstances
  *  - GetRaServ0VNumberOfInstances, see @SatLowerLayerServiceRaEntry::GetNumberOfInstances
+ *  - SetRaServ0MaximumBackOffProbability, see @SatLowerLayerServiceRaEntry::SetMaximumBackOffProbability
+ *  - GetRaServ0VMaximumBackOffProbability, see @SatLowerLayerServiceRaEntry::GetMaximumBackOffProbability
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -684,7 +717,11 @@ private:
   inline void SetRaServ ## index ## NumberOfInstances (uint8_t value)  \
     { return SetRaNumberOfInstances (index, value); } \
   inline uint8_t GetRaServ ## index ## NumberOfInstances () const  \
-    { return GetRaNumberOfInstances (index); }
+    { return GetRaNumberOfInstances (index); } \
+  inline void SetRaServ ## index ## MaximumBackOffProbability (double value)  \
+    { return SetRaMaximumBackOffProbability (index, value); } \
+  inline double GetRaServ ## index ## MaximumBackOffProbability () const  \
+    { return GetRaMaximumBackOffProbability (index); }
 
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
