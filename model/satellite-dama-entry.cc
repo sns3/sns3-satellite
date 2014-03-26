@@ -131,7 +131,13 @@ SatDamaEntry::GetCraInKbps (uint8_t index) const
        NS_FATAL_ERROR ("RC index requested is out of range!!!");
     }
 
-  return m_llsConf->GetDaConstantServiceRateInKbps (index);
+  uint16_t cra (0);
+  if (m_llsConf->GetDaConstantAssignmentProvided (index))
+    {
+      cra = m_llsConf->GetDaConstantServiceRateInKbps (index);
+    }
+
+  return cra;
 }
 
 uint16_t
@@ -144,7 +150,13 @@ SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
        NS_FATAL_ERROR ("RC index requested is out of range!!!");
     }
 
-  return m_llsConf->GetDaMinimumServiceRateInKbps (index);
+  uint16_t minRbdc (0);
+  if (m_llsConf->GetDaRbdcAllowed (index))
+    {
+      minRbdc = m_llsConf->GetDaMinimumServiceRateInKbps (index);
+    }
+
+  return minRbdc;
 }
 
 uint16_t
