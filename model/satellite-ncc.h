@@ -107,8 +107,9 @@ public:
     *        be forwarded to the Beam UTs.
     * \param seq Super frame sequence
     * \param maxRcCount Maximum number of RCs in use.
+    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
     */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t macRcCount);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t macRcCount, uint32_t maxFrameSizeInBytes);
 
   /**
     * \param utId ID (mac address) of the UT to be added

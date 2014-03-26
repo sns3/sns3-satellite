@@ -283,6 +283,55 @@ SatTbtpMessage::SetRaChannel (uint32_t raChannel, uint8_t frameId, uint16_t time
   m_frameIds.insert (frameId);
 }
 
+uint32_t
+SatTbtpMessage::GetTimeSlotInfoSizeInBytes () const
+{
+  uint32_t assignmentIdSizeInBytes = 0;
+
+  switch (m_assignmentFormat)
+  {
+    case 0:
+      // assignment id 48 bits
+      assignmentIdSizeInBytes = 6;
+      break;
+
+    case 1:
+      // assignment id 8 bits
+      assignmentIdSizeInBytes = 1;
+      break;
+
+    case 2:
+      // assignment id 16 bits
+      assignmentIdSizeInBytes = 2;
+      break;
+
+    case 3:
+      // assignment id 24 bits
+      assignmentIdSizeInBytes = 3;
+      break;
+
+    case 10:
+      // dynamic tx type 8 bits + assignment id 8 bits
+      assignmentIdSizeInBytes = 2;
+      break;
+
+    case 11:
+      // dynamic tx type 8 bits + assignment id 16 bits
+      assignmentIdSizeInBytes = 3;
+      break;
+
+    case 12:
+      // dynamic tx type 8 bits + assignment id 24 bits
+      assignmentIdSizeInBytes = 4;
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Assignment format=" << m_assignmentFormat << " not supported!!!" );
+      break;
+  }
+
+  return assignmentIdSizeInBytes;
+}
 
 uint32_t SatTbtpMessage::GetSizeInBytes () const
 {
@@ -291,60 +340,18 @@ uint32_t SatTbtpMessage::GetSizeInBytes () const
   // see definition for TBTP2 from specification ETSI EN 301 545-2 (V1.1.1), chapter 6.4.9
 
   uint32_t sizeInBytes = m_tbtpBodySizeInBytes + ( m_frameIds.size () * m_tbtpFrameBodySizeInBytes );
-  uint32_t assignmentBodySizeInBytes = 0;
-
-  switch (m_assignmentFormat)
-  {
-    case 0:
-      // assignment id 48 bits
-      assignmentBodySizeInBytes = 6;
-      break;
-
-    case 1:
-      // assignment id 8 bits
-      assignmentBodySizeInBytes = 1;
-      break;
-
-    case 2:
-      // assignment id 16 bits
-      assignmentBodySizeInBytes = 2;
-      break;
-
-    case 3:
-      // assignment id 24 bits
-      assignmentBodySizeInBytes = 3;
-      break;
-
-    case 10:
-      // dynamic tx type 8 bits + assignment id 8 bits
-      assignmentBodySizeInBytes = 2;
-      break;
-
-    case 11:
-      // dynamic tx type 8 bits + assignment id 16 bits
-      assignmentBodySizeInBytes = 3;
-      break;
-
-    case 12:
-      // dynamic tx type 8 bits + assignment id 24 bits
-      assignmentBodySizeInBytes = 4;
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Assignment format=" << m_assignmentFormat << " not supported!!!" );
-      break;
-  }
+  uint32_t assignmentIdSizeInBytes = GetTimeSlotInfoSizeInBytes ();
 
   // add size of DA time slots
   for (DaTimeSlotMap_t::const_iterator it = m_daTimeSlots.begin (); it != m_daTimeSlots.end (); it++ )
     {
-      sizeInBytes += (it->second.size () * assignmentBodySizeInBytes);
+      sizeInBytes += (it->second.size () * assignmentIdSizeInBytes);
     }
 
   // add size of RA time slots
   for (RaChannelMap_t::const_iterator it = m_raChannels.begin (); it != m_raChannels.end (); it++ )
     {
-      sizeInBytes += (it->second * assignmentBodySizeInBytes);
+      sizeInBytes += (it->second * assignmentIdSizeInBytes);
     }
 
   return sizeInBytes;

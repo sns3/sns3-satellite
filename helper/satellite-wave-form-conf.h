@@ -72,7 +72,7 @@ public:
   uint32_t GetPayloadInBytes () const;
 
   /**
-   * Get burst lenght of the waveform in symbols
+   * Get burst length of the waveform in symbols
    * \return burst length
    */
   uint32_t GetBurstLengthInSymbols () const;

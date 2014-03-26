@@ -339,7 +339,6 @@ public:
   } ConfigType_t;
 
   static const uint8_t m_maxFrameCount = 10;
-  static const uint32_t m_maxFrameConfigTypeIndex = 3;
 
   /**
    * Template method to convert number to string
@@ -458,6 +457,14 @@ public:
    * \return RA channel time slots
    */
   SatFrameConf::SatTimeSlotConfContainer_t GetRaSlots (uint32_t raChannel);
+
+  /**
+   * Get RA channel time slot count
+   *
+   * \param raChannel RA channel, which slot count is requested
+   * \return RA channel time slot count
+   */
+  uint16_t GetRaSlotCount (uint32_t raChannel);
 
   /**
    * Get the number of the RA channels in super frame configuration.

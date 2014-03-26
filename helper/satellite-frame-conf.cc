@@ -589,6 +589,28 @@ SatSuperframeConf::GetRaSlots (uint32_t raChannel)
   return timeSlots;
 }
 
+uint16_t
+SatSuperframeConf::GetRaSlotCount (uint32_t raChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  uint16_t slotCount = 0;
+
+  if ( raChannel < m_raChannels.size ())
+    {
+      uint8_t frameId = m_raChannels[raChannel].first;
+      uint32_t carrierId = m_raChannels[raChannel].second;
+
+      slotCount = m_frames[frameId]->GetTimeSlotConfs (carrierId).size ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Channel out of range!!!");
+    }
+
+  return slotCount;
+}
+
 uint32_t
 SatSuperframeConf::GetRaChannelCount () const
 {

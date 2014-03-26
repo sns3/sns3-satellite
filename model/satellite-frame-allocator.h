@@ -242,11 +242,12 @@ public:
   void AllocateSymbols ();
 
   /**
-   * Generate time slot for the UT/RC.
+   * Generate time slots in TBTP(s) for the UT/RC.
    *
-   * \param tbtp TBTP message to add generated time slots.
+   * \param tbtpContainer TBTP message container to add/fill TBTPs.
+   * \param maxFrameSizeInBytes Maximum size for a TBTP message.
    */
-  void GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp);
+  void GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes);
 
 
 private:
@@ -292,11 +293,12 @@ private:
       void AllocateSymbols (double targetLoad, bool fcaEnabled);
 
       /**
-       * Generate time slots for UT/RC.
+       * Generate time slots for UT/RCs .
        *
-       * \param tbtp TBTP message to add generated time slots.
+       * \param tbtpContainer TBTP message container to add/fill TBTPs.
+       * \param maxFrameSizeInBytes Maximum size for a TBTP message.
        */
-      void GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp);
+      void GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes);
 
       /**
        * Get frame load by requested CC

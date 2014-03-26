@@ -126,7 +126,7 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
 void
 SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2)
 {
-  NS_LOG_FUNCTION (this );
+  NS_LOG_FUNCTION (this);
 
   // TODO: Usage of multiple carriers needed to take into account, now only one carrier assumed to be used.
   // TODO: Symbol rate needed to check.
@@ -142,6 +142,14 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDv
 
   m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate);
   m_bbFrameConf->InitializeCNoRequirements (lrS2);
+}
+
+Ptr<SatBbFrameConf>
+SatGwHelper::GetBbFrameConf () const
+{
+  NS_LOG_FUNCTION (this );
+
+  return m_bbFrameConf;
 }
 
 void 

@@ -176,7 +176,8 @@ SatBeamScheduler::SatBeamScheduler ()
     m_craBasedBytes (0),
     m_rbdcBasedBytes (0),
     m_vbdcBasedBytes (0),
-    m_cnoEstimatorMode (SatCnoEstimator::LAST)
+    m_cnoEstimatorMode (SatCnoEstimator::LAST),
+    m_maxBbFrameSize (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -216,13 +217,14 @@ SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 }
 
 void
-SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount)
+SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount, uint32_t maxFrameSizeInBytes)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
 
   m_beamId = beamId;
   m_txCallback = cb;
   m_superframeSeq = seq;
+  m_maxBbFrameSize = maxFrameSizeInBytes;
 
   /**
    * Calculating to start time for superframe counts to start the scheduling from.
@@ -358,15 +360,24 @@ SatBeamScheduler::Schedule ()
 
       DoPreResourceAllocation ();
 
-      // create TBTP  message
-      Ptr<SatTbtpMessage> tbtpMsg = CreateObject<SatTbtpMessage> ();
-      tbtpMsg->SetSuperframeCounter (m_superFrameCounter++);
 
-      m_frameAllocator->GenerateTimeSlots (tbtpMsg);
+      Ptr<SatTbtpMessage> firstTbtp = CreateObject<SatTbtpMessage> (m_currentSequence);
+      firstTbtp->SetSuperframeCounter (m_superFrameCounter++);
 
-      AddRaChannels (tbtpMsg);
+      std::vector<Ptr<SatTbtpMessage> > tbtps;
+      tbtps.push_back (firstTbtp);
 
-      Send (tbtpMsg);
+      // Add RA slots (channels)
+      AddRaChannels (tbtps);
+
+      // add DA slots to TBTP(s)
+      m_frameAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize);
+
+      // send TBTPs
+      for ( std::vector <Ptr<SatTbtpMessage> > ::const_iterator it = tbtps.begin (); it != tbtps.end (); it++ )
+        {
+          Send (*it);
+        }
 
       NS_LOG_LOGIC ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
     }
@@ -376,8 +387,17 @@ SatBeamScheduler::Schedule ()
 }
 
 void
-SatBeamScheduler::AddRaChannels (Ptr<SatTbtpMessage> header)
+SatBeamScheduler::AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer)
 {
+  NS_LOG_FUNCTION (this);
+
+  if (tbtpContainer.empty ())
+    {
+      NS_FATAL_ERROR ("TBTP container must contain at least one message.");
+    }
+
+  Ptr<SatTbtpMessage> tbtpToFill = tbtpContainer.back ();
+
   Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (m_currentSequence);
 
   for (uint32_t i = 0; i < superFrameConf->GetRaChannelCount (); i++)
@@ -386,7 +406,20 @@ SatBeamScheduler::AddRaChannels (Ptr<SatTbtpMessage> header)
       Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (frameId);
       uint16_t timeSlotCount = frameConf->GetTimeSlotCount() / frameConf->GetCarrierCount();
 
-      header->SetRaChannel (i, superFrameConf->GetRaChannelFrameId (i), timeSlotCount);
+      if ( timeSlotCount > 0 )
+        {
+          if ( (tbtpToFill->GetSizeInBytes () + (tbtpToFill->GetTimeSlotInfoSizeInBytes () * timeSlotCount)) > m_maxBbFrameSize )
+            {
+              Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
+              newTbtp->SetSuperframeCounter ( tbtpToFill->GetSuperframeCounter ());
+
+              tbtpContainer.push_back (newTbtp);
+
+              tbtpToFill = newTbtp;
+            }
+
+          tbtpToFill->SetRaChannel (i, superFrameConf->GetRaChannelFrameId (i), timeSlotCount);
+        }
     }
 }
 

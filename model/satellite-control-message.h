@@ -288,6 +288,13 @@ public:
   virtual uint32_t GetSizeInBytes () const;
 
   /**
+   * Get size of the time slot in bytes.
+   *
+   * \return Size of the time slot in bytes.
+   */
+  uint32_t GetTimeSlotInfoSizeInBytes () const;
+
+  /**
    * Dump all the contents of the TBTP
    */
   void Dump () const;

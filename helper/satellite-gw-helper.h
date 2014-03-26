@@ -69,6 +69,13 @@ public:
   void Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2);
 
   /**
+   * Get BB frame configuration.
+   *
+   * \return BB frame configuration create by helper.
+   */
+  Ptr<SatBbFrameConf> GetBbFrameConf () const;
+
+  /**
    * Set an attribute value to be propagated to each NetDevice created by the
    * helper.
    *

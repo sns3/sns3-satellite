@@ -83,9 +83,16 @@ SatFrameAllocator::SatFrameInfo::UpdateTotalRequests ()
 }
 
 void
-SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
+SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes)
 {
   NS_LOG_FUNCTION (this);
+
+  if (tbtpContainer.empty ())
+    {
+      NS_FATAL_ERROR ("TBTP container must contain at least one message.");
+    }
+
+  Ptr<SatTbtpMessage> tbtpToFill = tbtpContainer.back ();
 
   // sort UTs using random method.
   std::vector<Address> uts;
@@ -128,10 +135,21 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
           if ( timeSlot )
             {
+              if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes ()) > maxSizeInBytes )
+                {
+                  Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
+                  newTbtp->SetSuperframeCounter ( tbtpToFill->GetSuperframeCounter ());
+
+                  tbtpContainer.push_back (newTbtp);
+
+                  tbtpToFill = newTbtp;
+                }
+
               timeSlot->SetRcIndex (currentRc);
-              tbtp->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
+              tbtpToFill->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
             }
-          else if ( carrierSymbolsToUse <= 0)
+
+          if ( carrierSymbolsToUse <= 0)
             {
               carrierSymbolsToUse = m_maxSymbolsPerCarrier;
               currentCarrier++;
@@ -175,6 +193,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
               timeSlotConf = m_frameConf->GetTimeSlotConf (index);
 
               carrierSymbolsToUse -= timeSlotSymbols;
+              utSymbolsToUse -= timeSlotSymbols;
 
               if (m_rcBasedAllocation )
                 {
@@ -197,10 +216,11 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
 
               if ( waveformFound )
                 {
-                  double startTime = (m_maxSymbolsPerCarrier - carrierSymbolsToUse) * m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();
-                  timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, timeSlotSymbols);
+                  double startTime = (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();
+                  timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId);
 
                   carrierSymbolsToUse -= timeSlotSymbols;
+                  utSymbolsToUse -= timeSlotSymbols;
 
                   if (m_rcBasedAllocation )
                     {
@@ -793,13 +813,18 @@ SatFrameAllocator::RemoveAllocations ()
 }
 
 void
-SatFrameAllocator::GenerateTimeSlots (Ptr<SatTbtpMessage> tbtp)
+SatFrameAllocator::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes)
 {
   NS_LOG_FUNCTION (this);
 
+  if (tbtpContainer.empty ())
+    {
+      NS_FATAL_ERROR ("TBTP container must contain at least one message.");
+    }
+
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
-      it->second.GenerateTimeSlots (tbtp);
+      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes);
     }
 }
 

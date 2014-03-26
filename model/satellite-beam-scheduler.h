@@ -94,8 +94,9 @@ public:
    *        be forwarded to the Beam UTs.
    * \param seq Superframe sequence.
    * \param maxRcCount Maximum number of the RCs in use.
+   * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
    */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount, uint32_t maxFrameSizeInBytes);
 
   /**
    * Add UT to scheduler.
@@ -280,6 +281,8 @@ private:
    */
   Time m_maxTBTPTxAndProcessingDelay;
 
+  uint32_t m_maxBbFrameSize;
+
   SatBeamScheduler& operator = (const SatBeamScheduler &);
   SatBeamScheduler (const SatBeamScheduler &);
 
@@ -289,7 +292,7 @@ private:
 
   void UpdateDamaEntries ();
   void DoPreResourceAllocation ();
-  void AddRaChannels (Ptr<SatTbtpMessage> tbtpMsg);
+  void AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer);
   static bool CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second);
 
   /**

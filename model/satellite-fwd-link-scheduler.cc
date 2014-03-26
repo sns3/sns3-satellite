@@ -177,19 +177,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   // Random variable used in scheduling
   m_random = CreateObject<UniformRandomVariable> ();
 
-  // create dummy frame
-  m_dummyFrame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod (), SatEnums::DUMMY_FRAME, m_bbFrameConf);
-
   Ptr<Packet> dummyPacket = Create<Packet> (1);
-
-  // Add MAC tag
-  SatMacTag tag;
-  tag.SetDestAddress (Mac48Address::GetBroadcast ());
-  tag.SetSourceAddress (m_macAddress);
-  dummyPacket->AddPacketTag (tag);
-
-  // Add dummy packet to dummy frame
-  m_dummyFrame->AddPayload (dummyPacket);
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
 }
@@ -205,7 +193,6 @@ SatFwdLinkScheduler::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_schedContextCallback.Nullify ();
   m_txOpportunityCallback.Nullify ();
-  m_dummyFrame = NULL;
   m_bbFrameContainer = NULL;
   m_cnoEstimatorContainer.clear ();
 }
@@ -237,9 +224,22 @@ SatFwdLinkScheduler::GetNextFrame ()
 
   Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame ();
 
+  // create dummy frame
   if ( frame == NULL )
     {
-      frame = m_dummyFrame;
+      frame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod (), SatEnums::DUMMY_FRAME, m_bbFrameConf);
+
+      // create dummy packet
+      Ptr<Packet> dummyPacket = Create<Packet> (1);
+
+      // Add MAC tag
+      SatMacTag tag;
+      tag.SetDestAddress (Mac48Address::GetBroadcast ());
+      tag.SetSourceAddress (m_macAddress);
+      dummyPacket->AddPacketTag (tag);
+
+      // Add dummy packet to dummy frame
+      frame->AddPayload (dummyPacket);
     }
 
   return frame;
@@ -316,6 +316,11 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
             {
               if ( frameBytes < currentObMinReqBytes )
                 {
+                  if (frame->GetSpaceLeftInBytes () == frame->GetMaxSpaceInBytes ())
+                    {
+                      NS_FATAL_ERROR ("Packet does not fit in empty BB Frame. Control package too long or fragmentation problem in user package!!!");
+                    }
+
                   AddFrameToContainer (flowId, frame);
                   frame = NULL;
                 }
