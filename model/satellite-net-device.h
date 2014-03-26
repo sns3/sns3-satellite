@@ -166,6 +166,7 @@ private:
   Ptr<SatPhy> m_phy;
   Ptr<SatMac> m_mac;
   Ptr<SatLlc> m_llc;
+  bool m_isStatisticsTagsEnabled;  ///< `EnableStatisticsTags` attribute.
   Ptr<SatPacketClassifier> m_classifier;
   NetDevice::ReceiveCallback m_rxCallback;
   NetDevice::PromiscReceiveCallback m_promiscCallback;

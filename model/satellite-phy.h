@@ -392,6 +392,11 @@ private:
   SatPhy::CnoCallback m_cnoCallback;
 
   /**
+   * `EnableStatisticsTags` attribute.
+   */
+  bool m_isStatisticsTagsEnabled;
+
+  /**
    * Configured receiver noise temperature in dBK.
    */
   double m_rxNoiseTemperatureDbk;

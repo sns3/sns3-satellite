@@ -495,6 +495,9 @@ SatStatsFwdDevDelayHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = (*it)->GetDevice (2);
       NS_ASSERT (dev->GetObject<SatNetDevice> () != 0);
 
+      // Enable statistics-related tags and trace sources on the device.
+      dev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+
       // Connect the object to the probe.
       if (probe->ConnectByObject ("RxDelay", dev))
         {
@@ -610,6 +613,10 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
         {
           Ptr<SatMac> satMac = satDev->GetMac ();
           NS_ASSERT (satMac != 0);
+
+          // Enable statistics-related tags and trace sources on the device.
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+          satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
 
           // Connect the object to the probe.
           if (probe->ConnectByObject ("RxDelay", satMac))
@@ -728,6 +735,10 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
         {
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
           NS_ASSERT (satPhy != 0);
+
+          // Enable statistics-related tags and trace sources on the device.
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
 
           // Connect the object to the probe.
           if (probe->ConnectByObject ("RxDelay", satPhy))
@@ -1016,6 +1027,9 @@ SatStatsRtnDevDelayHelper::DoInstallProbes ()
               NS_LOG_INFO (this << " successfully connected with node ID "
                                 << (*it)->GetId ()
                                 << " device #" << i);
+
+              // Enable statistics-related tags and trace sources on the device.
+              dev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
             }
           else
             {
@@ -1085,6 +1099,10 @@ SatStatsRtnMacDelayHelper::DoInstallProbes ()
             {
               Ptr<SatMac> satMac = satDev->GetMac ();
               NS_ASSERT (satMac != 0);
+
+              // Enable statistics-related tags and trace sources on the device.
+              satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+              satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
 
               // Connect the object to the probe.
               if (satMac->TraceConnectWithoutContext ("RxDelay", callback))
@@ -1163,6 +1181,10 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes ()
             {
               Ptr<SatPhy> satPhy = satDev->GetPhy ();
               NS_ASSERT (satPhy != 0);
+
+              // Enable statistics-related tags and trace sources on the device.
+              satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+              satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
 
               // Connect the object to the probe.
               if (satPhy->TraceConnectWithoutContext ("RxDelay", callback))

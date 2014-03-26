@@ -23,6 +23,7 @@
 #include <ns3/packet.h>
 #include <ns3/trace-source-accessor.h>
 #include <ns3/uinteger.h>
+#include <ns3/boolean.h>
 #include <ns3/nstime.h>
 #include <ns3/pointer.h>
 #include <ns3/satellite-mac-tag.h>
@@ -42,6 +43,11 @@ SatMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatMac")
     .SetParent<Object> ()
     .AddConstructor<SatMac> ()
+    .AddAttribute ("EnableStatisticsTags",
+                   "If true, some tags will be added to each transmitted packet to assist with statistics computation",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatMac::m_isStatisticsTagsEnabled),
+                   MakeBooleanChecker ())
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatMac::m_packetTrace))
@@ -122,10 +128,13 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
   NS_LOG_FUNCTION (this);
 
   // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
-  for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
-       it != packets.end (); ++it)
+  if (m_isStatisticsTagsEnabled)
     {
-      (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+           it != packets.end (); ++it)
+        {
+          (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+        }
     }
 
   // Use call back to send packet to lower layer
@@ -137,41 +146,44 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
 {
   NS_LOG_FUNCTION (this);
 
-  for (SatPhy::PacketContainer_t::const_iterator it1 = packets.begin ();
-       it1 != packets.end (); ++it1)
+  if (m_isStatisticsTagsEnabled)
     {
-      Address addr; // invalid address.
-      bool isTaggedWithAddress = false;
-      ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
-
-      while (!isTaggedWithAddress && it2.HasNext ())
+      for (SatPhy::PacketContainer_t::const_iterator it1 = packets.begin ();
+           it1 != packets.end (); ++it1)
         {
-          ByteTagIterator::Item item = it2.Next ();
+          Address addr; // invalid address.
+          bool isTaggedWithAddress = false;
+          ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
 
-          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+          while (!isTaggedWithAddress && it2.HasNext ())
             {
-              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                 << " start=" << item.GetStart ()
-                                 << " end=" << item.GetEnd ());
-              SatAddressTag addrTag;
-              item.GetTag (addrTag);
-              addr = addrTag.GetSourceAddress ();
-              isTaggedWithAddress = true; // this will exit the while loop.
+              ByteTagIterator::Item item = it2.Next ();
+
+              if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+                {
+                  NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                     << " start=" << item.GetStart ()
+                                     << " end=" << item.GetEnd ());
+                  SatAddressTag addrTag;
+                  item.GetTag (addrTag);
+                  addr = addrTag.GetSourceAddress ();
+                  isTaggedWithAddress = true; // this will exit the while loop.
+                }
             }
-        }
 
-      m_rxTrace (*it1, addr);
+          m_rxTrace (*it1, addr);
 
-      SatMacTimeTag timeTag;
-      if ((*it1)->RemovePacketTag (timeTag))
-        {
-          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
-          m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
-                          addr);
-        }
+          SatMacTimeTag timeTag;
+          if ((*it1)->RemovePacketTag (timeTag))
+            {
+              NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+              m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
+                              addr);
+            }
 
-    } // end of `for it1 = packets.begin () -> packets.end ()`
+        } // end of `for it1 = packets.begin () -> packets.end ()`
 
+    } // end of `if (m_isStatisticsTagsEnabled)`
 }
 
 void

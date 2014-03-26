@@ -198,6 +198,11 @@ protected:
   SatMac::WriteCtrlMsgCallback m_writeCtrlCallback;
 
   /**
+   * `EnableStatisticsTags` attribute.
+   */
+  bool m_isStatisticsTagsEnabled;
+
+  /**
    * Trace callback used for packet tracing.
    */
   TracedCallback< Time,
