@@ -199,6 +199,12 @@ private:
   TracedCallback<Ptr<const Packet> > m_txTrace;
 
   /**
+   * Traced callback for all signalling (control message) packets sent,
+   * including the destination address.
+   */
+  TracedCallback<Ptr<const Packet>, const Address &> m_signallingTxTrace;
+
+  /**
    * Traced callback for all received packets, including the address of the
    * senders.
    */

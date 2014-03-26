@@ -27,6 +27,7 @@
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
+#include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
@@ -60,6 +61,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
+ * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
@@ -158,6 +160,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdQueuePackets,
                                         "forward link queue size (in number of packets) statistics")
 
+    // Forward link signalling load statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdSignallingLoad,
+                                        "forward link signalling load statistics")
+
     // Forward link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput,
                                         "forward link application-level throughput statistics")
@@ -203,6 +209,10 @@ SatStatsHelperContainer::GetTypeId ()
     // Return link queue size (in number of packets) statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnQueuePackets,
                                         "return link queue size (in number of packets) statistics")
+
+    // Return link signalling load statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnSignallingLoad,
+                                        "return link signalling load statistics")
 
     // Return link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput,
@@ -263,6 +273,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
@@ -397,6 +408,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdQueuePackets, "fwd-queue-packets")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdQueuePackets, "fwd-queue-packets")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdQueuePackets, "fwd-queue-packets")
 
+// Forward link signalling load statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdSignallingLoad, "fwd-signalling-load")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdSignallingLoad, "fwd-signalling-load")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdSignallingLoad, "fwd-signalling-load")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdSignallingLoad, "fwd-signalling-load")
+
 // Forward link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
@@ -458,6 +475,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnQueuePackets, "rtn-queue-packets")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
+
+// Return link signalling load statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnSignallingLoad, "rtn-signalling-load")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnSignallingLoad, "rtn-signalling-load")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnSignallingLoad, "rtn-signalling-load")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnSignallingLoad, "rtn-signalling-load")
 
 // Return link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")

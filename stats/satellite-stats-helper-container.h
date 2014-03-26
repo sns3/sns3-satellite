@@ -38,6 +38,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
@@ -122,6 +123,9 @@ public:
   // Forward link queue size (in number of packets) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdQueuePackets)
 
+  // Forward link signalling load statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdSignallingLoad)
+
   // Forward link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppThroughput)
 
@@ -151,6 +155,9 @@ public:
 
   // Return link queue size (in number of packets) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueuePackets)
+
+  // Return link signalling load statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnSignallingLoad)
 
   // Return link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)

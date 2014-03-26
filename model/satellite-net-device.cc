@@ -81,6 +81,9 @@ SatNetDevice::GetTypeId (void)
      .AddTraceSource ("Tx",
                       "A packet to be sent",
                       MakeTraceSourceAccessor (&SatNetDevice::m_txTrace))
+     .AddTraceSource ("SignallingTx",
+                      "A signalling packet to be sent",
+                      MakeTraceSourceAccessor (&SatNetDevice::m_signallingTxTrace))
      .AddTraceSource ("Rx",
                       "A packet received",
                       MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace))
@@ -420,6 +423,8 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
   packet->AddPacketTag (tag);
 
   uint8_t flowId = m_classifier->Classify (packet, dest);
+
+  m_signallingTxTrace (packet, dest);
 
   m_llc->Enque (packet, dest, flowId);
 
