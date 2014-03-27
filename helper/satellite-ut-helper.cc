@@ -201,23 +201,16 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   NetDeviceContainer devs;
 
-  Ptr<SatRandomAccessConf> randomAccessConf = NULL;
-
-  if (m_randomAccessModel != SatEnums::RA_OFF)
-    {
-      randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf,m_superframeSeq);
-    }
-
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
   {
-    devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, randomAccessConf));
+    devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
   }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, Ptr<SatRandomAccessConf> randomAccessConf)
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -425,6 +418,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   if (m_randomAccessModel != SatEnums::RA_OFF)
     {
+      Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf,m_superframeSeq);
+
       /// create RA module with defaults
       Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_randomAccessModel);
 

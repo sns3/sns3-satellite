@@ -1186,13 +1186,20 @@ SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s p
               iterList->packetHasBeenProcessed = false;
 
               /// reduce interference power for the colliding packets
-              iterList->rxParams->m_ifPowerInSatellite_W -= removedPacket.rxParams->m_ifPowerInSatellite_W;
-              iterList->rxParams->m_ifPower_W -= removedPacket.rxParams->m_ifPower_W;
+              /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+              iterList->rxParams->m_ifPowerInSatellite_W -= removedPacket.rxParams->m_rxPowerInSatellite_W;
+              iterList->rxParams->m_ifPower_W -= removedPacket.rxParams->m_rxPower_W;
 
-              /// sanity check
-              if (iterList->rxParams->m_ifPower_W < 0 || iterList->rxParams->m_ifPowerInSatellite_W < 0)
+              /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+              if (iterList->rxParams->m_ifPowerInSatellite_W < 0)
                 {
-                  NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Negative interference power");
+                  iterList->rxParams->m_ifPowerInSatellite_W = 0;
+                }
+
+              /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+              if (iterList->rxParams->m_ifPower_W < 0)
+                {
+                  iterList->rxParams->m_ifPower_W = 0;
                 }
             }
         }

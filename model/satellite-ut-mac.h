@@ -266,14 +266,6 @@ private:
    void ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp);
 
    /**
-    * Superframe start time for this specific UT. This is triggered
-    * by the TBTP reception and takes into account the current propagation
-    * delay of the UT.
-    * \param superframeSeqId Superframe sequence id
-    */
-   void SuperFrameStart (uint8_t superframeSeqId);
-
-   /**
     * Schdules one Tx opportunity, i.e. time slot.
     * \param transmitDelay time when transmit possibility starts
     * \param durationInSecs duration of the burst
