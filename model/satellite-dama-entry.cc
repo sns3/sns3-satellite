@@ -198,7 +198,7 @@ SatDamaEntry::UpdateRbdcInKbps (uint8_t index, uint16_t rateInKbps)
     }
 }
 
-uint8_t
+uint32_t
 SatDamaEntry::GetVbdcInBytes (uint8_t index) const
 {
   NS_LOG_FUNCTION (this);
@@ -231,9 +231,9 @@ SatDamaEntry::SetVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
     {
       m_volumeBacklogRequestedInBytes[index] = volumeInBytes;
 
-      if ( m_volumeBacklogRequestedInBytes[index] > (1000 * m_llsConf->GetDaMaximumBacklogInKbytes (index)))
+      if ( m_volumeBacklogRequestedInBytes[index] > (1024 * m_llsConf->GetDaMaximumBacklogInKbytes (index)))
         {
-          m_volumeBacklogRequestedInBytes[index] = (1000 * m_llsConf->GetDaMaximumBacklogInKbytes (index));
+          m_volumeBacklogRequestedInBytes[index] = (1024 * m_llsConf->GetDaMaximumBacklogInKbytes (index));
         }
 
       ResetVolumeBacklogPersistence ();

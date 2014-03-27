@@ -238,21 +238,6 @@ private:
   Ptr<RandomVariableStream> m_raChRandomIndex;
 
   /**
-   * CRA bytes for the super frame scheduled next
-   */
-  uint32_t  m_craBasedBytes;
-
-  /**
-   * RBDC bytes for the super frame scheduled next
-   */
-  uint32_t  m_rbdcBasedBytes;
-
-  /**
-   * VBDC bytes for the super frame scheduled next
-   */
-  uint32_t  m_vbdcBasedBytes;
-
-  /**
    * Mode used for C/N0 estimator.
    */
   SatCnoEstimator::EstimationMode_t m_cnoEstimatorMode;
@@ -290,7 +275,8 @@ private:
   bool Send ( Ptr<SatControlMessage> packet );
   void Schedule ();
 
-  void UpdateDamaEntries ();
+  void UpdateDamaEntriesWithReqs ();
+  void UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
   void DoPreResourceAllocation ();
   void AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer);
   static bool CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second);

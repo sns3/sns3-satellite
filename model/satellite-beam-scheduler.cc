@@ -87,11 +87,11 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntriesFromCrs ()
               break;
 
             case SatEnums::DA_VBDC:
-              m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second);
+              m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
               break;
 
             case SatEnums::DA_AVBDC:
-              m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second);
+              m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
               break;
 
             default:
@@ -173,9 +173,6 @@ SatBeamScheduler::SatBeamScheduler ()
     m_totalSlotsLeft (0),
     m_additionalSlots (0),
     m_slotsPerUt (0),
-    m_craBasedBytes (0),
-    m_rbdcBasedBytes (0),
-    m_vbdcBasedBytes (0),
     m_cnoEstimatorMode (SatCnoEstimator::LAST),
     m_maxBbFrameSize (0)
 {
@@ -356,22 +353,27 @@ SatBeamScheduler::Schedule ()
   // check that there is UTs to schedule
   if ( m_utInfos.size() > 0 )
     {
-      UpdateDamaEntries ();
+      UpdateDamaEntriesWithReqs ();
 
       DoPreResourceAllocation ();
 
-
+      // generate time slots
       Ptr<SatTbtpMessage> firstTbtp = CreateObject<SatTbtpMessage> (m_currentSequence);
       firstTbtp->SetSuperframeCounter (m_superFrameCounter++);
 
       std::vector<Ptr<SatTbtpMessage> > tbtps;
       tbtps.push_back (firstTbtp);
 
-      // Add RA slots (channels)
+        // Add RA slots (channels)
       AddRaChannels (tbtps);
 
-      // add DA slots to TBTP(s)
-      m_frameAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize);
+      SatFrameAllocator::UtAllocInfoContainer_t utAllocs;
+
+        // Add DA slots to TBTP(s)
+      m_frameAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs);
+
+      // update VBDC counter of the UT/RCs
+      UpdateDamaEntriesWithAllocs (utAllocs);
 
       // send TBTPs
       for ( std::vector <Ptr<SatTbtpMessage> > ::const_iterator it = tbtps.begin (); it != tbtps.end (); it++ )
@@ -424,14 +426,9 @@ SatBeamScheduler::AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContain
 }
 
 void
-SatBeamScheduler::UpdateDamaEntries ()
+SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 {
   NS_LOG_FUNCTION (this);
-
-  // reset requested bytes per SF for each (RC_index, CC)
-  m_craBasedBytes = 0;
-  m_rbdcBasedBytes = 0;
-  m_vbdcBasedBytes = 0;
 
   for (UtInfoMap_t::iterator it = m_utInfos.begin (); it != m_utInfos.end (); it ++ )
     {
@@ -441,11 +438,6 @@ SatBeamScheduler::UpdateDamaEntries ()
 
       // process received CRs
       it->second->UpdateDamaEntriesFromCrs ();
-
-      // calculate (update) requested bytes per SF for each (RC_index, CC)
-      m_craBasedBytes += damaEntry->GetCraBasedBytes (m_superframeSeq->GetDuration (m_currentSequence).GetSeconds ());
-      m_rbdcBasedBytes += damaEntry->GetRbdcBasedBytes (m_superframeSeq->GetDuration (m_currentSequence).GetSeconds ());
-      m_vbdcBasedBytes += damaEntry->GetVbdcBasedBytes ();
       
       // decrease persistence values
       damaEntry->DecrementDynamicRatePersistence ();
@@ -477,9 +469,11 @@ void SatBeamScheduler::DoPreResourceAllocation ()
             {
               SatFrameAllocator::SatFrameAllocReqItem rcAllocReq;
 
-              rcAllocReq.m_craInKbps = damaEntry->GetCraInKbps (i);
-              rcAllocReq.m_minRbdcInKbps = damaEntry->GetMinRbdcInKbps (i);
-              rcAllocReq.m_rbdcInKbps = damaEntry->GetRbdcInKbps (i);
+              double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+
+              rcAllocReq.m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / 8.0;
+              rcAllocReq.m_minRbdcBytes = ( 1000.0 * damaEntry->GetMinRbdcInKbps (i)  * superFrameDuration ) / 8.0;
+              rcAllocReq.m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / 8.0;
               rcAllocReq.m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
               allocReqContainer.push_back (rcAllocReq);
@@ -488,12 +482,43 @@ void SatBeamScheduler::DoPreResourceAllocation ()
           SatFrameAllocator::SatFrameAllocReq allocReq (allocReqContainer);
           allocReq.m_address = it->first;
 
-          SatFrameAllocator::SatFrameAllocResp allocResp;
-
-          m_frameAllocator->AllocateToFrame (it->second->GetCnoEstimation (), allocReq, allocResp);
+          m_frameAllocator->AllocateToFrame (it->second->GetCnoEstimation (), allocReq);
         }
 
       m_frameAllocator->AllocateSymbols ();
+    }
+}
+
+void
+SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer)
+{
+  NS_LOG_FUNCTION (this);
+
+
+  for (SatFrameAllocator::UtAllocInfoContainer_t::const_iterator it = utAllocContainer.begin (); it != utAllocContainer.end (); it ++ )
+    {
+      Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
+      double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+
+      for (uint32_t i = 0; i < it->second.size (); i++ )
+        {
+          uint32_t rateBasedBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / 8.0;
+          rateBasedBytes += ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / 8.0;
+
+          if ( rateBasedBytes < it->second[i] )
+            {
+              uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
+
+              if ( vbdcBytes > (it->second[i] - rateBasedBytes) )
+                {
+                  damaEntry->SetVbdcInBytes (i, (it->second[i] - rateBasedBytes));
+                }
+              else
+                {
+                  damaEntry->SetVbdcInBytes (i, 0);
+                }
+            }
+        }
     }
 }
 

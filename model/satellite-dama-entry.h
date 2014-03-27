@@ -136,7 +136,7 @@ public:
    * \param index Index of RC, which volume backlog is requested.
    * \return Current value of the VBDC requested in bytes.
    */
-  uint8_t GetVbdcInBytes (uint8_t index) const;
+  uint32_t GetVbdcInBytes (uint8_t index) const;
 
   /**
    * Update VBDC request of the RC.

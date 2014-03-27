@@ -83,7 +83,7 @@ SatFrameAllocator::SatFrameInfo::UpdateTotalRequests ()
 }
 
 void
-SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes)
+SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer)
 {
   NS_LOG_FUNCTION (this);
 
@@ -120,16 +120,16 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
       // sort RCs in UT using random method.
-      std::vector<uint32_t> rcIndeces;
+      std::vector<uint32_t> rcIndices;
 
       for (uint32_t i = 0; i < m_utAllocs[*it].m_allocation.m_allocInfoPerRc.size (); i++)
         {
-          rcIndeces.push_back (i);
+          rcIndices.push_back (i);
         }
 
-      std::random_shuffle (rcIndeces.begin (), rcIndeces.end ());
+      std::random_shuffle (rcIndices.begin (), rcIndices.end ());
 
-      std::vector<uint32_t>::const_iterator currentRcIndex = rcIndeces.begin ();
+      std::vector<uint32_t>::const_iterator currentRcIndex = rcIndices.begin ();
 
       int64_t rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
 
@@ -156,6 +156,26 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
               timeSlot->SetRcIndex (*currentRcIndex);
               tbtpToFill->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
+
+              UtAllocInfoContainer_t::iterator utAlloc = utAllocContainer.find (*it);
+
+              if ( utAlloc == utAllocContainer.end () )
+                {
+                  std::vector<uint32_t> rcAllocs = std::vector<uint32_t> (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.size (), 0);
+
+                  std::pair<UtAllocInfoContainer_t::iterator, bool> result = utAllocContainer.insert (std::make_pair (*it, rcAllocs ));
+
+                  if ( result.second )
+                    {
+                      utAlloc = result.first;
+                    }
+                  else
+                    {
+                      NS_FATAL_ERROR ("UT cannot be added to map!!!");
+                    }
+                }
+
+               utAlloc->second[*currentRcIndex] += m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ())->GetPayloadInBytes ();
             }
 
           if ( carrierSymbolsToUse <= 0)
@@ -168,7 +188,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
             {
               currentRcIndex++;
 
-              if ( currentRcIndex != rcIndeces.end () )
+              if ( currentRcIndex != rcIndices.end () )
                 {
                   rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
                 }
@@ -176,6 +196,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
         }
     }
 }
+
+
 
 Ptr<SatTimeSlotConf>
 SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno)
@@ -211,7 +233,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
               carrierSymbolsToUse -= timeSlotSymbols;
               utSymbolsToUse -= timeSlotSymbols;
 
-              if (m_rcBasedAllocation )
+              if ( m_rcBasedAllocation )
                 {
                   utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
                 }
@@ -687,13 +709,13 @@ SatFrameAllocator::SatFrameInfo::Allocate (CcLevel_t ccLevel, Address address, d
       utAlloc.m_allocation = SatFrameAllocInfo (req.m_allocInfoPerRc.size ());
       utAlloc.m_cno = cno;
 
-      m_utAllocs.insert (std::make_pair (address, utAlloc));
-
       for (uint8_t i = 0; i < req.m_allocInfoPerRc.size (); i++)
         {
           RcAllocItem_t rcAlloc = std::make_pair (address, i);
           m_rcAllocs.push_back (rcAlloc);
         }
+
+      m_utAllocs.insert (std::make_pair (address, utAlloc));
     }
 
   return allocated;
@@ -829,7 +851,7 @@ SatFrameAllocator::RemoveAllocations ()
 }
 
 void
-SatFrameAllocator::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes)
+SatFrameAllocator::GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer)
 {
   NS_LOG_FUNCTION (this);
 
@@ -840,7 +862,7 @@ SatFrameAllocator::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpCon
 
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
-      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes);
+      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer);
     }
 }
 
@@ -856,12 +878,11 @@ SatFrameAllocator::AllocateSymbols ()
 }
 
 bool
-SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp)
+SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq)
 {
   NS_LOG_FUNCTION (this << cno);
 
   bool allocated = false;
-  allocResp = SatFrameAllocResp ();
 
   SupportedFrameInfo_t supportedFrames;
 
@@ -899,22 +920,22 @@ SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatF
   if ( supportedFrames.empty () == false )
     {
       // allocate with CC level CRA + RBDC + VBDC
-      allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC_VBDC, cno, allocReq, allocResp, supportedFrames );
+      allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC_VBDC, cno, allocReq, supportedFrames );
 
       if ( allocated == false )
         {
           // allocate with CC level CRA + RBDC
-          allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC, cno, allocReq, allocResp, supportedFrames );
+          allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_RBDC, cno, allocReq, supportedFrames );
 
           if ( allocated == false )
             {
               // allocate with CC level CRA + MIM RBDC
-              allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_MIN_RBDC, cno, allocReq, allocResp, supportedFrames );
+              allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA_MIN_RBDC, cno, allocReq, supportedFrames );
 
               if ( allocated == false )
                 {
                   // allocate with CC level CRA
-                  allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA, cno, allocReq, allocResp, supportedFrames );
+                  allocated = AllocateBasedOnCc (SatFrameInfo::CC_LEVEL_CRA, cno, allocReq, supportedFrames );
                 }
             }
         }
@@ -924,11 +945,12 @@ SatFrameAllocator::AllocateToFrame (double cno, SatFrameAllocReq& allocReq, SatF
 }
 
 bool
-SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp, const SupportedFrameInfo_t &frames)
+SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, const SupportedFrameInfo_t &frames)
 {
+  NS_LOG_FUNCTION (this << ccLevel << cno);
+
   double loadInSymbols = 0;
   uint8_t selectedFrame = 0;
-  bool allocated = false;
 
   if (frames.empty ())
     {
@@ -955,17 +977,7 @@ SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cn
   // convert bytes to symbols based on wave form
   SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq.m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)), frameDuration );
 
-  if (m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq.m_address, cno, reqSymbols))
-    {
-      // initialize needed information for the selected frame
-      allocResp.m_frameId = selectedFrame;
-      allocResp.m_waveformId = frames.at (selectedFrame);
-
-      allocated = true;
-    }
-
-  return allocated;
+  return m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq.m_address, cno, reqSymbols);
 }
-
 
 } // namespace ns3

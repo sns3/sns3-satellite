@@ -42,12 +42,15 @@ namespace ns3 {
 class SatFrameAllocator : public Object
 {
 public:
+  typedef std::vector<Ptr<SatTbtpMessage> > TbtpMsgContainer_t;
+  typedef std::map<Address, std::vector<uint32_t> > UtAllocInfoContainer_t;
+
   class SatFrameAllocReqItem
   {
   public:
-    uint32_t  m_craInKbps;
-    uint32_t  m_minRbdcInKbps;
-    uint32_t  m_rbdcInKbps;
+    uint32_t  m_craBytes;
+    uint32_t  m_minRbdcBytes;
+    uint32_t  m_rbdcBytes;
     uint32_t  m_vbdcBytes;
   };
 
@@ -150,10 +153,10 @@ public:
         {
           SatFrameAllocInfoItem  reqInSymbols;
 
-          reqInSymbols.m_craSymbols  = bitInSymbols * (it->m_craInKbps * 1000.0) * frameDuration.GetSeconds ();
-          reqInSymbols.m_minRbdcSymbols = bitInSymbols * it->m_minRbdcInKbps * frameDuration.GetSeconds ();
-          reqInSymbols.m_rbdcSymbols = bitInSymbols * it->m_rbdcInKbps * frameDuration.GetSeconds ();
-          reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes * frameDuration.GetSeconds ();
+          reqInSymbols.m_craSymbols  = bitInSymbols * it->m_craBytes;
+          reqInSymbols.m_minRbdcSymbols = bitInSymbols * it->m_minRbdcBytes;
+          reqInSymbols.m_rbdcSymbols = bitInSymbols * it->m_rbdcBytes;
+          reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes;
 
           m_craSymbols += reqInSymbols.m_craSymbols;
           m_minRbdcSymbols += reqInSymbols.m_minRbdcSymbols;
@@ -198,23 +201,6 @@ public:
   };
 
   /**
-   * SatFrameAllocResp is used by SatFrameAllocator, when information of a allocation is returned.
-   */
-  class SatFrameAllocResp
-  {
-  public:
-    uint8_t   m_frameId;
-    uint32_t  m_waveformId;
-
-    /**
-     * Construct SatFrameAllocResp
-     */
-    SatFrameAllocResp ()
-      : m_frameId (0),
-        m_waveformId (0) {}
-  };
-
-  /**
    * Construct SatFrameAllocator
    * \param superFrameConf Super frame configuration
    * \param waveformConf Waveform configuration
@@ -235,10 +221,9 @@ public:
    * Allocate to the frame.
    * \param cno C/N0 estimation to use in allocation
    * \param allocReq  Allocation request parameters for RC/CCs
-   * \param allocResp Frame information when allocation is successful
    * \return true when allocation is successful, false otherwise
    */
-  bool AllocateToFrame (double cno, SatFrameAllocReq &allocReq, SatFrameAllocResp &allocResp);
+  bool AllocateToFrame (double cno, SatFrameAllocReq &allocReq);
 
   /**
    * Remove allocations from all frames maintained by frame helper.
@@ -257,8 +242,7 @@ public:
    * \param tbtpContainer TBTP message container to add/fill TBTPs.
    * \param maxFrameSizeInBytes Maximum size for a TBTP message.
    */
-  void GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes);
-
+  void GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer);
 
 private:
 
@@ -308,7 +292,7 @@ private:
        * \param tbtpContainer TBTP message container to add/fill TBTPs.
        * \param maxFrameSizeInBytes Maximum size for a TBTP message.
        */
-      void GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes);
+      void GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer);
 
       /**
        * Get frame load by requested CC
@@ -365,7 +349,6 @@ private:
        * \return Frame symbol rate in bauds.
        */
       double GetSymbolRateInBauds () const { return m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();}
-
 
       /**
        * Get configuration type.
@@ -497,12 +480,10 @@ private:
    *
    * \param ccLevel CC level of the request
    * \param allocReq Requested bytes
-   * \param allocResp Frame information when allocation is successful
    * \param frames Information of the possibles frames to allocate.
    * \return
    */
-  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, SatFrameAllocResp& allocResp, const SupportedFrameInfo_t &frames);
-
+  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, const SupportedFrameInfo_t &frames);  
 };
 
 } // namespace ns3

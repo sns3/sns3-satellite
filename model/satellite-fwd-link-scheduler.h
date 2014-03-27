@@ -265,11 +265,6 @@ private:
   Ptr<SatCnoEstimator> CreateCnoEstimator ();
 
   /**
-   * Dummy frame
-   */
-  Ptr<SatBbFrame> m_dummyFrame;
-
-  /**
    * MAC address of the this instance (node)
    */
   Mac48Address m_macAddress;
