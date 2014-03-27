@@ -106,16 +106,16 @@ SatStatsQueueHelper::SetUnitType (SatStatsQueueHelper::UnitType_t unitType)
       m_shortLabel = "size_bytes";
       m_longLabel = "Queue size (in bytes)";
       m_distributionMinValue = 0.0;
-      m_distributionMaxValue = 10000.0;
-      m_distributionBinLength = 100.0;
+      m_distributionMaxValue = 1000.0;
+      m_distributionBinLength = 20.0;
     }
   else if (unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
     {
       m_shortLabel = "num_packets";
       m_longLabel = "Queue size (in number of packets)";
       m_distributionMinValue = 0.0;
-      m_distributionMaxValue = 100.0;
-      m_distributionBinLength = 2.0;
+      m_distributionMaxValue = 50.0;
+      m_distributionBinLength = 1.0;
     }
   else
     {

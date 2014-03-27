@@ -52,7 +52,7 @@ SatStatsResourcesGrantedHelper::SatStatsResourcesGrantedHelper (Ptr<const SatHel
   : SatStatsHelper (satHelper),
     m_distributionMinValue (0.0),
     m_distributionMaxValue (20000.0),
-    m_distributionBinLength (500.0)
+    m_distributionBinLength (400.0)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }

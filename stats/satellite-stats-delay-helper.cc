@@ -58,7 +58,10 @@ NS_LOG_COMPONENT_DEFINE ("SatStatsDelayHelper");
 namespace ns3 {
 
 SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+  : SatStatsHelper (satHelper),
+    m_distributionMinValue (0.0),
+    m_distributionMaxValue (1.0),
+    m_distributionBinLength (0.02)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -141,9 +144,9 @@ SatStatsDelayHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
@@ -211,9 +214,9 @@ SatStatsDelayHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (0.0));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (1.0));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (0.02));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
              it != m_terminalCollectors.End (); ++it)

@@ -100,6 +100,11 @@ protected:
   /// Map of address and the identifier associated with it (for return link).
   std::map<const Address, uint32_t> m_identifierMap;
 
+private:
+  double m_distributionMinValue;   ///<
+  double m_distributionMaxValue;   ///<
+  double m_distributionBinLength;  ///<
+
 }; // end of class SatStatsFwdAppDelayHelper
 
 
