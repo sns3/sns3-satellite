@@ -545,7 +545,7 @@ SatRandomAccess::CrdsaHasBackoffTimePassed (uint32_t allocationChannel)
 
   bool hasCrdsaBackoffTimePassed = false;
 
-  if ((Now ().GetSeconds () >= m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffReleaseTime ()))
+  if ((Now () >= m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffReleaseTime ()))
     {
       hasCrdsaBackoffTimePassed = true;
     }
