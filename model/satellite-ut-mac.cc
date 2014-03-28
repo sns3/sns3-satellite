@@ -298,7 +298,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
   // Update the allocated TBTP resources for each RC index
   for (uint32_t i = 0; i < SatEnums::NUM_FIDS; ++i)
     {
-      m_assignedDaResourcesCallback (i, payloadSumInSuperFrame);
+      m_assignedDaResourcesCallback (i, payloadSumPerRcIndex[i]);
     }
 }
 

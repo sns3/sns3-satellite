@@ -150,13 +150,13 @@ SatRequestManager::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIn
 
   if (event == SatQueue::FIRST_BUFFERED_PKT)
     {
-      NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << rcIndex);
+      NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << (uint32_t)(rcIndex));
 
       //DoEvaluation (false);
     }
   else if (event == SatQueue::BUFFERED_PKT)
     {
-      NS_LOG_LOGIC ("BUFFERED_PKT event received from queue: " << rcIndex);
+      NS_LOG_LOGIC ("BUFFERED_PKT event received from queue: " << (uint32_t)(rcIndex));
     }
   else
     {
@@ -242,7 +242,12 @@ SatRequestManager::DoEvaluation (bool periodical)
            * TODO: add functionality here which handles a RC with both RBDC and
            * VBDC enabled!
            */
-          //DoRbdcVbdc (rc, stats, crMsg);
+          NS_FATAL_ERROR ("Simultaneous RBDC and VBDC for one RC is not currently supported!");
+        }
+      // No dynamic DA configured
+      else
+        {
+          NS_LOG_LOGIC ("RBDC nor VBDC was configured for RC: " << (uint32_t)(rc));
         }
     }
 
@@ -372,20 +377,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
 
   NS_LOG_LOGIC("RBDC bitrate after CRA as been taken off: " << reqRbdcKbps << " kbps");
 
-  uint32_t crRbdcKbps (0);
-  // Quantization
-  // 0 - 512 kbps     -> 2 kbps resolution
-  if (reqRbdcKbps <= M_RBDC_QUANTIZATION_THRESHOLD_KBPS)
-      {
-        crRbdcKbps =
-            (uint32_t)(floor(reqRbdcKbps / M_RBDC_QUANTIZATION_STEP_SMALL_KBPS) * M_RBDC_QUANTIZATION_STEP_SMALL_KBPS);
-      }
-  // 512 - 8160 kbps  -> 32 kbps resolution
-  else
-    {
-      crRbdcKbps =
-          (uint32_t)(floor(reqRbdcKbps / M_RBDC_QUANTIZATION_STEP_LARGE_KBPS) * M_RBDC_QUANTIZATION_STEP_LARGE_KBPS);
-    }
+  uint32_t crRbdcKbps = m_llsConf->GetQuantizedRbdcValue (rc, reqRbdcKbps);
 
   NS_LOG_LOGIC("Quantized RBDC bitrate: " << crRbdcKbps << " kbps");
 
@@ -396,79 +388,66 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
 
 
 SatEnums::SatCapacityAllocationCategory_t
-SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcBytes)
+SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcKBytes)
 {
   NS_LOG_FUNCTION (this << rc);
 
   SatEnums::SatCapacityAllocationCategory_t cac = SatEnums::DA_VBDC;
-  rcVbdcBytes = stats.m_volumeInBytes;
-
-  NS_LOG_LOGIC("VBDC volume in for RC: " << (uint32_t)(rc) << ": " << rcVbdcBytes << " Bytes");
-
-  // Calculate the raw VBDC request
-  uint32_t volumeSumBytes = stats.m_volumeInBytes + m_pendingVbdcBytes.at (rc);
-  if (stats.m_queueSizeBytes > volumeSumBytes)
-  {
-    rcVbdcBytes += (m_gainValueK * (stats.m_queueSizeBytes - volumeSumBytes));
-  }
-
-  NS_LOG_LOGIC("Calculated VBDC bytes: " << rcVbdcBytes << " Bytes");
-
-  // If CRA enabled, substract the CRA bitrate from VBDC
-  if (m_llsConf->GetDaConstantAssignmentProvided (rc))
+  uint32_t vbdcKBytes (0);
+  uint32_t vbdcBytes = stats.m_volumeInBytes;
+  // If there is volume in
+  if (vbdcBytes > 0)
     {
-      NS_LOG_LOGIC("CRA is enabled together with VBDC for RC: " << rc);
+      NS_LOG_LOGIC("VBDC volume in for RC: " << (uint32_t)(rc) << ": " << vbdcBytes << " Bytes");
 
-      double craBytes = (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps(rc) * m_evaluationInterval.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
+      // Calculate the raw VBDC request
+      uint32_t volumeSumBytes = stats.m_volumeInBytes + m_pendingVbdcBytes.at (rc);
 
-      if (craBytes < rcVbdcBytes)
-        {
-          rcVbdcBytes -= (uint32_t)(round(craBytes));
-        }
-      else
-        {
-          rcVbdcBytes = 0;
-        }
-    }
+      NS_LOG_LOGIC("Total pending: " << volumeSumBytes << " Bytes");
 
-  uint32_t maxBacklogInBytes = 1000 * m_llsConf->GetDaMaximumBacklogInKbytes (rc);
-
-  // Check DA volume allowed
-  if ( (rcVbdcBytes + m_pendingVbdcBytes.at (rc)) > maxBacklogInBytes)
-    {
-      rcVbdcBytes = maxBacklogInBytes - m_pendingVbdcBytes.at (rc);
-    }
-
-  NS_LOG_LOGIC("VBDC bytes after maximum backlog into account: " << rcVbdcBytes << " Bytes");
-
-
-  // Convert Bytes to KBytes
-  uint32_t rcVbdcKBytes = (uint32_t)(ceil (rcVbdcBytes / 1000.0));
-
-  // Quantization
-  // 0 - 255 kbytes     -> 1 kbyte resolution
-  if (rcVbdcKBytes <= M_VBDC_QUANTIZATION_THRESHOLD_KBYTES)
+      if (stats.m_queueSizeBytes > volumeSumBytes)
       {
-        rcVbdcKBytes =
-            (uint32_t)(floor(rcVbdcKBytes / M_VBDC_QUANTIZATION_STEP_SMALL) * M_VBDC_QUANTIZATION_STEP_SMALL);
+        vbdcBytes += (m_gainValueK * (stats.m_queueSizeBytes - volumeSumBytes));
       }
-  // 256 - 4080 kbytes  -> 16 kbyte resolution
-  else
-    {
-      rcVbdcKBytes =
-          (uint32_t)(floor(rcVbdcKBytes / M_VBDC_QUANTIZATION_STEP_LARGE) * M_VBDC_QUANTIZATION_STEP_LARGE);
+
+      NS_LOG_LOGIC("Calculated VBDC bytes: " << vbdcBytes << " Bytes");
+
+      // If CRA enabled, substract the CRA bitrate from VBDC
+      if (m_llsConf->GetDaConstantAssignmentProvided (rc))
+        {
+          NS_LOG_LOGIC("CRA is enabled together with VBDC for RC: " << rc);
+
+          double craBytes = (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps(rc) * m_evaluationInterval.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
+
+          if (craBytes < vbdcBytes)
+            {
+              vbdcBytes -= (uint32_t)(round(craBytes));
+            }
+          else
+            {
+              vbdcBytes = 0;
+            }
+        }
+
+      if (vbdcBytes > 0)
+        {
+          // Convert Bytes to KBytes
+          vbdcKBytes = (uint32_t)(ceil (vbdcBytes / 1000.0));
+
+          vbdcKBytes = m_llsConf->GetQuantizedVbdcValue (rc, vbdcKBytes);
+
+            // No data received for a certain duration or resynchronize has occurred
+          if (vbdcKBytes > 0 && m_pendingVbdcBytes.at (rc) == 0)
+            {
+              cac = SatEnums::DA_AVBDC;
+            }
+
+            NS_LOG_LOGIC("VBDC bytes after quantization: " << vbdcKBytes << " KBytes");
+
+            // Update the pending counters
+            m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + 1000 * vbdcKBytes;
+        }
     }
-
-  // No data received for a certain duration or resynchronize has occurred
-  if (rcVbdcKBytes > 0 && m_pendingVbdcBytes.at (rc) == 0)
-    {
-      cac = SatEnums::DA_AVBDC;
-    }
-
-  NS_LOG_LOGIC("VBDC bytes after quantization: " << rcVbdcKBytes << " KBytes");
-
-  // Update the pending counters
-  m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + 1000 * rcVbdcKBytes;
 
   // m_assignedDaResources holds the amount of resources allocated during the previous
   // superframe.
@@ -482,6 +461,8 @@ SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint3
       m_pendingVbdcBytes.at (rc) = 0;
       m_assignedDaResourcesBytes.at (rc) = 0;
     }
+
+  rcVbdcKBytes = vbdcKBytes;
 
   return cac;
 }

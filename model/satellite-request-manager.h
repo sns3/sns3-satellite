@@ -156,7 +156,7 @@ private:
    * \param &vbdcBytes Reference to vbdcBytes
    * \return SatCapacityAllocationCategory_t Capacity allocation category
    */
-  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &vbdcBytes);
+  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcKBytes);
 
   /**
    * Calculate the pending RBDC requests related to a specific RC
@@ -270,13 +270,28 @@ private:
   TracedCallback< uint32_t> m_rbdcTrace;
   TracedCallback< uint32_t> m_vbdcTrace;
 
-  static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBPS = 2;
-  static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBPS = 32;
-  static const uint32_t M_RBDC_QUANTIZATION_THRESHOLD_KBPS = 512;
+  /**
+   * Note that there are 8 bits space in the control message for each
+   * request value. This means that by default the maximum size of the
+   * requested value (RBDC rate or VBDC bytes) is 256. A coding is needed
+   * to be able to have also higher values.
+   * - Small resolution: 8 - 1024 kbps
+   * - Larger resolution: 1024 - 9216 kbps
+   */
 
-  static const uint32_t M_VBDC_QUANTIZATION_STEP_SMALL = 1;
-  static const uint32_t M_VBDC_QUANTIZATION_STEP_LARGE = 16;
-  static const uint32_t M_VBDC_QUANTIZATION_THRESHOLD_KBYTES = 255;
+  static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBITPS = 8;
+  static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBITPS = 64;
+  static const uint32_t M_RBDC_QUANTIZATION_THRESHOLD_KBITPS = 1024;
+  static const uint32_t M_RBDC_MAX_SERVICE_RATE_KBITPS = 9216;
+
+  /*
+   * Small resolution: 1 - 128 kB
+   * Larger resolution: 128 - 384 kB
+   */
+  static const uint32_t M_VBDC_QUANTIZATION_STEP_SMALL_KBYTES = 1;
+  static const uint32_t M_VBDC_QUANTIZATION_STEP_LARGE_KBYTES = 4;
+  static const uint32_t M_VBDC_QUANTIZATION_THRESHOLD_KBYTES = 128;
+  static const uint32_t M_VBDC_MAX_BACKLOG_KBYTES = 384;
 
 };
 

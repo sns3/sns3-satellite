@@ -170,9 +170,9 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO: Currently we assume that there is two priority classes in use
+  // TODO: Currently we assume that there is four priority classes in use
   // control and normal. This is needed to configure according to priorities used by LLC
-  m_bbFrameContainer = Create<SatBbFrameContainer> (2);
+  m_bbFrameContainer = Create<SatBbFrameContainer> (4);
 
   // Random variable used in scheduling
   m_random = CreateObject<UniformRandomVariable> ();

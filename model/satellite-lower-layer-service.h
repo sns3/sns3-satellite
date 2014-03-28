@@ -51,7 +51,7 @@ private:
   Ptr<RandomVariableStream> m_constantServiceRateStream;
   uint16_t                  m_maximumServiceRateKbps;
   uint16_t                  m_minimumServiceRateKbps;
-  uint8_t                   m_maximumBacklogInKbytes;
+  uint16_t                  m_maximumBacklogInKbytes;
 
   /**
    * Get state, if constant assignment is provided.
@@ -149,14 +149,14 @@ private:
    *
    * \return Maximum backlog size [KBytes]
    */
-  inline uint8_t GetMaximumBacklogInKbytes () const {return m_maximumBacklogInKbytes;}
+  inline uint16_t GetMaximumBacklogInKbytes () const {return m_maximumBacklogInKbytes;}
 
   /**
    * Set maximum backlog size.
    *
    * \param maximumBacklogInBytes Maximum backlog size [KBytes]
    */
-  inline void SetMaximumBacklogInKbytes (uint8_t maximumBacklogInKbytes) { m_maximumBacklogInKbytes = maximumBacklogInKbytes;}
+  inline void SetMaximumBacklogInKbytes (uint16_t maximumBacklogInKbytes) { m_maximumBacklogInKbytes = maximumBacklogInKbytes;}
 };
 
 /**
@@ -409,7 +409,7 @@ public:
    * \param index Index of the service
    * \return Maximum backlog size [KBytes]
    */
-  uint8_t GetDaMaximumBacklogInKbytes (uint8_t index) const;
+  uint16_t GetDaMaximumBacklogInKbytes (uint8_t index) const;
 
   /**
    * Get maximum unique payload per block for a RA service.
@@ -467,6 +467,31 @@ public:
    */
   double GetRaMaximumBackOffProbability (uint8_t index) const;
 
+  /**
+   * Check the DA service entry parameters so that they make sense.
+   */
+  void CheckAttributes () const;
+
+  /**
+   * The RBDC value is signalled with 8 bits, which means that to be able to signal
+   * larger than 256 values, we need to use quantization and coding to convert the
+   * raw values into defined discrete values.
+   * \param index RC index
+   * \param reqRbdcKbps Raw RBDC request
+   * \return uint16_t Quantized RBDC value
+   */
+  uint16_t GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) const;
+
+  /**
+   * The RBDC value is signalled with 8 bits, which means that to be able to signal
+   * larger than 256 values, we need to use quantization and coding to convert the
+   * raw values into defined discrete values.
+   * \param index RC index
+   * \param reqRbdcKbps Raw VBDC request
+   * \return uint16_t Quantized VBDC value
+   */
+  uint16_t GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdcKBytes) const;
+
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
@@ -475,6 +500,23 @@ private:
   SatLowerLayerServiceDaEntry              m_daServiceEntries[m_maxDaServiceEntries];
   uint8_t                                  m_raServiceEntryCount;
   SatLowerLayerServiceRaEntry              m_raServiceEntries[m_maxRaServiceEntries];
+
+  uint16_t m_rbdcQuantizationSmallStepKbps;
+  uint16_t m_rbdcQuantizationLargeStepKbps;
+  uint16_t m_rbdcQuantizationThresholdKbps;
+  uint16_t m_vbdcQuantizationSmallStepKB;
+  uint16_t m_vbdcQuantizationLargeStepKB;
+  uint16_t m_vbdcQuantizationThresholdKB;
+
+  /**
+   * Check the DA service entry parameters so that they make sense.
+   */
+  void CheckRbdcAttributes (uint8_t index) const;
+
+  /**
+   * Check the DA service entry parameters so that they make sense.
+   */
+  void CheckVbdcAttributes (uint8_t index) const;
 
   /**
    * Template method to convert number to string
@@ -559,7 +601,7 @@ private:
    * \param index Index of the service
    * \param maximumBacklogInKbytes Maximum backlog size [KBytes]
    */
-  void SetDaMaximumBacklogInKbytes (uint8_t index, uint8_t maximumBacklogInKbytes);
+  void SetDaMaximumBacklogInKbytes (uint8_t index, uint16_t maximumBacklogInKbytes);
 
   /**
    * Set maximum unique payload per block for a RA service.
@@ -665,7 +707,7 @@ private:
     { return SetDaMinimumServiceRateInKbps (index, value); } \
   inline uint16_t GetDaServ ## index ## MinimumServiceRateInKbps () const  \
     { return GetDaMinimumServiceRateInKbps (index); } \
-  inline void SetDaServ ## index ## MaximumBacklogInKbytes (uint8_t value)  \
+  inline void SetDaServ ## index ## MaximumBacklogInKbytes (uint16_t value)  \
     { return SetDaMaximumBacklogInKbytes (index, value); } \
   inline uint8_t GetDaServ ## index ## MaximumBacklogInKbytes () const  \
     { return GetDaMaximumBacklogInKbytes (index); }
