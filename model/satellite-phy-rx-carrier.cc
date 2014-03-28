@@ -1095,7 +1095,28 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
 
-  packet.cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+  double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+
+  /**
+   * Channel estimation error. Channel estimation error works in dB domain, thus we need
+   * to do linear-to-db and db-to-linear conversions here.
+   */
+  // Forward link
+  if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Random access is not used in forward link");
+    }
+  // Return link
+  else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
+    {
+      cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cSinr), packet.rxParams->m_txInfo.waveformId));
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
+    }
+
+  packet.cSinr = cSinr;
   packet.ifPower = packet.rxParams->m_ifPower_W;
 
   if (m_dropCollidingRandomAccessPackets)
