@@ -198,7 +198,6 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 }
 
 
-
 Ptr<SatTimeSlotConf>
 SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno)
 {
@@ -378,8 +377,13 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
               double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
               double symbolsToAdd = std::min<double> (freeUtSymbols, (vbdcSymbolsLeft / rcAllocsLeft));
 
-              m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols += symbolsToAdd;
-              m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
+              // only share symbols to RCs requested RBDC or VBDC
+              if ( ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_rbdcSymbols > 0 ) ||
+                   ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_vbdcSymbols > 0 ) )
+                {
+                  m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols += symbolsToAdd;
+                  m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
+                }
 
               vbdcSymbolsLeft -= symbolsToAdd;
               rcAllocsLeft--;
@@ -408,8 +412,12 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
           double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
           double symbolsToAdd = std::min<double> (freeUtSymbols, (vbdcSymbolsLeft / rcAllocsLeft));
 
-          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols = symbolsToAdd;
-          m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
+          // only share symbols to RCs requested VBDC
+          if ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_vbdcSymbols > 0 )
+            {
+              m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols = symbolsToAdd;
+              m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
+            }
 
           vbdcSymbolsLeft -= symbolsToAdd;
           rcAllocsLeft--;
@@ -439,8 +447,12 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
           double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
           double symbolsToAdd = std::min<double> (freeUtSymbols, (rbdcSymbolsLeft / rcAllocsLeft));
 
-          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_rbdcSymbols = symbolsToAdd + m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols;
-          m_utAllocs.at (it->first).m_allocation.m_rbdcSymbols += symbolsToAdd + m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols;
+          // only share symbols to RCs requested RBDC
+          if ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_rbdcSymbols > 0 )
+            {
+              m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_rbdcSymbols = symbolsToAdd + m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols;
+              m_utAllocs.at (it->first).m_allocation.m_rbdcSymbols += symbolsToAdd + m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols;
+            }
 
           rbdcSymbolsLeft -= symbolsToAdd;
           rcAllocsLeft--;
@@ -471,11 +483,15 @@ void SatFrameAllocator::SatFrameInfo::ShareSymbols (bool fcaEnabled)
           double freeUtSymbols = std::max<double> (0.0, m_maxSymbolsPerCarrier - m_utAllocs.at (it->first).m_allocation.GetTotalSymbols ());
           double symbolsToAdd = std::min<double> (freeUtSymbols, (minRbdcSymbolsLeft / rcAllocsLeft));
 
-          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols = symbolsToAdd;
-          m_utAllocs.at (it->first).m_allocation.m_minRbdcSymbols += symbolsToAdd;
+          // only share symbols to RCs requested RBDC
+          if ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_rbdcSymbols > 0 )
+            {
+              m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_minRbdcSymbols = symbolsToAdd;
+              m_utAllocs.at (it->first).m_allocation.m_minRbdcSymbols += symbolsToAdd;
 
-          m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_rbdcSymbols = symbolsToAdd;
-          m_utAllocs.at (it->first).m_allocation.m_rbdcSymbols += symbolsToAdd;
+              m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_rbdcSymbols = symbolsToAdd;
+              m_utAllocs.at (it->first).m_allocation.m_rbdcSymbols += symbolsToAdd;
+            }
 
           minRbdcSymbolsLeft -= symbolsToAdd;
           rcAllocsLeft--;

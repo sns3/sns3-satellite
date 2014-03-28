@@ -386,29 +386,29 @@ private:
 
         bool operator() (RcAllocItem_t rcAlloc1, RcAllocItem_t rcAlloc2)
         {
-          bool result = rcAlloc1.second < rcAlloc1.second;
+          bool result = false;
 
-          if ( rcAlloc1.second == rcAlloc1.second )
-            {
-              switch (m_ccReqType)
-              {
-                case CC_TYPE_MIN_RBDC:
-                  result = m_utAllocContainer.at(rcAlloc1.first).m_request.m_minRbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).m_request.m_minRbdcSymbols;
-                  break;
+          switch (m_ccReqType)
+          {
+            case CC_TYPE_MIN_RBDC:
+              result = ( m_utAllocContainer.at(rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_minRbdcSymbols <
+                         m_utAllocContainer.at(rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_minRbdcSymbols );
+              break;
 
-                case CC_TYPE_RBDC:
-                  result = m_utAllocContainer.at(rcAlloc1.first).m_request.m_rbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).m_request.m_rbdcSymbols;
-                  break;
+            case CC_TYPE_RBDC:
+              result = ( m_utAllocContainer.at(rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_rbdcSymbols <
+                         m_utAllocContainer.at(rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_rbdcSymbols );
+              break;
 
-                case CC_TYPE_VBDC:
-                  result = m_utAllocContainer.at(rcAlloc1.first).m_request.m_vbdcSymbols < m_utAllocContainer.at(rcAlloc2.first).m_request.m_vbdcSymbols;
-                  break;
+            case CC_TYPE_VBDC:
+              result = ( m_utAllocContainer.at(rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_vbdcSymbols <
+                         m_utAllocContainer.at(rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_vbdcSymbols );
+              break;
 
-                default:
-                  NS_FATAL_ERROR ("Invalid CC type!!!");
-                  break;
-              }
-            }
+            default:
+              NS_FATAL_ERROR ("Invalid CC type!!!");
+              break;
+          }
 
           return result;
         }
