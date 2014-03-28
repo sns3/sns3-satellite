@@ -985,6 +985,9 @@ SatPhyRxCarrier::ProcessFrame ()
                       /// remove the successfully received packet from the container
                       iter->second.erase (iterList);
 
+                      /// eliminate the interference caused by this packet to other packets in this slot
+                      EliminateInterference (iter,processedPacket);
+
                       /// break the cycle
                       break;
                     }
@@ -999,12 +1002,6 @@ SatPhyRxCarrier::ProcessFrame ()
           if (!nothingToProcess)
             {
               NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Packet successfully received, breaking the container iteration");
-
-              if (iter->second.empty ())
-                {
-                  m_crdsaPacketContainer.erase (iter);
-                }
-
               break;
             }
         }
@@ -1078,6 +1075,11 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
     {
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Replica in slot: " << packet.slotIdsForOtherReplicas[i]);
     }
+
+  NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - SINR CALCULATION, RX sat: " << packet.rxParams->m_rxPowerInSatellite_W <<
+               " IF sat: " << packet.rxParams->m_ifPowerInSatellite_W <<
+               " RX gnd: " << packet.rxParams->m_rxPower_W <<
+               " IF gnd: " << packet.rxParams->m_ifPower_W);
 
   double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
                                          packet.rxParams->m_ifPowerInSatellite_W,
@@ -1173,35 +1175,53 @@ SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s p
           NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Replica not found");
         }
 
-      if (iter->second.empty ())
+      EliminateInterference (iter, removedPacket);
+    }
+}
+
+void
+SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter, SatPhyRxCarrier::crdsaPacketRxParams_s processedPacket)
+{
+  if (iter->second.empty ())
+    {
+      NS_LOG_INFO ("SatPhyRxCarrier::EliminateInterference - No other packets in this slot, erasing the slot container");
+      m_crdsaPacketContainer.erase (iter);
+    }
+  else
+    {
+      std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList;
+
+      for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
         {
-          NS_LOG_INFO ("SatPhyRxCarrier::FindAndRemoveReplicas - No other packets in this slot, erasing the slot container");
-          m_crdsaPacketContainer.erase (iter);
-        }
-      else
-        {
-          for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
+          /// release packets in this slot for re-processing
+          iterList->packetHasBeenProcessed = false;
+
+          NS_LOG_INFO ("SatPhyRxCarrier::EliminateInterference- BEFORE INTERFERENCE ELIMINATION, RX sat: " << iterList->rxParams->m_rxPowerInSatellite_W <<
+                       " IF sat: " << iterList->rxParams->m_ifPowerInSatellite_W <<
+                       " RX gnd: " << iterList->rxParams->m_rxPower_W <<
+                       " IF gnd: " << iterList->rxParams->m_ifPower_W);
+
+          /// reduce interference power for the colliding packets
+          /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+          iterList->rxParams->m_ifPowerInSatellite_W -= processedPacket.rxParams->m_rxPowerInSatellite_W;
+          iterList->rxParams->m_ifPower_W -= processedPacket.rxParams->m_rxPower_W;
+
+          /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+          if (iterList->rxParams->m_ifPowerInSatellite_W < 0)
             {
-              /// release packets in this slot for re-processing
-              iterList->packetHasBeenProcessed = false;
-
-              /// reduce interference power for the colliding packets
-              /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
-              iterList->rxParams->m_ifPowerInSatellite_W -= removedPacket.rxParams->m_rxPowerInSatellite_W;
-              iterList->rxParams->m_ifPower_W -= removedPacket.rxParams->m_rxPower_W;
-
-              /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
-              if (iterList->rxParams->m_ifPowerInSatellite_W < 0)
-                {
-                  iterList->rxParams->m_ifPowerInSatellite_W = 0;
-                }
-
-              /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
-              if (iterList->rxParams->m_ifPower_W < 0)
-                {
-                  iterList->rxParams->m_ifPower_W = 0;
-                }
+              iterList->rxParams->m_ifPowerInSatellite_W = 0;
             }
+
+          /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+          if (iterList->rxParams->m_ifPower_W < 0)
+            {
+              iterList->rxParams->m_ifPower_W = 0;
+            }
+
+          NS_LOG_INFO ("SatPhyRxCarrier::EliminateInterference- AFTER INTERFERENCE ELIMINATION, RX sat: " << iterList->rxParams->m_rxPowerInSatellite_W <<
+                       " IF sat: " << iterList->rxParams->m_ifPowerInSatellite_W <<
+                       " RX gnd: " << iterList->rxParams->m_rxPower_W <<
+                       " IF gnd: " << iterList->rxParams->m_ifPower_W);
         }
     }
 }

@@ -261,6 +261,13 @@ private:
 
   /**
    *
+   * \param iter
+   * \param processedPacket
+   */
+  void EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter, SatPhyRxCarrier::crdsaPacketRxParams_s processedPacket);
+
+  /**
+   *
    * \param packet
    * \param iter
    * \return
