@@ -410,6 +410,12 @@ private:
                   >
      m_packetTrace;
 
+
+  /**
+   * \brief A callback for transmission composite SINR at UT (BBFrame) or GW (time slot).
+   */
+  TracedCallback<double> m_sinrTrace;
+
   /**
    * \brief Enable composite SINR output tracing
    */

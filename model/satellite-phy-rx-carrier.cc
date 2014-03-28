@@ -150,14 +150,17 @@ SatPhyRxCarrier::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrier")
     .SetParent<Object> ()
-    .AddTraceSource ("PacketTrace",
-                     "The trace for calculated interferences of the received packets",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
     .AddAttribute( "EnableCompositeSinrOutputTrace",
                    "Enable composite SINR output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrier::m_enableCompositeSinrOutputTrace),
                     MakeBooleanChecker ())
+    .AddTraceSource ("PacketTrace",
+                     "The trace for calculated interferences of the received packets",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
+    .AddTraceSource ("SinrTrace",
+                     "The trace for composite SINR in dB",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrTrace))
   ;
   return tid;
 }
@@ -478,17 +481,19 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       // Forward link
       if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
         {
-          cSinr = SatUtils::LinearToDb (m_channelEstimationError->AddError (SatUtils::DbToLinear(cSinr)));
+          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb(cSinr)));
         }
       // Return link
       else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
         {
-          cSinr = SatUtils::LinearToDb (m_channelEstimationError->AddError (SatUtils::DbToLinear(cSinr), iter->second.rxParams->m_txInfo.waveformId));
+          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb(cSinr), iter->second.rxParams->m_txInfo.waveformId));
         }
       else
         {
           NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
         }
+
+      m_sinrTrace (SatUtils::LinearToDb(cSinr));
 
       /// composite sinr output trace
       if (m_enableCompositeSinrOutputTrace)
