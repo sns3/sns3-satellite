@@ -147,15 +147,14 @@ public:
       m_vbdcSymbols (0.0)
     {
       double byteInSymbols = waveForm->GetBurstLengthInSymbols () / (waveForm->GetPayloadInBytes ());
-      double bitInSymbols = byteInSymbols / 8.0;
 
       for (SatFrameAllocReqItemContainer_t::const_iterator it = req.begin (); it != req.end (); it++ )
         {
           SatFrameAllocInfoItem  reqInSymbols;
 
-          reqInSymbols.m_craSymbols  = bitInSymbols * it->m_craBytes;
-          reqInSymbols.m_minRbdcSymbols = bitInSymbols * it->m_minRbdcBytes;
-          reqInSymbols.m_rbdcSymbols = bitInSymbols * it->m_rbdcBytes;
+          reqInSymbols.m_craSymbols  = byteInSymbols * it->m_craBytes;
+          reqInSymbols.m_minRbdcSymbols = byteInSymbols * it->m_minRbdcBytes;
+          reqInSymbols.m_rbdcSymbols = byteInSymbols * it->m_rbdcBytes;
           reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes;
 
           m_craSymbols += reqInSymbols.m_craSymbols;
