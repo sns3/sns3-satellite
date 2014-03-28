@@ -108,7 +108,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
 	NS_LOG_FUNCTION (this);
 
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
-  m_tbtpContainer = CreateObject<SatTbtpContainer> ();
+  /// TODO get rid of the hard coded 0
+  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq->GetDuration(0));
 }
 
 SatUtMac::~SatUtMac ()
@@ -216,7 +217,7 @@ void
 SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 {
   NS_LOG_FUNCTION (this << tbtp);
-  NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " received TBTP " << tbtp->GetSuperframeCounter () << " at time: " << Simulator::Now ().GetSeconds ());
+  NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () << " received TBTP " << tbtp->GetSuperframeCounter () << " at time: " << Simulator::Now ().GetSeconds ());
 
   /**
    * Calculate the sending time of the time slots within this TBTP for this specific UT.
@@ -239,8 +240,8 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
       NS_FATAL_ERROR ("UT: " << m_nodeInfo->GetMacAddress () << " received TBTP " << tbtp->GetSuperframeCounter () << ", which should have been sent already in the past");
     }
 
-  NS_LOG_LOGIC ("Time to start sending the superframe for this UT: " << txTime.GetSeconds ());
-  NS_LOG_LOGIC ("Waiting delay before the superframe start: " << startDelay.GetSeconds ());
+  NS_LOG_INFO ("Time to start sending the superframe for this UT: " << txTime.GetSeconds ());
+  NS_LOG_INFO ("Waiting delay before the superframe start: " << startDelay.GetSeconds ());
 
   //tbtp->Dump ();
 
@@ -252,7 +253,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
   if ( !slots.empty ())
     {
-      NS_LOG_LOGIC ("TBTP contains " << slots.size () << " timeslots for UT: " << m_nodeInfo->GetMacAddress ());
+      NS_LOG_INFO ("TBTP contains " << slots.size () << " timeslots for UT: " << m_nodeInfo->GetMacAddress ());
 
       uint8_t frameId = 0;
 
@@ -276,7 +277,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
           // Start time
           Time slotDelay = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());
-          NS_LOG_LOGIC ("Slot start delay: " << slotDelay.GetSeconds());
+          NS_LOG_INFO ("Slot start delay: " << slotDelay.GetSeconds());
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());

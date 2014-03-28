@@ -38,7 +38,7 @@ SatTbtpContainer::GetTypeId (void)
       .AddConstructor<SatTbtpContainer>()
       .AddAttribute ("MaxStoredTbtps",
                      "Maximum amount of stored TBTPs",
-                     UintegerValue (10),
+                     UintegerValue (100),
                      MakeUintegerAccessor (&SatTbtpContainer::m_maxStoredTbtps),
                      MakeUintegerChecker<uint32_t> ())
     ;
@@ -47,8 +47,18 @@ SatTbtpContainer::GetTypeId (void)
 
 SatTbtpContainer::SatTbtpContainer ()
 :m_address (),
- m_maxStoredTbtps (10),
- m_rcvdTbtps (0)
+ m_maxStoredTbtps (100),
+ m_rcvdTbtps (0),
+ m_superFrameDuration (0)
+{
+  NS_FATAL_ERROR ("SatTbtpContainer::SatTbtpContainer - Constructor not in use");
+}
+
+SatTbtpContainer::SatTbtpContainer (Time superFrameDuration)
+:m_address (),
+ m_maxStoredTbtps (100),
+ m_rcvdTbtps (0),
+ m_superFrameDuration (superFrameDuration)
 {
 
 }
@@ -85,50 +95,45 @@ SatTbtpContainer::Add (Time startTime, Ptr<SatTbtpMessage> tbtp)
     }
 }
 
+void
+SatTbtpContainer::RemovePastTbtps ()
+{
+  for (TbtpMap_t::iterator it = m_tbtps.begin (); it != m_tbtps.end (); )
+    {
+      if ((it->first + m_superFrameDuration) < Now ())
+        {
+          m_tbtps.erase (it++);
+        }
+      else
+        {
+          ++it;
+        }
+    }
+}
 
 bool
-SatTbtpContainer::HasScheduledTimeSlots () const
+SatTbtpContainer::HasScheduledTimeSlots ()
 {
-  if (m_tbtps.empty ())
+  bool hasScheduledTimeSlots = false;
+
+  if (!m_tbtps.empty ())
     {
-      return false;
-    }
-  else
-    {
-      /**
-       * Go through the TBTP container in reverse order, until we
-       * are in the first TBTP with earlier start time than Now!
-       * If there are at least one time slot scheduled, return true.
-       * Otherwise return false.
-       */
+      RemovePastTbtps ();
+
       SatTbtpMessage::DaTimeSlotInfoContainer_t slots;
       for (TbtpMap_t::const_reverse_iterator it = m_tbtps.rbegin ();
           it != m_tbtps.rend ();
           ++it)
         {
-          // TBTP in the future
-          if (it->first > Simulator::Now ())
+          slots = it->second->GetDaTimeslots (m_address);
+          if (!slots.empty ())
             {
-              slots = it->second->GetDaTimeslots (m_address);
-              if (!slots.empty ())
-                {
-                  return true;
-                }
-            }
-          // it->first <= Simulator::Now ()
-          // TBTP in the past or Now()
-          else
-            {
-              slots = it->second->GetDaTimeslots (m_address);
-              if (!slots.empty ())
-                {
-                  return true;
-                }
-              return false;
+              hasScheduledTimeSlots = true;
+              break;
             }
         }
     }
-  return false;
+  return hasScheduledTimeSlots;
 }
 
 

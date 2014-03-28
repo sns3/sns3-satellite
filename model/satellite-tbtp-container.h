@@ -38,6 +38,7 @@ class SatTbtpContainer : public Object
 {
 public:
   SatTbtpContainer ();
+  SatTbtpContainer (Time superFrameDuration);
   ~SatTbtpContainer ();
 
   static TypeId GetTypeId (void);
@@ -63,11 +64,16 @@ public:
    * /return bool Boolean indicating whether UT has been scheduled
    * time slots into the future.
    */
-  bool HasScheduledTimeSlots () const;
+  bool HasScheduledTimeSlots ();
 
 private:
 
-  typedef std::map<Time, Ptr<SatTbtpMessage> > TbtpMap_t;
+  /**
+   * Function for removing the TBTPs which are in the past.
+   */
+  void RemovePastTbtps ();
+
+  typedef std::multimap<Time, Ptr<SatTbtpMessage> > TbtpMap_t;
   TbtpMap_t m_tbtps;
 
   /**
@@ -84,6 +90,11 @@ private:
    * Number of received TBTPs
    */
   uint32_t m_rcvdTbtps;
+
+  /**
+   * Superframe duration
+   */
+  Time m_superFrameDuration;
 };
 
 } // namespace

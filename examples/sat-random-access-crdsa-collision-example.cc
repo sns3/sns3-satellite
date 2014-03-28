@@ -39,8 +39,8 @@ main (int argc, char *argv[])
 
   // enable info logs
   LogComponentEnable ("sat-random-access-crdsa-collision-example", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
   LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
 
   // read command line parameters given by user
