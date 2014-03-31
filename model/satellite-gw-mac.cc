@@ -248,7 +248,18 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
           }
         break;
       }
-
+    case SatControlMsgTag::SAT_ARQ_ACK:
+      {
+        // ARQ ACKs need to be forwarded to LLC/ARQ for processing
+        m_rxCallback (packet, sourceAddress);
+        break;
+      }
+    case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
+    case SatControlMsgTag::SAT_RA_CTRL_MSG:
+      {
+        NS_FATAL_ERROR ("SatGwMac received a non-supported control packet!");
+        break;
+      }
     default:
       {
         NS_FATAL_ERROR ("SatGwMac received a non-supported control packet!");

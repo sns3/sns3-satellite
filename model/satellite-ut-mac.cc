@@ -49,6 +49,8 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatUtMac);
 
+//#define SAT_CHECK_TBTP_CONTENT
+
 TypeId 
 SatUtMac::GetTypeId (void)
 {
@@ -225,6 +227,11 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * send the time slots at different times so that the transmissions are received at the GW
    * at correct time.
    */
+
+#ifdef SAT_CHECK_TBTP_CONTENT
+  CheckTbtpMessage (tbtp);
+#endif
+
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
 
@@ -493,8 +500,6 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  // Remove the mac tag
-                  (*i)->RemovePacketTag (macTag);
                   ReceiveSignalingPacket (*i, ctrlTag);
                 }
               else
@@ -522,6 +527,10 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 {
   NS_LOG_FUNCTION (this);
 
+  // Remove the mac tag
+  SatMacTag macTag;
+  packet->PeekPacketTag (macTag);
+
   switch (ctrlTag.GetMsgType ())
   {
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
@@ -535,7 +544,16 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
             NS_FATAL_ERROR ("TBTP not found, check that TBTP storage time is set long enough for superframe sequence!!!");
           }
 
+        packet->RemovePacketTag (macTag);
+
         ScheduleTimeSlots (tbtp);
+        break;
+      }
+    case SatControlMsgTag::SAT_ARQ_ACK:
+      {
+        // ARQ ACKs need to be forwarded to LLC/ARQ for processing
+        Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+        m_rxCallback (packet, destAddress);
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:
@@ -1017,5 +1035,70 @@ SatUtMac::DoFrameStart ()
 
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
 }
+
+
+bool
+SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
+{
+  NS_LOG_LOGIC (this);
+  SatTbtpMessage::DaTimeSlotInfoContainer_t slots = tbtp->GetDaTimeslots (m_nodeInfo->GetMacAddress ());
+
+  Time prevEnd;
+  bool first (true);
+
+  if (!slots.empty ())
+    {
+      NS_LOG_LOGIC ("Number of time slots: " << slots.size ());
+
+      // Ensure that the time slots are in increasing order
+      // based on start time
+      std::sort (slots.begin (), slots.end (), SortTimeSlots ());
+
+      uint32_t i (0);
+      uint8_t frameId (0);
+      for ( SatTbtpMessage::DaTimeSlotInfoContainer_t::iterator it = slots.begin (); it != slots.end (); it++ )
+        {
+          // Store frame id from first slot and check later that frame id is same
+          // If frame id changes in TBTP for same UT, raise error.
+          if ( it == slots.begin () )
+            {
+              frameId = it->first;
+            }
+          else if ( frameId != it->first )
+            {
+              NS_FATAL_ERROR ("Error in TBTP: slot allocate from different frames for same UT!!!");
+            }
+
+          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
+          Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+          Ptr<SatTimeSlotConf> timeSlotConf = it->second;
+
+          // Start time
+          Time startTime = Seconds (timeSlotConf->GetStartTimeInSeconds ());
+
+          // Carrier
+          uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
+
+          NS_LOG_LOGIC ("Time slot: " << i << " start time: " << startTime.GetSeconds () << " carrier id: " << carrierId);
+          if (first != true && prevEnd >= startTime)
+            {
+              NS_FATAL_ERROR ("Time slots in TBTP are overlapping! Current start time: " << startTime.GetSeconds () << " previous timeslot end time: " << prevEnd.GetSeconds () <<  " carrier id: " << carrierId);
+            }
+
+          // Duration
+          Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
+          Time duration = Seconds (wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ()));
+          prevEnd = startTime + duration - m_guardTime;
+
+          NS_LOG_LOGIC ("Time slot: " << i << " end time: " << prevEnd.GetSeconds () << " carrier id: " << carrierId);
+
+          first = false;
+          ++i;
+        }
+    }
+
+  return true;
+}
+
 
 } // namespace ns3

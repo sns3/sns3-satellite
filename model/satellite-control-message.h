@@ -51,7 +51,8 @@ public:
       SAT_NON_CTRL_MSG, //!< SAT_NON_CTRL_MSG
       SAT_TBTP_CTRL_MSG,//!< SAT_TBTP_CTRL_MSG
       SAT_CR_CTRL_MSG,  //!< SAT_CR_CTRL_MSG
-      SAT_RA_CTRL_MSG   //!< SAT_RA_CTRL_MSG
+      SAT_RA_CTRL_MSG,  //!< SAT_RA_CTRL_MSG
+      SAT_ARQ_ACK       //!< SAT_ARQ_ACK
     } SatControlMsgType_t;
 
   /**

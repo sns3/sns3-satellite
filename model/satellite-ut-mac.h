@@ -36,6 +36,21 @@
 namespace ns3 {
 
 /**
+ * This class sorts time slots within TBTP into increasing order based
+ * on start time.
+ */
+class SortTimeSlots
+{
+public:
+  SortTimeSlots () {};
+
+  bool operator() (std::pair<uint8_t, Ptr<SatTimeSlotConf> > p1, std::pair<uint8_t, Ptr<SatTimeSlotConf> > p2)
+  {
+    return p1.second->GetStartTimeInSeconds () < p2.second->GetStartTimeInSeconds ();
+  }
+};
+
+/**
  * \ingroup satellite
   * \brief UT specific Mac class for Sat Net Devices.
  *
@@ -327,6 +342,13 @@ private:
    * \brief Function which is executed at every frame start.
    */
   void DoFrameStart ();
+
+  /**
+   * \brief Check TBTP time slots so that they do no overlap!
+   * \param tbtp Received TBTP
+   * \return bool True if TBTP is valid
+   */
+  bool CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const;
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
