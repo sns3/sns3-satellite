@@ -117,10 +117,19 @@ SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
   if (m_currentlyReceiving > 1)
     {
       std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator iter;
+      bool wasCollisionReported = true;
 
       for (iter = m_packetCollisions.begin (); iter != m_packetCollisions.end (); iter++)
         {
+          if (!iter->second)
+            {
+              wasCollisionReported = false;
+            }
           iter->second = true;
+        }
+      if (!wasCollisionReported)
+        {
+          NS_LOG_INFO ("SatInterference::Calculate - Time: " << Now ().GetSeconds () << " - Packet collision!");
         }
     }
 

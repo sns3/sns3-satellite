@@ -503,6 +503,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
       if (iter->second.rxParams->m_txInfo.packetType == SatEnums::SLOTTED_ALOHA_PACKET)
         {
+          NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
           /// check for slotted aloha packet collisions
           phyError = ProcessSlottedAlohaCollisions (cSinr, iter->second.rxParams, iter->second.interferenceEvent);
         }
@@ -532,7 +533,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
      }
   else
     {
-      NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - CRDSA packet received");
+      NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - CRDSA packet received");
       SatPhyRxCarrier::crdsaPacketRxParams_s params;
 
       params.destAddress = iter->second.destAddress;
@@ -565,12 +566,15 @@ SatPhyRxCarrier::ProcessSlottedAlohaCollisions (double cSinr, Ptr<SatSignalParam
     {
       /// check whether the packet has collided. This mode is intended to be used with constant interference and traced interference
       phyError = m_satInterference->HasCollision (interferenceEvent);
+      NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Strict collision mode, phyError: " << phyError);
     }
   else
     {
       /// check cSinr against link results
       phyError = CheckAgainstLinkResults (cSinr,rxParams);
+      NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Composite SINR mode, phyError: " << phyError);
     }
+
   return phyError;
 }
 

@@ -41,6 +41,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
   LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -49,7 +50,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   // Configure error model
-  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
+  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_AVI);
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
