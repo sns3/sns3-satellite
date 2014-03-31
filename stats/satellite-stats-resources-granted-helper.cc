@@ -361,53 +361,40 @@ SatStatsResourcesGrantedHelper::InstallProbe (Ptr<Node> utNode,
   Ptr<BytesProbe> probe = CreateObject<BytesProbe> ();
   probe->SetName (probeName.str ());
 
-  /*
-   * Assuming that device #0 is for loopback device, device #1 is for
-   * subscriber network device, and device #2 is for satellite beam device.
-   */
-  NS_ASSERT (utNode->GetNDevices () >= 3);
-  Ptr<NetDevice> dev = utNode->GetDevice (2);
+  Ptr<NetDevice> dev = GetUtSatNetDevice (utNode);
   Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+  NS_ASSERT (satDev != 0);
+  Ptr<SatMac> satMac = satDev->GetMac ();
+  NS_ASSERT (satMac != 0);
+  Ptr<SatUtMac> satUtMac = satMac->GetObject<SatUtMac> ();
+  NS_ASSERT (satUtMac != 0);
 
-  if (satDev == 0)
+  // Connect the object to the probe.
+  if (probe->ConnectByObject ("DaResourcesTrace", satUtMac))
     {
-      NS_LOG_WARN (this << " Node " << utNode->GetId ()
-                        << " is not a valid UT");
-    }
-  else
-    {
-      Ptr<SatMac> satMac = satDev->GetMac ();
-      NS_ASSERT (satMac != 0);
-      Ptr<SatUtMac> satUtMac = satMac->GetObject<SatUtMac> ();
-      NS_ASSERT (satUtMac != 0);
-
-      // Connect the object to the probe.
-      if (probe->ConnectByObject ("DaResourcesTrace", satUtMac))
+      // Connect the probe to the right collector.
+      if (m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                 "Output",
+                                                 identifier,
+                                                 collectorTraceSink))
         {
-          // Connect the probe to the right collector.
-          if (m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                     "Output",
-                                                     identifier,
-                                                     collectorTraceSink))
-            {
-              NS_LOG_INFO (this << " created probe " << probeName
-                                << ", connected to collector " << identifier);
-              m_probes.push_back (probe->GetObject<Probe> ());
-            }
-          else
-            {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                << " to collector " << identifier);
-            }
-
+          NS_LOG_INFO (this << " created probe " << probeName
+                            << ", connected to collector " << identifier);
+          m_probes.push_back (probe->GetObject<Probe> ());
         }
       else
         {
-          NS_FATAL_ERROR ("Error connecting to DaResourcesTrace trace source of SatUtMac"
-                          << " at node ID " << utNode->GetId () << " device #2");
+          NS_LOG_WARN (this << " unable to connect probe " << probeName
+                            << " to collector " << identifier);
         }
 
-    } // end of else of `if (satDev == 0)`
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Error connecting to DaResourcesTrace trace source of SatUtMac"
+                      << " at node ID " << utNode->GetId ()
+                      << " device #" << satDev->GetIfIndex ());
+    }
 
 } // end of `void InstallProbe (Ptr<Node>, R (C::*) (P, P));`
 

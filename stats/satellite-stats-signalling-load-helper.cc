@@ -350,32 +350,30 @@ SatStatsFwdSignallingLoadHelper::DoInstallProbes ()
 
   for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
     {
-      NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                         << " has " << (*it)->GetNDevices () << " devices");
-      /*
-       * Assuming that device #0 is for loopback device, device #(N-1) is for
-       * backbone network device, and devices #1 until #(N-2) are for satellite
-       * beam device.
-       */
-      for (uint32_t i = 1; i <= (*it)->GetNDevices ()-2; i++)
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
         {
-          Ptr<NetDevice> dev = (*it)->GetDevice (i);
-          if ((dev->GetObject<SatNetDevice> () != 0)
-              && (dev->TraceConnectWithoutContext ("SignallingTx", callback)))
+          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != 0);
+
+          if ((*itDev)->TraceConnectWithoutContext ("SignallingTx", callback))
             {
               NS_LOG_INFO (this << " successfully connected with node ID "
                                 << (*it)->GetId ()
-                                << " device #" << i);
+                                << " device #" << (*itDev)->GetIfIndex ());
             }
           else
             {
-              NS_FATAL_ERROR ("Error connecting to SignallingTx trace source "
+              NS_FATAL_ERROR ("Error connecting to SignallingTx trace source"
                               << " of SatNetDevice"
                               << " at node ID " << (*it)->GetId ()
-                              << " device #" << i);
+                              << " device #" << (*itDev)->GetIfIndex ());
             }
-        }
-    }
+
+        } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
+
+    } // end of `for (NodeContainer::Iterator it = gws)`
 
 } // end of `void DoInstallProbes ();`
 
@@ -426,13 +424,7 @@ SatStatsRtnSignallingLoadHelper::DoInstallProbes ()
       Ptr<ApplicationPacketProbe> probe = CreateObject<ApplicationPacketProbe> ();
       probe->SetName (probeName.str ());
 
-      /*
-       * Assuming that device #0 is for loopback device, device #1 is for
-       * subscriber network device, and device #2 is for satellite beam device.
-       */
-      NS_ASSERT ((*it)->GetNDevices () >= 3);
-      Ptr<NetDevice> dev = (*it)->GetDevice (2);
-      NS_ASSERT (dev->GetObject<SatNetDevice> () != 0);
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
 
       // Connect the object to the probe.
       if (probe->ConnectByObject ("SignallingTx", dev))

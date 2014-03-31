@@ -25,6 +25,7 @@
 #include <ns3/ptr.h>
 #include <ns3/object.h>
 #include <ns3/attribute.h>
+#include <ns3/net-device-container.h>
 #include <map>
 
 
@@ -263,6 +264,18 @@ protected:
    * \return
    */
   virtual uint32_t GetIdentifierForGw (Ptr<Node> gwNode) const;
+
+  // DEVICE RETRIEVAL METHODS /////////////////////////////////////////////////
+
+  /**
+   * \return
+   */
+  static NetDeviceContainer GetGwSatNetDevice (Ptr<Node> gwNode);
+
+  /**
+   * \return
+   */
+  static Ptr<NetDevice> GetUtSatNetDevice (Ptr<Node> utNode);
 
 private:
   std::string           m_name;            ///<

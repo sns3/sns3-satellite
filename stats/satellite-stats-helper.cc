@@ -705,4 +705,53 @@ SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
 }
 
 
+NetDeviceContainer // static
+SatStatsHelper::GetGwSatNetDevice (Ptr<Node> gwNode)
+{
+  NetDeviceContainer ret;
+
+  NS_LOG_DEBUG (" Node ID " << gwNode->GetId ()
+                          << " has " << gwNode->GetNDevices () << " devices");
+  /*
+   * Assuming that device #0 is for loopback device, device #(N-1) is for
+   * backbone network device, and devices #1 until #(N-2) are for satellite
+   * beam device.
+   */
+  for (uint32_t i = 1; i <= gwNode->GetNDevices ()-2; i++)
+    {
+      Ptr<NetDevice> dev = gwNode->GetDevice (i);
+
+      if (dev->GetObject<SatNetDevice> () == 0)
+        {
+          NS_FATAL_ERROR ("Node " << gwNode->GetId () << " is not a valid GW");
+        }
+      else
+        {
+          ret.Add (dev);
+        }
+    }
+
+  return ret;
+}
+
+
+Ptr<NetDevice> // static
+SatStatsHelper::GetUtSatNetDevice (Ptr<Node> utNode)
+{
+  /*
+   * Assuming that device #0 is for loopback device, device #1 is for
+   * subscriber network device, and device #2 is for satellite beam device.
+   */
+  NS_ASSERT (utNode->GetNDevices () >= 3);
+  Ptr<NetDevice> dev = utNode->GetDevice (2);
+
+  if (dev->GetObject<SatNetDevice> () == 0)
+    {
+      NS_FATAL_ERROR ("Node " << utNode->GetId () << " is not a valid UT");
+    }
+
+  return dev;
+}
+
+
 } // end of namespace ns3

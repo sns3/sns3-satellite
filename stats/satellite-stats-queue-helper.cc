@@ -627,62 +627,49 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
   for (NodeContainer::Iterator it1 = gws.Begin(); it1 != gws.End (); ++it1)
     {
-      NS_LOG_DEBUG (this << " Node ID " << (*it1)->GetId ()
-                         << " has " << (*it1)->GetNDevices () << " devices");
-      /*
-       * Assuming that device #0 is for loopback device, device #(N-1) is for
-       * backbone network device, and devices #1 until #(N-2) are for satellite
-       * beam device.
-       */
-      for (uint32_t i = 1; i <= (*it1)->GetNDevices ()-2; i++)
+      NetDeviceContainer devs = GetGwSatNetDevice (*it1);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
         {
-          Ptr<NetDevice> dev = (*it1)->GetDevice (i);
-          Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
 
-          if (satDev == 0)
-            {
-              NS_LOG_WARN (this << " Node " << (*it1)->GetId ()
-                                << " is not a valid GW");
-            }
-          else
-            {
-              // Get the beam ID of this device.
-              Ptr<SatPhy> satPhy = satDev->GetPhy ();
-              NS_ASSERT (satPhy != 0);
-              Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-              NS_ASSERT (satPhyRx != 0);
-              const uint32_t beamId = satPhyRx->GetBeamId ();
-              NS_LOG_DEBUG (this << " enlisting UT from beam ID " << beamId);
+          // Get the beam ID of this device.
+          Ptr<SatPhy> satPhy = satDev->GetPhy ();
+          NS_ASSERT (satPhy != 0);
+          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
+          NS_ASSERT (satPhyRx != 0);
+          const uint32_t beamId = satPhyRx->GetBeamId ();
+          NS_LOG_DEBUG (this << " enlisting UT from beam ID " << beamId);
 
-              // Go through the UTs of this beam.
-              ListOfUt_t listOfUt;
-              NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (beamId);
-              for (NodeContainer::Iterator it2 = uts.Begin();
-                   it2 != uts.End (); ++it2)
+          // Go through the UTs of this beam.
+          ListOfUt_t listOfUt;
+          NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (beamId);
+          for (NodeContainer::Iterator it2 = uts.Begin();
+               it2 != uts.End (); ++it2)
+            {
+              const Address addr = satIdMapper->GetUtMacWithNode (*it2);
+              const Mac48Address mac48Addr = Mac48Address::ConvertFrom (addr);
+
+              if (addr.IsInvalid ())
                 {
-                  const Address addr = satIdMapper->GetUtMacWithNode (*it2);
-                  const Mac48Address mac48Addr = Mac48Address::ConvertFrom (addr);
-
-                  if (addr.IsInvalid ())
-                    {
-                      NS_LOG_WARN (this << " Node " << (*it2)->GetId ()
-                                        << " is not a valid UT");
-                    }
-                  else
-                    {
-                      const uint32_t identifier = GetIdentifierForUt (*it2);
-                      listOfUt.push_back (std::make_pair (mac48Addr, identifier));
-                    }
+                  NS_LOG_WARN (this << " Node " << (*it2)->GetId ()
+                                    << " is not a valid UT");
                 }
+              else
+                {
+                  const uint32_t identifier = GetIdentifierForUt (*it2);
+                  listOfUt.push_back (std::make_pair (mac48Addr, identifier));
+                }
+            }
 
-              // Add an entry to the LLC list.
-              Ptr<SatLlc> satLlc = satDev->GetLlc ();
-              NS_ASSERT (satLlc != 0);
-              m_llc.push_back (std::make_pair (satLlc, listOfUt));
+          // Add an entry to the LLC list.
+          Ptr<SatLlc> satLlc = satDev->GetLlc ();
+          NS_ASSERT (satLlc != 0);
+          m_llc.push_back (std::make_pair (satLlc, listOfUt));
 
-            } // end of else of `if (satDev == 0)`
-
-        } // end of `for (uint32_t i = 1; i <= (*it)->GetNDevices ()-2; i++)`
+        } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
 
     } // end of `for (it1 = gws.Begin(); it1 != gws.End (); ++it1)`
 
@@ -811,28 +798,13 @@ SatStatsRtnQueueHelper::DoEnlistSource ()
   for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
     {
       const uint32_t identifier = GetIdentifierForUt (*it);
-
-      /*
-       * Assuming that device #0 is for loopback device, device #1 is for
-       * subscriber network device, and device #2 is for satellite beam device.
-       */
-      NS_ASSERT ((*it)->GetNDevices () >= 3);
-      Ptr<NetDevice> dev = (*it)->GetDevice (2);
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-
-      if (satDev == 0)
-        {
-          NS_LOG_WARN (this << " Node " << (*it)->GetId ()
-                            << " is not a valid UT");
-        }
-      else
-        {
-          Ptr<SatLlc> satLlc = satDev->GetLlc ();
-          NS_ASSERT (satLlc != 0);
-          m_llc.push_back (std::make_pair (satLlc, identifier));
-        }
-
-    } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
+      NS_ASSERT (satDev != 0);
+      Ptr<SatLlc> satLlc = satDev->GetLlc ();
+      NS_ASSERT (satLlc != 0);
+      m_llc.push_back (std::make_pair (satLlc, identifier));
+    }
 
 } // end of `void DoInstall ();`
 
