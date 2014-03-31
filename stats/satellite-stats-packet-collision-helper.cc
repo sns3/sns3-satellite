@@ -139,6 +139,9 @@ SatStatsPacketCollisionHelper::DoInstall ()
         m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
                                                   m_aggregator,
                                                   &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator ("OutputString",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::AddContextHeading);
         break;
       }
 
