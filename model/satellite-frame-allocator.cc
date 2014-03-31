@@ -210,13 +210,13 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
 
     if ( timeSlotSymbols == 0 )
       {
-        if (carrierSymbolsToUse < utSymbolsLeft)
-          {
-            carrierSymbolsToUse -= symbolsToUse;
-          }
-
         if ( rcSymbolsLeft > 0)
           {
+            if (carrierSymbolsToUse < utSymbolsToUse)
+              {
+                carrierSymbolsToUse -= symbolsToUse;
+              }
+
             utSymbolsToUse -= symbolsToUse;
           }
       }
@@ -226,8 +226,8 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
         {
           case 0:
             {
-              uint16_t index = (carrierId * m_frameConf->GetTimeSlotCount ()/m_frameConf->GetCarrierCount ()) + ((m_maxSymbolsPerCarrier - carrierSymbolsToUse) / timeSlotSymbols);
-              timeSlotConf = m_frameConf->GetTimeSlotConf (index);
+              uint16_t index = (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / timeSlotSymbols;
+              timeSlotConf = m_frameConf->GetTimeSlotConf (carrierId, index);
 
               carrierSymbolsToUse -= timeSlotSymbols;
               utSymbolsToUse -= timeSlotSymbols;

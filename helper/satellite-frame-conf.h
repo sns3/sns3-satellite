@@ -212,10 +212,19 @@ public:
   /**
    * Get time slot conf of the frame. Possible values for id are from 0 to 2047.
    *
-   * \param index Id of the time slot requested.
+   * \param index Id of the time slot requested in frame.
    * \return      The requested time slot configuration of frame.
    */
   Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
+
+  /**
+   * Get time slot conf of the frame. Possible values for id are from 0 to Carrier count - 1.
+   *
+   * \param carrierId Id of carrier which time slot is requested.
+   * \param index Id of the time slot requested in the carrier of the frame.
+   * \return The requested time slot configuration of frame.
+  */
+  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t carrierId, uint16_t index) const;
 
   /**
    * Get bandwidth of the frame.

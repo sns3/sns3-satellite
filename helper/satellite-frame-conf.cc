@@ -147,6 +147,27 @@ SatFrameConf::GetTimeSlotCount () const
 }
 
 Ptr<SatTimeSlotConf>
+SatFrameConf::GetTimeSlotConf (uint16_t carrierId, uint16_t index) const
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatTimeSlotConf> foundTimeSlot = NULL;
+
+  SatTimeSlotConfMap_t::const_iterator foundCarrier = m_timeSlotConfMap.find (carrierId);
+
+  if ( foundCarrier != m_timeSlotConfMap.end () && index < foundCarrier->second.size () )
+    {
+      foundTimeSlot = foundCarrier->second[index];
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Index is invalid!!!");
+    }
+
+  return foundTimeSlot;
+}
+
+Ptr<SatTimeSlotConf>
 SatFrameConf::GetTimeSlotConf (uint16_t index) const
 {
   NS_LOG_FUNCTION (this);
@@ -155,16 +176,7 @@ SatFrameConf::GetTimeSlotConf (uint16_t index) const
   uint32_t carrierId = index / m_timeSlotConfMap.begin ()->second.size ();
   uint16_t timeSlotIndex = index % m_timeSlotConfMap.begin ()->second.size ();
 
-  SatTimeSlotConfMap_t::const_iterator foundCarrier = m_timeSlotConfMap.find (carrierId);
-
-  if ( foundCarrier != m_timeSlotConfMap.end () && timeSlotIndex < foundCarrier->second.size () )
-    {
-      foundTimeSlot = foundCarrier->second[timeSlotIndex];
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Index is invalid!!!");
-    }
+  foundTimeSlot = GetTimeSlotConf (carrierId, timeSlotIndex);
 
   return foundTimeSlot;
 }
