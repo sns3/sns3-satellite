@@ -141,24 +141,24 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
     // Forward link device-level packet delay statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDevDelay,
-                                        "forward link device-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdDevDelay,
+                                               "forward link device-level delay statistics")
 
     // Forward link MAC-level packet delay statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdMacDelay,
-                                        "forward link MAC-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdMacDelay,
+                                               "forward link MAC-level delay statistics")
 
     // Forward link PHY-level packet delay statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdPhyDelay,
-                                        "forward link PHY-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdPhyDelay,
+                                               "forward link PHY-level delay statistics")
 
     // Forward link queue size (in bytes) statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdQueueBytes,
-                                        "forward link queue size (in bytes) statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdQueueBytes,
+                                               "forward link queue size (in bytes) statistics")
 
     // Forward link queue size (in number of packets) statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdQueuePackets,
-                                        "forward link queue size (in number of packets) statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdQueuePackets,
+                                               "forward link queue size (in number of packets) statistics")
 
     // Forward link signalling load statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdSignallingLoad,
@@ -191,24 +191,24 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
     // Return link device-level packet delay statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevDelay,
-                                        "return link device-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnDevDelay,
+                                               "return link device-level delay statistics")
 
     // Return link MAC-level packet delay statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnMacDelay,
-                                        "return link MAC-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnMacDelay,
+                                               "return link MAC-level delay statistics")
 
     // Return link PHY-level packet delay statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyDelay,
-                                        "return link PHY-level delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnPhyDelay,
+                                               "return link PHY-level delay statistics")
 
     // Return link queue size (in bytes) statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnQueueBytes,
-                                        "return link queue size (in bytes) statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnQueueBytes,
+                                               "return link queue size (in bytes) statistics")
 
     // Return link queue size (in number of packets) statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnQueuePackets,
-                                        "return link queue size (in number of packets) statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnQueuePackets,
+                                               "return link queue size (in number of packets) statistics")
 
     // Return link signalling load statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnSignallingLoad,
@@ -234,8 +234,8 @@ SatStatsHelperContainer::GetTypeId ()
                                         "return link PHY-level throughput statistics")
 
     // Resources granted statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (ResourcesGranted,
-                                        "resources granted statistics")
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (ResourcesGranted,
+                                               "resources granted statistics")
   ;
   return tid;
 }
