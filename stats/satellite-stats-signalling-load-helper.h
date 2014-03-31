@@ -71,12 +71,11 @@ public:
    * Used in return link statistics. DoInstallProbes() is expected to connect
    * the right trace sources to this method.
    */
-  virtual void SignallingTxCallback (Ptr<const Packet> packet,
-                                     const Address &to);
+  void SignallingTxCallback (Ptr<const Packet> packet, const Address &to);
 
 protected:
   // inherited from SatStatsHelper base class
-  virtual void DoInstall ();
+  void DoInstall ();
 
   /**
    * \brief
@@ -93,7 +92,7 @@ protected:
    * Used in forward link statistics. DoInstallProbes() is expected to pass the
    * the UT node of interest into this method.
    */
-  virtual void SaveAddressAndIdentifier (Ptr<Node> utNode);
+  void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
   /// Maintains a list of first-level collectors created by this helper.
   CollectorMap m_conversionCollectors;
@@ -143,7 +142,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsFwdSignallingLoadHelper
 
@@ -183,7 +182,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.

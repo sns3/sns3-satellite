@@ -101,11 +101,11 @@ public:
    * Used in return link statistics. DoInstallProbes() is expected to connect
    * the right trace sources to this method.
    */
-  virtual void RxDelayCallback (Time delay, const Address &from);
+  void RxDelayCallback (Time delay, const Address &from);
 
 protected:
   // inherited from SatStatsHelper base class
-  virtual void DoInstall ();
+  void DoInstall ();
 
   /**
    * \brief
@@ -122,7 +122,7 @@ protected:
    * Used in return link statistics. DoInstallProbes() is expected to pass the
    * the UT node of interest into this method.
    */
-  virtual void SaveAddressAndIdentifier (Ptr<Node> utNode);
+  void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
@@ -176,7 +176,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -218,7 +218,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -260,7 +260,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -302,7 +302,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -352,7 +352,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /**
@@ -403,7 +403,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsRtnDevDelayHelper
 
@@ -441,7 +441,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsRtnMacDelayHelper
 
@@ -479,7 +479,7 @@ public:
 
 protected:
   // inherited from SatStatsDelayHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsRtnPhyDelayHelper
 

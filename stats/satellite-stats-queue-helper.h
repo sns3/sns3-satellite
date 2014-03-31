@@ -194,7 +194,7 @@ public:
 
 protected:
   // inherited from SatStatsHelper base class
-  virtual void DoInstall ();
+  void DoInstall ();
 
   /**
    * \brief
@@ -258,8 +258,8 @@ public:
 
 protected:
   // inherited from SatStatsQueueHelper base class
-  virtual void DoEnlistSource ();
-  virtual void DoPoll ();
+  void DoEnlistSource ();
+  void DoPoll ();
 
 private:
   ///
@@ -329,8 +329,8 @@ public:
 
 protected:
   // inherited from SatStatsQueueHelper base class
-  virtual void DoEnlistSource ();
-  virtual void DoPoll ();
+  void DoEnlistSource ();
+  void DoPoll ();
 
 private:
   /// Maintains a list of UT LLC and its identifier.

@@ -82,7 +82,7 @@ public:
 
 protected:
   // inherited from SatStatsHelper base class
-  virtual void DoInstall ();
+  void DoInstall ();
 
 private:
   /**

@@ -196,17 +196,17 @@ protected:
    * The created aggregator is stored in #m_aggregator. It can be retrieved
    * from outside using GetAggregator().
    */
-  virtual Ptr<DataCollectionObject> CreateAggregator (std::string aggregatorTypeId,
-                                                      std::string n1 = "",
-                                                      const AttributeValue &v1 = EmptyAttributeValue (),
-                                                      std::string n2 = "",
-                                                      const AttributeValue &v2 = EmptyAttributeValue (),
-                                                      std::string n3 = "",
-                                                      const AttributeValue &v3 = EmptyAttributeValue (),
-                                                      std::string n4 = "",
-                                                      const AttributeValue &v4 = EmptyAttributeValue (),
-                                                      std::string n5 = "",
-                                                      const AttributeValue &v5 = EmptyAttributeValue ());
+  Ptr<DataCollectionObject> CreateAggregator (std::string aggregatorTypeId,
+                                              std::string n1 = "",
+                                              const AttributeValue &v1 = EmptyAttributeValue (),
+                                              std::string n2 = "",
+                                              const AttributeValue &v2 = EmptyAttributeValue (),
+                                              std::string n3 = "",
+                                              const AttributeValue &v3 = EmptyAttributeValue (),
+                                              std::string n4 = "",
+                                              const AttributeValue &v4 = EmptyAttributeValue (),
+                                              std::string n5 = "",
+                                              const AttributeValue &v5 = EmptyAttributeValue ());
 
   /**
    * \brief
@@ -223,7 +223,7 @@ protected:
    * \return the ID previously assigned to the UT user, or zero if the UT user
    *         is not assigned to any ID.
    */
-  virtual uint32_t GetUtUserId (Ptr<Node> utUserNode) const;
+  uint32_t GetUtUserId (Ptr<Node> utUserNode) const;
 
   /**
    * \brief
@@ -231,7 +231,7 @@ protected:
    * \return the ID previously assigned to the UT, or zero if the UT is not
    *         assigned to any ID.
    */
-  virtual uint32_t GetUtId (Ptr<Node> utNode) const;
+  uint32_t GetUtId (Ptr<Node> utNode) const;
 
   /**
    * \brief
@@ -239,31 +239,31 @@ protected:
    * \return the ID previously assigned to the GW, or zero if the GW is not
    *         assigned to any ID.
    */
-  virtual uint32_t GetGwId (Ptr<Node> gwNode) const;
+  uint32_t GetGwId (Ptr<Node> gwNode) const;
 
   /**
    * \param utUserNode
    * \return
    */
-  virtual uint32_t GetIdentifierForUtUser (Ptr<Node> utUserNode) const;
+  uint32_t GetIdentifierForUtUser (Ptr<Node> utUserNode) const;
 
   /**
    * \param utNode
    * \return
    */
-  virtual uint32_t GetIdentifierForUt (Ptr<Node> utNode) const;
+  uint32_t GetIdentifierForUt (Ptr<Node> utNode) const;
 
   /**
    * \param beamId
    * \return
    */
-  virtual uint32_t GetIdentifierForBeam (uint32_t beamId) const;
+  uint32_t GetIdentifierForBeam (uint32_t beamId) const;
 
   /**
    * \param gwNode
    * \return
    */
-  virtual uint32_t GetIdentifierForGw (Ptr<Node> gwNode) const;
+  uint32_t GetIdentifierForGw (Ptr<Node> gwNode) const;
 
   // DEVICE RETRIEVAL METHODS /////////////////////////////////////////////////
 

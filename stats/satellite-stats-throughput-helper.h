@@ -71,11 +71,11 @@ public:
    * Used in return link statistics. DoInstallProbes() is expected to connect
    * the right trace sources to this method.
    */
-  virtual void RxCallback (Ptr<const Packet> packet, const Address &from);
+  void RxCallback (Ptr<const Packet> packet, const Address &from);
 
 protected:
   // inherited from SatStatsHelper base class
-  virtual void DoInstall ();
+  void DoInstall ();
 
   /**
    * \brief
@@ -92,7 +92,7 @@ protected:
    * Used in return link statistics. DoInstallProbes() is expected to pass the
    * the UT node of interest into this method.
    */
-  virtual void SaveAddressAndIdentifier (Ptr<Node> utNode);
+  void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
   /// Maintains a list of first-level collectors created by this helper.
   CollectorMap m_conversionCollectors;
@@ -144,7 +144,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -186,7 +186,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -230,7 +230,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -274,7 +274,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
@@ -324,7 +324,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 private:
   /**
@@ -375,7 +375,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsRtnDevThroughputHelper
 
@@ -415,7 +415,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsRtnMacThroughputHelper
 
@@ -455,7 +455,7 @@ public:
 
 protected:
   // inherited from SatStatsThroughputHelper base class
-  virtual void DoInstallProbes ();
+  void DoInstallProbes ();
 
 }; // end of class SatStatsRtnPhyThroughputHelper
 
