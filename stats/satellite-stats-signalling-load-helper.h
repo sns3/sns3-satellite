@@ -53,6 +53,9 @@ public:
   /// Destructor.
   virtual ~SatStatsSignallingLoadHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
   /**
    * \brief Set up several probes or other means of listeners and connect them
    *        to the first-level collectors.
@@ -135,6 +138,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdSignallingLoadHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsThroughputHelper base class
   virtual void DoInstallProbes ();
@@ -171,6 +177,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnSignallingLoadHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsThroughputHelper base class

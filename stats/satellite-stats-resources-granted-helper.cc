@@ -47,12 +47,13 @@ NS_LOG_COMPONENT_DEFINE ("SatStatsResourcesGrantedHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsResourcesGrantedHelper);
 
 SatStatsResourcesGrantedHelper::SatStatsResourcesGrantedHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_distributionMinValue (0.0),
-    m_distributionMaxValue (20000.0),
-    m_distributionBinLength (400.0)
+    m_minValue (0.0),
+    m_maxValue (0.0),
+    m_binLength (0.0)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -61,6 +62,79 @@ SatStatsResourcesGrantedHelper::SatStatsResourcesGrantedHelper (Ptr<const SatHel
 SatStatsResourcesGrantedHelper::~SatStatsResourcesGrantedHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsResourcesGrantedHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsResourcesGrantedHelper")
+    .SetParent<SatStatsHelper> ()
+    .AddAttribute ("MinValue",
+                   "Configure the MinValue attribute of the histogram, PDF, CDF output.",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatStatsResourcesGrantedHelper::SetMinValue,
+                                       &SatStatsResourcesGrantedHelper::GetMinValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("MaxValue",
+                   "Configure the MaxValue attribute of the histogram, PDF, CDF output.",
+                   DoubleValue (20000.0),
+                   MakeDoubleAccessor (&SatStatsResourcesGrantedHelper::SetMaxValue,
+                                       &SatStatsResourcesGrantedHelper::GetMaxValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("BinLength",
+                   "Configure the BinLength attribute of the histogram, PDF, CDF output.",
+                   DoubleValue (400.0),
+                   MakeDoubleAccessor (&SatStatsResourcesGrantedHelper::SetBinLength,
+                                       &SatStatsResourcesGrantedHelper::GetBinLength),
+                   MakeDoubleChecker<double> ())
+  ;
+  return tid;
+}
+
+
+void
+SatStatsResourcesGrantedHelper::SetMinValue (double minValue)
+{
+  NS_LOG_FUNCTION (this << minValue);
+  m_minValue = minValue;
+}
+
+
+double
+SatStatsResourcesGrantedHelper::GetMinValue () const
+{
+  return m_minValue;
+}
+
+
+void
+SatStatsResourcesGrantedHelper::SetMaxValue (double maxValue)
+{
+  NS_LOG_FUNCTION (this << maxValue);
+  m_maxValue = maxValue;
+}
+
+
+double
+SatStatsResourcesGrantedHelper::GetMaxValue () const
+{
+  return m_maxValue;
+}
+
+
+void
+SatStatsResourcesGrantedHelper::SetBinLength (double binLength)
+{
+  NS_LOG_FUNCTION (this << binLength);
+  m_binLength = binLength;
+}
+
+
+double
+SatStatsResourcesGrantedHelper::GetBinLength () const
+{
+  return m_binLength;
 }
 
 
@@ -151,9 +225,9 @@ SatStatsResourcesGrantedHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
@@ -237,9 +311,9 @@ SatStatsResourcesGrantedHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
              it != m_terminalCollectors.End (); ++it)

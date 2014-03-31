@@ -53,6 +53,9 @@ public:
   /// Destructor.
   virtual ~SatStatsThroughputHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
   /**
    * \brief Set up several probes or other means of listeners and connect them
    *        to the first-level collectors.
@@ -136,6 +139,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdAppThroughputHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsThroughputHelper base class
   virtual void DoInstallProbes ();
@@ -174,6 +180,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsFwdDevThroughputHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsThroughputHelper base class
@@ -216,6 +225,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdMacThroughputHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsThroughputHelper base class
   virtual void DoInstallProbes ();
@@ -257,6 +269,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdPhyThroughputHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsThroughputHelper base class
   virtual void DoInstallProbes ();
@@ -295,6 +310,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnAppThroughputHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
   /**
    * \brief Receive inputs from trace sources and determine the right collector
@@ -352,6 +370,9 @@ public:
   /// Destructor.
   virtual ~SatStatsRtnDevThroughputHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsThroughputHelper base class
   virtual void DoInstallProbes ();
@@ -389,6 +410,9 @@ public:
   /// Destructor.
   virtual ~SatStatsRtnMacThroughputHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsThroughputHelper base class
   virtual void DoInstallProbes ();
@@ -425,6 +449,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnPhyThroughputHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsThroughputHelper base class

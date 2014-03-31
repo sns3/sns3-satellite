@@ -34,6 +34,7 @@
 #include <ns3/type-id.h>
 #include <ns3/object-factory.h>
 #include <ns3/string.h>
+#include <ns3/enum.h>
 #include <sstream>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelper");
@@ -41,6 +42,7 @@ NS_LOG_COMPONENT_DEFINE ("SatStatsHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsHelper);
 
 std::string // static
 SatStatsHelper::GetIdentiferTypeName (SatStatsHelper::IdentifierType_t identifierType)
@@ -118,6 +120,47 @@ SatStatsHelper::SatStatsHelper (Ptr<const SatHelper> satHelper)
 SatStatsHelper::~SatStatsHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsHelper")
+    .SetParent<Object> ()
+    .AddAttribute ("Name",
+                   "String to be prepended on every output file name",
+                   StringValue ("stat"),
+                   MakeStringAccessor (&SatStatsHelper::SetName,
+                                       &SatStatsHelper::GetName),
+                   MakeStringChecker ())
+    .AddAttribute ("IdentifierType",
+                   "",
+                   EnumValue (SatStatsHelper::IDENTIFIER_GLOBAL),
+                   MakeEnumAccessor (&SatStatsHelper::SetIdentifierType,
+                                     &SatStatsHelper::GetIdentifierType),
+                   MakeEnumChecker (SatStatsHelper::IDENTIFIER_GLOBAL,  "GLOBAL",
+                                    SatStatsHelper::IDENTIFIER_GW,      "GW",
+                                    SatStatsHelper::IDENTIFIER_BEAM,    "BEAM",
+                                    SatStatsHelper::IDENTIFIER_UT,      "UT",
+                                    SatStatsHelper::IDENTIFIER_UT_USER, "UT_USER"))
+    .AddAttribute ("OutputType",
+                   "",
+                   EnumValue (SatStatsHelper::OUTPUT_SCATTER_FILE),
+                   MakeEnumAccessor (&SatStatsHelper::SetOutputType,
+                                     &SatStatsHelper::GetOutputType),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+  ;
+  return tid;
 }
 
 

@@ -23,7 +23,7 @@
 #define SATELLITE_STATS_HELPER_H
 
 #include <ns3/ptr.h>
-#include <ns3/simple-ref-count.h>
+#include <ns3/object.h>
 #include <ns3/attribute.h>
 #include <map>
 
@@ -42,13 +42,18 @@ class DataCollectionObject;
  *
  * Data Collection Framework (DCF) implementation on Satellite module. For
  * usage in simulation script, see SatStatsHelperContainer.
+ *
+ * \warning SatStatsHelperContainer takes care of setting the attributes
+ *          `Name`, `IdentifierType`, and `OutputType`. Thus it's *not*
+ *          recommended to manually set the values of these attributes while
+ *          using SatStatsHelperContainer.
  */
 
 /**
  * \ingroup satstats
  * \brief Abstract class.
  */
-class SatStatsHelper : public SimpleRefCount<SatStatsHelper>
+class SatStatsHelper : public Object
 {
 public:
 
@@ -108,6 +113,10 @@ public:
 
   /// Destructor.
   virtual ~SatStatsHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 
   // PUBLIC METHODS ///////////////////////////////////////////////////////////
 

@@ -57,11 +57,13 @@ NS_LOG_COMPONENT_DEFINE ("SatStatsDelayHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsDelayHelper);
+
 SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_distributionMinValue (0.0),
-    m_distributionMaxValue (1.0),
-    m_distributionBinLength (0.02)
+    m_minValue (0.0),
+    m_maxValue (0.0),
+    m_binLength (0.0)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -70,6 +72,79 @@ SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
 SatStatsDelayHelper::~SatStatsDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsDelayHelper")
+    .SetParent<SatStatsHelper> ()
+    .AddAttribute ("MinValue",
+                   "Configure the MinValue attribute of the histogram, PDF, CDF output.",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatStatsDelayHelper::SetMinValue,
+                                       &SatStatsDelayHelper::GetMinValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("MaxValue",
+                   "Configure the MaxValue attribute of the histogram, PDF, CDF output.",
+                   DoubleValue (1.0),
+                   MakeDoubleAccessor (&SatStatsDelayHelper::SetMaxValue,
+                                       &SatStatsDelayHelper::GetMaxValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("BinLength",
+                   "Configure the BinLength attribute of the histogram, PDF, CDF output.",
+                   DoubleValue (0.02),
+                   MakeDoubleAccessor (&SatStatsDelayHelper::SetBinLength,
+                                       &SatStatsDelayHelper::GetBinLength),
+                   MakeDoubleChecker<double> ())
+  ;
+  return tid;
+}
+
+
+void
+SatStatsDelayHelper::SetMinValue (double minValue)
+{
+  NS_LOG_FUNCTION (this << minValue);
+  m_minValue = minValue;
+}
+
+
+double
+SatStatsDelayHelper::GetMinValue () const
+{
+  return m_minValue;
+}
+
+
+void
+SatStatsDelayHelper::SetMaxValue (double maxValue)
+{
+  NS_LOG_FUNCTION (this << maxValue);
+  m_maxValue = maxValue;
+}
+
+
+double
+SatStatsDelayHelper::GetMaxValue () const
+{
+  return m_maxValue;
+}
+
+
+void
+SatStatsDelayHelper::SetBinLength (double binLength)
+{
+  NS_LOG_FUNCTION (this << binLength);
+  m_binLength = binLength;
+}
+
+
+double
+SatStatsDelayHelper::GetBinLength () const
+{
+  return m_binLength;
 }
 
 
@@ -144,9 +219,9 @@ SatStatsDelayHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
@@ -214,9 +289,9 @@ SatStatsDelayHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
              it != m_terminalCollectors.End (); ++it)
@@ -351,6 +426,8 @@ SatStatsDelayHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdAppDelayHelper);
+
 SatStatsFwdAppDelayHelper::SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
 {
@@ -361,6 +438,16 @@ SatStatsFwdAppDelayHelper::SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHe
 SatStatsFwdAppDelayHelper::~SatStatsFwdAppDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdAppDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdAppDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -456,7 +543,9 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
 } // end of `void DoInstallProbes ();`
 
 
-// FORWARD LINK DEVICE-LEVEL /////////////////////////////////////////////////////
+// FORWARD LINK DEVICE-LEVEL //////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdDevDelayHelper);
 
 SatStatsFwdDevDelayHelper::SatStatsFwdDevDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
@@ -468,6 +557,16 @@ SatStatsFwdDevDelayHelper::SatStatsFwdDevDelayHelper (Ptr<const SatHelper> satHe
 SatStatsFwdDevDelayHelper::~SatStatsFwdDevDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdDevDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdDevDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -567,6 +666,8 @@ SatStatsFwdDevDelayHelper::DoInstallProbes ()
 
 // FORWARD LINK MAC-LEVEL /////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdMacDelayHelper);
+
 SatStatsFwdMacDelayHelper::SatStatsFwdMacDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
 {
@@ -577,6 +678,16 @@ SatStatsFwdMacDelayHelper::SatStatsFwdMacDelayHelper (Ptr<const SatHelper> satHe
 SatStatsFwdMacDelayHelper::~SatStatsFwdMacDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdMacDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdMacDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -689,6 +800,8 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
 
 // FORWARD LINK PHY-LEVEL /////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdPhyDelayHelper);
+
 SatStatsFwdPhyDelayHelper::SatStatsFwdPhyDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
 {
@@ -699,6 +812,16 @@ SatStatsFwdPhyDelayHelper::SatStatsFwdPhyDelayHelper (Ptr<const SatHelper> satHe
 SatStatsFwdPhyDelayHelper::~SatStatsFwdPhyDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdPhyDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdPhyDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -811,6 +934,8 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
 
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnAppDelayHelper);
+
 SatStatsRtnAppDelayHelper::SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
 {
@@ -821,6 +946,16 @@ SatStatsRtnAppDelayHelper::SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHe
 SatStatsRtnAppDelayHelper::~SatStatsRtnAppDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnAppDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnAppDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -981,7 +1116,9 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 }
 
 
-// RETURN LINK DEVICE-LEVEL //////////////////////////////////////////////////////
+// RETURN LINK DEVICE-LEVEL ///////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnDevDelayHelper);
 
 SatStatsRtnDevDelayHelper::SatStatsRtnDevDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
@@ -993,6 +1130,16 @@ SatStatsRtnDevDelayHelper::SatStatsRtnDevDelayHelper (Ptr<const SatHelper> satHe
 SatStatsRtnDevDelayHelper::~SatStatsRtnDevDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnDevDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnDevDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -1050,6 +1197,8 @@ SatStatsRtnDevDelayHelper::DoInstallProbes ()
 
 // RETURN LINK MAC-LEVEL //////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnMacDelayHelper);
+
 SatStatsRtnMacDelayHelper::SatStatsRtnMacDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
 {
@@ -1060,6 +1209,16 @@ SatStatsRtnMacDelayHelper::SatStatsRtnMacDelayHelper (Ptr<const SatHelper> satHe
 SatStatsRtnMacDelayHelper::~SatStatsRtnMacDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnMacDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnMacDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -1132,6 +1291,8 @@ SatStatsRtnMacDelayHelper::DoInstallProbes ()
 
 // RETURN LINK PHY-LEVEL //////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnPhyDelayHelper);
+
 SatStatsRtnPhyDelayHelper::SatStatsRtnPhyDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsDelayHelper (satHelper)
 {
@@ -1142,6 +1303,16 @@ SatStatsRtnPhyDelayHelper::SatStatsRtnPhyDelayHelper (Ptr<const SatHelper> satHe
 SatStatsRtnPhyDelayHelper::~SatStatsRtnPhyDelayHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnPhyDelayHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnPhyDelayHelper")
+    .SetParent<SatStatsDelayHelper> ()
+  ;
+  return tid;
 }
 
 

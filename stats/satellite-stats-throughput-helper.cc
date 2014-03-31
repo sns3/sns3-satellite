@@ -58,6 +58,8 @@ NS_LOG_COMPONENT_DEFINE ("SatStatsThroughputHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsThroughputHelper);
+
 SatStatsThroughputHelper::SatStatsThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
@@ -68,6 +70,16 @@ SatStatsThroughputHelper::SatStatsThroughputHelper (Ptr<const SatHelper> satHelp
 SatStatsThroughputHelper::~SatStatsThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsThroughputHelper")
+    .SetParent<SatStatsHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -281,6 +293,8 @@ SatStatsThroughputHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdAppThroughputHelper);
+
 SatStatsFwdAppThroughputHelper::SatStatsFwdAppThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -291,6 +305,16 @@ SatStatsFwdAppThroughputHelper::SatStatsFwdAppThroughputHelper (Ptr<const SatHel
 SatStatsFwdAppThroughputHelper::~SatStatsFwdAppThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdAppThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdAppThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -355,6 +379,8 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes ()
 
 // FORWARD LINK DEVICE-LEVEL //////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdDevThroughputHelper);
+
 SatStatsFwdDevThroughputHelper::SatStatsFwdDevThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -365,6 +391,16 @@ SatStatsFwdDevThroughputHelper::SatStatsFwdDevThroughputHelper (Ptr<const SatHel
 SatStatsFwdDevThroughputHelper::~SatStatsFwdDevThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdDevThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdDevThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -431,6 +467,8 @@ SatStatsFwdDevThroughputHelper::DoInstallProbes ()
 
 // FORWARD LINK MAC-LEVEL /////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdMacThroughputHelper);
+
 SatStatsFwdMacThroughputHelper::SatStatsFwdMacThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -441,6 +479,16 @@ SatStatsFwdMacThroughputHelper::SatStatsFwdMacThroughputHelper (Ptr<const SatHel
 SatStatsFwdMacThroughputHelper::~SatStatsFwdMacThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdMacThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdMacThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -520,6 +568,8 @@ SatStatsFwdMacThroughputHelper::DoInstallProbes ()
 
 // FORWARD LINK PHY-LEVEL /////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdPhyThroughputHelper);
+
 SatStatsFwdPhyThroughputHelper::SatStatsFwdPhyThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -530,6 +580,16 @@ SatStatsFwdPhyThroughputHelper::SatStatsFwdPhyThroughputHelper (Ptr<const SatHel
 SatStatsFwdPhyThroughputHelper::~SatStatsFwdPhyThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdPhyThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdPhyThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -609,6 +669,8 @@ SatStatsFwdPhyThroughputHelper::DoInstallProbes ()
 
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnAppThroughputHelper);
+
 SatStatsRtnAppThroughputHelper::SatStatsRtnAppThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -619,6 +681,16 @@ SatStatsRtnAppThroughputHelper::SatStatsRtnAppThroughputHelper (Ptr<const SatHel
 SatStatsRtnAppThroughputHelper::~SatStatsRtnAppThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnAppThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnAppThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -748,6 +820,8 @@ SatStatsRtnAppThroughputHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNo
 
 // RETURN LINK DEVICE-LEVEL ///////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnDevThroughputHelper);
+
 SatStatsRtnDevThroughputHelper::SatStatsRtnDevThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -758,6 +832,16 @@ SatStatsRtnDevThroughputHelper::SatStatsRtnDevThroughputHelper (Ptr<const SatHel
 SatStatsRtnDevThroughputHelper::~SatStatsRtnDevThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnDevThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnDevThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -815,6 +899,8 @@ SatStatsRtnDevThroughputHelper::DoInstallProbes ()
 
 // RETURN LINK MAC-LEVEL //////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnMacThroughputHelper);
+
 SatStatsRtnMacThroughputHelper::SatStatsRtnMacThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -825,6 +911,16 @@ SatStatsRtnMacThroughputHelper::SatStatsRtnMacThroughputHelper (Ptr<const SatHel
 SatStatsRtnMacThroughputHelper::~SatStatsRtnMacThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnMacThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnMacThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -897,6 +993,8 @@ SatStatsRtnMacThroughputHelper::DoInstallProbes ()
 
 // RETURN LINK PHY-LEVEL //////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnPhyThroughputHelper);
+
 SatStatsRtnPhyThroughputHelper::SatStatsRtnPhyThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsThroughputHelper (satHelper)
 {
@@ -907,6 +1005,16 @@ SatStatsRtnPhyThroughputHelper::SatStatsRtnPhyThroughputHelper (Ptr<const SatHel
 SatStatsRtnPhyThroughputHelper::~SatStatsRtnPhyThroughputHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnPhyThroughputHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnPhyThroughputHelper")
+    .SetParent<SatStatsThroughputHelper> ()
+  ;
+  return tid;
 }
 
 

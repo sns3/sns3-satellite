@@ -52,6 +52,8 @@ NS_LOG_COMPONENT_DEFINE ("SatStatsSignallingLoadHelper");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsSignallingLoadHelper);
+
 SatStatsSignallingLoadHelper::SatStatsSignallingLoadHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
@@ -62,6 +64,16 @@ SatStatsSignallingLoadHelper::SatStatsSignallingLoadHelper (Ptr<const SatHelper>
 SatStatsSignallingLoadHelper::~SatStatsSignallingLoadHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsSignallingLoadHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsSignallingLoadHelper")
+    .SetParent<SatStatsHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -292,6 +304,8 @@ SatStatsSignallingLoadHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdSignallingLoadHelper);
+
 SatStatsFwdSignallingLoadHelper::SatStatsFwdSignallingLoadHelper (Ptr<const SatHelper> satHelper)
   : SatStatsSignallingLoadHelper (satHelper)
 {
@@ -302,6 +316,16 @@ SatStatsFwdSignallingLoadHelper::SatStatsFwdSignallingLoadHelper (Ptr<const SatH
 SatStatsFwdSignallingLoadHelper::~SatStatsFwdSignallingLoadHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdSignallingLoadHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdSignallingLoadHelper")
+    .SetParent<SatStatsSignallingLoadHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -358,6 +382,8 @@ SatStatsFwdSignallingLoadHelper::DoInstallProbes ()
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnSignallingLoadHelper);
+
 SatStatsRtnSignallingLoadHelper::SatStatsRtnSignallingLoadHelper (Ptr<const SatHelper> satHelper)
   : SatStatsSignallingLoadHelper (satHelper)
 {
@@ -368,6 +394,16 @@ SatStatsRtnSignallingLoadHelper::SatStatsRtnSignallingLoadHelper (Ptr<const SatH
 SatStatsRtnSignallingLoadHelper::~SatStatsRtnSignallingLoadHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnSignallingLoadHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnSignallingLoadHelper")
+    .SetParent<SatStatsSignallingLoadHelper> ()
+  ;
+  return tid;
 }
 
 

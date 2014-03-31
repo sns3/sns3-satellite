@@ -68,6 +68,9 @@ public:
   /// Destructor.
   virtual ~SatStatsQueueHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
   /**
    * \param pollInterval
    */
@@ -79,6 +82,96 @@ public:
   Time GetPollInterval () const;
 
   /**
+   * \param minValue the MinValue attribute of the histogram, PDF, CDF output
+   *                 in bytes unit.
+   */
+  void SetBytesMinValue (double minValue);
+
+  /**
+   * \return the MinValue attribute of the histogram, PDF, CDF output
+   *         in bytes unit.
+   */
+  double GetBytesMinValue () const;
+
+  /**
+   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output
+   *                 in bytes unit.
+   */
+  void SetBytesMaxValue (double maxValue);
+
+  /**
+   * \return the MaxValue attribute of the histogram, PDF, CDF output
+   *         in bytes unit.
+   */
+  double GetBytesMaxValue () const;
+
+  /**
+   * \param binLength the BinLength attribute of the histogram, PDF, CDF output
+   *                 in bytes unit.
+   */
+  void SetBytesBinLength (double binLength);
+
+  /**
+   * \return the BinLength attribute of the histogram, PDF, CDF output
+   *         in bytes unit.
+   */
+  double GetBytesBinLength () const;
+
+  /**
+   * \param minValue the MinValue attribute of the histogram, PDF, CDF output
+   *                 in packets unit.
+   */
+  void SetPacketsMinValue (double minValue);
+
+  /**
+   * \return the MinValue attribute of the histogram, PDF, CDF output
+   *         in packets unit.
+   */
+  double GetPacketsMinValue () const;
+
+  /**
+   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output
+   *                 in packets unit.
+   */
+  void SetPacketsMaxValue (double maxValue);
+
+  /**
+   * \return the MaxValue attribute of the histogram, PDF, CDF output
+   *         in packets unit.
+   */
+  double GetPacketsMaxValue () const;
+
+  /**
+   * \param binLength the BinLength attribute of the histogram, PDF, CDF output
+   *                 in packets unit.
+   */
+  void SetPacketsBinLength (double binLength);
+
+  /**
+   * \return the BinLength attribute of the histogram, PDF, CDF output
+   *         in packets unit.
+   */
+  double GetPacketsBinLength () const;
+
+  /**
+   * \return the MinValue attribute of the histogram, PDF, CDF output
+   *         in currently selected unit type.
+   */
+  double GetMinValue () const;
+
+  /**
+   * \return the MaxValue attribute of the histogram, PDF, CDF output
+   *         in currently selected unit type.
+   */
+  double GetMaxValue () const;
+
+  /**
+   * \return the BinLength attribute of the histogram, PDF, CDF output
+   *         in currently selected unit type.
+   */
+  double GetBinLength () const;
+
+  /**
    * \param unitType
    */
   void SetUnitType (UnitType_t unitType);
@@ -87,28 +180,6 @@ public:
    * \return
    */
   UnitType_t GetUnitType () const;
-
-//  /**
-//   * \param shortLabel
-//   * \warning Does not have any effect if invoked after Install().
-//   */
-//  void SetShortLabel (std::string shortLabel);
-//
-//  /**
-//   * \return
-//   */
-//  std::string GetShortLabel () const;
-//
-//  /**
-//   * \param longLabel
-//   * \warning Does not have any effect if invoked after Install().
-//   */
-//  void SetLongLabel (std::string longLabel);
-//
-//  /**
-//   * \return
-//   */
-//  std::string GetLongLabel () const;
 
   /**
    * \brief Identify the list of source of queue events.
@@ -154,9 +225,13 @@ private:
   std::string  m_shortLabel;    ///<
   std::string  m_longLabel;     ///<
 
-  double m_distributionMinValue;   ///<
-  double m_distributionMaxValue;   ///<
-  double m_distributionBinLength;  ///<
+  double m_bytesMinValue;   ///<
+  double m_bytesMaxValue;   ///<
+  double m_bytesBinLength;  ///<
+
+  double m_packetsMinValue;   ///<
+  double m_packetsMaxValue;   ///<
+  double m_packetsBinLength;  ///<
 
 }; // end of class SatStatsQueueHelper
 
@@ -177,6 +252,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsFwdQueueHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsQueueHelper base class
@@ -206,6 +284,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdQueueBytesHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 }; // end of class SatStatsFwdQueueBytesHelper
 
 
@@ -221,6 +302,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsFwdQueuePacketsHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 }; // end of class SatStatsFwdQueuePacketsHelper
 
@@ -239,6 +323,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnQueueHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsQueueHelper base class
@@ -265,6 +352,9 @@ public:
   /// Destructor.
   virtual ~SatStatsRtnQueueBytesHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 }; // end of class SatStatsRtnQueueBytesHelper
 
 
@@ -280,6 +370,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnQueuePacketsHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 }; // end of class SatStatsRtnQueuePacketsHelper
 

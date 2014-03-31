@@ -289,7 +289,7 @@ SatStatsHelperContainer::AddGlobal ## id (SatStatsHelper::OutputType_t type)  \
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
-        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-global-" + name                               \
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);            \
@@ -307,7 +307,7 @@ SatStatsHelperContainer::AddPerGw ## id (SatStatsHelper::OutputType_t type)   \
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
-        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-gw-" + name                               \
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);                \
@@ -325,7 +325,7 @@ SatStatsHelperContainer::AddPerBeam ## id (SatStatsHelper::OutputType_t type) \
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
-        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-beam-" + name                             \
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);              \
@@ -343,7 +343,7 @@ SatStatsHelperContainer::AddPerUt ## id (SatStatsHelper::OutputType_t type)   \
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
-        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-ut-" + name                               \
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                \
@@ -361,7 +361,7 @@ SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) 
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
-        = Create<SatStats ## id ## Helper> (m_satHelper);                     \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-ut-user_" + name                          \
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \

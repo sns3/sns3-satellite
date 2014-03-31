@@ -55,6 +55,8 @@ namespace ns3 {
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsQueueHelper);
+
 std::string // static
 SatStatsQueueHelper::GetUnitTypeName (SatStatsQueueHelper::UnitType_t unitType)
 {
@@ -80,9 +82,12 @@ SatStatsQueueHelper::SatStatsQueueHelper (Ptr<const SatHelper> satHelper)
     m_unitType (SatStatsQueueHelper::UNIT_BYTES),
     m_shortLabel (""),
     m_longLabel (""),
-    m_distributionMinValue (std::numeric_limits<double>::max ()),
-    m_distributionMaxValue (-std::numeric_limits<double>::max ()),
-    m_distributionBinLength (-1.0)
+    m_bytesMinValue (0.0),
+    m_bytesMaxValue (0.0),
+    m_bytesBinLength (0.0),
+    m_packetsMinValue (0.0),
+    m_packetsMaxValue (0.0),
+    m_packetsBinLength (0.0)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -91,6 +96,64 @@ SatStatsQueueHelper::SatStatsQueueHelper (Ptr<const SatHelper> satHelper)
 SatStatsQueueHelper::~SatStatsQueueHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsQueueHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsQueueHelper")
+    .SetParent<SatStatsHelper> ()
+    .AddAttribute ("PollInterval",
+                   "",
+                   TimeValue (MilliSeconds (10)),
+                   MakeTimeAccessor (&SatStatsQueueHelper::SetPollInterval,
+                                     &SatStatsQueueHelper::GetPollInterval),
+                   MakeTimeChecker ())
+    .AddAttribute ("BytesMinValue",
+                   "Configure the MinValue attribute of the histogram, PDF, "
+                   "and CDF output in bytes unit.",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatStatsQueueHelper::SetBytesMinValue,
+                                       &SatStatsQueueHelper::GetBytesMinValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("BytesMaxValue",
+                   "Configure the MaxValue attribute of the histogram, PDF, "
+                   "and CDF output in bytes unit.",
+                   DoubleValue (1000.0),
+                   MakeDoubleAccessor (&SatStatsQueueHelper::SetBytesMaxValue,
+                                       &SatStatsQueueHelper::GetBytesMaxValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("BytesBinLength",
+                   "Configure the BinLength attribute of the histogram, PDF, "
+                   "and CDF output in bytes unit.",
+                   DoubleValue (20.0),
+                   MakeDoubleAccessor (&SatStatsQueueHelper::SetBytesBinLength,
+                                       &SatStatsQueueHelper::GetBytesBinLength),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("PacketsMinValue",
+                   "Configure the MinValue attribute of the histogram, PDF, "
+                   "and CDF output in packets unit.",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatStatsQueueHelper::SetPacketsMinValue,
+                                       &SatStatsQueueHelper::GetPacketsMinValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("PacketsMaxValue",
+                   "Configure the MaxValue attribute of the histogram, PDF, "
+                   "and CDF output in packets unit.",
+                   DoubleValue (50.0),
+                   MakeDoubleAccessor (&SatStatsQueueHelper::SetPacketsMaxValue,
+                                       &SatStatsQueueHelper::GetPacketsMaxValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("PacketsBinLength",
+                   "Configure the BinLength attribute of the histogram, PDF, "
+                   "and CDF output in packets unit.",
+                   DoubleValue (1.0),
+                   MakeDoubleAccessor (&SatStatsQueueHelper::SetPacketsBinLength,
+                                       &SatStatsQueueHelper::GetPacketsBinLength),
+                   MakeDoubleChecker<double> ())
+  ;
+  return tid;
 }
 
 
@@ -105,17 +168,11 @@ SatStatsQueueHelper::SetUnitType (SatStatsQueueHelper::UnitType_t unitType)
     {
       m_shortLabel = "size_bytes";
       m_longLabel = "Queue size (in bytes)";
-      m_distributionMinValue = 0.0;
-      m_distributionMaxValue = 1000.0;
-      m_distributionBinLength = 20.0;
     }
   else if (unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
     {
       m_shortLabel = "num_packets";
       m_longLabel = "Queue size (in number of packets)";
-      m_distributionMinValue = 0.0;
-      m_distributionMaxValue = 50.0;
-      m_distributionBinLength = 1.0;
     }
   else
     {
@@ -131,56 +188,6 @@ SatStatsQueueHelper::GetUnitType () const
 }
 
 
-//void
-//SatStatsQueueHelper::SetShortLabel (std::string shortLabel)
-//{
-//  NS_LOG_FUNCTION (this << shortLabel);
-//
-//  if (IsInstalled () && (m_shortLabel != shortLabel))
-//    {
-//      NS_LOG_WARN (this << " cannot modify the current short label"
-//                        << " (" << m_shortLabel << ")"
-//                        << " because this instance have already been installed");
-//    }
-//  else
-//    {
-//      m_shortLabel = shortLabel;
-//    }
-//}
-//
-//
-//std::string
-//SatStatsQueueHelper::GetShortLabel () const
-//{
-//  return m_shortLabel;
-//}
-//
-//
-//void
-//SatStatsQueueHelper::SetLongLabel (std::string longLabel)
-//{
-//  NS_LOG_FUNCTION (this << longLabel);
-//
-//  if (IsInstalled () && (m_longLabel != longLabel))
-//    {
-//      NS_LOG_WARN (this << " cannot modify the current long label"
-//                        << " (" << m_longLabel << ")"
-//                        << " because this instance have already been installed");
-//    }
-//  else
-//    {
-//      m_longLabel = longLabel;
-//    }
-//}
-//
-//
-//std::string
-//SatStatsQueueHelper::GetLongLabel () const
-//{
-//  return m_longLabel;
-//}
-
-
 void
 SatStatsQueueHelper::SetPollInterval (Time pollInterval)
 {
@@ -193,6 +200,153 @@ Time
 SatStatsQueueHelper::GetPollInterval () const
 {
   return m_pollInterval;
+}
+
+
+void
+SatStatsQueueHelper::SetBytesMinValue (double minValue)
+{
+  NS_LOG_FUNCTION (this << minValue);
+  m_bytesMinValue = minValue;
+}
+
+
+double
+SatStatsQueueHelper::GetBytesMinValue () const
+{
+  return m_bytesMinValue;
+}
+
+
+void
+SatStatsQueueHelper::SetBytesMaxValue (double maxValue)
+{
+  NS_LOG_FUNCTION (this << maxValue);
+  m_bytesMaxValue = maxValue;
+}
+
+
+double
+SatStatsQueueHelper::GetBytesMaxValue () const
+{
+  return m_bytesMaxValue;
+}
+
+
+void
+SatStatsQueueHelper::SetBytesBinLength (double binLength)
+{
+  NS_LOG_FUNCTION (this << binLength);
+  m_bytesBinLength = binLength;
+}
+
+
+double
+SatStatsQueueHelper::GetBytesBinLength () const
+{
+  return m_bytesBinLength;
+}
+
+
+void
+SatStatsQueueHelper::SetPacketsMinValue (double minValue)
+{
+  NS_LOG_FUNCTION (this << minValue);
+  m_packetsMinValue = minValue;
+}
+
+
+double
+SatStatsQueueHelper::GetPacketsMinValue () const
+{
+  return m_packetsMinValue;
+}
+
+
+void
+SatStatsQueueHelper::SetPacketsMaxValue (double maxValue)
+{
+  NS_LOG_FUNCTION (this << maxValue);
+  m_packetsMaxValue = maxValue;
+}
+
+
+double
+SatStatsQueueHelper::GetPacketsMaxValue () const
+{
+  return m_packetsMaxValue;
+}
+
+
+void
+SatStatsQueueHelper::SetPacketsBinLength (double binLength)
+{
+  NS_LOG_FUNCTION (this << binLength);
+  m_packetsBinLength = binLength;
+}
+
+
+double
+SatStatsQueueHelper::GetPacketsBinLength () const
+{
+  return m_packetsBinLength;
+}
+
+
+double
+SatStatsQueueHelper::GetMinValue () const
+{
+  if (m_unitType == SatStatsQueueHelper::UNIT_BYTES)
+    {
+      return m_bytesMinValue;
+    }
+  else if (m_unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
+    {
+      return m_packetsMinValue;
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
+      return 0.0;
+    }
+}
+
+
+double
+SatStatsQueueHelper::GetMaxValue () const
+{
+  if (m_unitType == SatStatsQueueHelper::UNIT_BYTES)
+    {
+      return m_bytesMaxValue;
+    }
+  else if (m_unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
+    {
+      return m_packetsMaxValue;
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
+      return 0.0;
+    }
+}
+
+
+double
+SatStatsQueueHelper::GetBinLength () const
+{
+  if (m_unitType == SatStatsQueueHelper::UNIT_BYTES)
+    {
+      return m_bytesBinLength;
+    }
+  else if (m_unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
+    {
+      return m_packetsBinLength;
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
+      return 0.0;
+    }
 }
 
 
@@ -269,9 +423,9 @@ SatStatsQueueHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (GetMinValue ()));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (GetMaxValue ()));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (GetBinLength ()));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
@@ -337,9 +491,9 @@ SatStatsQueueHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_distributionMinValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_distributionMaxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_distributionBinLength));
+        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (GetMinValue ()));
+        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (GetMaxValue ()));
+        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (GetBinLength ()));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
              it != m_terminalCollectors.End (); ++it)
@@ -438,6 +592,8 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdQueueHelper);
+
 SatStatsFwdQueueHelper::SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper)
   : SatStatsQueueHelper (satHelper)
 {
@@ -448,6 +604,16 @@ SatStatsFwdQueueHelper::SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper)
 SatStatsFwdQueueHelper::~SatStatsFwdQueueHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdQueueHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdQueueHelper")
+    .SetParent<SatStatsQueueHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -555,6 +721,8 @@ SatStatsFwdQueueHelper::DoPoll ()
 
 // FORWARD LINK IN BYTES //////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdQueueBytesHelper);
+
 SatStatsFwdQueueBytesHelper::SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper)
   : SatStatsFwdQueueHelper (satHelper)
 {
@@ -569,7 +737,19 @@ SatStatsFwdQueueBytesHelper::~SatStatsFwdQueueBytesHelper ()
 }
 
 
+TypeId // static
+SatStatsFwdQueueBytesHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdQueueBytesHelper")
+    .SetParent<SatStatsFwdQueueHelper> ()
+  ;
+  return tid;
+}
+
+
 // FORWARD LINK IN PACKETS ////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdQueuePacketsHelper);
 
 SatStatsFwdQueuePacketsHelper::SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper)
   : SatStatsFwdQueueHelper (satHelper)
@@ -585,7 +765,19 @@ SatStatsFwdQueuePacketsHelper::~SatStatsFwdQueuePacketsHelper ()
 }
 
 
+TypeId // static
+SatStatsFwdQueuePacketsHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdQueuePacketsHelper")
+    .SetParent<SatStatsFwdQueueHelper> ()
+  ;
+  return tid;
+}
+
+
 // RETURN LINK ////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnQueueHelper);
 
 SatStatsRtnQueueHelper::SatStatsRtnQueueHelper (Ptr<const SatHelper> satHelper)
   : SatStatsQueueHelper (satHelper)
@@ -597,6 +789,16 @@ SatStatsRtnQueueHelper::SatStatsRtnQueueHelper (Ptr<const SatHelper> satHelper)
 SatStatsRtnQueueHelper::~SatStatsRtnQueueHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnQueueHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnQueueHelper")
+    .SetParent<SatStatsQueueHelper> ()
+  ;
+  return tid;
 }
 
 
@@ -658,6 +860,8 @@ SatStatsRtnQueueHelper::DoPoll ()
 
 // RETURN LINK IN BYTES ///////////////////////////////////////////////////////
 
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnQueueBytesHelper);
+
 SatStatsRtnQueueBytesHelper::SatStatsRtnQueueBytesHelper (Ptr<const SatHelper> satHelper)
   : SatStatsRtnQueueHelper (satHelper)
 {
@@ -672,7 +876,19 @@ SatStatsRtnQueueBytesHelper::~SatStatsRtnQueueBytesHelper ()
 }
 
 
+TypeId // static
+SatStatsRtnQueueBytesHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnQueueBytesHelper")
+    .SetParent<SatStatsRtnQueueHelper> ()
+  ;
+  return tid;
+}
+
+
 // RETURN LINK IN PACKETS /////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnQueuePacketsHelper);
 
 SatStatsRtnQueuePacketsHelper::SatStatsRtnQueuePacketsHelper (Ptr<const SatHelper> satHelper)
   : SatStatsRtnQueueHelper (satHelper)
@@ -685,6 +901,16 @@ SatStatsRtnQueuePacketsHelper::SatStatsRtnQueuePacketsHelper (Ptr<const SatHelpe
 SatStatsRtnQueuePacketsHelper::~SatStatsRtnQueuePacketsHelper ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnQueuePacketsHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnQueuePacketsHelper")
+    .SetParent<SatStatsRtnQueueHelper> ()
+  ;
+  return tid;
 }
 
 

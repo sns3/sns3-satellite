@@ -53,6 +53,39 @@ public:
   /// Destructor.
   virtual ~SatStatsDelayHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
+  /**
+   * \param minValue the MinValue attribute of the histogram, PDF, CDF output.
+   */
+  void SetMinValue (double minValue);
+
+  /**
+   * \return the MinValue attribute of the histogram, PDF, CDF output.
+   */
+  double GetMinValue () const;
+
+  /**
+   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output.
+   */
+  void SetMaxValue (double maxValue);
+
+  /**
+   * \return the MaxValue attribute of the histogram, PDF, CDF output.
+   */
+  double GetMaxValue () const;
+
+  /**
+   * \param binLength the BinLength attribute of the histogram, PDF, CDF output.
+   */
+  void SetBinLength (double binLength);
+
+  /**
+   * \return the BinLength attribute of the histogram, PDF, CDF output.
+   */
+  double GetBinLength () const;
+
   /**
    * \brief Set up several probes or other means of listeners and connect them
    *        to the collectors.
@@ -101,9 +134,9 @@ protected:
   std::map<const Address, uint32_t> m_identifierMap;
 
 private:
-  double m_distributionMinValue;   ///<
-  double m_distributionMaxValue;   ///<
-  double m_distributionBinLength;  ///<
+  double m_minValue;   ///< `MinValue` attribute.
+  double m_maxValue;   ///< `MaxValue` attribute.
+  double m_binLength;  ///< `BinLength` attribute.
 
 }; // end of class SatStatsFwdAppDelayHelper
 
@@ -137,6 +170,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsFwdAppDelayHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsDelayHelper base class
@@ -177,6 +213,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdDevDelayHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsDelayHelper base class
   virtual void DoInstallProbes ();
@@ -215,6 +254,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsFwdMacDelayHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsDelayHelper base class
@@ -255,6 +297,9 @@ public:
   /// Destructor.
   virtual ~SatStatsFwdPhyDelayHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsDelayHelper base class
   virtual void DoInstallProbes ();
@@ -293,6 +338,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnAppDelayHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
   /**
    * \brief Receive inputs from trace sources and determine the right collector
@@ -350,6 +398,9 @@ public:
   /// Destructor.
   virtual ~SatStatsRtnDevDelayHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsDelayHelper base class
   virtual void DoInstallProbes ();
@@ -385,6 +436,9 @@ public:
   /// Destructor.
   virtual ~SatStatsRtnMacDelayHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
 protected:
   // inherited from SatStatsDelayHelper base class
   virtual void DoInstallProbes ();
@@ -419,6 +473,9 @@ public:
 
   /// Destructor.
   virtual ~SatStatsRtnPhyDelayHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
 
 protected:
   // inherited from SatStatsDelayHelper base class

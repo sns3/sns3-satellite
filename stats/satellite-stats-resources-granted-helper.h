@@ -47,6 +47,39 @@ public:
   /// Destructor.
   virtual ~SatStatsResourcesGrantedHelper ();
 
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
+  /**
+   * \param minValue the MinValue attribute of the histogram, PDF, CDF output.
+   */
+  void SetMinValue (double minValue);
+
+  /**
+   * \return the MinValue attribute of the histogram, PDF, CDF output.
+   */
+  double GetMinValue () const;
+
+  /**
+   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output.
+   */
+  void SetMaxValue (double maxValue);
+
+  /**
+   * \return the MaxValue attribute of the histogram, PDF, CDF output.
+   */
+  double GetMaxValue () const;
+
+  /**
+   * \param binLength the BinLength attribute of the histogram, PDF, CDF output.
+   */
+  void SetBinLength (double binLength);
+
+  /**
+   * \return the BinLength attribute of the histogram, PDF, CDF output.
+   */
+  double GetBinLength () const;
+
 protected:
   // inherited from SatStatsHelper base class
   virtual void DoInstall ();
@@ -69,9 +102,9 @@ private:
   /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
-  double m_distributionMinValue;   ///<
-  double m_distributionMaxValue;   ///<
-  double m_distributionBinLength;  ///<
+  double m_minValue;   ///<
+  double m_maxValue;   ///<
+  double m_binLength;  ///<
 
 }; // end of class SatStatsResourcesGrantedHelper
 
