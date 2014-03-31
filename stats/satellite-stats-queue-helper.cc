@@ -508,7 +508,7 @@ SatStatsQueueHelper::DoInstall ()
       }
 
     default:
-      NS_FATAL_ERROR ("SatStatsRtnQueueBytesHelper - Invalid output type");
+      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid output type");
       break;
     }
 

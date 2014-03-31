@@ -41,6 +41,8 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - Add [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
+ * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
  * Also check the Doxygen documentation of this class for more information.
@@ -170,6 +172,21 @@ public:
 
   // Return link PHY-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
+
+  // Dedicated Access packet error rate statistics.
+  //SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (DaPacketError)
+
+  // Random Access Slotted ALOHA packet error rate statistics.
+  //SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketError)
+
+  // Random Access Slotted ALOHA packet collision rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketCollision)
+
+  // Random Access CRDSA packet error rate statistics.
+  //SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketError)
+
+  // Random Access CRDSA packet collision rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
 
   // Resources granted statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (ResourcesGranted)

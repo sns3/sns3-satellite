@@ -441,6 +441,67 @@ private:
   TracedCallback<double> m_sinrTrace;
 
   /**
+   * \brief `DaRx` trace source.
+   *
+   * Fired when a packet burst is received through Dedicated Channel.
+   *
+   * Contains the following information:
+   * - number of upper layer packets in the received packet burst;
+   * - the MAC48 address of the sender; and
+   * - whether a PHY error has occurred.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_daRxTrace;
+
+  /**
+   * \brief `SlottedAlohaRxCollision` trace source.
+   *
+   * Fired when a packet burst is received through Random Access Slotted ALOHA.
+   *
+   * Contains the following information:
+   * - number of upper layer packets in the received packet burst;
+   * - the MAC48 address of the sender; and
+   * - whether a collision has occurred.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_slottedAlohaRxCollisionTrace;
+
+  /**
+   * \brief `SlottedAlohaRxError` trace source.
+   *
+   * Fired when a packet burst is received through Random Access Slotted ALOHA.
+   *
+   * Contains the following information:
+   * - number of upper layer packets in the received packet burst;
+   * - the MAC48 address of the sender; and
+   * - whether a PHY error has occurred.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_slottedAlohaRxErrorTrace;
+
+  /**
+   * \brief `CrdsaReplicaRx` trace source.
+   *
+   * Fired when a CRDSA packet replica is received through Random Access CRDSA.
+   *
+   * Contains the following information:
+   * - number of upper layer packets in the received packet burst;
+   * - the MAC48 address of the sender; and
+   * - whether a collision has occurred.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_crdsaReplicaRxTrace;
+
+  /**
+   * \brief `CrdsaUniquePayloadRx` trace source.
+   *
+   * Fired when a unique CRDSA payload is received (after frame processing)
+   * through Random Access CRDSA.
+   *
+   * Contains the following information:
+   * - number of upper layer packets in the received packet burst;
+   * - the MAC48 address of the sender; and
+   * - whether a PHY error has occurred.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_crdsaUniquePayloadRxTrace;
+
+  /**
    * \brief Enable composite SINR output tracing
    */
   bool m_enableCompositeSinrOutputTrace;

@@ -25,6 +25,8 @@
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
+#include <ns3/satellite-stats-packet-collision-helper.h>
+//#include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-signalling-load-helper.h>
@@ -64,6 +66,8 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
+ * - [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
  * Also check the Doxygen documentation of this class for more information.
@@ -233,6 +237,26 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyThroughput,
                                         "return link PHY-level throughput statistics")
 
+    // Dedicated Access packet error rate statistics.
+//    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (DaPacketError,
+//                                        "Dedicated Access packet error rate statistics")
+
+    // Random Access Slotted ALOHA packet error rate statistics.
+//    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketError,
+//                                        "Random Access Slotted ALOHA packet error rate statistics")
+
+    // Random Access Slotted ALOHA packet collision rate statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketCollision,
+                                        "Random Access Slotted ALOHA packet collision rate statistics")
+
+    // Random Access CRDSA packet error rate statistics.
+//    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketError,
+//                                        "Random Access CRDSA packet error rate statistics")
+
+    // Random Access CRDSA packet collision rate statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketCollision,
+                                        "Random Access CRDSA packet collision rate statistics")
+
     // Resources granted statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (ResourcesGranted,
                                                "resources granted statistics")
@@ -276,6 +300,8 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - Add [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
+ * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
  * Also check the Doxygen documentation of this class for more information.
@@ -506,6 +532,36 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
+
+// Dedicated Access packet error rate statistics.
+//SAT_STATS_GLOBAL_METHOD_DEFINITION      (DaPacketError, "da-error")
+//SAT_STATS_PER_GW_METHOD_DEFINITION      (DaPacketError, "da-error")
+//SAT_STATS_PER_BEAM_METHOD_DEFINITION    (DaPacketError, "da-error")
+//SAT_STATS_PER_UT_METHOD_DEFINITION      (DaPacketError, "da-error")
+
+// Random Access Slotted ALOHA packet error rate statistics.
+//SAT_STATS_GLOBAL_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+//SAT_STATS_PER_GW_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+//SAT_STATS_PER_BEAM_METHOD_DEFINITION    (SlottedAlohaPacketError, "slotted-aloha-error")
+//SAT_STATS_PER_UT_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+
+// Random Access Slotted ALOHA packet collision rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (SlottedAlohaPacketCollision, "slotted-aloha-collision")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (SlottedAlohaPacketCollision, "slotted-aloha-collision")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (SlottedAlohaPacketCollision, "slotted-aloha-collision")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (SlottedAlohaPacketCollision, "slotted-aloha-collision")
+
+// Random Access CRDSA packet error rate statistics.
+//SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+//SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+//SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketError, "crdsa-error")
+//SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+
+// Random Access CRDSA packet collision rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketCollision, "crdsa-collision")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
 
 // Resources granted statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")

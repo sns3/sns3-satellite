@@ -198,7 +198,7 @@ SatStatsSignallingLoadHelper::DoInstall ()
       break;
 
     default:
-      NS_FATAL_ERROR ("SatStatsThroughputHelper - Invalid output type");
+      NS_FATAL_ERROR ("SatStatsSignallingLoadHelper - Invalid output type");
       break;
     }
 

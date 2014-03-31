@@ -165,6 +165,22 @@ SatPhyRxCarrier::GetTypeId (void)
     .AddTraceSource ("SinrTrace",
                      "The trace for composite SINR in dB",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrTrace))
+    .AddTraceSource ("DaRx",
+                     "Received a packet burst through Dedicated Channel",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace))
+    .AddTraceSource ("SlottedAlohaRxCollision",
+                     "Received a packet burst through Random Access Slotted ALOHA",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_slottedAlohaRxCollisionTrace))
+    .AddTraceSource ("SlottedAlohaRxError",
+                     "Received a packet burst through Random Access Slotted ALOHA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_slottedAlohaRxErrorTrace))
+    .AddTraceSource ("CrdsaReplicaRx",
+                     "Received a CRDSA packet replica through Random Access",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_crdsaReplicaRxTrace))
+    .AddTraceSource ("CrdsaUniquePayloadRx",
+                     "Received a unique CRDSA payload (after frame processing) "
+                     "through Random Access CRDSA",
+                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_crdsaUniquePayloadRxTrace))
   ;
   return tid;
 }
@@ -455,6 +471,8 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       NS_FATAL_ERROR ("SatPhyRxCarrier::EndRxData - No matching Rx params found");
     }
 
+  const uint32_t nPackets = iter->second.rxParams->m_packetsInBurst.size ();
+
   DecreaseNumOfRxState (iter->second.rxParams->m_txInfo.packetType);
 
   NS_ASSERT (m_rxMode == SatPhyRxCarrierConf::NORMAL && iter->second.rxParams->m_sinr != 0);
@@ -510,11 +528,33 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
           NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
           /// check for slotted aloha packet collisions
           phyError = ProcessSlottedAlohaCollisions (cSinr, iter->second.rxParams, iter->second.interferenceEvent);
+
+          if (nPackets > 0)
+            {
+              const bool hasCollision =
+                m_satInterference->HasCollision (iter->second.interferenceEvent);
+              m_slottedAlohaRxCollisionTrace (nPackets,                    // number of packets
+                                              iter->second.sourceAddress,  // sender address
+                                              hasCollision                 // collision flag
+                                              );
+              m_slottedAlohaRxErrorTrace (nPackets,                    // number of packets
+                                          iter->second.sourceAddress,  // sender address
+                                          phyError                     // error flag
+                                          );
+            }
         }
       else
         {
           /// check against link results
           phyError = CheckAgainstLinkResults (cSinr, iter->second.rxParams);
+
+          if (nPackets > 0)
+            {
+              m_daRxTrace (nPackets,                    // number of packets
+                           iter->second.sourceAddress,  // sender address
+                           phyError                     // error flag
+                           );
+            }
         }
 
       /// save 2nd link sinr value
@@ -547,6 +587,14 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       /// check for collisions
       params.hasCollision = m_satInterference->HasCollision (iter->second.interferenceEvent);
       params.packetHasBeenProcessed = false;
+
+      if (nPackets > 0)
+        {
+          m_crdsaReplicaRxTrace (nPackets,              // number of packets
+                                 params.sourceAddress,  // sender address
+                                 params.hasCollision    // collision flag
+                                 );
+        }
 
       AddCrdsaPacket (params);
     }
@@ -616,6 +664,11 @@ SatPhyRxCarrier::DoFrameEnd ()
                              results[i].ifPower,
                              results[i].cSinr);
 
+              /// CRDSA trace
+              m_crdsaUniquePayloadRxTrace (results[i].rxParams->m_packetsInBurst.size (),  // number of packets
+                                           results[i].sourceAddress,  // sender address
+                                           results[i].phyError        // error flag
+                                       );
               /// send packet upwards
               m_rxCallback (results[i].rxParams,
                             results[i].phyError);
