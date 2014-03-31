@@ -32,6 +32,7 @@
 #include "satellite-phy-rx-carrier-conf.h"
 #include <map>
 #include <list>
+#include <deque>
 
 namespace ns3 {
 
@@ -294,6 +295,29 @@ private:
                                       Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
 
   /**
+   *
+   */
+  void MeasureRandomAccessLoad ();
+
+  /**
+   *
+   * \return
+   */
+  double CalculateNormalizedOfferedRandomAccessLoad ();
+
+  /**
+   *
+   * \param measuredRandomAccessLoad
+   */
+  void SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad);
+
+  /**
+   *
+   * \return
+   */
+  double CalculateAverageNormalizedOfferedRandomAccessLoad ();
+
+  /**
    * \brief
    */
   std::map<uint32_t, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> > m_crdsaPacketContainer;
@@ -456,6 +480,31 @@ private:
    *
    */
   bool m_dropCollidingRandomAccessPackets;
+
+  /**
+   *
+   */
+  uint32_t m_randomAccessDynamicLoadControlMeasurementWindowSize;
+
+  /**
+   *
+   */
+  std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad;
+
+  /**
+   *
+   */
+  bool m_isLowRandomAccessLoad;
+
+  /**
+   *
+   */
+  double m_highRandomAccessLoadThreshold;
+
+  /**
+   *
+   */
+  bool m_isRandomAccessEnabledForThisCarrier;
 };
 
 }
