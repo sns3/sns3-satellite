@@ -524,6 +524,8 @@ SatStatsQueueHelper::DoInstall ()
 void
 SatStatsQueueHelper::EnlistSource ()
 {
+  NS_LOG_FUNCTION (this);
+
   // The method below is supposed to be implemented by the child class.
   DoEnlistSource ();
 }
@@ -532,6 +534,8 @@ SatStatsQueueHelper::EnlistSource ()
 void
 SatStatsQueueHelper::Poll ()
 {
+  NS_LOG_FUNCTION (this);
+
   // The method below is supposed to be implemented by the child class.
   DoPoll ();
 
@@ -543,6 +547,8 @@ SatStatsQueueHelper::Poll ()
 void
 SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
 {
+  //NS_LOG_FUNCTION (this << identifier << value);
+
   // Find the collector with the right identifier.
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
   NS_ASSERT_MSG (collector != 0,

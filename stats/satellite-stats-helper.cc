@@ -710,8 +710,8 @@ SatStatsHelper::GetGwSatNetDevice (Ptr<Node> gwNode)
 {
   NetDeviceContainer ret;
 
-  NS_LOG_DEBUG (" Node ID " << gwNode->GetId ()
-                          << " has " << gwNode->GetNDevices () << " devices");
+  NS_LOG_DEBUG ("Node ID " << gwNode->GetId ()
+                           << " has " << gwNode->GetNDevices () << " devices");
   /*
    * Assuming that device #0 is for loopback device, device #(N-1) is for
    * backbone network device, and devices #1 until #(N-2) are for satellite

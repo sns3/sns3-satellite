@@ -655,6 +655,20 @@ SatStatsFwdDevDelayHelper::DoInstallProbes ()
 
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
+  // Enable statistics-related tags on the transmitting device.
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != 0);
+          (*itDev)->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    }
+
 } // end of `void DoInstallProbes ();`
 
 
@@ -775,6 +789,25 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
 
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
+  // Enable statistics-related tags on the transmitting device.
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
+          Ptr<SatMac> satMac = satDev->GetMac ();
+          NS_ASSERT (satMac != 0);
+
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+          satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    }
+
 } // end of `void DoInstallProbes ();`
 
 
@@ -894,6 +927,25 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
         }
 
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
+
+  // Enable statistics-related tags on the transmitting device.
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
+          Ptr<SatPhy> satPhy = satDev->GetPhy ();
+          NS_ASSERT (satPhy != 0);
+
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    }
 
 } // end of `void DoInstallProbes ();`
 
@@ -1115,11 +1167,17 @@ SatStatsRtnDevDelayHelper::GetTypeId ()
 void
 SatStatsRtnDevDelayHelper::DoInstallProbes ()
 {
-  // Create a map of UT addresses and identifiers.
+  NS_LOG_FUNCTION (this);
+
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
+      // Create a map of UT addresses and identifiers.
       SaveAddressAndIdentifier (*it);
+
+      // Enable statistics-related tags and trace sources on the device.
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      dev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
     }
 
   // Connect to trace sources at GW nodes.
@@ -1191,11 +1249,22 @@ SatStatsRtnMacDelayHelper::GetTypeId ()
 void
 SatStatsRtnMacDelayHelper::DoInstallProbes ()
 {
-  // Create a map of UT addresses and identifiers.
+  NS_LOG_FUNCTION (this);
+
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
+      // Create a map of UT addresses and identifiers.
       SaveAddressAndIdentifier (*it);
+
+      // Enable statistics-related tags and trace sources on the device.
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+      Ptr<SatMac> satMac = satDev->GetMac ();
+      NS_ASSERT (satMac != 0);
+      satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+      satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
     }
 
   // Connect to trace sources at GW nodes.
@@ -1271,11 +1340,22 @@ SatStatsRtnPhyDelayHelper::GetTypeId ()
 void
 SatStatsRtnPhyDelayHelper::DoInstallProbes ()
 {
-  // Create a map of UT addresses and identifiers.
+  NS_LOG_FUNCTION (this);
+
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
+      // Create a map of UT addresses and identifiers.
       SaveAddressAndIdentifier (*it);
+
+      // Enable statistics-related tags and trace sources on the device.
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+      Ptr<SatPhy> satPhy = satDev->GetPhy ();
+      NS_ASSERT (satPhy != 0);
+      satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+      satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
     }
 
   // Connect to trace sources at GW nodes.
