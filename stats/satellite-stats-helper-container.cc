@@ -26,7 +26,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
-//#include <ns3/satellite-stats-packet-error-helper.h>
+#include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-signalling-load-helper.h>
@@ -238,20 +238,20 @@ SatStatsHelperContainer::GetTypeId ()
                                         "return link PHY-level throughput statistics")
 
     // Dedicated Access packet error rate statistics.
-//    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (DaPacketError,
-//                                        "Dedicated Access packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (DaPacketError,
+                                        "Dedicated Access packet error rate statistics")
 
     // Random Access Slotted ALOHA packet error rate statistics.
-//    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketError,
-//                                        "Random Access Slotted ALOHA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketError,
+                                        "Random Access Slotted ALOHA packet error rate statistics")
 
     // Random Access Slotted ALOHA packet collision rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketCollision,
                                         "Random Access Slotted ALOHA packet collision rate statistics")
 
     // Random Access CRDSA packet error rate statistics.
-//    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketError,
-//                                        "Random Access CRDSA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketError,
+                                        "Random Access CRDSA packet error rate statistics")
 
     // Random Access CRDSA packet collision rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketCollision,
@@ -534,16 +534,16 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 
 // Dedicated Access packet error rate statistics.
-//SAT_STATS_GLOBAL_METHOD_DEFINITION      (DaPacketError, "da-error")
-//SAT_STATS_PER_GW_METHOD_DEFINITION      (DaPacketError, "da-error")
-//SAT_STATS_PER_BEAM_METHOD_DEFINITION    (DaPacketError, "da-error")
-//SAT_STATS_PER_UT_METHOD_DEFINITION      (DaPacketError, "da-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (DaPacketError, "da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (DaPacketError, "da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (DaPacketError, "da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (DaPacketError, "da-error")
 
 // Random Access Slotted ALOHA packet error rate statistics.
-//SAT_STATS_GLOBAL_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
-//SAT_STATS_PER_GW_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
-//SAT_STATS_PER_BEAM_METHOD_DEFINITION    (SlottedAlohaPacketError, "slotted-aloha-error")
-//SAT_STATS_PER_UT_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (SlottedAlohaPacketError, "slotted-aloha-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
 
 // Random Access Slotted ALOHA packet collision rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (SlottedAlohaPacketCollision, "slotted-aloha-collision")
@@ -552,10 +552,10 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION    (SlottedAlohaPacketCollision, "slotted-a
 SAT_STATS_PER_UT_METHOD_DEFINITION      (SlottedAlohaPacketCollision, "slotted-aloha-collision")
 
 // Random Access CRDSA packet error rate statistics.
-//SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
-//SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
-//SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketError, "crdsa-error")
-//SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketError, "crdsa-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
 
 // Random Access CRDSA packet collision rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")

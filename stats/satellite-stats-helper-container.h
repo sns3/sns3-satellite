@@ -174,16 +174,16 @@ public:
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
 
   // Dedicated Access packet error rate statistics.
-  //SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (DaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (DaPacketError)
 
   // Random Access Slotted ALOHA packet error rate statistics.
-  //SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketError)
 
   // Random Access Slotted ALOHA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketCollision)
 
   // Random Access CRDSA packet error rate statistics.
-  //SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketError)
 
   // Random Access CRDSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
