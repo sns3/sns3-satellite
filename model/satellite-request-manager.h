@@ -159,6 +159,22 @@ private:
   SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcKBytes);
 
   /**
+   * Calculate the needed VBDC bytes for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \return uint32_t Requested VBDC kilobytes
+   */
+  uint32_t GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
+
+  /**
+   * Calculate the needed AVBDC bytes for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \return uint32_t Requested AVBDC kilobytes
+   */
+  uint32_t GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
+
+  /**
    * Calculate the pending RBDC requests related to a specific RC
    * \param rc Request class index
    * \return uint32_t Pending sum in kbps or Bytes
@@ -172,13 +188,17 @@ private:
    */
   void UpdatePendingRbdcCounters (uint8_t rc, uint32_t value);
 
+  void UpdatePendingVbdcCounters (uint8_t rc);
+
   /**
    * Send the capacity request control msg via txCallback to
    * SatNetDevice
    */
   void SendCapacityRequest (Ptr<SatCrMessage> crMsg);
 
-  void Reset ();
+  void ResetAssignedResources ();
+  void Reset (uint8_t rc);
+  void ResetAll ();
 
   /**
    * The queue enque/deque rate getter callback
@@ -241,12 +261,6 @@ private:
   std::vector<uint32_t> m_pendingVbdcBytes;
 
   /**
-   * Periodical VBDC resynchronization timer in superframes.
-   */
-  uint32_t m_vbdcResynchronizationTimer;
-  uint32_t m_vbdcResynchronizationCount;
-
-  /**
    * Node information
    */
   Ptr<SatNodeInfo> m_nodeInfo;
@@ -255,6 +269,11 @@ private:
    * Dedicated assignments received within the previous superframe
    */
   std::vector<uint32_t> m_assignedDaResourcesBytes;
+
+  /**
+   * Sum of VBDC volume in
+   */
+  std::vector<uint32_t> m_sumVbdcVolumeIn;
 
   /**
    * Trace callback used for CR tracing:
@@ -269,29 +288,6 @@ private:
    */
   TracedCallback< uint32_t> m_rbdcTrace;
   TracedCallback< uint32_t> m_vbdcTrace;
-
-  /**
-   * Note that there are 8 bits space in the control message for each
-   * request value. This means that by default the maximum size of the
-   * requested value (RBDC rate or VBDC bytes) is 256. A coding is needed
-   * to be able to have also higher values.
-   * - Small resolution: 8 - 1024 kbps
-   * - Larger resolution: 1024 - 9216 kbps
-   */
-
-  static const uint32_t M_RBDC_QUANTIZATION_STEP_SMALL_KBITPS = 8;
-  static const uint32_t M_RBDC_QUANTIZATION_STEP_LARGE_KBITPS = 64;
-  static const uint32_t M_RBDC_QUANTIZATION_THRESHOLD_KBITPS = 1024;
-  static const uint32_t M_RBDC_MAX_SERVICE_RATE_KBITPS = 9216;
-
-  /*
-   * Small resolution: 1 - 128 kB
-   * Larger resolution: 128 - 384 kB
-   */
-  static const uint32_t M_VBDC_QUANTIZATION_STEP_SMALL_KBYTES = 1;
-  static const uint32_t M_VBDC_QUANTIZATION_STEP_LARGE_KBYTES = 4;
-  static const uint32_t M_VBDC_QUANTIZATION_THRESHOLD_KBYTES = 128;
-  static const uint32_t M_VBDC_MAX_BACKLOG_KBYTES = 384;
 
 };
 
