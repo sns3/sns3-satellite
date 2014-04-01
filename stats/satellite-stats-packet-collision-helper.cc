@@ -29,6 +29,9 @@
 #include <ns3/node-container.h>
 #include <ns3/mac48-address.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy-rx-carrier.h>
 
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
@@ -245,7 +248,7 @@ SatStatsPacketCollisionHelper::DoInstall ()
                 {
                   NS_FATAL_ERROR ("Error connecting to "
                                   << GetTraceSourceName () << " trace source"
-                                  << " of SatNetDevice"
+                                  << " of SatPhyRxCarrier"
                                   << " at node ID " << (*it)->GetId ()
                                   << " device #" << (*itDev)->GetIfIndex ()
                                   << " RX carrier #" << itCarrier->first);

@@ -436,9 +436,13 @@ private:
 
 
   /**
-   * \brief A callback for transmission composite SINR at UT (BBFrame) or GW (time slot).
+   * \brief A callback for transmission composite SINR at UT (BBFrame) or GW
+   *        (time slot).
+   *
+   * The first argument is the SINR in dB. The second argument is the address
+   * of the node where the signal originates from.
    */
-  TracedCallback<double> m_sinrTrace;
+  TracedCallback<double, const Address &> m_sinrTrace;
 
   /**
    * \brief `DaRx` trace source.

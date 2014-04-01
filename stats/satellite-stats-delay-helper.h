@@ -138,7 +138,7 @@ private:
   double m_maxValue;   ///< `MaxValue` attribute.
   double m_binLength;  ///< `BinLength` attribute.
 
-}; // end of class SatStatsFwdAppDelayHelper
+}; // end of class SatStatsDelayHelper
 
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////

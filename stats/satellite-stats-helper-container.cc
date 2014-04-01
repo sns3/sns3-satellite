@@ -30,6 +30,7 @@
 #include <ns3/satellite-stats-queue-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-signalling-load-helper.h>
+#include <ns3/satellite-stats-sinr-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
@@ -64,6 +65,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
+ * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
@@ -168,6 +170,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdSignallingLoad,
                                         "forward link signalling load statistics")
 
+    // Forward link SINR statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdSinr,
+                                               "forward link SINR statistics")
+
     // Forward link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdAppThroughput,
                                         "forward link application-level throughput statistics")
@@ -217,6 +223,10 @@ SatStatsHelperContainer::GetTypeId ()
     // Return link signalling load statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnSignallingLoad,
                                         "return link signalling load statistics")
+
+    // Return link SINR statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnSinr,
+                                               "return link SINR statistics")
 
     // Return link application-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnAppThroughput,
@@ -298,6 +308,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
@@ -440,6 +451,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdSignallingLoad, "fwd-signalling-load
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdSignallingLoad, "fwd-signalling-load")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdSignallingLoad, "fwd-signalling-load")
 
+// Forward link SINR statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdSinr, "fwd-sinr")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdSinr, "fwd-sinr")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdSinr, "fwd-sinr")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdSinr, "fwd-sinr")
+
 // Forward link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdAppThroughput, "fwd-app-throughput")
@@ -507,6 +524,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnSignallingLoad, "rtn-signalling-load
 SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnSignallingLoad, "rtn-signalling-load")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnSignallingLoad, "rtn-signalling-load")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnSignallingLoad, "rtn-signalling-load")
+
+// Return link SINR statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnSinr, "rtn-sinr")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnSinr, "rtn-sinr")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnSinr, "rtn-sinr")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnSinr, "rtn-sinr")
 
 // Return link application-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")

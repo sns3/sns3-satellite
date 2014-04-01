@@ -122,6 +122,7 @@ def build(bld):
         'helper/satellite-user-helper.cc',
         'helper/satellite-ut-helper.cc',
         'helper/satellite-wave-form-conf.cc',
+        'stats/satellite-sinr-probe.cc',
         'stats/satellite-stats-helper.cc',
         'stats/satellite-stats-delay-helper.cc',
         'stats/satellite-stats-packet-collision-helper.cc',
@@ -129,6 +130,7 @@ def build(bld):
         'stats/satellite-stats-queue-helper.cc',
         'stats/satellite-stats-resources-granted-helper.cc',
         'stats/satellite-stats-signalling-load-helper.cc',
+        'stats/satellite-stats-sinr-helper.cc',
         'stats/satellite-stats-throughput-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
@@ -280,6 +282,7 @@ def build(bld):
         'helper/satellite-user-helper.h',
         'helper/satellite-ut-helper.h',
         'helper/satellite-wave-form-conf.h',
+        'stats/satellite-sinr-probe.h',
         'stats/satellite-stats-helper.h',
         'stats/satellite-stats-delay-helper.h',
         'stats/satellite-stats-packet-collision-helper.h',
@@ -287,6 +290,7 @@ def build(bld):
         'stats/satellite-stats-queue-helper.h',
         'stats/satellite-stats-resources-granted-helper.h',
         'stats/satellite-stats-signalling-load-helper.h',
+        'stats/satellite-stats-sinr-helper.h',
         'stats/satellite-stats-throughput-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]

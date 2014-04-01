@@ -162,7 +162,7 @@ SatPhyRxCarrier::GetTypeId (void)
     .AddTraceSource ("PacketTrace",
                      "The trace for calculated interferences of the received packets",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
-    .AddTraceSource ("SinrTrace",
+    .AddTraceSource ("Sinr",
                      "The trace for composite SINR in dB",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrTrace))
     .AddTraceSource ("DaRx",
@@ -515,7 +515,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
           NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
         }
 
-      m_sinrTrace (SatUtils::LinearToDb(cSinr));
+      m_sinrTrace (SatUtils::LinearToDb (cSinr), iter->second.sourceAddress);
 
       /// composite sinr output trace
       if (m_enableCompositeSinrOutputTrace)

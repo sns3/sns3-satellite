@@ -39,6 +39,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
+ * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
@@ -128,6 +129,9 @@ public:
   // Forward link signalling load statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdSignallingLoad)
 
+  // Forward link SINR statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdSinr)
+
   // Forward link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppThroughput)
 
@@ -160,6 +164,9 @@ public:
 
   // Return link signalling load statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnSignallingLoad)
+
+  // Return link SINR statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnSinr)
 
   // Return link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)
