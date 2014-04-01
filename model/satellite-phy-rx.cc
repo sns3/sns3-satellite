@@ -40,6 +40,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRx);
 
 SatPhyRx::SatPhyRx () :
+  m_beamId (),
   m_maxAntennaGain (),
   m_antennaLoss (),
   m_defaultFadingValue ()
@@ -202,10 +203,24 @@ SatPhyRx::SetCnoCallback (SatPhyRx::CnoCallback cb)
   NS_ASSERT (!m_rxCarriers.empty ());
 
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
-      it != m_rxCarriers.end();
+      it != m_rxCarriers.end ();
       ++it)
     {
-      (*it)->SetCnoCb(cb);
+      (*it)->SetCnoCb (cb);
+    }
+}
+
+void
+SatPhyRx::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (!m_rxCarriers.empty ());
+
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
+      it != m_rxCarriers.end ();
+      ++it)
+    {
+      (*it)->SetAverageNormalizedOfferedLoadCallback (cb);
     }
 }
 

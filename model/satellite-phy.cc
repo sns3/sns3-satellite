@@ -47,6 +47,9 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
   : m_eirpWoGainW (0),
+    m_beamId (0),
+    m_isStatisticsTagsEnabled (false),
+    m_rxNoiseTemperatureDbk (0),
     m_rxMaxAntennaGainDb (0),
     m_rxAntennaLossDb (0),
     m_txMaxAntennaGainDb (0),
@@ -63,6 +66,9 @@ SatPhy::SatPhy (void)
 
 SatPhy::SatPhy (CreateParam_t & params)
  : m_eirpWoGainW (0),
+   m_beamId (0),
+   m_isStatisticsTagsEnabled (false),
+   m_rxNoiseTemperatureDbk (0),
    m_rxMaxAntennaGainDb (0),
    m_rxAntennaLossDb (0),
    m_txMaxAntennaGainDb (0),
@@ -101,6 +107,10 @@ SatPhy::GetTypeId (void)
     .AddAttribute ("CnoCb", "The C/N0 info callback for this phy.",
                     CallbackValue (),
                     MakeCallbackAccessor (&SatPhy::m_cnoCallback),
+                    MakeCallbackChecker ())
+    .AddAttribute ("AverageNormalizedOfferedLoad", "The average offered random access load callback for this phy.",
+                    CallbackValue (),
+                    MakeCallbackAccessor (&SatPhy::m_avgNormalizedOfferedLoadCallback),
                     MakeCallbackChecker ())
     .AddAttribute ("EnableStatisticsTags",
                    "If true, some tags will be added to each transmitted packet to assist with statistics computation",
@@ -152,6 +162,11 @@ SatPhy::Initialize ()
   if ( m_cnoCallback.IsNull () == false )
     {
       m_phyRx->SetCnoCallback ( MakeCallback (&SatPhy::CnoInfo, this) );
+    }
+
+  if ( m_avgNormalizedOfferedLoadCallback.IsNull () == false )
+    {
+      m_phyRx->SetAverageNormalizedOfferedLoadCallback ( MakeCallback (&SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo, this) );
     }
 
   m_phyTx->SetMaxAntennaGain_Db (m_txMaxAntennaGainDb);
@@ -417,6 +432,12 @@ SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno)
   m_cnoCallback ( beamId, source, dest, cno);
 }
 
+void
+SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad)
+{
+  NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (beamId, carrierId, averageNormalizedOfferedLoad);
+}
 
 
 } // namespace ns3

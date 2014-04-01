@@ -59,9 +59,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_rxPacketCounter (0),
    m_dropCollidingRandomAccessPackets (carrierConf->AreCollidingRandomAccessPacketsAlwaysDropped ()),
    m_randomAccessDynamicLoadControlMeasurementWindowSize (10), /// TODO change this to parameter
-   m_isLowRandomAccessLoad (true), /// TODO change this to parameter
-   m_highRandomAccessLoadThreshold (0.5), /// TODO change this to parameter
-   m_isRandomAccessEnabledForThisCarrier (true) /// TODO change this to parameter
+   m_isRandomAccessEnabledForThisCarrier (false), /// TODO change this to parameter
+   m_randomAccessBitsInFrame (0)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -131,16 +130,27 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // Configured channel estimation error
   m_channelEstimationError = carrierConf->GetChannelEstimatorErrorContainer ();
 
-  Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
-
-  if (Now () >= nextSuperFrameRxTime)
+  /// TODO remove this once the parameter is properly initialized!!!
+  if (m_carrierId == 10)
     {
-      NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
+      m_isRandomAccessEnabledForThisCarrier = true;
     }
 
-  Time schedulingDelay = nextSuperFrameRxTime - Now ();
+  /// frame end scheduling is at the moment needed only for Random Access
+  if (m_isRandomAccessEnabledForThisCarrier && m_rxMode == SatPhyRxCarrierConf::NORMAL)
+    {
+      /// TODO get rid of the hard coded 0
+      Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
 
-  Simulator::Schedule (schedulingDelay, &SatPhyRxCarrier::DoFrameEnd, this);
+      if (Now () >= nextSuperFrameRxTime)
+        {
+          NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
+        }
+
+      Time schedulingDelay = nextSuperFrameRxTime - Now ();
+
+      Simulator::Schedule (schedulingDelay, &SatPhyRxCarrier::DoFrameEnd, this);
+    }
 }
 
 
@@ -190,11 +200,13 @@ SatPhyRxCarrier::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_rxCallback.Nullify();
-  m_cnoCallback.Nullify();
-  m_sinrCalculate.Nullify();
+  m_rxCallback.Nullify ();
+  m_cnoCallback.Nullify ();
+  m_sinrCalculate.Nullify ();
+  m_avgNormalizedOfferedLoadCallback.Nullify ();
   m_satInterference = NULL;
   m_uniformVariable = NULL;
+  m_randomAccessDynamicLoadControlNormalizedOfferedLoad.clear ();
 
   std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter;
 
@@ -465,6 +477,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
   NS_ASSERT (m_state == RX);
 
   std::map<uint32_t,rxParams_s>::iterator iter = m_rxParamsMap.find (key);
+  SatSignalParameters::PacketsInBurst_t::iterator it;
 
   if (iter == m_rxParamsMap.end ())
     {
@@ -526,6 +539,12 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       if (iter->second.rxParams->m_txInfo.packetType == SatEnums::SLOTTED_ALOHA_PACKET)
         {
           NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
+
+          for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
+            {
+              m_randomAccessBitsInFrame += ((*it)->GetSize () * SatUtils::BITS_PER_BYTE);
+            }
+
           /// check for slotted aloha packet collisions
           phyError = ProcessSlottedAlohaCollisions (cSinr, iter->second.rxParams, iter->second.interferenceEvent);
 
@@ -588,6 +607,11 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       params.hasCollision = m_satInterference->HasCollision (iter->second.interferenceEvent);
       params.packetHasBeenProcessed = false;
 
+      for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
+        {
+          m_randomAccessBitsInFrame += ((*it)->GetSize () * SatUtils::BITS_PER_BYTE);
+        }
+
       if (nPackets > 0)
         {
           m_crdsaReplicaRxTrace (nPackets,              // number of packets
@@ -636,65 +660,56 @@ SatPhyRxCarrier::DoFrameEnd ()
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("SatPhyRxCarrier::DoFrameEnd");
 
-  if (m_isRandomAccessEnabledForThisCarrier)
+  NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Time: " << Now ().GetSeconds ());
+
+  MeasureRandomAccessLoad ();
+
+  if (m_crdsaPacketContainer.size () > 0)
     {
-      MeasureRandomAccessLoad ();
+      NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Packets in container, will process the frame");
+
+      std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> results = ProcessFrame ();
 
       if (m_crdsaPacketContainer.size () > 0)
         {
-          NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Packets in container, will process the frame");
+          NS_FATAL_ERROR("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
+        }
 
-          std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> results = ProcessFrame ();
+      for (uint32_t i = 0; i < results.size (); i++)
+        {
+          NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Sending a packet to the next layer, slot: " << results[i].ownSlotId
+              << " error: " << results[i].phyError
+              << " SINR: " << results[i].cSinr);
 
-          if (m_crdsaPacketContainer.size () > 0)
-            {
-              NS_FATAL_ERROR ("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
-            }
-
-          for (uint32_t i = 0; i < results.size (); i++)
-            {
-              NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Sending a packet to the next layer, slot: " << results[i].ownSlotId
-                           << " error: " << results[i].phyError
-                           << " SINR: " << results[i].cSinr);
-
-              /// uses composite sinr
-              m_packetTrace (results[i].rxParams,
-                             m_ownAddress,
-                             results[i].destAddress,
-                             results[i].ifPower,
-                             results[i].cSinr);
-
-              /// CRDSA trace
-              m_crdsaUniquePayloadRxTrace (results[i].rxParams->m_packetsInBurst.size (),  // number of packets
-                                           results[i].sourceAddress,  // sender address
-                                           results[i].phyError        // error flag
+          /// uses composite sinr
+          m_packetTrace (results[i].rxParams,
+                         m_ownAddress,
+                         results[i].destAddress,
+                         results[i].ifPower,
+                         results[i].cSinr);
+          /// CRDSA trace
+          m_crdsaUniquePayloadRxTrace (results[i].rxParams->m_packetsInBurst.size (),  // number of packets
+                                       results[i].sourceAddress,  // sender address
+                                       results[i].phyError        // error flag
                                        );
-              /// send packet upwards
-              m_rxCallback (results[i].rxParams,
-                            results[i].phyError);
+          /// send packet upwards
+          m_rxCallback (results[i].rxParams,
+                        results[i].phyError);
 
-              /// uses composite sinr
-              if (!m_cnoCallback.IsNull ())
-                {
-                  double cno = results[i].cSinr * m_rxBandwidthHz;
-                  m_cnoCallback (results[i].rxParams->m_beamId,
-                                 results[i].sourceAddress,
-                                 m_ownAddress,
-                                 cno);
-                }
-
-              results[i].rxParams = NULL;
+          /// uses composite sinr
+          if (!m_cnoCallback.IsNull ())
+            {
+              double cno = results[i].cSinr * m_rxBandwidthHz;
+              m_cnoCallback (results[i].rxParams->m_beamId,
+                             results[i].sourceAddress,
+                             m_ownAddress,
+                             cno);
             }
 
-          results.clear ();
+          results[i].rxParams = NULL;
         }
-    }
-  else
-    {
-      if (m_crdsaPacketContainer.size () > 0)
-        {
-          NS_FATAL_ERROR ("SatPhyRxCarrier::DoFrameEnd  - CRDSA packets received when RA is disabled");
-        }
+
+      results.clear ();
     }
 
   /// TODO get rid of the hard coded 0
@@ -716,6 +731,8 @@ SatPhyRxCarrier::MeasureRandomAccessLoad ()
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("SatPhyRxCarrier::MeasureRandomAccessLoad");
 
+  NS_LOG_INFO ("SatPhyRxCarrier::MeasureRandomAccessLoad - Time: " << Now ().GetSeconds ());
+
   /// calculate the load for this frame
   double normalizedOfferedLoad = CalculateNormalizedOfferedRandomAccessLoad ();
 
@@ -725,32 +742,9 @@ SatPhyRxCarrier::MeasureRandomAccessLoad ()
   /// calculate the average load over the measurement window
   double averageNormalizedOfferedLoad = CalculateAverageNormalizedOfferedRandomAccessLoad ();
 
-  /// low RA load in effect
-  if (m_isLowRandomAccessLoad)
-    {
-      /// check the load against the parameterized value
-      if (averageNormalizedOfferedLoad >= m_highRandomAccessLoadThreshold)
-        {
-          /// use high load back off value
-          // trigger control packet creation with high load settings
+  NS_LOG_INFO ("SatPhyRxCarrier::MeasureRandomAccessLoad - Average normalized offered load: " << averageNormalizedOfferedLoad);
 
-          /// flag RA load as high load
-          m_isLowRandomAccessLoad = false;
-        }
-    }
-  /// high RA load in effect
-  else
-    {
-      /// check the load against the parameterized value
-      if (averageNormalizedOfferedLoad < m_highRandomAccessLoadThreshold)
-        {
-          /// use low load back off value
-          // trigger control packet creation with low load settings
-
-          /// flag RA load as low load
-          m_isLowRandomAccessLoad = true;
-        }
-    }
+  m_avgNormalizedOfferedLoadCallback (m_beamId, m_carrierId, averageNormalizedOfferedLoad);
 }
 
 double
@@ -759,7 +753,24 @@ SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad ()
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad");
 
-  return 0.5;
+  NS_LOG_INFO ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad - Time: " << Now ().GetSeconds ());
+
+  SatSignalParameters::PacketsInBurst_t::iterator iterPackets;
+
+  /// TODO get rid of the hard coded 0
+  Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (0);
+
+  double normalizedOfferedLoad = (m_randomAccessBitsInFrame / superFrameDuration.GetSeconds ()) / m_rxBandwidthHz;
+
+  NS_LOG_INFO ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad - bits: " << m_randomAccessBitsInFrame
+               << ", frame length in seconds: " << superFrameDuration.GetSeconds ()
+               << ", bandwidth in Hz: " << m_rxBandwidthHz
+               << ", normalized offered load (bps/Hz): " << normalizedOfferedLoad);
+
+  /// reset the counter
+  m_randomAccessBitsInFrame = 0;
+
+  return normalizedOfferedLoad;
 }
 
 void
@@ -767,6 +778,8 @@ SatPhyRxCarrier::SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad");
+
+  NS_LOG_INFO ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
   m_randomAccessDynamicLoadControlNormalizedOfferedLoad.push_back (measuredRandomAccessLoad);
 
@@ -782,6 +795,8 @@ SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad ()
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad");
 
+  NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad - Time: " << Now ().GetSeconds ());
+
   double sum = 0.0;
   double averageNormalizedOfferedLoad = 0.0;
   std::deque<double>::iterator it;
@@ -795,6 +810,8 @@ SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad ()
     {
       averageNormalizedOfferedLoad = sum / m_randomAccessDynamicLoadControlNormalizedOfferedLoad.size ();
     }
+
+  NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad - average normalized offered load: " << averageNormalizedOfferedLoad);
 
   return averageNormalizedOfferedLoad;
 }
@@ -1502,6 +1519,15 @@ SatPhyRxCarrier::HaveSameSlotIds (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
     }
 
   return HaveSameSlotIds;
+}
+
+void
+SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback)
+{
+  NS_LOG_FUNCTION (this << &callback);
+  NS_LOG_LOGIC ("SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback - Time: " << Now ().GetSeconds ());
+
+  m_avgNormalizedOfferedLoadCallback = callback;
 }
 
 }

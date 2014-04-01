@@ -151,6 +151,11 @@ public:
   typedef Callback<void, uint32_t, Address, Address, double > CnoCallback;
 
   /**
+   *
+   */
+  typedef Callback<void,uint32_t,uint32_t,double > AverageNormalizedOfferedLoadCallback;
+
+  /**
    * Set the upper layer receive callback
    * \param cb receive callback funtion pointer
    */
@@ -161,6 +166,12 @@ public:
    * \param cb receive callback funtion pointer
    */
   void SetCnoCallback (SatPhyRx::CnoCallback cb);
+
+  /**
+   *
+   * \param cb
+   */
+  void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb);
 
    /**
     * \brief Get MAC address of this PHY/MAC

@@ -73,6 +73,13 @@ public:
   typedef Callback<void, uint32_t, Address, Address, double> CnoCallback;
 
   /**
+   * \param
+   * \param
+   * \param
+   */
+  typedef Callback<void,uint32_t,uint32_t,double> AverageNormalizedOfferedLoadCallback;
+
+  /**
    * \brief Creation parameters for base PHY object
    */
   typedef struct
@@ -331,6 +338,14 @@ public:
   void CnoInfo (uint32_t beamId, Address source, Address destination, double cno);
 
   /**
+   *
+   * \param beamId Beam id of average normalized load is received
+   * \param carrierId Carrier id of average normalized load is received
+   * \param averageNormalizedOfferedLoad Value of average normalized offered load
+   */
+  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad);
+
+  /**
    * \brief Set the node info class
    * \param nodeInfo Node information related to this SatPhy
    */
@@ -384,12 +399,20 @@ protected:
 
 private:
 
+  /**
+   * Beam ID
+   */
   uint32_t m_beamId;
 
   /**
    * The C/N0 info callback
    */
   SatPhy::CnoCallback m_cnoCallback;
+
+  /**
+   *
+   */
+  SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
 
   /**
    * `EnableStatisticsTags` attribute.

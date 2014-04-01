@@ -88,6 +88,14 @@ public:
   void UtCnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
 
   /**
+   *
+   * \param beamId
+   * \param carrierId
+   * \param averageNormalizedOfferedLoad
+   */
+  void DoRandomAccessDynamicLoad (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad);
+
+  /**
    * Capacity request receiver.
    *
    * The SatNcc receives Capacity Rrequest (CR) messages from UTs

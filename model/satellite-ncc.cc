@@ -86,6 +86,49 @@ SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cn
 }
 
 void
+SatNcc::DoRandomAccessDynamicLoad (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad)
+{
+  NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
+
+  /// TODO fix these
+  bool m_isLowRandomAccessLoad = true;
+  double m_highRandomAccessLoadThreshold = 0.5;
+
+  NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Measuring the average normalized offered random access load");
+
+  /// low RA load in effect
+  if (m_isLowRandomAccessLoad)
+    {
+      /// check the load against the parameterized value
+      if (averageNormalizedOfferedLoad >= m_highRandomAccessLoadThreshold)
+        {
+          /// use high load back off value
+          // create high load parameterization control packet
+
+          NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Switching to HIGH LOAD back off parameterization");
+
+          /// flag RA load as high load
+          m_isLowRandomAccessLoad = false;
+        }
+    }
+  /// high RA load in effect
+  else
+    {
+      /// check the load against the parameterized value
+      if (averageNormalizedOfferedLoad < m_highRandomAccessLoadThreshold)
+        {
+          /// use low load back off value
+          // create low load parameterization control packet
+
+          NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Switching to LOW LOAD back off parameterization");
+
+          /// flag RA load as low load
+          m_isLowRandomAccessLoad = true;
+        }
+    }
+}
+
+void
 SatNcc::UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (this << beamId << utId << crMsg);

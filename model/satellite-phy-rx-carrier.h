@@ -142,6 +142,12 @@ public:
    */
   void SetCnoCb(SatPhyRx::CnoCallback cb);
 
+  /**
+   * \brief Function for setting the AverageNormalizedOfferedLoadCallback callback
+   * \param callback callback
+   */
+  void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
+
 private:
 
   /**
@@ -392,6 +398,11 @@ private:
   SatPhy::CnoCallback m_cnoCallback;
 
   /**
+   *
+   */
+  SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
+
+  /**
    * \brief Address of the device owning this object.
    */
   Mac48Address m_ownAddress;
@@ -559,17 +570,12 @@ private:
   /**
    *
    */
-  bool m_isLowRandomAccessLoad;
-
-  /**
-   *
-   */
-  double m_highRandomAccessLoadThreshold;
-
-  /**
-   *
-   */
   bool m_isRandomAccessEnabledForThisCarrier;
+
+  /**
+   *
+   */
+  uint32_t m_randomAccessBitsInFrame;
 };
 
 }
