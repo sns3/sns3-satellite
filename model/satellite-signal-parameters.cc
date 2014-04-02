@@ -68,6 +68,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_txInfo.modCod = p.m_txInfo.modCod;
   m_txInfo.waveformId = p.m_txInfo.waveformId;
   m_txInfo.packetType = p.m_txInfo.packetType;
+  m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;
   m_rxPowerInSatellite_W = p.m_rxPowerInSatellite_W;
   m_ifPower_W = p.m_ifPower_W;
   m_ifPowerInSatellite_W = p.m_ifPowerInSatellite_W;

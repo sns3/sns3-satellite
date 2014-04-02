@@ -92,7 +92,8 @@ SatUtMac::SatUtMac ()
    m_timingAdvanceCb (0),
    m_randomAccess (NULL),
    m_guardTime (MicroSeconds (1)),
-   m_raChannel (0)
+   m_raChannel (0),
+   crdsaUniquePacketId (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -105,7 +106,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
    m_superframeSeq (seq),
    m_timingAdvanceCb (0),
    m_guardTime (MicroSeconds (1)),
-   m_raChannel (0)
+   m_raChannel (0),
+   crdsaUniquePacketId (0)
 {
 	NS_LOG_FUNCTION (this);
 
@@ -908,6 +910,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           txInfo.packetType = SatEnums::CRDSA_PACKET;
           txInfo.modCod = wf->GetModCod ();
           txInfo.waveformId = wf->GetWaveformId ();
+          txInfo.crdsaUniquePacketId = crdsaUniquePacketId;
 
           /// schedule transmission
           Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
@@ -915,6 +918,8 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
         }
       replicas.clear ();
       tags.clear ();
+
+      crdsaUniquePacketId++;
     }
 }
 
@@ -1020,6 +1025,9 @@ SatUtMac::DoFrameStart ()
 
   if (m_randomAccess != NULL)
     {
+      /// reset packet ID counter for this frame
+      crdsaUniquePacketId = 0;
+
       /// execute CRDSA trigger
       DoRandomAccess (SatEnums::RA_CRDSA_TRIGGER);
     }

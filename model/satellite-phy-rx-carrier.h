@@ -148,6 +148,14 @@ public:
    */
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
 
+  /**
+   *
+   * \param obj1
+   * \param obj2
+   * \return
+   */
+  static bool CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s obj1, SatPhyRxCarrier::crdsaPacketRxParams_s obj2);
+
 private:
 
   /**

@@ -408,6 +408,11 @@ private:
    * Assigned TBTP resources in superframe for this UT (in bytes).
    */
   TracedCallback<uint32_t> m_tbtpResourcesTrace;
+
+  /**
+   * CRDSA packet ID (per frame)
+   */
+  uint8_t crdsaUniquePacketId;
 };
 
 } // namespace ns3

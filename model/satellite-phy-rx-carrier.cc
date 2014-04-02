@@ -19,7 +19,7 @@
  */
 
 #include <math.h>
-
+#include <algorithm>
 #include "ns3/log.h"
 #include "ns3/object.h"
 #include "ns3/simulator.h"
@@ -675,11 +675,16 @@ SatPhyRxCarrier::DoFrameEnd ()
           NS_FATAL_ERROR("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
         }
 
+      /// sort the results based on CRDSA packet IDs to make sure the packets are processed in correct order
+      std::sort (results.begin (), results.end (), CompareCrdsaPacketId);
+
       for (uint32_t i = 0; i < results.size (); i++)
         {
           NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Sending a packet to the next layer, slot: " << results[i].ownSlotId
-              << " error: " << results[i].phyError
-              << " SINR: " << results[i].cSinr);
+                       << ", UT: " << results[i].sourceAddress
+                       << ", unique packet ID: " << results[i].rxParams->m_txInfo.crdsaUniquePacketId
+                       << ", error: " << results[i].phyError
+                       << ", SINR: " << results[i].cSinr);
 
           /// uses composite sinr
           m_packetTrace (results[i].rxParams,
@@ -1528,6 +1533,12 @@ SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNorma
   NS_LOG_LOGIC ("SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback - Time: " << Now ().GetSeconds ());
 
   m_avgNormalizedOfferedLoadCallback = callback;
+}
+
+bool
+SatPhyRxCarrier::CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s obj1, SatPhyRxCarrier::crdsaPacketRxParams_s obj2)
+{
+  return (bool) (obj1.rxParams->m_txInfo.crdsaUniquePacketId < obj2.rxParams->m_txInfo.crdsaUniquePacketId);
 }
 
 }
