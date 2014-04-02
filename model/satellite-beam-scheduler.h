@@ -123,6 +123,13 @@ public:
    */
   void UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg);
 
+  /**
+   *
+   * \param packet
+   * \return
+   */
+  bool Send (Ptr<SatControlMessage> packet);
+
 private:
   // UT information helper class for SatBeamScheduler
   class SatUtInfo : public SimpleRefCount<SatUtInfo>
@@ -272,7 +279,6 @@ private:
   SatBeamScheduler (const SatBeamScheduler &);
 
   void DoDispose (void);
-  bool Send ( Ptr<SatControlMessage> packet );
   void Schedule ();
 
   void UpdateDamaEntriesWithReqs ();

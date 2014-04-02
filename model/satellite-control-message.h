@@ -511,6 +511,74 @@ private:
 
 };
 
+/**
+ * \ingroup satellite
+ * \brief Random access load control message
+ * (Tagged by SatControlMsgTag with type value SAT_RA_CTRL_MSG)
+ */
+
+class SatRaMessage : public SatControlMessage
+{
+public:
+
+  /**
+   * Constructor for SatRaMessage
+   */
+  SatRaMessage ();
+
+  /**
+   * Destructor for SatRaMessage
+   */
+  ~SatRaMessage ();
+
+  // methods derived from base classes
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_RA_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_RA_CTRL_MSG; }
+
+  /**
+   *
+   * \return
+   */
+  uint16_t GetBackoffProbability () const;
+
+  /**
+   *
+   * \param backoffProbability
+   */
+  void SetBackoffProbability (uint16_t backoffProbability);
+
+  /**
+   * Get real size of the random access message, which can be used to e.g. simulate real size.
+   * \return Real size of the random access message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+
+  /**
+   * Type field of the random access control element
+   */
+  static const uint32_t RA_CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES = 1;
+
+  /**
+   * Common header of the random access control element
+   */
+  static const uint32_t RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES = 3;
+
+  /**
+   *
+   */
+  uint16_t m_backoffProbability;
+};
+
+
 
 } // namespace ns3
 

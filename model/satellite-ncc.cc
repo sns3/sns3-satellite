@@ -54,7 +54,10 @@ SatNcc::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatNcc::SatNcc ()
+SatNcc::SatNcc () :
+  m_randomAccessHighLoadThreshold (1.0),
+  m_lowLoadBackOffProbability (0),
+  m_highLoadBackOffProbability (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -68,6 +71,9 @@ void
 SatNcc::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_isLowRandomAccessLoad.clear ();
+
   Object::DoDispose ();
 }
 
@@ -86,46 +92,88 @@ SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cn
 }
 
 void
-SatNcc::DoRandomAccessDynamicLoad (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad)
+SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad)
 {
   NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
 
-  /// TODO fix these
-  bool m_isLowRandomAccessLoad = true;
-  double m_highRandomAccessLoadThreshold = 0.5;
+  bool isLowRandomAccessLoad = true;
+  std::map<uint32_t,bool>::iterator findResult;
+  std::pair<std::map<uint32_t,bool>::iterator,bool> insertResult;
+
+  findResult = m_isLowRandomAccessLoad.find (beamId);
+
+  if (findResult == m_isLowRandomAccessLoad.end ())
+    {
+      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (beamId,isLowRandomAccessLoad));
+
+      if (!insertResult.second)
+        {
+          NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoad - Insert failed");
+        }
+      else
+        {
+          isLowRandomAccessLoad = insertResult.second;
+        }
+    }
+  else
+    {
+      isLowRandomAccessLoad = findResult->second;
+    }
 
   NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Measuring the average normalized offered random access load: " << averageNormalizedOfferedLoad);
 
   /// low RA load in effect
-  if (m_isLowRandomAccessLoad)
+  if (isLowRandomAccessLoad)
     {
       /// check the load against the parameterized value
-      if (averageNormalizedOfferedLoad >= m_highRandomAccessLoadThreshold)
+      if (averageNormalizedOfferedLoad >= m_randomAccessHighLoadThreshold)
         {
           /// use high load back off value
-          // create high load parameterization control packet
+          CreateRandomAccessLoadControlMessage (m_highLoadBackOffProbability, beamId);
 
           NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Switching to HIGH LOAD back off parameterization");
 
           /// flag RA load as high load
-          m_isLowRandomAccessLoad = false;
+          m_isLowRandomAccessLoad.at (beamId) = false;
         }
     }
   /// high RA load in effect
   else
     {
       /// check the load against the parameterized value
-      if (averageNormalizedOfferedLoad < m_highRandomAccessLoadThreshold)
+      if (averageNormalizedOfferedLoad < m_randomAccessHighLoadThreshold)
         {
           /// use low load back off value
-          // create low load parameterization control packet
+          CreateRandomAccessLoadControlMessage (m_lowLoadBackOffProbability, beamId);
 
           NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Switching to LOW LOAD back off parameterization");
 
           /// flag RA load as low load
-          m_isLowRandomAccessLoad = true;
+          m_isLowRandomAccessLoad.at (beamId) = true;
         }
     }
+}
+
+void
+SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_LOGIC ("SatNcc::CreateRandomAccessLoadControlMessage");
+
+  Ptr<SatRaMessage> raMsg = CreateObject<SatRaMessage> ();
+  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
+
+  if ( iterator == m_beamSchedulers.end () )
+    {
+      NS_FATAL_ERROR ( "SatNcc::SendRaControlMessage - Beam scheduler not found" );
+    }
+
+  raMsg->SetBackoffProbability (backoffProbability);
+
+  NS_LOG_INFO ("SatNcc::CreateRandomAccessLoadControlMessage - Send random access control message");
+
+  iterator->second->Send (raMsg);
 }
 
 void

@@ -254,7 +254,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   SatPhy::CnoCallback cnoCb = MakeCallback (&SatNcc::UtCnoUpdated, ncc);
 
   // Attach the NCC random access load update to Phy
-  SatPhy::AverageNormalizedOfferedLoadCallback avgNormalizedOfferedLoadCb = MakeCallback (&SatNcc::DoRandomAccessDynamicLoad, ncc);
+  SatPhy::AverageNormalizedOfferedLoadCallback avgNormalizedOfferedLoadCb = MakeCallback (&SatNcc::DoRandomAccessDynamicLoadControl, ncc);
 
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
   phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));

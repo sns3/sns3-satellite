@@ -93,7 +93,7 @@ public:
    * \param carrierId
    * \param averageNormalizedOfferedLoad
    */
-  void DoRandomAccessDynamicLoad (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad);
+  void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad);
 
   /**
    * Capacity request receiver.
@@ -128,12 +128,38 @@ public:
     */
   uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
 
+  /**
+   *
+   * \param threshold
+   */
+  void SetRandomAccessHighLoadThreshold (double threshold) { m_randomAccessHighLoadThreshold = threshold; }
+
+  /**
+   *
+   * \param lowLoadBackOffProbability
+   */
+  void SetRandomAccessLowLoadBackoffProbability (uint16_t lowLoadBackOffProbability) { m_lowLoadBackOffProbability = lowLoadBackOffProbability; }
+
+  /**
+   *
+   * \param highLoadBackOffProbability
+   */
+  void SetRandomAccessHighLoadBackoffProbability (uint16_t highLoadBackOffProbability) { m_highLoadBackOffProbability = highLoadBackOffProbability; }
+
 private:
 
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
 
   void DoDispose (void);
+
+  /**
+   *
+   * \param backoffProbability
+   * \param beamId
+   */
+  void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId);
+
   /**
    * The map containing beams in use (set).
    */
@@ -154,6 +180,25 @@ private:
    */
   TracedCallback<Ptr<const Packet> > m_nccTxTrace;
 
+  /**
+   *
+   */
+  std::map<uint32_t,bool> m_isLowRandomAccessLoad;
+
+  /**
+   *
+   */
+  double m_randomAccessHighLoadThreshold;
+
+  /**
+   *
+   */
+  uint16_t m_lowLoadBackOffProbability;
+
+  /**
+   *
+   */
+  uint16_t m_highLoadBackOffProbability;
 };
 
 } // namespace ns3

@@ -587,4 +587,61 @@ SatControlMsgContainer::EraseFirst ()
     }
 }
 
+NS_OBJECT_ENSURE_REGISTERED (SatRaMessage);
+
+TypeId
+SatRaMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatRaMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatRaMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatRaMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatRaMessage::SatRaMessage () :
+  m_backoffProbability (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatRaMessage::~SatRaMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatRaMessage::SetBackoffProbability (uint16_t backoffProbability)
+{
+  NS_LOG_FUNCTION (this << backoffProbability);
+
+  m_backoffProbability = backoffProbability;
+}
+
+
+uint16_t
+SatRaMessage::GetBackoffProbability () const
+{
+  return m_backoffProbability;
+}
+
+uint32_t
+SatRaMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size (RA_CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES +
+                 RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES +
+                 sizeof (uint16_t));
+  return size;
+}
+
 }; // namespace ns3

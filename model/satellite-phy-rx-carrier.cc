@@ -1426,12 +1426,12 @@ SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarr
           iterList->rxParams->m_ifPowerInSatellite_W -= processedPacket.rxParams->m_rxPowerInSatellite_W;
           iterList->rxParams->m_ifPower_W -= processedPacket.rxParams->m_rxPower_W;
 
-          if (iterList->rxParams->m_ifPowerInSatellite_W < 0)
+          if (fabs(iterList->rxParams->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
             {
               iterList->rxParams->m_ifPowerInSatellite_W = 0;
             }
 
-          if (iterList->rxParams->m_ifPower_W < 0)
+          if (fabs(iterList->rxParams->m_ifPower_W) < std::numeric_limits<double>::epsilon ())
             {
               iterList->rxParams->m_ifPower_W = 0;
             }
