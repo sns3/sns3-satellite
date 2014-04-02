@@ -399,7 +399,7 @@ SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) 
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
-      stat->SetName (m_name + "-per-ut-user_" + name                          \
+      stat->SetName (m_name + "-per-ut-user-" + name                          \
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \
       stat->SetOutputType (type);                                             \
