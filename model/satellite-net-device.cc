@@ -76,6 +76,11 @@ SatNetDevice::GetTypeId (void)
                     MakePointerAccessor (&SatNetDevice::GetLlc,
                                          &SatNetDevice::SetLlc),
                                          MakePointerChecker<SatLlc> ())
+     .AddAttribute( "MaximumTransmissionUnit",
+                    "Maximum transmission unit in Bytes",
+                    UintegerValue (0xffff),
+                    MakeUintegerAccessor (&SatNetDevice::m_mtu),
+                    MakeUintegerChecker<uint16_t> ())
      .AddAttribute ("EnableStatisticsTags",
                     "If true, some tags will be added to each transmitted packet to assist with statistics computation",
                     BooleanValue (false),

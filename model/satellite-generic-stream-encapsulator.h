@@ -97,15 +97,7 @@ private:
    * reached, it is reset to zero.
    */
   void IncreaseFragmentId ();
-
-  /**
-   * Method is calculating the total transmission size of a HL packet
-   * by taking into account the fragmentation and header overhead. This is
-   * needed to check that the HL packet fits into the available tx opportunity,
-   * since fragmentation between BB frames is not allowed.
-   */
-  uint32_t CalculateTotalPacketSizeWithHeaders (uint32_t hlPacketSize) const;
-
+  
   /**
    * Reassemble functionality
    */
