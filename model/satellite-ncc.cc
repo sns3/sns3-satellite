@@ -94,7 +94,7 @@ SatNcc::DoRandomAccessDynamicLoad (uint32_t beamId, uint32_t carrierId, double a
   bool m_isLowRandomAccessLoad = true;
   double m_highRandomAccessLoadThreshold = 0.5;
 
-  NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Measuring the average normalized offered random access load");
+  NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoad - Beam: " << beamId << ", carrier ID: " << carrierId << " - Measuring the average normalized offered random access load: " << averageNormalizedOfferedLoad);
 
   /// low RA load in effect
   if (m_isLowRandomAccessLoad)

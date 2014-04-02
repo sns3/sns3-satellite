@@ -84,4 +84,7 @@ def build(bld):
     
     obj = bld.create_ns3_program('sat-random-access-slotted-aloha-collision-example', ['satellite'])
     obj.source = 'sat-random-access-slotted-aloha-collision-example.cc'
+
+    obj = bld.create_ns3_program('sat-random-access-dynamic-load-control-example', ['satellite'])
+    obj.source = 'sat-random-access-dynamic-load-control-example.cc'
     
