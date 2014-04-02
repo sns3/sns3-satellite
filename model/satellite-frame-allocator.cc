@@ -212,7 +212,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
       {
         if ( rcSymbolsLeft > 0)
           {
-            if (carrierSymbolsToUse < utSymbolsToUse)
+            if (carrierSymbolsToUse <= utSymbolsToUse)
               {
                 carrierSymbolsToUse -= symbolsToUse;
               }

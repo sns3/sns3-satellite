@@ -220,26 +220,6 @@ private:
   double GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob);
 
   /**
-   *
-   * \param flowId Higher layer flow id of the frame
-   * \param frame Frame to add.
-   * \return true if container scheduling limit is reached, false otherwise
-   */
-  bool AddFrameToContainer (uint8_t flowId, Ptr<SatBbFrame> frame );
-
-  /**
-   *
-   * \param bytesToReq
-   * \param frame
-   * \param address
-   * \param flowId
-   * \param bytesLeft
-   * \param control
-   * \return
-   */
-  uint32_t AddPacketToFrame (uint32_t bytesToReq, Ptr<SatBbFrame> frame, Mac48Address address, uint8_t flowId, uint32_t &bytesLeft);
-
-  /**
    *  Handles periodic timer timeouts.
    */
   void PeriodicTimerExpired ();

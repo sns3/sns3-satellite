@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -19,6 +19,7 @@
  */
 
 #include "ns3/log.h"
+#include "satellite-utils.h"
 #include "satellite-bbframe.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrame");
@@ -27,8 +28,8 @@ namespace ns3 {
 
 
 SatBbFrame::SatBbFrame ()
- : m_modCod (SatEnums::SAT_MODCOD_QPSK_3_TO_4),
-   m_spaceInBytes (0),
+ : m_modCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+   m_freeSpaceInBytes (0),
    m_maxSpaceInBytes (0),
    m_containsControlPdu (false),
    m_frameType ()
@@ -49,15 +50,15 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
   {
     case SatEnums::SHORT_FRAME:
     case SatEnums::NORMAL_FRAME:
-      m_spaceInBytes = conf->GetBbFramePayloadBits (modCod, type) / 8;
-      m_maxSpaceInBytes = m_spaceInBytes;
+      m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, type) / SatUtils::BITS_PER_BYTE;
+      m_freeSpaceInBytes = m_maxSpaceInBytes - conf->GetBbFrameHeaderSizeInBytes ();
       m_duration = conf->GetBbFrameDuration (modCod, type);
       break;
 
     case SatEnums::DUMMY_FRAME:
       // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
-      m_spaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / 8;
-      m_maxSpaceInBytes = m_spaceInBytes;
+      m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatUtils::BITS_PER_BYTE;
+      m_freeSpaceInBytes = m_maxSpaceInBytes - conf->GetBbFrameHeaderSizeInBytes ();
       m_duration = conf->GetDummyBbFrameDuration ();
       break;
 
@@ -66,7 +67,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
       break;
   }
 
-  m_spaceInBytes = m_maxSpaceInBytes;
+  m_freeSpaceInBytes = m_maxSpaceInBytes;
 }
 
 SatBbFrame::~SatBbFrame ()
@@ -88,10 +89,10 @@ SatBbFrame::AddPayload (Ptr<Packet> data)
 
   uint32_t dataLengthInBytes = data->GetSize ();
 
-  if ( dataLengthInBytes <= m_spaceInBytes )
+  if ( dataLengthInBytes <= m_freeSpaceInBytes )
     {
       m_framePayload.push_back (data);
-      m_spaceInBytes -= dataLengthInBytes;
+      m_freeSpaceInBytes -= dataLengthInBytes;
     }
   else
     {
@@ -106,7 +107,7 @@ uint32_t
 SatBbFrame::GetSpaceLeftInBytes () const
 {
   NS_LOG_FUNCTION (this);
-  return m_spaceInBytes;
+  return m_freeSpaceInBytes;
 }
 
 uint32_t

@@ -186,6 +186,12 @@ public:
    */
   SatEnums::SatModcod_t GetDefaultModCod () const;
 
+  /**
+   * Get BB frame header size in bytes.
+   *
+   * \return BB frame header size in bytes
+   */
+  inline uint32_t GetBbFrameHeaderSizeInBytes () const { return m_bbFrameHeaderSizeInBytes; }
 
 private:
 
@@ -235,6 +241,11 @@ private:
    * Dummy BBFrame length in slots
    */
   uint32_t m_dummyFrameInSlots;
+
+  /**
+   * The BB frame header size in bytes
+   */
+  uint32_t m_bbFrameHeaderSizeInBytes;
 
   /**
    * Block error rate target for the waveforms. Default value

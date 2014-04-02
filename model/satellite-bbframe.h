@@ -76,12 +76,6 @@ public:
   uint32_t AddPayload (Ptr<Packet> packet);
 
   /**
-   * Check whether the buffer contains control messages (PDUs)
-   * \return boolean
-   */
-  bool ContainsControlPdu () const;
-
-  /**
    * Get space left in BB frame transmit buffer in bytes.
    * \return free bytes in transmit buffer
    */
@@ -114,7 +108,7 @@ public:
 private:
 
   SatEnums::SatModcod_t m_modCod;
-  uint32_t m_spaceInBytes;
+  uint32_t m_freeSpaceInBytes;
   uint32_t m_maxSpaceInBytes;
   bool m_containsControlPdu;
   SatBbFramePayload_t m_framePayload;

@@ -129,6 +129,7 @@ SatBbFrameConf::SatBbFrameConf ()
   m_pilotBlockIntervalInSlots (36),
   m_plHeaderInSlots (1),
   m_dummyFrameInSlots (36),
+  m_bbFrameHeaderSizeInBytes (10),
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
@@ -147,6 +148,7 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_pilotBlockIntervalInSlots (36),
   m_plHeaderInSlots (1),
   m_dummyFrameInSlots (36),
+  m_bbFrameHeaderSizeInBytes (10),
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
@@ -235,7 +237,6 @@ SatBbFrameConf::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddAttribute( "DefaultModCod",
                    "Default MODCOD",
-                   // TODO: most robust MODCOD needed to set SAT_MODCOD_QPSK_1_TO_2 when TBTP message length problem is solved.
                    EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
                    MakeEnumAccessor (&SatBbFrameConf::m_defaultModCod),
                    MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_2,  "QPSK_1_TO_2",
@@ -260,6 +261,11 @@ SatBbFrameConf::GetTypeId (void)
                                     SatEnums::SAT_MODCOD_16APSK_9_TO_10, "16APSK_9_TO_10",
                                     SatEnums::SAT_MODCOD_32APSK_3_TO_4, "32APSK_3_TO_4",
                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5, "32APSK_4_TO_5"))
+    .AddAttribute( "BBFrameHeaderInBytes",
+                   "BB Frame header size in bytes",
+                    UintegerValue (10), // ETSI EN 302 307 V1.3.1 specified 80 bits
+                    MakeUintegerAccessor (&SatBbFrameConf::m_bbFrameHeaderSizeInBytes),
+                    MakeUintegerChecker<uint32_t> ())
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;
