@@ -559,6 +559,17 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:
+      {
+        /// TODO this needs to be implemented
+        uint32_t raCtrlId = ctrlTag.GetMsgId();
+        Ptr<SatRaMessage> raMsg = DynamicCast<SatRaMessage> (m_readCtrlCallback (raCtrlId));
+
+        uint32_t allocationChannelId = raMsg->GetAllocationChannelId ();
+        uint16_t backoffProbability = raMsg->GetBackoffProbability ();
+
+        m_randomAccess->CrdsaSetBackoffProbability (allocationChannelId,backoffProbability);
+        break;
+      }
     case SatControlMsgTag::SAT_CR_CTRL_MSG:
       {
         NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");

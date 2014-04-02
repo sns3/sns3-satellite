@@ -102,14 +102,20 @@ public:
   void SetRandomAccessModel (SatEnums::RandomAccessModel_t randomAccessModel);
 
   /**
-   * \brief Function for setting the load control parameters
+   * \brief Function for setting the backoff time in milliseconds
+   * \param allocationChannel allocation channel
+   * \param backoffTimeInMilliSeconds backoff time
+   */
+  void CrdsaSetBackoffTimeInMilliSeconds (uint32_t allocationChannel,
+                                          uint32_t backoffTimeInMilliSeconds);
+
+  /**
+   * \brief Function for setting the backoff probability
    * \param allocationChannel allocation channel
    * \param backoffProbability backoff probability
-   * \param backoffTime backoff time
    */
-  void CrdsaSetLoadControlParameters (uint32_t allocationChannel,
-                                      double backoffProbability,
-                                      uint32_t backoffTimeInMilliSeconds);
+  void CrdsaSetBackoffProbability (uint32_t allocationChannel,
+                                   uint16_t backoffProbability);
 
   /**
    * \brief Function for setting the maximum backoff probability

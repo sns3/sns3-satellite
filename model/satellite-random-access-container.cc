@@ -421,16 +421,32 @@ SatRandomAccess::SlottedAlohaRandomizeReleaseTime ()
 ///-----------------------
 
 void
-SatRandomAccess::CrdsaSetLoadControlParameters (uint32_t allocationChannel,
-                                                double backoffProbability,
-                                                uint32_t backoffTimeInMilliSeconds)
+SatRandomAccess::CrdsaSetBackoffTimeInMilliSeconds (uint32_t allocationChannel,
+                                                    uint32_t backoffTimeInMilliSeconds)
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+    {
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffTimeInMilliSeconds (backoffTimeInMilliSeconds);
+
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->DoCrdsaVariableSanityCheck ();
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetLoadControlParameters - Wrong random access model in use");
+    }
+}
+
+void
+SatRandomAccess::CrdsaSetBackoffProbability (uint32_t allocationChannel,
+                                             uint16_t backoffProbability)
 {
   NS_LOG_FUNCTION (this);
 
   if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffProbability (backoffProbability);
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffTimeInMilliSeconds (backoffTimeInMilliSeconds);
 
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->DoCrdsaVariableSanityCheck ();
     }

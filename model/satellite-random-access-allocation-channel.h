@@ -86,7 +86,7 @@ public:
    * \brief Function for setting the CRDSA backoff probability
    * \param crdsaBackoffProbability CRDSA backoff probability
    */
-  void SetCrdsaBackoffProbability (double crdsaBackoffProbability) { m_crdsaBackoffProbability = crdsaBackoffProbability; }
+  void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability) { m_crdsaBackoffProbability = ((crdsaBackoffProbability - 1) * (1 / (std::pow(2,16) - 2))); }
 
   /**
    * \brief Function for getting the CRDSA maximum backoff probability

@@ -608,6 +608,7 @@ SatRaMessage::GetInstanceTypeId (void) const
 }
 
 SatRaMessage::SatRaMessage () :
+  m_allocationChannelId (0),
   m_backoffProbability (0)
 {
   NS_LOG_FUNCTION (this);
@@ -616,6 +617,21 @@ SatRaMessage::SatRaMessage () :
 SatRaMessage::~SatRaMessage ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatRaMessage::SetAllocationChannelId (uint32_t allocationChannelId)
+{
+  NS_LOG_FUNCTION (this << allocationChannelId);
+
+  m_allocationChannelId = allocationChannelId;
+}
+
+
+uint32_t
+SatRaMessage::GetAllocationChannelId () const
+{
+  return m_allocationChannelId;
 }
 
 void
@@ -640,7 +656,7 @@ SatRaMessage::GetSizeInBytes () const
 
   uint32_t size (RA_CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES +
                  RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES +
-                 sizeof (uint16_t));
+                 sizeof (uint16_t) + sizeof (uint32_t));
   return size;
 }
 

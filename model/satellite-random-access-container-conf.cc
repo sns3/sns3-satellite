@@ -65,7 +65,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability ((llsConf->GetRaBackOffProbability (i) - 1) * (1 / (std::pow(2,16) - 2)));
+      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
       /// TODO Get rid of the hard coded 0
       GetAllocationChannelConfiguration (i)->SetCrdsaPayloadBytes (superframeSeq->GetSuperframeConf (0)->GetRaChannelPayloadInBytes (i));

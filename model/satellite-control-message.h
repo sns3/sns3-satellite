@@ -555,6 +555,18 @@ public:
   void SetBackoffProbability (uint16_t backoffProbability);
 
   /**
+   *
+   * \return
+   */
+  uint32_t GetAllocationChannelId () const;
+
+  /**
+   *
+   * \param allocationChannel
+   */
+  void SetAllocationChannelId (uint32_t allocationChannel);
+
+  /**
    * Get real size of the random access message, which can be used to e.g. simulate real size.
    * \return Real size of the random access message.
    */
@@ -571,6 +583,11 @@ private:
    * Common header of the random access control element
    */
   static const uint32_t RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES = 3;
+
+  /**
+   *
+   */
+  uint32_t m_allocationChannelId;
 
   /**
    *

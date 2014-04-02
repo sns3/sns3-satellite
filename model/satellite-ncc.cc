@@ -164,11 +164,15 @@ SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint3
   Ptr<SatRaMessage> raMsg = CreateObject<SatRaMessage> ();
   std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
 
+  /// TODO at the moment only one RA allocation channel is fully supported
+  uint32_t allocationChannelId = 0;
+
   if ( iterator == m_beamSchedulers.end () )
     {
       NS_FATAL_ERROR ( "SatNcc::SendRaControlMessage - Beam scheduler not found" );
     }
 
+  raMsg->SetAllocationChannelId (allocationChannelId);
   raMsg->SetBackoffProbability (backoffProbability);
 
   NS_LOG_INFO ("SatNcc::CreateRandomAccessLoadControlMessage - Send random access control message");
