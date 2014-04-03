@@ -38,6 +38,7 @@
 #include <ns3/singleton.h>
 
 #include <ns3/data-collection-object.h>
+#include <ns3/satellite-phy-rx-carrier-packet-probe.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
@@ -57,7 +58,9 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatStatsPacketErrorHelper);
 
 SatStatsPacketErrorHelper::SatStatsPacketErrorHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+  : SatStatsHelper (satHelper),
+    m_traceSourceName (""),
+    m_linkDirection (SatEnums::LD_UNDEFINED)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -91,6 +94,21 @@ std::string
 SatStatsPacketErrorHelper::GetTraceSourceName () const
 {
   return m_traceSourceName;
+}
+
+
+void
+SatStatsPacketErrorHelper::SetLinkDirection (SatEnums::SatLinkDir_t linkDirection)
+{
+  NS_LOG_FUNCTION (this << SatEnums::GetLinkDirName (linkDirection));
+  m_linkDirection = linkDirection;
+}
+
+
+SatEnums::SatLinkDir_t
+SatStatsPacketErrorHelper::GetLinkDirection () const
+{
+  return m_linkDirection;
 }
 
 
@@ -199,65 +217,43 @@ SatStatsPacketErrorHelper::DoInstall ()
       break;
     }
 
-  // Create a map of UT addresses and identifiers.
-  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
-    {
-      SaveAddressAndIdentifier (*it);
-    }
+  switch (m_linkDirection)
+  {
+    case SatEnums::LD_FORWARD:
+      {
+        // Connect to trace sources at UT nodes.
+        NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+          {
+            InstallProbeOnUt (*it);
+          }
 
-  // Connect to trace sources at GW nodes.
+        break;
+      }
 
-  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  Callback<void, uint32_t, const Address &, bool> callback
-    = MakeCallback (&SatStatsPacketErrorHelper::ErrorRxCallback, this);
+    case SatEnums::LD_RETURN:
+      {
+        // Create a map of UT addresses and identifiers.
+        NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+          {
+            SaveAddressAndIdentifier (*it);
+          }
 
-  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
-    {
-      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+        // Connect to trace sources at GW nodes.
+        NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+        for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+          {
+            InstallProbeOnGw (*it);
+          }
 
-      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
-           itDev != devs.End (); ++itDev)
-        {
-          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
-          Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
-          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
-          ObjectVectorValue carriers;
-          satPhyRx->GetAttribute ("RxCarrierList", carriers);
-          NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                             << " device #" << (*itDev)->GetIfIndex ()
-                             << " has " << carriers.GetN () << " RX carriers");
+        break;
+      }
 
-          for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-               itCarrier != carriers.End (); ++itCarrier)
-            {
-              const bool ret = itCarrier->second->TraceConnectWithoutContext (
-                                 GetTraceSourceName (), callback);
-              if (ret)
-                {
-                  NS_LOG_INFO (this << " successfully connected with node ID "
-                                    << (*it)->GetId ()
-                                    << " device #" << (*itDev)->GetIfIndex ()
-                                    << " RX carrier #" << itCarrier->first);
-                }
-              else
-                {
-                  NS_FATAL_ERROR ("Error connecting to "
-                                  << GetTraceSourceName () << " trace source"
-                                  << " of SatPhyRxCarrier"
-                                  << " at node ID " << (*it)->GetId ()
-                                  << " device #" << (*itDev)->GetIfIndex ()
-                                  << " RX carrier #" << itCarrier->first);
-                }
-
-            } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
-
-        } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
-
-    } // end of `for (NodeContainer::Iterator it = gws)`
+    default:
+      NS_FATAL_ERROR ("SatStatsPacketErrorHelper - Invalid link direction");
+      break;
+  }
 
 } // end of `void DoInstall ();`
 
@@ -352,28 +348,200 @@ SatStatsPacketErrorHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 }
 
 
-// DEDICATED ACCESS ///////////////////////////////////////////////////////////
+void
+SatStatsPacketErrorHelper::InstallProbeOnGw (Ptr<Node> gwNode)
+{
+  NS_LOG_FUNCTION (this << gwNode->GetId ());
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsDaPacketErrorHelper);
+  NetDeviceContainer devs = GetGwSatNetDevice (gwNode);
+  Callback<void, uint32_t, const Address &, bool> callback
+    = MakeCallback (&SatStatsPacketErrorHelper::ErrorRxCallback, this);
 
-SatStatsDaPacketErrorHelper::SatStatsDaPacketErrorHelper (Ptr<const SatHelper> satHelper)
+  for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+       itDev != devs.End (); ++itDev)
+    {
+      Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+      Ptr<SatPhy> satPhy = satDev->GetPhy ();
+      NS_ASSERT (satPhy != 0);
+      Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
+      NS_ASSERT (satPhyRx != 0);
+      ObjectVectorValue carriers;
+      satPhyRx->GetAttribute ("RxCarrierList", carriers);
+      NS_LOG_DEBUG (this << " Node ID " << gwNode->GetId ()
+                         << " device #" << (*itDev)->GetIfIndex ()
+                         << " has " << carriers.GetN () << " RX carriers");
+
+      for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
+           itCarrier != carriers.End (); ++itCarrier)
+        {
+          const bool ret = itCarrier->second->TraceConnectWithoutContext (
+                             GetTraceSourceName (), callback);
+          if (ret)
+            {
+              NS_LOG_INFO (this << " successfully connected with node ID "
+                                << gwNode->GetId ()
+                                << " device #" << (*itDev)->GetIfIndex ()
+                                << " RX carrier #" << itCarrier->first);
+            }
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to "
+                              << GetTraceSourceName () << " trace source"
+                              << " of SatPhyRxCarrier"
+                              << " at node ID " << gwNode->GetId ()
+                              << " device #" << (*itDev)->GetIfIndex ()
+                              << " RX carrier #" << itCarrier->first);
+            }
+
+        } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
+
+    } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
+
+} // end of `void InstallProbeOnGw (Ptr<Node>)`
+
+
+void
+SatStatsPacketErrorHelper::InstallProbeOnUt (Ptr<Node> utNode)
+{
+  NS_LOG_FUNCTION (this << utNode->GetId ());
+
+  const int32_t utId = GetUtId (utNode);
+  NS_ASSERT_MSG (utId > 0,
+                 "Node " << utNode->GetId () << " is not a valid UT");
+  const uint32_t identifier = GetIdentifierForUt (utNode);
+
+  // Create the probe.
+  std::ostringstream probeName;
+  probeName << utId;
+  Ptr<SatPhyRxCarrierPacketProbe> probe = CreateObject<SatPhyRxCarrierPacketProbe> ();
+  probe->SetName (probeName.str ());
+
+  Ptr<NetDevice> dev = GetUtSatNetDevice (utNode);
+  Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+  NS_ASSERT (satDev != 0);
+  Ptr<SatPhy> satPhy = satDev->GetPhy ();
+  NS_ASSERT (satPhy != 0);
+  Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
+  NS_ASSERT (satPhyRx != 0);
+  ObjectVectorValue carriers;
+  satPhyRx->GetAttribute ("RxCarrierList", carriers);
+  NS_LOG_DEBUG (this << " Node ID " << utNode->GetId ()
+                     << " device #" << dev->GetIfIndex ()
+                     << " has " << carriers.GetN () << " RX carriers");
+
+  for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
+       itCarrier != carriers.End (); ++itCarrier)
+    {
+      // Connect the object to the probe.
+      if (probe->ConnectByObject (GetTraceSourceName (), itCarrier->second))
+        {
+          // Connect the probe to the right collector.
+          bool ret = false;
+          switch (GetOutputType ())
+            {
+            case SatStatsHelper::OUTPUT_SCALAR_FILE:
+            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                           "OutputBool",
+                                                           identifier,
+                                                           &ScalarCollector::TraceSinkBoolean);
+              break;
+
+            case SatStatsHelper::OUTPUT_SCATTER_FILE:
+            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
+                                                           "OutputBool",
+                                                           identifier,
+                                                           &IntervalRateCollector::TraceSinkBoolean);
+              break;
+
+            default:
+              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
+              break;
+
+            } // end of `switch (GetOutputType ())`
+
+          if (ret)
+            {
+              NS_LOG_INFO (this << " created probe " << probeName
+                                << ", connected to collector " << identifier);
+              m_probes.push_back (probe->GetObject<Probe> ());
+            }
+          else
+            {
+              NS_LOG_WARN (this << " unable to connect probe " << probeName
+                                << " to collector " << identifier);
+            }
+
+        } // end of `if (probe->ConnectByObject (GetTraceSourceName (), itCarrier->second))`
+      else
+        {
+          NS_FATAL_ERROR ("Error connecting to "
+                          << GetTraceSourceName () << " trace source"
+                          << " of SatPhyRxCarrier"
+                          << " at node ID " << utNode->GetId ()
+                          << " device #" << dev->GetIfIndex ()
+                          << " RX carrier #" << itCarrier->first);
+        }
+
+    } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
+
+} // end of `void InstallProbeOnUt (Ptr<Node>)`
+
+
+// FORWARD LINK DEDICATED ACCESS //////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdDaPacketErrorHelper);
+
+SatStatsFwdDaPacketErrorHelper::SatStatsFwdDaPacketErrorHelper (Ptr<const SatHelper> satHelper)
   : SatStatsPacketErrorHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("DaRx");
+  SetLinkDirection (SatEnums::LD_FORWARD);
 }
 
 
-SatStatsDaPacketErrorHelper::~SatStatsDaPacketErrorHelper ()
+SatStatsFwdDaPacketErrorHelper::~SatStatsFwdDaPacketErrorHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 TypeId // static
-SatStatsDaPacketErrorHelper::GetTypeId ()
+SatStatsFwdDaPacketErrorHelper::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsDaPacketErrorHelper")
+  static TypeId tid = TypeId ("ns3::SatStatsFwdDaPacketErrorHelper")
+    .SetParent<SatStatsPacketErrorHelper> ()
+  ;
+  return tid;
+}
+
+
+// RETURN LINK DEDICATED ACCESS ///////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnDaPacketErrorHelper);
+
+SatStatsRtnDaPacketErrorHelper::SatStatsRtnDaPacketErrorHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsPacketErrorHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetTraceSourceName ("DaRx");
+  SetLinkDirection (SatEnums::LD_RETURN);
+}
+
+
+SatStatsRtnDaPacketErrorHelper::~SatStatsRtnDaPacketErrorHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnDaPacketErrorHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnDaPacketErrorHelper")
     .SetParent<SatStatsPacketErrorHelper> ()
   ;
   return tid;
@@ -389,6 +557,7 @@ SatStatsSlottedAlohaPacketErrorHelper::SatStatsSlottedAlohaPacketErrorHelper (Pt
 {
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("SlottedAlohaRxError");
+  SetLinkDirection (SatEnums::LD_RETURN);
 }
 
 
@@ -417,6 +586,7 @@ SatStatsCrdsaPacketErrorHelper::SatStatsCrdsaPacketErrorHelper (Ptr<const SatHel
 {
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("CrdsaUniquePayloadRx");
+  SetLinkDirection (SatEnums::LD_RETURN);
 }
 
 

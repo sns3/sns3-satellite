@@ -42,7 +42,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - Add [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
+ * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
@@ -180,8 +180,11 @@ public:
   // Return link PHY-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
 
-  // Dedicated Access packet error rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (DaPacketError)
+  // Forward link Dedicated Access packet error rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDaPacketError)
+
+  // Return link Dedicated Access packet error rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDaPacketError)
 
   // Random Access Slotted ALOHA packet error rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketError)

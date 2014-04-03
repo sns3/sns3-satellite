@@ -68,7 +68,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
+ * - [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
@@ -247,9 +247,13 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyThroughput,
                                         "return link PHY-level throughput statistics")
 
-    // Dedicated Access packet error rate statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (DaPacketError,
-                                        "Dedicated Access packet error rate statistics")
+    // Forward link Dedicated Access packet error rate statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDaPacketError,
+                                        "Forward link Dedicated Access packet error rate statistics")
+
+    // Return link Dedicated Access packet error rate statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDaPacketError,
+                                        "Return link Dedicated Access packet error rate statistics")
 
     // Random Access Slotted ALOHA packet error rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketError,
@@ -311,7 +315,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - Add [Global,PerGw,PerBeam,PerUt] [Da,SlottedAloha,Crdsa] PacketError
+ * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  *
@@ -556,11 +560,17 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 
-// Dedicated Access packet error rate statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION      (DaPacketError, "da-error")
-SAT_STATS_PER_GW_METHOD_DEFINITION      (DaPacketError, "da-error")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION    (DaPacketError, "da-error")
-SAT_STATS_PER_UT_METHOD_DEFINITION      (DaPacketError, "da-error")
+// Forward link Dedicated Access packet error rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdDaPacketError, "fwd-da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FwdDaPacketError, "fwd-da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FwdDaPacketError, "fwd-da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FwdDaPacketError, "fwd-da-error")
+
+// Return link Dedicated Access packet error rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnDaPacketError, "rtn-da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnDaPacketError, "rtn-da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnDaPacketError, "rtn-da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnDaPacketError, "rtn-da-error")
 
 // Random Access Slotted ALOHA packet error rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")

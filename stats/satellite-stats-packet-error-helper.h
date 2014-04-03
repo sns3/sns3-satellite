@@ -23,6 +23,7 @@
 #define SATELLITE_STATS_PACKET_ERROR_HELPER_H
 
 #include <ns3/satellite-stats-helper.h>
+#include <ns3/satellite-enums.h>
 #include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
@@ -37,6 +38,7 @@ namespace ns3 {
 class SatHelper;
 class Node;
 class DataCollectionObject;
+class Probe;
 
 /**
  * \ingroup satstats
@@ -60,6 +62,8 @@ public:
    * \param nPackets number of packets in the received packet burst.
    * \param from the source address of the packet.
    * \param isError whether a PHY error has occurred.
+   *
+   * Used only in return link.
    */
   void ErrorRxCallback (uint32_t nPackets, const Address & from, bool isError);
 
@@ -73,6 +77,16 @@ public:
    */
   std::string GetTraceSourceName () const;
 
+  /**
+   * \param linkDirection link direction where statistics are gathered from.
+   */
+  void SetLinkDirection (SatEnums::SatLinkDir_t linkDirection);
+
+  /**
+   * \return link direction where statistics are gathered from.
+   */
+  SatEnums::SatLinkDir_t GetLinkDirection () const;
+
 protected:
   // inherited from SatStatsHelper base class
   void DoInstall ();
@@ -83,9 +97,26 @@ private:
    * \param utNode a UT node.
    *
    * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
+   * member variable. Used only in return link.
    */
   void SaveAddressAndIdentifier (Ptr<Node> utNode);
+
+  /**
+   * \brief Set up several listeners on a GW node and connect them to the
+   *        collectors.
+   * \param gwNode
+   */
+  void InstallProbeOnGw (Ptr<Node> gwNode);
+
+  /**
+   * \brief Set up several probes on a UT node and connect them to the
+   *        collectors.
+   * \param utNode
+   */
+  void InstallProbeOnUt (Ptr<Node> utNode);
+
+  /// Maintains a list of probes created by this helper (for forward link).
+  std::list<Ptr<Probe> > m_probes;
 
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
@@ -93,20 +124,23 @@ private:
   /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
-  /// Map of address and the identifier associated with it (for forward link).
+  /// Map of address and the identifier associated with it (for return link).
   std::map<const Address, uint32_t> m_identifierMap;
 
   /// Name of trace source of PHY RX carrier to listen to.
   std::string m_traceSourceName;
 
+  /// Link direction where statistics are gathered from.
+  SatEnums::SatLinkDir_t m_linkDirection;
+
 }; // end of class SatStatsPacketErrorHelper
 
 
-// DEDICATED ACCESS ///////////////////////////////////////////////////////////
+// FORWARD LINK DEDICATED ACCESS //////////////////////////////////////////////
 
 /**
  * \ingroup satstats
- * \brief Produce packet error statistics of Dedicated Access
+ * \brief Produce packet error statistics of Dedicated Access in forward link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -114,21 +148,55 @@ private:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsDaPacketErrorHelper> s = Create<SatStatsDaPacketErrorHelper> (satHelper);
+ * Ptr<SatStatsFwdDaPacketErrorHelper> s = Create<SatStatsFwdDaPacketErrorHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsDaPacketErrorHelper : public SatStatsPacketErrorHelper
+class SatStatsFwdDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
 public:
   // inherited from SatStatsPacketErrorHelper base class
-  SatStatsDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  SatStatsFwdDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
-  virtual ~SatStatsDaPacketErrorHelper ();
+  virtual ~SatStatsFwdDaPacketErrorHelper ();
+
+  // inherited from ObjectBase base class
+  static TypeId GetTypeId ();
+
+};
+
+
+// RETURN LINK DEDICATED ACCESS ///////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce packet error statistics of Dedicated Access in return link
+ *        from a satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnDaPacketErrorHelper> s = Create<SatStatsRtnDaPacketErrorHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnDaPacketErrorHelper : public SatStatsPacketErrorHelper
+{
+public:
+  // inherited from SatStatsPacketErrorHelper base class
+  SatStatsRtnDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+
+  /// Destructor.
+  virtual ~SatStatsRtnDaPacketErrorHelper ();
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
