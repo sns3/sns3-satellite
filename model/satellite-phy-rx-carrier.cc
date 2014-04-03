@@ -550,8 +550,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
           if (nPackets > 0)
             {
-              const bool hasCollision =
-                m_satInterference->HasCollision (iter->second.interferenceEvent);
+              const bool hasCollision = m_satInterference->HasCollision (iter->second.interferenceEvent);
               m_slottedAlohaRxCollisionTrace (nPackets,                    // number of packets
                                               iter->second.sourceAddress,  // sender address
                                               hasCollision                 // collision flag
@@ -610,6 +609,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
         {
           m_randomAccessBitsInFrame += ((*it)->GetSize () * SatUtils::BITS_PER_BYTE);
+          NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Fragment (HL packet) UID: " << (*it)->GetUid ());
         }
 
       if (nPackets > 0)
@@ -685,6 +685,11 @@ SatPhyRxCarrier::DoFrameEnd ()
                        << ", unique packet ID: " << results[i].rxParams->m_txInfo.crdsaUniquePacketId
                        << ", error: " << results[i].phyError
                        << ", SINR: " << results[i].cSinr);
+
+          for (uint32_t j = 0; j < results[i].rxParams->m_packetsInBurst.size (); j++)
+            {
+              NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Fragment (HL packet) UID: " << results[i].rxParams->m_packetsInBurst.at (j)->GetUid ());
+            }
 
           /// uses composite sinr
           m_packetTrace (results[i].rxParams,
@@ -1434,6 +1439,11 @@ SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarr
           if (fabs(iterList->rxParams->m_ifPower_W) < std::numeric_limits<double>::epsilon ())
             {
               iterList->rxParams->m_ifPower_W = 0;
+            }
+
+          if (iterList->rxParams->m_ifPower_W < 0 || iterList->rxParams->m_ifPowerInSatellite_W < 0)
+            {
+              NS_FATAL_ERROR ("SatPhyRxCarrier::EliminateInterference - Negative interference");
             }
 
           NS_LOG_INFO ("SatPhyRxCarrier::EliminateInterference- AFTER INTERFERENCE ELIMINATION, RX sat: " << iterList->rxParams->m_rxPowerInSatellite_W <<

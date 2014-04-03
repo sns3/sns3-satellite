@@ -817,6 +817,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel);
 
+  /// TODO get rid of the hard coded 0
   Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
   uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
@@ -832,12 +833,12 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   SatPhy::PacketContainer_t uniq;
   m_utScheduler->DoScheduling (uniq, payloadBytes, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
 
-  NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Processing the packet container");
+  NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Processing the packet container, fragments: " << uniq.size ());
 
   if ( !uniq.empty () )
     {
-      std::vector < std::pair< uint16_t, std::vector<Ptr<Packet> > > > replicas;
-      std::vector < SatCrdsaReplicaTag > tags;
+      std::vector < std::pair< uint16_t, SatPhy::PacketContainer_t > > replicas;
+      std::map <uint16_t, SatCrdsaReplicaTag> tags;
       std::set<uint32_t>::iterator iterSet;
 
       NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Creating replicas for a packet");
@@ -851,6 +852,9 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           for ( ; it != uniq.end (); ++it)
             {
               rep.push_back ((*it)->Copy ());
+              NS_LOG_INFO ("Replica in slot: " << (*iterSet)
+                           << ", original (HL packet) fragment UID: " << (*it)->GetUid ()
+                           << ", copied replica fragment (HL packet) UID: " << rep.back()->GetUid ());
             }
 
           NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - One replica created");
@@ -878,7 +882,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
                   NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Other packet tag: " << replicas[j].first);
                 }
             }
-          tags.push_back (replicaTag);
+          tags.insert (std::make_pair(replicas[i].first,replicaTag));
         }
 
       NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Scheduling replicas");
@@ -886,17 +890,17 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
       /// loop through the replicas
       for (uint32_t i = 0; i < replicas.size (); i++)
         {
-          /// create packet container
-          SatPhy::PacketContainer_t packets;
+          for (uint32_t j = 0; j < replicas[i].second.size (); j++)
+            {
+              NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - replica: " << i
+                           << ", fragment: " << j
+                           << ", key: " << replicas[i].first
+                           << ", tag: " << tags.at (replicas[i].first).GetSlotIds ().at (0)
+                           << ", fragment (HL packet) UID: " << replicas[i].second.at (j)->GetUid ());
 
-          /// get packet
-          Ptr<Packet> packet = replicas[i].second.front ();
-
-          /// attach the replica tag
-          packet->AddPacketTag (tags[i]);
-
-          /// push the replica into the container
-          packets.push_back (packet);
+              /// attach the replica tag
+              replicas[i].second.at (j)->AddPacketTag (tags.at (replicas[i].first));
+            }
 
           /// time slot configuration
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( replicas[i].first );
@@ -915,6 +919,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
           /// carrier
+          /// TODO get rid of the hard coded 0
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
           SatSignalParameters::txInfo_s txInfo;
@@ -924,7 +929,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           txInfo.crdsaUniquePacketId = crdsaUniquePacketId;
 
           /// schedule transmission
-          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
+          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, replicas[i].second, duration, carrierId, txInfo);
           NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Scheduled a replica in slot " << replicas[i].first << " with offset " << offset.GetSeconds ());
         }
       replicas.clear ();

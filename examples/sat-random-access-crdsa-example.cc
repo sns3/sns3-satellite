@@ -31,7 +31,7 @@ main (int argc, char *argv[])
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
-  uint32_t packetSize (128);
+  uint32_t packetSize (20);
   Time interval (Seconds(0.01));
   Time simLength (Seconds(0.60));
   Time appStartTime = Seconds(0.01);

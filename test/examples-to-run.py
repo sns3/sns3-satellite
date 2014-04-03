@@ -26,9 +26,6 @@ cpp_examples = [
     ("sat-multicast-example", "True", "True"),
     ("sat-nrtv-example", "True", "True"),
     ("sat-onoff-example", "True", "True"),
-    ("sat-random-access-crdsa-example", "True", "True"),
-    ("sat-random-access-example", "True", "True"),
-    ("sat-random-access-slotted-aloha-example", "True", "True"),
     ("sat-rayleigh-example", "True", "True"),
 ]
 
