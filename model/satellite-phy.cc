@@ -240,6 +240,13 @@ SatPhy::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
   m_phyRx->SetNodeInfo (nodeInfo);
 }
 
+void
+SatPhy::BeginFrameEndScheduling ()
+{
+  NS_LOG_FUNCTION (this);
+  m_phyRx->BeginFrameEndScheduling ();
+}
+
 Ptr<SatPhyTx>
 SatPhy::GetPhyTx () const
 {

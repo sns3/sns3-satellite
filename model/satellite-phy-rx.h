@@ -185,6 +185,11 @@ public:
     */
    void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
+   /**
+    * \brief Begin frame end scheduling for processes utilizing frame length as interval
+    */
+   void BeginFrameEndScheduling ();
+
 private:
 
   Ptr<MobilityModel> m_mobility;

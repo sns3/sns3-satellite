@@ -55,7 +55,7 @@ SatNcc::GetInstanceTypeId (void) const
 }
 
 SatNcc::SatNcc () :
-  m_randomAccessHighLoadThreshold (1.0),
+  m_randomAccessHighLoadThreshold (0.3),
   m_lowLoadBackOffProbability (0),
   m_highLoadBackOffProbability (0)
 {

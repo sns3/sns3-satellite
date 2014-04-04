@@ -60,7 +60,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_dropCollidingRandomAccessPackets (carrierConf->AreCollidingRandomAccessPacketsAlwaysDropped ()),
    m_randomAccessDynamicLoadControlMeasurementWindowSize (10), /// TODO change this to parameter
    m_isRandomAccessEnabledForThisCarrier (false), /// TODO change this to parameter
-   m_randomAccessBitsInFrame (0)
+   m_randomAccessBitsInFrame (0),
+   m_frameEndSchedulingStarted (false)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -135,21 +136,35 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     {
       m_isRandomAccessEnabledForThisCarrier = true;
     }
+}
 
-  /// frame end scheduling is at the moment needed only for Random Access
-  if (m_isRandomAccessEnabledForThisCarrier && m_rxMode == SatPhyRxCarrierConf::NORMAL)
+void
+SatPhyRxCarrier::BeginFrameEndScheduling ()
+{
+  if (!m_frameEndSchedulingStarted)
     {
-      /// TODO get rid of the hard coded 0
-      Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
-
-      if (Now () >= nextSuperFrameRxTime)
+      /// frame end scheduling is at the moment needed only for Random Access at the GW
+      if (m_isRandomAccessEnabledForThisCarrier && m_rxMode == SatPhyRxCarrierConf::NORMAL)
         {
-          NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
+          /// TODO get rid of the hard coded 0
+          Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
+
+          if (Now () >= nextSuperFrameRxTime)
+            {
+              NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
+            }
+
+          Time schedulingDelay = nextSuperFrameRxTime - Now ();
+
+          if (m_nodeInfo == NULL)
+            {
+              NS_FATAL_ERROR ("SatPhyRxCarrier::BeginFrameEndScheduling - m_nodeInfo not set");
+            }
+
+          m_frameEndSchedulingStarted = true;
+
+          Simulator::ScheduleWithContext (m_nodeInfo->GetNodeId (),schedulingDelay, &SatPhyRxCarrier::DoFrameEnd, this);
         }
-
-      Time schedulingDelay = nextSuperFrameRxTime - Now ();
-
-      Simulator::Schedule (schedulingDelay, &SatPhyRxCarrier::DoFrameEnd, this);
     }
 }
 
@@ -682,7 +697,8 @@ SatPhyRxCarrier::DoFrameEnd ()
         {
           NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Sending a packet to the next layer, slot: " << results[i].ownSlotId
                        << ", UT: " << results[i].sourceAddress
-                       << ", unique packet ID: " << results[i].rxParams->m_txInfo.crdsaUniquePacketId
+                       << ", unique CRDSA packet ID: " << results[i].rxParams->m_txInfo.crdsaUniquePacketId
+                       << ", destination address: " << results[i].destAddress
                        << ", error: " << results[i].phyError
                        << ", SINR: " << results[i].cSinr);
 
@@ -870,11 +886,13 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                   error = true;
                 }
 
+              /*
               NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
                         << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
                         << " rand: " << r
                         << " ber: " << ber
                         << " error: " << error);
+               */
               break;
             }
           case SatEnums::RETURN_FEEDER_CH:
@@ -894,11 +912,13 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                   error = true;
                 }
 
+              /*
               NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
                         << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
                         << " rand: " << r
                         << " ber: " << ber
                         << " error: " << error);
+               */
               break;
             }
           case SatEnums::FORWARD_FEEDER_CH:
@@ -1069,7 +1089,7 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
     {
       SatCrdsaReplicaTag replicaTag;
 
-      /// the tag is in the first packet
+      /// check the first packet for tag
       bool result = crdsaPacket.rxParams->m_packetsInBurst[0]->PeekPacketTag (replicaTag);
 
       if (!result)
@@ -1084,7 +1104,7 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
           NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - The tag did not contain any slot IDs");
         }
 
-      /// The first slot ID is this replicas own slot ID
+      /// the first slot ID is this replicas own slot ID
       crdsaPacket.ownSlotId = slotIds[0];
 
       if (crdsaPacket.slotIdsForOtherReplicas.size () > 0)
@@ -1092,9 +1112,16 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
           NS_FATAL_ERROR ("SatPhyRxCarrier::AddCrdsaPacket - Vector for packet replicas should be empty at this point");
         }
 
+      /// rest of the slot IDs are for the replicas
       for (uint32_t i = 1; i < slotIds.size (); i++)
         {
           crdsaPacket.slotIdsForOtherReplicas.push_back (slotIds[i]);
+        }
+
+      /// tags are not needed after this
+      for (uint32_t i = 0; i < crdsaPacket.rxParams->m_packetsInBurst.size (); i++)
+        {
+          crdsaPacket.rxParams->m_packetsInBurst[i]->RemovePacketTag (replicaTag);
         }
     }
   else

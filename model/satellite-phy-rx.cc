@@ -183,6 +183,17 @@ SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
+SatPhyRx::BeginFrameEndScheduling ()
+{
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
+        it != m_rxCarriers.end();
+        ++it)
+    {
+      (*it)->BeginFrameEndScheduling ();
+    }
+}
+
+void
 SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this);

@@ -301,6 +301,10 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
 
+  // Begin frame end scheduling for processes utilizing frame length as interval
+  // Node info needs to be set before the start in order to get the scheduling context correctly set
+  phy->BeginFrameEndScheduling ();
+
   Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkScheduler> (m_bbFrameConf, addr);
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler

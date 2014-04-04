@@ -156,6 +156,11 @@ public:
    */
   static bool CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s obj1, SatPhyRxCarrier::crdsaPacketRxParams_s obj2);
 
+  /**
+   *
+   */
+  void BeginFrameEndScheduling ();
+
 private:
 
   /**
@@ -584,6 +589,11 @@ private:
    *
    */
   uint32_t m_randomAccessBitsInFrame;
+
+  /**
+   *
+   */
+  bool m_frameEndSchedulingStarted;
 };
 
 }

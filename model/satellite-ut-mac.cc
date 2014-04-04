@@ -922,6 +922,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           /// TODO get rid of the hard coded 0
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
+          /// create CRDSA Tx params
           SatSignalParameters::txInfo_s txInfo;
           txInfo.packetType = SatEnums::CRDSA_PACKET;
           txInfo.modCod = wf->GetModCod ();
