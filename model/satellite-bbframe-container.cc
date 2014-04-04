@@ -50,7 +50,6 @@ SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& mo
           NS_FATAL_ERROR ("Queue for MODCOD: " << *it << " already exists!!!");
         }
     }
-
 }
 
 SatBbFrameContainer::~SatBbFrameContainer ()
@@ -85,10 +84,12 @@ SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums
   if ( priorityClass > 0)
     {
       payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE;
+      payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
     }
   else
     {
       payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE;
+      payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
     }
 
   return payloadBytes;
@@ -150,7 +151,6 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
         }
 
       m_ctrlContainer.back ()->AddPayload (data);
-
     }
 }
 
@@ -167,7 +167,7 @@ SatBbFrameContainer::GetNextFrame ()
 
   if ( m_ctrlContainer.empty () == false )
     {
-      nextFrame = *m_ctrlContainer.begin ();
+      nextFrame = m_ctrlContainer.front ();
       m_ctrlContainer.pop_front ();
       m_totalDuration -= nextFrame->GetDuration();
     }
@@ -187,13 +187,95 @@ SatBbFrameContainer::GetNextFrame ()
         {
           std::random_shuffle( nonEmpytQueues.begin (), nonEmpytQueues.end ());
 
-          nextFrame = *(*nonEmpytQueues.begin ())->begin ();
+          nextFrame = (*nonEmpytQueues.begin ())->front ();
           (*nonEmpytQueues.begin ())->pop_front ();
           m_totalDuration -= nextFrame->GetDuration();
         }
     }
 
   return nextFrame;
+}
+
+void
+SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
+{
+  // go through all BB Frame containers from the most efficient to the robust
+  for (FrameContainer_t::reverse_iterator itFromMerge = m_container.rbegin (); itFromMerge != m_container.rend (); itFromMerge++ )
+    {
+      // BB Frames currently exists in the BB Frame container for this MODCOD.
+      if ( itFromMerge->second.empty () == false )
+        {
+          // Get occupancy i.e. ratio of used space to maximum space in buffer at the back of the list.
+          // Occupancy is not necessarily efficiency.
+          double occupancy = itFromMerge->second.back ()->GetOccupancy ();
+
+          // GetBbFrameHighOccupancyThreshold () returns a configured parameter. Part of a high-low threshold hysteresis damper.
+          // Current occupancy is no good. Need to off load the contents to some other BB Frame.
+          if (occupancy < m_bbFrameConf->GetBbFrameHighOccupancyThreshold ())
+            {
+              // weighted occupancy takes into account the spectra efficiency of the current frame (MODCOD and frame length).
+              double weightedOccupancy = itFromMerge->second.back ()->GetSpectralEfficiency (carrierBandwidthInHz) * occupancy;
+
+              double maxNewOccupancyIfMerged = 0.0; // holder variable during a maximum value search
+              Ptr<SatBbFrame> frameToMerge = NULL;  // holder variable for frame to potentially merge
+
+              // check rest of the containers to find frame to merge.
+              for ( FrameContainer_t::reverse_iterator itToMerge = ++FrameContainer_t::reverse_iterator (itFromMerge); itToMerge != m_container.rend (); itToMerge++ )
+                {
+                  // BB Frames currently exists in the BB Frame container for this MODCOD.
+                  if (itToMerge->second.empty () == false)
+                    {
+                      /* check whether there is enough space in the frame */
+                      // GetBbFrameLowOccupancyThreshold() returns a configured parameter. Part of a high-low threshold hysteresis damper.
+                      // Current occupancy is no good. Need to fill in more.
+                      double occupancy2 = itToMerge->second.back ()->GetOccupancy ();
+
+                      if (occupancy2 < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
+                        {
+                          Ptr<SatBbFrame> frame = itFromMerge->second.back ();
+
+                          double newOccupancyIfMerged = itToMerge->second.back ()->GetOccupancyIfMerged (frame);
+
+                          if (newOccupancyIfMerged > maxNewOccupancyIfMerged)
+                            {
+                              maxNewOccupancyIfMerged = newOccupancyIfMerged;
+                              frameToMerge = itToMerge->second.back ();
+                            }
+                        }
+                    }
+                }
+
+              // check control message container tail still.
+              if ( m_ctrlContainer.empty () == false )
+                {
+                  if (m_ctrlContainer.back ()->GetOccupancy() < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
+                    {
+                      double newOccupancyIfMerged = m_ctrlContainer.back ()->GetOccupancyIfMerged (itFromMerge->second.back ());
+
+                      if (newOccupancyIfMerged > maxNewOccupancyIfMerged)
+                        {
+                          maxNewOccupancyIfMerged = newOccupancyIfMerged;
+                          frameToMerge = m_ctrlContainer.back ();
+                        }
+                    }
+                }
+
+              if ( frameToMerge )
+                {
+                  double newWeightedOccupancyIfMerged = frameToMerge->GetSpectralEfficiency (carrierBandwidthInHz) * maxNewOccupancyIfMerged;
+
+                  if ( newWeightedOccupancyIfMerged > weightedOccupancy )
+                    {
+                      // Merge two frames
+                      if ( frameToMerge->MergeWithFrame (itFromMerge->second.back ()) )
+                        {
+                          itFromMerge->second.pop_back ();
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 

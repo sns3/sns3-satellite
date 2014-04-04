@@ -122,8 +122,9 @@ public:
    *    *
    * \param conf BB Frame configuration
    * \param address MAC address
+   * \param Carrier bandwidth where scheduler is associated to [Hz].
    */
-  SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address);
+  SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
 
   /**
    * Destroy a SatFwdLinkScheduler
@@ -316,6 +317,10 @@ private:
    */
   Time m_cnoEstimationWindow;
 
+  /**
+   * Carrier bandwidth in hertz where scheduler is associated to.
+   */
+  double m_carrierBandwidthInHz;
 
  };
 

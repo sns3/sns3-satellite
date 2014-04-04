@@ -147,6 +147,27 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
+   * Get BB frame header size in bytes.
+   *
+   * \return BB frame header size in bytes
+   */
+  inline uint32_t GetBbFrameHeaderSizeInBytes () const { return m_bbFrameHeaderSizeInBytes; }
+
+  /**
+   * Get configured BB frame high occupancy threshold.
+   *
+   * \return BB frame high occupancy threshold
+   */
+  inline double GetBbFrameHighOccupancyThreshold () const { return m_bbFrameHighOccupancyThreshold; }
+
+  /**
+   * Get configured BB frame low occupancy threshold.
+   *
+   * \return BB frame low occupancy threshold
+   */
+  inline double GetBbFrameLowOccupancyThreshold () const { return m_bbFrameLowOccupancyThreshold; }
+
+  /**
    * Initialize the C/No requirements for a given BLER target
    * \param linkResults DVB-S2 link results
    */
@@ -185,13 +206,6 @@ public:
    * \return SatModcod_t The default MODCOD
    */
   SatEnums::SatModcod_t GetDefaultModCod () const;
-
-  /**
-   * Get BB frame header size in bytes.
-   *
-   * \return BB frame header size in bytes
-   */
-  inline uint32_t GetBbFrameHeaderSizeInBytes () const { return m_bbFrameHeaderSizeInBytes; }
 
 private:
 
@@ -246,6 +260,16 @@ private:
    * The BB frame header size in bytes
    */
   uint32_t m_bbFrameHeaderSizeInBytes;
+
+  /**
+   * The BB frame high occupancy threshold in range 0 - 1
+   */
+  double m_bbFrameHighOccupancyThreshold;
+
+  /**
+   * The BB frame low occupancy threshold in range 0 - 1
+   */
+  double m_bbFrameLowOccupancyThreshold;
 
   /**
    * Block error rate target for the waveforms. Default value

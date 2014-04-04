@@ -100,7 +100,7 @@ SatWaveform::GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRa
 {
   NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
 
-  return ( 8.0 * m_payloadBytes ) / (m_lengthInSymbols / symbolRateInBaud) / carrierBandwidthInHz;
+  return ( SatUtils::BITS_PER_BYTE * m_payloadBytes ) / (m_lengthInSymbols / symbolRateInBaud) / carrierBandwidthInHz;
 }
 
 double
@@ -108,7 +108,7 @@ SatWaveform::GetThroughputInBitsPerSecond (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
 
-  return 8.0 * m_payloadBytes / ( m_lengthInSymbols / symbolRateInBaud );
+  return SatUtils::BITS_PER_BYTE * m_payloadBytes / ( m_lengthInSymbols / symbolRateInBaud );
 }
 
 double

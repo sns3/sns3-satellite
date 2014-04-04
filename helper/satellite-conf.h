@@ -109,21 +109,6 @@ public:
     */
    uint32_t GetRtnLinkCarrierCount () const;
 
-
-   /**
-    * \return The number of the carriers in return link.
-    */
-   uint32_t GetFwdLinkCarrierCount () const;
-
-   /**
-    * Get bandwidth of the forward link carrier.
-    *
-    * \param carrierId Id of the carrier.
-    * \param bandwidthType Type of the bandwidth.
-    * \return Requested carrier frequency.
-    */
-   double GetFwdLinkCarrierFrequencyHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
-
    /**
     * Get count of the GWs (positions).
     *
@@ -182,6 +167,11 @@ public:
    double GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType );
 
    /**
+    * \return The number of the carriers in return link.
+    */
+   uint32_t GetFwdLinkCarrierCount () const;
+
+   /**
     * Definition for beam ID index (column) in m_conf
     */
    static const uint32_t BEAM_ID_INDEX = 0;
@@ -203,6 +193,15 @@ public:
    static const uint32_t BEAM_ELEM_COUNT = 4;
 
 private:
+
+   /**
+    * Get bandwidth of the forward link carrier.
+    *
+    * \param carrierId Id of the carrier.
+    * \param bandwidthType Type of the bandwidth.
+    * \return Requested carrier bandwidth.
+    */
+   double GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
    /**
     * Configures itself with default values. Creates configuration storages as needed.

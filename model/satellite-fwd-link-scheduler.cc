@@ -162,12 +162,13 @@ SatFwdLinkScheduler::SatFwdLinkScheduler ()
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
 }
 
-SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address)
+SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz)
  : m_macAddress (address),
    m_bbFrameConf (conf),
    m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
    m_bbFrameUsageMode (SatFwdLinkScheduler::NORMAL_FRAMES),
-   m_cnoEstimatorMode (SatCnoEstimator::LAST)
+   m_cnoEstimatorMode (SatCnoEstimator::LAST),
+   m_carrierBandwidthInHz (carrierBandwidthInHz)
 {
   NS_LOG_FUNCTION (this);
 
@@ -287,18 +288,19 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
   // Get scheduling objects from LLC
   std::vector< Ptr<SatSchedulingObject> > so =  GetSchedulingObjects ();
 
-  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin () ;it != so.end(); it++ )
+  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
+        ( it != so.end() ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
     {
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
       uint8_t flowId = (*it)->GetFlowId ();
       SatEnums::SatModcod_t modcod = m_bbFrameContainer->GetModcod( flowId, GetSchedulingObjectCno (*it));
 
+      uint32_t frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
+
       while ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ) &&
                (currentObBytes > 0) )
         {
-          uint32_t frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
-
           if ( frameBytes < currentObMinReqBytes)
             {
               frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod);
@@ -309,17 +311,19 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
           if ( p )
             {
               m_bbFrameContainer->AddData (flowId, modcod, p);
+              frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
+            }
+          else if ( m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod))
+            {
+              frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod);
             }
           else
             {
               NS_FATAL_ERROR ("Packet does not fit in empty BB Frame. Control package too long or fragmentation problem in user package!!!");
-           }
+            }
         }
 
-      if (m_bbFrameContainer->GetTotalDuration () >= m_schedulingStopThresholdTime )
-        {
-          it = so.end ();
-        }
+      m_bbFrameContainer->MergeBbFrames (m_carrierBandwidthInHz);
     }
 }
 

@@ -335,9 +335,9 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
   // calculate maximum size of the BB fraem with default (most robust) MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
-  uint32_t maxBbFrameSizeInBytes = bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME) / 8;
+  uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
-  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq, rcMaxCount, maxBbFrameSizeInBytes );
+  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq, rcMaxCount, maxBbFrameDataSizeInBytes );
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,

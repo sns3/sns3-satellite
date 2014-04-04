@@ -98,6 +98,8 @@ public:
    */
   Ptr<SatBbFrame> GetNextFrame ();
 
+  void MergeBbFrames (double carrierBandwidthInHz);
+
   /**
    * Get total transmission duration of the frames in container.
    * \return Total transmission duration of the frames.

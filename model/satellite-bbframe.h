@@ -71,45 +71,88 @@ public:
    * Add payload (packet) to transmit buffer of this BB Frame info
    *
    * \param packet  Pointer to packet wanted to add to transmit buffer
-   * \return Free bytes left in transmit buffer
+   * \return Space left bytes in transmit buffer after addition
    */
   uint32_t AddPayload (Ptr<Packet> packet);
 
   /**
    * Get space left in BB frame transmit buffer in bytes.
-   * \return free bytes in transmit buffer
+   * \return space left in bytes in transmit buffer
    */
   uint32_t GetSpaceLeftInBytes () const;
 
   /**
+   * Get space used in BB frame transmit buffer in bytes.
+   * \return space used in bytes in transmit buffer
+   */
+  uint32_t GetSpaceUsedInBytes () const;
+
+  /**
    * Get the maximum size of the BB Frame transmit buffer in bytes.
-   * \return the maximum size of the BB Frame transmit buffer
+   * \return the maximum size of the BB Frame transmit buffer in bytes
    */
   uint32_t GetMaxSpaceInBytes () const;
+
+  /**
+   * Get the occupancy of the of the BB Frame.
+   * \return the occupancy of the BB Frame 0 - 1.
+   */
+  double GetOccupancy () const;
+
+  /**
+   * Get spectra efficiency of the frame.
+   *
+   * \param carrierBandwidthInHz Carrier bandwidth in hertz.
+   * \return
+   */
+  double GetSpectralEfficiency (double carrierBandwidthInHz) const;
+
+  /**
+   * Checks occupancy of the frame if given frame would been merged with this frame.
+   *
+   * \param mergedFrame Another frame wanted to merge with this frame.
+   * \return O, if frames cannot be merged, occupancy of the merged frame in otherwise.
+   */
+  double GetOccupancyIfMerged (Ptr<SatBbFrame> mergedFrame) const;
+
+  /**
+   * Merge given frame with this frame.
+   *
+   * \param mergedFrame Another frame to be merged with this frame.
+   * \return true if merging done, false otherwise.
+   */
+  bool MergeWithFrame (Ptr<SatBbFrame> mergedFrame);
 
   /**
    * Get duration of the frame transmission.
    * \return duration of the frame transmission
    */
-  inline Time GetDuration () const {return m_duration;}
+  inline Time GetDuration () const { return m_duration; }
 
   /**
    * Get type of the frame.
    * \return Type of the frame
    */
-  inline SatEnums::SatBbFrameType_t GetFrameType () const {return m_frameType;}
+  inline SatEnums::SatBbFrameType_t GetFrameType () const { return m_frameType; }
 
   /**
    * Get type of the frame.
    * \return Type of the frame
    */
-  inline SatEnums::SatModcod_t GetModcod () const {return m_modCod;}
+  inline SatEnums::SatModcod_t GetModcod () const { return m_modCod; }
+
+  /**
+   * Get header size of the frame .
+   * \return Header size in bytes.
+   */
+  inline uint32_t GetFrameHeaderSize () const { return m_headerSizeInBytes; }
 
 private:
 
   SatEnums::SatModcod_t m_modCod;
   uint32_t m_freeSpaceInBytes;
   uint32_t m_maxSpaceInBytes;
+  uint32_t m_headerSizeInBytes;
   bool m_containsControlPdu;
   SatBbFramePayload_t m_framePayload;
   Time m_duration;

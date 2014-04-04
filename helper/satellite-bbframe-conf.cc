@@ -130,6 +130,8 @@ SatBbFrameConf::SatBbFrameConf ()
   m_plHeaderInSlots (1),
   m_dummyFrameInSlots (36),
   m_bbFrameHeaderSizeInBytes (10),
+  m_bbFrameHighOccupancyThreshold (0.9),
+  m_bbFrameLowOccupancyThreshold (0.5),
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
@@ -138,7 +140,7 @@ SatBbFrameConf::SatBbFrameConf ()
   m_waveforms ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_FATAL_ERROR ("Default constructor not supported!!!");
 }
 
 SatBbFrameConf::SatBbFrameConf (double symbolRate)
@@ -149,6 +151,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_plHeaderInSlots (1),
   m_dummyFrameInSlots (36),
   m_bbFrameHeaderSizeInBytes (10),
+  m_bbFrameHighOccupancyThreshold (0.9),
+  m_bbFrameLowOccupancyThreshold (0.5),
   m_targetBler (0.00001),
   m_acmEnabled (false),
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
@@ -261,11 +265,21 @@ SatBbFrameConf::GetTypeId (void)
                                     SatEnums::SAT_MODCOD_16APSK_9_TO_10, "16APSK_9_TO_10",
                                     SatEnums::SAT_MODCOD_32APSK_3_TO_4, "32APSK_3_TO_4",
                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5, "32APSK_4_TO_5"))
-    .AddAttribute( "BBFrameHeaderInBytes",
+    .AddAttribute( "BbFrameHeaderInBytes",
                    "BB Frame header size in bytes",
                     UintegerValue (10), // ETSI EN 302 307 V1.3.1 specified 80 bits
                     MakeUintegerAccessor (&SatBbFrameConf::m_bbFrameHeaderSizeInBytes),
                     MakeUintegerChecker<uint32_t> ())
+    .AddAttribute( "BbFrameHighOccupancyThreshold",
+                   "BB Frame high occupancy threshold [0-1]",
+                    DoubleValue (0.9),
+                    MakeDoubleAccessor (&SatBbFrameConf::m_bbFrameHighOccupancyThreshold),
+                    MakeDoubleChecker<double> (0.0, 1.0))
+    .AddAttribute( "BbFrameLowOccupancyThreshold",
+                   "BB Frame low occupancy threshold [0-1]",
+                    DoubleValue (0.5),
+                    MakeDoubleAccessor (&SatBbFrameConf::m_bbFrameLowOccupancyThreshold),
+                    MakeDoubleChecker<double> (0.0, 1.0))
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;

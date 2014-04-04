@@ -277,11 +277,11 @@ SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrie
   switch (chType)
   {
     case SatEnums::FORWARD_FEEDER_CH:
-      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidthType);
+      carrierBandwidthHz = GetFwdLinkCarrierBandwidthHz (carrierId, bandwidthType);
       break;
 
     case SatEnums::FORWARD_USER_CH:
-      carrierBandwidthHz = GetFwdLinkCarrierFrequencyHz (carrierId, bandwidthType);
+      carrierBandwidthHz = GetFwdLinkCarrierBandwidthHz (carrierId, bandwidthType);
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
@@ -460,7 +460,7 @@ SatConf::GetFwdLinkCarrierCount () const
 }
 
 double
-SatConf::GetFwdLinkCarrierFrequencyHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+SatConf::GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
   NS_LOG_FUNCTION (this);
 
