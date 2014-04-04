@@ -441,10 +441,10 @@ SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno)
 }
 
 void
-SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad)
+SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
   NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
-  m_avgNormalizedOfferedLoadCallback (beamId, carrierId, averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
 }
 
 

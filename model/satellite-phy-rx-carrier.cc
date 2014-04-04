@@ -770,7 +770,10 @@ SatPhyRxCarrier::MeasureRandomAccessLoad ()
 
   NS_LOG_INFO ("SatPhyRxCarrier::MeasureRandomAccessLoad - Average normalized offered load: " << averageNormalizedOfferedLoad);
 
-  m_avgNormalizedOfferedLoadCallback (m_beamId, m_carrierId, averageNormalizedOfferedLoad);
+  /// TODO at the moment only one RA allocation channel is fully supported
+  uint32_t allocationChannelId = 0;
+
+  m_avgNormalizedOfferedLoadCallback (m_beamId, m_carrierId, allocationChannelId, averageNormalizedOfferedLoad);
 }
 
 double

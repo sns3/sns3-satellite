@@ -77,7 +77,7 @@ public:
    * \param
    * \param
    */
-  typedef Callback<void,uint32_t,uint32_t,double> AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void,uint32_t,uint32_t,uint32_t,double> AverageNormalizedOfferedLoadCallback;
 
   /**
    * \brief Creation parameters for base PHY object
@@ -330,7 +330,7 @@ public:
   virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
-   *
+   * \brief Function for getting the C/NO information
    * \param beamId Beam id of C/N0 is received
    * \param source Id (address) of the source (sender)
    * \param cno Value of the C/N0
@@ -338,12 +338,13 @@ public:
   void CnoInfo (uint32_t beamId, Address source, Address destination, double cno);
 
   /**
-   *
+   * \brief Function for getting the normalized offered load of the specific random access allocation channel
    * \param beamId Beam id of average normalized load is received
    * \param carrierId Carrier id of average normalized load is received
+   * \param allocationChannelId allocation channel ID
    * \param averageNormalizedOfferedLoad Value of average normalized offered load
    */
-  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad);
+  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad);
 
   /**
    * \brief Set the node info class

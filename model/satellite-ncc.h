@@ -91,9 +91,10 @@ public:
    *
    * \param beamId
    * \param carrierId
+   * \param allocationChannelId
    * \param averageNormalizedOfferedLoad
    */
-  void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, double averageNormalizedOfferedLoad);
+  void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad);
 
   /**
    * Capacity request receiver.
@@ -136,15 +137,17 @@ public:
 
   /**
    *
+   * \param allocationChannelId
    * \param lowLoadBackOffProbability
    */
-  void SetRandomAccessLowLoadBackoffProbability (uint16_t lowLoadBackOffProbability) { m_lowLoadBackOffProbability = lowLoadBackOffProbability; }
+  void SetRandomAccessLowLoadBackoffProbability (uint32_t allocationChannelId, uint16_t lowLoadBackOffProbability);
 
   /**
    *
+   * \param allocationChannelId
    * \param highLoadBackOffProbability
    */
-  void SetRandomAccessHighLoadBackoffProbability (uint16_t highLoadBackOffProbability) { m_highLoadBackOffProbability = highLoadBackOffProbability; }
+  void SetRandomAccessHighLoadBackoffProbability (uint32_t allocationChannelId, uint16_t highLoadBackOffProbability);
 
 private:
 
@@ -157,8 +160,9 @@ private:
    *
    * \param backoffProbability
    * \param beamId
+   * \param allocationChannelId
    */
-  void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId);
+  void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId, uint32_t allocationChannelId);
 
   /**
    * The map containing beams in use (set).
@@ -193,12 +197,12 @@ private:
   /**
    *
    */
-  uint16_t m_lowLoadBackOffProbability;
+  std::map<uint32_t,uint16_t> m_lowLoadBackOffProbability;
 
   /**
    *
    */
-  uint16_t m_highLoadBackOffProbability;
+  std::map<uint32_t,uint16_t> m_highLoadBackOffProbability;
 };
 
 } // namespace ns3

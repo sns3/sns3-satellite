@@ -153,7 +153,7 @@ public:
   /**
    *
    */
-  typedef Callback<void,uint32_t,uint32_t,double > AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void,uint32_t,uint32_t,uint32_t,double > AverageNormalizedOfferedLoadCallback;
 
   /**
    * Set the upper layer receive callback
