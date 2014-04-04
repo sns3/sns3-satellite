@@ -187,7 +187,7 @@ private:
   /**
    *
    */
-  std::map<uint32_t,bool> m_isLowRandomAccessLoad;
+  std::map<std::pair<uint32_t,uint32_t>,bool> m_isLowRandomAccessLoad;
 
   /**
    *

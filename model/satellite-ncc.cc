@@ -95,14 +95,15 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
   NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
 
   bool isLowRandomAccessLoad = true;
-  std::map<uint32_t,bool>::iterator findResult;
-  std::pair<std::map<uint32_t,bool>::iterator,bool> insertResult;
+  std::map<std::pair<uint32_t,uint32_t>,bool>::iterator findResult;
+  std::pair<std::map<std::pair<uint32_t,uint32_t>,bool>::iterator,bool> insertResult;
 
-  findResult = m_isLowRandomAccessLoad.find (beamId);
+  /// search for the current status of load control
+  findResult = m_isLowRandomAccessLoad.find (std::make_pair (beamId,allocationChannelId));
 
   if (findResult == m_isLowRandomAccessLoad.end ())
     {
-      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (beamId,isLowRandomAccessLoad));
+      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (std::make_pair (beamId,allocationChannelId),isLowRandomAccessLoad));
 
       if (!insertResult.second)
         {
@@ -140,7 +141,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
           NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << allocationChannelId << " - Switching to HIGH LOAD back off parameterization");
 
           /// flag RA load as high load
-          m_isLowRandomAccessLoad.at (beamId) = false;
+          m_isLowRandomAccessLoad.at (std::make_pair (beamId,allocationChannelId)) = false;
         }
     }
   /// high RA load in effect
@@ -164,7 +165,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
           NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << allocationChannelId << " - Switching to LOW LOAD back off parameterization");
 
           /// flag RA load as low load
-          m_isLowRandomAccessLoad.at (beamId) = true;
+          m_isLowRandomAccessLoad.at (std::make_pair (beamId,allocationChannelId)) = true;
         }
     }
 }
@@ -184,7 +185,10 @@ SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint3
       NS_FATAL_ERROR ( "SatNcc::SendRaControlMessage - Beam scheduler not found" );
     }
 
+  /// set the random access allocation channel this message affects
   raMsg->SetAllocationChannelId (allocationChannelId);
+
+  /// attach the new load control parameters to the message
   raMsg->SetBackoffProbability (backoffProbability);
 
   NS_LOG_INFO ("SatNcc::CreateRandomAccessLoadControlMessage - Sending random access control message for AC: " << allocationChannelId << ", backoff probability: " << backoffProbability);
