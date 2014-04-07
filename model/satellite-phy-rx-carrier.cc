@@ -58,8 +58,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_numOfOngoingRx (0),
    m_rxPacketCounter (0),
    m_dropCollidingRandomAccessPackets (carrierConf->AreCollidingRandomAccessPacketsAlwaysDropped ()),
-   m_randomAccessDynamicLoadControlMeasurementWindowSize (10), /// TODO change this to parameter
-   m_isRandomAccessEnabledForThisCarrier (false), /// TODO change this to parameter
+   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ()),
+   m_isRandomAccessEnabledForThisCarrier (carrierConf->IsRandomAccessEnabledForThisCarrier ()),
    m_randomAccessBitsInFrame (0),
    m_frameEndSchedulingStarted (false)
 {
@@ -677,65 +677,75 @@ SatPhyRxCarrier::DoFrameEnd ()
 
   NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Time: " << Now ().GetSeconds ());
 
-  MeasureRandomAccessLoad ();
-
-  if (m_crdsaPacketContainer.size () > 0)
+  if (m_isRandomAccessEnabledForThisCarrier)
     {
-      NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Packets in container, will process the frame");
-
-      std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> results = ProcessFrame ();
+      MeasureRandomAccessLoad ();
 
       if (m_crdsaPacketContainer.size () > 0)
         {
-          NS_FATAL_ERROR("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
-        }
+          NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Packets in container, will process the frame");
 
-      /// sort the results based on CRDSA packet IDs to make sure the packets are processed in correct order
-      std::sort (results.begin (), results.end (), CompareCrdsaPacketId);
+          std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> results = ProcessFrame ();
 
-      for (uint32_t i = 0; i < results.size (); i++)
-        {
-          NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Sending a packet to the next layer, slot: " << results[i].ownSlotId
-                       << ", UT: " << results[i].sourceAddress
-                       << ", unique CRDSA packet ID: " << results[i].rxParams->m_txInfo.crdsaUniquePacketId
-                       << ", destination address: " << results[i].destAddress
-                       << ", error: " << results[i].phyError
-                       << ", SINR: " << results[i].cSinr);
-
-          for (uint32_t j = 0; j < results[i].rxParams->m_packetsInBurst.size (); j++)
+          if (m_crdsaPacketContainer.size () > 0)
             {
-              NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Fragment (HL packet) UID: " << results[i].rxParams->m_packetsInBurst.at (j)->GetUid ());
+              NS_FATAL_ERROR("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
             }
 
-          /// uses composite sinr
-          m_packetTrace (results[i].rxParams,
-                         m_ownAddress,
-                         results[i].destAddress,
-                         results[i].ifPower,
-                         results[i].cSinr);
-          /// CRDSA trace
-          m_crdsaUniquePayloadRxTrace (results[i].rxParams->m_packetsInBurst.size (),  // number of packets
-                                       results[i].sourceAddress,  // sender address
-                                       results[i].phyError        // error flag
-                                       );
-          /// send packet upwards
-          m_rxCallback (results[i].rxParams,
-                        results[i].phyError);
+          /// sort the results based on CRDSA packet IDs to make sure the packets are processed in correct order
+          std::sort (results.begin (), results.end (), CompareCrdsaPacketId);
 
-          /// uses composite sinr
-          if (!m_cnoCallback.IsNull ())
+          for (uint32_t i = 0; i < results.size (); i++)
             {
-              double cno = results[i].cSinr * m_rxBandwidthHz;
-              m_cnoCallback (results[i].rxParams->m_beamId,
-                             results[i].sourceAddress,
+              NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Sending a packet to the next layer, slot: " << results[i].ownSlotId
+                           << ", UT: " << results[i].sourceAddress
+                           << ", unique CRDSA packet ID: " << results[i].rxParams->m_txInfo.crdsaUniquePacketId
+                           << ", destination address: " << results[i].destAddress
+                           << ", error: " << results[i].phyError
+                           << ", SINR: " << results[i].cSinr);
+
+              for (uint32_t j = 0; j < results[i].rxParams->m_packetsInBurst.size (); j++)
+                {
+                  NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Fragment (HL packet) UID: " << results[i].rxParams->m_packetsInBurst.at (j)->GetUid ());
+                }
+
+              /// uses composite sinr
+              m_packetTrace (results[i].rxParams,
                              m_ownAddress,
-                             cno);
+                             results[i].destAddress,
+                             results[i].ifPower,
+                             results[i].cSinr);
+              /// CRDSA trace
+              m_crdsaUniquePayloadRxTrace (results[i].rxParams->m_packetsInBurst.size (),  // number of packets
+                                           results[i].sourceAddress,  // sender address
+                                           results[i].phyError        // error flag
+                                           );
+              /// send packet upwards
+              m_rxCallback (results[i].rxParams,
+                            results[i].phyError);
+
+              /// uses composite sinr
+              if (!m_cnoCallback.IsNull ())
+                {
+                  double cno = results[i].cSinr * m_rxBandwidthHz;
+                  m_cnoCallback (results[i].rxParams->m_beamId,
+                                 results[i].sourceAddress,
+                                 m_ownAddress,
+                                 cno);
+                }
+
+              results[i].rxParams = NULL;
             }
 
-          results[i].rxParams = NULL;
+          results.clear ();
         }
-
-      results.clear ();
+    }
+  else
+    {
+      if (m_crdsaPacketContainer.size () > 0)
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::DoFrameEnd - CRDSA packets received by carrier which has random access disabled");
+        }
     }
 
   /// TODO get rid of the hard coded 0
@@ -812,7 +822,7 @@ SatPhyRxCarrier::SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad)
 
   m_randomAccessDynamicLoadControlNormalizedOfferedLoad.push_back (measuredRandomAccessLoad);
 
-  while (m_randomAccessDynamicLoadControlNormalizedOfferedLoad.size () > m_randomAccessDynamicLoadControlMeasurementWindowSize)
+  while (m_randomAccessDynamicLoadControlNormalizedOfferedLoad.size () > m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize)
     {
       m_randomAccessDynamicLoadControlNormalizedOfferedLoad.pop_front ();
     }

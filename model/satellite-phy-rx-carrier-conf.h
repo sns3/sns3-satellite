@@ -233,6 +233,18 @@ public:
    */
   bool AreCollidingRandomAccessPacketsAlwaysDropped () const;
 
+  /**
+   *
+   * \return
+   */
+  bool IsRandomAccessEnabledForThisCarrier () const;
+
+  /**
+   *
+   * \return
+   */
+  uint32_t GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize () const;
+
 private:
 
   /*
@@ -256,6 +268,8 @@ private:
   double m_rxExtNoiseDensityDbwhz;
   bool m_enableIntfOutputTrace;
   bool m_alwaysDropCollidingRandomAccessPackets;
+  bool m_randomAccessEnabledForThisCarrier;
+  uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
 };
 
 } // namespace ns3

@@ -124,7 +124,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
 
   if (itThreshold == m_randomAccessAverageNormalizedOfferedLoadThreshold.end ())
     {
-      NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Average normalized offered load threshold not set for allocation channel: " << allocationChannelId);
+      NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Average normalized offered load threshold not set for beam: " << beamId << ", carrier: " << carrierId << ", allocation channel: " << allocationChannelId);
     }
 
   /// low RA load in effect

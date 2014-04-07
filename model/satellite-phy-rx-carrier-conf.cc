@@ -48,7 +48,9 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_linkResults (),
   m_rxExtNoiseDensityDbwhz (0),
   m_enableIntfOutputTrace (false),
-  m_alwaysDropCollidingRandomAccessPackets (false)
+  m_alwaysDropCollidingRandomAccessPackets (false),
+  m_randomAccessEnabledForThisCarrier (false),
+  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10)
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
@@ -68,7 +70,9 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
    m_linkResults (),
    m_rxExtNoiseDensityDbwhz (0),
    m_enableIntfOutputTrace (false),
-   m_alwaysDropCollidingRandomAccessPackets (false)
+   m_alwaysDropCollidingRandomAccessPackets (false),
+   m_randomAccessEnabledForThisCarrier (false),
+   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10)
 {
 
 }
@@ -98,6 +102,16 @@ SatPhyRxCarrierConf::GetTypeId (void)
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrierConf::m_alwaysDropCollidingRandomAccessPackets),
                     MakeBooleanChecker ())
+    .AddAttribute( "RandomAccessEnabledForThisCarrier",
+                   "Is random access enabled for this carrier",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatPhyRxCarrierConf::m_randomAccessEnabledForThisCarrier),
+                    MakeBooleanChecker ())
+    .AddAttribute( "RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
+                   "Random access average normalized offered load measurement window size",
+                    UintegerValue (10),
+                    MakeUintegerAccessor (&SatPhyRxCarrierConf::m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize),
+                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute( "ConstantErrorRatio",
                    "Constant error ratio",
                     DoubleValue (0.01),
@@ -209,6 +223,18 @@ bool
 SatPhyRxCarrierConf::AreCollidingRandomAccessPacketsAlwaysDropped () const
 {
   return m_alwaysDropCollidingRandomAccessPackets;
+}
+
+bool
+SatPhyRxCarrierConf::IsRandomAccessEnabledForThisCarrier () const
+{
+  return m_randomAccessEnabledForThisCarrier;
+}
+
+uint32_t
+SatPhyRxCarrierConf::GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize () const
+{
+  return m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
 }
 
 } // namespace ns3

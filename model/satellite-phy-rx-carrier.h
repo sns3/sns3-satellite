@@ -573,7 +573,7 @@ private:
   /**
    *
    */
-  uint32_t m_randomAccessDynamicLoadControlMeasurementWindowSize;
+  uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
 
   /**
    *

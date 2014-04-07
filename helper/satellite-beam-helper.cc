@@ -189,8 +189,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   m_ncc = CreateObject<SatNcc> ();
 
-  /// if random access if enabled
-  if (m_randomAccessModel != SatEnums::RA_OFF)
+  /// TODO if random access if enabled
+  //if (m_randomAccessModel != SatEnums::RA_OFF)
+  if (1)
     {
       PointerValue llsConf;
       m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
