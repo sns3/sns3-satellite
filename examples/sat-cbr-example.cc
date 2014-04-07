@@ -30,6 +30,7 @@ NS_LOG_COMPONENT_DEFINE ("sat-cbr-example");
 int
 main (int argc, char *argv[])
 {
+  uint32_t beamIdInFullScenario = 10;
   uint32_t packetSize = 512;
   std::string interval = "1s";
   std::string scenario = "simple";
@@ -38,10 +39,11 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
-  cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
-  cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
+  cmd.AddValue ("beamIdInFullScenario", "Id where Sending/Receiving UT is selected in FULL scenario. (used only when scenario is full) ", beamIdInFullScenario);
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue ("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
   if ( scenario == "larger")
@@ -73,24 +75,38 @@ main (int argc, char *argv[])
 
   if ( scenarioLogFile != "" )
     {
-      helper->EnableCreationTraces(scenarioLogFile, false);
+      helper->EnableCreationTraces (scenarioLogFile, false);
     }
 
-  helper->CreateScenario(satScenario);
+  helper->CreateScenario (satScenario);
 
   helper->EnablePacketTrace ();
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+
+  NodeContainer utUsers;
+  
+  // in full scenario get given beam UTs and use first UT's users
+  // other scenarios get all UT users.
+  if ( scenario == "full")
+    {
+      NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (beamIdInFullScenario);
+      utUsers = helper->GetUserHelper()->GetUtUsers (uts.Get (0));
+    }
+  else
+    {
+      utUsers = helper->GetUtUsers ();
+    }
+
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   uint16_t port = 9;
 
   // create application on GW user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
-  cbrHelper.SetAttribute("Interval", StringValue (interval));
-  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
+  cbrHelper.SetAttribute ("Interval", StringValue (interval));
+  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
 
   ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
   gwSink.Start (Seconds (1.0));
@@ -101,8 +117,8 @@ main (int argc, char *argv[])
   gwCbr.Stop (Seconds (2.1));
 
   // create application on UT user
-  sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
-  cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
   utSink.Start (Seconds (1.0));
@@ -114,6 +130,10 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
+  if ( scenario == "full" )
+    {
+      NS_LOG_INFO("  UT used in full scenario from beam: " << beamIdInFullScenario );
+    }
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);
   NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);

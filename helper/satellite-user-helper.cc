@@ -66,7 +66,10 @@ SatUserHelper::GetInstanceTypeId (void) const
 }
 
 SatUserHelper::SatUserHelper ()
-  : m_router (0)
+  : m_backboneNetworkType (SatUserHelper::NETWORK_TYPE_IDEAL),
+    m_subscriberNetworkType (SatUserHelper::NETWORK_TYPE_CSMA),
+    m_router (0)
+
 {
   NS_LOG_FUNCTION (this);
 }
@@ -176,7 +179,15 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
     }
 
   m_ipv4Ut.NewNetwork();
-  m_utUsers.Add(users);
+
+  std::pair<UtUsersContainer_t::const_iterator, bool> result = m_utUsers.insert ( std::make_pair (ut, users) );
+
+  if (result.second == false)
+    {
+      NS_FATAL_ERROR ("UT is already installed.");
+    }
+
+  m_allUtUsers.Add (users);
 
   return users;
 }
@@ -249,7 +260,22 @@ SatUserHelper::GetUtUsers () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_utUsers;
+  return m_allUtUsers;
+}
+
+NodeContainer
+SatUserHelper::GetUtUsers (Ptr<Node> ut) const
+{
+  NS_LOG_FUNCTION (this);
+
+  UtUsersContainer_t::const_iterator it = m_utUsers.find (ut);
+
+  if ( it == m_utUsers.end ())
+    {
+      NS_FATAL_ERROR ("UT which users are requested in not installed!!!");
+    }
+
+  return it->second;
 }
 
 uint32_t
@@ -265,7 +291,22 @@ SatUserHelper::GetUtUserCount () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_utUsers.GetN ();
+  return m_allUtUsers.GetN ();
+}
+
+uint32_t
+SatUserHelper::GetUtUserCount (Ptr<Node> ut) const
+{
+  NS_LOG_FUNCTION (this);
+
+  UtUsersContainer_t::const_iterator it = m_utUsers.find (ut);
+
+    if ( it == m_utUsers.end ())
+      {
+        NS_FATAL_ERROR ("UT which user count is requested in not installed!!!");
+      }
+
+  return it->second.GetN ();
 }
 
 Ptr<Node>

@@ -50,6 +50,8 @@ public:
      NETWORK_TYPE_IDEAL, NETWORK_TYPE_CSMA
    };
 
+  typedef std::map<Ptr<Node>, NodeContainer>    UtUsersContainer_t;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
   /**
@@ -180,9 +182,15 @@ public:
   NodeContainer GetGwUsers () const;
 
   /**
-   * \return A container having all UT nodes in satellite network.
+   * \return A container having all UT user nodes in satellite network.
    */
   NodeContainer GetUtUsers () const;
+
+  /**
+   * \param ut  Pointer to UT node, which user nodes are requested.
+   * \return A container having UT specific user nodes in satellite network.
+   */
+  NodeContainer GetUtUsers (Ptr<Node> ut) const;
 
   /**
    * \return A pointer to the GW router node in satellite network.
@@ -195,9 +203,15 @@ public:
   uint32_t GetGwUserCount () const;
 
   /**
-   * \return number of UT users in satellite network.
+   * \return number of all UT users in satellite network.
    */
   uint32_t GetUtUserCount () const;
+
+  /**
+   * \param ut Pointer to UT node, which user node count is requested.
+   * \return number of UT specific users in satellite network.
+   */
+  uint32_t GetUtUserCount (Ptr<Node> ut) const;
 
   /**
    * \param pointer to the UT user node
@@ -258,14 +272,16 @@ private:
    * \param gw      container having GWs
    * \param router  pointer to IP router
    */
-  void InstallRouter(NodeContainer gw, Ptr<Node> router);
+  void InstallRouter (NodeContainer gw, Ptr<Node> router);
 
   CsmaHelper        m_csma;
   Ipv4AddressHelper m_ipv4Ut;
   Ipv4AddressHelper m_ipv4Gw;
 
-  NodeContainer     m_gwUsers;
-  NodeContainer     m_utUsers;
+  NodeContainer       m_gwUsers;
+  UtUsersContainer_t  m_utUsers;
+  NodeContainer       m_allUtUsers;
+
   NetworkType       m_backboneNetworkType;
   NetworkType       m_subscriberNetworkType;
 
