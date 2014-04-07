@@ -248,6 +248,19 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
           }
         break;
       }
+    case SatControlMsgTag::SAT_CN0_REPORT:
+      {
+        uint32_t msgId = ctrlTag.GetMsgId ();
+        Ptr<SatCnoReportMessage> cnoReport = DynamicCast<SatCnoReportMessage> ( m_readCtrlCallback (msgId) );
+
+        // Control message NOT found in container anymore, so silently ignore it.
+        // TODO: Should we crash or just silently ignore it.
+        if ( cnoReport != NULL )
+          {
+            m_fwdScheduler->CnoInfoUpdated (sourceAddress, cnoReport->GetCnoEstimate ());
+          }
+        break;
+      }
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACKs need to be forwarded to LLC/ARQ for processing

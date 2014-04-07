@@ -439,7 +439,7 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
-  // add CR tag to message and write msg to container in MAC
+  // add control tag to message and write msg to container in MAC
   SatControlMsgTag tag;
   tag.SetMsgType (msg->GetMsgType ());
   tag.SetMsgId ( m_mac->WriteCtrlMsgToContainer (msg) );

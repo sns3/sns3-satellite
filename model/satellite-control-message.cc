@@ -484,6 +484,132 @@ bool SatCrMessage::HasNonZeroContent () const
   return m_hasNonZeroContent;
 }
 
+NS_OBJECT_ENSURE_REGISTERED (SatCnoReportMessage);
+
+TypeId
+SatCnoReportMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatCnoReportMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatCnoReportMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatCnoReportMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatCnoReportMessage::SatCnoReportMessage ()
+ : m_forwardLinkCNo (NAN)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatCnoReportMessage::~SatCnoReportMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+double
+SatCnoReportMessage::GetCnoEstimate (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_forwardLinkCNo;
+}
+
+void
+SatCnoReportMessage::SetCnoEstimate (double cno)
+{
+  NS_LOG_FUNCTION (this << cno);
+  m_forwardLinkCNo = cno;
+}
+
+uint32_t
+SatCnoReportMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+  return sizeof (m_forwardLinkCNo);
+}
+
+NS_OBJECT_ENSURE_REGISTERED (SatRaMessage);
+
+TypeId
+SatRaMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatRaMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatRaMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatRaMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatRaMessage::SatRaMessage () :
+  m_allocationChannelId (0),
+  m_backoffProbability (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatRaMessage::~SatRaMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatRaMessage::SetAllocationChannelId (uint32_t allocationChannelId)
+{
+  NS_LOG_FUNCTION (this << allocationChannelId);
+
+  m_allocationChannelId = allocationChannelId;
+}
+
+
+uint32_t
+SatRaMessage::GetAllocationChannelId () const
+{
+  return m_allocationChannelId;
+}
+
+void
+SatRaMessage::SetBackoffProbability (uint16_t backoffProbability)
+{
+  NS_LOG_FUNCTION (this << backoffProbability);
+
+  m_backoffProbability = backoffProbability;
+}
+
+
+uint16_t
+SatRaMessage::GetBackoffProbability () const
+{
+  return m_backoffProbability;
+}
+
+uint32_t
+SatRaMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size (RA_CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES +
+                 RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES +
+                 sizeof (uint16_t) + sizeof (uint32_t));
+  return size;
+}
+
 // Control message container
 
 SatControlMsgContainer::SatControlMsgContainer ()
@@ -508,7 +634,6 @@ SatControlMsgContainer::~SatControlMsgContainer ()
 {
   NS_LOG_FUNCTION (this);
 }
-
 
 uint32_t
 SatControlMsgContainer::Add (Ptr<SatControlMessage> ctrlMsg)
@@ -585,79 +710,6 @@ SatControlMsgContainer::EraseFirst ()
 
       m_storeTimeout = Simulator::Schedule (m_storeTime - elapsedTime, &SatControlMsgContainer::EraseFirst, this);
     }
-}
-
-NS_OBJECT_ENSURE_REGISTERED (SatRaMessage);
-
-TypeId
-SatRaMessage::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatRaMessage")
-    .SetParent<SatControlMessage> ()
-    .AddConstructor<SatRaMessage> ()
-  ;
-  return tid;
-}
-
-TypeId
-SatRaMessage::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
-}
-
-SatRaMessage::SatRaMessage () :
-  m_allocationChannelId (0),
-  m_backoffProbability (0)
-{
-  NS_LOG_FUNCTION (this);
-}
-
-SatRaMessage::~SatRaMessage ()
-{
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SatRaMessage::SetAllocationChannelId (uint32_t allocationChannelId)
-{
-  NS_LOG_FUNCTION (this << allocationChannelId);
-
-  m_allocationChannelId = allocationChannelId;
-}
-
-
-uint32_t
-SatRaMessage::GetAllocationChannelId () const
-{
-  return m_allocationChannelId;
-}
-
-void
-SatRaMessage::SetBackoffProbability (uint16_t backoffProbability)
-{
-  NS_LOG_FUNCTION (this << backoffProbability);
-
-  m_backoffProbability = backoffProbability;
-}
-
-
-uint16_t
-SatRaMessage::GetBackoffProbability () const
-{
-  return m_backoffProbability;
-}
-
-uint32_t
-SatRaMessage::GetSizeInBytes () const
-{
-  NS_LOG_FUNCTION (this);
-
-  uint32_t size (RA_CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES +
-                 RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES +
-                 sizeof (uint16_t) + sizeof (uint32_t));
-  return size;
 }
 
 }; // namespace ns3

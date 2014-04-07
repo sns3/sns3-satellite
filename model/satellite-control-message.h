@@ -48,11 +48,12 @@ public:
    */
   typedef enum
     {
-      SAT_NON_CTRL_MSG, //!< SAT_NON_CTRL_MSG
-      SAT_TBTP_CTRL_MSG,//!< SAT_TBTP_CTRL_MSG
-      SAT_CR_CTRL_MSG,  //!< SAT_CR_CTRL_MSG
-      SAT_RA_CTRL_MSG,  //!< SAT_RA_CTRL_MSG
-      SAT_ARQ_ACK       //!< SAT_ARQ_ACK
+      SAT_NON_CTRL_MSG,   //!< SAT_NON_CTRL_MSG
+      SAT_TBTP_CTRL_MSG,  //!< SAT_TBTP_CTRL_MSG
+      SAT_CR_CTRL_MSG,    //!< SAT_CR_CTRL_MSG
+      SAT_RA_CTRL_MSG,    //!< SAT_RA_CTRL_MSG
+      SAT_ARQ_ACK,        //!< SAT_ARQ_ACK
+      SAT_CN0_REPORT      //!< SAT_CN0_REPORT
     } SatControlMsgType_t;
 
   /**
@@ -437,78 +438,61 @@ private:
 
 /**
  * \ingroup satellite
- * \brief The container to store control messages. It assigns ID for added messages.
- * ID is used when message is requested.
+ * \brief C/N0 (CNI) estimation report message.
+ * (Tagged by SatControlMsgTag with type value SAT_CN0_REPORT)
  *
- * Message are deleted after set store time expired for a message. Message is deleted already when read,
- * if this functionality is enabled in creation time.
- *
- * Container is needed to store control messages which content are not wanted to simulate inside packet.
- *
+ * This message is sent periodically by UT to GW.
  */
-class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
+
+class SatCnoReportMessage : public SatControlMessage
 {
 public:
-  /**
-   * Default constructor for SatControlMsgContainer.
-   */
-  SatControlMsgContainer ();
 
   /**
-   * Default constructor for SatControlMsgContainer.
+   * Constructor for SatCnoReportMessage
    */
-  SatControlMsgContainer (Time m_storeTime, bool deleteOnRead);
+  SatCnoReportMessage ();
 
   /**
-   * Destructor for SatControlMsgContainer
+   * Destructor for SatCnoReportMessage
    */
-  ~SatControlMsgContainer ();
+  ~SatCnoReportMessage ();
+
+  // methods derived from base classes
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Add a control message.
+   * Get type of the message.
    *
-   * \param Id of the message to add.
-   * \param Pointer to message to add.
-   *
-   * \return ID of the created added message.
+   * \return SatControlMsgTag::SAT_CN0_REPORT
    */
-  uint32_t Add (Ptr<SatControlMessage> controlMsg);
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CN0_REPORT; }
 
   /**
-   * Get a control message.
-   *
-   * \param Id of the message to get.
-   * \return Pointer to message.
+   * Get C/N0 estimate.
+   * \return Estimate of the C/N0.
    */
-  Ptr<SatControlMessage> Get (uint32_t id);
+  double GetCnoEstimate () const;
+
+  /**
+   * Set C/N0 estimate.
+   * \param cno The estimate of the C/N0.
+   */
+  void SetCnoEstimate (double cno);
+
+  /**
+   * Get real size of the CR message, which can be used to e.g. simulate real size.
+   * \return Real size of the CR message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
 
 private:
 
   /**
-   * Erase first item from container. Schedules a new erase call to this function with time left
-   * for next item in list (if container is not empty).
+   * C/N0 estimate.
    */
-  void EraseFirst ();
-
-  typedef std::pair<Time, Ptr<SatControlMessage> > CtrlMsgMapValue_t;
-  typedef std::map<uint32_t, CtrlMsgMapValue_t > CtrlMsgMap_t;
-  CtrlMsgMap_t   m_ctrlMsgs;
-  uint32_t       m_id;
-  EventId        m_storeTimeout;
-
-  /**
-   * Time to store a message in container.
-   *
-   * If m_deleteOnRead is set false, the message
-   * is always deleted only when this time is elapsed.
-   */
-  Time m_storeTime;
-
-  /**
-   * Flag to tell, if message is deleted from container when read (get).
-   */
-  bool m_deleteOnRead;
-
+  double m_forwardLinkCNo;
 };
 
 /**
@@ -593,6 +577,83 @@ private:
    *
    */
   uint16_t m_backoffProbability;
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief The container to store control messages. It assigns ID for added messages.
+ * ID is used when message is requested.
+ *
+ * Message are deleted after set store time expired for a message. Message is deleted already when read,
+ * if this functionality is enabled in creation time.
+ *
+ * Container is needed to store control messages which content are not wanted to simulate inside packet.
+ *
+ */
+class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
+{
+public:
+  /**
+   * Default constructor for SatControlMsgContainer.
+   */
+  SatControlMsgContainer ();
+
+  /**
+   * Default constructor for SatControlMsgContainer.
+   */
+  SatControlMsgContainer (Time m_storeTime, bool deleteOnRead);
+
+  /**
+   * Destructor for SatControlMsgContainer
+   */
+  ~SatControlMsgContainer ();
+
+  /**
+   * Add a control message.
+   *
+   * \param Id of the message to add.
+   * \param Pointer to message to add.
+   *
+   * \return ID of the created added message.
+   */
+  uint32_t Add (Ptr<SatControlMessage> controlMsg);
+
+  /**
+   * Get a control message.
+   *
+   * \param Id of the message to get.
+   * \return Pointer to message.
+   */
+  Ptr<SatControlMessage> Get (uint32_t id);
+
+private:
+
+  /**
+   * Erase first item from container. Schedules a new erase call to this function with time left
+   * for next item in list (if container is not empty).
+   */
+  void EraseFirst ();
+
+  typedef std::pair<Time, Ptr<SatControlMessage> > CtrlMsgMapValue_t;
+  typedef std::map<uint32_t, CtrlMsgMapValue_t > CtrlMsgMap_t;
+  CtrlMsgMap_t   m_ctrlMsgs;
+  uint32_t       m_id;
+  EventId        m_storeTimeout;
+
+  /**
+   * Time to store a message in container.
+   *
+   * If m_deleteOnRead is set false, the message
+   * is always deleted only when this time is elapsed.
+   */
+  Time m_storeTime;
+
+  /**
+   * Flag to tell, if message is deleted from container when read (get).
+   */
+  bool m_deleteOnRead;
+
 };
 
 

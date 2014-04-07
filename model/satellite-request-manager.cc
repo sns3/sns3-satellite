@@ -71,6 +71,9 @@ SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf)
 
   // Start the request manager evaluation cycle
   Simulator::Schedule (m_evaluationInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
+
+  // Start the C/N0 report cycle
+  m_cnoReportEvent = Simulator::Schedule (m_cnoReportInterval, &SatRequestManager::SendCnoReport, this);
 }
 
 TypeId
@@ -79,11 +82,16 @@ SatRequestManager::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatRequestManager")
     .SetParent<Object> ()
     .AddConstructor<SatRequestManager> ()
-    .AddAttribute( "EvaluationIntervalInSeconds",
-                   "Evaluation interval in seconds",
+    .AddAttribute( "EvaluationInterval",
+                   "Evaluation interval time",
                    TimeValue (Seconds (0.1)),
                    MakeTimeAccessor (&SatRequestManager::m_evaluationInterval),
                    MakeTimeChecker ())
+    .AddAttribute( "CnoReportInterval",
+                   "C/NO report interval time",
+                    TimeValue (Seconds (0.1)),
+                    MakeTimeAccessor (&SatRequestManager::m_cnoReportInterval),
+                    MakeTimeChecker ())
     .AddAttribute( "RttEstimate",
                    "Round trip time estimate for request manager",
                    TimeValue (MilliSeconds (560)),
@@ -575,9 +583,11 @@ SatRequestManager::SendCapacityRequest (Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (this);
 
+  m_cnoReportEvent.Cancel ();
+
   if ( !m_ctrlCallback.IsNull ())
     {
-      NS_LOG_LOGIC ("Send capacity request to GW: " << m_gwAddress);
+      NS_LOG_LOGIC ("Send C/N0 report to GW: " << m_gwAddress);
 
       m_crTrace (Simulator::Now (), m_nodeInfo->GetMacAddress (), crMsg);
 
@@ -588,6 +598,30 @@ SatRequestManager::SendCapacityRequest (Ptr<SatCrMessage> crMsg)
     {
       NS_FATAL_ERROR ("Unable to send capacity request, since the Ctrl callback is NULL!");
     }
+
+  m_cnoReportEvent = Simulator::Schedule (m_cnoReportInterval, &SatRequestManager::SendCnoReport, this);
+}
+
+void
+SatRequestManager::SendCnoReport ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( !m_ctrlCallback.IsNull ())
+    {
+      NS_LOG_LOGIC ("Send capacity request to GW: " << m_gwAddress);
+
+      Ptr<SatCnoReportMessage> cnoReport = CreateObject<SatCnoReportMessage> ();
+
+      cnoReport->SetCnoEstimate (m_lastCno);
+      m_ctrlCallback (cnoReport, m_gwAddress);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unable to send C/N0 report, since the Ctrl callback is NULL!");
+    }
+
+  m_cnoReportEvent = Simulator::Schedule (m_cnoReportInterval, &SatRequestManager::SendCnoReport, this);
 }
 
 void

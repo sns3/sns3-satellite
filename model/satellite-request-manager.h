@@ -196,6 +196,11 @@ private:
    */
   void SendCapacityRequest (Ptr<SatCrMessage> crMsg);
 
+  /**
+   * Send the C/N0 report message via txCallback to SatNetDevice.
+   */
+  void SendCnoReport ();
+
   void ResetAssignedResources ();
   void Reset (uint8_t rc);
   void ResetAll ();
@@ -231,6 +236,16 @@ private:
    * Interval to do the periodical CR evaluation
    */
   Time m_evaluationInterval;
+
+  /**
+   * Interval to send C/N0 report.
+   */
+  Time m_cnoReportInterval;
+
+  /**
+   * Event id for the C/NO report.
+   */
+  EventId m_cnoReportEvent;
 
   /**
    * Round trip time estimate. Used to estimate the amount of

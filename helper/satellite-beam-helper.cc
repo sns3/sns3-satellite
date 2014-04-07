@@ -83,7 +83,7 @@ SatBeamHelper::GetTypeId (void)
                      MakeBooleanAccessor(&SatBeamHelper::m_printDetailedInformationToCreationTraces),
                      MakeBooleanChecker ())
       .AddAttribute ("CtrlMsgStoreTimeInFwdLink", "Time to store a control message in container for forward link.",
-                      TimeValue (MilliSeconds (300)),
+                      TimeValue (MilliSeconds (1000)),
                       MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeFwdLink),
                       MakeTimeChecker ())
       .AddAttribute ("CtrlMsgStoreTimeInRtnLink", "Time to store a control message in container for return link.",

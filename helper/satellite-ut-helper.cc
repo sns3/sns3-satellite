@@ -280,7 +280,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Create a request manager and attach it to LLC, and set control message callback to RM
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
-  rm->SetAttribute ("EvaluationIntervalInSeconds", TimeValue (m_superframeSeq->GetDuration (0)));
+  rm->SetAttribute ("EvaluationInterval", TimeValue (m_superframeSeq->GetDuration (0)));
   rm->Initialize (m_llsConf);
   llc->SetRequestManager (rm);
   rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
