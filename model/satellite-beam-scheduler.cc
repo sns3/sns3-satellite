@@ -318,6 +318,8 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
   UtInfoMap_t::iterator result = m_utInfos.find (utId);
   NS_ASSERT (result != m_utInfos.end ());
 
+  NS_LOG_INFO ("SatBeamScheduler::UtCrReceived - UT: " << utId << " @ " << Now ().GetSeconds ());
+
   m_utInfos[utId]->AddCrMsg (crMsg);
 }
 

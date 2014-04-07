@@ -34,18 +34,19 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (30);
   uint32_t packetSize (20);
   Time interval (Seconds(0.01));
-  Time simLength (Seconds(2.00));
+  Time simLength (Seconds(5.00));
   Time appStartTime = Seconds(0.01);
 
-  // enable info logs
+  // Enable info logs
   LogComponentEnable ("sat-random-access-dynamic-load-control-example", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
   LogComponentEnable ("SatNcc", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
 
-  // read command line parameters given by user
+  // Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
   cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
@@ -57,8 +58,25 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
+  // Disable CRA
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+
   // Enable Random Access with CRDSA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_CRDSA));
+
+  // Set random access parameters
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (2));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (50));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (1));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (1));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumBackOffProbability", DoubleValue (0.3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
 
   // Create reference system, two options:
   // - "Scenario72"
@@ -68,7 +86,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  // create user defined scenario
+  // Create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
@@ -77,13 +95,11 @@ main (int argc, char *argv[])
 
   helper->CreateScenario (SatHelper::USER_DEFINED);
 
-  // get users
+  // Get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
 
-  // >>> Start of actual test using Full scenario >>>
-
-  // port used for packet delivering
+  // Port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
 
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
@@ -92,7 +108,7 @@ main (int argc, char *argv[])
 
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
-  // initialized time values for simulation
+  // Initialized time values for simulation
   uint32_t maxTransmitters = utUsers.GetN ();
 
   ApplicationContainer gwApps;

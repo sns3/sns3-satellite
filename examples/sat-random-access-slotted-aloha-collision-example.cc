@@ -37,14 +37,14 @@ main (int argc, char *argv[])
   Time simLength (Seconds(1.00));
   Time appStartTime = Seconds(0.01);
 
-  // enable info logs
+  // Enable info logs
   LogComponentEnable ("sat-random-access-slotted-aloha-collision-example", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
   LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
   LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
 
-  // read command line parameters given by user
+  // Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
   cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
@@ -59,6 +59,17 @@ main (int argc, char *argv[])
   // Enable Random Access with CRDSA
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_SLOTTED_ALOHA));
 
+  // Set random access parameters
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (2));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (50));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (10000));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (30000));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumBackOffProbability", DoubleValue (0.3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
+
   // Create reference system, two options:
   // - "Scenario72"
   // - "Scenario98"
@@ -67,7 +78,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  // create user defined scenario
+  // Create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
@@ -76,13 +87,11 @@ main (int argc, char *argv[])
 
   helper->CreateScenario (SatHelper::USER_DEFINED);
 
-  // get users
+  // Get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
 
-  // >>> Start of actual test using Full scenario >>>
-
-  // port used for packet delivering
+  // Port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
 
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
@@ -91,7 +100,7 @@ main (int argc, char *argv[])
 
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
-  // initialized time values for simulation
+  // Initialized time values for simulation
   uint32_t maxTransmitters = utUsers.GetN ();
 
   ApplicationContainer gwApps;
