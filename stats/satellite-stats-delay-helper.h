@@ -124,6 +124,21 @@ protected:
    */
   void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
+  /**
+   * \brief Connect the probe to the right collector.
+   * \param probe
+   * \param identifier
+   */
+  bool ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier);
+
+  /**
+   * \brief Find a collector with the right identifier and pass a sample data
+   *        to it.
+   * \param delay
+   * \param identifier
+   */
+  void PassSampleToCollector (Time delay, uint32_t identifier);
+
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
 
@@ -173,6 +188,18 @@ public:
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
+
+  /**
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param packet the received packet, expected to have been tagged with
+   *               SatAppTimeTag.
+   * \param from the InetSocketAddress of the sender of the packet.
+   */
+  static void RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
+                          uint32_t identifier,
+                          Ptr<const Packet> packet,
+                          const Address &from);
 
 protected:
   // inherited from SatStatsDelayHelper base class
@@ -341,6 +368,15 @@ public:
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
+
+  /**
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param packet the received packet, expected to have been tagged with
+   *               SatAppTimeTag.
+   * \param from the InetSocketAddress of the sender of the packet.
+   */
+  void RxCallback (Ptr<const Packet> packet, const Address &from);
 
   /**
    * \brief Receive inputs from trace sources and determine the right collector

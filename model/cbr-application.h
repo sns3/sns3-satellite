@@ -3,16 +3,15 @@
 #ifndef CBR_APPLICATION_H
 #define CBR_APPLICATION_H
 
-#include "ns3/address.h"
-#include "ns3/application.h"
-#include "ns3/event-id.h"
-#include "ns3/ptr.h"
-#include "ns3/data-rate.h"
-#include "ns3/traced-callback.h"
+#include <ns3/address.h>
+#include <ns3/application.h>
+#include <ns3/event-id.h>
+#include <ns3/ptr.h>
+#include <ns3/traced-callback.h>
+#include <ns3/nstime.h>
 
 namespace ns3 {
 
-class Address;
 class Socket;
 
 /**
@@ -76,8 +75,8 @@ private:
   Time            m_lastStartTime; // Time last packet sent
   uint32_t        m_totTxBytes;   // Total bytes sent so far
   EventId         m_sendEvent;    // Eventid of pending "send packet" event
-  bool            m_sending;      // True if currently in sending state
   TypeId          m_tid;
+  bool            m_isStatisticsTagsEnabled;  ///< `EnableStatisticsTags` attribute.
   TracedCallback<Ptr<const Packet> > m_txTrace;
 
 private:

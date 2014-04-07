@@ -18,23 +18,21 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/address.h"
-#include "ns3/inet-socket-address.h"
-#include "ns3/inet6-socket-address.h"
-#include "ns3/node.h"
-#include "ns3/nstime.h"
-#include "ns3/data-rate.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/socket.h"
-#include "ns3/simulator.h"
-#include "ns3/socket-factory.h"
-#include "ns3/packet.h"
-#include "ns3/uinteger.h"
-#include "ns3/trace-source-accessor.h"
-#include "ns3/udp-socket-factory.h"
-#include "ns3/string.h"
-#include "ns3/pointer.h"
+#include <ns3/log.h>
+#include <ns3/inet-socket-address.h>
+#include <ns3/inet6-socket-address.h>
+#include <ns3/node.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/socket.h>
+#include <ns3/simulator.h>
+#include <ns3/socket-factory.h>
+#include <ns3/packet.h>
+#include <ns3/uinteger.h>
+#include <ns3/trace-source-accessor.h>
+#include <ns3/udp-socket-factory.h>
+#include <ns3/string.h>
+#include <ns3/boolean.h>
+#include <ns3/satellite-time-tag.h>
 
 #include "cbr-application.h"
 
@@ -66,6 +64,11 @@ CbrApplication::GetTypeId (void)
                    TypeIdValue (UdpSocketFactory::GetTypeId ()),
                    MakeTypeIdAccessor (&CbrApplication::m_tid),
                    MakeTypeIdChecker ())
+    .AddAttribute ("EnableStatisticsTags",
+                   "If true, some tags will be added to each transmitted packet to assist with statistics computation",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&CbrApplication::m_isStatisticsTagsEnabled),
+                   MakeBooleanChecker ())
     .AddTraceSource ("Tx", "A new packet is created and is sent",
                      MakeTraceSourceAccessor (&CbrApplication::m_txTrace))
   ;
@@ -76,7 +79,8 @@ CbrApplication::GetTypeId (void)
 CbrApplication::CbrApplication ()
   : m_socket (0),
     m_lastStartTime (Seconds (0)),
-    m_totTxBytes (0)
+    m_totTxBytes (0),
+    m_isStatisticsTagsEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -167,6 +171,13 @@ void CbrApplication::SendPacket ()
 
   NS_ASSERT (m_sendEvent.IsExpired ());
   Ptr<Packet> packet = Create<Packet> (m_pktSize);
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAppTimeTag tag for packet delay computation at the receiver end.
+      packet->AddPacketTag (SatAppTimeTag (Simulator::Now ()));
+    }
+
   m_txTrace (packet);
   m_socket->Send (packet);
   m_totTxBytes += m_pktSize;
@@ -210,3 +221,4 @@ void CbrApplication::ConnectionFailed (Ptr<Socket> socket)
 }
 
 } // Namespace ns3
+

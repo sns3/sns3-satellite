@@ -36,6 +36,7 @@
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-phy.h>
 
+#include <ns3/satellite-time-tag.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/singleton.h>
@@ -341,63 +342,18 @@ SatStatsDelayHelper::RxDelayCallback (Time delay, const Address &from)
       const Address addr = Mac48Address::ConvertFrom (from);
       std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (addr);
 
-      if (it == m_identifierMap.end ())
+      if (it != m_identifierMap.end ())
+        {
+          PassSampleToCollector (delay, it->second);
+        }
+      else
         {
           NS_LOG_WARN (this << " discarding a packet delay of " << delay.GetSeconds ()
                             << " from statistics collection because of"
                             << " unknown sender address " << addr);
         }
-      else
-        {
-          // Find the collector with the right identifier.
-          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
-          NS_ASSERT_MSG (collector != 0,
-                         "Unable to find collector with identifier " << it->second);
-
-          switch (GetOutputType ())
-            {
-            case OUTPUT_SCALAR_FILE:
-            case OUTPUT_SCALAR_PLOT:
-              {
-                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != 0);
-                c->TraceSinkDouble (0.0, delay.GetSeconds ());
-                break;
-              }
-
-            case OUTPUT_SCATTER_FILE:
-            case OUTPUT_SCATTER_PLOT:
-              {
-                Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-                NS_ASSERT (c != 0);
-                c->TraceSinkDouble (0.0, delay.GetSeconds ());
-                break;
-              }
-
-            case OUTPUT_HISTOGRAM_FILE:
-            case OUTPUT_HISTOGRAM_PLOT:
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              {
-                Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-                NS_ASSERT (c != 0);
-                c->TraceSinkDouble (0.0, delay.GetSeconds ());
-                break;
-              }
-
-            default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
-
-            } // end of `switch (GetOutputType ())`
-
-        } // end of `if (it == m_identifierMap.end ())`
-
-    } // end of else of `if (from.IsInvalid ())`
-
-} // end of `void RxDelayCallback (Time, const Address);`
+    }
+}
 
 
 void
@@ -422,6 +378,114 @@ SatStatsDelayHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 
     }
 }
+
+
+bool
+SatStatsDelayHelper::ConnectProbeToCollector (Ptr<Probe> probe,
+                                              uint32_t identifier)
+{
+  NS_LOG_FUNCTION (this << probe << probe->GetName () << identifier);
+
+  bool ret = false;
+  switch (GetOutputType ())
+    {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+      ret = m_terminalCollectors.ConnectWithProbe (probe,
+                                                   "OutputSeconds",
+                                                   identifier,
+                                                   &ScalarCollector::TraceSinkDouble);
+      break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+      ret = m_terminalCollectors.ConnectWithProbe (probe,
+                                                   "OutputSeconds",
+                                                   identifier,
+                                                   &UnitConversionCollector::TraceSinkDouble);
+      break;
+
+    case OUTPUT_HISTOGRAM_FILE:
+    case OUTPUT_HISTOGRAM_PLOT:
+    case OUTPUT_PDF_FILE:
+    case OUTPUT_PDF_PLOT:
+    case OUTPUT_CDF_FILE:
+    case OUTPUT_CDF_PLOT:
+      ret = m_terminalCollectors.ConnectWithProbe (probe,
+                                                   "OutputSeconds",
+                                                   identifier,
+                                                   &DistributionCollector::TraceSinkDouble);
+      break;
+
+    default:
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
+      break;
+    }
+
+  if (ret)
+    {
+      NS_LOG_INFO (this << " created probe " << probe->GetName ()
+                        << ", connected to collector " << identifier);
+    }
+  else
+    {
+      NS_LOG_WARN (this << " unable to connect probe " << probe->GetName ()
+                        << " to collector " << identifier);
+    }
+
+  return ret;
+}
+
+
+void
+SatStatsDelayHelper::PassSampleToCollector (Time delay, uint32_t identifier)
+{
+  //NS_LOG_FUNCTION (this << delay.GetSeconds () << identifier);
+
+  Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
+  NS_ASSERT_MSG (collector != 0,
+                 "Unable to find collector with identifier " << identifier);
+
+  switch (GetOutputType ())
+    {
+    case OUTPUT_SCALAR_FILE:
+    case OUTPUT_SCALAR_PLOT:
+      {
+        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
+        NS_ASSERT (c != 0);
+        c->TraceSinkDouble (0.0, delay.GetSeconds ());
+        break;
+      }
+
+    case OUTPUT_SCATTER_FILE:
+    case OUTPUT_SCATTER_PLOT:
+      {
+        Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
+        NS_ASSERT (c != 0);
+        c->TraceSinkDouble (0.0, delay.GetSeconds ());
+        break;
+      }
+
+    case OUTPUT_HISTOGRAM_FILE:
+    case OUTPUT_HISTOGRAM_PLOT:
+    case OUTPUT_PDF_FILE:
+    case OUTPUT_PDF_PLOT:
+    case OUTPUT_CDF_FILE:
+    case OUTPUT_CDF_PLOT:
+      {
+        Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
+        NS_ASSERT (c != 0);
+        c->TraceSinkDouble (0.0, delay.GetSeconds ());
+        break;
+      }
+
+    default:
+      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
+      break;
+
+    } // end of `switch (GetOutputType ())`
+
+} // end of `void PassSampleToCollector (Time, uint32_t)`
 
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
@@ -466,72 +530,55 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
 
       for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
         {
-          // Create the probe.
-          std::ostringstream probeName;
-          probeName << utUserId << "-" << i;
-          Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
-          probe->SetName (probeName.str ());
+          Ptr<Application> app = (*it)->GetApplication (i);
+          bool isConnected = false;
 
-          // Connect the object to the probe.
-          if (probe->ConnectByObject ("RxDelay", (*it)->GetApplication (i)))
+          /*
+           * Some applications support RxDelay trace sources, and some other
+           * applications support Rx trace sources. Below we support both ways.
+           */
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != 0)
             {
-              // Connect the probe to the right collector.
-              bool ret = false;
-              switch (GetOutputType ())
+              NS_LOG_LOGIC (this << " attempt to connect using RxDelay");
+
+              // Create the probe.
+              std::ostringstream probeName;
+              probeName << utUserId << "-" << i;
+              Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
+              probe->SetName (probeName.str ());
+
+              // Connect the object to the probe.
+              if (probe->ConnectByObject ("RxDelay", app))
                 {
-                case SatStatsHelper::OUTPUT_SCALAR_FILE:
-                case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                               "OutputSeconds",
-                                                               identifier,
-                                                               &ScalarCollector::TraceSinkDouble);
-                  break;
-
-                case SatStatsHelper::OUTPUT_SCATTER_FILE:
-                case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                               "OutputSeconds",
-                                                               identifier,
-                                                               &UnitConversionCollector::TraceSinkDouble);
-                  break;
-
-                case OUTPUT_HISTOGRAM_FILE:
-                case OUTPUT_HISTOGRAM_PLOT:
-                case OUTPUT_PDF_FILE:
-                case OUTPUT_PDF_PLOT:
-                case OUTPUT_CDF_FILE:
-                case OUTPUT_CDF_PLOT:
-                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                               "OutputSeconds",
-                                                               identifier,
-                                                               &DistributionCollector::TraceSinkDouble);
-                  break;
-
-                default:
-                  NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-                  break;
-                }
-
-              if (ret)
-                {
-                  NS_LOG_INFO (this << " created probe " << probeName
-                                    << ", connected to collector " << identifier);
+                  isConnected = ConnectProbeToCollector (probe, identifier);
                   m_probes.push_back (probe->GetObject<Probe> ());
                 }
-              else
-                {
-                  NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                    << " to collector " << identifier);
-                }
+            }
+          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
+            {
+              NS_LOG_LOGIC (this << " attempt to connect using Rx");
+              Callback<void, Ptr<const Packet>, const Address &> rxCallback
+                = MakeBoundCallback (&SatStatsFwdAppDelayHelper::RxCallback,
+                                     this,
+                                     identifier);
+              isConnected = app->TraceConnectWithoutContext ("Rx",
+                                                             rxCallback);
+            }
+
+          if (isConnected)
+            {
+              NS_LOG_INFO (this << " successfully connected"
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
             }
           else
             {
               /*
                * We're being tolerant here by only logging a warning, because
                * not every kind of Application is equipped with the expected
-               * RxDelay trace source.
+               * RxDelay or Rx trace source.
                */
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
+              NS_LOG_WARN (this << " unable to connect"
                                 << " with node ID " << (*it)->GetId ()
                                 << " application #" << i);
             }
@@ -540,7 +587,84 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
 
     } // end of `for (it = utUsers.Begin(); it != utUsers.End (); ++it)`
 
+  /*
+   * Some sender applications might need a special attribute to be enabled
+   * before delay statistics can be computed. We enable it here.
+   */
+  NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
+  for (NodeContainer::Iterator it = gwUsers.Begin(); it != gwUsers.End (); ++it)
+    {
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+
+          if (!app->SetAttributeFailSafe ("EnableStatisticsTags",
+                                          BooleanValue (true)))
+            {
+              NS_LOG_WARN (this << " node ID " << (*it)->GetId ()
+                                << " application #" << i
+                                << " might not produce the required tags"
+                                << " in the packets it transmits,"
+                                << " thus preventing delay statistics"
+                                << " from this application");
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (it = gwUsers.Begin(); it != gwUsers.End (); ++it)`
+
 } // end of `void DoInstallProbes ();`
+
+
+void // static
+SatStatsFwdAppDelayHelper::RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
+                                       uint32_t identifier,
+                                       Ptr<const Packet> packet,
+                                       const Address &from)
+{
+  NS_LOG_FUNCTION (helper << identifier << packet << packet->GetSize () << from);
+
+  //  bool isTagged = false;
+  //  ByteTagIterator it = packet->GetByteTagIterator ();
+  //
+  //  while (!isTagged && it.HasNext ())
+  //    {
+  //      ByteTagIterator::Item item = it.Next ();
+  //
+  //      if (item.GetTypeId () == SatAppTimeTag::GetTypeId ())
+  //        {
+  //          NS_LOG_DEBUG ("Contains a SatAppTimeTag tag:"
+  //                        << " start=" << item.GetStart ()
+  //                        << " end=" << item.GetEnd ());
+  //          SatAppTimeTag timeTag;
+  //          item.GetTag (timeTag);
+  //          const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+  //          helper->PassSampleToCollector (delay, identifier);
+  //          isTagged = true; // this will exit the while loop.
+  //        }
+  //    }
+  //
+  //  if (!isTagged)
+  //    {
+  //      NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
+  //                   << " from statistics collection"
+  //                   << " because it does not contain any SatAppTimeTag");
+  //    }
+
+  SatAppTimeTag timeTag;
+  if (packet->PeekPacketTag (timeTag))
+    {
+      NS_LOG_DEBUG ("Contains a SatAppTimeTag tag");
+      const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+      helper->PassSampleToCollector (delay, identifier);
+    }
+  else
+    {
+      NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
+                   << " from statistics collection"
+                   << " because it does not contain any SatAppTimeTag");
+    }
+}
 
 
 // FORWARD LINK DEVICE-LEVEL //////////////////////////////////////////////////
@@ -592,61 +716,14 @@ SatStatsFwdDevDelayHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
 
       // Connect the object to the probe.
-      if (probe->ConnectByObject ("RxDelay", dev))
+      if (probe->ConnectByObject ("RxDelay", dev)
+          && ConnectProbeToCollector (probe, identifier))
         {
-          // Connect the probe to the right collector.
-          bool ret = false;
-          switch (GetOutputType ())
-            {
-            case SatStatsHelper::OUTPUT_SCALAR_FILE:
-            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &ScalarCollector::TraceSinkDouble);
-              break;
+          m_probes.push_back (probe->GetObject<Probe> ());
 
-            case SatStatsHelper::OUTPUT_SCATTER_FILE:
-            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &UnitConversionCollector::TraceSinkDouble);
-              break;
-
-            case OUTPUT_HISTOGRAM_FILE:
-            case OUTPUT_HISTOGRAM_PLOT:
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &DistributionCollector::TraceSinkDouble);
-              break;
-
-            default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
-            }
-
-          if (ret)
-            {
-              NS_LOG_INFO (this << " created probe " << probeName
-                                << ", connected to collector " << identifier);
-              m_probes.push_back (probe->GetObject<Probe> ());
-
-              // Enable statistics-related tags and trace sources on the device.
-              dev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
-            }
-          else
-            {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                << " to collector " << identifier);
-            }
-
-        } // end of `if (probe->ConnectByObject ("RxDelay", dev))`
+          // Enable statistics-related tags and trace sources on the device.
+          dev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
       else
         {
           NS_FATAL_ERROR ("Error connecting to RxDelay trace source of SatNetDevice"
@@ -725,62 +802,15 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
       NS_ASSERT (satMac != 0);
 
       // Connect the object to the probe.
-      if (probe->ConnectByObject ("RxDelay", satMac))
+      if (probe->ConnectByObject ("RxDelay", satMac)
+          && ConnectProbeToCollector (probe, identifier))
         {
-          // Connect the probe to the right collector.
-          bool ret = false;
-          switch (GetOutputType ())
-            {
-            case SatStatsHelper::OUTPUT_SCALAR_FILE:
-            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &ScalarCollector::TraceSinkDouble);
-              break;
+          m_probes.push_back (probe->GetObject<Probe> ());
 
-            case SatStatsHelper::OUTPUT_SCATTER_FILE:
-            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &UnitConversionCollector::TraceSinkDouble);
-              break;
-
-            case OUTPUT_HISTOGRAM_FILE:
-            case OUTPUT_HISTOGRAM_PLOT:
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &DistributionCollector::TraceSinkDouble);
-              break;
-
-            default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
-            }
-
-          if (ret)
-            {
-              NS_LOG_INFO (this << " created probe " << probeName
-                                << ", connected to collector " << identifier);
-              m_probes.push_back (probe->GetObject<Probe> ());
-
-              // Enable statistics-related tags and trace sources on the device.
-              satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
-              satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
-            }
-          else
-            {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                << " to collector " << identifier);
-            }
-
-        } // end of `if (probe->ConnectByObject ("RxDelay", satMac))`
+          // Enable statistics-related tags and trace sources on the device.
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+          satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
       else
         {
           NS_FATAL_ERROR ("Error connecting to RxDelay trace source of satMac"
@@ -864,62 +894,15 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
       NS_ASSERT (satPhy != 0);
 
       // Connect the object to the probe.
-      if (probe->ConnectByObject ("RxDelay", satPhy))
+      if (probe->ConnectByObject ("RxDelay", satPhy)
+          && ConnectProbeToCollector (probe, identifier))
         {
-          // Connect the probe to the right collector.
-          bool ret = false;
-          switch (GetOutputType ())
-            {
-            case SatStatsHelper::OUTPUT_SCALAR_FILE:
-            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &ScalarCollector::TraceSinkDouble);
-              break;
+          m_probes.push_back (probe->GetObject<Probe> ());
 
-            case SatStatsHelper::OUTPUT_SCATTER_FILE:
-            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &UnitConversionCollector::TraceSinkDouble);
-              break;
-
-            case OUTPUT_HISTOGRAM_FILE:
-            case OUTPUT_HISTOGRAM_PLOT:
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                           "OutputSeconds",
-                                                           identifier,
-                                                           &DistributionCollector::TraceSinkDouble);
-              break;
-
-            default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
-            }
-
-          if (ret)
-            {
-              NS_LOG_INFO (this << " created probe " << probeName
-                                << ", connected to collector " << identifier);
-              m_probes.push_back (probe->GetObject<Probe> ());
-
-              // Enable statistics-related tags and trace sources on the device.
-              satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
-              satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
-            }
-          else
-            {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
-                                << " to collector " << identifier);
-            }
-
-        } // end of `if (probe->ConnectByObject ("RxDelay", satPhy))`
+          // Enable statistics-related tags and trace sources on the device.
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
       else
         {
           NS_FATAL_ERROR ("Error connecting to RxDelay trace source of SatPhy"
@@ -982,19 +965,43 @@ SatStatsRtnAppDelayHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  // Create a map of UT user addresses and identifiers.
   NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
   for (NodeContainer::Iterator it = utUsers.Begin ();
        it != utUsers.End (); ++it)
     {
+      // Create a map of UT user addresses and identifiers.
       SaveIpv4AddressAndIdentifier (*it);
-    }
+
+      /*
+       * Some sender applications might need a special attribute to be enabled
+       * before delay statistics can be computed. We enable it here.
+       */
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+
+          if (!app->SetAttributeFailSafe ("EnableStatisticsTags",
+                                          BooleanValue (true)))
+            {
+              NS_LOG_WARN (this << " node ID " << (*it)->GetId ()
+                                << " application #" << i
+                                << " might not produce the required tags"
+                                << " in the transmitted packets,"
+                                << " thus preventing delay statistics"
+                                << " from this sender application");
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (NodeContainer::Iterator it: utUsers)`
 
   // Connect to trace sources at GW user node's applications.
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  Callback<void, Time, const Address &> callback
+  Callback<void, Time, const Address &> rxDelayCallback
     = MakeCallback (&SatStatsRtnAppDelayHelper::Ipv4Callback, this);
+  Callback<void, Ptr<const Packet>, const Address &> rxCallback
+    = MakeCallback (&SatStatsRtnAppDelayHelper::RxCallback, this);
 
   for (NodeContainer::Iterator it = gwUsers.Begin ();
        it != gwUsers.End (); ++it)
@@ -1002,10 +1009,27 @@ SatStatsRtnAppDelayHelper::DoInstallProbes ()
       for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
         {
           Ptr<Application> app = (*it)->GetApplication (i);
+          bool isConnected = false;
 
-          if (app->TraceConnectWithoutContext ("RxDelay", callback))
+          /*
+           * Some applications support RxDelay trace sources, and some other
+           * applications support Rx trace sources. Below we support both ways.
+           */
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != 0)
             {
-              NS_LOG_INFO (this << " successfully connected with node ID " << (*it)->GetId ()
+              isConnected = app->TraceConnectWithoutContext ("RxDelay",
+                                                             rxDelayCallback);
+            }
+          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
+            {
+              isConnected = app->TraceConnectWithoutContext ("Rx",
+                                                             rxCallback);
+            }
+
+          if (isConnected)
+            {
+              NS_LOG_INFO (this << " successfully connected"
+                                << " with node ID " << (*it)->GetId ()
                                 << " application #" << i);
             }
           else
@@ -1013,15 +1037,68 @@ SatStatsRtnAppDelayHelper::DoInstallProbes ()
               /*
                * We're being tolerant here by only logging a warning, because
                * not every kind of Application is equipped with the expected
-               * Rx trace source.
+               * RxDelay or Rx trace source.
                */
-              NS_LOG_WARN (this << " unable to connect with node ID " << (*it)->GetId ()
+              NS_LOG_WARN (this << " unable to connect"
+                                << " with node ID " << (*it)->GetId ()
                                 << " application #" << i);
             }
-        }
-    }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (NodeContainer::Iterator it: gwUsers)`
 
 } // end of `void DoInstallProbes ();`
+
+
+void
+SatStatsRtnAppDelayHelper::RxCallback (Ptr<const Packet> packet,
+                                       const Address &from)
+{
+  //NS_LOG_FUNCTION (this << packet << packet->GetSize () << from);
+
+  //  bool isTagged = false;
+  //  ByteTagIterator it = packet->GetByteTagIterator ();
+  //
+  //  while (!isTagged && it.HasNext ())
+  //    {
+  //      ByteTagIterator::Item item = it.Next ();
+  //
+  //      if (item.GetTypeId () == SatAppTimeTag::GetTypeId ())
+  //        {
+  //          NS_LOG_DEBUG ("Contains a SatAppTimeTag tag:"
+  //                        << " start=" << item.GetStart ()
+  //                        << " end=" << item.GetEnd ());
+  //          SatAppTimeTag timeTag;
+  //          item.GetTag (timeTag);
+  //          const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+  //          helper->PassSampleToCollector (delay, identifier);
+  //          isTagged = true; // this will exit the while loop.
+  //        }
+  //    }
+  //
+  //  if (!isTagged)
+  //    {
+  //      NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
+  //                   << " from statistics collection"
+  //                   << " because it does not contain any SatAppTimeTag");
+  //    }
+
+
+  SatAppTimeTag timeTag;
+  if (packet->PeekPacketTag (timeTag))
+    {
+      NS_LOG_DEBUG (this << " contains a SatAppTimeTag tag");
+      Ipv4Callback (Simulator::Now () - timeTag.GetSenderTimestamp (), from);
+    }
+  else
+    {
+      NS_LOG_WARN (this << " discarding a packet of " << packet->GetSize ()
+                        << " from statistics collection"
+                        << " because it does not contain any SatAppTimeTag");
+    }
+
+} // end of `void RxCallback (Ptr<const Packet>, const Address);`
 
 
 void
@@ -1043,53 +1120,9 @@ SatStatsRtnAppDelayHelper::Ipv4Callback (Time delay, const Address &from)
         }
       else
         {
-          // Find the collector with the right identifier.
-          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it1->second);
-          NS_ASSERT_MSG (collector != 0,
-                         "Unable to find collector with identifier " << it1->second);
-
-          switch (GetOutputType ())
-            {
-            case OUTPUT_SCALAR_FILE:
-            case OUTPUT_SCALAR_PLOT:
-              {
-                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != 0);
-                c->TraceSinkDouble (0.0, delay.GetSeconds ());
-                break;
-              }
-
-            case OUTPUT_SCATTER_FILE:
-            case OUTPUT_SCATTER_PLOT:
-              {
-                Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-                NS_ASSERT (c != 0);
-                c->TraceSinkDouble (0.0, delay.GetSeconds ());
-                break;
-              }
-
-            case OUTPUT_HISTOGRAM_FILE:
-            case OUTPUT_HISTOGRAM_PLOT:
-            case OUTPUT_PDF_FILE:
-            case OUTPUT_PDF_PLOT:
-            case OUTPUT_CDF_FILE:
-            case OUTPUT_CDF_PLOT:
-              {
-                Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-                NS_ASSERT (c != 0);
-                c->TraceSinkDouble (0.0, delay.GetSeconds ());
-                break;
-              }
-
-            default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
-
-            } // end of `switch (GetOutputType ())`
-
-        } // end of `else of if (it1 == m_identifierMap.end ())`
-
-    } // end of `if (InetSocketAddress::IsMatchingType (from))`
+          PassSampleToCollector (delay, it1->second);
+        }
+    }
   else
     {
       NS_LOG_WARN (this << " discarding a packet delay of " << delay.GetSeconds ()
@@ -1097,8 +1130,7 @@ SatStatsRtnAppDelayHelper::Ipv4Callback (Time delay, const Address &from)
                         << " because it comes from sender " << from
                         << " without valid InetSocketAddress");
     }
-
-} // end of `void Ipv4Callback (Time, const Address);`
+}
 
 
 void

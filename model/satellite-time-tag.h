@@ -28,9 +28,9 @@
 namespace ns3 {
 
 /*
- * There are 4 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
- * and SatDevTimeTag. Except of the name difference, they share exactly the
- * same definitions.
+ * There are 5 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
+ * SatDevTimeTag, and SatAppTimeTag. Except of the name difference, they share
+ * exactly the same definitions.
  */
 
 /**
@@ -130,6 +130,34 @@ public:
 
   SatDevTimeTag ();
   SatDevTimeTag (Time senderTimestamp);
+
+  virtual void  Serialize (TagBuffer i) const;
+  virtual void  Deserialize (TagBuffer i);
+  virtual uint32_t  GetSerializedSize () const;
+  virtual void Print (std::ostream &os) const;
+
+  Time GetSenderTimestamp (void) const;
+  void SetSenderTimestamp (Time senderTimestamp);
+
+private:
+  Time m_senderTimestamp;
+
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief Time tag used to identify the time when packet is enqueued at
+ *        application level.
+ */
+class SatAppTimeTag : public Tag
+{
+public:
+  static TypeId  GetTypeId (void);
+  virtual TypeId  GetInstanceTypeId (void) const;
+
+  SatAppTimeTag ();
+  SatAppTimeTag (Time senderTimestamp);
 
   virtual void  Serialize (TagBuffer i) const;
   virtual void  Deserialize (TagBuffer i);
