@@ -4,6 +4,9 @@ def build(bld):
     obj = bld.create_ns3_program('sat-cbr-example', ['satellite'])
     obj.source = 'sat-cbr-example.cc'
     
+    obj = bld.create_ns3_program('sat-cbr-stats-example', ['satellite'])
+    obj.source = 'sat-cbr-stats-example.cc'
+
     obj = bld.create_ns3_program('sat-cbr-larger-example', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-cbr-larger-example.cc'
 
