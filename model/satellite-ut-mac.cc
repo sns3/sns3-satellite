@@ -541,9 +541,9 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 
         Ptr<SatTbtpMessage> tbtp = DynamicCast<SatTbtpMessage> (m_readCtrlCallback (tbtpId));
 
-        if ( tbtp == NULL )
+        if (tbtp == NULL)
           {
-            NS_FATAL_ERROR ("TBTP not found, check that TBTP storage time is set long enough for superframe sequence!!!");
+            NS_FATAL_ERROR ("TBTP not found, check that control message storage time is set long enough for superframe sequence!!!");
           }
 
         packet->RemovePacketTag (macTag);
@@ -560,9 +560,13 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:
       {
-        /// TODO this needs to be implemented
         uint32_t raCtrlId = ctrlTag.GetMsgId();
         Ptr<SatRaMessage> raMsg = DynamicCast<SatRaMessage> (m_readCtrlCallback (raCtrlId));
+
+        if (raMsg == NULL)
+          {
+            NS_FATAL_ERROR ("Random access control message not found, check that control message storage time is long enough");
+          }
 
         uint32_t allocationChannelId = raMsg->GetAllocationChannelId ();
         uint16_t backoffProbability = raMsg->GetBackoffProbability ();
@@ -637,8 +641,8 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
   NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel);
 
   /// check if we have known DAMA allocations
-  /// TODO this functionality checks the current and all known future frames for DAMA allocation
-  /// it might be better to check only the current frame or a limited subset of frames
+  /// this functionality checks the current and all known future frames for DAMA allocation
+  /// TODO it might be better to check only the current frame or a limited subset of frames
   if ( !m_tbtpContainer->HasScheduledTimeSlots () )
     {
       NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission @ " << Now ().GetSeconds () << " - No known DAMA, selecting a slot for Slotted ALOHA");
@@ -799,7 +803,8 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
           /// check and update used slots
           if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, (*iterSet)))
             {
-              /// TODO this needs to be handled better
+              /// TODO this needs to be handled better, e.g., select next free slot instead of forced exit or the use slot exclusion list
+              /// this is an issue when both Slotted ALOHA and CRDSA are enabled and Slotted ALOHA takes the same slot with CRDSA
               NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable");
             }
         }
@@ -823,7 +828,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
   /// CRDSA is evaluated only at the frame start
-  /// TODO this might have to be updated when a proper mobility model is added
+  /// TODO this has to be updated when a proper mobility model is added
   Time superframeStartTime = Now ();
 
   /// get the slot payload
@@ -997,7 +1002,6 @@ SatUtMac::RemovePastRandomAccessSlots (uint32_t superFrameId)
 
   std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
 
-  /// TODO this functionality needs to be checked!
   for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); )
     {
       if (iter->first.first < superFrameId)
