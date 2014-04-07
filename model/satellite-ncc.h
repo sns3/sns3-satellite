@@ -88,11 +88,11 @@ public:
   void UtCnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
 
   /**
-   *
-   * \param beamId
-   * \param carrierId
-   * \param allocationChannelId
-   * \param averageNormalizedOfferedLoad
+   * \brief Function for adjusting the random access allocation channel specific load
+   * \param beamId Beam ID
+   * \param carrierId Carrier ID
+   * \param allocationChannelId Allocation channel ID
+   * \param averageNormalizedOfferedLoad Measured average normalized offered load
    */
   void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad);
 
@@ -111,41 +111,43 @@ public:
   typedef SatBeamScheduler::SendCtrlMsgCallback SendCallback;
 
   /**
-    * \param beamId ID of the beam which for callback is set
-    * \param cb callback to invoke whenever a TBTP is ready for sending and must
-    *        be forwarded to the Beam UTs.
-    * \param seq Super frame sequence
-    * \param maxRcCount Maximum number of RCs in use.
-    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
-    */
+   * \brief Function for adding the beam
+   * \param beamId ID of the beam which for callback is set
+   * \param cb callback to invoke whenever a TBTP is ready for sending and must
+   *        be forwarded to the Beam UTs.
+   * \param seq Super frame sequence
+   * \param maxRcCount Maximum number of RCs in use.
+   * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+   */
   void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t macRcCount, uint32_t maxFrameSizeInBytes);
 
   /**
-    * \param utId ID (mac address) of the UT to be added
-    * \param llsConf Lower layer service configuration for the UT to be added.
-    * \param beamId ID of the beam where UT is connected.
-    *
-    * \return RA channel index assigned to added UT.
-    */
+   * \brief Function for adding the UT
+   * \param utId ID (mac address) of the UT to be added
+   * \param llsConf Lower layer service configuration for the UT to be added.
+   * \param beamId ID of the beam where UT is connected.
+   * \return RA channel index assigned to added UT.
+   */
   uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
 
   /**
-   *
-   * \param threshold
+   * \brief Function for setting the random access allocation channel specific high load backoff probabilities
+   * \param allocationChannelId Allocation channel ID
+   * \param threshold Average normalized offered load threshold
    */
-  void SetRandomAccessHighLoadThreshold (double threshold) { m_randomAccessHighLoadThreshold = threshold; }
+  void SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint32_t allocationChannelId, double threshold);
 
   /**
-   *
-   * \param allocationChannelId
-   * \param lowLoadBackOffProbability
+   * \brief Function for setting the random access allocation channel specific high load backoff probabilities
+   * \param allocationChannelId Allocation channel ID
+   * \param lowLoadBackOffProbability Low load backoff probability
    */
   void SetRandomAccessLowLoadBackoffProbability (uint32_t allocationChannelId, uint16_t lowLoadBackOffProbability);
 
   /**
-   *
-   * \param allocationChannelId
-   * \param highLoadBackOffProbability
+   * \brief Function for setting the random access allocation channel specific high load backoff probabilities
+   * \param allocationChannelId Allocation channel ID
+   * \param highLoadBackOffProbability High load backoff probability
    */
   void SetRandomAccessHighLoadBackoffProbability (uint32_t allocationChannelId, uint16_t highLoadBackOffProbability);
 
@@ -157,10 +159,10 @@ private:
   void DoDispose (void);
 
   /**
-   *
-   * \param backoffProbability
-   * \param beamId
-   * \param allocationChannelId
+   * \brief Function for creating the random access control message
+   * \param backoffProbability Backoff probability
+   * \param beamId Beam ID
+   * \param allocationChannelId Allocation channel ID
    */
   void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId, uint32_t allocationChannelId);
 
@@ -176,7 +178,6 @@ private:
    */
   TracedCallback<Ptr<const Packet> > m_nccRxTrace;
 
-
   /**
    * The trace source fired for TBTPs sent by the NCC.
    *
@@ -185,22 +186,22 @@ private:
   TracedCallback<Ptr<const Packet> > m_nccTxTrace;
 
   /**
-   *
+   * Map for keeping track of the load status of each random access allocation channel
    */
   std::map<std::pair<uint32_t,uint32_t>,bool> m_isLowRandomAccessLoad;
 
   /**
-   *
+   * Map for random access allocation channel specific load thresholds
    */
-  double m_randomAccessHighLoadThreshold;
+  std::map<uint32_t,double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
 
   /**
-   *
+   * Map for random access allocation channel specific low load backoff probabilities
    */
   std::map<uint32_t,uint16_t> m_lowLoadBackOffProbability;
 
   /**
-   *
+   * Map for random access allocation channel specific high load backoff probabilities
    */
   std::map<uint32_t,uint16_t> m_highLoadBackOffProbability;
 };

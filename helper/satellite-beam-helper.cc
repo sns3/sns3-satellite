@@ -66,6 +66,14 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
                                        SatEnums::FADING_TRACE, "FadingTrace",
                                        SatEnums::FADING_MARKOV, "FadingMarkov"))
+      .AddAttribute ("RandomAccessModel",
+                     "Random Access Model",
+                      EnumValue (SatEnums::RA_OFF),
+                      MakeEnumAccessor (&SatBeamHelper::m_randomAccessModel),
+                      MakeEnumChecker (SatEnums::RA_OFF, "RA not in use.",
+                                       SatEnums::RA_SLOTTED_ALOHA, "Slotted ALOHA",
+                                       SatEnums::RA_CRDSA, "CRDSA",
+                                       SatEnums::RA_ANY_AVAILABLE, "Any available"))
       .AddAttribute ("PropagationDelayModel",
                       "Propagation delay model",
                       EnumValue (SatEnums::PD_CONSTANT_SPEED),
@@ -108,7 +116,8 @@ SatBeamHelper::SatBeamHelper () :
     m_printDetailedInformationToCreationTraces (false),
     m_fadingModel (),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
-    m_constantPropagationDelay (0.13)
+    m_constantPropagationDelay (0.13),
+    m_randomAccessModel (SatEnums::RA_OFF)
 {
   NS_LOG_FUNCTION (this);
 
@@ -125,7 +134,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     m_printDetailedInformationToCreationTraces (false),
     m_fadingModel (SatEnums::FADING_MARKOV),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
-    m_constantPropagationDelay (0.13)
+    m_constantPropagationDelay (0.13),
+    m_randomAccessModel (SatEnums::RA_OFF)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -139,16 +149,16 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   Ptr<SatControlMsgContainer> rtnCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeRtnLink, true);
   Ptr<SatControlMsgContainer> fwdCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeFwdLink, false);
 
-  SatMac::ReadCtrlMsgCallback rtnReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, rtnCtrlMsgContainer );
-  SatMac::WriteCtrlMsgCallback rtnWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, rtnCtrlMsgContainer );
+  SatMac::ReadCtrlMsgCallback rtnReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, rtnCtrlMsgContainer);
+  SatMac::WriteCtrlMsgCallback rtnWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, rtnCtrlMsgContainer);
 
-  SatMac::ReadCtrlMsgCallback fwdReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, fwdCtrlMsgContainer );
-  SatMac::WriteCtrlMsgCallback fwdWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, fwdCtrlMsgContainer );
+  SatMac::ReadCtrlMsgCallback fwdReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, fwdCtrlMsgContainer);
+  SatMac::WriteCtrlMsgCallback fwdWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, fwdCtrlMsgContainer);
 
   // create needed low level satellite helpers
-  m_geoHelper = CreateObject<SatGeoHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount);
-  m_gwHelper = CreateObject<SatGwHelper> ( bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb);
-  m_utHelper = CreateObject<SatUtHelper> ( bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb );
+  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount);
+  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb);
+  m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb, m_randomAccessModel);
 
   // Two usage of link results is two-fold: on the other hand they are needed in the
   // packet reception for packet decoding, but on the other hand they are utilized in
@@ -178,6 +188,22 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_geoHelper->Install (m_geoNode);
 
   m_ncc = CreateObject<SatNcc> ();
+
+  /// if random access if enabled
+  if (m_randomAccessModel != SatEnums::RA_OFF)
+    {
+      PointerValue llsConf;
+      m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
+      uint8_t allocationChannelCount = llsConf.Get<SatLowerLayerServiceConf> ()->GetRaServiceCount ();
+
+      /// set dynamic load control values required by NCC
+      for (uint8_t i = 0; i < allocationChannelCount; i++)
+        {
+          m_ncc->SetRandomAccessLowLoadBackoffProbability (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaBackOffProbability (i));
+          m_ncc->SetRandomAccessHighLoadBackoffProbability (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaHighLoadBackOffProbability (i));
+          m_ncc->SetRandomAccessAverageNormalizedOfferedLoadThreshold (i,llsConf.Get<SatLowerLayerServiceConf> ()->GetRaAverageNormalizedOfferedLoadThreshold (i));
+        }
+    }
 
   switch (m_fadingModel)
     {
@@ -328,7 +354,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
 
   // add beam to NCC
-  PointerValue llsConf = PointerValue ();
+  PointerValue llsConf;
   m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
 
   uint8_t rcMaxCount = llsConf.Get<SatLowerLayerServiceConf> ()->GetDaServiceCount ();

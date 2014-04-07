@@ -54,8 +54,7 @@ SatNcc::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatNcc::SatNcc () :
-  m_randomAccessHighLoadThreshold (0.3)
+SatNcc::SatNcc ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -121,12 +120,19 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
 
   NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << allocationChannelId << " - Measuring the average normalized offered random access load: " << averageNormalizedOfferedLoad);
 
+  std::map<uint32_t,double>::iterator itThreshold = m_randomAccessAverageNormalizedOfferedLoadThreshold.find (allocationChannelId);
+
+  if (itThreshold == m_randomAccessAverageNormalizedOfferedLoadThreshold.end ())
+    {
+      NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Average normalized offered load threshold not set for allocation channel: " << allocationChannelId);
+    }
+
   /// low RA load in effect
   if (isLowRandomAccessLoad)
     {
       NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << " - Currently low load in effect for allocation channel: " << allocationChannelId);
       /// check the load against the parameterized value
-      if (averageNormalizedOfferedLoad >= m_randomAccessHighLoadThreshold)
+      if (averageNormalizedOfferedLoad >= itThreshold->second)
         {
           std::map<uint32_t,uint16_t>::iterator it = m_highLoadBackOffProbability.find (allocationChannelId);
 
@@ -150,7 +156,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
       NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << " - Currently high load in effect for allocation channel: " << allocationChannelId);
 
       /// check the load against the parameterized value
-      if (averageNormalizedOfferedLoad < m_randomAccessHighLoadThreshold)
+      if (averageNormalizedOfferedLoad < itThreshold->second)
         {
           std::map<uint32_t,uint16_t>::iterator it = m_lowLoadBackOffProbability.find (allocationChannelId);
 
@@ -180,9 +186,9 @@ SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint3
   Ptr<SatRaMessage> raMsg = CreateObject<SatRaMessage> ();
   std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
 
-  if ( iterator == m_beamSchedulers.end () )
+  if (iterator == m_beamSchedulers.end ())
     {
-      NS_FATAL_ERROR ( "SatNcc::SendRaControlMessage - Beam scheduler not found" );
+      NS_FATAL_ERROR ("SatNcc::SendRaControlMessage - Beam scheduler not found");
     }
 
   /// set the random access allocation channel this message affects
@@ -242,6 +248,8 @@ void
 SatNcc::SetRandomAccessLowLoadBackoffProbability (uint32_t allocationChannelId, uint16_t lowLoadBackOffProbability)
 {
   NS_LOG_FUNCTION (this << allocationChannelId << lowLoadBackOffProbability);
+
+  NS_LOG_INFO ("SatNcc::SetRandomAccessLowLoadBackoffProbability - AC: " << allocationChannelId << ", low load backoff probability: " << lowLoadBackOffProbability);
   m_lowLoadBackOffProbability[allocationChannelId] = lowLoadBackOffProbability;
 }
 
@@ -249,7 +257,18 @@ void
 SatNcc::SetRandomAccessHighLoadBackoffProbability (uint32_t allocationChannelId, uint16_t highLoadBackOffProbability)
 {
   NS_LOG_FUNCTION (this << allocationChannelId << highLoadBackOffProbability);
+
+  NS_LOG_INFO ("SatNcc::SetRandomAccessHighLoadBackoffProbability - AC: " << allocationChannelId << ", high load backoff probability: " << highLoadBackOffProbability);
   m_highLoadBackOffProbability[allocationChannelId] = highLoadBackOffProbability;
+}
+
+void
+SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint32_t allocationChannelId, double threshold)
+{
+  NS_LOG_FUNCTION (this << allocationChannelId << threshold);
+
+  NS_LOG_INFO ("SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold - AC: " << allocationChannelId << ", average normalized offered load threshold: " << threshold);
+  m_randomAccessAverageNormalizedOfferedLoadThreshold[allocationChannelId] = threshold;
 }
 
 } // namespace ns3

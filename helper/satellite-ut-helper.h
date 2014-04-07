@@ -51,12 +51,18 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   SatUtHelper ();
+
   /**
    * Create a SatUtHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq,
-               SatMac::ReadCtrlMsgCallback readCb, SatMac::WriteCtrlMsgCallback writeCb);
+  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+               uint32_t rtnLinkCarrierCount,
+               Ptr<SatSuperframeSeq> seq,
+               SatMac::ReadCtrlMsgCallback readCb,
+               SatMac::WriteCtrlMsgCallback writeCb,
+               SatEnums::RandomAccessModel_t randomAccessModel);
+
   virtual ~SatUtHelper () {}
 
   /*
@@ -171,11 +177,6 @@ private:
     TracedCallback<std::string> m_creationTrace;
 
     /**
-     *
-     */
-    SatEnums::RandomAccessModel_t m_randomAccessModel;
-
-    /**
      * Configured lower layer service configuration.
      */
     Ptr<SatLowerLayerServiceConf> m_llsConf;
@@ -185,6 +186,11 @@ private:
      * receiver (= UT).
      */
     bool m_enableChannelEstimationError;
+
+    /**
+     * The used random access model
+     */
+    SatEnums::RandomAccessModel_t m_randomAccessModel;
 };
 
 } // namespace ns3

@@ -81,14 +81,6 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute ("RandomAccessModel",
-                     "Random Access Model",
-                     EnumValue (SatEnums::RA_OFF),
-                     MakeEnumAccessor (&SatUtHelper::m_randomAccessModel),
-                     MakeEnumChecker (SatEnums::RA_OFF, "RA not in use.",
-                                      SatEnums::RA_SLOTTED_ALOHA, "Slotted ALOHA",
-                                      SatEnums::RA_CRDSA, "CRDSA",
-                                      SatEnums::RA_ANY_AVAILABLE, "Any available"))
       .AddAttribute ("LowerLayerServiceConf",
                      "Pointer to lower layer service configuration.",
                      PointerValue (),
@@ -121,9 +113,9 @@ SatUtHelper::SatUtHelper ()
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
-   m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
-   m_enableChannelEstimationError (false)
+   m_enableChannelEstimationError (false),
+   m_randomAccessModel ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -135,7 +127,8 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
                           uint32_t fwdLinkCarrierCount,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
-                          SatMac::WriteCtrlMsgCallback writeCb)
+                          SatMac::WriteCtrlMsgCallback writeCb,
+                          SatEnums::RandomAccessModel_t randomAccessModel)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
    m_superframeSeq (seq),
@@ -144,9 +137,9 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
    m_interferenceModel (),
    m_errorModel (),
    m_linkResults (),
-   m_randomAccessModel (SatEnums::RA_OFF),
    m_llsConf (),
-   m_enableChannelEstimationError (false)
+   m_enableChannelEstimationError (false),
+   m_randomAccessModel (randomAccessModel)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");

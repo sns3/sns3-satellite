@@ -292,6 +292,11 @@ private:
   double m_constantPropagationDelay;
 
   /**
+   *  The used random access model
+   */
+  SatEnums::RandomAccessModel_t m_randomAccessModel;
+
+  /**
    * Packet trace
    */
   Ptr<SatPacketTrace> m_packetTrace;

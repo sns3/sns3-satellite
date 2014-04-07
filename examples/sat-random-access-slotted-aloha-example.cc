@@ -56,7 +56,7 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
   // Enable Random Access with Slotted ALOHA
-  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_SLOTTED_ALOHA));
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_SLOTTED_ALOHA));
 
   // Create reference system, two options:
   // - "Scenario72"

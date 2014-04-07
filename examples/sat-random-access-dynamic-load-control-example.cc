@@ -58,7 +58,7 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
   // Enable Random Access with CRDSA
-  Config::SetDefault ("ns3::SatUtHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
 
   // Create reference system, two options:
   // - "Scenario72"

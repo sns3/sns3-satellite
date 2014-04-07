@@ -179,8 +179,10 @@ private:
   uint8_t  m_minimumIdleBlock;
   uint16_t m_backOffTimeInMilliSeconds;
   uint16_t m_backOffProbability;
+  uint16_t m_highLoadBackOffProbability;
   uint8_t m_numberOfInstances;
   double m_maximumBackOffProbability;
+  double m_averageNormalizedOfferedLoadThreshold;
 
   /**
    * Get maximum unique payload per block.
@@ -194,7 +196,7 @@ private:
    *
    * \param maxUniquePayloadPerBlock Maximum unique payload per block
    */
-  inline void SetMaximumUniquePayloadPerBlock (uint8_t maxUniquePayloadPerBlock) { m_maxUniquePayloadPerBlock = maxUniquePayloadPerBlock;}
+  inline void SetMaximumUniquePayloadPerBlock (uint8_t maxUniquePayloadPerBlock) {m_maxUniquePayloadPerBlock = maxUniquePayloadPerBlock;}
 
   /**
    * Get maximum consecutive block accessed.
@@ -208,7 +210,7 @@ private:
    *
    * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed
    */
-  inline void SetMaximumConsecutiveBlockAccessed (uint8_t maxConsecutiveBlockAccessed) { m_maxConsecutiveBlockAccessed = maxConsecutiveBlockAccessed;}
+  inline void SetMaximumConsecutiveBlockAccessed (uint8_t maxConsecutiveBlockAccessed) {m_maxConsecutiveBlockAccessed = maxConsecutiveBlockAccessed;}
 
   /**
    * Get minimum idle block.
@@ -222,7 +224,7 @@ private:
    *
    * \param minimumIdleBlock Minimum idle block
    */
-  inline void SetMinimumIdleBlock (uint8_t minimumIdleBlock) { m_minimumIdleBlock = minimumIdleBlock;}
+  inline void SetMinimumIdleBlock (uint8_t minimumIdleBlock) {m_minimumIdleBlock = minimumIdleBlock;}
 
   /**
    * Get back off time in milliseconds.
@@ -236,7 +238,7 @@ private:
    *
    * \param backOffTimeInMilliSeconds Back off time
    */
-  inline void SetBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) { m_backOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
+  inline void SetBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) {m_backOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
 
   /**
    * Get back off probability.
@@ -250,7 +252,21 @@ private:
    *
    * \param backOffProbability Back off probability
    */
-  inline void SetBackOffProbability (uint16_t backOffProbability) { m_backOffProbability = backOffProbability;}
+  inline void SetBackOffProbability (uint16_t backOffProbability) {m_backOffProbability = backOffProbability;}
+
+  /**
+   * Get high load back off probability.
+   *
+   * \return High load back off probability
+   */
+  inline uint16_t GetHighLoadBackOffProbability () const {return m_highLoadBackOffProbability;}
+
+  /**
+   * Set high load back off probability.
+   *
+   * \param highLoadBackOffProbability High load back off probability
+   */
+  inline void SetHighLoadBackOffProbability (uint16_t highLoadBackOffProbability) {m_highLoadBackOffProbability = highLoadBackOffProbability;}
 
   /**
    * Get number of instances.
@@ -264,7 +280,7 @@ private:
    *
    * \param numberOfInstances Number of instances
    */
-  inline void SetNumberOfInstances (uint8_t numberOfInstances) { m_numberOfInstances = numberOfInstances;}
+  inline void SetNumberOfInstances (uint8_t numberOfInstances) {m_numberOfInstances = numberOfInstances;}
 
   /**
    * Get maximum back off probability.
@@ -278,7 +294,21 @@ private:
    *
    * \param maximumBackOffProbability Maximum back off probability
    */
-  inline void SetMaximumBackOffProbability (double maximumBackOffProbability) { m_maximumBackOffProbability = maximumBackOffProbability;}
+  inline void SetMaximumBackOffProbability (double maximumBackOffProbability) {m_maximumBackOffProbability = maximumBackOffProbability;}
+
+  /**
+   * Get average normalized offered load threshold.
+   *
+   * \return Average normalized offered load threshold
+   */
+  inline double GetAverageNormalizedOfferedLoadThreshold () const {return m_averageNormalizedOfferedLoadThreshold;}
+
+  /**
+   * Set average normalized offered load threshold.
+   *
+   * \param averageNormalizedOfferedLoadThreshold Average normalized offered load threshold
+   */
+  inline void SetAverageNormalizedOfferedLoadThreshold (double averageNormalizedOfferedLoadThreshold) {m_averageNormalizedOfferedLoadThreshold = averageNormalizedOfferedLoadThreshold;}
 };
 
 /**
@@ -296,7 +326,7 @@ public:
   static const uint8_t m_minRaServiceEntries = 1;
 
   static const uint8_t m_maxDaServiceEntries = 4;
-  static const uint8_t m_maxRaServiceEntries = 4;
+  static const uint8_t m_maxRaServiceEntries = 1;
 
   /**
    * Constructor for SatLowerLayerServiceConf.
@@ -452,6 +482,14 @@ public:
   uint16_t GetRaBackOffProbability (uint8_t index) const;
 
   /**
+   * Get high load back off probability.
+   *
+   * \param index Index of the service
+   * \return High load back off probability
+   */
+  uint16_t GetRaHighLoadBackOffProbability (uint8_t index) const;
+
+  /**
    * Get number of instances.
    *
    * \param index Index of the service
@@ -463,9 +501,17 @@ public:
    * Get maximum back off probability.
    *
    * \param index Index of the service
-   * \return Maximu back off probability
+   * \return Maximum back off probability
    */
   double GetRaMaximumBackOffProbability (uint8_t index) const;
+
+  /**
+   * Get average normalized offeredLoad Threshold.
+   *
+   * \param index Index of the service
+   * \return Average normalized offered load threshold
+   */
+  double GetRaAverageNormalizedOfferedLoadThreshold (uint8_t index) const;
 
   /**
    * Check the DA service entry parameters so that they make sense.
@@ -547,6 +593,7 @@ private:
    * \return service name
    */
   static std::string GetIndexAsRaServiceName(uint8_t index);
+
   /**
    * Set state, if constant assignment is provided for a DA service.
    *
@@ -644,6 +691,14 @@ private:
   void SetRaBackOffProbability (uint8_t index, uint16_t backOffProbability);
 
   /**
+   * Set high load back off probability.
+   *
+   * \param index Index of the service
+   * \param highLoadBackOffProbability High load back off probability
+   */
+  void SetRaHighLoadBackOffProbability (uint8_t index, uint16_t highLoadBackOffProbability);
+
+  /**
    * Set number of instances.
    *
    * \param index Index of the service
@@ -658,6 +713,14 @@ private:
    * \param maximumBackOffProbability Maximum back off probability
    */
   void SetRaMaximumBackOffProbability (uint8_t index, double maximumBackOffProbability);
+
+  /**
+   * Set average normalized offeredLoad Threshold.
+   *
+   * \param index Index of the service
+   * \param Average normalized offered load threshold
+   */
+  void SetRaAverageNormalizedOfferedLoadThreshold (uint8_t index, double averageNormalizedOfferedLoadThreshold);
 
 /**
  * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
@@ -728,10 +791,14 @@ private:
  *  - GetRaServ0VBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetBackOffTimeInMilliSeconds
  *  - SetRaServ0BackOffProbability, see @SatLowerLayerServiceRaEntry::SetBackOffProbability
  *  - GetRaServ0VBackOffProbability, see @SatLowerLayerServiceRaEntry::GetBackOffProbability
+ *  - SetRaServ0HighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::SetHighLoadBackOffProbability
+ *  - GetRaServ0VHighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffProbability
  *  - SetRaServ0NumberOfInstances, see @SatLowerLayerServiceRaEntry::SetNumberOfInstances
  *  - GetRaServ0VNumberOfInstances, see @SatLowerLayerServiceRaEntry::GetNumberOfInstances
  *  - SetRaServ0MaximumBackOffProbability, see @SatLowerLayerServiceRaEntry::SetMaximumBackOffProbability
  *  - GetRaServ0VMaximumBackOffProbability, see @SatLowerLayerServiceRaEntry::GetMaximumBackOffProbability
+ *  - SetRaServ0AverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::SetAverageNormalizedOfferedLoadThreshold
+ *  - GetRaServ0VAverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::GetAverageNormalizedOfferedLoadThreshold
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -756,6 +823,10 @@ private:
     { return SetRaBackOffProbability (index, value); } \
   inline uint16_t GetRaServ ## index ## BackOffProbability () const  \
     { return GetRaBackOffProbability (index); } \
+  inline void SetRaServ ## index ## HighLoadBackOffProbability (uint16_t value)  \
+    { return SetRaHighLoadBackOffProbability (index, value); } \
+  inline uint16_t GetRaServ ## index ## HighLoadBackOffProbability () const  \
+    { return GetRaHighLoadBackOffProbability (index); } \
   inline void SetRaServ ## index ## NumberOfInstances (uint8_t value)  \
     { return SetRaNumberOfInstances (index, value); } \
   inline uint8_t GetRaServ ## index ## NumberOfInstances () const  \
@@ -763,9 +834,13 @@ private:
   inline void SetRaServ ## index ## MaximumBackOffProbability (double value)  \
     { return SetRaMaximumBackOffProbability (index, value); } \
   inline double GetRaServ ## index ## MaximumBackOffProbability () const  \
-    { return GetRaMaximumBackOffProbability (index); }
+    { return GetRaMaximumBackOffProbability (index); } \
+  inline void SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold (double value)  \
+    { return SetRaAverageNormalizedOfferedLoadThreshold (index, value); } \
+  inline double GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold () const  \
+    { return GetRaAverageNormalizedOfferedLoadThreshold (index); }
 
-  SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
+    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);

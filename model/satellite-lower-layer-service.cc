@@ -55,8 +55,10 @@ SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
   m_minimumIdleBlock (0),
   m_backOffTimeInMilliSeconds (0),
   m_backOffProbability (0),
+  m_highLoadBackOffProbability (0),
   m_numberOfInstances (0),
-  m_maximumBackOffProbability (0.0)
+  m_maximumBackOffProbability (0.0),
+  m_averageNormalizedOfferedLoadThreshold (0.0)
 {
    NS_LOG_FUNCTION (this);
 }
@@ -83,8 +85,15 @@ SatLowerLayerServiceConf::SatLowerLayerServiceConf ()
 {
    NS_LOG_FUNCTION (this);
 
-   NS_ASSERT ( m_minRaServiceEntries <= m_maxRaServiceEntries);
-   NS_ASSERT ( m_minDaServiceEntries <= m_maxDaServiceEntries);
+   if (m_minRaServiceEntries > m_maxRaServiceEntries)
+     {
+       NS_FATAL_ERROR ("SatLowerLayerServiceConf::SatLowerLayerServiceConf - m_minRaServiceEntries > m_maxRaServiceEntries");
+     }
+
+   if (m_minDaServiceEntries > m_maxDaServiceEntries)
+     {
+       NS_FATAL_ERROR ("SatLowerLayerServiceConf::SatLowerLayerServiceConf - m_minDaServiceEntries > m_maxDaServiceEntries");
+     }
 }
 
 SatLowerLayerServiceConf::~SatLowerLayerServiceConf ()
@@ -180,7 +189,7 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  *
  * \return TypeId
  */
-#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7) \
+#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) \
    AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                   "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a1), \
@@ -188,40 +197,52 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumConsecutiveBlockAccessed", \
-                  "Maximum consecutive block accessed for RA  " + GetIndexAsRaServiceName (index), \
+                  "Maximum consecutive block accessed for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a2), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumConsecutiveBlockAccessed, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumConsecutiveBlockAccessed), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MinimumIdleBlock", \
-                  "Minimum idle block for RA  " + GetIndexAsRaServiceName (index), \
+                  "Minimum idle block for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a3), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MinimumIdleBlock, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## MinimumIdleBlock), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_BackOffTimeInMilliSeconds", \
-                  "Back off time in milliseconds for RA  " + GetIndexAsRaServiceName (index), \
+                  "Back off time in milliseconds for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a4), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## BackOffTimeInMilliSeconds, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## BackOffTimeInMilliSeconds), \
                   MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_BackOffProbability", \
-                  "Back off probability for RA  " + GetIndexAsRaServiceName (index), \
+                  "Back off probability for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a5), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## BackOffProbability, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## BackOffProbability), \
                   MakeUintegerChecker<uint16_t> ()) \
-  .AddAttribute ( GetIndexAsRaServiceName (index) + "_NumberOfInstances", \
-                  "Number of instances for RA  " + GetIndexAsRaServiceName (index), \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_HighLoadBackOffProbability", \
+                  "High load back off probability for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a6), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## HighLoadBackOffProbability, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## HighLoadBackOffProbability), \
+                  MakeUintegerChecker<uint16_t> ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_NumberOfInstances", \
+                  "Number of instances for RA " + GetIndexAsRaServiceName (index), \
+                  UintegerValue (a7), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## NumberOfInstances, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## NumberOfInstances), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumBackOffProbability", \
-                  "Maximum back off probability for RA  " + GetIndexAsRaServiceName (index), \
-                  DoubleValue (a7), \
+                  "Maximum back off probability for RA " + GetIndexAsRaServiceName (index), \
+                  DoubleValue (a8), \
                   MakeDoubleAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumBackOffProbability, \
                                       &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumBackOffProbability), \
+                  MakeDoubleChecker<double> ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_AverageNormalizedOfferedLoadThreshold", \
+                  "Average normalized offered load threshold for RA " + GetIndexAsRaServiceName (index), \
+                  DoubleValue (a9), \
+                  MakeDoubleAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold, \
+                                      &SatLowerLayerServiceConf::GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold), \
                   MakeDoubleChecker<double> ())
 
 TypeId
@@ -257,34 +278,34 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
     .AddAttribute ( "RbdcQuantizationSmallStepKbps",
                     "Smaller quantization step for RBDC in kbps.",
-                    UintegerValue (8),
-                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationSmallStepKbps),
-                    MakeUintegerChecker<uint16_t> ())
+                     UintegerValue (8),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationSmallStepKbps),
+                     MakeUintegerChecker<uint16_t> ())
     .AddAttribute ( "RbdcQuantizationLargeStepKbps",
                     "Larger quantization step for RBDC in kbps.",
-                    UintegerValue (64),
-                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationLargeStepKbps),
-                    MakeUintegerChecker<uint16_t> ())
+                     UintegerValue (64),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationLargeStepKbps),
+                     MakeUintegerChecker<uint16_t> ())
     .AddAttribute ( "RbdcQuantizationThresholdKbps",
                     "Quantization threshold for RBDC in kbps.",
-                    UintegerValue (1024),
-                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationThresholdKbps),
-                    MakeUintegerChecker<uint16_t> ())
+                     UintegerValue (1024),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationThresholdKbps),
+                     MakeUintegerChecker<uint16_t> ())
     .AddAttribute ( "VbdcQuantizationSmallStepKB",
                     "Smaller quantization step for VBDC in kB.",
-                    UintegerValue (1),
-                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationSmallStepKB),
-                    MakeUintegerChecker<uint16_t> ())
+                     UintegerValue (1),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationSmallStepKB),
+                     MakeUintegerChecker<uint16_t> ())
     .AddAttribute ( "VbdcQuantizationLargeStepKB",
                     "Larger quantization step for VBDC in kB.",
-                    UintegerValue (2),
-                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationLargeStepKB),
-                    MakeUintegerChecker<uint16_t> ())
+                     UintegerValue (2),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationLargeStepKB),
+                     MakeUintegerChecker<uint16_t> ())
     .AddAttribute ( "VbdcQuantizationThresholdKB",
                     "Quantization threshold for VBDC in kB.",
-                    UintegerValue (128),
-                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationThresholdKB),
-                    MakeUintegerChecker<uint16_t> ())
+                     UintegerValue (128),
+                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationThresholdKB),
+                     MakeUintegerChecker<uint16_t> ())
     /*
      * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
      */
@@ -293,10 +314,10 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, false, false, false, 100, 9216, 50, 384)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, false, false, false, 100, 9216, 50, 384)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 10000, 3, 0.3)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 6, 2, 50, 10000, 3, 0.3)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 6, 2, 50, 10000, 3, 0.3)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 3, 6, 2, 50, 10000, 3, 0.3)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
+    //.SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
+    //.SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
+    //.SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
   ;
 
   return tid;
@@ -353,7 +374,7 @@ SatLowerLayerServiceConf::GetInstanceTypeId (void) const
 
 bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -364,7 +385,7 @@ bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint8_t index) c
 void
 SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint8_t index, bool constAssignmentProvided)
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -375,7 +396,7 @@ SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint8_t index, bool c
 bool
 SatLowerLayerServiceConf::GetDaRbdcAllowed (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -385,7 +406,7 @@ SatLowerLayerServiceConf::GetDaRbdcAllowed (uint8_t index) const
 
 void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint8_t index, bool bdcAllowed)
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -395,7 +416,7 @@ void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint8_t index, bool bdcAllowed)
 
 bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -406,7 +427,7 @@ bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaVolumeAllowed (uint8_t index, bool volumeAllowed)
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -417,7 +438,7 @@ SatLowerLayerServiceConf::SetDaVolumeAllowed (uint8_t index, bool volumeAllowed)
 uint16_t
 SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -429,7 +450,7 @@ SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint8_t index) const
 Ptr<RandomVariableStream>
 SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -440,7 +461,7 @@ SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint8_t index, Ptr<RandomVariableStream> constantServiceRateStream)
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -451,7 +472,7 @@ SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint8_t index, Ptr<Ran
 uint16_t
 SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -462,7 +483,7 @@ SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint8_t index, uint16_t maximumServiceRateKbps)
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -473,7 +494,7 @@ SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint8_t index, uint16_t
 uint16_t
 SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -484,7 +505,7 @@ SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t minimumServiceRateKbps)
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -495,7 +516,7 @@ SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t
 uint16_t
 SatLowerLayerServiceConf::GetDaMaximumBacklogInKbytes (uint8_t index) const
 {
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -508,7 +529,7 @@ SatLowerLayerServiceConf::SetDaMaximumBacklogInKbytes (uint8_t index, uint16_t m
 {
   NS_LOG_FUNCTION (this << index);
 
-  if ( index >= m_maxDaServiceEntries)
+  if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -519,7 +540,7 @@ SatLowerLayerServiceConf::SetDaMaximumBacklogInKbytes (uint8_t index, uint16_t m
 uint8_t
 SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -530,7 +551,7 @@ SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint8_t index) cons
 void
 SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint8_t index, uint8_t uniquePayloadPerBlock)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -541,7 +562,7 @@ SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint8_t index, uint
 uint8_t
 SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -552,7 +573,7 @@ SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint8_t index) c
 void
 SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint8_t index, uint8_t consecutiveBlockAccessed)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -563,7 +584,7 @@ SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint8_t index, u
 uint8_t
 SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -574,7 +595,7 @@ SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumIdleBlock)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -585,7 +606,7 @@ SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumI
 uint16_t
 SatLowerLayerServiceConf::GetRaBackOffTimeInMilliSeconds (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -596,7 +617,7 @@ SatLowerLayerServiceConf::GetRaBackOffTimeInMilliSeconds (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -607,7 +628,7 @@ SatLowerLayerServiceConf::SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_
 uint16_t
 SatLowerLayerServiceConf::GetRaBackOffProbability (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -618,18 +639,39 @@ SatLowerLayerServiceConf::GetRaBackOffProbability (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaBackOffProbability (uint8_t index, uint16_t backOffProbability)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
 
   m_raServiceEntries[index].SetBackOffProbability (backOffProbability);
 }
+uint16_t
+SatLowerLayerServiceConf::GetRaHighLoadBackOffProbability (uint8_t index) const
+{
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetHighLoadBackOffProbability ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaHighLoadBackOffProbability (uint8_t index, uint16_t highLoadBackOffProbability)
+{
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetHighLoadBackOffProbability (highLoadBackOffProbability);
+}
 
 uint8_t
 SatLowerLayerServiceConf::GetRaNumberOfInstances (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -640,7 +682,7 @@ SatLowerLayerServiceConf::GetRaNumberOfInstances (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaNumberOfInstances (uint8_t index, uint8_t numberOfInstances)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -651,7 +693,7 @@ SatLowerLayerServiceConf::SetRaNumberOfInstances (uint8_t index, uint8_t numberO
 double
 SatLowerLayerServiceConf::GetRaMaximumBackOffProbability (uint8_t index) const
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -662,7 +704,7 @@ SatLowerLayerServiceConf::GetRaMaximumBackOffProbability (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaMaximumBackOffProbability (uint8_t index, double maximumBackOffProbability)
 {
-  if ( index >= m_maxRaServiceEntries)
+  if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
     }
@@ -670,6 +712,27 @@ SatLowerLayerServiceConf::SetRaMaximumBackOffProbability (uint8_t index, double 
   m_raServiceEntries[index].SetMaximumBackOffProbability (maximumBackOffProbability);
 }
 
+double
+SatLowerLayerServiceConf::GetRaAverageNormalizedOfferedLoadThreshold (uint8_t index) const
+{
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetAverageNormalizedOfferedLoadThreshold ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaAverageNormalizedOfferedLoadThreshold (uint8_t index, double averageNormalizedOfferedLoadThreshold)
+{
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetAverageNormalizedOfferedLoadThreshold (averageNormalizedOfferedLoadThreshold);
+}
 
 uint16_t
 SatLowerLayerServiceConf::GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) const
