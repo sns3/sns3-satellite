@@ -122,7 +122,7 @@ SatStatsSignallingLoadHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec throughput_kbps"));
+                                         "GeneralHeading", StringValue ("% time_sec signalling_kbps"));
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
@@ -164,7 +164,7 @@ SatStatsSignallingLoadHelper::DoInstall ()
         Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Received throughput (in kilobits per second)");
+                                   "Signalling load (in kilobits per second)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
         m_aggregator = plotAggregator;
 
