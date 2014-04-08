@@ -445,6 +445,14 @@ public:
   double GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
+   * Check if given carrier is random access carrier.
+   *
+   * \param carrierId Id of the carrier inside super frame which is requested.
+   * @return true if carrier is random access, false otherwise
+   */
+  bool IsRandomAccessCarrier (uint32_t carrierId) const;
+
+  /**
    * Configures super frame configuration according to set attributes.
    *
    * \param bandwidthHz Allocated bandwidth for super frame.
@@ -535,7 +543,7 @@ public:
   double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
   double GetFrameCarrierSpacing (uint8_t frameIndex) const;
   double GetFrameCarrierRollOff (uint8_t frameIndex) const;
-  bool GetFrameIsRandomAccess (uint8_t frameIndex) const;
+  bool GetFrameRandomAccess (uint8_t frameIndex) const;
 
 private:
   typedef std::pair<uint8_t, uint32_t> RaChannelInfo_t;
@@ -579,7 +587,7 @@ public:
     inline void SetFrame ## index ## RandomAccess (bool value)  \
       { return SetFrameRandomAccess (index, value); } \
     inline double GetFrame ## index ## RandomAccess () const      \
-      { return GetFrameIsRandomAccess (index); }
+      { return GetFrameRandomAccess (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines
@@ -652,7 +660,8 @@ private:
 
 /**
  * \ingroup satellite
- * \brief This class implements super frame configuration 2
+ * \brief This class implements sup./ns3/satellite-frame-conf.h: In member function ‘double ns3::SatSuperframeConf::GetFrame0RandomAccess() const’:
+ * er frame configuration 2
  */
 class SatSuperframeConf2 : public SatSuperframeConf
 {

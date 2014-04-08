@@ -372,6 +372,25 @@ SatSuperframeConf::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierB
   return m_frames[currentFrame]->GetCarrierBandwidthHz (bandwidthType);
 }
 
+bool
+SatSuperframeConf::IsRandomAccessCarrier (uint32_t carrierId) const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t currentFrame = 0;
+  uint32_t lastIdInFrame = m_frames[0]->GetCarrierCount () - 1;
+  uint32_t carrierIdInFrame = carrierId;
+
+  while (carrierId > lastIdInFrame)
+    {
+      carrierIdInFrame -= m_frames[currentFrame]->GetCarrierCount ();
+      currentFrame++;
+      lastIdInFrame += m_frames[currentFrame]->GetCarrierCount ();
+    }
+
+  return m_frameIsRandomAccess[currentFrame];
+}
+
 void
 SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
@@ -490,7 +509,7 @@ SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
 }
 
 bool
-SatSuperframeConf::GetFrameIsRandomAccess (uint8_t frameIndex) const
+SatSuperframeConf::GetFrameRandomAccess (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -499,7 +518,7 @@ SatSuperframeConf::GetFrameIsRandomAccess (uint8_t frameIndex) const
       NS_FATAL_ERROR ("Frame index out of range!!!");
     }
 
-  return m_frameCarrierRollOff[frameIndex];
+  return m_frameIsRandomAccess[frameIndex];
 }
 
 
