@@ -50,6 +50,7 @@ SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)
 bool
 SatArqSequenceNumber::SeqNoAvailable () const
 {
+  NS_LOG_FUNCTION (this);
   return (m_seqNoMap.size () < m_windowSize);
 }
 
@@ -95,6 +96,8 @@ SatArqSequenceNumber::Release (uint8_t seqNo)
 void
 SatArqSequenceNumber::CleanUp ()
 {
+  NS_LOG_FUNCTION (this);
+
   std::map<uint32_t, bool>::iterator it = m_seqNoMap.begin ();
 
   while (it != m_seqNoMap.end () && it->second == true)

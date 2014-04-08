@@ -27,7 +27,12 @@
 /**
  * \ingroup satellite
  *
- * \brief SatArqSequenceNumber
+ * \brief SatArqSequenceNumber is handling the sequence numbers for the
+ * ARQ process. There may be a total of windowSize sequential sequence numbers
+ * in use simultaneously. If all of them are booked, then no new sequence numbers
+ * are available for new transmissions until some sequence numbers are released.
+ * Releasing may happen due to maximum retransmissions reached or received ACK.
+ * Sequence number is identified with one byte, thus it may range between 0 - 255.
  */
 namespace ns3 {
 
