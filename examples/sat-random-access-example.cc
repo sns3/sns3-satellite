@@ -42,6 +42,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
   LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
   LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
 
   // Read command line parameters given by user
   CommandLine cmd;
@@ -68,6 +69,12 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumBackOffProbability", DoubleValue (0.3));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
+
+  // Disable CRA
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
 
   // Create reference system, two options:
   // - "Scenario72"

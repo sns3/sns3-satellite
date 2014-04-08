@@ -202,6 +202,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
   RandomAccessTxOpportunities_s txOpportunities;
 
   txOpportunities.txOpportunityType = SatEnums::RA_DO_NOTHING;
+  txOpportunities.allocationChannel = allocationChannel;
 
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Starting Random Access ------");
@@ -239,38 +240,61 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
           NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for Slotted ALOHA");
         }
     }
+
+  /// This is an experimental option to allow testing of multiple RA models at the same time
+
   /// Frame start is a known trigger for CRDSA
   /// If SA is triggered by a buffer arrival at frame start, both SA and CRDSA will be evaluated.
   /// TODO: Although the possibility is remote, this approach is not optimal and should be improved in the future
 
-  /// When CRDSA is triggered, if the following conditions are fulfilled, SA shall be used instead of CRDSA
-  /// 1) CRDSA back off probability is higher than the parameterized value
-  /// 2) CRDSA back off is in effect
+  /// If all RA models are enabled, CRDSA is always prioritized over SA, i.e., SA transmission is not done and only CRDSA is used
+  /// This behaviour has the following exceptions:
+  /// 1) SA shall be used if CRDSA back off is in effect, i.e., CRDSA has idle
+
   else if (m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - All RA models enabled");
 
-      if (triggerType == SatEnums::RA_SLOTTED_ALOHA_TRIGGER && IsSlottedAlohaAllocationChannel (allocationChannel))
+      if (triggerType == SatEnums::RA_SLOTTED_ALOHA_TRIGGER)
         {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid Slotted ALOHA allocation channel, evaluating Slotted ALOHA");
-          txOpportunities = DoSlottedAloha ();
-        }
-      else if (triggerType == SatEnums::RA_CRDSA_TRIGGER && IsCrdsaAllocationChannel (allocationChannel))
-        {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff & backoff probability");
-
-          if (CrdsaHasBackoffTimePassed (allocationChannel) && !IsCrdsaBackoffProbabilityTooHigh (allocationChannel))
+          if (IsSlottedAlohaAllocationChannel (allocationChannel))
             {
-              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Low CRDSA backoff value AND CRDSA is free, evaluating CRDSA");
-              txOpportunities = DoCrdsa (allocationChannel);
+              if (IsCrdsaAllocationChannel (allocationChannel) && CrdsaHasBackoffTimePassed (allocationChannel))
+                {
+                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA triggered, but CRDSA available. Abstaining and waiting for CRDSA opportunity");
+                }
+              else
+                {
+                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid Slotted ALOHA allocation channel, evaluating Slotted ALOHA");
+                  txOpportunities = DoSlottedAloha ();
+                }
             }
           else
             {
-              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - High CRDSA backoff value OR CRDSA is not free, evaluating Slotted ALOHA");
-              txOpportunities = DoSlottedAloha ();
+              NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for Slotted ALOHA");
+            }
+        }
+      else if (triggerType == SatEnums::RA_CRDSA_TRIGGER)
+        {
+          if (IsCrdsaAllocationChannel (allocationChannel))
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff & backoff probability");
 
-              CrdsaReduceIdleBlocksForAllAllocationChannels ();
-              CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+              if (CrdsaHasBackoffTimePassed (allocationChannel))
+                {
+                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is free, evaluating CRDSA");
+                  txOpportunities = DoCrdsa (allocationChannel);
+                }
+              else
+                {
+                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is not free, aborting");
+                  CrdsaReduceIdleBlocksForAllAllocationChannels ();
+                  CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+                }
+            }
+          else
+            {
+              NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for CRDSA");
             }
         }
     }

@@ -41,10 +41,10 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-random-access-dynamic-load-control-example", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
-  //LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
+  LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
   LogComponentEnable ("SatNcc", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
 
   // Read command line parameters given by user
   CommandLine cmd;
