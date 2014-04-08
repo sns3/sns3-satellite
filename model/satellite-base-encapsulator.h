@@ -112,6 +112,12 @@ public:
   virtual void ReceivePdu (Ptr<Packet> p);
 
   /**
+   * Receive a control packet (ARQ ACK)
+   * \param p packet pointer received from lower layer
+   */
+  virtual void ReceiveAck (Ptr<Packet> p);
+
+  /**
    * Get the buffered packets for this encapsulator
    * \return uint32_t buffered bytes
    */

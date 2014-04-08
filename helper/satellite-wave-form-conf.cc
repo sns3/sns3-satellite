@@ -161,12 +161,6 @@ SatWaveformConf::SatWaveformConf ()
   NS_ASSERT (false);
 }
 
-/**
- * Minimum and maximum waveform ids. Note, that currently it is
- * assumed that all the wfs between min and max are valid!
- */
-uint32_t m_minWfId;
-uint32_t m_maxWfId;
 
 SatWaveformConf::SatWaveformConf (std::string filePathName)
 :m_waveforms (),

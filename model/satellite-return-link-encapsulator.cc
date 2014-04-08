@@ -345,17 +345,22 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   // FULL_PPDU
   if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == true)
     {
-      NS_LOG_LOGIC ("FULL PPDU received");
+      NS_LOG_LOGIC ("FULL PPDU received for UT: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
 
+      // Reset all previous possible packet fragments
       Reset ();
 
+      // Forward packet upwards
       m_rxCallback (p);
     }
 
   // START_PPDU
   else if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == false)
     {
-      NS_LOG_LOGIC ("START PPDU received");
+      NS_LOG_LOGIC ("START PPDU received: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
+
+      // Reset all previous possible packet fragments
+      Reset ();
 
       m_currRxFragmentId = ppduHeader.GetFragmentId ();
       m_currRxPacketSize = ppduHeader.GetTotalLength ();
@@ -366,7 +371,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   // CONTINUATION_PPDU
   else if (ppduHeader.GetStartIndicator() == false && ppduHeader.GetEndIndicator() == false)
     {
-      NS_LOG_LOGIC ("CONTINUATION PPDU received");
+      NS_LOG_LOGIC ("CONTINUATION PPDU received: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
 
       // Previous fragment found
       if (m_currRxPacketFragment && ppduHeader.GetFragmentId () == m_currRxFragmentId)
@@ -384,7 +389,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   // END_PPDU
   else if (ppduHeader.GetStartIndicator() == false && ppduHeader.GetEndIndicator() == true)
     {
-      NS_LOG_LOGIC ("END PPDU received");
+      NS_LOG_LOGIC ("END PPDU received: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
 
       // Previous fragment found
       if (m_currRxPacketFragment && ppduHeader.GetFragmentId () == m_currRxFragmentId)

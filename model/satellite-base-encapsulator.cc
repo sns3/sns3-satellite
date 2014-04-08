@@ -158,8 +158,19 @@ SatBaseEncapsulator::ReceivePdu (Ptr<Packet> p)
 
   /**
    * The base encapsulator should not be used at receiving packets
-   * at all, since all the packets are terminated currently already
-   * in lower layers
+   * at all! This functionality is implemented in the inherited classes.
+   */
+}
+
+void
+SatBaseEncapsulator::ReceiveAck (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (true);
+
+  /**
+   * The base encapsulator should not be used at receiving control packets
+   * at all! This functionality is implemented in the inherited classes.
    */
 }
 

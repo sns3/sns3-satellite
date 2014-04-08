@@ -274,7 +274,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create a request manager and attach it to LLC, and set control message callback to RM
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
   rm->SetAttribute ("EvaluationInterval", TimeValue (m_superframeSeq->GetDuration (0)));
-  rm->Initialize (m_llsConf);
   llc->SetRequestManager (rm);
   rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
 
@@ -384,6 +383,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
+  // Attach the LLC receive callback to SatMac
+  mac->SetControlReceiveCallback (MakeCallback (&SatLlc::ReceiveAck, llc));
+
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
@@ -394,7 +396,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetRaChannel (raChannel);
 
   phy->Initialize ();
-
   llc->SetQueueStatisticsCallbacks ();
 
   // Create UT scheduler for MAC and connect callbacks to LLC
@@ -409,6 +410,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
+
+  rm->Initialize (m_llsConf);
 
   if (m_randomAccessModel != SatEnums::RA_OFF)
     {

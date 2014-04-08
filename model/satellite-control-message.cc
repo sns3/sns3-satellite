@@ -610,6 +610,60 @@ SatRaMessage::GetSizeInBytes () const
   return size;
 }
 
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatArqAckMessage);
+
+TypeId
+SatArqAckMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatArqAckMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatArqAckMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatArqAckMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatArqAckMessage::SatArqAckMessage ()
+:m_sequenceNumber (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatArqAckMessage::~SatArqAckMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatArqAckMessage::SetSequenceNumber (uint32_t sn)
+{
+  NS_LOG_FUNCTION (this);
+  m_sequenceNumber = sn;
+}
+
+uint32_t
+SatArqAckMessage::GetSequenceNumber () const
+{
+  return m_sequenceNumber;
+}
+
+uint32_t
+SatArqAckMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+  return 2;
+}
+
+
 // Control message container
 
 SatControlMsgContainer::SatControlMsgContainer ()

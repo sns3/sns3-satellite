@@ -228,6 +228,10 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
 {
   NS_LOG_FUNCTION (this);
 
+  // Remove the mac tag
+  SatMacTag macTag;
+  packet->PeekPacketTag (macTag);
+
   switch (ctrlTag.GetMsgType ())
   {
     case SatControlMsgTag::SAT_CR_CTRL_MSG:
@@ -264,7 +268,18 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACKs need to be forwarded to LLC/ARQ for processing
-        m_rxCallback (packet, sourceAddress);
+        uint32_t ackId = ctrlTag.GetMsgId ();
+
+        Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage> (m_readCtrlCallback (ackId));
+
+        if ( ack == NULL )
+          {
+            NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
+          }
+
+        packet->RemovePacketTag (macTag);
+        Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+        m_controlRxCallback (packet, ack, destAddress);
         break;
       }
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:

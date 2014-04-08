@@ -70,7 +70,7 @@ SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf)
   NS_LOG_LOGIC ("Gain value: " << m_gainValueK << ", maxPendinCrEntries: " << m_maxPendingCrEntries);
 
   // Start the request manager evaluation cycle
-  Simulator::Schedule (m_evaluationInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
+  Simulator::ScheduleWithContext (m_nodeInfo->GetNodeId (), m_evaluationInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
 
   // Start the C/N0 report cycle
   m_cnoReportEvent = Simulator::Schedule (m_cnoReportInterval, &SatRequestManager::SendCnoReport, this);

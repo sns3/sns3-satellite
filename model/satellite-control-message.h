@@ -436,6 +436,61 @@ private:
 
 };
 
+
+/**
+ * \ingroup satellite
+ * \brief ARQ ACK message
+ */
+
+class SatArqAckMessage : public SatControlMessage
+{
+public:
+
+  /**
+   * Constructor for SatCrMessage
+   */
+  SatArqAckMessage ();
+
+  /**
+   * Destructor for SatCrMessage
+   */
+  ~SatArqAckMessage ();
+
+  // methods derived from base classes
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_ARQ_ACK
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_ARQ_ACK; }
+
+  /**
+   * Set the sequence number to be ACK'ed
+   */
+  void SetSequenceNumber (uint32_t sn);
+
+  /**
+   * Set the sequence number to be ACK'ed
+   * \return uint32_t Sequence number
+   */
+  uint32_t GetSequenceNumber () const;
+
+  /**
+   * Get real size of the ACK message, which can be used to e.g. simulate real size.
+   * \return Real size of the ARQ ACK
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+
+  uint32_t m_sequenceNumber;
+
+};
+
+
 /**
  * \ingroup satellite
  * \brief C/N0 (CNI) estimation report message.

@@ -173,12 +173,54 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
         {
           NS_FATAL_ERROR ("Control messages should be terminated already at lower layer!");
         }
-
+        
       // Note: control messages should not be seen at the LLC layer, since
       // they are received already at the MAC layer.
       if (it != m_decaps.end ())
         {
           it->second->ReceivePdu (packet);
+        }
+	    else
+  	 	 {
+	  	   NS_FATAL_ERROR ("MAC tag not found in the packet!");
+  			}
+    }
+}
+
+
+void
+SatLlc::ReceiveAck (Ptr<Packet> packet, Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
+{
+  NS_LOG_FUNCTION (this << macAddr << packet);
+
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_LLC,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  // Receive packet with a decapsulator instance which is handling the
+  // packets for this specific id
+  SatRcIndexTag rcTag;
+  bool mSuccess = packet->PeekPacketTag (rcTag);
+  if (mSuccess)
+    {
+      uint32_t flowId = rcTag.GetRcIndex ();
+      EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
+      EncapContainer_t::iterator it = m_decaps.find (key);
+
+      // Note: control messages should not be seen at the LLC layer, since
+      // they are received already at the MAC layer.
+      if (it != m_decaps.end ())
+        {
+          it->second->ReceiveAck (packet);
         }
       else
         {
@@ -190,6 +232,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
 }
+
 
 void
 SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)

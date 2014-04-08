@@ -90,7 +90,7 @@ public:
    */
   virtual uint32_t GetMinTxOpportunityInBytes () const;
 
-private:
+protected:
 
   /**
    * Method increases the fragment id by one. If the maximum fragment id is
