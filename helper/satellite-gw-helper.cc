@@ -230,13 +230,18 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
       cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
     }
 
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters;
+  parameters.m_errorModel = m_errorModel;
+  parameters.m_daIfModel = m_interferenceModel;
+  parameters.m_raIfModel = m_interferenceModel;
+  parameters.m_converter = m_carrierBandwidthConverter;
+  parameters.m_carrierCount = m_rtnLinkCarrierCount;
+  parameters.m_cec = cec;
+  parameters.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR;
+
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
-                                              m_errorModel,
                                               m_linkResults,
-                                              m_interferenceModel,
-                                              m_carrierBandwidthConverter,
-                                              m_rtnLinkCarrierCount,
-                                              cec);
+                                              parameters);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

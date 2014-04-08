@@ -199,20 +199,30 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
    */
   Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
 
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser;
+  parametersUser.m_daIfModel = m_rtnLinkInterferenceModel;
+  parametersUser.m_raIfModel = m_rtnLinkInterferenceModel;
+  parametersUser.m_converter = m_carrierBandwidthConverter;
+  parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
+  parametersUser.m_cec = cec;
+  parametersUser.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
-                                                         m_rtnLinkInterferenceModel,
-                                                         m_carrierBandwidthConverter,
-                                                         m_rtnLinkCarrierCount,
-                                                         cec);
+                                                         parametersUser);
 
   params.m_txCh = fr;
   params.m_rxCh = ff;
 
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder;
+  parametersFeeder.m_daIfModel = m_fwdLinkInterferenceModel;
+  parametersFeeder.m_raIfModel = m_fwdLinkInterferenceModel;
+  parametersFeeder.m_converter = m_carrierBandwidthConverter;
+  parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
+  parametersFeeder.m_cec = cec;
+  parametersFeeder.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+
   Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,
-                                                             m_fwdLinkInterferenceModel,
-                                                             m_carrierBandwidthConverter,
-                                                             m_fwdLinkCarrierCount,
-                                                             cec);
+                                                             parametersFeeder);
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

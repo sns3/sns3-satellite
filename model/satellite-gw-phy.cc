@@ -127,12 +127,8 @@ SatGwPhy::SatGwPhy (void)
 }
 
 SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
-                    ErrorModel errorModel,
                     Ptr<SatLinkResults> linkResults,
-                    InterferenceModel ifModel,
-                    CarrierBandwidthConverter converter,
-                    uint32_t carrierCount,
-                    Ptr<SatChannelEstimationErrorContainer> cec)
+                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters)
   : SatPhy (params),
     m_aciIfWrtNoisePercent (10.0),
     m_imInterferenceCOverIDb (22.0),
@@ -144,17 +140,11 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
 
   m_imInterferenceCOverI = SatUtils::DbToLinear (m_imInterferenceCOverIDb);
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
-  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
-  p.m_errorModel = errorModel;
-  p.m_ifModel = ifModel;
-  p.m_rxMode = SatPhyRxCarrierConf::NORMAL;
-  p.m_chType = SatEnums::RETURN_FEEDER_CH;
-  p.m_converter = converter;
-  p.m_carrierCount = carrierCount;
-  p.m_cec = cec;
+  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  parameters.m_chType = SatEnums::RETURN_FEEDER_CH;
 
-	Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
+	Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
 
   carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoisePercent) );
 

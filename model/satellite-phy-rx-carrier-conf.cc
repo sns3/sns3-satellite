@@ -34,7 +34,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
-: m_ifModel (),
+: m_daIfModel (),
+  m_raIfModel (),
   m_errorModel (),
   m_rxTemperatureK (),
   m_rxAciIfWrtNoise (),
@@ -48,15 +49,15 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_linkResults (),
   m_rxExtNoiseDensityDbwhz (0),
   m_enableIntfOutputTrace (false),
-  m_alwaysDropCollidingRandomAccessPackets (false),
-  m_randomAccessEnabledForThisCarrier (false),
-  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10)
+  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
+  m_raCollisionModel (RA_COLLISION_NOT_DEFINED)
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
- : m_ifModel (createParams.m_ifModel),
+ : m_daIfModel (createParams.m_daIfModel),
+   m_raIfModel (createParams.m_raIfModel),
    m_errorModel (createParams.m_errorModel),
    m_rxTemperatureK (SatUtils::DbToLinear (createParams.m_rxTemperatureK)),
    m_rxAciIfWrtNoise (createParams.m_aciIfWrtNoisePercent),
@@ -70,9 +71,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
    m_linkResults (),
    m_rxExtNoiseDensityDbwhz (0),
    m_enableIntfOutputTrace (false),
-   m_alwaysDropCollidingRandomAccessPackets (false),
-   m_randomAccessEnabledForThisCarrier (false),
-   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10)
+   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
+   m_raCollisionModel (createParams.m_raCollisionModel)
 {
 
 }
@@ -96,16 +96,6 @@ SatPhyRxCarrierConf::GetTypeId (void)
                    "Enable interference output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableIntfOutputTrace),
-                    MakeBooleanChecker ())
-    .AddAttribute( "AlwaysDropCollidingRandomAccessPackets",
-                   "Always drop colliding random access packets regardless of link result mapping",
-                    BooleanValue (false),
-                    MakeBooleanAccessor (&SatPhyRxCarrierConf::m_alwaysDropCollidingRandomAccessPackets),
-                    MakeBooleanChecker ())
-    .AddAttribute( "RandomAccessEnabledForThisCarrier",
-                   "Is random access enabled for this carrier",
-                    BooleanValue (false),
-                    MakeBooleanAccessor (&SatPhyRxCarrierConf::m_randomAccessEnabledForThisCarrier),
                     MakeBooleanChecker ())
     .AddAttribute( "RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
                    "Random access average normalized offered load measurement window size",
@@ -154,9 +144,16 @@ SatPhyRxCarrierConf::GetErrorModel () const
 }
 
 SatPhyRxCarrierConf::InterferenceModel
-SatPhyRxCarrierConf::GetInterferenceModel () const
+SatPhyRxCarrierConf::GetInterferenceModel (bool isRandomAccessCarrier) const
 {
-  return m_ifModel;
+  if (isRandomAccessCarrier)
+    {
+      return m_raIfModel;
+    }
+  else
+    {
+      return m_daIfModel;
+    }
 }
 
 Ptr<SatLinkResults>
@@ -219,16 +216,17 @@ SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer () const
   return m_channelEstimationError;
 }
 
-bool
-SatPhyRxCarrierConf::AreCollidingRandomAccessPacketsAlwaysDropped () const
+SatPhyRxCarrierConf::RandomAccessCollisionModel
+SatPhyRxCarrierConf::GetRandomAccessCollisionModel () const
 {
-  return m_alwaysDropCollidingRandomAccessPackets;
-}
-
-bool
-SatPhyRxCarrierConf::IsRandomAccessEnabledForThisCarrier () const
-{
-  return m_randomAccessEnabledForThisCarrier;
+  if (m_raIfModel == IF_PER_PACKET)
+    {
+      return m_raCollisionModel;
+    }
+  else
+    {
+      return RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS;
+    }
 }
 
 uint32_t

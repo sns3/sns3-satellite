@@ -48,12 +48,8 @@ public:
   SatUtPhy (void);
 
   SatUtPhy (SatPhy::CreateParam_t & params,
-            SatPhy::ErrorModel errorModel,
             Ptr<SatLinkResults> linkResults,
-            SatPhy::InterferenceModel ifModel,
-            SatPhy::CarrierBandwidthConverter converter,
-            uint32_t carrierCount,
-            Ptr<SatChannelEstimationErrorContainer> cec);
+            SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters);
 
   virtual ~SatUtPhy ();
 

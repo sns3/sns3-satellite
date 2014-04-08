@@ -48,12 +48,8 @@ public:
   SatGwPhy (void);
 
   SatGwPhy (SatPhy::CreateParam_t& params,
-            ErrorModel errorModel,
             Ptr<SatLinkResults> linkResults,
-            InterferenceModel ifModel,
-            CarrierBandwidthConverter converter,
-            uint32_t carrierCount,
-            Ptr<SatChannelEstimationErrorContainer> cec);
+            SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters);
 
   virtual ~SatGwPhy ();
 

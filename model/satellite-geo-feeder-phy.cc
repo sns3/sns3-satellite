@@ -127,10 +127,7 @@ SatGeoFeederPhy::SatGeoFeederPhy (void)
 }
 
 SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
-                                  InterferenceModel ifModel,
-                                  CarrierBandwidthConverter converter,
-                                  uint32_t carrierCount,
-                                  Ptr<SatChannelEstimationErrorContainer> cec)
+                                  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
@@ -144,17 +141,12 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   // Configure the SatPhyRxCarrier instances
   // Note, that in GEO satellite, there is no need for error modeling.
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
-  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
-  p.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
-  p.m_ifModel = ifModel;
-  p.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
-  p.m_chType = SatEnums::FORWARD_FEEDER_CH;
-  p.m_converter = converter;
-  p.m_carrierCount = carrierCount;
-  p.m_cec = cec;
+  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
+  parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+  parameters.m_chType = SatEnums::FORWARD_FEEDER_CH;
 
-  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
 
   carrierConf->SetAttribute ("ExtNoiseDensityDbwhz", DoubleValue (m_extNoisePowerDensityDbwHz) );
 

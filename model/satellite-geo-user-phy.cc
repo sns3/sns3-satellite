@@ -128,10 +128,7 @@ SatGeoUserPhy::SatGeoUserPhy (void)
 }
 
 SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
-                              InterferenceModel ifModel,
-                              CarrierBandwidthConverter converter,
-                              uint32_t carrierCount,
-                              Ptr<SatChannelEstimationErrorContainer> cec)
+                              SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
@@ -143,17 +140,12 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
   m_aciInterferenceCOverI = SatUtils::DbToLinear (m_aciInterferenceCOverIDb);
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s p;
-  p.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
-  p.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
-  p.m_ifModel = ifModel;
-  p.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
-  p.m_chType = SatEnums::RETURN_USER_CH;
-  p.m_converter = converter;
-  p.m_carrierCount = carrierCount;
-  p.m_cec = cec;
+  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
+  parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+  parameters.m_chType = SatEnums::RETURN_USER_CH;
 
-  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (p);
+  Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoUserPhy::CalculateSinr, this));
 

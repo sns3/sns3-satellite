@@ -39,12 +39,14 @@ class SatPhyRxCarrierConf : public Object
 public:
 
   /**
+   * \brief Callback for SINR calculation
    * \param Calculated C/NI
    * \return Calculated Final SINR in linear
    */
   typedef Callback<double, double> SinrCalculatorCallback;
 
   /**
+   * \brief Callback for carrier bandwidth
    * \param channelType     The type of the channel
    * \param carrierId       The id of the carrier
    * \param bandwidthType   The type of the bandwidth
@@ -54,7 +56,7 @@ public:
   typedef Callback<double, SatEnums::ChannelType_t, uint32_t, SatEnums::CarrierBandwidthType_t > CarrierBandwidthConverter;
 
   /**
-   *  RX mode.
+   *  \brief RX mode enum
    *
    *  TRANSPARENT   Only beam Id is checked for receiving
    *  NORMAL        Beam Id and valid address (own or broadcast) is checked for receiving
@@ -65,7 +67,7 @@ public:
   };
 
   /**
-   * Used error model
+   * \brief Error model enum
    */
   enum ErrorModel
   {
@@ -73,7 +75,7 @@ public:
   };
 
   /**
-   * Used interference model
+   * \brief Interference model enum
    */
   enum InterferenceModel
   {
@@ -81,11 +83,20 @@ public:
   };
 
   /**
+   * \brief Random access collision model enum
+   */
+  enum RandomAccessCollisionModel
+  {
+    RA_COLLISION_NOT_DEFINED, RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS, RA_COLLISION_CHECK_AGAINST_SINR
+  };
+
+  /**
    * \brief Struct for storing the information for SatPhyRxCarrierConf.
    * \param rxTemperatureK RX noise temperature in Kelvins
    * \param aciIfWrtNoisePercent Adjacent channel interference wrt noise in percents
    * \param errorModel Used error model
-   * \param ifModel Used interference model
+   * \param daIfModel Used interference model for dedicated access
+   * \param raIfModel Used interference model for random access
    * \param rxMode RX mode used in carrier
    * \param chType RX channel type
    * \param converter Bandwidth converter
@@ -97,98 +108,97 @@ public:
     double                                  m_rxTemperatureK;
     double                                  m_aciIfWrtNoisePercent;
     ErrorModel                              m_errorModel;
-    InterferenceModel                       m_ifModel;
+    InterferenceModel                       m_daIfModel;
+    InterferenceModel                       m_raIfModel;
     RxMode                                  m_rxMode;
     SatEnums::ChannelType_t                 m_chType;
     CarrierBandwidthConverter               m_converter;
     uint32_t                                m_carrierCount;
     Ptr<SatChannelEstimationErrorContainer> m_cec;
+    RandomAccessCollisionModel              m_raCollisionModel;
   } RxCarrierCreateParams_s;
 
   /**
-   * Default constructor for SatPhyRxCarrierConf.
+   * Default constructor for SatPhyRxCarrierConf
+   * \param params Rx carrier parameters
    */
-  SatPhyRxCarrierConf (RxCarrierCreateParams_s p);
+  SatPhyRxCarrierConf (RxCarrierCreateParams_s params);
 
   /**
-   * Constructor for SatPhyRxCarrierConf.
-   * \param
+   * Constructor for SatPhyRxCarrierConf
    */
   SatPhyRxCarrierConf ( );
 
   /**
-   * Destructor for SatPhyRxCarrierConf.
+   * Destructor for SatPhyRxCarrierConf
    */
   virtual ~SatPhyRxCarrierConf () {}
 
   static TypeId GetTypeId (void);
 
   /**
-   * \brief
+   * \brief Dispose function
    */
   virtual void DoDispose ();
 
   /**
-   * Set link results for the carrier configuration, either
-   * - DVB-RCS2
-   * - DVB-S2
+   * \brief Set link results for the carrier configuration, either DVB-RCS2 or DVB-S2
    */
   void SetLinkResults (Ptr<SatLinkResults> linkResults);
 
   /**
-   * Get the number of configured carriers
+   * \brief Get the number of configured carriers
    * \return the number of configured carriers
    */
   uint32_t GetCarrierCount () const;
 
   /**
-   * Get configured error model
+   * \brief Get configured error model
    * \return configured error model
    */
   ErrorModel GetErrorModel () const;
 
   /**
-   * Get configured interference model
+   * \brief Get configured interference model
+   * \param isRandomAccessCarrier Do we want RA or DA IF model
    * \return configured interference model
    */
-  InterferenceModel GetInterferenceModel () const;
+  InterferenceModel GetInterferenceModel (bool isRandomAccessCarrier) const;
 
   /**
-   * Get configured link results
+   * \brief Get configured link results
    * \return configured link results
    */
   Ptr<SatLinkResults> GetLinkResults () const;
 
   /**
-   * Get configured bandwidth
-   *
+   * \brief Get configured bandwidth
    * \param carrierId   Id of the carrier
    * \param bandwidthType Type of the bandwidth
-   *
    * \return Bandwidth of the requested carrier.
    */
   double GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType ) const;
 
   /**
-   * Get configured RX noise temperature
+   * \brief Get configured RX noise temperature
    * \return configured RX noise temperature
    */
   double GetRxTemperatureK () const;
 
   /**
-   * Get other system RX noise
+   * \brief Get other system RX noise
    * \return other system RX noise
    */
   double GetExtPowerDensityDbwhz () const;
 
   /**
-   * Get adjacent channel interference wrt noise (percent)
+   * \brief Get adjacent channel interference wrt noise (percent)
    * \return adjacent channel interference wrt noise (percent)
    */
   double GetRxAciInterferenceWrtNoise () const;
 
   /**
-   * Get configured RX mode
+   * \brief Get configured RX mode
    * \return configured RX mode
    */
   RxMode GetRxMode () const;
@@ -212,36 +222,32 @@ public:
   bool IsIntfOutputTraceEnabled () const;
 
   /**
-   * \brief Get callback function to calculate final SINR.
+   * \brief Get callback function to calculate final SINR
+   * \return final SINR
    */
   inline SinrCalculatorCallback  GetSinrCalculatorCb () {return m_sinrCalculate;}
 
   /**
-   * \brief Set callback function to calculate final SINR.
+   * \brief Set callback function to calculate final SINR
+   * \param sinrCalculator SINR calculator callback
    */
-  inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator ) {m_sinrCalculate = sinrCalculator;}
+  inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator) {m_sinrCalculate = sinrCalculator;}
 
   /**
-   *
-   * \return
+   * \brief Get channel estimator container
+   * \return channel estimator container
    */
   Ptr<SatChannelEstimationErrorContainer> GetChannelEstimatorErrorContainer () const;
 
   /**
-   *
-   * \return
+   * \brief Get random access collision model
+   * \return random access collision model
    */
-  bool AreCollidingRandomAccessPacketsAlwaysDropped () const;
+  RandomAccessCollisionModel GetRandomAccessCollisionModel () const;
 
   /**
-   *
-   * \return
-   */
-  bool IsRandomAccessEnabledForThisCarrier () const;
-
-  /**
-   *
-   * \return
+   * \brief Get random access average normalized offered load measurement window size
+   * \return average normalized offered load measurement window size
    */
   uint32_t GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize () const;
 
@@ -253,7 +259,8 @@ private:
    * we can pass the bandwidth information for each carrier. The bandwidth may be needed
    * for at least noise and C/No calculation.
    */
-  InterferenceModel m_ifModel;
+  InterferenceModel m_daIfModel;
+  InterferenceModel m_raIfModel;
   ErrorModel m_errorModel;
   double m_rxTemperatureK;
   double m_rxAciIfWrtNoise;
@@ -268,8 +275,8 @@ private:
   double m_rxExtNoiseDensityDbwhz;
   bool m_enableIntfOutputTrace;
   bool m_alwaysDropCollidingRandomAccessPackets;
-  bool m_randomAccessEnabledForThisCarrier;
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
+  RandomAccessCollisionModel m_raCollisionModel;
 };
 
 } // namespace ns3

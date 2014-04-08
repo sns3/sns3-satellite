@@ -240,13 +240,18 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       cec = Create<SatFwdLinkChannelEstimationErrorContainer> ();
     }
 
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters;
+  parameters.m_errorModel = m_errorModel;
+  parameters.m_daIfModel = m_interferenceModel;
+  parameters.m_raIfModel = m_interferenceModel;
+  parameters.m_converter = m_carrierBandwidthConverter;
+  parameters.m_carrierCount = m_fwdLinkCarrierCount;
+  parameters.m_cec = cec;
+  parameters.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
-                                              m_errorModel,
                                               m_linkResults,
-                                              m_interferenceModel,
-                                              m_carrierBandwidthConverter,
-                                              m_fwdLinkCarrierCount,
-                                              cec);
+                                              parameters);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

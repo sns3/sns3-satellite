@@ -47,10 +47,7 @@ public:
   SatGeoUserPhy (void);
 
   SatGeoUserPhy (SatPhy::CreateParam_t& params,
-                 InterferenceModel ifModel,
-                 CarrierBandwidthConverter converter,
-                 uint32_t carrierCount,
-                 Ptr<SatChannelEstimationErrorContainer> cec);
+                 SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters);
 
   virtual ~SatGeoUserPhy ();
 

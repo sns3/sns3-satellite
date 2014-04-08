@@ -568,7 +568,7 @@ private:
   /**
    *
    */
-  bool m_dropCollidingRandomAccessPackets;
+  SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel;
 
   /**
    *
@@ -593,7 +593,7 @@ private:
   /**
    *
    */
-  bool m_frameEndSchedulingStarted;
+  bool m_frameEndSchedulingInitialized;
 };
 
 }

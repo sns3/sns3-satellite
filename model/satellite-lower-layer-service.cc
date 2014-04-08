@@ -273,7 +273,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "DefaultControlRandomizationInterval",
                     "Default control randomization interval for the lower layer service",
-                     TimeValue (MilliSeconds (10)),
+                     TimeValue (MilliSeconds (100)),
                      MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
                      MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
     .AddAttribute ( "RbdcQuantizationSmallStepKbps",

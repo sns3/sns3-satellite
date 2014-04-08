@@ -57,18 +57,18 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_enableCompositeSinrOutputTrace (false),
    m_numOfOngoingRx (0),
    m_rxPacketCounter (0),
-   m_dropCollidingRandomAccessPackets (carrierConf->AreCollidingRandomAccessPacketsAlwaysDropped ()),
-   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ()),
-   m_isRandomAccessEnabledForThisCarrier (carrierConf->IsRandomAccessEnabledForThisCarrier ()),
+   m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
+   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
+   m_isRandomAccessEnabledForThisCarrier (false),
    m_randomAccessBitsInFrame (0),
-   m_frameEndSchedulingStarted (false)
+   m_frameEndSchedulingInitialized (false)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
   m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId, SatEnums::EFFECTIVE_BANDWIDTH);
 
   // Create proper interference object for carrier i
-  switch (carrierConf->GetInterferenceModel ())
+  switch (carrierConf->GetInterferenceModel (m_isRandomAccessEnabledForThisCarrier))
   {
     case SatPhyRxCarrierConf::IF_CONSTANT:
       NS_LOG_LOGIC (this << " Constant interference model created for carrier: " << carrierId);
@@ -132,8 +132,11 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_channelEstimationError = carrierConf->GetChannelEstimatorErrorContainer ();
 
   /// TODO remove this once the parameter is properly initialized!!!
+  //if (m_isRandomAccessEnabledForThisCarrier)
   if (m_carrierId == 10)
     {
+      m_randomAccessCollisionModel = carrierConf->GetRandomAccessCollisionModel ();
+      m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize = carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ();
       m_isRandomAccessEnabledForThisCarrier = true;
     }
 }
@@ -141,7 +144,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 void
 SatPhyRxCarrier::BeginFrameEndScheduling ()
 {
-  if (!m_frameEndSchedulingStarted)
+  if (!m_frameEndSchedulingInitialized)
     {
       /// frame end scheduling is at the moment needed only for Random Access at the GW
       if (m_isRandomAccessEnabledForThisCarrier && m_rxMode == SatPhyRxCarrierConf::NORMAL)
@@ -161,7 +164,7 @@ SatPhyRxCarrier::BeginFrameEndScheduling ()
               NS_FATAL_ERROR ("SatPhyRxCarrier::BeginFrameEndScheduling - m_nodeInfo not set");
             }
 
-          m_frameEndSchedulingStarted = true;
+          m_frameEndSchedulingInitialized = true;
 
           Simulator::ScheduleWithContext (m_nodeInfo->GetNodeId (),schedulingDelay, &SatPhyRxCarrier::DoFrameEnd, this);
         }
@@ -653,17 +656,21 @@ SatPhyRxCarrier::ProcessSlottedAlohaCollisions (double cSinr, Ptr<SatSignalParam
 
   bool phyError = false;
 
-  if (m_dropCollidingRandomAccessPackets)
+  if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
     {
       /// check whether the packet has collided. This mode is intended to be used with constant interference and traced interference
       phyError = m_satInterference->HasCollision (interferenceEvent);
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Strict collision mode, phyError: " << phyError);
     }
-  else
+  else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
     {
       /// check cSinr against link results
       phyError = CheckAgainstLinkResults (cSinr,rxParams);
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Composite SINR mode, phyError: " << phyError);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Random access collision model not defined");
     }
 
   return phyError;
@@ -1360,7 +1367,7 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
   packet.cSinr = cSinr;
   packet.ifPower = packet.rxParams->m_ifPower_W;
 
-  if (m_dropCollidingRandomAccessPackets)
+  if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
     {
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Strict collision detection is ENABLED");
 
@@ -1379,11 +1386,15 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
         }
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Strict collision detection, phy error: " << packet.phyError);
     }
-  else
+  else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
     {
       /// check against link results
       packet.phyError = CheckAgainstLinkResults (packet.cSinr,packet.rxParams);
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Check against link results, phy error: " << packet.phyError);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Random access collision model not defined");
     }
 
   /// mark the packet as processed
