@@ -128,7 +128,8 @@ SatGwPhy::SatGwPhy (void)
 
 SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
                     Ptr<SatLinkResults> linkResults,
-                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters)
+                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+                    Ptr<SatSuperframeConf> superFrameConf)
   : SatPhy (params),
     m_aciIfWrtNoisePercent (10.0),
     m_imInterferenceCOverIDb (22.0),
@@ -155,7 +156,7 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGwPhy::CalculateSinr, this));
 
-  SatPhy::ConfigureRxCarriers (carrierConf);
+  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
 
 SatGwPhy::~SatGwPhy ()

@@ -47,7 +47,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 
-SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf)
+SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabledForThisCarrier)
   :m_state (IDLE),
    m_receivingDedicatedAccess (false),
    m_beamId (),
@@ -59,7 +59,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_rxPacketCounter (0),
    m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
-   m_isRandomAccessEnabledForThisCarrier (false),
+   m_isRandomAccessEnabledForThisCarrier (isRandomAccessEnabledForThisCarrier),
    m_randomAccessBitsInFrame (0),
    m_frameEndSchedulingInitialized (false)
 {
@@ -131,13 +131,10 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // Configured channel estimation error
   m_channelEstimationError = carrierConf->GetChannelEstimatorErrorContainer ();
 
-  /// TODO remove this once the parameter is properly initialized!!!
-  //if (m_isRandomAccessEnabledForThisCarrier)
-  if (m_carrierId == 10)
+  if (m_isRandomAccessEnabledForThisCarrier)
     {
       m_randomAccessCollisionModel = carrierConf->GetRandomAccessCollisionModel ();
       m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize = carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ();
-      m_isRandomAccessEnabledForThisCarrier = true;
     }
 }
 

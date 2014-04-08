@@ -128,7 +128,8 @@ SatGeoUserPhy::SatGeoUserPhy (void)
 }
 
 SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
-                              SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters)
+                              SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+                              Ptr<SatSuperframeConf> superFrameConf)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
@@ -149,7 +150,7 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoUserPhy::CalculateSinr, this));
 
-  SatPhy::ConfigureRxCarriers (carrierConf);
+  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
 
 SatGeoUserPhy::~SatGeoUserPhy ()

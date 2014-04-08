@@ -29,6 +29,7 @@
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-frame-conf.h"
 
 namespace ns3 {
 
@@ -49,7 +50,8 @@ public:
 
   SatUtPhy (SatPhy::CreateParam_t & params,
             Ptr<SatLinkResults> linkResults,
-            SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters);
+            SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+            Ptr<SatSuperframeConf> superFrameConf);
 
   virtual ~SatUtPhy ();
 

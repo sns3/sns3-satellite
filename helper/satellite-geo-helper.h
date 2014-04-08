@@ -31,6 +31,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
+#include "satellite-superframe-sequence.h"
 
 namespace ns3 {
 
@@ -51,7 +52,7 @@ public:
    * Create a SatGeoHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount);
+  SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
   virtual ~SatGeoHelper () {}
 
   /**
@@ -175,6 +176,11 @@ private:
      * \brief Trace callback for creation traces
      */
     TracedCallback<std::string> m_creationTrace;
+
+    /**
+     * \brief Superframe sequence
+     */
+    Ptr<SatSuperframeSeq> m_superframeSeq;
 };
 
 } // namespace ns3

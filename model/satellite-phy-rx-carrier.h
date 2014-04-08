@@ -79,8 +79,9 @@ public:
    * \brief
    * \param carrierId
    * \param carrierConf
+   * \param isRandomAccessEnabledForThisCarrier
    */
-  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf);
+  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabledForThisCarrier);
 
   /**
    * \brief

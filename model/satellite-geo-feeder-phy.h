@@ -28,6 +28,7 @@
 #include "ns3/address.h"
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
+#include "ns3/satellite-frame-conf.h"
 
 namespace ns3 {
 
@@ -47,7 +48,8 @@ public:
   SatGeoFeederPhy (void);
 
   SatGeoFeederPhy (SatPhy::CreateParam_t& params,
-                   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters);
+                   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+                   Ptr<SatSuperframeConf> superFrameConf);
 
   virtual ~SatGeoFeederPhy ();
 

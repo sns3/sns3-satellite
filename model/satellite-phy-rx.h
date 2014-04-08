@@ -29,6 +29,7 @@
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
 #include "satellite-base-fading.h"
+#include "ns3/satellite-frame-conf.h"
 
 namespace ns3 {
 
@@ -126,8 +127,9 @@ public:
 
   /**
    * \param carrierConf Carrier configuration class
+   * \param superFrameConf Superframe configuration
    */
-  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf);
+  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf);
 
   /**
    * Start packet reception from the SatChannel

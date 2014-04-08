@@ -22,7 +22,6 @@
 #include "ns3/object-vector.h"
 #include "ns3/antenna-model.h"
 #include "ns3/object-factory.h"
-
 #include "satellite-utils.h"
 #include "satellite-net-device.h"
 #include "satellite-phy.h"
@@ -256,7 +255,7 @@ SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 }
 
 void
-SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
+SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf)
 {
   NS_ASSERT (m_rxCarriers.empty());
 
@@ -264,7 +263,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf)
     {
       NS_LOG_LOGIC(this << " Create carrier: " << i);
 
-      Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf);
+      Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf, superFrameConf->IsRandomAccessCarrier (i));
       m_rxCarriers.push_back (rxc);
     }
 }

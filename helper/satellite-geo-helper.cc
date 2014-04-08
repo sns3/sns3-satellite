@@ -95,7 +95,7 @@ SatGeoHelper::SatGeoHelper()
   NS_ASSERT (false);
 }
 
-SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount)
+SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
 : m_nodeId (0),
   m_carrierBandwidthConverter (bandwidthConverterCb),
   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
@@ -103,7 +103,8 @@ SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint
   m_deviceCount(0),
   m_deviceFactory (),
   m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT)
+  m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_superframeSeq (seq)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
@@ -207,8 +208,10 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersUser.m_cec = cec;
   parametersUser.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
 
+  /// TODO get rid of the hard coded 0
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
-                                                         parametersUser);
+                                                         parametersUser,
+                                                         m_superframeSeq->GetSuperframeConf (0));
 
   params.m_txCh = fr;
   params.m_rxCh = ff;
@@ -221,8 +224,10 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersFeeder.m_cec = cec;
   parametersFeeder.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
 
+  /// TODO get rid of the hard coded 0
   Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,
-                                                             parametersFeeder);
+                                                             parametersFeeder,
+                                                             m_superframeSeq->GetSuperframeConf (0));
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

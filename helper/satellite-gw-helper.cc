@@ -239,9 +239,11 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR;
 
+  /// TODO get rid of the hard coded 0
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
                                               m_linkResults,
-                                              parameters);
+                                              parameters,
+                                              m_superframeSeq->GetSuperframeConf(0));
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
