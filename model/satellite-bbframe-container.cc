@@ -173,22 +173,22 @@ SatBbFrameContainer::GetNextFrame ()
     }
   else
     {
-      std::vector< std::deque<Ptr<SatBbFrame> >* > nonEmpytQueues;
+      std::vector< std::deque<Ptr<SatBbFrame> >* > nonEmptyQueues;
 
       for (FrameContainer_t::iterator it = m_container.begin (); it != m_container.end (); it++ )
         {
           if ( (*it).second.empty () == false )
             {
-              nonEmpytQueues.push_back (&it->second);
+              nonEmptyQueues.push_back (&it->second);
             }
         }
 
-      if ( nonEmpytQueues.empty () == false )
+      if ( nonEmptyQueues.empty () == false )
         {
-          std::random_shuffle( nonEmpytQueues.begin (), nonEmpytQueues.end ());
+          std::random_shuffle( nonEmptyQueues.begin (), nonEmptyQueues.end ());
 
-          nextFrame = (*nonEmpytQueues.begin ())->front ();
-          (*nonEmpytQueues.begin ())->pop_front ();
+          nextFrame = (*nonEmptyQueues.begin ())->front ();
+          (*nonEmptyQueues.begin ())->pop_front ();
           m_totalDuration -= nextFrame->GetDuration();
         }
     }
@@ -269,6 +269,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
                       // Merge two frames
                       if ( frameToMerge->MergeWithFrame (itFromMerge->second.back ()) )
                         {
+                          m_totalDuration -= itFromMerge->second.back ()->GetDuration();
                           itFromMerge->second.pop_back ();
                         }
                     }

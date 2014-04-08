@@ -120,12 +120,12 @@ SatFwdLinkScheduler::GetTypeId (void)
                                      SatFwdLinkScheduler::SHORT_AND_NORMAL_FRAMES, "Both short and normal frames used."))
     .AddAttribute ("SchedulingStartThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
-                    TimeValue (Seconds (0.005)),
+                    TimeValue (MilliSeconds (5)),
                     MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStartThresholdTime),
                     MakeTimeChecker ())
     .AddAttribute ("SchedulingStopThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
-                    TimeValue (Seconds (0.015)),
+                    TimeValue (MilliSeconds (15)),
                     MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStopThresholdTime),
                     MakeTimeChecker ())
     .AddAttribute ("AdditionalSortCriteria",
@@ -156,7 +156,8 @@ SatFwdLinkScheduler::GetTypeId (void)
 SatFwdLinkScheduler::SatFwdLinkScheduler ()
 : m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
   m_bbFrameUsageMode (SatFwdLinkScheduler::NORMAL_FRAMES),
-  m_cnoEstimatorMode (SatCnoEstimator::LAST)
+  m_cnoEstimatorMode (SatCnoEstimator::LAST),
+  m_carrierBandwidthInHz (0.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
@@ -221,7 +222,7 @@ SatFwdLinkScheduler::GetNextFrame ()
 
   if ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStartThresholdTime )
     {
-        ScheduleBbFrames ();
+      ScheduleBbFrames ();
     }
 
   Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame ();
@@ -286,7 +287,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
   NS_LOG_FUNCTION (this);
 
   // Get scheduling objects from LLC
-  std::vector< Ptr<SatSchedulingObject> > so =  GetSchedulingObjects ();
+  std::vector< Ptr<SatSchedulingObject> > so = GetSchedulingObjects ();
 
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
         ( it != so.end() ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
@@ -298,7 +299,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
 
       uint32_t frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
 
-      while ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ) &&
+      while ( ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime )) &&
                (currentObBytes > 0) )
         {
           if ( frameBytes < currentObMinReqBytes)
