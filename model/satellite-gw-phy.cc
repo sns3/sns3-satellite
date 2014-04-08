@@ -156,7 +156,7 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGwPhy::CalculateSinr, this));
 
-  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
+  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf, parameters.m_isRandomAccessEnabled);
 }
 
 SatGwPhy::~SatGwPhy ()

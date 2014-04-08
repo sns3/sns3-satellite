@@ -57,7 +57,8 @@ public:
                uint32_t fwdLinkCarrierCount,
                Ptr<SatSuperframeSeq> seq,
                SatMac::ReadCtrlMsgCallback readCb,
-               SatMac::WriteCtrlMsgCallback writeCb );
+               SatMac::WriteCtrlMsgCallback writeCb,
+               SatEnums::RandomAccessModel_t randomAccessModel);
 
   virtual ~SatGwHelper () {}
 
@@ -188,6 +189,11 @@ private:
    * receiver (= UT).
    */
   bool m_enableChannelEstimationError;
+
+  /**
+   * \brief The used random access model
+   */
+  SatEnums::RandomAccessModel_t m_randomAccessModel;
 };
 
 } // namespace ns3

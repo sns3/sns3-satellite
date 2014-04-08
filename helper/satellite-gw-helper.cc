@@ -94,7 +94,8 @@ SatGwHelper::SatGwHelper ()
    m_interferenceModel (),
    m_errorModel (),
    m_symbolRate (0.0),
-   m_enableChannelEstimationError (false)
+   m_enableChannelEstimationError (false),
+   m_randomAccessModel ()
 {
   // this default constructor should be never called
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -104,7 +105,8 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
                           uint32_t rtnLinkCarrierCount,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
-                          SatMac::WriteCtrlMsgCallback writeCb )
+                          SatMac::WriteCtrlMsgCallback writeCb,
+                          SatEnums::RandomAccessModel_t randomAccessModel)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
    m_superframeSeq (seq),
@@ -113,7 +115,8 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
    m_interferenceModel (),
    m_errorModel (),
    m_symbolRate (0.0),
-   m_enableChannelEstimationError (false)
+   m_enableChannelEstimationError (false),
+   m_randomAccessModel (randomAccessModel)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 
@@ -238,6 +241,15 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   parameters.m_carrierCount = m_rtnLinkCarrierCount;
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR;
+
+  if (m_randomAccessModel != SatEnums::RA_OFF)
+    {
+      parameters.m_isRandomAccessEnabled = true;
+    }
+  else
+    {
+      parameters.m_isRandomAccessEnabled = false;
+    }
 
   /// TODO get rid of the hard coded 0
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,

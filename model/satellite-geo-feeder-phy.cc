@@ -153,7 +153,7 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoFeederPhy::CalculateSinr, this));
 
-  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
+  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf, parameters.m_isRandomAccessEnabled);
 }
 
 SatGeoFeederPhy::~SatGeoFeederPhy ()

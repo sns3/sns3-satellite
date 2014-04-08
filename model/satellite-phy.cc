@@ -210,10 +210,10 @@ SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 }
 
 void
-SatPhy::ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf)
+SatPhy::ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled)
 {
   NS_LOG_FUNCTION (this);
-  m_phyRx->ConfigurePhyRxCarriers (carrierConf, superFrameConf);
+  m_phyRx->ConfigurePhyRxCarriers (carrierConf, superFrameConf, isRandomAccessEnabled);
 }
 
 void

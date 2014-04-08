@@ -257,8 +257,9 @@ public:
   /**
    * \param carrierConf Carrier configuration class
    * \param superFrameConf Superframe configuration
+   * \param isRandomAccessEnabled Is random access enabled
    */
-  void ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf);
+  void ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled);
 
   /**
    * \brief Set fading container

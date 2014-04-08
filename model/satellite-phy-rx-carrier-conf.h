@@ -116,6 +116,7 @@ public:
     uint32_t                                m_carrierCount;
     Ptr<SatChannelEstimationErrorContainer> m_cec;
     RandomAccessCollisionModel              m_raCollisionModel;
+    bool                                    m_isRandomAccessEnabled;
   } RxCarrierCreateParams_s;
 
   /**

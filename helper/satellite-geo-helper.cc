@@ -87,7 +87,8 @@ SatGeoHelper::SatGeoHelper()
  m_deviceCount (0),
  m_deviceFactory (),
  m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
- m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT)
+ m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+ m_randomAccessModel ()
 {
   NS_LOG_FUNCTION (this );
 
@@ -95,7 +96,11 @@ SatGeoHelper::SatGeoHelper()
   NS_ASSERT (false);
 }
 
-SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq)
+SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb,
+                            uint32_t rtnLinkCarrierCount,
+                            uint32_t fwdLinkCarrierCount,
+                            Ptr<SatSuperframeSeq> seq,
+                            SatEnums::RandomAccessModel_t randomAccessModel)
 : m_nodeId (0),
   m_carrierBandwidthConverter (bandwidthConverterCb),
   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
@@ -104,7 +109,8 @@ SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint
   m_deviceFactory (),
   m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_superframeSeq (seq)
+  m_superframeSeq (seq),
+  m_randomAccessModel (randomAccessModel)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
@@ -208,14 +214,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersUser.m_cec = cec;
   parametersUser.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
 
-  /// TODO get rid of the hard coded 0
-  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
-                                                         parametersUser,
-                                                         m_superframeSeq->GetSuperframeConf (0));
-
-  params.m_txCh = fr;
-  params.m_rxCh = ff;
-
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder;
   parametersFeeder.m_daIfModel = m_fwdLinkInterferenceModel;
   parametersFeeder.m_raIfModel = m_fwdLinkInterferenceModel;
@@ -223,6 +221,26 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
   parametersFeeder.m_cec = cec;
   parametersFeeder.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+
+  if (m_randomAccessModel != SatEnums::RA_OFF)
+    {
+      parametersUser.m_isRandomAccessEnabled = true;
+      parametersFeeder.m_isRandomAccessEnabled = true;
+    }
+  else
+    {
+      parametersUser.m_isRandomAccessEnabled = false;
+      parametersFeeder.m_isRandomAccessEnabled = false;
+    }
+
+
+  /// TODO get rid of the hard coded 0
+  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
+                                                         parametersUser,
+                                                         m_superframeSeq->GetSuperframeConf (0));
+
+  params.m_txCh = fr;
+  params.m_rxCh = ff;
 
   /// TODO get rid of the hard coded 0
   Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,

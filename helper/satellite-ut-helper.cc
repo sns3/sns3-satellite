@@ -249,6 +249,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
 
+  if (m_randomAccessModel != SatEnums::RA_OFF)
+    {
+      parameters.m_isRandomAccessEnabled = true;
+    }
+  else
+    {
+      parameters.m_isRandomAccessEnabled = false;
+    }
+
   /// TODO get rid of the hard coded 0
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,

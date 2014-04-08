@@ -156,8 +156,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   SatMac::WriteCtrlMsgCallback fwdWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, fwdCtrlMsgContainer);
 
   // create needed low level satellite helpers
-  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq);
-  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb);
+  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, m_randomAccessModel);
+  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb, m_randomAccessModel);
   m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb, m_randomAccessModel);
 
   // Two usage of link results is two-fold: on the other hand they are needed in the
@@ -189,9 +189,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   m_ncc = CreateObject<SatNcc> ();
 
-  /// TODO if random access if enabled
-  //if (m_randomAccessModel != SatEnums::RA_OFF)
-  if (1)
+  if (m_randomAccessModel != SatEnums::RA_OFF)
     {
       PointerValue llsConf;
       m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);

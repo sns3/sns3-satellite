@@ -255,15 +255,24 @@ SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 }
 
 void
-SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf)
+SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled)
 {
   NS_ASSERT (m_rxCarriers.empty());
+
+  Ptr<SatPhyRxCarrier> rxc;
 
   for ( uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i )
     {
       NS_LOG_LOGIC(this << " Create carrier: " << i);
 
-      Ptr<SatPhyRxCarrier> rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf, superFrameConf->IsRandomAccessCarrier (i));
+      if (isRandomAccessEnabled)
+        {
+          rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf, superFrameConf->IsRandomAccessCarrier (i));
+        }
+      else
+        {
+          rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf, false);
+        }
       m_rxCarriers.push_back (rxc);
     }
 }

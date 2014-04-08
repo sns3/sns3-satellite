@@ -143,7 +143,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatUtPhy::CalculateSinr, this));
 
-  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
+  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf, parameters.m_isRandomAccessEnabled);
 }
 
 SatUtPhy::~SatUtPhy ()

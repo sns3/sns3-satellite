@@ -128,8 +128,9 @@ public:
   /**
    * \param carrierConf Carrier configuration class
    * \param superFrameConf Superframe configuration
+   * \param isRandomAccessEnabled Is random access enabled
    */
-  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf);
+  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled);
 
   /**
    * Start packet reception from the SatChannel

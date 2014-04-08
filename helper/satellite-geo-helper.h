@@ -48,11 +48,17 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   SatGeoHelper ();
+
   /**
    * Create a SatGeoHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb, uint32_t rtnLinkCarrierCount, uint32_t fwdLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
+  SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb,
+                uint32_t rtnLinkCarrierCount,
+                uint32_t fwdLinkCarrierCount,
+                Ptr<SatSuperframeSeq> seq,
+                SatEnums::RandomAccessModel_t randomAccessModel);
+
   virtual ~SatGeoHelper () {}
 
   /**
@@ -181,6 +187,11 @@ private:
      * \brief Superframe sequence
      */
     Ptr<SatSuperframeSeq> m_superframeSeq;
+
+    /**
+     * \brief The used random access model
+     */
+    SatEnums::RandomAccessModel_t m_randomAccessModel;
 };
 
 } // namespace ns3
