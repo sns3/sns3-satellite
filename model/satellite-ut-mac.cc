@@ -695,7 +695,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( result.second );
 
       /// start time
-      Time slotStartTime = superframeStartTime + Seconds (timeSlotConf->GetStartTime ());
+      Time slotStartTime = superframeStartTime + timeSlotConf->GetStartTime ();
       Time offset = slotStartTime - Now ();
 
       if (offset.IsStrictlyNegative())
@@ -923,7 +923,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( replicas[i].first );
 
           /// start time
-          Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTime ());
+          Time slotDelay = superframeStartTime + timeSlotConf->GetStartTime ();
           Time offset = slotDelay - Now ();
 
           if (offset.IsStrictlyNegative ())
@@ -1115,7 +1115,7 @@ SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
           Ptr<SatTimeSlotConf> timeSlotConf = it->second;
 
           // Start time
-          Time startTime = Seconds (timeSlotConf->GetStartTime ());
+          Time startTime = timeSlotConf->GetStartTime ();
 
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
@@ -1128,7 +1128,7 @@ SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-          Time duration = Seconds (wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ()));
+          Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
           prevEnd = startTime + duration - m_guardTime;
 
           NS_LOG_LOGIC ("Time slot: " << i << " end time: " << prevEnd.GetSeconds () << " carrier id: " << carrierId);
