@@ -774,7 +774,7 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
       //             " opportunity offset: " << opportunityOffset.GetSeconds ());
 
       /// if slot offset is equal or larger than Tx opportunity offset, i.e., the slot is in the future
-      if (slotConf->GetStartTime () >= opportunityOffset.GetSeconds ())
+      if (slotConf->GetStartTime () >= opportunityOffset)
         {
           /// if slot is available, set the slot as used and continue with the transmission
           if (UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, slotId))

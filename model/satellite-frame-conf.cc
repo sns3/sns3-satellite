@@ -124,7 +124,12 @@ SatFrameConf::~SatFrameConf ()
 double
 SatFrameConf::GetCarrierFrequencyHz (uint16_t carrierId) const
 {
-  NS_ASSERT (carrierId < m_carrierCount );
+  NS_LOG_FUNCTION ( this << carrierId);
+
+  if (carrierId >= m_carrierCount )
+    {
+      NS_FATAL_ERROR ( "Carrier Id out of range" );
+    }
 
   double carrierBandwidthHz = m_btu->GetAllocatedBandwidthInHz ();
 
@@ -322,7 +327,10 @@ SatSuperframeConf::GetCarrierId ( uint8_t frameId, uint16_t frameCarrierId ) con
 
   for (uint8_t i = 0; i < frameId; i++)
     {
-      NS_ASSERT ( i < m_frames.size ());
+      if ( i >= m_frames.size ())
+        {
+          NS_FATAL_ERROR ("Carrier ID out of range.");
+        }
 
       carrierId += m_frames[i]->GetCarrierCount ();
     }
@@ -335,17 +343,20 @@ SatSuperframeConf::GetCarrierFrequencyHz (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
 
+  double frameStartFrequency = 0.0;
   uint32_t carrierIdInFrame = carrierId;
+
   uint8_t frameId = GetCarrierFrame (carrierId);
-  double carrierFrequency = m_frames[frameId]->GetCarrierFrequencyHz (carrierIdInFrame);
 
   for ( uint8_t i = 0; i < frameId; i++ )
-    {
-      carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
-      carrierFrequency += m_frames[i]->GetBandwidthHz ();
-    }
+      {
+        carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
+        frameStartFrequency += m_frames[i]->GetBandwidthHz ();
+      }
 
-  return carrierFrequency;
+  double carrierFrequencyInFrame = m_frames[frameId]->GetCarrierFrequencyHz (carrierIdInFrame);
+
+  return frameStartFrequency + carrierFrequencyInFrame;
 }
 
 double
