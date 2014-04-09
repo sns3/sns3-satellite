@@ -11,8 +11,11 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  Example of Random Access usage in satellite network.
-*         The scripts is using CBR application in user defined scenario,
+* \brief  Example of Random Access usage in satellite network. This
+*         experimental example uses all available RA models at the same time. It
+*         is meant to demonstrate the co-operative use of different RA models.
+*
+*         The script is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
 *         whatever between 1 and full scenario (72 beams). Currently it
 *         is configured to using only one beam. CBR application is sending
@@ -20,10 +23,10 @@ using namespace ns3;
 *         and KpiHelper are enabled by default. End user may change the
 *         number of UTs and end users from the command line.
 *
-*         execute command -> ./waf --run "sat-random-access-example --PrintHelp"
+*         execute command -> ./waf --run "sat-random-access-all-models-enabled-example --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
+NS_LOG_COMPONENT_DEFINE ("sat-random-access-all-models-enabled-example");
 
 int
 main (int argc, char *argv[])
@@ -37,7 +40,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds(0.01);
 
   // Enable info logs
-  LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-random-access-all-models-enabled-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
   LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);

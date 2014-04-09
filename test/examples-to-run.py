@@ -26,6 +26,12 @@ cpp_examples = [
     ("sat-multicast-example", "True", "True"),
     ("sat-nrtv-example", "True", "True"),
     ("sat-onoff-example", "True", "True"),
+    ("sat-random-access-all-models-enabled-example", "True", "True"),
+    ("sat-random-access-crdsa-collision-example", "True", "True"),
+    ("sat-random-access-crdsa-example", "True", "True"),
+    ("sat-random-access-dynamic-load-control-example", "True", "True"),
+    ("sat-random-access-slotted-aloha-collision-example", "True", "True"),
+    ("sat-random-access-slotted-aloha-example", "True", "True"),
     ("sat-rayleigh-example", "True", "True"),
 ]
 

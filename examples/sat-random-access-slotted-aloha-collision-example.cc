@@ -13,7 +13,8 @@ using namespace ns3;
 *
 * \brief  Example of Random Access Slotted ALOHA usage in satellite network. This
 *         example is modified to produce collisions with high probability.
-*         The scripts is using CBR application in user defined scenario,
+*
+*         The script is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
 *         whatever between 1 and full scenario (72 beams). Currently it
 *         is configured to using only one beam. CBR application is sending

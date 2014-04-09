@@ -11,8 +11,11 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  Example of Random Access CRDSA usage in satellite network.
-*         The scripts is using CBR application in user defined scenario,
+* \brief  Example of Random Access CRDSA usage in satellite network. The
+*         example demonstrates the CRDSA functionality in greater detail,
+*         but with lower load than the collision example.
+*
+*         The script is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
 *         whatever between 1 and full scenario (72 beams). Currently it
 *         is configured to using only one beam. CBR application is sending

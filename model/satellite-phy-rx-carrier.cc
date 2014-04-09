@@ -104,7 +104,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   m_errorModel = carrierConf->GetErrorModel ();
 
-  if ( m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+  if (m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
       NS_LOG_LOGIC (this << " link results in use in carrier: " << carrierId);
       m_linkResults = carrierConf->GetLinkResults ();
@@ -135,12 +135,14 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     {
       m_randomAccessCollisionModel = carrierConf->GetRandomAccessCollisionModel ();
       m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize = carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ();
-
-      NS_LOG_INFO ("SatPhyRxCarrier::SatPhyRxCarrier - Carrier ID: " << m_carrierId <<
-                   ", RA interference model: " << carrierConf->GetInterferenceModel (m_isRandomAccessEnabledForThisCarrier) <<
-                   ", RA collision model: " << m_randomAccessCollisionModel <<
-                   ", avg. normalized offered load measurement window size: " << m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize);
     }
+
+  NS_LOG_INFO ("SatPhyRxCarrier::SatPhyRxCarrier - Carrier ID: " << m_carrierId <<
+               ", channel type: " << SatEnums::GetChannelTypeName (m_channelType) <<
+               ", RA enabled: " << m_isRandomAccessEnabledForThisCarrier <<
+               ", RA interference model: " << carrierConf->GetInterferenceModel (m_isRandomAccessEnabledForThisCarrier) <<
+               ", RA collision model: " << m_randomAccessCollisionModel <<
+               ", RA avg. normalized offered load measurement window size: " << m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize);
 }
 
 void

@@ -12,8 +12,10 @@ using namespace ns3;
 * \ingroup satellite
 *
 * \brief  Example of Random Access Dynamic Load Control usage in satellite
-*         network. This example is modified to produce high load.
-*         The scripts is using CBR application in user defined scenario,
+*         network. This example is modified to produce high load. The example
+*         uses CRDSA.
+*
+*         The script is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
 *         whatever between 1 and full scenario (72 beams). Currently it
 *         is configured to using only one beam. CBR application is sending
