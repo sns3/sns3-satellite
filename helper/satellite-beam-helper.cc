@@ -94,11 +94,11 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumAccessor (&SatBeamHelper::m_propagationDelayModel),
                       MakeEnumChecker (SatEnums::PD_CONSTANT_SPEED, "ConstantSpeed",
                                        SatEnums::PD_CONSTANT, "Constant"))
-      .AddAttribute ("ConstantPropagationDelayInSeconds",
-                     "Constant propagation delay in seconds",
-                      DoubleValue (0.13),
-                      MakeDoubleAccessor(&SatBeamHelper::m_constantPropagationDelay),
-                      MakeDoubleChecker<double> ())
+      .AddAttribute ("ConstantPropagationDelay",
+                     "Constant propagation delay",
+                      TimeValue ( Seconds(0.13)),
+                      MakeTimeAccessor (&SatBeamHelper::m_constantPropagationDelay),
+                      MakeTimeChecker ())
       .AddAttribute ("PrintDetailedInformationToCreationTraces",
                      "Print detailed information to creation traces",
                      BooleanValue (true),

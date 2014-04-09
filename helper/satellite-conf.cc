@@ -22,8 +22,8 @@
 #include "ns3/double.h"
 #include "ns3/enum.h"
 #include "ns3/simulator.h"
+#include "ns3/satellite-wave-form-conf.h"
 #include "satellite-conf.h"
-#include "satellite-wave-form-conf.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatConf");
@@ -235,14 +235,14 @@ SatConf::GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId
   {
     case SatEnums::FORWARD_FEEDER_CH:
       channelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
-      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
+      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthInHz ();
       baseFreqHz = m_fwdFeederLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
 
     case SatEnums::FORWARD_USER_CH:
       channelBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
-      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthHz ();
+      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthInHz ();
       baseFreqHz = m_fwdUserLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
@@ -469,15 +469,15 @@ SatConf::GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBand
   switch (bandwidthType)
   {
     case SatEnums::ALLOCATED_BANDWIDTH:
-      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthHz ();
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
       break;
 
     case SatEnums::OCCUPIED_BANDWIDTH:
-      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetOccupiedBandwidthHz ();
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetOccupiedBandwidthInHz ();
       break;
 
     case SatEnums::EFFECTIVE_BANDWIDTH:
-      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidthHz ();
+      bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidthInHz ();
       break;
 
     default:

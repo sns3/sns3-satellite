@@ -28,7 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/geo-coordinate.h"
 #include "ns3/satellite-channel.h"
-#include "satellite-superframe-sequence.h"
+#include "ns3/satellite-superframe-sequence.h"
 
 namespace ns3 {
 

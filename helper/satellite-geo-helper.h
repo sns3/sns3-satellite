@@ -31,7 +31,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
-#include "satellite-superframe-sequence.h"
+#include "ns3/satellite-superframe-sequence.h"
 
 namespace ns3 {
 

@@ -80,9 +80,9 @@ public:
   /**
    * Get/calculate the burst duration of a waveform based on symbol rate
    * \param symbolRateInBaud symbol rate
-   * \return burst duration in seconds
+   * \return burst duration
    */
-  double GetBurstDurationInSeconds (double symbolRateInBaud) const;
+  Time GetBurstDuration (double symbolRateInBaud) const;
 
   /**
    * Get/calculate the spectral efficiency of a waveform

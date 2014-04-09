@@ -33,10 +33,10 @@ SatConstantPropagationDelayModel::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatConstantPropagationDelayModel")
     .SetParent<PropagationDelayModel> ()
     .AddConstructor<SatConstantPropagationDelayModel> ()
-    .AddAttribute ("Delay", "The delay (s)",
-                   DoubleValue (0.13),
-                   MakeDoubleAccessor (&SatConstantPropagationDelayModel::m_delay),
-                   MakeDoubleChecker<double> ())
+    .AddAttribute ("Delay", "The delay",
+                   TimeValue ( Seconds (0.13)),
+                   MakeTimeAccessor (&SatConstantPropagationDelayModel::m_delay),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -48,16 +48,16 @@ SatConstantPropagationDelayModel::SatConstantPropagationDelayModel ()
 Time
 SatConstantPropagationDelayModel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
 {
-  return Seconds (m_delay);
+  return m_delay;
 }
 
 void
-SatConstantPropagationDelayModel::SetDelay (double delay)
+SatConstantPropagationDelayModel::SetDelay (Time delay)
 {
   m_delay = delay;
 }
 
-double
+Time
 SatConstantPropagationDelayModel::GetDelay (void) const
 {
   return m_delay;

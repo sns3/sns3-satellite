@@ -70,26 +70,26 @@ public:
   /**
    * Get CRA based bytes with given duration.
    *
-   * \param durationInSeconds of the transmission in seconds
+   * \param duration Duration of the transmission
    * \return Rate based bytes with given duration.
    */
-  uint32_t GetCraBasedBytes (double durationInSeconds) const;
+  uint32_t GetCraBasedBytes (Time duration) const;
 
   /**
    * Get minimum RBDC based bytes with given duration.
    *
-   * \param durationInSeconds of the transmission in seconds
+   * \param duration Duration of the transmission
    * \return Rate based bytes with given duration.
    */
-  uint32_t GetMinRbdcBasedBytes (double durationInSeconds) const;
+  uint32_t GetMinRbdcBasedBytes (Time duration) const;
 
   /**
    * Get RBDC based bytes with given duration.
    *
-   * \param durationInSeconds of the transmission in seconds
+   * \param duration Duration of the transmission
    * \return Rate based bytes with given duration.
    */
-  uint32_t GetRbdcBasedBytes (double durationInSeconds) const;
+  uint32_t GetRbdcBasedBytes (Time duration) const;
 
   /**
    * Get VBDC based bytes.

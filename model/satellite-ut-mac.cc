@@ -40,7 +40,7 @@
 #include "satellite-queue.h"
 #include "satellite-ut-scheduler.h"
 #include "satellite-rtn-link-time.h"
-#include "../helper/satellite-wave-form-conf.h"
+#include "satellite-wave-form-conf.h"
 #include "satellite-crdsa-replica-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -285,12 +285,12 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatTimeSlotConf> timeSlotConf = it->second;
 
           // Start time
-          Time slotDelay = startDelay + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+          Time slotDelay = startDelay + timeSlotConf->GetStartTime ();
           NS_LOG_INFO ("Slot start delay: " << slotDelay.GetSeconds());
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-          double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+          Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
@@ -313,34 +313,34 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 }
 
 void
-SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, double durationInSecs, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId)
+SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, Time duration, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << durationInSecs << waveform->GetPayloadInBytes () << rcIndex << carrierId);
+  NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << duration.GetSeconds () << waveform->GetPayloadInBytes () << rcIndex << carrierId);
 
-  NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << durationInSecs << ", payload: " << waveform->GetPayloadInBytes () << ", rcIndex: " << rcIndex << ", carrier: " << carrierId);
+  NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", rcIndex: " << rcIndex << ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, durationInSecs, waveform, carrierId, rcIndex, SatUtScheduler::LOOSE);
+  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, waveform, carrierId, rcIndex, SatUtScheduler::LOOSE);
 }
 
 void
-SatUtMac::DoTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+SatUtMac::DoTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
-  NS_LOG_FUNCTION (this << durationInSecs << waveform->GetPayloadInBytes () << carrierId << rcIndex);
-  NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << waveform->GetPayloadInBytes () << carrierId << rcIndex);
+  NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
   txInfo.modCod = waveform->GetModCod ();
   txInfo.waveformId = waveform->GetWaveformId ();
 
-  TransmitPackets (FetchPackets (waveform->GetPayloadInBytes (), rcIndex, policy), durationInSecs, carrierId, txInfo);
+  TransmitPackets (FetchPackets (waveform->GetPayloadInBytes (), rcIndex, policy), duration, carrierId, txInfo);
 }
 
 void
-SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
-  NS_LOG_FUNCTION (this << durationInSecs << waveform->GetPayloadInBytes () << carrierId << rcIndex);
-  NS_LOG_INFO ("SatUtMac::DoSlottedAlohaTransmit - Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << durationInSecs << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << waveform->GetPayloadInBytes () << carrierId << rcIndex);
+  NS_LOG_INFO ("SatUtMac::DoSlottedAlohaTransmit - Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
   SatPhy::PacketContainer_t packets;
 
@@ -370,7 +370,7 @@ SatUtMac::DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> wavefo
       txInfo.modCod = waveform->GetModCod ();
       txInfo.waveformId = waveform->GetWaveformId ();
 
-      TransmitPackets (packets, durationInSecs, carrierId, txInfo);
+      TransmitPackets (packets, duration, carrierId, txInfo);
     }
 }
 SatPhy::PacketContainer_t
@@ -415,21 +415,21 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, uint8_t rcIndex, SatUtScheduler::
 }
 
 void
-SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
+SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this);
 
   // If there are packets to send
   if (!packets.empty ())
     {
-      NS_LOG_INFO ("SatUtMac::TransmitPackets - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << ", transmitting " << packets.size () << " packets, duration: " << durationInSecs << ", carrier: " << carrierId);
+      NS_LOG_INFO ("SatUtMac::TransmitPackets - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << ", transmitting " << packets.size () << " packets, duration: " << duration.GetSeconds () << ", carrier: " << carrierId);
 
       // Decrease a guard time from time slot duration.
-      Time duration (Time::FromDouble(durationInSecs, Time::S) - m_guardTime);
-      NS_LOG_LOGIC ("Duration double: " << durationInSecs << " duration time: " << duration.GetSeconds ());
-      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds () << " duration: " << duration.GetSeconds ());
+      Time durationWithGuardPeriod (duration - m_guardTime);
+      NS_LOG_LOGIC ("Duration: " << duration.GetSeconds () << " duration with guard period: " << duration.GetSeconds ());
+      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds () << " duration: " << durationWithGuardPeriod.GetSeconds ());
 
-      SendPacket (packets, carrierId, duration, txInfo);
+      SendPacket (packets, carrierId, durationWithGuardPeriod, txInfo);
     }
 }
 
@@ -695,7 +695,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( result.second );
 
       /// start time
-      Time slotStartTime = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+      Time slotStartTime = superframeStartTime + Seconds (timeSlotConf->GetStartTime ());
       Time offset = slotStartTime - Now ();
 
       if (offset.IsStrictlyNegative())
@@ -705,7 +705,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       /// duration
       Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-      double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+      Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
       /// carrier
       uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
@@ -715,7 +715,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
                    " slot: " << result.second <<
                    " SF start: " << superframeStartTime.GetSeconds () <<
                    " Tx start: " << (Now () + offset).GetSeconds () <<
-                   " duration: " << duration <<
+                   " duration: " << duration.GetSeconds () <<
                    " carrier ID: " << carrierId <<
                    " payload in bytes: " << wf->GetPayloadInBytes ());
 
@@ -770,11 +770,11 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
       slotConf = frameConf->GetTimeSlotConf (slotId);
 
       //NS_LOG_INFO ("SatUtMac::FindNextAvailableRandomAccessSlot - Slot: " << slotId <<
-      //             " slot offset: " << slotConf->GetStartTimeInSeconds () <<
+      //             " slot offset: " << slotConf->GetStartTime.GetSeconds () <<
       //             " opportunity offset: " << opportunityOffset.GetSeconds ());
 
       /// if slot offset is equal or larger than Tx opportunity offset, i.e., the slot is in the future
-      if (slotConf->GetStartTimeInSeconds () >= opportunityOffset.GetSeconds ())
+      if (slotConf->GetStartTime () >= opportunityOffset.GetSeconds ())
         {
           /// if slot is available, set the slot as used and continue with the transmission
           if (UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, slotId))
@@ -923,7 +923,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( replicas[i].first );
 
           /// start time
-          Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTimeInSeconds ());
+          Time slotDelay = superframeStartTime + Seconds (timeSlotConf->GetStartTime ());
           Time offset = slotDelay - Now ();
 
           if (offset.IsStrictlyNegative ())
@@ -933,7 +933,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
           /// duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-          double duration = wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+          Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
           /// carrier
           /// TODO get rid of the hard coded 0
@@ -1115,7 +1115,7 @@ SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
           Ptr<SatTimeSlotConf> timeSlotConf = it->second;
 
           // Start time
-          Time startTime = Seconds (timeSlotConf->GetStartTimeInSeconds ());
+          Time startTime = Seconds (timeSlotConf->GetStartTime ());
 
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
@@ -1128,7 +1128,7 @@ SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
 
           // Duration
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-          Time duration = Seconds (wf->GetBurstDurationInSeconds (frameConf->GetBtuConf ()->GetSymbolRateInBauds ()));
+          Time duration = Seconds (wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ()));
           prevEnd = startTime + duration - m_guardTime;
 
           NS_LOG_LOGIC ("Time slot: " << i << " end time: " << prevEnd.GetSeconds () << " carrier id: " << carrierId);

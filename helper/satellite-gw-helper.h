@@ -31,8 +31,8 @@
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-mac.h"
-#include "satellite-bbframe-conf.h"
-#include "satellite-superframe-sequence.h"
+#include "ns3/satellite-bbframe-conf.h"
+#include "ns3/satellite-superframe-sequence.h"
 
 namespace ns3 {
 

@@ -35,10 +35,11 @@
 #include "ns3/satellite-mobility-observer.h"
 #include "ns3/satellite-markov-container.h"
 #include "ns3/satellite-packet-trace.h"
+#include "ns3/satellite-superframe-sequence.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
-#include "satellite-superframe-sequence.h"
+
 
 namespace ns3 {
 
@@ -286,10 +287,10 @@ private:
   SatEnums::PropagationDelayModel_t m_propagationDelayModel;
 
   /**
-   * Constant propagation delay in seconds. Note, that this is valid
+   * Constant propagation delay. Note, that this is valid
    * only if SatConstantPropagationDelay is used.
    */
-  double m_constantPropagationDelay;
+  Time m_constantPropagationDelay;
 
   /**
    *  The used random access model

@@ -60,7 +60,7 @@ SatDamaEntry::GetRcCount () const
 }
 
 uint32_t
-SatDamaEntry::GetCraBasedBytes (double duration) const
+SatDamaEntry::GetCraBasedBytes (Time duration) const
 {
   NS_LOG_FUNCTION (this << duration);
 
@@ -70,7 +70,7 @@ SatDamaEntry::GetCraBasedBytes (double duration) const
     {
       if (m_llsConf->GetDaConstantAssignmentProvided (i))
         {
-          totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration) / 8;
+          totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration.GetSeconds ()) / 8;
         }
     }
 
@@ -78,7 +78,7 @@ SatDamaEntry::GetCraBasedBytes (double duration) const
 }
 
 uint32_t
-SatDamaEntry::GetMinRbdcBasedBytes (double duration) const
+SatDamaEntry::GetMinRbdcBasedBytes (Time duration) const
 {
   NS_LOG_FUNCTION (this << duration);
 
@@ -87,14 +87,14 @@ SatDamaEntry::GetMinRbdcBasedBytes (double duration) const
   for ( uint8_t i = 0; i < m_llsConf->GetDaServiceCount (); i++)
     {
       uint16_t minRateInKbps = m_llsConf->GetDaMinimumServiceRateInKbps (i) - m_llsConf->GetDaConstantServiceRateInKbps (i);
-      totalBytes += (1000.0 * minRateInKbps * duration) / 8;
+      totalBytes += (1000.0 * minRateInKbps * duration.GetSeconds ()) / 8;
     }
 
   return totalBytes;
 }
 
 uint32_t
-SatDamaEntry::GetRbdcBasedBytes (double duration) const
+SatDamaEntry::GetRbdcBasedBytes (Time duration) const
 {
   NS_LOG_FUNCTION (this << duration);
 
@@ -102,7 +102,7 @@ SatDamaEntry::GetRbdcBasedBytes (double duration) const
 
   for ( uint8_t i = 0; i < m_dynamicRateRequestedInKbps.size (); i++)
     {
-      totalBytes += (1000.0 * m_dynamicRateRequestedInKbps[i] * duration) / 8;
+      totalBytes += (1000.0 * m_dynamicRateRequestedInKbps[i] * duration.GetSeconds ()) / 8;
     }
 
   return totalBytes;

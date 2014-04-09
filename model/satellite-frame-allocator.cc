@@ -253,7 +253,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
 
               if ( waveformFound )
                 {
-                  double startTime = (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ();
+                  Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
                   timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId);
 
                   carrierSymbolsToUse -= timeSlotSymbols;

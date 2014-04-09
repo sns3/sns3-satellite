@@ -283,11 +283,11 @@ SatMobilityObserverTestCase::DoRun (void)
   Ptr<SatConstantPropagationDelayModel> utProgDelay = CreateObject<SatConstantPropagationDelayModel> ();
 
   // set propagation delays
-  gwProgDelay->SetDelay (200);
-  utProgDelay->SetDelay (300);
+  gwProgDelay->SetDelay (Seconds (200));
+  utProgDelay->SetDelay (Seconds (300));
 
   // set satellite position, altitude is the Earth radius
-  double earthRadius = CalculateDistance ( GeoCoordinate (0.00, 0.00, 0.00).ToVector(), Vector (0,0,0) );
+  double earthRadius = CalculateDistance ( GeoCoordinate (0.00, 0.00, 0.00).ToVector (), Vector (0,0,0) );
   GeoCoordinate satellitePosition = GeoCoordinate (0.00, 0.00, earthRadius);
   geoMob->SetGeoPosition (satellitePosition);
 
@@ -300,7 +300,7 @@ SatMobilityObserverTestCase::DoRun (void)
   Ptr<SatMobilityObserver> gwObserver = CreateObject<SatMobilityObserver> (gwMob, geoMob);
 
   utObserver->ObserveTimingAdvance (utProgDelay, gwProgDelay, gwMob);
-  double timingAdvance = utObserver->GetTimingAdvance ().GetSeconds();
+  double timingAdvance = utObserver->GetTimingAdvance ().GetSeconds ();
 
   // check that we use correct earth radius
   NS_TEST_ASSERT_MSG_EQ ( earthRadius, 6378137, "Earth radius is not what expected");

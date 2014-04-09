@@ -47,11 +47,11 @@ public:
   /**
    * Constructor for SatBtuConf
    *
-   * \param bandwidthHz      Allocated bandwidth of BTU in Hertz
+   * \param bandwidthInHz     Allocated bandwidth of BTU in Hertz
    * \param rollOff           Roll-off factor
    * \param spacing           Spacing factor
    */
-  SatBtuConf (double bandwidthHz, double rollOff, double spacing);
+  SatBtuConf (double bandwidthInHz, double rollOff, double spacing);
 
   /**
    * Destructor for SatBtuConf
@@ -63,34 +63,34 @@ public:
    *
    * \return The bandwidth of BTU in hertz.
    */
-  inline double GetAllocatedBandwidthHz () const { return m_allocatedBandwidthHz; }
+  inline double GetAllocatedBandwidthInHz () const { return m_allocatedBandwidthInHz; }
 
   /**
    * Get occupied bandwidth of BTU.
    *
    * \return The occupied bandwidth of BTU in hertz.
    */
-  inline double GetOccupiedBandwidthHz () const { return m_occupiedBandwidthHz; }
+  inline double GetOccupiedBandwidthInHz () const { return m_occupiedBandwidthInHz; }
 
   /**
    * Get occupied bandwidth of BTU.
    *
    * \return The occupied bandwidth of BTU in hertz.
    */
-  inline double GetEffectiveBandwidthHz () const { return m_effectiveBandwidthHz; }
+  inline double GetEffectiveBandwidthInHz () const { return m_effectiveBandwidthInHz; }
 
   /**
    * Get symbol rate of BTU.
    *
    * \return The symbol rate of BTU in bauds.
    */
-  inline double GetSymbolRateInBauds () const { return GetEffectiveBandwidthHz ();}
+  inline double GetSymbolRateInBauds () const { return GetEffectiveBandwidthInHz ();}
 
 private:
-  double m_allocatedBandwidthHz;
-  double m_occupiedBandwidthHz;
-  double m_effectiveBandwidthHz;  // i.e. symbol rate
-  double m_lengthInSeconds;       // length field reserved, but not used currently
+  double m_allocatedBandwidthInHz;
+  double m_occupiedBandwidthInHz;
+  double m_effectiveBandwidthInHz;  // i.e. symbol rate
+  Time m_duration;                  // duration field reserved, but not used currently
 };
 
 /**
@@ -110,11 +110,11 @@ public:
   /**
    * Constructor for SatTimeSlotConf
    *
-   * \param startTimeInSeconds  Start time of time slot in side frame.
-   * \param waveFormId          Wave form id of time slot
-   * \param carrierId           Carrier id of time slot
+   * \param startTime       Start time of time slot in side frame.
+   * \param waveFormId      Wave form id of time slot
+   * \param carrierId       Carrier id of time slot
    */
-  SatTimeSlotConf (double startTimeInSeconds, uint32_t waveFormId, uint16_t carrierId);
+  SatTimeSlotConf (Time startTime, uint32_t waveFormId, uint16_t carrierId);
 
   /**
    * Destructor for SatTimeSlotConf
@@ -124,9 +124,9 @@ public:
   /**
    * Get start time of time slot. (inside frame)
    *
-   * \return The start time of time slot in seconds.
+   * \return The start time of time slot.
    */
-  inline double GetStartTimeInSeconds () const { return m_startTimeInSeconds; }
+  inline Time GetStartTime () const { return m_startTime; }
 
   /**
    * Get wave form id of time slot.
@@ -157,7 +157,7 @@ public:
   inline uint8_t GetRcIndex () { return m_rcIndex; }
 
 private:
-  double  m_startTimeInSeconds;
+  Time     m_startTime;
   uint32_t m_waveFormId;
   uint16_t m_frameCarrierId;
   uint8_t  m_rcIndex;
@@ -189,11 +189,11 @@ public:
    * Constructor for SatFrameConf.
    *
    * \param bandwidthHz       Bandwidth of the frame in hertz
-   * \param durationInSeconds Duration of the frame
+   * \param duration          Duration of the frame
    * \param btu               BTU configuration of the frame
    * \param timeSlots         Time slot of the frame.
    */
-  SatFrameConf ( double bandwidthHz, Time durationInSeconds, Ptr<SatBtuConf> btu,
+  SatFrameConf ( double bandwidthHz, Time duration, Ptr<SatBtuConf> btu,
                  SatTimeSlotConfMap_t& timeSlots, bool isRandomAccess );
 
   /**
@@ -261,15 +261,15 @@ public:
     switch (bandwidthType)
     {
       case SatEnums::ALLOCATED_BANDWIDTH:
-        bandwidth = m_btu->GetAllocatedBandwidthHz();
+        bandwidth = m_btu->GetAllocatedBandwidthInHz();
         break;
 
       case SatEnums::OCCUPIED_BANDWIDTH:
-        bandwidth = m_btu->GetOccupiedBandwidthHz();
+        bandwidth = m_btu->GetOccupiedBandwidthInHz();
         break;
 
       case SatEnums::EFFECTIVE_BANDWIDTH:
-        bandwidth = m_btu->GetEffectiveBandwidthHz();
+        bandwidth = m_btu->GetEffectiveBandwidthInHz();
         break;
 
       default:
@@ -384,6 +384,11 @@ public:
    */
   ~SatSuperframeConf ();
 
+  /**
+   * Add frame configuration to super frame configuration.
+   *
+   * \param conf  Frame configuration to add super frame configuration
+   */
   void AddFrameConf (Ptr<SatFrameConf> conf);
 
   /**
@@ -564,6 +569,14 @@ private:
   std::vector<RaChannelInfo_t>  m_raChannels;
   uint32_t                      m_carrierCount;
   Ptr<SatWaveformConf>          m_waveFormConf;
+
+  /**
+   * Get frame id where given global carrier ID belongs to.
+   *
+   * \param carrierId Carried ID which frame ID is requested.
+   * \return frame id where given global carrier ID belongs to.
+   */
+  uint8_t GetCarrierFrame (uint32_t carrierId) const;
 
 public:
   // macro to ease definition of access methods for frame specific attributes

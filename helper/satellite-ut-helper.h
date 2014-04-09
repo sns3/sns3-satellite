@@ -31,7 +31,7 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-ncc.h"
-#include "satellite-superframe-sequence.h"
+#include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-mac.h"
 #include "ns3/satellite-random-access-container.h"
 #include "ns3/satellite-random-access-container-conf.h"

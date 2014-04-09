@@ -87,12 +87,12 @@ SatWaveform::GetBurstLengthInSymbols () const
   return m_lengthInSymbols;
 }
 
-double
-SatWaveform::GetBurstDurationInSeconds (double symbolRateInBaud) const
+Time
+SatWaveform::GetBurstDuration (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
 
-  return m_lengthInSymbols / symbolRateInBaud;
+  return Seconds (m_lengthInSymbols / symbolRateInBaud);
 }
 
 double
@@ -140,7 +140,7 @@ SatWaveform::Dump (double carrierBandwidthInHz, double symbolRateInBaud) const
   std::cout << "ModulatedBits: " << m_modulatedBits << ", CodingRate: " << m_codingRate <<
       ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
       ", EbNoRequirement: " << SatUtils::LinearToDb (m_ebnoRequirement) <<
-      ", BurstDuration: " << GetBurstDurationInSeconds (symbolRateInBaud) <<
+      ", BurstDuration: " << GetBurstDuration (symbolRateInBaud) <<
       ", Throughput: " << GetThroughputInBitsPerSecond (symbolRateInBaud) <<
       ", SpectralEfficiency: " << GetSpectralEfficiency (carrierBandwidthInHz, symbolRateInBaud) <<
       ", C/No threshold: " << SatUtils::LinearToDb (GetCNoThreshold (symbolRateInBaud)) << std::endl;

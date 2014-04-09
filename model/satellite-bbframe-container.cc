@@ -245,8 +245,9 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
                     }
                 }
 
-              // check control message container tail still.
-              if ( m_ctrlContainer.empty () == false )
+              // check control message container tail still, if it is not empty and MODCOD match
+              // control messages are used default MODCOD
+              if ( ( m_ctrlContainer.empty () == false ) && ( m_bbFrameConf->GetDefaultModCod () < itFromMerge->first ) )
                 {
                   if (m_ctrlContainer.back ()->GetOccupancy() < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
                     {
@@ -260,6 +261,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
                     }
                 }
 
+              // frame found where merging can be tried
               if ( frameToMerge )
                 {
                   double newWeightedOccupancyIfMerged = frameToMerge->GetSpectralEfficiency (carrierBandwidthInHz) * maxNewOccupancyIfMerged;

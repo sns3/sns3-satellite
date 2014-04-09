@@ -45,12 +45,12 @@ public:
    */
   virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  virtual double GetDelay (void) const;
-  void SetDelay (double delay);
+  virtual Time GetDelay (void) const;
+  void SetDelay (Time delay);
 
 private:
   virtual int64_t DoAssignStreams (int64_t stream);
-  double m_delay;
+  Time m_delay;
 };
 
 

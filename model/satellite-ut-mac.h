@@ -46,7 +46,7 @@ public:
 
   bool operator() (std::pair<uint8_t, Ptr<SatTimeSlotConf> > p1, std::pair<uint8_t, Ptr<SatTimeSlotConf> > p2)
   {
-    return p1.second->GetStartTimeInSeconds () < p2.second->GetStartTimeInSeconds ();
+    return p1.second->GetStartTime () < p2.second->GetStartTime ();
   }
 };
 
@@ -283,34 +283,34 @@ private:
    /**
     * Schdules one Tx opportunity, i.e. time slot.
     * \param transmitDelay time when transmit possibility starts
-    * \param durationInSecs duration of the burst
+    * \param duration duration of the burst
     * \param waveform waveform
     * \param rcIndex Primary RC index to be scheduled
     * \param carrierId Carrier id used for the transmission
     */
-   void ScheduleDaTxOpportunity (Time transmitDelay, double durationInSecs, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId);
+   void ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId);
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
     * returns a PDU, send it to lower layer.
     *
-    * \param durationInSecs duration of the burst
+    * \param duration duration of the burst
     * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index
     */
-   void DoTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
     * returns a PDU, send it to lower layer.
     *
-    * \param durationInSecs duration of the burst
+    * \param duration duration of the burst
     * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
     * \param rcIndex RC index as int
     */
-   void DoSlottedAlohaTransmit (double durationInSecs, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     *
@@ -324,11 +324,11 @@ private:
    /**
     *
     * \param packets
-    * \param durationInSecs
+    * \param duration
     * \param carrierId
     * \param txInfo
     */
-   void TransmitPackets (SatPhy::PacketContainer_t packets, double durationInSecs, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo);
+   void TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet
