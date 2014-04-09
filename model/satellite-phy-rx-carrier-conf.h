@@ -275,7 +275,6 @@ private:
   Ptr<SatLinkResults> m_linkResults;
   double m_rxExtNoiseDensityDbwhz;
   bool m_enableIntfOutputTrace;
-  bool m_alwaysDropCollidingRandomAccessPackets;
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
   RandomAccessCollisionModel m_raCollisionModel;
 };

@@ -74,6 +74,20 @@ SatBeamHelper::GetTypeId (void)
                                        SatEnums::RA_SLOTTED_ALOHA, "Slotted ALOHA",
                                        SatEnums::RA_CRDSA, "CRDSA",
                                        SatEnums::RA_ANY_AVAILABLE, "Any available"))
+      .AddAttribute ("RaInterferenceModel",
+                     "Interference model for random access",
+                      EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
+                      MakeEnumAccessor (&SatBeamHelper::m_raInterferenceModel),
+                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
+                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+      .AddAttribute ("RaCollisionModel",
+                     "Collision model for random access",
+                      EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+                      MakeEnumAccessor (&SatBeamHelper::m_raCollisionModel),
+                      MakeEnumChecker (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED, "Not defined",
+                                       SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS, "Always drop colliding packets",
+                                       SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR, "Check against SINR"))
       .AddAttribute ("PropagationDelayModel",
                       "Propagation delay model",
                       EnumValue (SatEnums::PD_CONSTANT_SPEED),
@@ -117,12 +131,14 @@ SatBeamHelper::SatBeamHelper () :
     m_fadingModel (),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
     m_constantPropagationDelay (0.13),
-    m_randomAccessModel (SatEnums::RA_OFF)
+    m_randomAccessModel (SatEnums::RA_OFF),
+    m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED)
 {
   NS_LOG_FUNCTION (this);
 
   // this default constructor should not be called...
-  NS_ASSERT(false);
+  NS_FATAL_ERROR ("SatBeamHelper::SatBeamHelper - Constructor not in use");
 }
 
 SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
@@ -135,7 +151,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     m_fadingModel (SatEnums::FADING_MARKOV),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
     m_constantPropagationDelay (0.13),
-    m_randomAccessModel (SatEnums::RA_OFF)
+    m_randomAccessModel (SatEnums::RA_OFF),
+    m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -155,10 +173,25 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   SatMac::ReadCtrlMsgCallback fwdReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, fwdCtrlMsgContainer);
   SatMac::WriteCtrlMsgCallback fwdWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, fwdCtrlMsgContainer);
 
+  SatGeoHelper::RandomAccessSettings_s geoRaSettings;
+  geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  geoRaSettings.m_randomAccessModel = m_randomAccessModel;
+  geoRaSettings.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED; // no collision checks at satellite
+
+  SatGwHelper::RandomAccessSettings_s gwRaSettings;
+  gwRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  gwRaSettings.m_randomAccessModel = m_randomAccessModel;
+  gwRaSettings.m_raCollisionModel = m_raCollisionModel;
+
+  SatUtHelper::RandomAccessSettings_s utRaSettings;
+  utRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  utRaSettings.m_randomAccessModel = m_randomAccessModel;
+  utRaSettings.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED; // no random access in fwd link
+
   // create needed low level satellite helpers
-  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, m_randomAccessModel);
-  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb, m_randomAccessModel);
-  m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb, m_randomAccessModel);
+  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, geoRaSettings);
+  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb, gwRaSettings);
+  m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb, utRaSettings);
 
   // Two usage of link results is two-fold: on the other hand they are needed in the
   // packet reception for packet decoding, but on the other hand they are utilized in

@@ -53,10 +53,10 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   /// Enable interference density input trace
-  Config::SetDefault ("ns3::SatGwHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
-  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
-  Config::SetDefault ("ns3::SatGeoHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
-  Config::SetDefault ("ns3::SatUtHelper::FwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
 
   Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
 

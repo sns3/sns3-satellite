@@ -74,10 +74,10 @@ SatUtHelper::GetTypeId (void)
                      MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
                                       SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::EM_AVI, "AVI"))
-      .AddAttribute ("FwdLinkInterferenceModel",
-                     "Forward link interference model",
+      .AddAttribute ("DaFwdLinkInterferenceModel",
+                     "Forward link interference model for dedicated access",
                      EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
-                     MakeEnumAccessor (&SatUtHelper::m_interferenceModel),
+                     MakeEnumAccessor (&SatUtHelper::m_daInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
@@ -110,12 +110,12 @@ SatUtHelper::SatUtHelper ()
  : m_carrierBandwidthConverter (),
    m_fwdLinkCarrierCount (),
    m_superframeSeq (),
-   m_interferenceModel (),
-   m_errorModel (),
+   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
    m_linkResults (),
    m_llsConf (),
    m_enableChannelEstimationError (false),
-   m_randomAccessModel ()
+   m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -128,18 +128,18 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
                           SatMac::WriteCtrlMsgCallback writeCb,
-                          SatEnums::RandomAccessModel_t randomAccessModel)
+                          RandomAccessSettings_s randomAccessSettings)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
    m_superframeSeq (seq),
    m_readCtrlCb (readCb),
    m_writeCtrlCb (writeCb),
-   m_interferenceModel (),
-   m_errorModel (),
+   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
    m_linkResults (),
    m_llsConf (),
    m_enableChannelEstimationError (false),
-   m_randomAccessModel (randomAccessModel)
+   m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
@@ -242,14 +242,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters;
   parameters.m_errorModel = m_errorModel;
-  parameters.m_daIfModel = m_interferenceModel;
-  parameters.m_raIfModel = m_interferenceModel;
+  parameters.m_daIfModel = m_daInterferenceModel;
+  parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_converter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
-  parameters.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+  parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
 
-  if (m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_OFF)
     {
       parameters.m_isRandomAccessEnabled = true;
     }
@@ -429,12 +429,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   rm->Initialize (m_llsConf);
 
-  if (m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_OFF)
     {
       Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf,m_superframeSeq);
 
       /// create RA module with defaults
-      Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_randomAccessModel);
+      Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
 
       /// attach callbacks
       randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));

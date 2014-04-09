@@ -45,6 +45,13 @@ class SatGwHelper : public Object
 public:
   typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
 
+  typedef struct
+  {
+    SatEnums::RandomAccessModel_t m_randomAccessModel;
+    SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+    SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
+  } RandomAccessSettings_s;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
@@ -58,7 +65,7 @@ public:
                Ptr<SatSuperframeSeq> seq,
                SatMac::ReadCtrlMsgCallback readCb,
                SatMac::WriteCtrlMsgCallback writeCb,
-               SatEnums::RandomAccessModel_t randomAccessModel);
+               RandomAccessSettings_s randomAccessSettings);
 
   virtual ~SatGwHelper () {}
 
@@ -161,9 +168,9 @@ private:
   ObjectFactory m_deviceFactory;
 
   /*
-   * Configured interference model for the return link. Set as an attribute.
+   * Configured dedicated access interference model for the return link. Set as an attribute.
    */
-  SatPhy::InterferenceModel m_interferenceModel;
+  SatPhy::InterferenceModel m_daInterferenceModel;
 
   /*
    * Configured error model for the return link. Set as an attribute.
@@ -191,9 +198,9 @@ private:
   bool m_enableChannelEstimationError;
 
   /**
-   * \brief The used random access model
+   * \brief The used random access model settings
    */
-  SatEnums::RandomAccessModel_t m_randomAccessModel;
+  RandomAccessSettings_s m_raSettings;
 };
 
 } // namespace ns3

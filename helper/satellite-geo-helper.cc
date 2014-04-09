@@ -50,17 +50,17 @@ SatGeoHelper::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::SatGeoHelper")
       .SetParent<Object> ()
       .AddConstructor<SatGeoHelper> ()
-      .AddAttribute ("FwdLinkInterferenceModel",
-                     "Forward link interference model",
+      .AddAttribute ("DaFwdLinkInterferenceModel",
+                     "Forward link interference model for dedicated access",
                      EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
-                     MakeEnumAccessor (&SatGeoHelper::m_fwdLinkInterferenceModel),
+                     MakeEnumAccessor (&SatGeoHelper::m_daFwdLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute ("RtnLinkInterferenceModel",
-                     "Return link interference model",
+      .AddAttribute ("DaRtnLinkInterferenceModel",
+                     "Return link interference model for dedicated access",
                      EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
-                     MakeEnumAccessor (&SatGeoHelper::m_rtnLinkInterferenceModel),
+                     MakeEnumAccessor (&SatGeoHelper::m_daRtnLinkInterferenceModel),
                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
@@ -86,9 +86,9 @@ SatGeoHelper::SatGeoHelper()
  m_rtnLinkCarrierCount (),
  m_deviceCount (0),
  m_deviceFactory (),
- m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
- m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
- m_randomAccessModel ()
+ m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+ m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+ m_raSettings ()
 {
   NS_LOG_FUNCTION (this );
 
@@ -100,17 +100,17 @@ SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb,
                             uint32_t rtnLinkCarrierCount,
                             uint32_t fwdLinkCarrierCount,
                             Ptr<SatSuperframeSeq> seq,
-                            SatEnums::RandomAccessModel_t randomAccessModel)
+                            RandomAccessSettings_s randomAccessSettings)
 : m_nodeId (0),
   m_carrierBandwidthConverter (bandwidthConverterCb),
   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
   m_rtnLinkCarrierCount (rtnLinkCarrierCount),
   m_deviceCount(0),
   m_deviceFactory (),
-  m_fwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_rtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_superframeSeq (seq),
-  m_randomAccessModel (randomAccessModel)
+  m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
@@ -207,22 +207,22 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser;
-  parametersUser.m_daIfModel = m_rtnLinkInterferenceModel;
-  parametersUser.m_raIfModel = m_rtnLinkInterferenceModel;
+  parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
+  parametersUser.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parametersUser.m_converter = m_carrierBandwidthConverter;
   parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
   parametersUser.m_cec = cec;
-  parametersUser.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+  parametersUser.m_raCollisionModel = m_raSettings.m_raCollisionModel;
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder;
-  parametersFeeder.m_daIfModel = m_fwdLinkInterferenceModel;
-  parametersFeeder.m_raIfModel = m_fwdLinkInterferenceModel;
+  parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
+  parametersFeeder.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parametersFeeder.m_converter = m_carrierBandwidthConverter;
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
   parametersFeeder.m_cec = cec;
-  parametersFeeder.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED;
+  parametersFeeder.m_raCollisionModel = m_raSettings.m_raCollisionModel;
 
-  if (m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_OFF)
     {
       parametersUser.m_isRandomAccessEnabled = true;
       parametersFeeder.m_isRandomAccessEnabled = true;

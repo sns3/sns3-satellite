@@ -297,6 +297,16 @@ private:
   SatEnums::RandomAccessModel_t m_randomAccessModel;
 
   /**
+   * The used interference model for random access
+   */
+  SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+
+  /**
+   * The used collision model for random access
+   */
+  SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
+
+  /**
    * Packet trace
    */
   Ptr<SatPacketTrace> m_packetTrace;

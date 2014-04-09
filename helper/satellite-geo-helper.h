@@ -44,6 +44,13 @@ class SatGeoHelper : public Object
 public:
   typedef SatPhy::CarrierBandwidthConverter CarrierBandwidthConverter;
 
+  typedef struct
+  {
+    SatEnums::RandomAccessModel_t m_randomAccessModel;
+    SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+    SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
+  } RandomAccessSettings_s;
+
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
@@ -57,7 +64,7 @@ public:
                 uint32_t rtnLinkCarrierCount,
                 uint32_t fwdLinkCarrierCount,
                 Ptr<SatSuperframeSeq> seq,
-                SatEnums::RandomAccessModel_t randomAccessModel);
+                RandomAccessSettings_s randomAccessSettings);
 
   virtual ~SatGeoHelper () {}
 
@@ -169,14 +176,14 @@ private:
     ObjectFactory m_deviceFactory;
 
     /*
-     * Configured forward link interference model
+     * Configured forward link interference model for dedicated access
      */
-    SatPhy::InterferenceModel m_fwdLinkInterferenceModel;
+    SatPhy::InterferenceModel m_daFwdLinkInterferenceModel;
 
     /*
-     * Configured return link interference model
+     * Configured return link interference model for dedicated access
      */
-    SatPhy::InterferenceModel m_rtnLinkInterferenceModel;
+    SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
 
     /**
      * \brief Trace callback for creation traces
@@ -189,9 +196,9 @@ private:
     Ptr<SatSuperframeSeq> m_superframeSeq;
 
     /**
-     * \brief The used random access model
+     * \brief The used random access model settings
      */
-    SatEnums::RandomAccessModel_t m_randomAccessModel;
+    RandomAccessSettings_s m_raSettings;
 };
 
 } // namespace ns3
