@@ -135,6 +135,11 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     {
       m_randomAccessCollisionModel = carrierConf->GetRandomAccessCollisionModel ();
       m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize = carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ();
+
+      NS_LOG_INFO ("SatPhyRxCarrier::SatPhyRxCarrier - Carrier ID: " << m_carrierId <<
+                   ", RA interference model: " << carrierConf->GetInterferenceModel (m_isRandomAccessEnabledForThisCarrier) <<
+                   ", RA collision model: " << m_randomAccessCollisionModel <<
+                   ", avg. normalized offered load measurement window size: " << m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize);
     }
 }
 

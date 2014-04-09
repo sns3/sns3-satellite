@@ -249,8 +249,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatGeoHelper::FwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault("ns3::SatUtHelper::FwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
@@ -399,8 +399,8 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatGeoHelper::FwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault("ns3::SatUtHelper::FwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
@@ -544,8 +544,8 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
-  Config::SetDefault ("ns3::SatGwHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
@@ -671,8 +671,8 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
-  Config::SetDefault ("ns3::SatGwHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
