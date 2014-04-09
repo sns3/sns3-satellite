@@ -530,7 +530,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
 
-              Time frameDuration = Seconds ( slotCount * timeSlotDuration );
+              Time frameDuration = Seconds ( slotCount * timeSlotDuration.GetSeconds () );
 
               // if frame duration is greater than current super frame duration, set it as super frame duration
               // super frame must last as long as the longest frame
