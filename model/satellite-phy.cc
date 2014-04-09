@@ -374,20 +374,6 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     }
   else
     {
-      // Pass the packet to the upper layer.
-      m_rxCallback (rxParams->m_packetsInBurst, rxParams);
-
-      /*
-       * Notice that here we put the callback to upper layer before the callback
-       * to the Rx and RxDelay trace sources. This solves a weird problem where
-       * the call to m_rxDelayTrace below does not hit the intended callback.
-       *
-       * This "hack" makes PHY trace to be fired after MAC and LLC traces, which
-       * is not supposed to be. But this flaw doesn't affect the statistical
-       * output at all, because both sides are still executed within the same
-       * simulation time.
-       */
-
       // Invoke the `Rx` and `RxDelay` trace sources.
       if (m_isStatisticsTagsEnabled)
         {
@@ -428,6 +414,9 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
             } // end of `for (it1 = rxParams->m_packetsInBurst)`
 
         } // end of `if (m_isStatisticsTagsEnabled)`
+
+      // Pass the packet to the upper layer.
+      m_rxCallback (rxParams->m_packetsInBurst, rxParams);
 
     } // end of else of `if (phyError)`
 
