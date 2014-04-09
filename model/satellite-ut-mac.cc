@@ -260,8 +260,9 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
   uint32_t payloadSumInSuperFrame = 0;
   uint32_t payloadSumPerRcIndex [SatEnums::NUM_FIDS] = { };
 
-  if ( !slots.empty ())
+  if (!slots.empty ())
     {
+
       NS_LOG_INFO ("TBTP contains " << slots.size () << " timeslots for UT: " << m_nodeInfo->GetMacAddress ());
 
       uint8_t frameId = 0;
@@ -316,7 +317,6 @@ void
 SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, Time duration, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << duration.GetSeconds () << waveform->GetPayloadInBytes () << rcIndex << carrierId);
-
   NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", rcIndex: " << rcIndex << ", carrier: " << carrierId);
 
   Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, waveform, carrierId, rcIndex, SatUtScheduler::LOOSE);
@@ -665,7 +665,6 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       uint32_t timeSlotCount = frameConf->GetTimeSlotCount ();
 
       std::pair<bool, uint32_t> result = std::make_pair (false, 0);
-      uint32_t frameOffset = 0;
       Time superframeStartTime = GetCurrentSuperFrameStartTime (0);
 
       if ( Now () < superframeStartTime )
@@ -675,19 +674,23 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
 
       uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
 
+      NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - Searching for next available slot");
+
       /// search for the next available slot
       /// if there is no free slots in the current frame, look for it in the following frames
       while (!result.first)
         {
-          superframeStartTime += Seconds (frameOffset * frameConf->GetDuration ().GetSeconds ());
+          NS_LOG_INFO ("Time now: " << Now ().GetSeconds () <<
+                       ", superFrameId: " << superFrameId <<
+                       ", superframeStartTime: " << superframeStartTime.GetSeconds ());
 
           result = SearchFrameForAvailableSlot (superframeStartTime, frameConf, timeSlotCount, superFrameId, allocationChannel);
 
           if (!result.first)
             {
               NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - Increasing frame offset!");
-              frameOffset++;
               superFrameId++;
+              superframeStartTime += frameConf->GetDuration ();
             }
         }
 
@@ -741,9 +744,10 @@ SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime,
 
   NS_LOG_INFO ("SatUtMac::SearchFrameForAvailableSlot - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " offset: " << opportunityOffset.GetSeconds ());
 
+  /// if we can not use the current superframe, e.g., we are in the the middle of the last slot of the frame, we will use offset 0, e.g., the first slot of the next frame
   if (opportunityOffset.IsStrictlyNegative())
     {
-      NS_FATAL_ERROR ("SatUtMac::FindNextAvailableRandomAccessSlot - Invalid Tx opportunity time");
+      opportunityOffset = Seconds (0);
     }
 
   return FindNextAvailableRandomAccessSlot (opportunityOffset, frameConf, timeSlotCount, superFrameId, allocationChannel);
