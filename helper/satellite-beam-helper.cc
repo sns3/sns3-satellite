@@ -130,7 +130,7 @@ SatBeamHelper::SatBeamHelper () :
     m_printDetailedInformationToCreationTraces (false),
     m_fadingModel (),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
-    m_constantPropagationDelay (0.13),
+    m_constantPropagationDelay (Seconds (0.13)),
     m_randomAccessModel (SatEnums::RA_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED)
@@ -150,7 +150,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     m_printDetailedInformationToCreationTraces (false),
     m_fadingModel (SatEnums::FADING_MARKOV),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
-    m_constantPropagationDelay (0.13),
+    m_constantPropagationDelay (Seconds (0.13)),
     m_randomAccessModel (SatEnums::RA_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)

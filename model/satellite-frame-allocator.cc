@@ -138,7 +138,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
       int64_t utSymbolsLeft = m_utAllocs[*it].m_allocation.GetTotalSymbols ();
       int64_t utSymbolsToUse = m_maxSymbolsPerCarrier;
 
-      while ( utSymbolsLeft > 0 )
+      while ( (utSymbolsLeft > 0 ) && ( utSymbolsToUse > 0 ) )
         {
           Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse, utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno );
 
