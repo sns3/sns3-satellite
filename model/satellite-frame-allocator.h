@@ -217,7 +217,24 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Allocate to the frame.
+   * Get super frame duration.
+   *
+   *  \return Super frame duration.
+   **/
+  inline Time GetSuperframeDuration () const { return m_superframeConf->GetDuration(); }
+
+  /**
+   * Allocate UT to the allocator.
+   *
+   * \param cno C/N0 estimation to use in allocation
+   * \param allocReq  Allocation request parameters for RC/CCs
+   * \return true when allocation is successful, false otherwise
+   */
+  void AllocateUt (uint32_t minimumRateBytes);
+
+  /**
+   * Allocate UT to the frame.
+   *
    * \param cno C/N0 estimation to use in allocation
    * \param allocReq  Allocation request parameters for RC/CCs
    * \return true when allocation is successful, false otherwise
@@ -469,11 +486,14 @@ private:
   typedef std::map<uint8_t, SatFrameInfo> FrameInfoContainer_t;
   typedef std::map<uint8_t, uint32_t>     SupportedFrameInfo_t;
 
-  FrameInfoContainer_t  m_frameInfos;
-  Ptr<SatWaveformConf>  m_waveformConf;
+  FrameInfoContainer_t    m_frameInfos;
+  Ptr<SatWaveformConf>    m_waveformConf;
+  Ptr<SatSuperframeConf>  m_superframeConf;
   double                m_targetLoad;
   bool                  m_fcaEnabled;
   uint32_t              m_maxRcCount;
+  uint32_t              m_minCarrierBytes;
+  uint32_t              m_minimumRateBasedBytesLeft;
 
   /**
    *

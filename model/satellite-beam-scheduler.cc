@@ -24,6 +24,7 @@
 #include "ns3/enum.h"
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/singleton.h"
+#include "satellite-utils.h"
 #include "satellite-rtn-link-time.h"
 #include "satellite-beam-scheduler.h"
 
@@ -274,11 +275,12 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   NS_LOG_FUNCTION (this << utId);
 
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
+
+  // this method call acts as CAC check, if allocation fails fatal error is occured.
+  m_frameAllocator->AllocateUt (damaEntry->GetMinRateBasedBytes (m_frameAllocator->GetSuperframeDuration ()));
+
   Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
-
   Ptr<SatUtInfo> utInfo = Create<SatUtInfo> (damaEntry, cnoEstimator);
-
-  // TODO: CAC check needed to add
 
   std::pair<UtInfoMap_t::iterator, bool > result = m_utInfos.insert (std::make_pair (utId, utInfo));
 
@@ -473,10 +475,12 @@ void SatBeamScheduler::DoPreResourceAllocation ()
 
               double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
 
-              rcAllocReq.m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / 8.0;
-              rcAllocReq.m_minRbdcBytes = ( 1000.0 * damaEntry->GetMinRbdcInKbps (i)  * superFrameDuration ) / 8.0;
-              rcAllocReq.m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / 8.0;
+              rcAllocReq.m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
+              rcAllocReq.m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
               rcAllocReq.m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
+
+              uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
+              rcAllocReq.m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
 
               allocReqContainer.push_back (rcAllocReq);
             }

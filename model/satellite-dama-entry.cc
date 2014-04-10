@@ -19,6 +19,7 @@
  */
 
 #include "ns3/log.h"
+#include "satellite-utils.h"
 #include "satellite-dama-entry.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatDamaEntry");
@@ -70,7 +71,7 @@ SatDamaEntry::GetCraBasedBytes (Time duration) const
     {
       if (m_llsConf->GetDaConstantAssignmentProvided (i))
         {
-          totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration.GetSeconds ()) / 8;
+          totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
         }
     }
 
@@ -78,7 +79,7 @@ SatDamaEntry::GetCraBasedBytes (Time duration) const
 }
 
 uint32_t
-SatDamaEntry::GetMinRbdcBasedBytes (Time duration) const
+SatDamaEntry::GetMinRateBasedBytes (Time duration) const
 {
   NS_LOG_FUNCTION (this << duration);
 
@@ -86,8 +87,22 @@ SatDamaEntry::GetMinRbdcBasedBytes (Time duration) const
 
   for ( uint8_t i = 0; i < m_llsConf->GetDaServiceCount (); i++)
     {
-      uint16_t minRateInKbps = m_llsConf->GetDaMinimumServiceRateInKbps (i) - m_llsConf->GetDaConstantServiceRateInKbps (i);
-      totalBytes += (1000.0 * minRateInKbps * duration.GetSeconds ()) / 8;
+      uint16_t minRateInKbps = 0;
+
+      if ( m_llsConf->GetDaConstantAssignmentProvided (i) && m_llsConf->GetDaRbdcAllowed (i) )
+        {
+          minRateInKbps = std::max<uint16_t> (m_llsConf->GetDaMinimumServiceRateInKbps (i),  m_llsConf->GetDaConstantServiceRateInKbps (i) );
+        }
+      else if (m_llsConf->GetDaConstantAssignmentProvided (i))
+        {
+          minRateInKbps = m_llsConf->GetDaConstantServiceRateInKbps (i);
+        }
+      else if (m_llsConf->GetDaRbdcAllowed (i))
+        {
+          minRateInKbps = m_llsConf->GetDaMinimumServiceRateInKbps (i);
+        }
+
+      totalBytes += (1000.0 * minRateInKbps * duration.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
     }
 
   return totalBytes;
@@ -102,7 +117,7 @@ SatDamaEntry::GetRbdcBasedBytes (Time duration) const
 
   for ( uint8_t i = 0; i < m_dynamicRateRequestedInKbps.size (); i++)
     {
-      totalBytes += (1000.0 * m_dynamicRateRequestedInKbps[i] * duration.GetSeconds ()) / 8;
+      totalBytes += (1000.0 * m_dynamicRateRequestedInKbps[i] * duration.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
     }
 
   return totalBytes;
@@ -151,9 +166,10 @@ SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
     }
 
   uint16_t minRbdc (0);
+
   if (m_llsConf->GetDaRbdcAllowed (index))
     {
-      minRbdc = m_llsConf->GetDaMinimumServiceRateInKbps (index);
+      minRbdc = std::max<uint16_t> (m_llsConf->GetDaMinimumServiceRateInKbps (index),  m_llsConf->GetDaConstantServiceRateInKbps (index) );
     }
 
   return minRbdc;

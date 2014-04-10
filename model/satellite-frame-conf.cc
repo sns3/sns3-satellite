@@ -537,7 +537,12 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
               Ptr<SatWaveform> defaultWaveForm = m_waveFormConf->GetWaveform (defaultWaveFormId);
 
               Time timeSlotDuration = defaultWaveForm->GetBurstDuration (btuConf->GetSymbolRateInBauds ());
-              uint32_t slotCount = std::max<uint32_t> (1 ,(targetDuration.GetSeconds() / timeSlotDuration.GetSeconds () ));
+              uint32_t slotCount = targetDuration.GetSeconds() / timeSlotDuration.GetSeconds ();
+
+              if ( slotCount == 0)
+                {
+                  NS_FATAL_ERROR ("Time slots cannot be created in target frame duration!!!");
+                }
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
 
@@ -786,16 +791,16 @@ SatSuperframeConf0::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0 )
-    ADD_FRAME_ATTRIBUTES (0, 12.5e6, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e6, 1.25e5, 0.20, 0.30, false)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e6, 1.25e5, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false)
   ;
 
   return tid;

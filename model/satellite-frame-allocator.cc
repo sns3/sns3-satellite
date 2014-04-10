@@ -23,6 +23,7 @@
 #include "ns3/log.h"
 #include "ns3/double.h"
 #include "ns3/boolean.h"
+#include "satellite-utils.h"
 #include "satellite-frame-allocator.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFrameAllocator");
@@ -830,22 +831,41 @@ SatFrameAllocator::GetInstanceTypeId (void) const
 
 SatFrameAllocator::SatFrameAllocator (Ptr<SatSuperframeConf> superFrameConf, Ptr<SatWaveformConf> waveformConf, uint8_t maxRcCount)
  : m_waveformConf (waveformConf),
+   m_superframeConf (superFrameConf),
    m_targetLoad (0.0),
    m_fcaEnabled (false),
-   m_maxRcCount (maxRcCount)
+   m_maxRcCount (maxRcCount),
+   m_minCarrierBytes (0),
+   m_minimumRateBasedBytesLeft (0)
 {
   NS_LOG_FUNCTION (this);
 
+  uint32_t minCarrierBytes = std::numeric_limits<uint32_t>::max ();
+
+  Ptr<SatWaveform> defWaveform = m_waveformConf->GetWaveform (m_waveformConf->GetDefaultWaveformId ());
+
   for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
     {
-      if (superFrameConf->GetFrameConf (i)->IsRandomAccess () == false )
+      Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (i);
+
+      if (frameConf->IsRandomAccess () == false )
         {
-          std::pair<FrameInfoContainer_t::const_iterator, bool> result = m_frameInfos.insert ( std::make_pair( i, SatFrameInfo (superFrameConf->GetFrameConf (i), waveformConf, i, superFrameConf->GetConfigType ())));
+          std::pair<FrameInfoContainer_t::const_iterator, bool> result = m_frameInfos.insert ( std::make_pair( i, SatFrameInfo (frameConf, waveformConf, i, superFrameConf->GetConfigType ())));
 
           if ( result.second == false )
             {
               NS_FATAL_ERROR ("Frame info insertion failed!!!");
             }
+
+          uint32_t bytesInCarrier = ( defWaveform->GetThroughputInBitsPerSecond (frameConf->GetBtuConf ()->GetSymbolRateInBauds ()) * frameConf->GetDuration ().GetSeconds () ) / SatUtils::BITS_PER_BYTE;
+
+          if ( bytesInCarrier < minCarrierBytes )
+            {
+              minCarrierBytes = bytesInCarrier;
+              m_minCarrierBytes = bytesInCarrier;
+            }
+
+          m_minimumRateBasedBytesLeft += frameConf->GetCarrierCount () * bytesInCarrier;
         }
     }
 }
@@ -890,6 +910,24 @@ SatFrameAllocator::AllocateSymbols ()
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
       it->second.AllocateSymbols (m_targetLoad, m_fcaEnabled);
+    }
+}
+
+void SatFrameAllocator::AllocateUt (uint32_t minimumRateBytes)
+{
+  NS_LOG_FUNCTION (this << minimumRateBytes);
+
+  if ( minimumRateBytes > m_minCarrierBytes )
+    {
+      NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes available in minimum carrier bytes: " << m_minCarrierBytes);
+    }
+  else if ( minimumRateBytes > m_minimumRateBasedBytesLeft )
+    {
+      NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes minimum bytes left: " << m_minimumRateBasedBytesLeft);
+    }
+  else
+    {
+      m_minimumRateBasedBytesLeft -= minimumRateBytes;
     }
 }
 

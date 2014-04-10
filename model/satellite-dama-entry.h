@@ -76,12 +76,14 @@ public:
   uint32_t GetCraBasedBytes (Time duration) const;
 
   /**
-   * Get minimum RBDC based bytes with given duration.
+   * Get minimum rate based bytes with given duration.
+   *
+   * When
    *
    * \param duration Duration of the transmission
    * \return Rate based bytes with given duration.
    */
-  uint32_t GetMinRbdcBasedBytes (Time duration) const;
+  uint32_t GetMinRateBasedBytes (Time duration) const;
 
   /**
    * Get RBDC based bytes with given duration.
