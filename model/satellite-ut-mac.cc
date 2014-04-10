@@ -580,10 +580,12 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 
         uint32_t allocationChannelId = raMsg->GetAllocationChannelId ();
         uint16_t backoffProbability = raMsg->GetBackoffProbability ();
+        uint16_t backoffTime = raMsg->GetBackoffTime ();
 
         NS_LOG_INFO ("SatUtMac::ReceiveSignalingPacket - UT: " << m_nodeInfo->GetMacAddress () << " @ time: " << Now ().GetSeconds () << " - Updating RA backoff probability for AC: " << allocationChannelId << " to: " << backoffProbability);
 
-        m_randomAccess->CrdsaSetBackoffProbability (allocationChannelId,backoffProbability);
+        m_randomAccess->CrdsaSetBackoffProbability (allocationChannelId, backoffProbability);
+        m_randomAccess->CrdsaSetBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
         break;
       }
     case SatControlMsgTag::SAT_CR_CTRL_MSG:

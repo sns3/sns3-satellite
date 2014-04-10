@@ -178,6 +178,7 @@ private:
   uint8_t  m_maxConsecutiveBlockAccessed;
   uint8_t  m_minimumIdleBlock;
   uint16_t m_backOffTimeInMilliSeconds;
+  uint16_t m_highLoadBackOffTimeInMilliSeconds;
   uint16_t m_backOffProbability;
   uint16_t m_highLoadBackOffProbability;
   uint8_t m_numberOfInstances;
@@ -239,6 +240,20 @@ private:
    * \param backOffTimeInMilliSeconds Back off time
    */
   inline void SetBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) {m_backOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
+
+  /**
+   * Get high load back off time in milliseconds.
+   *
+   * \return Back off time
+   */
+  inline uint16_t GetHighLoadBackOffTimeInMilliSeconds () const {return m_highLoadBackOffTimeInMilliSeconds;}
+
+  /**
+   * Set high load back off time in milliseconds.
+   *
+   * \param backOffTimeInMilliSeconds Back off time
+   */
+  inline void SetHighLoadBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) {m_highLoadBackOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
 
   /**
    * Get back off probability.
@@ -474,6 +489,14 @@ public:
   uint16_t GetRaBackOffTimeInMilliSeconds (uint8_t index) const;
 
   /**
+   * Get high load back off time in milliseconds.
+   *
+   * \param index Index of the service
+   * \return Back off time
+   */
+  uint16_t GetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index) const;
+
+  /**
    * Get back off probability.
    *
    * \param index Index of the service
@@ -683,6 +706,14 @@ private:
   void SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds);
 
   /**
+   * Set high load back off time in milliseconds.
+   *
+   * \param index Index of the service
+   * \param backOffTimeInMilliSeconds Back off time
+   */
+  void SetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds);
+
+  /**
    * Set back off probability.
    *
    * \param index Index of the service
@@ -776,7 +807,7 @@ private:
     { return GetDaMaximumBacklogInKbytes (index); }
 
 /**
- * SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
+ * SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define RA service entry
  * attribute access method.
  *
  *  Methods defined e.g. when index is 0.
@@ -789,6 +820,8 @@ private:
  *  - GetRaServ0VMinimumIdleBlock, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlock
  *  - SetRaServ0BackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::SetBackOffTimeInMilliSeconds
  *  - GetRaServ0VBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetBackOffTimeInMilliSeconds
+ *  - SetRaServ0HighLoadBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::SetHighLoadBackOffTimeInMilliSeconds
+ *  - GetRaServ0VHighLoadBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffTimeInMilliSeconds
  *  - SetRaServ0BackOffProbability, see @SatLowerLayerServiceRaEntry::SetBackOffProbability
  *  - GetRaServ0VBackOffProbability, see @SatLowerLayerServiceRaEntry::GetBackOffProbability
  *  - SetRaServ0HighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::SetHighLoadBackOffProbability
@@ -819,6 +852,10 @@ private:
     { return SetRaBackOffTimeInMilliSeconds (index, value); } \
   inline uint16_t GetRaServ ## index ## BackOffTimeInMilliSeconds () const  \
     { return GetRaBackOffTimeInMilliSeconds (index); } \
+  inline void SetRaServ ## index ## HighLoadBackOffTimeInMilliSeconds (uint16_t value)  \
+    { return SetRaHighLoadBackOffTimeInMilliSeconds (index, value); } \
+  inline uint16_t GetRaServ ## index ## HighLoadBackOffTimeInMilliSeconds () const  \
+    { return GetRaHighLoadBackOffTimeInMilliSeconds (index); } \
   inline void SetRaServ ## index ## BackOffProbability (uint16_t value)  \
     { return SetRaBackOffProbability (index, value); } \
   inline uint16_t GetRaServ ## index ## BackOffProbability () const  \
@@ -846,9 +883,9 @@ private:
     SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
 
     SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
-    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
-    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
-    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
+    //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
+    //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
+    //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
 };
 
 } // namespace ns3

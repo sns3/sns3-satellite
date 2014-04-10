@@ -54,6 +54,7 @@ SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
   m_maxConsecutiveBlockAccessed (0),
   m_minimumIdleBlock (0),
   m_backOffTimeInMilliSeconds (0),
+  m_highLoadBackOffTimeInMilliSeconds (0),
   m_backOffProbability (0),
   m_highLoadBackOffProbability (0),
   m_numberOfInstances (0),
@@ -184,12 +185,16 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a2    'Maximum consecutive block accessed' attribute value
  * \param a3    'Minimum idle block' attribute value
  * \param a4    'Back off time in milliseconds' attribute value
- * \param a5    'Back off probability' attribute value
- * \param a6    'Number of instances' attribute value
+ * \param a5    'High load back off time in milliseconds' attribute value
+ * \param a6    'Back off probability' attribute value
+ * \param a7    'High load back off probability' attribute value
+ * \param a8    'Number of instances' attribute value
+ * \param a9    'Maximum backoff probability' attribute value
+ * \param a10    'Average normalized offered load threshold' attribute value
  *
  * \return TypeId
  */
-#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) \
+#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) \
    AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                   "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a1), \
@@ -214,33 +219,39 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## BackOffTimeInMilliSeconds, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## BackOffTimeInMilliSeconds), \
                   MakeUintegerChecker<uint16_t> ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_HighLoadBackOffTimeInMilliSeconds", \
+                  "High load back off time in milliseconds for RA " + GetIndexAsRaServiceName (index), \
+                  UintegerValue (a5), \
+                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## HighLoadBackOffTimeInMilliSeconds, \
+                                        &SatLowerLayerServiceConf::GetRaServ ## index ## HighLoadBackOffTimeInMilliSeconds), \
+                  MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_BackOffProbability", \
                   "Back off probability for RA " + GetIndexAsRaServiceName (index), \
-                  UintegerValue (a5), \
+                  UintegerValue (a6), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## BackOffProbability, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## BackOffProbability), \
                   MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_HighLoadBackOffProbability", \
                   "High load back off probability for RA " + GetIndexAsRaServiceName (index), \
-                  UintegerValue (a6), \
+                  UintegerValue (a7), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## HighLoadBackOffProbability, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## HighLoadBackOffProbability), \
                   MakeUintegerChecker<uint16_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_NumberOfInstances", \
                   "Number of instances for RA " + GetIndexAsRaServiceName (index), \
-                  UintegerValue (a7), \
+                  UintegerValue (a8), \
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## NumberOfInstances, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## NumberOfInstances), \
                   MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumBackOffProbability", \
                   "Maximum back off probability for RA " + GetIndexAsRaServiceName (index), \
-                  DoubleValue (a8), \
+                  DoubleValue (a9), \
                   MakeDoubleAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumBackOffProbability, \
                                       &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumBackOffProbability), \
                   MakeDoubleChecker<double> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_AverageNormalizedOfferedLoadThreshold", \
                   "Average normalized offered load threshold for RA " + GetIndexAsRaServiceName (index), \
-                  DoubleValue (a9), \
+                  DoubleValue (a10), \
                   MakeDoubleAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold, \
                                       &SatLowerLayerServiceConf::GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold), \
                   MakeDoubleChecker<double> ())
@@ -314,10 +325,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, false, false, false, 100, 9216, 50, 384)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, false, false, false, 100, 9216, 50, 384)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
-    //.SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
-    //.SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
-    //.SAT_ADD_RA_SERVICE_ATTRIBUTES (3, 3, 6, 2, 50, 10000, 30000, 3, 0.3, 0.5)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 100, 10000, 30000, 3, 0.3, 0.5)
   ;
 
   return tid;
@@ -623,6 +631,28 @@ SatLowerLayerServiceConf::SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_
     }
 
   m_raServiceEntries[index].SetBackOffTimeInMilliSeconds (backOffTimeInMilliSeconds);
+}
+
+uint16_t
+SatLowerLayerServiceConf::GetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index) const
+{
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetHighLoadBackOffTimeInMilliSeconds ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds)
+{
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetHighLoadBackOffTimeInMilliSeconds (backOffTimeInMilliSeconds);
 }
 
 uint16_t

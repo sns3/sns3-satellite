@@ -94,7 +94,7 @@ public:
    * \param allocationChannelId Allocation channel ID
    * \param averageNormalizedOfferedLoad Measured average normalized offered load
    */
-  void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad);
+  void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad);
 
   /**
    * Capacity request receiver.
@@ -135,21 +135,35 @@ public:
    * \param allocationChannelId Allocation channel ID
    * \param threshold Average normalized offered load threshold
    */
-  void SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint32_t allocationChannelId, double threshold);
+  void SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocationChannelId, double threshold);
 
   /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities
    * \param allocationChannelId Allocation channel ID
    * \param lowLoadBackOffProbability Low load backoff probability
    */
-  void SetRandomAccessLowLoadBackoffProbability (uint32_t allocationChannelId, uint16_t lowLoadBackOffProbability);
+  void SetRandomAccessLowLoadBackoffProbability (uint8_t allocationChannelId, uint16_t lowLoadBackOffProbability);
 
   /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities
    * \param allocationChannelId Allocation channel ID
    * \param highLoadBackOffProbability High load backoff probability
    */
-  void SetRandomAccessHighLoadBackoffProbability (uint32_t allocationChannelId, uint16_t highLoadBackOffProbability);
+  void SetRandomAccessHighLoadBackoffProbability (uint8_t allocationChannelId, uint16_t highLoadBackOffProbability);
+
+  /**
+   * \brief Function for setting the random access allocation channel specific high load backoff time
+   * \param allocationChannelId Allocation channel ID
+   * \param lowLoadBackOffTime Low load backoff time
+   */
+  void SetRandomAccessLowLoadBackoffTime (uint8_t allocationChannelId, uint16_t lowLoadBackOffTime);
+
+  /**
+   * \brief Function for setting the random access allocation channel specific high load backoff time
+   * \param allocationChannelId Allocation channel ID
+   * \param highLoadBackOffTime High load backoff time
+   */
+  void SetRandomAccessHighLoadBackoffTime (uint8_t allocationChannelId, uint16_t highLoadBackOffTime);
 
 private:
 
@@ -161,10 +175,11 @@ private:
   /**
    * \brief Function for creating the random access control message
    * \param backoffProbability Backoff probability
+   * \param backoffProbability Backoff Time
    * \param beamId Beam ID
    * \param allocationChannelId Allocation channel ID
    */
-  void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId, uint32_t allocationChannelId);
+  void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint16_t backoffTime, uint32_t beamId, uint8_t allocationChannelId);
 
   /**
    * The map containing beams in use (set).
@@ -188,22 +203,32 @@ private:
   /**
    * Map for keeping track of the load status of each random access allocation channel
    */
-  std::map<std::pair<uint32_t,uint32_t>,bool> m_isLowRandomAccessLoad;
+  std::map<std::pair<uint32_t,uint8_t>,bool> m_isLowRandomAccessLoad;
 
   /**
    * Map for random access allocation channel specific load thresholds
    */
-  std::map<uint32_t,double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
+  std::map<uint8_t,double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
 
   /**
    * Map for random access allocation channel specific low load backoff probabilities
    */
-  std::map<uint32_t,uint16_t> m_lowLoadBackOffProbability;
+  std::map<uint8_t,uint16_t> m_lowLoadBackOffProbability;
 
   /**
    * Map for random access allocation channel specific high load backoff probabilities
    */
-  std::map<uint32_t,uint16_t> m_highLoadBackOffProbability;
+  std::map<uint8_t,uint16_t> m_highLoadBackOffProbability;
+
+  /**
+   * Map for random access allocation channel specific low load backoff time
+   */
+  std::map<uint8_t,uint16_t> m_lowLoadBackOffTime;
+
+  /**
+   * Map for random access allocation channel specific high load backoff time
+   */
+  std::map<uint8_t,uint16_t> m_highLoadBackOffTime;
 };
 
 } // namespace ns3

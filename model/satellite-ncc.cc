@@ -89,13 +89,13 @@ SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cn
 }
 
 void
-SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad)
+SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
   NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
 
   bool isLowRandomAccessLoad = true;
-  std::map<std::pair<uint32_t,uint32_t>,bool>::iterator findResult;
-  std::pair<std::map<std::pair<uint32_t,uint32_t>,bool>::iterator,bool> insertResult;
+  std::map<std::pair<uint32_t,uint8_t>,bool>::iterator findResult;
+  std::pair<std::map<std::pair<uint32_t,uint8_t>,bool>::iterator,bool> insertResult;
 
   /// search for the current status of load control
   findResult = m_isLowRandomAccessLoad.find (std::make_pair (beamId,allocationChannelId));
@@ -118,33 +118,46 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
       isLowRandomAccessLoad = findResult->second;
     }
 
-  NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << allocationChannelId << " - Measuring the average normalized offered random access load: " << averageNormalizedOfferedLoad);
+  NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Measuring the average normalized offered random access load: " << averageNormalizedOfferedLoad);
 
-  std::map<uint32_t,double>::iterator itThreshold = m_randomAccessAverageNormalizedOfferedLoadThreshold.find (allocationChannelId);
+  std::map<uint8_t,double>::iterator itThreshold = m_randomAccessAverageNormalizedOfferedLoadThreshold.find (allocationChannelId);
 
   if (itThreshold == m_randomAccessAverageNormalizedOfferedLoadThreshold.end ())
     {
-      NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Average normalized offered load threshold not set for beam: " << beamId << ", carrier: " << carrierId << ", allocation channel: " << allocationChannelId);
+      NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Average normalized offered load threshold not set for beam: " << beamId << ", carrier: " << carrierId << ", allocation channel: " << (uint32_t)allocationChannelId);
     }
 
   /// low RA load in effect
   if (isLowRandomAccessLoad)
     {
-      NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << " - Currently low load in effect for allocation channel: " << allocationChannelId);
+      NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << " - Currently low load in effect for allocation channel: " << (uint32_t)allocationChannelId);
       /// check the load against the parameterized value
       if (averageNormalizedOfferedLoad >= itThreshold->second)
         {
-          std::map<uint32_t,uint16_t>::iterator it = m_highLoadBackOffProbability.find (allocationChannelId);
+          std::map<uint8_t,uint16_t>::iterator it;
+
+          it = m_highLoadBackOffProbability.find (allocationChannelId);
 
           if (it == m_highLoadBackOffProbability.end ())
             {
-              NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - High load backoff probability not set for allocation channel: " << allocationChannelId);
+              NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - High load backoff probability not set for allocation channel: " << (uint32_t)allocationChannelId);
             }
 
-          /// use high load back off value
-          CreateRandomAccessLoadControlMessage (it->second, beamId, allocationChannelId);
+          uint16_t probability = it->second;
 
-          NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << allocationChannelId << " - Switching to HIGH LOAD back off parameterization");
+          it = m_highLoadBackOffTime.find (allocationChannelId);
+
+          if (it == m_highLoadBackOffTime.end ())
+            {
+              NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - High load backoff time not set for allocation channel: " << (uint32_t)allocationChannelId);
+            }
+
+          uint16_t time = it->second;
+
+          /// use high load back off value
+          CreateRandomAccessLoadControlMessage (probability, time, beamId, allocationChannelId);
+
+          NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Switching to HIGH LOAD back off parameterization");
 
           /// flag RA load as high load
           m_isLowRandomAccessLoad.at (std::make_pair (beamId,allocationChannelId)) = false;
@@ -153,22 +166,35 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
   /// high RA load in effect
   else
     {
-      NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << " - Currently high load in effect for allocation channel: " << allocationChannelId);
+      NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << " - Currently high load in effect for allocation channel: " << (uint32_t)allocationChannelId);
 
       /// check the load against the parameterized value
       if (averageNormalizedOfferedLoad < itThreshold->second)
         {
-          std::map<uint32_t,uint16_t>::iterator it = m_lowLoadBackOffProbability.find (allocationChannelId);
+          std::map<uint8_t,uint16_t>::iterator it;
+
+          it = m_lowLoadBackOffProbability.find (allocationChannelId);
 
           if (it == m_lowLoadBackOffProbability.end ())
             {
-              NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Low load backoff probability not set for allocation channel: " << allocationChannelId);
+              NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Low load backoff probability not set for allocation channel: " << (uint32_t)allocationChannelId);
             }
 
-          /// use low load back off value
-          CreateRandomAccessLoadControlMessage (it->second, beamId, allocationChannelId);
+          uint16_t probability = it->second;
 
-          NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << allocationChannelId << " - Switching to LOW LOAD back off parameterization");
+          it = m_lowLoadBackOffTime.find (allocationChannelId);
+
+          if (it == m_lowLoadBackOffTime.end ())
+            {
+              NS_FATAL_ERROR ("SatNcc::DoRandomAccessDynamicLoadControl - Low load backoff time not set for allocation channel: " << (uint32_t)allocationChannelId);
+            }
+
+          uint16_t time = it->second;
+
+          /// use low load back off value
+          CreateRandomAccessLoadControlMessage (probability, time, beamId, allocationChannelId);
+
+          NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Switching to LOW LOAD back off parameterization");
 
           /// flag RA load as low load
           m_isLowRandomAccessLoad.at (std::make_pair (beamId,allocationChannelId)) = true;
@@ -177,7 +203,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
 }
 
 void
-SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint32_t beamId, uint32_t allocationChannelId)
+SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint16_t backoffTime, uint32_t beamId, uint8_t allocationChannelId)
 {
   NS_LOG_FUNCTION (this);
 
@@ -196,8 +222,11 @@ SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint3
 
   /// attach the new load control parameters to the message
   raMsg->SetBackoffProbability (backoffProbability);
+  raMsg->SetBackoffTime (backoffTime);
 
-  NS_LOG_INFO ("SatNcc::CreateRandomAccessLoadControlMessage - Sending random access control message for AC: " << allocationChannelId << ", backoff probability: " << backoffProbability);
+  NS_LOG_INFO ("SatNcc::CreateRandomAccessLoadControlMessage - Sending random access control message for AC: " << (uint32_t)allocationChannelId <<
+               ", backoff probability: " << backoffProbability <<
+               ", backoff time: " << backoffTime);
 
   iterator->second->Send (raMsg);
 }
@@ -245,29 +274,47 @@ SatNcc::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t bea
 }
 
 void
-SatNcc::SetRandomAccessLowLoadBackoffProbability (uint32_t allocationChannelId, uint16_t lowLoadBackOffProbability)
+SatNcc::SetRandomAccessLowLoadBackoffProbability (uint8_t allocationChannelId, uint16_t lowLoadBackOffProbability)
 {
-  NS_LOG_FUNCTION (this << allocationChannelId << lowLoadBackOffProbability);
+  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << lowLoadBackOffProbability);
 
-  NS_LOG_INFO ("SatNcc::SetRandomAccessLowLoadBackoffProbability - AC: " << allocationChannelId << ", low load backoff probability: " << lowLoadBackOffProbability);
+  NS_LOG_INFO ("SatNcc::SetRandomAccessLowLoadBackoffProbability - AC: " << (uint32_t)allocationChannelId << ", low load backoff probability: " << lowLoadBackOffProbability);
   m_lowLoadBackOffProbability[allocationChannelId] = lowLoadBackOffProbability;
 }
 
 void
-SatNcc::SetRandomAccessHighLoadBackoffProbability (uint32_t allocationChannelId, uint16_t highLoadBackOffProbability)
+SatNcc::SetRandomAccessHighLoadBackoffProbability (uint8_t allocationChannelId, uint16_t highLoadBackOffProbability)
 {
-  NS_LOG_FUNCTION (this << allocationChannelId << highLoadBackOffProbability);
+  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << highLoadBackOffProbability);
 
-  NS_LOG_INFO ("SatNcc::SetRandomAccessHighLoadBackoffProbability - AC: " << allocationChannelId << ", high load backoff probability: " << highLoadBackOffProbability);
+  NS_LOG_INFO ("SatNcc::SetRandomAccessHighLoadBackoffProbability - AC: " << (uint32_t)allocationChannelId << ", high load backoff probability: " << highLoadBackOffProbability);
   m_highLoadBackOffProbability[allocationChannelId] = highLoadBackOffProbability;
 }
 
 void
-SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint32_t allocationChannelId, double threshold)
+SatNcc::SetRandomAccessLowLoadBackoffTime (uint8_t allocationChannelId, uint16_t lowLoadBackOffTime)
 {
-  NS_LOG_FUNCTION (this << allocationChannelId << threshold);
+  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << lowLoadBackOffTime);
 
-  NS_LOG_INFO ("SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold - AC: " << allocationChannelId << ", average normalized offered load threshold: " << threshold);
+  NS_LOG_INFO ("SatNcc::SetRandomAccessLowLoadBackoffTime - AC: " << (uint32_t)allocationChannelId << ", low load backoff time: " << lowLoadBackOffTime);
+  m_lowLoadBackOffTime[allocationChannelId] = lowLoadBackOffTime;
+}
+
+void
+SatNcc::SetRandomAccessHighLoadBackoffTime (uint8_t allocationChannelId, uint16_t highLoadBackOffTime)
+{
+  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << highLoadBackOffTime);
+
+  NS_LOG_INFO ("SatNcc::SetRandomAccessHighLoadBackoffTime - AC: " << (uint32_t)allocationChannelId << ", high load backoff time: " << highLoadBackOffTime);
+  m_highLoadBackOffTime[allocationChannelId] = highLoadBackOffTime;
+}
+
+void
+SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocationChannelId, double threshold)
+{
+  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << threshold);
+
+  NS_LOG_INFO ("SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold - AC: " << (uint32_t)allocationChannelId << ", average normalized offered load threshold: " << threshold);
   m_randomAccessAverageNormalizedOfferedLoadThreshold[allocationChannelId] = threshold;
 }
 

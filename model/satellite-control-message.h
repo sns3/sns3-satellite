@@ -595,28 +595,40 @@ public:
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_RA_CTRL_MSG; }
 
   /**
-   *
-   * \return
+   * Get backoff probability
+   * \return backoff probability
    */
   uint16_t GetBackoffProbability () const;
 
   /**
-   *
-   * \param backoffProbability
+   * Set backoff probability
+   * \param backoffProbability Backoff probability
    */
   void SetBackoffProbability (uint16_t backoffProbability);
 
   /**
-   *
-   * \return
+   * Get backoff time
+   * \return backoff time
    */
-  uint32_t GetAllocationChannelId () const;
+  uint16_t GetBackoffTime () const;
 
   /**
-   *
-   * \param allocationChannel
+   * Set backoff time
+   * \param backoffProbability Backoff time
    */
-  void SetAllocationChannelId (uint32_t allocationChannel);
+  void SetBackoffTime (uint16_t backoffTime);
+
+  /**
+   * Get allocation chanel ID
+   * \return Allocation channel ID
+   */
+  uint8_t GetAllocationChannelId () const;
+
+  /**
+   * Set allocation channel ID
+   * \param allocationChannel Allocation channel ID
+   */
+  void SetAllocationChannelId (uint8_t allocationChannel);
 
   /**
    * Get real size of the random access message, which can be used to e.g. simulate real size.
@@ -627,24 +639,24 @@ public:
 private:
 
   /**
-   * Type field of the random access control element
+   * Common header of the random access element
    */
-  static const uint32_t RA_CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES = 1;
+  static const uint32_t RA_CONTROL_MSG_HEADER_SIZE_IN_BYTES = 5;
 
   /**
-   * Common header of the random access control element
+   * Allocation channel ID
    */
-  static const uint32_t RA_CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES = 3;
+  uint8_t m_allocationChannelId;
 
   /**
-   *
-   */
-  uint32_t m_allocationChannelId;
-
-  /**
-   *
+   * Backoff probability
    */
   uint16_t m_backoffProbability;
+
+  /**
+   * Backoff time
+   */
+  uint16_t m_backoffTime;
 };
 
 

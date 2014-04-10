@@ -74,11 +74,12 @@ public:
   typedef Callback<void, uint32_t, Address, Address, double> CnoCallback;
 
   /**
-   * \param
-   * \param
-   * \param
+   * \param beam Id
+   * \param carrier Id
+   * \param allocation channel Id
+   * \param average normalized offered load
    */
-  typedef Callback<void,uint32_t,uint32_t,uint32_t,double> AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void,uint32_t,uint32_t,uint8_t,double> AverageNormalizedOfferedLoadCallback;
 
   /**
    * \brief Creation parameters for base PHY object
@@ -255,6 +256,7 @@ public:
   virtual void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
+   * Configure Rx carriers
    * \param carrierConf Carrier configuration class
    * \param superFrameConf Superframe configuration
    * \param isRandomAccessEnabled Is random access enabled
@@ -347,7 +349,7 @@ public:
    * \param allocationChannelId allocation channel ID
    * \param averageNormalizedOfferedLoad Value of average normalized offered load
    */
-  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint32_t allocationChannelId, double averageNormalizedOfferedLoad);
+  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad);
 
   /**
    * \brief Set the node info class
@@ -419,7 +421,7 @@ private:
   SatPhy::CnoCallback m_cnoCallback;
 
   /**
-   *
+   * Average normalized offered load callback
    */
   SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
 

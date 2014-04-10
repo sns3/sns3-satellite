@@ -233,6 +233,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
         {
           m_ncc->SetRandomAccessLowLoadBackoffProbability (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaBackOffProbability (i));
           m_ncc->SetRandomAccessHighLoadBackoffProbability (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaHighLoadBackOffProbability (i));
+          m_ncc->SetRandomAccessLowLoadBackoffTime (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaBackOffTimeInMilliSeconds (i));
+          m_ncc->SetRandomAccessHighLoadBackoffTime (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaHighLoadBackOffTimeInMilliSeconds (i));
           m_ncc->SetRandomAccessAverageNormalizedOfferedLoadThreshold (i,llsConf.Get<SatLowerLayerServiceConf> ()->GetRaAverageNormalizedOfferedLoadThreshold (i));
         }
     }

@@ -154,9 +154,12 @@ public:
   typedef Callback<void, uint32_t, Address, Address, double > CnoCallback;
 
   /**
-   *
+   * \param beam Id
+   * \param carrier Id
+   * \param allocation channel Id
+   * \param average normalized offered load
    */
-  typedef Callback<void,uint32_t,uint32_t,uint32_t,double > AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void, uint32_t, uint32_t, uint8_t, double > AverageNormalizedOfferedLoadCallback;
 
   /**
    * Set the upper layer receive callback
@@ -171,7 +174,7 @@ public:
   void SetCnoCallback (SatPhyRx::CnoCallback cb);
 
   /**
-   *
+   * Set average normalized offered load callback
    * \param cb
    */
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb);
