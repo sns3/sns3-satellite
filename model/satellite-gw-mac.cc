@@ -278,8 +278,8 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
           }
 
         packet->RemovePacketTag (macTag);
-        Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
-        m_controlRxCallback (packet, ack, destAddress);
+        Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
+        m_controlRxCallback (ack, destAddress);
         break;
       }
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:

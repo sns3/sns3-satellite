@@ -181,6 +181,8 @@ private:
   /*
    * Virtual channel is used to virtually connect netdevices to each other.
    * This allows the usage of global "automated" routing.
+   * TODO: Virtual channel is not anymore needed in satellite module! Thus
+   * it should be removed!
    */
   Ptr<VirtualChannel> m_virtualChannel;
 

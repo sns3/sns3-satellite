@@ -633,7 +633,8 @@ SatArqAckMessage::GetInstanceTypeId (void) const
 }
 
 SatArqAckMessage::SatArqAckMessage ()
-:m_sequenceNumber (0)
+:m_sequenceNumber (0),
+ m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -644,25 +645,40 @@ SatArqAckMessage::~SatArqAckMessage ()
 }
 
 void
-SatArqAckMessage::SetSequenceNumber (uint32_t sn)
+SatArqAckMessage::SetSequenceNumber (uint8_t sn)
 {
   NS_LOG_FUNCTION (this);
   m_sequenceNumber = sn;
 }
 
-uint32_t
+uint8_t
 SatArqAckMessage::GetSequenceNumber () const
 {
   return m_sequenceNumber;
 }
 
+void
+SatArqAckMessage::SetFlowId (uint8_t flowId)
+{
+  NS_LOG_FUNCTION (this);
+  m_flowId = flowId;
+}
+
+uint8_t
+SatArqAckMessage::GetFlowId () const
+{
+  return m_flowId;
+}
+
+
 uint32_t
 SatArqAckMessage::GetSizeInBytes () const
 {
   NS_LOG_FUNCTION (this);
-  return 2;
-}
 
+  uint32_t size = 2*sizeof (uint8_t);
+  return size;
+}
 
 // Control message container
 

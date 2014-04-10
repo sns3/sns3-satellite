@@ -55,14 +55,15 @@ private:
   Address   m_sourceAddress;
 };
 
-class SatRcIndexTag : public Tag
+class SatFlowIdTag : public Tag
 {
 public:
 
-  SatRcIndexTag ();
-  ~SatRcIndexTag ();
-  void SetRcIndex (uint8_t rcIndex);
-  uint8_t GetRcIndex () const;
+  SatFlowIdTag ();
+  ~SatFlowIdTag ();
+
+  void SetFlowId (uint8_t flowId);
+  uint8_t GetFlowId () const;
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -72,7 +73,7 @@ public:
   virtual void Print (std::ostream &os) const;
 
 private:
-  uint8_t m_rcIndex;
+  uint8_t m_flowId;
 };
 
 

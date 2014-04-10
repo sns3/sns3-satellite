@@ -72,7 +72,7 @@ private:
   void CleanUp ();
 
   std::map<uint32_t, bool> m_seqNoMap;
-  uint32_t m_currSeqNo;
+  int m_currSeqNo;
   uint32_t m_windowSize;
   uint32_t m_maxSn;
 

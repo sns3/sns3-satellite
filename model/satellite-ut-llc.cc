@@ -114,6 +114,7 @@ SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcI
   return packet;
 }
 
+
 void
 SatUtLlc::SetRequestManager (Ptr<SatRequestManager> rm)
 {

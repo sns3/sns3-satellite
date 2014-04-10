@@ -119,11 +119,10 @@ public:
 
   /**
    * Receive a control msg (ARQ ACK) from lower layer.
-   * \param packet Pointer to packet received.
    * \param ack ARQ ACK message
    * \param macAddr MAC address of the UT (either as transmitter or receiver)
    */
-  void ReceiveAck (Ptr<Packet> packet, Ptr<SatArqAckMessage> ack, Mac48Address macAddr);
+  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr);
 
   /**
    * Receive HL PDU from encapsulator/decapsulator entity

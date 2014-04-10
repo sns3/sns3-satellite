@@ -61,7 +61,7 @@ public:
    * Enqueue a Higher Layer packet to txBuffer.
    * \param p To be buffered packet
    */
-  virtual void TransmitPdu (Ptr<Packet> p);
+  virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this encapsulator.

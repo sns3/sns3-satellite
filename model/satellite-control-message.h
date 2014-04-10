@@ -469,14 +469,27 @@ public:
 
   /**
    * Set the sequence number to be ACK'ed
+   * \param sn Sequence number
    */
-  void SetSequenceNumber (uint32_t sn);
+  void SetSequenceNumber (uint8_t sn);
 
   /**
-   * Set the sequence number to be ACK'ed
+   * Get the sequence number to be ACK'ed
    * \return uint32_t Sequence number
    */
-  uint32_t GetSequenceNumber () const;
+  uint8_t GetSequenceNumber () const;
+
+  /**
+   * Set the flow id to be ACK'ed
+   * \param sn Sequence number
+   */
+  void SetFlowId (uint8_t sn);
+
+  /**
+   * Get the sequence number to be ACK'ed
+   * \return uint32_t Sequence number
+   */
+  uint8_t GetFlowId () const;
 
   /**
    * Get real size of the ACK message, which can be used to e.g. simulate real size.
@@ -486,8 +499,8 @@ public:
 
 private:
 
-  uint32_t m_sequenceNumber;
-
+  uint8_t m_sequenceNumber;
+  uint8_t m_flowId;
 };
 
 

@@ -565,7 +565,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 
         packet->RemovePacketTag (macTag);
         Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
-        m_controlRxCallback (packet, ack, destAddress);
+        m_controlRxCallback (ack, destAddress);
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:

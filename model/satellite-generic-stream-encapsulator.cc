@@ -99,7 +99,7 @@ SatGenericStreamEncapsulator::DoDispose ()
 }
 
 void
-SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p)
+SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address /*mac*/)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
@@ -290,14 +290,10 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   mTag.SetSourceAddress (m_sourceAddress);
   packet->AddPacketTag (mTag);
 
-  /**
-   * TODO: RC index itself is not valid in forward link. But, instead it could be named
-   * using a more generic name, such as flow id.
-   */
-  uint8_t flowId (1);
-  SatRcIndexTag rcTag;
-  rcTag.SetRcIndex (flowId);
-  packet->AddPacketTag (rcTag);
+  // Add flow id tag
+  SatFlowIdTag flowIdTag;
+  flowIdTag.SetFlowId (m_flowId);
+  packet->AddPacketTag (flowIdTag);
 
   // Update bytes left
   bytesLeft = GetTxBufferSizeInBytes ();

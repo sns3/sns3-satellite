@@ -94,7 +94,7 @@ SatReturnLinkEncapsulator::DoDispose ()
 }
 
 void
-SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p)
+SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address /*mac*/)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
@@ -147,6 +147,9 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       return packet;
     }
 
+  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE);
+
+  /*
   // RLE (PPDU) header
   SatPPduHeader ppduHeader;
 
@@ -293,29 +296,195 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 
       NS_LOG_LOGIC ("Packed a packet of size: " << packet->GetSize ());
     }
-
-  // Add MAC tag to identify the packet in lower layers
-  SatMacTag mTag;
-  mTag.SetDestAddress (m_destAddress);
-  mTag.SetSourceAddress (m_sourceAddress);
-  packet->AddPacketTag (mTag);
-
-  SatRcIndexTag rcTag;
-  rcTag.SetRcIndex (m_flowId);
-  packet->AddPacketTag (rcTag);
-
-  // Update bytes lefts
-  bytesLeft = GetTxBufferSizeInBytes ();
+  */
 
   if (packet)
     {
+      // Add MAC tag to identify the packet in lower layers
+      SatMacTag mTag;
+      mTag.SetDestAddress (m_destAddress);
+      mTag.SetSourceAddress (m_sourceAddress);
+      packet->AddPacketTag (mTag);
+
+      // Add flow id tag
+      SatFlowIdTag flowIdTag;
+      flowIdTag.SetFlowId (m_flowId);
+      packet->AddPacketTag (flowIdTag);
+
+      // Update bytes lefts
+      bytesLeft = GetTxBufferSizeInBytes ();
+
       if (packet->GetSize () > bytes)
         {
           NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
         }
       NS_LOG_LOGIC ("Created packet size: " << packet->GetSize ());
     }
+
   NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes());
+
+  return packet;
+}
+
+
+Ptr<Packet>
+SatReturnLinkEncapsulator::GetNewRlePdu (uint32_t txOpportunityBytes, uint32_t maxRlePduSize, uint32_t additionalHeaderSize)
+{
+  // Payload adapted PDU = NULL
+  Ptr<Packet> packet;
+
+  // RLE (PPDU) header
+  SatPPduHeader ppduHeader;
+
+  // Peek the first PDU from the buffer.
+  Ptr<const Packet> peekSegment = m_txQueue->Peek ();
+
+  SatEncapPduStatusTag tag;
+  bool found = peekSegment->PeekPacketTag (tag);
+  if (!found)
+    {
+      NS_FATAL_ERROR ("EncapPduStatus tag not found from packet!");
+    }
+
+  // Tx opportunity bytes is not enough
+  uint32_t headerSize = ppduHeader.GetHeaderSizeInBytes(tag.GetStatus()) + additionalHeaderSize;
+  if (txOpportunityBytes <= headerSize)
+    {
+      NS_LOG_LOGIC ("TX opportunity too small = " << txOpportunityBytes);
+      return packet;
+    }
+
+  NS_LOG_LOGIC ("Size of the first packet in buffer: " << peekSegment->GetSize ());
+  NS_LOG_LOGIC ("Encapsulation status of the first packet in buffer: " << tag.GetStatus());
+
+  // Build Data field
+  uint32_t maxSegmentSize = std::min(txOpportunityBytes, maxRlePduSize) - headerSize;
+
+  NS_LOG_LOGIC ("Maximum supported segment size: " << maxSegmentSize);
+
+  // Fragmentation if the HL PDU does not fit into the burst or
+  // the HL packet is too large.
+  if ( peekSegment->GetSize () > maxSegmentSize )
+    {
+      NS_LOG_LOGIC ("Buffered packet is larger than the maximum segment size!");
+
+      if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
+        {
+          // Calculate again that the packet fits into the Tx opportunity
+          headerSize = ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::START_PDU) + additionalHeaderSize;
+          if (txOpportunityBytes <= headerSize)
+            {
+              NS_LOG_LOGIC ("Start PDU does not fit into the TxOpportunity anymore!");
+              return packet;
+            }
+
+          maxSegmentSize = std::min(txOpportunityBytes, maxRlePduSize) - headerSize;
+          NS_LOG_LOGIC ("Recalculated maximum supported segment size: " << maxSegmentSize);
+
+          // In case we have to fragment a FULL PDU, we need to increase
+          // the fragment id.
+          IncreaseFragmentId ();
+        }
+      // END_PDU
+      else
+        {
+          // Calculate again that the packet fits into the Tx opportunity
+          headerSize = ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::CONTINUATION_PDU) + additionalHeaderSize;
+          if (txOpportunityBytes <= headerSize)
+            {
+              NS_LOG_LOGIC ("Continuation PDU does not fit into the TxOpportunity anymore!");
+              return packet;
+            }
+
+          maxSegmentSize = std::min(txOpportunityBytes, maxRlePduSize) - headerSize;
+          NS_LOG_LOGIC ("Recalculated maximum supported segment size: " << maxSegmentSize);
+        }
+
+      // Now we can take the packe away from the queue
+      Ptr<Packet> firstSegment = m_txQueue->Dequeue ();
+
+      // Create a new fragment
+      Ptr<Packet> newSegment = firstSegment->CreateFragment (0, maxSegmentSize);
+
+      // Status tag of the new and remaining segments
+      // Note: This is the only place where a PDU is segmented and
+      // therefore its status can change
+      SatEncapPduStatusTag oldTag, newTag;
+      firstSegment->RemovePacketTag (oldTag);
+      newSegment->RemovePacketTag (newTag);
+
+      // Create new PPDU header
+      ppduHeader.SetPPduLength (newSegment->GetSize());
+      ppduHeader.SetFragmentId (m_txFragmentId);
+
+      if (oldTag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
+        {
+          ppduHeader.SetStartIndicator ();
+          ppduHeader.SetTotalLength (firstSegment->GetSize());
+
+          newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
+          oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
+        }
+      else if (oldTag.GetStatus () == SatEncapPduStatusTag::END_PDU)
+        {
+          // oldTag still is left with the END_PPDU tag
+          newTag.SetStatus (SatEncapPduStatusTag::CONTINUATION_PDU);
+        }
+
+      // Give back the remaining segment to the transmission buffer
+      firstSegment->RemoveAtStart (maxSegmentSize);
+
+      // If bytes left after fragmentation
+      if (firstSegment->GetSize () > 0)
+        {
+          NS_LOG_LOGIC ("Returning the remaining " << firstSegment->GetSize () << " bytes to buffer");
+          firstSegment->AddPacketTag (oldTag);
+          m_txQueue->PushFront (firstSegment);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("The full segment was taken even though we are in the fragmentation part of the code!");
+        }
+
+      // Put status tag once it has been adjusted
+      newSegment->AddPacketTag (newTag);
+
+      // Add PPDU header
+      newSegment->AddHeader (ppduHeader);
+
+      // PPDU
+      packet = newSegment;
+
+      NS_LOG_LOGIC ("Created a fragment of size: " << packet->GetSize ());
+    }
+  // Packing functionality, for either a FULL_PPDU or END_PPDU
+  else
+    {
+      NS_LOG_LOGIC ("Packing functionality TxO: " << txOpportunityBytes << " packet size: " << peekSegment->GetSize ());
+
+      if (tag.GetStatus() == SatEncapPduStatusTag::FULL_PDU)
+        {
+          ppduHeader.SetStartIndicator ();
+        }
+      else
+        {
+          ppduHeader.SetFragmentId (m_txFragmentId);
+        }
+
+      // Take the packe away from the queue
+      Ptr<Packet> firstSegment = m_txQueue->Dequeue ();
+
+      ppduHeader.SetEndIndicator ();
+      ppduHeader.SetPPduLength (firstSegment->GetSize());
+
+      // Add PPDU header
+      firstSegment->AddHeader (ppduHeader);
+
+      // PPDU
+      packet = firstSegment;
+
+      NS_LOG_LOGIC ("Packed a packet of size: " << packet->GetSize ());
+    }
 
   return packet;
 }
@@ -338,6 +507,15 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
 
+  ProcessPdu (p);
+}
+
+
+void
+SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this << p->GetSize () << p->GetUid ());
+
   // Remove PPDU header
   SatPPduHeader ppduHeader;
   p->RemoveHeader (ppduHeader);
@@ -345,21 +523,18 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   // FULL_PPDU
   if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == true)
     {
-      NS_LOG_LOGIC ("FULL PPDU received for UT: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
+      NS_LOG_LOGIC ("FULL PPDU received");
 
-      // Reset all previous possible packet fragments
       Reset ();
 
-      // Forward packet upwards
       m_rxCallback (p);
     }
 
   // START_PPDU
   else if (ppduHeader.GetStartIndicator() == true && ppduHeader.GetEndIndicator() == false)
     {
-      NS_LOG_LOGIC ("START PPDU received: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
+      NS_LOG_LOGIC ("START PPDU received");
 
-      // Reset all previous possible packet fragments
       Reset ();
 
       m_currRxFragmentId = ppduHeader.GetFragmentId ();
@@ -371,7 +546,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   // CONTINUATION_PPDU
   else if (ppduHeader.GetStartIndicator() == false && ppduHeader.GetEndIndicator() == false)
     {
-      NS_LOG_LOGIC ("CONTINUATION PPDU received: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
+      NS_LOG_LOGIC ("CONTINUATION PPDU received");
 
       // Previous fragment found
       if (m_currRxPacketFragment && ppduHeader.GetFragmentId () == m_currRxFragmentId)
@@ -389,7 +564,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   // END_PPDU
   else if (ppduHeader.GetStartIndicator() == false && ppduHeader.GetEndIndicator() == true)
     {
-      NS_LOG_LOGIC ("END PPDU received: " << m_sourceAddress << " frag: " << (uint32_t)(ppduHeader.GetFragmentId ()) << " UID: " << p->GetUid ());
+      NS_LOG_LOGIC ("END PPDU received");
 
       // Previous fragment found
       if (m_currRxPacketFragment && ppduHeader.GetFragmentId () == m_currRxFragmentId)
@@ -416,6 +591,19 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
       // Reset anyway
       Reset ();
     }
+}
+
+
+void
+SatReturnLinkEncapsulator::ReceiveAck (Ptr<SatArqAckMessage> ack)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (false);
+
+  /**
+   * The base encapsulator should not be used at receiving control packets
+   * at all! This functionality is implemented in the inherited classes.
+   */
 }
 
 void

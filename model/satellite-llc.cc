@@ -109,7 +109,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 
   if (it != m_encaps.end ())
     {
-      it->second->TransmitPdu (packet);
+      it->second->TransmitPdu (packet, Mac48Address::ConvertFrom (dest));
     }
   else
     {
@@ -136,6 +136,7 @@ Ptr<Packet>
 SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft )
 {
   NS_LOG_FUNCTION (this << bytes << macAddr << bytesLeft);
+  NS_ASSERT (true);
 
   Ptr<Packet> packet;
   return packet;
@@ -161,11 +162,11 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
 
   // Receive packet with a decapsulator instance which is handling the
   // packets for this specific id
-  SatRcIndexTag rcTag;
-  bool mSuccess = packet->PeekPacketTag (rcTag);
+  SatFlowIdTag flowIdTag;
+  bool mSuccess = packet->PeekPacketTag (flowIdTag);
   if (mSuccess)
     {
-      uint32_t flowId = rcTag.GetRcIndex ();
+      uint32_t flowId = flowIdTag.GetFlowId ();
       EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
       EncapContainer_t::iterator it = m_decaps.find (key);
 
@@ -189,47 +190,28 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
 
 
 void
-SatLlc::ReceiveAck (Ptr<Packet> packet, Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
+SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
 {
-  NS_LOG_FUNCTION (this << macAddr << packet);
+  NS_LOG_FUNCTION (this << macAddr);
 
-  SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+  /**
+   * Note, that the received ACK is forwarded to the proper encapsulator
+   * instead of a decapsulator. The macAddress is the address of the UT
+   * in case of both RTN and FWD links.
+   */
+  uint32_t flowId = ack->GetFlowId ();
+  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
+  EncapContainer_t::iterator it = m_encaps.find (key);
 
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
-                 SatEnums::PACKET_RECV,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_LLC,
-                 ld,
-                 SatUtils::GetPacketInfo (packet));
-
-  // Receive packet with a decapsulator instance which is handling the
-  // packets for this specific id
-  SatRcIndexTag rcTag;
-  bool mSuccess = packet->PeekPacketTag (rcTag);
-  if (mSuccess)
+  // Note: control messages should not be seen at the LLC layer, since
+  // they are received already at the MAC layer.
+  if (it != m_encaps.end ())
     {
-      uint32_t flowId = rcTag.GetRcIndex ();
-      EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
-      EncapContainer_t::iterator it = m_decaps.find (key);
-
-      // Note: control messages should not be seen at the LLC layer, since
-      // they are received already at the MAC layer.
-      if (it != m_decaps.end ())
-        {
-          it->second->ReceiveAck (packet);
-        }
-      else
-        {
-          NS_FATAL_ERROR ("Key: (" << macAddr << ", " << flowId << ") not found in the encapsulator container!");
-        }
+      it->second->ReceiveAck (ack);
     }
   else
     {
-      NS_FATAL_ERROR ("MAC tag not found in the packet!");
+      NS_FATAL_ERROR ("Key: (" << macAddr << ", " << flowId << ") not found in the encapsulator container!");
     }
 }
 

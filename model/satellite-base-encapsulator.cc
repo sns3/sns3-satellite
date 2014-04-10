@@ -85,13 +85,24 @@ SatBaseEncapsulator::DoDispose ()
 }
 
 void
-SatBaseEncapsulator::TransmitPdu (Ptr<Packet> p)
+SatBaseEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address mac)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
   // Store packet arrival time
   SatTimeTag timeTag (Simulator::Now ());
   p->AddPacketTag (timeTag);
+
+  // Add flow id tag
+  SatFlowIdTag flowIdTag;
+  flowIdTag.SetFlowId (m_flowId);
+  p->AddPacketTag (flowIdTag);
+
+  // Add MAC tag to identify the packet in lower layers
+  SatMacTag mTag;
+  mTag.SetDestAddress (mac);
+  mTag.SetSourceAddress (m_sourceAddress);
+  p->AddPacketTag (mTag);
 
   NS_LOG_LOGIC ("Tx Buffer: New packet added of size: " << p->GetSize ());
 
@@ -132,16 +143,6 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
           NS_FATAL_ERROR ("Packet not dequeued from txQueue even though the peek PDU should have been fit!");
         }
 
-      // Add MAC tag to identify the packet in lower layers
-      SatMacTag mTag;
-      mTag.SetDestAddress (m_destAddress);
-      mTag.SetSourceAddress (m_sourceAddress);
-      packet->AddPacketTag (mTag);
-
-      SatRcIndexTag rcTag;
-      rcTag.SetRcIndex (m_flowId);
-      packet->AddPacketTag (rcTag);
-
       // Update bytes left
       bytesLeft = m_txQueue->GetNBytes ();
     }
@@ -154,7 +155,7 @@ void
 SatBaseEncapsulator::ReceivePdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
 
   /**
    * The base encapsulator should not be used at receiving packets
@@ -163,10 +164,10 @@ SatBaseEncapsulator::ReceivePdu (Ptr<Packet> p)
 }
 
 void
-SatBaseEncapsulator::ReceiveAck (Ptr<Packet> p)
+SatBaseEncapsulator::ReceiveAck (Ptr<SatArqAckMessage> ack)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
 
   /**
    * The base encapsulator should not be used at receiving control packets
@@ -208,6 +209,13 @@ SatBaseEncapsulator::SetReceiveCallback (ReceiveCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_rxCallback = cb;
+}
+
+void
+SatBaseEncapsulator::SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_ctrlCallback = cb;
 }
 
 void

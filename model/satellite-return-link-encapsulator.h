@@ -26,6 +26,7 @@
 #include "ns3/event-id.h"
 #include "ns3/mac48-address.h"
 #include "satellite-base-encapsulator.h"
+#include "satellite-control-message.h"
 
 
 namespace ns3 {
@@ -61,7 +62,7 @@ public:
    * Enqueue a Higher Layer packet to txBuffer.
    * \param p To be buffered packet
    */
-  virtual void TransmitPdu (Ptr<Packet> p);
+  virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this encapsulator.
@@ -84,6 +85,12 @@ public:
   virtual void ReceivePdu (Ptr<Packet> p);
   
   /**
+   * Receive a control msg (ARQ ACK)
+   * \param p Control msg pointer received from lower layer
+   */
+  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
+
+  /**
    * Get minimum Tx opportunity in bytes, which takes the
    * assumed header sizes into account.
    * \return uint32_t minimum tx opportunity
@@ -91,6 +98,20 @@ public:
   virtual uint32_t GetMinTxOpportunityInBytes () const;
 
 protected:
+
+  /**
+   * Get new packet performs the RLE fragmentation and encapsulation
+   * for a one single packet. Returns NULL packet if a suitable packet
+   * is not created.
+   * \return Ptr<Packet> RLE packet
+   */
+  Ptr<Packet> GetNewRlePdu (uint32_t txOpportunityBytes, uint32_t maxRlePduSize, uint32_t additionalHeaderSize = 0);
+
+  /**
+   * Process the reception of individual RLE PDUs
+   * \param p Packet to be received
+   */
+  virtual void ProcessPdu (Ptr<Packet> p);
 
   /**
    * Method increases the fragment id by one. If the maximum fragment id is

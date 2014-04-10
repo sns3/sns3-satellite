@@ -29,7 +29,7 @@ namespace ns3 {
 
 SatArqSequenceNumber::SatArqSequenceNumber ()
 :m_seqNoMap (),
- m_currSeqNo (0),
+ m_currSeqNo (-1),
  m_windowSize (0),
  m_maxSn (std::numeric_limits<uint8_t>::max())
 {
@@ -39,7 +39,7 @@ SatArqSequenceNumber::SatArqSequenceNumber ()
 
 SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)
 :m_seqNoMap (),
- m_currSeqNo (0),
+ m_currSeqNo (-1),
  m_windowSize (windowSize),
  m_maxSn (std::numeric_limits<uint8_t>::max())
 {

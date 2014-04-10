@@ -236,7 +236,7 @@ uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
       }
     default:
       {
-        NS_FATAL_ERROR ("Unsupported SatEncapPduStatusTag!");
+        NS_FATAL_ERROR ("Unsupported SatEncapPduStatusTag: " << type);
         break;
       }
   }

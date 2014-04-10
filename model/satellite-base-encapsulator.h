@@ -28,6 +28,7 @@
 #include "ns3/nstime.h"
 #include "ns3/mac48-address.h"
 #include "satellite-queue.h"
+#include "satellite-control-message.h"
 
 #include "ns3/object.h"
 
@@ -72,6 +73,14 @@ public:
   typedef Callback<void, Ptr<Packet> > ReceiveCallback;
 
   /**
+   * Control msg sending callback
+   * \param msg        the message send
+   * \param address    Packet destination address
+   * \return bool
+   */
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
+
+  /**
    * Set the used queue from outside
    * \param queue Transmission queue
    */
@@ -91,10 +100,15 @@ public:
   void SetReceiveCallback (ReceiveCallback cb);
 
   /**
+   * \param cb callback to send control messages.
+   */
+  void SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb);
+
+  /**
    * Enqueue a packet to txBuffer.
    * \param p To be buffered packet
    */
-  virtual void TransmitPdu (Ptr<Packet> p);
+  virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this base encapsulator. Note, that
@@ -115,7 +129,7 @@ public:
    * Receive a control packet (ARQ ACK)
    * \param p packet pointer received from lower layer
    */
-  virtual void ReceiveAck (Ptr<Packet> p);
+  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 
   /**
    * Get the buffered packets for this encapsulator
@@ -160,6 +174,11 @@ protected:
    * Receive callback
    */
   ReceiveCallback m_rxCallback;
+
+  /**
+   * Callback to send control messages.
+  */
+  SendCtrlCallback m_ctrlCallback;
 
   /**
    * Used to inform of a PDU delivery

@@ -111,7 +111,7 @@ public:
    * \param MAC address related to the received packet connection
    * \param packet the packet received
    */
-  typedef Callback<void, Ptr<Packet>, Ptr<SatArqAckMessage>, Mac48Address> ControlReceiveCallback;
+  typedef Callback<void, Ptr<SatArqAckMessage>, Mac48Address> ControlReceiveCallback;
 
   /**
    * Method to set control packet receive callback.

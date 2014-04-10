@@ -132,30 +132,30 @@ SatMacTag::Print (std::ostream &os) const
 }
 
 
-NS_OBJECT_ENSURE_REGISTERED (SatRcIndexTag);
+NS_OBJECT_ENSURE_REGISTERED (SatFlowIdTag);
 
 
-SatRcIndexTag::SatRcIndexTag ()
+SatFlowIdTag::SatFlowIdTag ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatRcIndexTag::~SatRcIndexTag ()
+SatFlowIdTag::~SatFlowIdTag ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 TypeId
-SatRcIndexTag::GetTypeId (void)
+SatFlowIdTag::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatRcIndexTag")
+  static TypeId tid = TypeId ("ns3::SatFlowIdTag")
     .SetParent<Tag> ()
-    .AddConstructor<SatRcIndexTag> ()
+    .AddConstructor<SatFlowIdTag> ()
   ;
   return tid;
 }
 TypeId
-SatRcIndexTag::GetInstanceTypeId (void) const
+SatFlowIdTag::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -163,47 +163,47 @@ SatRcIndexTag::GetInstanceTypeId (void) const
 }
 
 void
-SatRcIndexTag::SetRcIndex (uint8_t rcIndex)
+SatFlowIdTag::SetFlowId (uint8_t flowId)
 {
-  NS_LOG_FUNCTION (this << rcIndex);
-  m_rcIndex = rcIndex;
+  NS_LOG_FUNCTION (this << flowId);
+  m_flowId = flowId;
 }
 
 uint8_t
-SatRcIndexTag::GetRcIndex (void) const
+SatFlowIdTag::GetFlowId (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_rcIndex;
+  return m_flowId;
 }
 
 uint32_t
-SatRcIndexTag::GetSerializedSize (void) const
+SatFlowIdTag::GetSerializedSize (void) const
 {
   NS_LOG_FUNCTION (this);
 
   return sizeof (uint8_t);
 }
 void
-SatRcIndexTag::Serialize (TagBuffer i) const
+SatFlowIdTag::Serialize (TagBuffer i) const
 {
   NS_LOG_FUNCTION (this << &i);
 
-  i.WriteU8 (m_rcIndex);
+  i.WriteU8 (m_flowId);
 }
 
 void
-SatRcIndexTag::Deserialize (TagBuffer i)
+SatFlowIdTag::Deserialize (TagBuffer i)
 {
   NS_LOG_FUNCTION (this << &i);
 
-  m_rcIndex = i.ReadU8 ();
+  m_flowId = i.ReadU8 ();
 }
 
 void
-SatRcIndexTag::Print (std::ostream &os) const
+SatFlowIdTag::Print (std::ostream &os) const
 {
   NS_LOG_FUNCTION (this << &os);
-  os << "RCindex=" << m_rcIndex;
+  os << "FlowId=" << m_flowId;
 }
 
 

@@ -48,6 +48,16 @@ public:
   virtual ~SatGwLlc ();
 
   /**
+    *  Called from higher layer (SatNetDevice) to enque packet to LLC
+    *
+    * \param packet packet sent from above down to SatMac
+    * \param dest Destination MAC address of the packet
+    * \param flowId Flow identifier
+    * \return whether the Send operation succeeded
+    */
+  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
+
+  /**
     *  Called from lower layer (MAC) to inform a tx
     *  opportunity of certain amount of bytes
     *
