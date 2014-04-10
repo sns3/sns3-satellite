@@ -103,8 +103,8 @@ public:
   typedef Callback<Time> TimingAdvanceCallback;
 
   /**
+   * \brief Set the timing advance callback
    * \param cb callback to invoke whenever a timing advance is needed by SatUtMac object.
-   *
    */
   void SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb);
 
@@ -117,8 +117,8 @@ public:
   typedef Callback<void, uint8_t, uint32_t> AssignedDaResourcesCallback;
 
   /**
+   * \brief Set the assigned DA resources callback
    * \param cb callback to invoke whenever TBTP is received.
-   *
    */
   void SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback cb);
 
@@ -166,7 +166,7 @@ public:
   uint32_t GetRaChannel () const;
 
   /**
-   *
+   * \brief Set the random access module
    * \param randomAccess
    */
   void SetRandomAccess (Ptr<SatRandomAccess> randomAccess);
@@ -412,7 +412,7 @@ private:
   /**
    * CRDSA packet ID (per frame)
    */
-  uint8_t crdsaUniquePacketId;
+  uint8_t m_crdsaUniquePacketId;
 };
 
 } // namespace ns3

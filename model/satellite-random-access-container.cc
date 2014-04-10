@@ -85,10 +85,6 @@ SatRandomAccess::~SatRandomAccess ()
       m_areBuffersEmptyCb.Nullify ();
     }
 
-  if (!m_numOfCandidatePacketsCb.IsNull ())
-    {
-      m_numOfCandidatePacketsCb.Nullify ();
-    }
   m_crdsaAllocationChannels.clear ();
   m_slottedAlohaAllocationChannels.clear ();
 }
@@ -111,10 +107,6 @@ SatRandomAccess::DoDispose ()
       m_areBuffersEmptyCb.Nullify ();
     }
 
-  if (!m_numOfCandidatePacketsCb.IsNull ())
-    {
-      m_numOfCandidatePacketsCb.Nullify ();
-    }
   m_crdsaAllocationChannels.clear ();
   m_slottedAlohaAllocationChannels.clear ();
 }
@@ -311,13 +303,17 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
   /// TODO: comment out this code at later stage
   if (txOpportunities.txOpportunityType == SatEnums::RA_CRDSA_TX_OPPORTUNITY)
     {
-      for (uint32_t i = 0; i < txOpportunities.crdsaTxOpportunities.size (); i++)
+      std::map<uint32_t, std::set<uint32_t> >::iterator iter;
+      uint32_t uniquePacketId = 1;
+
+      for (iter = txOpportunities.crdsaTxOpportunities.begin (); iter != txOpportunities.crdsaTxOpportunities.end (); iter++)
         {
           std::set<uint32_t>::iterator iterSet;
-          for (iterSet = txOpportunities.crdsaTxOpportunities[i].begin(); iterSet != txOpportunities.crdsaTxOpportunities[i].end(); iterSet++)
+          for (iterSet = iter->second.begin(); iterSet != iter->second.end(); iterSet++)
             {
-              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity for unique packet: " << i << " at slot: " << (*iterSet));
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity for unique packet: " << uniquePacketId << " at slot: " << (*iterSet));
             }
+          uniquePacketId++;
         }
     }
   else if (txOpportunities.txOpportunityType == SatEnums::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
@@ -512,7 +508,7 @@ SatRandomAccess::CrdsaSetPayloadBytes (uint32_t allocationChannel,
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetMaximumBackoffProbability - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetPayloadBytes - Wrong random access model in use");
     }
 }
 
@@ -718,7 +714,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
               slots = CrdsaRandomizeTxOpportunities (allocationChannel,slots);
 
               /// save the packet specific Tx opportunities into a vector
-              txOpportunities.crdsaTxOpportunities.push_back (slots.second);
+              txOpportunities.crdsaTxOpportunities.insert (std::make_pair(*slots.second.begin (), slots.second));
 
               /// increase the number of randomized unique packets
               actualUniquePackets++;
@@ -877,15 +873,6 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std:
   return slots;
 }
 
-/**
-TODO The known DAMA capacity condition is different for control and data.
-For control the known DAMA is limited to the SF about to start, i.e.,
-the look ahead is one SF. For data the known DAMA allocation can be
-one or more SF in the future, i.e., the look ahead contains all known
-future DAMA allocations. With CRDSA the control packets have priority
-over data packets.
-*/
-
 void
 SatRandomAccess::SetIsDamaAvailableCallback (SatRandomAccess::IsDamaAvailableCallback callback)
 {
@@ -900,14 +887,6 @@ SatRandomAccess::SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCal
   NS_LOG_FUNCTION (this << &callback);
 
   m_areBuffersEmptyCb = callback;
-}
-
-void
-SatRandomAccess::SetNumOfCandidatePacketsCallback (SatRandomAccess::NumOfCandidatePacketsCallback callback)
-{
-  NS_LOG_FUNCTION (this << &callback);
-
-  m_numOfCandidatePacketsCb = callback;
 }
 
 } // namespace ns3

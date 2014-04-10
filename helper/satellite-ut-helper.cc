@@ -464,7 +464,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
       /// attach callbacks
       randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));
-      randomAccess->SetNumOfCandidatePacketsCallback (MakeCallback(&SatUtLlc::GetNumSmallerPackets, llc));
 
       /// define which allocation channels should be used with each of the random access models
       /// TODO get rid of the hard coded allocation channel 0

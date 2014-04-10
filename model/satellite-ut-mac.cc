@@ -93,7 +93,7 @@ SatUtMac::SatUtMac ()
    m_randomAccess (NULL),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0),
-   crdsaUniquePacketId (0)
+   m_crdsaUniquePacketId (1)
 {
   NS_LOG_FUNCTION (this);
 
@@ -107,7 +107,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
    m_timingAdvanceCb (0),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0),
-   crdsaUniquePacketId (0)
+   m_crdsaUniquePacketId (1)
 {
 	NS_LOG_FUNCTION (this);
 
@@ -810,13 +810,15 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 
   NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel << ", SF: " << superFrameId << ", num of opportunities: " << txOpportunities.crdsaTxOpportunities.size ());
 
+  std::map<uint32_t,std::set<uint32_t> >::iterator iter;
+
   /// loop through the unique packets
-  for (uint32_t i = 0; i < txOpportunities.crdsaTxOpportunities.size (); i++)
+  for (iter = txOpportunities.crdsaTxOpportunities.begin (); iter != txOpportunities.crdsaTxOpportunities.end (); iter++)
     {
       std::set<uint32_t>::iterator iterSet;
 
       /// loop through the replicas
-      for (iterSet = txOpportunities.crdsaTxOpportunities[i].begin(); iterSet != txOpportunities.crdsaTxOpportunities[i].end(); iterSet++)
+      for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
         {
           /// check and update used slots
           if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, (*iterSet)))
@@ -828,8 +830,8 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
         }
 
       /// create replicas and schedule the packets
-      NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - Creating replicas for packet " << i);
-      CreateCrdsaPacketInstances (allocationChannel, txOpportunities.crdsaTxOpportunities[i]);
+      NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - Creating replicas for packet " << (uint32_t)m_crdsaUniquePacketId);
+      CreateCrdsaPacketInstances (allocationChannel, iter->second);
     }
 }
 
@@ -950,7 +952,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           txInfo.packetType = SatEnums::CRDSA_PACKET;
           txInfo.modCod = wf->GetModCod ();
           txInfo.waveformId = wf->GetWaveformId ();
-          txInfo.crdsaUniquePacketId = crdsaUniquePacketId;
+          txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId;
 
           /// schedule transmission
           Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, replicas[i].second, duration, carrierId, txInfo);
@@ -959,7 +961,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
       replicas.clear ();
       tags.clear ();
 
-      crdsaUniquePacketId++;
+      m_crdsaUniquePacketId++;
     }
 }
 
@@ -1065,7 +1067,7 @@ SatUtMac::DoFrameStart ()
   if (m_randomAccess != NULL)
     {
       /// reset packet ID counter for this frame
-      crdsaUniquePacketId = 0;
+      m_crdsaUniquePacketId = 1;
 
       /// execute CRDSA trigger
       DoRandomAccess (SatEnums::RA_CRDSA_TRIGGER);
@@ -1146,6 +1148,5 @@ SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
 
   return true;
 }
-
 
 } // namespace ns3

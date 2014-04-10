@@ -57,12 +57,6 @@ public:
   typedef Callback<bool> AreBuffersEmptyCallback;
 
   /**
-   * \brief Typedef of callback for packets matching the size conditions for RA
-   * \return How many packets small enough for RA is in the buffers
-   */
-  typedef Callback<uint32_t,uint32_t> NumOfCandidatePacketsCallback;
-
-  /**
    * \struct RandomAccessTxOpportunities_s
    * \brief Random access Tx opportunities. This struct contains the algorithm results from this module
    */
@@ -70,7 +64,7 @@ public:
   {
     SatEnums::RandomAccessTxOpportunityType_t txOpportunityType;
     uint32_t slottedAlohaTxOpportunity;
-    std::vector <std::set<uint32_t> > crdsaTxOpportunities;
+    std::map <uint32_t,std::set<uint32_t> > crdsaTxOpportunities;
     uint32_t allocationChannel;
   } RandomAccessTxOpportunities_s;
 
@@ -184,19 +178,13 @@ public:
   void SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCallback callback);
 
   /**
-   * \brief Function for setting the NumOfCandidatePackets callback
-   * \param callback callback
-   */
-  void SetNumOfCandidatePacketsCallback (SatRandomAccess::NumOfCandidatePacketsCallback callback);
-
-  /**
-   *
+   * \brief Function for adding a Slotted ALOHA allocation channel
    * \param allocationChannel
    */
   void AddSlottedAlohaAllocationChannel (uint32_t allocationChannel);
 
   /**
-   *
+   * \brief Function for adding a CRDSA allocation channel
    * \param allocationChannel
    */
   void AddCrdsaAllocationChannel (uint32_t allocationChannel);
@@ -323,16 +311,16 @@ private:
   bool CrdsaIsAllocationChannelFree (uint32_t allocationChannel);
 
   /**
-   *
-   * \param allocationChannel
-   * \return
+   * \brief Function for checking if the allocation channel is CRDSA allocation channel
+   * \param allocationChannel allocation channel
+   * \return Is CRDSA allocation channel
    */
   bool IsCrdsaAllocationChannel (uint32_t allocationChannel);
 
   /**
-   *
-   * \param allocationChannel
-   * \return
+   * \brief Function for checking if the allocation channel is Slotted ALOHA allocation channel
+   * \param allocationChannel allocation channel
+   * \return Is Slotted ALOHA allocation channel
    */
   bool IsSlottedAlohaAllocationChannel (uint32_t allocationChannel);
 
@@ -371,11 +359,6 @@ private:
     * \brief Callback for buffer status
    */
   AreBuffersEmptyCallback m_areBuffersEmptyCb;
-
-  /**
-    * \brief Callback for packets matching the size conditions for RA
-   */
-  NumOfCandidatePacketsCallback m_numOfCandidatePacketsCb;
 
   /**
    * \brief Defines the allocation channels which are enabled for Slotted ALOHA
