@@ -76,20 +76,20 @@ public:
   } crdsaPacketRxParams_s;
 
   /**
-   * \brief
-   * \param carrierId
-   * \param carrierConf
-   * \param isRandomAccessEnabledForThisCarrier
+   * \brief Constructor
+   * \param carrierId Carrier ID
+   * \param carrierConf Carrier configuration object
+   * \param isRandomAccessEnabledForThisCarrier Is random access enabled for this carrier
    */
   SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabledForThisCarrier);
 
   /**
-   * \brief
+   * \brief Destructor
    */
   virtual ~SatPhyRxCarrier ();
 
   /**
-   * \brief PHY states
+   * \brief Enum for PHY states
    */
   enum State
   {
@@ -97,49 +97,49 @@ public:
   };
 
   /**
-   * \brief
+   * \brief Function for gettign the NS-3 type ID
    * \return
    */
   static TypeId GetTypeId (void);
 
   /**
-   * \brief
+   * \brief Dispose function
    */
   virtual void DoDispose ();
 
   /**
-  * \brief Set the SatPhy module
+  * \brief Function for setting the SatPhy module
   * \param phy PHY module
   */
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
-   * \brief Set the beam id for all the transmissions from this SatPhyTx
+   * \brief Function for setting the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
   void SetBeamId (uint32_t beamId);
 
   /**
-   * \brief Set the node info class
+   * \brief Function for setting the node info class
    * \param nodeInfo Node information related to this SatPhyRxCarrier
    */
   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * \brief Start packet reception from the SatChannel
+   * \brief Function for starting packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
    */
   void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * \brief
-   * \param cb
+   * \brief Function for setting the receive callback
+   * \param cb callback
    */
   void SetReceiveCb(SatPhyRx::ReceiveCallback cb);
 
   /**
-   * \brief
-   * \param cb
+   * \brief Function for settign the C/NO callback
+   * \param cb callback
    */
   void SetCnoCb(SatPhyRx::CnoCallback cb);
 
@@ -150,15 +150,15 @@ public:
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
 
   /**
-   *
-   * \param obj1
-   * \param obj2
-   * \return
+   * \brief Function for comparing the CRDSA unique packet IDs
+   * \param obj1 Comparison object 1
+   * \param obj2 Comparison object 2
+   * \return Comparison result
    */
   static bool CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s obj1, SatPhyRxCarrier::crdsaPacketRxParams_s obj2);
 
   /**
-   *
+   * \brief Function for initializing the frame end scheduling
    */
   void BeginFrameEndScheduling ();
 
@@ -176,8 +176,8 @@ private:
   void DoCompositeSinrOutputTrace (double cSinr);
 
   /**
-   * \brief
-   * \param newState
+   * \brief Function for changing the receiver state
+   * \param newState New state
    */
   void ChangeState (State newState);
 
@@ -190,36 +190,37 @@ private:
   bool CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters> rxParams);
 
   /**
-   * \brief
-   * \param key
+   * \brief Function for ending the packet reception from the SatChannel
+   * \param key Key for Rx params map
    */
   void EndRxData (uint32_t key);
 
   /**
-   *
-   * \param key
+   * \brief Function for ending the packet reception from the SatChannel in the satellite
+   * \param key Key for Rx params map
    */
   void EndRxDataTransparent (uint32_t key);
 
   /**
-   *
-   * \param key
+   * \brief Function for ending the packet reception from the SatChannel in the ground node
+   * \param key Key for Rx params map
    */
   void EndRxDataNormal (uint32_t key);
 
   /**
-   *
+   * \brief Function for processing the frame interval operations
    */
   void DoFrameEnd ();
 
   /**
-   *
-   * \param rxPowerW
-   * \param ifPowerW
-   * \param rxNoisePowerW
-   * \param rxAciIfPowerW
-   * \param rxExtNoisePowerW
-   * \return
+   * \brief Function for calculating the SINR
+   * \param rxPowerW Rx power in Watts
+   * \param ifPowerW Interference power in Watts
+   * \param rxNoisePowerW Rx noise power in Watts
+   * \param rxAciIfPowerW Rx ACI power in Watts
+   * \param rxExtNoisePowerW Rx external noise power in Watts
+   * \param sinrCalculate SINR calculator callback
+   * \return Calculated SINR
    */
   double CalculateSinr (double rxPowerW,
                         double ifPowerW,
@@ -229,136 +230,136 @@ private:
                         SatPhyRxCarrierConf::SinrCalculatorCallback sinrCalculate);
 
   /**
-   * \brief
-   * \param sinr1
-   * \param sinr2
-   * \return
+   * \brief Function for calculating the composite SINR
+   * \param sinr1 SINR 1
+   * \param sinr2 SINR 2
+   * \return Composite SINR
    */
   double CalculateCompositeSinr(double sinr1, double sinr2);
 
   /**
-   *
-   *\param packetType
+   * \brief Function for increasing the number of ongoing transmissions
+   * \param packetType Packet type of the ongoing transmission
    */
   void IncreaseNumOfRxState (SatEnums::PacketType_t packetType);
 
   /**
-   *
-   * \param packetType
+   * \brief Function for decreasing the number of ongoing transmissions
+   * \param packetType Packet type of the ongoing transmission
    */
   void DecreaseNumOfRxState (SatEnums::PacketType_t packetType);
 
   /**
-   *
+   * \brief Function for checking the Rx state sanity
    */
   void CheckRxStateSanity ();
 
   /**
-   * \brief
-   * \param
+   * \brief Funciton for storing the received CRDSA packets
+   * \param Rx parameters of the packet
    */
   void AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s rxParams);
 
   /**
-   * \brief
-   * \return
+   * \brief Function for processing the CRDSA frame
+   * \return Processed packets
    */
   std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> ProcessFrame ();
 
   /**
-   *
-   * \param packet
-   * \param numOfPacketsForThisSlot
-   * \return
+   * \brief Function for processing the received CRDSA packets
+   * \param packet Received packet
+   * \param numOfPacketsForThisSlot Number of packets in this slot
+   * \return Processed packet
    */
   SatPhyRxCarrier::crdsaPacketRxParams_s ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
                                                                      uint32_t numOfPacketsForThisSlot);
 
   /**
-   *
-   * \param
+   * \brief Function for finding and removing the replicas of the CRDSA packet
+   * \param CRDSA packet
    */
   void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s);
 
   /**
-   *
-   * \param iter
-   * \param processedPacket
+   * \brief Function for eliminating the interference to other packets in the slot from the correctly received packet
+   * \param iter Packets in the slot
+   * \param processedPacket Correctly received processed packet
    */
   void EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter, SatPhyRxCarrier::crdsaPacketRxParams_s processedPacket);
 
   /**
-   *
-   * \param packet
-   * \param iter
-   * \return
+   * \brief Function for identifying whether the packet is a replica of another packet
+   * \param packet Packet
+   * \param iter A packet in certain slot
+   * \return Is the packet a replica
    */
   bool IsReplica (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
 
   /**
-   *
-   * \param packet
-   * \param iter
-   * \return
+   * \brief Function for checking do the packets have identical slots
+   * \param packet Packet
+   * \param iter A packet in certain slot
+   * \return Have the packets identical slots
    */
   bool HaveSameSlotIds (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
 
   /**
-   *
-   * \param cSinr
-   * \param rxParams
-   * \param interferenceEvent
-   * \return
+   * \brief Function for processing the Slotted ALOHA collisions
+   * \param cSinr Composite SINR
+   * \param rxParams Rx parameters of the packet
+   * \param interferenceEvent Interference event details
+   * \return PHY error
    */
   bool ProcessSlottedAlohaCollisions (double cSinr,
                                       Ptr<SatSignalParameters> rxParams,
                                       Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
 
   /**
-   *
+   * \brief Function for measuring the random access load
    */
   void MeasureRandomAccessLoad ();
 
   /**
-   *
-   * \return
+   * \brief Function for calculating the normalized offered random access load
+   * \return Normalized offered load
    */
   double CalculateNormalizedOfferedRandomAccessLoad ();
 
   /**
-   *
-   * \param measuredRandomAccessLoad
+   * \brief Function for saving the measured random access load
+   * \param measuredRandomAccessLoad Measured random access load
    */
   void SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad);
 
   /**
-   *
-   * \return
+   * \brief Function for calculating the average normalized offered random access load
+   * \return Average normalized offered load
    */
   double CalculateAverageNormalizedOfferedRandomAccessLoad ();
 
   /**
-   * \brief
+   * \brief CRDSA packet container
    */
   std::map<uint32_t, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> > m_crdsaPacketContainer;
 
   /**
-   * \brief
+   * \brief Rx state
    */
   State m_state;
 
   /**
-   * \brief
+   * \brief Are we receiving dedicated access at this moment
    */
   bool m_receivingDedicatedAccess;
 
   /**
-   * \brief
+   * \brief Beam ID
    */
   uint32_t m_beamId;
 
   /**
-   * \brief
+   * \brief Carrier ID
    */
   uint32_t m_carrierId;
 
@@ -412,7 +413,7 @@ private:
   SatPhy::CnoCallback m_cnoCallback;
 
   /**
-   *
+   * \brief Average normalized offered load callback
    */
   SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
 
@@ -567,32 +568,32 @@ private:
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
 
   /**
-   *
+   * \brief Random access collision model
    */
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel;
 
   /**
-   *
+   * \brief Random access average normalized offered load measurement window size
    */
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
 
   /**
-   *
+   * \brief Container for calculated normalized offered loads
    */
   std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad;
 
   /**
-   *
+   * \brief Is random access enabled for this carrier
    */
   bool m_isRandomAccessEnabledForThisCarrier;
 
   /**
-   *
+   * \brief Number of random access bits in the frame
    */
   uint32_t m_randomAccessBitsInFrame;
 
   /**
-   *
+   * \brief Has the frame end scheduling been initialized
    */
   bool m_frameEndSchedulingInitialized;
 };
