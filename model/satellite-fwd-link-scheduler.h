@@ -144,7 +144,7 @@ public:
    * Callback to get scheduling contexts from upper layer
    * \param vector of scheduling contexts
    */
-  typedef Callback<std::vector< Ptr<SatSchedulingObject> > > SchedContextCallback;
+  typedef Callback<void, std::vector< Ptr<SatSchedulingObject> > &> SchedContextCallback;
 
   /**
    * Callback to notify upper layer about Tx opportunity.
@@ -228,9 +228,10 @@ private:
   /**
    * Gets scheduling object in sorted order according to configured sorting criteria.
    *
-   * \return Scheduling object available for scheduling
+   * \param output reference to a vector which will be filled with pointers to
+   *               the scheduling objects available for scheduling.
    */
-  std::vector< Ptr<SatSchedulingObject> > GetSchedulingObjects ();
+  void GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output);
 
   /**
    * Sorts given scheduling objects according to configured sorting criteria.

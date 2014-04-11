@@ -287,7 +287,8 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
   NS_LOG_FUNCTION (this);
 
   // Get scheduling objects from LLC
-  std::vector< Ptr<SatSchedulingObject> > so = GetSchedulingObjects ();
+  std::vector< Ptr<SatSchedulingObject> > so;
+  GetSchedulingObjects (so);
 
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
         ( it != so.end() ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
@@ -328,22 +329,18 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
     }
 }
 
-std::vector< Ptr<SatSchedulingObject> >
-SatFwdLinkScheduler::GetSchedulingObjects ()
+void
+SatFwdLinkScheduler::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output)
 {
   NS_LOG_FUNCTION (this);
-
-  std::vector< Ptr<SatSchedulingObject> > so;
 
   if ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime )
     {
       // Get scheduling objects from LLC
-      so = m_schedContextCallback ();
+      m_schedContextCallback (output);
 
-      SortSchedulingObjects (so);
+      SortSchedulingObjects (output);
     }
-
-  return so;
 }
 
 void

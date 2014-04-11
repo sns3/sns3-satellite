@@ -167,9 +167,10 @@ public:
   /**
    * Create and fill the scheduling objects based on LLC layer information.
    * Scheduling objects may be used at the MAC layer to assist in scheduling.
-   * \return vector of scheduling object pointers
+   * \param output reference to an output vector that will be filled with
+   *               pointer to scheduling objects
    */
-  virtual std::vector< Ptr<SatSchedulingObject> > GetSchedulingContexts () const;
+  void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
 
   /**
    * Are buffers empty

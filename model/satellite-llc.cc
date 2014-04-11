@@ -268,12 +268,10 @@ SatLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   m_nodeInfo = nodeInfo;
 }
 
-std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
+void SatLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
 {
   // Head of link queuing delay
   Time holDelay;
-
-  std::vector< Ptr<SatSchedulingObject> > schedObjects;
 
   // Then the user data
   for (EncapContainer_t::const_iterator cit = m_encaps.begin ();
@@ -288,10 +286,9 @@ std::vector< Ptr<SatSchedulingObject> > SatLlc::GetSchedulingContexts () const
           uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
           Ptr<SatSchedulingObject> so =
               Create<SatSchedulingObject> (cit->first.first, buf, minTxOpportunityInBytes, holDelay, cit->first.second);
-          schedObjects.push_back (so);
+          output.push_back (so);
         }
     }
-  return schedObjects;
 }
 
 void

@@ -103,7 +103,7 @@ public:
    * Callback to get scheduling contexts from upper layer
    * \param vector of scheduling contexts
    */
-  typedef Callback<std::vector< Ptr<SatSchedulingObject> > > SchedContextCallback;
+  typedef Callback<void, std::vector< Ptr<SatSchedulingObject> > &> SchedContextCallback;
 
   /**
    * Callback to notify upper layer about Tx opportunity.
