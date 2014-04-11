@@ -175,7 +175,7 @@ SatBbFrameContainer::GetNextFrame ()
     {
       std::vector< std::deque<Ptr<SatBbFrame> >* > nonEmptyQueues;
 
-      for (FrameContainer_t::iterator it = m_container.begin (); it != m_container.end (); it++ )
+      for (FrameContainer_t::iterator it = m_container.begin (); it != m_container.end (); ++it )
         {
           if ( (*it).second.empty () == false )
             {
