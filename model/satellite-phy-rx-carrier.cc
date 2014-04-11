@@ -372,7 +372,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
           if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
             {
-              if (m_receivingDedicatedAccess && rxParams->m_txInfo.packetType == SatEnums::DEDICATED_ACCESS_PACKET)
+              if (m_receivingDedicatedAccess && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
                 {
                   NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission!");
                 }
@@ -514,7 +514,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
   iter->second.rxParams->m_ifPower_W = m_satInterference->Calculate (iter->second.interferenceEvent);
 
-  if (iter->second.rxParams->m_txInfo.packetType != SatEnums::CRDSA_PACKET)
+  if (iter->second.rxParams->m_txInfo.packetType != SatEnums::PACKET_TYPE_CRDSA)
     {
       /// calculates sinr for 2nd link
       double sinr = CalculateSinr ( iter->second.rxParams->m_rxPower_W,
@@ -558,7 +558,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
           DoCompositeSinrOutputTrace (cSinr);
         }
 
-      if (iter->second.rxParams->m_txInfo.packetType == SatEnums::SLOTTED_ALOHA_PACKET)
+      if (iter->second.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA)
         {
           NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
 
@@ -1049,7 +1049,7 @@ SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
   m_numOfOngoingRx++;
   ChangeState (RX);
 
-  if (packetType == SatEnums::DEDICATED_ACCESS_PACKET)
+  if (packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
     {
       m_receivingDedicatedAccess = true;
     }
@@ -1074,7 +1074,7 @@ SatPhyRxCarrier::DecreaseNumOfRxState (SatEnums::PacketType_t packetType)
       ChangeState (IDLE);
     }
 
-  if (packetType == SatEnums::DEDICATED_ACCESS_PACKET)
+  if (packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
     {
       m_receivingDedicatedAccess = false;
     }

@@ -112,14 +112,6 @@ public:
                                    uint16_t backoffProbability);
 
   /**
-   * \brief Function for setting the maximum backoff probability
-   * \param allocationChannel allocation channel
-   * \param maximumBackoffProbability maximum backoff probability
-   */
-  void CrdsaSetMaximumBackoffProbability (uint32_t allocationChannel,
-                                          double maximumBackoffProbability);
-
-  /**
    * \brief Function for setting the maximum CRDSA payload bytes
    * \param allocationChannel allocation channel
    * \param payloadBytes payload bytes
@@ -197,14 +189,6 @@ protected:
   void DoDispose ();
 
 private:
-
-  /**
-   * \brief Function for checking whether the CRDSA backoff probability is higher than the parameterized value.
-   * This affects algorithm selection in the case both CRDSA and Slotted ALOHA are enabled
-   * \param allocationChannel allocation channel
-   * \return Is CRDSA backoff probability too high
-   */
-  bool IsCrdsaBackoffProbabilityTooHigh (uint32_t allocationChannel);
 
   /**
    * \brief Function for printing out various module variables to console

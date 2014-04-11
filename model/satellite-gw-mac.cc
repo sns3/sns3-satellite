@@ -209,7 +209,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
                      SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
                      
       SatSignalParameters::txInfo_s txInfo;
-      txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
+      txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
       txInfo.modCod = bbFrame->GetModcod ();
       txInfo.waveformId = 0;
 

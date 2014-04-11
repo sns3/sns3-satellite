@@ -518,21 +518,21 @@ public:
    */
   typedef enum
   {
-    RA_SLOTTED_ALOHA_TRIGGER = 0,
-    RA_CRDSA_TRIGGER = 1
+    RA_TRIGGER_TYPE_SLOTTED_ALOHA = 0,
+    RA_TRIGGER_TYPE_CRDSA = 1
   } RandomAccessTriggerType_t;
 
   static inline std::string GetRandomAccessTriggerTypeName (RandomAccessTriggerType_t triggerType)
   {
     switch (triggerType)
     {
-      case RA_SLOTTED_ALOHA_TRIGGER:
+      case RA_TRIGGER_TYPE_SLOTTED_ALOHA:
         {
-          return "SLOTTED_ALOHA_TRIGGER";
+          return "RA_TRIGGER_TYPE_SLOTTED_ALOHA";
         }
-      case RA_CRDSA_TRIGGER:
+      case RA_TRIGGER_TYPE_CRDSA:
         {
-          return "RA_CRDSA_TRIGGER";
+          return "RA_TRIGGER_TYPE_CRDSA";
         }
       default:
         {
@@ -550,31 +550,31 @@ public:
    */
   typedef enum
   {
-    RA_OFF = 0,
-    RA_SLOTTED_ALOHA = 1,
-    RA_CRDSA = 2,
-    RA_ANY_AVAILABLE = 3
+    RA_MODEL_OFF = 0,
+    RA_MODEL_SLOTTED_ALOHA = 1,
+    RA_MODEL_CRDSA = 2,
+    RA_MODEL_RCS2_SPECIFICATION = 3
   } RandomAccessModel_t;
 
   static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)
   {
     switch (model)
     {
-      case RA_OFF:
+      case RA_MODEL_OFF:
         {
-          return "RA_OFF";
+          return "RA_MODEL_OFF";
         }
-      case RA_SLOTTED_ALOHA:
+      case RA_MODEL_SLOTTED_ALOHA:
         {
-          return "RA_SLOTTED_ALOHA";
+          return "RA_MODEL_SLOTTED_ALOHA";
         }
-      case RA_CRDSA:
+      case RA_MODEL_CRDSA:
         {
-          return "RA_CRDSA";
+          return "RA_MODEL_CRDSA";
         }
-      case RA_ANY_AVAILABLE:
+      case RA_MODEL_RCS2_SPECIFICATION:
         {
-          return "RA_ANY_AVAILABLE";
+          return "RA_MODEL_RCS2_SPECIFICATION";
         }
       default:
         {
@@ -593,26 +593,26 @@ public:
    */
   typedef enum
   {
-    RA_DO_NOTHING = 0,
-    RA_SLOTTED_ALOHA_TX_OPPORTUNITY = 1,
-    RA_CRDSA_TX_OPPORTUNITY = 2,
+    RA_TX_OPPORTUNITY_DO_NOTHING = 0,
+    RA_TX_OPPORTUNITY_SLOTTED_ALOHA = 1,
+    RA_TX_OPPORTUNITY_CRDSA = 2,
   } RandomAccessTxOpportunityType_t;
 
   static inline std::string GetRandomAccessOpportunityTypeName (RandomAccessTxOpportunityType_t opportunityType)
   {
     switch (opportunityType)
     {
-      case RA_DO_NOTHING:
+      case RA_TX_OPPORTUNITY_DO_NOTHING:
         {
-          return "RA_DO_NOTHING";
+          return "RA_TX_OPPORTUNITY_DO_NOTHING";
         }
-      case RA_SLOTTED_ALOHA_TX_OPPORTUNITY:
+      case RA_TX_OPPORTUNITY_SLOTTED_ALOHA:
         {
-          return "RA_SLOTTED_ALOHA_TX_OPPORTUNITY";
+          return "RA_TX_OPPORTUNITY_SLOTTED_ALOHA";
         }
-      case RA_CRDSA_TX_OPPORTUNITY:
+      case RA_TX_OPPORTUNITY_CRDSA:
         {
-          return "RA_CRDSA_TX_OPPORTUNITY";
+          return "RA_TX_OPPORTUNITY_CRDSA";
         }
       default:
         {
@@ -630,26 +630,26 @@ public:
    */
   typedef enum
   {
-    DEDICATED_ACCESS_PACKET = 0,
-    SLOTTED_ALOHA_PACKET = 1,
-    CRDSA_PACKET = 2,
+    PACKET_TYPE_DEDICATED_ACCESS = 0,
+    PACKET_TYPE_SLOTTED_ALOHA = 1,
+    PACKET_TYPE_CRDSA = 2,
   } PacketType_t;
 
   static inline std::string GetPacketTypeName (PacketType_t packetType)
   {
     switch (packetType)
     {
-      case DEDICATED_ACCESS_PACKET:
+      case PACKET_TYPE_DEDICATED_ACCESS:
         {
-          return "DEDICATED_ACCESS_PACKET";
+          return "PACKET_TYPE_DEDICATED_ACCESS";
         }
-      case SLOTTED_ALOHA_PACKET:
+      case PACKET_TYPE_SLOTTED_ALOHA:
         {
-          return "SLOTTED_ALOHA_PACKET";
+          return "PACKET_TYPE_SLOTTED_ALOHA";
         }
-      case CRDSA_PACKET:
+      case PACKET_TYPE_CRDSA:
         {
-          return "CRDSA_PACKET";
+          return "PACKET_TYPE_CRDSA";
         }
       default:
         {

@@ -222,7 +222,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersFeeder.m_cec = cec;
   parametersFeeder.m_raCollisionModel = m_raSettings.m_raCollisionModel;
 
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {
       parametersUser.m_isRandomAccessEnabled = true;
       parametersFeeder.m_isRandomAccessEnabled = true;

@@ -89,18 +89,6 @@ public:
   void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability) { m_crdsaBackoffProbability = ((crdsaBackoffProbability - 1) * (1 / (std::pow(2,16) - 2))); }
 
   /**
-   * \brief Function for getting the CRDSA maximum backoff probability
-   * \return CRDSA maximum backoff probability
-   */
-  double GetCrdsaMaximumBackoffProbability () { return m_crdsaMaximumBackoffProbability; }
-
-  /**
-   * \brief Function for setting the CRDSA maximum backoff probability
-   * \param CRDSA maximum backoff probability
-   */
-  void SetCrdsaMaximumBackoffProbability (double crdsaMaximumBackoffProbability) { m_crdsaMaximumBackoffProbability = crdsaMaximumBackoffProbability; }
-
-  /**
    * \brief Function for getting the CRDSA minimum randomization value
    * \return CRDSA minimum randomization value
    */
@@ -249,11 +237,6 @@ private:
    * \brief CRDSA backoff probability
    */
   double m_crdsaBackoffProbability;
-
-  /**
-   * \brief CRDSA maximum backoff probability
-   */
-  double m_crdsaMaximumBackoffProbability;
 
   /**
    * \brief CRDSA maximum number of unique payloads per block

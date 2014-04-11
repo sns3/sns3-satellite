@@ -182,7 +182,6 @@ private:
   uint16_t m_backOffProbability;
   uint16_t m_highLoadBackOffProbability;
   uint8_t m_numberOfInstances;
-  double m_maximumBackOffProbability;
   double m_averageNormalizedOfferedLoadThreshold;
 
   /**
@@ -296,20 +295,6 @@ private:
    * \param numberOfInstances Number of instances
    */
   inline void SetNumberOfInstances (uint8_t numberOfInstances) {m_numberOfInstances = numberOfInstances;}
-
-  /**
-   * Get maximum back off probability.
-   *
-   * \return Maximum back off probability
-   */
-  inline double GetMaximumBackOffProbability () const {return m_maximumBackOffProbability;}
-
-  /**
-   * Set maximum back off probability.
-   *
-   * \param maximumBackOffProbability Maximum back off probability
-   */
-  inline void SetMaximumBackOffProbability (double maximumBackOffProbability) {m_maximumBackOffProbability = maximumBackOffProbability;}
 
   /**
    * Get average normalized offered load threshold.
@@ -521,14 +506,6 @@ public:
   uint8_t GetRaNumberOfInstances (uint8_t index) const;
 
   /**
-   * Get maximum back off probability.
-   *
-   * \param index Index of the service
-   * \return Maximum back off probability
-   */
-  double GetRaMaximumBackOffProbability (uint8_t index) const;
-
-  /**
    * Get average normalized offeredLoad Threshold.
    *
    * \param index Index of the service
@@ -738,14 +715,6 @@ private:
   void SetRaNumberOfInstances (uint8_t index, uint8_t numberOfInstances);
 
   /**
-   * Set maximum back off probability.
-   *
-   * \param index Index of the service
-   * \param maximumBackOffProbability Maximum back off probability
-   */
-  void SetRaMaximumBackOffProbability (uint8_t index, double maximumBackOffProbability);
-
-  /**
    * Set average normalized offeredLoad Threshold.
    *
    * \param index Index of the service
@@ -828,8 +797,6 @@ private:
  *  - GetRaServ0VHighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffProbability
  *  - SetRaServ0NumberOfInstances, see @SatLowerLayerServiceRaEntry::SetNumberOfInstances
  *  - GetRaServ0VNumberOfInstances, see @SatLowerLayerServiceRaEntry::GetNumberOfInstances
- *  - SetRaServ0MaximumBackOffProbability, see @SatLowerLayerServiceRaEntry::SetMaximumBackOffProbability
- *  - GetRaServ0VMaximumBackOffProbability, see @SatLowerLayerServiceRaEntry::GetMaximumBackOffProbability
  *  - SetRaServ0AverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::SetAverageNormalizedOfferedLoadThreshold
  *  - GetRaServ0VAverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::GetAverageNormalizedOfferedLoadThreshold
  *
@@ -868,10 +835,6 @@ private:
     { return SetRaNumberOfInstances (index, value); } \
   inline uint8_t GetRaServ ## index ## NumberOfInstances () const  \
     { return GetRaNumberOfInstances (index); } \
-  inline void SetRaServ ## index ## MaximumBackOffProbability (double value)  \
-    { return SetRaMaximumBackOffProbability (index, value); } \
-  inline double GetRaServ ## index ## MaximumBackOffProbability () const  \
-    { return GetRaMaximumBackOffProbability (index); } \
   inline void SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold (double value)  \
     { return SetRaAverageNormalizedOfferedLoadThreshold (index, value); } \
   inline double GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold () const  \

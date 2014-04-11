@@ -264,7 +264,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
 
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {
       parameters.m_isRandomAccessEnabled = true;
     }
@@ -455,7 +455,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   rm->Initialize (m_llsConf);
 
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {
       Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf,m_superframeSeq);
 

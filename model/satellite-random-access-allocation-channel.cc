@@ -41,7 +41,6 @@ SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel () :
   m_crdsaIdleBlocksLeft (0),
   m_crdsaBackoffTimeInMilliSeconds (),
   m_crdsaBackoffProbability (),
-  m_crdsaMaximumBackoffProbability (),
   m_crdsaMaxUniquePayloadPerBlock (),
   m_crdsaMaxConsecutiveBlocksAccessed (),
   m_crdsaNumOfConsecutiveBlocksUsed (0),
@@ -89,11 +88,6 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
   if (m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0)
     {
       NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0");
-    }
-
-  if (m_crdsaMaximumBackoffProbability < 0.0 || m_crdsaMaximumBackoffProbability > 1.0)
-    {
-      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaMaximumBackoffProbability < 0.0 || m_crdsaMaximumBackoffProbability > 1.0");
     }
 
   if (m_crdsaPayloadBytes < 1)

@@ -12,8 +12,7 @@ using namespace ns3;
 * \ingroup satellite
 *
 * \brief  Example of Random Access usage in satellite network. This
-*         experimental example uses all available RA models at the same time. It
-*         is meant to demonstrate the co-operative use of different RA models.
+*         example uses RA models based on DVB-RCS2 specification.
 *
 *         The script is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
@@ -23,10 +22,10 @@ using namespace ns3;
 *         and KpiHelper are enabled by default. End user may change the
 *         number of UTs and end users from the command line.
 *
-*         execute command -> ./waf --run "sat-random-access-all-models-enabled-example --PrintHelp"
+*         execute command -> ./waf --run "sat-random-access-example --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-random-access-all-models-enabled-example");
+NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
 
 int
 main (int argc, char *argv[])
@@ -40,7 +39,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds(0.01);
 
   // Enable info logs
-  LogComponentEnable ("sat-random-access-all-models-enabled-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-random-access-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
   LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
@@ -60,7 +59,7 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
   // Enable Random Access with all available modules
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_ANY_AVAILABLE));
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
 
   // Set Random Access interference model
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -76,7 +75,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (10000));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (30000));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumBackOffProbability", DoubleValue (0.3));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
 
   // Disable CRA

@@ -68,12 +68,12 @@ SatBeamHelper::GetTypeId (void)
                                        SatEnums::FADING_MARKOV, "FadingMarkov"))
       .AddAttribute ("RandomAccessModel",
                      "Random Access Model",
-                      EnumValue (SatEnums::RA_OFF),
+                      EnumValue (SatEnums::RA_MODEL_OFF),
                       MakeEnumAccessor (&SatBeamHelper::m_randomAccessModel),
-                      MakeEnumChecker (SatEnums::RA_OFF, "RA not in use.",
-                                       SatEnums::RA_SLOTTED_ALOHA, "Slotted ALOHA",
-                                       SatEnums::RA_CRDSA, "CRDSA",
-                                       SatEnums::RA_ANY_AVAILABLE, "Any available"))
+                      MakeEnumChecker (SatEnums::RA_MODEL_OFF, "RA not in use.",
+                                       SatEnums::RA_MODEL_SLOTTED_ALOHA, "Slotted ALOHA",
+                                       SatEnums::RA_MODEL_CRDSA, "CRDSA",
+                                       SatEnums::RA_MODEL_RCS2_SPECIFICATION, "RA based on RCS2 specification"))
       .AddAttribute ("RaInterferenceModel",
                      "Interference model for random access",
                       EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -131,7 +131,7 @@ SatBeamHelper::SatBeamHelper () :
     m_fadingModel (),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
     m_constantPropagationDelay (Seconds (0.13)),
-    m_randomAccessModel (SatEnums::RA_OFF),
+    m_randomAccessModel (SatEnums::RA_MODEL_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED)
 {
@@ -151,7 +151,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     m_fadingModel (SatEnums::FADING_MARKOV),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
     m_constantPropagationDelay (Seconds (0.13)),
-    m_randomAccessModel (SatEnums::RA_OFF),
+    m_randomAccessModel (SatEnums::RA_MODEL_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
 {
@@ -222,7 +222,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   m_ncc = CreateObject<SatNcc> ();
 
-  if (m_randomAccessModel != SatEnums::RA_OFF)
+  if (m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {
       PointerValue llsConf;
       m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);

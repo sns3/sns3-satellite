@@ -58,7 +58,6 @@ SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
   m_backOffProbability (0),
   m_highLoadBackOffProbability (0),
   m_numberOfInstances (0),
-  m_maximumBackOffProbability (0.0),
   m_averageNormalizedOfferedLoadThreshold (0.0)
 {
    NS_LOG_FUNCTION (this);
@@ -189,12 +188,11 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a6    'Back off probability' attribute value
  * \param a7    'High load back off probability' attribute value
  * \param a8    'Number of instances' attribute value
- * \param a9    'Maximum backoff probability' attribute value
  * \param a10    'Average normalized offered load threshold' attribute value
  *
  * \return TypeId
  */
-#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) \
+#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) \
    AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                   "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a1), \
@@ -243,15 +241,9 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                   MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## NumberOfInstances, \
                                         &SatLowerLayerServiceConf::GetRaServ ## index ## NumberOfInstances), \
                   MakeUintegerChecker<uint8_t> ()) \
-  .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumBackOffProbability", \
-                  "Maximum back off probability for RA " + GetIndexAsRaServiceName (index), \
-                  DoubleValue (a9), \
-                  MakeDoubleAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumBackOffProbability, \
-                                      &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumBackOffProbability), \
-                  MakeDoubleChecker<double> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_AverageNormalizedOfferedLoadThreshold", \
                   "Average normalized offered load threshold for RA " + GetIndexAsRaServiceName (index), \
-                  DoubleValue (a10), \
+                  DoubleValue (a9), \
                   MakeDoubleAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold, \
                                       &SatLowerLayerServiceConf::GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold), \
                   MakeDoubleChecker<double> ())
@@ -325,7 +317,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, false, false, false, 100, 9216, 50, 384)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, false, false, false, 100, 9216, 50, 384)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 100, 10000, 30000, 3, 0.3, 0.5)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 100, 10000, 30000, 3, 0.5)
   ;
 
   return tid;
@@ -718,28 +710,6 @@ SatLowerLayerServiceConf::SetRaNumberOfInstances (uint8_t index, uint8_t numberO
     }
 
   m_raServiceEntries[index].SetNumberOfInstances (numberOfInstances);
-}
-
-double
-SatLowerLayerServiceConf::GetRaMaximumBackOffProbability (uint8_t index) const
-{
-  if (index >= m_maxRaServiceEntries)
-    {
-      NS_FATAL_ERROR ("Service index out of range!!!");
-    }
-
-  return m_raServiceEntries[index].GetMaximumBackOffProbability ();
-}
-
-void
-SatLowerLayerServiceConf::SetRaMaximumBackOffProbability (uint8_t index, double maximumBackOffProbability)
-{
-  if (index >= m_maxRaServiceEntries)
-    {
-      NS_FATAL_ERROR ("Service index out of range!!!");
-    }
-
-  m_raServiceEntries[index].SetMaximumBackOffProbability (maximumBackOffProbability);
 }
 
 double

@@ -35,7 +35,7 @@ SatRandomAccess::GetTypeId (void)
 
 SatRandomAccess::SatRandomAccess () :
   m_uniformRandomVariable (),
-  m_randomAccessModel (SatEnums::RA_OFF),
+  m_randomAccessModel (SatEnums::RA_MODEL_OFF),
   m_randomAccessConf (),
   m_numOfAllocationChannels (),
 
@@ -193,7 +193,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
   /// return variable initialization
   RandomAccessTxOpportunities_s txOpportunities;
 
-  txOpportunities.txOpportunityType = SatEnums::RA_DO_NOTHING;
+  txOpportunities.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING;
   txOpportunities.allocationChannel = allocationChannel;
 
   NS_LOG_INFO ("------------------------------------");
@@ -201,7 +201,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
   NS_LOG_INFO ("------------------------------------");
 
   /// Do CRDSA
-  if (m_randomAccessModel == SatEnums::RA_CRDSA && triggerType == SatEnums::RA_CRDSA_TRIGGER)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA && triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only CRDSA enabled && CRDSA trigger, checking allocation channel");
 
@@ -217,7 +217,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
         }
     }
   /// Do Slotted ALOHA
-  else if (m_randomAccessModel == SatEnums::RA_SLOTTED_ALOHA && triggerType == SatEnums::RA_SLOTTED_ALOHA_TRIGGER)
+  else if (m_randomAccessModel == SatEnums::RA_MODEL_SLOTTED_ALOHA && triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only SA enabled, checking allocation channel");
 
@@ -232,76 +232,73 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
           NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for Slotted ALOHA");
         }
     }
-
-  /// This is an experimental option to allow testing of multiple RA models at the same time
-
-  /// Frame start is a known trigger for CRDSA
-  /// If SA is triggered by a buffer arrival at frame start, both SA and CRDSA will be evaluated.
-  /// TODO: Although the possibility is remote, this approach is not optimal and should be improved in the future
-
-  /// If all RA models are enabled, CRDSA is always prioritized over SA, i.e., SA transmission is not done and only CRDSA is used
-  /// This behaviour has the following exceptions:
-  /// 1) SA shall be used if CRDSA back off is in effect, i.e., CRDSA has idle
-
-  else if (m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  /// If all RA based on RCS2 specification is enabled, CRDSA is used if the RA parameter number of instances is set >= 2. Otherwise SA is used.
+  else if (m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
-      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - All RA models enabled");
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - RA based on RCS2 specification enabled");
 
-      if (triggerType == SatEnums::RA_SLOTTED_ALOHA_TRIGGER)
+      if (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaNumOfInstances () < 2)
         {
-          if (IsSlottedAlohaAllocationChannel (allocationChannel))
+          if (triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA)
             {
-              if (IsCrdsaAllocationChannel (allocationChannel) && CrdsaHasBackoffTimePassed (allocationChannel))
-                {
-                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA triggered, but CRDSA available. Abstaining and waiting for CRDSA opportunity");
-                }
-              else
+              if (IsSlottedAlohaAllocationChannel (allocationChannel))
                 {
                   NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid Slotted ALOHA allocation channel, evaluating Slotted ALOHA");
                   txOpportunities = DoSlottedAloha ();
                 }
+              else
+                {
+                  NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for Slotted ALOHA");
+                }
             }
           else
             {
-              NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for Slotted ALOHA");
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Number of instances is < 2, only Slotted ALOHA is in use");
             }
         }
-      else if (triggerType == SatEnums::RA_CRDSA_TRIGGER)
+      else
         {
-          if (IsCrdsaAllocationChannel (allocationChannel))
+          if (triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA)
             {
-              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff & backoff probability");
-
-              if (CrdsaHasBackoffTimePassed (allocationChannel))
+              if (IsCrdsaAllocationChannel (allocationChannel))
                 {
-                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is free, evaluating CRDSA");
-                  txOpportunities = DoCrdsa (allocationChannel);
+                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff & backoff probability");
+
+                  if (CrdsaHasBackoffTimePassed (allocationChannel))
+                    {
+                      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is free, evaluating CRDSA");
+                      txOpportunities = DoCrdsa (allocationChannel);
+                    }
+                  else
+                    {
+                      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is not free, aborting");
+                      CrdsaReduceIdleBlocksForAllAllocationChannels ();
+                      CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+                    }
                 }
               else
                 {
-                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is not free, aborting");
-                  CrdsaReduceIdleBlocksForAllAllocationChannels ();
-                  CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+                  NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for CRDSA");
                 }
             }
           else
             {
-              NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for CRDSA");
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Number of instances is > 1, only CRDSA is in use");
             }
         }
     }
-  else if (m_randomAccessModel != SatEnums::RA_SLOTTED_ALOHA && triggerType == SatEnums::RA_SLOTTED_ALOHA_TRIGGER)
+  else if (m_randomAccessModel != SatEnums::RA_MODEL_SLOTTED_ALOHA && triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Slotted ALOHA is disabled");
     }
-  else if (m_randomAccessModel != SatEnums::RA_CRDSA && triggerType == SatEnums::RA_CRDSA_TRIGGER)
+  else if (m_randomAccessModel != SatEnums::RA_MODEL_CRDSA && triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is disabled");
     }
 
   /// For debugging purposes
   /// TODO: comment out this code at later stage
-  if (txOpportunities.txOpportunityType == SatEnums::RA_CRDSA_TX_OPPORTUNITY)
+  if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
     {
       std::map<uint32_t, std::set<uint32_t> >::iterator iter;
       uint32_t uniquePacketId = 1;
@@ -316,11 +313,11 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
           uniquePacketId++;
         }
     }
-  else if (txOpportunities.txOpportunityType == SatEnums::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_SLOTTED_ALOHA)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - SA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " milliseconds");
     }
-  else if (txOpportunities.txOpportunityType == SatEnums::RA_DO_NOTHING)
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - No Tx opportunity");
     }
@@ -355,7 +352,6 @@ SatRandomAccess::PrintVariables ()
       NS_LOG_INFO ("Backoff release at: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffReleaseTime ().GetSeconds () << " seconds");
       NS_LOG_INFO ("Backoff time: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffTimeInMilliSeconds () << " milliseconds");
       NS_LOG_INFO ("Backoff probability: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaBackoffProbability () * 100 << " %");
-      NS_LOG_INFO ("Maximum backoff probability: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaMaximumBackoffProbability () * 100 << " %");
       NS_LOG_INFO ("Slot randomization: " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaNumOfInstances () * m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaMaxUniquePayloadPerBlock () <<
                    " Tx opportunities with range from " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaMinRandomizationValue () <<
                    " to " << m_randomAccessConf->GetAllocationChannelConfiguration (index)->GetCrdsaMaxRandomizationValue ());
@@ -375,7 +371,7 @@ SatRandomAccess::SlottedAlohaSetControlRandomizationIntervalInMilliSeconds (uint
 {
   NS_LOG_FUNCTION (this << controlRandomizationIntervalInMilliSeconds);
 
-  if (m_randomAccessModel == SatEnums::RA_SLOTTED_ALOHA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_SLOTTED_ALOHA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (controlRandomizationIntervalInMilliSeconds);
 
@@ -395,7 +391,7 @@ SatRandomAccess::DoSlottedAloha ()
   NS_LOG_FUNCTION (this);
 
   RandomAccessTxOpportunities_s txOpportunity;
-  txOpportunity.txOpportunityType = SatEnums::RA_DO_NOTHING;
+  txOpportunity.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING;
 
   NS_LOG_INFO ("---------------------------------------------");
   NS_LOG_INFO ("------ Running Slotted ALOHA algorithm ------");
@@ -412,7 +408,7 @@ SatRandomAccess::DoSlottedAloha ()
 
       /// Randomize Tx opportunity release time
       txOpportunity.slottedAlohaTxOpportunity = SlottedAlohaRandomizeReleaseTime ();
-      txOpportunity.txOpportunityType = SatEnums::RA_SLOTTED_ALOHA_TX_OPPORTUNITY;
+      txOpportunity.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_SLOTTED_ALOHA;
     }
 
   NS_LOG_INFO ("----------------------------------------------");
@@ -446,7 +442,7 @@ SatRandomAccess::CrdsaSetBackoffTimeInMilliSeconds (uint32_t allocationChannel,
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffTimeInMilliSeconds (backoffTimeInMilliSeconds);
 
@@ -464,7 +460,7 @@ SatRandomAccess::CrdsaSetBackoffProbability (uint32_t allocationChannel,
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffProbability (backoffProbability);
 
@@ -477,30 +473,12 @@ SatRandomAccess::CrdsaSetBackoffProbability (uint32_t allocationChannel,
 }
 
 void
-SatRandomAccess::CrdsaSetMaximumBackoffProbability (uint32_t allocationChannel,
-                                                    double maximumBackoffProbability)
-{
-  NS_LOG_FUNCTION (this);
-
-  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
-    {
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaximumBackoffProbability (maximumBackoffProbability);
-
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->DoCrdsaVariableSanityCheck ();
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetMaximumBackoffProbability - Wrong random access model in use");
-    }
-}
-
-void
 SatRandomAccess::CrdsaSetPayloadBytes (uint32_t allocationChannel,
                                        uint32_t payloadBytes)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaPayloadBytes (payloadBytes);
 
@@ -520,7 +498,7 @@ SatRandomAccess::CrdsaSetRandomizationParameters (uint32_t allocationChannel,
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMinRandomizationValue (minRandomizationValue);
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaxRandomizationValue (maxRandomizationValue);
@@ -542,7 +520,7 @@ SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters (uint32_t allocatio
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_CRDSA || m_randomAccessModel == SatEnums::RA_ANY_AVAILABLE)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaxUniquePayloadPerBlock (maxUniquePayloadPerBlock);
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaxConsecutiveBlocksAccessed (maxConsecutiveBlocksAccessed);
@@ -554,24 +532,6 @@ SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters (uint32_t allocatio
     {
       NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters - Wrong random access model in use");
     }
-}
-
-bool
-SatRandomAccess::IsCrdsaBackoffProbabilityTooHigh (uint32_t allocationChannel)
-{
-  NS_LOG_FUNCTION (this);
-
-  bool isBackoffProbabilityTooHigh = false;
-
-  if ((m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffProbability ()
-      >= m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaximumBackoffProbability ()))
-    {
-      isBackoffProbabilityTooHigh = true;
-    }
-
-  NS_LOG_INFO ("SatRandomAccess::IsCrdsaBackoffProbabilityTooHigh for allocation channel " << allocationChannel << ": "  << isBackoffProbabilityTooHigh);
-
-  return isBackoffProbabilityTooHigh;
 }
 
 bool
@@ -685,7 +645,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   NS_LOG_FUNCTION (this);
 
   RandomAccessTxOpportunities_s txOpportunities;
-  txOpportunities.txOpportunityType = SatEnums::RA_DO_NOTHING;
+  txOpportunities.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING;
 
   uint32_t maxUniquePackets = m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ();
 
@@ -725,7 +685,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
                 }
 
               /// save the rest of the CRDSA Tx opportunity results
-              txOpportunities.txOpportunityType = SatEnums::RA_CRDSA_TX_OPPORTUNITY;
+              txOpportunities.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_CRDSA;
             }
         }
     }
@@ -760,7 +720,7 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
   NS_LOG_FUNCTION (this);
 
   RandomAccessTxOpportunities_s txOpportunities;
-  txOpportunities.txOpportunityType = SatEnums::RA_DO_NOTHING;
+  txOpportunities.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING;
 
   NS_LOG_INFO ("-------------------------------------");
   NS_LOG_INFO ("------ Running CRDSA algorithm ------");
@@ -801,11 +761,11 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
               txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
             }
 
-          if (txOpportunities.txOpportunityType == SatEnums::RA_CRDSA_TX_OPPORTUNITY)
+          if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
             {
               CrdsaIncreaseConsecutiveBlocksUsed (allocationChannel);
             }
-          else if (txOpportunities.txOpportunityType == SatEnums::RA_DO_NOTHING)
+          else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
             {
               CrdsaReduceIdleBlocks (allocationChannel);
               CrdsaResetConsecutiveBlocksUsed (allocationChannel);

@@ -329,7 +329,7 @@ SatUtMac::DoTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrier
   NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
   SatSignalParameters::txInfo_s txInfo;
-  txInfo.packetType = SatEnums::DEDICATED_ACCESS_PACKET;
+  txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
   txInfo.modCod = waveform->GetModCod ();
   txInfo.waveformId = waveform->GetWaveformId ();
 
@@ -366,7 +366,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
         }
 
       SatSignalParameters::txInfo_s txInfo;
-      txInfo.packetType = SatEnums::SLOTTED_ALOHA_PACKET;
+      txInfo.packetType = SatEnums::PACKET_TYPE_SLOTTED_ALOHA;
       txInfo.modCod = waveform->GetModCod ();
       txInfo.waveformId = waveform->GetWaveformId ();
 
@@ -451,7 +451,7 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
             {
               NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - Doing Slotted ALOHA");
 
-              DoRandomAccess (SatEnums::RA_SLOTTED_ALOHA_TRIGGER);
+              DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA);
             }
         }
     }
@@ -617,7 +617,7 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
   txOpportunities = m_randomAccess->DoRandomAccess (allocationChannel, randomAccessTriggerType);
 
   /// process Slotted ALOHA Tx opportunities
-  if (txOpportunities.txOpportunityType == SatEnums::RA_SLOTTED_ALOHA_TX_OPPORTUNITY)
+  if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_SLOTTED_ALOHA)
     {
       Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
 
@@ -627,7 +627,7 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
       Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
     }
   /// process CRDSA Tx opportunities
-  else if (txOpportunities.txOpportunityType == SatEnums::RA_CRDSA_TX_OPPORTUNITY)
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
     {
       NS_LOG_INFO ("SatUtMac::DoRandomAccess - Processing CRDSA results");
 
@@ -949,7 +949,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
           /// create CRDSA Tx params
           SatSignalParameters::txInfo_s txInfo;
-          txInfo.packetType = SatEnums::CRDSA_PACKET;
+          txInfo.packetType = SatEnums::PACKET_TYPE_CRDSA;
           txInfo.modCod = wf->GetModCod ();
           txInfo.waveformId = wf->GetWaveformId ();
           txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId;
@@ -1070,7 +1070,7 @@ SatUtMac::DoFrameStart ()
       m_crdsaUniquePacketId = 1;
 
       /// execute CRDSA trigger
-      DoRandomAccess (SatEnums::RA_CRDSA_TRIGGER);
+      DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (0);
