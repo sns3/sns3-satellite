@@ -72,16 +72,12 @@ using namespace ns3;
 * \ingroup satellite
 *
 * \brief  Cbr example application to use satellite network and to produce
-*         the full range of statistics.
+*         the full range of statistics. Only some of the statistics are enabled
+*         by default.
 *         Interval, packet size and test scenario can be given
 *         in command line as user argument.
 *         To see help for user arguments:
-*         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
-*
-*         Cbr example application sends first packets from GW connected user
-*         to UT connected users and after that from UT connected user to GW connected
-*         user.
-*
+*         execute command -> ./waf --run "sat-cbr-stats-example --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-stats-example");
@@ -94,7 +90,7 @@ main (int argc, char *argv[])
   std::string scenario = "larger";
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
-  double duration = 100;
+  double duration = 4;
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -195,61 +191,95 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
   s->SetName ("cbr");
 
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdAppDelay)
+  /*
+   * The following is the statements for enabling *all* the satellite
+   * statistics.
+   */
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdAppDelay)
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
+//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdDevDelay)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdMacDelay)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdPhyDelay)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueueBytes)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueuePackets)
+//  CALL_SAT_STATS_BASIC_SET (FwdSignallingLoad)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdSinr)
+//  CALL_SAT_STATS_BASIC_SET (FwdAppThroughput)
+//  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  CALL_SAT_STATS_BASIC_SET (FwdDevThroughput)
+//  CALL_SAT_STATS_BASIC_SET (FwdMacThroughput)
+//  CALL_SAT_STATS_BASIC_SET (FwdPhyThroughput)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnAppDelay)
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
+//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnDevDelay)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnMacDelay)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnPhyDelay)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueueBytes)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueuePackets)
+//  CALL_SAT_STATS_BASIC_SET (RtnSignallingLoad)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnSinr)
+//  CALL_SAT_STATS_BASIC_SET (RtnAppThroughput)
+//  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  CALL_SAT_STATS_BASIC_SET (RtnDevThroughput)
+//  CALL_SAT_STATS_BASIC_SET (RtnMacThroughput)
+//  CALL_SAT_STATS_BASIC_SET (RtnPhyThroughput)
+//  CALL_SAT_STATS_BASIC_SET (FwdDaPacketError)
+//  CALL_SAT_STATS_BASIC_SET (RtnDaPacketError)
+//  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketError)
+//  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketCollision)
+//  CALL_SAT_STATS_BASIC_SET (CrdsaPacketError)
+//  CALL_SAT_STATS_BASIC_SET (CrdsaPacketCollision)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (ResourcesGranted)
+
+  /*
+   * The following is the statements for enabling some satellite statistics
+   * for testing purpose.
+   */
   s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
-  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdDevDelay)
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdMacDelay)
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdPhyDelay)
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueueBytes)
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueuePackets)
-  CALL_SAT_STATS_BASIC_SET (FwdSignallingLoad)
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdSinr)
-  CALL_SAT_STATS_BASIC_SET (FwdAppThroughput)
-  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  CALL_SAT_STATS_BASIC_SET (FwdDevThroughput)
-  CALL_SAT_STATS_BASIC_SET (FwdMacThroughput)
-  CALL_SAT_STATS_BASIC_SET (FwdPhyThroughput)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnAppDelay)
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnDevDelay)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnMacDelay)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnPhyDelay)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueueBytes)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueuePackets)
-  CALL_SAT_STATS_BASIC_SET (RtnSignallingLoad)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnSinr)
-  CALL_SAT_STATS_BASIC_SET (RtnAppThroughput)
+  s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
+  s->AddPerGwRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddGlobalFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_PDF_FILE);
+  s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+
+  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  CALL_SAT_STATS_BASIC_SET (RtnDevThroughput)
-  CALL_SAT_STATS_BASIC_SET (RtnMacThroughput)
-  CALL_SAT_STATS_BASIC_SET (RtnPhyThroughput)
-  CALL_SAT_STATS_BASIC_SET (FwdDaPacketError)
-  CALL_SAT_STATS_BASIC_SET (RtnDaPacketError)
-  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketError)
-  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketCollision)
-  CALL_SAT_STATS_BASIC_SET (CrdsaPacketError)
-  CALL_SAT_STATS_BASIC_SET (CrdsaPacketCollision)
-  CALL_SAT_STATS_DISTRIBUTION_SET (ResourcesGranted)
+  s->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerGwFwdQueueBytes (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+  s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);
+  s->AddPerGwFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdSignallingLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
