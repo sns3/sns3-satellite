@@ -405,12 +405,12 @@ SatStatsDelayHelper::ConnectProbeToCollector (Ptr<Probe> probe,
                                                    &UnitConversionCollector::TraceSinkDouble);
       break;
 
-    case OUTPUT_HISTOGRAM_FILE:
-    case OUTPUT_HISTOGRAM_PLOT:
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_FILE:
-    case OUTPUT_CDF_PLOT:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
       ret = m_terminalCollectors.ConnectWithProbe (probe,
                                                    "OutputSeconds",
                                                    identifier,
@@ -448,8 +448,8 @@ SatStatsDelayHelper::PassSampleToCollector (Time delay, uint32_t identifier)
 
   switch (GetOutputType ())
     {
-    case OUTPUT_SCALAR_FILE:
-    case OUTPUT_SCALAR_PLOT:
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
         NS_ASSERT (c != 0);
@@ -457,8 +457,8 @@ SatStatsDelayHelper::PassSampleToCollector (Time delay, uint32_t identifier)
         break;
       }
 
-    case OUTPUT_SCATTER_FILE:
-    case OUTPUT_SCATTER_PLOT:
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
         NS_ASSERT (c != 0);
@@ -466,12 +466,12 @@ SatStatsDelayHelper::PassSampleToCollector (Time delay, uint32_t identifier)
         break;
       }
 
-    case OUTPUT_HISTOGRAM_FILE:
-    case OUTPUT_HISTOGRAM_PLOT:
-    case OUTPUT_PDF_FILE:
-    case OUTPUT_PDF_PLOT:
-    case OUTPUT_CDF_FILE:
-    case OUTPUT_CDF_PLOT:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
         NS_ASSERT (c != 0);

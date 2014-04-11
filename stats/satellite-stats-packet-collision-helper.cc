@@ -298,8 +298,8 @@ SatStatsPacketCollisionHelper::CollisionRxCallback (uint32_t nPackets,
 
           switch (GetOutputType ())
             {
-            case OUTPUT_SCALAR_FILE:
-            case OUTPUT_SCALAR_PLOT:
+            case SatStatsHelper::OUTPUT_SCALAR_FILE:
+            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
               {
                 Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
                 NS_ASSERT (c != 0);
@@ -307,8 +307,8 @@ SatStatsPacketCollisionHelper::CollisionRxCallback (uint32_t nPackets,
                 break;
               }
 
-            case OUTPUT_SCATTER_FILE:
-            case OUTPUT_SCATTER_PLOT:
+            case SatStatsHelper::OUTPUT_SCATTER_FILE:
+            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
               {
                 Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
                 NS_ASSERT (c != 0);
