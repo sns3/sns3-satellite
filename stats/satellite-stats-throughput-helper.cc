@@ -779,7 +779,7 @@ SatStatsRtnAppThroughputHelper::Ipv4Callback (Ptr<const Packet> packet,
           NS_LOG_WARN (this << " discarding packet " << packet
                             << " (" << packet->GetSize () << " bytes)"
                             << " from statistics collection because of"
-                            << " unknown sender IPV4 address " << ipv4Addr);
+                            << " unknown sender IPv4 address " << ipv4Addr);
         }
       else
         {
