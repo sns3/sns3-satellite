@@ -277,7 +277,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
   // this method call acts as CAC check, if allocation fails fatal error is occured.
-  m_frameAllocator->AllocateUt (damaEntry->GetMinRateBasedBytes (m_frameAllocator->GetSuperframeDuration ()));
+  m_frameAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_frameAllocator->GetSuperframeDuration ()));
 
   Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
   Ptr<SatUtInfo> utInfo = Create<SatUtInfo> (damaEntry, cnoEstimator);
@@ -487,8 +487,9 @@ void SatBeamScheduler::DoPreResourceAllocation ()
 
           SatFrameAllocator::SatFrameAllocReq allocReq (allocReqContainer);
           allocReq.m_address = it->first;
+          allocReq.cno = it->second->GetCnoEstimation ();
 
-          m_frameAllocator->AllocateToFrame (it->second->GetCnoEstimation (), allocReq);
+          m_frameAllocator->AllocateToFrame (allocReq);
         }
 
       m_frameAllocator->AllocateSymbols ();

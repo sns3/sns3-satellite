@@ -91,14 +91,16 @@ public:
   class SatFrameAllocReq
   {
   public:
+    double                            cno;
     Address                           m_address;
     SatFrameAllocReqItemContainer_t   m_reqPerRc;
+
     /**
      * Construct SatFrameAllocReq
      *
      * \param req Allocation request per RC/CC
      */
-    SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : m_reqPerRc (req) { }
+    SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : cno (NAN), m_reqPerRc (req) { }
   };
 
   /**
@@ -224,22 +226,20 @@ public:
   inline Time GetSuperframeDuration () const { return m_superframeConf->GetDuration(); }
 
   /**
-   * Allocate UT to the allocator.
+   * Reserve minimum rate from the allocator. This method is called to reserved minimum rate from
+   * allocator.
    *
-   * \param cno C/N0 estimation to use in allocation
-   * \param allocReq  Allocation request parameters for RC/CCs
-   * \return true when allocation is successful, false otherwise
+   * \param minimumRateBytes Minimum rate based bytes needed to reserve
    */
-  void AllocateUt (uint32_t minimumRateBytes);
+  void ReserveMinimumRate (uint32_t minimumRateBytes);
 
   /**
-   * Allocate UT to the frame.
+   * Allocate a request to a frame.
    *
-   * \param cno C/N0 estimation to use in allocation
    * \param allocReq  Allocation request parameters for RC/CCs
    * \return true when allocation is successful, false otherwise
    */
-  bool AllocateToFrame (double cno, SatFrameAllocReq &allocReq);
+  bool AllocateToFrame (SatFrameAllocReq &allocReq);
 
   /**
    * Remove allocations from all frames maintained by frame helper.
@@ -502,7 +502,7 @@ private:
    * \param frames Information of the possibles frames to allocate.
    * \return
    */
-  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, double cno, SatFrameAllocReq& allocReq, const SupportedFrameInfo_t &frames);  
+  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq& allocReq, const SupportedFrameInfo_t &frames);
 };
 
 } // namespace ns3

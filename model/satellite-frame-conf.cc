@@ -546,7 +546,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
 
-              Time frameDuration = Seconds ( slotCount * timeSlotDuration.GetSeconds () );
+              Time frameDuration = Time ( slotCount * timeSlotDuration.GetInteger () );
 
               // if frame duration is greater than current super frame duration, set it as super frame duration
               // super frame must last as long as the longest frame
@@ -556,7 +556,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
                 }
 
               // Created one frame to be used utilizing earlier created BTU
-              Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], m_duration,
+              Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], frameDuration,
                                                                   btuConf, SatFrameConf::SatTimeSlotConfMap_t (), m_frameIsRandomAccess[frameIndex] );
 
               // Created time slots for every carrier and add them to frame configuration
