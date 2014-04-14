@@ -103,6 +103,8 @@ public:
     SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : cno (NAN), m_reqPerRc (req) { }
   };
 
+  typedef std::vector<SatFrameAllocReq *> SatFrameAllocContainer_t;
+
   /**
    * SatFrameAllocInfo is used to hold frame allocation info in symbols.
    *
@@ -234,23 +236,10 @@ public:
   void ReserveMinimumRate (uint32_t minimumRateBytes);
 
   /**
-   * Allocate a request to a frame.
-   *
-   * \param allocReq  Allocation request parameters for RC/CCs
-   * \return true when allocation is successful, false otherwise
-   */
-  bool AllocateToFrame (SatFrameAllocReq &allocReq);
-
-  /**
-   * Remove allocations from all frames maintained by frame helper.
-   */
-  void RemoveAllocations ();
-
-  /**
-   * Allocate symbols in all frame to UTs allocated a frame.
+   * Allocate symbols to UTs in all frames.
    * Allocation is done in fairly manner between UTs and RCs.
    */
-  void AllocateSymbols ();
+  void AllocateSymbols (SatFrameAllocContainer_t& allocReqs);
 
   /**
    * Generate time slots in TBTP(s) for the UT/RC.
@@ -502,7 +491,20 @@ private:
    * \param frames Information of the possibles frames to allocate.
    * \return
    */
-  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq& allocReq, const SupportedFrameInfo_t &frames);
+  bool AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq * allocReq, const SupportedFrameInfo_t &frames);
+
+  /**
+   * Allocate a request to a frame.
+   *
+   * \param allocReq  Allocation request parameters for RC/CCs
+   * \return true when allocation is successful, false otherwise
+   */
+  bool AllocateToFrame (SatFrameAllocReq * allocReq);
+
+  /**
+   * Remove allocations from all frames maintained by frame allocator.
+   */
+  void RemoveAllocations ();
 };
 
 } // namespace ns3

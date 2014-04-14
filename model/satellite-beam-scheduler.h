@@ -153,9 +153,40 @@ private:
 
   };
 
-  typedef std::pair<Address, Ptr<SatUtInfo> >   UtInfoItem_t;
-  typedef std::map<Address, Ptr<SatUtInfo> >    UtInfoMap_t;
-  typedef std::list<UtInfoItem_t>               UtSortedInfoContainer_t;
+  typedef std::pair<Address, SatFrameAllocator::SatFrameAllocReq >   UtReqInfoItem_t;
+  typedef std::map<Address, Ptr<SatUtInfo> >                         UtInfoMap_t;
+  typedef std::list<UtReqInfoItem_t>                                 UtReqInfoContainer_t;
+
+  class CnoCompare
+  {
+  public:
+    CnoCompare (const UtInfoMap_t& utInfoMap)
+      : m_utInfoMap (utInfoMap) {}
+
+    bool operator() (UtReqInfoItem_t ut1, UtReqInfoItem_t ut2)
+    {
+      double result = false;
+
+      double cnoFirst = m_utInfoMap.at (ut1.first)->GetCnoEstimation ();
+      double cnoSecond = m_utInfoMap.at (ut2.first)->GetCnoEstimation ();
+
+      if ( !isnan (cnoFirst) )
+        {
+           if ( isnan (cnoSecond) )
+             {
+               result = false;
+             }
+           else
+             {
+               result = (cnoFirst < cnoSecond);
+             }
+        }
+
+      return result;
+    }
+  private:
+    const UtInfoMap_t&  m_utInfoMap;
+  };
 
   static const uint8_t  m_currentSequence = 0;  // only sequence 0 supported currently
 
@@ -192,12 +223,7 @@ private:
   /**
    * Container including all UT address and UT info pair for sorting purposes.
    */
-  UtSortedInfoContainer_t  m_utSortedInfos;
-
-  /**
-   * Iterator of the current UT to schedule
-   */
-  UtSortedInfoContainer_t::iterator m_currentUt;
+  UtReqInfoContainer_t  m_utSortedInfos;
 
   /**
    * Shuffled list of carrier ids.
@@ -285,7 +311,7 @@ private:
   void UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
   void DoPreResourceAllocation ();
   void AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer);
-  static bool CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second);
+  static bool CompareCno (const UtReqInfoItem_t &first, const UtReqInfoItem_t &second);
 
   /**
    * Create estimator for the UT according to set attributes.

@@ -910,9 +910,16 @@ SatFrameAllocator::GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_
 }
 
 void
-SatFrameAllocator::AllocateSymbols ()
+SatFrameAllocator::AllocateSymbols (SatFrameAllocContainer_t& allocReqs)
 {
   NS_LOG_FUNCTION (this);
+
+  RemoveAllocations ();
+
+  for (SatFrameAllocContainer_t::iterator itReq = allocReqs.begin (); itReq != allocReqs.end (); itReq++  )
+    {
+      AllocateToFrame (*itReq);
+    }
 
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
@@ -939,7 +946,7 @@ void SatFrameAllocator::ReserveMinimumRate (uint32_t minimumRateBytes)
 }
 
 bool
-SatFrameAllocator::AllocateToFrame (SatFrameAllocReq& allocReq)
+SatFrameAllocator::AllocateToFrame (SatFrameAllocReq * allocReq)
 {
   NS_LOG_FUNCTION (this);
 
@@ -959,14 +966,14 @@ SatFrameAllocator::AllocateToFrame (SatFrameAllocReq& allocReq)
           break;
 
         case SatSuperframeConf::CONFIG_TYPE_1:
-            if ( m_waveformConf->GetBestWaveformId ( allocReq.cno, it->second.GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLength ()))
+            if ( m_waveformConf->GetBestWaveformId ( allocReq->cno, it->second.GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLength ()))
               {
                 supportedFrames.insert (std::make_pair (it->first, waveFormId));
               }
           break;
 
         case SatSuperframeConf::CONFIG_TYPE_2:
-          if ( m_waveformConf->GetBestWaveformId ( allocReq.cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
+          if ( m_waveformConf->GetBestWaveformId ( allocReq->cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
             {
               supportedFrames.insert (std::make_pair (it->first, waveFormId));
             }
@@ -1006,7 +1013,7 @@ SatFrameAllocator::AllocateToFrame (SatFrameAllocReq& allocReq)
 }
 
 bool
-SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq& allocReq, const SupportedFrameInfo_t &frames)
+SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameAllocReq * allocReq, const SupportedFrameInfo_t &frames)
 {
   NS_LOG_FUNCTION (this << ccLevel);
 
@@ -1036,9 +1043,9 @@ SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameA
   Time frameDuration = m_frameInfos.at (selectedFrame).GetDuration ();
 
   // convert bytes to symbols based on wave form
-  SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq.m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)), frameDuration );
+  SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq->m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)), frameDuration );
 
-  return m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq.m_address, allocReq.cno, reqSymbols);
+  return m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq->m_address, allocReq->cno, reqSymbols);
 }
 
 } // namespace ns3

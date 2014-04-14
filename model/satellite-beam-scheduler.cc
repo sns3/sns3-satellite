@@ -32,7 +32,8 @@ NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
 
 namespace ns3 {
 
-bool SatBeamScheduler::CompareCno (const UtInfoItem_t &first, const UtInfoItem_t &second)
+/*
+bool SatBeamScheduler::CompareCno (const UtReqInfoItem_t &first, const UtReqInfoItem_t &second)
 {
   double result = false;
 
@@ -52,7 +53,7 @@ bool SatBeamScheduler::CompareCno (const UtInfoItem_t &first, const UtInfoItem_t
     }
 
   return result;
-}
+}*/
 
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator )
@@ -179,7 +180,6 @@ SatBeamScheduler::SatBeamScheduler ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_currentUt = m_utSortedInfos.end ();
   m_currentCarrier = m_carrierIds.end ();
   m_currentSlot = m_timeSlots.end ();
 }
@@ -286,7 +286,12 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   if (result.second)
     {
-      m_utSortedInfos.push_back (std::make_pair (utId, utInfo));
+      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount(), SatFrameAllocator::SatFrameAllocReqItem () );
+      SatFrameAllocator::SatFrameAllocReq allocReq (reqContainer);
+      allocReq.cno = NAN;
+      allocReq.m_address = utId;
+
+      m_utSortedInfos.push_back (std::make_pair (utId, allocReq));
     }
   else
     {
@@ -434,15 +439,29 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 {
   NS_LOG_FUNCTION (this);
 
-  for (UtInfoMap_t::iterator it = m_utInfos.begin (); it != m_utInfos.end (); it ++ )
+  for (UtReqInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
     {
       // estimation of the C/N0 is done when scheduling UT
 
-      Ptr<SatDamaEntry> damaEntry = it->second->GetDamaEntry ();
+      Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
 
       // process received CRs
-      it->second->UpdateDamaEntriesFromCrs ();
-      
+      m_utInfos.at (it->first)->UpdateDamaEntriesFromCrs ();
+
+      it->second.cno = m_utInfos.at (it->first)->GetCnoEstimation ();
+
+      for (uint8_t i = 0; i < damaEntry->GetRcCount (); i++ )
+        {
+          double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+
+          it->second.m_reqPerRc[i].m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
+
+          uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
+          it->second.m_reqPerRc[i].m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
+        }
+
       // decrease persistence values
       damaEntry->DecrementDynamicRatePersistence ();
       damaEntry->DecrementVolumeBacklogPersistence ();
@@ -458,41 +477,16 @@ void SatBeamScheduler::DoPreResourceAllocation ()
   if ( m_utInfos.size () > 0 )
     {
       // sort UTs according to C/N0
-      m_utSortedInfos.sort (CompareCno);
+      m_utSortedInfos.sort (CnoCompare (m_utInfos));
 
-      m_currentUt = m_utSortedInfos.begin ();
+      SatFrameAllocator::SatFrameAllocContainer_t allocReqs;
 
-      m_frameAllocator->RemoveAllocations ();
-
-      for (UtSortedInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
+      for (UtReqInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
         {
-          Ptr<SatDamaEntry> damaEntry = it->second->GetDamaEntry ();
-          SatFrameAllocator::SatFrameAllocReqItemContainer_t allocReqContainer;
-
-          for (uint8_t i = 0; i < damaEntry->GetRcCount (); i++ )
-            {
-              SatFrameAllocator::SatFrameAllocReqItem rcAllocReq;
-
-              double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
-
-              rcAllocReq.m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
-              rcAllocReq.m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
-              rcAllocReq.m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
-
-              uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
-              rcAllocReq.m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
-
-              allocReqContainer.push_back (rcAllocReq);
-            }
-
-          SatFrameAllocator::SatFrameAllocReq allocReq (allocReqContainer);
-          allocReq.m_address = it->first;
-          allocReq.cno = it->second->GetCnoEstimation ();
-
-          m_frameAllocator->AllocateToFrame (allocReq);
+          allocReqs.push_back (&(it->second));
         }
 
-      m_frameAllocator->AllocateSymbols ();
+      m_frameAllocator->AllocateSymbols (allocReqs);
     }
 }
 
