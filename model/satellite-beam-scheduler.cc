@@ -452,14 +452,14 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 
       for (uint8_t i = 0; i < damaEntry->GetRcCount (); i++ )
         {
-          double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+          double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
 
-          it->second.m_reqPerRc[i].m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
-          it->second.m_reqPerRc[i].m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
           it->second.m_reqPerRc[i].m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
-          it->second.m_reqPerRc[i].m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDuration ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
         }
 
       // decrease persistence values
@@ -499,12 +499,12 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
   for (SatFrameAllocator::UtAllocInfoContainer_t::const_iterator it = utAllocContainer.begin (); it != utAllocContainer.end (); it ++ )
     {
       Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
-      double superFrameDuration = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+      double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
 
       for (uint32_t i = 0; i < it->second.size (); i++ )
         {
-          uint32_t rateBasedBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDuration ) / 8.0;
-          rateBasedBytes += ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDuration ) / 8.0;
+          uint32_t rateBasedBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+          rateBasedBytes += ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
 
           if ( rateBasedBytes < it->second[i] )
             {

@@ -564,7 +564,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
                 {
                   for (uint32_t j = 0; j < slotCount; j++)
                     {
-                      Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Seconds (j * timeSlotDuration.GetSeconds()), defaultWaveFormId, i);
+                      Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defaultWaveFormId, i);
                       frameConf->AddTimeSlotConf (timeSlot);
                     }
                 }
