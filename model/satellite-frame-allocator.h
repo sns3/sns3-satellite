@@ -42,9 +42,22 @@ namespace ns3 {
 class SatFrameAllocator : public Object
 {
 public:
+  /**
+   * Container to store generated TBTP messages.
+   */
   typedef std::vector<Ptr<SatTbtpMessage> > TbtpMsgContainer_t;
+
+  /**
+   * Map container to store UT allocation information.
+   *
+   * key is UT's address and value holds information of the allocated bytes
+   * for the UT.
+   */
   typedef std::map<Address, std::vector<uint32_t> > UtAllocInfoContainer_t;
 
+  /**
+   * Allocation information item for the UT/RC requests [bytes].
+   */
   class SatFrameAllocReqItem
   {
   public:
@@ -54,6 +67,15 @@ public:
     uint32_t  m_vbdcBytes;
   };
 
+  /**
+   * Container to store SatFrameAllocReqItem items.
+   */
+  typedef std::vector<SatFrameAllocReqItem>   SatFrameAllocReqItemContainer_t;
+
+  /**
+   * Allocation information item for requests and allocations [symbols] used
+   * internally by SatFrameAllocator.
+   */
   class SatFrameAllocInfoItem
   {
   public:
@@ -62,31 +84,31 @@ public:
     double  m_rbdcSymbols;
     double  m_vbdcSymbols;
 
+    /**
+     * Construct SatFrameAllocInfoItem.
+     */
     SatFrameAllocInfoItem ()
      : m_craSymbols (0.0),
        m_minRbdcSymbols (0.0),
        m_rbdcSymbols (0.0),
        m_vbdcSymbols (0.0) {}
 
+    /**
+     * Get symbols allocated/requested by this item.
+     *
+     * \return Total symbols allocated/requested.
+     */
     double GetTotalSymbols () { return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);}
-
-    void SetTotalSymbols (double symbols)
-    {
-      if ( symbols <= 0)
-        {
-          m_craSymbols = 0.0;
-          m_rbdcSymbols = 0.0;
-          m_vbdcSymbols = 0.0;
-        }
-    }
   };
 
-  typedef std::vector<SatFrameAllocReqItem>   SatFrameAllocReqItemContainer_t;
+  /**
+   * Container to store SatFrameAllocInfoItem items.
+   */
   typedef std::vector<SatFrameAllocInfoItem>  SatFrameAllocInfoItemContainer_t;
 
   /**
    * SatFrameAllocReq is used to define frame allocation parameters when
-   * calling AllocateToFrame.
+   * requesting allocation from SatFrameAllocator (calling method AllocateSymbols).
    */
   class SatFrameAllocReq
   {
@@ -103,10 +125,13 @@ public:
     SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : cno (NAN), m_reqPerRc (req) { }
   };
 
+  /**
+   * Container to store SatFrameAllocReq item pointers.
+   */
   typedef std::vector<SatFrameAllocReq *> SatFrameAllocContainer_t;
 
   /**
-   * SatFrameAllocInfo is used to hold frame allocation info in symbols.
+   * SatFrameAllocInfo is used to hold a frame's allocation info in symbols.
    *
    * It is used for both requested and actual allocations.
    */
@@ -118,8 +143,14 @@ public:
     double  m_rbdcSymbols;
     double  m_vbdcSymbols;
 
+    /**
+     * Information for the RCs.
+     */
     SatFrameAllocInfoItemContainer_t  m_allocInfoPerRc;
 
+    /**
+     * Construct empty SatFrameAllocInfo.
+     */
     SatFrameAllocInfo ()
      : m_craSymbols (0.0),
        m_minRbdcSymbols (0.0),
@@ -128,6 +159,9 @@ public:
     {
     }
 
+    /**
+     * Construct empty SatFrameAllocInfo with given number of RCs.
+     */
     SatFrameAllocInfo (uint8_t countOfRcs)
      : m_craSymbols (0.0),
        m_minRbdcSymbols (0.0),
@@ -138,9 +172,9 @@ public:
     }
 
     /**
-     * Construct SatFrameAllocReqInSymbols from SatFrameAllocReq.
+     * Construct SatFrameAllocInfo from SatFrameAllocReqItem items.
      *
-     * \param req Frame allocation request parameters
+     * \param req Reference to container having SatFrameAllocReqItem items.
      * \param waveForm  Waveform to use in allocation.
      * \param frameDuration Frame duration
      */
@@ -170,6 +204,11 @@ public:
         }
     }
 
+    /**
+     * Update total count of SatFrameAllocInfo from RCs.
+     *
+     * \return SatFrameAllocInfoItem holding information of the total request per category.
+     */
     SatFrameAllocInfoItem UpdateTotalCounts ()
     {
       m_craSymbols = 0.0;
@@ -197,6 +236,10 @@ public:
       return totalReqs;
     }
 
+    /**
+     * Get total symbols of the item.
+     * \return
+     */
     double GetTotalSymbols ()
     {
       return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);
@@ -228,8 +271,7 @@ public:
   inline Time GetSuperframeDuration () const { return m_superframeConf->GetDuration(); }
 
   /**
-   * Reserve minimum rate from the allocator. This method is called to reserved minimum rate from
-   * allocator.
+   * Reserve minimum rate from the allocator. This method is called to perform CAC functionality.
    *
    * \param minimumRateBytes Minimum rate based bytes needed to reserve
    */
@@ -363,6 +405,9 @@ private:
       inline uint32_t GetConfigType () const { return m_configType; }
 
     private:
+      /**
+       * Allocation information for a UT.
+       */
       typedef struct
       {
         double              m_cno;
@@ -370,25 +415,55 @@ private:
         SatFrameAllocInfo   m_allocation;
       } UtAllocItem_t;
 
-      // first = UT address, second = RC index
-      typedef std::pair<Address, uint8_t>                     RcAllocItem_t;
+      /**
+       * Pair used as RC allocation item.
+       *
+       * first = UT address, second = RC index
+       */
+      typedef std::pair<Address, uint8_t> RcAllocItem_t;
 
-      typedef std::map<Address, UtAllocItem_t>                UtAllocContainer_t;
-      typedef std::list<RcAllocItem_t>                        RcAllocContainer_t;
+      /**
+       * Map container for UT allocation items.
+       */
+      typedef std::map<Address, UtAllocItem_t> UtAllocContainer_t;
 
+      /**
+       * Container for RC allocation items.
+       */
+      typedef std::list<RcAllocItem_t> RcAllocContainer_t;
+
+      /**
+       *  CcReqCompare class for CC type comparisons.
+       */
       class CcReqCompare
       {
       public:
+        /**
+         * Definition for different comparison types.
+         */
         typedef enum
         {
-          CC_TYPE_MIN_RBDC,
-          CC_TYPE_RBDC,
-          CC_TYPE_VBDC,
+          CC_TYPE_MIN_RBDC,//!< CC_TYPE_MIN_RBDC
+          CC_TYPE_RBDC,    //!< CC_TYPE_RBDC
+          CC_TYPE_VBDC,    //!< CC_TYPE_VBDC
         } CcReqType_t;
 
+        /**
+         * Construct CcReqCompare.
+         *
+         * \param utAllocContainer Reference to UT allocation container.
+         * \param ccReqType Type used for comparisons.
+         */
         CcReqCompare (const UtAllocContainer_t& utAllocContainer, CcReqCompare::CcReqType_t ccReqType)
           : m_utAllocContainer (utAllocContainer), m_ccReqType (ccReqType) {}
 
+        /**
+         * Comparison operator to compare two RC allocations.
+         *
+         * \param rcAlloc1
+         * \param rcAlloc2
+         * \return false if first RC allocation is smaller than second.
+         */
         bool operator() (RcAllocItem_t rcAlloc1, RcAllocItem_t rcAlloc2)
         {
           bool result = false;
@@ -417,34 +492,70 @@ private:
 
           return result;
         }
+
       private:
+        /**
+         * Reference to UT allocation container
+         */
         const UtAllocContainer_t& m_utAllocContainer;
-        CcReqType_t               m_ccReqType;
+
+        /**
+         * Type used for comparisons.
+         */
+        CcReqType_t m_ccReqType;
       };
 
-
+      // total symbols in frame.
       double  m_totalSymbolsInFrame;
+
+      // available (left) symbols in frame.
       double  m_availableSymbolsInFrame;
 
+      // pre-allocated CRA symbols in frame
       double  m_preAllocatedCraSymbols;
+
+      // pre-allocated minimum RBDC symbols in frame
       double  m_preAllocatedMinRdbcSymbols;
+
+      // pre-allocated RBDC symbols in frame
       double  m_preAllocatedRdbcSymbols;
+
+      // pre-allocated minimum VBDC symbols in frame
       double  m_preAllocatedVdbcSymbols;
 
-      double                            m_maxSymbolsPerCarrier;
-      SatSuperframeConf::ConfigType_t   m_configType;
-      uint8_t                           m_frameId;
-      bool                              m_rcBasedAllocation;
+      // maximum symbols available in frame
+      double  m_maxSymbolsPerCarrier;
 
+      // configuration type of the frame
+      SatSuperframeConf::ConfigType_t  m_configType;
+
+      // Id of the frame
+      uint8_t  m_frameId;
+
+      /**
+       * flag indicating if RC based allocation is used. When flag is on then
+       * RC is tried to allocate fully. UT total request is used allocation criteria when flag is off.
+       */
+      bool  m_rcBasedAllocation;
+
+      // Burst lengths in use.
       SatWaveformConf::BurstLengthContainer_t m_burstLenghts;
+
+      // Waveform configuration
       Ptr<SatWaveformConf> m_waveformConf;
 
+      // Frame configuration
       Ptr<SatFrameConf>   m_frameConf;
+
+      // UT allocation container
       UtAllocContainer_t  m_utAllocs;
+
+      // RC allocation container
       RcAllocContainer_t  m_rcAllocs;
 
       /**
        * Share symbols between all UTs and RCs allocated to the frame.
+       *
        * \param fcaEnabled FCA (free capacity allocation) enable status
        */
       void ShareSymbols (bool fcaEnabled);
@@ -472,19 +583,42 @@ private:
       Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno);
   };
 
+  /**
+   * Container for SatFrameInfo items.
+   */
   typedef std::map<uint8_t, SatFrameInfo> FrameInfoContainer_t;
-  typedef std::map<uint8_t, uint32_t>     SupportedFrameInfo_t;
-
-  FrameInfoContainer_t    m_frameInfos;
-  Ptr<SatWaveformConf>    m_waveformConf;
-  Ptr<SatSuperframeConf>  m_superframeConf;
-  double                m_targetLoad;
-  bool                  m_fcaEnabled;
-  uint32_t              m_maxRcCount;
-  uint32_t              m_minCarrierBytes;
-  uint32_t              m_minimumRateBasedBytesLeft;
 
   /**
+   * Container for ids of the supported SatFrameInfo.
+   */
+  typedef std::map<uint8_t, uint32_t> SupportedFrameInfo_t;
+
+  // Frame info container.
+  FrameInfoContainer_t    m_frameInfos;
+
+  // waveform configuration
+  Ptr<SatWaveformConf>    m_waveformConf;
+
+  // super frame  configuration
+  Ptr<SatSuperframeConf>  m_superframeConf;
+
+  // target load for the frame
+  double  m_targetLoad;
+
+  // flag telling if FCA (free capacity allocation) is on
+  bool  m_fcaEnabled;
+
+  // maximum count for RCs
+  uint32_t  m_maxRcCount;
+
+  // bytes in minimum carrier
+  uint32_t  m_minCarrierBytes;
+
+  // minimum rate based bytes left can been guaranteed by frame allocator
+  uint32_t  m_minimumRateBasedBytesLeft;
+
+  /**
+   *  Allocate given request according to type.
    *
    * \param ccLevel CC level of the request
    * \param allocReq Requested bytes
