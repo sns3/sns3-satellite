@@ -5,6 +5,7 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/config-store-module.h"
 #include "ns3/cbr-helper.h"
 
 
@@ -36,6 +37,12 @@ main (int argc, char *argv[])
   std::string scenario = "simple";
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -138,6 +145,13 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Interval: " << interval);
   NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
+
+//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
+//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+//  ConfigStore outputConfig;
+//  outputConfig.ConfigureDefaults ();
+//  outputConfig.ConfigureAttributes ();
 
   Simulator::Stop (Seconds(11));
   Simulator::Run ();

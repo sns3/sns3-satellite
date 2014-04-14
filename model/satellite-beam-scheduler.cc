@@ -32,29 +32,6 @@ NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
 
 namespace ns3 {
 
-/*
-bool SatBeamScheduler::CompareCno (const UtReqInfoItem_t &first, const UtReqInfoItem_t &second)
-{
-  double result = false;
-
-  double cnoFirst = first.second->GetCnoEstimation ();
-  double cnoSecond = second.second->GetCnoEstimation ();
-
-  if ( !isnan (cnoFirst) )
-    {
-       if ( isnan (cnoSecond) )
-         {
-           result = false;
-         }
-       else
-         {
-           result = (cnoFirst < cnoSecond);
-         }
-    }
-
-  return result;
-}*/
-
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator )
  : m_damaEntry (damaEntry),
@@ -72,7 +49,7 @@ SatBeamScheduler::SatUtInfo::GetDamaEntry ()
 }
 
 void
-SatBeamScheduler::SatUtInfo::UpdateDamaEntriesFromCrs ()
+SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -170,18 +147,10 @@ SatBeamScheduler::SatBeamScheduler ()
     m_superframeSeq (0),
     m_superFrameCounter (0),
     m_txCallback (0),
-    m_tbtpAddCb (0),
-    m_currentFrame (0),
-    m_totalSlotsLeft (0),
-    m_additionalSlots (0),
-    m_slotsPerUt (0),
     m_cnoEstimatorMode (SatCnoEstimator::LAST),
     m_maxBbFrameSize (0)
 {
   NS_LOG_FUNCTION (this);
-
-  m_currentCarrier = m_carrierIds.end ();
-  m_currentSlot = m_timeSlots.end ();
 }
 
 SatBeamScheduler::~SatBeamScheduler ()
@@ -195,12 +164,6 @@ SatBeamScheduler::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_txCallback.Nullify ();
   Object::DoDispose ();
-}
-
-void
-SatBeamScheduler::Receive (Ptr<Packet> packet)
-{
-  NS_LOG_FUNCTION (this << packet);
 }
 
 bool
@@ -225,7 +188,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_maxBbFrameSize = maxFrameSizeInBytes;
 
   /**
-   * Calculating to start time for superframe counts to start the scheduling from.
+   * Calculating to start time for super frame counts to start the scheduling from.
    * The offset is calculated by estimating the maximum delay between GW and UT,
    * so that the sent TBTP will be received by UT in time to be able to still send
    * the packet in time.
@@ -263,7 +226,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
   else
     {
-      NS_FATAL_ERROR ("Trying to schedule a superframe in the past!");
+      NS_FATAL_ERROR ("Trying to schedule a super frame in the past!");
     }
 
   Simulator::Schedule (delay, &SatBeamScheduler::Schedule, this);
@@ -276,7 +239,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
-  // this method call acts as CAC check, if allocation fails fatal error is occured.
+  // this method call acts as CAC check, if allocation fails fatal error is occurred.
   m_frameAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_frameAllocator->GetSuperframeDuration ()));
 
   Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
@@ -291,7 +254,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
       allocReq.cno = NAN;
       allocReq.m_address = utId;
 
-      m_utSortedInfos.push_back (std::make_pair (utId, allocReq));
+      m_utRequestInfos.push_back (std::make_pair (utId, allocReq));
     }
   else
     {
@@ -439,15 +402,16 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 {
   NS_LOG_FUNCTION (this);
 
-  for (UtReqInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
+  for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
     {
       // estimation of the C/N0 is done when scheduling UT
 
       Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
 
       // process received CRs
-      m_utInfos.at (it->first)->UpdateDamaEntriesFromCrs ();
+      m_utInfos.at (it->first)->UpdateDamaEntryFromCrs ();
 
+      // update allocation request information to be used later to request capacity from frame allocator
       it->second.cno = m_utInfos.at (it->first)->GetCnoEstimation ();
 
       for (uint8_t i = 0; i < damaEntry->GetRcCount (); i++ )
@@ -472,20 +436,19 @@ void SatBeamScheduler::DoPreResourceAllocation ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_totalSlotsLeft = 0;
-
   if ( m_utInfos.size () > 0 )
     {
-      // sort UTs according to C/N0
-      m_utSortedInfos.sort (CnoCompare (m_utInfos));
+      // sort UT requests according to C/N0 of the UTs
+      m_utRequestInfos.sort (CnoCompare (m_utInfos));
 
       SatFrameAllocator::SatFrameAllocContainer_t allocReqs;
 
-      for (UtReqInfoContainer_t::iterator it = m_utSortedInfos.begin (); it != m_utSortedInfos.end (); it++)
+      for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
         {
           allocReqs.push_back (&(it->second));
         }
 
+      // request capacity for UTs from frame allocator
       m_frameAllocator->AllocateSymbols (allocReqs);
     }
 }
@@ -494,7 +457,6 @@ void
 SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer)
 {
   NS_LOG_FUNCTION (this);
-
 
   for (SatFrameAllocator::UtAllocInfoContainer_t::const_iterator it = utAllocContainer.begin (); it != utAllocContainer.end (); it ++ )
     {

@@ -66,16 +66,6 @@ public:
   ~SatBeamScheduler ();
 
   /**
-   * Receive a packet from a beam.
-   *
-   * The SatBeamScheduler receives CR packets from own beam (sent by UTs)
-   * and takes CRs into account when making schedule decisions.
-   *
-   * \param p       Pointer to the received CR packet.
-   */
-  void Receive (Ptr<Packet> p);
-
-  /**
    * \param msg        the message send
    * \param address    Packet destination address
    * \return Result of sending, true success or false failure
@@ -124,51 +114,129 @@ public:
   void UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg);
 
   /**
+   * Send control messages to the beam.
    *
-   * \param packet
-   * \return
+   * \param message Pointer or control message to send.
+   * \return true if sending is success, false otherwise.
    */
-  bool Send (Ptr<SatControlMessage> packet);
+  bool Send (Ptr<SatControlMessage> message);
 
 private:
-  // UT information helper class for SatBeamScheduler
+  /**
+   * \brief UT information helper class for SatBeamScheduler.
+   *
+   * Stores capacity request and C/N0 estimation information of the UT.
+   */
   class SatUtInfo : public SimpleRefCount<SatUtInfo>
   {
     public:
+      /**
+       * Contruct SatUtInfo.
+       *
+       * \param damaEntry DamaEntry for created UT info.
+       * \param cnoEstimator C/N0 estimator for the UT info.
+       */
       SatUtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator );
 
+      /**
+       * Get damaEntry of the UT info.
+       *
+       * \return Pointer to DamEntry of the UT info.
+       */
       Ptr<SatDamaEntry> GetDamaEntry ();
 
-      void UpdateDamaEntriesFromCrs ();
+      /**
+       * Update DamaEntry with information of the received CR messages.
+       */
+      void UpdateDamaEntryFromCrs ();
+
+      /**
+       * Add C/N0 sample to UT info's estimator.
+       *
+       * \param sample C/N0 samp value to add.
+       */
       void AddCnoSample (double sample);
+
+      /**
+       * Get estimated C/N0 value based on added samples.
+       *
+       * \return C/N0 estimation.
+       */
       double GetCnoEstimation ();
+
+      /**
+       * Add CR message to UT info to be used when capacity request is calculated
+       * next time (method UpdateDamaEntryFromCrs is called).
+       *
+       * \param crMsg
+       */
       void AddCrMsg (Ptr<SatCrMessage> crMsg);
 
     private:
+      /**
+       * Container to store received CR messages.
+       */
       typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
 
-      Ptr<SatDamaEntry>     m_damaEntry;    // DAMA entry
-      Ptr<SatCnoEstimator>  m_cnoEstimator; // Estimator for C/N0
-      CrMsgContainer_t      m_crContainer;  // received CRs since last scheduling round.
+      /**
+       * DamaEntry of this UT info.
+       */
+      Ptr<SatDamaEntry>     m_damaEntry;
+
+      /**
+       *  Estimator for the C/N0.
+       */
+      Ptr<SatCnoEstimator>  m_cnoEstimator;
+
+      /**
+       *  Received CRs since last update round (call of the method UpdateDamaEntryFromCrs).
+       */
+      CrMsgContainer_t      m_crContainer;
 
   };
 
+  /**
+   * Pair to store capacity request information for the UT
+   */
   typedef std::pair<Address, SatFrameAllocator::SatFrameAllocReq >   UtReqInfoItem_t;
+
+  /**
+   * Map container to store UT information.
+   */
   typedef std::map<Address, Ptr<SatUtInfo> >                         UtInfoMap_t;
+
+  /**
+   * Container to store capacity request information for the UTs.
+   */
   typedef std::list<UtReqInfoItem_t>                                 UtReqInfoContainer_t;
 
+  /**
+   * \brief CnoCompare class to sort UT request according to C/N0 information
+   */
   class CnoCompare
   {
   public:
+    /**
+     * Contruct CnoCompare object
+     *
+     * \param utInfoMap Reference to map container for the UT information
+     */
     CnoCompare (const UtInfoMap_t& utInfoMap)
       : m_utInfoMap (utInfoMap) {}
 
-    bool operator() (UtReqInfoItem_t ut1, UtReqInfoItem_t ut2)
+    /**
+     * Compare operator to compare request information of the two UTs.
+     *
+     * \param utReqInfo1 Request information for UT 1
+     * \param utReqInfo2 Request information for UT 2
+     * \return true if first UT's C/N0 is more robust than second UT's
+     */
+    bool operator() (UtReqInfoItem_t utReqInfo1, UtReqInfoItem_t utReqInfo2)
     {
       double result = false;
 
-      double cnoFirst = m_utInfoMap.at (ut1.first)->GetCnoEstimation ();
-      double cnoSecond = m_utInfoMap.at (ut2.first)->GetCnoEstimation ();
+      double cnoFirst = m_utInfoMap.at (utReqInfo1.first)->GetCnoEstimation ();
+      double cnoSecond = m_utInfoMap.at (utReqInfo2.first)->GetCnoEstimation ();
 
       if ( !isnan (cnoFirst) )
         {
@@ -185,10 +253,16 @@ private:
       return result;
     }
   private:
+    /**
+     * Reference to map container for the UT information
+     */
     const UtInfoMap_t&  m_utInfoMap;
   };
 
-  static const uint8_t  m_currentSequence = 0;  // only sequence 0 supported currently
+  /**
+   * Current super frame sequence in use. (only sequence 0 supported currently)
+   */
+  static const uint8_t  m_currentSequence = 0;
 
   /**
    * ID of the beam
@@ -211,59 +285,14 @@ private:
   SatBeamScheduler::SendCtrlMsgCallback m_txCallback;
 
   /**
-   * The TBTP send callback.
-   */
-  SatBeamScheduler::TbtpAddCallback m_tbtpAddCb;
-
-  /**
    * Map to store UT information in beam for updating purposes.
    */
   UtInfoMap_t m_utInfos;
 
   /**
-   * Container including all UT address and UT info pair for sorting purposes.
+   * Container including every UT's allocation requests.
    */
-  UtReqInfoContainer_t  m_utSortedInfos;
-
-  /**
-   * Shuffled list of carrier ids.
-   */
-  std::vector<uint32_t> m_carrierIds;
-
-  /**
-   * Iterator of the currently used carrier id from shuffled list.
-   */
-  std::vector<uint32_t>::iterator m_currentCarrier;
-
-  /**
-   * Time slot confs of the currently used carrier.
-   */
-  SatFrameConf::SatTimeSlotConfContainer_t m_timeSlots;
-
-  /**
-   * Iterator of the currently used time slot id for time slot id list.
-   */
-  SatFrameConf::SatTimeSlotConfContainer_t::iterator m_currentSlot;
-
-  /**
-   * Current frame id scheduled.
-   */
-  uint32_t m_currentFrame;
-
-  /**
-   * Counter for total time slots left for scheduling
-   */
-  uint32_t m_totalSlotsLeft;
-
-  /**
-   * Counter for time slots left when there is even number of slots available for UTs
-   */
-  uint32_t m_additionalSlots;
-
-  /**
-   * Number of time slots reserved per every UTs
-   */
-  uint32_t m_slotsPerUt;
+  UtReqInfoContainer_t  m_utRequestInfos;
 
   /**
    * Random variable stream to select RA channel for a UT.
@@ -281,37 +310,61 @@ private:
   Time m_cnoEstimationWindow;
 
   /**
-   * Frame allocator to maintain load information of the frame and its configuration.
+   * Frame allocator to maintain load information of the frames and their configurations.
    */
   Ptr<SatFrameAllocator>  m_frameAllocator;
 
   /**
    * Maximum two-way propagation delay estimate between GW-SAT-UT-SAT-GW.
    * This is used to estimate how much time into the future the scheduler
-   * has to schedule the supreframes.
+   * has to schedule the super frames.
    */
   Time m_maxTwoWayPropagationDelay;
 
   /**
    * Maximum TBTP tx and processing delay estimate at the GW (scheduler).
    * This is used to estimate how much time into the future the scheduler
-   * has to schedule the supreframes.
+   * has to schedule the super frames.
    */
   Time m_maxTBTPTxAndProcessingDelay;
 
+  /**
+   * Maximum size of the BB frame.
+   */
   uint32_t m_maxBbFrameSize;
 
-  SatBeamScheduler& operator = (const SatBeamScheduler &);
-  SatBeamScheduler (const SatBeamScheduler &);
-
+  /**
+   * Dispose actions for SatBeamScheduler.
+   */
   void DoDispose (void);
+
+  /**
+   * Schedule UTs added (registered) to scheduler.
+   */
   void Schedule ();
 
+  /**
+   * Update dama entries with received requests at beginning of the scheduling.
+   */
   void UpdateDamaEntriesWithReqs ();
+
+  /**
+   * Update dama entries with given allocations at end of the scheduling.
+   *
+   * \param utAllocContainer Reference to container including granted allocations per UT.
+   */
   void UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
+
+  /**
+   * Do pre-allocation of the symbols per UT/RC, before time slot generation.
+   */
   void DoPreResourceAllocation ();
+
+  /**
+   * Add RA channel information to TBTP(s).
+   * \param tbtpContainer Reference to container including TBTPs already and to be added.
+   */
   void AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer);
-  static bool CompareCno (const UtReqInfoItem_t &first, const UtReqInfoItem_t &second);
 
   /**
    * Create estimator for the UT according to set attributes.
