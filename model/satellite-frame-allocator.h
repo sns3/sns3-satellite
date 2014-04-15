@@ -50,8 +50,8 @@ public:
   /**
    * Map container to store UT allocation information.
    *
-   * key is UT's address and value holds information of the allocated bytes
-   * for the UT.
+   * key is UT's address and value is vector holding information of the allocated bytes
+   * for the UT/RC.
    */
   typedef std::map<Address, std::vector<uint32_t> > UtAllocInfoContainer_t;
 

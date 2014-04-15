@@ -326,12 +326,18 @@ private:
    * This is used to estimate how much time into the future the scheduler
    * has to schedule the super frames.
    */
-  Time m_maxTBTPTxAndProcessingDelay;
+  Time m_maxTbtpTxAndProcessingDelay;
 
   /**
    * Maximum size of the BB frame.
    */
   uint32_t m_maxBbFrameSize;
+
+  /**
+   * Trace for backlog requests done to beam scheduler.
+   */
+  TracedCallback<std::string> m_backlogRequestsTrace;
+
 
   /**
    * Dispose actions for SatBeamScheduler.

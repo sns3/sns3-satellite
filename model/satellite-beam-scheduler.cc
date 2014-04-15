@@ -25,8 +25,10 @@
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/singleton.h"
 #include "satellite-utils.h"
+#include "satellite-id-mapper.h"
 #include "satellite-rtn-link-time.h"
 #include "satellite-beam-scheduler.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
 
@@ -136,8 +138,12 @@ SatBeamScheduler::GetTypeId (void)
     .AddAttribute( "MaxTBTPTxAndProcessingDelay",
                    "Maximum TBTP transmission and processing delay at the GW.",
                    TimeValue (MilliSeconds (100)),
-                   MakeTimeAccessor (&SatBeamScheduler::m_maxTBTPTxAndProcessingDelay),
+                   MakeTimeAccessor (&SatBeamScheduler::m_maxTbtpTxAndProcessingDelay),
                    MakeTimeChecker ())
+    .AddTraceSource ("BacklogRequestsTrace",
+                     "Trace for backlog requests done to beam scheduler.",
+                      MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace))
+
   ;
   return tid;
 }
@@ -193,7 +199,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
    * so that the sent TBTP will be received by UT in time to be able to still send
    * the packet in time.
    */
-  Time totalDelay = m_maxTwoWayPropagationDelay + m_maxTBTPTxAndProcessingDelay;
+  Time totalDelay = m_maxTwoWayPropagationDelay + m_maxTbtpTxAndProcessingDelay;
   uint32_t sfCountOffset = (uint32_t)(totalDelay.GetInteger () / seq->GetDuration (0).GetInteger () + 1);
 
   // Scheduling starts after one empty super frame.
@@ -424,6 +430,24 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
           it->second.m_reqPerRc[i].m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+
+          // write backlog requests traces starts ...
+          std::stringstream head;
+          head << Now ().GetSeconds () << ", ";
+          head << Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (it->first) << ", ";
+
+          std::stringstream rbdcTail;
+          rbdcTail << SatEnums::DA_RBDC << ", ";
+          rbdcTail << damaEntry->GetRbdcInKbps (i);
+
+          m_backlogRequestsTrace ( head.str () + rbdcTail.str () );
+
+          std::stringstream vbdcTail;
+          vbdcTail << SatEnums::DA_VBDC << ", ";
+          vbdcTail << damaEntry->GetVbdcInBytes (i);
+
+          m_backlogRequestsTrace ( head.str () + vbdcTail.str () );
+          // ... write backlog requests traces ends
         }
 
       // decrease persistence values
