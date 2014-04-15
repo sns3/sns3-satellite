@@ -32,7 +32,10 @@
 
 namespace ns3 {
 
-
+/**
+ * ARQ buffer context is holding information related to the ARQ transmission
+ * or reception depending on whether packet(s) are being transmitted or received.
+ */
 class SatArqBufferContext : public SimpleRefCount<SatArqBufferContext>
 {
 public:
@@ -56,8 +59,14 @@ public:
 /**
  * \ingroup satellite
  *
- * \brief SatReturnLinkEncapsulator class used in return link for
+ * \brief SatReturnLinkEncapsulatorArq class is inherited from the
+ * SatReturnLinkEncapsulator class, which is used in return link for
  * encapsulation, fragmentation and packing of higher layer packets.
+ * SatReturnLinkEncapsulatorArq includes in addition the retransmission
+ * functionality if packets are not received properly in the first
+ * transmission. ARQ is controlled by ACK messages replied related to
+ * each properly received packet.
+ *
  * The SatReturnLinkEncapsulator object is UT specific and its entities
  * are located at both UT (encapsulation, fragmentation, packing) and
  * GW (decapsulation, defragmentation, reassembly).
@@ -73,6 +82,9 @@ public:
 
   /**
    * Constructor
+   * \param source Source MAC address for the encapsulator (UT address)
+   * \param dest Destination MAC address for the encapsulator (GW address)
+   * \param rcIndex RC index of the encapsulator
    */
   SatReturnLinkEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
   virtual ~SatReturnLinkEncapsulatorArq ();
@@ -84,13 +96,9 @@ public:
 
   /**
    * Notify a Tx opportunity to this encapsulator.
-   * HL packet = IP packet
-   * AL PDU = Addressed link PDU
-   * PPDU = Payload Adapted PDU
-   * FPDU = Frame PDU
    * \param bytes Notified tx opportunity bytes from lower layer
    * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \return Ptr<Packet> a Frame PDU
+   * \return Ptr<Packet> a PPDU (RLE) PDU
    */
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
 
@@ -130,6 +138,14 @@ private:
   void CleanUp (uint8_t sequenceNumber);
 
   /**
+   * Convert the 8-bit sequence number value from ARQ header into
+   * 32-bit continuous sequence number stream at the receiver.
+   * \param seqNo 8-bit sequence number
+   * \return uint32_t 32-bit sequence number
+   */
+  uint32_t ConvertSeqNo (uint8_t seqNo) const;
+
+  /**
    * Reassemble and receive the received PDUs if possible
    */
   void ReassembleAndReceive ();
@@ -138,7 +154,7 @@ private:
    * Rx waiting timer for a PDU has expired
    * \param sn Sequence number
    */
-  void RxWaitingTimerExpired (uint8_t sn);
+  void RxWaitingTimerExpired (uint32_t sn);
 
   /**
    * Send ACK for a given sequence number
@@ -200,7 +216,7 @@ private:
    * key = sequence number
    * value = RLE packet
    */
-  std::map<uint8_t, Ptr<SatArqBufferContext> > m_reorderingBuffer;
+  std::map<uint32_t, Ptr<SatArqBufferContext> > m_reorderingBuffer;
 };
 
 

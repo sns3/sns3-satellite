@@ -102,12 +102,12 @@ SatReturnLinkEncapsulatorArq::GetTypeId (void)
                    MakeUintegerAccessor (&SatReturnLinkEncapsulatorArq::m_maxNoOfRetransmissions),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute( "RetransmissionTimer",
-                   "Retransmission time value.",
+                   "Retransmission time value, i.e. how long to wait for ACK before retransmission.",
                    TimeValue (Seconds (0.6)),
                    MakeTimeAccessor (&SatReturnLinkEncapsulatorArq::m_retransmissionTimer),
                    MakeTimeChecker ())
     .AddAttribute( "WindowSize",
-                   "Window size for ARQ.",
+                   "Window size for ARQ, i.e. how many simultaneous packets are allowed in the air.",
                    UintegerValue (10),
                    MakeUintegerAccessor (&SatReturnLinkEncapsulatorArq::m_arqWindowSize),
                    MakeUintegerChecker<uint32_t> ())
@@ -117,7 +117,7 @@ SatReturnLinkEncapsulatorArq::GetTypeId (void)
                    MakeUintegerAccessor (&SatReturnLinkEncapsulatorArq::m_arqHeaderSize),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute( "RxWaitingTime",
-                   "Time to wait for a packet.",
+                   "Time to wait for a packet at the reception (GW) before moving onwards with the packet reception.",
                    TimeValue (Seconds (1.8)),
                    MakeTimeAccessor (&SatReturnLinkEncapsulatorArq::m_rxWaitingTimer),
                    MakeTimeChecker ())
@@ -182,7 +182,7 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           EventId t = Simulator::Schedule (m_retransmissionTimer, &SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired, this, context);
           context->m_waitingTimer = t;
 
-          NS_LOG_LOGIC ("UT: " << m_sourceAddress << " sending a retransmission at: " << Now ().GetSeconds () << ": packetSize: " << context->m_pdu->GetSize () << " SeqNo: " << context->m_seqNo);
+          NS_LOG_LOGIC ("UT: << " << m_sourceAddress << " sent a retransmission packet of size: " << context->m_pdu->GetSize () << " with seqNo: " << (uint32_t)(context->m_seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
 
           return context->m_pdu;
         }
@@ -196,164 +196,8 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   // available for any new transmissions.
   else if (!m_txQueue->IsEmpty() && m_seqNo->SeqNoAvailable ())
     {
-
+      // Crate new RLE PDU
       packet = GetNewRlePdu (bytes, m_maxRtnArqSegmentSize, m_arqHeaderSize);
-
-      /*
-      // RLE (PPDU) header
-      SatPPduHeader ppduHeader;
-
-      // Peek the first PDU from the buffer.
-      Ptr<const Packet> peekSegment = m_txQueue->Peek ();
-
-      SatEncapPduStatusTag tag;
-      bool found = peekSegment->PeekPacketTag (tag);
-      if (!found)
-        {
-          NS_FATAL_ERROR ("EncapPduStatus tag not found from packet!");
-        }
-
-      // Tx opportunity bytes is not enough
-      uint32_t headerSize = ppduHeader.GetHeaderSizeInBytes(tag.GetStatus()) + m_arqHeaderSize;
-      if (bytes <= headerSize)
-        {
-          NS_LOG_LOGIC ("TX opportunity too small = " << bytes);
-          return packet;
-        }
-
-      NS_LOG_LOGIC ("Size of the first packet in buffer: " << peekSegment->GetSize ());
-      NS_LOG_LOGIC ("Encapsulation status of the first packet in buffer: " << tag.GetStatus());
-
-      // Build Data field
-       uint32_t maxSegmentSize = std::min(bytes, m_maxRtnArqSegmentSize) - headerSize;
-
-       NS_LOG_LOGIC ("Maximum supported segment size: " << maxSegmentSize);
-
-       // Fragmentation if the HL PDU does not fit into the burst or
-       // the HL packet is too large.
-       if ( peekSegment->GetSize () > maxSegmentSize )
-         {
-           NS_LOG_LOGIC ("Buffered packet is larger than the maximum segment size!");
-
-           if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
-             {
-               // Calculate again that the packet fits into the Tx opportunity
-               headerSize = ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::START_PDU) + m_arqHeaderSize;
-               if (bytes <= headerSize)
-                 {
-                   NS_LOG_LOGIC ("Start PDU does not fit into the TxOpportunity anymore!");
-                   return packet;
-                 }
-
-               maxSegmentSize = std::min(bytes, m_maxRtnArqSegmentSize) - headerSize;
-               NS_LOG_LOGIC ("Recalculated maximum supported segment size: " << maxSegmentSize);
-
-               // In case we have to fragment a FULL PDU, we need to increase
-               // the fragment id.
-               IncreaseFragmentId ();
-             }
-           // END_PDU
-           else
-             {
-               // Calculate again that the packet fits into the Tx opportunity
-               headerSize = ppduHeader.GetHeaderSizeInBytes(SatEncapPduStatusTag::CONTINUATION_PDU) + m_arqHeaderSize;
-               if (bytes <= headerSize)
-                 {
-                   NS_LOG_LOGIC ("Continuation PDU does not fit into the TxOpportunity anymore!");
-                   return packet;
-                 }
-
-               maxSegmentSize = std::min(bytes, m_maxRtnArqSegmentSize) - headerSize;
-               NS_LOG_LOGIC ("Recalculated maximum supported segment size: " << maxSegmentSize);
-             }
-
-           // Now we can take the packe away from the queue
-           Ptr<Packet> firstSegment = m_txQueue->Dequeue ();
-
-           // Create a new fragment
-           Ptr<Packet> newSegment = firstSegment->CreateFragment (0, maxSegmentSize);
-
-           // Status tag of the new and remaining segments
-           // Note: This is the only place where a PDU is segmented and
-           // therefore its status can change
-           SatEncapPduStatusTag oldTag, newTag;
-           firstSegment->RemovePacketTag (oldTag);
-           newSegment->RemovePacketTag (newTag);
-
-           // Create new PPDU header
-           ppduHeader.SetPPduLength (newSegment->GetSize());
-           ppduHeader.SetFragmentId (m_txFragmentId);
-
-           if (oldTag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
-             {
-               ppduHeader.SetStartIndicator ();
-               ppduHeader.SetTotalLength (firstSegment->GetSize());
-
-               newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
-               oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
-             }
-           else if (oldTag.GetStatus () == SatEncapPduStatusTag::END_PDU)
-             {
-               // oldTag still is left with the END_PPDU tag
-               newTag.SetStatus (SatEncapPduStatusTag::CONTINUATION_PDU);
-             }
-
-           // Give back the remaining segment to the transmission buffer
-           firstSegment->RemoveAtStart (maxSegmentSize);
-
-           // If bytes left after fragmentation
-           if (firstSegment->GetSize () > 0)
-             {
-               NS_LOG_LOGIC ("Returning the remaining " << firstSegment->GetSize () << " bytes to buffer");
-               firstSegment->AddPacketTag (oldTag);
-               m_txQueue->PushFront (firstSegment);
-             }
-           else
-             {
-               NS_FATAL_ERROR ("The full segment was taken even though we are in the fragmentation part of the code!");
-             }
-
-           // Put status tag once it has been adjusted
-           newSegment->AddPacketTag (newTag);
-
-           // Add PPDU header
-           newSegment->AddHeader (ppduHeader);
-
-           // PPDU
-           packet = newSegment;
-
-           NS_LOG_LOGIC ("Created a fragment of size: " << packet->GetSize ());
-         }
-       // Packing functionality, for either a FULL_PPDU or END_PPDU
-       else
-         {
-           NS_LOG_LOGIC ("Packing functionality TxO: " << bytes << " packet size: " << peekSegment->GetSize ());
-
-           if (tag.GetStatus() == SatEncapPduStatusTag::FULL_PDU)
-             {
-               ppduHeader.SetStartIndicator ();
-             }
-           else
-             {
-               ppduHeader.SetFragmentId (m_txFragmentId);
-             }
-
-           // Take the packe away from the queue
-           Ptr<Packet> firstSegment = m_txQueue->Dequeue ();
-
-           ppduHeader.SetEndIndicator ();
-           ppduHeader.SetPPduLength (firstSegment->GetSize());
-
-           // Add PPDU header
-           firstSegment->AddHeader (ppduHeader);
-
-           // PPDU
-           packet = firstSegment;
-
-           NS_LOG_LOGIC ("Packed a packet of size: " << packet->GetSize ());
-         }
-
-       */
 
       if (packet)
         {
@@ -412,7 +256,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (Ptr<SatArqBufferContext> cont
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("At UT: " << m_sourceAddress << " ARQ retransmission timer expired for: " << context->m_seqNo << " at: " << Now ().GetSeconds ());
+  NS_LOG_LOGIC ("At UT: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(context->m_seqNo) << " at: " << Now ().GetSeconds ());
 
   // Retransmission still possible
   if (context->m_retransmissionCount < m_maxNoOfRetransmissions)
@@ -438,7 +282,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (Ptr<SatArqBufferContext> cont
   // Maximum retransmissions reached
   else
     {
-      NS_LOG_LOGIC ("Maximum retransmissions reached, clean-up!");
+      NS_LOG_LOGIC ("For UT: " << m_sourceAddress << " max retransmissions reached for " << context->m_seqNo << " at: " << Now ().GetSeconds ());
 
       // Do clean-up
       CleanUp (context->m_seqNo);
@@ -511,79 +355,114 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
   p->RemoveHeader (arqHeader);
   uint8_t seqNo = arqHeader.GetSeqNo ();
 
+  NS_LOG_LOGIC ("UT: " << m_sourceAddress << " received a packet with SeqNo: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
+
   // Send ACK for the received RLE packet.
   SendAck (seqNo);
 
-  std::map<uint8_t, Ptr<SatArqBufferContext > >::iterator it = m_reorderingBuffer.find (seqNo);
+  // Convert the 8-bit sequence number to continuous 32-bit sequence number
+  uint32_t sn = ConvertSeqNo (seqNo);
 
-  // If the context is not found, then we create a new one. This imeans that all the
-  // seqNos have been arriving in-order.
-  if (it == m_reorderingBuffer.end ())
-    {
-      Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
-      arqContext->m_pdu = p;
-      arqContext->m_rxStatus = true;
-      arqContext->m_seqNo = seqNo;
-      arqContext->m_retransmissionCount = 0;
-      m_reorderingBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (seqNo, arqContext));
-    }
-  // If the context is found, we have received at least one packet with higher SN that this one.
-  // Then the context exists, but it has not yet received a packet.
-  else
-    {
-      it->second->m_waitingTimer.Cancel ();
-      it->second->m_pdu = p;
-      it->second->m_rxStatus = true;
-    }
+  NS_LOG_LOGIC ("8bit SN: " << (uint32_t)(seqNo) << " 32bit SN: " << sn);
 
-  // SeqNo is NOT the one we are expecting
-  if (seqNo != m_nextExpectedSeqNo)
+  // If the received SN is valid. If we receive a SN from the past
+  // nothing is needed to be done.
+  if (sn >= m_nextExpectedSeqNo)
     {
-      if (seqNo < m_nextExpectedSeqNo)
+      std::map<uint32_t, Ptr<SatArqBufferContext > >::iterator it = m_reorderingBuffer.find (sn);
+
+      // If the context is not found, then we create a new one.
+      if (it == m_reorderingBuffer.end ())
         {
-          NS_FATAL_ERROR ("A packet with sequence number from the past was received! SeqNo: " << seqNo << " nextExpectedSeqNo: " << m_nextExpectedSeqNo);
+          NS_LOG_LOGIC ("UT: " << m_sourceAddress << " created a new ARQ buffer entry for SeqNo: " << sn << " at: " << Now ().GetSeconds ());
+          Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
+          arqContext->m_pdu = p;
+          arqContext->m_rxStatus = true;
+          arqContext->m_seqNo = sn;
+          arqContext->m_retransmissionCount = 0;
+          m_reorderingBuffer.insert (std::make_pair<uint32_t, Ptr<SatArqBufferContext> > (sn, arqContext));
+        }
+      // If the context is found, update it.
+      else
+        {
+          NS_LOG_LOGIC ("UT: " << m_sourceAddress << " reset an existing ARQ entry for SeqNo: " << sn << " at " << Now ().GetSeconds ());
+          it->second->m_waitingTimer.Cancel ();
+          it->second->m_pdu = p;
+          it->second->m_rxStatus = true;
         }
 
-      /**
-       * We shall start a timer for all the sequence numbers preceeding this seq no, which
-       * we have not yet received, if such timer is not already running.
-       */
-      for (uint8_t i = m_nextExpectedSeqNo; i < seqNo; ++i)
-        {
-          // If the timer is not already running
-          std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.find (i);
+      NS_LOG_LOGIC ("Received a packet with SeqNo: " << sn << ", expecting: " << m_nextExpectedSeqNo);
 
-          // Found!
-          if (it != m_reorderingBuffer.end ())
+      // If this is not the SN we expect
+      if (sn != m_nextExpectedSeqNo)
+        {
+          // Add context
+          for (uint32_t i = m_nextExpectedSeqNo; i < sn; ++i)
             {
-              // If not already running!
-              if (!it->second->m_waitingTimer.IsRunning ())
+              std::map<uint32_t, Ptr<SatArqBufferContext > >::iterator it2 = m_reorderingBuffer.find (i);
+
+              NS_LOG_LOGIC ("Finding context for " << i);
+
+              // If context not found
+              if (it2 == m_reorderingBuffer.end ())
                 {
+                  NS_LOG_LOGIC ("Context NOT found for SeqNo: " << i);
+
+                  Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
+                  arqContext->m_pdu = NULL;
+                  arqContext->m_rxStatus = false;
+                  arqContext->m_seqNo = i;
+                  arqContext->m_retransmissionCount = 0;
+                  m_reorderingBuffer.insert (std::make_pair<uint32_t, Ptr<SatArqBufferContext> > (i, arqContext));
                   EventId id = Simulator::Schedule (m_rxWaitingTimer, &SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired, this, i);
-                  it->second->m_waitingTimer = id;
+                  arqContext->m_waitingTimer = id;
                 }
             }
-          // Not found!
-          else
-            {
-              Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
-              arqContext->m_pdu = NULL;
-              arqContext->m_rxStatus = false;
-              arqContext->m_seqNo = i;
-              arqContext->m_retransmissionCount = 0;
-              m_reorderingBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (i, arqContext));
-
-              EventId id = Simulator::Schedule (m_rxWaitingTimer, &SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired, this, i);
-              it->second->m_waitingTimer = id;
-            }
+        }
+      // An expected sequence number received, reassemble and receive.
+      else
+        {
+          ReassembleAndReceive();
         }
     }
-  // SeqNo is the one we are expecting, thus try to reasseble and receive
   else
     {
-      NS_LOG_LOGIC ("Received a packet with SeqNo we were expecting: " << m_nextExpectedSeqNo);
-      ReassembleAndReceive();
+      NS_LOG_LOGIC ("UT: " << m_sourceAddress << " received a packet with SeqNo: " << sn << " which is already received!");
     }
+}
+
+uint32_t
+SatReturnLinkEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
+{
+  uint32_t globalSeqNo (0);
+
+  // Calculate the rounds and current seq no from m_nextExpectedSeqNo
+  uint32_t rounds = (m_nextExpectedSeqNo / std::numeric_limits<uint8_t>::max ());
+  uint32_t rawSeqNo = m_nextExpectedSeqNo % std::numeric_limits<uint8_t>::max ();
+
+  NS_LOG_LOGIC ("Input: " << (uint32_t)(seqNo) << " rounds: " << rounds << " rawSeqNo: " << rawSeqNo << " windowSize: " << m_arqWindowSize << " next expected: " << m_nextExpectedSeqNo);
+
+  // Received sequence number is higher than the expected one.
+  if (seqNo >= rawSeqNo)
+    {
+      // If seqNo is from previous round
+      if ((seqNo - rawSeqNo) > 2*m_arqWindowSize)
+        {
+          rounds--;
+        }
+    }
+  // seqNo < rawSeqNo
+  else
+    {
+      if ((rawSeqNo - seqNo) > 2*m_arqWindowSize)
+        {
+          rounds++;
+        }
+    }
+
+  globalSeqNo = rounds * std::numeric_limits<uint8_t>::max () + seqNo;
+
+  return globalSeqNo;
 }
 
 void
@@ -592,13 +471,9 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive ()
   NS_LOG_FUNCTION (this);
 
   // Start from the expected sequence number iterator
-  std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.find (m_nextExpectedSeqNo);
+  std::map<uint32_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.begin ();
 
-  // If not found
-  if (it == m_reorderingBuffer.end ())
-    {
-      NS_FATAL_ERROR ("Expected sequence number was not found in the reordering buffer!");
-    }
+  NS_LOG_LOGIC ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
 
   /**
    * As long as the PDU is the next expected one, process the PDU
@@ -606,44 +481,43 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive ()
    */
   while (it != m_reorderingBuffer.end () && it->first == m_nextExpectedSeqNo && it->second->m_rxStatus == true)
     {
+      NS_LOG_LOGIC ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
+
       // If timer is running, cancel it.
       if (it->second->m_waitingTimer.IsRunning ())
         {
           it->second->m_waitingTimer.Cancel ();
         }
 
-      // Process the PDU
-      ProcessPdu (it->second->m_pdu);
+      // If PDU == NULL, it means that the RxWaitingTimer has expired
+      // without PDU being received
+      if (it->second->m_pdu)
+        {
+          // Process the PDU
+          ProcessPdu (it->second->m_pdu);
+        }
 
-      std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator currIt = it++;
+      m_reorderingBuffer.erase (it);
+      it = m_reorderingBuffer.begin ();
 
-      m_reorderingBuffer.erase (currIt);
-
-      // Start from the beginning
+      // Increase the seq no
       ++m_nextExpectedSeqNo;
-      if (m_nextExpectedSeqNo >= std::numeric_limits<uint8_t>::max ())
-        {
-          m_nextExpectedSeqNo = 0;
-          it = m_reorderingBuffer.begin ();
-        }
-      // Take the next iterator! Note, that it may also be m_reorderingBuffer.end ()
-      else
-        {
-          NS_LOG_LOGIC ("Advance the iterator");
-        }
 
-      NS_LOG_LOGIC ("Starting to process a packet, increase the next expected seqNo to: " << m_nextExpectedSeqNo);
+      NS_LOG_LOGIC ("Increasing SeqNo to " << m_nextExpectedSeqNo);
     }
 }
 
 
 void
-SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired (uint8_t seqNo)
+SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired (uint32_t seqNo)
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint8_t)(seqNo));
+
+  NS_LOG_LOGIC ("For UT: " << m_sourceAddress << " max waiting time reached for SeqNo: " << seqNo << " at: " << Now ().GetSeconds ());
+  NS_LOG_LOGIC ("Mark the PDU received and move forward!");
 
   // Find waiting timer, erase it and mark the packet received.
-  std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.find (seqNo);
+  std::map<uint32_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.find (seqNo);
   if (it != m_reorderingBuffer.end ())
     {
       it->second->m_waitingTimer.Cancel ();
@@ -671,7 +545,7 @@ SatReturnLinkEncapsulatorArq::SendAck (uint8_t seqNo) const
 {
   NS_LOG_FUNCTION (this << seqNo);
 
-  NS_LOG_LOGIC ("GW: " << m_destAddress << " send ACK to UT: " << m_sourceAddress << " with flowId: " << (uint32_t)(m_flowId) << " with SN: " << (uint8_t)(seqNo) << " at: " << Now ().GetSeconds ());
+  NS_LOG_LOGIC ("GW: " << m_destAddress << " send ACK to UT: " << m_sourceAddress << " with flowId: " << (uint32_t)(m_flowId) << " with SN: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
   /**
    * RLE sends the ACK control message via a callback to SatNetDevice of the GW to the
