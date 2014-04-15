@@ -434,6 +434,7 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
           // write backlog requests traces starts ...
           std::stringstream head;
           head << Now ().GetSeconds () << ", ";
+          head << m_beamId << ", ";
           head << Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (it->first) << ", ";
 
           std::stringstream rbdcTail;
