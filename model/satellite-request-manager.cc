@@ -100,6 +100,9 @@ SatRequestManager::GetTypeId (void)
     .AddTraceSource ("CrTrace",
                      "Capacity request trace",
                      MakeTraceSourceAccessor (&SatRequestManager::m_crTrace))
+    .AddTraceSource ("CrTraceLog",
+                     "Capacity request trace log",
+                     MakeTraceSourceAccessor (&SatRequestManager::m_crTraceLog))
     .AddTraceSource ("RbdcTrace",
                      "Trace for all sent RBDC capacity requests.",
                      MakeTraceSourceAccessor (&SatRequestManager::m_rbdcTrace))
@@ -211,6 +214,9 @@ SatRequestManager::DoEvaluation (bool periodical)
 
           if (rbdcRateKbps > 0)
             {
+              std::stringstream ss;
+              ss << Now ().GetSeconds () << ", " << m_nodeInfo->GetNodeId () << ", " << rc << ", " << SatEnums::DA_RBDC << ", " <<  rbdcRateKbps << ", " << stats.m_queueSizeBytes << std::endl;
+              m_crTraceLog (ss.str ());
               m_rbdcTrace (rbdcRateKbps);
             }
 
@@ -228,7 +234,10 @@ SatRequestManager::DoEvaluation (bool periodical)
 
           if (vbdcKBytes > 0)
             {
-              m_rbdcTrace (vbdcKBytes);
+              std::stringstream ss;
+              ss << Now ().GetSeconds () << ", " << m_nodeInfo->GetNodeId () << ", " << rc << ", " << cac << ", " <<  vbdcKBytes << ", " << stats.m_queueSizeBytes << std::endl;
+              m_crTraceLog (ss.str ());
+              m_vbdcTrace (vbdcKBytes);
             }
 
           NS_LOG_LOGIC ("Requested VBCD volume for RC: " << (uint32_t)(rc) << " is " << vbdcKBytes << " KBytes with CAC: " << cac);

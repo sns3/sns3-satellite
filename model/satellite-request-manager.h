@@ -291,9 +291,14 @@ private:
   std::vector<uint32_t> m_sumVbdcVolumeIn;
 
   /**
-   * Trace callback used for CR tracing:
+   * Trace callback used for CR tracing.
    */
   TracedCallback< Time, Mac48Address, Ptr<SatCrMessage> > m_crTrace;
+
+  /**
+   * Trace callback used for CR tracing.
+   */
+  TracedCallback<std::string> m_crTraceLog;
 
   /**
    * Traced callbacks for all sent RBDC and VBDC capacity requests.
