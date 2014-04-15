@@ -92,9 +92,6 @@ SatGenericStreamEncapsulator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  while (!m_rxBuffer.empty ()) m_rxBuffer.pop_back ();
-  m_rxBuffer.clear();
-
   SatBaseEncapsulator::DoDispose ();
 }
 
@@ -139,15 +136,48 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   // GSE PDU
   Ptr<Packet> packet;
 
-  // GSE header
-  SatGseHeader gseHeader;
-
   // No packets in buffer
   if ( m_txQueue->GetNPackets () == 0 )
     {
       NS_LOG_LOGIC ("No data pending, return NULL packet");
       return packet;
     }
+
+  packet = GetNewGsePdu (bytes, m_maxGsePduSize);
+
+  if (packet)
+    {
+      // Add MAC tag to identify the packet in lower layers
+      SatMacTag mTag;
+      mTag.SetDestAddress (m_destAddress);
+      mTag.SetSourceAddress (m_sourceAddress);
+      packet->AddPacketTag (mTag);
+
+      // Add flow id tag
+      SatFlowIdTag flowIdTag;
+      flowIdTag.SetFlowId (m_flowId);
+      packet->AddPacketTag (flowIdTag);
+
+      // Update bytes left
+      bytesLeft = GetTxBufferSizeInBytes ();
+
+      if (packet->GetSize () > bytes)
+        {
+          NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
+        }
+    }
+
+  return packet;
+}
+
+Ptr<Packet>
+SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_t maxGsePduSize, uint32_t additionalHeaderSize)
+{
+  // GSE packet = NULL
+  Ptr<Packet> packet;
+
+  // GSE header
+  SatGseHeader gseHeader;
 
   // Peek the first PDU from the buffer.
   Ptr<const Packet> peekPacket = m_txQueue->Peek ();
@@ -156,14 +186,15 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
   peekPacket->PeekPacketTag (peekTag);
 
   // Too small TxOpportunity!
-  if (bytes <= gseHeader.GetGseHeaderSizeInBytes(peekTag.GetStatus ()))
+  uint32_t headerSize = gseHeader.GetGseHeaderSizeInBytes(peekTag.GetStatus ()) + additionalHeaderSize;
+  if (txOpportunityBytes <= headerSize)
     {
-      NS_LOG_LOGIC ("TX opportunity too small = " << bytes);
+      NS_LOG_LOGIC ("TX opportunity too small = " << txOpportunityBytes);
       return packet;
     }
 
   // Build Data field
-  uint32_t maxGsePayload = std::min(bytes, m_maxGsePduSize) - gseHeader.GetGseHeaderSizeInBytes (peekTag.GetStatus ());
+  uint32_t maxGsePayload = std::min(txOpportunityBytes, maxGsePduSize) - headerSize;
 
   NS_LOG_LOGIC ("GSE header size: " << gseHeader.GetGseHeaderSizeInBytes (peekTag.GetStatus ()));
 
@@ -192,7 +223,9 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
           oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
 
-          uint32_t newMaxGsePayload = std::min(bytes, m_maxGsePduSize) - gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::START_PDU);
+          uint32_t newMaxGsePayload = std::min(txOpportunityBytes, maxGsePduSize) -
+              gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::START_PDU) -
+              additionalHeaderSize;
 
           NS_LOG_LOGIC ("Packet size: " << firstPacket->GetSize () << " max GSE payload: " << maxGsePayload);
 
@@ -206,7 +239,9 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           // oldTag still is left with the END_PDU tag
           newTag.SetStatus (SatEncapPduStatusTag::CONTINUATION_PDU);
 
-          uint32_t newMaxGsePayload = std::min(bytes, m_maxGsePduSize) - gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::CONTINUATION_PDU);
+          uint32_t newMaxGsePayload = std::min(txOpportunityBytes, maxGsePduSize) -
+              gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::CONTINUATION_PDU) -
+              additionalHeaderSize;
 
           NS_LOG_LOGIC ("Packet size: " << firstPacket->GetSize () << " max GSE payload: " << maxGsePayload);
 
@@ -279,24 +314,10 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       packet = firstPacket;
     }
 
-  if (packet->GetSize () > bytes)
+  if (packet->GetSize () > txOpportunityBytes)
     {
-      NS_FATAL_ERROR ("Created GSE PDU of size: " << packet->GetSize () << " is larger than the Tx opportunity: " << bytes);
+      NS_FATAL_ERROR ("Created GSE PDU of size: " << packet->GetSize () << " is larger than the Tx opportunity: " << txOpportunityBytes);
     }
-
-  // Add MAC tag to identify the packet in lower layers
-  SatMacTag mTag;
-  mTag.SetDestAddress (m_destAddress);
-  mTag.SetSourceAddress (m_sourceAddress);
-  packet->AddPacketTag (mTag);
-
-  // Add flow id tag
-  SatFlowIdTag flowIdTag;
-  flowIdTag.SetFlowId (m_flowId);
-  packet->AddPacketTag (flowIdTag);
-
-  // Update bytes left
-  bytesLeft = GetTxBufferSizeInBytes ();
 
   return packet;
 }
@@ -330,99 +351,89 @@ SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
 
-  m_rxBuffer.push_back (p);
-
-  // Try to reassemble the received packets
-  Reassemble ();
+  ProcessPdu (p);
 }
 
 
 void
-SatGenericStreamEncapsulator::Reassemble ()
+SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (!m_rxBuffer.empty ());
+  // Remove PDU header
+  SatGseHeader gseHeader;
+  packet->RemoveHeader (gseHeader);
 
-  while (!m_rxBuffer.empty ())
+  // FULL_PDU
+  if (gseHeader.GetStartIndicator() == true && gseHeader.GetEndIndicator() == true)
     {
-      // Remove PDU header
-      SatGseHeader gseHeader;
-      m_rxBuffer.front()->RemoveHeader (gseHeader);
+      NS_LOG_LOGIC ("FULL PDU received");
 
-      // FULL_PDU
-      if (gseHeader.GetStartIndicator() == true && gseHeader.GetEndIndicator() == true)
+      Reset ();
+
+      m_rxCallback (packet);
+    }
+
+  // START_PDU
+  else if (gseHeader.GetStartIndicator() == true && gseHeader.GetEndIndicator() == false)
+    {
+      NS_LOG_LOGIC ("START PDU received");
+
+      Reset ();
+
+      m_currRxFragmentId = gseHeader.GetFragmentId ();
+      m_currRxPacketSize = gseHeader.GetTotalLength ();
+      m_currRxPacketFragmentBytes = gseHeader.GetGsePduLength ();
+      m_currRxPacketFragment = packet;
+    }
+
+  // CONTINUATION_PDU
+  else if (gseHeader.GetStartIndicator() == false && gseHeader.GetEndIndicator() == false)
+    {
+      NS_LOG_LOGIC ("CONTINUATION PDU received");
+
+      // Previous fragment found
+      if (m_currRxPacketFragment && gseHeader.GetFragmentId () == m_currRxFragmentId)
         {
-          NS_LOG_LOGIC ("FULL PDU received");
-
+          m_currRxPacketFragmentBytes += gseHeader.GetGsePduLength ();
+          m_currRxPacketFragment->AddAtEnd (packet);
+        }
+      else
+        {
           Reset ();
-
-          m_rxCallback(m_rxBuffer.front ());
-          m_rxBuffer.pop_front();
+          NS_LOG_LOGIC ("CONTINUATION PDU received while the START of the PDU may have been lost");
         }
+    }
 
-      // START_PDU
-      else if (gseHeader.GetStartIndicator() == true && gseHeader.GetEndIndicator() == false)
+  // END_PDU
+  else if (gseHeader.GetStartIndicator() == false && gseHeader.GetEndIndicator() == true)
+    {
+      NS_LOG_LOGIC ("END PDU received");
+
+      // Previous fragment found
+      if (m_currRxPacketFragment && gseHeader.GetFragmentId () == m_currRxFragmentId)
         {
-          NS_LOG_LOGIC ("START PDU received");
+          m_currRxPacketFragmentBytes += gseHeader.GetGsePduLength ();
 
-          m_currRxFragmentId = gseHeader.GetFragmentId ();
-          m_currRxPacketSize = gseHeader.GetTotalLength ();
-          m_currRxPacketFragmentBytes = gseHeader.GetGsePduLength ();
-          m_currRxPacketFragment = m_rxBuffer.front ();
-          m_rxBuffer.pop_front();
-        }
-
-      // CONTINUATION_PDU
-      else if (gseHeader.GetStartIndicator() == false && gseHeader.GetEndIndicator() == false)
-        {
-          NS_LOG_LOGIC ("CONTINUATION PDU received");
-
-          // Previous fragment found
-          if (m_currRxPacketFragment && gseHeader.GetFragmentId () == m_currRxFragmentId)
+          // The packet size is wrong!
+          if (m_currRxPacketFragmentBytes != m_currRxPacketSize)
             {
-              m_currRxPacketFragmentBytes += gseHeader.GetGsePduLength ();
-              m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
+              NS_LOG_LOGIC ("END PDU received, but the packet size of the HL PDU is wrong. Drop the HL packet!");
             }
+          //   Receive the HL packet here
           else
             {
-              Reset ();
-              NS_LOG_LOGIC ("CONTINUATION PDU received while the START of the PDU may have been lost");
+              m_currRxPacketFragment->AddAtEnd (packet);
+              m_rxCallback (m_currRxPacketFragment);
             }
-          m_rxBuffer.pop_front();
         }
-
-      // END_PDU
-      else if (gseHeader.GetStartIndicator() == false && gseHeader.GetEndIndicator() == true)
+      else
         {
-          NS_LOG_LOGIC ("END PDU received");
-
-          // Previous fragment found
-          if (m_currRxPacketFragment && gseHeader.GetFragmentId () == m_currRxFragmentId)
-            {
-              m_currRxPacketFragmentBytes += gseHeader.GetGsePduLength ();
-
-              // The packet size is wrong!
-              if (m_currRxPacketFragmentBytes != m_currRxPacketSize)
-                {
-                  NS_LOG_LOGIC ("END PDU received, but the packet size of the HL PDU is wrong. Drop the HL packet!");
-                }
-              // Receive the HL packet here
-              else
-                {
-                  m_currRxPacketFragment->AddAtEnd (m_rxBuffer.front ());
-                  m_rxBuffer.pop_front();
-                  m_rxCallback (m_currRxPacketFragment);
-                }
-            }
-          else
-            {
-              NS_LOG_LOGIC ("END PDU received while the START of the PDU may have been lost");
-            }
-
-          // Reset anyway
-          Reset ();
+          NS_LOG_LOGIC ("END PDU received while the START of the PDU may have been lost");
         }
+
+      // Reset anyway
+      Reset ();
     }
 }
 

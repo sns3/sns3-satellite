@@ -130,6 +130,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO("  ");
 
+
   Simulator::Stop (simLength);
   Simulator::Run ();
 

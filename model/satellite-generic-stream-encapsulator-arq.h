@@ -18,14 +18,14 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_RETURN_LINK_ENCAPSULATOR_ARQ
-#define SATELLITE_RETURN_LINK_ENCAPSULATOR_ARQ
+#ifndef SATELLITE_GENERIC_STREAM_ENCAPSULATOR_ARQ
+#define SATELLITE_GENERIC_STREAM_ENCAPSULATOR_ARQ
 
 
 #include <map>
 #include "ns3/event-id.h"
 #include "ns3/mac48-address.h"
-#include "satellite-return-link-encapsulator.h"
+#include "satellite-generic-stream-encapsulator.h"
 #include "satellite-arq-sequence-number.h"
 #include "satellite-control-message.h"
 
@@ -35,26 +35,26 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatReturnLinkEncapsulatorArq class is inherited from the
- * SatReturnLinkEncapsulator class, which is used in return link for
+ * \brief SatGenericStreamEncapsulatorArq class is inherited from the
+ * SatGenericStreamEncapsulator class, which is used in forward link for
  * encapsulation, fragmentation and packing of higher layer packets.
- * SatReturnLinkEncapsulatorArq includes in addition the retransmission
+ * SatGenericStreamEncapsulatorArq includes in addition the retransmission
  * functionality if packets are not received properly in the first
  * transmission. ARQ is controlled by ACK messages replied related to
  * each properly received packet.
  *
- * The SatReturnLinkEncapsulator object is UT specific and its entities
+ * The SatGenericStreamEncapsulator object is UT specific and its entities
  * are located at both UT (encapsulation, fragmentation, packing) and
  * GW (decapsulation, defragmentation, reassembly).
  */
-class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
+class SatGenericStreamEncapsulatorArq : public SatGenericStreamEncapsulator
 {
 public:
 
   /**
    * Default constructor, not used
    */
-  SatReturnLinkEncapsulatorArq ();
+  SatGenericStreamEncapsulatorArq ();
 
   /**
    * Constructor
@@ -62,8 +62,8 @@ public:
    * \param dest Destination MAC address for the encapsulator (GW address)
    * \param rcIndex RC index of the encapsulator
    */
-  SatReturnLinkEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
-  virtual ~SatReturnLinkEncapsulatorArq ();
+  SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
+  virtual ~SatGenericStreamEncapsulatorArq ();
 
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
@@ -152,11 +152,6 @@ private:
   uint32_t m_txedBufferSize;
 
   /**
-   * Max RTN link ARQ segment size
-   */
-  uint32_t m_maxRtnArqSegmentSize;
-
-  /**
    * Maximum number of retransmissions
    */
   uint32_t m_maxNoOfRetransmissions;
@@ -198,4 +193,4 @@ private:
 
 } // namespace ns3
 
-#endif // SATELLITE_RETURN_LINK_ENCAPSULATOR_ARQ
+#endif // SATELLITE_GENERIC_STREAM_ENCAPSULATOR_ARQ

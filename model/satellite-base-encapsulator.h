@@ -34,6 +34,30 @@
 
 namespace ns3 {
 
+/**
+ * ARQ buffer context is holding information related to the ARQ transmission
+ * or reception depending on whether packet(s) are being transmitted or received.
+ */
+class SatArqBufferContext : public SimpleRefCount<SatArqBufferContext>
+{
+public:
+  SatArqBufferContext ()
+  :m_pdu (),
+   m_seqNo (0),
+   m_retransmissionCount (0),
+   m_waitingTimer (),
+   m_rxStatus (false)
+  {
+  }
+
+public:
+  Ptr<Packet> m_pdu;
+  uint32_t    m_seqNo;
+  uint32_t    m_retransmissionCount;
+  EventId     m_waitingTimer;
+  bool        m_rxStatus;
+};
+
 
 /**
  * \ingroup satellite

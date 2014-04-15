@@ -90,18 +90,27 @@ public:
    */
   virtual uint32_t GetMinTxOpportunityInBytes () const;
 
-private:
+protected:
+
+  /**
+   * Get new packet performs the GSE fragmentation and encapsulation
+   * for a one single packet. Returns NULL packet if a suitable packet
+   * is not created.
+   * \return Ptr<Packet> GSE packet
+   */
+  Ptr<Packet> GetNewGsePdu (uint32_t txOpportunityBytes, uint32_t maxGsePduSize, uint32_t additionalHeaderSize = 0);
 
   /**
    * Method increases the fragment id by one. If the maximum fragment id is
    * reached, it is reset to zero.
    */
   void IncreaseFragmentId ();
-  
+
   /**
-   * Reassemble functionality
+   * Process the reception of individual GSE PDUs
+   * \param p Packet to be received
    */
-  void Reassemble ();
+  virtual void ProcessPdu (Ptr<Packet> p);
 
   void Reset ();
 
@@ -114,12 +123,6 @@ private:
    * Fragment id used in the packet transmissions
    */
   uint32_t m_txFragmentId;
-
-  /**
-   * Reception buffer
-   */
-  std::list < Ptr<Packet> >  m_rxBuffer;
-
   /**
    * Current fragment id in the reassembly process
    */

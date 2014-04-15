@@ -42,6 +42,7 @@
 #include "../model/satellite-phy-rx-carrier-conf.h"
 #include "../model/satellite-base-encapsulator.h"
 #include "../model/satellite-generic-stream-encapsulator.h"
+#include "../model/satellite-generic-stream-encapsulator-arq.h"
 #include "../model/satellite-return-link-encapsulator.h"
 #include "../model/satellite-return-link-encapsulator-arq.h"
 #include "../model/satellite-net-device.h"
@@ -405,12 +406,21 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // User data
   for (uint8_t fid = 1; fid < SatEnums::NUM_FIDS; ++fid)
     {
+      if (m_enableFwdLinkArq)
+        {
+          gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (gwAddr, addr, fid);
+          utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (gwAddr, addr, fid);
+        }
+      else
+        {
+          gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
+          utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
+        }
+
       queue = CreateObject<SatQueue> (fid);
-      gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
       gwEncap->SetQueue (queue);
       gwLlc->AddEncap (addr, gwEncap, fid); // Tx
 
-      utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
       utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
       llc->AddDecap (addr, utDecap, fid); // Rx
       utDecap->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));

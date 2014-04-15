@@ -2,8 +2,11 @@
 
 def build(bld):
 
-    obj = bld.create_ns3_program('sat-arq-example', ['satellite'])
-    obj.source = 'sat-arq-example.cc'
+    obj = bld.create_ns3_program('sat-arq-fwd-example', ['satellite'])
+    obj.source = 'sat-arq-fwd-example.cc'
+
+    obj = bld.create_ns3_program('sat-arq-rtn-example', ['satellite'])
+    obj.source = 'sat-arq-rtn-example.cc'
     
     obj = bld.create_ns3_program('sat-cbr-example', ['satellite'])
     obj.source = 'sat-cbr-example.cc'
