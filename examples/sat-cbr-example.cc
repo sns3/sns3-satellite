@@ -36,6 +36,13 @@ main (int argc, char *argv[])
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
+//  To read attributes from file
+//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("input-attributes.xml"));
+//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+//  ConfigStore inputConfig;
+//  inputConfig.ConfigureDefaults ();
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("beamIdInFullScenario", "Id where Sending/Receiving UT is selected in FULL scenario. (used only when scenario is full) ", beamIdInFullScenario);
@@ -137,6 +144,14 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Interval: " << interval);
   NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
+
+//  To store attributes to file
+//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
+//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+//  ConfigStore outputConfig;
+//  outputConfig.ConfigureDefaults ();
+//  outputConfig.ConfigureAttributes ();
 
   Simulator::Stop (Seconds(11));
   Simulator::Run ();
