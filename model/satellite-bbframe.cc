@@ -51,7 +51,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
   {
     case SatEnums::SHORT_FRAME:
     case SatEnums::NORMAL_FRAME:
-      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (modCod, type) / SatUtils::BITS_PER_BYTE) ;
+      m_maxSpaceInBytes = std::floor (conf->GetBbFramePayloadBits (modCod, type) * SatUtils::BYTES_PER_BIT) ;
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;
       m_duration = conf->GetBbFrameDuration (modCod, type);
@@ -59,7 +59,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
 
     case SatEnums::DUMMY_FRAME:
       // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
-      m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatUtils::BITS_PER_BYTE;
+      m_maxSpaceInBytes = std::floor (conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) * SatUtils::BYTES_PER_BIT);
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;
       m_duration = conf->GetDummyBbFrameDuration ();
