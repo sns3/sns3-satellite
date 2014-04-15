@@ -53,11 +53,6 @@ public:
   static const uint32_t BITS_PER_BYTE = 8;
 
   /**
-   * Number of bytes in a bit
-   */
-  static const double BYTES_PER_BIT = 0.125;
-
-  /**
    * Converts radians to degrees
    *
    * \param radian value to convert as radians
