@@ -34,7 +34,6 @@
 #include "../model/satellite-gw-phy.h"
 #include "../model/satellite-phy-tx.h"
 #include "../model/satellite-phy-rx.h"
-#include "../model/virtual-channel.h"
 #include "../model/satellite-phy-rx-carrier-conf.h"
 #include "../model/satellite-link-results.h"
 #include "../model/satellite-node-info.h"
