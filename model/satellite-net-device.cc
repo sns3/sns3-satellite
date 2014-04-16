@@ -29,17 +29,15 @@
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/channel.h"
 
-#include "virtual-channel.h"
 #include "satellite-net-device.h"
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-llc.h"
+#include "satellite-control-message.h"
+#include "satellite-utils.h"
+#include "satellite-node-info.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -512,20 +510,16 @@ SatNetDevice::SupportsSendFrom (void) const
   return true;
 }
 
-void
-SatNetDevice::SetVirtualChannel (Ptr<VirtualChannel> vChannel)
-{
-  NS_LOG_FUNCTION (this);
-
-  m_virtualChannel = vChannel;
-}
-
 Ptr<Channel>
 SatNetDevice::GetChannel (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_virtualChannel;
+  /**
+   * We cannot do anything here, since the SatNetDevice does not hold
+   * directly any channels, but they are attached to Phy layers.
+   */
+  return 0;
 }
 
 

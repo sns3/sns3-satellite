@@ -37,22 +37,29 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * Satellite channel implementation
+ * Satellite channel implementation. Satellite channel is responsible of
+ * passing through packets from the transmitter to the receiver. One SatChannel
+ * is mapped into a frequency band, which means that there may be several nodes
+ * (UTs, GWs, satellite receivers) attached to the same channel as a transmitter
+ * or a receiver. There may be also several spot-beams using the same SatChannel,
+ * i.e. the ones which are using the same frequency band. This enables the per-
+ * packet interference calculation at the receiver side. Receiver checks all
+ * incoming packets whether they are intended to be received or whether the packet
+ * is causing interference with a certain received power.
  *
+ * The main tasks of the SatChannel are:
+ * - Pass through packets to a set of receivers
+ * - Calculate the propagation delay for the packet based on propagation delay model
+ * - Calculate the received signal power for the packet based on free-space loss model
+ *   and fading (Markov/Loo)
+ * - Handle the fading input/output trace functionality
  */
 
 class SatChannel : public Channel
 {
 public:
 
-  /**
-   * \brief
-   */
   SatChannel ();
-
-  /**
-   * \brief
-   */
   virtual ~SatChannel ();
 
   /**
@@ -65,15 +72,8 @@ public:
       ALL_BEAMS
     };
 
-  /**
-   * \brief
-   * \return
-   */
   static TypeId GetTypeId (void);
 
-  /**
-   * \brief
-   */
   typedef std::vector<Ptr<SatPhyRx> > PhyList;
 
   /**
@@ -81,7 +81,6 @@ public:
    * \param channelType     The type of channel
    * \param freqId          The id of the carrier
    * \param carrierId       The id of the carrier
-   *
    * \return The center frequency of the carrier.
    */
   typedef Callback<double, SatEnums::ChannelType_t, uint32_t, uint32_t  > CarrierFreqConverter;
@@ -100,14 +99,12 @@ public:
 
   /**
    * \brief Set the type of the channel.
-   *
    * \param chType Type of the channel.
    */
   virtual void SetChannelType (SatEnums::ChannelType_t chType);
 
   /**
    * \brief Set the frequency id of the channel.
-   *
    * \param freqId The frequency id of the channel.
    */
   virtual void SetFrequencyId (uint32_t freqId);
@@ -138,38 +135,33 @@ public:
   virtual void StartTx (Ptr<SatSignalParameters> params);
 
   /**
-   * This method is used to attach the receiver entity SatPhyRx instance to a
+   * \brief This method is used to attach the receiver entity SatPhyRx instance to a
    * SatChannel instance, so that the SatPhyRx can receive packets sent on that channel.
-   * \param phyRx the SatPhyRx instance to be added to the channel as
-   * a receiver.
+   * \param phyRx the SatPhyRx instance to be added to the channel as a receiver.
    */
   virtual void AddRx (Ptr<SatPhyRx> phyRx);
 
   /**
-   * This method is used to remove a SatPhyRx instance from a
+   * \brief This method is used to remove a SatPhyRx instance from a
    * SatChannel instance, e.g. due to a spot-beam handover
    * \param phyRx the SatPhyRx instance to be removed from the channel.
    */
   virtual void RemoveRx (Ptr<SatPhyRx> phyRx);
 
   /**
-   *
-   * \return
+   * \return Number of receivers in the channel
    */
   virtual uint32_t GetNDevices (void) const;
 
   /**
-   *
-   * \param i
-   * \return
+   * \brief Get a device for a certain receiver index
+   * \param i Index
+   * \return A netdevice attached to this channel
    */
   virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
 
 private:
 
-  /**
-   *
-   */
   virtual void DoDispose ();
 
   /**
@@ -295,7 +287,7 @@ private:
    * net device, receiving net device, transmission time and
    * packet receipt time.
    *
-   * @see class CallBackTraceSource
+   * \see class CallBackTraceSource
    */
   TracedCallback<Ptr<const Packet>, // Packet being transmitted
                  Ptr<NetDevice>,    // Transmitting NetDevice

@@ -104,7 +104,7 @@ SatChannel::GetTypeId (void)
                     MakeEnumChecker (SatEnums::RX_PWR_CALCULATION, "RxPowerCalculation",
                                      SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
     .AddAttribute ("RxMode",
-                   "Channel receiving mode",
+                   "Channel receiving mode.",
                    EnumValue (SatChannel::ALL_BEAMS),
                    MakeEnumAccessor (&SatChannel::m_rxMode),
                    MakeEnumChecker (SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
@@ -249,14 +249,6 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
   Ptr<NetDevice> netDev = receiver->GetDevice ();
   uint32_t dstNode =  netDev->GetNode ()->GetId ();
   Simulator::ScheduleWithContext (dstNode, delay, &SatChannel::StartRx, this, rxParams, receiver);
-
-  // Call the tx anim callback on the channel (check net devices from virtual channel)
-  // Note: this is only needed for NetAnim. By default, the NetDevice does not have a channel
-  // pointer.
-  /*
-  Ptr<Channel> ch = netDev->GetChannel();
-  m_txrxPointToPoint(txParams->m_packet, ch->GetDevice(0), ch->GetDevice(1), Seconds(0), delay );
-   */
 }
 
 void
@@ -299,6 +291,8 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 void
 SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
+  NS_LOG_FUNCTION (this << rxParams << phyRx);
+
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
   tempVector.push_back (rxParams->m_rxPower_W / rxParams->m_carrierFreq_hz);
@@ -328,6 +322,8 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 void
 SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
+  NS_LOG_FUNCTION (this << rxParams << phyRx);
+
   switch (m_channelType)
     {
       case SatEnums::RETURN_FEEDER_CH:
@@ -359,6 +355,8 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
 void
 SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue)
 {
+  NS_LOG_FUNCTION (this << rxParams << phyRx << fadingValue);
+
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
   tempVector.push_back (fadingValue);
@@ -388,6 +386,8 @@ SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
 void
 SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
+  NS_LOG_FUNCTION (this << rxParams << phyRx);
+
   Ptr<MobilityModel> txMobility = rxParams->m_phyTx->GetMobility ();
   Ptr<MobilityModel> rxMobility = phyRx->GetMobility ();
 
@@ -442,6 +442,8 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 double
 SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
+  NS_LOG_FUNCTION (this << rxParams << phyRx);
+
   int32_t nodeId;
 
   switch (m_channelType)
@@ -485,6 +487,8 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
 Mac48Address
 SatChannel::GetSourceAddress (Ptr<SatSignalParameters> rxParams)
 {
+  NS_LOG_FUNCTION (this << rxParams);
+
   SatMacTag tag;
 
   SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
@@ -569,5 +573,6 @@ SatChannel::GetDevice (uint32_t i) const
   NS_LOG_FUNCTION (this << i);
   return m_phyList.at (i)->GetDevice ()->GetObject<NetDevice> ();
 }
+
 
 } // namespace ns3

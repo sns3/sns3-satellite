@@ -40,7 +40,6 @@ class SatMac;
 class SatLlc;
 class Node;
 class ErrorModel;
-class VirtualChannel;
 class SatNodeInfo;
 class SatControlMessage;
 
@@ -150,7 +149,6 @@ public:
   virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
   virtual bool SupportsSendFrom (void) const;
 
-  virtual void SetVirtualChannel (Ptr<VirtualChannel>);
   virtual Ptr<Channel> GetChannel (void) const;
 
   /**
@@ -177,14 +175,6 @@ private:
   Ptr<ErrorModel> m_receiveErrorModel;
 
   Ptr<SatNodeInfo> m_nodeInfo;
-
-  /*
-   * Virtual channel is used to virtually connect netdevices to each other.
-   * This allows the usage of global "automated" routing.
-   * TODO: Virtual channel is not anymore needed in satellite module! Thus
-   * it should be removed!
-   */
-  Ptr<VirtualChannel> m_virtualChannel;
 
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,

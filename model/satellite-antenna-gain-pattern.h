@@ -56,13 +56,13 @@ public:
 
   /**
    * Calculate the antenna gain value for a certain {latitude, longitude} point
-   * \return The gain value
+   * \return The gain value in linear format
    */
   double GetAntennaGain_lin (GeoCoordinate coord) const;
 
   /**
    * Get a valid random position under this spot-beam coverage.
-   * \return GeoCoordinate
+   * \return A valid random GeoCoordinate
    */
   GeoCoordinate GetValidRandomPosition () const;
 

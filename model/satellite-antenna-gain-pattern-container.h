@@ -29,7 +29,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Antenna gain pattern
+ * \brief Antenna gain pattern container holds all antenna patterns
+ * related to the reference system. Current reference system consists
+ * of 72 spot-beams. Each antenna gain pattern is stored in a separate
+ * class SatAntennaGainPattern. The best beam may be chosen based on
+ * the antenna patterns by using GetBestBeamId for a given position.
  */
 class SatAntennaGainPatternContainer : public Object
 {
@@ -47,7 +51,7 @@ public:
   /**
    * Get the antenna pattern of a specified beam id
    * \param beamId Beam identifier
-   * \return the antenna gain pattern instance of the specified beam id
+   * \return The antenna gain pattern instance of the specified beam id
    */
   Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
 
