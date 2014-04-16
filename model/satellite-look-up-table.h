@@ -42,12 +42,27 @@ public:
   virtual ~SatLookUpTable ();
   static TypeId GetTypeId ();
 
+  /**
+   * \brief Get the BLER corresponding to a given SINR
+   * \param sinrDb SINR in logarithmic scale
+   * \return BLER
+   */
   double GetBler (double sinrDb) const;
 
+  /**
+   * \brief Get Es/No in dB for a given BLER target
+   * \param blerTarget BLER target (0-1)
+   * \return Es/No target in dB
+   */
   double GetEsNoDb (double blerTarget) const;
 
 private:
   virtual void DoDispose ();
+
+  /**
+   * \brief Load the link results
+   * \param linkResultsPath Path to a link results file.
+   */
   void Load (std::string linkResultPath);
 
   std::vector<double> m_esNoDb;

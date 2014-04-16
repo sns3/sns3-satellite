@@ -46,20 +46,21 @@ public:
   virtual ~SatArqSequenceNumber () {};
 
   /**
-   * Check whether there are free (released) sequence numbers
-   *  \return bool Boolean to indicate whether there are seq no available
+   * \brief Check whether there are free (released) sequence numbers. If a
+   *        sequence number is not available, ARQ may not send any new packets.
+   *  \return Boolean to indicate whether there are seq no available
    */
   bool SeqNoAvailable () const;
 
   /**
-   * Returns the next free sequence number
-   * \return uint32_t Next free sequence number
+   * \brief   Returns the next free sequence number
+   * \return  Next free sequence number
    */
   uint8_t NextSequenceNumber ();
 
   /**
-   * Release a sequence number if either ACK is received or
-   * maximum retransmissions have been reached.
+   * \brief Release a sequence number if either ACK is received or
+   *        maximum retransmissions have been reached.
    * \param seqNo Sequence number to be released
    */
   void Release (uint8_t seqNo);
@@ -67,7 +68,7 @@ public:
 private:
 
   /**
-   * Clean ups the sequence number map
+   * \brief Clean ups the sequence number map
    */
   void CleanUp ();
 

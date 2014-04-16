@@ -29,7 +29,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * Sat
+ * SatChannelEstimatorError holds the error mean and STD
+ * for a set of SINR values. A proper value for a given SINR is
+ * interpolated between two points.
  *
  */
 class SatChannelEstimationError : public Object
@@ -40,7 +42,7 @@ public:
   /**
    * Constructor
    * \param filePathName A file containing the gaussian
-   * gaussian distribution mean and std.
+   * gaussian distribution mean and STD.
    */
   SatChannelEstimationError (std::string filePathName);
   virtual ~SatChannelEstimationError ();
@@ -50,16 +52,16 @@ public:
   virtual void DoDispose ();
 
   /**
-   * Add channel estimation error to SINR
+   * \brief Add channel estimation error to SINR.
    * \param sinrInDb Measured SINR in dB
-   * @return double SINR including channel estimation error in dB
+   * @return SINR including channel estimation error in dB
    */
   double AddError (double sinrInDb) const;
 
 private:
 
   /**
-   * Read the distribution mean and std values from file
+   * \brief Read the distribution mean and STD values from file.
    * @param filePathName File name
    */
   void ReadFile (std::string filePathName);
@@ -93,7 +95,5 @@ private:
 };
 
 }
-
-
 
 #endif /* SATELLITE_CHANNEL_ESTIMATION_ERROR_H_ */

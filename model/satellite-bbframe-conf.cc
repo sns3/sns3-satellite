@@ -55,7 +55,7 @@ const uint32_t payloadConf[4][3] = { { 2, 360, 90 },
 SatDvbS2Waveform::SatDvbS2Waveform ()
 :m_modcod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
  m_frameType (SatEnums::NORMAL_FRAME),
- m_frameLength (Seconds (0.0)),
+ m_frameDuration (Seconds (0.0)),
  m_payloadBits (0),
  m_cnoRequirement (0.0)
 {
@@ -63,10 +63,10 @@ SatDvbS2Waveform::SatDvbS2Waveform ()
   NS_ASSERT (true);
 }
 
-SatDvbS2Waveform::SatDvbS2Waveform(SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t fType, Time frameLen, uint32_t payloadBits)
+SatDvbS2Waveform::SatDvbS2Waveform(SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t fType, Time frameDur, uint32_t payloadBits)
 :m_modcod (modcod),
  m_frameType (fType),
- m_frameLength (frameLen),
+ m_frameDuration (frameDur),
  m_payloadBits (payloadBits),
  m_cnoRequirement (0.0)
 {
@@ -76,46 +76,54 @@ SatDvbS2Waveform::SatDvbS2Waveform(SatEnums::SatModcod_t modcod, SatEnums::SatBb
 SatEnums::SatModcod_t
 SatDvbS2Waveform::GetModcod () const
 {
+  NS_LOG_FUNCTION (this);
   return m_modcod;
 }
 
 SatEnums::SatBbFrameType_t
 SatDvbS2Waveform::GetBbFrameType () const
 {
+  NS_LOG_FUNCTION (this);
   return m_frameType;
 }
 
 uint32_t
 SatDvbS2Waveform::GetPayloadInBits () const
 {
+  NS_LOG_FUNCTION (this);
   return m_payloadBits;
 }
 
 Time
-SatDvbS2Waveform::GetFrameLength () const
+SatDvbS2Waveform::GetFrameDuration () const
 {
-  return m_frameLength;
+  NS_LOG_FUNCTION (this);
+  return m_frameDuration;
 }
 
 double
 SatDvbS2Waveform::GetCNoRequirement () const
 {
+  NS_LOG_FUNCTION (this);
   return m_cnoRequirement;
 }
 
 void
 SatDvbS2Waveform::SetCNoRequirement (double cnoRequirement)
 {
+  NS_LOG_FUNCTION (this << cnoRequirement);
   m_cnoRequirement = cnoRequirement;
 }
 
 void
 SatDvbS2Waveform::Dump () const
 {
+  NS_LOG_FUNCTION (this);
+
   std::cout << "Modcod, " << SatEnums::GetModcodTypeName (m_modcod) <<
       ", frameType, " << m_frameType <<
       ", payloadBits, " << m_payloadBits <<
-      ", frameLength, " << m_frameLength <<
+      ", frameDuration, " << m_frameDuration <<
       ", cnoRequirement, " << m_cnoRequirement << std::endl;
 }
 
@@ -306,7 +314,7 @@ SatBbFrameConf::InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults 
       ++it)
     {
       /**
-       * TODO, We have link results for only normal BB frames! The link results for short
+       * TODO: We have link results for only normal BB frames! The link results for short
        * BB frames should be added and the interface changed to be able to GetEsNoDb for
        * both frame types.
        */
@@ -401,7 +409,7 @@ Time
 SatBbFrameConf::GetBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const
 {
   NS_LOG_FUNCTION (this << modcod << frameType);
-  return m_waveforms.at (std::make_pair(modcod, frameType))->GetFrameLength ();
+  return m_waveforms.at (std::make_pair(modcod, frameType))->GetFrameDuration ();
 }
 
 Time
@@ -416,16 +424,13 @@ SatBbFrameConf::GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType)
 {
   NS_LOG_FUNCTION (this << frameType);
 
-  // Return the waveform with best spectral efficiency
-  // JPU, Note, that this algorithm is not final, but just a skeleton which shall be enhanced
-  // when implementing the actual NCC RTN link burst scheduler algorithm!
-
   // If ACM is disabled, return the default MODCOD
   if (!m_acmEnabled)
     {
       return m_defaultModCod;
     }
 
+  // Return the waveform with best spectral efficiency
   for ( waveformMap_t::const_reverse_iterator rit = m_waveforms.rbegin ();
       rit != m_waveforms.rend ();
       ++rit )
@@ -446,6 +451,7 @@ SatBbFrameConf::GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType)
 SatEnums::SatModcod_t
 SatBbFrameConf::GetDefaultModCod () const
 {
+  NS_LOG_FUNCTION (this);
   return m_defaultModCod;
 }
 

@@ -46,22 +46,22 @@ public:
   virtual void DoDispose ();
 
   /**
-   * Set the mac address of this node
-   * /param address MAC address of this node
+   * \brief Set the MAC address of this node
+   * \param address MAC address of this node
    */
   void SetMacAddress (Mac48Address address);
 
   /**
-   * Add a TBTP message to the container
-   * /param startTime TBTP superframe transmit start time
-   * /param tbtp TBTP message
+   * \brief Add a TBTP message to the container
+   * \param startTime TBTP superframe transmit start time
+   * \param tbtp TBTP message
    */
   void Add (Time startTime, Ptr<SatTbtpMessage> tbtp);
 
   /**
-   * Method of checking whether the UT has been scheduled time
+   * \brief Method of checking whether the UT has been scheduled time
    * slots into the future.
-   * /return bool Boolean indicating whether UT has been scheduled
+   * \return bool Boolean indicating whether UT has been scheduled
    * time slots into the future.
    */
   bool HasScheduledTimeSlots ();
@@ -69,7 +69,7 @@ public:
 private:
 
   /**
-   * Function for removing the TBTPs which are in the past.
+   * \brief Function for removing the TBTPs which are in the past.
    */
   void RemovePastTbtps ();
 

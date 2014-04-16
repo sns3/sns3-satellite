@@ -27,7 +27,7 @@
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
 #include "satellite-encap-pdu-status-tag.h"
-#include "satellite-gse-headers.h"
+#include "satellite-gse-header.h"
 #include "satellite-time-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGenericStreamEncapsulator");

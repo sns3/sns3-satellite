@@ -20,7 +20,7 @@
 
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
-#include "satellite-gse-headers.h"
+#include "satellite-gse-header.h"
 #include "satellite-encap-pdu-status-tag.h"
 
 
@@ -63,8 +63,10 @@ SatGseHeader::GetTypeId (void)
   return tid;
 }
 
-uint32_t SatGseHeader::GetSerializedSize (void) const
+uint32_t SatGseHeader::GetSerializedSize () const
 {
+  NS_LOG_FUNCTION (this);
+
   if (m_startIndicator)
     {
       // FULL PDU
@@ -97,6 +99,8 @@ uint32_t SatGseHeader::GetSerializedSize (void) const
 
 void SatGseHeader::Serialize (Buffer::Iterator start) const
 {
+  NS_LOG_FUNCTION (this);
+
   Buffer::Iterator i = start;
 
   // First two bytes
@@ -135,6 +139,8 @@ void SatGseHeader::Serialize (Buffer::Iterator start) const
 
 uint32_t SatGseHeader::Deserialize (Buffer::Iterator start)
 {
+  NS_LOG_FUNCTION (this);
+
   Buffer::Iterator i = start;
   uint16_t field_16;
 
@@ -171,6 +177,8 @@ uint32_t SatGseHeader::Deserialize (Buffer::Iterator start)
 
 void SatGseHeader::Print (std::ostream &os) const
 {
+  NS_LOG_FUNCTION (this);
+
   os << m_startIndicator << " " << m_endIndicator << " "
       << m_gsePduLengthInBytes << " " << m_fragmentId << " "
       << m_totalLengthInBytes << " " << m_protocolType << " "
@@ -185,56 +193,68 @@ SatGseHeader::GetInstanceTypeId (void) const
 
 uint8_t SatGseHeader::GetStartIndicator () const
 {
+  NS_LOG_FUNCTION (this);
   return m_startIndicator;
 }
 
 uint8_t SatGseHeader::GetEndIndicator () const
 {
+  NS_LOG_FUNCTION (this);
   return m_endIndicator;
 }
 
 uint32_t SatGseHeader::GetGsePduLength () const
 {
+  NS_LOG_FUNCTION (this);
   return m_gsePduLengthInBytes;
 }
 
 uint32_t SatGseHeader::GetFragmentId () const
 {
+  NS_LOG_FUNCTION (this);
   return m_fragmentId;
 }
 
 uint32_t SatGseHeader::GetTotalLength () const
 {
+  NS_LOG_FUNCTION (this);
   return m_totalLengthInBytes;
 }
 
 void SatGseHeader::SetStartIndicator ()
 {
+  NS_LOG_FUNCTION (this);
   m_startIndicator = 1;
 }
 
 void SatGseHeader::SetEndIndicator ()
 {
+  NS_LOG_FUNCTION (this);
   m_endIndicator = 1;
 }
 
 void SatGseHeader::SetGsePduLength (uint32_t bytes)
 {
+  NS_LOG_FUNCTION (this << bytes);
   m_gsePduLengthInBytes = bytes;
 }
 
 void SatGseHeader::SetFragmentId (uint32_t id)
 {
+  NS_LOG_FUNCTION (this << id);
   m_fragmentId = id;
 }
 
 void SatGseHeader::SetTotalLength (uint32_t bytes)
 {
+  NS_LOG_FUNCTION (this << bytes);
   m_totalLengthInBytes = bytes;
 }
 
 uint32_t SatGseHeader::GetGseHeaderSizeInBytes (uint8_t type) const
 {
+  NS_LOG_FUNCTION (this << type);
+
   uint32_t size (0);
   switch (type)
   {
@@ -269,6 +289,8 @@ uint32_t SatGseHeader::GetGseHeaderSizeInBytes (uint8_t type) const
 
 uint32_t SatGseHeader::GetMaxGseHeaderSizeInBytes () const
 {
+  NS_LOG_FUNCTION (this);
+
   return std::max (std::max ( (m_fullGseHeaderSize + m_labelFieldLengthInBytes),
                               (m_startGseHeaderSize + m_labelFieldLengthInBytes) ),
                   (std::max ( m_endGseHeaderSize,

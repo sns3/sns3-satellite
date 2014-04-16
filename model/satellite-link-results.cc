@@ -21,8 +21,9 @@
 
 #include <sstream>
 
-#include <ns3/log.h>
-#include <ns3/string.h>
+#include "ns3/log.h"
+#include "ns3/string.h"
+#include "ns3/object.h"
 
 #include "satellite-link-results.h"
 
@@ -88,6 +89,8 @@ SatLinkResultsDvbRcs2::GetTypeId ()
 void
 SatLinkResultsDvbRcs2::DoInitialize ()
 {
+  NS_LOG_FUNCTION (this);
+
   // Waveform ids 2-22 currently supported
   for (uint32_t i = 2; i <= 22; ++i)
     {
@@ -147,6 +150,8 @@ SatLinkResultsDvbS2::GetTypeId ()
 void
 SatLinkResultsDvbS2::DoInitialize ()
 {
+  NS_LOG_FUNCTION (this);
+
   // QPSK
   m_table[SatEnums::SAT_MODCOD_QPSK_1_TO_2] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
   m_table[SatEnums::SAT_MODCOD_QPSK_2_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_2_to_3.txt");

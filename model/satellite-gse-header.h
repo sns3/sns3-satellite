@@ -28,7 +28,9 @@
 /**
  * \ingroup satellite
  *
- * \brief SatGseHeader implementations.
+ * \brief SatGseHeader implementation. GSE header is added to full
+ * or fragmented HL packets at the GW and decapsuled at the UT. Header
+ * size affects the total packet size.
  */
 namespace ns3 {
 
@@ -50,71 +52,72 @@ public:
   virtual void Print (std::ostream &os) const;
 
   /**
-   * Get start indicator of GSE header
-   * \return uint8_t start indicator
+   * \brief Get start indicator of GSE header
+   * \return Start indicator
    */
   uint8_t GetStartIndicator () const;
 
   /**
-   * Get end indicator of GSE header
-   * \return uint8_t end indicator
+   * \brief Get end indicator of GSE header
+   * \return End indicator
    */
   uint8_t GetEndIndicator () const;
 
   /**
-   * Get GSE fragment length in bytes
-   * \return uint32_t PPDU length
+   * \brief Get GSE fragment length in bytes
+   * \return GSE PDU length
    */
   uint32_t GetGsePduLength () const;
 
   /**
-   * Get GSE fragment id
-   * \return uint32_t fragment id
+   * \brief Get GSE fragment id
+   * \return Fragment id
    */
   uint32_t GetFragmentId () const;
 
   /**
-   * Get total length of higher layer PDU.
-   * \return uint32_t total length of HL PDU
+   * \brief Get total length of higher layer PDU.
+   * \return Total length of HL PDU
    */
   uint32_t GetTotalLength () const;
 
   /**
-   * Set start indicator to GSE header
+   * \brief Set start indicator to GSE header
    */
   void SetStartIndicator ();
 
   /**
-   * Set end indicator to GSE header
+   * \brief Set end indicator to GSE header
    */
   void SetEndIndicator ();
 
   /**
-   * Set GSE fragment length to PPDU header
+   * \brief Set GSE fragment length to PPDU header
    * \param bytes GSE length in bytes
    */
   void SetGsePduLength (uint32_t bytes);
 
   /**
-   * Set fragment id to GSE header
+   * \brief Set fragment id to GSE header
    * \param id Fragment id
    */
   void SetFragmentId (uint32_t id);
 
   /**
-   * Set total length of higher layer PDU. Set in
+   * \brief Set total length of higher layer PDU. Set in
    * START_PPDU status type.
+   * \param bytes Size of the full HL packet
    */
   void SetTotalLength (uint32_t bytes);
 
   /**
    * Get the maximum GSE header size
-   * \return uint32_t header size
+   * \return Header size in bytes
    */
   uint32_t GetGseHeaderSizeInBytes (uint8_t type) const;
 
   /**
-   * Get the maximum GSE header size
+   * \brief Get the maximum GSE header size
    * \return uint32_t header size
    */
   uint32_t GetMaxGseHeaderSizeInBytes () const;

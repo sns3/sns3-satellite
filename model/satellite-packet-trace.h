@@ -30,8 +30,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- *
- * The SatPacketTrace implements a packet trace functionality
+ * \brief The SatPacketTrace implements a packet trace functionality.
+ * The movement of packet through the satellite stack can be traced
+ * in different protocol layers and direction.
  */
 
 class SatPacketTrace : public Object
@@ -50,13 +51,11 @@ public:
 
 
   TypeId GetInstanceTypeId () const;
-
   static TypeId GetTypeId (void);
-
   virtual void DoDispose ();
 
   /**
-   * Add a packet trace entry to the log
+   * \brief Add a packet trace entry to the log
    * \param Time time of a trace event
    * \param Packet event(SND, RCV, DRP, ENQ)
    * \param Node type (UT, SAT, GW, NCC, TER)
@@ -78,7 +77,7 @@ public:
 private:
 
   /**
-   * Print header to the packet trace log
+   * \brief Print header to the packet trace log
    */
   void PrintHeader ();
 

@@ -25,6 +25,10 @@
 #include <vector>
 #include "ns3/header.h"
 
+
+namespace ns3 {
+
+
 /**
  * \ingroup satellite
  *
@@ -32,8 +36,6 @@
  * to the packet in question. Sequence number is identified with one byte, thus
  * it may range between 0 - 255.
  */
-
-namespace ns3 {
 
 class SatArqHeader : public Header
 {
@@ -54,13 +56,13 @@ public:
 
   /**
    * Get sequence number
-   * \return uint8_t Sequence number
+   * \return Sequence number
    */
   uint8_t GetSeqNo () const;
 
   /**
    * Set sequence number
-   * \param uint8_t Sequence number
+   * \param seqNo Sequence number
    */
   void SetSeqNo (uint8_t seqNo);
 

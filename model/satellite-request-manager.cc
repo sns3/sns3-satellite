@@ -58,6 +58,8 @@ SatRequestManager::~SatRequestManager ()
 void
 SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf)
 {
+  NS_LOG_LOGIC (this);
+
   m_llsConf = llsConf;
   m_gainValueK = 1 / (2 * m_evaluationInterval.GetSeconds ());
   m_maxPendingCrEntries = (uint32_t)(m_rttEstimate.GetInteger () / m_evaluationInterval.GetInteger ());
@@ -319,6 +321,8 @@ SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId
 void
 SatRequestManager::ReSynchronizeVbdc ()
 {
+  NS_LOG_LOGIC (this);
+
   ResetAll ();
 
   for (uint32_t i = 0; i < m_pendingVbdcBytes.size (); ++i)
@@ -568,6 +572,8 @@ SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t value)
 void
 SatRequestManager::UpdatePendingVbdcCounters (uint8_t rc)
 {
+  NS_LOG_LOGIC (this << rc);
+
   /*
    * m_pendingVbdcBytes is updated with requested bytes and reduce by allocated
    * bytes via TBTP. This information comes from UT MAC.

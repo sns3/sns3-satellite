@@ -39,7 +39,7 @@ SatMacTag::~SatMacTag ()
 }
 
 TypeId
-SatMacTag::GetTypeId (void)
+SatMacTag::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatMacTag")
     .SetParent<Tag> ()
@@ -48,7 +48,7 @@ SatMacTag::GetTypeId (void)
   return tid;
 }
 TypeId
-SatMacTag::GetInstanceTypeId (void) const
+SatMacTag::GetInstanceTypeId () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -63,7 +63,7 @@ SatMacTag::SetDestAddress (Address dest)
 }
 
 Address
-SatMacTag::GetDestAddress (void) const
+SatMacTag::GetDestAddress () const
 {
   NS_LOG_FUNCTION (this);
   return m_destAddress;
@@ -77,14 +77,14 @@ SatMacTag::SetSourceAddress (Address source)
 }
 
 Address
-SatMacTag::GetSourceAddress (void) const
+SatMacTag::GetSourceAddress () const
 {
   NS_LOG_FUNCTION (this);
   return m_sourceAddress;
 }
 
 uint32_t
-SatMacTag::GetSerializedSize (void) const
+SatMacTag::GetSerializedSize () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -136,6 +136,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatFlowIdTag);
 
 
 SatFlowIdTag::SatFlowIdTag ()
+:m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -146,7 +147,7 @@ SatFlowIdTag::~SatFlowIdTag ()
 }
 
 TypeId
-SatFlowIdTag::GetTypeId (void)
+SatFlowIdTag::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatFlowIdTag")
     .SetParent<Tag> ()
@@ -155,7 +156,7 @@ SatFlowIdTag::GetTypeId (void)
   return tid;
 }
 TypeId
-SatFlowIdTag::GetInstanceTypeId (void) const
+SatFlowIdTag::GetInstanceTypeId () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -170,14 +171,14 @@ SatFlowIdTag::SetFlowId (uint8_t flowId)
 }
 
 uint8_t
-SatFlowIdTag::GetFlowId (void) const
+SatFlowIdTag::GetFlowId () const
 {
   NS_LOG_FUNCTION (this);
   return m_flowId;
 }
 
 uint32_t
-SatFlowIdTag::GetSerializedSize (void) const
+SatFlowIdTag::GetSerializedSize () const
 {
   NS_LOG_FUNCTION (this);
 

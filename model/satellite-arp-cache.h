@@ -27,10 +27,11 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief An ARP cache interface for satellite module
- *
- * A cached lookup table for translating layer 3 addresses to layer 2.
- * This implementation does lookups from IPv4 to a MAC address
+ * \brief An ARP cache interface for satellite module.
+ * In satellite module, the ARP cache entries are pre-filled
+ * by the helpers and n "infinite" timeout is set for all
+ * ARP cache entries. Thus, ARP (cache) is enabled but the
+ * ARP messages do not need to be actively sent.
  */
 class SatArpCache : public ArpCache
 {
@@ -41,6 +42,9 @@ public:
 
   /**
    * \brief Add an Ipv4Address - MAC address entry to this ARP cache
+   * \param to IP address
+   * \param macAddress MAC address
+   * \return ArpCache entry
    */
   ArpCache::Entry *Add (Ipv4Address to, Address macAddress);
 };

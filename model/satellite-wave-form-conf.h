@@ -31,9 +31,13 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements the usable waveform configurations of DVB-RCS2
+ * \brief This class implements the available waveform configurations of DVB-RCS2
+ * return link. Currently the waveforms 3-22 are in use: 3-12 with shorter burst
+ * duration and 13-22 with longer burst duration.
+ * \see ETSI EN 301 545-2 Digital Video Broadcasting (DVB); Second Generation
+ * Interactive Satellite System (DVB-RCS2); Part 2: Lower Layers for Satellite Standard
+ * - Annex A Reference waveforms
  */
-
 
 class SatWaveform : public SimpleRefCount<SatWaveform>
 {
@@ -45,77 +49,77 @@ public:
 
   /**
    * Constructor for SatWaveform
-   * \param wfId waveform id
-   * \param modulatedBits modulated bits
-   * \param codingRate coding rate
-   * \param payloadBytes payload in bytes
-   * \param lengthInSymbols duration in symbols
+   * \param wfId Waveform id
+   * \param modulatedBits Modulated bits
+   * \param codingRate Coding rate
+   * \param payloadBytes Payload in bytes
+   * \param lengthInSymbols Duration in symbols
    */
   SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols);
 
   /**
-   * Get waveform id
-   * \return payload in bits
+   * \brief Get waveform id
+   * \return Waveform id
    */
   uint32_t GetWaveformId () const;
 
   /**
-   * Get MODCOD enum
-   * \return SatModCod_t MODCOD enum
+   * \brief Get MODCOD enum
+   * \return MODCOD enum
    */
   SatEnums::SatModcod_t GetModCod () const;
 
   /**
-   * Get payload of a waveform in bytes
-   * \return payload in bytes
+   * \brief Get payload of a waveform in bytes
+   * \return Payload in bytes
    */
   uint32_t GetPayloadInBytes () const;
 
   /**
-   * Get burst length of the waveform in symbols
-   * \return burst length
+   * \brief Get burst length of the waveform in symbols
+   * \return Burst length
    */
   uint32_t GetBurstLengthInSymbols () const;
 
   /**
-   * Get/calculate the burst duration of a waveform based on symbol rate
-   * \param symbolRateInBaud symbol rate
-   * \return burst duration
+   * \brief Get/calculate the burst duration of a waveform based on symbol rate
+   * \param symbolRateInBaud Symbol rate
+   * \return Burst duration
    */
   Time GetBurstDuration (double symbolRateInBaud) const;
 
   /**
-   * Get/calculate the spectral efficiency of a waveform
-   * \param carrierBandwidthInHz
-   * \param symbolRateInBaud symbol rate
+   * \brief Get/calculate the spectral efficiency of a waveform
+   * \param carrierBandwidthInHz Carrier bandwidth in Hz
+   * \param symbolRateInBaud Symbol rate in baud
    * \return spectral efficiency in bits/s/Hz
    */
   double GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
   /**
-   * Get/calculate the throughput of a waveform based on symbol rate
-   * \param symbolRateInBaud symbol rate
-   * \return throughput in bits per second
+   * \brief Get/calculate the throughput of a waveform based on symbol rate
+   * \param symbolRateInBaud Symbol rate in baud
+   * \return Throughput in bits per second
    */
   double GetThroughputInBitsPerSecond (double symbolRateInBaud) const;
 
   /**
-   * Get the C/No threshold of the waveform in linear domain
-   * \param symbolRateInBaud symbol rate
+   * \brief Get the C/No threshold of the waveform in linear domain
+   * \param symbolRateInBaud Symbol rate in baud
    * \return C/No threshold
    */
   double GetCNoThreshold (double symbolRateInBaud) const;
 
   /**
-   * Set the Eb/No requirement of the waveform  in linear domain
+   * \brief Set the Eb/No requirement of the waveform  in linear domain
    * based on the used link results
-   * \param ebnoRequirement EbNo requirement
+   * \param ebnoRequirement EbNo requirement in linear domain
    */
   void SetEbNoRequirement (double ebnoRequirement);
 
   /**
-   * Dump the contents of the waveform. For spectral efficiency calculation,
-   * the total carrier bandwidth and symbol rate are needed.
+   * \brief Dump the contents of the waveform. The total carrier bandwidth and
+   * symbol rate are needed for spectral efficiency calculation.
    * \param carrierBandwidthInHz Total carrier bandwidth including e.g. guard band.
    * \param symbolRateInBaud Effective symbol rate where guard band and roll-off has been deduced.
    */
@@ -175,6 +179,7 @@ public:
 
   /**
    * Constructor
+   * \param filePathName Path and filename of the waveform configurations
    */
   SatWaveformConf (std::string filePathName);
 
@@ -186,48 +191,46 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Initialize the Eb/No requirements of the waveforms based on
+   * \brief Initialize the Eb/No requirements of the waveforms based on
    * the used DVB-RCS2 link results.
    * \param linkResults Pointer to DVB-RCS2 link results
    */
   void InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
 
   /**
-   * Get the details of a certain waveform
+   * \brief Get the details of a certain waveform
    * \param wfId Waveform id
-   * \return SatWaveform holding all the details of a certain wf
+   * \return SatWaveform holding all the details of a certain waveform
    */
   Ptr<SatWaveform> GetWaveform (uint32_t wfId) const;
 
   /**
-   * Get MODCOD enum corresponding to a waveform id
+   * \brief Get MODCOD enum corresponding to a waveform id
    * \param wfId Waveform id
-   * \return SatModcod_t MODCOD enum
+   * \return MODCOD enum
    */
   SatEnums::SatModcod_t GetModCod (uint32_t wfId) const;
 
   /**
-   * Get default waveform id
-   * \return SatWaveform id of the configuration holding all the details of the default wf
+   * \brief Get default waveform id
+   * \return SatWaveform id of the configuration holding all the details of the default waveform
    */
   uint32_t GetDefaultWaveformId () const;
 
   /**
-   * Get default burst length
+   * \brief Get default burst length
    * \return Configured default burst length.
    */
   inline uint32_t GetDefaultBurstLength () const { return GetWaveform (m_defaultWfId)->GetBurstLengthInSymbols (); }
 
   /**
-   * Get supported burst lengths.
+   * \brief Get supported burst lengths.
    * \return Supported burst lengths.
    */
   inline const BurstLengthContainer_t& GetSupportedBurstLengths () const { return m_supportedBurstLengthsInSymbols;}
 
   /**
-   * Get the best waveform id based on UT's C/No and C/No thresholds
-   * JPU: Note, that this algorithm is not final, but just a skeleton which shall be enhanced
-   * when implementing the actual NCC RTN link burst scheduler algorithm!
+   * \brief Get the best waveform id based on UT's C/No and C/No thresholds
    * \param cno UTs estimated C/No
    * \param symbolRateInBaud Frame's symbol rate used for waveform C/No requirement calculation
    * \param wfId Waveform id variable used for passing the best waveform id to the client
@@ -237,14 +240,23 @@ public:
   bool GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength = SHORT_BURST_LENGTH) const;
 
   /**
-   * Dump the contents of the waveform. For spectral efficiency calculation,
-   * the total carrier bandwidth and symbol rate are needed.
+   * \brief Dump the contents of the waveform. The total carrier bandwidth and symbol rate
+   * are needed for spectral efficiency calculation.
    * \param carrierBandwidthInHz Total carrier bandwidth including e.g. guard band.
    * \param symbolRateInBaud Effective symbol rate where guard band and roll-off has been deduced.
    */
   void Dump (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
+  /**
+   * \brief Get minimum supported waveform id
+   * return Minimum waveform id
+   */
   inline uint32_t GetMinWfId () {return m_minWfId;};
+
+  /**
+   * \brief Get maximum supported waveform id
+   * return Maximum waveform id
+   */
   inline uint32_t GetMaxWfId () {return m_maxWfId;};
 
   /**
@@ -256,17 +268,17 @@ public:
 private:
 
   /**
-   * Read the waveform table from a file
+   * \brief Read the waveform table from a file
    * \param filePathName path and file name
    */
   void ReadFromFile (std::string filePathName);
 
   /**
-   * Convert modulated bits and coding rate to a MODCOD enum
+   * \brief Convert modulated bits and coding rate to a MODCOD enum
    * \param modulatedBits Modulated bits of the MODCOD
    * \param codingRateNumerator Coding rate numerator of the MODCOD
    * \param codingRateDenominator Coding rate denominator of the MODCOD
-   * \return SatEnums::SatModcod_t MODCOD enum
+   * \return MODCOD enum
    */
   SatEnums::SatModcod_t ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNumerator, uint32_t codingRateDenominator) const;
 

@@ -22,9 +22,12 @@
 #include "ns3/uinteger.h"
 #include "ns3/nstime.h"
 #include "ns3/simulator.h"
+#include "ns3/log.h"
+
 #include "satellite-tbtp-container.h"
 #include "satellite-control-message.h"
 
+NS_LOG_COMPONENT_DEFINE ("SatTbtpContainer");
 
 namespace ns3 {
 
@@ -78,12 +81,15 @@ void SatTbtpContainer::DoDispose ()
 void
 SatTbtpContainer::SetMacAddress (Mac48Address address)
 {
+  NS_LOG_FUNCTION (this);
   m_address = address;
 }
 
 void
 SatTbtpContainer::Add (Time startTime, Ptr<SatTbtpMessage> tbtp)
 {
+  NS_LOG_FUNCTION (this << startTime.GetSeconds ());
+
   ++m_rcvdTbtps;
 
   m_tbtps.insert (std::make_pair<Time, Ptr<SatTbtpMessage> > (startTime, tbtp));
@@ -98,6 +104,8 @@ SatTbtpContainer::Add (Time startTime, Ptr<SatTbtpMessage> tbtp)
 void
 SatTbtpContainer::RemovePastTbtps ()
 {
+  NS_LOG_FUNCTION (this);
+
   for (TbtpMap_t::iterator it = m_tbtps.begin (); it != m_tbtps.end (); )
     {
       if ((it->first + m_superFrameDuration) < Now ())
@@ -114,6 +122,8 @@ SatTbtpContainer::RemovePastTbtps ()
 bool
 SatTbtpContainer::HasScheduledTimeSlots ()
 {
+  NS_LOG_FUNCTION (this);
+
   bool hasScheduledTimeSlots = false;
 
   if (!m_tbtps.empty ())

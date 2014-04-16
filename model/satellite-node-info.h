@@ -30,7 +30,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatNodeInfo implements a container for all needed node related information.
+ * \brief The SatNodeInfo implements a container for all needed node related information.
+ * It may be passed to all entities which need node specific information, e.g. LLC,
+ * MAC and PHY layers.
  */
 
 class SatNodeInfo : public SimpleRefCount<SatNodeInfo>
@@ -40,8 +42,22 @@ public:
   SatNodeInfo (SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress);
   virtual ~SatNodeInfo ();
 
+  /**
+   * \brief Get node identifier
+   * \return Node identifier
+   */
   uint32_t GetNodeId () const;
+
+  /**
+   * \brief Get Node type (UT, SAT, GW, NCC, TER)
+   * \return Node type enum
+   */
   SatEnums::SatNodeType_t GetNodeType () const;
+
+  /**
+   * \brief Get MAC address
+   * \return Node (SatNetDevice) MAC address
+   */
   Mac48Address GetMacAddress () const;
 
 private:

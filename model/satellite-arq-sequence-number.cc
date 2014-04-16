@@ -46,7 +46,6 @@ SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)
 
 }
 
-
 bool
 SatArqSequenceNumber::SeqNoAvailable () const
 {
@@ -71,7 +70,7 @@ SatArqSequenceNumber::NextSequenceNumber ()
 void
 SatArqSequenceNumber::Release (uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << seqNo);
 
   uint32_t factor = uint32_t(m_currSeqNo / m_maxSn);
   uint32_t mod = uint32_t(m_currSeqNo % m_maxSn);

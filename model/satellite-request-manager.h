@@ -34,8 +34,10 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatRequestManager analyzes periodically (every superframe) UT's
- * buffers' status and sends Capacity Requests to NCC.
+ * \brief SatRequestManager analyzes periodically UT's
+ * buffer status for different RC indices (= queues), and
+ * sends Capacity Requests to NCC according to need and lower
+ * layer service configuration (CRA, RBDC, VBDC for each RC).
  */
 class SatRequestManager : public Object
 {
@@ -49,7 +51,6 @@ public:
   // inherited from Object
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
-
   virtual void DoDispose ();
 
   /**
@@ -58,9 +59,9 @@ public:
   typedef Callback<SatQueue::QueueStats_t, bool> QueueCallback;
 
   /**
-   * Control msg sending callback
-   * \param msg        the message send
-   * \param address    Packet destination address
+   * \brief Control message sending callback
+   * \param Ptr<SatControlMessage> The message to be sent
+   * \param Address Packet destination address
    * \return bool
    */
   typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
@@ -73,55 +74,60 @@ public:
   typedef std::vector<std::deque<uint32_t> > PendingRbdcRequestsContainer_t;
 
   /**
-   * Receive a queue event
-   * /param event Queue event from SatQueue
-   * /param rcIndex Identifier of the queue
+   * \brief Receive a queue event
+   * \param event Queue event from SatQueue
+   * \param rcIndex RC identifier of the queue
    */
   void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
-   * Set a callback to fetch queue statistics
+   * \brief Add a callback to fetch queue statistics
+   * \param rcIndex RC identifier
    * \param cb Callback
    */
   void AddQueueCallback (uint8_t rcIndex, SatRequestManager::QueueCallback cb);
 
   /**
+   * \brief Set the control message sending callback.
    * \param cb callback to send control messages.
    */
   void SetCtrlMsgCallback (SatRequestManager::SendCtrlCallback cb);
 
   /**
-   * GW address needed for CR transmission
+   * \brief Set the GW address needed for CR transmission.
+   * \param address GW MAC address
    */
   void SetGwAddress (Mac48Address address);
 
   /**
-   * Set the node info of this UT
-   * \param nodeInfo Node information
+   * \brief Set the node info of this UT
+   * \param nodeInfo Node information pointer
    */
   void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * Update C/N0 information from lower layer.
+   * \brief Update C/N0 information from lower layer.
    *
    * The SatUtMac receives C/N0 information of packet receptions from GW
    * to update this information to serving GW periodically.
    *
-   * \param beamId  The id of the beam where C/N0 is from.
-   * \param gwId  The id of the GW.
-   * \param utId  The id (address) of the UT.
+   * \param beamId The id of the beam where C/N0 is from.
+   * \param utId The id (address) of the UT.
+   * \param gwId The id of the GW.
    * \param cno Value of the C/N0.
    */
   void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
 
   /**
-   * Sat UT MAC informs that certain amount of resources have been received
+   * \brief Sat UT MAC informs that certain amount of resources have been received
    * in TBTP.
+   * \param rcIndex RC index
+   * \param bytes Amount of bytes assigned to this UT in TBTP.
    */
   void AssignedDaResources (uint8_t rcIndex, uint32_t bytes);
 
   /**
-   * Resynchronize
+   * \brief Resynchronize VBDC
    */
   void ReSynchronizeVbdc ();
 
@@ -136,13 +142,14 @@ private:
   void DoPeriodicalEvaluation ();
 
   /**
-   * Do evaluation of the buffer status and decide whether or not
-   * to send CRs
+   * \brief Do evaluation of the buffer status and decide whether or not
+   * to send CRs.
+   * \param periodical Flag indicating whether the evaluation was periodical or on-demand.
    */
   void DoEvaluation (bool periodical);
 
   /**
-   * Do RBDC calculation for a RC
+   * \brief Do RBDC calculation for a RC
    * \param rc Request class index
    * \param stats Queue statistics
    * \return uint32_t Requested bytes
@@ -150,7 +157,7 @@ private:
   uint32_t DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats);
 
   /**
-   * Do VBDC calculation for a RC
+   * \brief Do VBDC calculation for a RC
    * \param rc Request class index
    * \param stats Queue statistics
    * \param &vbdcBytes Reference to vbdcBytes
@@ -159,50 +166,67 @@ private:
   SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcKBytes);
 
   /**
-   * Calculate the needed VBDC bytes for a RC
+   * \brief Calculate the needed VBDC bytes for a RC
    * \param rc Request class index
    * \param stats Queue statistics
-   * \return uint32_t Requested VBDC kilobytes
+   * \return Requested VBDC kilobytes
    */
   uint32_t GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
 
   /**
-   * Calculate the needed AVBDC bytes for a RC
+   * \brief Calculate the needed AVBDC bytes for a RC
    * \param rc Request class index
    * \param stats Queue statistics
-   * \return uint32_t Requested AVBDC kilobytes
+   * \return Requested AVBDC kilobytes
    */
   uint32_t GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
 
   /**
-   * Calculate the pending RBDC requests related to a specific RC
+   * \brief Calculate the pending RBDC requests related to a specific RC.
    * \param rc Request class index
-   * \return uint32_t Pending sum in kbps or Bytes
+   * \return Pending sum in kbps or Bytes
    */
   uint32_t GetPendingRbdcSumKbps (uint8_t rc) const;
 
   /**
-   * Update the pending RBDC counters with new request information
+   * \brief Update the pending RBDC counters with new request information
    * \param rc Request class index
    * \param value Requested value in kbps or Bytes
    */
   void UpdatePendingRbdcCounters (uint8_t rc, uint32_t value);
 
+  /**
+   * \brief Update the pending VBDC counters with new request information
+   * \param rc Request class index
+   */
   void UpdatePendingVbdcCounters (uint8_t rc);
 
   /**
-   * Send the capacity request control msg via txCallback to
+   * \brief Send the capacity request control msg via txCallback to
    * SatNetDevice
+   * \param crMsg Created capacity request
    */
   void SendCapacityRequest (Ptr<SatCrMessage> crMsg);
 
   /**
-   * Send the C/N0 report message via txCallback to SatNetDevice.
+   * \brief Send the C/N0 report message via txCallback to SatNetDevice.
    */
   void SendCnoReport ();
 
+  /**
+   * \brief Reset the assigned resources counter
+   */
   void ResetAssignedResources ();
+
+  /**
+   * \brief Reset RC index counters
+   * \param rc RC index
+   */
   void Reset (uint8_t rc);
+
+  /**
+   * \brief Reset all RC index statistics
+   */
   void ResetAll ();
 
   /**
@@ -265,9 +289,11 @@ private:
    */
   double m_gainValueK;
 
-  // Key = RC index
-  // Value -> Key   = Time when the request was sent
-  // Value -> Value = Requested bitrate or bytes
+  /**
+   * Key = RC index
+   * Value -> Key   = Time when the request was sent
+   * Value -> Value = Requested bitrate or bytes
+   */
   PendingRbdcRequestsContainer_t m_pendingRbdcRequestsKbps;
 
   /**

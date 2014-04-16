@@ -29,7 +29,8 @@ namespace ns3 {
  * \ingroup satellite
  *
  * \brief SatEncapPduStatusTag is used to tag packets in the
- * fragmentation process
+ * encapsulation and fragmentation process. The same tag is used
+ * in both RLE (SatReturnLinkEncapsulator) and GSE (SatGenericStreamEncapsulator).
  */
 class SatEncapPduStatusTag : public Tag
 {
@@ -37,14 +38,14 @@ public:
   SatEncapPduStatusTag ();
 
   /**
-   * Set PDU status
-   * \param status
+   * \brief Set PDU status
+   * \param status Status of a PDU
    */
   void SetStatus (uint8_t status);
 
   /**
-   * Get PDU status
-   * \return uint8_t PDU status
+   * \brief Get PDU status
+   * \return PDU status
    */
   uint8_t GetStatus (void) const;
 

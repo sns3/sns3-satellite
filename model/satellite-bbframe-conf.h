@@ -43,52 +43,53 @@ public:
   SatDvbS2Waveform ();
 
   /**
-   * Constructor for SatWaveform
+   * \brief Constructor for SatWaveform
    * \param modcod MODCOD
    * \param fType BB frame type (short, normal)
    * \param frameLen BB frame length in Time
-   * \param payloadBits payload in bits
+   * \param Payload in bits
    */
   SatDvbS2Waveform (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t fType, Time frameLen, uint32_t payloadBits);
 
   /**
-   * Get MODCOD of this waveform
+   * \brief Get MODCOD of this waveform
+   * \return MODCOD enum
    */
   SatEnums::SatModcod_t GetModcod () const;
 
   /**
-   * Get BB frame type
+   * \brief Get BB frame type
+   * \return BB frame type enum
    */
   SatEnums::SatBbFrameType_t GetBbFrameType () const;
 
   /**
-   * Get payload of this waveform in bits
+   * \brief Get payload of this waveform in bits
+   * \return Payload in bits
    */
   uint32_t GetPayloadInBits () const;
 
   /**
-   * Get the frame length in Time
+   * \brief Get the frame duration in Time
+   * \return Frame duration in Time
    */
-  Time GetFrameLength () const;
+  Time GetFrameDuration () const;
 
   /**
-   * Set the C/No requirement of the waveform  in linear domain
-   * based on the used link results
+   * \brief Set the C/No requirement of the waveform  in linear domain.
+   * based on the used link results.
    * \param esnoThreshold EsNo threshold
    */
   void SetCNoRequirement (double cnoRequirement);
 
   /**
-   * Get C/No requirement corresponding a given BLER target
+   * \brief Get C/No requirement corresponding a given BLER target.
    * \return C/No threshold in linear format
    */
   double GetCNoRequirement () const;
 
   /**
-   * Dump the contents of the waveform. For spectral efficiency calculation,
-   * the total carrier bandwidth and symbol rate are needed.
-   * \param carrierBandwidthInHz Total carrier bandwidth including e.g. guard band.
-   * \param symbolRateInBaud Effective symbol rate where guard band and roll-off has been deduced.
+   * \brief Dump the contents of the waveform.
    */
   void Dump () const;
 
@@ -105,9 +106,9 @@ private:
   SatEnums::SatBbFrameType_t m_frameType;
 
   /**
-   * Frame length in Time
+   * Frame duration in Time
    */
-  Time m_frameLength;
+  Time m_frameDuration;
 
   /**
    * Payload in bits
@@ -132,10 +133,9 @@ public:
 
   /**
    * SatBbFrameConf constructor
+   * \param symbolRate Symbol rate in baud
    */
   SatBbFrameConf (double symbolRate);
-
-  typedef std::map<std::pair<SatEnums::SatModcod_t, SatEnums::SatBbFrameType_t>, Ptr<SatDvbS2Waveform> > waveformMap_t;
 
   /**
    * Destructor for SatBbFrameConf
@@ -143,58 +143,62 @@ public:
   virtual ~SatBbFrameConf ();
 
   static TypeId GetTypeId (void);
-
   virtual TypeId GetInstanceTypeId (void) const;
 
+  typedef std::map<std::pair<SatEnums::SatModcod_t, SatEnums::SatBbFrameType_t>, Ptr<SatDvbS2Waveform> > waveformMap_t;
+
   /**
-   * Get BB frame header size in bytes.
+   * \brief Get BB frame header size in bytes.
    *
    * \return BB frame header size in bytes
    */
   inline uint32_t GetBbFrameHeaderSizeInBytes () const { return m_bbFrameHeaderSizeInBytes; }
 
   /**
-   * Get configured BB frame high occupancy threshold.
+   * \brief Get configured BB frame high occupancy threshold.
    *
    * \return BB frame high occupancy threshold
    */
   inline double GetBbFrameHighOccupancyThreshold () const { return m_bbFrameHighOccupancyThreshold; }
 
   /**
-   * Get configured BB frame low occupancy threshold.
+   * \brief Get configured BB frame low occupancy threshold.
    *
    * \return BB frame low occupancy threshold
    */
   inline double GetBbFrameLowOccupancyThreshold () const { return m_bbFrameLowOccupancyThreshold; }
 
   /**
-   * Initialize the C/No requirements for a given BLER target
+   * \brief Initialize the C/No requirements for a given BLER target.
+   *
    * \param linkResults DVB-S2 link results
    */
   void InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults );
 
   /**
-   * Get the dummy frame duration in Time
+   * \brief Get the dummy frame duration in Time.
+   *
    * \return The dummy BBFrame length in Time
    */
   Time GetDummyBbFrameDuration () const;
 
   /**
-   * Get the BB frame frame duration
+   * \brief Get the BB frame frame duration.
+   *
    * \param modcod MODCOD
    * \param frameType BB frame type: short, normal
    */
   Time GetBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
-   * Get the BB frame payload in bits
+   * \brief Get the BB frame payload in bits.
    * \param modcod MODCOD
    * \param frameType BB frame type: short, normal
    */
   uint32_t GetBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
-   * Get the best MODCOD with a given BB frame type
+   * \brief Get the best MODCOD with a given BB frame type.
    * \param cNo C/No of the UT to be scheduled
    * \param frameType Used BBFrame type (short OR normal)
    * \return SatModcod_t The best MODCOD
@@ -210,7 +214,7 @@ public:
 private:
 
   /**
-   * Calculate the BBrame higher layer payload in bits
+   * \brief Calculate the BBrame higher layer payload in bits.
    * \param modcod Used MODCOD in the BBFrame
    * \param frameType Used BBFrame type (short OR normal)
    * \return The maximum payload in bits
@@ -218,16 +222,16 @@ private:
   uint32_t CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
-   * Calculate the BBFrame duration in Time
+   * \brief Calculate the BBFrame duration in Time
    * \param modcod Used MODCOD in the BBFrame
    * \param frameType Used BBFrame type (short OR normal)
    * \param symbolRate The symbol rate of the scheduled carrier
-   * \return The BBFrame length in Time
+   * \return The BBFrame duration in Time
    */
   Time CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
-   * Symbol rate
+   * Symbol rate in baud
    */
   double m_symbolRate;
 

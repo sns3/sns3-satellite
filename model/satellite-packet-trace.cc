@@ -82,6 +82,8 @@ SatPacketTrace::DoDispose ()
 void
 SatPacketTrace::PrintHeader ()
 {
+  NS_LOG_FUNCTION (this);
+
   *m_packetTraceStream->GetStream () << "COLUMN DESCRIPTIONS" << std::endl;
   *m_packetTraceStream->GetStream () << "-------------------" << std::endl;
   *m_packetTraceStream->GetStream () << "Time" << std::endl;
@@ -105,6 +107,8 @@ SatPacketTrace::AddTraceEntry (Time now,
                                SatEnums::SatLinkDir_t linkDir,
                                std::string packetInfo)
 {
+  NS_LOG_FUNCTION (this << now.GetSeconds ());
+
   /**
    * TODO: Currently the packet trace logs all entries updated by the protocol layers.
    * A filtering functionality may be implemented later, to restrict the amount of output

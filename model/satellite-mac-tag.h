@@ -29,7 +29,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * \brief This class implements a tag that carries the satellite MAC specific
- * information currently unit-ID (mac address)
+ * information, such as source and destination MAC address.
  */
 class SatMacTag : public Tag
 {
@@ -37,10 +37,29 @@ public:
 
   SatMacTag ();
   ~SatMacTag ();
+
+  /**
+   * \brief Set destination MAC address
+   * \param dest Destination MAC address
+   */
   void SetDestAddress (Address dest);
+
+  /**
+   * \brief Get destination MAC address
+   * \return Destination MAC address
+   */
   Address GetDestAddress (void) const;
 
+  /**
+   * \brief Set source MAC address
+   * \param source Source MAC address
+   */
   void SetSourceAddress (Address source);
+
+  /**
+   * \brief Get source MAC address
+   * \return Source MAC address
+   */
   Address GetSourceAddress (void) const;
 
   static TypeId GetTypeId (void);
@@ -55,6 +74,10 @@ private:
   Address   m_sourceAddress;
 };
 
+/**
+ * \brief This class implements a tag that carries the flow identifier
+ * of a packet.
+ */
 class SatFlowIdTag : public Tag
 {
 public:
@@ -62,7 +85,16 @@ public:
   SatFlowIdTag ();
   ~SatFlowIdTag ();
 
+  /**
+   * \brief Set flow id
+   * \param flowId Flow identifier
+   */
   void SetFlowId (uint8_t flowId);
+
+  /**
+   * \brief Get flow identifier
+   * \return Flow identifier
+   */
   uint8_t GetFlowId () const;
 
   static TypeId GetTypeId (void);

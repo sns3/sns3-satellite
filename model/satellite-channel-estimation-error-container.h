@@ -47,14 +47,22 @@ public:
   virtual ~SatChannelEstimationErrorContainer ();
 
   /**
-   * Add channel estimation error to SINR. Base class does not actually
+   * \brief Add channel estimation error to SINR. Base class does not actually
    * do anything, but returns only the sinrInDb as sinrOutDb.
    * \param sinrInDb Measured SINR in dB
-   * @return double SINR including channel estimation error in dB
+   * \param wfId Waveform id
+   * \return SINR including channel estimation error in dB
    */
   double AddError (double sinrInDb, uint32_t wfId = 0) const;
 
 protected:
+
+  /**
+   * \brief Pure virtual method for the implementation in derived classes.
+   * \param sinrInDb Measured SINR in dB
+   * \param wfId Waveform id
+   * \return SINR including channel estimation error in dB
+   */
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const = 0;
 
 private:
@@ -70,10 +78,10 @@ public:
 
 protected:
   /**
-   * Add channel estimation error to SINR. Base class does not actually
-   * do anything, but returns only the sinrInDb as sinrOutDb.
+   * \brief Simple channel estimation error does nothing to the SINR
    * \param sinrInDb Measured SINR in dB
-   * @return double SINR including channel estimation error in dB
+   * \param wfId Waveform id
+   * \return SINR including channel estimation error in dB
    */
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
 
@@ -89,9 +97,11 @@ public:
 
 protected:
   /**
-   * Add channel estimation error to SINR
+   * \brief Add channel estimation error to SINR in FWD link
+   * Waveform id does not have any significance here.
    * \param sinrInDb Measured SINR in dB
-   * \return double SINR including channel estimation error in dB
+   * \param wfId Waveform id
+   * \return SINR including channel estimation error in dB
    */
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
 
@@ -113,13 +123,18 @@ public:
 
 protected:
   /**
-   * Add channel estimation error to SINR
+   * \brief Add channel estimation error to SINR in RTN link.
    * \param sinrInDb Measured SINR in dB
-   * \return double SINR including channel estimation error in dB
+   * \param wfId Waveform id
+   * \return SINR including channel estimation error in dB
    */
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
 
 private:
+
+  /**
+   * Map of channel estimation errors for each waveform id
+   */
   std::map<uint32_t, Ptr<SatChannelEstimationError> > m_channelEstimationErrors;
 };
 

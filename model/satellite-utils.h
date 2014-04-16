@@ -35,7 +35,7 @@ namespace ns3 {
  * \ingroup satellite
  * 
  * \brief SatUtils class is for general conversions and constants used in satellite module.
- * This class is not planned to instantiate or inherted.
+ * This class is not planned to be instantiated or inherted.
  */
 class SatUtils
 {
@@ -43,17 +43,17 @@ public:
 
 
   /**
-   * Constant definition for the speed of light in m/s
+   * \brief Constant definition for the speed of light in m/s
    */
   static const double SPEED_OF_LIGHT = 299792458.0;
 
   /**
-   * Number of bits in a byte
+   * \brief Number of bits in a byte
    */
   static const uint32_t BITS_PER_BYTE = 8;
 
   /**
-   * Converts radians to degrees
+   * \brief Converts radians to degrees
    *
    * \param radian value to convert as radians
    * \return degrees converted from radians
@@ -62,7 +62,7 @@ public:
   static inline T RadiansToDegrees ( T radian ) { return (T) ( ( radian ) * ( 180.0 / M_PI ) ); }
 
   /**
-   * Converts degrees to radians
+   * \brief Converts degrees to radians
    *
    * \param degree value to convert as degrees
    * \return radians converted from degrees
@@ -71,7 +71,7 @@ public:
   static inline T DegreesToRadians ( T degree ) { return (T) ( ( degree ) * ( M_PI / 180.0 ) ); }
 
   /**
-   * Get minimum value for linear. (The smallest value greater than zero)
+   * \brief Get minimum value for linear. (The smallest value greater than zero)
    *
    * \return minimum linear value
    */
@@ -79,7 +79,7 @@ public:
   static inline T MinLin () { return (T) ( std::numeric_limits<T>::min () ); }
 
   /**
-   * Get maximum value for linear
+   * \brief Get maximum value for linear
    *
    * \return maximum linear value
    */
@@ -87,7 +87,7 @@ public:
   static inline T MaxLin () { return (T) ( std::numeric_limits<T>::max () ); }
 
   /**
-   * Get minimum value for Decibel
+   * \brief Get minimum value for Decibel
    *
    * \return minimum Decibel value
    */
@@ -95,7 +95,7 @@ public:
   static inline T MinDb () { return (T) LinearToDb ( MinLin<T>() ); }
 
   /**
-   * Get maximum value for Decibel
+   * \brief Get maximum value for Decibel
    *
    * \return maximum Decibel value
    */
@@ -103,7 +103,7 @@ public:
   static inline T MaxDb () { return (T) LinearToDb ( MaxLin<T>() ); }
 
   /**
-   * Converts Decibel Watts to Watts
+   * \brief Converts Decibel Watts to Watts
    *
    * \param dbw value in Decibel Watts to convert
    * \return Watts converted from Decibel Watts
@@ -112,7 +112,7 @@ public:
   static inline T DbWToW ( T dbw ) { return (T) DbToLinear<T> (dbw); }
 
   /**
-   * Converts Watts to Decibel Watts
+   * \brief Converts Watts to Decibel Watts
    *
    * \param w value in Watts to convert
    * \return Decibel Watts converted from Watts
@@ -121,7 +121,7 @@ public:
   static inline T WToDbW ( T w ) { return (T) LinearToDb<T> (w); }
 
   /**
-   * Converts Decibels to linear
+   * \brief Converts Decibels to linear.
    * Accepted values for conversion are between minimum decibel value and
    * maximum decibel value. Zero is also accepted and it converts to -inf.
    *
@@ -138,12 +138,11 @@ public:
   }
 
   /**
-   * Converts linear to Decibels.
+   * \brief Converts linear to Decibels.
    * Accepted values for conversion are between minimum linear value (greater than zero and
    * maximum linear value. -inf is also accepted and it converts to 0.
    *
    * \param linear value in linear to convert
-   *
    * \return Decibels converted from linear
    */
   template <typename T>
@@ -155,7 +154,7 @@ public:
   }
 
   /**
-   * Converts Decibel milli Watts to Watts
+   * \brief Converts Decibel milli Watts to Watts
    *
    * \param dbm value in Decibel milli Watts to convert
    * \return Watts converted from Decibel milli Watts
@@ -164,7 +163,7 @@ public:
   static inline T DbmToW ( T dbm ) { return ( DbWToW<T> ( dbm ) / 1000 ); }
 
   /**
-   * Converts Watts to Decibel milli Watts
+   * \brief Converts Watts to Decibel milli Watts
    *
    * \param w value in Watts to convert
    * \return Decibel milli Watts converted from Watts
@@ -173,7 +172,7 @@ public:
   static inline T WToDbm ( T w ) { return (T) ( WToDbW<T> ( w * 1000.0 ) ); }
 
   /**
-   * Gets packet information in std::string for printing purposes
+   * \brief Get packet information in std::string for printing purposes
    *
    * \param p Packet
    * \return Packet information in std::string
@@ -192,7 +191,7 @@ public:
   }
 
   /**
-   * Gets packet information in std::string for printing purposes
+   * \brief Gets packet information in std::string for printing purposes
    *
    * \param packets A vector of packets
    * \return Packet information in std::string
@@ -210,10 +209,10 @@ public:
   }
 
   /**
-   * Gets the modulated bits of a certain modcod
+   * \brief Get the modulated bits of a certain MODCOD
    *
    * \param modcod Modulation and coding scheme
-   * \return uint32_t modulated bits
+   * \return Modulated bits
    */
   static inline uint32_t GetModulatedBits (SatEnums::SatModcod_t modcod)
   {
@@ -272,7 +271,7 @@ public:
   }
 
   /**
-   * Gets the coding rate of a certain modcod
+   * \brief Gets the coding rate of a certain MODCOD
    *
    * \param modcod Modulation and coding scheme
    * \return double coding rate
@@ -347,9 +346,15 @@ public:
   }
 
   /**
-   * Simple linear interpolation
+   * \brief Simple linear interpolation.
    * y = y0 + (y1-y0)*(x-x0)/(x1-x0)
    * http://en.wikipedia.org/wiki/Linear_interpolation
+   * \param x Interpolated x
+   * \param x0 Lower x value
+   * \param x1 Higher x value
+   * \param y0 Lower y value
+   * \param y1 Higher y value
+   * \return Interpolated value
    */
   static inline double Interpolate (double x, double x0, double x1, double y0, double y1)
   {

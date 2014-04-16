@@ -29,8 +29,12 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Base Llc class for Sat Net Devices.
- *
+ * \brief SatSchedulingObject is on object which passes the LLC/encapsulator
+ * layer related information for MAC layer to be used by the scheduler (either
+ * at GW by the forward link scheduler or at the UT by the RTN link UT scheduler).
+ * One scheduling object holds information from one single LLC encapsulator (MAC
+ * address, flow identifier). Scheduler may analyze the data and decide how to
+ * divide the MAC Tx opportunity bytes between UTs (MAC address) and flows (flow id).
  */
 class SatSchedulingObject :  public SimpleRefCount<SatSchedulingObject>
 {
@@ -43,6 +47,12 @@ public:
 
   /**
    * Default constructor
+   * \param addr MAC address of an UT
+   * \param bytes Amount of bytes at an encapsulator
+   * \param minTxOpportunity Minimum size of the Tx opportunity to be
+   *        able to create a packet.
+   * \param holDelay Head of line queuing delay
+   * \param flowId Flow identifier
    */
   SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint8_t flowId);
 
@@ -52,34 +62,33 @@ public:
   virtual ~SatSchedulingObject ();
 
   /**
-   * Get the MAC address of this object
+   * \brief Get the MAC address of this object
    * \return Mac48Address MAC address
    */
   Mac48Address GetMacAddress () const;
 
   /**
-   * Get buffered bytes of this object
-   * \return uint32_t buffered bytes
+   * \brief Get buffered bytes of this object
+   * \return Buffered bytes
    */
   uint32_t GetBufferedBytes () const;
 
   /**
-   * Get minimum tx opportunity in bytes
-   * \return minimum Tx opportunity in bytes
+   * \brief Get minimum Tx opportunity in bytes
+   * \return Minimum Tx opportunity in bytes
    */
   uint32_t GetMinTxOpportunityInBytes () const;
 
   /**
-   * Get the flow identifier of the scheduling object. This may be used
-   * as priority as well.
-   * \return uint8_t Flow identifier
+   * \brief Get the flow identifier of the scheduling object.
+   * This may be used as priority as well.
+   * \return Flow identifier
    */
   uint8_t GetFlowId () const;
 
   /**
-   * Get HOL delay of the object.
-   *
-   * \return Time HOL delay of the object.
+   * \brief Get HOL delay of the object.
+   * \return HOL delay of the object in Time.
    */
   Time GetHolDelay () const;
 
@@ -90,7 +99,6 @@ private:
   uint32_t m_minTxOpportunity;
   Time m_holDelay;
   uint8_t m_flowId;
-
 };
 
 

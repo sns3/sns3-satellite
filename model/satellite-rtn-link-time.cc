@@ -30,7 +30,6 @@ NS_LOG_COMPONENT_DEFINE ("SatRtnLinkTime");
 namespace ns3 {
 
 
-
 SatRtnLinkTime::SatRtnLinkTime ()
  :m_superframeSeq ()
 {
@@ -77,6 +76,8 @@ SatRtnLinkTime::GetNextSuperFrameCount (uint8_t superFrameSeqId) const
 Time
 SatRtnLinkTime::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
 {
+  NS_LOG_LOGIC (this << superFrameSeqId);
+
   uint32_t count = GetCurrentSuperFrameCount (superFrameSeqId);
   return Time (count * m_superframeSeq->GetDuration (superFrameSeqId).GetInteger());
 }
@@ -84,6 +85,8 @@ SatRtnLinkTime::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
 Time
 SatRtnLinkTime::GetNextSuperFrameStartTime (uint8_t superFrameSeqId) const
 {
+  NS_LOG_LOGIC (this << superFrameSeqId);
+
   uint32_t count = GetNextSuperFrameCount (superFrameSeqId);
   return Time (count * m_superframeSeq->GetDuration (superFrameSeqId).GetInteger ());
 }
@@ -91,6 +94,8 @@ SatRtnLinkTime::GetNextSuperFrameStartTime (uint8_t superFrameSeqId) const
 Time
 SatRtnLinkTime::GetSuperFrameTxTime (uint8_t superFrameSeqId, uint32_t superFrameCount, Time timingAdvance) const
 {
+  NS_LOG_LOGIC (this << superFrameSeqId << superFrameCount << timingAdvance.GetSeconds ());
+
   return (Time (superFrameCount * m_superframeSeq->GetDuration (superFrameSeqId).GetInteger ()) - timingAdvance);
 }
 

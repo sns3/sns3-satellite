@@ -60,7 +60,13 @@ SatArpCache::Add (Ipv4Address to, Address macAddress)
   ArpCache::Entry *entry = ArpCache::Add (to);
   entry->MarkWaitReply (0);
   entry->MarkAlive (macAddress);
-  ArpCache::SetAliveTimeout ( Time (std::numeric_limits<int64_t>::max () )); /// \todo Temporary hack.
+
+  /**
+   * Currently the an "infinite" timeout is set for all satellite
+   * link ARP cache entries. Thus, ARP is enabled in satellite link
+   * but the ARP messages do not need to be actively sent.
+   */
+  ArpCache::SetAliveTimeout ( Time (std::numeric_limits<int64_t>::max () ));
 
   NS_LOG_LOGIC( "IP: " << to << ", MAC: " << macAddress );
 

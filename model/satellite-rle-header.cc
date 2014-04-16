@@ -58,8 +58,10 @@ SatPPduHeader::GetTypeId (void)
   return tid;
 }
 
-uint32_t SatPPduHeader::GetSerializedSize (void) const
+uint32_t SatPPduHeader::GetSerializedSize () const
 {
+  NS_LOG_FUNCTION (this);
+
   if (m_startIndicator)
     {
       // FULL PDU
@@ -92,6 +94,8 @@ uint32_t SatPPduHeader::GetSerializedSize (void) const
 
 void SatPPduHeader::Serialize (Buffer::Iterator start) const
 {
+  NS_LOG_FUNCTION (this);
+
   Buffer::Iterator i = start;
 
   // FULL PDU
@@ -119,6 +123,8 @@ void SatPPduHeader::Serialize (Buffer::Iterator start) const
 
 uint32_t SatPPduHeader::Deserialize (Buffer::Iterator start)
 {
+  NS_LOG_FUNCTION (this);
+
   Buffer::Iterator i = start;
   uint16_t field_16;
 
@@ -150,6 +156,8 @@ uint32_t SatPPduHeader::Deserialize (Buffer::Iterator start)
 
 void SatPPduHeader::Print (std::ostream &os) const
 {
+  NS_LOG_FUNCTION (this);
+
   os << m_startIndicator << " " << m_endIndicator << " " << m_ppduLengthInBytes << " " << m_fragmentId << " " << m_totalLengthInBytes;
 }
 
@@ -161,56 +169,78 @@ SatPPduHeader::GetInstanceTypeId (void) const
 
 uint8_t SatPPduHeader::GetStartIndicator () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_startIndicator;
 }
 
 uint8_t SatPPduHeader::GetEndIndicator () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_endIndicator;
 }
 
 uint16_t SatPPduHeader::GetPPduLength () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_ppduLengthInBytes;
 }
 
 uint8_t SatPPduHeader::GetFragmentId () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_fragmentId;
 }
 
 uint16_t SatPPduHeader::GetTotalLength () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_totalLengthInBytes;
 }
 
 void SatPPduHeader::SetStartIndicator ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_startIndicator = 1;
 }
 
 void SatPPduHeader::SetEndIndicator ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_endIndicator = 1;
 }
 
 void SatPPduHeader::SetPPduLength (uint16_t bytes)
 {
+  NS_LOG_FUNCTION (this << bytes);
+
   m_ppduLengthInBytes = bytes;
 }
 
 void SatPPduHeader::SetFragmentId (uint8_t id)
 {
+  NS_LOG_FUNCTION (this << id);
+
   m_fragmentId = id;
 }
 
 void SatPPduHeader::SetTotalLength (uint16_t bytes)
 {
+  NS_LOG_FUNCTION (this << bytes);
+
   m_totalLengthInBytes = bytes;
 }
 
 uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
 {
+  NS_LOG_FUNCTION (this << type);
+
   uint32_t size (0);
   switch (type)
   {
@@ -246,6 +276,8 @@ uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
 
 uint32_t SatPPduHeader::GetMaxHeaderSizeInBytes () const
 {
+  NS_LOG_FUNCTION (this);
+
   return std::max (std::max (m_startPpduHeaderSize, m_continuationPpduHeaderSize), std::max (m_endPpduHeaderSize, m_fullPpduHeaderSize));
 }
 

@@ -28,9 +28,9 @@
 /**
  * \ingroup satellite
  *
- * \brief Payload adapted PDU (PPDU) header implementation. PPDU header is used to
- * encapsulate the HL packets at SatLlc/SatReturnLinkEncapsulator in RTN link (at UT) and
- * to defragment (deconcatenate) the HL packets at GW.
+ * \brief SatPPduHeader implementation (RLE). PPDU header is added to full
+ * or fragmented HL packets at the UT and decapsuled at the GW. Header
+ * size affects the total packet size.
  */
 namespace ns3 {
 
@@ -52,54 +52,54 @@ public:
   virtual void Print (std::ostream &os) const;
 
   /**
-   * Get start indicator of PPDU header
-   * \return uint8_t start indicator
+   * \brief Get start indicator of PPDU header
+   * \return Start indicator
    */
   uint8_t GetStartIndicator () const;
 
   /**
-   * Get end indicator of PPDU header
-   * \return uint8_t end indicator
+   * \brief Get end indicator of PPDU header
+   * \return End indicator
    */
   uint8_t GetEndIndicator () const;
 
   /**
-   * Get PPDU fragment length in bytes
-   * \return uint32_t PPDU length
+   * \brief Get PPDU fragment length in bytes
+   * \return PPDU length in bytes
    */
   uint16_t GetPPduLength () const;
 
   /**
-   * Get PPDU fragment id
-   * \return uint32_t fragment id
+   * \brief Get PPDU fragment id
+   * \return Fragment id
    */
   uint8_t GetFragmentId () const;
 
   /**
-   * Get total length of higher layer PDU. Set in
+   * \brief Get total length of higher layer PDU. Set in
    * START_PPDU status type.
-   * \return uint32_t total length of HL PDU
+   * \return Total length of HL PDU
    */
   uint16_t GetTotalLength () const;
 
   /**
-   * Set start indicator to PPDU header
+   * \brief Set start indicator to PPDU header
    */
   void SetStartIndicator ();
 
   /**
-   * Set end indicator to PPDU header
+   * \brief Set end indicator to PPDU header
    */
   void SetEndIndicator ();
 
   /**
-   * Set PPDU fragment length to PPDU header
+   * \brief Set PPDU fragment length to PPDU header
    * \param bytes PPDU length in bytes
    */
   void SetPPduLength (uint16_t bytes);
 
   /**
-   * Set fragment id to PPDU header
+   * \brief Set fragment id to PPDU header
    * \param id Fragment id
    */
   void SetFragmentId (uint8_t id);
@@ -107,18 +107,20 @@ public:
   /**
    * Set total length of higher layer PDU. Set in
    * START_PPDU status type.
+   * \param bytes Total HL packet size
    */
   void SetTotalLength (uint16_t bytes);
 
   /**
-   * Get the maximum RLE header size
-   * \return uint32_t header size
+   * \brief Get the maximum RLE header size
+   * \param type Header type
+   * \return Header size
    */
   uint32_t GetHeaderSizeInBytes (uint8_t type) const;
 
   /**
-   * Get maximum RLE header size
-   * \return uint32_t header size
+   * \brief Get maximum RLE header size
+   * \return Maximum header size
    */
   uint32_t GetMaxHeaderSizeInBytes () const;
 

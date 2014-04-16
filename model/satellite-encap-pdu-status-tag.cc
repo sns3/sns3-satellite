@@ -18,31 +18,38 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "ns3/log.h"
 #include "satellite-encap-pdu-status-tag.h"
+
+NS_LOG_COMPONENT_DEFINE ("SatEncapPduStatusTag");
+
 
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatEncapPduStatusTag);
 
 SatEncapPduStatusTag::SatEncapPduStatusTag ()
+:m_pduStatus (FULL_PDU)
 {
 }
 
 void
 SatEncapPduStatusTag::SetStatus (uint8_t status)
 {
+  NS_LOG_FUNCTION (this << status);
   m_pduStatus = status;
 }
 
 uint8_t
-SatEncapPduStatusTag::GetStatus (void) const
+SatEncapPduStatusTag::GetStatus () const
 {
+  NS_LOG_FUNCTION (this);
   return m_pduStatus;
 }
 
 
 TypeId
-SatEncapPduStatusTag::GetTypeId (void)
+SatEncapPduStatusTag::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatEncapPduStatusTag")
     .SetParent<Tag> ()
@@ -51,29 +58,33 @@ SatEncapPduStatusTag::GetTypeId (void)
   return tid;
 }
 TypeId
-SatEncapPduStatusTag::GetInstanceTypeId (void) const
+SatEncapPduStatusTag::GetInstanceTypeId () const
 {
   return GetTypeId ();
 }
 
 uint32_t
-SatEncapPduStatusTag::GetSerializedSize (void) const
+SatEncapPduStatusTag::GetSerializedSize () const
 {
+  NS_LOG_FUNCTION (this);
   return 1;
 }
 void
 SatEncapPduStatusTag::Serialize (TagBuffer i) const
 {
+  NS_LOG_FUNCTION (this);
   i.WriteU8 (m_pduStatus);
 }
 void
 SatEncapPduStatusTag::Deserialize (TagBuffer i)
 {
+  NS_LOG_FUNCTION (this);
   m_pduStatus = i.ReadU8 ();
 }
 void
 SatEncapPduStatusTag::Print (std::ostream &os) const
 {
+  NS_LOG_FUNCTION (this);
   os << "PPDU Status=" << (uint32_t) m_pduStatus;
 }
 

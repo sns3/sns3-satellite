@@ -64,18 +64,21 @@ SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRa
 uint32_t
 SatWaveform::GetWaveformId () const
 {
+  NS_LOG_FUNCTION (this);
   return m_waveformId;
 }
 
 SatEnums::SatModcod_t
 SatWaveform::GetModCod () const
 {
+  NS_LOG_FUNCTION (this);
   return m_modCod;
 }
 
 uint32_t
 SatWaveform::GetPayloadInBytes () const
 {
+  NS_LOG_FUNCTION (this);
   return m_payloadBytes;
 }
 
@@ -83,7 +86,6 @@ uint32_t
 SatWaveform::GetBurstLengthInSymbols () const
 {
   NS_LOG_FUNCTION (this);
-
   return m_lengthInSymbols;
 }
 
@@ -91,7 +93,6 @@ Time
 SatWaveform::GetBurstDuration (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
-
   return Seconds (m_lengthInSymbols / symbolRateInBaud);
 }
 
@@ -99,7 +100,6 @@ double
 SatWaveform::GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
-
   return ( SatUtils::BITS_PER_BYTE * m_payloadBytes ) / (m_lengthInSymbols / symbolRateInBaud) / carrierBandwidthInHz;
 }
 
@@ -107,7 +107,6 @@ double
 SatWaveform::GetThroughputInBitsPerSecond (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
-
   return SatUtils::BITS_PER_BYTE * m_payloadBytes / ( m_lengthInSymbols / symbolRateInBaud );
 }
 
@@ -128,7 +127,6 @@ void
 SatWaveform::SetEbNoRequirement (double ebnoRequirement)
 {
   NS_LOG_FUNCTION (this << ebnoRequirement);
-
   m_ebnoRequirement = ebnoRequirement;
 }
 
@@ -335,10 +333,6 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
     }
 
   // Return the waveform with best spectral efficiency
-
-  // JPU: Note, that this algorithm is not final, but just a skeleton which shall be enhanced
-  // when implementing the actual NCC RTN link burst scheduler algorithm!
-
   for ( std::map< uint32_t, Ptr<SatWaveform> >::const_reverse_iterator rit = m_waveforms.rbegin ();
       rit != m_waveforms.rend ();
       ++rit )
@@ -397,6 +391,8 @@ SatWaveformConf::GetModCod (uint32_t wfId) const
 SatEnums::SatModcod_t
 SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNumerator, uint32_t codingRateDenominator) const
 {
+  NS_LOG_FUNCTION (this << modulatedBits << codingRateNumerator << codingRateDenominator);
+
   switch (modulatedBits)
   {
     // QPSK
