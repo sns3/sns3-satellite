@@ -28,7 +28,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatGwLlc holds the GW implementation of LLC layer. Inherited from SatLlc.
+ * \brief SatGwLlc holds the GW implementation of LLC layer. SatGwLlc is inherited from
+ * SatLlc base class and implements the needed changes from the base class related to
+ * GW LLC packet transmissions and receptions.
  */
 class SatGwLlc : public SatLlc
 {
@@ -72,19 +74,13 @@ public:
   /**
    * Is control encapsulator already created. Only one control encapsulator
    * for flow id 0 and broadcast address is needed.
-   * \return bool Flag indicating whether control encapsulator exists
+   * \return Flag indicating whether control encapsulator exists
    */
   virtual bool ControlEncapsulatorCreated () const;
 
 protected:
-  /**
-   * \brief
-   */
+
   void DoDispose ();
-
-private:
-
-
 };
 
 } // namespace ns3

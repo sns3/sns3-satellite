@@ -77,6 +77,12 @@ SatGwLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   SatControlMsgTag cTag;
   bool found = packet->PeekPacketTag (cTag);
 
+  /**
+   * Currently only one control queue is assumed in both UT and GW. The control
+   * encapsulator is identified by a key with flowId == 0 and a broadcast MAC
+   * address. However, the control message encapsulator supports both unicast
+   * and broadcast control message transmissions.
+   */
   if (found)
     {
       NS_ASSERT (flowId == 0);
@@ -157,6 +163,8 @@ SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flo
 bool
 SatGwLlc::ControlEncapsulatorCreated () const
 {
+  NS_LOG_FUNCTION (this);
+
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
   EncapContainer_t::const_iterator it = m_encaps.find (key);
   if (it != m_encaps.end ())

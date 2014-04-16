@@ -45,13 +45,13 @@ namespace ns3 {
  * base pointers of the encapsulators, but the actual encapsulator types depend on the simulation direction:
  *
  * At GW:
- * - Encapsulators are of type SatGenericStreamEncapsulator
- * - Decapsulators are of type SatReturnLinkEncapsulator
+ * - Encapsulators are of type SatGenericStreamEncapsulator or SatGenericStreamEncapsulatorArq
+ * - Decapsulators are of type SatReturnLinkEncapsulator or SatReturnLinkEncapsulatorArq
  * - There are as many encapsulators and decapsulators as there are UTs within the spot-beam.
  *
  * At UT
- * - Encapsulators are of type SatReturnLinkEncapsulator
- * - Decapsulators are of type SatGenericStreamEncapsulator
+ * - Encapsulators are of type SatReturnLinkEncapsulator or SatReturnLinkEncapsulatorArq
+ * - Decapsulators are of type SatGenericStreamEncapsulator or SatGenericStreamEncapsulatorArq
  * - There is only one encapsulator and one decapsulator
  *
  * Fragmentation is not allowed for control packets, thus the basic functionality of just buffering
@@ -95,15 +95,15 @@ public:
     * \param packet packet sent from above down to SatMac
     * \param dest Destination MAC address of the packet
     * \param flowId Flow identifier
-    * \return whether the Send operation succeeded
+    * \return Boolean indicating whether the enque operation succeeded
     */
   virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
 
   /**
-    *  Called from lower layer (MAC) to inform a tx
+    *  Called from lower layer (MAC) to inform a Tx
     *  opportunity of certain amount of bytes
     *
-    * \param macAddr Mac address of the UT with tx opportunity
+    * \param macAddr Mac address of the UT with the Tx opportunity
     * \param bytes Size of the Tx opportunity
     * \param &bytesLeft Bytes left after TxOpportunity
     * \return Pointer to packet to be transmitted
@@ -111,7 +111,7 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft);
 
   /**
-   * Receive packet from lower layer.
+   * Receive user data packet from lower layer.
    * \param macAddr MAC address of the UT (either as transmitter or receiver)
    * \param packet Pointer to packet received.
    */
@@ -139,7 +139,8 @@ public:
   void SetReceiveCallback (SatLlc::ReceiveCallback cb);
 
   /**
-   * Add an encapsulator entry for the LLC
+   * Add an encapsulator entry for the LLC. This is called from the helpers
+   * at initialization phase.
    * Key = UT's MAC address
    * Value = encap entity
    * \param macAddr UT's MAC address
@@ -149,7 +150,8 @@ public:
   void AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t flowId);
 
   /**
-   * Add an decapsulator entry for the LLC
+   * Add an decapsulator entry for the LLC. This is called from the helpers
+   * at initialization phase.
    * Key = UT's MAC address
    * Value = decap entity
    * \param macAddr UT's MAC address
@@ -173,12 +175,15 @@ public:
   void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
 
   /**
-   * Are buffers empty
-   * \return bool Boolean to indicate whether the buffers are empty or not.
+   * Are buffers empty?
+   * \return Boolean to indicate whether the buffers are empty or not.
    */
   virtual bool BuffersEmpty () const;
 
   /**
+   * Get the number of (new) bytes at LLC queue for a certain UT. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ).
    * \param utAddress the MAC address that identifies a particular UT node.
    * \return Number of bytes currently queued in the encapsulator(s)
    *         associated with the UT.
@@ -186,6 +191,9 @@ public:
   virtual uint32_t GetNBytesInQueue (Mac48Address utAddress) const;
 
   /**
+    Get the number of (new) packets at LLC queues for a certain UT. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ).
    * \param utAddress the MAC address that identifies a particular UT node.
    * \return Number of packets currently queued in the encapsulator(s)
    *         associated with the UT.
@@ -193,19 +201,23 @@ public:
   virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
 
   /**
+   * Get the total number of (new) bytes in all encapsulators. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ).
    * \return Total number of bytes currently queued in all the encapsulators.
    */
   virtual uint32_t GetNBytesInQueue () const;
 
   /**
+   * Get the total number of (new) packets in all encapsulators. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ).
    * \return Total number of packets currently queued in all the encapsulators.
    */
   virtual uint32_t GetNPacketsInQueue () const;
 
 protected:
-  /**
-   * \brief
-   */
+
   void DoDispose ();
 
   /**
@@ -227,18 +239,20 @@ protected:
    */
   Ptr<SatNodeInfo> m_nodeInfo;
 
-  // Map of encapsulator base pointers
+  /**
+   * Map of encapsulator base pointers
+   */
   EncapContainer_t m_encaps;
 
-  // Map of decapsulator base pointers
+  /**
+   * Map of decapsulator base pointers
+   */
   EncapContainer_t m_decaps;
 
   /**
    * The upper layer package receive callback.
    */
   ReceiveCallback m_rxCallback;
-
-private:
 
 };
 

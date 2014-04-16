@@ -90,8 +90,8 @@ public:
    * LOOSE = UT scheduler may schedule also from other RC indices if needed
    */
   typedef enum {
-    STRICT = 0,//!< STRICT
-    LOOSE = 1  //!< LOOSE
+    STRICT = 0,
+    LOOSE = 1
   } SatCompliancePolicy_t;
 
   // inherited from Object
@@ -143,7 +143,7 @@ public:
    * \param   packets Vector of packets to be sent in a time slot
    * \param   payloadBytes Maximum payload of a time slot
    * \param   rcIndex RC index
-   * \param   level Compliance level of the scheduling process
+   * \param   policy Compliance policy of the scheduling process
    * \return  Ptr<Packet> Packet fetched from higher layer
    */
   void DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, uint8_t rcIndex, SatCompliancePolicy_t policy);
@@ -161,13 +161,14 @@ private:
    * \param packets       Reference to a vector of packets to be sent
    * \param payloadBytes  Payload bytes available for this time slot
    * \param rcIndex       RC index to be scheduled
-   * \return uint32_t     Scheduled bytes
+   * \return              Scheduled bytes
    */
   uint32_t DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint32_t &payloadBytes, uint8_t rcIndex);
 
   /**
-   *
-   * @return
+   * Get a prioritized order of the available RC indices for
+   * LOOSE policy UT scheduling.
+   * @return Vector of RC indices
    */
   std::vector<uint8_t> GetPrioritizedRcIndexOrder ();
 

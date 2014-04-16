@@ -233,9 +233,6 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           m_txedBufferSize += packet->GetSize ();
           m_txedBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (seqNo, arqContext));
 
-          // Update bytes lefts
-          bytesLeft = GetTxBufferSizeInBytes ();
-
           if (packet->GetSize () > bytes)
             {
               NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
@@ -245,7 +242,10 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes());
         }
     }
-  NS_LOG_LOGIC ("No data pending");
+
+  // Update bytes lefts
+  bytesLeft = GetTxBufferSizeInBytes ();
+
   return packet;
 }
 
@@ -335,7 +335,7 @@ SatReturnLinkEncapsulatorArq::ReceiveAck (Ptr<SatArqAckMessage> ack)
 void
 SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 {
-  NS_LOG_FUNCTION (this << p->GetSize () << p->GetUid ());
+  NS_LOG_FUNCTION (this << p->GetSize ());
 
   // Sanity check
   SatMacTag mTag;
@@ -432,6 +432,8 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 uint32_t
 SatReturnLinkEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
 {
+  NS_LOG_FUNCTION (this << seqNo);
+
   uint32_t globalSeqNo (0);
 
   // Calculate the rounds and current seq no from m_nextExpectedSeqNo

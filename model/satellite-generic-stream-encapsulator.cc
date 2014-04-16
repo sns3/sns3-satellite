@@ -173,6 +173,8 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 Ptr<Packet>
 SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_t maxGsePduSize, uint32_t additionalHeaderSize)
 {
+  NS_LOG_FUNCTION (this << txOpportunityBytes << maxGsePduSize << additionalHeaderSize);
+
   // GSE packet = NULL
   Ptr<Packet> packet;
 
@@ -351,6 +353,7 @@ SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
 
+  // Decapsuling and defragmentation
   ProcessPdu (p);
 }
 
@@ -358,7 +361,7 @@ SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
 void
 SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << packet->GetSize ());
 
   // Remove PDU header
   SatGseHeader gseHeader;

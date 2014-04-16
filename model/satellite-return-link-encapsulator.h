@@ -61,15 +61,12 @@ public:
   /**
    * Enqueue a Higher Layer packet to txBuffer.
    * \param p To be buffered packet
+   * \param mac Target MAC address
    */
   virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this encapsulator.
-   * HL packet = IP packet
-   * AL PDU = Addressed link PDU
-   * PPDU = Payload Adapted PDU
-   * FPDU = Frame PDU
    * \param bytes Notified tx opportunity bytes from lower layer
    * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
    * \return Ptr<Packet> a Frame PDU
@@ -78,22 +75,22 @@ public:
 
   /**
    * Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The formulated HL PDU is forwarded back to LLC and
-   * to upper layer.
+   * if needed. The decapsulated/defragmented HL PDU is forwarded back to
+   * LLC and to upper layer.
    * \param p packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
   
   /**
    * Receive a control msg (ARQ ACK)
-   * \param p Control msg pointer received from lower layer
+   * \param p Control message pointer received from lower layer
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 
   /**
    * Get minimum Tx opportunity in bytes, which takes the
    * assumed header sizes into account.
-   * \return uint32_t minimum tx opportunity
+   * \return Minimum Tx opportunity
    */
   virtual uint32_t GetMinTxOpportunityInBytes () const;
 
@@ -103,7 +100,7 @@ protected:
    * Get new packet performs the RLE fragmentation and encapsulation
    * for a one single packet. Returns NULL packet if a suitable packet
    * is not created.
-   * \return Ptr<Packet> RLE packet
+   * \return A RLE packet
    */
   Ptr<Packet> GetNewRlePdu (uint32_t txOpportunityBytes, uint32_t maxRlePduSize, uint32_t additionalHeaderSize = 0);
 
@@ -119,6 +116,9 @@ protected:
    */
   void IncreaseFragmentId ();
 
+  /**
+   * Reset defragmentation variables
+   */
   void Reset ();
 
   /**

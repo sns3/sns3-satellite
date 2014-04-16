@@ -75,7 +75,7 @@ public:
   /**
    * Constructor
    */
-  SatQueue (uint8_t rcIndex);
+  SatQueue (uint8_t flowId);
   ~SatQueue ();
 
   virtual void DoDispose ();
@@ -97,7 +97,7 @@ public:
   /**
    * Enque pushes packet to the packet container (back)
    * \param p Packet
-   * \return bool Was the enque succesfull or not
+   * \return bool indicating whether the enque was successfull
    */
   virtual bool Enqueue (Ptr<Packet> p);
 
@@ -116,7 +116,7 @@ public:
 
   /**
    * Get a copy of the item at the front of the queue without removing it
-   * \return 0 if the operation was not successful; the packet otherwise.
+   * \return Pointer to the packet
    */
   virtual Ptr<const Packet> Peek (void) const;
 
@@ -126,10 +126,10 @@ public:
   void DequeueAll (void);
 
   /**
-   * Configured RC index for this queue
-   * \param rcIndex
+   * Configured flow index for this queue
+   * \param flowId
    */
-  void SetRcIndex (uint32_t rcIndex);
+  void SetFlowId (uint32_t flowId);
 
   /**
    * Add queue event callback
@@ -239,7 +239,7 @@ private:
   /**
    * An unique id for each queue
    */
-  uint8_t m_rcIndex;
+  uint8_t m_flowId;
 
   // Statistics
   uint32_t m_nBytes;

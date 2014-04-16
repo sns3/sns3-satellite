@@ -41,11 +41,6 @@ SatUtLlc::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtLlc")
     .SetParent<SatLlc> ()
     .AddConstructor<SatUtLlc> ()
-    .AddAttribute ("SatRequestManager",
-                   "The Satellite request manager attached to this UT LLC.",
-                   PointerValue (),
-                   MakePointerAccessor (&SatUtLlc::GetRequestManager),
-                   MakePointerChecker<SatRequestManager> ())
   ;
   return tid;
 }
@@ -125,12 +120,16 @@ SatUtLlc::SetRequestManager (Ptr<SatRequestManager> rm)
 Ptr<SatRequestManager>
 SatUtLlc::GetRequestManager () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_requestManager;
 }
 
 void
 SatUtLlc::SetQueueStatisticsCallbacks ()
 {
+  NS_LOG_FUNCTION (this);
+
   // Control queue = rcIndex 0
   SatRequestManager::QueueCallback queueCb;
   for (EncapContainer_t::iterator it = m_encaps.begin ();
@@ -146,6 +145,8 @@ SatUtLlc::SetQueueStatisticsCallbacks ()
 uint32_t
 SatUtLlc::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
 {
+  NS_LOG_FUNCTION (this << maxPacketSizeBytes);
+
   uint32_t packets (0);
   for (EncapContainer_t::const_iterator it = m_encaps.begin ();
       it != m_encaps.end ();

@@ -74,21 +74,21 @@ public:
    * Notify a Tx opportunity to this encapsulator.
    * \param bytes Notified tx opportunity bytes from lower layer
    * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \return Ptr<Packet> a PPDU (RLE) PDU
+   * \return A RLE PDU pointer
    */
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
 
   /**
    * Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The formulated HL PDU is forwarded back to LLC and
-   * to upper layer.
+   * if needed. The decapsuled/defragmented HL PDU is forwarded back to
+   * LLC and to upper layer.
    * \param p packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
 
   /**
-   * Receive a control msg (ARQ ACK)
-   * \param p Control msg pointer received from lower layer
+   * Receive a control message (ARQ ACK)
+   * \param p Control message pointer received from lower layer
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 
@@ -117,7 +117,7 @@ private:
    * Convert the 8-bit sequence number value from ARQ header into
    * 32-bit continuous sequence number stream at the receiver.
    * \param seqNo 8-bit sequence number
-   * \return uint32_t 32-bit sequence number
+   * \return 32-bit sequence number
    */
   uint32_t ConvertSeqNo (uint8_t seqNo) const;
 

@@ -181,6 +181,8 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 Ptr<Packet>
 SatReturnLinkEncapsulator::GetNewRlePdu (uint32_t txOpportunityBytes, uint32_t maxRlePduSize, uint32_t additionalHeaderSize)
 {
+  NS_LOG_FUNCTION (this << txOpportunityBytes << maxRlePduSize << additionalHeaderSize);
+
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
 
@@ -358,6 +360,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
 
+  // Do decapsulation and defragmentation
   ProcessPdu (p);
 }
 
@@ -365,7 +368,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
 void
 SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
 {
-  NS_LOG_FUNCTION (this << p->GetSize () << p->GetUid ());
+  NS_LOG_FUNCTION (this << p->GetSize ());
 
   // Remove PPDU header
   SatPPduHeader ppduHeader;

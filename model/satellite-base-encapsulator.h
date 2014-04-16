@@ -37,6 +37,8 @@ namespace ns3 {
 /**
  * ARQ buffer context is holding information related to the ARQ transmission
  * or reception depending on whether packet(s) are being transmitted or received.
+ * The SatArqBufferContext is used only when ARQ is enabled, i.e. encapsulator is
+ * of type SatReturnLinkEncapsulatorArq or SatGenericStreamEncapsulatorArq.
  */
 class SatArqBufferContext : public SimpleRefCount<SatArqBufferContext>
 {
@@ -61,7 +63,7 @@ public:
 
 /**
  * \ingroup satellite
- * \brief This class implements a base encapsulator class. Basically
+ * \brief This class implements a base encapsulator class. Basically,
  * it is a packet container using SatQueue class. It does not support
  * encapsulator nor fragmentation / packing. Return Link Encapsulator (RLE)
  * and Generic Stream Encapsulator (GSE) are inherited from this base
@@ -131,13 +133,17 @@ public:
   /**
    * Enqueue a packet to txBuffer.
    * \param p To be buffered packet
+   * \param mac Target MAC address
    */
   virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this base encapsulator. Note, that
    * this class does not do encapsulator nor do not support fragmentation.
-   * Thus, enqueued packet must fit into the tx opportunity.
+   *
+   * \param bytes Notified Tx opportunity bytes from lower layer
+   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
+   * \return An raw control PDU
    */
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
 
@@ -150,8 +156,8 @@ public:
   virtual void ReceivePdu (Ptr<Packet> p);
 
   /**
-   * Receive a control packet (ARQ ACK)
-   * \param p packet pointer received from lower layer
+   * Receive a control message (ARQ ACK)
+   * \param ack Control message received (e.g. ARQ ACK)
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 

@@ -170,13 +170,14 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
       EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
       EncapContainer_t::iterator it = m_decaps.find (key);
 
+      // Note: control messages should not be seen at the LLC layer, since
+      // they are received already at the MAC layer and received as control
+      // messages.
       if (flowId == SatEnums::CONTROL_FID)
         {
           NS_FATAL_ERROR ("Control messages should be terminated already at lower layer!");
         }
         
-      // Note: control messages should not be seen at the LLC layer, since
-      // they are received already at the MAC layer.
       if (it != m_decaps.end ())
         {
           it->second->ReceivePdu (packet);
@@ -306,7 +307,7 @@ SatLlc::BuffersEmpty () const
       it != m_encaps.end ();
       ++it)
     {
-      if (!(it->second->GetQueue ()->IsEmpty ()))
+      if (it->second->GetTxBufferSizeInBytes () > 0)
         {
           return false;
         }

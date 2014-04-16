@@ -60,25 +60,22 @@ public:
   /**
    * Enqueue a Higher Layer packet to txBuffer.
    * \param p To be buffered packet
+   * \param mac Target MAC address
    */
   virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this encapsulator.
-   * HL packet = IP packet
-   * AL PDU = Addressed link PDU
-   * PPDU = Payload Adapted PDU
-   * FPDU = Frame PDU
    * \param bytes Notified tx opportunity bytes from lower layer
-   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \return Ptr<Packet> a Frame PDU
+   * \param bytesLeft Bytes left after this TxOpportunity in SatQueue
+   * \return A GSE PDU
    */
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
 
   /**
    * Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The formulated HL PDU is forwarded back to LLC and
-   * to upper layer.
+   * if needed. The decapsulated/defragmented HL PDU is forwarded back
+   * to LLC and to upper layer.
    * \param p packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
@@ -112,6 +109,9 @@ protected:
    */
   virtual void ProcessPdu (Ptr<Packet> p);
 
+  /**
+   * Reset defragmentation variables
+   */
   void Reset ();
 
   /**

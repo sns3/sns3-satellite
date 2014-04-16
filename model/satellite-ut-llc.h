@@ -28,9 +28,10 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatUtLlc holds the Ut implementation of LLC layer. Inherited from SatLlc.
+ * \brief SatUtLlc holds the UT implementation of LLC layer. SatUtLlc is inherited from
+ * SatLlc base class and implements the needed changes from the base class related to
+ * UT LLC packet transmissions and receptions.
  */
-
 class SatUtLlc : public SatLlc
 {
 public:
@@ -49,10 +50,10 @@ public:
   virtual ~SatUtLlc ();
 
   /**
-    *  Called from lower layer (MAC) to inform a tx
+    *  Called from lower layer (MAC) to inform a Tx
     *  opportunity of certain amount of bytes
     *
-    * \param macAddr Mac address of the UT with tx opportunity
+    * \param macAddr Mac address of the UT with Tx opportunity
     * \param bytes Size of the Tx opportunity
     * \param rcIndex RC index
     * \return Pointer to packet to be transmitted
@@ -67,14 +68,13 @@ public:
 
   /**
    * Getter for the request manager
-   * \return Ptr<SatRequestManager>
+   * \return Pointer to SatRequestManager
    */
   Ptr<SatRequestManager> GetRequestManager () const;
 
   /**
-   * Set queue statistics callbacks
-   * from SatRequestManager
-   * to SatQueue
+   * Set queue statistics callbacks for each UT packet queue. Callbacks are
+   * passed on to request manager.
    */
   void SetQueueStatisticsCallbacks ();
 
@@ -95,9 +95,7 @@ public:
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 protected:
-  /**
-   * \brief
-   */
+
   void DoDispose ();
 
 private:

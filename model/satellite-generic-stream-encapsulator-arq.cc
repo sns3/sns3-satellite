@@ -88,7 +88,7 @@ SatGenericStreamEncapsulatorArq::GetTypeId (void)
     .SetParent<SatGenericStreamEncapsulator> ()
     .AddConstructor<SatGenericStreamEncapsulatorArq> ()
     .AddAttribute( "MaxNoOfRetransmissions",
-                   "Maximum number of retransmissions for a single RLE PDU.",
+                   "Maximum number of retransmissions for a single GSE PDU.",
                    UintegerValue (2),
                    MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_maxNoOfRetransmissions),
                    MakeUintegerChecker<uint32_t> ())
@@ -136,8 +136,8 @@ SatGenericStreamEncapsulatorArq::DoDispose ()
 Ptr<Packet>
 SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
 {
-  //NS_LOG_FUNCTION (this << bytes);
-  //NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
+  NS_LOG_FUNCTION (this << bytes);
+  NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -187,7 +187,7 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
   // available for any new transmissions.
   else if (!m_txQueue->IsEmpty() && m_seqNo->SeqNoAvailable ())
     {
-      // Crate new RLE PDU
+      // Crate new GSE PDU
       packet = GetNewGsePdu (bytes, bytes, m_arqHeaderSize);
 
       if (packet)
@@ -226,9 +226,6 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
           m_txedBufferSize += packet->GetSize ();
           m_txedBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (seqNo, arqContext));
 
-          // Update bytes lefts
-          bytesLeft = GetTxBufferSizeInBytes ();
-
           if (packet->GetSize () > bytes)
             {
               NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
@@ -238,6 +235,10 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
           NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes());
         }
     }
+
+  // Update bytes lefts
+  bytesLeft = GetTxBufferSizeInBytes ();
+
   return packet;
 }
 
@@ -327,7 +328,7 @@ SatGenericStreamEncapsulatorArq::ReceiveAck (Ptr<SatArqAckMessage> ack)
 void
 SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 {
-  NS_LOG_FUNCTION (this << p->GetSize () << p->GetUid ());
+  NS_LOG_FUNCTION (this << p->GetSize ());
 
   // Sanity check
   SatMacTag mTag;
@@ -347,7 +348,7 @@ SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 
   NS_LOG_LOGIC ("GW: " << m_sourceAddress << " received a packet with SeqNo: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
-  // Send ACK for the received RLE packet.
+  // Send ACK for the received GSE packet.
   SendAck (seqNo);
 
   // Convert the 8-bit sequence number to continuous 32-bit sequence number
@@ -424,6 +425,8 @@ SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 uint32_t
 SatGenericStreamEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
 {
+  NS_LOG_FUNCTION (this << seqNo);
+
   uint32_t globalSeqNo (0);
 
   // Calculate the rounds and current seq no from m_nextExpectedSeqNo
@@ -525,7 +528,7 @@ SatGenericStreamEncapsulatorArq::RxWaitingTimerExpired (uint32_t seqNo)
 uint32_t
 SatGenericStreamEncapsulatorArq::GetTxBufferSizeInBytes () const
 {
-  //NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 
   return m_txQueue->GetNBytes () + m_retxBufferSize;
 }
@@ -538,8 +541,8 @@ SatGenericStreamEncapsulatorArq::SendAck (uint8_t seqNo) const
   NS_LOG_LOGIC ("GW: " << m_destAddress << " send ACK to GW: " << m_sourceAddress << " with flowId: " << (uint32_t)(m_flowId) << " with SN: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
   /**
-   * RLE sends the ACK control message via a callback to SatNetDevice of the GW to the
-   * GSE control buffer. The transmission assumptions for the control messages are currently
+   * GSE sends the ACK control message via a callback to SatNetDevice of the GW to the
+   * RLE control buffer. The transmission assumptions for the control messages are currently
    * - Default (most robust) MODCOD
    * - Strict priority
    */

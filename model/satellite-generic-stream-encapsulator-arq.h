@@ -60,9 +60,9 @@ public:
    * Constructor
    * \param source Source MAC address for the encapsulator (UT address)
    * \param dest Destination MAC address for the encapsulator (GW address)
-   * \param rcIndex RC index of the encapsulator
+   * \param flowId Flow id of the encapsulator
    */
-  SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
+  SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId);
   virtual ~SatGenericStreamEncapsulatorArq ();
 
   static TypeId GetTypeId (void);
@@ -73,22 +73,22 @@ public:
   /**
    * Notify a Tx opportunity to this encapsulator.
    * \param bytes Notified tx opportunity bytes from lower layer
-   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \return Ptr<Packet> a PPDU (RLE) PDU
+   * \param bytesLeft Bytes left after this TxOpportunity in SatQueue
+   * \return A GSE PDU
    */
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
 
   /**
    * Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The formulated HL PDU is forwarded back to LLC and
-   * to upper layer.
-   * \param p packet pointer received from lower layer
+   * if needed. The decapsuled/defragmented HL PDU is forwarded back to
+   * LLC and to upper layer.
+   * \param A packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
 
   /**
-   * Receive a control msg (ARQ ACK)
-   * \param p Control msg pointer received from lower layer
+   * Receive a control message (ARQ ACK)
+   * \param ack Control message pointer received from lower layer
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 
@@ -185,7 +185,7 @@ private:
 
   /**
    * key = sequence number
-   * value = RLE packet
+   * value = GSE packet
    */
   std::map<uint32_t, Ptr<SatArqBufferContext> > m_reorderingBuffer;
 };

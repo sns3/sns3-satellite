@@ -124,7 +124,7 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
   Ptr<Packet> packet;
 
   // No packets in buffer
-  if ( m_txQueue->GetNPackets () == 0 )
+  if (m_txQueue->IsEmpty())
     {
       NS_LOG_LOGIC ("No data pending, return NULL packet");
       return packet;
@@ -133,6 +133,7 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
   // Peek the first PDU from the buffer.
   Ptr<const Packet> peekPacket = m_txQueue->Peek ();
 
+  // If control packet fits into TxO
   if (peekPacket->GetSize () <= bytes)
     {
       // Peek the first PDU from the buffer.
@@ -215,6 +216,7 @@ void
 SatBaseEncapsulator::SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
+
   m_ctrlCallback = cb;
 }
 
