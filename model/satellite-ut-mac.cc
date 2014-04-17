@@ -643,8 +643,8 @@ SatUtMac::GetNextRandomAccessAllocationChannel ()
 
   NS_LOG_INFO ("SatUtMac::GetNextRandomAccessAllocationChannel - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds ());
 
-  /// TODO at the moment only allocation channel 0 is supported
-  return 0;
+  /// TODO at the moment only one allocation channel is supported
+  return m_raChannel;
 }
 
 void
@@ -662,7 +662,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission @ " << Now ().GetSeconds () << " - No known DAMA, selecting a slot for Slotted ALOHA");
 
       Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
-      uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
+      uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
       Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
       uint32_t timeSlotCount = frameConf->GetTimeSlotCount ();
 
@@ -844,7 +844,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   /// TODO get rid of the hard coded 0
   Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
-  uint8_t frameId = superframeConf->GetRaChannelFrameId (m_raChannel);
+  uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
   /// CRDSA is evaluated only at the frame start
@@ -852,7 +852,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   Time superframeStartTime = Now ();
 
   /// get the slot payload
-  uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (m_raChannel);
+  uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (allocationChannel);
 
   /// get the next packet
   SatPhy::PacketContainer_t uniq;
