@@ -11,6 +11,8 @@
 cpp_examples = [
     ("simple-scenario-p2p", "True", "True"),
     ("larger-scenario-p2p", "True", "True"),
+    ("sat-arq-fwd-example", "True", "True"),
+    ("sat-arq-rtn-example", "True", "True"),
     ("sat-cbr-example", "True", "True"),
     ("sat-cbr-larger-example", "True", "True"),
     ("sat-cbr-user-defined-example", "True", "True"),
