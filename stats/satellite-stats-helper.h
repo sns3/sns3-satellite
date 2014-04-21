@@ -77,7 +77,7 @@ public:
    * \param identifierType
    * \return
    */
-  static std::string GetIdentiferTypeName (IdentifierType_t identifierType);
+  static std::string GetIdentifierTypeName (IdentifierType_t identifierType);
 
   /**
    * \enum OutputType_t

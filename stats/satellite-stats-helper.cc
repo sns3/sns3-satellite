@@ -45,7 +45,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatStatsHelper);
 
 std::string // static
-SatStatsHelper::GetIdentiferTypeName (SatStatsHelper::IdentifierType_t identifierType)
+SatStatsHelper::GetIdentifierTypeName (SatStatsHelper::IdentifierType_t identifierType)
 {
   switch (identifierType)
     {
@@ -209,12 +209,12 @@ SatStatsHelper::GetName () const
 void
 SatStatsHelper::SetIdentifierType (SatStatsHelper::IdentifierType_t identifierType)
 {
-  NS_LOG_FUNCTION (this << GetIdentiferTypeName (identifierType));
+  NS_LOG_FUNCTION (this << GetIdentifierTypeName (identifierType));
 
   if (m_isInstalled && (m_identifierType != identifierType))
     {
       NS_LOG_WARN (this << " cannot modify the current identifier type"
-                        << " (" << GetIdentiferTypeName (m_identifierType) << ")"
+                        << " (" << GetIdentifierTypeName (m_identifierType) << ")"
                         << " because this instance have already been installed");
     }
   else
@@ -239,7 +239,7 @@ SatStatsHelper::SetOutputType (SatStatsHelper::OutputType_t outputType)
   if (m_isInstalled && (m_outputType != outputType))
     {
       NS_LOG_WARN (this << " cannot modify the current output type"
-                        << " (" << GetIdentiferTypeName (m_identifierType) << ")"
+                        << " (" << GetIdentifierTypeName (m_identifierType) << ")"
                         << " because this instance have already been installed");
     }
   else
@@ -377,7 +377,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 
   NS_LOG_INFO (this << " created " << n << " instance(s)"
                     << " of " << collectorMap.GetType ().GetName ()
-                    << " for " << GetIdentiferTypeName (GetIdentifierType ()));
+                    << " for " << GetIdentifierTypeName (GetIdentifierType ()));
 
   return n;
 
@@ -572,7 +572,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
     default:
       NS_LOG_WARN (this << " Identifier type "
-                        << GetIdentiferTypeName (m_identifierType)
+                        << GetIdentifierTypeName (m_identifierType)
                         << " is not valid for a UT user."
                         << " Assigning identifier 0 to this UT user.");
       break;
@@ -637,7 +637,7 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 
     default:
       NS_LOG_WARN (this << " Identifier type "
-                        << GetIdentiferTypeName (m_identifierType)
+                        << GetIdentifierTypeName (m_identifierType)
                         << " is not valid for a UT."
                         << " Assigning identifier 0 to this UT.");
       break;
@@ -673,7 +673,7 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
 
     default:
       NS_LOG_WARN (this << " Identifier type "
-                        << GetIdentiferTypeName (m_identifierType)
+                        << GetIdentifierTypeName (m_identifierType)
                         << " is not valid for a beam."
                         << " Assigning identifier 0 to this beam.");
       break;
@@ -697,7 +697,7 @@ SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
   else
     {
       NS_LOG_WARN (this << " Identifier type "
-                        << GetIdentiferTypeName (m_identifierType)
+                        << GetIdentifierTypeName (m_identifierType)
                         << " is not valid for a GW."
                         << " Assigning identifier 0 to this GW.");
       return 0;
