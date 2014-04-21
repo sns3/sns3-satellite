@@ -23,41 +23,40 @@
 #include <ns3/fatal-error.h>
 #include <ns3/string.h>
 
-#include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-beam-helper.h>
+#include <ns3/node-container.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-helper.h>
 
 #include <ns3/data-collection-object.h>
 #include <ns3/multi-file-aggregator.h>
-#include <list>
 
-#include "satellite-stats-backlogged-request-helper.h"
+#include "satellite-stats-capacity-request-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsBackloggedRequestHelper");
+NS_LOG_COMPONENT_DEFINE ("SatStatsCapacityRequestHelper");
 
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsBackloggedRequestHelper);
+NS_OBJECT_ENSURE_REGISTERED (SatStatsCapacityRequestHelper);
 
-SatStatsBackloggedRequestHelper::SatStatsBackloggedRequestHelper (Ptr<const SatHelper> satHelper)
+SatStatsCapacityRequestHelper::SatStatsCapacityRequestHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsBackloggedRequestHelper::~SatStatsBackloggedRequestHelper ()
+SatStatsCapacityRequestHelper::~SatStatsCapacityRequestHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 TypeId // static
-SatStatsBackloggedRequestHelper::GetTypeId ()
+SatStatsCapacityRequestHelper::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsBackloggedRequestHelper")
+  static TypeId tid = TypeId ("ns3::SatStatsCapacityRequestHelper")
     .SetParent<SatStatsHelper> ()
   ;
   return tid;
@@ -65,7 +64,7 @@ SatStatsBackloggedRequestHelper::GetTypeId ()
 
 
 void
-SatStatsBackloggedRequestHelper::DoInstall ()
+SatStatsCapacityRequestHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -75,8 +74,7 @@ SatStatsBackloggedRequestHelper::DoInstall ()
                       << " is not a valid output type for this statistics.");
     }
 
-  if (GetIdentifierType () == SatStatsHelper::IDENTIFIER_UT
-      || GetIdentifierType () == SatStatsHelper::IDENTIFIER_UT_USER)
+  if (GetIdentifierType () == SatStatsHelper::IDENTIFIER_UT_USER)
     {
       NS_FATAL_ERROR (GetIdentifierTypeName (GetIdentifierType ())
                       << " is not a valid identifier type for this statistics.");
@@ -85,21 +83,16 @@ SatStatsBackloggedRequestHelper::DoInstall ()
   // Setup aggregator.
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                    "OutputFileName", StringValue (GetName ()),
-                                   "GeneralHeading", StringValue ("% time_sec beam_id ut_id type requests"));
+                                   "GeneralHeading",
+                                   StringValue ("% time_sec node_id rc_id type rate_kBps queue_bytes"));
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
   NS_ASSERT (multiFileAggregator != 0);
   Callback<void, std::string, std::string> aggregatorSink
       = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
 
   // Setup probes.
-  Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
-  NS_ASSERT (beamHelper != 0);
-  Ptr<SatNcc> ncc = beamHelper->GetNcc ();
-  NS_ASSERT (ncc != 0);
-  std::list<uint32_t> beams = beamHelper->GetBeams ();
-
-  for (std::list<uint32_t>::const_iterator it = beams.begin ();
-       it != beams.end (); ++it)
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
     {
       std::ostringstream context;
       switch (GetIdentifierType ())
@@ -108,26 +101,38 @@ SatStatsBackloggedRequestHelper::DoInstall ()
           context << "global";
           break;
         case SatStatsHelper::IDENTIFIER_GW:
-          context << "gw-" << GetIdentifierForBeam (*it);
+          context << "gw-" << GetIdentifierForUt (*it);
           break;
         case SatStatsHelper::IDENTIFIER_BEAM:
-          context << "beam-" << GetIdentifierForBeam (*it);
+          context << "beam-" << GetIdentifierForUt (*it);
+          break;
+        case SatStatsHelper::IDENTIFIER_UT:
+          context << "ut-" << GetIdentifierForUt (*it);
           break;
         default:
-          NS_FATAL_ERROR ("SatStatsBackloggedRequestHelper - Invalid identifier type");
+          NS_FATAL_ERROR ("SatStatsCapacityRequestHelper - Invalid identifier type");
           break;
         }
 
-      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (*it);
-      NS_ASSERT_MSG (s != 0, "Error finding beam " << *it);
-      const bool ret = s->TraceConnect ("BacklogRequestsTrace",
-                                        context.str (), aggregatorSink);
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+      Ptr<SatLlc> satLlc = satDev->GetLlc ();
+      NS_ASSERT (satLlc != 0);
+      Ptr<SatUtLlc> utLlc = satLlc->GetObject<SatUtLlc> ();
+      NS_ASSERT (utLlc != 0);
+      Ptr<SatRequestManager> requestManager = utLlc->GetRequestManager ();
+
+      const bool ret = requestManager->TraceConnect ("CrTraceLog",
+                                                     context.str (),
+                                                     aggregatorSink);
       NS_ASSERT_MSG (ret,
-                     "Error connecting to BacklogRequestsTrace of beam " << *it);
+                     "Error connecting to CrTraceLog of node " << (*it)->GetId ());
       NS_UNUSED (ret);
       NS_LOG_INFO (this << " successfully connected"
-                        << " with beam " << *it);
-    }
+                        << " with node ID " << (*it)->GetId ());
+
+    } // end of `for (NodeContainer::Iterator it = uts.Begin () -> uts.End ())`
 
 } // end of `void DoInstall ();`
 

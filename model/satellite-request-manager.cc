@@ -193,7 +193,7 @@ SatRequestManager::DoEvaluation (bool periodical)
 
   Ptr<SatCrMessage> crMsg = CreateObject<SatCrMessage> ();
 
-  // Go through the RC indeces
+  // Go through the RC indices
   for (uint8_t rc = 0; rc < m_llsConf->GetDaServiceCount(); ++rc)
     {
       // Get statistics for LLC/SatQueue
@@ -217,7 +217,12 @@ SatRequestManager::DoEvaluation (bool periodical)
           if (rbdcRateKbps > 0)
             {
               std::stringstream ss;
-              ss << Now ().GetSeconds () << ", " << m_nodeInfo->GetNodeId () << ", " << rc << ", " << SatEnums::DA_RBDC << ", " <<  rbdcRateKbps << ", " << stats.m_queueSizeBytes << std::endl;
+              ss << Simulator::Now ().GetSeconds () << ", "
+                 << m_nodeInfo->GetNodeId () << ", "
+                 << static_cast<uint32_t> (rc) << ", "
+                 << SatEnums::DA_RBDC << ", "
+                 << rbdcRateKbps << ", "
+                 << stats.m_queueSizeBytes;
               m_crTraceLog (ss.str ());
               m_rbdcTrace (rbdcRateKbps);
             }
@@ -237,7 +242,12 @@ SatRequestManager::DoEvaluation (bool periodical)
           if (vbdcKBytes > 0)
             {
               std::stringstream ss;
-              ss << Now ().GetSeconds () << ", " << m_nodeInfo->GetNodeId () << ", " << rc << ", " << cac << ", " <<  vbdcKBytes << ", " << stats.m_queueSizeBytes << std::endl;
+              ss << Simulator::Now ().GetSeconds () << ", "
+                 << m_nodeInfo->GetNodeId () << ", "
+                 << static_cast<uint32_t> (rc) << ", "
+                 << cac << ", "
+                 << vbdcKBytes << ", "
+                 << stats.m_queueSizeBytes;
               m_crTraceLog (ss.str ());
               m_vbdcTrace (vbdcKBytes);
             }

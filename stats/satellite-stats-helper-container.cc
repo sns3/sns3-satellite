@@ -25,6 +25,7 @@
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-backlogged-request-helper.h>
+#include <ns3/satellite-stats-capacity-request-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
@@ -71,6 +72,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
+ * - [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - [Global,PerGw,PerBeam] BackloggedRequest
  *
@@ -273,6 +275,32 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketCollision,
                                         "Random Access CRDSA packet collision rate statistics")
 
+    // Capacity request statistics.
+    .AddAttribute ("GlobalCapacityRequest",
+                   "Enable the output of capacity request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalCapacityRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    .AddAttribute ("PerGwCapacityRequest",
+                   "Enable the output of capacity request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwCapacityRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    .AddAttribute ("PerBeamCapacityRequest",
+                   "Enable the output of capacity request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamCapacityRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    .AddAttribute ("PerUtCapacityRequest",
+                   "Enable the output of capacity request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtCapacityRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+
     // Resources granted statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (ResourcesGranted,
                                                "resources granted statistics")
@@ -339,6 +367,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
  * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
+ * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
  *
@@ -618,6 +647,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision"
 SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketCollision, "crdsa-collision")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
+
+// Capacity request statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CapacityRequest, "capacity-request")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
 
 // Resources granted statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")

@@ -249,6 +249,10 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketCollision)
 //  CALL_SAT_STATS_BASIC_SET (CrdsaPacketError)
 //  CALL_SAT_STATS_BASIC_SET (CrdsaPacketCollision)
+//  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerGwCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddGlobalCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  CALL_SAT_STATS_DISTRIBUTION_SET (ResourcesGranted)
 //  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -282,8 +286,9 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerGwFwdSignallingLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
