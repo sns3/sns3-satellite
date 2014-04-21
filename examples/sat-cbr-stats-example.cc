@@ -250,6 +250,9 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_BASIC_SET (CrdsaPacketError)
 //  CALL_SAT_STATS_BASIC_SET (CrdsaPacketCollision)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (ResourcesGranted)
+//  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddGlobalBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   /*
    * The following is the statements for enabling some satellite statistics
@@ -275,11 +278,12 @@ main (int argc, char *argv[])
 
   s->AddPerGwFwdQueueBytes (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
   s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);
-  s->AddPerGwFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdSignallingLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdSignallingLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);

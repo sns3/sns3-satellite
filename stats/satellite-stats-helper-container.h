@@ -45,9 +45,15 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
+ * - Add [Global,PerGw,PerBeam] BackloggedRequest
  *
  * Also check the Doxygen documentation of this class for more information.
  */
+
+#define SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION(id)                        \
+  void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
+  void AddPerGw ## id (SatStatsHelper::OutputType_t outputType);              \
+  void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);
 
 #define SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION(id)                         \
   void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
@@ -200,6 +206,9 @@ public:
 
   // Resources granted statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (ResourcesGranted)
+
+  // Backlogged request statistics.
+  SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (BackloggedRequest)
 
   /**
    * \param outputType an arbitrary output type.

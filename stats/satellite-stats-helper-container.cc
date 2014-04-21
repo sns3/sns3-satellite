@@ -24,6 +24,7 @@
 #include <ns3/enum.h>
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-stats-backlogged-request-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
@@ -71,6 +72,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
+ * - [Global,PerGw,PerBeam] BackloggedRequest
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -274,6 +276,26 @@ SatStatsHelperContainer::GetTypeId ()
     // Resources granted statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (ResourcesGranted,
                                                "resources granted statistics")
+
+    // Backlogged request statistics.
+    .AddAttribute ("GlobalBackloggedRequest",
+                   "Enable the output of backlogged request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalBackloggedRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    .AddAttribute ("PerGwBackloggedRequest",
+                   "Enable the output of backlogged request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwBackloggedRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    .AddAttribute ("PerBeamBackloggedRequest",
+                   "Enable the output of backlogged request statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamBackloggedRequest),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
   ;
   return tid;
 }
@@ -318,6 +340,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
+ * - Add [Global,PerGw,PerBeam] BackloggedRequest
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -601,6 +624,11 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (ResourcesGranted, "resources-granted")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
+
+// Backlogged request statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (BackloggedRequest, "backlogged-request")
 
 
 std::string // static
