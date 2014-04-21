@@ -218,6 +218,11 @@ public:
    */
   Ptr<SatGeoHelper>  GetGeoHelper () { return m_geoHelper;}
 
+  /**
+   * \return pointer to the NCC.
+   */
+  Ptr<SatNcc> GetNcc () const;
+
   virtual void DoDispose ();
 
   /**
@@ -247,6 +252,7 @@ private:
   std::map<uint32_t, ChannelPair_t >        m_ulChannels;  // user link ID, channel pointers pair
   std::map<uint32_t, ChannelPair_t >        m_flChannels;  // feeder link ID, channel pointers pair
   std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
+
 
   /**
    * Trace callback for creation traces

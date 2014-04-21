@@ -523,6 +523,12 @@ SatBeamHelper::GetBeams () const
   return ret;
 }
 
+Ptr<SatNcc>
+SatBeamHelper::GetNcc () const
+{
+  return m_ncc;
+}
+
 void
 SatBeamHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {

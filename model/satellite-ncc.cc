@@ -318,4 +318,19 @@ SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocation
   m_randomAccessAverageNormalizedOfferedLoadThreshold[allocationChannelId] = threshold;
 }
 
+Ptr<SatBeamScheduler>
+SatNcc::GetBeamScheduler (uint32_t beamId) const
+{
+  std::map<uint32_t, Ptr<SatBeamScheduler> >::const_iterator it = m_beamSchedulers.find (beamId);
+
+  if (it == m_beamSchedulers.end ())
+    {
+      return 0;
+    }
+  else
+    {
+      return it->second;
+    }
+}
+
 } // namespace ns3

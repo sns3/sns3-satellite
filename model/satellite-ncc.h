@@ -165,6 +165,12 @@ public:
    */
   void SetRandomAccessHighLoadBackoffTime (uint8_t allocationChannelId, uint16_t highLoadBackOffTime);
 
+  /**
+   * \param beamId the ID of the beam.
+   * \return pointer to the beam scheduler, or zero if the beam is not found.
+   */
+  Ptr<SatBeamScheduler> GetBeamScheduler (uint32_t beamId) const;
+
 private:
 
   SatNcc& operator = (const SatNcc &);
