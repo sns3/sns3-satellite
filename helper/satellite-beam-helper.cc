@@ -449,11 +449,31 @@ SatBeamHelper::GetGwNode (uint32_t gwId) const
 }
 
 Ptr<Node>
-SatBeamHelper::GetGeoSatNode()
+SatBeamHelper::GetGeoSatNode () const
 {
   NS_LOG_FUNCTION (this);
-
   return m_geoNode;
+}
+
+Ptr<SatUtHelper>
+SatBeamHelper::GetUtHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_utHelper;
+}
+
+Ptr<SatGwHelper>
+SatBeamHelper::GetGwHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwHelper;
+}
+
+Ptr<SatGeoHelper>
+SatBeamHelper::GetGeoHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_geoHelper;
 }
 
 NodeContainer
@@ -575,7 +595,7 @@ SatBeamHelper::EnablePacketTrace ()
 }
 
 std::string
-SatBeamHelper::GetBeamInfo ()
+SatBeamHelper::GetBeamInfo () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -591,13 +611,14 @@ SatBeamHelper::GetBeamInfo ()
 }
 
 std::string
-SatBeamHelper::GetUtInfo ()
+SatBeamHelper::GetUtInfo () const
 {
   NS_LOG_FUNCTION (this);
 
   std::ostringstream oss;
 
-  for (std::map<uint32_t, Ptr<Node> >::iterator i = m_utNode.begin (); i != m_utNode.end (); i++)
+  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+       i != m_utNode.end (); ++i)
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
       GeoCoordinate pos = model->GetGeoPosition ();
@@ -647,7 +668,7 @@ SatBeamHelper::GetUtInfo ()
 }
 
 std::string
-SatBeamHelper::CreateBeamInfo ()
+SatBeamHelper::CreateBeamInfo () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -655,11 +676,12 @@ SatBeamHelper::CreateBeamInfo ()
 
   oss << std::endl << " -- Beam details --";
 
-  for (std::map<uint32_t, uint32_t>::iterator i = m_beam.begin (); i != m_beam.end (); i++)
+  for (std::map<uint32_t, uint32_t>::const_iterator i = m_beam.begin ();
+       i != m_beam.end (); ++i)
     {
       oss << std::endl << "Beam ID: " << (*i).first << " ";
 
-      std::map<uint32_t, FrequencyPair_t >::iterator freqIds = m_beamFreqs.find ((*i).first);
+      std::map<uint32_t, FrequencyPair_t >::const_iterator freqIds = m_beamFreqs.find ((*i).first);
 
       if ( freqIds != m_beamFreqs.end ())
         {
@@ -675,7 +697,8 @@ SatBeamHelper::CreateBeamInfo ()
   oss.precision (8);
   oss.setf (std::ios::fixed, std::ios::floatfield);
 
-  for (std::map<uint32_t, Ptr<Node> >::iterator i = m_gwNode.begin (); i != m_gwNode.end (); i++)
+  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = m_gwNode.begin ();
+       i != m_gwNode.end (); ++i)
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
       GeoCoordinate pos = model->GetGeoPosition ();

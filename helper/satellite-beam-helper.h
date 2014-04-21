@@ -180,12 +180,12 @@ public:
   /**
    * \return info of created beams as std::string with GW info..
    */
-  std::string GetBeamInfo ();
+  std::string GetBeamInfo () const;
 
   /**
    * \return Information of UTs.
    */
-  std::string GetUtInfo ();
+  std::string GetUtInfo () const;
 
   /**
    * Gets GW node according to given id.
@@ -201,22 +201,22 @@ public:
    *
    * \return pointer to Geo Satellite node.
    */
-  Ptr<Node> GetGeoSatNode ();
+  Ptr<Node> GetGeoSatNode () const;
 
   /**
    * \return pointer to UT helper.
    */
-  Ptr<SatUtHelper>  GetUtHelper () { return m_utHelper;}
+  Ptr<SatUtHelper> GetUtHelper () const;
 
   /**
    * \return pointer to GW helper.
    */
-  Ptr<SatGwHelper>  GetGwHelper () { return m_gwHelper;}
+  Ptr<SatGwHelper> GetGwHelper () const;
 
   /**
-   * \return pointer to UT helper.
+   * \return pointer to Geo helper.
    */
-  Ptr<SatGeoHelper>  GetGeoHelper () { return m_geoHelper;}
+  Ptr<SatGeoHelper> GetGeoHelper () const;
 
   /**
    * \return pointer to the NCC.
@@ -322,7 +322,7 @@ private:
    * Creates info of the beam.
    * \return info for beams as std::string.
    */
-  std::string CreateBeamInfo ();
+  std::string CreateBeamInfo () const;
 
   /**
    * Gets satellite channel pair from requested map.
