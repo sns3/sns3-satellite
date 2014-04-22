@@ -127,7 +127,7 @@ SatRleTestCase::DoRun (void)
    */
   NS_TEST_ASSERT_MSG_EQ( m_sentPacketSizes.size(), m_rcvdPacketSizes.size(), "All sent packets are not received");
 
-  rle->DoDispose ();
+  Simulator::Destroy ();
 }
 
 void SatRleTestCase::Receive (Ptr<Packet> p)

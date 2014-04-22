@@ -138,7 +138,7 @@ SatGseTestCase::DoRun (void)
    */
   NS_TEST_ASSERT_MSG_EQ( m_sentPacketSizes.size(), m_rcvdPacketSizes.size(), "All sent packets are not received");
 
-  gse->DoDispose ();
+  Simulator::Destroy ();
 }
 
 void SatGseTestCase::Receive (Ptr<Packet> p)
