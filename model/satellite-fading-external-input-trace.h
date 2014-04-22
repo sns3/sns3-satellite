@@ -22,7 +22,7 @@
 #define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H
 
 #include <vector>
-#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3 {
 
@@ -30,7 +30,7 @@ namespace ns3 {
  * \ingroup satellite
  * \brief Satellite fading external input trace
  */
-class SatFadingExternalInputTrace : public Object
+class SatFadingExternalInputTrace : public SimpleRefCount <SatFadingExternalInputTrace>
 {
 public:
   enum TraceFileType_e
@@ -38,8 +38,6 @@ public:
     FT_TWO_COLUMN,
     FT_THREE_COLUMN
   };
-
-  static TypeId GetTypeId (void);
 
   SatFadingExternalInputTrace ();
   SatFadingExternalInputTrace (TraceFileType_e type, std::string filePathName);

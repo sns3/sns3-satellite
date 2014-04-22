@@ -29,17 +29,6 @@ NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTrace");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFadingExternalInputTrace);
-
-TypeId
-SatFadingExternalInputTrace::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatFadingExternalInputTrace")
-    .SetParent<Object> ()
-    .AddConstructor<SatFadingExternalInputTrace> ()
-  ;
-  return tid;
-}
 
 SatFadingExternalInputTrace::SatFadingExternalInputTrace () :
   m_traceFileType (),

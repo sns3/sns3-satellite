@@ -23,7 +23,7 @@
 #define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_CONTAINER_H_
 
 #include <map>
-#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
 #include "satellite-fading-external-input-trace.h"
 #include "satellite-channel.h"
 
@@ -33,13 +33,11 @@ namespace ns3 {
  * \ingroup satellite
  * \brief Satellite fading external input trace container
  */
-class SatFadingExternalInputTraceContainer : public Object
+class SatFadingExternalInputTraceContainer : public SimpleRefCount <SatFadingExternalInputTraceContainer>
 {
 public:
 
   typedef std::pair<Ptr<SatFadingExternalInputTrace>, Ptr<SatFadingExternalInputTrace> >  ChannelTracePair_t;
-
-  static TypeId GetTypeId (void);
 
   /**
    * \brief Constructor

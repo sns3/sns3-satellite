@@ -26,18 +26,6 @@ NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTraceContainer");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFadingExternalInputTraceContainer);
-
-TypeId
-SatFadingExternalInputTraceContainer::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatFadingExternalInputTraceContainer")
-    .SetParent<Object> ()
-    .AddConstructor<SatFadingExternalInputTraceContainer> ()
-  ;
-  return tid;
-}
-
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
@@ -46,6 +34,9 @@ SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
 SatFadingExternalInputTraceContainer::~SatFadingExternalInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_utFadingMap.clear ();
+  m_gwFadingMap.clear ();
 }
 
 void
@@ -62,8 +53,8 @@ SatFadingExternalInputTraceContainer::CreateUtFadingTrace (uint32_t utId)
   std::string fwd = path + "term_ID" + ss.str () + "_fading_fwddwn.dat";
   std::string ret = path + "term_ID" + ss.str () + "_fading_rtnup.dat";
 
-  Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
-  Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_THREE_COLUMN, fwd);
+  Ptr<SatFadingExternalInputTrace> ftRet = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
+  Ptr<SatFadingExternalInputTrace> ftFwd = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_THREE_COLUMN, fwd);
 
   // First = RETURN_USER
   // Second = FORWARD_USER
@@ -85,8 +76,8 @@ SatFadingExternalInputTraceContainer::CreateGwFadingTrace (uint32_t gwId)
   std::string fwd = path + "GW_ID" + ss.str () + "_fading_fwdup.dat";
   std::string ret = path + "GW_ID" + ss.str () + "_fading_rtndwn.dat";
 
-  Ptr<SatFadingExternalInputTrace> ftRet = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
-  Ptr<SatFadingExternalInputTrace> ftFwd = CreateObject<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, fwd);
+  Ptr<SatFadingExternalInputTrace> ftRet = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
+  Ptr<SatFadingExternalInputTrace> ftFwd = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, fwd);
 
   // First = RETURN_FEEDER
   // Second = FORWARD_FEEDR
