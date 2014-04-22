@@ -118,6 +118,8 @@ SatMobilityRandomTestCase::DoRun (void)
       NS_TEST_ASSERT_MSG_GT( pos.GetLongitude(), -10.1, "Longitude is too small.");
       NS_TEST_ASSERT_MSG_GT( pos.GetAltitude(), -0.1, "Altitude is too small.");
     }
+
+  Simulator::Destroy ();
 }
 
 
@@ -200,6 +202,8 @@ SatMobilityList1TestCase::DoRun (void)
         NS_TEST_ASSERT_MSG_EQ( pos.GetLongitude(), longitude, "Longitude is different.");
         NS_TEST_ASSERT_MSG_EQ( pos.GetAltitude(), altitude, "Altitude is different.");
       }
+
+    Simulator::Destroy ();
 }
 
 /**
@@ -277,6 +281,8 @@ SatMobilityList2TestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLatitude() - 30), 0.000001, "Latitude difference too big!");
   NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLongitude() - 45), 0.000001, "Longitude difference too big!");
   NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetAltitude() - 1000), 0.000001, "Altitude difference too big!");
+
+  Simulator::Destroy ();
 }
 
 /**
