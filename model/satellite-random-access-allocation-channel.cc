@@ -29,7 +29,8 @@ TypeId
 SatRandomAccessAllocationChannel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccessAllocationChannel")
-    .SetParent<Object> ();
+    .SetParent<Object> ()
+    .AddConstructor<SatRandomAccessAllocationChannel> ();
   return tid;
 }
 

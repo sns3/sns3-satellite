@@ -87,6 +87,18 @@ public:
   uint32_t GetNumOfAllocationChannels () { return m_allocationChannelCount; }
 
   /**
+   * \brief Function for getting the CRDSA signaling overhead in bytes
+   * \return CRDSA signaling overhead in bytes
+   */
+  uint32_t GetCrdsaSignalingOverheadInBytes () { return m_crdsaSignalingOverheadInBytes; }
+
+  /**
+   * \brief Function for getting the Slotted ALOHA signaling overhead in bytes
+   * \return Slotted ALOHA signaling overhead in bytes
+   */
+  uint32_t GetSlottedAlohaSignalingOverheadInBytes () { return m_slottedAlohaSignalingOverheadInBytes; }
+
+  /**
    * \brief Function for checking the Slotted ALOHA variable sanity
    */
   void DoSlottedAlohaVariableSanityCheck ();
@@ -108,6 +120,16 @@ private:
    * \brief Number of available allocation channels
    */
   uint32_t m_allocationChannelCount;
+
+  /**
+   * \brief Defines the size of the CRDSA signaling overhead in bytes
+   */
+  uint32_t m_crdsaSignalingOverheadInBytes;
+
+  /**
+   * \brief Defines the size of the Slotted ALOHA signaling overhead in bytes
+   */
+  uint32_t m_slottedAlohaSignalingOverheadInBytes;
 };
 
 } // namespace ns3

@@ -100,7 +100,7 @@ public:
    * \param allocationChannel allocation channel
    * \param backoffTimeInMilliSeconds backoff time
    */
-  void CrdsaSetBackoffTimeInMilliSeconds (uint32_t allocationChannel,
+  void SetCrdsaBackoffTimeInMilliSeconds (uint32_t allocationChannel,
                                           uint32_t backoffTimeInMilliSeconds);
 
   /**
@@ -108,7 +108,7 @@ public:
    * \param allocationChannel allocation channel
    * \param backoffProbability backoff probability
    */
-  void CrdsaSetBackoffProbability (uint32_t allocationChannel,
+  void SetCrdsaBackoffProbability (uint32_t allocationChannel,
                                    uint16_t backoffProbability);
 
   /**
@@ -116,7 +116,7 @@ public:
    * \param allocationChannel allocation channel
    * \param payloadBytes payload bytes
    */
-  void CrdsaSetPayloadBytes (uint32_t allocationChannel,
+  void SetCrdsaPayloadBytes (uint32_t allocationChannel,
                              uint32_t payloadBytes);
   /**
    * \brief Function for setting the parameters related to CRDSA randomization
@@ -125,7 +125,7 @@ public:
    * \param maxRandomizationValue maximum randomization value
    * \param numOfInstances number of packet instances (packet replicas)
    */
-  void CrdsaSetRandomizationParameters (uint32_t allocationChannel,
+  void SetCrdsaRandomizationParameters (uint32_t allocationChannel,
                                         uint32_t minRandomizationValue,
                                         uint32_t maxRandomizationValue,
                                         uint32_t numOfInstances);
@@ -137,7 +137,7 @@ public:
    * \param maxConsecutiveBlocksAccessed maximum number of consecutive blocks accessed
    * \param minIdleBlocks minimum number of idle blocks
    */
-  void CrdsaSetMaximumDataRateLimitationParameters (uint32_t allocationChannel,
+  void SetCrdsaMaximumDataRateLimitationParameters (uint32_t allocationChannel,
                                                     uint32_t maxUniquePayloadPerBlock,
                                                     uint32_t maxConsecutiveBlocksAccessed,
                                                     uint32_t minIdleBlocks);
@@ -146,7 +146,7 @@ public:
    * \brief Function for setting the Slotted ALOHA control randomization interval
    * \param controlRandomizationInterval control randomization interval
    */
-  void SlottedAlohaSetControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds);
+  void SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds);
 
   /**
    * \brief Main function of this module. This will be called from outside and it is responsible
@@ -180,6 +180,18 @@ public:
    * \param allocationChannel
    */
   void AddCrdsaAllocationChannel (uint32_t allocationChannel);
+
+  /**
+   * \brief Function for getting the CRDSA signaling overhead in bytes
+   * \return CRDSA signaling overhead in bytes
+   */
+  uint32_t GetCrdsaSignalingOverheadInBytes ();
+
+  /**
+   * \brief Function for getting the Slotted ALOHA signaling overhead in bytes
+   * \return Slotted ALOHA signaling overhead in bytes
+   */
+  uint32_t GetSlottedAlohaSignalingOverheadInBytes ();
 
 protected:
 

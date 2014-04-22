@@ -29,7 +29,8 @@ TypeId
 SatRandomAccess::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccess")
-    .SetParent<Object> ();
+    .SetParent<Object> ()
+    .AddConstructor<SatRandomAccess> ();
   return tid;
 }
 
@@ -366,8 +367,14 @@ SatRandomAccess::PrintVariables ()
 /// Slotted ALOHA related methods
 ///-------------------------------
 
+uint32_t
+SatRandomAccess::GetSlottedAlohaSignalingOverheadInBytes ()
+{
+  return m_randomAccessConf->GetSlottedAlohaSignalingOverheadInBytes ();
+}
+
 void
-SatRandomAccess::SlottedAlohaSetControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds)
+SatRandomAccess::SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds)
 {
   NS_LOG_FUNCTION (this << controlRandomizationIntervalInMilliSeconds);
 
@@ -379,10 +386,10 @@ SatRandomAccess::SlottedAlohaSetControlRandomizationIntervalInMilliSeconds (uint
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::SlottedAlohaSetRandomizationParameters - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::SetSlottedAlohaControlRandomizationIntervalInMilliSeconds - Wrong random access model in use");
     }
 
-  NS_LOG_INFO ("SatRandomAccess::SlottedAlohaSetRandomizationParameters - new control randomization interval : " << controlRandomizationIntervalInMilliSeconds);
+  NS_LOG_INFO ("SatRandomAccess::SetSlottedAlohaControlRandomizationIntervalInMilliSeconds - new control randomization interval : " << controlRandomizationIntervalInMilliSeconds);
 }
 
 SatRandomAccess::RandomAccessTxOpportunities_s
@@ -437,7 +444,7 @@ SatRandomAccess::SlottedAlohaRandomizeReleaseTime ()
 ///-----------------------
 
 void
-SatRandomAccess::CrdsaSetBackoffTimeInMilliSeconds (uint32_t allocationChannel,
+SatRandomAccess::SetCrdsaBackoffTimeInMilliSeconds (uint32_t allocationChannel,
                                                     uint32_t backoffTimeInMilliSeconds)
 {
   NS_LOG_FUNCTION (this);
@@ -450,12 +457,12 @@ SatRandomAccess::CrdsaSetBackoffTimeInMilliSeconds (uint32_t allocationChannel,
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetLoadControlParameters - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::SetCrdsaBackoffTimeInMilliSeconds - Wrong random access model in use");
     }
 }
 
 void
-SatRandomAccess::CrdsaSetBackoffProbability (uint32_t allocationChannel,
+SatRandomAccess::SetCrdsaBackoffProbability (uint32_t allocationChannel,
                                              uint16_t backoffProbability)
 {
   NS_LOG_FUNCTION (this);
@@ -468,12 +475,12 @@ SatRandomAccess::CrdsaSetBackoffProbability (uint32_t allocationChannel,
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetLoadControlParameters - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::SetCrdsaBackoffProbability - Wrong random access model in use");
     }
 }
 
 void
-SatRandomAccess::CrdsaSetPayloadBytes (uint32_t allocationChannel,
+SatRandomAccess::SetCrdsaPayloadBytes (uint32_t allocationChannel,
                                        uint32_t payloadBytes)
 {
   NS_LOG_FUNCTION (this);
@@ -486,12 +493,12 @@ SatRandomAccess::CrdsaSetPayloadBytes (uint32_t allocationChannel,
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetPayloadBytes - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::SetCrdsaPayloadBytes - Wrong random access model in use");
     }
 }
 
 void
-SatRandomAccess::CrdsaSetRandomizationParameters (uint32_t allocationChannel,
+SatRandomAccess::SetCrdsaRandomizationParameters (uint32_t allocationChannel,
                                                   uint32_t minRandomizationValue,
                                                   uint32_t maxRandomizationValue,
                                                   uint32_t numOfInstances)
@@ -508,12 +515,12 @@ SatRandomAccess::CrdsaSetRandomizationParameters (uint32_t allocationChannel,
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetRandomizationParameters - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::SetCrdsaRandomizationParameters - Wrong random access model in use");
     }
 }
 
 void
-SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters (uint32_t allocationChannel,
+SatRandomAccess::SetCrdsaMaximumDataRateLimitationParameters (uint32_t allocationChannel,
                                                               uint32_t maxUniquePayloadPerBlock,
                                                               uint32_t maxConsecutiveBlocksAccessed,
                                                               uint32_t minIdleBlocks)
@@ -530,8 +537,14 @@ SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters (uint32_t allocatio
     }
   else
     {
-      NS_FATAL_ERROR ("SatRandomAccess::CrdsaSetMaximumDataRateLimitationParameters - Wrong random access model in use");
+      NS_FATAL_ERROR ("SatRandomAccess::SetCrdsaMaximumDataRateLimitationParameters - Wrong random access model in use");
     }
+}
+
+uint32_t
+SatRandomAccess::GetCrdsaSignalingOverheadInBytes ()
+{
+  return m_randomAccessConf->GetCrdsaSignalingOverheadInBytes ();
 }
 
 bool

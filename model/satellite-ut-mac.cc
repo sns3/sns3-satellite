@@ -344,7 +344,18 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
 
   SatPhy::PacketContainer_t packets;
 
-  m_utScheduler->DoScheduling (packets, waveform->GetPayloadInBytes (), rcIndex, policy);
+  /// get the slot payload
+  uint32_t payloadBytes = waveform->GetPayloadInBytes ();
+
+  /// reduce the CRDSA signaling overhead from the payload
+  payloadBytes -= m_randomAccess->GetSlottedAlohaSignalingOverheadInBytes ();
+
+  if (payloadBytes < 1)
+    {
+      NS_FATAL_ERROR ("SatUtMac::DoSlottedAlohaTransmit - Not enough capacity in Slotted ALOHA payload");
+    }
+
+  m_utScheduler->DoScheduling (packets, payloadBytes, rcIndex, policy);
 
   if ( !packets.empty () )
     {
@@ -584,8 +595,8 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 
         NS_LOG_INFO ("SatUtMac::ReceiveSignalingPacket - UT: " << m_nodeInfo->GetMacAddress () << " @ time: " << Now ().GetSeconds () << " - Updating RA backoff probability for AC: " << allocationChannelId << " to: " << backoffProbability);
 
-        m_randomAccess->CrdsaSetBackoffProbability (allocationChannelId, backoffProbability);
-        m_randomAccess->CrdsaSetBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
+        m_randomAccess->SetCrdsaBackoffProbability (allocationChannelId, backoffProbability);
+        m_randomAccess->SetCrdsaBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
         break;
       }
     case SatControlMsgTag::SAT_CR_CTRL_MSG:
@@ -709,7 +720,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
         }
 
       /// duration
-      Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
+      Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
       Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
       /// carrier
@@ -853,6 +864,14 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   /// get the slot payload
   uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (allocationChannel);
+
+  /// reduce the CRDSA signaling overhead from the payload
+  payloadBytes -= m_randomAccess->GetCrdsaSignalingOverheadInBytes ();
+
+  if (payloadBytes < 1)
+    {
+      NS_FATAL_ERROR ("SatUtMac::CreateCrdsaPacketInstances - Not enough capacity in CRDSA payload");
+    }
 
   /// get the next packet
   SatPhy::PacketContainer_t uniq;
