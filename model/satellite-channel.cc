@@ -107,7 +107,8 @@ SatChannel::GetTypeId (void)
                    "Channel receiving mode.",
                    EnumValue (SatChannel::ALL_BEAMS),
                    MakeEnumAccessor (&SatChannel::m_rxMode),
-                   MakeEnumChecker (SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
+                   MakeEnumChecker (SatChannel::ONLY_DEST_NODE, "OnlyDestNode",
+                                    SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
                                     SatChannel::ALL_BEAMS, "AllBeams"))
     .AddTraceSource ("TxRxPointToPoint",
                      "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
@@ -148,7 +149,72 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
   switch (m_rxMode)
   {
     /**
-     * The packet shall be received by only by the receivers within the same spot-beam
+     * The packet shall be received by only by the receivers to whom this transmission
+     * is intended to.
+     * Note, that with ONLY_DEST_NODE mode, the PerPacket interference may not be used,
+     * since there will be no interference.
+    */
+    case SatChannel::ONLY_DEST_NODE:
+      {
+        // For all receivers
+        for (PhyList::const_iterator rxPhyIterator = m_phyList.begin ();
+            rxPhyIterator != m_phyList.end ();
+            ++rxPhyIterator)
+          {
+            // If the same beam
+            if ( (*rxPhyIterator)->GetBeamId() == txParams->m_beamId )
+              {
+                switch (m_channelType)
+                  {
+                    // If the destination is satellite
+                    case SatEnums::FORWARD_FEEDER_CH:
+                    case SatEnums::RETURN_USER_CH:
+                      {
+                        // The packet burst is passed on to the satellite receiver
+                        ScheduleRx (txParams, *rxPhyIterator);
+                        break;
+                      }
+                    // If the destination is terrestrial node
+                    case SatEnums::FORWARD_USER_CH:
+                    case SatEnums::RETURN_FEEDER_CH:
+                      {
+                        // Go through the packets and check their destination address by peeking the MAC tag
+                        SatSignalParameters::PacketsInBurst_t::const_iterator it = txParams->m_packetsInBurst.begin ();
+                        for ( ; it != txParams->m_packetsInBurst.end (); ++it )
+                          {
+                            SatMacTag macTag;
+                            bool mSuccess = (*it)->PeekPacketTag (macTag);
+                            if (!mSuccess)
+                              {
+                                NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+                              }
+
+                            Mac48Address dest = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+
+                            // If the packet destination is the same as the receiver MAC
+                            if (dest == (*rxPhyIterator)->GetAddress () || dest.IsBroadcast () || dest.IsGroup ())
+                              {
+                                ScheduleRx (txParams, *rxPhyIterator);
+
+                                // Remember to break the packet loop, so that the transmission
+                                // is not received several times!
+                                break;
+                              }
+                          }
+                        break;
+                      }
+                    default:
+                      {
+                        NS_FATAL_ERROR ("Unsupported channel type!");
+                        break;
+                      }
+                  }
+              }
+          }
+        break;
+      }
+    /**
+     * The packet shall be received by only by the receivers within the same spot-beam.
      * Note, that with ONLY_DEST_BEAM mode, the PerPacket interference may not be used,
      * since there will be no interference.
     */
@@ -158,17 +224,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
             rxPhyIterator != m_phyList.end ();
             ++rxPhyIterator)
           {
-            /**
-             * Currently ONLY_DEST_BEAM mode restricts only the transmissions to the
-             * intended beam id. When the SatSignalParameters includes the
-             * packet target MAC addresses and information whether the PHY
-             * transmission contains broadcast data, this may be enhanced to
-             * pass data to only the intended receivers within the spot-beam
-             * TODO: Add the target MAC address container and a flag indicating
-             * whether the PHY transmission contains broadcast data to the
-             * SatSignalParameters. Implement the functionality to pass the PHY
-             * transmission to only for the proper receivers within the beam.
-             */
+            // If the same beam
             if ( (*rxPhyIterator)->GetBeamId() == txParams->m_beamId )
               {
                 ScheduleRx (txParams, *rxPhyIterator);
