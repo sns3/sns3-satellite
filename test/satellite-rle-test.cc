@@ -126,6 +126,8 @@ SatRleTestCase::DoRun (void)
    * Test that the amount of sent packets is the same as the amount of received packets.
    */
   NS_TEST_ASSERT_MSG_EQ( m_sentPacketSizes.size(), m_rcvdPacketSizes.size(), "All sent packets are not received");
+
+  rle->DoDispose ();
 }
 
 void SatRleTestCase::Receive (Ptr<Packet> p)

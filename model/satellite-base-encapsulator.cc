@@ -82,6 +82,7 @@ SatBaseEncapsulator::DoDispose ()
       m_txQueue->DoDispose ();
     }
   m_rxCallback.Nullify ();
+  m_ctrlCallback.Nullify ();
 }
 
 void
