@@ -21,45 +21,19 @@
 #ifndef SAT_BASE_ENCAPSULATOR_H
 #define SAT_BASE_ENCAPSULATOR_H
 
-#include <ns3/packet.h>
+#include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "ns3/traced-value.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/nstime.h"
 #include "ns3/mac48-address.h"
+#include "ns3/object.h"
+
 #include "satellite-queue.h"
 #include "satellite-control-message.h"
 
-#include "ns3/object.h"
 
 namespace ns3 {
-
-/**
- * ARQ buffer context is holding information related to the ARQ transmission
- * or reception depending on whether packet(s) are being transmitted or received.
- * The SatArqBufferContext is used only when ARQ is enabled, i.e. encapsulator is
- * of type SatReturnLinkEncapsulatorArq or SatGenericStreamEncapsulatorArq.
- */
-class SatArqBufferContext : public SimpleRefCount<SatArqBufferContext>
-{
-public:
-  SatArqBufferContext ()
-  :m_pdu (),
-   m_seqNo (0),
-   m_retransmissionCount (0),
-   m_waitingTimer (),
-   m_rxStatus (false)
-  {
-  }
-
-public:
-  Ptr<Packet> m_pdu;
-  uint32_t    m_seqNo;
-  uint32_t    m_retransmissionCount;
-  EventId     m_waitingTimer;
-  bool        m_rxStatus;
-};
-
 
 /**
  * \ingroup satellite

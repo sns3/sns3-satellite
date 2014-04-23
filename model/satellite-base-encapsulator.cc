@@ -26,14 +26,12 @@
 #include "satellite-mac-tag.h"
 #include "satellite-base-encapsulator.h"
 
-
 NS_LOG_COMPONENT_DEFINE ("SatBaseEncapsulator");
 
 namespace ns3 {
 
 
 NS_OBJECT_ENSURE_REGISTERED (SatBaseEncapsulator);
-
 
 SatBaseEncapsulator::SatBaseEncapsulator ()
 :m_sourceAddress (),

@@ -27,6 +27,7 @@
 #include "ns3/mac48-address.h"
 #include "satellite-generic-stream-encapsulator.h"
 #include "satellite-arq-sequence-number.h"
+#include "satellite-arq-buffer-context.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -103,9 +104,9 @@ private:
   /**
    * ARQ Tx timer has expired. The PDU will be flushed, if the maximum
    * retransmissions has been reached. Otherwise the packet will be resent.
-   * \param context Context for which the ARQ timer expired
+   * \param seqNo Sequence number
    */
-  void ArqReTxTimerExpired (Ptr<SatArqBufferContext> context);
+  void ArqReTxTimerExpired (uint8_t seqNo);
 
   /**
    * Clean-up a certain sequence number

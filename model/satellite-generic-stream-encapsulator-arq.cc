@@ -30,6 +30,8 @@
 #include "satellite-time-tag.h"
 #include "satellite-queue.h"
 #include "satellite-arq-header.h"
+#include "satellite-arq-buffer-context.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatGenericStreamEncapsulatorArq");
 
@@ -79,6 +81,7 @@ SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq (Mac48Address s
 SatGenericStreamEncapsulatorArq::~SatGenericStreamEncapsulatorArq ()
 {
   NS_LOG_FUNCTION (this);
+  m_seqNo = 0;
 }
 
 TypeId
@@ -128,7 +131,38 @@ void
 SatGenericStreamEncapsulatorArq::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
-  m_seqNo = NULL;
+  m_seqNo = 0;
+
+  // Clean-up the Tx'ed buffer
+  std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.begin ();
+  while (it != m_txedBuffer.end ())
+    {
+      it->second->DoDispose ();
+      it->second = 0;
+      ++it;
+    }
+  m_txedBuffer.clear ();
+
+  // Clean-up the reTx buffer
+  it = m_retxBuffer.begin ();
+  while (it != m_retxBuffer.end ())
+    {
+      it->second->DoDispose ();
+      it->second = 0;
+      ++it;
+    }
+  m_retxBuffer.clear ();
+
+  // Clean-up the reordering buffer
+  std::map<uint32_t, Ptr<SatArqBufferContext> >::iterator it2 = m_reorderingBuffer.begin ();
+  while (it2 != m_reorderingBuffer.end ())
+    {
+      it2->second->DoDispose ();
+      it2->second = 0;
+      ++it2;
+    }
+  m_reorderingBuffer.clear ();
+
   SatGenericStreamEncapsulator::DoDispose ();
 }
 
@@ -164,13 +198,19 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
           m_retxBufferSize -= context->m_pdu->GetSize ();
           m_txedBufferSize += context->m_pdu->GetSize ();
 
+          std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (context->m_seqNo);
+          if (it != m_txedBuffer.end ())
+            {
+              NS_FATAL_ERROR ("Trying to add retransmission packet to txedBuffer even though it already exists there!");
+            }
+
           // Store it back to the transmitted packet container.
           m_txedBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (context->m_seqNo, context));
 
           // Create the retransmission event and store it to the context. Event is cancelled if a ACK
           // is received. However, if the event triggers, we shall send the packet again, if the packet still
           // has retransmissions left.
-          EventId t = Simulator::Schedule (m_retransmissionTimer, &SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired, this, context);
+          EventId t = Simulator::Schedule (m_retransmissionTimer, &SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired, this, context->m_seqNo);
           context->m_waitingTimer = t;
 
           NS_LOG_LOGIC ("GW: << " << m_sourceAddress << " sent a retransmission packet of size: " << context->m_pdu->GetSize () << " with seqNo: " << (uint32_t)(context->m_seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
@@ -212,7 +252,7 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
           packet->AddHeader (arqHeader);
 
           // Create ARQ context and store it to Tx'ed buffer
-          Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
+          Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext> ();
           arqContext->m_retransmissionCount = 0;
           arqContext->m_pdu = packet;
           arqContext->m_seqNo = seqNo;
@@ -220,7 +260,7 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
           // Create the retransmission event and store it to the context. Event is cancelled if a ACK
           // is received. However, if the event triggers, we shall send the packet again, if the packet still
           // has retransmissions left.
-          arqContext->m_waitingTimer = Simulator::Schedule (m_retransmissionTimer, &SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired, this, arqContext);
+          arqContext->m_waitingTimer = Simulator::Schedule (m_retransmissionTimer, &SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired, this, seqNo);
 
           // Update the buffer status
           m_txedBufferSize += packet->GetSize ();
@@ -243,40 +283,41 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
 }
 
 void
-SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired (Ptr<SatArqBufferContext> context)
+SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("At GW: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(context->m_seqNo) << " at: " << Now ().GetSeconds ());
+  NS_LOG_LOGIC ("At GW: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
-  // Retransmission still possible
-  if (context->m_retransmissionCount < m_maxNoOfRetransmissions)
+  std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (seqNo);
+
+  if (it != m_txedBuffer.end ())
     {
-      NS_LOG_LOGIC ("Moving the ARQ context to retransmission buffer");
-
-      // Erase from the Tx'ed buffer and insert to the reTx buffer
-      std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (context->m_seqNo);
-      if (it != m_txedBuffer.end ())
+      // Retransmission still possible
+      if (it->second->m_retransmissionCount < m_maxNoOfRetransmissions)
         {
-          m_txedBuffer.erase (it);
+          NS_LOG_LOGIC ("Moving the ARQ context to retransmission buffer");
 
+          Ptr<SatArqBufferContext> context = it->second;
+
+          m_txedBuffer.erase (it);
           m_retxBufferSize += context->m_pdu->GetSize ();
 
           // Push to the retransmission buffer
-          m_retxBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (context->m_seqNo, context));
+          m_retxBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (seqNo, context));
         }
+      // Maximum retransmissions reached
       else
         {
-          NS_LOG_LOGIC ("Element not found anymore in the m_txedBuffer, thus ACK has been received already earlier");
+          NS_LOG_LOGIC ("For GW: " << m_sourceAddress << " max retransmissions reached for " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
+
+          // Do clean-up
+          CleanUp (seqNo);
         }
     }
-  // Maximum retransmissions reached
   else
     {
-      NS_LOG_LOGIC ("For GW: " << m_sourceAddress << " max retransmissions reached for " << context->m_seqNo << " at: " << Now ().GetSeconds ());
-
-      // Do clean-up
-      CleanUp (context->m_seqNo);
+      NS_LOG_LOGIC ("Element not found anymore in the m_txedBuffer, thus ACK has been received already earlier");
     }
 }
 
@@ -292,8 +333,10 @@ SatGenericStreamEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (sequenceNumber);
   if (it != m_txedBuffer.end ())
     {
+      NS_LOG_LOGIC ("Sequence no: " << sequenceNumber << " clean up from txedBuffer!");
       m_txedBufferSize -= it->second->m_pdu->GetSize ();
-      it->second->m_waitingTimer.Cancel ();
+      it->second->DoDispose ();
+      it->second = 0;
       m_txedBuffer.erase (it);
     }
 
@@ -301,8 +344,10 @@ SatGenericStreamEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   it = m_retxBuffer.find (sequenceNumber);
   if (it != m_retxBuffer.end ())
     {
+      NS_LOG_LOGIC ("Sequence no: " << sequenceNumber << " clean up from retxBuffer!");
       m_retxBufferSize -= it->second->m_pdu->GetSize ();
-      it->second->m_waitingTimer.Cancel ();
+      it->second->DoDispose ();
+      it->second = 0;
       m_retxBuffer.erase (it);
     }
 }
@@ -366,7 +411,7 @@ SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
       if (it == m_reorderingBuffer.end ())
         {
           NS_LOG_LOGIC ("GW: " << m_sourceAddress << " created a new ARQ buffer entry for SeqNo: " << sn << " at: " << Now ().GetSeconds ());
-          Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
+          Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext> ();
           arqContext->m_pdu = p;
           arqContext->m_rxStatus = true;
           arqContext->m_seqNo = sn;
@@ -399,7 +444,7 @@ SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
                 {
                   NS_LOG_LOGIC ("Context NOT found for SeqNo: " << i);
 
-                  Ptr<SatArqBufferContext> arqContext = Create<SatArqBufferContext> ();
+                  Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext> ();
                   arqContext->m_pdu = NULL;
                   arqContext->m_rxStatus = false;
                   arqContext->m_seqNo = i;
@@ -476,12 +521,6 @@ SatGenericStreamEncapsulatorArq::ReassembleAndReceive ()
     {
       NS_LOG_LOGIC ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
 
-      // If timer is running, cancel it.
-      if (it->second->m_waitingTimer.IsRunning ())
-        {
-          it->second->m_waitingTimer.Cancel ();
-        }
-
       // If PDU == NULL, it means that the RxWaitingTimer has expired
       // without PDU being received
       if (it->second->m_pdu)
@@ -490,6 +529,8 @@ SatGenericStreamEncapsulatorArq::ReassembleAndReceive ()
           ProcessPdu (it->second->m_pdu);
         }
 
+      it->second->DoDispose ();
+      it->second = 0;
       m_reorderingBuffer.erase (it);
       it = m_reorderingBuffer.begin ();
 
