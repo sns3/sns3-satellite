@@ -61,7 +61,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
    m_isRandomAccessEnabledForThisCarrier (isRandomAccessEnabledForThisCarrier),
    m_randomAccessBitsInFrame (0),
-   m_frameEndSchedulingInitialized (false)
+   m_frameEndSchedulingInitialized (false),
+   m_randomAccessAllocationChannelId (0)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -791,10 +792,7 @@ SatPhyRxCarrier::MeasureRandomAccessLoad ()
 
   NS_LOG_INFO ("SatPhyRxCarrier::MeasureRandomAccessLoad - Average normalized offered load: " << averageNormalizedOfferedLoad);
 
-  /// TODO at the moment only one RA allocation channel is fully supported
-  uint8_t allocationChannelId = 0;
-
-  m_avgNormalizedOfferedLoadCallback (m_beamId, m_carrierId, allocationChannelId, averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (m_beamId, m_carrierId, m_randomAccessAllocationChannelId, averageNormalizedOfferedLoad);
 }
 
 double
@@ -1170,7 +1168,6 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
 
   NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - Packet in slot " << crdsaPacket.ownSlotId << " was added to the CRDSA packet container");
 
-  /// TODO this is for debugging purposes, it should be removed at later point
   for (uint32_t i = 0; i < crdsaPacket.slotIdsForOtherReplicas.size (); i++)
     {
       NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - A replica of the packet is in slot " << crdsaPacket.slotIdsForOtherReplicas[i]);
@@ -1322,7 +1319,6 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Processing a packet in slot: " << packet.ownSlotId <<
                " number of packets in this slot: " << numOfPacketsForThisSlot);
 
-  /// TODO this is for debugging and can be removed later
   for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
     {
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Replica in slot: " << packet.slotIdsForOtherReplicas[i]);
@@ -1604,6 +1600,22 @@ bool
 SatPhyRxCarrier::CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s obj1, SatPhyRxCarrier::crdsaPacketRxParams_s obj2)
 {
   return (bool) (obj1.rxParams->m_txInfo.crdsaUniquePacketId < obj2.rxParams->m_txInfo.crdsaUniquePacketId);
+}
+
+void
+SatPhyRxCarrier::SetRandomAccessAllocationChannelId (uint8_t randomAccessAllocationChannelId)
+{
+  NS_LOG_FUNCTION (this << randomAccessAllocationChannelId);
+
+  m_randomAccessAllocationChannelId = randomAccessAllocationChannelId;
+}
+
+uint8_t
+SatPhyRxCarrier::GetRandomAccessAllocationChannelId () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_randomAccessAllocationChannelId;
 }
 
 }

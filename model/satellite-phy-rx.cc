@@ -261,13 +261,24 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
 
   Ptr<SatPhyRxCarrier> rxc;
 
-  for ( uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i )
+  /// TODO get this from superframe config
+  uint8_t allocationChannelId = 0;
+  bool isRandomAccessCarrier = false;
+
+  for (uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i)
     {
       NS_LOG_LOGIC(this << " Create carrier: " << i);
 
       if (isRandomAccessEnabled)
         {
-          rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf, superFrameConf->IsRandomAccessCarrier (i));
+          isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
+          rxc = CreateObject<SatPhyRxCarrier> (i, carrierConf, isRandomAccessCarrier);
+
+          if (isRandomAccessCarrier)
+            {
+              rxc->SetRandomAccessAllocationChannelId (allocationChannelId);
+              allocationChannelId++;
+            }
         }
       else
         {

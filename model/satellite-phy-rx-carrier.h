@@ -162,6 +162,18 @@ public:
    */
   void BeginFrameEndScheduling ();
 
+  /**
+   * \brief Function for setting the random access allocation channel ID
+   * \param randomAccessAllocationChannelId
+   */
+  void SetRandomAccessAllocationChannelId (uint8_t randomAccessAllocationChannelId);
+
+  /**
+   * \brief Function for getting the random access allocation channel ID
+   * \return randomAccessAllocationChannelId
+   */
+  uint8_t GetRandomAccessAllocationChannelId () const;
+
 private:
 
   /**
@@ -596,6 +608,11 @@ private:
    * \brief Has the frame end scheduling been initialized
    */
   bool m_frameEndSchedulingInitialized;
+
+  /**
+   * \brief Random access allocation channel ID
+   */
+  uint8_t m_randomAccessAllocationChannelId;
 };
 
 }
