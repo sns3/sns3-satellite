@@ -110,6 +110,7 @@ void SatFadingExternalInputTrace::ReadTrace (std::string filePathName)
         }
     }
   ifs->close();
+  delete ifs;
 }
 
 double
