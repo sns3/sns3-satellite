@@ -291,10 +291,19 @@ SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
   if ( conf->IsRandomAccess () )
     {
       uint32_t frameId = m_frames.size ();
+      uint16_t raBaseIndex = m_raChannels.size ();
 
       for ( uint32_t i = 0; i < conf->GetCarrierCount (); i++)
         {
-          m_raChannels.push_back ( std::make_pair (frameId, i) );
+          // Only number of the RA channels definable by uint8_t data type can used
+          // This is needed to take into account when configuring frames and defined which of them
+          // are random access channels
+          if ( (raBaseIndex + i) >= std::numeric_limits<uint8_t>::max () )
+            {
+              NS_FATAL_ERROR ("RA channels maximum count is exceeded!!!");
+            }
+
+          m_raChannels.push_back ( std::make_pair (frameId, raBaseIndex + i) );
         }
     }
 
@@ -349,10 +358,10 @@ SatSuperframeConf::GetCarrierFrequencyHz (uint32_t carrierId) const
   uint8_t frameId = GetCarrierFrame (carrierId);
 
   for ( uint8_t i = 0; i < frameId; i++ )
-      {
-        carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
-        frameStartFrequency += m_frames[i]->GetBandwidthHz ();
-      }
+    {
+      carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
+      frameStartFrequency += m_frames[i]->GetBandwidthHz ();
+    }
 
   double carrierFrequencyInFrame = m_frames[frameId]->GetCarrierFrequencyHz (carrierIdInFrame);
 
@@ -592,7 +601,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 }
 
 SatFrameConf::SatTimeSlotConfContainer_t
-SatSuperframeConf::GetRaSlots (uint32_t raChannel)
+SatSuperframeConf::GetRaSlots (uint8_t raChannel)
 {
   NS_LOG_FUNCTION (this);
 
@@ -614,7 +623,7 @@ SatSuperframeConf::GetRaSlots (uint32_t raChannel)
 }
 
 uint16_t
-SatSuperframeConf::GetRaSlotCount (uint32_t raChannel)
+SatSuperframeConf::GetRaSlotCount (uint8_t raChannel)
 {
   NS_LOG_FUNCTION (this);
 
@@ -635,7 +644,7 @@ SatSuperframeConf::GetRaSlotCount (uint32_t raChannel)
   return slotCount;
 }
 
-uint32_t
+uint8_t
 SatSuperframeConf::GetRaChannelCount () const
 {
   NS_LOG_FUNCTION (this);
@@ -643,7 +652,7 @@ SatSuperframeConf::GetRaChannelCount () const
 }
 
 uint8_t
-SatSuperframeConf::GetRaChannelFrameId (uint32_t raChannel) const
+SatSuperframeConf::GetRaChannelFrameId (uint8_t raChannel) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -662,12 +671,11 @@ SatSuperframeConf::GetRaChannelFrameId (uint32_t raChannel) const
 }
 
 uint32_t
-SatSuperframeConf::GetRaChannelPayloadInBytes (uint32_t raChannel) const
+SatSuperframeConf::GetRaChannelPayloadInBytes (uint8_t raChannel) const
 {
   NS_LOG_FUNCTION (this);
 
   uint32_t payloadInBytes = 0;
-
 
   if ( raChannel < m_raChannels.size ())
     {
@@ -767,6 +775,36 @@ SatSuperframeConf::GetCarrierFrame (uint32_t carrierId) const
     }
 
   return currentFrame;
+}
+
+uint8_t
+SatSuperframeConf::GetRaChannel (uint32_t carrierId) const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint8_t raChannelId = 0;
+  uint8_t frameId = GetCarrierFrame (carrierId);
+
+  if ( m_frames[frameId]->IsRandomAccess() )
+    {
+      uint32_t carrierIdInFrame = carrierId;
+
+      for ( uint8_t i = 0; i < frameId; i++ )
+        {
+          carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
+
+          // increase RA channel id (index) by count of RA carriers before asked carrier/frame
+          if ( m_frames[i]->IsRandomAccess() )
+            {
+              raChannelId += m_frames[i]->GetCarrierCount ();
+            }
+        }
+
+      // increase RA channel id (index) by carrier id of the asked carrier/frame
+      raChannelId += carrierIdInFrame;
+    }
+
+  return raChannelId;
 }
 
 

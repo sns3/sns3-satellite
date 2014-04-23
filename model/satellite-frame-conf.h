@@ -478,7 +478,7 @@ public:
    * \param raChannel RA channel, which slot are requested
    * \return RA channel time slots
    */
-  SatFrameConf::SatTimeSlotConfContainer_t GetRaSlots (uint32_t raChannel);
+  SatFrameConf::SatTimeSlotConfContainer_t GetRaSlots (uint8_t raChannel);
 
   /**
    * Get RA channel time slot count
@@ -486,14 +486,23 @@ public:
    * \param raChannel RA channel, which slot count is requested
    * \return RA channel time slot count
    */
-  uint16_t GetRaSlotCount (uint32_t raChannel);
+  uint16_t GetRaSlotCount (uint8_t raChannel);
 
   /**
    * Get the number of the RA channels in super frame configuration.
    *
    * \return Number of the RA channels
    */
-  uint32_t GetRaChannelCount () const;
+  uint8_t GetRaChannelCount () const;
+
+  /**
+   * Get the RA channel id (index) corresponding to given (global) carrier id.
+   * Note! In case that carrier id requested does not belong to RA frame, is O eturned.
+   *
+   * \param carrierId
+   * \return RA channel id
+   */
+  uint8_t GetRaChannel (uint32_t carrierId) const;
 
   /**
    * Get RA channel frame ID.
@@ -501,14 +510,14 @@ public:
    * \param raChannel RA channel, which frame ID is requested
    * \return RA channel frame ID
    */
-  uint8_t GetRaChannelFrameId (uint32_t raChannel) const;
+  uint8_t GetRaChannelFrameId (uint8_t raChannel) const;
 
   /**
    * Get the payload of the RA channel in bytes.
    *
    * \return Payload of the RA channel [bytes]
    */
-  uint32_t GetRaChannelPayloadInBytes (uint32_t raChannel) const;
+  uint32_t GetRaChannelPayloadInBytes (uint8_t raChannel) const;
 
   /**
    * Set number of frames to be used in super frame.
@@ -551,7 +560,8 @@ public:
   bool GetFrameRandomAccess (uint8_t frameIndex) const;
 
 private:
-  typedef std::pair<uint8_t, uint32_t> RaChannelInfo_t;
+  // first = frame ID, second = RA channel id (index)
+  typedef std::pair<uint8_t, uint8_t> RaChannelInfo_t;
 
   double    m_usedBandwidthHz;
   Time      m_duration;
