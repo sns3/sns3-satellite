@@ -82,7 +82,7 @@ SatEstimatorBaseTestCase::CreateEstimator (SatCnoEstimator::EstimationMode_t mod
  *
  * This case tests that SatBasicCnoEstimator can be created in mode LAST and
  * C/N0 is estimated correctly in set window.
- *  1.  Create SatBasicCnoEstimator object with LAST mode and different window values.
+ *  1.  Create SatBasicCnoEstimator object with LAST mode using different window values.
  *  2.  Set samples to estimator at different points of time (method AddSample).
  *  3.  Get C/N0 estimation from estimator at some points of time (method GetCnoEstimation).
  *
@@ -166,7 +166,7 @@ SatBasicEstimatorLastTestCase::DoRun (void)
  *
  * This case tests that SatBasicCnoEstimator can be created in mode MINIMUM and
  * C/N0 is estimated correctly in set window.
- *  1.  Create SatBasicCnoEstimator object with MINIMUM mode.
+ *  1.  Create SatBasicCnoEstimator object with MINIMUM mode using different window values.
  *  2.  Set samples to estimator at different points of time (method AddSample).
  *  3.  Get C/N0 estimation from estimator at some points of time (method GetCnoEstimation).
  *
@@ -228,7 +228,7 @@ SatBasicEstimatorMinTestCase::DoRun (void)
  *
  * This case tests that SatBasicCnoEstimator can be created in mode AVERAGE and
  * C/N0 is estimated correctly in set window.
- *  1.  Create SatBasicCnoEstimator object with AVERAGE mode.
+ *  1.  Create SatBasicCnoEstimator object with AVERAGE mode using different window values.
  *  2.  Set samples to estimator at different points of time (method AddSample).
  *  3.  Get C/N0 estimation from estimator at some points of time (method GetCnoEstimation).
  *
