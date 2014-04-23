@@ -34,43 +34,59 @@ SatEnvVariables::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatEnvVariables")
     .SetParent<Object> ()
-    .AddConstructor<SatEnvVariables> ();
+    .AddConstructor<SatEnvVariables> ()
+    .AddAttribute ("CurrentWorkingDirectory",
+                   "Current working directory for the simulator.",
+                   StringValue (""),
+                   MakeStringAccessor (&SatEnvVariables::m_currentWorkingDirectoryFromAttribute),
+                   MakeStringChecker ())
+    .AddAttribute ("PathToExecutable",
+                   "Path to the simulator executable.",
+                   StringValue (""),
+                   MakeStringAccessor (&SatEnvVariables::m_pathToExecutableFromAttribute),
+                   MakeStringChecker ());
   return tid;
 }
 
 SatEnvVariables::SatEnvVariables () :
   m_currentWorkingDirectory (""),
-  m_pathToExecutable ("")
+  m_pathToExecutable (""),
+  m_currentWorkingDirectoryFromAttribute (""),
+  m_pathToExecutableFromAttribute ("")
 {
   NS_LOG_FUNCTION (this);
 
-  /// TODO: load attributes here
-  /// m_currentWorkingDirectory = ...
-  /// m_pathToExecutable = ...
+  char currentWorkingDirectory[FILENAME_MAX] = "";
 
-  if (!m_currentWorkingDirectory.length() > 0)
+  if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
     {
-      char currentWorkingDirectory[FILENAME_MAX] = "";
-
-      if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
-        {
-          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
-        }
-      currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
-      m_currentWorkingDirectory = std::string (currentWorkingDirectory);
+      NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
     }
+  currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
+  m_currentWorkingDirectory = std::string (currentWorkingDirectory);
 
-  if (!m_pathToExecutable.length() > 0)
+  char pathToExecutable[FILENAME_MAX] = "";
+
+  if (readlink ("/proc/self/exe",
+                pathToExecutable,
+                sizeof (pathToExecutable)) < 0)
     {
-      char pathToExecutable[FILENAME_MAX] = "";
-
-      if (readlink("/proc/self/exe", pathToExecutable, sizeof (pathToExecutable)) < 0)
-        {
-          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
-        }
-      pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
-      m_pathToExecutable = std::string (pathToExecutable);
+      NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
     }
+  pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
+  m_pathToExecutable = std::string (pathToExecutable);
+}
+
+void
+SatEnvVariables::SetCurrentWorkingDirectory (std::string currentWorkingDirectory)
+{
+  m_currentWorkingDirectory = currentWorkingDirectory;
+}
+
+void
+SatEnvVariables::SetPathToExecutable (std::string pathToExecutable)
+{
+  m_pathToExecutable = pathToExecutable;
 }
 
 SatEnvVariables::~SatEnvVariables ()
@@ -79,6 +95,8 @@ SatEnvVariables::~SatEnvVariables ()
 
   m_currentWorkingDirectory = "";
   m_pathToExecutable = "";
+  m_currentWorkingDirectoryFromAttribute = "";
+  m_pathToExecutableFromAttribute = "";
 }
 
 std::string
@@ -87,8 +105,18 @@ SatEnvVariables::GetCurrentWorkingDirectory ()
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Current working directory: " << m_currentWorkingDirectory);
+  NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Current working directory (attribute): " << m_currentWorkingDirectoryFromAttribute);
 
-  return m_currentWorkingDirectory;
+  if (m_currentWorkingDirectoryFromAttribute.empty ())
+    {
+      NS_LOG_INFO ("Attribute string is empty, using detected working directory");
+      return m_currentWorkingDirectory;
+    }
+  else
+    {
+      NS_LOG_INFO ("Using attributed working directory");
+      return m_currentWorkingDirectoryFromAttribute;
+    }
 }
 
 std::string
@@ -97,8 +125,18 @@ SatEnvVariables::GetPathToExecutable ()
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Path to executable: " << m_pathToExecutable);
+  NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Path to executable (attribute): " << m_pathToExecutableFromAttribute);
 
-  return m_pathToExecutable;
+  if (m_pathToExecutableFromAttribute.empty ())
+    {
+      NS_LOG_INFO ("Attribute string is empty, using detected path to executable");
+      return m_pathToExecutable;
+    }
+  else
+    {
+      NS_LOG_INFO ("Using attributed path to executable");
+      return m_pathToExecutableFromAttribute;
+    }
 }
 
 } // namespace ns3

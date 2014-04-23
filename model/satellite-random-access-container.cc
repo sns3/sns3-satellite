@@ -662,7 +662,11 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
 
   uint32_t maxUniquePackets = m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMaxUniquePayloadPerBlock ();
 
-  /// TODO slots.first can be updated to take into account the reserved RA slots from MAC.
+  /// TODO when multiple overlapping allocation channels for a single UT needs to be supported
+  /// slots.first can be updated to take into account the reserved RA slots from MAC.
+  /// For this the logic for determining the reserved slots needs to be implemented in UT MAC
+  /// and the slots should be passed as parameter to RA logic and used instead of slots.first
+
   /// This should be done by including the list of used slots in this SF as a parameter for the
   /// random access algorithm call. This functionality is needed with, e.g., multiple allocation channels
   std::pair <std::set<uint32_t>, std::set<uint32_t> > slots;

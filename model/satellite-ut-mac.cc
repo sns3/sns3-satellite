@@ -834,8 +834,8 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
           /// check and update used slots
           if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, (*iterSet)))
             {
-              /// TODO this needs to be handled better, e.g., select next free slot instead of forced exit or the use slot exclusion list
-              /// this is an issue when both Slotted ALOHA and CRDSA are enabled and Slotted ALOHA takes the same slot with CRDSA
+              /// TODO this needs to be handled better when multiple allocation channels are in use
+              /// In that case a slot exclusion list should be used when randomizing the Tx slots
               NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable");
             }
         }

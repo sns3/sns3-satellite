@@ -261,8 +261,6 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
 
   Ptr<SatPhyRxCarrier> rxc;
 
-  /// TODO get this from superframe config
-  uint8_t allocationChannelId = 0;
   bool isRandomAccessCarrier = false;
 
   for (uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i)
@@ -276,8 +274,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
 
           if (isRandomAccessCarrier)
             {
-              rxc->SetRandomAccessAllocationChannelId (allocationChannelId);
-              allocationChannelId++;
+              rxc->SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
             }
         }
       else

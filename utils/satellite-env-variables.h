@@ -53,15 +53,27 @@ public:
 
   /**
    * \brief Function for getting the path to current working directory
-   * \return
+   * \return path to current working directory
    */
   std::string GetCurrentWorkingDirectory ();
 
   /**
    * \brief Function for getting the path to executable
-   * \return
+   * \return path to executable
    */
   std::string GetPathToExecutable ();
+
+  /**
+   * \brief Function for setting the path to current working directory
+   * \param currentWorkingDirectory path to current working directory
+   */
+  void SetCurrentWorkingDirectory (std::string currentWorkingDirectory);
+
+  /**
+   * \brief Function for setting the path to executable
+   * \param pathToExecutable path to executable
+   */
+  void SetPathToExecutable (std::string pathToExecutable);
 
 private:
 
@@ -74,6 +86,16 @@ private:
    * \brief Path to executable
    */
   std::string m_pathToExecutable;
+
+  /**
+   * \brief Path to current working directory (attribute value)
+   */
+  std::string m_currentWorkingDirectoryFromAttribute;
+
+  /**
+   * \brief Path to executable (attribute value)
+   */
+  std::string m_pathToExecutableFromAttribute;
 };
 
 } // namespace ns3
