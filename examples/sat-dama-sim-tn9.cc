@@ -11,19 +11,72 @@
 
 using namespace ns3;
 
+#define CALL_SAT_STATS_BASIC_SET(id)                                          \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                    \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                   \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                   \
+                                                                              \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
+                                                                              \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                   \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                  \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                  \
+                                                                              \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
+
+#define CALL_SAT_STATS_DISTRIBUTION_SET(id)                                   \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                    \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                   \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                 \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_PDF_FILE);                       \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_CDF_FILE);                       \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                   \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                 \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                       \
+  s->AddGlobal ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                       \
+                                                                              \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                  \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_PDF_FILE);                        \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_CDF_FILE);                        \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
+  s->AddPerGw ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                        \
+                                                                              \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                   \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                  \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_PDF_FILE);                      \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_CDF_FILE);                      \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                  \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                      \
+  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                      \
+                                                                              \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                  \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_FILE);                        \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_FILE);                        \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
+  s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_PLOT);
+
 /**
 * \ingroup satellite
 *
-* \brief  Another example of CBR application usage in satellite network.
-*         The scripts is using user defined scenario, which means that user
-*         can change the scenario size quite to be whatever between 1 and
-*         full scenario (72 beams). Currently it is configured to using only
-*         one beam. CBR application is sending packets in RTN link, i.e. from UT
-*         side to GW side. Packet trace and KpiHelper are enabled by default.
-*         End user may change the number of UTs and end users from
-*         the command line.
+* \brief Simulation script to run example simulation results related to satellite RTN
+* link performance. Currently only one beam is simulated with variable amount of users
+* and DAMA configuration.
 *
-*         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
+* execute command -> ./waf --run "sat-dama-sim-tn9 --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-dama-sim-tn9");
@@ -35,19 +88,23 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (3);
   uint32_t damaConf (0);
-  Time simLength (Seconds(5.0));
-  Time appStartTime = Seconds(0.5);
+
+  Time simLength (Seconds(50.0));
+  Time appStartTime = Seconds(0.1);
 
   // CBR parameters
-  uint32_t packetSize (128);
-  Time interval (Seconds(1.0));
+  uint32_t minPacketSizeBytes (800); // -> 128 kbps
+  uint32_t maxPacketSizeBytes (6400); // -> 1024 kbps
+  Time interval (MilliSeconds(50));
 
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-dama-input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
   inputConfig.ConfigureDefaults ();
+
+  Ptr<UniformRandomVariable> randVariable = CreateObject<UniformRandomVariable> ();
 
   /**
    * Attributes:
@@ -90,7 +147,7 @@ main (int argc, char *argv[])
     case 0:
       {
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=50]"));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=20]"));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(true));
@@ -103,7 +160,7 @@ main (int argc, char *argv[])
     case 1:
       {
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=50]"));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=20]"));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(false));
@@ -115,7 +172,7 @@ main (int argc, char *argv[])
     case 2:
       {
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=50]"));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=20]"));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(false));
@@ -156,64 +213,29 @@ main (int argc, char *argv[])
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
-
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-   cbrHelper.SetAttribute("Interval", TimeValue (interval));
-   cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
-
-   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-   // initialized time values for simulation
-   uint32_t maxTransmitters = utUsers.GetN ();
-
-   ApplicationContainer gwApps;
-   ApplicationContainer utApps;
-
-   Time cbrStartDelay = appStartTime;
-
-   // Cbr and Sink applications creation
-   for ( uint32_t i = 0; i < maxTransmitters; i++)
-     {
-       cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-       sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-       utApps.Add(cbrHelper.Install (utUsers.Get (i)));
-       gwApps.Add(sinkHelper.Install (gwUsers.Get (0)));
-
-       cbrStartDelay += Seconds (0.05);
-
-       utApps.Get(i)->SetStartTime (cbrStartDelay);
-       utApps.Get(i)->SetStopTime (simLength);
-     }
-
-   // Add the created applications to CbrKpiHelper
-   CbrKpiHelper kpiHelper (KpiHelper::KPI_RTN);
-   kpiHelper.AddSink (gwApps);
-   kpiHelper.AddSender (utApps);
-
-   utApps.Start (appStartTime);
-   utApps.Stop (simLength);
-
-  //const std::string protocol = "ns3::UdpSocketFactory";
+  const std::string protocol = "ns3::UdpSocketFactory";
 
   /**
    * Set-up CBR traffic
    */
-   /*
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
       itUt != utUsers.End ();
       ++itUt)
     {
-      appStartTime += Seconds (0.05);
+      appStartTime += MilliSeconds (10);
 
       // return link
       Ptr<CbrApplication> rtnApp = CreateObject<CbrApplication> ();
       rtnApp->SetAttribute ("Protocol", StringValue (protocol));
       rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
       rtnApp->SetAttribute ("Interval", TimeValue (interval));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
+
+      // Random static packet size
+      uint32_t size = randVariable->GetInteger (minPacketSizeBytes, maxPacketSizeBytes);
+      rtnApp->SetAttribute ("PacketSize", UintegerValue (size));
+
       rtnApp->SetStartTime (appStartTime);
       rtnApp->SetStopTime (simLength);
       (*itUt)->AddApplication (rtnApp);
@@ -224,7 +246,7 @@ main (int argc, char *argv[])
   ps->SetAttribute ("Protocol", StringValue (protocol));
   ps->SetAttribute ("Local", AddressValue (gwAddr));
   gwUsers.Get (0)->AddApplication (ps);
-*/
+
   /**
    * Set-up statistics
    */
@@ -232,71 +254,28 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
   s->SetName ("cbr");
 
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdAppDelay)
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
-  //  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdDevDelay)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdMacDelay)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdPhyDelay)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueueBytes)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueuePackets)
-  //  CALL_SAT_STATS_BASIC_SET (FwdSignallingLoad)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdSinr)
-  //  CALL_SAT_STATS_BASIC_SET (FwdAppThroughput)
-  //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  //  CALL_SAT_STATS_BASIC_SET (FwdDevThroughput)
-  //  CALL_SAT_STATS_BASIC_SET (FwdMacThroughput)
-  //  CALL_SAT_STATS_BASIC_SET (FwdPhyThroughput)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnAppDelay)
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
-  //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnDevDelay)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnMacDelay)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnPhyDelay)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueueBytes)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueuePackets)
-  //  CALL_SAT_STATS_BASIC_SET (RtnSignallingLoad)
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnSinr)
-  //  CALL_SAT_STATS_BASIC_SET (RtnAppThroughput)
-  //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  //  CALL_SAT_STATS_BASIC_SET (RtnDevThroughput)
-  //  CALL_SAT_STATS_BASIC_SET (RtnMacThroughput)
-  //  CALL_SAT_STATS_BASIC_SET (RtnPhyThroughput)
-  //  CALL_SAT_STATS_BASIC_SET (FwdDaPacketError)
-  //  CALL_SAT_STATS_BASIC_SET (RtnDaPacketError)
-  //  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketError)
-  //  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketCollision)
-  //  CALL_SAT_STATS_BASIC_SET (CrdsaPacketError)
-  //  CALL_SAT_STATS_BASIC_SET (CrdsaPacketCollision)
-  //  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerGwCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddGlobalCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  CALL_SAT_STATS_DISTRIBUTION_SET (ResourcesGranted)
-  //  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //  s->AddGlobalBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  /*
+   * The following is the statements for enabling some satellite statistics
+   * for testing purpose.
+   */
+  s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddPerGwRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+  s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   NS_LOG_INFO("--- Cbr-user-defined-example ---");
-  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);

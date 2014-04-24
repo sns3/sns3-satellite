@@ -351,7 +351,6 @@
  <default name="ns3::SatNetDevice::EnableStatisticsTags" value="false"/>
  <default name="ns3::SatPacketTrace::FileName" value="PacketTrace"/>
  <default name="ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace" value="false"/>
- <default name="ns3::SatPhyRxCarrierConf::RxAciIfWrtNoise" value="0"/>
  <default name="ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace" value="false"/>
  <default name="ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize" value="10"/>
  <default name="ns3::SatPhyRxCarrierConf::ConstantErrorRatio" value="0.01"/>
