@@ -20,6 +20,9 @@ def build(bld):
     obj = bld.create_ns3_program('sat-cbr-user-defined-example', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-cbr-user-defined-example.cc'
 
+    obj = bld.create_ns3_program('sat-dama-sim-tn9', ['satellite', 'traffic', 'flow-monitor'])
+    obj.source = 'sat-dama-sim-tn9.cc'
+
     obj = bld.create_ns3_program('sat-multi-application-rtn-example', ['satellite', 'traffic'])
     obj.source = 'sat-multi-application-rtn-example.cc'
     
