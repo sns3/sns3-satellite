@@ -542,7 +542,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatConf::SUPER_FRAME_CONFIG_0));
+  Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
   Config::SetDefault("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
   Config::SetDefault("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
   Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
@@ -669,7 +669,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
 
   Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatConf::SUPER_FRAME_CONFIG_0));
+  Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
   Config::SetDefault("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
   Config::SetDefault("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
   Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));

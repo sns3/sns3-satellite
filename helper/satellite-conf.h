@@ -40,13 +40,6 @@ namespace ns3 {
 class SatConf : public Object
 {
 public:
-  typedef enum
-  {
-    SUPER_FRAME_CONFIG_0,
-    SUPER_FRAME_CONFIG_1,
-    SUPER_FRAME_CONFIG_2,
-    SUPER_FRAME_CONFIG_3,
-  } SuperFrameConfiguration_t;
 
   SatConf ();
   virtual ~SatConf () {}
@@ -323,9 +316,9 @@ private:
    uint32_t m_feederLinkChannelCount;
 
    /**
-    *  The id of the super frame configuration used for sequence 0.
+    *  The super frame configuration used for sequence 0.
     */
-   SuperFrameConfiguration_t m_SuperFrameConfForSeq0;
+   SatSuperframeConf::SuperFrameConfiguration_t m_SuperFrameConfForSeq0;
 
    /**
     * The configured allocated bandwidth for forward link carriers.

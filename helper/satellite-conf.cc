@@ -80,12 +80,12 @@ SatConf::GetTypeId (void)
                       MakeUintegerChecker<uint32_t> (1))
       .AddAttribute ("SuperFrameConfForSeq0",
                      "Super frame configuration used for super frame sequence 0.",
-                      EnumValue (SatConf::SUPER_FRAME_CONFIG_0),
+                      EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
                       MakeEnumAccessor (&SatConf::m_SuperFrameConfForSeq0),
-                      MakeEnumChecker (SatConf::SUPER_FRAME_CONFIG_0, "Configuration 0",
-                                       SatConf::SUPER_FRAME_CONFIG_1, "Configuration 1",
-                                       SatConf::SUPER_FRAME_CONFIG_2, "Configuration 2",
-                                       SatConf::SUPER_FRAME_CONFIG_3, "Configuration 3"))
+                      MakeEnumChecker (SatSuperframeConf::SUPER_FRAME_CONFIG_0, "Configuration 0",
+                                       SatSuperframeConf::SUPER_FRAME_CONFIG_1, "Configuration 1",
+                                       SatSuperframeConf::SUPER_FRAME_CONFIG_2, "Configuration 2",
+                                       SatSuperframeConf::SUPER_FRAME_CONFIG_3, "Configuration 3"))
       .AddAttribute ("FwdCarrierAllocatedBandwidth",
                      "The allocated carrier bandwidth for forward link carriers [Hz].",
                      DoubleValue (0.125e9),
@@ -126,7 +126,7 @@ SatConf::SatConf()
    m_rtnUserLinkBandwidthHz (0.0),
    m_userLinkChannelCount (0),
    m_feederLinkChannelCount (0),
-   m_SuperFrameConfForSeq0 (SatConf::SUPER_FRAME_CONFIG_0),
+   m_SuperFrameConfForSeq0 (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
    m_fwdCarrierAllocatedBandwidthHz (0.0),
    m_fwdCarrierRollOffFactor (0.0),
    m_fwdCarrierSpacingFactor (0.0)
@@ -197,30 +197,7 @@ SatConf::Configure (std::string wfConf)
   Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
   m_superframeSeq->AddWaveformConf (waveFormConf);
 
-  Ptr<SatSuperframeConf> superFrameConf = CreateObject<SatSuperframeConf0> ();
-
-  switch (m_SuperFrameConfForSeq0)
-  {
-    case SUPER_FRAME_CONFIG_0:
-      superFrameConf = CreateObject<SatSuperframeConf0> ();
-      break;
-
-    case SUPER_FRAME_CONFIG_1:
-      superFrameConf = CreateObject<SatSuperframeConf1> ();
-      break;
-
-    case SUPER_FRAME_CONFIG_2:
-      superFrameConf = CreateObject<SatSuperframeConf2> ();
-      break;
-
-    case SUPER_FRAME_CONFIG_3:
-      superFrameConf = CreateObject<SatSuperframeConf3> ();
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Not supported super frame configuration!!!");
-      break;
-  }
+  Ptr<SatSuperframeConf> superFrameConf = SatSuperframeConf::CreateSuperframeConf (m_SuperFrameConfForSeq0 );
 
   superFrameConf->Configure ( rtnUserLinkBandwidthHz, m_superframeSeq->GetTargetDuration(), waveFormConf);
   m_superframeSeq->AddSuperframe (superFrameConf);

@@ -334,6 +334,17 @@ private:
 class SatSuperframeConf : public Object
 {
 public:
+  /**
+   * Configurable Super Frames
+   */
+  typedef enum
+    {
+      SUPER_FRAME_CONFIG_0,//!< SUPER_FRAME_CONFIG_0
+      SUPER_FRAME_CONFIG_1,//!< SUPER_FRAME_CONFIG_1
+      SUPER_FRAME_CONFIG_2,//!< SUPER_FRAME_CONFIG_2
+      SUPER_FRAME_CONFIG_3,//!< SUPER_FRAME_CONFIG_3
+    } SuperFrameConfiguration_t;
+
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
   /**
@@ -348,6 +359,14 @@ public:
   } ConfigType_t;
 
   static const uint8_t m_maxFrameCount = 10;
+
+  /**
+   * Create pre-configured super frame configuration-
+   *
+   * \param conf Pre-configured super frame configuration to create
+   * \return Pointer to created super frame configuration
+   */
+  static Ptr<SatSuperframeConf> CreateSuperframeConf (SuperFrameConfiguration_t conf);
 
   /**
    * Template method to convert number to string

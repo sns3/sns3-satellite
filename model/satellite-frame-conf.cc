@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -248,6 +248,37 @@ SatFrameConf::AddTimeSlotConf (Ptr<SatTimeSlotConf> conf)
 NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf);
 
 // Super frame configuration interface.
+
+Ptr<SatSuperframeConf>
+SatSuperframeConf::CreateSuperframeConf (SuperFrameConfiguration_t conf)
+{
+  Ptr<SatSuperframeConf> superFrameConf = CreateObject<SatSuperframeConf0> ();
+
+  switch (conf)
+  {
+    case SUPER_FRAME_CONFIG_0:
+      superFrameConf = CreateObject<SatSuperframeConf0> ();
+      break;
+
+    case SUPER_FRAME_CONFIG_1:
+      superFrameConf = CreateObject<SatSuperframeConf1> ();
+      break;
+
+    case SUPER_FRAME_CONFIG_2:
+      superFrameConf = CreateObject<SatSuperframeConf2> ();
+      break;
+
+    case SUPER_FRAME_CONFIG_3:
+      superFrameConf = CreateObject<SatSuperframeConf3> ();
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Not supported super frame configuration!!!");
+      break;
+  }
+
+  return superFrameConf;
+}
 
 SatSuperframeConf::SatSuperframeConf ()
  : m_usedBandwidthHz (0.0),
