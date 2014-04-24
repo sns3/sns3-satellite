@@ -142,14 +142,14 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   // Configure the SatPhyRxCarrier instances
   // Note, that in GEO satellite, there is no need for error modeling.
 
-  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  parameters.m_rxTemperatureK = SatUtils::DbToLinear ( SatPhy::GetRxNoiseTemperatureDbk ());
+  parameters.m_extNoiseDensityWhz = SatUtils::DbToLinear( m_extNoisePowerDensityDbwHz );
+  parameters.m_aciIfWrtNoiseFactor = 0.0;
   parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
   parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
   parameters.m_chType = SatEnums::FORWARD_FEEDER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
-
-  carrierConf->SetAttribute ("ExtNoiseDensityDbwhz", DoubleValue (m_extNoisePowerDensityDbwHz) );
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoFeederPhy::CalculateSinr, this));
 

@@ -38,7 +38,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_raIfModel (),
   m_errorModel (),
   m_rxTemperatureK (),
-  m_rxAciIfWrtNoise (),
+  m_rxAciIfWrtNoiseFactor (),
   m_rxMode (),
   m_carrierCount (),
   m_carrierBandwidthConverter (),
@@ -47,7 +47,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_sinrCalculate (),
   m_constantErrorRate (),
   m_linkResults (),
-  m_rxExtNoiseDensityDbwhz (0),
+  m_rxExtNoiseDensityWhz (0),
   m_enableIntfOutputTrace (false),
   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
   m_raCollisionModel (RA_COLLISION_NOT_DEFINED)
@@ -59,8 +59,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
  : m_daIfModel (createParams.m_daIfModel),
    m_raIfModel (createParams.m_raIfModel),
    m_errorModel (createParams.m_errorModel),
-   m_rxTemperatureK (SatUtils::DbToLinear (createParams.m_rxTemperatureK)),
-   m_rxAciIfWrtNoise (createParams.m_aciIfWrtNoisePercent),
+   m_rxTemperatureK (createParams.m_rxTemperatureK),
+   m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
    m_rxMode (createParams.m_rxMode),
    m_carrierCount (createParams.m_carrierCount),
    m_carrierBandwidthConverter (createParams.m_converter),
@@ -69,12 +69,12 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
    m_sinrCalculate (),
    m_constantErrorRate (0.0),
    m_linkResults (),
-   m_rxExtNoiseDensityDbwhz (0),
+   m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
    m_enableIntfOutputTrace (false),
    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
    m_raCollisionModel (createParams.m_raCollisionModel)
 {
-
+  NS_LOG_FUNCTION (this);
 }
 
 TypeId
@@ -82,16 +82,6 @@ SatPhyRxCarrierConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
     .SetParent<Object> ()
-    .AddAttribute( "ExtNoiseDensityDbwhz",
-                   "External noise power density.",
-                    DoubleValue (SatUtils::MinDb<double> ()),
-                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxExtNoiseDensityDbwhz),
-                    MakeDoubleChecker<double> ())
-	  .AddAttribute( "RxAciIfWrtNoise",
-                   "Adjacent channel interference wrt noise in percents.",
-                    DoubleValue (0.0),
-                    MakeDoubleAccessor (&SatPhyRxCarrierConf::m_rxAciIfWrtNoise),
-                    MakeDoubleChecker<double> ())                    
     .AddAttribute( "EnableIntfOutputTrace",
                    "Enable interference output trace.",
                     BooleanValue (false),
@@ -175,15 +165,15 @@ SatPhyRxCarrierConf::GetRxTemperatureK () const
 }
 
 double
-SatPhyRxCarrierConf::GetExtPowerDensityDbwhz () const
+SatPhyRxCarrierConf::GetExtPowerDensityWhz () const
 {
-  return m_rxExtNoiseDensityDbwhz;
+  return m_rxExtNoiseDensityWhz;
 }
 
 double
-SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoise () const
+SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoiseFactor () const
 {
-  return m_rxAciIfWrtNoise;
+  return m_rxAciIfWrtNoiseFactor;
 }
 
 SatPhyRxCarrierConf::RxMode

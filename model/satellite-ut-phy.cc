@@ -130,7 +130,9 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
 
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
 
-  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk ();
+  parameters.m_rxTemperatureK = SatUtils::DbToLinear (SatPhy::GetRxNoiseTemperatureDbk ());
+  parameters.m_aciIfWrtNoiseFactor = 0.0;
+  parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
   parameters.m_chType = SatEnums::FORWARD_USER_CH;
 

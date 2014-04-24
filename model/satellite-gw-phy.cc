@@ -141,13 +141,13 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
 
   m_imInterferenceCOverI = SatUtils::DbToLinear (m_imInterferenceCOverIDb);
 
-  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  parameters.m_rxTemperatureK = SatUtils::DbToLinear (SatPhy::GetRxNoiseTemperatureDbk ());
+  parameters.m_aciIfWrtNoiseFactor = m_aciIfWrtNoisePercent / 100.0;
+  parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
   parameters.m_chType = SatEnums::RETURN_FEEDER_CH;
 
 	Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
-
-  carrierConf->SetAttribute ("RxAciIfWrtNoise", DoubleValue (m_aciIfWrtNoisePercent) );
 
   if (linkResults)
     {

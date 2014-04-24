@@ -141,7 +141,9 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
   m_aciInterferenceCOverI = SatUtils::DbToLinear (m_aciInterferenceCOverIDb);
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
 
-  parameters.m_rxTemperatureK = SatPhy::GetRxNoiseTemperatureDbk();
+  parameters.m_rxTemperatureK = SatUtils::DbToLinear (SatPhy::GetRxNoiseTemperatureDbk ());
+  parameters.m_aciIfWrtNoiseFactor = 0.0;
+  parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
   parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
   parameters.m_chType = SatEnums::RETURN_USER_CH;

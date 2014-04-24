@@ -93,7 +93,7 @@ public:
   /**
    * \brief Struct for storing the information for SatPhyRxCarrierConf.
    * \param rxTemperatureK RX noise temperature in Kelvins
-   * \param aciIfWrtNoisePercent Adjacent channel interference wrt noise in percents
+   * \param m_aciIfWrtNoiseFactor Adjacent channel interference wrt noise factor
    * \param errorModel Used error model
    * \param daIfModel Used interference model for dedicated access
    * \param raIfModel Used interference model for random access
@@ -106,7 +106,8 @@ public:
   typedef struct
   {
     double                                  m_rxTemperatureK;
-    double                                  m_aciIfWrtNoisePercent;
+    double                                  m_extNoiseDensityWhz;
+    double                                  m_aciIfWrtNoiseFactor;
     ErrorModel                              m_errorModel;
     InterferenceModel                       m_daIfModel;
     InterferenceModel                       m_raIfModel;
@@ -190,13 +191,13 @@ public:
    * \brief Get other system RX noise
    * \return other system RX noise
    */
-  double GetExtPowerDensityDbwhz () const;
+  double GetExtPowerDensityWhz () const;
 
   /**
-   * \brief Get adjacent channel interference wrt noise (percent)
-   * \return adjacent channel interference wrt noise (percent)
+   * \brief Get adjacent channel interference wrt noise (factor)
+   * \return adjacent channel interference wrt noise (factor)
    */
-  double GetRxAciInterferenceWrtNoise () const;
+  double GetRxAciInterferenceWrtNoiseFactor () const;
 
   /**
    * \brief Get configured RX mode
@@ -264,7 +265,7 @@ private:
   InterferenceModel m_raIfModel;
   ErrorModel m_errorModel;
   double m_rxTemperatureK;
-  double m_rxAciIfWrtNoise;
+  double m_rxAciIfWrtNoiseFactor;
   RxMode m_rxMode;
   uint32_t m_carrierCount;
   CarrierBandwidthConverter m_carrierBandwidthConverter;
@@ -273,7 +274,7 @@ private:
   SinrCalculatorCallback m_sinrCalculate;
   double m_constantErrorRate;
   Ptr<SatLinkResults> m_linkResults;
-  double m_rxExtNoiseDensityDbwhz;
+  double m_rxExtNoiseDensityWhz;
   bool m_enableIntfOutputTrace;
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
   RandomAccessCollisionModel m_raCollisionModel;

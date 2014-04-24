@@ -101,7 +101,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   m_rxMode = carrierConf->GetRxMode ();
 
-  m_rxExtNoisePowerW = SatUtils::DbWToW(carrierConf->GetExtPowerDensityDbwhz ()) * m_rxBandwidthHz;
+  m_rxExtNoisePowerW = carrierConf->GetExtPowerDensityWhz () * m_rxBandwidthHz;
 
   m_errorModel = carrierConf->GetErrorModel ();
 
@@ -116,8 +116,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // calculate RX noise
   m_rxNoisePowerW = BoltzmannConstant * m_rxTemperatureK * m_rxBandwidthHz;
 
-  // calculate RX ACI power with percent wrt noise
-  m_rxAciIfPowerW = m_rxNoisePowerW * carrierConf->GetRxAciInterferenceWrtNoise () / 100;
+  // calculate RX ACI power
+  m_rxAciIfPowerW = m_rxNoisePowerW * carrierConf->GetRxAciInterferenceWrtNoiseFactor ();
 
   m_sinrCalculate = carrierConf->GetSinrCalculatorCb ();
 
