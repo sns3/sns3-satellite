@@ -84,11 +84,11 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
 
-  // Create reference system, two options:
-  // - "Scenario72"
-  // - "Scenario98"
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
-  //std::string scenarioName = "Scenario98";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 

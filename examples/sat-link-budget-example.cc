@@ -66,7 +66,10 @@ main (int argc, char *argv[])
   // enable info logs
   LogComponentEnable ("sat-link-budget-example", LOG_LEVEL_INFO);
 
-  // Create reference system "Scenario72"
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
 
   // create helpers

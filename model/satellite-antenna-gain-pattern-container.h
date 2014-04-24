@@ -65,7 +65,9 @@ public:
 
 private:
   /**
-   * Definition of number of beams (72-beam reference scenario)
+   * Definition of number of beams (72-beam reference scenario).
+   * TODO: To change the reference system this has to be changed
+   * accordingly.
    */
   static const uint32_t NUMBER_OF_BEAMS = 72;
 

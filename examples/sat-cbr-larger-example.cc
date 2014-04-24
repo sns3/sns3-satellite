@@ -70,67 +70,69 @@ main (int argc, char *argv[])
 
   // Create full scenario
 
-   // Create reference system, two options:
-   // - "Scenario72"
-   // - "Scenario98"
-   std::string scenarioName = "Scenario72";
-   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-   helper->CreateScenario (SatHelper::FULL);
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
+  std::string scenarioName = "Scenario72";
 
-   helper->EnablePacketTrace ();
+  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  helper->CreateScenario (SatHelper::FULL);
 
-   NodeContainer utUsers = helper->GetUtUsers ();
-   NodeContainer gwUsers = helper->GetGwUsers ();
+  helper->EnablePacketTrace ();
 
-   // >>> Start of actual test using Full scenario >>>
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
-   // port used for packet delivering
-   uint16_t port = 9; // Discard port (RFC 863)
+  // >>> Start of actual test using Full scenario >>>
 
-   CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-   cbrHelper.SetAttribute("Interval", StringValue (interval));
-   cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
+  // port used for packet delivering
+  uint16_t port = 9; // Discard port (RFC 863)
 
-   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
+  cbrHelper.SetAttribute("Interval", StringValue (interval));
+  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
 
-   // initialized time values for simulation
-   uint32_t maxReceivers = utUsers.GetN ();
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
-   ApplicationContainer gwApps;
-   ApplicationContainer utApps;
+  // initialized time values for simulation
+  uint32_t maxReceivers = utUsers.GetN ();
 
-   Time cbrStartDelay = appStartTime;
+  ApplicationContainer gwApps;
+  ApplicationContainer utApps;
 
-   // Cbr and Sink applications creation
-   for ( uint32_t i = 0; i < maxReceivers; i++)
-     {
-       cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-       sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+  Time cbrStartDelay = appStartTime;
 
-       gwApps.Add(cbrHelper.Install (gwUsers.Get (4)));
-       utApps.Add(sinkHelper.Install (utUsers.Get (i)));
+  // Cbr and Sink applications creation
+  for ( uint32_t i = 0; i < maxReceivers; i++)
+    {
+      cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
 
-       cbrStartDelay += Seconds (0.001);
+      gwApps.Add(cbrHelper.Install (gwUsers.Get (4)));
+      utApps.Add(sinkHelper.Install (utUsers.Get (i)));
 
-       gwApps.Get(i)->SetStartTime (cbrStartDelay);
-       gwApps.Get(i)->SetStopTime (Seconds (simLength));
-     }
+      cbrStartDelay += Seconds (0.001);
 
-   // Add the created applications to CbrKpiHelper
-   CbrKpiHelper kpiHelper (KpiHelper::KPI_FWD);
-   kpiHelper.AddSink (utApps);
-   kpiHelper.AddSender (gwApps);
+      gwApps.Get(i)->SetStartTime (cbrStartDelay);
+      gwApps.Get(i)->SetStopTime (Seconds (simLength));
+    }
 
-   utApps.Start (appStartTime);
-   utApps.Stop (Seconds (simLength));
+  // Add the created applications to CbrKpiHelper
+  CbrKpiHelper kpiHelper (KpiHelper::KPI_FWD);
+  kpiHelper.AddSink (utApps);
+  kpiHelper.AddSender (gwApps);
 
-   Simulator::Stop (Seconds (simLength));
-   Simulator::Run ();
+  utApps.Start (appStartTime);
+  utApps.Stop (Seconds (simLength));
 
-   kpiHelper.Print ();
+  Simulator::Stop (Seconds (simLength));
+  Simulator::Run ();
 
-   Simulator::Destroy ();
+  kpiHelper.Print ();
 
-   return 0;
+  Simulator::Destroy ();
+
+  return 0;
 
 } // end of `int main (int argc, char *argv[])`

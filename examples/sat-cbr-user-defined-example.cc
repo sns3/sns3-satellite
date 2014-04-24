@@ -69,11 +69,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
-  // Create reference system, two options:
-  // - "Scenario72"
-  // - "Scenario98"
+  // Create reference system
   std::string scenarioName = "Scenario72";
-  //std::string scenarioName = "Scenario98";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 

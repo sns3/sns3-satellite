@@ -83,11 +83,11 @@ ScenarioCreationSimple::DoRun (void)
 
   // Create simple scenario
 
-  // Create reference system, two options:
-  // - "Scenario72"
-  // - "Scenario98"
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
-  //std::string scenarioName = "Scenario98";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("simple-scenario-creation.log", false);
@@ -146,11 +146,11 @@ ScenarioCreationLarger::DoRun (void)
 
   // Create larger scenario
 
-  // Create reference system, two options:
-  // - "Scenario72"
-  // - "Scenario98"
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
-  //std::string scenarioName = "Scenario98";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("larger-scenario-creation.log", false);
@@ -209,11 +209,11 @@ ScenarioCreationFull::DoRun (void)
 
   // Create full scenario
 
-  // Create reference system, two options:
-  // - "Scenario72"
-  // - "Scenario98"
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
-  //std::string scenarioName = "Scenario98";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("full-scenario-creation.log", false );
@@ -277,11 +277,11 @@ ScenarioCreationUser::DoRun (void)
 
   // Create user scenario
 
-  // Create reference system, two options:
-  // - "Scenario72"
-  // - "Scenario98"
+  // Creating the reference system. Note, currently the satellite module supports
+  // only one reference system, which is named as "Scenario72". The string is utilized
+  // in mapping the scenario to the needed reference system configuration files. Arbitrary
+  // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
-  //std::string scenarioName = "Scenario98";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);

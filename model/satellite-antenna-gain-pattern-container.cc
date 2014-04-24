@@ -40,6 +40,12 @@ SatAntennaGainPatternContainer::GetTypeId (void)
 
 SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
 {
+  /**
+   * TODO: To change the reference system, these hard coded paths
+   * and filenames may have to be changed! One way could be to hard
+   * code the antenna pattern names, but change the input folder
+   * according to the wanted reference system.
+   */
   std::string path = "src/satellite/data/antennapatterns/";
   std::string fileName = "SatAntennaGain72Beams_";
 
