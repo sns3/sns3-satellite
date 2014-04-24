@@ -195,7 +195,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
                 }
             }
 
-          if ( utSymbolsLeft < 0)
+          // carrier limit for UT received, so we need to stopm because time slot cannot generated anymore
+          if ( utSymbolsToUse <= 0)
             {
               utSymbolsLeft = 0;
             }
