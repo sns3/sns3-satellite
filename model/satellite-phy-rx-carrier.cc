@@ -1335,14 +1335,14 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
 
   double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
                                          packet.rxParams->m_ifPowerInSatellite_W,
-                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
+                                         packet.rxParams->m_rxNoisePowerInSatellite_W,
                                          packet.rxParams->m_rxAciIfPowerInSatellite_W,
                                          packet.rxParams->m_rxExtNoisePowerInSatellite_W,
                                          packet.rxParams->m_sinrCalculate);
 
   double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                 packet.rxParams->m_ifPower_W,
-                                m_rxExtNoisePowerW,
+                                m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
