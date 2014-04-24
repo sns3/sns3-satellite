@@ -206,7 +206,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
    */
   Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser;
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
   parametersUser.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parametersUser.m_converter = m_carrierBandwidthConverter;
@@ -214,7 +214,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersUser.m_cec = cec;
   parametersUser.m_raCollisionModel = m_raSettings.m_raCollisionModel;
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder;
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
   parametersFeeder.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parametersFeeder.m_converter = m_carrierBandwidthConverter;
@@ -232,7 +232,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
       parametersUser.m_isRandomAccessEnabled = false;
       parametersFeeder.m_isRandomAccessEnabled = false;
     }
-
 
   /// TODO get rid of the hard coded 0
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,

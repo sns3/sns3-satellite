@@ -256,7 +256,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       cec = Create<SatFwdLinkChannelEstimationErrorContainer> ();
     }
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters;
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parameters.m_errorModel = m_errorModel;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;

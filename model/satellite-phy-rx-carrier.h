@@ -613,6 +613,11 @@ private:
    * \brief Random access allocation channel ID
    */
   uint8_t m_randomAccessAllocationChannelId;
+
+  /**
+   * \brief Enable random access dynamic load control
+   */
+  bool m_enableRandomAccessDynamicLoadControl;
 };
 
 }

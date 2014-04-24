@@ -62,7 +62,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
    m_isRandomAccessEnabledForThisCarrier (isRandomAccessEnabledForThisCarrier),
    m_randomAccessBitsInFrame (0),
    m_frameEndSchedulingInitialized (false),
-   m_randomAccessAllocationChannelId (0)
+   m_randomAccessAllocationChannelId (0),
+   m_enableRandomAccessDynamicLoadControl (false)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -136,6 +137,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     {
       m_randomAccessCollisionModel = carrierConf->GetRandomAccessCollisionModel ();
       m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize = carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ();
+      m_enableRandomAccessDynamicLoadControl = carrierConf->IsRandomAccessDynamicLoadControlEnabled ();
     }
 
   NS_LOG_INFO ("SatPhyRxCarrier::SatPhyRxCarrier - Carrier ID: " << m_carrierId <<
@@ -691,7 +693,10 @@ SatPhyRxCarrier::DoFrameEnd ()
 
   if (m_isRandomAccessEnabledForThisCarrier)
     {
-      MeasureRandomAccessLoad ();
+      if (m_enableRandomAccessDynamicLoadControl)
+        {
+          MeasureRandomAccessLoad ();
+        }
 
       if (m_crdsaPacketContainer.size () > 0)
         {

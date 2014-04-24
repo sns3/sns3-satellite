@@ -103,7 +103,7 @@ public:
    * \param carrierCount carrier count
    * \param cec Channel estimation error container
    */
-  typedef struct
+  typedef struct RxCarrierCreateParams_s
   {
     double                                  m_rxTemperatureK;
     double                                  m_extNoiseDensityWhz;
@@ -118,6 +118,24 @@ public:
     Ptr<SatChannelEstimationErrorContainer> m_cec;
     RandomAccessCollisionModel              m_raCollisionModel;
     bool                                    m_isRandomAccessEnabled;
+
+    RxCarrierCreateParams_s () :
+      m_rxTemperatureK (0.0),
+      m_extNoiseDensityWhz (0.0),
+      m_aciIfWrtNoiseFactor (0.0),
+      m_errorModel (SatPhyRxCarrierConf::EM_NONE),
+      m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
+      m_chType (SatEnums::RETURN_USER_CH),
+      m_converter (),
+      m_carrierCount (0),
+      m_cec (NULL),
+      m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+      m_isRandomAccessEnabled (false)
+    {
+      // do nothing
+    }
   } RxCarrierCreateParams_s;
 
   /**
@@ -253,6 +271,12 @@ public:
    */
   uint32_t GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize () const;
 
+  /**
+   * \brief Function for checking if random access dynamic load control is enabled
+   * \return Is random access dynamic load control enabled
+   */
+  bool IsRandomAccessDynamicLoadControlEnabled () const;
+
 private:
 
   /*
@@ -278,6 +302,7 @@ private:
   bool m_enableIntfOutputTrace;
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
   RandomAccessCollisionModel m_raCollisionModel;
+  bool m_enableRandomAccessDynamicLoadControl;
 };
 
 } // namespace ns3

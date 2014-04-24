@@ -232,7 +232,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
       cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
     }
 
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters;
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parameters.m_errorModel = m_errorModel;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;

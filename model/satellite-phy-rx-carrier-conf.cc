@@ -50,7 +50,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_rxExtNoiseDensityWhz (0),
   m_enableIntfOutputTrace (false),
   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-  m_raCollisionModel (RA_COLLISION_NOT_DEFINED)
+  m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
+  m_enableRandomAccessDynamicLoadControl (true)
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
@@ -72,7 +73,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
    m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
    m_enableIntfOutputTrace (false),
    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-   m_raCollisionModel (createParams.m_raCollisionModel)
+   m_raCollisionModel (createParams.m_raCollisionModel),
+   m_enableRandomAccessDynamicLoadControl (true)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -92,6 +94,11 @@ SatPhyRxCarrierConf::GetTypeId (void)
                     UintegerValue (10),
                     MakeUintegerAccessor (&SatPhyRxCarrierConf::m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize),
                     MakeUintegerChecker<uint32_t> ())
+    .AddAttribute( "EnableRandomAccessDynamicLoadControl",
+                   "Enable random access dynamic load control.",
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableRandomAccessDynamicLoadControl),
+                    MakeBooleanChecker ())
     .AddAttribute( "ConstantErrorRatio",
                    "Constant error ratio",
                     DoubleValue (0.01),
@@ -223,6 +230,12 @@ uint32_t
 SatPhyRxCarrierConf::GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize () const
 {
   return m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
+}
+
+bool
+SatPhyRxCarrierConf::IsRandomAccessDynamicLoadControlEnabled () const
+{
+  return m_enableRandomAccessDynamicLoadControl;
 }
 
 } // namespace ns3
