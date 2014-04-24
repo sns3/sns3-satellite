@@ -23,6 +23,7 @@
 
 #include "ns3/log.h"
 #include "ns3/string.h"
+#include "ns3/double.h"
 #include "ns3/object.h"
 
 #include "satellite-link-results.h"
@@ -142,6 +143,11 @@ SatLinkResultsDvbS2::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
     .SetParent<SatLinkResults> ()
+    .AddAttribute( "EsNoOffsetForShortFrame",
+                   "EsNo increase offset for short BB frame with a given BLER",
+                   DoubleValue (0.4),
+                   MakeDoubleAccessor (&SatLinkResultsDvbS2::m_shortFrameOffsetInDb),
+                   MakeDoubleChecker <double_t> ())
   ;
   return tid;
 }
@@ -188,7 +194,7 @@ SatLinkResultsDvbS2::DoInitialize ()
 
 
 double
-SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, double esNoDb) const
+SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const
 {
   NS_LOG_FUNCTION (this << modcod << esNoDb);
 
@@ -197,12 +203,22 @@ SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, double esNoDb) const
       NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
     }
 
+  /**
+   * Short BB frame is assumed to be requiring m_shortFrameOffsetInDb dB
+   * higher Es/No if compared to normal BB frame.
+   * TODO: a proper link result to be added for short BB frame.
+   */
+  if (frameType == SatEnums::SHORT_FRAME)
+    {
+      esNoDb -= m_shortFrameOffsetInDb;
+    }
+
   return m_table.at(modcod)->GetBler (esNoDb);
 }
 
 
 double
-SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, double blerTarget) const
+SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const
 {
   NS_LOG_FUNCTION (this << modcod << blerTarget);
 
@@ -211,7 +227,20 @@ SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, double blerTarget)
       NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
     }
 
-  return m_table.at(modcod)->GetEsNoDb (blerTarget);
+  // Get Es/No requirement for normal BB frame
+  double esno = m_table.at(modcod)->GetEsNoDb (blerTarget);
+
+  /**
+   * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB
+   * higher Es/No if compared to normal BB frame.
+   * TODO: a proper link result to be added for short BB frame.
+   */
+  if (frameType == SatEnums::SHORT_FRAME)
+    {
+      esno += m_shortFrameOffsetInDb;
+    }
+
+  return esno;
 }
 
 

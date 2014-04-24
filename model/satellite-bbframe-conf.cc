@@ -318,7 +318,7 @@ SatBbFrameConf::InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults 
        * BB frames should be added and the interface changed to be able to GetEsNoDb for
        * both frame types.
        */
-      double esnoRequirementDb = linkResults->GetEsNoDb (it->second->GetModcod(), m_targetBler);
+      double esnoRequirementDb = linkResults->GetEsNoDb (it->second->GetModcod(), it->first.second, m_targetBler);
 
       /**
        * In forward link the link results are in Es/No format, thus here we need

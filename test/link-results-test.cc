@@ -149,7 +149,7 @@ void
 SatLinkResultsDvbS2TestCase::DoRun ()
 {
   NS_LOG_FUNCTION (this << m_modcod << m_sinrDb << m_bler);
-  double actualBler = m_linkResults->GetBler (m_modcod, m_sinrDb);
+  double actualBler = m_linkResults->GetBler (m_modcod, SatEnums::NORMAL_FRAME, m_sinrDb);
   NS_LOG_DEBUG (this << " actualBler=" << actualBler);
   NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
                             "Difference of " << (actualBler - m_bler)

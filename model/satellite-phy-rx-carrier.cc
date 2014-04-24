@@ -900,7 +900,9 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                * Es/No = (C*Ts)/No = C/No * (1/fs) = C/N
               */
 
-              double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,SatUtils::LinearToDb (cSinr));
+              double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,
+                                                                                         rxParams->m_txInfo.frameType,
+                                                                                         SatUtils::LinearToDb (cSinr));
               double r = m_uniformVariable->GetValue (0, 1);
 
               if ( r < ber )
@@ -926,7 +928,9 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
               */
 
               double ebNo = cSinr * (1/log2(SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)));
-              double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,SatUtils::LinearToDb (ebNo));
+
+              double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
+                                                                                           SatUtils::LinearToDb (ebNo));
               double r = m_uniformVariable->GetValue (0, 1);
 
               if ( r < ber )

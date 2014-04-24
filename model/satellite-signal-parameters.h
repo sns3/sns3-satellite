@@ -47,6 +47,7 @@ public:
   {
     SatEnums::PacketType_t packetType;
     SatEnums::SatModcod_t modCod;
+    SatEnums::SatBbFrameType_t frameType;
     uint32_t waveformId;
     uint32_t crdsaUniquePacketId;
   } txInfo_s;

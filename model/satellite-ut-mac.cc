@@ -970,6 +970,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           SatSignalParameters::txInfo_s txInfo;
           txInfo.packetType = SatEnums::PACKET_TYPE_CRDSA;
           txInfo.modCod = wf->GetModCod ();
+          txInfo.frameType = SatEnums::UNDEFINED_FRAME;
           txInfo.waveformId = wf->GetWaveformId ();
           txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId;
 

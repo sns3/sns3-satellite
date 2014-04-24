@@ -166,25 +166,27 @@ public:
    * \brief Get a BLER value from link results.
    *
    * \param modcod Modulation and coding scheme
+   * \param frameType BB frame type (short, long)
    * \param esNoDb the received Es/No in dB
    * \return BLER value, which is a `double` ranging between [0..1]
    *
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetBler (SatEnums::SatModcod_t modcod, double esNoDb) const;
+  double GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const;
 
   /**
    * \brief Get a Es/No requirement for a given BLER target from link results.
    *
    * \param modcod Modulation and coding scheme
+   * \param frameType BB frame type (short, long)
    * \param blerTarget Target BLER for the system
    * \return Es/No value
    *
    * Must be run after SatLinkResults::Initialize is called.
    *
    */
-  double GetEsNoDb (SatEnums::SatModcod_t modcod, double blerTarget) const;
+  double GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const;
 
 protected:
   /**
@@ -200,6 +202,8 @@ private:
    * - value = Ptr<SatLookUpTable>, i.e. look-up table containing the link results
    */
   std::map<SatEnums::SatModcod_t, Ptr<SatLookUpTable> > m_table;
+
+  double m_shortFrameOffsetInDb;
 };
 
 

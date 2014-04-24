@@ -248,9 +248,10 @@ public:
    */
   typedef enum
   {
-    SHORT_FRAME = 0,
-    NORMAL_FRAME = 1,
-    DUMMY_FRAME = 2
+    UNDEFINED_FRAME = 0,
+    SHORT_FRAME = 1,
+    NORMAL_FRAME = 2,
+    DUMMY_FRAME = 3
   } SatBbFrameType_t;
 
   /**
