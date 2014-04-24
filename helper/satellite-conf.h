@@ -29,6 +29,7 @@
 #include "ns3/geo-coordinate.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-fwd-carrier-conf.h"
 
 namespace ns3 {
 
@@ -269,7 +270,7 @@ private:
     * Item index of the list means carrier configuration sequence.
     * Currently only one sequence used and only one carrier inside carrier conf.
     */
-   std::vector<Ptr<SatBtuConf> >  m_forwardLinkCarrierConf;
+   std::vector<Ptr<SatFwdCarrierConf> >  m_forwardLinkCarrierConf;
 
    /**
     *  Base frequency of forward feeder link.

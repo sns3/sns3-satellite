@@ -160,18 +160,23 @@ SatConf::Configure (std::string wfConf)
   // *** configure forward link ***
 
   // currently only one carrier in forward link is used.
-  double fwdFeederLinkBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
-  double fwdUserLinkBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
+  double fwdFeederLinkChannelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
+  double fwdUserLinkChannelBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
 
-  // bandwidths of the forward feeder and user links is expected to be equal
-    if ( fwdFeederLinkBandwidthHz != fwdUserLinkBandwidthHz )
+  // channel bandwidths for the forward feeder and user links is expected to be equal
+    if ( fwdFeederLinkChannelBandwidthHz != fwdUserLinkChannelBandwidthHz )
       {
-        NS_FATAL_ERROR ( "Bandwidths of forward feeder and user links are not equal!!!");
+        NS_FATAL_ERROR ("Channel bandwidths for forward feeder and user links are not equal!!!");
       }
 
-  // TODO: implement forward link specific conf instead of using BTU conf
-  Ptr<SatBtuConf> fwdCarrierConf = Create<SatBtuConf> (m_fwdCarrierAllocatedBandwidthHz, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
+    if ( m_fwdCarrierAllocatedBandwidthHz > fwdFeederLinkChannelBandwidthHz )
+      {
+        NS_FATAL_ERROR ("Fwd Link carrier bandwidth exceeds channel bandwidth!!!");
+      }
 
+  // create forward link carrier configuration and one carrier pushing just one carrier to container
+  // only one carrier supported in forward link currently
+  Ptr<SatFwdCarrierConf> fwdCarrierConf = Create<SatFwdCarrierConf> (m_fwdCarrierAllocatedBandwidthHz, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
   m_forwardLinkCarrierConf.push_back (fwdCarrierConf);
 
   // *** configure return link ***
@@ -234,15 +239,25 @@ SatConf::GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId
   switch (chType)
   {
     case SatEnums::FORWARD_FEEDER_CH:
+      if ( carrierId >= m_forwardLinkCarrierConf.size ())
+        {
+          NS_FATAL_ERROR ("Fwd Carrier id out of the range!!");
+        }
+
       channelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
-      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthInHz ();
+      carrierBandwidthHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
       baseFreqHz = m_fwdFeederLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
 
     case SatEnums::FORWARD_USER_CH:
+      if ( carrierId >= m_forwardLinkCarrierConf.size ())
+        {
+          NS_FATAL_ERROR ("Fwd Carrier id out of the range!!");
+        }
+
       channelBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
-      carrierBandwidthHz = m_forwardLinkCarrierConf[0]->GetAllocatedBandwidthInHz ();
+      carrierBandwidthHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
       baseFreqHz = m_fwdUserLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
@@ -465,6 +480,11 @@ SatConf::GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBand
   NS_LOG_FUNCTION (this);
 
   double bandwidtHz = 0.0;
+
+  if ( carrierId >= m_forwardLinkCarrierConf.size ())
+    {
+      NS_FATAL_ERROR ("Fwd Carrier id out of the range!!");
+    }
 
   switch (bandwidthType)
   {
