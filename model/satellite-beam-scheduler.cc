@@ -122,9 +122,9 @@ SatBeamScheduler::GetTypeId (void)
                    "Mode of the C/N0 estimator",
                    EnumValue (SatCnoEstimator::LAST),
                    MakeEnumAccessor (&SatBeamScheduler::m_cnoEstimatorMode),
-                   MakeEnumChecker (SatCnoEstimator::LAST, "Last value in window used.",
-                                    SatCnoEstimator::MINIMUM, "Minimum value in window used.",
-                                    SatCnoEstimator::AVERAGE, "Average value in window used."))
+                   MakeEnumChecker (SatCnoEstimator::LAST, "LastValueInWindow",
+                                    SatCnoEstimator::MINIMUM, "MinimumValueInWindow",
+                                    SatCnoEstimator::AVERAGE, "AverageValueInWindow"))
     .AddAttribute( "CnoEstimationWindow",
                    "Time window for C/N0 estimation.",
                    TimeValue (MilliSeconds (1000)),

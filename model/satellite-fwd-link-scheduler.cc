@@ -115,9 +115,9 @@ SatFwdLinkScheduler::GetTypeId (void)
                    "Mode for selecting used BBFrames.",
                     EnumValue (SatFwdLinkScheduler::NORMAL_FRAMES),
                     MakeEnumAccessor (&SatFwdLinkScheduler::m_bbFrameUsageMode),
-                    MakeEnumChecker (SatFwdLinkScheduler::SHORT_FRAMES, "Only short frames used.",
-                                     SatFwdLinkScheduler::NORMAL_FRAMES, "Only normal frames used",
-                                     SatFwdLinkScheduler::SHORT_AND_NORMAL_FRAMES, "Both short and normal frames used."))
+                    MakeEnumChecker (SatFwdLinkScheduler::SHORT_FRAMES, "ShortFrames",
+                                     SatFwdLinkScheduler::NORMAL_FRAMES, "NormalFrames",
+                                     SatFwdLinkScheduler::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
     .AddAttribute ("SchedulingStartThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
                     TimeValue (MilliSeconds (5)),
@@ -132,16 +132,16 @@ SatFwdLinkScheduler::GetTypeId (void)
                    "Sorting criteria after priority for scheduling objects from LLC.",
                     EnumValue (SatFwdLinkScheduler::NO_SORT),
                     MakeEnumAccessor (&SatFwdLinkScheduler::m_additionalSortCriteria),
-                    MakeEnumChecker (SatFwdLinkScheduler::NO_SORT, "No sorting",
-                                     SatFwdLinkScheduler::BUFFERING_DELAY_SORT, "Sorting by delay in buffer",
-                                     SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "Sorting by load in buffer"))
+                    MakeEnumChecker (SatFwdLinkScheduler::NO_SORT, "NoSorting",
+                                     SatFwdLinkScheduler::BUFFERING_DELAY_SORT, "DelaySort",
+                                     SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "LoadSort"))
     .AddAttribute ("CnoEstimationMode",
                    "Mode of the C/N0 estimator",
                    EnumValue (SatCnoEstimator::LAST),
                    MakeEnumAccessor (&SatFwdLinkScheduler::m_cnoEstimatorMode),
-                   MakeEnumChecker (SatCnoEstimator::LAST, "Last value in window used.",
-                                    SatCnoEstimator::MINIMUM, "Minimum value in window used.",
-                                    SatCnoEstimator::AVERAGE, "Average value in window used."))
+                   MakeEnumChecker (SatCnoEstimator::LAST, "LastValueInWindow",
+                                    SatCnoEstimator::MINIMUM, "MinValueInWindow",
+                                    SatCnoEstimator::AVERAGE, "AverageValueInWindow"))
     .AddAttribute( "CnoEstimationWindow",
                    "Time window for C/N0 estimation.",
                    TimeValue (MilliSeconds (500)),
