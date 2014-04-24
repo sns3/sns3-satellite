@@ -55,7 +55,7 @@ static const double g_MarkovInitialStateProbabilities[SatMarkovConf::DEFAULT_STA
     };
 
 TypeId
-SatMarkovConf::GetTypeId (void) //TODO: add attribute for m_markovElevations and m_markovProbabilities
+SatMarkovConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMarkovConf")
       .SetParent<Object> ()

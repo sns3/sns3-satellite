@@ -43,7 +43,7 @@ static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatM
     };
 
 TypeId
-SatLooConf::GetTypeId (void) //TODO: add attribute m_looParameters
+SatLooConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLooConf")
       .SetParent<SatBaseFaderConf> ()

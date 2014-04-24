@@ -58,7 +58,7 @@ SatPhy::SatPhy (void)
     m_txPointingLossDb (0),
     m_txOboLossDb (0),
     m_txAntennaLossDb (0),
-    m_defaultFadingValue (1)
+    m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
@@ -77,7 +77,7 @@ SatPhy::SatPhy (CreateParam_t & params)
    m_txPointingLossDb (0),
    m_txOboLossDb (0),
    m_txAntennaLossDb (0),
-   m_defaultFadingValue (1)
+   m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());

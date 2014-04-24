@@ -47,7 +47,7 @@ SatTracedInterference::GetInstanceTypeId (void) const
 
 SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth) :
     m_rxing (false),
-    m_power (),
+    m_power (0),
     m_channelType (channeltype),
     m_rxBandwidth_Hz (rxBandwidth)
 {
