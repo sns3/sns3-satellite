@@ -135,7 +135,7 @@ SatStatsHelper::GetTypeId ()
                                        &SatStatsHelper::GetName),
                    MakeStringChecker ())
     .AddAttribute ("IdentifierType",
-                   "",
+                   "Determines how the statistics are categorized.",
                    EnumValue (SatStatsHelper::IDENTIFIER_GLOBAL),
                    MakeEnumAccessor (&SatStatsHelper::SetIdentifierType,
                                      &SatStatsHelper::GetIdentifierType),
@@ -145,7 +145,7 @@ SatStatsHelper::GetTypeId ()
                                     SatStatsHelper::IDENTIFIER_UT,      "UT",
                                     SatStatsHelper::IDENTIFIER_UT_USER, "UT_USER"))
     .AddAttribute ("OutputType",
-                   "",
+                   "Determines the type and format of the output.",
                    EnumValue (SatStatsHelper::OUTPUT_SCATTER_FILE),
                    MakeEnumAccessor (&SatStatsHelper::SetOutputType,
                                      &SatStatsHelper::GetOutputType),
