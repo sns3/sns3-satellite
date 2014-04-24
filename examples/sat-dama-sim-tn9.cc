@@ -11,64 +11,6 @@
 
 using namespace ns3;
 
-#define CALL_SAT_STATS_BASIC_SET(id)                                          \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                    \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                   \
-                                                                              \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-                                                                              \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                   \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                  \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                  \
-                                                                              \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-
-#define CALL_SAT_STATS_DISTRIBUTION_SET(id)                                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                    \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                 \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_PDF_FILE);                       \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_CDF_FILE);                       \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                 \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                       \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                       \
-                                                                              \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                  \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_PDF_FILE);                        \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_CDF_FILE);                        \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                        \
-                                                                              \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                   \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                  \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_PDF_FILE);                      \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_CDF_FILE);                      \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                  \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                      \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                      \
-                                                                              \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                  \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_FILE);                        \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_FILE);                        \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_PLOT);
-
 /**
 * \ingroup satellite
 *
@@ -196,20 +138,12 @@ main (int argc, char *argv[])
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
   helper->SetBeamUserInfo (beamMap);
-  helper->EnablePacketTrace ();
 
   helper->CreateScenario (SatHelper::USER_DEFINED);
-
-  // enable info logs
-  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  //LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
-
-  // >>> Start of actual test using Full scenario >>>
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -252,7 +186,6 @@ main (int argc, char *argv[])
    */
 
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
-  s->SetName ("cbr");
 
   /*
    * The following is the statements for enabling some satellite statistics
