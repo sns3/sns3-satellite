@@ -31,7 +31,7 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (3);
   uint32_t damaConf (0);
 
-  Time simLength (Seconds(50.0));
+  double simLength (100.0); // in seconds
   Time appStartTime = Seconds(0.1);
 
   // CBR parameters
@@ -79,8 +79,9 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue("damaConf", "DAMA configuration", damaConf);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
+  cmd.AddValue ("simLength", "Simulation duration (in seconds)", simLength);
   cmd.Parse (argc, argv);
 
   switch (damaConf)
@@ -175,7 +176,6 @@ main (int argc, char *argv[])
       rtnApp->SetAttribute ("PacketSize", UintegerValue (size));
 
       rtnApp->SetStartTime (appStartTime);
-      rtnApp->SetStopTime (simLength);
       (*itUt)->AddApplication (rtnApp);
     }
 
@@ -191,30 +191,33 @@ main (int argc, char *argv[])
 
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
-  /*
-   * The following is the statements for enabling some satellite statistics
-   * for testing purpose.
-   */
-  s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddPerGwRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-  s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  NS_LOG_INFO("--- Cbr-user-defined-example ---");
+  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  LogComponentEnable ("sat-dama-sim-tn9", LOG_INFO);
+  NS_LOG_INFO("--- sat-dama-sim-tn9 ---");
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
-  NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
+  NS_LOG_INFO("  Simulation length: " << simLength);
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
   NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO("  ");
@@ -232,7 +235,7 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (simLength);
+  Simulator::Stop (Seconds (simLength));
   Simulator::Run ();
 
   Simulator::Destroy ();
