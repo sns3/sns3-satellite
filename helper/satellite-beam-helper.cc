@@ -70,10 +70,10 @@ SatBeamHelper::GetTypeId (void)
                      "Random Access Model",
                       EnumValue (SatEnums::RA_MODEL_OFF),
                       MakeEnumAccessor (&SatBeamHelper::m_randomAccessModel),
-                      MakeEnumChecker (SatEnums::RA_MODEL_OFF, "RA not in use.",
-                                       SatEnums::RA_MODEL_SLOTTED_ALOHA, "Slotted ALOHA",
-                                       SatEnums::RA_MODEL_CRDSA, "CRDSA",
-                                       SatEnums::RA_MODEL_RCS2_SPECIFICATION, "RA based on RCS2 specification"))
+                      MakeEnumChecker (SatEnums::RA_MODEL_OFF, "RaOff",
+                                       SatEnums::RA_MODEL_SLOTTED_ALOHA, "RaSlottedAloha",
+                                       SatEnums::RA_MODEL_CRDSA, "RaCrdsa",
+                                       SatEnums::RA_MODEL_RCS2_SPECIFICATION, "RaRcs2Specification"))
       .AddAttribute ("RaInterferenceModel",
                      "Interference model for random access",
                       EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -85,9 +85,9 @@ SatBeamHelper::GetTypeId (void)
                      "Collision model for random access",
                       EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
                       MakeEnumAccessor (&SatBeamHelper::m_raCollisionModel),
-                      MakeEnumChecker (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED, "Not defined",
-                                       SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS, "Always drop colliding packets",
-                                       SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR, "Check against SINR"))
+                      MakeEnumChecker (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED, "RaCollisionNotDefined",
+                                       SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS, "RaCollisionAlwaysDropCollidingPackets",
+                                       SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR, "RaCollisionCheckAgainstSinr"))
       .AddAttribute ("PropagationDelayModel",
                       "Propagation delay model",
                       EnumValue (SatEnums::PD_CONSTANT_SPEED),
