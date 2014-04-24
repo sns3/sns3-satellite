@@ -89,7 +89,7 @@ class SatHelper;
  * The output files will be named in a certain pattern using the name set in
  * the `Name` attribute or SetName() method. The default name is "stat", e.g.,
  * which will produce output files with the names such as
- * `stat-per-ut-fwd-app-delay-scalar-0.txt`,
+ * `stat-per-ut-fwd-app-delay-scalar.txt`,
  * `stat-per-ut-fwd-app-delay-cdf-ut-1.txt`, etc.
  */
 class SatStatsHelperContainer : public Object

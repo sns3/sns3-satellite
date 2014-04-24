@@ -22,7 +22,7 @@
  * - Tiago G. Rodrigues (tgr002@bucknell.edu)
  * - Mitch Watrous (watrous@u.washington.edu)
  *
- * Modified for Sinr trace source by:
+ * Modified for the signature of SatPhyRxCarrier trace sources by:
  * - Budiarto Herman (budiarto.herman@magister.fi)
  */
 

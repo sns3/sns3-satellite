@@ -127,7 +127,7 @@ SatStatsPacketErrorHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName () + ".txt"),
+                                         "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false));
 
         // Setup collectors.

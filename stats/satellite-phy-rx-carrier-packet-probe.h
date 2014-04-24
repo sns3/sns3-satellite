@@ -22,7 +22,7 @@
  * - Tiago G. Rodrigues (tgr002@bucknell.edu)
  * - Mitch Watrous (watrous@u.washington.edu)
  *
- * Modified for Sinr trace source by:
+ * Modified for the signature of SatPhyRxCarrier trace sources by:
  * - Budiarto Herman (budiarto.herman@magister.fi)
  */
 
@@ -41,7 +41,7 @@ namespace ns3 {
  *
  * This class is designed to probe an underlying ns3 TraceSource exporting a
  * packet burst information from SatPhyRxCarrier.  This probe exports a trace
- * source "Output" with arguments of type uint32_t, bool, and const Address&.
+ * source "Output" with arguments of type uint32_t, const Address&, and bool.
  * This probe exports other trace sources "OutputUinteger" and "OutputBool"
  * with arguments of type uint32_t and bool, respectively.  The trace sources
  * emit values when either the probed trace source emits a new value, or when
