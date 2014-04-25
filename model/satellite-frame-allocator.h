@@ -23,6 +23,7 @@
 
 #include "ns3/simple-ref-count.h"
 #include "ns3/address.h"
+#include "ns3/traced-callback.h"
 #include "ns3/satellite-frame-conf.h"
 #include "satellite-control-message.h"
 
@@ -288,8 +289,10 @@ public:
    *
    * \param tbtpContainer TBTP message container to add/fill TBTPs.
    * \param maxFrameSizeInBytes Maximum size for a TBTP message.
+   * \param waveformTrace Wave form trace callback
+   * \param utLoadTrace UT load per the frame trace callback
    */
-  void GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer);
+  void GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
 
 private:
 
@@ -338,8 +341,12 @@ private:
        *
        * \param tbtpContainer TBTP message container to add/fill TBTPs.
        * \param maxFrameSizeInBytes Maximum size for a TBTP message.
+       * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
+       * \param waveformTrace Wave form trace callback
+       * \param utLoadTrace UT load per the frame trace callback
        */
-      void GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer);
+      void GenerateTimeSlots ( std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes,
+                               UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
 
       /**
        * Get frame load by requested CC

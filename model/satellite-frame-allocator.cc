@@ -84,7 +84,7 @@ SatFrameAllocator::SatFrameInfo::UpdateTotalRequests ()
 }
 
 void
-SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer)
+SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -118,6 +118,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
   std::vector<uint16_t>::const_iterator currentCarrier = carriers.begin ();
   int64_t carrierSymbolsToUse = m_maxSymbolsPerCarrier;
 
+  uint32_t utCount = 0;
+
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
       // sort RCs in UT using random method.
@@ -139,12 +141,22 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
       int64_t utSymbolsLeft = m_utAllocs[*it].m_allocation.GetTotalSymbols ();
       int64_t utSymbolsToUse = m_maxSymbolsPerCarrier;
 
+      bool waveformIdTraced = false;
+
       while ( utSymbolsLeft > 0 )
         {
           Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse, utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno );
 
           if ( timeSlot )
             {
+              // trace first used wave form per UT
+              if ( !waveformIdTraced )
+                {
+                  waveformIdTraced = true;
+                  waveformTrace (timeSlot->GetWaveFormId ());
+                  utCount++;
+                }
+
               if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes ()) > maxSizeInBytes )
                 {
                   Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
@@ -202,6 +214,9 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
             }
         }
     }
+
+  // trace out UT load
+  utLoadTrace ((uint32_t) m_frameId, (long) utCount);
 }
 
 
@@ -895,7 +910,7 @@ SatFrameAllocator::RemoveAllocations ()
 }
 
 void
-SatFrameAllocator::GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer)
+SatFrameAllocator::GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -906,7 +921,7 @@ SatFrameAllocator::GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_
 
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
-      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer);
+      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer, waveformTrace, utLoadTrace);
     }
 }
 

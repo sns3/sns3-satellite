@@ -197,7 +197,7 @@ SatConf::Configure (std::string wfConf)
   Ptr<SatWaveformConf> waveFormConf = CreateObject<SatWaveformConf> (wfConf);
   m_superframeSeq->AddWaveformConf (waveFormConf);
 
-  Ptr<SatSuperframeConf> superFrameConf = CreateSuperframeConf (m_SuperFrameConfForSeq0 );
+  Ptr<SatSuperframeConf> superFrameConf = SatSuperframeConf::CreateSuperframeConf (m_SuperFrameConfForSeq0 );
 
   superFrameConf->Configure ( rtnUserLinkBandwidthHz, m_superframeSeq->GetTargetDuration(), waveFormConf);
   m_superframeSeq->AddSuperframe (superFrameConf);
@@ -500,37 +500,6 @@ SatConf::GetGeoSatPosition () const
   NS_LOG_FUNCTION (this);
 
   return m_geoSatPosition;
-}
-
-Ptr<SatSuperframeConf>
-SatConf::CreateSuperframeConf (SatSuperframeConf::SuperFrameConfiguration_t conf)
-{
-  Ptr<SatSuperframeConf> superFrameConf = NULL;
-
-  switch (conf)
-  {
-    case SatSuperframeConf::SUPER_FRAME_CONFIG_0:
-      superFrameConf = CreateObject<SatSuperframeConf0> ();
-      break;
-
-    case SatSuperframeConf::SUPER_FRAME_CONFIG_1:
-      superFrameConf = CreateObject<SatSuperframeConf1> ();
-      break;
-
-    case SatSuperframeConf::SUPER_FRAME_CONFIG_2:
-      superFrameConf = CreateObject<SatSuperframeConf2> ();
-      break;
-
-    case SatSuperframeConf::SUPER_FRAME_CONFIG_3:
-      superFrameConf = CreateObject<SatSuperframeConf3> ();
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Not supported super frame configuration!!!");
-      break;
-  }
-
-  return superFrameConf;
 }
 
 } // namespace ns3

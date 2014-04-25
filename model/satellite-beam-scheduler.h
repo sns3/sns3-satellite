@@ -338,6 +338,15 @@ private:
    */
   TracedCallback<std::string> m_backlogRequestsTrace;
 
+  /**
+   * Trace first wave form scheduled for the UT.
+   */
+  TracedCallback<uint32_t> m_waveformTrace;
+
+  /**
+   * Trace count of UTs schdeduled per Frame.
+   */
+  TracedCallback<uint32_t, long> m_frameUtLoadTrace;
 
   /**
    * Dispose actions for SatBeamScheduler.

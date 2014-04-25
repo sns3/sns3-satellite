@@ -361,6 +361,14 @@ public:
   static const uint8_t m_maxFrameCount = 10;
 
   /**
+   * Create pre-configured super frame configuration-
+   *
+   * \param conf Pre-configured super frame configuration to create
+   * \return Pointer to created super frame configuration
+   */
+  static Ptr<SatSuperframeConf> CreateSuperframeConf (SuperFrameConfiguration_t conf);
+
+  /**
    * Template method to convert number to string
    * \param number number to convert as string
    * \return number as string

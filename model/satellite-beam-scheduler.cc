@@ -143,7 +143,10 @@ SatBeamScheduler::GetTypeId (void)
     .AddTraceSource ("BacklogRequestsTrace",
                      "Trace for backlog requests done to beam scheduler.",
                       MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace))
-
+    .AddTraceSource ("WaveformTrace", "Trace scheduled wave forms (called once per UT per round).",
+                      MakeTraceSourceAccessor (&SatBeamScheduler::m_waveformTrace))
+    .AddTraceSource ("FrameUtLoadTrace", "Trace UT load per the frame.",
+                      MakeTraceSourceAccessor (&SatBeamScheduler::m_frameUtLoadTrace))
   ;
   return tid;
 }
@@ -348,7 +351,7 @@ SatBeamScheduler::Schedule ()
       SatFrameAllocator::UtAllocInfoContainer_t utAllocs;
 
         // Add DA slots to TBTP(s)
-      m_frameAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs);
+      m_frameAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace);
 
       // update VBDC counter of the UT/RCs
       UpdateDamaEntriesWithAllocs (utAllocs);

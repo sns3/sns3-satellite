@@ -189,14 +189,6 @@ public:
 private:
 
    /**
-    * Create pre-configured super frame configuration-
-    *
-    * \param conf Pre-configured super frame configuration to create
-    * \return Pointer to created super frame configuration
-    */
-   Ptr<SatSuperframeConf> CreateSuperframeConf (SatSuperframeConf::SuperFrameConfiguration_t conf);
-
-   /**
     * Get bandwidth of the forward link carrier.
     *
     * \param carrierId Id of the carrier.
