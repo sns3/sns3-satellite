@@ -51,7 +51,7 @@ main (int argc, char *argv[])
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue ("damaConf", "DAMA configuration", raMode);
+  cmd.AddValue ("raMode", "RA mode", raMode);
   cmd.AddValue ("simLength", "Simulation duration (in seconds)", simLength);
   cmd.Parse (argc, argv);
 
@@ -174,6 +174,16 @@ main (int argc, char *argv[])
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   LogComponentEnable ("sat-ra-sim-tn9", LOG_INFO);
   NS_LOG_INFO("--- sat-ra-sim-tn9 ---");
