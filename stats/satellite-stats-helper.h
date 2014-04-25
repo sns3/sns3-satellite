@@ -52,7 +52,35 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief Abstract class.
+ * \brief Parent abstract class of all satellite statistics helpers.
+ *
+ * A helper is responsible to locate source objects, create probes, collectors,
+ * and aggregators, and connect them together in a proper way to produce the
+ * required statistics.
+ *
+ * The main input for the helper is a reference to a SatHelper instance, a name,
+ * an identifier type, and an output type. After all the necessary inputs have
+ * been set, the statistics can be started into action by invoking Install().
+ * For example:
+ *     Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
+ *     satHelper->CreateScenario (SatHelper::SIMPLE);
+ *     // ... (snip) ...
+ *     Ptr<SatStatsFwdSinrHelper> fwdFinr
+ *         = CreateObject<SatStatsFwdSinrHelper> (satHelper);
+ *     stat->SetName ("name");
+ *     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ *     stat->SetOutputType (SatStatsHelper::OUTPUT_SCALAR_FILE);
+ *     stat->Install ();
+ *
+ * However, it's recommended to use the SatStatsHelperContainer class to
+ * automatically handle the above.
+ *
+ * This parent abstract class hosts several protected methods which are intended
+ * to simplify the development of child classes. Some of these methods handle
+ * tasks related to DCF components, while some other handle tasks related to
+ * satellite topology.
+ *
+ * \sa SatStatsHelperContainer
  */
 class SatStatsHelper : public Object
 {
@@ -62,7 +90,7 @@ public:
 
   /**
    * \enum IdentifierType_t
-   * \brief
+   * \brief Possible categorization of statistics output.
    */
   typedef enum
   {
@@ -74,14 +102,14 @@ public:
   } IdentifierType_t;
 
   /**
-   * \param identifierType
-   * \return
+   * \param identifierType an arbitrary identifier type.
+   * \return representation of the identifier type in string.
    */
   static std::string GetIdentifierTypeName (IdentifierType_t identifierType);
 
   /**
    * \enum OutputType_t
-   * \brief
+   * \brief Possible types and formats of statistics output.
    */
   typedef enum
   {
@@ -99,16 +127,17 @@ public:
   } OutputType_t;
 
   /**
-   * \param outputType
-   * \return
+   * \param outputType an arbitrary output type.
+   * \return representation of the output type in string.
    */
   static std::string GetOutputTypeName (OutputType_t outputType);
 
   // CONSTRUCTOR AND DESTRUCTOR ///////////////////////////////////////////////
 
   /**
-   * \brief
-   * \param satHelper
+   * \brief Creates a new helper instance.
+   * \param satHelper pointer to a SatHelper instance where information
+   *                  about the simulation topology will be taken.
    */
   SatStatsHelper (Ptr<const SatHelper> satHelper);
 
@@ -118,11 +147,11 @@ public:
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
 
-
   // PUBLIC METHODS ///////////////////////////////////////////////////////////
 
   /**
-   * \brief Install probes, collectors, and aggregators.
+   * \brief Install the probes, collectors, and aggregators necessary to
+   *        produce the statistics output.
    *
    * Behaviour should be implemented by child class in DoInstall().
    */
@@ -131,50 +160,55 @@ public:
   // SETTER AND GETTER METHODS ////////////////////////////////////////////////
 
   /**
-   * \param name
+   * \param name string to be prepended on every output file name.
    */
   void SetName (std::string name);
 
   /**
-   * \return
+   * \return the name of this helper instance.
    */
   std::string GetName () const;
 
   /**
-   * \param identifierType
+   * \param identifierType categorization of statistics output.
    * \warning Does not have any effect if invoked after Install().
    */
   void SetIdentifierType (IdentifierType_t identifierType);
 
   /**
-   * \return
+   * \return the currently active categorization of statistics output.
    */
   IdentifierType_t GetIdentifierType () const;
 
   /**
-   * \param outputType
+   * \param outputType types and formats of statistics output.
    * \warning Does not have any effect if invoked after Install().
    */
   void SetOutputType (OutputType_t outputType);
 
   /**
-   * \return
+   * \return the currently active types and formats of statistics output.
    */
   OutputType_t GetOutputType () const;
 
   /**
-   * \return
+   * \return true if Install() has been invoked, otherwise false.
    */
   bool IsInstalled () const;
 
   /**
-   * \return
+   * \return a pointer to the the SatHelper instance used as a reference by
+   *         this helper instance.
    */
   Ptr<const SatHelper> GetSatHelper () const;
 
 protected:
   /**
-   * \brief
+   * \brief Install the probes, collectors, and aggregators necessary to
+   *        produce the statistics output.
+   *
+   * An abstract method of SatStatsHelper which must be implemented by child
+   * classed. It will be invoked by Install().
    */
   virtual void DoInstall () = 0;
 
@@ -191,10 +225,7 @@ protected:
    * \param v4 the value of the attribute to be set on the aggregator created.
    * \param n5 the name of the attribute to be set on the aggregator created.
    * \param v5 the value of the attribute to be set on the aggregator created.
-   * \return the created aggregator.
-   *
-   * The created aggregator is stored in #m_aggregator. It can be retrieved
-   * from outside using GetAggregator().
+   * \return a pointer to the created aggregator.
    */
   Ptr<DataCollectionObject> CreateAggregator (std::string aggregatorTypeId,
                                               std::string n1 = "",
@@ -209,9 +240,16 @@ protected:
                                               const AttributeValue &v5 = EmptyAttributeValue ());
 
   /**
-   * \brief
-   * \param collectorMap
-   * \return number of collectors created.
+   * \brief Create one collector instance for each identifier in the simulation.
+   * \param collectorMap the CollectorMap where the collectors will be created.
+   * \return number of collector instances created.
+   *
+   * The identifier is determined by the currently active identifier type, as
+   * previously selected by SetIdentifierType() method or `IdentifierType`
+   * attribute. Then the method searches the reference SatHelper instance for
+   * such identifier. For each of the found identifiers, the method creates a
+   * collector instance for it, assigns the collector instance a meaningful
+   * name, and put the collector instance into the CollectorMap.
    */
   uint32_t CreateCollectorPerIdentifier (CollectorMap &collectorMap) const;
 
