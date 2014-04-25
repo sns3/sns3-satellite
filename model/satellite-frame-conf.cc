@@ -249,37 +249,6 @@ NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf);
 
 // Super frame configuration interface.
 
-Ptr<SatSuperframeConf>
-SatSuperframeConf::CreateSuperframeConf (SuperFrameConfiguration_t conf)
-{
-  Ptr<SatSuperframeConf> superFrameConf = CreateObject<SatSuperframeConf0> ();
-
-  switch (conf)
-  {
-    case SUPER_FRAME_CONFIG_0:
-      superFrameConf = CreateObject<SatSuperframeConf0> ();
-      break;
-
-    case SUPER_FRAME_CONFIG_1:
-      superFrameConf = CreateObject<SatSuperframeConf1> ();
-      break;
-
-    case SUPER_FRAME_CONFIG_2:
-      superFrameConf = CreateObject<SatSuperframeConf2> ();
-      break;
-
-    case SUPER_FRAME_CONFIG_3:
-      superFrameConf = CreateObject<SatSuperframeConf3> ();
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Not supported super frame configuration!!!");
-      break;
-  }
-
-  return superFrameConf;
-}
-
 SatSuperframeConf::SatSuperframeConf ()
  : m_usedBandwidthHz (0.0),
    m_duration (0.0),
