@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns3>
- 
  <default name="ns3::SatAntennaGainPattern::MinAcceptableAntennaGainDb" value="40"/>
  <default name="ns3::SatBbFrameConf::SymbolsPerSlot" value="90"/>
  <default name="ns3::SatBbFrameConf::PilotBlockInSymbols" value="36"/>
@@ -22,6 +21,7 @@
  <default name="ns3::SatChannel::EnableExternalFadingInputTrace" value="false"/>
  <default name="ns3::SatChannel::RxPowerCalculationMode" value="RxPowerCalculation"/>
  <default name="ns3::SatChannel::RxMode" value="AllBeams"/>
+ <default name="ns3::SatConstantInterference::ConstantInterferencePower" value="0"/>
  <default name="ns3::SatMobilityModel::AsGeoCoordinates" value="true"/>
  <default name="ns3::SatTbtpMessage::AssigmentFormat" value="0"/>
  <default name="ns3::SatCrMessage::CrBlockType" value="Small"/>
@@ -34,20 +34,20 @@
  <default name="ns3::SatFwdLinkScheduler::CnoEstimationWindow" value="+500000000.0ns"/>
  <default name="ns3::SatFrameAllocator::TargetLoad" value="0.9"/>
  <default name="ns3::SatFrameAllocator::FcaEnabled" value="false"/>
- <default name="ns3::SatSuperframeConf0::FrameCount" value="3"/>
- <default name="ns3::SatSuperframeConf0::FrameConfigType" value="Config type 2"/>
- <default name="ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz" value="2.5e+07"/>
- <default name="ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz" value="0.625e+06"/>
+ <default name="ns3::SatSuperframeConf0::FrameCount" value="10"/>
+ <default name="ns3::SatSuperframeConf0::FrameConfigType" value="Config type 0"/>
+ <default name="ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz" value="1.25e+07"/>
+ <default name="ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierRollOff" value="0.2"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf0::Frame0_RandomAccessFrame" value="false"/>
- <default name="ns3::SatSuperframeConf0::Frame1_AllocatedBandwidthHz" value="5.0e+07"/>
+ <default name="ns3::SatSuperframeConf0::Frame1_AllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame1_CarrierAllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame1_CarrierRollOff" value="0.2"/>
  <default name="ns3::SatSuperframeConf0::Frame1_CarrierSpacing" value="0.3"/>
- <default name="ns3::SatSuperframeConf0::Frame1_RandomAccessFrame" value="false"/>
- <default name="ns3::SatSuperframeConf0::Frame2_AllocatedBandwidthHz" value="5.0+07"/>
- <default name="ns3::SatSuperframeConf0::Frame2_CarrierAllocatedBandwidthHz" value="2.5e+06"/>
+ <default name="ns3::SatSuperframeConf0::Frame1_RandomAccessFrame" value="true"/>
+ <default name="ns3::SatSuperframeConf0::Frame2_AllocatedBandwidthHz" value="1.25e+07"/>
+ <default name="ns3::SatSuperframeConf0::Frame2_CarrierAllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame2_CarrierRollOff" value="0.2"/>
  <default name="ns3::SatSuperframeConf0::Frame2_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf0::Frame2_RandomAccessFrame" value="false"/>
@@ -303,7 +303,7 @@
  <default name="ns3::SatLowerLayerServiceConf::VbdcQuantizationSmallStepKB" value="1"/>
  <default name="ns3::SatLowerLayerServiceConf::VbdcQuantizationLargeStepKB" value="2"/>
  <default name="ns3::SatLowerLayerServiceConf::VbdcQuantizationThresholdKB" value="128"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided" value="true"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=100]"/>
@@ -332,9 +332,9 @@
  <default name="ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate" value="50"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock" value="3"/>
- <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed" value="6"/>
+ <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed" value="4"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock" value="2"/>
- <default name="ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds" value="50"/>
+ <default name="ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds" value="150"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffTimeInMilliSeconds" value="100"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability" value="10000"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability" value="30000"/>
@@ -353,6 +353,7 @@
  <default name="ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace" value="false"/>
  <default name="ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace" value="false"/>
  <default name="ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize" value="10"/>
+ <default name="ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl" value="false"/>
  <default name="ns3::SatPhyRxCarrierConf::ConstantErrorRatio" value="0.01"/>
  <default name="ns3::SatPhyTx::TxMode" value="Normal Tx mode"/>
  <default name="ns3::SatPositionAllocator::AsGeoCoordinates" value="true"/>
@@ -397,8 +398,8 @@
  <default name="ns3::SatEnvVariables::CurrentWorkingDirectory" value=""/>
  <default name="ns3::SatEnvVariables::PathToExecutable" value=""/>
  <default name="ns3::SatBeamHelper::FadingModel" value="FadingMarkov"/>
- <default name="ns3::SatBeamHelper::RandomAccessModel" value="RaOff"/>
- <default name="ns3::SatBeamHelper::RaInterferenceModel" value="Constant"/>
+ <default name="ns3::SatBeamHelper::RandomAccessModel" value="RaRcs2Specification"/>
+ <default name="ns3::SatBeamHelper::RaInterferenceModel" value="PerPacket"/>
  <default name="ns3::SatBeamHelper::RaCollisionModel" value="RaCollisionCheckAgainstSinr"/>
  <default name="ns3::SatBeamHelper::PropagationDelayModel" value="ConstantSpeed"/>
  <default name="ns3::SatBeamHelper::ConstantPropagationDelay" value="+130000000.0ns"/>
@@ -422,7 +423,7 @@
  <default name="ns3::SatGeoHelper::DaFwdLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGeoHelper::DaRtnLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGwHelper::RtnLinkErrorModel" value="AVI"/>
- <default name="ns3::SatGwHelper::DaRtnLinkInterferenceModel" value="PerPacket"/>
+ <default name="ns3::SatGwHelper::DaRtnLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGwHelper::EnableChannelEstimationError" value="true"/>
  <default name="ns3::SatHelper::UtCount" value="3"/>
  <default name="ns3::SatHelper::GwUsers" value="1"/>
@@ -437,10 +438,10 @@
  <default name="ns3::SatUtHelper::EnableChannelEstimationError" value="true"/>
  <default name="ns3::SatUtHelper::EnableRtnLinkArq" value="false"/>
  <default name="ns3::SatUtHelper::EnableFwdLinkArq" value="false"/>
-
+ <default name="ns3::SatStatsDelayHelper::MinValue" value="0.0"/>
+ <default name="ns3::SatStatsDelayHelper::MaxValue" value="10.0"/>
+ <default name="ns3::SatStatsDelayHelper::BinLength" value="0.2"/>
  <global name="RngSeed" value="1"/>
  <global name="RngRun" value="1"/>
  <global name="ChecksumEnabled" value="false"/>
- 
-
 </ns3>

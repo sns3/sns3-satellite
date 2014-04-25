@@ -16,31 +16,31 @@ using namespace ns3;
 *
 * \brief Simulation script to run example simulation results related to satellite RTN
 * link performance. Currently only one beam is simulated with variable amount of users
-* and DAMA configuration.
+* and RA-DAMA configuration.
 *
-* execute command -> ./waf --run "sat-dama-sim-tn9 --PrintHelp"
+* execute command -> ./waf --run "sat-ra-sim-tn9 --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-dama-sim-tn9");
+NS_LOG_COMPONENT_DEFINE ("sat-ra-sim-tn9");
 
 int
 main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
+  uint32_t raMode (0);
   uint32_t utsPerBeam (3);
-  uint32_t damaConf (0);
 
-  Time simLength (Seconds(50.0));
+  double simLength (30.0); // in seconds
   Time appStartTime = Seconds(0.1);
 
   // CBR parameters
-  uint32_t minPacketSizeBytes (800); // -> 128 kbps
-  uint32_t maxPacketSizeBytes (6400); // -> 1024 kbps
+  uint32_t minPacketSizeBytes (20); // -> 3.2 kbps
+  uint32_t maxPacketSizeBytes (800); // -> 128 kbps
   Time interval (MilliSeconds(50));
 
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-ra-input-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
@@ -48,87 +48,49 @@ main (int argc, char *argv[])
 
   Ptr<UniformRandomVariable> randVariable = CreateObject<UniformRandomVariable> ();
 
-  /**
-   * Attributes:
-   * -----------
-   *
-   * Scenario: 1 beam (beam id = 1)
-   *
-   * Frame configuration:
-   * - 3 frames
-   * - 125 MHz user bandwidth
-   *    - 40 x 0.625 MHz -> 25 MHz
-   *    - 40 x 1.25 MHz -> 50 MHz
-   *    - 20 x 2.5 MHz -> 50 MHz
-   *
-   * Conf-2 scheduling mode (dynamic time slots)
-   * - FCA disabled
-   *
-   * RTN link
-   *   - ACM enabled
-   *   - Constant interference
-   *   - AVI error model
-   *   - ARQ disabled
-   * FWD link
-   *   - ACM disabled
-   *   - Constant interference
-   *   - No error model
-   *   - ARQ disabled
-   *
-   */
-
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue("damaConf", "DAMA configuration", damaConf);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("damaConf", "DAMA configuration", raMode);
+  cmd.AddValue ("simLength", "Simulation duration (in seconds)", simLength);
   cmd.Parse (argc, argv);
 
-  switch (damaConf)
+  switch (raMode)
   {
-    // CRA only
+    // CRDSA + DAMA
     case 0:
       {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=20]"));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=128]"));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue(false));
         break;
       }
-    // CRA + RBDC
+    // SA + DAMA
     case 1:
       {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=20]"));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue(false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
         break;
       }
-    // CRA + VBDC
+    // CRDSA only
     case 2:
       {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=20]"));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue(true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
         break;
       }
     default:
       {
-        NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
+        NS_FATAL_ERROR ("Unsupported raMode: " << raMode);
         break;
       }
   }
-
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
@@ -175,7 +137,6 @@ main (int argc, char *argv[])
       rtnApp->SetAttribute ("PacketSize", UintegerValue (size));
 
       rtnApp->SetStartTime (appStartTime);
-      rtnApp->SetStopTime (simLength);
       (*itUt)->AddApplication (rtnApp);
     }
 
@@ -191,30 +152,33 @@ main (int argc, char *argv[])
 
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
-  /*
-   * The following is the statements for enabling some satellite statistics
-   * for testing purpose.
-   */
-  s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddPerGwRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-  s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  NS_LOG_INFO("--- Cbr-user-defined-example ---");
+  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  LogComponentEnable ("sat-ra-sim-tn9", LOG_INFO);
+  NS_LOG_INFO("--- sat-ra-sim-tn9 ---");
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
-  NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
+  NS_LOG_INFO("  Simulation length: " << simLength);
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
   NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO("  ");
@@ -222,7 +186,7 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-dama-output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-ra-output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
@@ -232,7 +196,7 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (simLength);
+  Simulator::Stop (Seconds (simLength));
   Simulator::Run ();
 
   Simulator::Destroy ();
