@@ -27,8 +27,8 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Ssatellite constant interference.
- *        Interference is constant until set again by Set method.
+ * \brief Satellite constant interference.
+ *        Interference is constant until set again by an attribute.
  */
 class SatConstantInterference : public SatInterference
 {
@@ -37,13 +37,6 @@ public:
   TypeId GetInstanceTypeId (void) const;
   SatConstantInterference ();
   ~SatConstantInterference ();
-
-  /**
-   * Sets constant interference power to constant interference object.
-   *
-   * \param power value of power to set.
-   */
-  virtual void Set(double power);
 
 private:
   /**

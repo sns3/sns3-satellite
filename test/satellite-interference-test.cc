@@ -32,6 +32,7 @@
 #include "ns3/config.h"
 #include "ns3/boolean.h"
 #include "ns3/string.h"
+#include "ns3/double.h"
 #include "../model/satellite-constant-interference.h"
 #include "../model/satellite-traced-interference.h"
 #include "../model/satellite-per-packet-interference.h"
@@ -75,8 +76,7 @@ void
 SatConstantInterferenceTestCase::DoRun (void)
 {
   Ptr<SatConstantInterference> interference = CreateObject<SatConstantInterference> ();
-
-  interference->Set (100);
+  interference->SetAttribute ("ConstantInterferencePower", DoubleValue(100.0));
 
   // just test that we can call add. However, It shouldn't have any effect on interference.
   Ptr<SatInterference::InterferenceChangeEvent> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
@@ -95,7 +95,7 @@ SatConstantInterferenceTestCase::DoRun (void)
   interference->NotifyRxEnd (event);
 
   // just test that we can set interference again
-  interference->Set (50);
+  interference->SetAttribute ("ConstantInterferencePower", DoubleValue(50.0));
 
   interference->NotifyRxStart (event);
 

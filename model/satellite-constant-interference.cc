@@ -20,6 +20,7 @@
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "ns3/double.h"
 #include "satellite-constant-interference.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatConstantInterference");
@@ -33,8 +34,13 @@ SatConstantInterference::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatConstantInterference")
     .SetParent<SatInterference> ()
-    .AddConstructor<SatConstantInterference>();
-
+    .AddConstructor<SatConstantInterference>()
+    .AddAttribute( "ConstantInterferencePower",
+                   "Constant interference power in linear format.",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatConstantInterference::m_power),
+                   MakeDoubleChecker<double_t> ())
+  ;
   return tid;
 }
 
@@ -54,14 +60,6 @@ SatConstantInterference::SatConstantInterference ()
 SatConstantInterference::~SatConstantInterference ()
 {
   Reset ();
-}
-
-void
-SatConstantInterference::Set (double power)
-{
-  NS_ASSERT (!m_rxing);
-
-  m_power = power;
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
