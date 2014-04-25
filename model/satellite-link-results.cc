@@ -26,6 +26,7 @@
 #include "ns3/double.h"
 #include "ns3/object.h"
 
+#include "satellite-enums.h"
 #include "satellite-link-results.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLinkResults");
@@ -76,6 +77,13 @@ SatLinkResults::Initialize ()
  */
 
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbRcs2);
+
+SatLinkResultsDvbRcs2::SatLinkResultsDvbRcs2 ()
+:SatLinkResults(),
+ m_table ()
+{
+
+}
 
 
 TypeId
@@ -137,6 +145,13 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
 
+SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
+:SatLinkResults (),
+ m_table (),
+ m_shortFrameOffsetInDb (0.0)
+{
+
+}
 
 TypeId
 SatLinkResultsDvbS2::GetTypeId ()

@@ -66,6 +66,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_channelType = p.m_channelType;
   m_carrierFreq_hz = p.m_carrierFreq_hz;
   m_txInfo.modCod = p.m_txInfo.modCod;
+  m_txInfo.frameType = p.m_txInfo.frameType;
   m_txInfo.waveformId = p.m_txInfo.waveformId;
   m_txInfo.packetType = p.m_txInfo.packetType;
   m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;

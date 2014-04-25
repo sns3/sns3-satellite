@@ -33,7 +33,7 @@ SatBbFrame::SatBbFrame ()
    m_maxSpaceInBytes (0),
    m_headerSizeInBytes (0),
    m_containsControlPdu (false),
-   m_frameType ()
+   m_frameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor of SatBbFrame not supported.");

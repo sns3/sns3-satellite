@@ -103,6 +103,10 @@ protected:
 class SatLinkResultsDvbRcs2 : public SatLinkResults
 {
 public:
+
+  SatLinkResultsDvbRcs2 ();
+  ~SatLinkResultsDvbRcs2 () {};
+
   static TypeId GetTypeId ();
 
   /**
@@ -159,6 +163,9 @@ private:
 class SatLinkResultsDvbS2 : public SatLinkResults
 {
 public:
+
+  SatLinkResultsDvbS2 ();
+  ~SatLinkResultsDvbS2 () {};
 
   static TypeId GetTypeId ();
 

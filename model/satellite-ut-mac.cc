@@ -331,6 +331,7 @@ SatUtMac::DoTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrier
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
   txInfo.modCod = waveform->GetModCod ();
+  txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = waveform->GetWaveformId ();
 
   TransmitPackets (FetchPackets (waveform->GetPayloadInBytes (), rcIndex, policy), duration, carrierId, txInfo);
@@ -379,6 +380,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
       SatSignalParameters::txInfo_s txInfo;
       txInfo.packetType = SatEnums::PACKET_TYPE_SLOTTED_ALOHA;
       txInfo.modCod = waveform->GetModCod ();
+      txInfo.frameType = SatEnums::UNDEFINED_FRAME;
       txInfo.waveformId = waveform->GetWaveformId ();
 
       TransmitPackets (packets, duration, carrierId, txInfo);
