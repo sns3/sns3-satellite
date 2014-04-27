@@ -21,6 +21,9 @@ using namespace ns3;
 *         Application sends one packet from GW connected user to UT connected users and
 *         from UT connected user to GW connected user. User defined scenario is created with given beam ID.
 *
+*         Example reads sat-link-budget-input-attributes.xml, so user is able to change link budget parameter by
+*         modifying this file without compiling example.
+*
 *         Used parameters and link budget calculation result are printed as long info.
 */
 
@@ -81,59 +84,26 @@ main (int argc, char *argv[])
   Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper();
   Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper();
 
-  // These are default values used by different PHY objects.
-  // Uncomment a line and change attribute value to override default
+  // set assuming file is found same directory than script (executed with waf)
+  std::string inputFileNameWithPath( "./src/satellite/examples/sat-link-budget-input-attributes.xml");
 
-//  gwHelper->SetPhyAttribute ("RxTemperatureDbk", DoubleValue (24.62));
-//  gwHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (61.50));
-//  gwHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (65.20));
-//  gwHelper->SetPhyAttribute ("TxMaxPowerDbw", DoubleValue (8.97));
-//  gwHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (2.00) );
-//  gwHelper->SetPhyAttribute ("TxPointingLossDb", DoubleValue (1.10));
-//  gwHelper->SetPhyAttribute ("TxOboLossDb", DoubleValue (6.00));
-//  gwHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (0.00));
-//  gwHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (0.00));
-//  gwHelper->SetPhyAttribute ("DefaultFadingValue", DoubleValue (1.00));
-//  gwHelper->SetPhyAttribute ("ImIfCOverIDb", DoubleValue (22.0));
-//  gwHelper->SetPhyAttribute ("AciIfWrtNoisePercent", DoubleValue (10.0));
+  // check is this the case?
+  std::ifstream *ifs = new std::ifstream (inputFileNameWithPath.c_str (), std::ifstream::in);
+  if (!ifs->is_open ())
+    {
+      // script might be launched by test.py, try a different base path
+      inputFileNameWithPath = "../../src/satellite/examples/sat-link-budget-input-attributes.xml";
+    }
 
-//  utHelper->SetPhyAttribute ("RxTemperatureDbk", DoubleValue (24.62));
-//  utHelper->SetPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (44.60));
-//  utHelper->SetPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (45.20));
-//  utHelper->SetPhyAttribute ("TxMaxPowerDbw", DoubleValue (4.00));
-//  utHelper->SetPhyAttribute ("TxOutputLossDb", DoubleValue (0.50) );
-//  utHelper->SetPhyAttribute ("TxPointingLossDb", DoubleValue (1.00));
-//  utHelper->SetPhyAttribute ("TxOboLossDb", DoubleValue (0.50));
-//  utHelper->SetPhyAttribute ("TxAntennaLossDb", DoubleValue (1.00));
-//  utHelper->SetPhyAttribute ("RxAntennaLossDb", DoubleValue (0.00));
-//  utHelper->SetPhyAttribute ("DefaultFadingValue", DoubleValue (1.00));
-//  utHelper->SetPhyAttribute ("OtherSysIfCOverIDb", DoubleValue (24.7));
-//
-//  geoHelper->SetUserPhyAttribute ("RxTemperatureDbk", DoubleValue (28.4));
-//  geoHelper->SetUserPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (54.00));
-//  geoHelper->SetUserPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (54.00));
-//  geoHelper->SetUserPhyAttribute ("TxMaxPowerDbw", DoubleValue (15.00));
-//  geoHelper->SetUserPhyAttribute ("TxOutputLossDb", DoubleValue (2.85) );
-//  geoHelper->SetUserPhyAttribute ("TxPointingLossDb", DoubleValue (0.00));
-//  geoHelper->SetUserPhyAttribute ("TxOboLossDb", DoubleValue (0.00));
-//  geoHelper->SetUserPhyAttribute ("TxAntennaLossDb", DoubleValue (1.00));
-//  geoHelper->SetUserPhyAttribute ("RxAntennaLossDb", DoubleValue (1.00));
-//  geoHelper->SetUserPhyAttribute ("DefaultFadingValue", DoubleValue (1.00));
-//  geoHelper->SetUserPhyAttribute ("OtherSysIfCOverIDb", DoubleValue (27.5));
-//  geoHelper->SetUserPhyAttribute ("AciIfCOverIDb", DoubleValue (17.0));
-//
-//  geoHelper->SetFeederPhyAttribute ("RxTemperatureDbk", DoubleValue (28.40));
-//  geoHelper->SetFeederPhyAttribute ("RxMaxAntennaGainDb", DoubleValue (54.00));
-//  geoHelper->SetFeederPhyAttribute ("TxMaxAntennaGainDb", DoubleValue (54.00));
-//  geoHelper->SetFeederPhyAttribute ("TxMaxPowerDbw", DoubleValue (-4.38));
-//  geoHelper->SetFeederPhyAttribute ("TxOutputLossDb", DoubleValue (1.75) );
-//  geoHelper->SetFeederPhyAttribute ("TxPointingLossDb", DoubleValue (1.10));
-//  geoHelper->SetFeederPhyAttribute ("TxOboLossDb", DoubleValue (4.00));
-//  geoHelper->SetFeederPhyAttribute ("TxAntennaLossDb", DoubleValue (1.00));
-//  geoHelper->SetFeederPhyAttribute ("RxAntennaLossDb", DoubleValue (1.00));
-//  geoHelper->SetFeederPhyAttribute ("DefaultFadingValue", DoubleValue (1.00));
-//  geoHelper->SetFeederPhyAttribute ("ExtNoisePowerDensityDbwhz", DoubleValue (-207.0));
-//  geoHelper->SetFeederPhyAttribute ("ImIfCOverIDb", DoubleValue (27.0));
+  delete ifs;
+
+  // To change attributes having affect on link budget,
+  // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
 
   // create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
@@ -144,7 +114,6 @@ main (int argc, char *argv[])
   helper->CreateScenario (SatHelper::USER_DEFINED);
 
   // set callback traces where we want results out
-
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
                                MakeCallback (&PacketTraceCb));
 
