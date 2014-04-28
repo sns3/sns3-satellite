@@ -291,7 +291,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
   GetSchedulingObjects (so);
 
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
-        ( it != so.end() ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
+        ( it != so.end () ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
     {
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
@@ -306,6 +306,12 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
           if ( frameBytes < currentObMinReqBytes)
             {
               frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod);
+
+              // if frame bytes still too small, we must have too long control message, so let's crash
+              if ( frameBytes < currentObMinReqBytes )
+                {
+                  NS_FATAL_ERROR ("Control package too probably too long!!!");
+                }
             }
 
           Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*it)->GetMacAddress (), flowId, currentObBytes);

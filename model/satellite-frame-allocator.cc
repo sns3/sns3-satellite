@@ -157,7 +157,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
                   utCount++;
                 }
 
-              if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes ()) > maxSizeInBytes )
+              if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes () + tbtpToFill->GetFrameInfoSize ()) > maxSizeInBytes )
                 {
                   Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
                   newTbtp->SetSuperframeCounter ( tbtpToFill->GetSuperframeCounter ());

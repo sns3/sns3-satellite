@@ -240,7 +240,7 @@ public:
    *
    * \return The super frame sequence id.
    */
-  inline uint8_t GetSuperframeSeqId () {return m_superframeSeqId;}
+  inline uint8_t GetSuperframeSeqId () { return m_superframeSeqId; }
 
   /**
    * Get counter of the super frame in this TBTP message.
@@ -248,6 +248,13 @@ public:
    * \return The super frame counter.
    */
   inline uint32_t GetSuperframeCounter () {return m_superframeCounter;}
+
+  /**
+   * Get size of frame info size in this TBTP message.
+   *
+   * \return Frame info size.
+   */
+  inline uint32_t GetFrameInfoSize () const { return m_tbtpFrameBodySizeInBytes; }
 
   /**
    * Get the information of the DA time slots.

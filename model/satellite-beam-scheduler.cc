@@ -391,7 +391,7 @@ SatBeamScheduler::AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContain
 
       if ( timeSlotCount > 0 )
         {
-          if ( (tbtpToFill->GetSizeInBytes () + (tbtpToFill->GetTimeSlotInfoSizeInBytes () * timeSlotCount)) > m_maxBbFrameSize )
+          if ( (tbtpToFill->GetSizeInBytes () + (tbtpToFill->GetTimeSlotInfoSizeInBytes () * timeSlotCount) + tbtpToFill->GetFrameInfoSize ()) > m_maxBbFrameSize )
             {
               Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
               newTbtp->SetSuperframeCounter ( tbtpToFill->GetSuperframeCounter ());
