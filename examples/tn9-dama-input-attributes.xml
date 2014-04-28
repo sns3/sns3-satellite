@@ -438,9 +438,6 @@
  <default name="ns3::SatUtHelper::EnableChannelEstimationError" value="true"/>
  <default name="ns3::SatUtHelper::EnableRtnLinkArq" value="false"/>
  <default name="ns3::SatUtHelper::EnableFwdLinkArq" value="false"/>
- <default name="ns3::SatStatsDelayHelper::MinValue" value="0.0"/>
- <default name="ns3::SatStatsDelayHelper::MaxValue" value="10.0"/>
- <default name="ns3::SatStatsDelayHelper::BinLength" value="0.2"/>
  <global name="RngSeed" value="1"/>
  <global name="RngRun" value="1"/>
  <global name="ChecksumEnabled" value="false"/>
