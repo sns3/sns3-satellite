@@ -260,6 +260,9 @@ main (int argc, char *argv[])
 //  s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerGwFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddGlobalFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   /*
    * The following is the statements for enabling some satellite statistics
@@ -292,6 +295,8 @@ main (int argc, char *argv[])
   s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
   s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- Cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
@@ -306,3 +311,4 @@ main (int argc, char *argv[])
 
   return 0;
 }
+

@@ -35,6 +35,7 @@
 #include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-sinr-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
+#include <ns3/satellite-stats-waveform-usage-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
@@ -77,6 +78,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - [Global,PerGw,PerBeam] BackloggedRequest
  * - [Global,PerGw,PerBeam] FrameLoad
+ * - [Global,PerGw,PerBeam] WaveformUsage
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -346,6 +348,26 @@ SatStatsHelperContainer::GetTypeId ()
                    MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameLoad),
                    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
                                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+
+    // Waveform usage statistics.
+    .AddAttribute ("GlobalWaveformUsage",
+                   "Enable the output of waveform usage statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalWaveformUsage),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("PerGwWaveformUsage",
+                   "Enable the output of waveform usage statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwWaveformUsage),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("PerBeamWaveformUsage",
+                   "Enable the output of waveform usage statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamWaveformUsage),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
   ;
   return tid;
 }
@@ -393,6 +415,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
  * - Add [Global,PerGw,PerBeam] FrameLoad
+ * - Add [Global,PerGw,PerBeam] WaveformUsage
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -688,10 +711,15 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request"
 SAT_STATS_PER_GW_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (BackloggedRequest, "backlogged-request")
 
-// Backlogged request statistics.
+// Frame load statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FrameLoad, "frame-load")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (FrameLoad, "frame-load")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FrameLoad, "frame-load")
+
+// Waveform usage statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (WaveformUsage, "waveform-usage")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (WaveformUsage, "waveform-usage")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (WaveformUsage, "waveform-usage")
 
 
 std::string // static

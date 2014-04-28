@@ -48,6 +48,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
  * - Add [Global,PerGw,PerBeam] FrameLoad
+ * - Add [Global,PerGw,PerBeam] WaveformUsage
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -217,6 +218,9 @@ public:
 
   // Frame load statistics.
   SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameLoad)
+
+  // Waveform usage statistics.
+  SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (WaveformUsage)
 
   /**
    * \param outputType an arbitrary output type.
