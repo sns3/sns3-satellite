@@ -47,6 +47,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
+ * - Add [Global,PerGw,PerBeam] FrameLoad
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -213,6 +214,9 @@ public:
 
   // Backlogged request statistics.
   SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (BackloggedRequest)
+
+  // Frame load statistics.
+  SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameLoad)
 
   /**
    * \param outputType an arbitrary output type.

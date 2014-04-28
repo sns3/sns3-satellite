@@ -257,6 +257,9 @@ main (int argc, char *argv[])
 //  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddGlobalBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+//  s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerGwFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddGlobalFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   /*
    * The following is the statements for enabling some satellite statistics

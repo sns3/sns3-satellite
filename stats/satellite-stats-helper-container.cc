@@ -27,6 +27,7 @@
 #include <ns3/satellite-stats-backlogged-request-helper.h>
 #include <ns3/satellite-stats-capacity-request-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
+#include <ns3/satellite-stats-frame-load-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
@@ -75,6 +76,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - [Global,PerGw,PerBeam] BackloggedRequest
+ * - [Global,PerGw,PerBeam] FrameLoad
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -324,6 +326,26 @@ SatStatsHelperContainer::GetTypeId ()
                    MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamBackloggedRequest),
                    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
                                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+
+    // Frame load statistics.
+    .AddAttribute ("GlobalFrameLoad",
+                   "Enable the output of frame load statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFrameLoad),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("PerGwFrameLoad",
+                   "Enable the output of frame load statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFrameLoad),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("PerBeamFrameLoad",
+                   "Enable the output of frame load statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameLoad),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
   ;
   return tid;
 }
@@ -370,6 +392,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
+ * - Add [Global,PerGw,PerBeam] FrameLoad
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -664,6 +687,11 @@ SAT_STATS_PER_UT_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (BackloggedRequest, "backlogged-request")
+
+// Backlogged request statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FrameLoad, "frame-load")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FrameLoad, "frame-load")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FrameLoad, "frame-load")
 
 
 std::string // static
