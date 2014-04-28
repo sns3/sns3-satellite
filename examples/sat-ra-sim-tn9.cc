@@ -74,6 +74,10 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (true));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.02));
         break;
       }
     // SA + VBDC
@@ -93,6 +97,10 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
+
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (30.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.06));
         break;
       }
     // CRDSA only
@@ -110,6 +118,10 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (20.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.04));
         break;
       }
     default:
@@ -119,9 +131,6 @@ main (int argc, char *argv[])
       }
   }
 
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (1.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MinValue", DoubleValue (0.0));
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MaxValue", DoubleValue (10000.0));
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::BinLength", DoubleValue (100.0));
