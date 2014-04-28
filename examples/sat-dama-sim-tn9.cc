@@ -96,7 +96,7 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=128]"));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=64]"));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
