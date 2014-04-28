@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns3>
+ <default name="ns3::SatConf::SuperFrameConfForSeq0" value="Configuration_3"/>
+</ns3>

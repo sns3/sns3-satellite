@@ -82,10 +82,10 @@ SatConf::GetTypeId (void)
                      "Super frame configuration used for super frame sequence 0.",
                       EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
                       MakeEnumAccessor (&SatConf::m_SuperFrameConfForSeq0),
-                      MakeEnumChecker (SatSuperframeConf::SUPER_FRAME_CONFIG_0, "Configuration 0",
-                                       SatSuperframeConf::SUPER_FRAME_CONFIG_1, "Configuration 1",
-                                       SatSuperframeConf::SUPER_FRAME_CONFIG_2, "Configuration 2",
-                                       SatSuperframeConf::SUPER_FRAME_CONFIG_3, "Configuration 3"))
+                      MakeEnumChecker (SatSuperframeConf::SUPER_FRAME_CONFIG_0, "Configuration_0",
+                                       SatSuperframeConf::SUPER_FRAME_CONFIG_1, "Configuration_1",
+                                       SatSuperframeConf::SUPER_FRAME_CONFIG_2, "Configuration_2",
+                                       SatSuperframeConf::SUPER_FRAME_CONFIG_3, "Configuration_3"))
       .AddAttribute ("FwdCarrierAllocatedBandwidth",
                      "The allocated carrier bandwidth for forward link carriers [Hz].",
                      DoubleValue (0.125e9),
