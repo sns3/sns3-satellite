@@ -100,8 +100,8 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (12.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.02));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (20.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.04));
         Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MinValue", DoubleValue (0.0));
         Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MaxValue", DoubleValue (10000.0));
         Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::BinLength", DoubleValue (100.0));

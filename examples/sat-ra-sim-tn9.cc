@@ -30,7 +30,7 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt (1);
   uint32_t raMode (0);
   uint32_t utsPerBeam (3);
-  uint32_t packetSize (1400);
+  uint32_t packetSize (64);
   bool isNoisy (false);
 
   double simLength (30.0); // in seconds
