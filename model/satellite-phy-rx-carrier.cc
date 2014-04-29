@@ -1287,31 +1287,39 @@ SatPhyRxCarrier::ProcessFrame ()
         {
           std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList = iter->second.begin ();
 
-          NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Processing unsuccessfully received packet in slot: " << iterList->ownSlotId
-                       << " packet phy error: " << iterList->phyError
-                       << " packet has been processed: " << iterList->packetHasBeenProcessed);
-
-          if (!iterList->packetHasBeenProcessed || !iterList->phyError)
+          if (iterList != iter->second.end ())
             {
-               NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessFrame - All packets should have been processed by now");
+              NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Processing unsuccessfully received packet in slot: " << iterList->ownSlotId
+                           << " packet phy error: " << iterList->phyError
+                           << " packet has been processed: " << iterList->packetHasBeenProcessed);
+
+              if (!iterList->packetHasBeenProcessed || !iterList->phyError)
+                {
+                   NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessFrame - All successfully received packets should have been processed by now");
+                }
+
+              /// find and remove replicas of the received packet
+              FindAndRemoveReplicas (*iterList);
+
+              /// save the the received packet
+              combinedPacketsForFrame.push_back (*iterList);
+
+              /// remove the packet from the container
+              iter->second.erase (iterList);
+
+              /// remove the empty slot container
+              if (iter->second.empty ())
+                {
+                  m_crdsaPacketContainer.erase (iter);
+                }
             }
-
-          /// find and remove replicas of the received packet
-          FindAndRemoveReplicas (*iterList);
-
-          /// save the the received packet
-          combinedPacketsForFrame.push_back (*iterList);
-
-          /// remove the packet from the container
-          iter->second.erase (iterList);
-
-          /// remove the empty slot container
-          if (iter->second.empty ())
+          else
             {
+              /// remove the empty slot container
               m_crdsaPacketContainer.erase (iter);
             }
         }
-    } while (m_crdsaPacketContainer.size () > 0);
+    } while (!m_crdsaPacketContainer.empty ());
 
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Container processed, packets left: " << m_crdsaPacketContainer.size ());
 
@@ -1457,7 +1465,10 @@ SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s p
           NS_FATAL_ERROR ("SatPhyRxCarrier::FindAndRemoveReplicas - Replica not found");
         }
 
-      EliminateInterference (iter, removedPacket);
+      if (!packet.phyError)
+        {
+          EliminateInterference (iter, removedPacket);
+        }
     }
 }
 

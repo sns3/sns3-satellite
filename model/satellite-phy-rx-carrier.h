@@ -289,9 +289,9 @@ private:
 
   /**
    * \brief Function for finding and removing the replicas of the CRDSA packet
-   * \param CRDSA packet
+   * \param packet CRDSA packet
    */
-  void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s);
+  void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s packet);
 
   /**
    * \brief Function for eliminating the interference to other packets in the slot from the correctly received packet
