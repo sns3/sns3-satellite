@@ -342,11 +342,12 @@ private:
        * \param tbtpContainer TBTP message container to add/fill TBTPs.
        * \param maxFrameSizeInBytes Maximum size for a TBTP message.
        * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
+       * \param rcBasedAllocationEnabled If time slot generated per RC
        * \param waveformTrace Wave form trace callback
        * \param utLoadTrace UT load per the frame trace callback
        */
-      void GenerateTimeSlots ( std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes,
-                               UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
+      void GenerateTimeSlots ( std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
+                               bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
 
       /**
        * Get frame load by requested CC
@@ -585,9 +586,11 @@ private:
        * \param utSymbolsLeft Symbols left for the UT
        * \param rcSymbolsLeft Symbols left for RC
        * \param cno Estimated C/N0 of the UT.
+       * \param rcBasedAllocationEnabled If time slot generated per RC
        * \return Create time slot configuration
        */
-      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno);
+      Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft,
+                                           int64_t& rcSymbolsLeft, double cno, bool rcBasedAllocationEnabled);
   };
 
   /**
@@ -623,6 +626,10 @@ private:
 
   // minimum rate based bytes left can been guaranteed by frame allocator
   uint32_t  m_minimumRateBasedBytesLeft;
+
+  // The flag telling if time slot generation is done per RC based symnols
+  // instead of UT based symbols
+  bool m_rcBasedAllocationEnabled;
 
   /**
    *  Allocate given request according to type.

@@ -33,7 +33,6 @@ namespace ns3 {
 SatFrameAllocator::SatFrameInfo::SatFrameInfo (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, SatSuperframeConf::ConfigType_t configType)
   : m_configType (configType),
     m_frameId (frameId),
-    m_rcBasedAllocation (false),
     m_waveformConf (waveformConf),
     m_frameConf (frameConf)
 
@@ -84,7 +83,8 @@ SatFrameAllocator::SatFrameInfo::UpdateTotalRequests ()
 }
 
 void
-SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace)
+SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
+                                                    bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -122,6 +122,18 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
+      // check before the first slot addition that frame info fit in TBTP
+      // in addition to time slot
+      if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes () + tbtpToFill->GetFrameInfoSize ()) > maxSizeInBytes )
+        {
+          Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
+          newTbtp->SetSuperframeCounter ( tbtpToFill->GetSuperframeCounter ());
+
+          tbtpContainer.push_back (newTbtp);
+
+          tbtpToFill = newTbtp;
+        }
+
       // sort RCs in UT using random method.
       std::vector<uint32_t> rcIndices;
 
@@ -145,7 +157,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
       while ( utSymbolsLeft > 0 )
         {
-          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse, utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno );
+          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse,
+                                                           utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno, rcBasedAllocationEnabled );
 
           if ( timeSlot )
             {
@@ -157,7 +170,7 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
                   utCount++;
                 }
 
-              if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes () + tbtpToFill->GetFrameInfoSize ()) > maxSizeInBytes )
+              if ( (tbtpToFill->GetSizeInBytes () + tbtpToFill->GetTimeSlotInfoSizeInBytes () ) > maxSizeInBytes )
                 {
                   Ptr<SatTbtpMessage> newTbtp = CreateObject<SatTbtpMessage> (tbtpToFill->GetSuperframeSeqId ());
                   newTbtp->SetSuperframeCounter ( tbtpToFill->GetSuperframeCounter ());
@@ -221,7 +234,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
 
 Ptr<SatTimeSlotConf>
-SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno)
+SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse,
+                                                 int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno, bool rcBasedAllocationEnabled)
 {
   NS_LOG_FUNCTION (this);
 
@@ -254,7 +268,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
               carrierSymbolsToUse -= timeSlotSymbols;
               utSymbolsToUse -= timeSlotSymbols;
 
-              if ( m_rcBasedAllocation )
+              if ( rcBasedAllocationEnabled )
                 {
                   utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
                 }
@@ -281,7 +295,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
                   carrierSymbolsToUse -= timeSlotSymbols;
                   utSymbolsToUse -= timeSlotSymbols;
 
-                  if (m_rcBasedAllocation )
+                  if ( rcBasedAllocationEnabled )
                     {
                       utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
                     }
@@ -839,7 +853,11 @@ SatFrameAllocator::GetTypeId (void)
                       BooleanValue (false),
                       MakeBooleanAccessor (&SatFrameAllocator::m_fcaEnabled),
                       MakeBooleanChecker ())
-
+      .AddAttribute ("RcBasedAllocationEnabled",
+                     "Time slot generated per RC symbols instead of sum of UT symbols.",
+                      BooleanValue (false),
+                      MakeBooleanAccessor (&SatFrameAllocator::m_rcBasedAllocationEnabled),
+                      MakeBooleanChecker ())
     ;
     return tid;
 }
@@ -859,7 +877,8 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatSuperframeConf> superFrameConf, Ptr
    m_fcaEnabled (false),
    m_maxRcCount (maxRcCount),
    m_minCarrierBytes (0),
-   m_minimumRateBasedBytesLeft (0)
+   m_minimumRateBasedBytesLeft (0),
+   m_rcBasedAllocationEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -921,7 +940,7 @@ SatFrameAllocator::GenerateTimeSlots (TbtpMsgContainer_t& tbtpContainer, uint32_
 
   for (FrameInfoContainer_t::iterator it = m_frameInfos.begin (); it != m_frameInfos.end (); it++  )
     {
-      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer, waveformTrace, utLoadTrace);
+      it->second.GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer, m_rcBasedAllocationEnabled, waveformTrace, utLoadTrace);
     }
 }
 
