@@ -163,12 +163,12 @@ main (int argc, char *argv[])
    * Set-up CBR traffic
    */
   Ptr<UniformRandomVariable> randVariable = CreateObject<UniformRandomVariable> ();
-  Time minInterval = Seconds (packetSize / (125 * 128.0)); // 128 kbps
-  Time maxInterval = Seconds (packetSize / (125 * 3.2)); // 3.2 kbps
+  Time minInterval = Seconds (packetSize / (125 * 8.0)); // 8 kbps
+  Time maxInterval = Seconds (packetSize / (125 * 2.0)); // 2 kbps
   NS_LOG_INFO ("Minimum interval between packets: " << minInterval.GetSeconds ()
-                   << "s (equivalent with 128 kbps data rate)");
+                   << "s (equivalent with 8 kbps data rate)");
   NS_LOG_INFO ("Maximum interval between packets: " << maxInterval.GetSeconds ()
-                   << "s (equivalent with 3.2 kbps data rate)");
+                   << "s (equivalent with 2 kbps data rate)");
   const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
@@ -214,7 +214,9 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
