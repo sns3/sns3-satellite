@@ -11,9 +11,15 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  Example of Random Access CRDSA usage in satellite network. The
-*         example demonstrates the CRDSA functionality in greater detail,
-*         but with lower load than the collision example.
+* \brief  This is an example of Random Access usage in satellite network. This
+*         example uses only the CRDSA model regardless of the number of instances
+*         parameter. CRA is disabled in this example. The example allows to
+*         set various RA parameters such as the maximum rate limitation related
+*         parameters, back off and load control related parameters.
+*
+*         By default, the RA dynamic load control is disabled in this
+*         example and only CRDSA is used. This example is aimed for CRDSA
+*         debugging and modified to produce full CRDSA log output with only one UT.
 *
 *         The script is using CBR application in user defined scenario,
 *         which means that user can change the scenario size quite to be
