@@ -36,6 +36,8 @@ main (int argc, char *argv[])
   std::string scenario = "simple";
   std::string sender = "both";
   std::string scenarioLogFile = "";
+  std::string simDuration = "11s";
+
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   // read command line parameters given by user
@@ -46,6 +48,7 @@ main (int argc, char *argv[])
   cmd.AddValue("offTime", "Time for packet sending is off in seconds, (e.g. (0.5)", offTime);
   cmd.AddValue("sender", "Packet sender (ut, gw, or both).", sender);
   cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue("simDuration", "Duration of the simulation (Time)", simDuration);
   cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
@@ -107,7 +110,7 @@ main (int argc, char *argv[])
   // create helpers for application creation
   // set address of the first UT connected user
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (0)), port));
-  OnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (0)), port));
+  SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (0)), port));
 
   // assert if sender is not valid
   NS_ASSERT_MSG ( ( (sender == "gw") || ( sender == "ut") || ( sender == "both") ) , "Sender argument invalid.");
@@ -150,11 +153,12 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  DataRate: " << dataRate);
   NS_LOG_INFO("  OnTime: " << onTime);
   NS_LOG_INFO("  OffTime: " << offTime);
+  NS_LOG_INFO("  Duration: " << simDuration);
   NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
 
   // run simulation and finally destroy it
-  Simulator::Stop (Seconds(11));
+  Simulator::Stop (Time (simDuration));
   Simulator::Run ();
   Simulator::Destroy ();
 

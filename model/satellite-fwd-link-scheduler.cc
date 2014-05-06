@@ -168,7 +168,7 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   std::vector<SatEnums::SatModcod_t> modCods;
   SatEnums::GetAvailableModcodsFwdLink (modCods);
 
-  m_bbFrameContainer = Create<SatBbFrameContainer> (modCods, m_bbFrameConf);
+  m_bbFrameContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
 
   // Random variable used in scheduling
   m_random = CreateObject<UniformRandomVariable> ();
