@@ -166,7 +166,6 @@ private:
   uint32_t m_freeSpaceInBytes;
   uint32_t m_maxSpaceInBytes;
   uint32_t m_headerSizeInBytes;
-  bool m_containsControlPdu;
   SatBbFramePayload_t m_framePayload;
   Time m_duration;
   SatEnums::SatBbFrameType_t m_frameType;

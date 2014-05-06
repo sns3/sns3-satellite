@@ -112,13 +112,13 @@ SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums
   if ( priorityClass > 0)
     {
       payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, frameType) / SatUtils::BITS_PER_BYTE;
-      payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
     }
   else
     {
       payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetDefaultModCod (), frameType) / SatUtils::BITS_PER_BYTE;
-      payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
     }
+
+  payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
   return payloadBytes;
 }

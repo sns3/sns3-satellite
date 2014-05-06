@@ -32,7 +32,6 @@ SatBbFrame::SatBbFrame ()
    m_freeSpaceInBytes (0),
    m_maxSpaceInBytes (0),
    m_headerSizeInBytes (0),
-   m_containsControlPdu (false),
    m_frameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
@@ -42,7 +41,6 @@ SatBbFrame::SatBbFrame ()
 
 SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf)
   :m_modCod (modCod),
-   m_containsControlPdu (false),
    m_frameType (type)
 {
   NS_LOG_FUNCTION (this << modCod << type);
@@ -99,7 +97,7 @@ SatBbFrame::AddPayload (Ptr<Packet> data)
     }
   else
     {
-      NS_FATAL_ERROR ("Data cannot be added to BB frame with length: " << dataLengthInBytes);
+      NS_FATAL_ERROR ("Data cannot be added to BB frame (length, free space): " << dataLengthInBytes << ", " << m_freeSpaceInBytes);
     }
 
   return GetSpaceLeftInBytes();
@@ -188,6 +186,7 @@ void SatBbFrame::Shrink (Ptr<SatBbFrameConf> conf)
       // shrink only if data used in normal frame can fit in short frame
       if ( spaceUsedInbytes < maxShortFrameSpaceInBytes)
         {
+          m_frameType = SatEnums::SHORT_FRAME;
           m_maxSpaceInBytes = maxShortFrameSpaceInBytes;
           m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
           m_duration = conf->GetBbFrameDuration (m_modCod, SatEnums::SHORT_FRAME);
