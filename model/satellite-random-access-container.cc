@@ -208,9 +208,19 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
 
       if (IsCrdsaAllocationChannel (allocationChannel))
         {
-          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid allocation channel, evaluating CRDSA");
+          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff status");
 
-          txOpportunities = DoCrdsa (allocationChannel);
+          if (CrdsaHasBackoffTimePassed (allocationChannel))
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA backoff period over, evaluating CRDSA");
+              txOpportunities = DoCrdsa (allocationChannel);
+            }
+          else
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA backoff period in effect, aborting");
+              CrdsaReduceIdleBlocksForAllAllocationChannels ();
+              CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+            }
         }
       else
         {
@@ -263,16 +273,16 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
             {
               if (IsCrdsaAllocationChannel (allocationChannel))
                 {
-                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff & backoff probability");
+                  NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid CRDSA allocation channel, checking backoff status");
 
                   if (CrdsaHasBackoffTimePassed (allocationChannel))
                     {
-                      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is free, evaluating CRDSA");
+                      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA backoff period over, evaluating CRDSA");
                       txOpportunities = DoCrdsa (allocationChannel);
                     }
                   else
                     {
-                      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is not free, aborting");
+                      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA backoff period in effect, aborting");
                       CrdsaReduceIdleBlocksForAllAllocationChannels ();
                       CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
                     }
@@ -544,6 +554,8 @@ SatRandomAccess::SetCrdsaMaximumDataRateLimitationParameters (uint32_t allocatio
 uint32_t
 SatRandomAccess::GetCrdsaSignalingOverheadInBytes ()
 {
+  NS_LOG_INFO ("SatRandomAccess::GetCrdsaSignalingOverheadInBytes");
+
   return m_randomAccessConf->GetCrdsaSignalingOverheadInBytes ();
 }
 
@@ -583,6 +595,8 @@ SatRandomAccess::CrdsaReduceIdleBlocksForAllAllocationChannels ()
 {
   NS_LOG_FUNCTION (this);
 
+  NS_LOG_INFO ("SatRandomAccess::CrdsaReduceIdleBlocksForAllAllocationChannels");
+
   for (uint32_t i = 0; i < m_numOfAllocationChannels; i++)
     {
       CrdsaReduceIdleBlocks (i);
@@ -594,6 +608,8 @@ SatRandomAccess::CrdsaResetConsecutiveBlocksUsed (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this);
 
+  NS_LOG_INFO ("SatRandomAccess::CrdsaResetConsecutiveBlocksUsed for AC: " << allocationChannel);
+
   m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaNumOfConsecutiveBlocksUsed (0);
 }
 
@@ -601,6 +617,8 @@ void
 SatRandomAccess::CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ()
 {
   NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatRandomAccess::CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels");
 
   for (uint32_t i = 0; i < m_numOfAllocationChannels; i++)
     {
@@ -646,8 +664,6 @@ SatRandomAccess::CrdsaSetBackoffTimer (uint32_t allocationChannel)
 
   m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffReleaseTime (Now ()
                       + MilliSeconds (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffTimeInMilliSeconds ()));
-
-  CrdsaReduceIdleBlocks (allocationChannel);
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaSetBackoffTimer - Setting backoff timer for allocation channel: " << allocationChannel);
 }
@@ -707,8 +723,6 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
         }
     }
 
-  CrdsaReduceIdleBlocks (allocationChannel);
-
   return txOpportunities;
 }
 
@@ -727,7 +741,20 @@ SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsed (uint32_t allocationChannel)
 
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaIdleBlocksLeft (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaMinIdleBlocks ());
 
-      CrdsaResetConsecutiveBlocksUsed (allocationChannel);
+      CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+    }
+}
+
+void
+SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatRandomAccess::CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels");
+
+  for (uint32_t i = 0; i < m_numOfAllocationChannels; i++)
+    {
+      CrdsaIncreaseConsecutiveBlocksUsed (i);
     }
 }
 
@@ -747,57 +774,53 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
 
   NS_LOG_INFO ("-------------------------------------");
 
-  NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Checking backoff period status...");
+  NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Backoff period over, checking DAMA status...");
 
-  if (CrdsaHasBackoffTimePassed (allocationChannel))
+  if (!m_isDamaAvailableCb ())
     {
-      NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Backoff period over, checking DAMA status...");
+      NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No DAMA, checking buffer status...");
 
-      if (!m_isDamaAvailableCb ())
+      if (m_crdsaNewData)
         {
-          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No DAMA, checking buffer status...");
+          m_crdsaNewData = false;
 
-          if (m_crdsaNewData)
+          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Evaluating back off...");
+
+          if (CrdsaDoBackoff (allocationChannel))
             {
-              m_crdsaNewData = false;
-
-              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Evaluating back off...");
-
-              if (CrdsaDoBackoff (allocationChannel))
-                {
-                  NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Initial new data backoff triggered");
-                  CrdsaSetBackoffTimer (allocationChannel);
-                }
-              else
-                {
-                  txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
-                }
+              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Initial new data backoff triggered");
+              CrdsaSetBackoffTimer (allocationChannel);
             }
           else
             {
               txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
             }
-
-          if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
-            {
-              CrdsaIncreaseConsecutiveBlocksUsed (allocationChannel);
-            }
-          else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
-            {
-              CrdsaReduceIdleBlocks (allocationChannel);
-              CrdsaResetConsecutiveBlocksUsed (allocationChannel);
-            }
         }
       else
         {
-          CrdsaReduceIdleBlocks (allocationChannel);
-          CrdsaResetConsecutiveBlocksUsed (allocationChannel);
+          txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
+        }
+
+      if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
+        {
+          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Tx opportunity, increasing consecutive blocks used");
+
+          CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels ();
+        }
+      else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
+        {
+          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No Tx opportunity, reducing idle blocks & resetting consecutive blocks");
+
+          CrdsaReduceIdleBlocksForAllAllocationChannels ();
+          CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
         }
     }
   else
     {
-      CrdsaReduceIdleBlocks (allocationChannel);
-      CrdsaResetConsecutiveBlocksUsed (allocationChannel);
+      NS_LOG_INFO ("SatRandomAccess::DoCrdsa - DAMA allocation found, aborting CRDSA...");
+
+      CrdsaReduceIdleBlocksForAllAllocationChannels ();
+      CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
     }
 
   NS_LOG_INFO ("--------------------------------------");

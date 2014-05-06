@@ -278,6 +278,11 @@ private:
   void CrdsaIncreaseConsecutiveBlocksUsed (uint32_t allocationChannel);
 
   /**
+   * \brief Function for increasing the count of consecutive used blocks for all allocation channels
+   */
+  void CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels ();
+
+  /**
    * \brief Function for reducing the allocation channel specific number of idle blocks in effect
    * \param allocationChannel allocation channel
    */
