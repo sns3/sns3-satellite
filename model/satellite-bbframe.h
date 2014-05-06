@@ -124,6 +124,19 @@ public:
   bool MergeWithFrame (Ptr<SatBbFrame> mergedFrame);
 
   /**
+   * Shrink BB frame to the shortest type possible according to
+   * current load in the frame.
+   * \param conf Pointer to BB frame configuration
+   */
+  void Shrink (Ptr<SatBbFrameConf> conf);
+
+  /**
+   * Extent BB frame to the longest type.
+   * \param conf Pointer to BB frame configuration
+   */
+  void Extend (Ptr<SatBbFrameConf> conf);
+
+  /**
    * Get duration of the frame transmission.
    * \return duration of the frame transmission
    */

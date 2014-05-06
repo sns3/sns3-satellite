@@ -68,15 +68,6 @@ public:
     PRIORITY_SORT        //!< PRIORITY_SORT
   } ScheduleSortingCriteria_t;
 
-  /**
-   * BBFrame usage modes.
-   */
-  typedef enum
-  {
-    SHORT_FRAMES,          //!< SHORT_FRAMES
-    NORMAL_FRAMES,         //!< NORMAL_FRAMES
-    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
-  } BbFrameUsageMode_t;
 
   /**
    * Compares to scheduling objects priorities
@@ -195,16 +186,6 @@ private:
   void ScheduleBbFrames ();
 
   /**
-   * Create short or normal frame according to byteCount, estimated C/N0 and
-   * according to member #m_bbFrameUsageMode.
-   *
-   * \param cno Estimated C/N0 value.
-   * \param byteCount byte count
-   * \return Pointer to created frame.
-   */
-  Ptr<SatBbFrame> CreateFrame (double cno, uint32_t byteCount) const;
-
-  /**
    * Check if given estimated C/N0 match with given frame.
    *
    * \param cno Estimated C/N0 value.
@@ -280,11 +261,6 @@ private:
    * Additional sorting criteria for scheduling objects received from LLC.
    */
   ScheduleSortingCriteria_t m_additionalSortCriteria;
-
-  /**
-   * BBFrame usage mode.
-   */
-  BbFrameUsageMode_t m_bbFrameUsageMode;
 
   /**
    * The container for BB Frames.

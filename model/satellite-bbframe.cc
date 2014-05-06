@@ -99,8 +99,7 @@ SatBbFrame::AddPayload (Ptr<Packet> data)
     }
   else
     {
-      std::cout << dataLengthInBytes << std::endl;
-      NS_ASSERT (0);
+      NS_FATAL_ERROR ("Data cannot be added to BB frame with length: " << dataLengthInBytes);
     }
 
   return GetSpaceLeftInBytes();
@@ -176,5 +175,39 @@ SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame)
 
   return merged;
 }
+
+void SatBbFrame::Shrink (Ptr<SatBbFrameConf> conf)
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( m_frameType == SatEnums::NORMAL_FRAME )
+    {
+      uint32_t maxShortFrameSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::SHORT_FRAME) / SatUtils::BITS_PER_BYTE) ;
+      uint32_t spaceUsedInbytes = GetSpaceUsedInBytes ();
+
+      // shrink only if data used in normal frame can fit in short frame
+      if ( spaceUsedInbytes < maxShortFrameSpaceInBytes)
+        {
+          m_maxSpaceInBytes = maxShortFrameSpaceInBytes;
+          m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
+          m_duration = conf->GetBbFrameDuration (m_modCod, SatEnums::SHORT_FRAME);
+        }
+    }
+}
+
+void SatBbFrame::Extend (Ptr<SatBbFrameConf> conf)
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( m_frameType == SatEnums::SHORT_FRAME )
+    {
+      uint32_t spaceUsedInbytes = GetSpaceUsedInBytes ();
+
+      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE) ;
+      m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
+      m_duration = conf->GetBbFrameDuration (m_modCod, SatEnums::NORMAL_FRAME);
+    }
+}
+
 
 } // namespace ns3

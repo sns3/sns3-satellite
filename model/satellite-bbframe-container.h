@@ -36,9 +36,21 @@ namespace ns3 {
  * Holds information of BB Frames for forward link scheduling.
  *
  */
-class SatBbFrameContainer :  public SimpleRefCount<SatBbFrameContainer>
+class SatBbFrameContainer :  public Object
 {
 public:
+  /**
+   * BBFrame usage modes.
+   */
+  typedef enum
+  {
+    SHORT_FRAMES,          //!< SHORT_FRAMES
+    NORMAL_FRAMES,         //!< NORMAL_FRAMES
+    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
+  } BbFrameUsageMode_t;
+
+  static TypeId GetTypeId (void);
+
   /**
    * Default constructor for SatBbFrameContainer not supported.
    */
@@ -113,6 +125,20 @@ private:
   FrameContainer_t              m_container;
   Time                          m_totalDuration;
   Ptr<SatBbFrameConf>           m_bbFrameConf;
+
+  /**
+   * BBFrame usage mode.
+   */
+  BbFrameUsageMode_t m_bbFrameUsageMode;
+
+  /**
+   * Create short or normal frame according to MODCOD and member #m_bbFrameUsageMode.
+   * Created frame is added back of appropriate container.
+   *
+   * \param priorityClass Priority for created frame
+   * \param modcod MODCOD for created frame
+   */
+  void CreateFrameToTail (uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 };
 
 

@@ -111,13 +111,6 @@ SatFwdLinkScheduler::GetTypeId (void)
                     PointerValue(),
                     MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameConf),
                     MakePointerChecker<SatBbFrameConf> ())
-    .AddAttribute ("BBFrameUsageMode",
-                   "Mode for selecting used BBFrames.",
-                    EnumValue (SatFwdLinkScheduler::NORMAL_FRAMES),
-                    MakeEnumAccessor (&SatFwdLinkScheduler::m_bbFrameUsageMode),
-                    MakeEnumChecker (SatFwdLinkScheduler::SHORT_FRAMES, "ShortFrames",
-                                     SatFwdLinkScheduler::NORMAL_FRAMES, "NormalFrames",
-                                     SatFwdLinkScheduler::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
     .AddAttribute ("SchedulingStartThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
                     TimeValue (MilliSeconds (5)),
@@ -155,7 +148,6 @@ SatFwdLinkScheduler::GetTypeId (void)
 
 SatFwdLinkScheduler::SatFwdLinkScheduler ()
 : m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
-  m_bbFrameUsageMode (SatFwdLinkScheduler::NORMAL_FRAMES),
   m_cnoEstimatorMode (SatCnoEstimator::LAST),
   m_carrierBandwidthInHz (0.0)
 {
@@ -167,7 +159,6 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
  : m_macAddress (address),
    m_bbFrameConf (conf),
    m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
-   m_bbFrameUsageMode (SatFwdLinkScheduler::NORMAL_FRAMES),
    m_cnoEstimatorMode (SatCnoEstimator::LAST),
    m_carrierBandwidthInHz (carrierBandwidthInHz)
 {
@@ -384,71 +375,6 @@ SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject
         PrintSoContent ("After sort",  so);
 #endif
     }
-}
-
-Ptr<SatBbFrame>
-SatFwdLinkScheduler::CreateFrame (double cno, uint32_t byteCount) const
-{
-  NS_LOG_FUNCTION (this << cno << byteCount);
-
-  // TODO: If frame is needed to optimize based on total data in scheduling objects
-  // possibly it can be done here and also taken into account when sorting objects
-
-  Ptr<SatBbFrame> frame = NULL;
-
-  // set default MODCOD first
-  SatEnums::SatModcod_t modCod = m_bbFrameConf->GetDefaultModCod ();
-
-  if ( isnan (cno) == false )
-    {
-      // use MODCOD based on C/N0 for normal frame first
-      modCod = m_bbFrameConf->GetBestModcod (cno, SatEnums::NORMAL_FRAME);
-    }
-
-  switch (m_bbFrameUsageMode)
-  {
-    case SHORT_FRAMES:
-      if ( isnan (cno) == false )
-        {
-          // use MODCOD based on C/N0 for short frame
-          modCod = m_bbFrameConf->GetBestModcod (cno, SatEnums::SHORT_FRAME);
-        }
-
-      frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf);
-      break;
-
-    case NORMAL_FRAMES:
-      frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf);
-      break;
-
-    case SHORT_AND_NORMAL_FRAMES:
-      {
-        uint32_t bytesInNormalFrame = m_bbFrameConf->GetBbFramePayloadBits (modCod, SatEnums::NORMAL_FRAME) / 8;
-
-        if (byteCount >= bytesInNormalFrame)
-          {
-            frame = Create<SatBbFrame> (modCod, SatEnums::NORMAL_FRAME, m_bbFrameConf);
-          }
-        else
-          {
-            if ( isnan (cno) == false )
-              {
-                // use MODCOD based on C/N0 for short frame
-                modCod = m_bbFrameConf->GetBestModcod (cno, SatEnums::SHORT_FRAME);
-              }
-
-            frame = Create<SatBbFrame> (modCod, SatEnums::SHORT_FRAME, m_bbFrameConf);
-          }
-      }
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Invalid BBFrame usage mode!!!");
-      break;
-
-  }
-
-  return frame;
 }
 
 bool

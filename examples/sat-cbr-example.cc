@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/core-module.h"
+#include "ns3/config-store-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
@@ -37,11 +38,11 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
 //  To read attributes from file
-//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("input-attributes.xml"));
-//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-//  ConfigStore inputConfig;
-//  inputConfig.ConfigureDefaults ();
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -145,7 +146,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
 
-//  To store attributes to file
+  //To store attributes to file
 //  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
 //  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
 //  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));

@@ -12,6 +12,7 @@
  <default name="ns3::SatBbFrameConf::BbFrameHeaderInBytes" value="10"/>
  <default name="ns3::SatBbFrameConf::BbFrameHighOccupancyThreshold" value="0.9"/>
  <default name="ns3::SatBbFrameConf::BbFrameLowOccupancyThreshold" value="0.5"/>
+ <default name="ns3::SatBbFrameContainer::BBFrameUsageMode" value="NormalFrames"/> 
  <default name="ns3::SatBeamScheduler::CnoEstimationMode" value="LastValueInWindow"/>
  <default name="ns3::SatBeamScheduler::CnoEstimationWindow" value="+1000000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTwoWayPropagationDelay" value="+560000000.0ns"/>
@@ -26,8 +27,7 @@
  <default name="ns3::SatTbtpMessage::AssigmentFormat" value="0"/>
  <default name="ns3::SatCrMessage::CrBlockType" value="Small"/>
  <default name="ns3::SatFwdLinkScheduler::Interval" value="+20000000.0ns"/>
- <default name="ns3::SatFwdLinkScheduler::BBFrameUsageMode" value="NormalFrames"/>
- <default name="ns3::SatFwdLinkScheduler::SchedulingStartThresholdTime" value="+5000000.0ns"/>
+  <default name="ns3::SatFwdLinkScheduler::SchedulingStartThresholdTime" value="+5000000.0ns"/>
  <default name="ns3::SatFwdLinkScheduler::SchedulingStopThresholdTime" value="+15000000.0ns"/>
  <default name="ns3::SatFwdLinkScheduler::AdditionalSortCriteria" value="NoSorting"/>
  <default name="ns3::SatFwdLinkScheduler::CnoEstimationMode" value="LastValueInWindow"/>
