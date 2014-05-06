@@ -38,11 +38,11 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
 //  To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("input-attributes.xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
+//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("input-attributes.xml"));
+//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+//  ConfigStore inputConfig;
+//  inputConfig.ConfigureDefaults ();
 
   // read command line parameters given by user
   CommandLine cmd;

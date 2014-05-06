@@ -78,6 +78,7 @@ CbrApplication::GetTypeId (void)
 
 CbrApplication::CbrApplication ()
   : m_socket (0),
+    m_pktSize (0),
     m_lastStartTime (Seconds (0)),
     m_totTxBytes (0),
     m_isStatisticsTagsEnabled (false)
