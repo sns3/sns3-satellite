@@ -34,7 +34,7 @@ main (int argc, char *argv[])
   /// UT users 2,3,5
   bool enableMulticastGroup_2 = true;
 
-  uint32_t MCAST_FLOW_ID (1);
+  uint32_t MCAST_FLOW_ID (3);
 
   /// Enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
