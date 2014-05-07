@@ -17,6 +17,8 @@
  <default name="ns3::SatBeamScheduler::CnoEstimationWindow" value="+1000000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTwoWayPropagationDelay" value="+560000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTBTPTxAndProcessingDelay" value="+100000000.0ns"/>
+ <default name="ns3::SatBeamScheduler::ControlSlotsEnabled" value="false"/>
+ <default name="ns3::SatBeamScheduler::ControlSlotInterval" value="+1000000000.0ns"/>
  <default name="ns3::SatChannel::EnableRxPowerOutputTrace" value="false"/>
  <default name="ns3::SatChannel::EnableFadingOutputTrace" value="false"/>
  <default name="ns3::SatChannel::EnableExternalFadingInputTrace" value="false"/>
