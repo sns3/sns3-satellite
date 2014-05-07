@@ -202,6 +202,7 @@ void SatBbFrame::Extend (Ptr<SatBbFrameConf> conf)
     {
       uint32_t spaceUsedInbytes = GetSpaceUsedInBytes ();
 
+      m_frameType = SatEnums::NORMAL_FRAME;
       m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE) ;
       m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
       m_duration = conf->GetBbFrameDuration (m_modCod, SatEnums::NORMAL_FRAME);
