@@ -74,10 +74,11 @@ public:
   /**
    * Notify a Tx opportunity to this encapsulator.
    * \param bytes Notified tx opportunity bytes from lower layer
-   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
+   * \param &bytesLeft Bytes left after this TxOpportunity in txBuffer
+   * \param &nextMinTxO Minimum TxO after this TxO
    * \return A RLE PDU pointer
    */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
    * Receive a packet, thus decapsulate and defragment/deconcatenate

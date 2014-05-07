@@ -110,9 +110,11 @@ public:
    * \param   uint32_t payload size in bytes
    * \param   Mac48Address address
    * \param   uint8_t RC index
+   * \param   uint32_t& Bytes left
+   * \param   uint32_t& Next min TxO
    * \return  packet Packet to be transmitted to PHY
    */
-  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t> TxOpportunityCallback;
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t&, uint32_t&> TxOpportunityCallback;
 
   /**
    * Byte counter container

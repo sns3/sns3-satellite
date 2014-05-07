@@ -117,9 +117,10 @@ public:
    *
    * \param bytes Notified Tx opportunity bytes from lower layer
    * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
+   * \param &nextMinTxO Minimum TxO after this TxO
    * \return An raw control PDU
    */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
    * Receive a packet. Note, that base encapsulator does not support

@@ -116,7 +116,7 @@ SatBaseEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address mac)
 
 
 Ptr<Packet>
-SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
+SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes << bytesLeft);
 
@@ -132,6 +132,9 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
   // Peek the first PDU from the buffer.
   Ptr<const Packet> peekPacket = m_txQueue->Peek ();
 
+  // Initialize with current packet size
+  nextMinTxO = peekPacket->GetSize ();
+
   // If control packet fits into TxO
   if (peekPacket->GetSize () <= bytes)
     {
@@ -145,6 +148,17 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
 
       // Update bytes left
       bytesLeft = m_txQueue->GetNBytes ();
+
+      // Update the next min TxO
+      Ptr<const Packet> nextPacket = m_txQueue->Peek ();
+      if (nextPacket)
+        {
+          nextMinTxO = nextPacket->GetSize ();
+        }
+      else
+        {
+          nextMinTxO = 0;
+        }
     }
 
   return packet;

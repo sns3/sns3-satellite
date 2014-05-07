@@ -63,9 +63,9 @@ SatGwLlc::DoDispose ()
 
 
 Ptr<Packet>
-SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft)
+SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << macAddr << bytes);
+  NS_LOG_FUNCTION (this << macAddr << bytes << flowId);
 
   Ptr<Packet> packet;
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
@@ -73,7 +73,7 @@ SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flo
 
   if (it != m_encaps.end ())
     {
-      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft);
+      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft, nextMinTxO);
     }
   else
     {

@@ -133,9 +133,9 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 }
 
 Ptr<Packet>
-SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint32_t &bytesLeft )
+SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << bytes << macAddr << bytesLeft);
+  NS_LOG_FUNCTION (this << bytes << macAddr << flowId);
   NS_ASSERT (true);
 
   Ptr<Packet> packet;

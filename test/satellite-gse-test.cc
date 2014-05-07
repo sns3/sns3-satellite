@@ -117,6 +117,7 @@ SatGseTestCase::DoRun (void)
    */
 
   uint32_t bytesLeft (1);
+  uint32_t nextMinTxO (0);
   uint32_t numFrames (15);
   uint32_t frameBytes (50000);
   for (uint32_t b = 0; b < numFrames; ++b)
@@ -124,7 +125,7 @@ SatGseTestCase::DoRun (void)
       uint32_t txOpp (frameBytes);
       while (bytesLeft > 0 )
         {
-          Ptr<Packet> p = gse->NotifyTxOpportunity (txOpp, bytesLeft);
+          Ptr<Packet> p = gse->NotifyTxOpportunity (txOpp, bytesLeft, nextMinTxO);
           if (!p)
             {
               break;

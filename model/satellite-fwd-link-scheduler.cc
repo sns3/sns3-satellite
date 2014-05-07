@@ -305,7 +305,7 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
                 }
             }
 
-          Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*it)->GetMacAddress (), flowId, currentObBytes);
+          Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*it)->GetMacAddress (), flowId, currentObBytes, currentObMinReqBytes);
 
           if ( p )
             {

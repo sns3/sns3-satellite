@@ -130,7 +130,7 @@ SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address /*mac*/)
 }
 
 Ptr<Packet>
-SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
+SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
   NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
@@ -162,9 +162,6 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       flowIdTag.SetFlowId (m_flowId);
       packet->AddPacketTag (flowIdTag);
 
-      // Update bytes lefts
-      bytesLeft = GetTxBufferSizeInBytes ();
-
       if (packet->GetSize () > bytes)
         {
           NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
@@ -173,6 +170,12 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
     }
 
   NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes());
+
+  // Update bytes lefts
+  bytesLeft = GetTxBufferSizeInBytes ();
+
+  // Update min TxO
+  nextMinTxO = GetMinTxOpportunityInBytes ();
 
   return packet;
 }

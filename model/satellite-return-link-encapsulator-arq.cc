@@ -174,7 +174,7 @@ SatReturnLinkEncapsulatorArq::DoDispose ()
 
 
 Ptr<Packet>
-SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
+SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
   NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
@@ -278,6 +278,9 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 
   // Update bytes lefts
   bytesLeft = GetTxBufferSizeInBytes ();
+
+  // Update min TxO
+  nextMinTxO = GetMinTxOpportunityInBytes ();
 
   return packet;
 }

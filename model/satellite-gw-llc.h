@@ -57,9 +57,10 @@ public:
     * \param bytes Size of the Tx opportunity
     * \param flowId Flow identifier
     * \param &bytesLeft Bytes left after TxOpportunity
+    * \param &nextMinTxO Minimum TxO after this TxO
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
    * Is control encapsulator already created. Only one control encapsulator

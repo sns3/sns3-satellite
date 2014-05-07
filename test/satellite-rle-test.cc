@@ -115,10 +115,11 @@ SatRleTestCase::DoRun (void)
    * Create TxOpportunities for RLE and call receive method to do decapsuling,
    * defragmentation and reassembly.
    */
+  uint32_t nextMinTxO (0);
   uint32_t bytesLeft (1);
   while (bytesLeft > 0)
     {
-      Ptr<Packet> p = rle->NotifyTxOpportunity (unif->GetInteger (3, 1500), bytesLeft);
+      Ptr<Packet> p = rle->NotifyTxOpportunity (unif->GetInteger (3, 1500), bytesLeft, nextMinTxO);
       rle->ReceivePdu (p);
     }
 

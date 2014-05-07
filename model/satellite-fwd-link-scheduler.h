@@ -68,7 +68,6 @@ public:
     PRIORITY_SORT        //!< PRIORITY_SORT
   } ScheduleSortingCriteria_t;
 
-
   /**
    * Compares to scheduling objects priorities
    *
@@ -142,9 +141,11 @@ public:
    * \param Mac48Address address
    * \param uint32_t payload size in bytes
    * \param uint8_t Flow identifier
+   * \param uint32_t& Bytes left
+   * \param uint32_t& Next min TxO
    * \return packet Packet to be transmitted to PHY
    */
-  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t& > TxOpportunityCallback;
+  typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t&, uint32_t&> TxOpportunityCallback;
 
   /**
    * Method to set Tx opportunity callback.

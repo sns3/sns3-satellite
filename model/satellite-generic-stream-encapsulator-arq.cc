@@ -168,7 +168,7 @@ SatGenericStreamEncapsulatorArq::DoDispose ()
 
 
 Ptr<Packet>
-SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
+SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
   NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
@@ -278,6 +278,9 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
 
   // Update bytes lefts
   bytesLeft = GetTxBufferSizeInBytes ();
+
+  // Update min TxO
+  nextMinTxO = GetMinTxOpportunityInBytes ();
 
   return packet;
 }

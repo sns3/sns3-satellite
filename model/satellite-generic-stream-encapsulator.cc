@@ -127,7 +127,7 @@ SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address /*mac*/)
 }
 
 Ptr<Packet>
-SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft)
+SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytesLeft);
 
@@ -158,14 +158,17 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       flowIdTag.SetFlowId (m_flowId);
       packet->AddPacketTag (flowIdTag);
 
-      // Update bytes left
-      bytesLeft = GetTxBufferSizeInBytes ();
-
       if (packet->GetSize () > bytes)
         {
           NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
         }
     }
+
+  // Update bytes lefts
+  bytesLeft = GetTxBufferSizeInBytes ();
+
+  // Update min TxO
+  nextMinTxO = GetMinTxOpportunityInBytes ();
 
   return packet;
 }

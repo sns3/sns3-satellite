@@ -168,6 +168,8 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
   NS_LOG_FUNCTION (this << payloadBytes << rcIndex);
 
   uint32_t schedBytes (0);
+  uint32_t bytesLeft (0);
+  uint32_t nextMinTxO (0);
 
   // User data packets are encapsulated within Frame PDU
   if (rcIndex != SatEnums::CONTROL_FID)
@@ -177,7 +179,7 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
 
   while (payloadBytes > 0)
     {
-      Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), rcIndex);
+      Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), rcIndex, bytesLeft, nextMinTxO);
       if (p)
         {
           NS_LOG_LOGIC ("Created a packet from RC: " << (uint32_t)(rcIndex) << " size: " << p->GetSize ());
