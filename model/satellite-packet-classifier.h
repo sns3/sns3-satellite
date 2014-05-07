@@ -24,6 +24,7 @@
 
 #include "ns3/simple-ref-count.h"
 #include "satellite-enums.h"
+#include "satellite-control-message.h"
 
 namespace ns3 {
 
@@ -46,12 +47,12 @@ public:
   virtual ~SatPacketClassifier ();
 
   /**
-   * Classify a control packet
-   * \param packet Packet to be classified
+   * Classify control message
+   * \param type Control msg type
    * \param dest Destination address
    * \return uint8_t Flow identifier
    */
-  uint8_t Classify (const Ptr<Packet> packet, const Address& dest) const;
+  uint8_t Classify (SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const;
 
   /**
    * Classify a packet based on IP header DSCP to a lower layer

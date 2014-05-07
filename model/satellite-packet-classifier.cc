@@ -41,20 +41,21 @@ SatPacketClassifier::~SatPacketClassifier ()
 }
 
 uint8_t
-SatPacketClassifier::Classify (const Ptr<Packet> packet, const Address& dest) const
+SatPacketClassifier::Classify (SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const
 {
-  NS_LOG_FUNCTION (this << packet->GetUid () << dest);
-  SatControlMsgTag tag;
-  bool mSuccess = packet->PeekPacketTag(tag);
-  if (mSuccess)
+  NS_LOG_FUNCTION (this << dest);
+
+  // ACKs are treated as user data, thus they are classified to be using the best effort
+  // flow id. Note, that in FWD link, the ACK is sent in RTN link back to the GW, thus
+  // the UT needs to have a lower layer service configured for BE RC index to be able to
+  // transmit the ACKs.
+  if (type == SatControlMsgTag::SAT_ARQ_ACK)
     {
-      return SatEnums::CONTROL_FID;
+      return SatEnums::BE_FID;
     }
-  else
-    {
-      NS_FATAL_ERROR ("Trying to classify a control packet but the packet does not contain a control tag!");
-    }
-  return SatEnums::BE_FID;
+
+  // By default the control messages are classified to control fid
+  return SatEnums::CONTROL_FID;
 }
 
 

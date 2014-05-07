@@ -90,6 +90,20 @@ public:
   typedef Callback<void,Ptr<const Packet> > ReceiveCallback;
 
   /**
+   * Callback to read control messages from container storing control messages.
+   * Real length of the control messages are simulated in a packet, but not structure.
+   * \param uint32_t ID of the message to read.
+   * \return Pointer to read packet. (NULL if not found).
+   */
+  typedef Callback<Ptr<SatControlMessage>, uint32_t> ReadCtrlMsgCallback;
+
+  /**
+   * Method to set read control message callback.
+   * \param cb callback to invoke whenever a control message is wanted to read.
+   */
+  void SetReadCtrlCallback (SatLlc::ReadCtrlMsgCallback cb);
+
+  /**
     *  Called from higher layer (SatNetDevice) to enque packet to LLC
     *
     * \param packet packet sent from above down to SatMac
@@ -118,18 +132,12 @@ public:
   virtual void Receive (Ptr<Packet> packet, Mac48Address macAddr);
 
   /**
-   * Receive a control msg (ARQ ACK) from lower layer.
-   * \param ack ARQ ACK message
-   * \param macAddr MAC address of the UT (either as transmitter or receiver)
-   */
-  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr);
-
-  /**
    * Receive HL PDU from encapsulator/decapsulator entity
    *
    * \param packet Pointer to packet received.
+   * \param macAddress  MAC address of the UT (either as transmitter or receiver)
    */
-  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet);
+  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr);
 
   /**
    * Set Receive callback to forward packet to upper layer
@@ -221,6 +229,13 @@ protected:
   void DoDispose ();
 
   /**
+   * Receive a control msg (ARQ ACK) from lower layer.
+   * \param ack ARQ ACK message
+   * \param macAddr MAC address of the UT (either as transmitter or receiver)
+   */
+  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr);
+
+  /**
    * Trace callback used for packet tracing:
    */
   TracedCallback<Time,
@@ -253,6 +268,11 @@ protected:
    * The upper layer package receive callback.
    */
   ReceiveCallback m_rxCallback;
+
+  /**
+   * The read control message callback.
+   */
+  SatLlc::ReadCtrlMsgCallback m_readCtrlCallback;
 
 };
 

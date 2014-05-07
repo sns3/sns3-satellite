@@ -374,7 +374,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
 
       Reset ();
 
-      m_rxCallback (packet);
+      m_rxCallback (packet, m_destAddress);
     }
 
   // START_PDU
@@ -427,7 +427,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
           else
             {
               m_currRxPacketFragment->AddAtEnd (packet);
-              m_rxCallback (m_currRxPacketFragment);
+              m_rxCallback (m_currRxPacketFragment, m_destAddress);
             }
         }
       else

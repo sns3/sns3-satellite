@@ -201,13 +201,6 @@ SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)
 }
 
 void
-SatMac::SetControlReceiveCallback (SatMac::ControlReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_controlRxCallback = cb;
-}
-
-void
 SatMac::SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);

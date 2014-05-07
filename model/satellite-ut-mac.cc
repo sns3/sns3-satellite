@@ -515,7 +515,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  ReceiveSignalingPacket (*i, ctrlTag);
+                  ReceiveSignalingPacket (*i);
                 }
               else
                 {
@@ -538,13 +538,22 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 }
 
 void
-SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
+SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
 
   // Remove the mac tag
   SatMacTag macTag;
   packet->PeekPacketTag (macTag);
+
+  // Peek control msg tag
+  SatControlMsgTag ctrlTag;
+  bool cSuccess = packet->PeekPacketTag (ctrlTag);
+
+  if (!cSuccess)
+    {
+      NS_FATAL_ERROR ("SatControlMsgTag not found in the packet!");
+    }
 
   switch (ctrlTag.GetMsgType ())
   {
@@ -559,26 +568,18 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
             NS_FATAL_ERROR ("TBTP not found, check that control message storage time is set long enough for superframe sequence!!!");
           }
 
-        packet->RemovePacketTag (macTag);
-
         ScheduleTimeSlots (tbtp);
+
+        packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (ctrlTag);
+
         break;
       }
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
-        // ARQ ACKs need to be forwarded to LLC/ARQ for processing
-        uint32_t ackId = ctrlTag.GetMsgId ();
-
-        Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage> (m_readCtrlCallback (ackId));
-
-        if ( ack == NULL )
-          {
-            NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
-          }
-
-        packet->RemovePacketTag (macTag);
+        // ARQ ACK messages are forwarded to LLC, since they may be fragmented
         Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
-        m_controlRxCallback (ack, destAddress);
+        m_rxCallback (packet, destAddress);
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:
@@ -599,6 +600,10 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag)
 
         m_randomAccess->SetCrdsaBackoffProbability (allocationChannelId, backoffProbability);
         m_randomAccess->SetCrdsaBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
+
+        packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (ctrlTag);
+
         break;
       }
     case SatControlMsgTag::SAT_CR_CTRL_MSG:

@@ -107,20 +107,6 @@ public:
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
   /**
-   * Callback to receive a control packet by upper layer.
-   * \param MAC address related to the received packet connection
-   * \param packet the packet received
-   */
-  typedef Callback<void, Ptr<SatArqAckMessage>, Mac48Address> ControlReceiveCallback;
-
-  /**
-   * Method to set control packet receive callback.
-   * \param cb callback to invoke whenever a packet has been received and must
-   *        be forwarded to the higher layers.
-   */
-  void SetControlReceiveCallback (SatMac::ControlReceiveCallback cb);
-
-  /**
    * Callback to read control messages from container storing control messages.
    * Real length of the control messages are simulated in a packet, but not structure.
    * \param uint32_t ID of the message to read.
@@ -200,11 +186,6 @@ protected:
    * The upper layer package receive callback.
    */
   SatMac::ReceiveCallback m_rxCallback;
-
-  /**
-   * The upper layer package receive callback.
-   */
-  SatMac::ControlReceiveCallback m_controlRxCallback;
 
   /**
    * The read control message callback.

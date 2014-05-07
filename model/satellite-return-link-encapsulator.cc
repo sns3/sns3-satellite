@@ -381,7 +381,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
 
       Reset ();
 
-      m_rxCallback (p);
+      m_rxCallback (p, m_sourceAddress);
     }
 
   // START_PPDU
@@ -434,7 +434,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
           else
             {
               m_currRxPacketFragment->AddAtEnd (p);
-              m_rxCallback (m_currRxPacketFragment);
+              m_rxCallback (m_currRxPacketFragment, m_sourceAddress);
             }
         }
       else

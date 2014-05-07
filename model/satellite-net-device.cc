@@ -443,7 +443,7 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
   tag.SetMsgId ( m_mac->WriteCtrlMsgToContainer (msg) );
   packet->AddPacketTag (tag);
 
-  uint8_t flowId = m_classifier->Classify (packet, dest);
+  uint8_t flowId = m_classifier->Classify (msg->GetMsgType (), dest);
 
   m_signallingTxTrace (packet, dest);
 

@@ -303,6 +303,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create Logical Link Control (LLC) layer
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
 
+  // Set the control msg read callback to LLC due to ARQ ACKs
+  llc->SetReadCtrlCallback (m_readCtrlCb);
+
   // Create a request manager and attach it to LLC, and set control message callback to RM
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
   llc->SetRequestManager (rm);
@@ -433,9 +436,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
-
-  // Attach the LLC receive callback to SatMac
-  mac->SetControlReceiveCallback (MakeCallback (&SatLlc::ReceiveAck, llc));
 
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));

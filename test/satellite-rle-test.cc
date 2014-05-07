@@ -56,7 +56,7 @@ public:
   /**
    * Receive packet and check that it is of correct size
    */
-  void Receive (Ptr<Packet> p);
+  void Receive (Ptr<Packet> p, Mac48Address macAddress);
 
 private:
   virtual void DoRun (void);
@@ -130,7 +130,7 @@ SatRleTestCase::DoRun (void)
   Simulator::Destroy ();
 }
 
-void SatRleTestCase::Receive (Ptr<Packet> p)
+void SatRleTestCase::Receive (Ptr<Packet> p, Mac48Address macAddr)
 {
   uint32_t rcvdPacketSize = p->GetSize ();
   m_rcvdPacketSizes.push_back (rcvdPacketSize);

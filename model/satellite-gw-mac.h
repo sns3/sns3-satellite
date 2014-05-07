@@ -143,9 +143,8 @@ private:
    *
    * \param sourceAddress Address of the packet sender.
    * \param packet Received signaling packet
-   * \param cType Control message type
    */
-  void ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, const SatControlMsgTag &ctrlTag);
+  void ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet);
 
   /**
    * Scheduler for the forward link.

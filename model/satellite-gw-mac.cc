@@ -149,9 +149,9 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
-          // Remove control msg tag
+          // Peek control msg tag
           SatControlMsgTag ctrlTag;
-          bool cSuccess = (*i)->RemovePacketTag (ctrlTag);
+          bool cSuccess = (*i)->PeekPacketTag (ctrlTag);
 
           if (cSuccess)
             {
@@ -161,7 +161,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
                 {
                   Mac48Address sourceAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
 
-                  ReceiveSignalingPacket (sourceAddress, *i, ctrlTag);
+                  ReceiveSignalingPacket (sourceAddress, *i);
                 }
               else
                 {
@@ -225,13 +225,22 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 }
 
 void
-SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet, const SatControlMsgTag &ctrlTag)
+SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
 
   // Remove the mac tag
   SatMacTag macTag;
   packet->PeekPacketTag (macTag);
+
+  // Peek control msg tag
+  SatControlMsgTag ctrlTag;
+  bool cSuccess = packet->PeekPacketTag (ctrlTag);
+
+  if (!cSuccess)
+    {
+      NS_FATAL_ERROR ("SatControlMsgTag not found in the packet!");
+    }
 
   switch (ctrlTag.GetMsgType ())
   {
@@ -251,6 +260,10 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
                 m_crReceiveCallback (m_beamId, sourceAddress, crMsg);
               }
           }
+
+        packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (ctrlTag);
+
         break;
       }
     case SatControlMsgTag::SAT_CN0_REPORT:
@@ -264,23 +277,17 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
           {
             m_fwdScheduler->CnoInfoUpdated (sourceAddress, cnoReport->GetCnoEstimate ());
           }
+
+        packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (ctrlTag);
+
         break;
       }
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
-        // ARQ ACKs need to be forwarded to LLC/ARQ for processing
-        uint32_t ackId = ctrlTag.GetMsgId ();
-
-        Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage> (m_readCtrlCallback (ackId));
-
-        if ( ack == NULL )
-          {
-            NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
-          }
-
-        packet->RemovePacketTag (macTag);
-        Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
-        m_controlRxCallback (ack, destAddress);
+        // ARQ ACK messages are forwarded to LLC, since they may be fragmented
+        Mac48Address sourceAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
+        m_rxCallback (packet, sourceAddress);
         break;
       }
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:

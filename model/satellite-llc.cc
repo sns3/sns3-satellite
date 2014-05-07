@@ -218,12 +218,39 @@ SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
 
 
 void
-SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet)
+SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  // Call a callback to receive the packet at upper layer
-  m_rxCallback (packet);
+  // Remove control msg tag
+  SatControlMsgTag ctrlTag;
+  bool cSuccess = packet->RemovePacketTag (ctrlTag);
+
+  if (cSuccess)
+    {
+      if (ctrlTag.GetMsgType() != SatControlMsgTag::SAT_ARQ_ACK)
+        {
+          NS_FATAL_ERROR ("A control message other than ARQ ACK received at the LLC!");
+        }
+
+      // ARQ ACKs need to be forwarded to LLC/ARQ for processing
+      uint32_t ackId = ctrlTag.GetMsgId ();
+
+      Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage> (m_readCtrlCallback (ackId));
+
+      if ( ack == NULL )
+        {
+          NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
+        }
+
+      ReceiveAck (ack, macAddr);
+    }
+  // Higher layer packet
+  else
+    {
+      // Call a callback to receive the packet at upper layer
+      m_rxCallback (packet);
+    }
 }
 
 void
@@ -395,6 +422,13 @@ SatLlc::GetNPacketsInQueue () const
     }
 
   return sum;
+}
+
+void
+SatLlc::SetReadCtrlCallback (SatLlc::ReadCtrlMsgCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_readCtrlCallback = cb;
 }
 
 

@@ -61,67 +61,6 @@ SatGwLlc::DoDispose ()
   SatLlc::DoDispose ();
 }
 
-bool
-SatGwLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
-{
-  NS_LOG_FUNCTION (this << packet << dest);
-  NS_LOG_LOGIC ("p=" << packet );
-  NS_LOG_LOGIC ("dest=" << dest );
-  NS_LOG_LOGIC ("UID is " << packet->GetUid ());
-
-  // UT: user own mac address
-  // GW: use destination address
-  Mac48Address mac;
-  EncapKey_t key;
-
-  SatControlMsgTag cTag;
-  bool found = packet->PeekPacketTag (cTag);
-
-  /**
-   * Currently only one control queue is assumed in both UT and GW. The control
-   * encapsulator is identified by a key with flowId == 0 and a broadcast MAC
-   * address. However, the control message encapsulator supports both unicast
-   * and broadcast control message transmissions.
-   */
-  if (found)
-    {
-      NS_ASSERT (flowId == 0);
-      mac = Mac48Address::GetBroadcast ();
-      key = std::make_pair<Mac48Address, uint8_t> (mac, flowId);
-    }
-  else
-    {
-      mac = Mac48Address::ConvertFrom (dest);
-      key = std::make_pair<Mac48Address, uint8_t> (mac, flowId);
-    }
-
-  EncapContainer_t::iterator it = m_encaps.find (key);
-
-  if (it != m_encaps.end ())
-    {
-      it->second->TransmitPdu (packet, Mac48Address::ConvertFrom (dest));
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Key: (" << mac << ", " << flowId << ") not found in the encapsulator container!");
-    }
-
-  SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
-
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
-                 SatEnums::PACKET_ENQUE,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_LLC,
-                 ld,
-                 SatUtils::GetPacketInfo (packet));
-
-  return true;
-}
-
 
 Ptr<Packet>
 SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft)

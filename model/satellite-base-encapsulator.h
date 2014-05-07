@@ -70,7 +70,7 @@ public:
    * Callback to send packet to lower layer.
     * \param Ptr<Packet> the packet received
     */
-  typedef Callback<void, Ptr<Packet> > ReceiveCallback;
+  typedef Callback<void, Ptr<Packet>, Mac48Address> ReceiveCallback;
 
   /**
    * Control msg sending callback

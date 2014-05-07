@@ -24,7 +24,7 @@ int
 main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
-  uint32_t endUsersPerUt (3);
+  uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (3);
   uint32_t packetSize (128);
   Time interval (Seconds(0.3));
@@ -38,7 +38,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   // Configure error model
-  double errorRate (0.10);
+  double errorRate (0.1);
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue(errorRate));
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_CONSTANT));
@@ -53,6 +53,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::WindowSize", UintegerValue(20));
   Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RetransmissionTimer", TimeValue(Seconds (0.6)));
   Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RxWaitingTime", TimeValue(Seconds (1.8)));
+
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=10]"));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
+
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=100]"));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(false));
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized

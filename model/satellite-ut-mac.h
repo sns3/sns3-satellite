@@ -334,9 +334,8 @@ private:
    * Signaling packet receiver, which handles all the signaling packet
    * receptions.
    * \param packet Received signaling packet
-   * \param cType Control message type
    */
-  void ReceiveSignalingPacket (Ptr<Packet> packet, SatControlMsgTag ctrlTag);
+  void ReceiveSignalingPacket (Ptr<Packet> packet);
 
   /**
    * \brief Function which is executed at every frame start.

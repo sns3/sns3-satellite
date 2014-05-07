@@ -287,6 +287,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Create Logical Link Control (LLC) layer
   Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
 
+  // Set the control msg read callback to LLC due to ARQ ACKs
+  llc->SetReadCtrlCallback (m_readCtrlCb);
+
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);
 
@@ -301,9 +304,6 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // Attach the device receive callback to SatLlc
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
-
-  // Attach the LLC receive callback to SatMac
-  mac->SetControlReceiveCallback (MakeCallback (&SatLlc::ReceiveAck, llc));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
