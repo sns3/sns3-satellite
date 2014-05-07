@@ -49,12 +49,21 @@ public:
   typedef std::vector<Ptr<SatTbtpMessage> > TbtpMsgContainer_t;
 
   /**
-   * Map container to store UT allocation information.
+   * Pair used to store UT allocation information.
    *
-   * key is UT's address and value is vector holding information of the allocated bytes
+   * first is vector holding information of the allocated bytes, and
+   * second is flag telling if control slot is allocated
    * for the UT/RC.
    */
-  typedef std::map<Address, std::vector<uint32_t> > UtAllocInfoContainer_t;
+  typedef std::pair< std::vector<uint32_t>, bool > UtAllocInfoItem_t;
+
+  /**
+   * Map container to store UT allocation information.
+   *
+   * key is UT's address and value is UtAllocInfoItem_t is vector holding information of the allocated bytes
+   * for the UT/RC.
+   */
+  typedef std::map<Address, UtAllocInfoItem_t > UtAllocInfoContainer_t;
 
   /**
    * Allocation information item for the UT/RC requests [bytes].
@@ -114,7 +123,8 @@ public:
   class SatFrameAllocReq
   {
   public:
-    double                            cno;
+    bool                              m_generateCtrlSlot;
+    double                            m_cno;
     Address                           m_address;
     SatFrameAllocReqItemContainer_t   m_reqPerRc;
 
@@ -123,7 +133,7 @@ public:
      *
      * \param req Allocation request per RC/CC
      */
-    SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : cno (NAN), m_reqPerRc (req) { }
+    SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : m_generateCtrlSlot (false), m_cno (NAN), m_reqPerRc (req) { }
   };
 
   /**
@@ -139,6 +149,7 @@ public:
   class SatFrameAllocInfo
   {
   public:
+    bool    m_ctrlSlotPresent;
     double  m_craSymbols;
     double  m_minRbdcSymbols;
     double  m_rbdcSymbols;
@@ -153,7 +164,8 @@ public:
      * Construct empty SatFrameAllocInfo.
      */
     SatFrameAllocInfo ()
-     : m_craSymbols (0.0),
+     : m_ctrlSlotPresent (false),
+       m_craSymbols (0.0),
        m_minRbdcSymbols (0.0),
        m_rbdcSymbols (0.0),
        m_vbdcSymbols (0.0)
@@ -164,7 +176,8 @@ public:
      * Construct empty SatFrameAllocInfo with given number of RCs.
      */
     SatFrameAllocInfo (uint8_t countOfRcs)
-     : m_craSymbols (0.0),
+     : m_ctrlSlotPresent (false),
+       m_craSymbols (0.0),
        m_minRbdcSymbols (0.0),
        m_rbdcSymbols (0.0),
        m_vbdcSymbols (0.0)
@@ -176,16 +189,17 @@ public:
      * Construct SatFrameAllocInfo from SatFrameAllocReqItem items.
      *
      * \param req Reference to container having SatFrameAllocReqItem items.
-     * \param waveForm  Waveform to use in allocation.
-     * \param frameDuration Frame duration
+     * \param waveForm  Waveform to use in allocation for TRC slots.
+     * \param ctrlSlotLength Slot length in symbols for control slots.
      */
-    SatFrameAllocInfo (SatFrameAllocReqItemContainer_t &req, Ptr<SatWaveform> waveForm, Time frameDuration)
-    : m_craSymbols (0.0),
+    SatFrameAllocInfo (SatFrameAllocReqItemContainer_t &req, Ptr<SatWaveform> trcWaveForm, bool ctrlSlotPresent, double ctrlSlotLength)
+    : m_ctrlSlotPresent (ctrlSlotPresent),
+      m_craSymbols (0.0),
       m_minRbdcSymbols (0.0),
       m_rbdcSymbols (0.0),
       m_vbdcSymbols (0.0)
     {
-      double byteInSymbols = waveForm->GetBurstLengthInSymbols () / (waveForm->GetPayloadInBytes ());
+      double byteInSymbols = trcWaveForm->GetBurstLengthInSymbols () / (trcWaveForm->GetPayloadInBytes ());
 
       for (SatFrameAllocReqItemContainer_t::const_iterator it = req.begin (); it != req.end (); it++ )
         {
@@ -195,6 +209,13 @@ public:
           reqInSymbols.m_minRbdcSymbols = byteInSymbols * it->m_minRbdcBytes;
           reqInSymbols.m_rbdcSymbols = byteInSymbols * it->m_rbdcBytes;
           reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes;
+
+          // if control slot should be allocated and RC index is 0
+          // add symbols needed for control slot to CRA symbols
+          if ( m_ctrlSlotPresent && (it == req.begin ()) )
+            {
+              reqInSymbols.m_craSymbols += ctrlSlotLength;
+            }
 
           m_craSymbols += reqInSymbols.m_craSymbols;
           m_minRbdcSymbols += reqInSymbols.m_minRbdcSymbols;
@@ -591,6 +612,21 @@ private:
        */
       Ptr<SatTimeSlotConf> CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft,
                                            int64_t& rcSymbolsLeft, double cno, bool rcBasedAllocationEnabled);
+
+      /**
+       * Create control time slot.
+       *
+       * \param carrierId Id of the carrier into create time slot
+       * \param utSymbolsToUse Symbols possible to allocated for the UT
+       * \param carrierSymbolsToUse Symbols possible to allocate to carrier
+       * \param utSymbolsLeft Symbols left for the UT
+       * \param rcSymbolsLeft Symbols left for RC
+       * \param rcBasedAllocationEnabled If time slot generated per RC
+       * \return Create time slot configuration
+       */
+      Ptr<SatTimeSlotConf> CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse, int64_t& utSymbolsLeft,
+                                               int64_t& rcSymbolsLeft, bool rcBasedAllocationEnabled);
+
   };
 
   /**

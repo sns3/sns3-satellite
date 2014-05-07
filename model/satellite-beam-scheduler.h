@@ -135,8 +135,10 @@ private:
        *
        * \param damaEntry DamaEntry for created UT info.
        * \param cnoEstimator C/N0 estimator for the UT info.
+       * \param controlSlotOffset Offset of the current moment to generate control slot.
+       * \param controlSlotsEnabled Flag to tell if control slots generation is enabled according to controlSlotOffset
        */
-      SatUtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator );
+      SatUtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator, Time controlSlotOffset, bool controlSlotsEnabled );
 
       /**
        * Get damaEntry of the UT info.
@@ -172,6 +174,20 @@ private:
        */
       void AddCrMsg (Ptr<SatCrMessage> crMsg);
 
+      /**
+       * Check if time is expired to send control slot.
+       *
+       * \return Status of control slot generation time.
+       */
+      bool IsControlSlotGenerationTime () const;
+
+      /**
+       * Set time for next time slot generation for this UT.
+       *
+       * \param offset Offset of the current moment to generate control slot.
+       */
+      void SetControlSlotGenerationTime (Time offset);
+
     private:
       /**
        * Container to store received CR messages.
@@ -181,7 +197,7 @@ private:
       /**
        * DamaEntry of this UT info.
        */
-      Ptr<SatDamaEntry>     m_damaEntry;
+      Ptr<SatDamaEntry>  m_damaEntry;
 
       /**
        *  Estimator for the C/N0.
@@ -191,8 +207,17 @@ private:
       /**
        *  Received CRs since last update round (call of the method UpdateDamaEntryFromCrs).
        */
-      CrMsgContainer_t      m_crContainer;
+      CrMsgContainer_t  m_crContainer;
 
+      /**
+       * Time to send next control time slot.
+       */
+      Time  m_controlSlotGenerationTime;
+
+      /**
+       * Flag to indicated if control time slots generation is enabled.
+       */
+      bool  m_controlSlotsEnabled;
   };
 
   /**
@@ -332,6 +357,16 @@ private:
    * Maximum size of the BB frame.
    */
   uint32_t m_maxBbFrameSize;
+
+  /**
+   * Interval to generate control time slots.
+   */
+  Time  m_controlSlotInterval;
+
+  /**
+   * Flag to indicated if control time slots generation is enabled.
+   */
+  bool  m_controlSlotsEnabled;
 
   /**
    * Trace for backlog requests done to beam scheduler.

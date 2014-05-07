@@ -142,7 +142,12 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
           rcIndices.push_back (i);
         }
 
-      std::random_shuffle (rcIndices.begin (), rcIndices.end ());
+      // we need to sort (or shuffle) only when there two RCs in addition to RC 0,
+      // because RC 0 is always first in the list
+      if ( rcIndices.size () > 2)
+        {
+          std::random_shuffle (rcIndices.begin (), rcIndices.end ());
+        }
 
       std::vector<uint32_t>::const_iterator currentRcIndex = rcIndices.begin ();
 
@@ -157,8 +162,30 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
       while ( utSymbolsLeft > 0 )
         {
-          Ptr<SatTimeSlotConf> timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse,
-                                                           utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno, rcBasedAllocationEnabled );
+          Ptr<SatTimeSlotConf> timeSlot = NULL;
+
+          if ( (currentRcIndex == rcIndices.begin ()) && m_utAllocs[*it].m_request.m_ctrlSlotPresent &&
+               (m_utAllocs[*it].m_allocation.m_ctrlSlotPresent == false ))
+            {
+              timeSlot = CreateCtrlTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse,
+                                                              utSymbolsLeft, rcSymbolsLeft, rcBasedAllocationEnabled );
+
+              if ( timeSlot )
+                {
+                  m_utAllocs[*it].m_allocation.m_ctrlSlotPresent = true;
+                }
+              else
+                {
+                  timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse,
+                                              utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno, rcBasedAllocationEnabled );
+                }
+            }
+          else
+            {
+
+              timeSlot = CreateTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse,
+                                                             utSymbolsLeft, rcSymbolsLeft, m_utAllocs[*it].m_cno, rcBasedAllocationEnabled );
+            }
 
           if ( timeSlot )
             {
@@ -187,7 +214,10 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
 
               if ( utAlloc == utAllocContainer.end () )
                 {
-                  std::vector<uint32_t> rcAllocs = std::vector<uint32_t> (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.size (), 0);
+                  UtAllocInfoItem_t rcAllocs;
+
+                  rcAllocs.second = false;
+                  rcAllocs.first = std::vector<uint32_t> (m_utAllocs[*it].m_allocation.m_allocInfoPerRc.size (), 0);
 
                   std::pair<UtAllocInfoContainer_t::iterator, bool> result = utAllocContainer.insert (std::make_pair (*it, rcAllocs ));
 
@@ -201,7 +231,8 @@ SatFrameAllocator::SatFrameInfo::GenerateTimeSlots (std::vector<Ptr<SatTbtpMessa
                     }
                 }
 
-               utAlloc->second[*currentRcIndex] += m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ())->GetPayloadInBytes ();
+               utAlloc->second.first[*currentRcIndex] += m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ())->GetPayloadInBytes ();
+               utAlloc->second.second |= m_utAllocs[*it].m_allocation.m_ctrlSlotPresent;
             }
 
           if ( carrierSymbolsToUse <= 0)
@@ -290,7 +321,7 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
               if ( waveformFound )
                 {
                   Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-                  timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId);
+                  timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_TRC);
 
                   carrierSymbolsToUse -= timeSlotSymbols;
                   utSymbolsToUse -= timeSlotSymbols;
@@ -315,6 +346,42 @@ SatFrameAllocator::SatFrameInfo::CreateTimeSlot (uint16_t carrierId, int64_t& ut
             break;
         }
       }
+
+  return timeSlotConf;
+}
+
+Ptr<SatTimeSlotConf>
+SatFrameAllocator::SatFrameInfo::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse,
+                                                     int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, bool rcBasedAllocationEnabled)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatTimeSlotConf> timeSlotConf = NULL;
+  int64_t symbolsToUse = std::min<int64_t> (carrierSymbolsToUse, utSymbolsToUse);
+
+  int64_t timeSlotSymbols = m_waveformConf->GetDefaultBurstLength ();
+
+  if ( timeSlotSymbols <= symbolsToUse )
+    {
+      uint32_t waveformId = m_waveformConf->GetDefaultWaveformId ();
+
+      Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+      timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_C);
+
+      carrierSymbolsToUse -= timeSlotSymbols;
+      utSymbolsToUse -= timeSlotSymbols;
+
+      if ( rcBasedAllocationEnabled )
+        {
+          utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
+        }
+      else
+        {
+          utSymbolsLeft -= timeSlotSymbols;
+        }
+
+      rcSymbolsLeft -= timeSlotSymbols;
+    }
 
   return timeSlotConf;
 }
@@ -1001,14 +1068,14 @@ SatFrameAllocator::AllocateToFrame (SatFrameAllocReq * allocReq)
           break;
 
         case SatSuperframeConf::CONFIG_TYPE_1:
-            if ( m_waveformConf->GetBestWaveformId ( allocReq->cno, it->second.GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLength ()))
+            if ( m_waveformConf->GetBestWaveformId ( allocReq->m_cno, it->second.GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLength ()))
               {
                 supportedFrames.insert (std::make_pair (it->first, waveFormId));
               }
           break;
 
         case SatSuperframeConf::CONFIG_TYPE_2:
-          if ( m_waveformConf->GetBestWaveformId ( allocReq->cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
+          if ( m_waveformConf->GetBestWaveformId ( allocReq->m_cno, it->second.GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH) )
             {
               supportedFrames.insert (std::make_pair (it->first, waveFormId));
             }
@@ -1075,12 +1142,11 @@ SatFrameAllocator::AllocateBasedOnCc (SatFrameInfo::CcLevel_t ccLevel, SatFrameA
         }
     }
 
-  Time frameDuration = m_frameInfos.at (selectedFrame).GetDuration ();
-
   // convert bytes to symbols based on wave form
-  SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq->m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)), frameDuration );
+  SatFrameAllocInfo reqSymbols = SatFrameAllocInfo (allocReq->m_reqPerRc, m_waveformConf->GetWaveform (frames.at (selectedFrame)),
+                                                    allocReq->m_generateCtrlSlot, m_waveformConf->GetDefaultBurstLength () );
 
-  return m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq->m_address, allocReq->cno, reqSymbols);
+  return m_frameInfos.at (selectedFrame).Allocate (ccLevel, allocReq->m_address, allocReq->m_cno, reqSymbols);
 }
 
 } // namespace ns3

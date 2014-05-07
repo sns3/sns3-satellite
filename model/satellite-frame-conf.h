@@ -103,6 +103,17 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
 public:
 
   /**
+   * Types for time slot.
+   */
+  typedef enum
+  {
+    SLOT_TYPE_C, //!< Control slot
+    SLOT_TYPE_TR,//!< User traffic slot
+    SLOT_TYPE_TRC//!< User or traffic slot
+
+  } SatTimeSlotType_t;
+
+  /**
    * Default constructor for SatTimeSlotConf
    */
   SatTimeSlotConf ();
@@ -113,8 +124,9 @@ public:
    * \param startTime       Start time of time slot in side frame.
    * \param waveFormId      Wave form id of time slot
    * \param carrierId       Carrier id of time slot
+   * \param slotType        Time slot type
    */
-  SatTimeSlotConf (Time startTime, uint32_t waveFormId, uint16_t carrierId);
+  SatTimeSlotConf (Time startTime, uint32_t waveFormId, uint16_t carrierId, SatTimeSlotConf::SatTimeSlotType_t slotType);
 
   /**
    * Destructor for SatTimeSlotConf
@@ -156,12 +168,27 @@ public:
    */
   inline uint8_t GetRcIndex () { return m_rcIndex; }
 
+  /**
+   * Get time slot type.
+   *
+   * \return Type of the time slot.
+   */
+  inline SatTimeSlotConf::SatTimeSlotType_t GetSlotType () const { return m_slotType; }
+
+  /**
+   * Set time slot type.
+   *
+   * \param Type of the time slot to set.
+   */
+  inline void SetSlotType (SatTimeSlotConf::SatTimeSlotType_t slotType) { m_slotType = slotType; }
+
 private:
   Time     m_startTime;
   uint32_t m_waveFormId;
   uint16_t m_frameCarrierId;
   uint8_t  m_rcIndex;
 
+  SatTimeSlotType_t m_slotType;
 };
 
 /**

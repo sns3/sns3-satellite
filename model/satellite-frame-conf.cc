@@ -69,17 +69,19 @@ SatTimeSlotConf::SatTimeSlotConf ()
 : m_startTime (0),
   m_waveFormId (0),
   m_frameCarrierId (0),
-  m_rcIndex (0)
+  m_rcIndex (0),
+  m_slotType (SatTimeSlotConf::SLOT_TYPE_TRC)
 {
   // default constructor should not be used
   NS_ASSERT (false);
 }
 
-SatTimeSlotConf::SatTimeSlotConf (Time startTime, uint32_t waveFormId, uint16_t frameCarrierId)
+SatTimeSlotConf::SatTimeSlotConf (Time startTime, uint32_t waveFormId, uint16_t frameCarrierId, SatTimeSlotConf::SatTimeSlotType_t slotType)
   : m_startTime (startTime),
     m_waveFormId (waveFormId),
     m_frameCarrierId (frameCarrierId),
-    m_rcIndex (0)
+    m_rcIndex (0),
+    m_slotType (slotType)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -604,7 +606,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
                 {
                   for (uint32_t j = 0; j < slotCount; j++)
                     {
-                      Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defaultWaveFormId, i);
+                      Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defaultWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
                       frameConf->AddTimeSlotConf (timeSlot);
                     }
                 }
