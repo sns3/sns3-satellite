@@ -698,13 +698,13 @@ SatPhyRxCarrier::DoFrameEnd ()
           MeasureRandomAccessLoad ();
         }
 
-      if (m_crdsaPacketContainer.size () > 0)
+      if (!m_crdsaPacketContainer.empty ())
         {
           NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Packets in container, will process the frame");
 
           std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> results = ProcessFrame ();
 
-          if (m_crdsaPacketContainer.size () > 0)
+          if (!m_crdsaPacketContainer.empty ())
             {
               NS_FATAL_ERROR("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
             }
@@ -759,7 +759,7 @@ SatPhyRxCarrier::DoFrameEnd ()
     }
   else
     {
-      if (m_crdsaPacketContainer.size () > 0)
+      if (!m_crdsaPacketContainer.empty ())
         {
           NS_FATAL_ERROR ("SatPhyRxCarrier::DoFrameEnd - CRDSA packets received by carrier which has random access disabled");
         }
