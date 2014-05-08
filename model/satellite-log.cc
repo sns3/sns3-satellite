@@ -33,7 +33,11 @@ SatLog::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLog")
     .SetParent<Object> ()
-    .AddConstructor<SatLog> ();
+    .AddConstructor<SatLog> ()
+    .AddAttribute ("SimulationTag", "The simulation specific tag which is appended to the log file name",
+                    StringValue (""),
+                    MakeStringAccessor (&SatLog::m_simulationTag),
+                    MakeStringChecker ());
   return tid;
 }
 
@@ -46,14 +50,9 @@ SatLog::GetInstanceTypeId (void) const
 }
 
 SatLog::SatLog () :
-  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ())
+  m_simulationTag ("")
 {
   NS_LOG_FUNCTION (this);
-
-  CreateLog (LOG_GENERIC,"");
-  CreateLog (LOG_INFO,"_info");
-  CreateLog (LOG_WARNING,"_warning");
-  CreateLog (LOG_ERROR,"_error");
 }
 
 SatLog::~SatLog ()
@@ -82,39 +81,45 @@ SatLog::Reset ()
 
       m_container.clear ();
     }
+  m_simulationTag = "";
 }
 
 Ptr<SatOutputFileStreamStringContainer>
-SatLog::CreateLog (LogType_t logType, std::string tag)
+SatLog::CreateLog (LogType_t logType, std::string fileTag)
 {
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/data");
 
-  filename << m_currentWorkingDirectory << "/src/satellite/data/logs/log" << tag;
+  filename << dataPath << "/logs/log" << fileTag << m_simulationTag;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (logType, CreateObject<SatOutputFileStreamStringContainer> (filename.str ().c_str (), std::ios::out)));
+  key_t key = std::make_pair (logType, fileTag);
+
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamStringContainer> (filename.str ().c_str (), std::ios::out)));
 
   if (result.second == false)
     {
-      NS_FATAL_ERROR ("SatLog::AddLog failed");
+      NS_FATAL_ERROR ("SatLog::CreateLog failed");
     }
 
-  NS_LOG_INFO ("SatLog::AddLog: Added log with tag " << tag);
+  NS_LOG_INFO ("SatLog::CreateLog - Created type " << logType << " log with file tag " << fileTag << " and simulation tag " << m_simulationTag);
 
   return result.first->second;
 }
 
 Ptr<SatOutputFileStreamStringContainer>
-SatLog::FindLog (LogType_t logType)
+SatLog::FindLog (LogType_t logType, std::string fileTag)
 {
   NS_LOG_FUNCTION (this);
 
-  container_t::iterator iter = m_container.find (logType);
+  key_t key = std::make_pair (logType, fileTag);
+
+  container_t::iterator iter = m_container.find (key);
 
   if (iter == m_container.end ())
     {
-      NS_FATAL_ERROR ("SatLog::FindLog - No log for key " << logType);
+      return CreateLog (logType, fileTag);
     }
 
   return iter->second;
@@ -134,26 +139,64 @@ SatLog::WriteToFile ()
 }
 
 void
-SatLog::AddToLog (LogType_t logType, std::string newLine)
+SatLog::AddToLog (LogType_t logType, std::string fileTag, std::string message)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatOutputFileStreamStringContainer> log = FindLog (logType);
+  if (logType != LOG_CUSTOM)
+    {
+      fileTag = GetFileTag (logType);
+    }
+
+  Ptr<SatOutputFileStreamStringContainer> log = FindLog (logType, fileTag);
+
+  NS_LOG_INFO ("SatLog::AddToLog - Type: " << logType << ", file tag: " << fileTag << ", message: " << message);
 
   if (log != NULL)
     {
-      log->AddToContainer (newLine);
+      log->AddToContainer (message);
     }
+}
 
-  if (logType != LOG_GENERIC)
-    {
-      Ptr<SatOutputFileStreamStringContainer> log_all = FindLog (LOG_GENERIC);
+std::string
+SatLog::GetFileTag (LogType_t logType)
+{
+  std::string fileTag = "";
 
-      if (log_all != NULL)
-        {
-          log_all->AddToContainer (newLine);
-        }
-    }
+  switch (logType)
+  {
+    case LOG_GENERIC:
+      {
+        fileTag = "";
+        break;
+      }
+    case LOG_INFO:
+      {
+        fileTag = "_info";
+        break;
+      }
+    case LOG_WARNING:
+      {
+        fileTag = "_warning";
+        break;
+      }
+    case LOG_ERROR:
+      {
+        fileTag = "_error";
+        break;
+      }
+    case LOG_CUSTOM:
+      {
+        NS_FATAL_ERROR ("SatLog::GetFileTag - This function should not be called for custom logs");
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatLog::GetFileTag - Invalid log type");
+        break;
+      }
+  }
+  return fileTag;
 }
 
 } // namespace ns3

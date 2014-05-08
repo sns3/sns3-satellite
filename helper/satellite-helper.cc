@@ -126,6 +126,12 @@ SatHelper::SatHelper (std::string scenarioName)
   // uncomment next line, if attributes are needed already in construction phase
   //ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_GENERIC, "", "Logging for generic messages started");
+  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_INFO, "", "Logging for info messages started");
+  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", "Logging for warning messages started");
+  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_ERROR, "", "Logging for error messages started");
+  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_CUSTOM, "_customTag", "Logging for custom messages started");
+
   std::string path = "src/satellite/data/";
 
   std::string satConf = scenarioName + "Conf.txt";
