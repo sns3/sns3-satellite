@@ -114,7 +114,7 @@ SatSuperframeAllocator::RemoveAllocations ()
 
   for (FrameAllocatorContainer_t::iterator it = m_frameAllocators.begin (); it != m_frameAllocators.end (); it++  )
     {
-      (*it)->ResetCounters ();
+      (*it)->Reset ();
     }
 }
 
@@ -135,7 +135,7 @@ SatSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t
 }
 
 void
-SatSuperframeAllocator::AllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs)
+SatSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs)
 {
   NS_LOG_FUNCTION (this);
 
@@ -148,7 +148,7 @@ SatSuperframeAllocator::AllocateSymbols (SatFrameAllocator::SatFrameAllocContain
 
   for (FrameAllocatorContainer_t::iterator it = m_frameAllocators.begin (); it != m_frameAllocators.end (); it++  )
     {
-      (*it)->AllocateSymbols (m_targetLoad, m_fcaEnabled);
+      (*it)->PreAllocateSymbols (m_targetLoad, m_fcaEnabled);
     }
 }
 

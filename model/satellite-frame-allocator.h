@@ -39,6 +39,17 @@ namespace ns3 {
  *
  * SatFrameAllocator is created and used by SatSuperframeAllocator.
  *
+ * After created this class is used by adding first requests (UTs) to it by calling method Allocate
+ * with proper parameters. When needed allocations are done, symbols are shared between UTs by calling
+ * PreAllocateSymbols. Finally time slots for UT can be generated for UT according to preallocation by
+ * calling method GenerateTimeSlots. GenerateTimeSlots method can be called as several time, if same preallocation
+ * is wanted to use.
+ *
+ * NOTE! Calling of PreAllocation or Allocate methods has no effect when PreAllocation
+ * is once called until Reset method is called.
+ *
+ * Methods GetBestWaveform and GetCcLoad are used to check status of the frame allocator to decide
+ * if UT should be allocated to this allocator (frame) or not.
  */
 class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
 {
@@ -129,29 +140,18 @@ public:
   SatFrameAllocator (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, SatSuperframeConf::ConfigType_t m_configType);
 
   /**
-   * Reset load counters in frame info.
+   * Reset frame allocator.
    */
-  void ResetCounters ();
+  void Reset ();
 
   /**
-   * Allocate symbols to all UTs with RCs allocated to the frame.
-   * \param targetLoad Target load limits upper bound of the symbols in the frame. Valid values in range 0 and 1.
-   * \param fcaEnabled FCA (free capacity allocation) enable status
-   */
-  void AllocateSymbols (double targetLoad, bool fcaEnabled);
-
-  /**
-   * Generate time slots for UT/RCs .
+   * Get the best waveform supported by this allocator based on given C/N0.
    *
-   * \param tbtpContainer TBTP message container to add/fill TBTPs.
-   * \param maxFrameSizeInBytes Maximum size for a TBTP message.
-   * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
-   * \param rcBasedAllocationEnabled If time slot generated per RC
-   * \param waveformTrace Wave form trace callback
-   * \param utLoadTrace UT load per the frame trace callback
-   */
-  void GenerateTimeSlots ( std::vector<Ptr<SatTbtpMessage> >& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
-                           bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
+   *  \param cno C/N0 value used to find the best waveform
+   *  \param waveFormId variable to store the best waveform id
+   *  \return true if allocator can support given C/N0
+   **/
+  bool GetBestWaveform (double cno, uint32_t & waveFormId) const;
 
   /**
    * Get frame load by requested CC
@@ -171,13 +171,25 @@ public:
   bool Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uint32_t waveformId);
 
   /**
-   * Get the best waveform supported by this allocator based on given C/N0.
+   * Preallocate symbols for all UTs with RCs allocated to the frame.
+   * \param targetLoad Target load limits upper bound of the symbols in the frame. Valid values in range 0 and 1.
+   * \param fcaEnabled FCA (free capacity allocation) enable status
+   */
+  void PreAllocateSymbols (double targetLoad, bool fcaEnabled);
+
+  /**
+   * Generate time slots for UT/RCs i.e. do actual allocation based on preallocation.
    *
-   *  \param cno C/N0 value used to find the best waveform
-   *  \param waveFormId variable to store the best waveform id
-   *  \return true if allocator can support given C/N0
-   **/
-  bool GetBestWaveform (double cno, uint32_t & waveFormId) const;
+   * \param tbtpContainer TBTP message container to add/fill TBTPs.
+   * \param maxFrameSizeInBytes Maximum size for a TBTP message.
+   * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
+   * \param rcBasedAllocationEnabled If time slot generated per RC
+   * \param waveformTrace Wave form trace callback
+   * \param utLoadTrace UT load per the frame trace callback
+   */
+  void GenerateTimeSlots ( SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
+                           bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
+
 
 private:
   /**
@@ -334,6 +346,8 @@ private:
     CcReqType_t m_ccReqType;
   };
 
+  bool m_allocationDenied;
+
   // total symbols in frame.
   double  m_totalSymbolsInFrame;
 
@@ -440,6 +454,46 @@ private:
    */
   void AcceptRequests (CcLevel_t ccLevel);
 
+  /**
+   * Sort UTs allocated to this frame.
+   *
+   * \return Addressed of the UTs in sorted order.
+   */
+  std::vector<Address> SortUts ();
+
+  /**
+   * Sort carriers belonging to this frame.
+   *
+   * \return Ids of the carriers in sorted order.
+   */
+  std::vector<uint16_t> SortCarriers ();
+
+  /**
+   * Sort RCs in given UT.
+   *
+   * \param ut Address of the UT which RCs is needed to sort
+   * \return Indices of the UT RC indices in sorted order.
+   */
+  std::vector<uint32_t> SortUtRcs (Address ut);
+
+  /**
+   *  Get UT allocation item from given container. If UT not available in the
+   *  container new UT specific item is added to container.
+   *
+   * \param allocContainer Container to check
+   * \param ut Address of the UT
+   * \return Iterator to UT specific allocation item
+   */
+  SatFrameAllocator::UtAllocInfoContainer_t::iterator GetUtAllocItem (UtAllocInfoContainer_t& allocContainer, Address ut);
+
+  /**
+   *  Creates new TBTP to given container with information of the
+   *  last TBTP in container.
+   *
+   * \param tbtpContainer TBTP container
+   * \return Pointer to created TBTP
+   */
+  Ptr<SatTbtpMessage> CreateNewTbtp (TbtpMsgContainer_t& tbtpContainer);
 };
 
 } // namespace ns3

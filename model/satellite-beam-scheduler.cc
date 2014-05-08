@@ -259,7 +259,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute("Max", DoubleValue (maxIndex));
-  m_frameAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (m_currentSequence), m_superframeSeq->GetWaveformConf (), maxRcCount);
+  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (m_currentSequence), m_superframeSeq->GetWaveformConf (), maxRcCount);
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
@@ -286,7 +286,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
   // this method call acts as CAC check, if allocation fails fatal error is occurred.
-  m_frameAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_frameAllocator->GetSuperframeDuration ()));
+  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()));
 
   Time firstCtrlSlotInterval = m_controlSlotInterval;
 
@@ -398,7 +398,7 @@ SatBeamScheduler::Schedule ()
       SatFrameAllocator::UtAllocInfoContainer_t utAllocs;
 
         // Add DA slots to TBTP(s)
-      m_frameAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace);
+      m_superframeAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace);
 
       // update VBDC counter of the UT/RCs
       UpdateDamaEntriesWithAllocs (utAllocs);
@@ -544,7 +544,7 @@ void SatBeamScheduler::DoPreResourceAllocation ()
         }
 
       // request capacity for UTs from frame allocator
-      m_frameAllocator->AllocateSymbols (allocReqs);
+      m_superframeAllocator->PreAllocateSymbols (allocReqs);
     }
 }
 

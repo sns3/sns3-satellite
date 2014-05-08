@@ -201,8 +201,6 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
 public:
 
   typedef std::vector<Ptr<SatTimeSlotConf> >              SatTimeSlotConfContainer_t;
-  typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
-
 
   static const uint16_t maxTimeSlotCount = 2048;
   static const uint16_t maxTimeSlotIndex = maxTimeSlotCount - 1;
@@ -216,12 +214,13 @@ public:
    * Constructor for SatFrameConf.
    *
    * \param bandwidthHz       Bandwidth of the frame in hertz
-   * \param duration          Duration of the frame
+   * \param targetDuration    Target duration of the frame
    * \param btu               BTU configuration of the frame
-   * \param timeSlots         Time slot of the frame.
+   * \param waveform          Waveform used in creation
+   * \param isRandomAccess    Flag telling if random access frame
    */
-  SatFrameConf ( double bandwidthHz, Time duration, Ptr<SatBtuConf> btu,
-                 SatTimeSlotConfMap_t& timeSlots, bool isRandomAccess );
+  SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btu,
+                 Ptr<SatWaveform> waveform, bool isRandomAccess );
 
   /**
    * Destructor for SatFrameConf
@@ -229,15 +228,7 @@ public:
   ~SatFrameConf ();
 
   /**
-   * Add time slot.
-   *
-   * \param conf  Time slot configuration added.
-   * \return ID of the added time slot.
-   */
-  uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
-
-  /**
-   * Get time slot conf of the frame. Possible values for id are from 0 to 2047.
+   * Get time slot configuration of the frame. Possible values for id are from 0 to 2047.
    *
    * \param index Id of the time slot requested in frame.
    * \return      The requested time slot configuration of frame.
@@ -278,34 +269,9 @@ public:
    * Get carrier bandwidth in frame.
    *
    * \param bandwidthType Type of bandwidth requested.
-   *
    * \return The carrier bandwidth in frame in hertz.
    */
-  inline double GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthType) const
-  {
-    double bandwidth = 0.0;
-
-    switch (bandwidthType)
-    {
-      case SatEnums::ALLOCATED_BANDWIDTH:
-        bandwidth = m_btu->GetAllocatedBandwidthInHz();
-        break;
-
-      case SatEnums::OCCUPIED_BANDWIDTH:
-        bandwidth = m_btu->GetOccupiedBandwidthInHz();
-        break;
-
-      case SatEnums::EFFECTIVE_BANDWIDTH:
-        bandwidth = m_btu->GetEffectiveBandwidthInHz();
-        break;
-
-      default:
-        NS_FATAL_ERROR ("Invalid bandwidth type!!!");
-        break;
-    }
-
-    return bandwidth;
-  }
+  double GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
    * Get BTU conf of the frame.
@@ -344,6 +310,8 @@ public:
   inline bool IsRandomAccess () const { return m_isRandomAccess;}
 
 private:
+  typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
+
   double    m_bandwidthHz;
   Time      m_duration;
   bool      m_isRandomAccess;
@@ -351,6 +319,14 @@ private:
   Ptr<SatBtuConf>                 m_btu;
   uint16_t                        m_carrierCount;
   SatTimeSlotConfMap_t            m_timeSlotConfMap;
+
+  /**
+   * Add time slot.
+   *
+   * \param conf  Time slot configuration added.
+   * \return ID of the added time slot.
+   */
+  uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
 };
 
 
@@ -429,13 +405,6 @@ public:
    * Destructor for SatSuperframeConf
    */
   ~SatSuperframeConf ();
-
-  /**
-   * Add frame configuration to super frame configuration.
-   *
-   * \param conf  Frame configuration to add super frame configuration
-   */
-  void AddFrameConf (Ptr<SatFrameConf> conf);
 
   /**
    * Get bandwidth of the super frame.
@@ -633,6 +602,13 @@ private:
    * \return frame id where given global carrier ID belongs to.
    */
   uint8_t GetCarrierFrame (uint32_t carrierId) const;
+
+  /**
+   * Add frame configuration to super frame configuration.
+   *
+   * \param conf  Frame configuration to add super frame configuration
+   */
+  void AddFrameConf (Ptr<SatFrameConf> conf);
 
 public:
   // macro to ease definition of access methods for frame specific attributes

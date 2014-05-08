@@ -76,10 +76,10 @@ public:
   void ReserveMinimumRate (uint32_t minimumRateBytes);
 
   /**
-   * Allocate symbols to UTs in all frames.
-   * Allocation is done in fairly manner between UTs and RCs.
+   * Preallocate symbols for given to UTs in superframe.
+   * Pre-allocation is done in fairly manner between UTs and RCs.
    */
-  void AllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
+  void PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
 
   /**
    * Generate time slots in TBTP(s) for the UT/RC.

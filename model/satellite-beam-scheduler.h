@@ -335,9 +335,9 @@ private:
   Time m_cnoEstimationWindow;
 
   /**
-   * Frame allocator to maintain load information of the frames and their configurations.
+   * Superframe allocator to maintain load information of the frames and their configurations.
    */
-  Ptr<SatSuperframeAllocator>  m_frameAllocator;
+  Ptr<SatSuperframeAllocator>  m_superframeAllocator;
 
   /**
    * Maximum two-way propagation delay estimate between GW-SAT-UT-SAT-GW.
