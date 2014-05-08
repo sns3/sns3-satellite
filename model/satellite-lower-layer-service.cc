@@ -317,7 +317,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, false, false, false, 100, 9216, 50, 384)
     .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, false, false, false, 100, 9216, 50, 384)
 
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 6, 2, 50, 100, 10000, 30000, 3, 0.5)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 4, 2, 250, 500, 10000, 30000, 3, 0.5)
   ;
 
   return tid;
