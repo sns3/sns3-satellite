@@ -50,10 +50,10 @@ SatLog::SatLog () :
 {
   NS_LOG_FUNCTION (this);
 
-  CreateLog (0,"");
-  CreateLog (1,"_info");
-  CreateLog (2,"_warning");
-  CreateLog (3,"_error");
+  CreateLog (LOG_GENERIC,"");
+  CreateLog (LOG_INFO,"_info");
+  CreateLog (LOG_WARNING,"_warning");
+  CreateLog (LOG_ERROR,"_error");
 }
 
 SatLog::~SatLog ()
@@ -85,7 +85,7 @@ SatLog::Reset ()
 }
 
 Ptr<SatOutputFileStreamStringContainer>
-SatLog::CreateLog (uint32_t key, std::string tag)
+SatLog::CreateLog (LogType_t logType, std::string tag)
 {
   NS_LOG_FUNCTION (this);
 
@@ -93,7 +93,7 @@ SatLog::CreateLog (uint32_t key, std::string tag)
 
   filename << m_currentWorkingDirectory << "/src/satellite/data/logs/log" << tag;
 
-  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamStringContainer> (filename.str ().c_str (), std::ios::out)));
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (logType, CreateObject<SatOutputFileStreamStringContainer> (filename.str ().c_str (), std::ios::out)));
 
   if (result.second == false)
     {
@@ -106,15 +106,15 @@ SatLog::CreateLog (uint32_t key, std::string tag)
 }
 
 Ptr<SatOutputFileStreamStringContainer>
-SatLog::FindLog (uint32_t key)
+SatLog::FindLog (LogType_t logType)
 {
   NS_LOG_FUNCTION (this);
 
-  container_t::iterator iter = m_container.find (key);
+  container_t::iterator iter = m_container.find (logType);
 
   if (iter == m_container.end ())
     {
-      NS_FATAL_ERROR ("SatLog::FindLog - No log for key " << key);
+      NS_FATAL_ERROR ("SatLog::FindLog - No log for key " << logType);
     }
 
   return iter->second;
@@ -134,20 +134,20 @@ SatLog::WriteToFile ()
 }
 
 void
-SatLog::AddToLog (key_t key, std::string newLine)
+SatLog::AddToLog (LogType_t logType, std::string newLine)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatOutputFileStreamStringContainer> log = FindLog (key);
+  Ptr<SatOutputFileStreamStringContainer> log = FindLog (logType);
 
   if (log != NULL)
     {
       log->AddToContainer (newLine);
     }
 
-  if (key != 0)
+  if (logType != LOG_GENERIC)
     {
-      Ptr<SatOutputFileStreamStringContainer> log_all = FindLog (0);
+      Ptr<SatOutputFileStreamStringContainer> log_all = FindLog (LOG_GENERIC);
 
       if (log_all != NULL)
         {

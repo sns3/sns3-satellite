@@ -44,9 +44,20 @@ class SatLog : public Object
 public:
 
   /**
+   * \brief Enum for log types
+   */
+  typedef enum
+  {
+    LOG_GENERIC = 0,//!< LOG_GENERIC
+    LOG_INFO = 1,   //!< LOG_INFO
+    LOG_WARNING = 2,//!< LOG_WARNING
+    LOG_ERROR = 3   //!< LOG_ERROR
+  } LogType_t;
+
+  /**
    * \brief typedef for map of containers
    */
-  typedef std::map <uint32_t, Ptr<SatOutputFileStreamStringContainer> > container_t;
+  typedef std::map <LogType_t, Ptr<SatOutputFileStreamStringContainer> > container_t;
 
   /**
    * \brief Constructor
@@ -77,10 +88,10 @@ public:
 
   /**
    * \brief Function for adding a line to a specific log
-   * \param key key to log
+   * \param logType log type
    * \param newLine line to be added
    */
-  void AddToLog (key_t key, std::string newLine);
+  void AddToLog (LogType_t logType, std::string newLine);
 
   /**
    * \brief Function for resetting the variables
@@ -91,18 +102,18 @@ private:
 
   /**
    * \brief Function for creating a log
-   * \param key key to the log
+   * \param logType log type
    * \param tag tag for the filename
    * \return the created log
    */
-  Ptr<SatOutputFileStreamStringContainer> CreateLog (uint32_t key, std::string tag);
+  Ptr<SatOutputFileStreamStringContainer> CreateLog (LogType_t logType, std::string tag);
 
   /**
    * \brief Function for finding a log based on the key
-   * \param key key for the log
+   * \param logType log type
    * \return the log
    */
-  Ptr<SatOutputFileStreamStringContainer> FindLog (uint32_t key);
+  Ptr<SatOutputFileStreamStringContainer> FindLog (LogType_t logType);
 
   /**
    * \brief Write the contents of a container matching to the key into a file
