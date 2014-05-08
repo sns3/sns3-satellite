@@ -29,6 +29,7 @@ main (int argc, char *argv[])
   /// Run simulation
   Simulator::Schedule (MilliSeconds(0), &SatEnvVariables::GetCurrentWorkingDirectory, envVariables);
   Simulator::Schedule (MilliSeconds(1), &SatEnvVariables::GetPathToExecutable, envVariables);
+  Simulator::Schedule (MilliSeconds(2), &SatEnvVariables::GetDataPath, envVariables);
 
   Simulator::Run ();
   Simulator::Destroy ();

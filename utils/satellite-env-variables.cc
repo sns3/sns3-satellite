@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "ns3/fatal-error.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatEnvVariables");
 
@@ -52,7 +54,8 @@ SatEnvVariables::SatEnvVariables () :
   m_currentWorkingDirectory (""),
   m_pathToExecutable (""),
   m_currentWorkingDirectoryFromAttribute (""),
-  m_pathToExecutableFromAttribute ("")
+  m_pathToExecutableFromAttribute (""),
+  m_levelsToCheck (5)
 {
   NS_LOG_FUNCTION (this);
 
@@ -109,12 +112,12 @@ SatEnvVariables::GetCurrentWorkingDirectory ()
 
   if (m_currentWorkingDirectoryFromAttribute.empty ())
     {
-      NS_LOG_INFO ("Attribute string is empty, using detected working directory");
+      NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Attribute string is empty, using detected working directory");
       return m_currentWorkingDirectory;
     }
   else
     {
-      NS_LOG_INFO ("Using attributed working directory");
+      NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Using attributed working directory");
       return m_currentWorkingDirectoryFromAttribute;
     }
 }
@@ -129,14 +132,85 @@ SatEnvVariables::GetPathToExecutable ()
 
   if (m_pathToExecutableFromAttribute.empty ())
     {
-      NS_LOG_INFO ("Attribute string is empty, using detected path to executable");
+      NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Attribute string is empty, using detected path to executable");
       return m_pathToExecutable;
     }
   else
     {
-      NS_LOG_INFO ("Using attributed path to executable");
+      NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Using attributed path to executable");
       return m_pathToExecutableFromAttribute;
     }
+}
+
+bool
+SatEnvVariables::IsValidDirectory (std::string path)
+{
+  NS_LOG_FUNCTION (this);
+
+  struct stat st;
+  bool validDirectory = false;
+
+  if (stat(path.c_str (),&st) == 0)
+    {
+      if (st.st_mode && S_IFDIR != 0)
+        {
+          validDirectory = true;
+        }
+    }
+
+  NS_LOG_INFO ("SatEnvVariables::IsValidDirectory - " << path << " validity: " << validDirectory);
+
+  return validDirectory;
+}
+
+std::string
+SatEnvVariables::GetDataPath ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatEnvVariables::GetDataPath - Locating the data directory");
+
+  std::stringstream initialDataPath;
+  std::string dataDirectory;
+
+  initialDataPath << "src/satellite/data";
+
+  dataDirectory = LocateDirectory (initialDataPath.str ());
+
+  return dataDirectory;
+}
+
+std::string
+SatEnvVariables::LocateDirectory (std::string initialPath)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::string path;
+
+  NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Initial path " << initialPath);
+
+  for (uint32_t i = 0; i < m_levelsToCheck; i++)
+    {
+      std::stringstream dataPath;
+
+      for (uint32_t j = 0; j < i; j++)
+        {
+          dataPath << "../";
+        }
+
+      dataPath << initialPath;
+
+      NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Checking " << dataPath.str ());
+
+      if (IsValidDirectory (dataPath.str ()))
+        {
+          NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Data directory located in " << dataPath.str ());
+          path = dataPath.str ();
+          break;
+        }
+    }
+
+  return path;
 }
 
 } // namespace ns3

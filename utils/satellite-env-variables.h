@@ -75,6 +75,25 @@ public:
    */
   void SetPathToExecutable (std::string pathToExecutable);
 
+  /**
+   * \brief Function for locating the data folder
+   * \return path to data folder
+   */
+  std::string GetDataPath ();
+
+  /**
+   * \brief Function for locating a specific directory within the NS-3 simulator folder
+   * \param initialPath initial search path
+   * \return path to the located directory
+   */
+  std::string LocateDirectory (std::string initialPath);
+
+  /**
+   * \brief Function for checking if the directory exists
+   * \return does the directory exist
+   */
+  bool IsValidDirectory (std::string path);
+
 private:
 
   /**
@@ -96,6 +115,11 @@ private:
    * \brief Path to executable (attribute value)
    */
   std::string m_pathToExecutableFromAttribute;
+
+  /**
+   * \brief How many directory levels to check for data path
+   */
+  uint32_t m_levelsToCheck;
 };
 
 } // namespace ns3
