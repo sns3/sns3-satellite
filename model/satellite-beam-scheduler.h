@@ -32,7 +32,7 @@
 #include "ns3/satellite-superframe-sequence.h"
 #include "satellite-dama-entry.h"
 #include "satellite-cno-estimator.h"
-#include "satellite-frame-allocator.h"
+#include "satellite-superframe-allocator.h"
 #include "satellite-control-message.h"
 
 namespace ns3 {
@@ -337,7 +337,7 @@ private:
   /**
    * Frame allocator to maintain load information of the frames and their configurations.
    */
-  Ptr<SatFrameAllocator>  m_frameAllocator;
+  Ptr<SatSuperframeAllocator>  m_frameAllocator;
 
   /**
    * Maximum two-way propagation delay estimate between GW-SAT-UT-SAT-GW.
