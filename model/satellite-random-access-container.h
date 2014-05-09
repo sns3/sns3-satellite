@@ -112,13 +112,6 @@ public:
                                    uint16_t backoffProbability);
 
   /**
-   * \brief Function for setting the maximum CRDSA payload bytes
-   * \param allocationChannel allocation channel
-   * \param payloadBytes payload bytes
-   */
-  void SetCrdsaPayloadBytes (uint32_t allocationChannel,
-                             uint32_t payloadBytes);
-  /**
    * \brief Function for setting the parameters related to CRDSA randomization
    * \param allocationChannel allocation channel
    * \param minRandomizationValue minimum randomization value

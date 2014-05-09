@@ -490,24 +490,6 @@ SatRandomAccess::SetCrdsaBackoffProbability (uint32_t allocationChannel,
 }
 
 void
-SatRandomAccess::SetCrdsaPayloadBytes (uint32_t allocationChannel,
-                                       uint32_t payloadBytes)
-{
-  NS_LOG_FUNCTION (this);
-
-  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
-    {
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaPayloadBytes (payloadBytes);
-
-      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->DoCrdsaVariableSanityCheck ();
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::SetCrdsaPayloadBytes - Wrong random access model in use");
-    }
-}
-
-void
 SatRandomAccess::SetCrdsaRandomizationParameters (uint32_t allocationChannel,
                                                   uint32_t minRandomizationValue,
                                                   uint32_t maxRandomizationValue,

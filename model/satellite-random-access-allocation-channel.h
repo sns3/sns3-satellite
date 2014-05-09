@@ -185,18 +185,6 @@ public:
   void SetCrdsaNumOfConsecutiveBlocksUsed (uint32_t numOfConsecutiveBlocksUsed) { m_crdsaNumOfConsecutiveBlocksUsed = numOfConsecutiveBlocksUsed; }
 
   /**
-   * \brief Function for getting the CRDSA maximum payload in bytes
-   * \return CRDSA maximum payload in bytes
-   */
-  uint32_t GetCrdsaPayloadBytes () { return m_crdsaPayloadBytes; }
-
-  /**
-   * \brief Function for setting the CRDSA maximum payload in bytes
-   * \param CRDSA maximum payload in bytes
-   */
-  void SetCrdsaPayloadBytes (uint32_t payloadBytes) { m_crdsaPayloadBytes = payloadBytes; }
-
-  /**
    * \brief Function for checking the CRDSA parameter sanity
    */
   void DoCrdsaVariableSanityCheck ();
@@ -257,11 +245,6 @@ private:
    * \brief CRDSA backoff release time
    */
   Time m_crdsaBackoffReleaseTime;
-
-  /**
-   * \brief CRDSA maximum payload in bytes
-   */
-  uint32_t m_crdsaPayloadBytes;
 };
 
 } // namespace ns3
