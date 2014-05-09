@@ -108,8 +108,9 @@ SatFrameConf::SatFrameConf ()
  : m_bandwidthHz (0.0),
    m_duration (0.0),
    m_isRandomAccess (false),
-   m_btu (0),
-   m_carrierCount (0)
+   m_btuConf (0),
+   m_carrierCount (0),
+   m_maxSymbolsPerCarrier (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -117,36 +118,44 @@ SatFrameConf::SatFrameConf ()
   NS_ASSERT (false);
 }
 
-SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btu, Ptr<SatWaveform> waveform, bool isRandomAccess)
+SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccess)
   : m_bandwidthHz (bandwidthHz),
     m_isRandomAccess (isRandomAccess),
-    m_btu (btu)
+    m_btuConf (btuConf),
+    m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this);
 
-  m_carrierCount = bandwidthHz / btu->GetAllocatedBandwidthInHz ();
+  m_carrierCount = bandwidthHz / m_btuConf->GetAllocatedBandwidthInHz ();
 
   if ( m_carrierCount == 0 )
     {
       NS_FATAL_ERROR ("No carriers can be created for the frame with given BTU and bandwidth. Check frame configuration parameters (attributes)!!! ");
     }
 
-  Time timeSlotDuration = waveform->GetBurstDuration (btu->GetSymbolRateInBauds ());
-  uint32_t slotCount = targetDuration.GetSeconds() / timeSlotDuration.GetSeconds ();
+  // get default waveform
+  uint32_t defaultWaveFormId = m_waveformConf->GetDefaultWaveformId ();
+  Ptr<SatWaveform> defaultWaveform = m_waveformConf->GetWaveform (defaultWaveFormId);
 
-  if ( slotCount == 0)
+  // calculate slot details based on given parameters and default waveform
+  Time timeSlotDuration = defaultWaveform->GetBurstDuration (m_btuConf->GetSymbolRateInBauds ());
+  uint32_t carrierSlotCount = targetDuration.GetSeconds() / timeSlotDuration.GetSeconds ();
+
+  if ( carrierSlotCount == 0)
     {
       NS_FATAL_ERROR ("Time slots cannot be created with target frame duration. Check frame target duration!!!");
     }
 
-  m_duration = Time ( slotCount * timeSlotDuration.GetInteger () );
+  m_duration = Time ( carrierSlotCount * timeSlotDuration.GetInteger () );
+  m_maxSymbolsPerCarrier = carrierSlotCount * defaultWaveform->GetBurstLengthInSymbols ();
+  m_minPayloadPerCarrierInBytes = carrierSlotCount * defaultWaveform->GetPayloadInBytes ();
 
   // Created time slots for every carrier and add them to frame configuration
   for (uint32_t i = 0; i < m_carrierCount; i++)
     {
-      for (uint32_t j = 0; j < slotCount; j++)
+      for (uint32_t j = 0; j < carrierSlotCount; j++)
         {
-          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), waveform->GetWaveformId (), i, SatTimeSlotConf::SLOT_TYPE_TRC);
+          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defaultWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
           AddTimeSlotConf (timeSlot);
         }
     }
@@ -167,7 +176,7 @@ SatFrameConf::GetCarrierFrequencyHz (uint16_t carrierId) const
       NS_FATAL_ERROR ( "Carrier Id out of range" );
     }
 
-  double carrierBandwidthHz = m_btu->GetAllocatedBandwidthInHz ();
+  double carrierBandwidthHz = m_btuConf->GetAllocatedBandwidthInHz ();
 
   return ( (carrierBandwidthHz * carrierId) + ( carrierBandwidthHz / 2.0 ) );
 }
@@ -182,15 +191,15 @@ SatFrameConf::GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthT
   switch (bandwidthType)
   {
     case SatEnums::ALLOCATED_BANDWIDTH:
-      bandwidth = m_btu->GetAllocatedBandwidthInHz();
+      bandwidth = m_btuConf->GetAllocatedBandwidthInHz();
       break;
 
     case SatEnums::OCCUPIED_BANDWIDTH:
-      bandwidth = m_btu->GetOccupiedBandwidthInHz();
+      bandwidth = m_btuConf->GetOccupiedBandwidthInHz();
       break;
 
     case SatEnums::EFFECTIVE_BANDWIDTH:
-      bandwidth = m_btu->GetEffectiveBandwidthInHz();
+      bandwidth = m_btuConf->GetEffectiveBandwidthInHz();
       break;
 
     default:
@@ -604,7 +613,7 @@ SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
 }
 
 bool
-SatSuperframeConf::GetFrameRandomAccess (uint8_t frameIndex) const
+SatSuperframeConf::IsFrameRandomAccess (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -618,14 +627,13 @@ SatSuperframeConf::GetFrameRandomAccess (uint8_t frameIndex) const
 
 
 void
-SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, Ptr<SatWaveformConf> waveFormConf)
+SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, Ptr<SatWaveformConf> waveformConf)
 {
   NS_LOG_FUNCTION (this);
 
   DoConfigure ();
 
   // make actual configuration
-  m_waveFormConf = waveFormConf;
 
   switch (m_configType)
     {
@@ -633,19 +641,19 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
       case CONFIG_TYPE_1:
       case CONFIG_TYPE_2:
         {
+          m_raChannels.clear ();
+          m_frames.clear ();
+          m_carrierCount = 0;
+
           for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
             {
               // Create BTU conf according to given attributes
               Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameCarrierAllocatedBandwidth[frameIndex],
                                                              m_frameCarrierRollOff[frameIndex], m_frameCarrierSpacing[frameIndex] );
 
-              // get default waveform
-              uint32_t defaultWaveFormId = m_waveFormConf->GetDefaultWaveformId ();
-              Ptr<SatWaveform> defaultWaveForm = m_waveFormConf->GetWaveform (defaultWaveFormId);
-
               // Created frame to be used utilizing earlier created BTU
               Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], targetDuration, btuConf,
-                                                                  defaultWaveForm, m_frameIsRandomAccess[frameIndex] );
+                                                                  waveformConf, m_frameIsRandomAccess[frameIndex] );
 
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
@@ -750,7 +758,7 @@ SatSuperframeConf::GetRaChannelFrameId (uint8_t raChannel) const
 }
 
 uint32_t
-SatSuperframeConf::GetRaChannelPayloadInBytes (uint8_t raChannel) const
+SatSuperframeConf::GetRaChannelTimeSlotPayloadInBytes (uint8_t raChannel) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -760,7 +768,7 @@ SatSuperframeConf::GetRaChannelPayloadInBytes (uint8_t raChannel) const
     {
       uint8_t frameId = m_raChannels[raChannel].first;
       Ptr<SatTimeSlotConf> timeSlotConf = (*m_frames[frameId]->GetTimeSlotConfs (0).begin ());
-      Ptr<SatWaveform> waveform = m_waveFormConf->GetWaveform( timeSlotConf->GetWaveFormId ());
+      Ptr<SatWaveform> waveform = m_frames[frameId]->GetWaveformConf()->GetWaveform( timeSlotConf->GetWaveFormId ());
 
       payloadInBytes = waveform->GetPayloadInBytes ();
     }
@@ -818,7 +826,7 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                 TypeId::ATTR_CONSTRUCT, \
                 BooleanValue (randomAccess), \
                 MakeBooleanAccessor (&SatSuperframeConf::SetFrame ## index ## RandomAccess, \
-                                     &SatSuperframeConf::GetFrame ## index ## RandomAccess), \
+                                     &SatSuperframeConf::IsFrame ## index ## RandomAccess), \
                 MakeBooleanChecker ())
 
 // macro to ease definition of attributes for several super frames

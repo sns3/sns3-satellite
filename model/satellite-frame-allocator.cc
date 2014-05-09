@@ -64,16 +64,14 @@ SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo (SatFrameAllocReqItemCon
 {
   NS_LOG_FUNCTION (this << ctrlSlotPresent << ctrlSlotLength);
 
-  double byteInSymbols = trcWaveForm->GetBurstLengthInSymbols () / (trcWaveForm->GetPayloadInBytes ());
-
   for (SatFrameAllocReqItemContainer_t::const_iterator it = req.begin (); it != req.end (); it++ )
     {
       SatFrameAllocInfoItem  reqInSymbols;
 
-      reqInSymbols.m_craSymbols  = byteInSymbols * it->m_craBytes;
-      reqInSymbols.m_minRbdcSymbols = byteInSymbols * it->m_minRbdcBytes;
-      reqInSymbols.m_rbdcSymbols = byteInSymbols * it->m_rbdcBytes;
-      reqInSymbols.m_vbdcSymbols = byteInSymbols * it->m_vbdcBytes;
+      reqInSymbols.m_craSymbols  = trcWaveForm->GetBurstLengthInSymbols () * it->m_craBytes / trcWaveForm->GetPayloadInBytes ();
+      reqInSymbols.m_minRbdcSymbols = trcWaveForm->GetBurstLengthInSymbols () * it->m_minRbdcBytes / trcWaveForm->GetPayloadInBytes ();
+      reqInSymbols.m_rbdcSymbols = trcWaveForm->GetBurstLengthInSymbols () * it->m_rbdcBytes / trcWaveForm->GetPayloadInBytes ();
+      reqInSymbols.m_vbdcSymbols = trcWaveForm->GetBurstLengthInSymbols () * it->m_vbdcBytes / trcWaveForm->GetPayloadInBytes ();
 
       // if control slot should be allocated and RC index is 0
       // add symbols needed for control slot to CRA symbols
@@ -165,20 +163,35 @@ SatFrameAllocator::CcReqCompare::operator() (RcAllocItem_t rcAlloc1, RcAllocItem
 
 // SatFrameAllocator
 
-SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, SatSuperframeConf::ConfigType_t configType)
+SatFrameAllocator::SatFrameAllocator ()
+: m_allocationDenied (true),
+  m_totalSymbolsInFrame (0.0),
+  m_availableSymbolsInFrame (0.0),
+  m_preAllocatedCraSymbols (0.0),
+  m_preAllocatedMinRdbcSymbols (0.0),
+  m_preAllocatedRdbcSymbols (0.0),
+  m_preAllocatedVdbcSymbols (0.0),
+  m_maxSymbolsPerCarrier (0),
+  m_configType (SatSuperframeConf::CONFIG_TYPE_0),
+  m_frameId (0),
+  m_rcBasedAllocation (false)
+{
+  NS_LOG_FUNCTION (this);
+  NS_FATAL_ERROR ("Default constructor not supported!!!");
+}
+
+SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frameId, SatSuperframeConf::ConfigType_t configType)
   : m_allocationDenied (true),
     m_configType (configType),
     m_frameId (frameId),
-    m_waveformConf (waveformConf),
     m_frameConf (frameConf)
-
 {
   NS_LOG_FUNCTION (this);
 
-  m_maxSymbolsPerCarrier = m_frameConf->GetBtuConf ()->GetSymbolRateInBauds () * m_frameConf->GetDuration ().GetSeconds ();
+  m_waveformConf = m_frameConf->GetWaveformConf ();
+  m_maxSymbolsPerCarrier = frameConf->GetCarrierMaxSymbols ();
   m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_frameConf->GetCarrierCount ();
-
-  m_burstLenghts = waveformConf->GetSupportedBurstLengths ();
+  m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
 
   Reset ();
 }

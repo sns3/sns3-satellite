@@ -47,10 +47,9 @@ public:
   /**
    * Construct SatSuperframeAllocator
    * \param superFrameConf Super frame configuration
-   * \param waveformConf Waveform configuration
    * \param maxRcCount Maximum number of the RCs
    */
-  SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, Ptr<SatWaveformConf> waveformConf, uint8_t maxRcCount);
+  SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, uint8_t maxRcCount);
 
   /**
    * Destruct SatSuperframeAllocator
@@ -105,9 +104,6 @@ private:
   // Frame info container.
   FrameAllocatorContainer_t    m_frameAllocators;
 
-  // waveform configuration
-  Ptr<SatWaveformConf>    m_waveformConf;
-
   // super frame  configuration
   Ptr<SatSuperframeConf>  m_superframeConf;
 
@@ -120,8 +116,8 @@ private:
   // maximum count for RCs
   uint32_t  m_maxRcCount;
 
-  // bytes in minimum carrier
-  uint32_t  m_minCarrierBytes;
+  // minimum carrier payload in bytes
+  uint32_t  m_minCarrierPayloadInBytes;
 
   // minimum rate based bytes left can been guaranteed by frame allocator
   uint32_t  m_minimumRateBasedBytesLeft;

@@ -870,7 +870,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   Time superframeStartTime = Now ();
 
   /// get the slot payload
-  uint32_t payloadBytes = superframeConf->GetRaChannelPayloadInBytes (allocationChannel);
+  uint32_t payloadBytes = superframeConf->GetRaChannelTimeSlotPayloadInBytes (allocationChannel);
 
   /// reduce the CRDSA signaling overhead from the payload
   payloadBytes -= m_randomAccess->GetCrdsaSignalingOverheadInBytes ();

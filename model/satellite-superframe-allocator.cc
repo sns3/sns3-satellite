@@ -64,21 +64,18 @@ SatSuperframeAllocator::GetInstanceTypeId (void) const
   return GetTypeId();
 }
 
-SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, Ptr<SatWaveformConf> waveformConf, uint8_t maxRcCount)
- : m_waveformConf (waveformConf),
-   m_superframeConf (superFrameConf),
+SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, uint8_t maxRcCount)
+ : m_superframeConf (superFrameConf),
    m_targetLoad (0.0),
    m_fcaEnabled (false),
    m_maxRcCount (maxRcCount),
-   m_minCarrierBytes (0),
+   m_minCarrierPayloadInBytes (0),
    m_minimumRateBasedBytesLeft (0),
    m_rcBasedAllocationEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t minCarrierBytes = std::numeric_limits<uint32_t>::max ();
-
-  Ptr<SatWaveform> defWaveform = m_waveformConf->GetWaveform (m_waveformConf->GetDefaultWaveformId ());
+  uint32_t currentMinCarrierPayloadInBytes = std::numeric_limits<uint32_t>::max ();
 
   for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
     {
@@ -86,18 +83,18 @@ SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFram
 
       if (frameConf->IsRandomAccess () == false )
         {
-          Ptr<SatFrameAllocator> frameAllocator = Create<SatFrameAllocator> (frameConf, waveformConf, i, superFrameConf->GetConfigType ());
+          Ptr<SatFrameAllocator> frameAllocator = Create<SatFrameAllocator> (frameConf, i, superFrameConf->GetConfigType ());
           m_frameAllocators.push_back( frameAllocator );
 
-          uint32_t bytesInCarrier = ( defWaveform->GetThroughputInBitsPerSecond (frameConf->GetBtuConf ()->GetSymbolRateInBauds ()) * frameConf->GetDuration ().GetSeconds () ) / SatUtils::BITS_PER_BYTE;
+          uint32_t minCarrierPayloadInBytes = frameAllocator->GetCarrierMinPayloadInBytes ();
 
-          if ( bytesInCarrier < minCarrierBytes )
+          if ( minCarrierPayloadInBytes < currentMinCarrierPayloadInBytes )
             {
-              minCarrierBytes = bytesInCarrier;
-              m_minCarrierBytes = bytesInCarrier;
+              currentMinCarrierPayloadInBytes = minCarrierPayloadInBytes;
+              m_minCarrierPayloadInBytes = minCarrierPayloadInBytes;
             }
 
-          m_minimumRateBasedBytesLeft += frameConf->GetCarrierCount () * bytesInCarrier;
+          m_minimumRateBasedBytesLeft += frameConf->GetCarrierCount () * minCarrierPayloadInBytes;
         }
     }
 }
@@ -156,9 +153,9 @@ void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes)
 {
   NS_LOG_FUNCTION (this << minimumRateBytes);
 
-  if ( minimumRateBytes > m_minCarrierBytes )
+  if ( minimumRateBytes > m_minCarrierPayloadInBytes )
     {
-      NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes available in minimum carrier bytes: " << m_minCarrierBytes);
+      NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes available in minimum carrier bytes: " << m_minCarrierPayloadInBytes);
     }
   else if ( minimumRateBytes > m_minimumRateBasedBytesLeft )
     {

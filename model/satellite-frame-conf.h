@@ -215,12 +215,12 @@ public:
    *
    * \param bandwidthHz       Bandwidth of the frame in hertz
    * \param targetDuration    Target duration of the frame
-   * \param btu               BTU configuration of the frame
-   * \param waveform          Waveform used in creation
+   * \param btuConf           BTU configuration of the frame
+   * \param waveformConf      Waveform configuration
    * \param isRandomAccess    Flag telling if random access frame
    */
-  SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btu,
-                 Ptr<SatWaveform> waveform, bool isRandomAccess );
+  SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf,
+                 Ptr<SatWaveformConf> waveformConf, bool isRandomAccess );
 
   /**
    * Destructor for SatFrameConf
@@ -259,6 +259,20 @@ public:
   inline Time GetDuration () const { return m_duration; }
 
   /**
+   * Get maximum symbols in carrier
+   *
+   * \return maximum symbols in carrier
+   */
+  inline uint32_t GetCarrierMaxSymbols () const { return m_maxSymbolsPerCarrier; }
+
+  /**
+   * Get minimum payload of a carrier in bytes
+   *
+   * \return minimum payload of a carrier in bytes
+   */
+  inline uint32_t GetCarrierMinPayloadInBytes () const { return m_minPayloadPerCarrierInBytes; }
+
+  /**
    * Get carrier center frequency in frame.
    *
    * \return The carrier bandwidth in frame in hertz.
@@ -278,7 +292,7 @@ public:
    *
    * \return The BTU conf of frame.
    */
-  inline Ptr<SatBtuConf> GetBtuConf () const { return m_btu; }
+  inline Ptr<SatBtuConf> GetBtuConf () const { return m_btuConf; }
 
   /**
    * Get carrier count of the frame.
@@ -309,6 +323,11 @@ public:
    */
   inline bool IsRandomAccess () const { return m_isRandomAccess;}
 
+  /**
+   * Get waveform configuration of this frame
+   */
+  inline Ptr<SatWaveformConf> GetWaveformConf () const { return m_waveformConf; }
+
 private:
   typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
 
@@ -316,9 +335,12 @@ private:
   Time      m_duration;
   bool      m_isRandomAccess;
 
-  Ptr<SatBtuConf>                 m_btu;
-  uint16_t                        m_carrierCount;
-  SatTimeSlotConfMap_t            m_timeSlotConfMap;
+  Ptr<SatBtuConf>       m_btuConf;
+  Ptr<SatWaveformConf>  m_waveformConf;
+  uint16_t              m_carrierCount;
+  uint32_t              m_maxSymbolsPerCarrier;
+  uint32_t              m_minPayloadPerCarrierInBytes;
+  SatTimeSlotConfMap_t  m_timeSlotConfMap;
 
   /**
    * Add time slot.
@@ -477,9 +499,9 @@ public:
    *
    * \param bandwidthHz Allocated bandwidth for super frame.
    * \param targetDuration Target duration for super frame sequence
-   * \param waveFormConf Wave Form Configuration
+   * \param waveformConf Wave Form Configuration
    */
-  void Configure (double allocatedBandwidthHz, Time targetDuration, Ptr<SatWaveformConf> waveFormConf);
+  void Configure (double allocatedBandwidthHz, Time targetDuration, Ptr<SatWaveformConf> waveformConf);
 
   /**
    * Do frame specific configuration as needed
@@ -528,11 +550,11 @@ public:
   uint8_t GetRaChannelFrameId (uint8_t raChannel) const;
 
   /**
-   * Get the payload of the RA channel in bytes.
+   * Get the payload of the RA channel time slot in bytes.
    *
-   * \return Payload of the RA channel [bytes]
+   * \return Payload of the RA channel time slot [bytes]
    */
-  uint32_t GetRaChannelPayloadInBytes (uint8_t raChannel) const;
+  uint32_t GetRaChannelTimeSlotPayloadInBytes (uint8_t raChannel) const;
 
   /**
    * Set number of frames to be used in super frame.
@@ -572,7 +594,7 @@ public:
   double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
   double GetFrameCarrierSpacing (uint8_t frameIndex) const;
   double GetFrameCarrierRollOff (uint8_t frameIndex) const;
-  bool GetFrameRandomAccess (uint8_t frameIndex) const;
+  bool IsFrameRandomAccess (uint8_t frameIndex) const;
 
 private:
   // first = frame ID, second = RA channel id (index)
@@ -593,7 +615,6 @@ private:
   SatFrameConfList_t            m_frames;
   std::vector<RaChannelInfo_t>  m_raChannels;
   uint32_t                      m_carrierCount;
-  Ptr<SatWaveformConf>          m_waveFormConf;
 
   /**
    * Get frame id where given global carrier ID belongs to.
@@ -631,8 +652,8 @@ public:
       { return GetFrameCarrierRollOff (index); } \
     inline void SetFrame ## index ## RandomAccess (bool value)  \
       { return SetFrameRandomAccess (index, value); } \
-    inline double GetFrame ## index ## RandomAccess () const      \
-      { return GetFrameRandomAccess (index); }
+    inline double IsFrame ## index ## RandomAccess () const      \
+      { return IsFrameRandomAccess (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines

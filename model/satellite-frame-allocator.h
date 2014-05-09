@@ -130,14 +130,25 @@ public:
     } CcLevel_t;
 
   /**
+   * Default constructor (not in used)
+   */
+  SatFrameAllocator ();
+
+  /**
    * Construct frame info
    *
    * \param frameConf Frame configuration for the frame info
-   * \param waveformConf Waveform configuration
    * \param frameId Id of the frame
    * \param m_configType Type of the configuration (0-2 supported)
    */
-  SatFrameAllocator (Ptr<SatFrameConf> frameConf, Ptr<SatWaveformConf> waveformConf, uint8_t frameId, SatSuperframeConf::ConfigType_t m_configType);
+  SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frameId, SatSuperframeConf::ConfigType_t m_configType);
+
+  /**
+   * Get minimum payload of a carrier in bytes
+   *
+   * \return minimum payload of a carrier in bytes
+   */
+  inline uint32_t GetCarrierMinPayloadInBytes () const { return m_frameConf->GetCarrierMinPayloadInBytes (); }
 
   /**
    * Reset frame allocator.
