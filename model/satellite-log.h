@@ -30,14 +30,24 @@ namespace ns3 {
  *
  * \brief Class for simulator output logging such as warnings and error messages.
  *
- * Contains 4 different log types:
- * 0 - for all messages
- * 1 - for info messages
- * 2 - for warning messages
- * 3 - for error messages
+ * The format for messages is (type, custom file tag, message). Custom file tag
+ * is in effect only with LOG_CUSTOM. With other types it does not matter and can
+ * be left empty. It is also possible to define a simulation specific tag, which
+ * is useful with simulation campaigns for avoiding log file overwrite.
  *
- * Messages for types 1 to 3 will have their own files in addition to the log for all messages.
- * This is to enable quick checking for specific message types.
+ * The class specifies the following log types:
+ * LOG_GENERIC - for all messages
+ * LOG_INFO - for info messages
+ * LOG_WARNING - for warning messages
+ * LOG_ERROR - for error messages
+ * LOG_CUSTOM - for custom messages specified by the second parameter
+ *
+ * The output files are located in src/satellite/data/logs folder. The output file
+ * format is the following: log<type><custom file tag><simulation tag>
+ *
+ * With (LOG_CUSTOM, "_exampleTag", "Example message for custom log") and simulation tag
+ * "_ut30_beam1" the file log_exampleTag_ut30_beam1 would contain the message
+ * "Example message for custom log".
  */
 class SatLog : public Object
 {

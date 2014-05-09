@@ -55,7 +55,7 @@ SatEnvVariables::SatEnvVariables () :
   m_pathToExecutable (""),
   m_currentWorkingDirectoryFromAttribute (""),
   m_pathToExecutableFromAttribute (""),
-  m_levelsToCheck (5)
+  m_levelsToCheck (10)
 {
   NS_LOG_FUNCTION (this);
 
@@ -186,6 +186,7 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
   NS_LOG_FUNCTION (this);
 
   std::string path;
+  bool directoryFound = false;
 
   NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Initial path " << initialPath);
 
@@ -206,8 +207,14 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
         {
           NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Data directory located in " << dataPath.str ());
           path = dataPath.str ();
+          directoryFound = true;
           break;
         }
+    }
+
+  if (!directoryFound)
+    {
+      NS_FATAL_ERROR ("SatEnvVariables::LocateDirectory - Directory not found within " << m_levelsToCheck << " levels: " << initialPath);
     }
 
   return path;
