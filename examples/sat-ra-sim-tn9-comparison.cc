@@ -18,10 +18,9 @@ using namespace ns3;
 * link performance. Currently only one beam is simulated with variable amount of users
 * and RA-DAMA configuration.
 *
-* As output, the example provides statistics about RA
-* collision and error rate, throughput, packet delay, SINR, resources granted, frame
-* load and waveform usage. The random access comparison results for TN9 were obtained
-* by using this script.
+* As output, the example provides statistics about RA collision and error rate,
+* throughput, packet delay, SINR, resources granted, frame load and waveform usage.
+* The random access comparison results for TN9 were obtained by using this script.
 *
 * execute command -> ./waf --run "sat-ra-sim-tn9-comparison --PrintHelp"
 */
@@ -33,14 +32,14 @@ main (int argc, char *argv[])
 {
   uint32_t beamId (18);
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (3);
-  uint32_t packetSize (10);
-  uint32_t numOfInstances (2);
+  uint32_t utsPerBeam (30);
+  uint32_t packetSize (64);
+  uint32_t numOfInstances (3);
   double intervalInSeconds (0.1);
   bool isNoisy (false);
 
-  double simLength (600.0); // in seconds
-  Time appStartTime = Seconds (0.0);
+  double simLength (30.0); // in seconds
+  Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-ra-input-attributes.xml"));
@@ -61,7 +60,7 @@ main (int argc, char *argv[])
 
   if (isNoisy)
     {
-      LogComponentEnable ("sat-ra-sim-tn9-comparison", LOG_INFO);
+      LogComponentEnable ("sat-ra-sim-tn9", LOG_INFO);
     }
 
   // Enable Random Access with all available modules
@@ -84,14 +83,11 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (1));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (0));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (1));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (50));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (1));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (1));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.99));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (numOfInstances));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
-  Config::SetDefault ("ns3::SatRandomAccessConf::CrdsaSignalingOverheadInBytes", UintegerValue (5));
-  Config::SetDefault ("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes", UintegerValue (3));
 
   // Disable CRA and DAMA
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
@@ -145,7 +141,9 @@ main (int argc, char *argv[])
   const SatIdMapper *satIdMapper = Singleton<SatIdMapper>::Get ();
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
-  for (NodeContainer::Iterator itUt = utUsers.Begin (); itUt != utUsers.End (); ++itUt)
+  for (NodeContainer::Iterator itUt = utUsers.Begin ();
+      itUt != utUsers.End ();
+      ++itUt)
     {
       appStartTime += MilliSeconds (10);
 
@@ -186,16 +184,16 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  //s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  //s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  //s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  //s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
@@ -213,12 +211,12 @@ main (int argc, char *argv[])
   s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  //s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-ra-sim-tn9-comparison ---");
+  NS_LOG_INFO("--- sat-ra-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
   NS_LOG_INFO("  Simulation length: " << simLength);
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);

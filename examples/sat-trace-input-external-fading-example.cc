@@ -88,15 +88,17 @@ main (int argc, char *argv[])
   /// Enable composite SINR output trace
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
 
+  /// Disable figure output
   //Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   //Singleton<SatInterferenceOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   //Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->EnableFigureOutput (false);
 
-  //Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("_fadingExampleTag");
-  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("_interferenceExampleTag");
-  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
-  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("_rxPowerExampleTag");
+  /// Add tag to file name (useful when running multiple consecutive simulations)
+  //Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("fadingExampleTag_");
+  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("interferenceExampleTag_");
+  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("rxPowerExampleTag_");
+  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("compositeSinrExampleTag_");
 
   /// Enable the printing of ID mapper trace IDs
   Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);
