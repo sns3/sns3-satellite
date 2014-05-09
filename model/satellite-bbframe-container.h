@@ -39,16 +39,6 @@ namespace ns3 {
 class SatBbFrameContainer :  public Object
 {
 public:
-  /**
-   * BBFrame usage modes.
-   */
-  typedef enum
-  {
-    SHORT_FRAMES,          //!< SHORT_FRAMES
-    NORMAL_FRAMES,         //!< NORMAL_FRAMES
-    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
-  } BbFrameUsageMode_t;
-
   static TypeId GetTypeId (void);
 
   /**
@@ -125,11 +115,8 @@ private:
   FrameContainer_t              m_container;
   Time                          m_totalDuration;
   Ptr<SatBbFrameConf>           m_bbFrameConf;
-
-  /**
-   * BBFrame usage mode.
-   */
-  BbFrameUsageMode_t m_bbFrameUsageMode;
+  SatEnums::SatModcod_t         m_defaultMostRobustModcod;
+  SatEnums::SatBbFrameType_t    m_defaultBbFrameType;
 
   /**
    * Create short or normal frame according to MODCOD and member #m_bbFrameUsageMode.

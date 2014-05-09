@@ -803,11 +803,11 @@ SatFrameAllocator::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToU
   Ptr<SatTimeSlotConf> timeSlotConf = NULL;
   int64_t symbolsToUse = std::min<int64_t> (carrierSymbolsToUse, utSymbolsToUse);
 
-  int64_t timeSlotSymbols = m_waveformConf->GetDefaultBurstLength ();
+  int64_t timeSlotSymbols = m_waveformConf->GetWaveform (m_waveformConf->GetMostRobustWaveformId ())->GetBurstLengthInSymbols();
 
   if ( timeSlotSymbols <= symbolsToUse )
     {
-      uint32_t waveformId = m_waveformConf->GetDefaultWaveformId ();
+      uint32_t waveformId = m_waveformConf->GetMostRobustWaveformId ();
 
       Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
       timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_C);

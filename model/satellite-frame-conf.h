@@ -218,9 +218,10 @@ public:
    * \param btuConf           BTU configuration of the frame
    * \param waveformConf      Waveform configuration
    * \param isRandomAccess    Flag telling if random access frame
+   * \param defaultwaveformInUse Flag telling if default waveform shoul be used with frame
    */
   SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf,
-                 Ptr<SatWaveformConf> waveformConf, bool isRandomAccess );
+                 Ptr<SatWaveformConf> waveformConf, bool isRandomAccess, bool defaultwaveformInUse );
 
   /**
    * Destructor for SatFrameConf

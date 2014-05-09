@@ -166,7 +166,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
   m_shortFramePayloadInSlots (),
   m_normalFramePayloadInSlots (),
-  m_waveforms ()
+  m_waveforms (),
+  m_bbFrameUsageMode (NORMAL_FRAMES)
 {
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
@@ -288,6 +289,13 @@ SatBbFrameConf::GetTypeId (void)
                     DoubleValue (0.5),
                     MakeDoubleAccessor (&SatBbFrameConf::m_bbFrameLowOccupancyThreshold),
                     MakeDoubleChecker<double> (0.0, 1.0))
+    .AddAttribute ("BBFrameUsageMode",
+                   "Mode for selecting used BB Frames.",
+                    EnumValue (SatBbFrameConf::NORMAL_FRAMES),
+                    MakeEnumAccessor (&SatBbFrameConf::m_bbFrameUsageMode),
+                    MakeEnumChecker (SatBbFrameConf::SHORT_FRAMES, "ShortFrames",
+                                     SatBbFrameConf::NORMAL_FRAMES, "NormalFrames",
+                                     SatBbFrameConf::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;
@@ -446,6 +454,37 @@ SatBbFrameConf::GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType)
         }
     }
   return m_defaultModCod;
+}
+
+SatEnums::SatModcod_t
+SatBbFrameConf::GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const
+{
+  NS_LOG_FUNCTION (this << frameType);
+
+  SatEnums::SatModcod_t mostRobustModCod = m_defaultModCod;
+
+  // If ACM is enabled, check if there more robust MODCOD than the default
+  if (m_acmEnabled)
+    {
+      uint32_t payloadBits = m_waveforms.at (std::make_pair (mostRobustModCod, frameType))->GetPayloadInBits ();
+
+      // find the waveform with the more robust MODCOD than previous one
+      for ( waveformMap_t::const_reverse_iterator rit = m_waveforms.rbegin ();
+          rit != m_waveforms.rend ();
+          ++rit )
+        {
+          if (rit->second->GetBbFrameType() == frameType)
+            {
+              // The first waveform over the threshold
+              if (rit->second->GetPayloadInBits() < payloadBits)
+                {
+                  mostRobustModCod = rit->second->GetModcod ();
+                }
+            }
+        }
+    }
+
+  return mostRobustModCod;
 }
 
 SatEnums::SatModcod_t

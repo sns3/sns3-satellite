@@ -127,6 +127,16 @@ class SatBbFrameConf : public Object
 {
 public:
   /**
+   * BBFrame usage modes.
+   */
+  typedef enum
+  {
+    SHORT_FRAMES,          //!< SHORT_FRAMES
+    NORMAL_FRAMES,         //!< NORMAL_FRAMES
+    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
+  } BbFrameUsageMode_t;
+
+  /**
    * Default constructor
    */
   SatBbFrameConf ();
@@ -167,6 +177,13 @@ public:
    * \return BB frame low occupancy threshold
    */
   inline double GetBbFrameLowOccupancyThreshold () const { return m_bbFrameLowOccupancyThreshold; }
+
+  /**
+   * Get configured BB frame usage mode.
+   *
+   * \return BB frame usage mode
+   */
+  inline SatBbFrameConf::BbFrameUsageMode_t GetBbFrameUsageMode () const { return m_bbFrameUsageMode; }
 
   /**
    * \brief Initialize the C/No requirements for a given BLER target.
@@ -210,6 +227,13 @@ public:
    * \return SatModcod_t The default MODCOD
    */
   SatEnums::SatModcod_t GetDefaultModCod () const;
+
+  /**
+   * \brief Get the most robust MODCOD with a given BB frame type.
+   * \param frameType Used BBFrame type (short OR normal)
+   * \return SatModcod_t The best MODCOD
+   */
+  SatEnums::SatModcod_t GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const;
 
 private:
 
@@ -305,6 +329,11 @@ private:
    * Available "waveforms", i.e. MODCOD + BBFrame combinations
    */
   waveformMap_t m_waveforms;
+
+  /**
+   * BBFrame usage mode.
+   */
+  BbFrameUsageMode_t m_bbFrameUsageMode;
 };
 
 } // namespace ns3

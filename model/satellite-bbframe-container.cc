@@ -32,7 +32,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatBbFrameContainer);
 
 SatBbFrameContainer::SatBbFrameContainer ()
 : m_totalDuration (Seconds (0)),
-  m_bbFrameUsageMode (SatBbFrameContainer::NORMAL_FRAMES)
+  m_defaultMostRobustModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor of SatBbFrameContainer not supported.");
@@ -40,9 +41,7 @@ SatBbFrameContainer::SatBbFrameContainer ()
 
 SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& modcodsInUse, Ptr<SatBbFrameConf> conf)
  : m_totalDuration (Seconds (0)),
-   m_bbFrameConf (conf),
-   m_bbFrameUsageMode (SatBbFrameContainer::NORMAL_FRAMES)
-
+   m_bbFrameConf (conf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -55,6 +54,16 @@ SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& mo
           NS_FATAL_ERROR ("Queue for MODCOD: " << *it << " already exists!!!");
         }
     }
+
+  m_defaultBbFrameType = SatEnums::NORMAL_FRAME;
+
+  if (m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_FRAMES )
+    {
+      m_defaultBbFrameType = SatEnums::SHORT_FRAME;
+    }
+
+  m_defaultMostRobustModcod = m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType);
+
 }
 
 SatBbFrameContainer::~SatBbFrameContainer ()
@@ -70,13 +79,6 @@ SatBbFrameContainer::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatBbFrameContainer")
     .SetParent<Object> ()
     .AddConstructor<SatBbFrameContainer> ()
-    .AddAttribute ("BBFrameUsageMode",
-                   "Mode for selecting used BB Frames.",
-                    EnumValue (SatBbFrameContainer::NORMAL_FRAMES),
-                    MakeEnumAccessor (&SatBbFrameContainer::m_bbFrameUsageMode),
-                    MakeEnumChecker (SatBbFrameContainer::SHORT_FRAMES, "ShortFrames",
-                                     SatBbFrameContainer::NORMAL_FRAMES, "NormalFrames",
-                                     SatBbFrameContainer::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
   ;
   return tid;
 }
@@ -88,9 +90,13 @@ SatBbFrameContainer::GetModcod (uint32_t priorityClass, double cno)
 
   SatEnums::SatModcod_t modcod = m_bbFrameConf->GetDefaultModCod ();
 
-  if ( ( priorityClass > 0 ) &&  !isnan (cno) )
+  if (priorityClass == 0)
     {
-      modcod = m_bbFrameConf->GetBestModcod (cno, SatEnums::NORMAL_FRAME);
+      modcod = m_defaultMostRobustModcod;
+    }
+  else if ( isnan (cno) == false )
+    {
+      modcod = m_bbFrameConf->GetBestModcod (cno, m_defaultBbFrameType);
     }
 
   return modcod;
@@ -102,20 +108,14 @@ SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums
   NS_LOG_FUNCTION (this);
 
   uint32_t payloadBytes = 0;
-  SatEnums::SatBbFrameType_t frameType = SatEnums::NORMAL_FRAME;
-
-  if ( m_bbFrameUsageMode == SHORT_FRAMES)
-    {
-      frameType = SatEnums::SHORT_FRAME;
-    }
 
   if ( priorityClass > 0)
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, frameType) / SatUtils::BITS_PER_BYTE;
+      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
     }
   else
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetDefaultModCod (), frameType) / SatUtils::BITS_PER_BYTE;
+      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_defaultMostRobustModcod, m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
     }
 
   payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
@@ -160,7 +160,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
         {
           CreateFrameToTail (priorityClass, modcod);
         }
-      else if ( ( m_bbFrameUsageMode == SHORT_AND_NORMAL_FRAMES ) &&
+      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
                 ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
           m_totalDuration -= m_container.at (modcod).back ()->GetDuration ();
@@ -177,10 +177,10 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
           GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
         {
           // create and add frame to tail
-          CreateFrameToTail (priorityClass, m_bbFrameConf->GetDefaultModCod ());
+          CreateFrameToTail (priorityClass, m_defaultMostRobustModcod);
         }
-      else if ( ( m_bbFrameUsageMode == SHORT_AND_NORMAL_FRAMES ) &&
-                      ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
+      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
+                ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
           m_totalDuration -= m_ctrlContainer.back ()->GetDuration ();
           m_ctrlContainer.back ()->Extend (m_bbFrameConf);
@@ -238,24 +238,7 @@ SatBbFrameContainer::CreateFrameToTail (uint32_t priorityClass, SatEnums::SatMod
 {
   NS_LOG_FUNCTION (this << modcod );
 
-  Ptr<SatBbFrame> frame = NULL;
-
-  switch (m_bbFrameUsageMode)
-  {
-    case SHORT_FRAMES:
-      frame = Create<SatBbFrame> (modcod, SatEnums::SHORT_FRAME, m_bbFrameConf);
-      break;
-
-    case SHORT_AND_NORMAL_FRAMES:
-    case NORMAL_FRAMES:
-      frame = Create<SatBbFrame> (modcod, SatEnums::NORMAL_FRAME, m_bbFrameConf);
-      break;
-
-    default:
-      NS_FATAL_ERROR ("Invalid BBFrame usage mode!!!");
-      break;
-
-  }
+  Ptr<SatBbFrame> frame = Create<SatBbFrame> (modcod, m_defaultBbFrameType, m_bbFrameConf);
 
   if ( frame != NULL )
     {
@@ -327,7 +310,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
 
               // check control message container tail still, if it is not empty and MODCOD match
               // control messages are used default MODCOD
-              if ( ( m_ctrlContainer.empty () == false ) && ( m_bbFrameConf->GetDefaultModCod () < itFromMerge->first ) )
+              if ( ( m_ctrlContainer.empty () == false ) && ( m_ctrlContainer.back ()->GetModcod () < itFromMerge->first ) )
                 {
                   if (m_ctrlContainer.back ()->GetOccupancy() < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
                     {
@@ -362,7 +345,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
 
     // if both short and normal frames are used then try to shrink normal frames
     // which are last ones in containers
-    if ( m_bbFrameUsageMode == SatBbFrameContainer::SHORT_AND_NORMAL_FRAMES )
+    if ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
       {
         // go through all MODCOD based BB Frame containers and try to shrink last frame in the container
         for (FrameContainer_t::reverse_iterator it = m_container.rbegin (); it != m_container.rend (); it++ )

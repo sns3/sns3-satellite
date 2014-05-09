@@ -240,6 +240,13 @@ public:
   bool GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength = SHORT_BURST_LENGTH) const;
 
   /**
+   * \brief Get the most robust waveform id based payload of the waveform in bytes
+   * \param burstLength Requested burst length in symbols
+   * \return The most robust waveform id.
+   */
+  uint32_t GetMostRobustWaveformId (uint32_t burstLength = SHORT_BURST_LENGTH) const;
+
+  /**
    * \brief Dump the contents of the waveform. The total carrier bandwidth and symbol rate
    * are needed for spectral efficiency calculation.
    * \param carrierBandwidthInHz Total carrier bandwidth including e.g. guard band.

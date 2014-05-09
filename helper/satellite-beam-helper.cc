@@ -393,9 +393,17 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
   uint8_t rcMaxCount = llsConf.Get<SatLowerLayerServiceConf> ()->GetDaServiceCount ();
 
-  // calculate maximum size of the BB fraem with default (most robust) MODCOD
+  // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
-  uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
+
+  SatEnums::SatBbFrameType_t frameType = SatEnums::NORMAL_FRAME;
+
+  if (bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_FRAMES)
+    {
+      frameType = SatEnums::SHORT_FRAME;
+    }
+
+  uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatUtils::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
   m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq, rcMaxCount, maxBbFrameDataSizeInBytes );
 

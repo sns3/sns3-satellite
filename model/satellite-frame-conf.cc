@@ -110,7 +110,8 @@ SatFrameConf::SatFrameConf ()
    m_isRandomAccess (false),
    m_btuConf (0),
    m_carrierCount (0),
-   m_maxSymbolsPerCarrier (0)
+   m_maxSymbolsPerCarrier (0),
+   m_minPayloadPerCarrierInBytes (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -118,7 +119,8 @@ SatFrameConf::SatFrameConf ()
   NS_ASSERT (false);
 }
 
-SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccess)
+SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf,
+                             Ptr<SatWaveformConf> waveformConf, bool isRandomAccess, bool defaultWaveformInUse )
   : m_bandwidthHz (bandwidthHz),
     m_isRandomAccess (isRandomAccess),
     m_btuConf (btuConf),
@@ -133,12 +135,17 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
       NS_FATAL_ERROR ("No carriers can be created for the frame with given BTU and bandwidth. Check frame configuration parameters (attributes)!!! ");
     }
 
-  // get default waveform
-  uint32_t defaultWaveFormId = m_waveformConf->GetDefaultWaveformId ();
-  Ptr<SatWaveform> defaultWaveform = m_waveformConf->GetWaveform (defaultWaveFormId);
+  uint32_t waveFormId = m_waveformConf->GetDefaultWaveformId ();
+
+  if ( ( defaultWaveformInUse == false ) && ( isRandomAccess == false ) )
+    {
+      waveFormId = m_waveformConf->GetMostRobustWaveformId ();
+    }
+
+  Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (waveFormId);
 
   // calculate slot details based on given parameters and default waveform
-  Time timeSlotDuration = defaultWaveform->GetBurstDuration (m_btuConf->GetSymbolRateInBauds ());
+  Time timeSlotDuration = waveform->GetBurstDuration (m_btuConf->GetSymbolRateInBauds ());
   uint32_t carrierSlotCount = targetDuration.GetSeconds() / timeSlotDuration.GetSeconds ();
 
   if ( carrierSlotCount == 0)
@@ -147,15 +154,15 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
     }
 
   m_duration = Time ( carrierSlotCount * timeSlotDuration.GetInteger () );
-  m_maxSymbolsPerCarrier = carrierSlotCount * defaultWaveform->GetBurstLengthInSymbols ();
-  m_minPayloadPerCarrierInBytes = carrierSlotCount * defaultWaveform->GetPayloadInBytes ();
+  m_maxSymbolsPerCarrier = carrierSlotCount * waveform->GetBurstLengthInSymbols ();
+  m_minPayloadPerCarrierInBytes = carrierSlotCount * waveform->GetPayloadInBytes ();
 
   // Created time slots for every carrier and add them to frame configuration
   for (uint32_t i = 0; i < m_carrierCount; i++)
     {
       for (uint32_t j = 0; j < carrierSlotCount; j++)
         {
-          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defaultWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
+          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), waveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
           AddTimeSlotConf (timeSlot);
         }
     }
@@ -633,6 +640,8 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
   DoConfigure ();
 
+  bool useDefaultWaveform = false;
+
   // make actual configuration
 
   switch (m_configType)
@@ -645,6 +654,11 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
           m_frames.clear ();
           m_carrierCount = 0;
 
+          if ( m_configType == CONFIG_TYPE_0)
+            {
+              useDefaultWaveform = true;
+            }
+
           for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
             {
               // Create BTU conf according to given attributes
@@ -653,7 +667,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
               // Created frame to be used utilizing earlier created BTU
               Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], targetDuration, btuConf,
-                                                                  waveformConf, m_frameIsRandomAccess[frameIndex] );
+                                                                  waveformConf, m_frameIsRandomAccess[frameIndex], useDefaultWaveform );
 
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
