@@ -46,7 +46,7 @@ SatReturnLinkEncapsulatorArq::SatReturnLinkEncapsulatorArq ()
  m_retxBuffer (),
  m_retxBufferSize (0),
  m_txedBufferSize (0),
- m_maxRtnArqSegmentSize (38),
+ m_maxRtnArqSegmentSize (37),
  m_maxNoOfRetransmissions (2),
  m_retransmissionTimer (Seconds (0.6)),
  m_arqWindowSize (10),
@@ -65,7 +65,7 @@ SatReturnLinkEncapsulatorArq::SatReturnLinkEncapsulatorArq (Mac48Address source,
  m_retxBuffer (),
  m_retxBufferSize (0),
  m_txedBufferSize (0),
- m_maxRtnArqSegmentSize (38),
+ m_maxRtnArqSegmentSize (37),
  m_maxNoOfRetransmissions (2),
  m_retransmissionTimer (Seconds (0.6)),
  m_arqWindowSize (10),
@@ -93,7 +93,7 @@ SatReturnLinkEncapsulatorArq::GetTypeId (void)
     .AddConstructor<SatReturnLinkEncapsulatorArq> ()
     .AddAttribute( "MaxRtnArqSegmentSize",
                    "Maximum return link ARQ segment size in Bytes.",
-                   UintegerValue (38),
+                   UintegerValue (37),
                    MakeUintegerAccessor (&SatReturnLinkEncapsulatorArq::m_maxRtnArqSegmentSize),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute( "MaxNoOfRetransmissions",
@@ -215,7 +215,8 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 
           NS_LOG_LOGIC ("UT: << " << m_sourceAddress << " sent a retransmission packet of size: " << context->m_pdu->GetSize () << " with seqNo: " << (uint32_t)(context->m_seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
 
-          return context->m_pdu;
+          Ptr<Packet> copy = context->m_pdu->Copy ();
+          return copy;
         }
       else
         {
@@ -254,7 +255,8 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           // Create ARQ context and store it to Tx'ed buffer
           Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext> ();
           arqContext->m_retransmissionCount = 0;
-          arqContext->m_pdu = packet;
+          Ptr<Packet> copy = packet->Copy ();
+          arqContext->m_pdu = copy;
           arqContext->m_seqNo = seqNo;
 
           // Create the retransmission event and store it to the context. Event is cancelled if a ACK
@@ -288,7 +290,7 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 void
 SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << seqNo);
 
   NS_LOG_LOGIC ("At UT: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
@@ -296,6 +298,9 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 
   if (it != m_txedBuffer.end ())
     {
+      NS_ASSERT (seqNo == it->second->m_seqNo);
+      NS_ASSERT (it->second->m_pdu);
+
       // Retransmission still possible
       if (it->second->m_retransmissionCount < m_maxNoOfRetransmissions)
         {

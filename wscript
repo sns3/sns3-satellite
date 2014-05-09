@@ -156,6 +156,7 @@ def build(bld):
         'test/link-results-test.cc',
         'test/performance-memory-test.cc',
         'test/satellite-antenna-pattern-test.cc',
+        'test/satellite-arq-test.cc',
         'test/satellite-arq-seqno-test.cc',
         'test/satellite-channel-estimation-error-test.cc',
         'test/satellite-control-msg-container-test.cc',
