@@ -191,7 +191,22 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frame
   m_waveformConf = m_frameConf->GetWaveformConf ();
   m_maxSymbolsPerCarrier = frameConf->GetCarrierMaxSymbols ();
   m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_frameConf->GetCarrierCount ();
-  m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
+
+  switch ( m_configType )
+    {
+      case SatSuperframeConf::CONFIG_TYPE_0:
+      case SatSuperframeConf::CONFIG_TYPE_1:
+        m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
+        break;
+
+      case SatSuperframeConf::CONFIG_TYPE_2:
+        m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
+        break;
+
+      default:
+        NS_FATAL_ERROR ("Not supported configuration type");
+        break;
+    }
 
   Reset ();
 }
@@ -377,26 +392,16 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
                 }
             }
             break;
+
+          default:
+            NS_FATAL_ERROR ("Not supported CC level!!!");
+            break;
         }
 
       if ( allocated )
         {
-          // update request according to carrier limit
-          UpdateAllocReq (reqInSymbols);
-
-          // add request and empty allocation info container
-          UtAllocItem_t utAlloc;
-          utAlloc.m_request = reqInSymbols;
-          utAlloc.m_allocation = SatFrameAllocInfo (reqInSymbols.m_allocInfoPerRc.size ());
-          utAlloc.m_cno = allocReq->m_cno;
-
-          for (uint8_t i = 0; i < reqInSymbols.m_allocInfoPerRc.size (); i++)
-            {
-              RcAllocItem_t rcAlloc = std::make_pair (allocReq->m_address, i);
-              m_rcAllocs.push_back (rcAlloc);
-            }
-
-          m_utAllocs.insert (std::make_pair (allocReq->m_address, utAlloc));
+          // update request according to carrier limit and store allocation request
+          UpdateAndStoreAllocReq (allocReq->m_address, allocReq->m_cno, reqInSymbols);
         }
       }
 
@@ -735,60 +740,49 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
       {
         switch (m_configType)
         {
-          case 0:
+          case SatSuperframeConf::CONFIG_TYPE_0:
             {
               uint16_t index = (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / timeSlotSymbols;
               timeSlotConf = m_frameConf->GetTimeSlotConf (carrierId, index);
-
-              carrierSymbolsToUse -= timeSlotSymbols;
-              utSymbolsToUse -= timeSlotSymbols;
-
-              if ( rcBasedAllocationEnabled )
-                {
-                  utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
-                }
-              else
-                {
-                  utSymbolsLeft -= timeSlotSymbols;
-                }
-
-              rcSymbolsLeft -= timeSlotSymbols;
             }
             break;
 
-          case 1:
-          case 2:
+          case SatSuperframeConf::CONFIG_TYPE_1:
+          case SatSuperframeConf::CONFIG_TYPE_2:
             {
               uint32_t waveformId = 0;
-              bool waveformFound = m_waveformConf->GetBestWaveformId (cno, m_frameConf->GetDuration ().GetSeconds (), waveformId, timeSlotSymbols );
+              bool waveformFound = m_waveformConf->GetBestWaveformId (cno, m_frameConf->GetBtuConf ()->GetSymbolRateInBauds (), waveformId, timeSlotSymbols );
 
               if ( waveformFound )
                 {
                   Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
                   timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_TRC);
-
-                  carrierSymbolsToUse -= timeSlotSymbols;
-                  utSymbolsToUse -= timeSlotSymbols;
-
-                  if ( rcBasedAllocationEnabled )
-                    {
-                      utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
-                    }
-                  else
-                    {
-                      utSymbolsLeft -= timeSlotSymbols;
-                    }
-
-                  rcSymbolsLeft -= timeSlotSymbols;
                 }
             }
             break;
 
-          case 3:
+          case SatSuperframeConf::CONFIG_TYPE_3:
           default:
             NS_FATAL_ERROR ("Not supported configuration type!!!");
             break;
         }
+
+        if (timeSlotConf)
+          {
+            carrierSymbolsToUse -= timeSlotSymbols;
+            utSymbolsToUse -= timeSlotSymbols;
+
+            if ( rcBasedAllocationEnabled )
+              {
+                utSymbolsLeft -= std::min (rcSymbolsLeft, timeSlotSymbols);
+              }
+            else
+              {
+                utSymbolsLeft -= timeSlotSymbols;
+              }
+
+            rcSymbolsLeft -= timeSlotSymbols;
+          }
       }
 
   return timeSlotConf;
@@ -837,46 +831,25 @@ SatFrameAllocator::GetOptimalBurtsLengthInSymbols (int64_t symbolsToUse, int64_t
 
   uint32_t burstLength = 0;
 
-  switch (m_configType)
-    {
-      case 0:
-      case 1:
-        if ( (rcSymbolsLeft > 0) && (symbolsToUse >= m_waveformConf->GetDefaultBurstLength ()))
+  for (SatWaveformConf::BurstLengthContainer_t::const_iterator it = m_burstLenghts.begin (); it != m_burstLenghts.end (); it++)
+  {
+    if ( symbolsToUse >= *it )
+      {
+        if ( burstLength < rcSymbolsLeft)
           {
-            burstLength = m_waveformConf->GetDefaultBurstLength ();
+            if ( burstLength < *it )
+              {
+                burstLength = *it;
+              }
           }
-        break;
-
-      case 2:
-        {
-          for (SatWaveformConf::BurstLengthContainer_t::const_iterator it = m_burstLenghts.begin (); it != m_burstLenghts.end (); it++)
-            {
-              if ( symbolsToUse >= *it )
-                {
-                  if ( burstLength < rcSymbolsLeft)
-                    {
-                      if ( burstLength < *it )
-                        {
-                          burstLength = *it;
-                        }
-                    }
-                  else if ( (*it - rcSymbolsLeft) < (burstLength - rcSymbolsLeft))
-                    {
-                      burstLength = *it;
-                    }
-                }
-            }
-        }
-        break;
-
-      case 3:
-      default:
-        NS_FATAL_ERROR ("Not supported configuration type!!!");
-        break;
-    }
+        else if ( (*it - rcSymbolsLeft) < (burstLength - rcSymbolsLeft))
+          {
+            burstLength = *it;
+          }
+      }
+  }
 
   return burstLength;
-
 }
 
 void
@@ -964,7 +937,7 @@ SatFrameAllocator::AcceptRequests (CcLevel_t ccLevel)
 }
 
 void
-SatFrameAllocator::UpdateAllocReq (SatFrameAllocInfo &req)
+SatFrameAllocator::UpdateAndStoreAllocReq (Address address, double cno, SatFrameAllocInfo &req)
 {
   NS_LOG_FUNCTION (this);
 
@@ -1022,6 +995,20 @@ SatFrameAllocator::UpdateAllocReq (SatFrameAllocInfo &req)
 
       req.m_vbdcSymbols = vbdcSymbolsLeft;
     }
+
+  // add request and empty allocation info container
+  UtAllocItem_t utAlloc;
+  utAlloc.m_request = req;
+  utAlloc.m_allocation = SatFrameAllocInfo (req.m_allocInfoPerRc.size ());
+  utAlloc.m_cno = cno;
+
+  for (uint8_t i = 0; i < req.m_allocInfoPerRc.size (); i++)
+    {
+      RcAllocItem_t rcAlloc = std::make_pair (address, i);
+      m_rcAllocs.push_back (rcAlloc);
+    }
+
+  m_utAllocs.insert (std::make_pair (address, utAlloc));
 }
 
 std::vector<Address>
@@ -1071,7 +1058,7 @@ SatFrameAllocator::SortUtRcs (Address ut)
       rcIndices.push_back (i);
     }
 
-  // we need to sort (or shuffle) only when there two RCs in addition to RC 0,
+  // we need to sort (or shuffle) only when there are at least two RCs in addition to RC 0,
   // because RC 0 is always first in the list
   if ( rcIndices.size () > 2)
     {

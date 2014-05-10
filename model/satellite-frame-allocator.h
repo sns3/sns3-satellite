@@ -454,9 +454,11 @@ private:
 
   /**
    * Update RC/CC requested according to carrier limit
+   * \param address Address of the UT which allocation is associated.
+   * \param cno C/N0 value estimated for the UT.
    * \param req Allocation request to update
    */
-  void UpdateAllocReq (SatFrameAllocInfo &req);
+  void UpdateAndStoreAllocReq (Address address, double cno, SatFrameAllocInfo &req);
 
   /**
    * Accept UT/RC requests of the frame according to given CC level.
