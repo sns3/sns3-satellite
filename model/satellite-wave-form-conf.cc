@@ -353,35 +353,33 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
   return success;
 }
 
-uint32_t
-SatWaveformConf::GetMostRobustWaveformId (uint32_t burstLength) const
+bool
+SatWaveformConf::GetMostRobustWaveformId (uint32_t& wfId, uint32_t burstLength) const
 {
   NS_LOG_FUNCTION (this << burstLength);
 
-  uint32_t mostRobustWaveformId = m_defaultWfId;
+  bool found = false;
 
-  // If ACM is enabled, find if there is more robust waveform that default
-  if (m_acmEnabled)
+  uint32_t mostRobustWaveformId = m_minWfId;
+  uint32_t payloadInBytes = m_waveforms.at (mostRobustWaveformId)->GetPayloadInBytes ();
+
+  // find the waveform with the more robust waveform than previous one
+  for ( std::map< uint32_t, Ptr<SatWaveform> >::const_reverse_iterator rit = m_waveforms.rbegin ();
+      rit != m_waveforms.rend ();
+      ++rit )
     {
-      uint32_t payloadInBytes = m_waveforms.at (mostRobustWaveformId)->GetPayloadInBytes ();
-
-      // find the waveform with the more robust waveform than previous one
-      for ( std::map< uint32_t, Ptr<SatWaveform> >::const_reverse_iterator rit = m_waveforms.rbegin ();
-          rit != m_waveforms.rend ();
-          ++rit )
+      if (rit->second->GetBurstLengthInSymbols() == burstLength)
         {
-          if (rit->second->GetBurstLengthInSymbols() == burstLength)
+          // The first waveform over the threshold
+          if ( rit->second->GetPayloadInBytes () < payloadInBytes)
             {
-              // The first waveform over the threshold
-              if ( rit->second->GetPayloadInBytes () < payloadInBytes)
-                {
-                  mostRobustWaveformId = rit->first;
-                }
+              mostRobustWaveformId = rit->first;
+              found = true;
             }
         }
     }
 
-  return mostRobustWaveformId;
+  return found;
 }
 
 void

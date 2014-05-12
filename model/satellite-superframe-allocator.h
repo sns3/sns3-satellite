@@ -71,8 +71,9 @@ public:
    * Reserve minimum rate from the allocator. This method is called to perform CAC functionality.
    *
    * \param minimumRateBytes Minimum rate based bytes needed to reserve
+   * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
    */
-  void ReserveMinimumRate (uint32_t minimumRateBytes);
+  void ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
 
   /**
    * Preallocate symbols for given to UTs in superframe.
@@ -125,6 +126,9 @@ private:
   // The flag telling if time slot generation is done per RC based symbols
   // instead of UT based symbols
   bool m_rcBasedAllocationEnabled;
+
+  // the most robust
+  uint32_t m_mostRobustSlotPayloadInBytes;
 
   /**
    *  Allocate given request according to type.

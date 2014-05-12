@@ -105,6 +105,8 @@ public:
     Address                           m_address;
     SatFrameAllocReqItemContainer_t   m_reqPerRc;
 
+    SatFrameAllocReq () : m_generateCtrlSlot (false), m_cno (NAN) {}
+
     /**
      * Construct SatFrameAllocReq
      *
@@ -149,6 +151,13 @@ public:
    * \return minimum payload of a carrier in bytes
    */
   inline uint32_t GetCarrierMinPayloadInBytes () const { return m_frameConf->GetCarrierMinPayloadInBytes (); }
+
+  /**
+   * Get the most robust waveform used by this frame allocator.
+   *
+   * \return the most robust waveform
+   */
+  inline Ptr<SatWaveform> GetMostRobustWaveform () const { return m_mostRobustWaveform; }
 
   /**
    * Reset frame allocator.
@@ -406,6 +415,9 @@ private:
 
   // RC allocation container
   RcAllocContainer_t  m_rcAllocs;
+
+  // The most robust waveform
+  Ptr<SatWaveform>  m_mostRobustWaveform;
 
   /**
    * Share symbols between all UTs and RCs allocated to the frame.

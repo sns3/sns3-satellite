@@ -32,7 +32,6 @@ NS_OBJECT_ENSURE_REGISTERED (SatBbFrameContainer);
 
 SatBbFrameContainer::SatBbFrameContainer ()
 : m_totalDuration (Seconds (0)),
-  m_defaultMostRobustModcod (SatEnums::SAT_NONVALID_MODCOD),
   m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
@@ -62,8 +61,6 @@ SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& mo
       m_defaultBbFrameType = SatEnums::SHORT_FRAME;
     }
 
-  m_defaultMostRobustModcod = m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType);
-
 }
 
 SatBbFrameContainer::~SatBbFrameContainer ()
@@ -92,7 +89,7 @@ SatBbFrameContainer::GetModcod (uint32_t priorityClass, double cno)
 
   if (priorityClass == 0)
     {
-      modcod = m_defaultMostRobustModcod;
+      modcod = m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType);
     }
   else if ( isnan (cno) == false )
     {
@@ -115,7 +112,7 @@ SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums
     }
   else
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_defaultMostRobustModcod, m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
+      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType), m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
     }
 
   payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
@@ -177,7 +174,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
           GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
         {
           // create and add frame to tail
-          CreateFrameToTail (priorityClass, m_defaultMostRobustModcod);
+          CreateFrameToTail (priorityClass, m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType) );
         }
       else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
                 ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )

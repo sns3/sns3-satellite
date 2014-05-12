@@ -286,7 +286,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
   // this method call acts as CAC check, if allocation fails fatal error is occurred.
-  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()));
+  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()), m_controlSlotsEnabled);
 
   Time firstCtrlSlotInterval = m_controlSlotInterval;
 

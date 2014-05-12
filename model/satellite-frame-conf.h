@@ -213,15 +213,15 @@ public:
   /**
    * Constructor for SatFrameConf.
    *
-   * \param bandwidthHz       Bandwidth of the frame in hertz
-   * \param targetDuration    Target duration of the frame
-   * \param btuConf           BTU configuration of the frame
-   * \param waveformConf      Waveform configuration
-   * \param isRandomAccess    Flag telling if random access frame
-   * \param defaultwaveformInUse Flag telling if default waveform shoul be used with frame
+   * \param bandwidthHz           Bandwidth of the frame in hertz
+   * \param targetDuration        Target duration of the frame
+   * \param btuConf               BTU configuration of the frame
+   * \param waveformConf          Waveform configuration
+   * \param isRandomAccess        Flag telling if random access frame
+   * \param defaultwaveformInUse  Flag telling if default waveform should be used with frame
    */
   SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf,
-                 Ptr<SatWaveformConf> waveformConf, bool isRandomAccess, bool defaultwaveformInUse );
+                 Ptr<SatWaveformConf> waveformConf, bool isRandomAccess, bool defaultWaveformInUse );
 
   /**
    * Destructor for SatFrameConf

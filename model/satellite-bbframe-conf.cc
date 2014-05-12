@@ -145,7 +145,10 @@ SatBbFrameConf::SatBbFrameConf ()
   m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
   m_shortFramePayloadInSlots (),
   m_normalFramePayloadInSlots (),
-  m_waveforms ()
+  m_waveforms (),
+  m_bbFrameUsageMode (NORMAL_FRAMES),
+  m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -167,7 +170,9 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_shortFramePayloadInSlots (),
   m_normalFramePayloadInSlots (),
   m_waveforms (),
-  m_bbFrameUsageMode (NORMAL_FRAMES)
+  m_bbFrameUsageMode (NORMAL_FRAMES),
+  m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
 {
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
@@ -205,6 +210,40 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
           m_waveforms.insert (std::make_pair (std::make_pair (*mit, *fit), wf));
           wfCount++;
         }
+    }
+
+  uint32_t payloadBitsForShortFrame = std::numeric_limits<uint32_t>::max ();
+  uint32_t payloadBitsForNormalFrame = std::numeric_limits<uint32_t>::max ();
+
+  // find the waveform with the more robust MODCOD than previous one
+  for ( waveformMap_t::const_reverse_iterator rit = m_waveforms.rbegin ();
+      rit != m_waveforms.rend ();
+      ++rit )
+    {
+      if (rit->second->GetBbFrameType() == SatEnums::SHORT_FRAME)
+        {
+          // The first waveform over the threshold
+          if (rit->second->GetPayloadInBits() < payloadBitsForShortFrame)
+            {
+              payloadBitsForShortFrame = rit->second->GetPayloadInBits();
+              m_mostRobustShortFrameModcod = rit->second->GetModcod ();
+            }
+        }
+
+        if (rit->second->GetBbFrameType() == SatEnums::NORMAL_FRAME)
+          {
+            // The first waveform over the threshold
+            if (rit->second->GetPayloadInBits() < payloadBitsForNormalFrame)
+              {
+                payloadBitsForNormalFrame = rit->second->GetPayloadInBits();
+                m_mostRobustNormalFrameModcod = rit->second->GetModcod ();
+              }
+          }
+    }
+
+  if ( ( m_mostRobustNormalFrameModcod == SatEnums::SAT_NONVALID_MODCOD ) || (m_mostRobustShortFrameModcod == SatEnums::SAT_NONVALID_MODCOD ) )
+    {
+      NS_FATAL_ERROR ("The most robust MODCOD not found, BB frame configuration error???");
     }
 }
 
@@ -461,30 +500,22 @@ SatBbFrameConf::GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const
 {
   NS_LOG_FUNCTION (this << frameType);
 
-  SatEnums::SatModcod_t mostRobustModCod = m_defaultModCod;
+  SatEnums::SatModcod_t mostRobustModcod = SatEnums::SAT_NONVALID_MODCOD;
 
-  // If ACM is enabled, check if there more robust MODCOD than the default
-  if (m_acmEnabled)
+  if ( frameType == SatEnums::SHORT_FRAME )
     {
-      uint32_t payloadBits = m_waveforms.at (std::make_pair (mostRobustModCod, frameType))->GetPayloadInBits ();
-
-      // find the waveform with the more robust MODCOD than previous one
-      for ( waveformMap_t::const_reverse_iterator rit = m_waveforms.rbegin ();
-          rit != m_waveforms.rend ();
-          ++rit )
-        {
-          if (rit->second->GetBbFrameType() == frameType)
-            {
-              // The first waveform over the threshold
-              if (rit->second->GetPayloadInBits() < payloadBits)
-                {
-                  mostRobustModCod = rit->second->GetModcod ();
-                }
-            }
-        }
+      mostRobustModcod = m_mostRobustShortFrameModcod;
+    }
+  else if ( frameType == SatEnums::NORMAL_FRAME )
+    {
+      mostRobustModcod = m_mostRobustNormalFrameModcod;
+    }
+  else
+    {
+     NS_FATAL_ERROR ("Not supported frame type!!!");
     }
 
-  return mostRobustModCod;
+  return mostRobustModcod;
 }
 
 SatEnums::SatModcod_t

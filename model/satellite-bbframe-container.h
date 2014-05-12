@@ -115,7 +115,6 @@ private:
   FrameContainer_t              m_container;
   Time                          m_totalDuration;
   Ptr<SatBbFrameConf>           m_bbFrameConf;
-  SatEnums::SatModcod_t         m_defaultMostRobustModcod;
   SatEnums::SatBbFrameType_t    m_defaultBbFrameType;
 
   /**

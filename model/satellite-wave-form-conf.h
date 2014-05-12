@@ -190,6 +190,8 @@ public:
 
   static TypeId GetTypeId (void);
 
+  inline bool IsAcmEnabled () const { return m_acmEnabled; }
+
   /**
    * \brief Initialize the Eb/No requirements of the waveforms based on
    * the used DVB-RCS2 link results.
@@ -241,10 +243,11 @@ public:
 
   /**
    * \brief Get the most robust waveform id based payload of the waveform in bytes
+   * \param wfId Waveform id variable used for passing the best waveform id to the client
    * \param burstLength Requested burst length in symbols
-   * \return The most robust waveform id.
+   * \return boolean value presenting whether or not a suitable waveform was found.
    */
-  uint32_t GetMostRobustWaveformId (uint32_t burstLength = SHORT_BURST_LENGTH) const;
+  bool GetMostRobustWaveformId (uint32_t& wfId, uint32_t burstLength = SHORT_BURST_LENGTH) const;
 
   /**
    * \brief Dump the contents of the waveform. The total carrier bandwidth and symbol rate

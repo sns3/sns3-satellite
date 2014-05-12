@@ -231,7 +231,7 @@ public:
   /**
    * \brief Get the most robust MODCOD with a given BB frame type.
    * \param frameType Used BBFrame type (short OR normal)
-   * \return SatModcod_t The best MODCOD
+   * \return SatModcod_t The most robuts MODCOD
    */
   SatEnums::SatModcod_t GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const;
 
@@ -334,6 +334,16 @@ private:
    * BBFrame usage mode.
    */
   BbFrameUsageMode_t m_bbFrameUsageMode;
+
+  /**
+   * The most robust MODCOD for short frame.
+   */
+  SatEnums::SatModcod_t m_mostRobustShortFrameModcod;
+
+  /**
+   * The most robust MODCOD fro long frame.
+   */
+  SatEnums::SatModcod_t m_mostRobustNormalFrameModcod;
 };
 
 } // namespace ns3

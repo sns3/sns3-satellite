@@ -135,17 +135,11 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
       NS_FATAL_ERROR ("No carriers can be created for the frame with given BTU and bandwidth. Check frame configuration parameters (attributes)!!! ");
     }
 
-  uint32_t waveFormId = m_waveformConf->GetDefaultWaveformId ();
-
-  if ( ( defaultWaveformInUse == false ) && ( isRandomAccess == false ) )
-    {
-      waveFormId = m_waveformConf->GetMostRobustWaveformId ();
-    }
-
-  Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (waveFormId);
+  uint32_t defWaveFormId = m_waveformConf->GetDefaultWaveformId ();
+  Ptr<SatWaveform> defWaveform = m_waveformConf->GetWaveform (defWaveFormId);
 
   // calculate slot details based on given parameters and default waveform
-  Time timeSlotDuration = waveform->GetBurstDuration (m_btuConf->GetSymbolRateInBauds ());
+  Time timeSlotDuration = defWaveform->GetBurstDuration (m_btuConf->GetSymbolRateInBauds ());
   uint32_t carrierSlotCount = targetDuration.GetSeconds() / timeSlotDuration.GetSeconds ();
 
   if ( carrierSlotCount == 0)
@@ -154,15 +148,31 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
     }
 
   m_duration = Time ( carrierSlotCount * timeSlotDuration.GetInteger () );
-  m_maxSymbolsPerCarrier = carrierSlotCount * waveform->GetBurstLengthInSymbols ();
-  m_minPayloadPerCarrierInBytes = carrierSlotCount * waveform->GetPayloadInBytes ();
+  m_maxSymbolsPerCarrier = carrierSlotCount * defWaveform->GetBurstLengthInSymbols ();
+
+  if ( defaultWaveformInUse || (m_waveformConf->IsAcmEnabled () == false ))
+    {
+      m_minPayloadPerCarrierInBytes = carrierSlotCount * defWaveform->GetPayloadInBytes ();
+    }
+  else
+    {
+      uint32_t mostRobustWaveFormId;
+
+      if ( !m_waveformConf->GetMostRobustWaveformId (mostRobustWaveFormId, defWaveform->GetBurstLengthInSymbols() ) )
+        {
+          NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
+        }
+
+      Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (mostRobustWaveFormId);
+      m_minPayloadPerCarrierInBytes = carrierSlotCount * defWaveform->GetPayloadInBytes ();
+    }
 
   // Created time slots for every carrier and add them to frame configuration
   for (uint32_t i = 0; i < m_carrierCount; i++)
     {
       for (uint32_t j = 0; j < carrierSlotCount; j++)
         {
-          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), waveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
+          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
           AddTimeSlotConf (timeSlot);
         }
     }

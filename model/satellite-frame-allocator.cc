@@ -195,13 +195,45 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frame
   switch ( m_configType )
     {
       case SatSuperframeConf::CONFIG_TYPE_0:
+        {
+          m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
+          m_mostRobustWaveform = m_waveformConf->GetWaveform (m_waveformConf->GetDefaultWaveformId ());
+          break;
+        }
+
       case SatSuperframeConf::CONFIG_TYPE_1:
-        m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
-        break;
+        {
+          m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
+
+          uint32_t mostRobustWaveformId = 0;
+
+          if ( m_waveformConf->GetMostRobustWaveformId (mostRobustWaveformId, m_waveformConf->GetDefaultBurstLength ()) )
+           {
+             m_mostRobustWaveform = m_waveformConf->GetWaveform (mostRobustWaveformId);
+           }
+          else
+           {
+             NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
+           }
+          break;
+        }
 
       case SatSuperframeConf::CONFIG_TYPE_2:
-        m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
-        break;
+        {
+          m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
+
+          uint32_t mostRobustWaveformId = 0;
+
+          if ( m_waveformConf->GetMostRobustWaveformId (mostRobustWaveformId, SatWaveformConf::SHORT_BURST_LENGTH) )
+            {
+              m_mostRobustWaveform = m_waveformConf->GetWaveform (mostRobustWaveformId);
+            }
+          else
+            {
+              NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
+            }
+          break;
+        }
 
       default:
         NS_FATAL_ERROR ("Not supported configuration type");
@@ -302,7 +334,7 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
     {
       // convert request in bytes to symbols based on given waveform
       SatFrameAllocator::SatFrameAllocInfo reqInSymbols = SatFrameAllocInfo (allocReq->m_reqPerRc, m_waveformConf->GetWaveform (waveFormId),
-                                                                             allocReq->m_generateCtrlSlot, m_waveformConf->GetDefaultBurstLength () );
+                                                                             allocReq->m_generateCtrlSlot, m_mostRobustWaveform->GetBurstLengthInSymbols () );
       switch (ccLevel)
         {
           case CC_LEVEL_CRA:
@@ -790,21 +822,19 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
 
 Ptr<SatTimeSlotConf>
 SatFrameAllocator::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse,
-                                                     int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, bool rcBasedAllocationEnabled)
+                                       int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, bool rcBasedAllocationEnabled)
 {
   NS_LOG_FUNCTION (this);
 
   Ptr<SatTimeSlotConf> timeSlotConf = NULL;
   int64_t symbolsToUse = std::min<int64_t> (carrierSymbolsToUse, utSymbolsToUse);
 
-  int64_t timeSlotSymbols = m_waveformConf->GetWaveform (m_waveformConf->GetMostRobustWaveformId ())->GetBurstLengthInSymbols();
+  int64_t timeSlotSymbols = m_mostRobustWaveform->GetBurstLengthInSymbols ();
 
   if ( timeSlotSymbols <= symbolsToUse )
     {
-      uint32_t waveformId = m_waveformConf->GetMostRobustWaveformId ();
-
       Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-      timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_C);
+      timeSlotConf = Create<SatTimeSlotConf> (startTime, m_mostRobustWaveform->GetWaveformId (), carrierId, SatTimeSlotConf::SLOT_TYPE_C);
 
       carrierSymbolsToUse -= timeSlotSymbols;
       utSymbolsToUse -= timeSlotSymbols;

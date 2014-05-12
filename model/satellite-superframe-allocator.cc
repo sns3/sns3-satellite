@@ -76,6 +76,7 @@ SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFram
   NS_LOG_FUNCTION (this);
 
   uint32_t currentMinCarrierPayloadInBytes = std::numeric_limits<uint32_t>::max ();
+  uint32_t currentMostRobustSlotPayloadInBytes = std::numeric_limits<uint32_t>::max ();
 
   for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
     {
@@ -92,6 +93,14 @@ SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFram
             {
               currentMinCarrierPayloadInBytes = minCarrierPayloadInBytes;
               m_minCarrierPayloadInBytes = minCarrierPayloadInBytes;
+            }
+
+          uint32_t mostRobustSlotPayloadInBytes = frameAllocator->GetMostRobustWaveform ()->GetPayloadInBytes ();
+
+          if ( mostRobustSlotPayloadInBytes < currentMostRobustSlotPayloadInBytes )
+            {
+              currentMostRobustSlotPayloadInBytes = mostRobustSlotPayloadInBytes;
+              m_mostRobustSlotPayloadInBytes = mostRobustSlotPayloadInBytes;
             }
 
           m_minimumRateBasedBytesLeft += frameConf->GetCarrierCount () * minCarrierPayloadInBytes;
@@ -149,15 +158,22 @@ SatSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAllocCont
     }
 }
 
-void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes)
+void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
 {
   NS_LOG_FUNCTION (this << minimumRateBytes);
 
-  if ( minimumRateBytes > m_minCarrierPayloadInBytes )
+  uint32_t rateBasedByteToCheck = minimumRateBytes;
+
+  if ( controlSlotsEnabled )
+    {
+      rateBasedByteToCheck += m_mostRobustSlotPayloadInBytes;
+    }
+
+  if ( rateBasedByteToCheck > m_minCarrierPayloadInBytes )
     {
       NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes available in minimum carrier bytes: " << m_minCarrierPayloadInBytes);
     }
-  else if ( minimumRateBytes > m_minimumRateBasedBytesLeft )
+  else if ( rateBasedByteToCheck > m_minimumRateBasedBytesLeft )
     {
       NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes minimum bytes left: " << m_minimumRateBasedBytesLeft);
     }
