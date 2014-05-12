@@ -335,6 +335,11 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
       // convert request in bytes to symbols based on given waveform
       SatFrameAllocator::SatFrameAllocInfo reqInSymbols = SatFrameAllocInfo (allocReq->m_reqPerRc, m_waveformConf->GetWaveform (waveFormId),
                                                                              allocReq->m_generateCtrlSlot, m_mostRobustWaveform->GetBurstLengthInSymbols () );
+      if ( reqInSymbols.m_minRbdcSymbols > reqInSymbols.m_rbdcSymbols )
+        {
+          NS_FATAL_ERROR ("Min RBDC bytes is greater than RBDC bytes!!!");
+        }
+
       switch (ccLevel)
         {
           case CC_LEVEL_CRA:

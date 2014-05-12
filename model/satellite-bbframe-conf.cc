@@ -245,6 +245,11 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
     {
       NS_FATAL_ERROR ("The most robust MODCOD not found, BB frame configuration error???");
     }
+  else if ( m_mostRobustNormalFrameModcod != m_mostRobustShortFrameModcod)
+    {
+      // currently is assumed that the most robust MODCODs are same for both short and normal frames
+      NS_FATAL_ERROR ("The most robust MODCODs are different for short and normal frames!!!");
+    }
 }
 
 TypeId

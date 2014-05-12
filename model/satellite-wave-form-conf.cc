@@ -360,8 +360,7 @@ SatWaveformConf::GetMostRobustWaveformId (uint32_t& wfId, uint32_t burstLength) 
 
   bool found = false;
 
-  uint32_t mostRobustWaveformId = m_minWfId;
-  uint32_t payloadInBytes = m_waveforms.at (mostRobustWaveformId)->GetPayloadInBytes ();
+  uint32_t payloadInBytes = std::numeric_limits<uint32_t>::max ();
 
   // find the waveform with the more robust waveform than previous one
   for ( std::map< uint32_t, Ptr<SatWaveform> >::const_reverse_iterator rit = m_waveforms.rbegin ();
@@ -370,10 +369,11 @@ SatWaveformConf::GetMostRobustWaveformId (uint32_t& wfId, uint32_t burstLength) 
     {
       if (rit->second->GetBurstLengthInSymbols() == burstLength)
         {
-          // The first waveform over the threshold
+          // The waveform more robust than previous one
           if ( rit->second->GetPayloadInBytes () < payloadInBytes)
             {
-              mostRobustWaveformId = rit->first;
+              payloadInBytes = rit->second->GetPayloadInBytes ();
+              wfId = rit->first;
               found = true;
             }
         }
