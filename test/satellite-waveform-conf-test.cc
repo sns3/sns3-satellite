@@ -73,7 +73,7 @@ SatDvbRcs2WaveformTableTestCase::~SatDvbRcs2WaveformTableTestCase ()
 void
 SatDvbRcs2WaveformTableTestCase::DoRun (void)
 {
-  std::string path = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
+  std::string path = Singleton<SatEnvVariables>::Get ()->GetDataPath () + "/";
   std::string fileName = "dvbRcs2Waveforms.txt";
 
   // Enable ACM
