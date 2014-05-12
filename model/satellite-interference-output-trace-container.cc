@@ -48,7 +48,6 @@ SatInterferenceOutputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatInterferenceOutputTraceContainer::SatInterferenceOutputTraceContainer () :
-  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ()),
   m_enableFigureOutput (true),
   m_tag ("")
 {
@@ -93,6 +92,7 @@ SatInterferenceOutputTraceContainer::AddNode (key_t key)
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
 
   int32_t gwId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (key.first);
   int32_t utId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (key.first);
@@ -106,12 +106,12 @@ SatInterferenceOutputTraceContainer::AddNode (key_t key)
     {
       if (utId >= 0 && gwId < 0)
         {
-          filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/output/" << m_tag << "BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+          filename << dataPath << "/interferencetraces/output/" << m_tag << "BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
         }
 
       if (gwId >= 0 && utId < 0)
         {
-          filename << m_currentWorkingDirectory << "/src/satellite/data/interferencetraces/output/" << m_tag << "BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+          filename << dataPath << "/interferencetraces/output/" << m_tag << "BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
         }
 
       std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));

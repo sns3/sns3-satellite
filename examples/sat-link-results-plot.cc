@@ -23,7 +23,8 @@
 #include <ns3/satellite-look-up-table.h>
 #include <ns3/gnuplot.h>
 #include <fstream>
-
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 /**
  * \ingroup satellite
@@ -84,15 +85,13 @@ private:
 
 }; // end of class SatLinkResultsPlot
 
-
 SatLinkResultsPlot::SatLinkResultsPlot ()
 {
   m_resolutionDb = 0.01;
   m_minSinrDb = 0.0;
   m_maxSinrDb = 20.0;
-  m_inputPath = "src/satellite/data/linkresults/";
+  m_inputPath = Singleton<SatEnvVariables>::Get ()->GetDataPath () + "/linkresults/";
 }
-
 
 void
 SatLinkResultsPlot::Run ()
@@ -105,7 +104,6 @@ SatLinkResultsPlot::Run ()
   RunDvbS2Apsk16 ();
   RunDvbS2Apsk32 ();
 }
-
 
 void
 SatLinkResultsPlot::RunDvbRcs2Qpsk ()
@@ -157,7 +155,6 @@ SatLinkResultsPlot::RunDvbRcs2Qpsk ()
 
 } // end of void SatLinkResultsPlot::RunDvbRcs2Qpsk ()
 
-
 void
 SatLinkResultsPlot::RunDvbRcs2Psk8 ()
 {
@@ -193,7 +190,6 @@ SatLinkResultsPlot::RunDvbRcs2Psk8 ()
 
 } // end of void SatLinkResultsPlot::RunDvbRcs2Psk8 ()
 
-
 void
 SatLinkResultsPlot::RunDvbRcs2Qam16 ()
 {
@@ -222,8 +218,6 @@ SatLinkResultsPlot::RunDvbRcs2Qam16 ()
   std::cout << "Output file written: " << plotFileName << std::endl;
 
 } // end of void SatLinkResultsPlot::RunDvbRcs2Qam16 ()
-
-
 
 void
 SatLinkResultsPlot::RunDvbS2Qpsk ()
@@ -265,7 +259,6 @@ SatLinkResultsPlot::RunDvbS2Qpsk ()
 
 } // end of void SatLinkResultsPlot::RunDvbS2Qpsk ()
 
-
 void
 SatLinkResultsPlot::RunDvbS2Psk8 ()
 {
@@ -299,7 +292,6 @@ SatLinkResultsPlot::RunDvbS2Psk8 ()
   std::cout << "Output file written: " << plotFileName << std::endl;
 
 } // end of void SatLinkResultsPlot::RunDvbS2Psk8 ()
-
 
 void
 SatLinkResultsPlot::RunDvbS2Apsk16 ()
@@ -336,7 +328,6 @@ SatLinkResultsPlot::RunDvbS2Apsk16 ()
 
 } // end of void SatLinkResultsPlot::RunDvbS2Apsk16 ()
 
-
 void
 SatLinkResultsPlot::RunDvbS2Apsk32 ()
 {
@@ -365,7 +356,6 @@ SatLinkResultsPlot::RunDvbS2Apsk32 ()
   std::cout << "Output file written: " << plotFileName << std::endl;
 
 } // end of void SatLinkResultsPlot::RunDvbS2Apsk32 ()
-
 
 Gnuplot2dDataset
 SatLinkResultsPlot::GetGnuplotDataset (Ptr<SatLookUpTable> table,
@@ -412,7 +402,6 @@ SatLinkResultsPlot::GetGnuplotDataset (Ptr<SatLookUpTable> table,
 
 } // end of GetGnuplotDataset
 
-
 Gnuplot
 SatLinkResultsPlot::GetGnuplot (std::string outputName, std::string title)
 {
@@ -432,7 +421,6 @@ SatLinkResultsPlot::GetGnuplot (std::string outputName, std::string title)
 
 
 } // end of namespace ns3
-
 
 int
 main (int argc, char *argv[])

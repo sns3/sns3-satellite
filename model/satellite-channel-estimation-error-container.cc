@@ -22,6 +22,8 @@
 #include <sstream>
 #include "ns3/log.h"
 #include "satellite-channel-estimation-error-container.h"
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFwdLinkChannelEstimationErrorContainer");
 
@@ -85,7 +87,8 @@ SatFwdLinkChannelEstimationErrorContainer::SatFwdLinkChannelEstimationErrorConta
    * Currently only one set of channel estimation error parameters
    * for forward link are created.
    */
-  std::string filePathName = "src/satellite/data/sinrmeaserror/ChannelEstimationErrorFwdLink.txt";
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+  std::string filePathName = dataPath + "/sinrmeaserror/ChannelEstimationErrorFwdLink.txt";
   m_channelEstimationError = CreateObject<SatChannelEstimationError> (filePathName);
 }
 
@@ -115,13 +118,14 @@ SatRtnLinkChannelEstimationErrorContainer::SatRtnLinkChannelEstimationErrorConta
    * parameters than longer burst waveforms 13-22.
    */
   std::string filePathName;
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
   Ptr<SatChannelEstimationError> ce;
 
   for (uint32_t i = minWfId; i <= maxWfId; ++i)
     {
       std::ostringstream ss;
       ss << i;
-      filePathName = "src/satellite/data/sinrmeaserror/ChannelEstimationErrorRtnLinkWf_" + ss.str () + ".txt";
+      filePathName = dataPath + "/sinrmeaserror/ChannelEstimationErrorRtnLinkWf_" + ss.str () + ".txt";
       ce = CreateObject<SatChannelEstimationError> (filePathName);
       m_channelEstimationErrors.insert (std::make_pair<uint32_t, Ptr<SatChannelEstimationError> > (i, ce));
     }
@@ -147,6 +151,5 @@ SatRtnLinkChannelEstimationErrorContainer::DoAddError (double sinrIn, uint32_t w
     }
   return 0.0;
 }
-
 
 }

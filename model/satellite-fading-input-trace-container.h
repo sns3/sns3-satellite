@@ -105,11 +105,6 @@ private:
    * \brief Map for containers
    */
   container_t m_container;
-
-  /**
-   * \brief Path to current working directory
-   */
-  std::string m_currentWorkingDirectory;
 };
 
 } // namespace ns3

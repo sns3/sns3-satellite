@@ -20,14 +20,14 @@
  */
 
 #include <sstream>
-
 #include "ns3/log.h"
 #include "ns3/string.h"
 #include "ns3/double.h"
 #include "ns3/object.h"
-
 #include "satellite-enums.h"
 #include "satellite-link-results.h"
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLinkResults");
 
@@ -53,15 +53,13 @@ SatLinkResults::GetTypeId ()
   static TypeId tid = TypeId ("ns3::SatLinkResults")
     .SetParent<Object> ()
     .AddAttribute ("InputPath",
-                   "The path relative to ns-3 project directory "
+                   "The path relative to data directory "
                    "where the link results file can be found",
-                   StringValue ("src/satellite/data/linkresults/"),
+                   StringValue ("/linkresults/"),
                    MakeStringAccessor (&SatLinkResults::m_inputPath),
-                   MakeStringChecker ())
-  ;
+                   MakeStringChecker ());
   return tid;
 }
-
 
 void
 SatLinkResults::Initialize ()
@@ -71,27 +69,27 @@ SatLinkResults::Initialize ()
   m_isInitialized = true;
 }
 
-
 /*
  * SATLINKRESULTSDVBRCS2 CHILD CLASS
  */
-
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbRcs2);
 
 SatLinkResultsDvbRcs2::SatLinkResultsDvbRcs2 ()
 :SatLinkResults(),
  m_table ()
 {
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
+  std::string path = Singleton<SatEnvVariables>::Get ()->LocateDirectory (dataPath + m_inputPath);
+  m_inputPath = path;
 }
-
 
 TypeId
 SatLinkResultsDvbRcs2::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatLinkResultsDvbRcs2")
-    .SetParent<SatLinkResults> ()
-  ;
+    .SetParent<SatLinkResults> ();
   return tid;
 }
 
@@ -108,9 +106,7 @@ SatLinkResultsDvbRcs2::DoInitialize ()
       std::string filePathName = m_inputPath + "rcs2_waveformat" + ss.str() + ".txt";
       m_table.insert (std::make_pair(i, CreateObject<SatLookUpTable> (filePathName)));
     }
-
 } // end of void SatLinkResultsDvbRcs2::DoInitialize
-
 
 double
 SatLinkResultsDvbRcs2::GetBler (uint32_t waveformId, double ebNoDb) const
@@ -124,7 +120,6 @@ SatLinkResultsDvbRcs2::GetBler (uint32_t waveformId, double ebNoDb) const
 
   return m_table.at(waveformId)->GetBler (ebNoDb);
 }
-
 
 double
 SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
@@ -142,7 +137,6 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 /*
  * SATLINKRESULTSDVBS2 CHILD CLASS
  */
-
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
 
 SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
@@ -166,7 +160,6 @@ SatLinkResultsDvbS2::GetTypeId ()
   ;
   return tid;
 }
-
 
 void
 SatLinkResultsDvbS2::DoInitialize ()
@@ -207,7 +200,6 @@ SatLinkResultsDvbS2::DoInitialize ()
 
 } // end of void SatLinkResultsDvbS2::DoInitialize
 
-
 double
 SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const
 {
@@ -230,7 +222,6 @@ SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrame
 
   return m_table.at(modcod)->GetBler (esNoDb);
 }
-
 
 double
 SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const
@@ -257,6 +248,5 @@ SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFra
 
   return esno;
 }
-
 
 } // end of namespace ns3

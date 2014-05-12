@@ -130,11 +130,6 @@ private:
   container_t m_container;
 
   /**
-   * \brief Path to current working directory
-   */
-  std::string m_currentWorkingDirectory;
-
-  /**
    * \brief Switch for figure output
    */
   bool m_enableFigureOutput;

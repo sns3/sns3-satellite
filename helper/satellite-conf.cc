@@ -24,7 +24,8 @@
 #include "ns3/simulator.h"
 #include "ns3/satellite-wave-form-conf.h"
 #include "satellite-conf.h"
-
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatConf");
 
@@ -136,20 +137,22 @@ SatConf::SatConf()
   // Nothing done here
 }
 
-void SatConf::Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos, std::string wfConf)
+void SatConf::Initialize (std::string satConf, std::string gwPos, std::string satPos, std::string wfConf)
 {
   NS_LOG_FUNCTION (this);
 
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+
   // Load satellite configuration file
-  LoadSatConf (path + satConf);
+  LoadSatConf (dataPath + satConf);
 
   // Load GW positions
-  LoadGwPos (path + gwPos);
+  LoadGwPos (dataPath + gwPos);
 
   // Load satellite position
-  LoadGeoSatPos (path + satPos);
+  LoadGeoSatPos (dataPath + satPos);
 
-  Configure (path + wfConf);
+  Configure (dataPath + wfConf);
 }
 
 void

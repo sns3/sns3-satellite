@@ -90,7 +90,7 @@ SatLog::CreateLog (LogType_t logType, std::string fileTag)
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/data");
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
 
   filename << dataPath << "/logs/log" << fileTag << m_simulationTag;
 

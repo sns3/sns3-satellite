@@ -51,13 +51,12 @@ public:
 
   /**
    * Initialize the configuration
-   * \param path
    * \param satConf
    * \param gwPos
    * \param satPos
    * \param wfConf
    */
-  void Initialize (std::string path, std::string satConf, std::string gwPos, std::string satPos, std::string wfConf);
+  void Initialize (std::string satConf, std::string gwPos, std::string satPos, std::string wfConf);
 
   /**
    * Try to open a file from a given path

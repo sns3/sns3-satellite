@@ -21,6 +21,8 @@
 #include <sstream>
 #include "ns3/log.h"
 #include "satellite-fading-external-input-trace-container.h"
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTraceContainer");
 
@@ -44,14 +46,14 @@ SatFadingExternalInputTraceContainer::CreateUtFadingTrace (uint32_t utId)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  std::string path = "src/satellite/data/fadingtraces/";
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
 
   // UT identifiers start from 1
   std::stringstream ss;
   ss << utId;
 
-  std::string fwd = path + "term_ID" + ss.str () + "_fading_fwddwn.dat";
-  std::string ret = path + "term_ID" + ss.str () + "_fading_rtnup.dat";
+  std::string fwd = dataPath + "/fadingtraces/term_ID" + ss.str () + "_fading_fwddwn.dat";
+  std::string ret = dataPath + "/fadingtraces/term_ID" + ss.str () + "_fading_rtnup.dat";
 
   Ptr<SatFadingExternalInputTrace> ftRet = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
   Ptr<SatFadingExternalInputTrace> ftFwd = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_THREE_COLUMN, fwd);
@@ -67,14 +69,14 @@ SatFadingExternalInputTraceContainer::CreateGwFadingTrace (uint32_t gwId)
 {
   NS_LOG_FUNCTION (this << gwId);
 
-  std::string path = "src/satellite/data/fadingtraces/";
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
 
   // GW identifiers start from 1
   std::stringstream ss;
   ss << gwId;
 
-  std::string fwd = path + "GW_ID" + ss.str () + "_fading_fwdup.dat";
-  std::string ret = path + "GW_ID" + ss.str () + "_fading_rtndwn.dat";
+  std::string fwd = dataPath + "/fadingtraces/GW_ID" + ss.str () + "_fading_fwdup.dat";
+  std::string ret = dataPath + "/fadingtraces/GW_ID" + ss.str () + "_fading_rtndwn.dat";
 
   Ptr<SatFadingExternalInputTrace> ftRet = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, ret);
   Ptr<SatFadingExternalInputTrace> ftFwd = Create<SatFadingExternalInputTrace> (SatFadingExternalInputTrace::FT_TWO_COLUMN, fwd);

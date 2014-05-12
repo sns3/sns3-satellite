@@ -34,7 +34,8 @@
 #include "../model/satellite-link-results.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-enums.h"
-
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -72,7 +73,7 @@ SatDvbRcs2WaveformTableTestCase::~SatDvbRcs2WaveformTableTestCase ()
 void
 SatDvbRcs2WaveformTableTestCase::DoRun (void)
 {
-  std::string path = "src/satellite/data/";
+  std::string path = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
   std::string fileName = "dvbRcs2Waveforms.txt";
 
   // Enable ACM

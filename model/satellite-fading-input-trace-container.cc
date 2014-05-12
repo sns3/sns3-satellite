@@ -45,8 +45,7 @@ SatFadingInputTraceContainer::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatFadingInputTraceContainer::SatFadingInputTraceContainer () :
-  m_currentWorkingDirectory (Singleton<SatEnvVariables>::Get ()->GetCurrentWorkingDirectory ())
+SatFadingInputTraceContainer::SatFadingInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -85,6 +84,7 @@ SatFadingInputTraceContainer::AddNode (key_t key)
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
 
   int32_t gwId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (key.first);
   int32_t utId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (key.first);
@@ -98,12 +98,12 @@ SatFadingInputTraceContainer::AddNode (key_t key)
     {
       if (utId >= 0 && gwId < 0)
         {
-          filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/input/BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+          filename << dataPath << "/fadingtraces/input/BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
         }
 
       if (gwId >= 0 && utId < 0)
         {
-          filename << m_currentWorkingDirectory << "/src/satellite/data/fadingtraces/input/BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+          filename << dataPath << "/fadingtraces/input/BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
         }
       std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 

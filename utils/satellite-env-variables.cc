@@ -46,6 +46,11 @@ SatEnvVariables::GetTypeId (void)
                    "Path to the simulator executable.",
                    StringValue (""),
                    MakeStringAccessor (&SatEnvVariables::m_pathToExecutableFromAttribute),
+                   MakeStringChecker ())
+    .AddAttribute ("DataPath",
+                   "Path to the data folder.",
+                   StringValue ("src/satellite/data"),
+                   MakeStringAccessor (&SatEnvVariables::m_dataPath),
                    MakeStringChecker ());
   return tid;
 }
@@ -55,7 +60,8 @@ SatEnvVariables::SatEnvVariables () :
   m_pathToExecutable (""),
   m_currentWorkingDirectoryFromAttribute (""),
   m_pathToExecutableFromAttribute (""),
-  m_levelsToCheck (10)
+  m_levelsToCheck (10),
+  m_dataPath ("src/satellite/data")
 {
   NS_LOG_FUNCTION (this);
 
@@ -164,20 +170,9 @@ SatEnvVariables::IsValidDirectory (std::string path)
 }
 
 std::string
-SatEnvVariables::GetDataPath ()
+SatEnvVariables::LocateDataDirectory ()
 {
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("SatEnvVariables::GetDataPath - Locating the data directory");
-
-  std::stringstream initialDataPath;
-  std::string dataDirectory;
-
-  initialDataPath << "src/satellite/data";
-
-  dataDirectory = LocateDirectory (initialDataPath.str ());
-
-  return dataDirectory;
+  return LocateDirectory (GetDataPath ());
 }
 
 std::string

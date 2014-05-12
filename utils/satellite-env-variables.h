@@ -79,7 +79,13 @@ public:
    * \brief Function for locating the data folder
    * \return path to data folder
    */
-  std::string GetDataPath ();
+  std::string GetDataPath () { return m_dataPath; }
+
+  /**
+   * \brief Function for locating the data directory within the NS-3 simulator folder
+   * \return path to the data directory
+   */
+  std::string LocateDataDirectory ();
 
   /**
    * \brief Function for locating a specific directory within the NS-3 simulator folder
@@ -93,6 +99,7 @@ public:
    * \return does the directory exist
    */
   bool IsValidDirectory (std::string path);
+
 
 private:
 
@@ -120,6 +127,11 @@ private:
    * \brief How many directory levels to check for data path
    */
   uint32_t m_levelsToCheck;
+
+  /**
+   * \brief Default data path
+   */
+  std::string m_dataPath;
 };
 
 } // namespace ns3

@@ -21,6 +21,8 @@
 #include <sstream>
 #include "ns3/log.h"
 #include "satellite-antenna-gain-pattern-container.h"
+#include "ns3/singleton.h"
+#include "ns3/satellite-env-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatAntennaGainPatternContainer");
 
@@ -46,15 +48,15 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
    * code the antenna pattern names, but change the input folder
    * according to the wanted reference system.
    */
-  std::string path = "src/satellite/data/antennapatterns/";
-  std::string fileName = "SatAntennaGain72Beams_";
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+  std::string path = dataPath + "/antennapatterns/SatAntennaGain72Beams_";
 
   // Note, that the beam ids start from 1
   for (uint32_t i = 1; i <= NUMBER_OF_BEAMS; ++i)
     {
       std::ostringstream ss;
       ss << i;
-      std::string filePathName = path + fileName + ss.str() + ".txt";
+      std::string filePathName = path + ss.str() + ".txt";
       Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePathName);
 
       std::pair<std::map<uint32_t,Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
@@ -67,8 +69,8 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
     }
 }
 
-
-Ptr<SatAntennaGainPattern> SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId) const
+Ptr<SatAntennaGainPattern>
+SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
@@ -79,8 +81,8 @@ Ptr<SatAntennaGainPattern> SatAntennaGainPatternContainer::GetAntennaGainPattern
   return m_antennaPatternMap.at(beamId);
 }
 
-
-uint32_t SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) const
+uint32_t
+SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude() << coord.GetLongitude());
 
@@ -108,5 +110,3 @@ uint32_t SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) con
 }
 
 } // namespace ns3
-
-
