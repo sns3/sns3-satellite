@@ -141,7 +141,7 @@ void SatConf::Initialize (std::string satConf, std::string gwPos, std::string sa
 {
   NS_LOG_FUNCTION (this);
 
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
 
   // Load satellite configuration file
   LoadSatConf (dataPath + satConf);
