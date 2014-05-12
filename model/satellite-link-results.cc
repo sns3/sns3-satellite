@@ -44,6 +44,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatLinkResults);
 SatLinkResults::SatLinkResults ()
   : m_isInitialized (false)
 {
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
+  m_inputPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory (dataPath + "/linkresults/");
 }
 
 
@@ -51,13 +53,7 @@ TypeId
 SatLinkResults::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatLinkResults")
-    .SetParent<Object> ()
-    .AddAttribute ("InputPath",
-                   "The path relative to data directory "
-                   "where the link results file can be found",
-                   StringValue ("/linkresults/"),
-                   MakeStringAccessor (&SatLinkResults::m_inputPath),
-                   MakeStringChecker ());
+    .SetParent<Object> ();
   return tid;
 }
 
@@ -78,11 +74,6 @@ SatLinkResultsDvbRcs2::SatLinkResultsDvbRcs2 ()
 :SatLinkResults(),
  m_table ()
 {
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
-
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
-  std::string path = Singleton<SatEnvVariables>::Get ()->LocateDirectory (dataPath + m_inputPath);
-  m_inputPath = path;
 }
 
 TypeId

@@ -78,7 +78,7 @@ protected:
   virtual void DoInitialize () = 0;
 
   /**
-   * \brief Linked to the attribute *InputPath*, the base path where the text
+   * \brief The base path where the text
    *        files containing link results data can be found.
    */
   std::string m_inputPath;
