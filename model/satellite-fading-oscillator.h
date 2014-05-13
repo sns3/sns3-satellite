@@ -71,17 +71,17 @@ public:
 
   /**
    * \brief Returns complex value at time t
-   * \param t time
+   * \param timeInSeconds current time in seconds
    * \return complex value
    */
-  std::complex<double> GetComplexValueAt (Time t) const;
+  std::complex<double> GetComplexValueAt (double timeInSeconds) const;
 
   /**
    * \brief Returns cosine wave complex value at time t
-   * \param t time
+   * \param timeInSeconds current time in seconds
    * \return complex value
    */
-  std::complex<double> GetCosineWaveValueAt (Time t) const;
+  std::complex<double> GetCosineWaveValueAt (double timeInSeconds) const;
 
   /**
    * \brief Do needed dispose actions

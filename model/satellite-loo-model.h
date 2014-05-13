@@ -150,17 +150,19 @@ private:
 
   /**
    * \brief Function for calculating cosine wave oscillator complex sum
-   * \param oscillator
-   * \return
+   * \param oscillator oscillator
+   * \param timeInSeconds current time in seconds
+   * \return sum
    */
-  std::complex<double> GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
+  std::complex<double> GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator, double timeInSeconds);
 
   /**
    * \brief Function for calculating oscillator complex sum
-   * \param oscillator
-   * \return
+   * \param oscillator oscillator
+   * \param timeInSeconds current time in seconds
+   * \return sum
    */
-  std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator);
+  std::complex<double> GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator, double timeInSeconds);
 
   /**
    * \brief Function for setting the state

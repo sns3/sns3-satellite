@@ -200,11 +200,13 @@ SatLooModel::GetChannelGain ()
 {
   NS_LOG_FUNCTION (this);
 
+  double timeInSeconds = Now ().GetSeconds ();
+
   /// Direct signal
-  std::complex<double> directComplexGain = GetOscillatorCosineWaveSum (m_directSignalOscillators[m_currentState]);
+  std::complex<double> directComplexGain = GetOscillatorCosineWaveSum (m_directSignalOscillators[m_currentState], timeInSeconds);
 
   /// Multipath
-  std::complex<double> multipathComplexGain = GetOscillatorComplexSum (m_multipathOscillators[m_currentState]);
+  std::complex<double> multipathComplexGain = GetOscillatorComplexSum (m_multipathOscillators[m_currentState], timeInSeconds);
   multipathComplexGain = multipathComplexGain * m_sigma[m_currentState];
 
   /// Combining
@@ -213,7 +215,7 @@ SatLooModel::GetChannelGain ()
 }
 
 std::complex<double>
-SatLooModel::GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator)
+SatLooModel::GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> > oscillator, double timeInSeconds)
 {
   NS_LOG_FUNCTION (this);
 
@@ -221,14 +223,14 @@ SatLooModel::GetOscillatorCosineWaveSum (std::vector< Ptr<SatFadingOscillator> >
 
   for (uint32_t i = 0; i < oscillator.size (); i++)
     {
-      complexSum += oscillator[i]->GetCosineWaveValueAt (Now ());
+      complexSum += oscillator[i]->GetCosineWaveValueAt (timeInSeconds);
     }
 
   return complexSum;
 }
 
 std::complex<double>
-SatLooModel::GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator)
+SatLooModel::GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > oscillator, double timeInSeconds)
 {
   NS_LOG_FUNCTION (this);
 
@@ -236,7 +238,7 @@ SatLooModel::GetOscillatorComplexSum (std::vector< Ptr<SatFadingOscillator> > os
 
   for (uint32_t i = 0; i < oscillator.size (); i++)
     {
-      complexSum += oscillator[i]->GetComplexValueAt (Now ());
+      complexSum += oscillator[i]->GetComplexValueAt (timeInSeconds);
     }
 
   return complexSum;
