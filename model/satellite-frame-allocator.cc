@@ -346,23 +346,24 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
             {
             m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
 
-            double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols;
-            double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
-
-            if ( symbolsToUse >= (reqInSymbols.m_craSymbols))
+            if ( (reqInSymbols.m_craSymbols) <= m_maxSymbolsPerCarrier )
               {
                 double symbolsLeftInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols;
 
                 m_preAllocatedMinRdbcSymbols += std::min<double> ( reqInSymbols.m_minRbdcSymbols, symbolsLeftInCarrier);
                 m_preAllocatedRdbcSymbols += std::min<double> ( reqInSymbols.m_rbdcSymbols, symbolsLeftInCarrier);
 
-                if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
+                if ( m_maxSymbolsPerCarrier >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
                   {
-                    double vbdcSymbolsInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_minRbdcSymbols;
+                    double vbdcSymbolsInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_rbdcSymbols;
                     m_preAllocatedVdbcSymbols += std::min<double> (reqInSymbols.m_vbdcSymbols, vbdcSymbolsInCarrier);
                   }
 
                 allocated = true;
+              }
+            else
+              {
+                NS_FATAL_ERROR ("CRA symbols exceeds carrier limit!!!");
               }
 
             allocated = true;
@@ -381,9 +382,9 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
 
                   double symbolsLeftInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_minRbdcSymbols;
 
-                  m_preAllocatedRdbcSymbols += std::min<double> (reqInSymbols.m_rbdcSymbols, symbolsLeftInCarrier);
+                  m_preAllocatedRdbcSymbols += std::min<double> (reqInSymbols.m_rbdcSymbols, symbolsLeftInCarrier + reqInSymbols.m_minRbdcSymbols);
 
-                  if (symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_minRbdcSymbols))
+                  if (symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
                     {
                       double vbdcSymbolsInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_rbdcSymbols;
                       m_preAllocatedVdbcSymbols += std::min<double> (reqInSymbols.m_vbdcSymbols, vbdcSymbolsInCarrier);
@@ -1015,7 +1016,7 @@ SatFrameAllocator::UpdateAndStoreAllocReq (Address address, double cno, SatFrame
         }
 
       // update UT total request
-      req.m_rbdcSymbols = rbdcSymbolsLeft;
+      req.m_rbdcSymbols = rbdcSymbolsLeft + req.m_minRbdcSymbols;
       req.m_vbdcSymbols = 0;
     }
   else if ( (m_maxSymbolsPerCarrier - req.m_craSymbols - req.m_rbdcSymbols - req.m_vbdcSymbols) < 0 )

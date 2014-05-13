@@ -164,7 +164,7 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
         }
 
       Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (mostRobustWaveFormId);
-      m_minPayloadPerCarrierInBytes = carrierSlotCount * defWaveform->GetPayloadInBytes ();
+      m_minPayloadPerCarrierInBytes = carrierSlotCount * waveform->GetPayloadInBytes ();
     }
 
   // Created time slots for every carrier and add them to frame configuration

@@ -86,6 +86,8 @@ public:
     uint32_t  m_minRbdcBytes;
     uint32_t  m_rbdcBytes;
     uint32_t  m_vbdcBytes;
+
+    SatFrameAllocReqItem () : m_craBytes (0), m_minRbdcBytes (0), m_rbdcBytes (0), m_vbdcBytes (0) {}
   };
 
   /**
