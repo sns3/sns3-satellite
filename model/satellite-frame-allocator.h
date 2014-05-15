@@ -432,10 +432,12 @@ private:
    * Get optimal burst length in symbols.
    *
    * \param symbolsToUse Symbols can be used for time slot.
-   * \param rcSymbolsLeft Symbols left for RC.
+   * \param symbolsLeft Symbols left for RC or UT.
+   * \param cno C/N0 to use for selection
+   * \param waveformId Variable to store id of the wave form of optimal length burst
    * \return Optimal burst length for the symbols to allocate.
    */
-  uint32_t GetOptimalBurtsLengthInSymbols (int64_t symbolsToUse, int64_t rcSymbolsLeft);
+  uint32_t GetOptimalBurtsLengthInSymbols (int64_t symbolsToUse, int64_t symbolsLeft, double cno, uint32_t& waveformId);
 
   /**
    * Create time slot according to configuration type.

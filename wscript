@@ -162,6 +162,7 @@ def build(bld):
         'test/satellite-control-msg-container-test.cc',
         'test/satellite-cno-estimator-test.cc',
         'test/satellite-fading-trace-test.cc',
+        'test/satellite-frame-allocator-test.cc',
         'test/satellite-fsl-test.cc',
         'test/satellite-gse-test.cc',
         'test/satellite-interference-test.cc',
