@@ -103,7 +103,7 @@ main (int argc, char *argv[])
     }
 
   // create satellite helper with given scenario default=simple
-  helper->CreateScenario (satScenario);
+  helper->CreatePredefinedScenario (satScenario);
 
   // Enable packet traces (to file PacketTrace.log).
   helper->EnablePacketTrace ();

@@ -76,10 +76,9 @@ main (int argc, char *argv[])
   SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
-  helper->SetBeamUserInfo (beamMap);
   helper->EnablePacketTrace ();
 
-  helper->CreateScenario (SatHelper::USER_DEFINED);
+  helper->CreateUserDefinedScenario (beamMap);
 
   // enable info logs
   //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);

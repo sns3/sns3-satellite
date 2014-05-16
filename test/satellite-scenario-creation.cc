@@ -91,7 +91,7 @@ ScenarioCreationSimple::DoRun (void)
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("simple-scenario-creation.log", false);
-  helper->CreateScenario(SatHelper::SIMPLE);
+  helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
@@ -154,7 +154,7 @@ ScenarioCreationLarger::DoRun (void)
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("larger-scenario-creation.log", false);
-  helper->CreateScenario(SatHelper::LARGER);
+  helper->CreatePredefinedScenario(SatHelper::LARGER);
 
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
@@ -217,7 +217,7 @@ ScenarioCreationFull::DoRun (void)
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->EnableCreationTraces("full-scenario-creation.log", false );
-  helper->CreateScenario(SatHelper::FULL);
+  helper->CreatePredefinedScenario(SatHelper::FULL);
 
   // check results what can be done at this level. More checking done in module level with traces
   // reference system includes 98 beams and we create three UTs with three users per UT in full scenario
@@ -290,11 +290,10 @@ ScenarioCreationUser::DoRun (void)
   beamMap[3] = beamInfo;
   beamInfo.AppendUt(2);
   beamMap[2] = beamInfo;
-  helper->SetBeamUserInfo(beamMap);
 
   helper->EnableCreationTraces("user-scenario-creation.log", false );
 
-  helper->CreateScenario(SatHelper::USER_DEFINED);
+  helper->CreateUserDefinedScenario (beamMap);
 
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");

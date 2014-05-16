@@ -24,7 +24,7 @@ using namespace ns3;
 *         Example reads sat-link-budget-input-attributes.xml, so user is able to change link budget parameter by
 *         modifying this file without compiling example.
 *
-*         Used parameters and link budget calculation result are printed as long info.
+*         Used parameters and link budget calculation result are printed as log info.
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-link-budget-example");
@@ -53,7 +53,7 @@ int
 main (int argc, char *argv[])
 {
   // parameters for link budget calculation
-  uint32_t beamId = 1;
+  uint32_t beamId = 11;
   double latitude = 50.00;
   double longitude = -1.00;
   double altitude = 0.00;
@@ -107,11 +107,13 @@ main (int argc, char *argv[])
 
   // create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-  helper->SetBeamUserInfo (beamMap);
+  SatHelper::BeamIdInfo_t beamIdInfo;
+  beamIdInfo.insert (beamId);
 
-  helper->CreateScenario (SatHelper::USER_DEFINED);
+  Ptr<SatListPositionAllocator> posAllocator = CreateObject<SatListPositionAllocator> ();
+  posAllocator->Add ( GeoCoordinate (latitude, longitude, altitude));
+
+  helper->CreateUserDefinedScenario (beamIdInfo, beamInfo, posAllocator);
 
   // set callback traces where we want results out
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
@@ -125,7 +127,6 @@ main (int argc, char *argv[])
   // Set UT position
   NodeContainer ut = helper->UtNodes ();
   Ptr<SatMobilityModel> utMob = ut.Get (0)->GetObject<SatMobilityModel> ();
-  utMob->SetGeoPosition (GeoCoordinate (latitude, longitude, altitude));
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();

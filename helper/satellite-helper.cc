@@ -165,24 +165,7 @@ SatHelper::SatHelper (std::string scenarioName)
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 }
 
-void
-SatHelper::SetBeamUserInfo(BeamUserInfoMap_t infos)
-{
-  NS_LOG_FUNCTION (this);
-
-  m_beamUserInfos = infos;
-}
-
-void
-SatHelper::SetBeamUserInfo(uint32_t beamId, SatBeamUserInfo info)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::pair<BeamUserInfoMap_t::iterator, bool> result = m_beamUserInfos.insert(std::make_pair(beamId, info));
-  NS_ASSERT(result.second == true);
-}
-
-void SatHelper::CreateScenario(PreDefinedScenario_t scenario)
+void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
 {
   NS_LOG_FUNCTION (this);
 
@@ -202,17 +185,14 @@ void SatHelper::CreateScenario(PreDefinedScenario_t scenario)
       CreateFullScenario();
       break;
 
-    case USER_DEFINED:
-      CreateUserDefinedScenario();
-      break;
-
     default:
+      NS_FATAL_ERROR ("Not supported predefined scenario.");
       break;
   }
 
 }
 
-void SatHelper::EnableCreationTraces(std::string filename, bool details)
+void SatHelper::EnableCreationTraces (std::string filename, bool details)
 {
   NS_LOG_FUNCTION (this);
 
@@ -290,7 +270,7 @@ SatHelper::GetUserHelper () const
 }
 
 void
-SatHelper::CreateSimpleScenario()
+SatHelper::CreateSimpleScenario ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -304,7 +284,7 @@ SatHelper::CreateSimpleScenario()
 }
 
 void
-SatHelper::CreateLargerScenario()
+SatHelper::CreateLargerScenario ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -327,7 +307,7 @@ SatHelper::CreateLargerScenario()
 }
 
 void
-SatHelper::CreateFullScenario()
+SatHelper::CreateFullScenario ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -355,37 +335,81 @@ SatHelper::CreateFullScenario()
 
   m_creationSummaryTrace("*** Full Scenario Creation Summary ***");
 }
+
 void
-SatHelper::CreateUserDefinedScenario()
+SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
 {
   NS_LOG_FUNCTION (this);
 
   // create as user wants
-  DoCreateScenario(m_beamUserInfos, m_gwUsers);
+  DoCreateScenario(infos, m_gwUsers);
 
   m_creationSummaryTrace("*** User Defined Scenario Creation Summary ***");
 }
 
 void
-SatHelper::DoCreateScenario(BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
+SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& utInfo, Ptr<SatListPositionAllocator> utPositions)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_utPositions = utPositions;
+
+  BeamUserInfoMap_t beamUserInfos;
+
+  if ( m_utPositions->GetCount () != utInfo.GetUtCount ())
+    {
+      NS_FATAL_ERROR ("Position count and UT count mismatch!");
+    }
+
+  for ( uint32_t i = 0; i < m_utPositions->GetCount (); i ++ )
+    {
+      uint32_t beamId = m_antennaGainPatterns->GetBestBeamId (m_utPositions->GetNextGeo ());
+
+      if ( beamInfo.empty () || ( beamInfo.find (beamId) != beamInfo.end () ) )
+        {
+          BeamUserInfoMap_t::iterator beamMap = beamUserInfos.find (beamId);
+
+          if ( beamMap != beamUserInfos.end ())
+            {
+              beamMap->second.AppendUt (utInfo.GetUtUserCount (i));
+            }
+          else
+            {
+              beamUserInfos[beamId] = SatBeamUserInfo (1, utInfo.GetUtUserCount (i));
+            }
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Position not valid for beam (s).");
+        }
+    }
+
+  // create as user wants
+  DoCreateScenario (beamUserInfos, m_gwUsers);
+
+  m_creationSummaryTrace("*** User Defined Scenario Creation Summary ***");
+}
+
+void
+SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
 {
   NS_LOG_FUNCTION (this);
 
   InternetStackHelper internet;
 
-  // create all possible GW nodes, set mobility to them and install to interner
+  // create all possible GW nodes, set mobility to them and install to Internet
   NodeContainer gwNodes;
-  gwNodes.Create(m_satConf->GetGwCount());
-  SetGwMobility(gwNodes);
-  internet.Install(gwNodes);
+  gwNodes.Create (m_satConf->GetGwCount ());
+  SetGwMobility (gwNodes);
+  internet.Install (gwNodes);
 
-  for ( BeamUserInfoMap_t::iterator info = beamInfos.begin(); info != beamInfos.end(); info++)
+  for ( BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
     {
-      // create UTs of the beam, set mobility to them and install to internet
+      // create UTs of the beam, set mobility to them and install to Internet
       NodeContainer uts;
-      uts.Create(info->second.GetUtCount());
-      SetUtMobility(uts, info->first);
-      internet.Install(uts);
+      uts.Create (info->second.GetUtCount ());
+      SetUtMobility (uts, info->first);
+      internet.Install (uts);
 
       for ( uint32_t i = 0; i < info->second.GetUtCount(); i++ )
         {
@@ -396,15 +420,15 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
       std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration(info->first);
 
       // gw index starts from 1 and we have stored them starting from 0
-      Ptr<Node> gwNode = gwNodes.Get(conf[SatConf::GW_ID_INDEX]-1);
-      m_beamHelper->Install(uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+      Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX]-1);
+      m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
     }
 
-  m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), gwUsers);
+  m_userHelper->InstallGw(m_beamHelper->GetGwNodes (), gwUsers);
 }
 
 void
-SatHelper::SetGwMobility(NodeContainer gwNodes)
+SatHelper::SetGwMobility (NodeContainer gwNodes)
 {
   NS_LOG_FUNCTION (this);
 
@@ -412,10 +436,10 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
 
   Ptr<SatListPositionAllocator> gwPosAllocator = CreateObject<SatListPositionAllocator> ();
 
-  for (uint32_t i = 0; i < gwNodes.GetN(); i++)
+  for (uint32_t i = 0; i < gwNodes.GetN (); i++)
     {
       // GW id start from 1
-      gwPosAllocator->Add(m_satConf->GetGwPosition(i + 1));
+      gwPosAllocator->Add(m_satConf->GetGwPosition (i + 1));
     }
 
   mobility.SetPositionAllocator (gwPosAllocator);
@@ -426,19 +450,30 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
 }
 
 void
-SatHelper::SetUtMobility(NodeContainer uts, uint32_t beamId)
+SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this);
 
   MobilityHelper mobility;
 
-  // Create new position allocator
-  Ptr<SatSpotBeamPositionAllocator> allocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition());
+  Ptr<SatPositionAllocator> allocator;
 
-  Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
-  altRnd->SetAttribute ("Min", DoubleValue (0.0));
-  altRnd->SetAttribute ("Max", DoubleValue (500.0));
-  allocator->SetAltitude (altRnd);
+  if ( m_utPositions != NULL )
+    {
+      allocator = m_utPositions;
+    }
+  else
+    {
+      // Create new position allocator
+      Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition ());
+
+      Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
+      altRnd->SetAttribute ("Min", DoubleValue (0.0));
+      altRnd->SetAttribute ("Max", DoubleValue (500.0));
+      beamAllocator->SetAltitude (altRnd);
+
+      allocator = beamAllocator;
+    }
 
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
@@ -455,7 +490,7 @@ SatHelper::SetGeoSatMobility(Ptr<Node> node)
   MobilityHelper mobility;
 
   Ptr<SatListPositionAllocator> geoSatPosAllocator = CreateObject<SatListPositionAllocator> ();
-  geoSatPosAllocator->Add(m_satConf->GetGeoSatPosition());
+  geoSatPosAllocator->Add (m_satConf->GetGeoSatPosition ());
 
   mobility.SetPositionAllocator (geoSatPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
@@ -467,7 +502,7 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
 {
   NS_LOG_FUNCTION (this);
 
-  for ( NodeContainer::Iterator i = nodes.Begin();  i != nodes.End(); i++ )
+  for ( NodeContainer::Iterator i = nodes.Begin();  i != nodes.End (); i++ )
     {
 
       Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();

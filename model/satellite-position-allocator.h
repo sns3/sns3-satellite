@@ -79,6 +79,7 @@ public:
    */
   void Add (GeoCoordinate coordinate);
   virtual GeoCoordinate GetNextGeo (void) const;
+  inline virtual uint32_t GetCount () { return m_positions.size (); }
 private:
   std::vector<GeoCoordinate> m_positions;
   mutable std::vector<GeoCoordinate>::const_iterator m_current;

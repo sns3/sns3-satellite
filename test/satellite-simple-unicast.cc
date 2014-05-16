@@ -100,7 +100,7 @@ SimpleUnicast1::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::SIMPLE);
+  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
   NodeContainer utUsers = helper->GetUtUsers ();
 
@@ -198,7 +198,7 @@ SimpleUnicast2::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::LARGER);
+  helper->CreatePredefinedScenario (SatHelper::LARGER);
 
   NodeContainer utUsers = helper->GetUtUsers ();
 
@@ -318,7 +318,7 @@ SimpleUnicast3::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::FULL);
+  helper->CreatePredefinedScenario (SatHelper::FULL);
 
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
@@ -442,7 +442,7 @@ SimpleUnicast4::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::SIMPLE);
+  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
   // >>> Start of actual test using Simple scenario >>>
 
@@ -541,7 +541,7 @@ SimpleUnicast5::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario(SatHelper::LARGER);
+  helper->CreatePredefinedScenario(SatHelper::LARGER);
 
   // >>> Start of actual test using Larger scenario >>>
 
@@ -649,7 +649,7 @@ SimpleUnicast6::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::FULL);
+  helper->CreatePredefinedScenario (SatHelper::FULL);
 
   // >>> Start of actual test using Full scenario >>>
 
@@ -776,7 +776,7 @@ SimpleUnicast7::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::SIMPLE);
+  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
@@ -895,7 +895,7 @@ SimpleUnicast8::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::LARGER);
+  helper->CreatePredefinedScenario (SatHelper::LARGER);
 
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();

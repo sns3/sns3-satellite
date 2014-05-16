@@ -263,9 +263,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[1] = beamInfo;
   beamMap[5] = beamInfo;
-  helper->SetBeamUserInfo (beamMap);
 
-  helper->CreateScenario (SatHelper::USER_DEFINED);
+  helper->CreateUserDefinedScenario (beamMap);
 
   // set callback traces where we want results out
 
@@ -412,7 +411,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   // create helpers
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->CreateScenario (SatHelper::FULL);
+  helper->CreatePredefinedScenario (SatHelper::FULL);
 
   // set callback traces where we want results out
 
@@ -562,9 +561,8 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[1] = beamInfo;
   beamMap[5] = beamInfo;
-  helper->SetBeamUserInfo (beamMap);
 
-  helper->CreateScenario (SatHelper::USER_DEFINED);
+  helper->CreateUserDefinedScenario (beamMap);
 
   // set callback traces where we want results out
 
@@ -683,7 +681,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
 
   // create helpers
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::FULL);
+  helper->CreatePredefinedScenario (SatHelper::FULL);
 
   // set callback traces where we want results out
 

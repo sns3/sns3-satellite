@@ -103,7 +103,7 @@ Pm1::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario(SatHelper::FULL);
+  helper->CreatePredefinedScenario(SatHelper::FULL);
 
   NodeContainer gwUsers = helper->GetGwUsers();
   NodeContainer utUsers = helper->GetUtUsers();

@@ -77,7 +77,7 @@ main (int argc, char *argv[])
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreateScenario (SatHelper::FULL);
+  helper->CreatePredefinedScenario (SatHelper::FULL);
 
   helper->EnablePacketTrace ();
 

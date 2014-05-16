@@ -93,7 +93,7 @@ main (int argc, char *argv[])
     }
 
   // create scenario
-  helper->CreateScenario(satScenario);
+  helper->CreatePredefinedScenario(satScenario);
 
   // enable packet traces on satellite modules
   helper->EnablePacketTrace ();

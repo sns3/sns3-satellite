@@ -103,7 +103,7 @@ main (int argc, char *argv[])
       helper->EnableCreationTraces (scenarioLogFile, false);
     }
 
-  helper->CreateScenario (satScenario);
+  helper->CreatePredefinedScenario (satScenario);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers ();

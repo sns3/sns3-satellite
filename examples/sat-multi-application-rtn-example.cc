@@ -105,9 +105,8 @@ main (int argc, char *argv[])
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[12] = beamInfo;
   beamMap[22] = beamInfo;
-  helper->SetBeamUserInfo (beamMap);
 
-  helper->CreateScenario (SatHelper::USER_DEFINED);
+  helper->CreateUserDefinedScenario (beamMap);
   helper->EnablePacketTrace ();
 
   // Get the end users so that it is possible to attach

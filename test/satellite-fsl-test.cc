@@ -82,7 +82,7 @@ SatFreeSpaceLossTestCase::DoRun (void)
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   helper->EnableCreationTraces("fsl-test.log", false);
-  helper->CreateScenario(SatHelper::SIMPLE);
+  helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
   NodeContainer gw = helper->GwNodes();
   NodeContainer ut = helper->UtNodes();

@@ -33,6 +33,7 @@
 #include "satellite-beam-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
+#include "ns3/satellite-position-allocator.h"
 #include "ns3/satellite-rx-power-input-trace-container.h"
 #include "ns3/satellite-rx-power-output-trace-container.h"
 #include "ns3/satellite-interference-input-trace-container.h"
@@ -51,9 +52,14 @@ class SatHelper : public Object
 public:
 
   /**
-   * definition for beam map key and value.
+   * definition for beam map key is beam ID and value is UT/user info.
    */
   typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
+
+  /**
+   * definition for beam info used when creating user defined scenario.
+   */
+  typedef std::set<uint32_t> BeamIdInfo_t;
 
   /**
    * \enum values for pre-defined scenarios to be used by helper when building
@@ -63,15 +69,13 @@ public:
    *  - SIMPLE:       Simple scenario used as base.
    *  - LARGER:       Larger scenario used as base.
    *  - FULL:         Full scenario used as base.
-   *  - USER_DEFINED: User defined scenario as base.
    */
   typedef enum
   {
     NONE,
     SIMPLE,
     LARGER,
-    FULL,
-    USER_DEFINED
+    FULL
   } PreDefinedScenario_t;
 
   static TypeId GetTypeId (void);
@@ -88,31 +92,30 @@ public:
   SatHelper (std::string scenarioName);
 
   /**
-   * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
+   * Destructor for SatHelper
    */
-  void CreateScenario (PreDefinedScenario_t scenario);
   virtual ~SatHelper () {}
 
   /**
-   * Sets beam info for sceanrio creation.
-   * Only in user defined scenario beam Ids have effect to number of beams to be creates.
-   * In other scenarios only UT count and their user count have meaning. So for this default
-   * count can be overidden.
-   *
-   * \param info information of the users in beams (for user defined scenario defines beams to create)
+   * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
    */
-  void SetBeamUserInfo (BeamUserInfoMap_t info);
+  void CreatePredefinedScenario (PreDefinedScenario_t scenario);
 
   /**
-   * Sets beam info for sceanrio creation.
-   * Only in user defined scenario beamId  have effect to number of beams to be creates.
-   * In other scenarios only UT count and their user count have meaning. So for this default
-   * count can be overidden.
+   * Creates satellite objects according to user defined scenario.
    *
-   * \param beamId id of the beam which info is set (for user defined scenario defines beam to create)
-   * \param info information of the user in beam
+   * \param info information of the beams, and beam UTs and users in beams
    */
-  void SetBeamUserInfo (uint32_t beamId, SatBeamUserInfo info);
+  void CreateUserDefinedScenario (BeamUserInfoMap_t& info);
+
+  /**
+   * Creates satellite objects according to user defined scenario.
+   *
+   * \param beamInfo Information of the beam to locate UTs, if empty whole reference scenario used to select beam
+   * \param info information of the UT and users in beams
+   * \param utPositions Position to set for UTs
+   */
+  void CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& info, Ptr<SatListPositionAllocator> utPositions);
 
   /**
    * \param  node pointer to user node.
@@ -149,6 +152,9 @@ public:
    */
   void EnableCreationTraces(std::string filename, bool details);
 
+  /**
+   * Enable packet traces
+   */
   void EnablePacketTrace ();
 
   inline NodeContainer GwNodes () { return m_beamHelper->GetGwNodes(); }
@@ -158,126 +164,6 @@ public:
   void DoDispose();
 
 private:
-  /**
-   * Enables creation traces in sub-helpers.
-   */
-  void EnableDetailedCreationTraces ();
-  /**
-   * Sink for creation details traces
-   * \param stream stream for traces
-   * \param context context for traces
-   * \param info creation info
-   */
-  static void CreationDetailsSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
-  /**
-   * Sink for creation summary traces
-   * \param title creation summary title
-   */
-  void CreationSummarySink (std::string title);
-  /**
-   * Creates satellite objects according to simple scenario.
-   */
-  void CreateSimpleScenario ();
-  /**
-   * Creates satellite objects according to larger scenario.
-   */
-  void CreateLargerScenario ();
-  /**
-   * Creates satellite objects according to full scenario.
-   */
-  void CreateFullScenario ();
-  /**
-   * Creates satellite objects according to user defined scenario.
-   * Beams to create with number of the UTs are set by method SetBeamUserInfo.
-   */
-  void CreateUserDefinedScenario ();
-
-  /**
-   * Creates satellite objects according to given beam info.
-   * \param beamInfos information of the beam to create (and beams which are given in map)
-   * \param gwUsers number of the users in GW(s) side
-   */
-  void DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers);
-
-  /**
-   * Creates trace summary starting with give title.
-   * \param title title for summary
-   * \returns std::string as summary
-   */
-  std::string CreateCreationSummary (std::string title);
-
-  /**
-   * Sets mobilities to created GW nodes.
-   *
-   * \param gws node container of UTs to set mobility
-   */
-  void SetGwMobility (NodeContainer gws);
-
-  /**
-   * Sets mobility to created Sat Geo node.
-   *
-   * \param node node pointer of Geo Satellite to set mobility
-   */
-  void SetGeoSatMobility(Ptr<Node> node);
-
-  /**
-   * Sets mobility to created UT nodes.
-   *
-   * \param uts node container of UTs to set mobility
-   * \param beamId the spot-beam id, where the UTs should be placed
-   *
-   */
-  void SetUtMobility (NodeContainer uts, uint32_t beamId);
-
-  /**
-   * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node
-   *
-   * \param nodes Nodecontainer of nodes to install mobility observer.
-   */
-  void InstallMobilityObserver (NodeContainer nodes) const;
-
-  /**
-   * \brief Set the initial network number to use during allocation of satellite
-   *        devices.
-   * \param addr the initial network number, e.g., 10.1.1.0 (must be different
-   *             from network numbers of GW and UT networks)
-   * \return true if the operation is successful
-   *
-   * 255.255.255.0 will be used as the network mask.
-   */
-  bool SetBeamNetworkAddress (Ipv4Address addr);
-
-  /// \return the initial network number of satellite devices
-  Ipv4Address GetBeamNetworkAddress () const;
-
-  /**
-   * \brief Set the initial network number to use during allocation of GW,
-   *        router, and GW users.
-   * \param addr the initial network number, e.g., 10.2.1.0 (must be different
-   *             from network numbers of beam and UT networks)
-   * \return true if the operation is successful
-   *
-   * 255.255.255.0 will be used as the network mask.
-   */
-  bool SetGwNetworkAddress (Ipv4Address addr);
-
-  /// \return the initial network number of GW, router, and GW users
-  Ipv4Address GetGwNetworkAddress () const;
-
-  /**
-   * \brief Set the initial network number to use during allocation of UT and
-   *        UT users.
-   * \param addr the initial network number, e.g., 10.3.1.0 (must be different
-   *             from network numbers of beam and GW networks)
-   * \return true if the operation is successful
-   *
-   * 255.255.255.0 will be used as the network mask.
-   */
-  bool SetUtNetworkAddress (Ipv4Address addr);
-
-  /// \return the initial network number of UT and UT users
-  Ipv4Address GetUtNetworkAddress () const;
-
   /**
    * User helper
    */
@@ -366,6 +252,125 @@ private:
    */
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
+  /**
+   * User defined UT positions.
+   */
+  Ptr<SatListPositionAllocator> m_utPositions;
+
+  /**
+   * Enables creation traces in sub-helpers.
+   */
+  void EnableDetailedCreationTraces ();
+  /**
+   * Sink for creation details traces
+   * \param stream stream for traces
+   * \param context context for traces
+   * \param info creation info
+   */
+  static void CreationDetailsSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info);
+  /**
+   * Sink for creation summary traces
+   * \param title creation summary title
+   */
+  void CreationSummarySink (std::string title);
+  /**
+   * Creates satellite objects according to simple scenario.
+   */
+  void CreateSimpleScenario ();
+  /**
+   * Creates satellite objects according to larger scenario.
+   */
+  void CreateLargerScenario ();
+  /**
+   * Creates satellite objects according to full scenario.
+   */
+  void CreateFullScenario ();
+
+  /**
+   * Creates satellite objects according to given beam info.
+   * \param beamInfos information of the beam to create (and beams which are given in map)
+   * \param gwUsers number of the users in GW(s) side
+   */
+  void DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers);
+
+  /**
+   * Creates trace summary starting with give title.
+   * \param title title for summary
+   * \returns std::string as summary
+   */
+  std::string CreateCreationSummary (std::string title);
+
+  /**
+   * Sets mobilities to created GW nodes.
+   *
+   * \param gws node container of UTs to set mobility
+   */
+  void SetGwMobility (NodeContainer gws);
+
+  /**
+   * Sets mobility to created Sat Geo node.
+   *
+   * \param node node pointer of Geo Satellite to set mobility
+   */
+  void SetGeoSatMobility(Ptr<Node> node);
+
+  /**
+   * Sets mobility to created UT nodes.
+   *
+   * \param uts node container of UTs to set mobility
+   * \param beamId the spot-beam id, where the UTs should be placed
+   *
+   */
+  void SetUtMobility (NodeContainer uts, uint32_t beamId);
+
+  /**
+   * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node
+   *
+   * \param nodes Nodecontainer of nodes to install mobility observer.
+   */
+  void InstallMobilityObserver (NodeContainer nodes) const;
+
+  /**
+   * \brief Set the initial network number to use during allocation of satellite
+   *        devices.
+   * \param addr the initial network number, e.g., 10.1.1.0 (must be different
+   *             from network numbers of GW and UT networks)
+   * \return true if the operation is successful
+   *
+   * 255.255.255.0 will be used as the network mask.
+   */
+  bool SetBeamNetworkAddress (Ipv4Address addr);
+
+  /// \return the initial network number of satellite devices
+  Ipv4Address GetBeamNetworkAddress () const;
+
+  /**
+   * \brief Set the initial network number to use during allocation of GW,
+   *        router, and GW users.
+   * \param addr the initial network number, e.g., 10.2.1.0 (must be different
+   *             from network numbers of beam and UT networks)
+   * \return true if the operation is successful
+   *
+   * 255.255.255.0 will be used as the network mask.
+   */
+  bool SetGwNetworkAddress (Ipv4Address addr);
+
+  /// \return the initial network number of GW, router, and GW users
+  Ipv4Address GetGwNetworkAddress () const;
+
+  /**
+   * \brief Set the initial network number to use during allocation of UT and
+   *        UT users.
+   * \param addr the initial network number, e.g., 10.3.1.0 (must be different
+   *             from network numbers of beam and GW networks)
+   * \return true if the operation is successful
+   *
+   * 255.255.255.0 will be used as the network mask.
+   */
+  bool SetUtNetworkAddress (Ipv4Address addr);
+
+  /// \return the initial network number of UT and UT users
+  Ipv4Address GetUtNetworkAddress () const;
 };
 
 } // namespace ns3
