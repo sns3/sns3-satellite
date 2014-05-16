@@ -115,6 +115,13 @@ main (int argc, char *argv[])
       }
   }
 
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
+
   switch (damaConf)
   {
     // RBDC
@@ -124,9 +131,6 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue(64));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
         break;
       }
     // VBDC
@@ -135,9 +139,6 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(true));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
         break;
       }
     default:
@@ -201,7 +202,6 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
-
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -212,6 +212,8 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
+  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
@@ -252,3 +254,4 @@ main (int argc, char *argv[])
 
   return 0;
 }
+
