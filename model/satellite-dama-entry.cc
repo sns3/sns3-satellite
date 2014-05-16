@@ -36,12 +36,11 @@ SatDamaEntry::SatDamaEntry ()
 }
 
 SatDamaEntry::SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf)
- : m_llsConf (llsConf)
+ : m_dynamicRatePersistence (0),
+   m_volumeBacklogPersistence (0),
+   m_llsConf (llsConf)
 {
   NS_LOG_FUNCTION (this);
-
-  ResetDynamicRatePersistence ();
-  ResetVolumeBacklogPersistence ();
 
   m_dynamicRateRequestedInKbps = std::vector<uint16_t> (m_llsConf->GetDaServiceCount (), 0.0);
   m_volumeBacklogRequestedInBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
@@ -167,7 +166,7 @@ SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
 
   uint16_t minRbdc (0);
 
-  if (m_llsConf->GetDaRbdcAllowed (index))
+  if (m_llsConf->GetDaRbdcAllowed (index) && (m_dynamicRatePersistence > 0) )
     {
       minRbdc = std::max<uint16_t> (m_llsConf->GetDaMinimumServiceRateInKbps (index),  m_llsConf->GetDaConstantServiceRateInKbps (index) );
     }

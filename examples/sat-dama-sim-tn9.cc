@@ -85,6 +85,9 @@ main (int argc, char *argv[])
   cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
   cmd.Parse (argc, argv);
 
+  // use 5 seconds store time for control messages
+  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
+
   switch (nccConf)
   {
     case 0:

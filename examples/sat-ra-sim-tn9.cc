@@ -63,6 +63,9 @@ main (int argc, char *argv[])
   cmd.AddValue ("offTime", "Time for packet sending is off in seconds", offTime);
   cmd.Parse (argc, argv);
 
+  // use 5 seconds store time for control messages
+  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
+
   // Enable Random Access with all available modules
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
 

@@ -792,7 +792,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
           utSymbolsToUse -= symbolsToUse;
         }
     }
-  else
+  else if (rcSymbolsLeft > 0)
     {
       switch (m_configType)
       {
@@ -1130,7 +1130,7 @@ SatFrameAllocator::SortUtRcs (Address ut)
   if ( rcIndices.size () > 2)
     {
       // sort RCs in UT using random method.
-      std::random_shuffle (rcIndices.begin (), rcIndices.end ());
+      std::random_shuffle (rcIndices.begin () + 1, rcIndices.end ());
     }
 
   return rcIndices;
