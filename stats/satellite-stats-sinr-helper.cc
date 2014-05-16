@@ -80,19 +80,22 @@ SatStatsSinrHelper::GetTypeId ()
   static TypeId tid = TypeId ("ns3::SatStatsSinrHelper")
     .SetParent<SatStatsHelper> ()
     .AddAttribute ("MinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, CDF output.",
+                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
+                   "(in dB).",
                    DoubleValue (-5.0),
                    MakeDoubleAccessor (&SatStatsSinrHelper::SetMinValue,
                                        &SatStatsSinrHelper::GetMinValue),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("MaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, CDF output.",
+                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
+                   "(in dB).",
                    DoubleValue (20.0),
                    MakeDoubleAccessor (&SatStatsSinrHelper::SetMaxValue,
                                        &SatStatsSinrHelper::GetMaxValue),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("BinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, CDF output.",
+                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
+                   "(in dB).",
                    DoubleValue (0.5),
                    MakeDoubleAccessor (&SatStatsSinrHelper::SetBinLength,
                                        &SatStatsSinrHelper::GetBinLength),

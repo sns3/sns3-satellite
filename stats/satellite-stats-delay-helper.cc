@@ -82,19 +82,22 @@ SatStatsDelayHelper::GetTypeId ()
   static TypeId tid = TypeId ("ns3::SatStatsDelayHelper")
     .SetParent<SatStatsHelper> ()
     .AddAttribute ("MinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, CDF output.",
+                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
+                   "(in seconds).",
                    DoubleValue (0.0),
                    MakeDoubleAccessor (&SatStatsDelayHelper::SetMinValue,
                                        &SatStatsDelayHelper::GetMinValue),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("MaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, CDF output.",
+                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
+                   "(in seconds).",
                    DoubleValue (1.0),
                    MakeDoubleAccessor (&SatStatsDelayHelper::SetMaxValue,
                                        &SatStatsDelayHelper::GetMaxValue),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("BinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, CDF output.",
+                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
+                   "(in seconds).",
                    DoubleValue (0.02),
                    MakeDoubleAccessor (&SatStatsDelayHelper::SetBinLength,
                                        &SatStatsDelayHelper::GetBinLength),
