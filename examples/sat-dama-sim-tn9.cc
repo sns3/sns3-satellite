@@ -224,6 +224,8 @@ main (int argc, char *argv[])
 
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
+  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -241,16 +243,7 @@ main (int argc, char *argv[])
   s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
-
   s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-dama-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
