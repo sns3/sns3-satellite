@@ -17,7 +17,7 @@
  <default name="ns3::SatBeamScheduler::CnoEstimationWindow" value="+1000000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTwoWayPropagationDelay" value="+560000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTBTPTxAndProcessingDelay" value="+100000000.0ns"/>
- <default name="ns3::SatBeamScheduler::ControlSlotsEnabled" value="false"/>
+ <default name="ns3::SatBeamScheduler::ControlSlotsEnabled" value="true"/>
  <default name="ns3::SatBeamScheduler::ControlSlotInterval" value="+1000000000.0ns"/>
  <default name="ns3::SatChannel::EnableRxPowerOutputTrace" value="false"/>
  <default name="ns3::SatChannel::EnableFadingOutputTrace" value="false"/>
@@ -38,17 +38,17 @@
  <default name="ns3::SatSuperframeAllocator::FcaEnabled" value="false"/>
  <default name="ns3::SatSuperframeConf0::FrameCount" value="3"/>
  <default name="ns3::SatSuperframeConf0::FrameConfigType" value="Config type 2"/>
- <default name="ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz" value="2.5e+07"/>
+ <default name="ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz" value="1.0e+07"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz" value="0.3125e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierRollOff" value="0.2"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf0::Frame0_RandomAccessFrame" value="false"/>
- <default name="ns3::SatSuperframeConf0::Frame1_AllocatedBandwidthHz" value="5.0e+07"/>
+ <default name="ns3::SatSuperframeConf0::Frame1_AllocatedBandwidthHz" value="2.0e+07"/>
  <default name="ns3::SatSuperframeConf0::Frame1_CarrierAllocatedBandwidthHz" value="0.625e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame1_CarrierRollOff" value="0.2"/>
  <default name="ns3::SatSuperframeConf0::Frame1_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf0::Frame1_RandomAccessFrame" value="false"/>
- <default name="ns3::SatSuperframeConf0::Frame2_AllocatedBandwidthHz" value="5.0e+07"/>
+ <default name="ns3::SatSuperframeConf0::Frame2_AllocatedBandwidthHz" value="2.0e+07"/>
  <default name="ns3::SatSuperframeConf0::Frame2_CarrierAllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame2_CarrierRollOff" value="0.2"/>
  <default name="ns3::SatSuperframeConf0::Frame2_CarrierSpacing" value="0.3"/>
@@ -304,7 +304,7 @@
  <default name="ns3::SatLowerLayerServiceConf::VbdcQuantizationSmallStepKB" value="1"/>
  <default name="ns3::SatLowerLayerServiceConf::VbdcQuantizationLargeStepKB" value="2"/>
  <default name="ns3::SatLowerLayerServiceConf::VbdcQuantizationThresholdKB" value="128"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided" value="true"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=100]"/>
@@ -313,7 +313,7 @@
  <default name="ns3::SatLowerLayerServiceConf::DaService0_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed" value="false"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed" value="true"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=50]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MaximumServiceRate" value="9216"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MinimumServiceRate" value="100"/>
