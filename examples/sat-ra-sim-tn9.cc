@@ -32,13 +32,18 @@ main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
-  uint32_t raMode (0);
+  uint32_t raMode (2);
   uint32_t utsPerBeam (3);
-  uint32_t packetSize (64);
-  bool isNoisy (false);
+  uint32_t packetSize (10);
+  std::string dataRate = "2kb/s";
+  std::string onTime = "0.1";
+  std::string offTime = "2.0";
 
-  double simLength (30.0); // in seconds
-  Time appStartTime = Seconds(0.1);
+  double simLength (15.0); // in seconds
+
+  LogComponentEnable ("sat-ra-sim-tn9", LOG_LEVEL_INFO);
+  LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-ra-input-attributes.xml"));
@@ -51,15 +56,41 @@ main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("raMode", "RA mode", raMode);
-  cmd.AddValue ("simLength", "Simulation duration (in seconds)", simLength);
-  cmd.AddValue ("packetSize", "Constant packet size (in bytes)", packetSize);
-  cmd.AddValue ("isNoisy", "If true, may print some logging messages", isNoisy);
+  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
+  cmd.AddValue ("packetSize", "Constant packet size in bytes", packetSize);
+  cmd.AddValue ("dataRate", "Data rate (e.g. 500kb/s)", dataRate);
+  cmd.AddValue ("onTime", "Time for packet sending is on in seconds", onTime);
+  cmd.AddValue ("offTime", "Time for packet sending is off in seconds", offTime);
   cmd.Parse (argc, argv);
 
-  if (isNoisy)
-    {
-      LogComponentEnable ("sat-ra-sim-tn9", LOG_INFO);
-    }
+  // Enable Random Access with all available modules
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
+
+  // Set Random Access interference model
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+
+  // Set Random Access collision model
+  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel",EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+
+  // Set dynamic load control parameters
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
+
+  // Set random access parameters
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (2));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (50));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (1));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (1));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.99));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
+
+  // Set up user given parameters for on/off functionality.
+  Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (packetSize));
+  Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue (dataRate));
+  Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
+  Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
 
   switch (raMode)
   {
@@ -75,13 +106,9 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
-
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.02));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
         break;
       }
     // SA + VBDC
@@ -96,18 +123,14 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
 
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
-
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (30.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.06));
         break;
       }
-    // CRDSA only
+    // Periodic control slots + VBDC
     case 2:
       {
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
@@ -121,11 +144,28 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
 
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (20.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.04));
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_OFF));
+
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+        break;
+      }
+    // CRDSA only
+    case 3:
+      {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
         break;
       }
     default:
@@ -134,6 +174,10 @@ main (int argc, char *argv[])
         break;
       }
   }
+
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (20.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.02));
 
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MinValue", DoubleValue (0.0));
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MaxValue", DoubleValue (10000.0));
@@ -161,57 +205,30 @@ main (int argc, char *argv[])
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
-  const std::string protocol = "ns3::UdpSocketFactory";
 
   /**
-   * Set-up CBR traffic
+   * Set-up On-Off traffic
    */
-  Ptr<UniformRandomVariable> randVariable = CreateObject<UniformRandomVariable> ();
-  Time minInterval = Seconds (packetSize / (125 * 8.0)); // 8 kbps
-  Time maxInterval = Seconds (packetSize / (125 * 2.0)); // 2 kbps
-  NS_LOG_INFO ("Minimum interval between packets: " << minInterval.GetSeconds ()
-                   << "s (equivalent with 8 kbps data rate)");
-  NS_LOG_INFO ("Maximum interval between packets: " << maxInterval.GetSeconds ()
-                   << "s (equivalent with 2 kbps data rate)");
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-  const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
-
-  for (NodeContainer::Iterator itUt = utUsers.Begin ();
-      itUt != utUsers.End ();
-      ++itUt)
+  for (uint32_t i = 0; i < utUsers.GetN (); i++)
     {
-      appStartTime += MilliSeconds (10);
+      SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (i)), port));
+      onOffHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
-      // return link
-      Ptr<CbrApplication> rtnApp = CreateObject<CbrApplication> ();
-      rtnApp->SetAttribute ("Protocol", StringValue (protocol));
-      rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
-      double intervalSeconds = randVariable->GetValue (minInterval.GetSeconds (),
-                                                       maxInterval.GetSeconds ());
-      if (isNoisy)
-        {
-          const Address addr = satIdMapper->GetUtUserMacWithNode (*itUt);
-          const int32_t utUserId = satIdMapper->GetUtUserIdWithMac (addr);
-          const double kbps = packetSize / intervalSeconds / 125.0;
-          std::cout << "UT User " << utUserId
-                    << " offers bandwidth of " << kbps << " kbps" << std::endl;
-        }
-      rtnApp->SetAttribute ("Interval", TimeValue (Seconds (intervalSeconds)));
-      rtnApp->SetStartTime (appStartTime);
-      (*itUt)->AddApplication (rtnApp);
+      ApplicationContainer utOnOff = onOffHelper.Install (utUsers.Get (i));
+      utOnOff.Start (Seconds (0.0));
+      utOnOff.Stop (Seconds (simLength - 1.0));
+
+      PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (i)), port));
+      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+
+      ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
+      gwSink.Start (Seconds (0.0));
+      gwSink.Stop (Seconds (simLength));
     }
-
-  // setup packet sinks at all users
-  Ptr<PacketSink> ps = CreateObject<PacketSink> ();
-  ps->SetAttribute ("Protocol", StringValue (protocol));
-  ps->SetAttribute ("Local", AddressValue (gwAddr));
-  gwUsers.Get (0)->AddApplication (ps);
 
   /**
    * Set-up statistics
    */
-
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -220,16 +237,16 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  //s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  //s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  //s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  //s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
@@ -247,10 +264,10 @@ main (int argc, char *argv[])
   s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-ra-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);

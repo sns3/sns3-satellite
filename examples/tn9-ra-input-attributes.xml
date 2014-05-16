@@ -313,7 +313,7 @@
  <default name="ns3::SatLowerLayerServiceConf::DaService0_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed" value="false"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed" value="true"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=50]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MaximumServiceRate" value="9216"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MinimumServiceRate" value="100"/>
