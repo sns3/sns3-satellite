@@ -44,8 +44,9 @@
 #include <ns3/probe.h>
 #include <ns3/application-packet-probe.h>
 #include <ns3/unit-conversion-collector.h>
-#include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
+#include <ns3/distribution-collector.h>
+#include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/gnuplot-aggregator.h>
 
@@ -61,7 +62,10 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatStatsThroughputHelper);
 
 SatStatsThroughputHelper::SatStatsThroughputHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+  : SatStatsHelper (satHelper),
+    m_minValue (0.0),
+    m_maxValue (0.0),
+    m_binLength (0.0)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -78,8 +82,74 @@ SatStatsThroughputHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsThroughputHelper")
     .SetParent<SatStatsHelper> ()
+    .AddAttribute ("MinValue",
+                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
+                   "(in kbps).",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetMinValue,
+                                       &SatStatsThroughputHelper::GetMinValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("MaxValue",
+                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
+                   "(in kbps).",
+                   DoubleValue (5000.0),
+                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetMaxValue,
+                                       &SatStatsThroughputHelper::GetMaxValue),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("BinLength",
+                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
+                   "(in kbps).",
+                   DoubleValue (100.0),
+                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetBinLength,
+                                       &SatStatsThroughputHelper::GetBinLength),
+                   MakeDoubleChecker<double> ())
   ;
   return tid;
+}
+
+
+void
+SatStatsThroughputHelper::SetMinValue (double minValue)
+{
+  NS_LOG_FUNCTION (this << minValue);
+  m_minValue = minValue;
+}
+
+
+double
+SatStatsThroughputHelper::GetMinValue () const
+{
+  return m_minValue;
+}
+
+
+void
+SatStatsThroughputHelper::SetMaxValue (double maxValue)
+{
+  NS_LOG_FUNCTION (this << maxValue);
+  m_maxValue = maxValue;
+}
+
+
+double
+SatStatsThroughputHelper::GetMaxValue () const
+{
+  return m_maxValue;
+}
+
+
+void
+SatStatsThroughputHelper::SetBinLength (double binLength)
+{
+  NS_LOG_FUNCTION (this << binLength);
+  m_binLength = binLength;
+}
+
+
+double
+SatStatsThroughputHelper::GetBinLength () const
+{
+  return m_binLength;
 }
 
 
@@ -156,8 +226,75 @@ SatStatsThroughputHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_FILE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+      {
+        if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
+          {
+            NS_FATAL_ERROR (GetInstanceTypeId ().GetName () << " is not a valid instance for this statistics.");
+          }
+        else if (GetIdentifierType () != SatStatsHelper::IDENTIFIER_UT_USER)
+          {
+            NS_FATAL_ERROR (GetIdentifierType () << " is not a valid identifier type for this statistics.");
+          }
+
+        // Setup aggregator.
+        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                         "OutputFileName", StringValue (GetName ()),
+                                         "GeneralHeading", StringValue ("% throughput_kbps freq"));
+        Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
+        NS_ASSERT (fileAggregator != 0);
+
+        // Setup the final-level collector.
+        m_averagingCollector = CreateObject<DistributionCollector> ();
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_averagingCollector->SetOutputType (outputType);
+        m_averagingCollector->SetMinValue (m_minValue);
+        m_averagingCollector->SetMaxValue (m_maxValue);
+        m_averagingCollector->SetBinLength (m_binLength);
+        m_averagingCollector->SetName ("0");
+        m_averagingCollector->TraceConnect ("Output",
+                                            GetName (),
+                                            MakeCallback (&MultiFileAggregator::Write2d,
+                                                          fileAggregator));
+        m_averagingCollector->TraceConnect ("OutputString",
+                                            GetName (),
+                                            MakeCallback (&MultiFileAggregator::AddContextHeading,
+                                                          fileAggregator));
+
+        // Setup second-level collectors.
+        m_terminalCollectors.SetType ("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        Callback<void, double> callback
+          = MakeCallback (&DistributionCollector::TraceSinkDouble1,
+                          m_averagingCollector);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
+          {
+            it->second->TraceConnectWithoutContext ("Output", callback);
+          }
+
+        // Setup first-level collectors.
+        m_conversionCollectors.SetType ("ns3::UnitConversionCollector");
+        m_conversionCollectors.SetAttribute ("ConversionType",
+                                             EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        CreateCollectorPerIdentifier (m_conversionCollectors);
+        m_conversionCollectors.ConnectToCollector ("Output",
+                                                   m_terminalCollectors,
+                                                   &ScalarCollector::TraceSinkDouble);
+        break;
+      }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       /// \todo Add support for boxes in Gnuplot.
@@ -203,8 +340,73 @@ SatStatsThroughputHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+      {
+        if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
+          {
+            NS_FATAL_ERROR (GetInstanceTypeId ().GetName () << " is not a valid instance for this statistics.");
+          }
+        else if (GetIdentifierType () != SatStatsHelper::IDENTIFIER_UT_USER)
+          {
+            NS_FATAL_ERROR (GetIdentifierType () << " is not a valid identifier type for this statistics.");
+          }
+
+        // Setup aggregator.
+        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        //plot->SetTitle ("");
+        plotAggregator->SetLegend ("Received throughput (in kilobits per second)",
+                                   "Frequency");
+        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        plotAggregator->Add2dDataset (GetName (), GetName ());
+        m_aggregator = plotAggregator;
+
+        // Setup the final-level collector.
+        m_averagingCollector = CreateObject<DistributionCollector> ();
+        DistributionCollector::OutputType_t outputType
+          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+          }
+        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+          {
+            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+          }
+        m_averagingCollector->SetOutputType (outputType);
+        m_averagingCollector->SetMinValue (m_minValue);
+        m_averagingCollector->SetMaxValue (m_maxValue);
+        m_averagingCollector->SetBinLength (m_binLength);
+        m_averagingCollector->SetName ("0");
+        m_averagingCollector->TraceConnect ("Output",
+                                            GetName (),
+                                            MakeCallback (&GnuplotAggregator::Write2d,
+                                                          plotAggregator));
+
+        // Setup second-level collectors.
+        m_terminalCollectors.SetType ("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute ("InputDataType",
+                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute ("OutputType",
+                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SECOND));
+        CreateCollectorPerIdentifier (m_terminalCollectors);
+        Callback<void, double> callback
+          = MakeCallback (&DistributionCollector::TraceSinkDouble1,
+                          m_averagingCollector);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+             it != m_terminalCollectors.End (); ++it)
+          {
+            it->second->TraceConnectWithoutContext ("Output", callback);
+          }
+
+        // Setup first-level collectors.
+        m_conversionCollectors.SetType ("ns3::UnitConversionCollector");
+        m_conversionCollectors.SetAttribute ("ConversionType",
+                                             EnumValue (UnitConversionCollector::FROM_BYTES_TO_KBIT));
+        CreateCollectorPerIdentifier (m_conversionCollectors);
+        m_conversionCollectors.ConnectToCollector ("Output",
+                                                   m_terminalCollectors,
+                                                   &ScalarCollector::TraceSinkDouble);
+        break;
+      }
 
     default:
       NS_FATAL_ERROR ("SatStatsThroughputHelper - Invalid output type");

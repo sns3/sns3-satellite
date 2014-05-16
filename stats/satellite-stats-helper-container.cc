@@ -243,6 +243,18 @@ SatStatsHelperContainer::GetTypeId ()
                                   "per UT user return link application-level throughput statistics")
     ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
 
+    .AddAttribute ("AverageUtUserRtnAppThroughput",
+                   "Enable the output of average UT user return link application-level throughput statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddAverageUtUserRtnAppThroughput),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
+                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
+                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
+                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
+                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
+                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+
     // Return link device-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevThroughput,
                                         "return link device-level throughput statistics")
@@ -639,6 +651,23 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppThroughput, "rtn-app-throughput")
+
+void
+SatStatsHelperContainer::AddAverageUtUserRtnAppThroughput (SatStatsHelper::OutputType_t type)
+{
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));
+  if (type != SatStatsHelper::OUTPUT_NONE)
+    {
+      Ptr<SatStatsRtnAppThroughputHelper> stat
+        = CreateObject<SatStatsRtnAppThroughputHelper> (m_satHelper);
+      stat->SetName (m_name + "-average-ut-user-" + "rtn-app-throughput"
+                            + GetOutputTypeSuffix (type));
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
+      stat->SetOutputType (type);
+      stat->Install ();
+      m_stats.push_back (stat);
+    }
+}
 
 // Return link device-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")

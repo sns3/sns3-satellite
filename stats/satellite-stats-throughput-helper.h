@@ -39,6 +39,7 @@ class SatHelper;
 class Node;
 class Packet;
 class DataCollectionObject;
+class DistributionCollector;
 
 /**
  * \ingroup satstats
@@ -55,6 +56,36 @@ public:
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
+
+  /**
+   * \param minValue the MinValue attribute of the histogram, PDF, CDF output.
+   */
+  void SetMinValue (double minValue);
+
+  /**
+   * \return the MinValue attribute of the histogram, PDF, CDF output.
+   */
+  double GetMinValue () const;
+
+  /**
+   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output.
+   */
+  void SetMaxValue (double maxValue);
+
+  /**
+   * \return the MaxValue attribute of the histogram, PDF, CDF output.
+   */
+  double GetMaxValue () const;
+
+  /**
+   * \param binLength the BinLength attribute of the histogram, PDF, CDF output.
+   */
+  void SetBinLength (double binLength);
+
+  /**
+   * \return the BinLength attribute of the histogram, PDF, CDF output.
+   */
+  double GetBinLength () const;
 
   /**
    * \brief Set up several probes or other means of listeners and connect them
@@ -100,11 +131,19 @@ protected:
   /// Maintains a list of second-level collectors created by this helper.
   CollectorMap m_terminalCollectors;
 
+  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+  Ptr<DistributionCollector> m_averagingCollector;
+
   /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
   /// Map of address and the identifier associated with it (for return link).
   std::map<const Address, uint32_t> m_identifierMap;
+
+private:
+  double m_minValue;   ///< `MinValue` attribute.
+  double m_maxValue;   ///< `MaxValue` attribute.
+  double m_binLength;  ///< `BinLength` attribute.
 
 }; // end of class SatStatsThroughputHelper
 
