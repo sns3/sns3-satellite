@@ -144,59 +144,105 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
 
   InitFrame (configType);
 
-  // Test with one UT
-  for ( uint32_t i = 0; i < 10; i++) // CRAs
+  // Test with one UT and one RC
+  for ( uint32_t i = 0; i < 11; i+=2) // CRAs
     {
-      for ( uint32_t j = 0; j < 15; j++) // minimum RBDCs
+      for ( uint32_t j = 0; j < 15; j+=2) // minimum RBDCs
         {
-          for ( uint32_t k = 0; k < 15; k++) // RBDCs
+          for ( uint32_t k = 0; k < 15; k+=2) // RBDCs
             {
-              for ( uint32_t l = 0; l < 15; l++) // VBDCs
+              for ( uint32_t l = 0; l < 15; l+=2) // VBDCs
                 {
-                  for ( uint32_t m = 0; m < 9; m++) // RC indices
+                  uint32_t bytesReq = 0;
+
+                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForSinleUtTest (bytesReq, i, j, k, l, 1 );
+
+                  // repeat with all CC levels
+                  for (uint32_t o = 0; o < m_ccLevelCount; o++ )
                     {
-                      uint32_t bytesReq = 0;
+                      // reset first allocations
+                      m_frameAllocator->Reset ();
 
-                      SatFrameAllocator::SatFrameAllocReq req = ContructRequestForSinleUtTest (bytesReq, i, j, k, l, m + 1 );
+                      uint32_t waveformId = m_waveFormConf->GetDefaultWaveformId ();
+                      m_frameAllocator->GetBestWaveform (req.m_cno, waveformId);
 
-                      // repeat with all CC levels
-                      for (uint32_t o = 0; o < m_ccLevelCount; o++ )
-                        {
-                          // reset first allocations
-                          m_frameAllocator->Reset ();
+                      // do allocation and check that result is what expected
+                      bool allocationResult = m_frameAllocator->Allocate (m_ccLevels[o], &req, waveformId );
 
-                          uint32_t waveformId = m_waveFormConf->GetDefaultWaveformId ();
-                          m_frameAllocator->GetBestWaveform (req.m_cno, waveformId);
+                      m_frameAllocator->PreAllocateSymbols (0.9, false);
 
-                          // do allocation and check that result is what expected
-                          bool allocationResult = m_frameAllocator->Allocate (m_ccLevels[o], &req, waveformId );
+                      // generate time slots and check results against request, RC based allocation off
 
-                          m_frameAllocator->PreAllocateSymbols (0.9, false);
+                      Ptr<SatTbtpMessage> tptp = CreateObject<SatTbtpMessage> ();
+                      SatFrameAllocator::TbtpMsgContainer_t tbtpContainer;
+                      tbtpContainer.push_back (tptp);
+                      SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
 
-                          // generate time slots and check results against request, RC based allocation off
+                      m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
 
-                          Ptr<SatTbtpMessage> tptp = CreateObject<SatTbtpMessage> ();
-                          SatFrameAllocator::TbtpMsgContainer_t tbtpContainer;
-                          tbtpContainer.push_back (tptp);
-                          SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
+                      CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, false);
 
-                          m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+                      // generate time slots and check results against request, RC based allocation on
 
-                          CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, false);
+                      tbtpContainer.clear ();
+                      tptp = CreateObject<SatTbtpMessage> ();
+                      tbtpContainer.push_back (tptp);
+                      utAllocContainer.clear ();
 
-                          // generate time slots and check results against request, RC based allocation on
+                      m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
 
-                          tbtpContainer.clear ();
-                          tptp = CreateObject<SatTbtpMessage> ();
-                          tbtpContainer.push_back (tptp);
-                          utAllocContainer.clear ();
-
-                          m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
-
-                          CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, true);
-                        }
+                      CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, true);
                     }
                 }
+            }
+        }
+    }
+
+  // test several times with random values using RC indices 2, 3, 4
+  for ( uint32_t i = 0; i < 1000; i++)
+    {
+      for ( uint32_t m = 2; m < 4; m++) //
+        {
+          uint32_t bytesReq = 0;
+          uint32_t divider = m_frameConf->GetCarrierMinPayloadInBytes () * 2;
+
+          SatFrameAllocator::SatFrameAllocReq req = ContructRequestForSinleUtTest (bytesReq, std::rand () % divider, std::rand () % divider, std::rand () % divider, std::rand () % divider, 2 );
+
+          // repeat with all CC levels
+          for (uint32_t o = 0; o < m_ccLevelCount; o++ )
+            {
+              // reset first allocations
+              m_frameAllocator->Reset ();
+
+              uint32_t waveformId = m_waveFormConf->GetDefaultWaveformId ();
+              m_frameAllocator->GetBestWaveform (req.m_cno, waveformId);
+
+              // do allocation and check that result is what expected
+              bool allocationResult = m_frameAllocator->Allocate (m_ccLevels[o], &req, waveformId );
+
+              m_frameAllocator->PreAllocateSymbols (0.9, false);
+
+              // generate time slots and check results against request, RC based allocation off
+
+              Ptr<SatTbtpMessage> tptp = CreateObject<SatTbtpMessage> ();
+              SatFrameAllocator::TbtpMsgContainer_t tbtpContainer;
+              tbtpContainer.push_back (tptp);
+              SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
+
+              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+
+              CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, false);
+
+              // generate time slots and check results against request, RC based allocation on
+
+              tbtpContainer.clear ();
+              tptp = CreateObject<SatTbtpMessage> ();
+              tbtpContainer.push_back (tptp);
+              utAllocContainer.clear ();
+
+              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+
+              CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, true);
             }
         }
     }
@@ -318,10 +364,6 @@ SatFrameAllocatorTestCase::ContructRequestForSinleUtTest ( uint32_t& totalBytes,
   req.m_cno = m_cnoValues[m_cnoIndex];
 
   uint32_t craBytesReq = 0;
-  uint32_t minRbdcBytesReq = 0;
-  uint32_t rbdcBytesReq = 0;
-  uint32_t vbdcBytesReq = 0;
-
   totalBytes = 0;
 
   uint32_t maxCraBytes = m_frameConf->GetCarrierMinPayloadInBytes ();
@@ -332,21 +374,48 @@ SatFrameAllocatorTestCase::ContructRequestForSinleUtTest ( uint32_t& totalBytes,
       maxCraBytes -= m_frameAllocator->GetMostRobustWaveform ()->GetPayloadInBytes ();
     }
 
-  for ( uint32_t i = 0; i < rcCount; i++ )
+  if ( craBytesReq < maxCraBytes )
+    {
+      uint32_t craBytesLeft = maxCraBytes - craBytesReq;
+      req.m_reqPerRc[0].m_craBytes = std::min<uint32_t> (minCarrierBytes * craBytes / 10, craBytesLeft);
+    }
+  else
+    {
+      req.m_reqPerRc[0].m_craBytes = 0;
+    }
+
+  req.m_reqPerRc[0].m_minRbdcBytes = minCarrierBytes * minRbdcBytes / 10;
+  req.m_reqPerRc[0].m_rbdcBytes = minCarrierBytes * rbdcBytes / 10;
+  req.m_reqPerRc[0].m_vbdcBytes = minCarrierBytes * vbdcBytes / 10;
+
+  if ( req.m_reqPerRc[0].m_minRbdcBytes > req.m_reqPerRc[0].m_rbdcBytes)
+    {
+      req.m_reqPerRc[0].m_rbdcBytes = req.m_reqPerRc[0].m_minRbdcBytes;
+    }
+
+  craBytesReq += req.m_reqPerRc[0].m_craBytes;
+
+  totalBytes += req.m_reqPerRc[0].m_craBytes;
+  totalBytes += req.m_reqPerRc[0].m_rbdcBytes;
+  totalBytes += req.m_reqPerRc[0].m_vbdcBytes;
+
+  uint32_t divider = minCarrierBytes + 1;
+
+  for ( uint32_t i = 1; i < rcCount; i++ )
     {
       if ( craBytesReq < maxCraBytes )
         {
           uint32_t craBytesLeft = maxCraBytes - craBytesReq;
-          req.m_reqPerRc[i].m_craBytes = std::min<uint32_t> (minCarrierBytes * craBytes / 10, craBytesLeft);
+          req.m_reqPerRc[i].m_craBytes = std::min<uint32_t> (std::rand () % divider, craBytesLeft);
         }
       else
         {
           req.m_reqPerRc[i].m_craBytes = 0;
         }
 
-      req.m_reqPerRc[i].m_minRbdcBytes = minCarrierBytes * minRbdcBytes / 10;
-      req.m_reqPerRc[i].m_rbdcBytes = minCarrierBytes * rbdcBytes / 10;
-      req.m_reqPerRc[i].m_vbdcBytes = minCarrierBytes * vbdcBytes / 10;
+      req.m_reqPerRc[i].m_minRbdcBytes = std::rand () % divider;
+      req.m_reqPerRc[i].m_rbdcBytes = std::rand () % divider;
+      req.m_reqPerRc[i].m_vbdcBytes = std::rand () % divider;
 
       if ( req.m_reqPerRc[i].m_minRbdcBytes > req.m_reqPerRc[i].m_rbdcBytes)
         {
@@ -354,17 +423,10 @@ SatFrameAllocatorTestCase::ContructRequestForSinleUtTest ( uint32_t& totalBytes,
         }
 
       craBytesReq += req.m_reqPerRc[i].m_craBytes;
-      minRbdcBytesReq += req.m_reqPerRc[i].m_minRbdcBytes;
-      rbdcBytesReq += req.m_reqPerRc[i].m_rbdcBytes;
-      vbdcBytesReq += req.m_reqPerRc[i].m_vbdcBytes;
+      totalBytes += req.m_reqPerRc[i].m_craBytes;
+      totalBytes += req.m_reqPerRc[i].m_rbdcBytes;
+      totalBytes += req.m_reqPerRc[i].m_vbdcBytes;
     }
-
-  if ( rcCount > 1 )
-    {
-      std::random_shuffle (req.m_reqPerRc.begin (), req.m_reqPerRc.end () );
-    }
-
-  totalBytes = craBytesReq + rbdcBytesReq + vbdcBytesReq;
 
   return req;
 }
