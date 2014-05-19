@@ -208,8 +208,6 @@ SatDamaEntry::UpdateRbdcInKbps (uint8_t index, uint16_t rateInKbps)
         {
           m_dynamicRateRequestedInKbps[index] = rateInKbps;
         }
-
-      ResetDynamicRatePersistence ();
     }
 }
 
@@ -250,8 +248,6 @@ SatDamaEntry::SetVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
         {
           m_volumeBacklogRequestedInBytes[index] = (1024 * m_llsConf->GetDaMaximumBacklogInKbytes (index));
         }
-
-      ResetVolumeBacklogPersistence ();
     }
 }
 

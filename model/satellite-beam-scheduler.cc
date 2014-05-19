@@ -69,14 +69,17 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
           {
             case SatEnums::DA_RBDC:
               m_damaEntry->UpdateRbdcInKbps (descriptorIt->first.first, descriptorIt->second);
+              m_damaEntry->ResetDynamicRatePersistence ();
               break;
 
             case SatEnums::DA_VBDC:
               m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
+              m_damaEntry->ResetVolumeBacklogPersistence ();
               break;
 
             case SatEnums::DA_AVBDC:
               m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
+              m_damaEntry->ResetVolumeBacklogPersistence ();
               break;
 
             default:
@@ -520,10 +523,6 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
           m_backlogRequestsTrace ( head.str () + vbdcTail.str () );
           // ... write backlog requests traces ends
         }
-
-      // decrease persistence values
-      damaEntry->DecrementDynamicRatePersistence ();
-      damaEntry->DecrementVolumeBacklogPersistence ();
     }
 }
 
@@ -553,36 +552,46 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
 {
   NS_LOG_FUNCTION (this);
 
-  for (SatFrameAllocator::UtAllocInfoContainer_t::const_iterator it = utAllocContainer.begin (); it != utAllocContainer.end (); it ++ )
+  for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
     {
-      // update time to send next control slot, if control slot is allocated
-      if ( it->second.second )
-        {
-          m_utInfos.at (it->first)->SetControlSlotGenerationTime (m_controlSlotInterval);
-        }
-
       Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
-      double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+      SatFrameAllocator::UtAllocInfoContainer_t::const_iterator allocInfo = utAllocContainer.find (it->first);
 
-      for (uint32_t i = 0; i < it->second.first.size (); i++ )
-        {
-          uint32_t rateBasedBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
-          rateBasedBytes += ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+      if ( allocInfo != utAllocContainer.end ())
+      {
+        // update time to send next control slot, if control slot is allocated
+        if ( allocInfo->second.second )
+          {
+            m_utInfos.at (allocInfo->first)->SetControlSlotGenerationTime (m_controlSlotInterval);
+          }
 
-          if ( rateBasedBytes < it->second.first[i] )
-            {
-              uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
+        double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
 
-              if ( vbdcBytes > (it->second.first[i] - rateBasedBytes) )
-                {
-                  damaEntry->SetVbdcInBytes (i, (it->second.first[i] - rateBasedBytes));
-                }
-              else
-                {
-                  damaEntry->SetVbdcInBytes (i, 0);
-                }
-            }
-        }
+        for (uint32_t i = 0; i < allocInfo->second.first.size (); i++ )
+          {
+            uint32_t rateBasedBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+            rateBasedBytes += ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+
+            if ( rateBasedBytes < allocInfo->second.first[i] )
+              {
+                uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
+
+                if ( vbdcBytes > (allocInfo->second.first[i] - rateBasedBytes) )
+                  {
+                    damaEntry->SetVbdcInBytes (i, (allocInfo->second.first[i] - rateBasedBytes));
+                  }
+                else
+                  {
+                    damaEntry->SetVbdcInBytes (i, 0);
+                  }
+              }
+          }
+      }
+
+      // decrease persistence values
+      damaEntry->DecrementDynamicRatePersistence ();
+      damaEntry->DecrementVolumeBacklogPersistence ();
+
     }
 }
 
