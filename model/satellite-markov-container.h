@@ -98,7 +98,13 @@ public:
   /**
    * \brief Function for locking the parameter set and state to random values
    */
-  void LockToRandomSetAndState ();
+  void RandomizeLockedSetAndState ();
+
+  /**
+   * \brief Function for locking the state to random value. The set will be locked to the value provided by the parameter
+   * \param set The value for set
+   */
+  void RandomizeLockedState (uint32_t set);
 
 private:
 

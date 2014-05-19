@@ -311,6 +311,8 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
 {
   NS_LOG_FUNCTION (this << channelType);
 
+  double fadingValue;
+
   if (!m_enableStateLock)
     {
       m_currentState = m_markovModel->GetState ();
@@ -338,7 +340,8 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
 
         m_latestCalculationTime_up = Now ();
 
-        return m_latestCalculatedFadingValue_up;
+        fadingValue = m_latestCalculatedFadingValue_up;
+        break;
       }
     case SatEnums::FORWARD_USER_CH:
     case SatEnums::RETURN_FEEDER_CH:
@@ -358,14 +361,15 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
 
         m_latestCalculationTime_down = Now ();
 
-        return m_latestCalculatedFadingValue_down;
+        fadingValue = m_latestCalculatedFadingValue_down;
+        break;
       }
     default:
       {
         NS_FATAL_ERROR ("SatMarkovContainer::CalculateFading - Invalid channel type");
       }
   }
-  return -1;
+  return fadingValue;
 }
 
 void
@@ -410,11 +414,23 @@ SatMarkovContainer::LockToSet (uint32_t newSet)
 }
 
 void
-SatMarkovContainer::LockToRandomSetAndState ()
+SatMarkovContainer::RandomizeLockedSetAndState ()
 {
   NS_LOG_FUNCTION (this);
 
   LockToSetAndState ((rand() % (m_numOfSets-1)),(rand() % (m_numOfStates-1)));
+}
+
+void
+SatMarkovContainer::RandomizeLockedState (uint32_t set)
+{
+  NS_LOG_FUNCTION (this);
+
+  LockToSet (set);
+
+  m_currentState = (rand() % (m_numOfStates-1));
+
+  m_enableStateLock = true;
 }
 
 void
