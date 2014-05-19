@@ -92,7 +92,8 @@ SatStatsFrameLoadHelper::DoInstall ()
   // Setup aggregator.
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                    "OutputFileName", StringValue (GetName ()),
-                                   "MultiFileMode", BooleanValue (false));
+                                   "MultiFileMode", BooleanValue (false),
+                                   "EnableContextPrinting", BooleanValue (true));
 
   Callback<void, std::string, uint32_t, long> frameLoadCallback
       = MakeCallback (&SatStatsFrameLoadHelper::FrameLoadCallback, this);

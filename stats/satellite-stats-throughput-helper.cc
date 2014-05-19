@@ -169,7 +169,8 @@ SatStatsThroughputHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "MultiFileMode", BooleanValue (false));
+                                         "MultiFileMode", BooleanValue (false),
+                                         "EnableContextPrinting", BooleanValue (true));
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -239,6 +240,8 @@ SatStatsThroughputHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
+                                         "MultiFileMode", BooleanValue (false),
+                                         "EnableContextPrinting", BooleanValue (false),
                                          "GeneralHeading", StringValue ("% throughput_kbps freq"));
         Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
         NS_ASSERT (fileAggregator != 0);
@@ -260,12 +263,10 @@ SatStatsThroughputHelper::DoInstall ()
         m_averagingCollector->SetMaxValue (m_maxValue);
         m_averagingCollector->SetBinLength (m_binLength);
         m_averagingCollector->SetName ("0");
-        m_averagingCollector->TraceConnect ("Output",
-                                            GetName (),
+        m_averagingCollector->TraceConnect ("Output", "0",
                                             MakeCallback (&MultiFileAggregator::Write2d,
                                                           fileAggregator));
-        m_averagingCollector->TraceConnect ("OutputString",
-                                            GetName (),
+        m_averagingCollector->TraceConnect ("OutputString", "0",
                                             MakeCallback (&MultiFileAggregator::AddContextHeading,
                                                           fileAggregator));
 
