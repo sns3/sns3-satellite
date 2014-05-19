@@ -33,11 +33,11 @@ main (int argc, char *argv[])
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
   uint32_t raMode (2);
-  uint32_t utsPerBeam (3);
+  uint32_t utsPerBeam (1);
   uint32_t packetSize (10);
-  std::string dataRate = "2kb/s";
-  std::string onTime = "0.1";
-  std::string offTime = "2.0";
+  std::string dataRate = "5kb/s";
+  std::string onTime = "0.2";
+  std::string offTime = "1.0";
 
   double simLength (15.0); // in seconds
 

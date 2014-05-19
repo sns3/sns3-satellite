@@ -226,7 +226,7 @@ main (int argc, char *argv[])
   s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-ra-sim-tn9 ---");
+  NS_LOG_INFO("--- sat-ra-sim-tn9-comparison ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
   NS_LOG_INFO("  Simulation length: " << simLength);
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
@@ -236,7 +236,7 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-ra-output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-ra-comparison-output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

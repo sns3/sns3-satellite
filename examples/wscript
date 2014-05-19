@@ -29,6 +29,9 @@ def build(bld):
     obj = bld.create_ns3_program('sat-ra-sim-tn9-comparison', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-ra-sim-tn9-comparison.cc'
 
+    obj = bld.create_ns3_program('sat-profiling-sim-tn8', ['satellite', 'traffic', 'flow-monitor'])
+    obj.source = 'sat-profiling-sim-tn8.cc'
+
     obj = bld.create_ns3_program('sat-multi-application-rtn-example', ['satellite', 'traffic'])
     obj.source = 'sat-multi-application-rtn-example.cc'
     

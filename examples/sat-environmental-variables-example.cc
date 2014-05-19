@@ -12,6 +12,7 @@ using namespace ns3;
 * \ingroup satellite
 *
 * \brief Example for environmental variables class.
+* Demonstrates various functions for locating directories.
 *
 */
 
@@ -30,6 +31,9 @@ main (int argc, char *argv[])
   Simulator::Schedule (MilliSeconds(0), &SatEnvVariables::GetCurrentWorkingDirectory, envVariables);
   Simulator::Schedule (MilliSeconds(1), &SatEnvVariables::GetPathToExecutable, envVariables);
   Simulator::Schedule (MilliSeconds(2), &SatEnvVariables::GetDataPath, envVariables);
+  Simulator::Schedule (MilliSeconds(3), &SatEnvVariables::LocateDataDirectory, envVariables);
+  Simulator::Schedule (MilliSeconds(4), &SatEnvVariables::LocateDirectory, envVariables, "src/satellite/data");
+  Simulator::Schedule (MilliSeconds(5), &SatEnvVariables::IsValidDirectory, envVariables, "src/satellite/data/notfound");
 
   Simulator::Run ();
   Simulator::Destroy ();
