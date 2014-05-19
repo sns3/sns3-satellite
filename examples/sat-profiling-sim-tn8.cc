@@ -44,7 +44,7 @@ main (int argc, char *argv[])
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue ("profilingConf", "DAMA configuration", profilingConf);
+  cmd.AddValue ("profilingConf", "Profiling configuration", profilingConf);
   cmd.Parse (argc, argv);
 
   // use 5 seconds store time for control messages
