@@ -34,15 +34,7 @@ main (int argc, char *argv[])
    'To Select super frame configuration, Option 2'
    -- Start --                                                                */
 
-//  std::string inputFileNameWithPath( "./src/satellite/examples/sat-tutorial-input.xml");
-//  std::ifstream *ifs = new std::ifstream (inputFileNameWithPath.c_str (), std::ifstream::in);
-//
-//  if (!ifs->is_open ())
-//    {
-//        inputFileNameWithPath = "../../src/satellite/examples/sat-tutorial-input.xml";
-//    }
-//
-//  delete ifs;
+//  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/sat-tutorial-input.xml";
 //
 //  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
 //  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
