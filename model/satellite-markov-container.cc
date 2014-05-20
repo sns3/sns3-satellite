@@ -418,7 +418,20 @@ SatMarkovContainer::RandomizeLockedSetAndState ()
 {
   NS_LOG_FUNCTION (this);
 
-  LockToSetAndState ((rand() % (m_numOfSets-1)),(rand() % (m_numOfStates-1)));
+  uint32_t newSet = 0;
+  uint32_t newState = 0;
+
+  if (m_numOfSets > 1)
+    {
+      newSet = (rand() % (m_numOfSets-1));
+    }
+
+  if (m_numOfStates > 1)
+    {
+      newState = (rand() % (m_numOfStates-1));
+    }
+
+  LockToSetAndState (newSet,newState);
 }
 
 void
@@ -428,7 +441,14 @@ SatMarkovContainer::RandomizeLockedState (uint32_t set)
 
   LockToSet (set);
 
-  m_currentState = (rand() % (m_numOfStates-1));
+  uint32_t newState = 0;
+
+  if (m_numOfStates > 1)
+    {
+      newState = (rand() % (m_numOfStates-1));
+    }
+
+  m_currentState = newState;
 
   m_enableStateLock = true;
 }
