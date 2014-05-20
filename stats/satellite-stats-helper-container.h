@@ -179,8 +179,9 @@ public:
 
   // Return link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)
-
   void AddAverageUtUserRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageBeamRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link device-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevThroughput)

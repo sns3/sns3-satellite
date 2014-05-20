@@ -1,11 +1,10 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/satellite-module.h"
-#include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include <ns3/core-module.h>
+#include <ns3/network-module.h>
+#include <ns3/internet-module.h>
+#include <ns3/satellite-module.h>
+#include <ns3/applications-module.h>
 
 
 using namespace ns3;
@@ -67,6 +66,21 @@ using namespace ns3;
   s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
   s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
   s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+#define CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET(id)                          \
+  s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);            \
+  s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_PDF_FILE);                  \
+  s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_CDF_FILE);                  \
+  s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);            \
+  s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                  \
+  s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                  \
+                                                                              \
+  s->AddAverageUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);              \
+  s->AddAverageUt ## id (SatStatsHelper::OUTPUT_PDF_FILE);                    \
+  s->AddAverageUt ## id (SatStatsHelper::OUTPUT_CDF_FILE);                    \
+  s->AddAverageUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);              \
+  s->AddAverageUt ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                    \
+  s->AddAverageUt ## id (SatStatsHelper::OUTPUT_CDF_PLOT);
 
 /**
 * \ingroup satellite
@@ -188,6 +202,9 @@ main (int argc, char *argv[])
       (*it)->AddApplication (ps);
     }
 
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (25.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (0.5));
+
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
   s->SetName ("cbr");
 
@@ -240,6 +257,13 @@ main (int argc, char *argv[])
 //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnAppThroughput)
+//  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+//  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_PDF_FILE);
+//  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+//  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+//  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
+//  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 //  CALL_SAT_STATS_BASIC_SET (RtnDevThroughput)
 //  CALL_SAT_STATS_BASIC_SET (RtnMacThroughput)
 //  CALL_SAT_STATS_BASIC_SET (RtnPhyThroughput)
@@ -298,7 +322,7 @@ main (int argc, char *argv[])
   s->AddGlobalFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- Cbr-example ---");
+  NS_LOG_INFO("--- Cbr-stats-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);

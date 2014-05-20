@@ -88,6 +88,16 @@ public:
   double GetBinLength () const;
 
   /**
+   * \param averagingMode average all samples before passing them to aggregator.
+   */
+  void SetAveragingMode (bool averagingMode);
+
+  /**
+   * \return the currently active averaging mode.
+   */
+  bool GetAveragingMode () const;
+
+  /**
    * \brief Set up several probes or other means of listeners and connect them
    *        to the first-level collectors.
    */
@@ -141,9 +151,10 @@ protected:
   std::map<const Address, uint32_t> m_identifierMap;
 
 private:
-  double m_minValue;   ///< `MinValue` attribute.
-  double m_maxValue;   ///< `MaxValue` attribute.
-  double m_binLength;  ///< `BinLength` attribute.
+  double m_minValue;     ///< `MinValue` attribute.
+  double m_maxValue;     ///< `MaxValue` attribute.
+  double m_binLength;    ///< `BinLength` attribute.
+  bool m_averagingMode;  ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsThroughputHelper
 

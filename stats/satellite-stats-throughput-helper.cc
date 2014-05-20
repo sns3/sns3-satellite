@@ -65,7 +65,8 @@ SatStatsThroughputHelper::SatStatsThroughputHelper (Ptr<const SatHelper> satHelp
   : SatStatsHelper (satHelper),
     m_minValue (0.0),
     m_maxValue (0.0),
-    m_binLength (0.0)
+    m_binLength (0.0),
+    m_averagingMode (false)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -102,6 +103,13 @@ SatStatsThroughputHelper::GetTypeId ()
                    DoubleValue (100.0),
                    MakeDoubleAccessor (&SatStatsThroughputHelper::SetBinLength,
                                        &SatStatsThroughputHelper::GetBinLength),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("AveragingMode",
+                   "If true, average all samples before passing them to aggregator. "
+                   "Only affects histogram, PDF, and CDF output types.",
+                   BooleanValue (false),
+                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetAveragingMode,
+                                       &SatStatsThroughputHelper::GetAveragingMode),
                    MakeDoubleChecker<double> ())
   ;
   return tid;
@@ -150,6 +158,21 @@ double
 SatStatsThroughputHelper::GetBinLength () const
 {
   return m_binLength;
+}
+
+
+void
+SatStatsThroughputHelper::SetAveragingMode (bool averagingMode)
+{
+  NS_LOG_FUNCTION (this << averagingMode);
+  m_averagingMode = averagingMode;
+}
+
+
+bool
+SatStatsThroughputHelper::GetAveragingMode () const
+{
+  return m_averagingMode;
 }
 
 
@@ -228,13 +251,13 @@ SatStatsThroughputHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_FILE:
       {
-        if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
+        if (!m_averagingMode)
+          {
+            NS_FATAL_ERROR ("This statistics require AveragingMode to be enabled");
+          }
+        else if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
           {
             NS_FATAL_ERROR (GetInstanceTypeId ().GetName () << " is not a valid instance for this statistics.");
-          }
-        else if (GetIdentifierType () != SatStatsHelper::IDENTIFIER_UT_USER)
-          {
-            NS_FATAL_ERROR (GetIdentifierType () << " is not a valid identifier type for this statistics.");
           }
 
         // Setup aggregator.
@@ -342,13 +365,13 @@ SatStatsThroughputHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
-        if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
+        if (!m_averagingMode)
+          {
+            NS_FATAL_ERROR ("This statistics require AveragingMode to be enabled");
+          }
+        else if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
           {
             NS_FATAL_ERROR (GetInstanceTypeId ().GetName () << " is not a valid instance for this statistics.");
-          }
-        else if (GetIdentifierType () != SatStatsHelper::IDENTIFIER_UT_USER)
-          {
-            NS_FATAL_ERROR (GetIdentifierType () << " is not a valid identifier type for this statistics.");
           }
 
         // Setup aggregator.

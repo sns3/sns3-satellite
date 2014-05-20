@@ -67,11 +67,15 @@ SatStatsHelperContainer::DoDispose ()
  *
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
+ * - Average [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay (#)
+ * - Average [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay (#)
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - Average [Beam,Ut,UtUser] [Fwd,Rtn] AppThroughput
+ * - Average [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Throughput (#)
  * - [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - [Global,PerGw,PerBeam,PerUt] CapacityRequest
@@ -97,6 +101,15 @@ SatStatsHelperContainer::DoDispose ()
                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",         \
                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",         \
                    SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",     \
+                   SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",   \
+                   SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",         \
+                   SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+
+#define ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER                    \
+  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",             \
+                   SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",   \
+                   SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",         \
+                   SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",         \
                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",   \
                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",         \
                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
@@ -134,6 +147,15 @@ SatStatsHelperContainer::DoDispose ()
   ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                                  \
                                 std::string ("per UT ") + desc)               \
   ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
+#define ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET(id, desc)          \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageBeam ## id,                            \
+                                std::string ("average beam ") + desc)         \
+  ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER                          \
+  ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUt ## id,                              \
+                                std::string ("average UT ") + desc)           \
+  ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
+
 
 TypeId // static
 SatStatsHelperContainer::GetTypeId ()
@@ -242,18 +264,11 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppThroughput,
                                   "per UT user return link application-level throughput statistics")
     ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
-
-    .AddAttribute ("AverageUtUserRtnAppThroughput",
-                   "Enable the output of average UT user return link application-level throughput statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddAverageUtUserRtnAppThroughput),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",
-                                    SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",
-                                    SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",
-                                    SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",
-                                    SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",
-                                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnAppThroughput,
+                                                        "return link application-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUtUserRtnAppThroughput,
+                                  "average UT user return link application-level throughput statistics")
+    ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
 
     // Return link device-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevThroughput,
@@ -416,11 +431,15 @@ SatStatsHelperContainer::GetName () const
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
+ * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay (#)
+ * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay (#)
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
+ * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppThroughput
+ * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Throughput (#)
  * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
  * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
  * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
@@ -517,6 +536,63 @@ SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) 
                             + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \
       stat->SetOutputType (type);                                             \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
+}
+
+#define SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION(id, name)                    \
+void                                                                          \
+SatStatsHelperContainer::AddAverageBeam ## id (SatStatsHelper::OutputType_t type) \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
+      stat->SetName (m_name + "-average-beam-" + name                             \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);              \
+      stat->SetOutputType (type);                                             \
+      stat->SetAveragingMode (true);                                          \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
+}
+
+#define SAT_STATS_AVERAGE_UT_METHOD_DEFINITION(id, name)                      \
+void                                                                          \
+SatStatsHelperContainer::AddAverageUt ## id (SatStatsHelper::OutputType_t type) \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
+      stat->SetName (m_name + "-average-ut-" + name                           \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                \
+      stat->SetOutputType (type);                                             \
+      stat->SetAveragingMode (true);                                          \
+      stat->Install ();                                                       \
+      m_stats.push_back (stat);                                               \
+    }                                                                         \
+}
+
+#define SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION(id, name)                 \
+void                                                                          \
+SatStatsHelperContainer::AddAverageUtUser ## id (SatStatsHelper::OutputType_t type) \
+{                                                                             \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+    {                                                                         \
+      Ptr<SatStats ## id ## Helper> stat                                      \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
+      stat->SetName (m_name + "-average-ut-user-" + name                      \
+                            + GetOutputTypeSuffix (type));                    \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \
+      stat->SetOutputType (type);                                             \
+      stat->SetAveragingMode (true);                                          \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
@@ -651,23 +727,9 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_PER_UT_USER_METHOD_DEFINITION (RtnAppThroughput, "rtn-app-throughput")
-
-void
-SatStatsHelperContainer::AddAverageUtUserRtnAppThroughput (SatStatsHelper::OutputType_t type)
-{
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));
-  if (type != SatStatsHelper::OUTPUT_NONE)
-    {
-      Ptr<SatStatsRtnAppThroughputHelper> stat
-        = CreateObject<SatStatsRtnAppThroughputHelper> (m_satHelper);
-      stat->SetName (m_name + "-average-ut-user-" + "rtn-app-throughput"
-                            + GetOutputTypeSuffix (type));
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);
-      stat->SetOutputType (type);
-      stat->Install ();
-      m_stats.push_back (stat);
-    }
-}
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION    (RtnAppThroughput, "rtn-app-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION      (RtnAppThroughput, "rtn-app-throughput")
+SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (RtnAppThroughput, "rtn-app-throughput")
 
 // Return link device-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
