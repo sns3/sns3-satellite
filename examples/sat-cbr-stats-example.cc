@@ -202,8 +202,8 @@ main (int argc, char *argv[])
       (*it)->AddApplication (ps);
     }
 
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (25.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (0.5));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (250.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (5.0));
 
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
   s->SetName ("cbr");
@@ -233,9 +233,19 @@ main (int argc, char *argv[])
 //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdAppThroughput)
+//  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+//  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_PDF_FILE);
+//  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+//  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+//  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
+//  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 //  CALL_SAT_STATS_BASIC_SET (FwdDevThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdDevThroughput)
 //  CALL_SAT_STATS_BASIC_SET (FwdMacThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdMacThroughput)
 //  CALL_SAT_STATS_BASIC_SET (FwdPhyThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdPhyThroughput)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnAppDelay)
 //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -265,8 +275,11 @@ main (int argc, char *argv[])
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 //  CALL_SAT_STATS_BASIC_SET (RtnDevThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnDevThroughput)
 //  CALL_SAT_STATS_BASIC_SET (RtnMacThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnMacThroughput)
 //  CALL_SAT_STATS_BASIC_SET (RtnPhyThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnPhyThroughput)
 //  CALL_SAT_STATS_BASIC_SET (FwdDaPacketError)
 //  CALL_SAT_STATS_BASIC_SET (RtnDaPacketError)
 //  CALL_SAT_STATS_BASIC_SET (SlottedAlohaPacketError)
@@ -303,12 +316,12 @@ main (int argc, char *argv[])
 
   s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddAverageUtFwdDevThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddAverageBeamRtnDevThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
+  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddAverageBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerGwFwdQueueBytes (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
   s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);

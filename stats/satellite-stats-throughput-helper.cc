@@ -255,10 +255,6 @@ SatStatsThroughputHelper::DoInstall ()
           {
             NS_FATAL_ERROR ("This statistics require AveragingMode to be enabled");
           }
-        else if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
-          {
-            NS_FATAL_ERROR (GetInstanceTypeId ().GetName () << " is not a valid instance for this statistics.");
-          }
 
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
@@ -368,10 +364,6 @@ SatStatsThroughputHelper::DoInstall ()
         if (!m_averagingMode)
           {
             NS_FATAL_ERROR ("This statistics require AveragingMode to be enabled");
-          }
-        else if (GetInstanceTypeId () != SatStatsRtnAppThroughputHelper::GetTypeId ())
-          {
-            NS_FATAL_ERROR (GetInstanceTypeId ().GetName () << " is not a valid instance for this statistics.");
           }
 
         // Setup aggregator.
