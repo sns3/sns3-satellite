@@ -105,12 +105,12 @@ SatStatsThroughputHelper::GetTypeId ()
                                        &SatStatsThroughputHelper::GetBinLength),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("AveragingMode",
-                   "If true, average all samples before passing them to aggregator. "
+                   "If true, all samples will be averaged before passed to aggregator. "
                    "Only affects histogram, PDF, and CDF output types.",
                    BooleanValue (false),
-                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetAveragingMode,
-                                       &SatStatsThroughputHelper::GetAveragingMode),
-                   MakeDoubleChecker<double> ())
+                   MakeBooleanAccessor (&SatStatsThroughputHelper::SetAveragingMode,
+                                        &SatStatsThroughputHelper::GetAveragingMode),
+                   MakeBooleanChecker ())
   ;
   return tid;
 }

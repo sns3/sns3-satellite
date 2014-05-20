@@ -37,8 +37,8 @@ namespace ns3 {
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay (#)
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay (#)
+ * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay
+ * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Sinr
@@ -123,15 +123,24 @@ public:
 
   // Forward link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppDelay)
+  void AddAverageBeamFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link device-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevDelay)
+  void AddAverageBeamFwdDevDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdDevDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link MAC-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacDelay)
+  void AddAverageBeamFwdMacDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdMacDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyDelay)
+  void AddAverageBeamFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link queue size (in bytes) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdQueueBytes)
@@ -168,15 +177,24 @@ public:
 
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
+  void AddAverageBeamRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserRtnAppDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link device-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevDelay)
+  void AddAverageBeamRtnDevDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnDevDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link MAC-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacDelay)
+  void AddAverageBeamRtnMacDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnMacDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyDelay)
+  void AddAverageBeamRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link queue size (in bytes) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueueBytes)

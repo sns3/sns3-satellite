@@ -64,7 +64,8 @@ SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
     m_minValue (0.0),
     m_maxValue (0.0),
-    m_binLength (0.0)
+    m_binLength (0.0),
+    m_averagingMode (false)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -102,6 +103,13 @@ SatStatsDelayHelper::GetTypeId ()
                    MakeDoubleAccessor (&SatStatsDelayHelper::SetBinLength,
                                        &SatStatsDelayHelper::GetBinLength),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("AveragingMode",
+                   "If true, all samples will be averaged before passed to aggregator. "
+                   "Only affects histogram, PDF, and CDF output types.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatStatsDelayHelper::SetAveragingMode,
+                                        &SatStatsDelayHelper::GetAveragingMode),
+                   MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -149,6 +157,21 @@ double
 SatStatsDelayHelper::GetBinLength () const
 {
   return m_binLength;
+}
+
+
+void
+SatStatsDelayHelper::SetAveragingMode (bool averagingMode)
+{
+  NS_LOG_FUNCTION (this << averagingMode);
+  m_averagingMode = averagingMode;
+}
+
+
+bool
+SatStatsDelayHelper::GetAveragingMode () const
+{
+  return m_averagingMode;
 }
 
 
@@ -206,34 +229,89 @@ SatStatsDelayHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_FILE:
       {
-        // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% delay_sec freq"));
+        if (m_averagingMode)
+          {
+            // Setup aggregator.
+            m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                             "OutputFileName", StringValue (GetName ()),
+                                             "MultiFileMode", BooleanValue (false),
+                                             "EnableContextPrinting", BooleanValue (false),
+                                             "GeneralHeading", StringValue ("% throughput_kbps freq"));
+            Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
+            NS_ASSERT (fileAggregator != 0);
 
-        // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        DistributionCollector::OutputType_t outputType
-          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-          {
-            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+            // Setup the final-level collector.
+            m_averagingCollector = CreateObject<DistributionCollector> ();
+            DistributionCollector::OutputType_t outputType
+              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+              }
+            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+              }
+            m_averagingCollector->SetOutputType (outputType);
+            m_averagingCollector->SetMinValue (m_minValue);
+            m_averagingCollector->SetMaxValue (m_maxValue);
+            m_averagingCollector->SetBinLength (m_binLength);
+            m_averagingCollector->SetName ("0");
+            m_averagingCollector->TraceConnect ("Output", "0",
+                                                MakeCallback (&MultiFileAggregator::Write2d,
+                                                              fileAggregator));
+            m_averagingCollector->TraceConnect ("OutputString", "0",
+                                                MakeCallback (&MultiFileAggregator::AddContextHeading,
+                                                              fileAggregator));
+
+            // Setup collectors.
+            m_terminalCollectors.SetType ("ns3::ScalarCollector");
+            m_terminalCollectors.SetAttribute ("InputDataType",
+                                               EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+            m_terminalCollectors.SetAttribute ("OutputType",
+                                               EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+            CreateCollectorPerIdentifier (m_terminalCollectors);
+            Callback<void, double> callback
+              = MakeCallback (&DistributionCollector::TraceSinkDouble1,
+                              m_averagingCollector);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+                 it != m_terminalCollectors.End (); ++it)
+              {
+                it->second->TraceConnectWithoutContext ("Output", callback);
+              }
           }
-        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+        else
           {
-            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+            // Setup aggregator.
+            m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                             "OutputFileName", StringValue (GetName ()),
+                                             "GeneralHeading", StringValue ("% delay_sec freq"));
+
+            // Setup collectors.
+            m_terminalCollectors.SetType ("ns3::DistributionCollector");
+            DistributionCollector::OutputType_t outputType
+              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+              }
+            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+              }
+            m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
+            m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
+            m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
+            m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
+            CreateCollectorPerIdentifier (m_terminalCollectors);
+            m_terminalCollectors.ConnectToAggregator ("Output",
+                                                      m_aggregator,
+                                                      &MultiFileAggregator::Write2d);
+            m_terminalCollectors.ConnectToAggregator ("OutputString",
+                                                      m_aggregator,
+                                                      &MultiFileAggregator::AddContextHeading);
           }
-        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::AddContextHeading);
+
         break;
       }
 
@@ -273,40 +351,93 @@ SatStatsDelayHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
-        // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Packet delay (in seconds)",
-                                   "Frequency");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
+        if (m_averagingMode)
+          {
+            // Setup aggregator.
+            Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+            //plot->SetTitle ("");
+            plotAggregator->SetLegend ("Packet delay (in seconds)",
+                                       "Frequency");
+            plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+            plotAggregator->Add2dDataset (GetName (), GetName ());
+            m_aggregator = plotAggregator;
 
-        // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        DistributionCollector::OutputType_t outputType
-          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-          {
-            outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+            // Setup the final-level collector.
+            m_averagingCollector = CreateObject<DistributionCollector> ();
+            DistributionCollector::OutputType_t outputType
+              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+              }
+            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+              }
+            m_averagingCollector->SetOutputType (outputType);
+            m_averagingCollector->SetMinValue (m_minValue);
+            m_averagingCollector->SetMaxValue (m_maxValue);
+            m_averagingCollector->SetBinLength (m_binLength);
+            m_averagingCollector->SetName ("0");
+            m_averagingCollector->TraceConnect ("Output",
+                                                GetName (),
+                                                MakeCallback (&GnuplotAggregator::Write2d,
+                                                              plotAggregator));
+
+            // Setup collectors.
+            m_terminalCollectors.SetType ("ns3::ScalarCollector");
+            m_terminalCollectors.SetAttribute ("InputDataType",
+                                               EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+            m_terminalCollectors.SetAttribute ("OutputType",
+                                               EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+            CreateCollectorPerIdentifier (m_terminalCollectors);
+            Callback<void, double> callback
+              = MakeCallback (&DistributionCollector::TraceSinkDouble1,
+                              m_averagingCollector);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+                 it != m_terminalCollectors.End (); ++it)
+              {
+                it->second->TraceConnectWithoutContext ("Output", callback);
+              }
           }
-        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+        else
           {
-            outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+            // Setup aggregator.
+            Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+            //plot->SetTitle ("");
+            plotAggregator->SetLegend ("Packet delay (in seconds)",
+                                       "Frequency");
+            plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+            m_aggregator = plotAggregator;
+
+            // Setup collectors.
+            m_terminalCollectors.SetType ("ns3::DistributionCollector");
+            DistributionCollector::OutputType_t outputType
+              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
+              }
+            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
+              {
+                outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
+              }
+            m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
+            m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
+            m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
+            m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
+            CreateCollectorPerIdentifier (m_terminalCollectors);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+                 it != m_terminalCollectors.End (); ++it)
+              {
+                const std::string context = it->second->GetName ();
+                plotAggregator->Add2dDataset (context, context);
+              }
+            m_terminalCollectors.ConnectToAggregator ("Output",
+                                                      m_aggregator,
+                                                      &GnuplotAggregator::Write2d);
           }
-        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+
         break;
       }
 
@@ -415,10 +546,20 @@ SatStatsDelayHelper::ConnectProbeToCollector (Ptr<Probe> probe,
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      ret = m_terminalCollectors.ConnectWithProbe (probe,
-                                                   "OutputSeconds",
-                                                   identifier,
-                                                   &DistributionCollector::TraceSinkDouble);
+      if (m_averagingMode)
+        {
+          ret = m_terminalCollectors.ConnectWithProbe (probe,
+                                                       "OutputSeconds",
+                                                       identifier,
+                                                       &ScalarCollector::TraceSinkDouble);
+        }
+      else
+        {
+          ret = m_terminalCollectors.ConnectWithProbe (probe,
+                                                       "OutputSeconds",
+                                                       identifier,
+                                                       &DistributionCollector::TraceSinkDouble);
+        }
       break;
 
     default:
@@ -476,12 +617,19 @@ SatStatsDelayHelper::PassSampleToCollector (Time delay, uint32_t identifier)
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      {
-        Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-        NS_ASSERT (c != 0);
-        c->TraceSinkDouble (0.0, delay.GetSeconds ());
-        break;
-      }
+      if (m_averagingMode)
+        {
+          Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
+          NS_ASSERT (c != 0);
+          c->TraceSinkDouble (0.0, delay.GetSeconds ());
+        }
+      else
+        {
+          Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
+          NS_ASSERT (c != 0);
+          c->TraceSinkDouble (0.0, delay.GetSeconds ());
+        }
+      break;
 
     default:
       NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");

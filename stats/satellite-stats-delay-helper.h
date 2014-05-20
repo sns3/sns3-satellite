@@ -39,6 +39,7 @@ class SatHelper;
 class Node;
 class Time;
 class DataCollectionObject;
+class DistributionCollector;
 
 /**
  * \ingroup satstats
@@ -85,6 +86,16 @@ public:
    * \return the BinLength attribute of the histogram, PDF, CDF output.
    */
   double GetBinLength () const;
+
+  /**
+   * \param averagingMode average all samples before passing them to aggregator.
+   */
+  void SetAveragingMode (bool averagingMode);
+
+  /**
+   * \return the currently active averaging mode.
+   */
+  bool GetAveragingMode () const;
 
   /**
    * \brief Set up several probes or other means of listeners and connect them
@@ -142,6 +153,9 @@ protected:
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
 
+  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+  Ptr<DistributionCollector> m_averagingCollector;
+
   /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
@@ -152,6 +166,7 @@ private:
   double m_minValue;   ///< `MinValue` attribute.
   double m_maxValue;   ///< `MaxValue` attribute.
   double m_binLength;  ///< `BinLength` attribute.
+  bool m_averagingMode;  ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsDelayHelper
 
