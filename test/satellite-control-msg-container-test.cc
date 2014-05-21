@@ -53,18 +53,18 @@ protected:
   virtual void DoRun (void) = 0;
   Ptr<SatControlMsgContainer> m_container;
   std::vector<Ptr<SatControlMessage> >  m_msgsRead;
+
+private:
+  std::vector<uint32_t> m_recvIds;
 };
 
 void
 SatCtrlMsgContBaseTestCase::AddMessage (Ptr<SatControlMessage> msg)
 {
-  uint32_t id = m_container->ReserveIdAndStore (msg);
-  bool success = m_container->Send (id);
+  uint32_t sendId = m_container->ReserveIdAndStore (msg);
+  uint32_t recvId = m_container->Send (sendId);
 
-  if (!success)
-    {
-      NS_FATAL_ERROR ("Add to control message container was not successful!");
-    }
+  m_recvIds.push_back (recvId);
 }
 
 void
@@ -115,12 +115,9 @@ SatCtrlMsgContDelOnTestCase::DoRun (void)
 
   // simulate get operations
   Simulator::Schedule (Seconds (0.10), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 0 ); // crMsg expected
-  Simulator::Schedule (Seconds (0.11), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 0 ); // NULL expected
   Simulator::Schedule (Seconds (0.21), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 1 ); // tbtpMsg expected
-  Simulator::Schedule (Seconds (0.22), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 1 ); // NULL expected
-  Simulator::Schedule (Seconds (0.42), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 2 ); // NULL expected
+  Simulator::Schedule (Seconds (0.35), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 2 ); // tbtpMsg expected
   Simulator::Schedule (Seconds (0.43), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 3 ); // crMsg expected
-  Simulator::Schedule (Seconds (0.49), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 3 ); // NULL expected
 
   Simulator::Run ();
 
@@ -132,12 +129,9 @@ SatCtrlMsgContDelOnTestCase::DoRun (void)
 
   // container content correct at points messages got
   NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[0] == crMsg) , true, "first message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == NULL) , true, "second message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == tbtpMsg) , true, "second message incorrect");
   NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[2] == tbtpMsg) , true, "third message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == NULL) , true, "fourth message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[4] == NULL) , true, "fifth message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[5] == crMsg) , true, "sixth message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[6] == NULL) , true, "seventh message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg) , true, "fourth message incorrect");
 
   Simulator::Destroy ();
 }
@@ -184,11 +178,8 @@ SatCtrlMsgContDelOffTestCase::DoRun (void)
 
   // simulate get operations
   Simulator::Schedule (Seconds (0.10), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 0 ); // crMsg expected
-  Simulator::Schedule (Seconds (0.11), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 0 ); // crMsg expected
   Simulator::Schedule (Seconds (0.21), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 1 ); // tbtpMsg expected
-  Simulator::Schedule (Seconds (0.22), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 1 ); // tbtpMsg expected
-  Simulator::Schedule (Seconds (0.42), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 2 ); // NULL expected
-  Simulator::Schedule (Seconds (0.43), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 3 ); // crMsg expected
+  Simulator::Schedule (Seconds (0.40), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 2 ); // tbtpMsg expected
   Simulator::Schedule (Seconds (0.49), &SatCtrlMsgContDelOnTestCase::GetMessage, this, 3 ); // crMsg expected
 
   Simulator::Run ();
@@ -201,12 +192,9 @@ SatCtrlMsgContDelOffTestCase::DoRun (void)
 
   // container content correct at points messages got
   NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[0] == crMsg) , true, "first message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == crMsg) , true, "second message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == tbtpMsg) , true, "second message incorrect");
   NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[2] == tbtpMsg) , true, "third message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == tbtpMsg) , true, "fourth message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[4] == NULL) , true, "fifth message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[5] == crMsg) , true, "sixth message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[6] == crMsg) , true, "seventh message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg) , true, "fourth message incorrect");
 
   Simulator::Destroy ();
 }
