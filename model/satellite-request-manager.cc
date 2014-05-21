@@ -61,7 +61,7 @@ SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf)
   NS_LOG_LOGIC (this);
 
   m_llsConf = llsConf;
-  m_gainValueK = 1 / (2 * m_evaluationInterval.GetSeconds ());
+  m_gainValueK = 1.0 / (2.0 * m_evaluationInterval.GetSeconds ());
   m_maxPendingCrEntries = (uint32_t)(m_rttEstimate.GetInteger () / m_evaluationInterval.GetInteger ());
 
   m_pendingRbdcRequestsKbps = std::vector< std::deque<uint32_t> > (m_llsConf->GetDaServiceCount (), std::deque<uint32_t> ());

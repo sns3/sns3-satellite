@@ -43,8 +43,8 @@ main (int argc, char *argv[])
 {
   uint32_t beamId (18);
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (30);
-  uint32_t packetSize (64);
+  uint32_t utsPerBeam (1);
+  uint32_t packetSize (1);
   uint32_t numOfInstances (3);
   double intervalInSeconds (0.1);
   bool isNoisy (false);
@@ -86,6 +86,9 @@ main (int argc, char *argv[])
   // Disable fading
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_OFF));
 
+  // Disable C/NO reporting
+  Config::SetDefault ("ns3::SatRequestManager::CnoReportInterval",TimeValue (Seconds (60.0)));
+
   // Set dynamic load control parameters
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
@@ -116,8 +119,8 @@ main (int argc, char *argv[])
 
   // Statistics settings
   Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (20.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.04));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (30.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
 
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MinValue", DoubleValue (0.0));
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MaxValue", DoubleValue (10000.0));
@@ -185,25 +188,33 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
-
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  //s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  //s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+
+  //s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  //s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
@@ -221,10 +232,10 @@ main (int argc, char *argv[])
   s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-ra-sim-tn9-comparison ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
