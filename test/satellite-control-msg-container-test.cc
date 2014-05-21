@@ -58,13 +58,19 @@ protected:
 void
 SatCtrlMsgContBaseTestCase::AddMessage (Ptr<SatControlMessage> msg)
 {
-  m_container->Add (msg);
+  uint32_t id = m_container->ReserveIdAndStore (msg);
+  bool success = m_container->Send (id);
+
+  if (!success)
+    {
+      NS_FATAL_ERROR ("Add to control message container was not successful!");
+    }
 }
 
 void
 SatCtrlMsgContBaseTestCase::GetMessage (uint32_t msgId)
 {
-  m_msgsRead.push_back (m_container->Get (msgId));
+  m_msgsRead.push_back (m_container->Read (msgId));
 }
 
 /**

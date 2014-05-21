@@ -67,7 +67,8 @@ public:
                uint32_t rtnLinkCarrierCount,
                Ptr<SatSuperframeSeq> seq,
                SatMac::ReadCtrlMsgCallback readCb,
-               SatMac::WriteCtrlMsgCallback writeCb,
+               SatMac::ReserveCtrlMsgCallback reserveCb,
+               SatMac::SendCtrlMsgCallback sendCb,
                RandomAccessSettings_s randomAccessSettings);
 
   virtual ~SatUtHelper () {}
@@ -155,8 +156,10 @@ private:
     uint32_t m_fwdLinkCarrierCount;
     Ptr<SatSuperframeSeq> m_superframeSeq;
 
-    SatMac::ReadCtrlMsgCallback   m_readCtrlCb;
-    SatMac::WriteCtrlMsgCallback  m_writeCtrlCb;
+    // Control message container callbacks
+    SatMac::ReadCtrlMsgCallback     m_readCtrlCb;
+    SatMac::ReserveCtrlMsgCallback  m_reserveCtrlCb;
+    SatMac::SendCtrlMsgCallback     m_sendCtrlCb;
 
     ObjectFactory m_channelFactory;
     ObjectFactory m_deviceFactory;

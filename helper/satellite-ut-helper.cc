@@ -141,13 +141,15 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
                           uint32_t fwdLinkCarrierCount,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
-                          SatMac::WriteCtrlMsgCallback writeCb,
+                          SatMac::ReserveCtrlMsgCallback reserveCb,
+                          SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
    m_superframeSeq (seq),
    m_readCtrlCb (readCb),
-   m_writeCtrlCb (writeCb),
+   m_reserveCtrlCb (reserveCb),
+   m_sendCtrlCb (sendCb),
    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
    m_linkResults (),
@@ -285,8 +287,11 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId);
+
+  // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
-  mac->SetWriteCtrlCallback (m_writeCtrlCb);
+  mac->SetReserveCtrlCallback (m_reserveCtrlCb);
+  mac->SetSendCtrlCallback (m_sendCtrlCb);
 
   // Set timing advance callback to mac.
   Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();

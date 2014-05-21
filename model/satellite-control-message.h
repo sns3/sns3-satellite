@@ -36,6 +36,7 @@
 
 namespace ns3 {
 
+
 /**
  * \ingroup satellite
  * \brief This class implements a tag that is used to identify control messages (packages)
@@ -669,14 +670,19 @@ private:
 
 /**
  * \ingroup satellite
- * \brief The container to store control messages. It assigns ID for added messages.
- * ID is used when message is requested.
+ * \brief The container to store control messages. Container assigns two sequences of IDs
+ * for added messages.
+ * - Send/buffered IDs - used during buffering period between ND and MAC.
+ * - Receive IDs - used to indicate the receiver the id for the control PDU
  *
  * Message are deleted after set store time expired for a message. Message is deleted already when read,
  * if this functionality is enabled in creation time.
  *
  * Container is needed to store control messages which content are not wanted to simulate inside packet.
  *
+ * The reason for two sets of IDs relate to two things:
+ * - The SatControlMessage Ptr needs to be stored also during buffering time (before it gets scheduling time)
+ * - The SatControlMsgContainer containers assume that the recv IDs are given in FIFO order.
  */
 class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
 {
@@ -697,22 +703,28 @@ public:
   ~SatControlMsgContainer ();
 
   /**
-   * Add a control message.
+   * Reserve an id and store a control message.
    *
-   * \param Id of the message to add.
-   * \param Pointer to message to add.
-   *
-   * \return ID of the created added message.
+   * \param Pointer to message to be added.
+   * \return Reserved send ID of the created added message.
    */
-  uint32_t Add (Ptr<SatControlMessage> controlMsg);
+  uint32_t ReserveIdAndStore (Ptr<SatControlMessage> controlMsg);
 
   /**
-   * Get a control message.
+   * Add a control message.
    *
-   * \param Id of the message to get.
+   * \param sendId of the message to add.
+   * \return Receive id given by the container.
+   */
+  uint32_t Send (uint32_t sendId);
+
+  /**
+   * Read a control message.
+   *
+   * \param Id of the message to read.
    * \return Pointer to message.
    */
-  Ptr<SatControlMessage> Get (uint32_t id);
+  Ptr<SatControlMessage> Read (uint32_t recvId);
 
 private:
 
@@ -722,11 +734,15 @@ private:
    */
   void EraseFirst ();
 
-  typedef std::pair<Time, Ptr<SatControlMessage> > CtrlMsgMapValue_t;
-  typedef std::map<uint32_t, CtrlMsgMapValue_t > CtrlMsgMap_t;
-  CtrlMsgMap_t   m_ctrlMsgs;
-  uint32_t       m_id;
-  EventId        m_storeTimeout;
+  typedef std::map<uint32_t, Ptr<SatControlMessage> >   ReservedCtrlMsgMap_t;
+  typedef std::pair<Time, Ptr<SatControlMessage> >      CtrlMsgMapValue_t;
+  typedef std::map<uint32_t, CtrlMsgMapValue_t >        CtrlMsgMap_t;
+
+  ReservedCtrlMsgMap_t  m_reservedCtrlMsgs;
+  CtrlMsgMap_t          m_ctrlMsgs;
+  uint32_t              m_sendId;
+  uint32_t              m_recvId;
+  EventId               m_storeTimeout;
 
   /**
    * Time to store a message in container.

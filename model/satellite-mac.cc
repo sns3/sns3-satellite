@@ -88,7 +88,8 @@ SatMac::DoDispose ()
   m_txCallback.Nullify ();
   m_rxCallback.Nullify ();
   m_readCtrlCallback.Nullify ();
-  m_writeCtrlCallback.Nullify ();
+  m_reserveCtrlCallback.Nullify ();
+  m_sendCtrlCallback.Nullify ();
 
   Object::DoDispose ();
 }
@@ -102,18 +103,38 @@ SatMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 }
 
 uint32_t
-SatMac::WriteCtrlMsgToContainer (Ptr<SatControlMessage> msg)
+SatMac::ReserveIdAndStoreCtrlMsgToContainer (Ptr<SatControlMessage> msg)
 {
   NS_LOG_FUNCTION (this << msg);
 
   uint32_t id = 0;
 
-  if ( m_writeCtrlCallback.IsNull () == false )
+  if ( m_reserveCtrlCallback.IsNull () == false )
     {
-      id = m_writeCtrlCallback (msg);
+      id = m_reserveCtrlCallback (msg);
     }
-
+  else
+    {
+      NS_FATAL_ERROR ("Reserve control message (m_reserveCtrlCallback) callback is NULL!");
+    }
   return id;
+}
+
+uint32_t
+SatMac::SendCtrlMsgFromContainer (uint32_t sendId)
+{
+  NS_LOG_FUNCTION (this << sendId);
+
+  uint32_t recvId (0);
+  if ( m_sendCtrlCallback.IsNull () == false )
+    {
+      recvId = m_sendCtrlCallback (sendId);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Write control message (m_writeCtrlCallback) callback is NULL!");
+    }
+  return recvId;
 }
 
 void
@@ -134,6 +155,37 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
            it != packets.end (); ++it)
         {
           (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+        }
+    }
+
+  /**
+   * The transmitted packets are gone through to check whether the PHY transmission
+   * contains control packets. If a control packet is found, its control tag is peeked
+   * and the control message is added to the control message container with control
+   * message id.
+   */
+  for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+       it != packets.end (); ++it)
+    {
+      SatControlMsgTag cTag;
+      bool success = (*it)->RemovePacketTag (cTag);
+
+      // Control tag found
+      if (success)
+        {
+          uint32_t sendId = cTag.GetMsgId ();
+
+          // Add the msg to container and receive the used recv id.
+          uint32_t recvId = SendCtrlMsgFromContainer (sendId);
+
+          // Store the recv id to tag and add the tag back to the packet
+          cTag.SetMsgId (recvId);
+          (*it)->AddPacketTag (cTag);
+
+          if (!success)
+            {
+              NS_FATAL_ERROR ("Write to control message container was not successful!");
+            }
         }
     }
 
@@ -208,10 +260,18 @@ SatMac::SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb)
 }
 
 void
-SatMac::SetWriteCtrlCallback (SatMac::WriteCtrlMsgCallback cb)
+SatMac::SetReserveCtrlCallback (SatMac::ReserveCtrlMsgCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
-  m_writeCtrlCallback = cb;
+  m_reserveCtrlCallback = cb;
 }
+
+void
+SatMac::SetSendCtrlCallback (SatMac::SendCtrlMsgCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_sendCtrlCallback = cb;
+}
+
 
 } // namespace ns3

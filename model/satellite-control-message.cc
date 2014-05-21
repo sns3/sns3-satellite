@@ -31,6 +31,7 @@ NS_LOG_COMPONENT_DEFINE ("SatCtrlMessage");
 
 namespace ns3 {
 
+
 NS_OBJECT_ENSURE_REGISTERED (SatControlMsgTag);
 
 
@@ -695,17 +696,20 @@ SatArqAckMessage::GetSizeInBytes () const
 
 // Control message container
 
+NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");
+
 SatControlMsgContainer::SatControlMsgContainer ()
- : m_id (0),
+ : m_sendId (0),
+   m_recvId (0),
    m_storeTime (MilliSeconds (300)),
    m_deleteOnRead (false)
-
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatControlMsgContainer::SatControlMsgContainer (Time storeTime, bool deleteOnRead)
- : m_id (0),
+ : m_sendId (0),
+   m_recvId (0),
    m_storeTime (storeTime),
    m_deleteOnRead (deleteOnRead)
 
@@ -719,39 +723,75 @@ SatControlMsgContainer::~SatControlMsgContainer ()
 }
 
 uint32_t
-SatControlMsgContainer::Add (Ptr<SatControlMessage> ctrlMsg)
+SatControlMsgContainer::ReserveIdAndStore (Ptr<SatControlMessage> ctrlMsg)
 {
   NS_LOG_FUNCTION (this << ctrlMsg);
 
-  Time now = Simulator::Now ();
+  NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " reserve id (send id): " << m_sendId);
 
-  CtrlMsgMapValue_t mapValue = std::make_pair (now, ctrlMsg);
+  uint32_t id = m_sendId;
+  m_sendId++;
 
-  std::pair<CtrlMsgMap_t::iterator, bool> result = m_ctrlMsgs.insert (std::make_pair (m_id, mapValue));
+  m_reservedCtrlMsgs.insert (std::make_pair<uint32_t, Ptr<SatControlMessage> > (id, ctrlMsg));
 
-  if ( result.second == false )
+  return id;
+}
+
+uint32_t
+SatControlMsgContainer::Send (uint32_t sendId)
+{
+  NS_LOG_FUNCTION (this << sendId);
+
+  uint32_t recvId = m_recvId;
+
+  ReservedCtrlMsgMap_t::iterator it = m_reservedCtrlMsgs.find (sendId);
+
+  // Found
+  if (it != m_reservedCtrlMsgs.end ())
     {
-      NS_FATAL_ERROR ("Control message can't added.");
+      Time now = Simulator::Now ();
+
+      NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " send id: " << sendId << ", recv id: " << m_recvId);
+
+      CtrlMsgMapValue_t mapValue = std::make_pair (now, it->second);
+      std::pair<CtrlMsgMap_t::iterator, bool> cResult = m_ctrlMsgs.insert (std::make_pair (recvId, mapValue));
+
+      if ( cResult.second == false )
+        {
+          NS_FATAL_ERROR ("Control message can't added.");
+        }
+
+      if ( m_storeTimeout.IsExpired ()  )
+        {
+          m_storeTimeout = Simulator::Schedule (m_storeTime, &SatControlMsgContainer::EraseFirst, this);
+        }
+
+      // Increase the receive id
+      ++m_recvId;
+
+      // Erase the entry from the temporary reserved container
+      m_reservedCtrlMsgs.erase (it);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Sending side control message id: " << sendId << " not found from SatControlMsgContainer (m_reservedCtrlMsgs)!");
     }
 
-  if ( m_storeTimeout.IsExpired ()  )
-    {
-      m_storeTimeout = Simulator::Schedule (m_storeTime, &SatControlMsgContainer::EraseFirst, this);
-    }
-
-  return m_id++;
+  return recvId;
 }
 
 Ptr<SatControlMessage>
-SatControlMsgContainer::Get (uint32_t id)
+SatControlMsgContainer::Read (uint32_t recvId)
 {
-  NS_LOG_FUNCTION (this << id);
+  NS_LOG_FUNCTION (this << recvId);
 
   Ptr<SatControlMessage> msg = NULL;
 
-  CtrlMsgMap_t::iterator it = m_ctrlMsgs.find (id);
+  CtrlMsgMap_t::iterator it = m_ctrlMsgs.find (recvId);
 
-  if ( it != m_ctrlMsgs.end () )
+  NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " receive id: " << recvId);
+
+  if (it != m_ctrlMsgs.end ())
     {
       msg = it->second.second;
 
@@ -768,9 +808,14 @@ SatControlMsgContainer::Get (uint32_t id)
             }
           else
             {
+              NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " remove id: " << recvId);
               m_ctrlMsgs.erase (it);
             }
         }
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Receive side control message id: " << recvId << " not found from SatControlMsgContainer (m_ctrlMsgs)!");
     }
 
   return msg;
@@ -781,14 +826,14 @@ SatControlMsgContainer::EraseFirst ()
 {
   NS_LOG_FUNCTION (this);
 
-  CtrlMsgMap_t::iterator first = m_ctrlMsgs.begin ();
-  m_ctrlMsgs.erase (first);
+  CtrlMsgMap_t::iterator it = m_ctrlMsgs.begin ();
+  m_ctrlMsgs.erase (it);
 
-  first = m_ctrlMsgs.begin ();
+  it = m_ctrlMsgs.begin ();
 
-  if ( first != m_ctrlMsgs.end () )
+  if (it != m_ctrlMsgs.end ())
     {
-      Time storedMoment = first->second.first;
+      Time storedMoment = it->second.first;
       Time elapsedTime = Simulator::Now () - storedMoment;
 
       m_storeTimeout = Simulator::Schedule (m_storeTime - elapsedTime, &SatControlMsgContainer::EraseFirst, this);

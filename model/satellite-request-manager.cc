@@ -634,7 +634,7 @@ SatRequestManager::SendCnoReport ()
 
   if ( !m_ctrlCallback.IsNull ())
     {
-      NS_LOG_LOGIC ("Send capacity request to GW: " << m_gwAddress);
+      NS_LOG_LOGIC ("Send C/No report to GW: " << m_gwAddress);
 
       Ptr<SatCnoReportMessage> cnoReport = CreateObject<SatCnoReportMessage> ();
 

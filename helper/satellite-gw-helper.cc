@@ -104,13 +104,15 @@ SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
                           uint32_t rtnLinkCarrierCount,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
-                          SatMac::WriteCtrlMsgCallback writeCb,
+                          SatMac::ReserveCtrlMsgCallback reserveCb,
+                          SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
  : m_carrierBandwidthConverter (carrierBandwidthConverter),
    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
    m_superframeSeq (seq),
    m_readCtrlCb (readCb),
-   m_writeCtrlCb (writeCb),
+   m_reserveCtrlCb (reserveCb),
+   m_sendCtrlCb (sendCb),
    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
    m_symbolRate (0.0),
@@ -261,8 +263,12 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
+
+  // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
-  mac->SetWriteCtrlCallback (m_writeCtrlCb);
+  mac->SetReserveCtrlCallback (m_reserveCtrlCb);
+  mac->SetSendCtrlCallback (m_sendCtrlCb);
+
   mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
 
   // Attach the Mac layer receiver to Phy

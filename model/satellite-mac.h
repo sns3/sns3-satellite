@@ -115,24 +115,38 @@ public:
   typedef Callback<Ptr<SatControlMessage>, uint32_t> ReadCtrlMsgCallback;
 
   /**
+   * Callback to reserve an id and initially store the control
+   * message.
+   * \param Pointer to the message to be stored.
+   * \return uint32_t ID of the stored message.
+   */
+  typedef Callback<uint32_t, Ptr<SatControlMessage> > ReserveCtrlMsgCallback;
+
+  /**
+   * Callback to send a control message and allocate a recv ID for it.
+   * \param uint32_t Internal ID used for initial storing of the control msg.
+   * \return uint32_t ID for the control message read operation.
+   */
+  typedef Callback<uint32_t, uint32_t> SendCtrlMsgCallback;
+
+  /**
    * Method to set read control message callback.
    * \param cb callback to invoke whenever a control message is wanted to read.
    */
   void SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb);
 
   /**
-   * Callback to write control messages to container storing control messages.
-   * Real length of the control messages are simulated in a packet, but not structure.
-   * \param Pointer to the message to be written.
-   * \return uint32_t ID of the written message.
+   * Method to set reserve control message id callback.
+   * \param cb callback to invoke whenever an id is wanted to
+   * be reserved for a control message.
    */
-  typedef Callback<uint32_t, Ptr<SatControlMessage> > WriteCtrlMsgCallback;
+  void SetReserveCtrlCallback (SatMac::ReserveCtrlMsgCallback cb);
 
   /**
-   * Method to set write control message callback.
-   * \param cb callback to invoke whenever a control message is wanted to write.
+   * Method to set send control message callback.
+   * \param cb callback to invoke whenever a control message is wanted to sent.
    */
-  void SetWriteCtrlCallback (SatMac::WriteCtrlMsgCallback cb);
+  void SetSendCtrlCallback (SatMac::SendCtrlMsgCallback cb);
 
   /**
    * Set the node info
@@ -141,12 +155,20 @@ public:
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * Write control message to container.
+   * Reserve id and store the control message.
    *
-   * \param msg Control message to write to container.
-   * \return Id of the written message.
+   * \param msg Control message to store to the container.
+   * \return Id of the internally stored message (send ID).
    */
-  uint32_t WriteCtrlMsgToContainer (Ptr<SatControlMessage> msg);
+  uint32_t ReserveIdAndStoreCtrlMsgToContainer (Ptr<SatControlMessage> msg);
+
+  /**
+   * Send the control message from the container.
+   *
+   * \param sendId Id of the internally stored message.
+   * \return ID to be used in the control packet reception (recv ID).
+   */
+  uint32_t SendCtrlMsgFromContainer (uint32_t sendId);
 
   /**
    * Receive a queue event:
@@ -193,9 +215,14 @@ protected:
   SatMac::ReadCtrlMsgCallback m_readCtrlCallback;
 
   /**
-   * The write control message callback.
+   * The reserve control message id callback.
    */
-  SatMac::WriteCtrlMsgCallback m_writeCtrlCallback;
+  SatMac::ReserveCtrlMsgCallback m_reserveCtrlCallback;
+
+  /**
+   * The send control message callback.
+   */
+  SatMac::SendCtrlMsgCallback m_sendCtrlCallback;
 
   /**
    * `EnableStatisticsTags` attribute.

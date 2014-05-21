@@ -109,7 +109,7 @@ SatBeamHelper::GetTypeId (void)
                       MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeFwdLink),
                       MakeTimeChecker ())
       .AddAttribute ("CtrlMsgStoreTimeInRtnLink", "Time to store a control message in container for return link.",
-                      TimeValue (MilliSeconds (1500)),
+                      TimeValue (MilliSeconds (400)),
                       MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeRtnLink),
                       MakeTimeChecker ())
       .AddTraceSource ("Creation", "Creation traces",
@@ -167,11 +167,13 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   Ptr<SatControlMsgContainer> rtnCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeRtnLink, true);
   Ptr<SatControlMsgContainer> fwdCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeFwdLink, false);
 
-  SatMac::ReadCtrlMsgCallback rtnReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, rtnCtrlMsgContainer);
-  SatMac::WriteCtrlMsgCallback rtnWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, rtnCtrlMsgContainer);
+  SatMac::ReadCtrlMsgCallback rtnReadCtrlCb = MakeCallback (&SatControlMsgContainer::Read, rtnCtrlMsgContainer);
+  SatMac::ReserveCtrlMsgCallback rtnReserveCtrlCb = MakeCallback (&SatControlMsgContainer::ReserveIdAndStore, rtnCtrlMsgContainer);
+  SatMac::SendCtrlMsgCallback rtnSendCtrlCb = MakeCallback (&SatControlMsgContainer::Send, rtnCtrlMsgContainer);
 
-  SatMac::ReadCtrlMsgCallback fwdReadCtrlCb = MakeCallback (&SatControlMsgContainer::Get, fwdCtrlMsgContainer);
-  SatMac::WriteCtrlMsgCallback fwdWriteCtrlCb = MakeCallback (&SatControlMsgContainer::Add, fwdCtrlMsgContainer);
+  SatMac::ReadCtrlMsgCallback fwdReadCtrlCb = MakeCallback (&SatControlMsgContainer::Read, fwdCtrlMsgContainer);
+  SatMac::ReserveCtrlMsgCallback fwdReserveCtrlCb = MakeCallback (&SatControlMsgContainer::ReserveIdAndStore, fwdCtrlMsgContainer);
+  SatMac::SendCtrlMsgCallback fwdSendCtrlCb = MakeCallback (&SatControlMsgContainer::Send, fwdCtrlMsgContainer);
 
   SatGeoHelper::RandomAccessSettings_s geoRaSettings;
   geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;
@@ -190,8 +192,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   // create needed low level satellite helpers
   m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, geoRaSettings);
-  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdWriteCtrlCb, gwRaSettings);
-  m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnWriteCtrlCb, utRaSettings);
+  m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdReserveCtrlCb, fwdSendCtrlCb, gwRaSettings);
+  m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnReserveCtrlCb, rtnSendCtrlCb, utRaSettings);
 
   // Two usage of link results is two-fold: on the other hand they are needed in the
   // packet reception for packet decoding, but on the other hand they are utilized in

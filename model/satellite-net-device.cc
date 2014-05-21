@@ -439,8 +439,9 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 
   // Add control tag to message and write msg to container in MAC
   SatControlMsgTag tag;
+  uint32_t id = m_mac->ReserveIdAndStoreCtrlMsgToContainer (msg);
+  tag.SetMsgId (id);
   tag.SetMsgType (msg->GetMsgType ());
-  tag.SetMsgId ( m_mac->WriteCtrlMsgToContainer (msg) );
   packet->AddPacketTag (tag);
 
   uint8_t flowId = m_classifier->Classify (msg->GetMsgType (), dest);
