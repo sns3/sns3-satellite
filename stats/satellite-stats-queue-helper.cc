@@ -364,10 +364,12 @@ SatStatsQueueHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
       {
         // Setup aggregator.
+        const std::string heading = "% identifier " + m_shortLabel;
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true));
+                                         "EnableContextPrinting", BooleanValue (true),
+                                         "GeneralHeading", StringValue (heading));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");

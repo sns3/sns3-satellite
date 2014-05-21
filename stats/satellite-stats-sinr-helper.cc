@@ -167,7 +167,8 @@ SatStatsSinrHelper::DoInstall ()
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true));
+                                         "EnableContextPrinting", BooleanValue (true),
+                                         "GeneralHeading", StringValue ("% identifier sinr_db"));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");

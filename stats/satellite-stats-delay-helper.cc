@@ -192,7 +192,8 @@ SatStatsDelayHelper::DoInstall ()
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true));
+                                         "EnableContextPrinting", BooleanValue (true),
+                                         "GeneralHeading", StringValue ("% identifier delay_sec"));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -236,7 +237,7 @@ SatStatsDelayHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()),
                                              "MultiFileMode", BooleanValue (false),
                                              "EnableContextPrinting", BooleanValue (false),
-                                             "GeneralHeading", StringValue ("% throughput_kbps freq"));
+                                             "GeneralHeading", StringValue ("% delay_sec freq"));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
             NS_ASSERT (fileAggregator != 0);
 
