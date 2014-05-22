@@ -41,9 +41,9 @@ main (int argc, char *argv[])
 
   double simLength (30.0); // in seconds
 
-  LogComponentEnable ("sat-ra-sim-tn9", LOG_LEVEL_INFO);
-  LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  //LogComponentEnable ("sat-ra-sim-tn9", LOG_LEVEL_INFO);
+  //LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-ra-input-attributes.xml"));
