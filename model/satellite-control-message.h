@@ -734,12 +734,21 @@ private:
    */
   void EraseFirst ();
 
+  /**
+   * Do clean up for the Ctrl msg id map. Currently it needs to erase
+   * a map entry based on value, which is not very efficient.
+   * @param recvId Ctrl msg id
+   */
+  void CleanUpIdMap (uint32_t recvId);
+
   typedef std::map<uint32_t, Ptr<SatControlMessage> >   ReservedCtrlMsgMap_t;
+  typedef std::map<uint32_t, uint32_t>                  CtrlIdMap_t;
   typedef std::pair<Time, Ptr<SatControlMessage> >      CtrlMsgMapValue_t;
   typedef std::map<uint32_t, CtrlMsgMapValue_t >        CtrlMsgMap_t;
 
   ReservedCtrlMsgMap_t  m_reservedCtrlMsgs;
   CtrlMsgMap_t          m_ctrlMsgs;
+	CtrlIdMap_t						m_ctrlIdMap;
   uint32_t              m_sendId;
   uint32_t              m_recvId;
   EventId               m_storeTimeout;

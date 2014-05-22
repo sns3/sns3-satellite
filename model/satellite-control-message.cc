@@ -758,7 +758,14 @@ SatControlMsgContainer::Send (uint32_t sendId)
 
       if ( cResult.second == false )
         {
-          NS_FATAL_ERROR ("Control message can't added.");
+          NS_FATAL_ERROR ("Control message cannot be added.");
+        }
+
+      // Add it to id map for possible future use
+      std::pair<CtrlIdMap_t::iterator, bool> idResult = m_ctrlIdMap.insert (std::make_pair<uint32_t, uint32_t> (sendId, recvId));
+      if (idResult.second == false)
+        {
+          NS_FATAL_ERROR ("ID map entry cannot be added!");
         }
 
       if ( m_storeTimeout.IsExpired ()  )
@@ -772,13 +779,24 @@ SatControlMsgContainer::Send (uint32_t sendId)
       // Erase the entry from the temporary reserved container
       m_reservedCtrlMsgs.erase (it);
     }
+  // Not found
   else
     {
-      NS_FATAL_ERROR ("Sending side control message id: " << sendId << " not found from SatControlMsgContainer (m_reservedCtrlMsgs)!");
+      // Try to find it from ID map
+      CtrlIdMap_t::iterator idIter = m_ctrlIdMap.find (sendId);
+      if (idIter != m_ctrlIdMap.end ())
+        {
+          recvId = idIter->second;
+        }
+      else
+        {
+          NS_FATAL_ERROR ("The id: " << sendId << " not found from either reserved control messages nor ID map!");
+        }
     }
 
   return recvId;
 }
+
 
 Ptr<SatControlMessage>
 SatControlMsgContainer::Read (uint32_t recvId)
@@ -809,6 +827,7 @@ SatControlMsgContainer::Read (uint32_t recvId)
           else
             {
               NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " remove id: " << recvId);
+              CleanUpIdMap (recvId);
               m_ctrlMsgs.erase (it);
             }
         }
@@ -827,6 +846,7 @@ SatControlMsgContainer::EraseFirst ()
   NS_LOG_FUNCTION (this);
 
   CtrlMsgMap_t::iterator it = m_ctrlMsgs.begin ();
+  CleanUpIdMap (it->first);
   m_ctrlMsgs.erase (it);
 
   it = m_ctrlMsgs.begin ();
@@ -837,6 +857,22 @@ SatControlMsgContainer::EraseFirst ()
       Time elapsedTime = Simulator::Now () - storedMoment;
 
       m_storeTimeout = Simulator::Schedule (m_storeTime - elapsedTime, &SatControlMsgContainer::EraseFirst, this);
+    }
+}
+
+void
+SatControlMsgContainer::CleanUpIdMap (uint32_t recvId)
+{
+  NS_LOG_FUNCTION (this << recvId);
+
+  CtrlIdMap_t::iterator it = m_ctrlIdMap.begin ();
+  for (; it != m_ctrlIdMap.end (); ++it)
+    {
+      if (it->second == recvId)
+        {
+          m_ctrlIdMap.erase (it);
+          break;
+        }
     }
 }
 
