@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   double intervalInSeconds (0.1);
   bool isNoisy (false);
 
-  double simLength (30.0); // in seconds
+  double simLength (60.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
@@ -62,9 +62,6 @@ main (int argc, char *argv[])
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue ("simLength", "Simulation duration (in seconds)", simLength);
-  cmd.AddValue ("packetSize", "Constant packet size (in bytes)", packetSize);
-  cmd.AddValue ("intervalInSeconds", "Packet interval (in seconds)", intervalInSeconds);
   cmd.AddValue ("numOfInstances", "Number of CRDSA packet instances", numOfInstances);
   cmd.AddValue ("isNoisy", "If true, may print some logging messages", isNoisy);
   cmd.Parse (argc, argv);
@@ -250,7 +247,10 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-ra-comparison-output-attributes.xml"));
+  std::stringstream filename;
+  filename << "tn9-ra-comparison-output-attributes-uts-" << utsPerBeam << "-instances-" << numOfInstances << ".xml";
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

@@ -32,18 +32,14 @@ main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
-  uint32_t raMode (2);
+  uint32_t raMode (3);
   uint32_t utsPerBeam (1);
   uint32_t packetSize (64);
   std::string dataRate = "5kb/s";
   std::string onTime = "0.2";
-  std::string offTime = "1.0";
+  std::string offTime = "0.8";
 
-  double simLength (30.0); // in seconds
-
-  //LogComponentEnable ("sat-ra-sim-tn9", LOG_LEVEL_INFO);
-  //LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  double simLength (300.0); // in seconds
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-ra-input-attributes.xml"));
@@ -229,7 +225,7 @@ main (int argc, char *argv[])
 
       ApplicationContainer utOnOff = onOffHelper.Install (utUsers.Get (i));
       utOnOff.Start (Seconds (0.0));
-      utOnOff.Stop (Seconds (simLength - 1.0));
+      utOnOff.Stop (Seconds (simLength - 2.0));
 
       PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (i)), port));
       sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
@@ -248,7 +244,10 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  
+
+  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
+
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -301,7 +300,10 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-ra-output-attributes.xml"));
+  std::stringstream filename;
+  filename << "tn9-ra-output-attributes-mode-" << raMode << "-uts-" << utsPerBeam << ".xml";
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

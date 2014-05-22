@@ -149,20 +149,6 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-
   s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-profiling-sim-tn8 ---");
@@ -175,7 +161,10 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn8-profiling-output-attributes.xml"));
+  std::stringstream filename;
+  filename << "tn8-profiling-output-attributes-conf-" << profilingConf << "-uts-" << utsPerBeam << ".xml";
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
