@@ -118,6 +118,15 @@ public:
   void CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& info, Ptr<SatListPositionAllocator> utPositions);
 
   /**
+   * Creates satellite objects according to user defined scenario.
+   * Positions are read from different input file set by attribute ns3::SatConf::UtPositionInputFileName.
+   *
+   * \param beamInfo Information of the beam to locate UTs, if empty whole reference scenario used to select beam
+   * \param info information of the UT and users in beams
+   */
+  void CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& info);
+
+  /**
    * \param  node pointer to user node.
    *
    * \return address of the user.

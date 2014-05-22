@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/double.h"
 #include "ns3/enum.h"
+#include "ns3/string.h"
 #include "ns3/simulator.h"
 #include "ns3/satellite-wave-form-conf.h"
 #include "satellite-conf.h"
@@ -102,6 +103,12 @@ SatConf::GetTypeId (void)
                      DoubleValue (0.00),
                      MakeDoubleAccessor (&SatConf::m_fwdCarrierSpacingFactor),
                      MakeDoubleChecker<double> (0.00, 1.00))
+      .AddAttribute ("UtPositionInputFileName",
+                     "File defining user defined UT positions for user defined scenarios.",
+                     StringValue ("UtPos.txt"),
+                     MakeStringAccessor (&SatConf::m_utPositionInputFileName),
+                     MakeStringChecker ())
+
 ;
     return tid;
 }
@@ -116,7 +123,6 @@ SatConf::GetInstanceTypeId (void) const
 
 SatConf::SatConf()
  : m_beamCount (0),
-   m_gwCount (0),
    m_fwdFeederLinkFreqHz (0.0),
    m_fwdFeederLinkBandwidthHz (0.0),
    m_fwdUserLinkFreqHz (0.0),
@@ -147,10 +153,13 @@ void SatConf::Initialize (std::string satConf, std::string gwPos, std::string sa
   LoadSatConf (dataPath + satConf);
 
   // Load GW positions
-  LoadGwPos (dataPath + gwPos);
+  LoadPositions (dataPath + gwPos, m_gwPositions);
+
+  // Load UT positions
+  LoadPositions (dataPath + m_utPositionInputFileName, m_utPositions);
 
   // Load satellite position
-  LoadGeoSatPos (dataPath + satPos);
+  LoadPositions (dataPath + satPos, m_geoSatPosition);
 
   Configure (dataPath + wfConf);
 }
@@ -357,7 +366,7 @@ SatConf::LoadSatConf (std::string filePathName)
 }
 
 void
-SatConf::LoadGwPos (std::string filePathName)
+SatConf::LoadPositions (std::string filePathName, PositionContainer_t& container)
 {
   NS_LOG_FUNCTION (this << filePathName);
 
@@ -374,39 +383,12 @@ SatConf::LoadGwPos (std::string filePathName)
                     ", longitude [deg] = " << lon <<
                     ", altitude [m] = ");
 
-      // Store the valuesNS_LOG_FUNCTION (this);
+      // Store the values
       GeoCoordinate coord(lat, lon, alt);
-      m_gwPositions.push_back (coord);
+      container.push_back (coord);
 
       // get next row
       *ifs >> lat >> lon >> alt;
-    }
-
-  m_gwCount = m_gwPositions.size ();
-
-  ifs->close ();
-  delete ifs;
-}
-
-void
-SatConf::LoadGeoSatPos (std::string filePathName)
-{
-  NS_LOG_FUNCTION (this << filePathName);
-
-  // READ FROM THE SPECIFIED INPUT FILE
-  std::ifstream *ifs = OpenFile (filePathName);
-
-  double lat, lon, alt;
-  *ifs >> lat >> lon >> alt;
-
-  if (ifs->good ())
-    {
-      NS_LOG_DEBUG (this <<
-                    " latitude [deg] = " << lat <<
-                    ", longitude [deg] = " << lon <<
-                    ", altitude [m] = ");
-
-      m_geoSatPosition = GeoCoordinate (lat,lon,alt);
     }
 
   ifs->close ();
@@ -426,7 +408,15 @@ SatConf::GetGwCount() const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_gwCount;
+  return m_gwPositions.size ();
+}
+
+uint32_t
+SatConf::GetUtCount() const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_utPositions.size ();
 }
 
 std::vector <uint32_t>
@@ -492,17 +482,27 @@ GeoCoordinate
 SatConf::GetGwPosition (uint32_t gwId) const
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT((gwId > 0) && (gwId <=  m_gwCount));
+  NS_ASSERT((gwId > 0) && (gwId <=  m_gwPositions.size ()));
 
   return m_gwPositions[gwId - 1];
+}
+
+GeoCoordinate
+SatConf::GetUtPosition (uint32_t utId) const
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT((utId > 0) && (utId <=  m_utPositions.size ()));
+
+  return m_utPositions[utId - 1];
 }
 
 GeoCoordinate
 SatConf::GetGeoSatPosition () const
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_geoSatPosition.size () == 1);
 
-  return m_geoSatPosition;
+  return m_geoSatPosition[0];
 }
 
 } // namespace ns3

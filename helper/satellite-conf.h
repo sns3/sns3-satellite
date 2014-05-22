@@ -71,18 +71,6 @@ public:
   void LoadSatConf (std::string filePathName);
 
   /**
-   * Load GW positions from a file
-   * \param filePathName
-   */
-  void LoadGwPos (std::string filePathName);
-
-  /**
-   * Load satellite position from a file
-   * \param filePathName
-   */
-  void LoadGeoSatPos (std::string filePathName);
-
-  /**
    * Get count of the beams (configurations).
    *
    * \return beam count
@@ -110,6 +98,14 @@ public:
    uint32_t GetGwCount () const;
 
    /**
+    * Get count of the UTs (positions).
+    *
+    * \return UT count
+    */
+   uint32_t GetUtCount () const;
+
+
+   /**
     * Get the position of the GW for a given GW id
     *
     * \param gwId id of the GW
@@ -117,6 +113,15 @@ public:
     * \return Requested GW's position.
     */
    GeoCoordinate GetGwPosition (uint32_t gwId) const;
+
+   /**
+    * Get the position of the GW for a given UT id
+    *
+    * \param utId id of the UT (from SatIdMapper)
+    *
+    * \return Requested UT's position.
+    */
+   GeoCoordinate GetUtPosition (uint32_t utId) const;
 
    /**
     * Get the position of the Geo Satellite
@@ -186,38 +191,7 @@ public:
    static const uint32_t BEAM_ELEM_COUNT = 4;
 
 private:
-
-   /**
-    * Get bandwidth of the forward link carrier.
-    *
-    * \param carrierId Id of the carrier.
-    * \param bandwidthType Type of the bandwidth.
-    * \return Requested carrier bandwidth.
-    */
-   double GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
-
-   /**
-    * Configures itself with default values. Creates configuration storages as needed.
-    * \param wfConf path+filename of the waveform configuration
-    */
-   void Configure(std::string wfConf);
-
-   /**
-    * \param carrierId  Global carrier ID across all seperframe sequncies.
-    * \param seqId      Pointer to variable to store seqId of the super frame sequence
-    *                   where globl id belongs to
-    *
-    * \return Carrier id relative to the superframe
-    */
-   uint32_t GetSuperframeCarrierId (uint32_t carrierId, uint32_t * seqId);
-
-   /**
-    * \param seqId      Sequence of the superframe.
-    * \param carrierId  Carrier ID inseide requested superframe.
-    *
-    * \return Global carrier id  across all seperframe sequncies.
-    */
-    uint32_t GetGlobalCarrierId (uint32_t seqId, uint32_t carrierId );
+   typedef std::vector <GeoCoordinate> PositionContainer_t;
 
    /*
     *  Columns:
@@ -236,17 +210,22 @@ private:
    /**
     * Geodetic positions of the GWs
     */
-   std::vector <GeoCoordinate> m_gwPositions;
+   PositionContainer_t m_gwPositions;
 
    /**
-    * GW count.
+    * Geodetic positions of the UTs
     */
-   uint32_t m_gwCount;
+   PositionContainer_t m_utPositions;
 
    /**
     * Geodetic positions of the Geo Satellite
     */
-   GeoCoordinate m_geoSatPosition;
+   PositionContainer_t m_geoSatPosition;
+
+   /**
+    * File to use when loading UT specific position (for user defined positions)
+    */
+   std::string  m_utPositionInputFileName;
 
    /**
     * Superframe sequence configuration
@@ -333,6 +312,46 @@ private:
     * The configured carrier spacing factor for forward link carriers.
     */
    double m_fwdCarrierSpacingFactor;
+
+   /**
+    * Get bandwidth of the forward link carrier.
+    *
+    * \param carrierId Id of the carrier.
+    * \param bandwidthType Type of the bandwidth.
+    * \return Requested carrier bandwidth.
+    */
+   double GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
+
+   /**
+    * Configures itself with default values. Creates configuration storages as needed.
+    * \param wfConf path+filename of the waveform configuration
+    */
+   void Configure(std::string wfConf);
+
+   /**
+    * \param carrierId  Global carrier ID across all superframe sequences.
+    * \param seqId      Pointer to variable to store seqId of the super frame sequence
+    *                   where global id belongs to
+    *
+    * \return Carrier id relative to the superframe
+    */
+   uint32_t GetSuperframeCarrierId (uint32_t carrierId, uint32_t * seqId);
+
+   /**
+    * \param seqId      Sequence of the superframe.
+    * \param carrierId  Carrier ID inside requested superframe.
+    *
+    * \return Global carrier id  across all superframe sequences.
+    */
+    uint32_t GetGlobalCarrierId (uint32_t seqId, uint32_t carrierId );
+
+    /**
+     * Load node positions from a file
+     * \param filePathName
+     * \param container Container reference to store found positions
+     */
+    void LoadPositions (std::string filePathName, PositionContainer_t& container);
+
 };
 
 

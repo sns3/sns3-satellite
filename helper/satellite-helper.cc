@@ -348,20 +348,35 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
 }
 
 void
+SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& utInfo)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatListPositionAllocator> utPositions = CreateObject<SatListPositionAllocator> ();
+
+  for ( uint32_t i = 0; i < m_satConf->GetUtCount (); i++ )
+    {
+      utPositions->Add ( m_satConf->GetUtPosition (i+1) );
+    }
+
+  CreateUserDefinedScenario (beamInfo, utInfo, utPositions);
+}
+
+void
 SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& utInfo, Ptr<SatListPositionAllocator> utPositions)
 {
   NS_LOG_FUNCTION (this);
 
   m_utPositions = utPositions;
 
-  BeamUserInfoMap_t beamUserInfos;
-
-  if ( m_utPositions->GetCount () != utInfo.GetUtCount ())
+  if ( m_utPositions->GetCount () < utInfo.GetUtCount ())
     {
-      NS_FATAL_ERROR ("Position count and UT count mismatch!");
+      NS_FATAL_ERROR ("Not enough position available for UTs!");
     }
 
-  for ( uint32_t i = 0; i < m_utPositions->GetCount (); i ++ )
+  BeamUserInfoMap_t beamUserInfos;
+
+  for ( uint32_t j = 0; j < utInfo.GetUtCount (); j++ )
     {
       uint32_t beamId = m_antennaGainPatterns->GetBestBeamId (m_utPositions->GetNextGeo ());
 
@@ -371,11 +386,11 @@ SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& u
 
           if ( beamMap != beamUserInfos.end ())
             {
-              beamMap->second.AppendUt (utInfo.GetUtUserCount (i));
+              beamMap->second.AppendUt (utInfo.GetUtUserCount (j));
             }
           else
             {
-              beamUserInfos[beamId] = SatBeamUserInfo (1, utInfo.GetUtUserCount (i));
+              beamUserInfos[beamId] = SatBeamUserInfo (1, utInfo.GetUtUserCount (j));
             }
         }
       else
@@ -504,7 +519,6 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
 
   for ( NodeContainer::Iterator i = nodes.Begin();  i != nodes.End (); i++ )
     {
-
       Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
 
       if (observer == 0)

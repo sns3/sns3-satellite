@@ -37,8 +37,8 @@
 #include "satellite-rx-power-output-trace-container.h"
 #include "satellite-rx-power-input-trace-container.h"
 #include "satellite-fading-output-trace-container.h"
-#include "satellite-id-mapper.h"
 #include "satellite-fading-external-input-trace-container.h"
+#include "satellite-id-mapper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 
@@ -501,27 +501,32 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
   NS_LOG_FUNCTION (this << rxParams << phyRx);
 
   int32_t nodeId;
+  Ptr<MobilityModel> mobility;
 
   switch (m_channelType)
   {
     case SatEnums::RETURN_FEEDER_CH:
       {
         nodeId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (phyRx->GetDevice ()->GetAddress ());
+        mobility = phyRx->GetMobility ();
         break;
       }
     case SatEnums::FORWARD_USER_CH:
       {
         nodeId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (phyRx->GetDevice ()->GetAddress ());
+        mobility = phyRx->GetMobility ();
         break;
       }
     case SatEnums::RETURN_USER_CH:
       {
         nodeId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (GetSourceAddress (rxParams));
+        mobility = rxParams->m_phyTx->GetMobility ();
         break;
       }
     case SatEnums::FORWARD_FEEDER_CH:
       {
         nodeId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (GetSourceAddress (rxParams));
+        rxParams->m_phyTx->GetMobility ();
         break;
       }
     default:
@@ -536,7 +541,7 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
       NS_FATAL_ERROR ("SatChannel::GetExternalFadingTrace - Invalid node ID");
     }
 
-  return (Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace ((uint32_t)nodeId, m_channelType))->GetFading ();
+  return (Singleton<SatFadingExternalInputTraceContainer>::Get()->GetFadingTrace ((uint32_t)nodeId, m_channelType, mobility))->GetFading ();
 }
 
 /// TODO get rid of source MAC address peeking

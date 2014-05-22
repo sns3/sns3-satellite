@@ -164,67 +164,6 @@ public:
 
 private:
 
-  virtual void DoDispose ();
-
-  /**
-   * \brief Used internally to schedule the StartRx method call after the propagation delay.
-   * \param rxParams Parameters of the signal being received
-   * \param phyRx The receiver SatPhyRx entity
-   */
-  void ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> phyRx);
-
-  /**
-   * \brief Used internally to start the packet reception of at the phyRx.
-   *
-   * \param rxParams Parameters of the signal being received
-   * \param phyRx The receiver SatPhyRx entity
-   */
-  void StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
-
-  /**
-   * \brief Function for Rx power output trace
-   * \param rxParams Rx parameters
-   * \param phyRx The receiver SatPhyRx entity
-   */
-  void DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
-
-  /**
-   * \brief Function for Rx power input trace
-   * \param rxParams Rx parameters
-   * \param phyRx The receiver SatPhyRx entity
-   */
-  void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
-
-  /**
-   * \brief Function for fading output trace
-   * \param rxParams Rx parameters
-   * \param phyRx The receiver SatPhyRx entity
-   * \param fadingValue fading value
-   */
-  void DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue);
-
-  /**
-   * \brief Function for calculating the Rx power
-   * \param rxParams Rx parameters
-   * \param phyRx The receiver SatPhyRx entity
-   */
-  void DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
-
-  /**
-   * \brief Function for getting the external source fading value
-   * \param rxParams Rx parameters
-   * \param phyRx The receiver SatPhyRx entity
-   * \return fading value
-   */
-  double GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
-
-  /**
-   * \brief Function for getting the source MAC address from Rx parameters
-   * \param rxParams Rx parameters
-   * \return source MAC address
-   */
-  Mac48Address GetSourceAddress (Ptr<SatSignalParameters> rxParams);
-
   /**
    * Receiving mode of the SatChannel:
    * SINGLE_RX = only the proper receiver of the packet shall receive the packet
@@ -310,6 +249,71 @@ private:
                   SatEnums::SatLinkDir_t,
                   std::string
                   > m_packetTrace;
+
+  /**
+   * Dispose SatChannel.
+   */
+  virtual void DoDispose ();
+
+  /**
+   * \brief Used internally to schedule the StartRx method call after the propagation delay.
+   * \param rxParams Parameters of the signal being received
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Used internally to start the packet reception of at the phyRx.
+   *
+   * \param rxParams Parameters of the signal being received
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Function for Rx power output trace
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Function for Rx power input trace
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Function for fading output trace
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   * \param fadingValue fading value
+   */
+  void DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx, double fadingValue);
+
+  /**
+   * \brief Function for calculating the Rx power
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Function for getting the external source fading value
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   * \return fading value
+   */
+  double GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
+   * \brief Function for getting the source MAC address from Rx parameters
+   * \param rxParams Rx parameters
+   * \return source MAC address
+   */
+  Mac48Address GetSourceAddress (Ptr<SatSignalParameters> rxParams);
+
 };
 
 }

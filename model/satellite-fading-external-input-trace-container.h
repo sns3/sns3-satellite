@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -23,9 +23,12 @@
 #define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_CONTAINER_H_
 
 #include <map>
-#include "ns3/simple-ref-count.h"
+#include <string>
+#include "ns3/object.h"
+#include "ns3/mobility-model.h"
+#include "satellite-enums.h"
+#include "geo-coordinate.h"
 #include "satellite-fading-external-input-trace.h"
-#include "satellite-channel.h"
 
 namespace ns3 {
 
@@ -33,11 +36,24 @@ namespace ns3 {
  * \ingroup satellite
  * \brief Satellite fading external input trace container
  */
-class SatFadingExternalInputTraceContainer : public SimpleRefCount <SatFadingExternalInputTraceContainer>
+class SatFadingExternalInputTraceContainer : public Object
 {
 public:
 
+  /**
+   * Definitions for different modes of using trace input files
+   */
+  typedef enum
+    {
+      LIST_MODE,    //!< LIST_MODE
+      POSITION_MODE,//!< POSITION_MODE
+      RANDOM_MODE   //!< RANDOM_MODE
+    } InputMode_t;
+
   typedef std::pair<Ptr<SatFadingExternalInputTrace>, Ptr<SatFadingExternalInputTrace> >  ChannelTracePair_t;
+
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
 
   /**
    * \brief Constructor
@@ -51,9 +67,13 @@ public:
 
   /**
    * Get method for getting a proper fading trace
+   *
+   * \param nodeId GW or UT Node id (from SatIdMapper)
+   * \param channelType Channel type
+   * \param mobility Mobility of the node
    * \return Channel fading trace for a certain node and channel.
    */
-  Ptr<SatFadingExternalInputTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType);
+  Ptr<SatFadingExternalInputTrace> GetFadingTrace (uint32_t nodeId, SatEnums::ChannelType_t channelType, Ptr<MobilityModel> mobility);
 
   /**
    * \brief A method to test that the fading traces are according to
@@ -65,16 +85,10 @@ public:
   bool TestFadingTraces (uint32_t numOfUts, uint32_t numOfGws);
 
 private:
+  typedef std::pair <std::string, GeoCoordinate > TraceFileContainerItem_t;
+  typedef std::vector<TraceFileContainerItem_t> TraceFileContainer_t;
 
-  /**
-   * Create new UT fading trace
-   */
-  void CreateUtFadingTrace (uint32_t utId);
-
-  /**
-   * Create new GW fading trace
-   */
-  void CreateGwFadingTrace (uint32_t gwId);
+  typedef std::map<std::string, Ptr<SatFadingExternalInputTrace> > TraceInputContainer_t;
 
   /**
    * Container of the UT fading traces
@@ -85,6 +99,102 @@ private:
    * Container of the GW fading traces
    */
   std::map< uint32_t, ChannelTracePair_t> m_gwFadingMap;
+
+  /**
+   * \brief Input mode to read trace files form given index table (file)
+   */
+  InputMode_t m_inputMode;
+
+  /**
+   * The name of file which defines the index table to be used for trace input of forward down link for UT.
+   * Index table defines files used as trace input sources.
+   */
+  std::string m_utFwdDownIndexFileName;
+
+  /**
+   * The name of file which defines the index table to be used for trace input of return up link for UTs.
+   * Index table defines files used as trace input sources.
+   */
+  std::string m_utRtnUpIndexFileName;
+
+  /**
+   * The name of file which defines the index table to be used for trace input of forward up link for GWs.
+   * Index table defines files used as trace input sources.
+   */
+  std::string m_gwFwdUpIndexFileName;
+
+  /**
+   * The name of file which defines the index table to be used for trace input of forward up link for GWs.
+   * Index table defines files used as trace input sources.
+   */
+  std::string m_gwRtnDownIndexFileName;
+
+  /**
+   * UT forward down link trace file names
+   */
+  TraceFileContainer_t  m_utFwdDownFileNames;
+
+  /**
+   * UT return up link trace file names
+   */
+  TraceFileContainer_t  m_utRtnUpFileNames;
+
+  /**
+   * GW forward up link trace file names
+   */
+  TraceFileContainer_t  m_gwFwdUpFileNames;
+
+  /**
+   * GW return down link trace file names
+   */
+  TraceFileContainer_t  m_gwRtnDownFileNames;
+
+  /**
+   * Loaded trace files
+   */
+  TraceInputContainer_t m_loadedTraces;
+
+  /// flag telling if UT specific index trace files are already loaded
+  bool m_utIndexFilesLoaded;
+
+  /// flag telling if GW specific index trace files are already loaded
+  bool m_gwIndexFilesLoaded;
+
+  /// data path to find trace input files
+  std::string m_dataPath;
+
+  /**
+   * Create new UT fading trace
+   * \param utId  Id of the UT (from SatIdMapper)
+   * \param mobility Mobility for given UT node
+   */
+  void CreateUtFadingTrace (uint32_t utId, Ptr<MobilityModel> mobility);
+
+  /**
+   * Create new GW fading trace
+   * \param gwId  Id of the GW (from SatIdMapper)
+   * \param mobility Mobility for given GW node
+   */
+  void CreateGwFadingTrace (uint32_t gwId, Ptr<MobilityModel> mobility);
+
+  /**
+   * Read trace file information from given index file.
+   *
+   * \param indexFile Index file to parse for trace file names
+   * \param container Container reference to store found trace file info
+   */
+  void ReadIndexFile (std::string indexFile, TraceFileContainer_t& container);
+
+  /**
+   *
+   * \param fileType Type of the trace file
+   * \param container Container reference to find out needed trace file info
+   * \param id Id of the node GW or UT (from SatIdMapper)
+   * \param mobility Mobility for given node
+   * \return Created trace input (or found trace input if queried trace input already created)
+   */
+  Ptr<SatFadingExternalInputTrace> CreateFadingTrace (SatFadingExternalInputTrace::TraceFileType_e fileType,
+                                                      TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility);
 };
 
 } // namespace ns3
