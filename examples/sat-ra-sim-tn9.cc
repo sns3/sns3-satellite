@@ -34,12 +34,12 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt (1);
   uint32_t raMode (2);
   uint32_t utsPerBeam (1);
-  uint32_t packetSize (10);
+  uint32_t packetSize (64);
   std::string dataRate = "5kb/s";
   std::string onTime = "0.2";
   std::string offTime = "1.0";
 
-  double simLength (15.0); // in seconds
+  double simLength (30.0); // in seconds
 
   LogComponentEnable ("sat-ra-sim-tn9", LOG_LEVEL_INFO);
   LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
@@ -114,6 +114,9 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
+
+        // Disable periodic control slots
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
         break;
       }
     // SA + VBDC
@@ -133,6 +136,9 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
 
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
+
+        // Disable periodic control slots
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
         break;
       }
     // Periodic control slots + VBDC
@@ -171,6 +177,9 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+
+        // Disable periodic control slots
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
         break;
       }
     default:
@@ -179,10 +188,10 @@ main (int argc, char *argv[])
         break;
       }
   }
-
+  // Statistics settings
   Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (20.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.02));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (30.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
 
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MinValue", DoubleValue (0.0));
   Config::SetDefault ("ns3::SatStatsResourcesGrantedHelper::MaxValue", DoubleValue (10000.0));
@@ -239,7 +248,16 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   //s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);

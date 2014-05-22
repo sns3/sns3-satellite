@@ -89,6 +89,9 @@ main (int argc, char *argv[])
   // Disable C/NO reporting
   Config::SetDefault ("ns3::SatRequestManager::CnoReportInterval",TimeValue (Seconds (60.0)));
 
+  // Disable periodic control slots
+  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+
   // Set dynamic load control parameters
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
