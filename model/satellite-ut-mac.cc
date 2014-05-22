@@ -296,7 +296,8 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
-          ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf->GetRcIndex (), carrierId);
+          //ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf->GetSlotType (), timeSlotConf->GetRcIndex (), carrierId);
+          ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf, carrierId);
 
           payloadSumInSuperFrame += wf->GetPayloadInBytes ();
           payloadSumPerRcIndex [timeSlotConf->GetRcIndex ()] += wf->GetPayloadInBytes ();
@@ -314,27 +315,28 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 }
 
 void
-SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, Time duration, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId)
+SatUtMac::ScheduleDaTxOpportunity(Time transmitDelay, Time duration, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << duration.GetSeconds () << waveform->GetPayloadInBytes () << rcIndex << carrierId);
-  NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", rcIndex: " << rcIndex << ", carrier: " << carrierId);
+  NS_LOG_FUNCTION (this << transmitDelay.GetSeconds() << duration.GetSeconds () << wf->GetPayloadInBytes () << tsConf->GetRcIndex () << carrierId);
+  NS_LOG_LOGIC ("SatUtMac::ScheduleDaTxOpportunity - at time: " << transmitDelay.GetSeconds () << " duration: " << duration.GetSeconds () << ", payload: " << wf->GetPayloadInBytes () << ", rcIndex: " << tsConf->GetRcIndex () << ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, waveform, carrierId, rcIndex, SatUtScheduler::LOOSE);
+  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, carrierId, wf, tsConf, SatUtScheduler::LOOSE);
 }
 
+
 void
-SatUtMac::DoTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, SatUtScheduler::SatCompliancePolicy_t policy)
 {
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << waveform->GetPayloadInBytes () << carrierId << rcIndex);
-  NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << wf->GetPayloadInBytes () << carrierId << tsConf->GetRcIndex ());
+  NS_LOG_LOGIC ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << duration.GetSeconds () << ", payload: " << wf->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << tsConf->GetRcIndex ());
 
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-  txInfo.modCod = waveform->GetModCod ();
+  txInfo.modCod = wf->GetModCod ();
   txInfo.frameType = SatEnums::UNDEFINED_FRAME;
-  txInfo.waveformId = waveform->GetWaveformId ();
+  txInfo.waveformId = wf->GetWaveformId ();
 
-  TransmitPackets (FetchPackets (waveform->GetPayloadInBytes (), rcIndex, policy), duration, carrierId, txInfo);
+  TransmitPackets (FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy), duration, carrierId, txInfo);
 }
 
 void
@@ -356,7 +358,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
       NS_FATAL_ERROR ("SatUtMac::DoSlottedAlohaTransmit - Not enough capacity in Slotted ALOHA payload");
     }
 
-  m_utScheduler->DoScheduling (packets, payloadBytes, rcIndex, policy);
+  m_utScheduler->DoScheduling (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_C, rcIndex, policy);
 
   if ( !packets.empty () )
     {
@@ -387,7 +389,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
     }
 }
 SatPhy::PacketContainer_t
-SatUtMac::FetchPackets (uint32_t payloadBytes, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this);
 
@@ -399,7 +401,7 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, uint8_t rcIndex, SatUtScheduler::
 
   NS_LOG_LOGIC ("Tx opportunity: payloadBytes: " << payloadBytes);
 
-  m_utScheduler->DoScheduling (packets, payloadBytes, rcIndex, policy);
+  m_utScheduler->DoScheduling (packets, payloadBytes, type, rcIndex, policy);
 
   // A valid packet received
   if ( !packets.empty () )
@@ -882,7 +884,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   /// get the next packet
   SatPhy::PacketContainer_t uniq;
-  m_utScheduler->DoScheduling (uniq, payloadBytes, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
+  m_utScheduler->DoScheduling (uniq, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
 
   NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Processing the packet container, fragments: " << uniq.size ());
 

@@ -20,10 +20,12 @@
 
 #include <algorithm>
 #include "ns3/log.h"
+#include "ns3/boolean.h"
 #include "ns3/object.h"
 #include "ns3/callback.h"
 #include "ns3/pointer.h"
 #include "satellite-ut-scheduler.h"
+#include "satellite-frame-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtScheduler");
 
@@ -37,6 +39,11 @@ SatUtScheduler::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtScheduler")
     .SetParent<Object> ()
     .AddConstructor<SatUtScheduler> ()
+    .AddAttribute ("StrictPriorityForControl",
+                   "Utilize strict priority for control packets",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatUtScheduler::m_prioritizeControl),
+                   MakeBooleanChecker ())
     .AddAttribute ("FramePduHeaderSize",
                    "Frame PDU header size in bytes",
                    UintegerValue (1),
@@ -58,8 +65,9 @@ SatUtScheduler::SatUtScheduler ()
 :m_schedContextCallback (),
  m_txOpportunityCallback (),
  m_llsConf (),
- m_nodeInfo (),
- m_framePduHeaderSizeInBytes (1)
+ m_prioritizeControl (true),
+ m_framePduHeaderSizeInBytes (1),
+ m_nodeInfo ()
 {
 
 }
@@ -68,8 +76,9 @@ SatUtScheduler::SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls)
 :m_schedContextCallback (),
  m_txOpportunityCallback (),
  m_llsConf (lls),
- m_nodeInfo (),
- m_framePduHeaderSizeInBytes (1)
+ m_prioritizeControl (true),
+ m_framePduHeaderSizeInBytes (1),
+ m_nodeInfo ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -120,18 +129,38 @@ SatUtScheduler::SetTxOpportunityCallback (SatUtScheduler::TxOpportunityCallback 
 
 
 void
-SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, uint8_t rcIndex, SatCompliancePolicy_t policy)
+SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this << payloadBytes << rcIndex << policy);
 
   NS_LOG_LOGIC ("UT scheduling RC: " << (uint32_t)(rcIndex) << " with " << payloadBytes << " bytes");
 
-  // Schedule the requested RC index
-  DoSchedulingForRcIndex (packets, payloadBytes, rcIndex);
+  if (type == SatTimeSlotConf::SLOT_TYPE_C && rcIndex != SatEnums::CONTROL_FID)
+    {
+      NS_FATAL_ERROR ("Confict in time slot data between RC index and slot type!");
+    }
+
+  // Schedule
+  // - 1. control
+  // - 2. rc index
+  if (m_prioritizeControl)
+    {
+      DoSchedulingForRcIndex (packets, payloadBytes, SatEnums::CONTROL_FID);
+
+      if (payloadBytes > 0)
+        {
+          DoSchedulingForRcIndex (packets, payloadBytes, rcIndex);
+        }
+    }
+  // Schedule only the requested RC index
+  else
+    {
+      DoSchedulingForRcIndex (packets, payloadBytes, rcIndex);
+    }
 
   // If we still have bytes left and the
   // scheduling policy is loose
-  if (payloadBytes > 0 && policy == LOOSE)
+  if (payloadBytes > 0 && policy == LOOSE && type == SatTimeSlotConf::SLOT_TYPE_TRC)
     {
       std::vector<uint8_t> rcIndices = GetPrioritizedRcIndexOrder ();
 

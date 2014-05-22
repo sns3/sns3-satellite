@@ -26,6 +26,7 @@
 #include "ns3/mac48-address.h"
 #include "satellite-lower-layer-service.h"
 #include "satellite-scheduling-object.h"
+#include "satellite-frame-conf.h"
 #include "satellite-node-info.h"
 
 namespace ns3 {
@@ -144,11 +145,12 @@ public:
    * then it just utilizes it.
    * \param   packets Vector of packets to be sent in a time slot
    * \param   payloadBytes Maximum payload of a time slot
+   * \param   type Time slot type
    * \param   rcIndex RC index
    * \param   policy Compliance policy of the scheduling process
    * \return  Ptr<Packet> Packet fetched from higher layer
    */
-  void DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, uint8_t rcIndex, SatCompliancePolicy_t policy);
+  void DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatCompliancePolicy_t policy);
 
   /**
    * Set the node info
@@ -192,14 +194,20 @@ private:
   Ptr<SatLowerLayerServiceConf> m_llsConf;
 
   /**
-   * Node information
+   * Strictly prioritize the control message scheduling regardless of the
+   * time slot information given from MAC layer.
    */
-  Ptr<SatNodeInfo> m_nodeInfo;
+  bool m_prioritizeControl;
 
   /**
    * Frame PDU header size. Frame PDU
    */
   uint32_t m_framePduHeaderSizeInBytes;
+
+  /**
+   * Node information
+   */
+  Ptr<SatNodeInfo> m_nodeInfo;
 
   /**
    * Byte counters for RC indices. The counters are updated, when UT has

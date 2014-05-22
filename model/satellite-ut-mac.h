@@ -284,22 +284,23 @@ private:
     * Schdules one Tx opportunity, i.e. time slot.
     * \param transmitDelay time when transmit possibility starts
     * \param duration duration of the burst
-    * \param waveform waveform
-    * \param rcIndex Primary RC index to be scheduled
+    * \param wf waveform
+    * \param tsConf Time slot conf
     * \param carrierId Carrier id used for the transmission
     */
-   void ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWaveform> waveform, uint8_t rcIndex, uint32_t carrierId);
+   void ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, uint32_t carrierId);
 
    /**
     * Notify the upper layer about the Tx opportunity. If upper layer
     * returns a PDU, send it to lower layer.
     *
     * \param duration duration of the burst
-    * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
-    * \param rcIndex RC index
+    * \param wf waveform
+    * \param tsConf Time slot conf
+    * \param policy UT scheduler policy
     */
-   void DoTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+   void DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
@@ -308,18 +309,19 @@ private:
     * \param duration duration of the burst
     * \param waveform waveform
     * \param carrierId Carrier id used for the transmission
-    * \param rcIndex RC index as int
+    * \param rcIndex RC index
     */
    void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
    /**
     *
-    * \param payloadBytes
-    * \param rcIndex
-    * \param policy
+    * \param payloadBytes Tx opportunity payload
+    * \param type Time slot type
+    * \param rcIndex RC index
+    * \param policy Scheduler policy
     * \return
     */
-   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
+   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
 
    /**
     *
