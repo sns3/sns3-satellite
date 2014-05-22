@@ -58,10 +58,11 @@ class DataCollectionObject;
  * and aggregators, and connect them together in a proper way to produce the
  * required statistics.
  *
- * The main input for the helper is a reference to a SatHelper instance, a name,
- * an identifier type, and an output type. After all the necessary inputs have
- * been set, the statistics can be started into action by invoking Install().
- * For example:
+ * The main inputs for the helper are a reference to a SatHelper instance, a
+ * name, an identifier type, and an output type. After all the necessary inputs
+ * have been set, the statistics can be started into action by invoking
+ * Install(). For example:
+ * \code
  *     Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
  *     satHelper->CreateScenario (SatHelper::SIMPLE);
  *     // ... (snip) ...
@@ -71,6 +72,7 @@ class DataCollectionObject;
  *     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  *     stat->SetOutputType (SatStatsHelper::OUTPUT_SCALAR_FILE);
  *     stat->Install ();
+ * \endcode
  *
  * However, it's recommended to use the SatStatsHelperContainer class to
  * automatically handle the above.
@@ -208,7 +210,7 @@ protected:
    *        produce the statistics output.
    *
    * An abstract method of SatStatsHelper which must be implemented by child
-   * classed. It will be invoked by Install().
+   * classes. It will be invoked by Install().
    */
   virtual void DoInstall () = 0;
 

@@ -129,7 +129,7 @@ SatStatsHelper::GetTypeId ()
   static TypeId tid = TypeId ("ns3::SatStatsHelper")
     .SetParent<Object> ()
     .AddAttribute ("Name",
-                   "String to be prepended on every output file name",
+                   "String to be prepended on every output file name.",
                    StringValue ("stat"),
                    MakeStringAccessor (&SatStatsHelper::SetName,
                                        &SatStatsHelper::GetName),
