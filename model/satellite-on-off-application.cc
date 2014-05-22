@@ -50,7 +50,8 @@ SatOnOffApplication::GetTypeId (void)
 
 
 SatOnOffApplication::SatOnOffApplication ()
- :  m_isStatisticsTagsEnabled (false)
+  : m_isStatisticsTagsEnabled (false),
+    m_isConnectedWithTraceSource (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -62,15 +63,26 @@ SatOnOffApplication::~SatOnOffApplication()
 
 void SatOnOffApplication::EnableStatisticTags (bool enable)
 {
+  NS_LOG_FUNCTION (this << enable);
   m_isStatisticsTagsEnabled = enable;
 
   if ( m_isStatisticsTagsEnabled )
     {
-      TraceConnectWithoutContext ("Tx", MakeCallback (&SatOnOffApplication::SendPacketTrace, this) );
+      /*
+       * Ensure that we don't connect to the same trace source two times.
+       * Otherwise, the same tag type will be added twice, resulting in a
+       * runtime error.
+       */
+      if (!m_isConnectedWithTraceSource)
+        {
+          TraceConnectWithoutContext ("Tx", MakeCallback (&SatOnOffApplication::SendPacketTrace, this) );
+          m_isConnectedWithTraceSource = true;
+        }
     }
   else
     {
       TraceDisconnectWithoutContext ("Tx", MakeCallback (&SatOnOffApplication::SendPacketTrace, this) );
+      m_isConnectedWithTraceSource = false;
     }
 }
 

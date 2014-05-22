@@ -73,6 +73,7 @@ public:
 private:
 
   bool  m_isStatisticsTagsEnabled;  ///< `EnableStatisticsTags` attribute.
+  bool  m_isConnectedWithTraceSource;
 };
 
 } // namespace ns3
