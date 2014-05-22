@@ -68,18 +68,18 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
           switch (descriptorIt->first.second)
           {
             case SatEnums::DA_RBDC:
-              m_damaEntry->UpdateRbdcInKbps (descriptorIt->first.first, descriptorIt->second);
               m_damaEntry->ResetDynamicRatePersistence ();
+              m_damaEntry->UpdateRbdcInKbps (descriptorIt->first.first, descriptorIt->second);
               break;
 
             case SatEnums::DA_VBDC:
-              m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
               m_damaEntry->ResetVolumeBacklogPersistence ();
+              m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
               break;
 
             case SatEnums::DA_AVBDC:
-              m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
               m_damaEntry->ResetVolumeBacklogPersistence ();
+              m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
               break;
 
             default:
@@ -503,6 +503,8 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
           it->second.m_reqPerRc[i].m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+
+          NS_ASSERT (it->second.m_reqPerRc[i].m_minRbdcBytes <= it->second.m_reqPerRc[i].m_rbdcBytes);
 
           // write backlog requests traces starts ...
           std::stringstream head;

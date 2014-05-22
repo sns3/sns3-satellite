@@ -168,7 +168,7 @@ SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
 
   if (m_llsConf->GetDaRbdcAllowed (index) && (m_dynamicRatePersistence > 0) )
     {
-      minRbdc = std::max<uint16_t> (m_llsConf->GetDaMinimumServiceRateInKbps (index),  m_llsConf->GetDaConstantServiceRateInKbps (index) );
+      minRbdc = std::max<uint16_t> (m_llsConf->GetDaMinimumServiceRateInKbps (index),  GetCraInKbps (index) );
     }
 
   return minRbdc;
@@ -194,11 +194,11 @@ SatDamaEntry::UpdateRbdcInKbps (uint8_t index, uint16_t rateInKbps)
 
   if ( m_llsConf->GetDaRbdcAllowed (index) )
     {
-      double craRbdcSum = m_llsConf->GetDaConstantServiceRateInKbps (index) + rateInKbps;
+      double craRbdcSum = GetCraInKbps (index) + rateInKbps;
 
-      if (craRbdcSum < m_llsConf->GetDaMinimumServiceRateInKbps (index) )
+      if (craRbdcSum < GetMinRbdcInKbps (index) )
         {
-          m_dynamicRateRequestedInKbps[index] = m_llsConf->GetDaMinimumServiceRateInKbps (index) - m_llsConf->GetDaConstantServiceRateInKbps (index);
+          m_dynamicRateRequestedInKbps[index] = GetMinRbdcInKbps (index) - GetCraInKbps (index);
         }
       else if (craRbdcSum > m_llsConf->GetDaMaximumServiceRateInKbps (index))
         {
