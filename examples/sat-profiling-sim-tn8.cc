@@ -20,6 +20,12 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("sat-profiling-sim-tn8");
 
+void
+TimeTickerCallback ()
+{
+  std::cout << "Time: " << Simulator::Now ().GetSeconds () << "s" << std::endl;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -35,11 +41,11 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn8-profiling-input-attributes.xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
+//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn8-profiling-input-attributes.xml"));
+//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+//  ConfigStore inputConfig;
+//  inputConfig.ConfigureDefaults ();
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -164,12 +170,23 @@ main (int argc, char *argv[])
   std::stringstream filename;
   filename << "tn8-profiling-output-attributes-conf-" << profilingConf << "-uts-" << utsPerBeam << ".xml";
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureDefaults ();
-  outputConfig.ConfigureAttributes ();
+//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
+//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+//  ConfigStore outputConfig;
+//  outputConfig.ConfigureDefaults ();
+//  outputConfig.ConfigureAttributes ();
+
+  /**
+   * Install simple stdout time ticker
+   */
+
+  double t = 0.0;
+  while (t <= simLength)
+    {
+      Simulator::Schedule (Seconds (t), &TimeTickerCallback);
+      t = t + 1.0;
+    }
 
   /**
    * Run simulation
