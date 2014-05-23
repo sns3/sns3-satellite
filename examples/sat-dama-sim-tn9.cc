@@ -94,18 +94,27 @@ main (int argc, char *argv[])
       {
         Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 0"));
         Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (25.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.1));
         break;
       }
     case 1:
       {
         Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 1"));
         Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
         break;
       }
     case 2:
       {
         Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
         Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
+        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
         break;
       }
     default:
@@ -115,9 +124,6 @@ main (int argc, char *argv[])
       }
   }
 
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
   Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
   Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
   Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
