@@ -30,7 +30,7 @@ NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTraceContainer");
 
 namespace ns3 {
 
-//NS_OBJECT_ENSURE_REGISTERED (SatFadingExternalInputTraceContainer);
+NS_OBJECT_ENSURE_REGISTERED (SatFadingExternalInputTraceContainer);
 
 TypeId
 SatFadingExternalInputTraceContainer::GetTypeId (void)
@@ -75,8 +75,7 @@ TypeId SatFadingExternalInputTraceContainer::GetInstanceTypeId (void) const
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
  : m_inputMode (LIST_MODE),
-   m_utIndexFilesLoaded (false),
-   m_gwIndexFilesLoaded (false)
+   m_indexFilesLoaded (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -93,15 +92,29 @@ SatFadingExternalInputTraceContainer::~SatFadingExternalInputTraceContainer ()
 }
 
 void
+SatFadingExternalInputTraceContainer::LoadIndexFiles ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( !m_indexFilesLoaded )
+    {
+      ReadIndexFile (m_utRtnUpIndexFileName, m_utRtnUpFileNames);
+      ReadIndexFile (m_utFwdDownIndexFileName, m_utFwdDownFileNames);
+      ReadIndexFile (m_gwRtnDownIndexFileName, m_gwRtnDownFileNames);
+      ReadIndexFile (m_gwFwdUpIndexFileName, m_gwFwdUpFileNames);
+
+      m_indexFilesLoaded = true;
+    }
+}
+
+void
 SatFadingExternalInputTraceContainer::CreateUtFadingTrace (uint32_t utId, Ptr<MobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  if ( !m_utIndexFilesLoaded )
+  if ( !m_indexFilesLoaded )
     {
-      ReadIndexFile (m_utRtnUpIndexFileName, m_utRtnUpFileNames);
-      ReadIndexFile (m_utFwdDownIndexFileName, m_utFwdDownFileNames);
-      m_utIndexFilesLoaded = true;
+      LoadIndexFiles ();
     }
 
   Ptr<SatFadingExternalInputTrace> ftRet = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, m_utRtnUpFileNames, utId - 1, mobility);
@@ -118,11 +131,9 @@ SatFadingExternalInputTraceContainer::CreateGwFadingTrace (uint32_t gwId, Ptr<Mo
 {
   NS_LOG_FUNCTION (this << gwId);
 
-  if ( !m_gwIndexFilesLoaded )
+  if ( !m_indexFilesLoaded )
     {
-      ReadIndexFile (m_gwRtnDownIndexFileName, m_gwRtnDownFileNames);
-      ReadIndexFile (m_gwFwdUpIndexFileName, m_gwFwdUpFileNames);
-      m_gwIndexFilesLoaded = true;
+      LoadIndexFiles ();
     }
 
   Ptr<SatFadingExternalInputTrace> ftRet = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, m_gwRtnDownFileNames, gwId - 1, mobility);
@@ -209,18 +220,13 @@ SatFadingExternalInputTraceContainer::TestFadingTraces (uint32_t numOfUts, uint3
   uint32_t ueCount = m_utFadingMap.size ();
   uint32_t gwCount = m_gwFadingMap.size ();
 
-  if ( !m_gwIndexFilesLoaded )
+  if ( !m_indexFilesLoaded )
     {
       ReadIndexFile (m_gwRtnDownIndexFileName, m_gwRtnDownFileNames);
       ReadIndexFile (m_gwFwdUpIndexFileName, m_gwFwdUpFileNames);
-      m_gwIndexFilesLoaded = true;
-    }
-
-  if ( !m_utIndexFilesLoaded )
-    {
       ReadIndexFile (m_utRtnUpIndexFileName, m_utRtnUpFileNames);
       ReadIndexFile (m_utFwdDownIndexFileName, m_utFwdDownFileNames);
-      m_utIndexFilesLoaded = true;
+      m_indexFilesLoaded = true;
     }
 
   for (uint32_t i = 1; i <= numOfUts; i++)

@@ -154,14 +154,16 @@ private:
    */
   TraceInputContainer_t m_loadedTraces;
 
-  /// flag telling if UT specific index trace files are already loaded
-  bool m_utIndexFilesLoaded;
-
-  /// flag telling if GW specific index trace files are already loaded
-  bool m_gwIndexFilesLoaded;
+  /// flag telling if index trace files are already loaded
+  bool m_indexFilesLoaded;
 
   /// data path to find trace input files
   std::string m_dataPath;
+
+  /**
+   * Initialize index files
+   */
+  void LoadIndexFiles ();
 
   /**
    * Create new UT fading trace
