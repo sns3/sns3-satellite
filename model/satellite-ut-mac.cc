@@ -504,7 +504,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
       NS_LOG_LOGIC("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
       NS_LOG_LOGIC("Receiver " << m_nodeInfo->GetMacAddress ());
 
-      Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+      Mac48Address destAddress = macTag.GetDestAddress ();
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast () || destAddress.IsGroup ())
         {
           // Remove control msg tag
@@ -580,7 +580,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+        Mac48Address destAddress = macTag.GetDestAddress ();
         m_rxCallback (packet, destAddress);
         break;
       }

@@ -145,7 +145,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
       NS_LOG_LOGIC ("Receiver " << m_nodeInfo->GetMacAddress ());
 
       // If the packet is intended for this receiver
-      Mac48Address destAddress = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+      Mac48Address destAddress = macTag.GetDestAddress ();
 
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
@@ -159,7 +159,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  Mac48Address sourceAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
+                  Mac48Address sourceAddress = macTag.GetSourceAddress ();
 
                   ReceiveSignalingPacket (sourceAddress, *i);
                 }
@@ -171,7 +171,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           else
             {
               // Pass the source address to LLC
-              m_rxCallback (*i, Mac48Address::ConvertFrom (macTag.GetSourceAddress ()));
+              m_rxCallback (*i, macTag.GetSourceAddress ());
             }
         }
       else
@@ -286,7 +286,7 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        Mac48Address sourceAddress = Mac48Address::ConvertFrom (macTag.GetSourceAddress ());
+        Mac48Address sourceAddress = macTag.GetSourceAddress ();
         m_rxCallback (packet, sourceAddress);
         break;
       }

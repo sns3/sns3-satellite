@@ -184,8 +184,8 @@ public:
     SatMacTag tag;
     if (p->PeekPacketTag (tag))
       {
-        oss << Mac48Address::ConvertFrom(tag.GetSourceAddress ()) << " ";
-        oss << Mac48Address::ConvertFrom(tag.GetDestAddress ()) << " ";
+        oss << tag.GetSourceAddress () << " ";
+        oss << tag.GetDestAddress () << " ";
       }
     return oss.str ();
   }

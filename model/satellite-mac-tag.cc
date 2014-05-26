@@ -56,13 +56,13 @@ SatMacTag::GetInstanceTypeId () const
 }
 
 void
-SatMacTag::SetDestAddress (Address dest)
+SatMacTag::SetDestAddress (Mac48Address dest)
 {
   NS_LOG_FUNCTION (this << dest);
   m_destAddress = dest;
 }
 
-Address
+Mac48Address
 SatMacTag::GetDestAddress () const
 {
   NS_LOG_FUNCTION (this);
@@ -70,13 +70,13 @@ SatMacTag::GetDestAddress () const
 }
 
 void
-SatMacTag::SetSourceAddress (Address source)
+SatMacTag::SetSourceAddress (Mac48Address source)
 {
   NS_LOG_FUNCTION (this << source);
   m_sourceAddress = source;
 }
 
-Address
+Mac48Address
 SatMacTag::GetSourceAddress () const
 {
   NS_LOG_FUNCTION (this);
@@ -88,24 +88,20 @@ SatMacTag::GetSerializedSize () const
 {
   NS_LOG_FUNCTION (this);
 
-  return ( m_destAddress.GetLength() + m_sourceAddress.GetLength() + 2 * sizeof (uint32_t) );
+  return ( 2 * ADDRESS_LENGHT );
 }
 void
 SatMacTag::Serialize (TagBuffer i) const
 {
   NS_LOG_FUNCTION (this << &i);
 
-  uint8_t buff[Address::MAX_SIZE];
-  uint32_t len = m_destAddress.CopyTo(buff);
+  uint8_t buff[ADDRESS_LENGHT];
 
-  i.WriteU32 (len);
-  i.Write (buff, len);
+  m_destAddress.CopyTo (buff);
+  i.Write (buff, ADDRESS_LENGHT);
 
-  len = m_sourceAddress.CopyTo(buff);
-  i.WriteU32 (len);
-
-  m_sourceAddress.CopyTo(buff);
-  i.Write (buff, len);
+  m_sourceAddress.CopyTo (buff);
+  i.Write (buff, ADDRESS_LENGHT);
 }
 
 void
@@ -113,15 +109,13 @@ SatMacTag::Deserialize (TagBuffer i)
 {
   NS_LOG_FUNCTION (this << &i);
 
-  uint8_t buff[Address::MAX_SIZE];
-  uint32_t len = i.ReadU32();
+  uint8_t buff[ADDRESS_LENGHT];
 
-  i.Read (buff, len);
-  m_destAddress.CopyFrom(buff, len);
+  i.Read (buff, ADDRESS_LENGHT);
+  m_destAddress.CopyFrom (buff);
 
-  len = i.ReadU32();
-  i.Read (buff, len);
-  m_sourceAddress.CopyFrom(buff, len);
+  i.Read (buff, ADDRESS_LENGHT);
+  m_sourceAddress.CopyFrom (buff);
 }
 
 void

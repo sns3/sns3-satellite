@@ -21,7 +21,7 @@
 #ifndef SATELLITE_MAC_TAG_H
 #define SATELLITE_MAC_TAG_H
 
-#include "ns3/address.h"
+#include "ns3/mac48-address.h"
 #include "ns3/tag.h"
 
 namespace ns3 {
@@ -42,25 +42,25 @@ public:
    * \brief Set destination MAC address
    * \param dest Destination MAC address
    */
-  void SetDestAddress (Address dest);
+  void SetDestAddress (Mac48Address dest);
 
   /**
    * \brief Get destination MAC address
    * \return Destination MAC address
    */
-  Address GetDestAddress (void) const;
+  Mac48Address GetDestAddress (void) const;
 
   /**
    * \brief Set source MAC address
    * \param source Source MAC address
    */
-  void SetSourceAddress (Address source);
+  void SetSourceAddress (Mac48Address source);
 
   /**
    * \brief Get source MAC address
    * \return Source MAC address
    */
-  Address GetSourceAddress (void) const;
+  Mac48Address GetSourceAddress (void) const;
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -70,8 +70,10 @@ public:
   virtual void Print (std::ostream &os) const;
 
 private:
-  Address   m_destAddress;
-  Address   m_sourceAddress;
+  static const uint32_t ADDRESS_LENGHT = 6;
+
+  Mac48Address   m_destAddress;
+  Mac48Address   m_sourceAddress;
 };
 
 /**

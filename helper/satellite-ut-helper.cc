@@ -461,7 +461,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetAttribute("Scheduler", PointerValue (utScheduler));
 
   // Create a node info to all the protocol layers
-  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), Mac48Address::ConvertFrom (addr));
+  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), addr);
   dev->SetNodeInfo (nodeInfo);
   llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);

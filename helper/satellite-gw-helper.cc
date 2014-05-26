@@ -322,7 +322,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   phy->Initialize();
 
   // Create a node info to all the protocol layers
-  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), Mac48Address::ConvertFrom (addr));
+  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), addr);
   dev->SetNodeInfo (nodeInfo);
   llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);

@@ -567,14 +567,13 @@ SatStatsRtnSinrHelper::SinrCallback (double sinrDb, const Address &from)
   else
     {
       // Determine the identifier associated with the sender address.
-      const Address addr = Mac48Address::ConvertFrom (from);
-      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (addr);
+      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (from);
 
       if (it == m_identifierMap.end ())
         {
           NS_LOG_WARN (this << " discarding a SINR trace of " << sinrDb << " dB"
                             << " from statistics collection because of"
-                            << " unknown sender address " << addr);
+                            << " unknown sender address " << from);
         }
       else
         {

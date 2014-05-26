@@ -189,7 +189,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
                                 NS_FATAL_ERROR ("MAC tag was not found from the packet!");
                               }
 
-                            Mac48Address dest = Mac48Address::ConvertFrom (macTag.GetDestAddress ());
+                            Mac48Address dest = macTag.GetDestAddress ();
 
                             // If the packet destination is the same as the receiver MAC
                             if (dest == (*rxPhyIterator)->GetAddress () || dest.IsBroadcast () || dest.IsGroup ())
@@ -561,7 +561,7 @@ SatChannel::GetSourceAddress (Ptr<SatSignalParameters> rxParams)
 
   (*i)->PeekPacketTag (tag);
 
-  return Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+  return tag.GetSourceAddress ();
 }
 
 void

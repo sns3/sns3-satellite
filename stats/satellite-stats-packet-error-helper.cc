@@ -275,16 +275,14 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
     }
   else
     {
-      const Mac48Address addr = Mac48Address::ConvertFrom (from);
-
       // Determine the identifier associated with the sender address.
-      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (addr);
+      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (from);
 
       if (it == m_identifierMap.end ())
         {
           NS_LOG_WARN (this << " discarding " << nPackets << " packets"
                             << " from statistics collection because of"
-                            << " unknown sender address " << addr);
+                            << " unknown sender address " << from);
         }
       else
         {

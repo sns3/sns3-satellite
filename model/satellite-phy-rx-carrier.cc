@@ -316,8 +316,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               SatMacTag tag;
               (*i)->PeekPacketTag (tag);
 
-              dest = Mac48Address::ConvertFrom (tag.GetDestAddress ());
-              source = Mac48Address::ConvertFrom (tag.GetSourceAddress ());
+              dest = tag.GetDestAddress ();
+              source = tag.GetSourceAddress ();
 
               if (( dest == m_ownAddress ))
                 {
