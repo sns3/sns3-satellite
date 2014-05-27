@@ -179,7 +179,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
                       tbtpContainer.push_back (tptp);
                       SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
 
-                      m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+                      m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> (), TracedCallback<uint32_t, long> ());
 
                       CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, false, fcaEnabled, acmEnabled);
 
@@ -190,7 +190,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
                       tbtpContainer.push_back (tptp);
                       utAllocContainer.clear ();
 
-                      m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+                      m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> (), TracedCallback<uint32_t, long> ());
 
                       CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, true, fcaEnabled, acmEnabled);
                     }
@@ -230,7 +230,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
               tbtpContainer.push_back (tptp);
               SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
 
-              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> (), TracedCallback<uint32_t, long> ());
 
               CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, false, fcaEnabled, acmEnabled);
 
@@ -241,7 +241,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
               tbtpContainer.push_back (tptp);
               utAllocContainer.clear ();
 
-              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> ());
+              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, true, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> (), TracedCallback<uint32_t, long> () );
 
               CheckSingleUtTestResults (bytesReq, req, allocationResult, configType, tbtpContainer, utAllocContainer, true, fcaEnabled, acmEnabled);
             }

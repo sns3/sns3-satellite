@@ -208,9 +208,10 @@ public:
    * \param rcBasedAllocationEnabled If time slot generated per RC
    * \param waveformTrace Wave form trace callback
    * \param utLoadTrace UT load per the frame trace callback
+   * \param loadTrace Load per the frame trace callback
    */
   void GenerateTimeSlots ( SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
-                           bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace);
+                           bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace, TracedCallback<uint32_t, long> loadTrace);
 
 
 private:

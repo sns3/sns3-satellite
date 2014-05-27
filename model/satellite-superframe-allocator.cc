@@ -125,7 +125,8 @@ SatSuperframeAllocator::RemoveAllocations ()
 }
 
 void
-SatSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace)
+SatSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
+                                           TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace, TracedCallback<uint32_t, long> loadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -136,7 +137,7 @@ SatSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t
 
   for (FrameAllocatorContainer_t::iterator it = m_frameAllocators.begin (); it != m_frameAllocators.end (); it++  )
     {
-      (*it)->GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer, m_rcBasedAllocationEnabled, waveformTrace, utLoadTrace);
+      (*it)->GenerateTimeSlots (tbtpContainer, maxSizeInBytes, utAllocContainer, m_rcBasedAllocationEnabled, waveformTrace, utLoadTrace, loadTrace);
     }
 }
 

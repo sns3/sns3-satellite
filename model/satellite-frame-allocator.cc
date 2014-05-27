@@ -476,7 +476,7 @@ SatFrameAllocator::PreAllocateSymbols (double targetLoad, bool fcaEnabled)
 
 void
 SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
-                                      bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace)
+                                      bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace, TracedCallback<uint32_t, long> loadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -498,6 +498,7 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
   std::vector<uint16_t>::const_iterator currentCarrier = carriers.begin ();
   int64_t carrierSymbolsToUse = m_maxSymbolsPerCarrier;
   uint32_t utCount = 0;
+  uint32_t symbolsAllocated = 0;
 
   for (std::vector<Address>::iterator it = uts.begin (); (it != uts.end ()) && (currentCarrier != carriers.end ()); it++ )
     {
@@ -567,9 +568,13 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
               tbtpToFill->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
 
               // store needed information to UT allocation container
+              Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ());
+
               UtAllocInfoContainer_t::iterator utAlloc = GetUtAllocItem (utAllocContainer, *it);
-              utAlloc->second.first.at(*currentRcIndex) += m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ())->GetPayloadInBytes ();
+              utAlloc->second.first.at(*currentRcIndex) += waveform->GetPayloadInBytes ();
               utAlloc->second.second |= m_utAllocs[*it].m_allocation.m_ctrlSlotPresent;
+
+              symbolsAllocated += waveform->GetBurstLengthInSymbols ();
             }
 
           // select new carrier to use
@@ -600,8 +605,11 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
       m_utAllocs[*it].m_allocation.m_ctrlSlotPresent = false;
     }
 
-  // trace out UT load
+  // trace out frame UT load
   utLoadTrace ((uint32_t) m_frameId, (long) utCount);
+
+  // trace out frame load
+  loadTrace ((uint32_t) m_frameId, (long) (symbolsAllocated / m_totalSymbolsInFrame) );
 }
 
 void SatFrameAllocator::ShareSymbols (bool fcaEnabled)

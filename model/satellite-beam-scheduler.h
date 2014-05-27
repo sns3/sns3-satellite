@@ -379,9 +379,14 @@ private:
   TracedCallback<uint32_t> m_waveformTrace;
 
   /**
-   * Trace count of UTs schdeduled per Frame.
+   * Trace count of UTs scheduled per Frame.
    */
   TracedCallback<uint32_t, long> m_frameUtLoadTrace;
+
+  /**
+   * Trace frame load ratio.
+   */
+  TracedCallback<uint32_t, long> m_frameLoadTrace;
 
   /**
    * Dispose actions for SatBeamScheduler.

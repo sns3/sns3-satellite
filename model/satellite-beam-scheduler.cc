@@ -187,7 +187,9 @@ SatBeamScheduler::GetTypeId (void)
                       MakeTraceSourceAccessor (&SatBeamScheduler::m_waveformTrace))
     .AddTraceSource ("FrameUtLoadTrace", "Trace UT load per the frame.",
                       MakeTraceSourceAccessor (&SatBeamScheduler::m_frameUtLoadTrace))
-  ;
+    .AddTraceSource ("FrameLoadTrace", "Trace load per the frame allocates symbols / total symbols.",
+                      MakeTraceSourceAccessor (&SatBeamScheduler::m_frameLoadTrace))
+;
   return tid;
 }
 
@@ -197,7 +199,8 @@ SatBeamScheduler::SatBeamScheduler ()
     m_superFrameCounter (0),
     m_txCallback (0),
     m_cnoEstimatorMode (SatCnoEstimator::LAST),
-    m_maxBbFrameSize (0)
+    m_maxBbFrameSize (0),
+    m_controlSlotsEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -401,7 +404,7 @@ SatBeamScheduler::Schedule ()
       SatFrameAllocator::UtAllocInfoContainer_t utAllocs;
 
         // Add DA slots to TBTP(s)
-      m_superframeAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace);
+      m_superframeAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace, m_frameLoadTrace);
 
       // update VBDC counter of the UT/RCs
       UpdateDamaEntriesWithAllocs (utAllocs);
