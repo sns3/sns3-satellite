@@ -80,7 +80,7 @@ SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
   NS_LOG_FUNCTION (this);
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
-  m_dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/fadingtraces/";
+  m_dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/ext-fadingtraces/input/";
 }
 
 SatFadingExternalInputTraceContainer::~SatFadingExternalInputTraceContainer ()
