@@ -582,6 +582,12 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
             {
               carrierSymbolsToUse = m_maxSymbolsPerCarrier;
               currentCarrier++;
+
+              if ( currentCarrier == carriers.end () )
+                {
+                  // stop if no more carriers left
+                  utSymbolsLeft = 0;
+                }
             }
 
           // select new RC to use
@@ -589,14 +595,20 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
             {
               currentRcIndex++;
 
-              if ( currentRcIndex != rcIndices.end () )
+              if ( currentRcIndex == rcIndices.end () )
+                {
+                  // stop if last RC handled
+                  utSymbolsLeft = 0;
+                }
+              else
                 {
                   rcSymbolsLeft = m_utAllocs[*it].m_allocation.m_allocInfoPerRc[*currentRcIndex].GetTotalSymbols ();
+
                 }
             }
 
           // carrier limit for UT reached, so we need to stop because time slot cannot generated anymore
-          if ( utSymbolsToUse <= 0)
+          if ( (utSymbolsToUse <= 0 ) || (currentCarrier == carriers.end ()) )
             {
               utSymbolsLeft = 0;
             }
