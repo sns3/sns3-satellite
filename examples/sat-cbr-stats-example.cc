@@ -314,9 +314,12 @@ main (int argc, char *argv[])
 //  s->AddPerBeamBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 //  s->AddGlobalBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-//  s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  s->AddPerGwFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  s->AddGlobalFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerGwFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddPerGwFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  s->AddGlobalFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -352,8 +355,9 @@ main (int argc, char *argv[])
   s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
   s->AddPerGwBackloggedRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- Cbr-stats-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);

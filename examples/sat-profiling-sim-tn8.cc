@@ -155,7 +155,7 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-profiling-sim-tn8 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);

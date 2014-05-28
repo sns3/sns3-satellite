@@ -222,7 +222,7 @@ main (int argc, char *argv[])
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerBeamFrameLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);

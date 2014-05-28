@@ -476,7 +476,7 @@ SatFrameAllocator::PreAllocateSymbols (double targetLoad, bool fcaEnabled)
 
 void
 SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, UtAllocInfoContainer_t& utAllocContainer,
-                                      bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace, TracedCallback<uint32_t, long> loadTrace)
+                                      bool rcBasedAllocationEnabled, TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -606,10 +606,10 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
     }
 
   // trace out frame UT load
-  utLoadTrace ((uint32_t) m_frameId, (long) utCount);
+  utLoadTrace ((uint32_t) m_frameId, utCount);
 
   // trace out frame load
-  loadTrace ((uint32_t) m_frameId, (long) (symbolsAllocated / m_totalSymbolsInFrame) );
+  loadTrace ((uint32_t) m_frameId, symbolsAllocated / m_totalSymbolsInFrame );
 }
 
 void SatFrameAllocator::ShareSymbols (bool fcaEnabled)

@@ -90,7 +90,7 @@ public:
    * \param utLoadTrace UT load per the frame trace callback
    */
   void GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
-                          TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, long> utLoadTrace, TracedCallback<uint32_t, long> loadTrace);
+                          TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace);
 
 private:
   /**

@@ -381,12 +381,12 @@ private:
   /**
    * Trace count of UTs scheduled per Frame.
    */
-  TracedCallback<uint32_t, long> m_frameUtLoadTrace;
+  TracedCallback<uint32_t, uint32_t> m_frameUtLoadTrace;
 
   /**
    * Trace frame load ratio.
    */
-  TracedCallback<uint32_t, long> m_frameLoadTrace;
+  TracedCallback<uint32_t, double> m_frameLoadTrace;
 
   /**
    * Dispose actions for SatBeamScheduler.

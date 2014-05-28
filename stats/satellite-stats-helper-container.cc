@@ -81,7 +81,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - [Global,PerGw,PerBeam] BackloggedRequest
- * - [Global,PerGw,PerBeam] FrameLoad
+ * - [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - [Global,PerGw,PerBeam] WaveformUsage
  *
  * Also check the Doxygen documentation of this class for more information.
@@ -396,22 +396,40 @@ SatStatsHelperContainer::GetTypeId ()
                                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Frame load statistics.
-    .AddAttribute ("GlobalFrameLoad",
-                   "Enable the output of frame load statistics",
+    .AddAttribute ("GlobalFrameSymbolLoad",
+                   "Enable the output of frame load (in ratio of allocated symbols) statistics ",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFrameLoad),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFrameSymbolLoad),
                    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
                                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerGwFrameLoad",
-                   "Enable the output of frame load statistics",
+    .AddAttribute ("PerGwFrameSymbolLoad",
+                   "Enable the output of frame load (in ratio of allocated symbols) statistics",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFrameLoad),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFrameSymbolLoad),
                    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
                                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerBeamFrameLoad",
-                   "Enable the output of frame load statistics",
+    .AddAttribute ("PerBeamFrameSymbolLoad",
+                   "Enable the output of frame load (in ratio of allocated symbols) statistics",
                    EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameLoad),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameSymbolLoad),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("GlobalFrameUserLoad",
+                   "Enable the output of frame load (in number of scheduled users) statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFrameUserLoad),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("PerGwFrameUserLoad",
+                   "Enable the output of frame load (in number of scheduled users) statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFrameUserLoad),
+                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    .AddAttribute ("PerBeamFrameUserLoad",
+                   "Enable the output of frame load (in number of scheduled users) statistics",
+                   EnumValue (SatStatsHelper::OUTPUT_NONE),
+                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameUserLoad),
                    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
                                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
 
@@ -484,7 +502,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
  * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
- * - Add [Global,PerGw,PerBeam] FrameLoad
+ * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - Add [Global,PerGw,PerBeam] WaveformUsage
  *
  * Also check the Doxygen documentation of this class for more information.
@@ -875,9 +893,12 @@ SAT_STATS_PER_GW_METHOD_DEFINITION      (BackloggedRequest, "backlogged-request"
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (BackloggedRequest, "backlogged-request")
 
 // Frame load statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION      (FrameLoad, "frame-load")
-SAT_STATS_PER_GW_METHOD_DEFINITION      (FrameLoad, "frame-load")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FrameLoad, "frame-load")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FrameSymbolLoad, "frame-symbol-load")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FrameSymbolLoad, "frame-symbol-load")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FrameSymbolLoad, "frame-symbol-load")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FrameUserLoad, "frame-user-load")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FrameUserLoad, "frame-user-load")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FrameUserLoad, "frame-user-load")
 
 // Waveform usage statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (WaveformUsage, "waveform-usage")

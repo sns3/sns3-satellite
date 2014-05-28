@@ -33,11 +33,11 @@
 #include <ns3/satellite-helper.h>
 
 #include <ns3/data-collection-object.h>
+#include <ns3/satellite-frame-symbol-load-probe.h>
+#include <ns3/satellite-frame-user-load-probe.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
-#include <sstream>
 #include <utility>
-#include <list>
 
 #include "satellite-stats-frame-load-helper.h"
 
@@ -48,8 +48,32 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatStatsFrameLoadHelper);
 
+std::string // static
+SatStatsFrameLoadHelper::GetUnitTypeName (SatStatsFrameLoadHelper::UnitType_t unitType)
+{
+  switch (unitType)
+    {
+    case SatStatsFrameLoadHelper::UNIT_SYMBOLS:
+      return "UNIT_SYMBOLS";
+    case SatStatsFrameLoadHelper::UNIT_USERS:
+      return "UNIT_USERS";
+    default:
+      NS_FATAL_ERROR ("SatStatsFrameLoadHelper - Invalid unit type");
+      break;
+    }
+
+  NS_FATAL_ERROR ("SatStatsFrameLoadHelper - Invalid unit type");
+  return "";
+}
+
+
 SatStatsFrameLoadHelper::SatStatsFrameLoadHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+  : SatStatsHelper (satHelper),
+    m_unitType (SatStatsFrameLoadHelper::UNIT_SYMBOLS),
+    m_shortLabel (""),
+    m_longLabel (""),
+    m_objectTraceSourceName (""),
+    m_probeTraceSourceName ("")
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -72,6 +96,41 @@ SatStatsFrameLoadHelper::GetTypeId ()
 
 
 void
+SatStatsFrameLoadHelper::SetUnitType (SatStatsFrameLoadHelper::UnitType_t unitType)
+{
+  NS_LOG_FUNCTION (this << GetUnitTypeName (unitType));
+  m_unitType = unitType;
+
+  // Update unit-specific attributes.
+  if (unitType == SatStatsFrameLoadHelper::UNIT_SYMBOLS)
+    {
+      m_shortLabel = "allocated_symbol_ratio";
+      m_longLabel = "Number of allocated symbols over total number of symbols";
+      m_objectTraceSourceName = "FrameLoadTrace";
+      m_probeTraceSourceName = "Output";
+    }
+  else if (unitType == SatStatsFrameLoadHelper::UNIT_USERS)
+    {
+      m_shortLabel = "allocated_users";
+      m_longLabel = "Number of scheduled users";
+      m_objectTraceSourceName = "FrameUtLoadTrace";
+      m_probeTraceSourceName = "Output";
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatStatsFrameLoadHelper - Invalid unit type");
+    }
+}
+
+
+SatStatsFrameLoadHelper::UnitType_t
+SatStatsFrameLoadHelper::GetUnitType () const
+{
+  return m_unitType;
+}
+
+
+void
 SatStatsFrameLoadHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
@@ -90,14 +149,12 @@ SatStatsFrameLoadHelper::DoInstall ()
     }
 
   // Setup aggregator.
+  const std::string heading = "% identifier_and_frame_number " + m_shortLabel;
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                    "OutputFileName", StringValue (GetName ()),
                                    "MultiFileMode", BooleanValue (false),
                                    "EnableContextPrinting", BooleanValue (true),
-                                   "GeneralHeading", StringValue ("% identifier_and_frame_number usage_count"));
-
-  Callback<void, std::string, uint32_t, long> frameLoadCallback
-      = MakeCallback (&SatStatsFrameLoadHelper::FrameLoadCallback, this);
+                                   "GeneralHeading", StringValue (heading));
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
@@ -105,53 +162,116 @@ SatStatsFrameLoadHelper::DoInstall ()
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
   NS_ASSERT (ncc != 0);
   std::list<uint32_t> beams = beamHelper->GetBeams ();
+  bool ret = false;
 
   for (std::list<uint32_t>::const_iterator it = beams.begin ();
        it != beams.end (); ++it)
     {
-      std::ostringstream context;
-      context << GetIdentifierForBeam (*it);
+      if (m_unitType == SatStatsFrameLoadHelper::UNIT_SYMBOLS)
+        {
+          ret = SetupProbe<SatFrameSymbolLoadProbe> (ncc->GetBeamScheduler (*it),
+                                                     GetIdentifierForBeam (*it),
+                                                     &SatStatsFrameLoadHelper::FrameSymbolLoadCallback);
+        }
+      else
+        {
+          NS_ASSERT_MSG (m_unitType == SatStatsFrameLoadHelper::UNIT_USERS,
+                         "Invalid unit type");
+          ret = SetupProbe<SatFrameUserLoadProbe> (ncc->GetBeamScheduler (*it),
+                                                   GetIdentifierForBeam (*it),
+                                                   &SatStatsFrameLoadHelper::FrameUserLoadCallback);
+        }
 
-      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (*it);
-      NS_ASSERT_MSG (s != 0, "Error finding beam " << *it);
-      const bool ret = s->TraceConnect ("FrameUtLoadTrace",
-                                        context.str (), frameLoadCallback);
-      NS_ASSERT_MSG (ret,
-                     "Error connecting to FrameUtLoadTrace of beam " << *it);
-      NS_UNUSED (ret);
-      NS_LOG_INFO (this << " successfully connected"
-                        << " with beam " << *it);
-    }
+      if (ret)
+        {
+          NS_LOG_INFO (this << " successfully connected"
+                            << " with beam " << *it);
+        }
+      else
+        {
+          NS_LOG_WARN (this << " unable to connect to beam " << *it);
+        }
+
+    } // end of `for (it: beams)`
+
 
 } // end of `void DoInstall ();`
 
 
 void
-SatStatsFrameLoadHelper::FrameLoadCallback (std::string context,
-                                            uint32_t frameId, long utCount)
+SatStatsFrameLoadHelper::FrameSymbolLoadCallback (std::string context,
+                                                  uint32_t frameId,
+                                                  double loadRatio)
+{
+  //NS_LOG_FUNCTION (this << context << frameId << loadRatio);
+
+  // Get the right collector for this frame ID and identifier.
+  Ptr<ScalarCollector> collector = GetCollector (frameId, context);
+  NS_ASSERT_MSG (collector != 0,
+                 "Unable to get/create collector"
+                     << " for frame ID "  << frameId
+                     << " and beam " << context);
+
+  // Pass the sample to the collector.
+  collector->TraceSinkDouble (0, loadRatio);
+}
+
+
+void
+SatStatsFrameLoadHelper::FrameUserLoadCallback (std::string context,
+                                                uint32_t frameId,
+                                                uint32_t utCount)
 {
   //NS_LOG_FUNCTION (this << context << frameId << utCount);
 
+  // Get the right collector for this frame ID and identifier.
+  Ptr<ScalarCollector> collector = GetCollector (frameId, context);
+  NS_ASSERT_MSG (collector != 0,
+                 "Unable to get/create collector"
+                     << " for frame ID "  << frameId
+                     << " and identifier " << context);
+
+  // Pass the sample to the collector.
+  collector->TraceSinkUinteger32 (0, utCount);
+}
+
+
+Ptr<ScalarCollector>
+SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
+{
+  //NS_LOG_FUNCTION (this << frameId);
+
   // convert context to number
-  std::stringstream ss (context);
-  uint32_t identifier;
-  if (!(ss >> identifier))
+  std::stringstream ss (identifier);
+  uint32_t identifierNum;
+  if (!(ss >> identifierNum))
     {
-      NS_FATAL_ERROR ("Cannot convert '" << context << "' to number");
+      NS_FATAL_ERROR ("Cannot convert '" << identifier << "' to number");
     }
 
   std::map<uint32_t, CollectorMap>::iterator it = m_collectors.find (frameId);
   if (it == m_collectors.end ())
     {
       // Newly discovered frame ID
-      NS_LOG_LOGIC (this << " Creating new collectors for frame ID " << frameId);
+      uint32_t n = 0;
       CollectorMap collectorMap;
       collectorMap.SetType ("ns3::ScalarCollector");
-      collectorMap.SetAttribute ("InputDataType",
-                                 EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER));
-      collectorMap.SetAttribute ("OutputType",
-                                 EnumValue (ScalarCollector::OUTPUT_TYPE_SUM));
-      uint32_t n = 0;
+      if (m_unitType == SatStatsFrameLoadHelper::UNIT_SYMBOLS)
+        {
+          collectorMap.SetAttribute ("InputDataType",
+                                     EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+          collectorMap.SetAttribute ("OutputType",
+                                     EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        }
+      else
+        {
+          NS_ASSERT_MSG (m_unitType == SatStatsFrameLoadHelper::UNIT_USERS,
+                         "Invalid unit type");
+          collectorMap.SetAttribute ("InputDataType",
+                                     EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER));
+          collectorMap.SetAttribute ("OutputType",
+                                     EnumValue (ScalarCollector::OUTPUT_TYPE_SUM));
+        }
 
       switch (GetIdentifierType ())
         {
@@ -218,16 +338,69 @@ SatStatsFrameLoadHelper::FrameLoadCallback (std::string context,
   NS_ASSERT (it != m_collectors.end ());
 
   // Find the collector with the right identifier.
-  Ptr<DataCollectionObject> collector = it->second.Get (identifier);
+  Ptr<DataCollectionObject> collector = it->second.Get (identifierNum);
   NS_ASSERT_MSG (collector != 0,
                  "Unable to find collector with identifier " << identifier);
   Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-  NS_ASSERT (c != 0);
+  return c;
 
-  // Pass the sample to the collector.
-  c->TraceSinkUinteger32 (0, static_cast<uint32_t> (utCount));
+} // `Ptr<ScalarCollector> GetCollector (uint32_t, std::string)`
 
-} // end of `void FrameLoadCallback (std::string, uint32_t, long)`
+
+// IN SYMBOL UNIT /////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFrameSymbolLoadHelper);
+
+SatStatsFrameSymbolLoadHelper::SatStatsFrameSymbolLoadHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsFrameLoadHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetUnitType (SatStatsFrameLoadHelper::UNIT_SYMBOLS);
+}
+
+
+SatStatsFrameSymbolLoadHelper::~SatStatsFrameSymbolLoadHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFrameSymbolLoadHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFrameSymbolLoadHelper")
+    .SetParent<SatStatsFrameLoadHelper> ()
+  ;
+  return tid;
+}
+
+
+// IN USER UNIT ///////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFrameUserLoadHelper);
+
+SatStatsFrameUserLoadHelper::SatStatsFrameUserLoadHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsFrameLoadHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetUnitType (SatStatsFrameLoadHelper::UNIT_USERS);
+}
+
+
+SatStatsFrameUserLoadHelper::~SatStatsFrameUserLoadHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFrameUserLoadHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFrameUserLoadHelper")
+    .SetParent<SatStatsFrameLoadHelper> ()
+  ;
+  return tid;
+}
 
 
 } // end of namespace ns3
