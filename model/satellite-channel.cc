@@ -404,7 +404,7 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
   // get external fading input trace
   if (m_enableExternalFadingInputTrace)
     {
-      rxParams->m_rxPower_W *= GetExternalFadingTrace (rxParams, phyRx);
+      rxParams->m_rxPower_W /= GetExternalFadingTrace (rxParams, phyRx);
     }
 }
 
@@ -449,7 +449,8 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 
   double txAntennaGain_W = 0.0;
   double rxAntennaGain_W = 0.0;
-  double fading = 0.0;
+  double markovFading = 0.0;
+  double extFading = 1.0;
 
   // use always UT's or GW's position when getting antenna gain
   switch (m_channelType)
@@ -459,7 +460,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       {
         txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (rxMobility);
         rxAntennaGain_W = phyRx->GetAntennaGain (rxMobility);
-        fading = phyRx->GetFadingValue (phyRx->GetDevice ()->GetAddress (),m_channelType);
+        markovFading = phyRx->GetFadingValue (phyRx->GetDevice ()->GetAddress (), m_channelType);
         break;
       }
     case SatEnums::RETURN_USER_CH:
@@ -467,7 +468,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       {
         txAntennaGain_W = rxParams->m_phyTx->GetAntennaGain (txMobility);
         rxAntennaGain_W = phyRx->GetAntennaGain (txMobility);
-        fading = rxParams->m_phyTx->GetFadingValue (GetSourceAddress (rxParams),m_channelType);
+        markovFading = rxParams->m_phyTx->GetFadingValue (GetSourceAddress (rxParams), m_channelType);
         break;
       }
     default:
@@ -477,22 +478,30 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
       }
   }
 
-  // get external fading input trace
+  /**
+   * Get the external (weather) fading trace value from the external
+   * fading container. The external fading is considered to be loss, thus
+   * it is taken into account at the end of the function by dividing in
+   * linear format.
+   */
   if (m_enableExternalFadingInputTrace)
     {
-      fading *= GetExternalFadingTrace (rxParams, phyRx);
+      extFading = GetExternalFadingTrace (rxParams, phyRx);
     }
 
-  // save fading output trace
+  /**
+   * Do fading output trace. Note, that the external fading is not utilized
+   * in fading output, but only the s.c. internal (Markov) fading provided
+   * by the simulator.
+   */
   if (m_enableFadingOutputTrace)
     {
-      DoFadingOutputTrace (rxParams, phyRx, fading);
+      DoFadingOutputTrace (rxParams, phyRx, markovFading);
     }
 
   // get (calculate) free space loss and RX power and set it to RX params
   double rxPower_W = (rxParams->m_txPower_W * txAntennaGain_W) / m_freeSpaceLoss->GetFsl (txMobility, rxMobility, rxParams->m_carrierFreq_hz);
-  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses () * fading;
-
+  rxParams->m_rxPower_W = rxPower_W * rxAntennaGain_W / phyRx->GetLosses () * markovFading / extFading;
 }
 
 double
