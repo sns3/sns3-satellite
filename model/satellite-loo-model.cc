@@ -143,12 +143,12 @@ SatLooModel::ConstructDirectSignalOscillators ()
           /// 1b. Initiate rotation speed:
           double omega = 2.0 * M_PI * m_looParameters[i][5] * std::cos (alpha);
           /// 2. Initiate amplitude:
-          double psi = m_normalRandomVariable->GetValue ();
-          double amplitude = (m_looParameters[i][0] + (m_looParameters[i][1] * psi));
-          amplitude = pow (10,amplitude / 20);
-          amplitude = amplitude / m_looParameters[i][3];
+          /// TODO: Direct signal amplitude calculations will need to be verified, especially applying the std. deviation with multiple oscillators
+          double amplitude = m_normalRandomVariable->GetValue (m_looParameters[i][0], m_looParameters[i][1]);
+          amplitude = pow (10,amplitude / 10) / m_looParameters[i][3];
+
           /// 3. Construct oscillator:
-          oscillators.push_back (CreateObject<SatFadingOscillator> ( amplitude, phi, omega));
+          oscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
         }
       m_directSignalOscillators.push_back (oscillators);
     }
@@ -190,7 +190,7 @@ SatLooModel::GetChannelGainDb ()
 {
   NS_LOG_FUNCTION (this);
 
-  double tempChannelGainDb = 20.0 * std::log10 (GetChannelGain ());
+  double tempChannelGainDb = 10.0 * std::log10 (GetChannelGain ());
   NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
   return tempChannelGainDb;
 }

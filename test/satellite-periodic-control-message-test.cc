@@ -48,7 +48,9 @@ using namespace ns3;
  * This case tests successful transmission of UDP packets from UT connected user
  * to GW connected user in simple scenario and using CRDSA only.
  *  1.  Simple test scenario set with helper
- *  2.  A single packet is transmitted from Node-2 UDP application to Node-1 UDP receiver with only CRA enabled.
+ *  2.  A single data packet is generated
+ *  3.  Capacity request is generated for the packet and transmitted from Node-2 UDP application to Node-1 UDP receiver using periodic control message slots
+ *  4.  Data packet is transmitted from Node-2 UDP application to Node-1 UDP receiver using the requested VDBC allocation
  *
  *  Expected result:
  *    One UDP packet sent by UT connected node-2 using CBR application is received by

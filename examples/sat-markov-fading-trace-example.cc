@@ -69,8 +69,8 @@ SatMarkovFadingExamplePlot::SatMarkovFadingExamplePlot ()
 void
 SatMarkovFadingExamplePlot::FadingTraceCb (std::string context, double time, SatEnums::ChannelType_t chType, double fadingValue)
 {
-  std::cout << time << " " << chType << " " << 20 * log10 (fadingValue) << std::endl;
-  m_fadingValues.push_back (std::make_pair (time,20 * log10 (fadingValue)));
+  std::cout << time << " " << chType << " " << 10 * log10 (fadingValue) << std::endl;
+  m_fadingValues.push_back (std::make_pair (time,10 * log10 (fadingValue)));
 }
 
 double

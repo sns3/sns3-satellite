@@ -31,9 +31,9 @@ static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatM
     {
      /**
       * Parameters
-      * {State 1 {mean in dB, std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
-      *  State 2 {mean in dB, std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
-      *  State 3 {mean in dB, std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
+      * {State 1 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
+      *  State 2 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
+      *  State 3 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
       */
 
      /* Elevation 30 degrees */

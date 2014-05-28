@@ -46,7 +46,7 @@ using namespace ns3;
  * \brief 'CRA, test 1' test case implementation.
  *
  * This case tests successful transmission of UDP packets from UT connected user
- * to GW connected user in simple scenario and using CRDSA only.
+ * to GW connected user in simple scenario and using CRA only.
  *  1.  Simple test scenario set with helper
  *  2.  A single packet is transmitted from Node-2 UDP application to Node-1 UDP receiver with only CRA enabled.
  *
