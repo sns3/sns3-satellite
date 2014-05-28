@@ -413,7 +413,7 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
               tbtpContainer.push_back (tptp);
               SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
 
-              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> (), TracedCallback<uint32_t, long> ());
+              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, uint32_t> (), TracedCallback<uint32_t, double> ());
 
               ReqInfo_t reqInfo;
               reqInfo.insert (std::make_pair ( req[n].m_address, std::make_pair (req[n], utBytesReq[n])) );
@@ -449,7 +449,7 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
               tbtpContainer.push_back (tptp);
               SatFrameAllocator::UtAllocInfoContainer_t utAllocContainer;
 
-              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, long> (), TracedCallback<uint32_t, long> ());
+              m_frameAllocator->GenerateTimeSlots (tbtpContainer, 1000, utAllocContainer, false, TracedCallback<uint32_t> (), TracedCallback<uint32_t, uint32_t> (), TracedCallback<uint32_t, double> ());
 
               ReqInfo_t reqInfo;
               reqInfo.insert (std::make_pair ( req[n].m_address, std::make_pair (req[n], utBytesReq[n])) );
