@@ -312,10 +312,10 @@ SatLowerLayerServiceConf::GetTypeId (void)
     /*
      * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
      */
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (0, true, false, false, 100, 9216, 10, 384)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (1, false, false, true, 50, 9216, 100, 384)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, false, false, false, 100, 9216, 50, 384)
-    .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, false, false, false, 100, 9216, 50, 384)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (0, true, false, false, 50, 9216, 10, 384)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (1, false, false, false, 50, 9216, 10, 384)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (2, false, false, false, 50, 9216, 10, 384)
+    .SAT_ADD_DA_SERVICE_ATTRIBUTES (3, false, true, false, 50, 9216, 10, 384)
 
     .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 4, 2, 250, 500, 10000, 30000, 3, 0.5)
   ;

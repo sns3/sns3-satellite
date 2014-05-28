@@ -13,8 +13,8 @@
  <default name="ns3::SatBbFrameConf::BbFrameHighOccupancyThreshold" value="0.9"/>
  <default name="ns3::SatBbFrameConf::BbFrameLowOccupancyThreshold" value="0.5"/>
  <default name="ns3::SatBbFrameConf::BBFrameUsageMode" value="NormalFrames"/> 
- <default name="ns3::SatBeamScheduler::CnoEstimationMode" value="LastValueInWindow"/>
- <default name="ns3::SatBeamScheduler::CnoEstimationWindow" value="+1000000000.0ns"/>
+ <default name="ns3::SatBeamScheduler::CnoEstimationMode" value="MinimumValueInWindow"/>
+ <default name="ns3::SatBeamScheduler::CnoEstimationWindow" value="+2000000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTwoWayPropagationDelay" value="+560000000.0ns"/>
  <default name="ns3::SatBeamScheduler::MaxTBTPTxAndProcessingDelay" value="+100000000.0ns"/>
  <default name="ns3::SatBeamScheduler::ControlSlotsEnabled" value="false"/>
@@ -316,21 +316,21 @@
  <default name="ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=50]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MaximumServiceRate" value="9216"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService1_MinimumServiceRate" value="100"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService1_MinimumServiceRate" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=100]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_MaximumServiceRate" value="9216"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService2_MinimumServiceRate" value="50"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService2_MinimumServiceRate" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=100]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_MaximumServiceRate" value="9216"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate" value="50"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock" value="3"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed" value="4"/>

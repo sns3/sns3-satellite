@@ -316,21 +316,21 @@
  <default name="ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=50]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MaximumServiceRate" value="9216"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService1_MinimumServiceRate" value="100"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService1_MinimumServiceRate" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService1_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed" value="true"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=100]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_MaximumServiceRate" value="9216"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService2_MinimumServiceRate" value="50"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService2_MinimumServiceRate" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService2_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed" value="true"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_ConstantServiceRate" value="ns3::ConstantRandomVariable[Constant=100]"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_MaximumServiceRate" value="9216"/>
- <default name="ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate" value="50"/>
+ <default name="ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService3_MaximumBacklogSize" value="384"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock" value="3"/>
  <default name="ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed" value="4"/>
