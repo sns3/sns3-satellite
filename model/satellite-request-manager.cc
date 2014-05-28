@@ -43,7 +43,10 @@ SatRequestManager::SatRequestManager ()
  m_maxPendingCrEntries (0),
  m_gainValueK (1/100),
  m_pendingRbdcRequestsKbps (),
- m_pendingVbdcBytes ()
+ m_pendingVbdcBytes (),
+ m_lastVbdcCrSent (Seconds (0)),
+ m_superFrameDuration (Seconds (0)),
+ m_forcedAvbdcUpdate (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -56,7 +59,7 @@ SatRequestManager::~SatRequestManager ()
 }
 
 void
-SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf)
+SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf, Time superFrameDuration)
 {
   NS_LOG_LOGIC (this);
 
@@ -70,6 +73,9 @@ SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf)
   m_sumVbdcVolumeIn = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
 
   NS_LOG_LOGIC ("Gain value: " << m_gainValueK << ", maxPendinCrEntries: " << m_maxPendingCrEntries);
+
+  // Superframe duration
+  m_superFrameDuration = superFrameDuration;
 
   // Start the request manager evaluation cycle
   Simulator::ScheduleWithContext (m_nodeInfo->GetNodeId (), m_evaluationInterval, &SatRequestManager::DoPeriodicalEvaluation, this);
@@ -191,6 +197,14 @@ SatRequestManager::DoEvaluation (bool periodical)
 
   bool reset = (periodical = true ? true : false);
 
+  // Update the VBDC counters based on received TBTP
+  // resources
+  UpdatePendingVbdcCounters ();
+
+  // Check whether we should update the VBDC request
+  // with AVBDC.
+  CheckForVolumeBacklogPersistence ();
+
   Ptr<SatCrMessage> crMsg = CreateObject<SatCrMessage> ();
 
   // Go through the RC indices
@@ -216,6 +230,9 @@ SatRequestManager::DoEvaluation (bool periodical)
 
           if (rbdcRateKbps > 0)
             {
+              // Add control element only if UT needs some rate
+              crMsg->AddControlElement (rc, SatEnums::DA_RBDC, rbdcRateKbps);
+
               std::stringstream ss;
               ss << Simulator::Now ().GetSeconds () << ", "
                  << m_nodeInfo->GetNodeId () << ", "
@@ -226,8 +243,6 @@ SatRequestManager::DoEvaluation (bool periodical)
               m_crTraceLog (ss.str ());
               m_rbdcTrace (rbdcRateKbps);
             }
-
-          crMsg->AddControlElement (rc, SatEnums::DA_RBDC, rbdcRateKbps);
         }
 
       // VBDC only
@@ -241,6 +256,12 @@ SatRequestManager::DoEvaluation (bool periodical)
 
           if (vbdcKBytes > 0)
             {
+              // Add control element only if UT needs some bytes
+              crMsg->AddControlElement (rc, cac, vbdcKBytes);
+
+              // Update the time when VBDC CR is sent
+              m_lastVbdcCrSent = Simulator::Now ();
+
               std::stringstream ss;
               ss << Simulator::Now ().GetSeconds () << ", "
                  << m_nodeInfo->GetNodeId () << ", "
@@ -253,7 +274,6 @@ SatRequestManager::DoEvaluation (bool periodical)
             }
 
           NS_LOG_LOGIC ("Requested VBCD volume for RC: " << (uint32_t)(rc) << " is " << vbdcKBytes << " KBytes with CAC: " << cac);
-          crMsg->AddControlElement (rc, cac, vbdcKBytes);
         }
 
       // RBDC + VBDC
@@ -274,9 +294,8 @@ SatRequestManager::DoEvaluation (bool periodical)
         }
     }
 
-  // If CR has some control elements with non-zero
-  // content, send the CR
-  if (crMsg->HasNonZeroContent ())
+  // If CR has some valid elements
+  if (crMsg->IsNotEmpty ())
     {
       NS_LOG_LOGIC ("Send CR");
       SendCapacityRequest (crMsg);
@@ -326,19 +345,6 @@ SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId
   NS_LOG_LOGIC ("C/No updated to request manager: " << cno);
 
   m_lastCno = cno;
-}
-
-void
-SatRequestManager::ReSynchronizeVbdc ()
-{
-  NS_LOG_LOGIC (this);
-
-  ResetAll ();
-
-  for (uint32_t i = 0; i < m_pendingVbdcBytes.size (); ++i)
-    {
-      m_pendingVbdcBytes.at (i) = 0;
-    }
 }
 
 
@@ -411,31 +417,34 @@ SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint3
 
   uint32_t vbdcKBytes (0);
 
-  // Update the counters identifying how much we have been requested, and
-  // on the other hand, given.
-  UpdatePendingVbdcCounters (rc);
+  SatEnums::SatCapacityAllocationCategory_t cac = SatEnums::DA_VBDC;
 
-  SatEnums::SatCapacityAllocationCategory_t cac = SatEnums::DA_AVBDC;
-
-  // If there is volume in, there is no need to ask for additional resources
-  if (stats.m_volumeInBytes > 0)
+  if (m_forcedAvbdcUpdate == true)
     {
-      NS_LOG_LOGIC("VBDC volume in for RC: " << (uint32_t)(rc) << ": " << stats.m_volumeInBytes << " Bytes");
+      cac = SatEnums::DA_AVBDC;
+      vbdcKBytes = GetAvbdcKBytes (rc, stats);
+    }
+  else
+    {
+      // If there is volume in, there is no need to ask for additional resources
+      if (stats.m_volumeInBytes > 0)
+        {
+          NS_LOG_LOGIC("VBDC volume in for RC: " << (uint32_t)(rc) << ": " << stats.m_volumeInBytes << " Bytes");
 
-      // If we assume that we have received all requested resources,
-      // send AVBDC request with total queue size.
-      if (m_pendingVbdcBytes.at (rc) == 0)
-        {
-          cac = SatEnums::DA_AVBDC;
-          vbdcKBytes = GetAvbdcKBytes (rc, stats);
-        }
-      else
-        {
-          cac = SatEnums::DA_VBDC;
-          vbdcKBytes = GetVbdcKBytes (rc, stats);
+          // If we assume that we have received all requested resources,
+          // send AVBDC request with total queue size.
+          if (m_pendingVbdcBytes.at (rc) == 0)
+            {
+              cac = SatEnums::DA_AVBDC;
+              vbdcKBytes = GetAvbdcKBytes (rc, stats);
+            }
+          else
+            {
+              cac = SatEnums::DA_VBDC;
+              vbdcKBytes = GetVbdcKBytes (rc, stats);
+            }
         }
     }
-
   // Return the VBDC as referenced uint32_t
   rcVbdcKBytes = vbdcKBytes;
 
@@ -538,7 +547,30 @@ SatRequestManager::GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats
   return vbdcKBytes;
 }
 
+void
+SatRequestManager::CheckForVolumeBacklogPersistence ()
+{
+  NS_LOG_FUNCTION (this);
 
+  // Volume backlog shall expire at the NCC?
+  if ((m_lastVbdcCrSent + m_llsConf->GetVolumeBacklogPersistence() * m_superFrameDuration) > Simulator::Now ())
+    {
+      for (std::vector<uint32_t>::iterator it = m_pendingVbdcBytes.begin ();
+          it != m_pendingVbdcBytes.end ();
+          ++it)
+        {
+          // Check if UT is still in need for resources
+          if (*it > 0)
+            {
+              m_forcedAvbdcUpdate = true;
+              return;
+            }
+        }
+    }
+
+  m_forcedAvbdcUpdate = false;
+  return;
+}
 
 uint32_t
 SatRequestManager::GetPendingRbdcSumKbps (uint8_t rc) const
@@ -577,6 +609,16 @@ SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t value)
     }
 
   NS_ASSERT (m_pendingRbdcRequestsKbps.at (rc).size () <= m_maxPendingCrEntries);
+}
+
+void
+SatRequestManager::UpdatePendingVbdcCounters ()
+{
+  NS_LOG_LOGIC (this);
+  for (uint8_t rc = 0; rc < m_llsConf->GetDaServiceCount (); rc++)
+    {
+      UpdatePendingVbdcCounters (rc);
+    }
 }
 
 void

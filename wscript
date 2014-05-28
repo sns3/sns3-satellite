@@ -172,6 +172,7 @@ def build(bld):
         'test/satellite-mobility-test.cc',
         'test/satellite-mobility-observer-test.cc',
         'test/satellite-random-access-test.cc',
+        'test/satellite-request-manager-test.cc',
         'test/satellite-rle-test.cc',
         'test/satellite-per-packet-if-test.cc',
         'test/satellite-periodic-control-message-test.cc',

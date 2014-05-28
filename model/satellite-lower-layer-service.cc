@@ -271,7 +271,7 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "VolumeBacklogPersistence",
                     "Volume backlog persistence for the lower layer service",
-                     UintegerValue (5),
+                     UintegerValue (7),
                      MakeUintegerAccessor (&SatLowerLayerServiceConf::m_volumeBacklogPersistence),
                      MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "DefaultControlRandomizationInterval",

@@ -46,7 +46,7 @@ public:
   SatRequestManager ();
   virtual ~SatRequestManager ();
 
-  void Initialize (Ptr<SatLowerLayerServiceConf> llsConf);
+  void Initialize (Ptr<SatLowerLayerServiceConf> llsConf, Time superFrameDuration);
 
   // inherited from Object
   static TypeId GetTypeId (void);
@@ -126,11 +126,6 @@ public:
    */
   void AssignedDaResources (uint8_t rcIndex, uint32_t bytes);
 
-  /**
-   * \brief Resynchronize VBDC
-   */
-  void ReSynchronizeVbdc ();
-
 private:
 
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
@@ -182,6 +177,12 @@ private:
   uint32_t GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
 
   /**
+   * Check whether VBDC volume backlog persistence shall expire and
+   * whether UT should update request by AVBDC due pending requests.
+   */
+  void CheckForVolumeBacklogPersistence ();
+
+  /**
    * \brief Calculate the pending RBDC requests related to a specific RC.
    * \param rc Request class index
    * \return Pending sum in kbps or Bytes
@@ -194,6 +195,11 @@ private:
    * \param value Requested value in kbps or Bytes
    */
   void UpdatePendingRbdcCounters (uint8_t rc, uint32_t value);
+
+  /**
+   * Update pending VBDC counters for all RCs
+   */
+  void UpdatePendingVbdcCounters ();
 
   /**
    * \brief Update the pending VBDC counters with new request information
@@ -315,6 +321,23 @@ private:
    * Sum of VBDC volume in
    */
   std::vector<uint32_t> m_sumVbdcVolumeIn;
+
+  /**
+   * Time when the last CR including VBDC request was sent
+   */
+  Time m_lastVbdcCrSent;
+
+  /**
+   * Superframe duration used for updating the volume backlog persistence
+   */
+  Time m_superFrameDuration;
+
+  /**
+   * Flag indicating that UT should send a forced AVBDC request, since
+   * the volume backlog persistence shall expire and UT still has pending
+   * requested bytes.
+   */
+  bool m_forcedAvbdcUpdate;
 
   /**
    * Trace callback used for CR tracing.

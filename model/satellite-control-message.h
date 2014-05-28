@@ -406,7 +406,7 @@ public:
    * Has the CR non-zero content
    * \return bool Flag to indicate whether the CR has non-zero content
    */
-  bool HasNonZeroContent () const;
+  bool IsNotEmpty () const;
 
 private:
 
@@ -424,11 +424,6 @@ private:
    * C/N0 estimate.
    */
   double m_forwardLinkCNo;
-
-  /**
-   * The CR could hold zero samples.
-   */
-  bool m_hasNonZeroContent;
 
   /**
    * Type field of the CR control element

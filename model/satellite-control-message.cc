@@ -409,8 +409,7 @@ SatCrMessage::GetInstanceTypeId (void) const
 
 SatCrMessage::SatCrMessage ()
  :m_crBlockSizeType (SatCrMessage::CR_BLOCK_SMALL),
-  m_forwardLinkCNo (NAN),
-  m_hasNonZeroContent (false)
+  m_forwardLinkCNo (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -427,11 +426,6 @@ SatCrMessage::AddControlElement (uint8_t rcIndex, SatEnums::SatCapacityAllocatio
 
   RequestDescriptor_t p = std::make_pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rcIndex, cac);
   m_requestData.insert (std::make_pair<RequestDescriptor_t, uint32_t> (p, value));
-
-  if (value > 0)
-    {
-      m_hasNonZeroContent = true;
-    }
 }
 
 
@@ -480,9 +474,9 @@ SatCrMessage::GetSizeInBytes () const
 }
 
 
-bool SatCrMessage::HasNonZeroContent () const
+bool SatCrMessage::IsNotEmpty () const
 {
-  return m_hasNonZeroContent;
+  return !m_requestData.empty ();
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatCnoReportMessage);

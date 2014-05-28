@@ -467,7 +467,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
 
-  rm->Initialize (m_llsConf);
+  rm->Initialize (m_llsConf, m_superframeSeq->GetDuration (0));
 
   if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {
