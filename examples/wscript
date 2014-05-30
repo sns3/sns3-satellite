@@ -20,16 +20,19 @@ def build(bld):
     obj = bld.create_ns3_program('sat-cbr-user-defined-example', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-cbr-user-defined-example.cc'
 
-    obj = bld.create_ns3_program('sat-dama-sim-tn9', ['satellite', 'traffic', 'flow-monitor'])
+    obj = bld.create_ns3_program('sat-dama-sim-tn9', ['satellite'])
     obj.source = 'sat-dama-sim-tn9.cc'
 
-    obj = bld.create_ns3_program('sat-ra-sim-tn9', ['satellite', 'traffic', 'flow-monitor'])
+    obj = bld.create_ns3_program('sat-dama-onoff-sim-tn9', ['satellite'])
+    obj.source = 'sat-dama-onoff-sim-tn9.cc'
+
+    obj = bld.create_ns3_program('sat-ra-sim-tn9', ['satellite'])
     obj.source = 'sat-ra-sim-tn9.cc'
 
-    obj = bld.create_ns3_program('sat-ra-sim-tn9-comparison', ['satellite', 'traffic', 'flow-monitor'])
+    obj = bld.create_ns3_program('sat-ra-sim-tn9-comparison', ['satellite'])
     obj.source = 'sat-ra-sim-tn9-comparison.cc'
 
-    obj = bld.create_ns3_program('sat-profiling-sim-tn8', ['satellite', 'traffic', 'flow-monitor'])
+    obj = bld.create_ns3_program('sat-profiling-sim-tn8', ['satellite'])
     obj.source = 'sat-profiling-sim-tn8.cc'
 
     obj = bld.create_ns3_program('sat-multi-application-rtn-example', ['satellite', 'traffic'])
