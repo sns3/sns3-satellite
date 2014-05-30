@@ -188,7 +188,7 @@ main (int argc, char *argv[])
       appStartTime += MilliSeconds (10);
 
       // return link
-      Ptr<OnOffApplication> rtnApp = CreateObject<OnOffApplication> ();
+      Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();
       rtnApp->SetAttribute ("Protocol", StringValue (protocol));
       rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
       rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
