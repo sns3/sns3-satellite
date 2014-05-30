@@ -46,7 +46,7 @@ using namespace ns3;
  * \brief 'Periodic control message, test 1' test case implementation.
  *
  * This case tests successful transmission of UDP packets from UT connected user
- * to GW connected user in simple scenario and using CRDSA only.
+ * to GW connected user in simple scenario and using periodic control slots and VBDC only.
  *  1.  Simple test scenario set with helper
  *  2.  A single data packet is generated
  *  3.  Capacity request is generated for the packet and transmitted from Node-2 UDP application to Node-1 UDP receiver using periodic control message slots
