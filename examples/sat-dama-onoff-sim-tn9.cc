@@ -33,9 +33,9 @@ main (int argc, char *argv[])
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
-  DataRate dataRate (128000); // in bps
+  DataRate dataRate (32000); // in bps
   uint32_t damaConf (0);
-  uint32_t nccConf (0);
+  uint32_t crTxConf (0);
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
@@ -57,11 +57,14 @@ main (int argc, char *argv[])
    *    - 32 x 0.625 MHz -> 20 MHz
    *    - 16 x 1.25 MHz -> 20 MHz
    *
-   * NCC configuration modes
-   * - Conf-0 (static timeslots with ACM off)
-   * - Conf-1 (static timeslots with ACM on)
+   * NCC configuration mode
    * - Conf-2 scheduling mode (dynamic time slots)
    * - FCA disabled
+   *
+   * CR transmission modes
+   * - RA slotted ALOHA
+   * - CDRSA (strict RC 0)
+   * - periodical control slots
    *
    * RTN link
    *   - Constant interference
@@ -78,52 +81,20 @@ main (int argc, char *argv[])
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("dataRate", "Offered load during each application's 'on' period (in bits per second)", dataRate);
-  cmd.AddValue ("nccConf", "NCC configuration", nccConf);
   cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
+  cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
   cmd.Parse (argc, argv);
 
   // use 5 seconds store time for control messages
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
 
-  switch (nccConf)
-  {
-    case 0:
-      {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 0"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (25.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.1));
-        break;
-      }
-    case 1:
-      {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 1"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
-        break;
-      }
-    case 2:
-      {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported nccConf: " << nccConf);
-        break;
-      }
-  }
+  // NCC configuration
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
 
   switch (damaConf)
   {
@@ -147,6 +118,36 @@ main (int argc, char *argv[])
     default:
       {
         NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
+        break;
+      }
+  }
+
+  switch (crTxConf)
+  {
+    // RA slotted ALOHA
+    case 0:
+      {
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+        break;
+      }
+    // CRDSA (strict RC 0)
+    case 1:
+      {
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+        break;
+      }
+    // Periodical control slots
+    case 2:
+      {
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported crTxConf: " << crTxConf);
         break;
       }
   }
@@ -193,8 +194,8 @@ main (int argc, char *argv[])
       rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
       rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
       rtnApp->SetAttribute ("DataRate", DataRateValue (dataRate));
-      rtnApp->SetAttribute ("OnTime", StringValue ("ns3::UniformRandomVariable[Min=2.0|Max=15.0]"));
-      rtnApp->SetAttribute ("OffTime", StringValue ("ns3::UniformRandomVariable[Min=2.0|Max=15.0]"));
+      rtnApp->SetAttribute ("OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
+      rtnApp->SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
       rtnApp->SetStartTime (appStartTime);
       (*itUt)->AddApplication (rtnApp);
     }
@@ -208,6 +209,9 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
@@ -227,6 +231,10 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  // Enable some logs.
+  LogComponentEnable ("sat-dama-onoff-sim-tn9", LOG_INFO);
+  LogComponentEnable ("OnOffApplication", LOG_LOGIC); // to see the distribution of OnOff periods.
 
   NS_LOG_INFO("--- sat-dama-onoff-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
