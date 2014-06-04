@@ -28,8 +28,7 @@ main (int argc, char *argv[])
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1);
-  uint32_t damaConf (0);
+  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 80% system load
   uint32_t nccConf (0);
 
   // 16 kbps per end user
@@ -38,7 +37,6 @@ main (int argc, char *argv[])
 
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
-
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
@@ -51,20 +49,24 @@ main (int argc, char *argv[])
    * Attributes:
    * -----------
    *
-   * Scenario: 1 beam (beam id = 18)
+   * Scenario:
+   *   - 1 beam (beam id = 18)
+   *   - 80% system load
    *
-   * Frame configuration:
-   * - 3 frames
-   * - 50 MHz user bandwidth
-   *    - 32 x 0.3125 MHz -> 10 MHz
-   *    - 32 x 0.625 MHz -> 20 MHz
-   *    - 16 x 1.25 MHz -> 20 MHz
+   * Frame configuration (configured in tn9-dama-input-attributes.xml):
+   *   - 4 frames (13.75 MHz user bandwidth)
+   *     - 8 x 0.3125 MHz -> 2.5 MHz
+   *     - 8 x 0.625 MHz  -> 5 MHz
+   *     - 4 x 1.25 MHz   -> 5 MHz
+   *     - 1 x 1.25 MHz   -> 1.25 MHz
    *
-   * NCC configuration modes
-   * - Conf-0 (static timeslots with ACM off)
-   * - Conf-1 (static timeslots with ACM on)
-   * - Conf-2 scheduling mode (dynamic time slots)
-   * - FCA disabled
+   * NCC configuration modes (selected from command line argument):
+   *   - Conf-0 (static timeslots with ACM off)
+   *   - Conf-1 (static timeslots with ACM on)
+   *   - Conf-2 scheduling mode (dynamic time slots)
+   *   - FCA disabled
+   *
+   * RBDC with periodical control slots
    *
    * RTN link
    *   - Constant interference
@@ -80,13 +82,20 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("nccConf", "NCC configuration", nccConf);
-  cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
   cmd.Parse (argc, argv);
 
   // use 5 seconds store time for control messages
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
+
+  // RBDC + periodical control slots
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+
+  /// \todo Rain fading
 
   switch (nccConf)
   {
@@ -124,37 +133,8 @@ main (int argc, char *argv[])
       }
   }
 
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
-
-  switch (damaConf)
-  {
-    // RBDC
-    case 0:
-      {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue(64));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(false));
-        break;
-      }
-    // VBDC
-    case 1:
-      {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(true));
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
-        break;
-      }
-  }
-
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
+  /// \todo Duplicate?
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -209,6 +189,9 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);

@@ -35,35 +35,37 @@ main (int argc, char *argv[])
   double simLength (300.0); // in seconds
 
   // To read attributes from file
-//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
-//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-//  ConfigStore inputConfig;
-//  inputConfig.ConfigureDefaults ();
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
 
   /**
    * Attributes:
    * -----------
    *
-   * Scenario: 1 beam (beam id = 18)
+   * Scenario:
+   *   - 1 beam (beam id = 18)
+   *   - 1 UT
    *
-   * Frame configuration:
-   * - 3 frames
-   * - 50 MHz user bandwidth
-   *    - 32 x 0.3125 MHz -> 10 MHz
-   *    - 32 x 0.625 MHz -> 20 MHz
-   *    - 16 x 1.25 MHz -> 20 MHz
+   * Frame configuration (configured in tn9-dama-input-attributes.xml):
+   *   - 4 frames (13.75 MHz user bandwidth)
+   *     - 8 x 0.3125 MHz -> 2.5 MHz
+   *     - 8 x 0.625 MHz  -> 5 MHz
+   *     - 4 x 1.25 MHz   -> 5 MHz
+   *     - 1 x 1.25 MHz   -> 1.25 MHz
    *
-   * NCC configuration modes
-   * - Conf-0 (static timeslots with ACM off)
-   * - Conf-1 (static timeslots with ACM on)
-   * - Conf-2 scheduling mode (dynamic time slots)
-   * - FCA disabled
+   * NCC configuration modes (selected from command line argument):
+   *   - Conf-0 (static timeslots with ACM off)
+   *   - Conf-1 (static timeslots with ACM on)
+   *   - Conf-2 scheduling mode (dynamic time slots)
+   *   - FCA disabled
    *
-   * CR transmission modes
-   * - RBDC + periodical control slots
-   * - RBDC + slotted ALOHA
-   * - RBDC + CDRSA (loose RC 0)
+   * CR transmission modes (selected from command line argument):
+   *   - RBDC + periodical control slots
+   *   - RBDC + slotted ALOHA
+   *   - RBDC + CDRSA (loose RC 0)
    *
    * RTN link
    *   - Constant interference
@@ -95,6 +97,7 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
         Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (25.0));
         Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.1));
+
         break;
       }
     case 1:
@@ -121,10 +124,6 @@ main (int argc, char *argv[])
         break;
       }
   }
-
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
 
   // RBDC
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -153,6 +152,7 @@ main (int argc, char *argv[])
       {
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+        /// \todo Add configuration for LOOSE 0
         break;
       }
     default:
@@ -163,6 +163,7 @@ main (int argc, char *argv[])
   }
 
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
+  /// \todo Duplicate?
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -194,6 +195,9 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
@@ -231,12 +235,12 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-dama-output-attributes.xml"));
-//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-//  ConfigStore outputConfig;
-//  outputConfig.ConfigureDefaults ();
-//  outputConfig.ConfigureAttributes ();
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-dama-output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  ConfigStore outputConfig;
+  outputConfig.ConfigureDefaults ();
+  outputConfig.ConfigureAttributes ();
 
   /**
    * Run simulation

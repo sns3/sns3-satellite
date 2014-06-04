@@ -28,7 +28,7 @@ main (int argc, char *argv[])
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (100);
+  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 70% system load
   uint32_t packetSize (1280); // in bytes
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
@@ -48,23 +48,25 @@ main (int argc, char *argv[])
    * Attributes:
    * -----------
    *
-   * Scenario: 1 beam (beam id = 18)
+   * Scenario:
+   *   - 1 beam (beam id = 18)
+   *   - 70% system load
    *
-   * Frame configuration:
-   * - 3 frames
-   * - 50 MHz user bandwidth
-   *    - 32 x 0.3125 MHz -> 10 MHz
-   *    - 32 x 0.625 MHz -> 20 MHz
-   *    - 16 x 1.25 MHz -> 20 MHz
+   * Frame configuration (configured in tn9-dama-input-attributes.xml):
+   *   - 4 frames (13.75 MHz user bandwidth)
+   *     - 8 x 0.3125 MHz -> 2.5 MHz
+   *     - 8 x 0.625 MHz  -> 5 MHz
+   *     - 4 x 1.25 MHz   -> 5 MHz
+   *     - 1 x 1.25 MHz   -> 1.25 MHz
    *
-   * NCC configuration mode
-   * - Conf-2 scheduling mode (dynamic time slots)
-   * - FCA disabled
+   * NCC configuration mode:
+   *   - Conf-2 scheduling mode (dynamic time slots)
+   *   - FCA disabled
    *
-   * CR transmission modes
-   * - RA slotted ALOHA
-   * - CDRSA (strict RC 0)
-   * - periodical control slots
+   * CR transmission modes (selected from command line argument):
+   *   - RA slotted ALOHA
+   *   - CDRSA (strict RC 0)
+   *   - periodical control slots
    *
    * RTN link
    *   - Constant interference
@@ -80,7 +82,6 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("dataRate", "Offered load during each application's 'on' period (in bits per second)", dataRate);
   cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
   cmd.Parse (argc, argv);
@@ -89,12 +90,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
 
   // NCC configuration
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
-  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("Config type 2"));
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
+  /// \todo Rain fading
 
   switch (damaConf)
   {
@@ -136,6 +135,7 @@ main (int argc, char *argv[])
       {
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+        /// \todo Add configuration for STRICT 0
         break;
       }
     // Periodical control slots
@@ -153,6 +153,7 @@ main (int argc, char *argv[])
   }
 
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
+  /// \todo Duplicate?
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -212,6 +213,9 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
   Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
   Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
