@@ -59,6 +59,9 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
 {
   NS_LOG_FUNCTION (this);
 
+  // map to sum up RBDC requests per RC
+  std::map<uint8_t, uint16_t> rbdcReqs;
+
   for ( CrMsgContainer_t::const_iterator crIt = m_crContainer.begin (); crIt != m_crContainer.end (); crIt++ )
     {
       SatCrMessage::RequestContainer_t crContent = (*crIt)->GetCapacityRequestContent ();
@@ -68,26 +71,39 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
           switch (descriptorIt->first.second)
           {
             case SatEnums::DA_RBDC:
-              m_damaEntry->ResetDynamicRatePersistence ();
-              m_damaEntry->UpdateRbdcInKbps (descriptorIt->first.first, descriptorIt->second);
-              break;
+              {
+                rbdcReqs[descriptorIt->first.first] += descriptorIt->second;
+                break;
+              }
 
             case SatEnums::DA_VBDC:
-              m_damaEntry->ResetVolumeBacklogPersistence ();
-              m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
-              break;
+              {
+                m_damaEntry->ResetVolumeBacklogPersistence ();
+                m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
+                break;
+              }
 
             case SatEnums::DA_AVBDC:
-              m_damaEntry->ResetVolumeBacklogPersistence ();
-              m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
-              break;
+              {
+                m_damaEntry->ResetVolumeBacklogPersistence ();
+                m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
+                break;
+              }
 
             default:
               break;
           }
         }
     }
-        // clear container when CRs processed
+
+		// update RBDC with summed up requests
+    for (std::map<uint8_t, uint16_t>::iterator it = rbdcReqs.begin (); it != rbdcReqs.end (); it++ )
+      {
+        m_damaEntry->ResetDynamicRatePersistence ();
+        m_damaEntry->UpdateRbdcInKbps (it->first, it->second);
+      }
+
+    // clear container when CRs processed
     m_crContainer.clear ();
 }
 

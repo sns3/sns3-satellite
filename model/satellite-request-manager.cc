@@ -61,7 +61,7 @@ SatRequestManager::~SatRequestManager ()
 void
 SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf, Time superFrameDuration)
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_FUNCTION (this);
 
   m_llsConf = llsConf;
   m_gainValueK = 1.0 / (2.0 * m_evaluationInterval.GetSeconds ());
@@ -97,7 +97,7 @@ SatRequestManager::GetTypeId (void)
                    MakeTimeChecker ())
     .AddAttribute( "CnoReportInterval",
                    "C/NO report interval time",
-                    TimeValue (Seconds (0.1)),
+                    TimeValue (Seconds (1.1)),
                     MakeTimeAccessor (&SatRequestManager::m_cnoReportInterval),
                     MakeTimeChecker ())
     .AddAttribute( "RttEstimate",
