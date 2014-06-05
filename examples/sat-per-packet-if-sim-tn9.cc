@@ -25,9 +25,8 @@ int
 main (int argc, char *argv[])
 {
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (30);
+  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 70% system load according to CRA 1 kbps
   DataRate dataRate (32000); // in bps
-  uint32_t damaConf (0);
   uint32_t beamConf (0);
 
   uint32_t packetSize (1280); // in bytes
@@ -36,7 +35,6 @@ main (int argc, char *argv[])
 
   // To read attributes from file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
-  /// \todo Confirm if we can use the same configuration file.
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
@@ -58,10 +56,8 @@ main (int argc, char *argv[])
    *     - 1 x 1.25 MHz   -> 1.25 MHz
    *
    * NCC configuration modes
-   * - Conf-0 (static timeslots with ACM off)
-   * - Conf-1 (static timeslots with ACM on)
-   * - Conf-2 scheduling mode (dynamic time slots)
-   * - FCA disabled
+   *   - Conf-2 scheduling mode (dynamic time slots)
+   *   - FCA disabled
    *
    * RTN link
    *   - Per-packet interference
@@ -77,44 +73,22 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
+  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("beamConf", "Beam configuration", beamConf);
-  cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
   cmd.Parse (argc, argv);
-
-  // use 5 seconds store time for control messages
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
 
   // NCC configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
-  switch (damaConf)
-  {
-    // RBDC
-    case 0:
-      {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue(64));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(false));
-        break;
-      }
-    // VBDC
-    case 1:
-      {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(true));
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
-        break;
-      }
-  }
-
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
+  // RBDC
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
+  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -191,8 +165,6 @@ main (int argc, char *argv[])
     {
       appStartTime += MilliSeconds (10);
 
-      /// \todo Do we need forward link traffic?
-
       // return link
       Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();
       rtnApp->SetAttribute ("Protocol", StringValue (protocol));
@@ -203,7 +175,6 @@ main (int argc, char *argv[])
       rtnApp->SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
       rtnApp->SetStartTime (appStartTime);
       (*itUt)->AddApplication (rtnApp);
-      /// \todo Verify if the above configuration is fine.
     }
 
   // setup packet sinks at all users

@@ -14,8 +14,7 @@ using namespace ns3;
 * \ingroup satellite
 *
 * \brief Simulation script to run example simulation results related to
-* satellite RTN link performance. Currently only one beam is simulated with
-* 100 users, variable data rate, and the selected DAMA configuration.
+* satellite RTN link performance.
 *
 * execute command -> ./waf --run "sat-dama-onoff-sim-tn9 --PrintHelp"
 */
@@ -28,13 +27,12 @@ main (int argc, char *argv[])
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 70% system load
+  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 70% system load according to CRA 1 kbps
   uint32_t packetSize (1280); // in bytes
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
   DataRate dataRate (32000); // in bps
-  uint32_t damaConf (0);
   uint32_t crTxConf (0);
 
   // To read attributes from file
@@ -64,9 +62,14 @@ main (int argc, char *argv[])
    *   - FCA disabled
    *
    * CR transmission modes (selected from command line argument):
-   *   - RA slotted ALOHA
-   *   - CDRSA (strict RC 0)
-   *   - periodical control slots
+   *   - RBDC + RA slotted ALOHA
+   *   - RBDC + CDRSA (strict RC 0)
+   *   - RBDC + periodical control slots
+   *   - CRA 1kbps
+   *
+   * Fading configuration:
+   *   - Rain
+   *   - Markov fading disabled
    *
    * RTN link
    *   - Constant interference
@@ -82,67 +85,75 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
+  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
   cmd.Parse (argc, argv);
-
-  // use 5 seconds store time for control messages
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
 
   // NCC configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("Config type 2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
-  /// \todo Rain fading
+  // Rain fading
+  Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
+  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
+                      StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
+  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
+                      StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
 
-  switch (damaConf)
-  {
-    // RBDC
-    case 0:
-      {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue(64));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(false));
-        break;
-      }
-    // VBDC
-    case 1:
-      {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(true));
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
-        break;
-      }
-  }
+  // Disable Markov fading
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
   switch (crTxConf)
   {
-    // RA slotted ALOHA
+    // RBDC + RA slotted ALOHA
     case 0:
       {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
         break;
       }
-    // CRDSA (strict RC 0)
+    // RBDC + CRDSA (strict RC 0)
     case 1:
       {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
         /// \todo Add configuration for STRICT 0
         break;
       }
-    // Periodical control slots
+    // RBDC + periodical control slots
     case 2:
       {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+        break;
+      }
+    // CRA 1 kbps
+    case 3:
+      {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
         break;
       }
     default:
@@ -151,9 +162,6 @@ main (int argc, char *argv[])
         break;
       }
   }
-
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
-  /// \todo Duplicate?
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -235,10 +243,6 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  // Enable some logs.
-  LogComponentEnable ("sat-dama-onoff-sim-tn9", LOG_INFO);
-  LogComponentEnable ("OnOffApplication", LOG_LOGIC); // to see the distribution of OnOff periods.
 
   NS_LOG_INFO("--- sat-dama-onoff-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);

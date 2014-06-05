@@ -13,9 +13,8 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Simulation script to run example simulation results related to satellite RTN
-* link performance. Currently only one beam is simulated with variable amount of users
-* and DAMA configuration.
+* \brief Simulation script to run example simulation results related to
+* satellite RTN link performance.
 *
 * execute command -> ./waf --run "sat-dama-sim-tn9 --PrintHelp"
 */
@@ -28,8 +27,9 @@ main (int argc, char *argv[])
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 80% system load
+  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 80% system load according to NCC-2
   uint32_t nccConf (0);
+  uint32_t fadingConf (0);
 
   // 16 kbps per end user
   uint32_t packetSize (1280); // in bytes
@@ -66,12 +66,15 @@ main (int argc, char *argv[])
    *   - Conf-2 scheduling mode (dynamic time slots)
    *   - FCA disabled
    *
-   * RBDC with periodical control slots
+   * Fading configuration (selected from command line argument):
+   *   - Markov
+   *   - Rain
    *
    * RTN link
    *   - Constant interference
    *   - AVI error model
    *   - ARQ disabled
+   *   - RBDC with periodical control slots
    * FWD link
    *   - ACM disabled
    *   - Constant interference
@@ -82,11 +85,11 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
+  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("nccConf", "NCC configuration", nccConf);
+  cmd.AddValue ("fadingConf", "Fading configuration (0: Markov, 1: Rain)", nccConf);
   cmd.Parse (argc, argv);
-
-  // use 5 seconds store time for control messages
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
 
   // RBDC + periodical control slots
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -94,8 +97,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
-
-  /// \todo Rain fading
 
   switch (nccConf)
   {
@@ -133,8 +134,31 @@ main (int argc, char *argv[])
       }
   }
 
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
-  /// \todo Duplicate?
+  switch (fadingConf)
+  {
+    case 0:
+      {
+        // Markov fading
+        Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_MARKOV));
+        break;
+      }
+    case 1:
+      {
+        // Rain fading
+        Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
+        Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
+        Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
+                            StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
+        Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
+                            StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported fadingConf: " << fadingConf);
+        break;
+      }
+  }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized

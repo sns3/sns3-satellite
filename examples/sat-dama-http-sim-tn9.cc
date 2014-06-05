@@ -29,7 +29,6 @@ main (int argc, char *argv[])
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
-  uint32_t nccConf (0);
   uint32_t crTxConf (0);
 
   double simLength (300.0); // in seconds
@@ -56,9 +55,7 @@ main (int argc, char *argv[])
    *     - 4 x 1.25 MHz   -> 5 MHz
    *     - 1 x 1.25 MHz   -> 1.25 MHz
    *
-   * NCC configuration modes (selected from command line argument):
-   *   - Conf-0 (static timeslots with ACM off)
-   *   - Conf-1 (static timeslots with ACM on)
+   * NCC configuration mode:
    *   - Conf-2 scheduling mode (dynamic time slots)
    *   - FCA disabled
    *
@@ -81,49 +78,17 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("nccConf", "NCC configuration", nccConf);
+  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
   cmd.Parse (argc, argv);
 
-  // use 5 seconds store time for control messages
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
-
-  switch (nccConf)
-  {
-    case 0:
-      {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 0"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (25.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.1));
-
-        break;
-      }
-    case 1:
-      {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 1"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
-        break;
-      }
-    case 2:
-      {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-        Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported nccConf: " << nccConf);
-        break;
-      }
-  }
+  // NCC configuration
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
 
   // RBDC
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -161,9 +126,6 @@ main (int argc, char *argv[])
         break;
       }
   }
-
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
-  /// \todo Duplicate?
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
