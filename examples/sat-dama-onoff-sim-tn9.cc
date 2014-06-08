@@ -32,7 +32,7 @@ main (int argc, char *argv[])
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
-  DataRate dataRate (32000); // in bps
+  DataRate dataRate (128000); // in bps
   uint32_t crTxConf (0);
 
   // To read attributes from file

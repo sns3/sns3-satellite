@@ -31,9 +31,9 @@ main (int argc, char *argv[])
   uint32_t nccConf (0);
   uint32_t fadingConf (0);
 
-  // 16 kbps per end user
+  // 64 kbps per end user
   uint32_t packetSize (1280); // in bytes
-  double intervalSeconds = 0.64;
+  double intervalSeconds = 0.16;
 
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
