@@ -88,7 +88,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("nccConf", "NCC configuration", nccConf);
-  cmd.AddValue ("fadingConf", "Fading configuration (0: Markov, 1: Rain)", nccConf);
+  cmd.AddValue ("fadingConf", "Fading configuration (0: Markov, 1: Rain)", fadingConf);
   cmd.Parse (argc, argv);
 
   // RBDC + periodical control slots
