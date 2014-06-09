@@ -218,7 +218,11 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("tn9-dama-output-attributes.xml"));
+  std::stringstream filename;
+  filename << "tn9-per-packet-if-output-attributes-ut" << utsPerBeam
+           << "-conf" << beamConf << ".xml";
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

@@ -306,7 +306,8 @@ main (int argc, char *argv[])
    * Store attributes into XML output
    */
   std::stringstream filename;
-  filename << "tn9-ra-output-attributes-mode-" << raMode << "-uts-" << utsPerBeam << ".xml";
+  filename << "tn9-ra-output-attributes-ut" << utsPerBeam
+           << "-mode" << raMode << ".xml";
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
