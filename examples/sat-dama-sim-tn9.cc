@@ -31,9 +31,9 @@ main (int argc, char *argv[])
   uint32_t nccConf (0);
   uint32_t fadingConf (0);
 
-  // 64 kbps per end user
+  // 16 kbps per end user
   uint32_t packetSize (1280); // in bytes
-  double intervalSeconds = 0.16;
+  double intervalSeconds = 0.64;
 
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
@@ -94,7 +94,7 @@ main (int argc, char *argv[])
   // RBDC + periodical control slots
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (32));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (16));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
