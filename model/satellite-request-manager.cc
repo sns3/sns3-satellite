@@ -226,7 +226,7 @@ SatRequestManager::DoEvaluation (bool periodical)
           NS_LOG_LOGIC ("Evaluating RBDC needs for RC: " << (uint32_t)(rc));
           uint32_t rbdcRateKbps = DoRbdc (rc, stats);
 
-          NS_LOG_LOGIC ("Requested RBCD rate for RC: " << (uint32_t)(rc) << " is " << rbdcRateKbps << " kbps");
+          NS_LOG_LOGIC ("Requested RBDC rate for RC: " << (uint32_t)(rc) << " is " << rbdcRateKbps << " kbps");
 
           if (rbdcRateKbps > 0)
             {
@@ -273,7 +273,7 @@ SatRequestManager::DoEvaluation (bool periodical)
               m_vbdcTrace (vbdcKBytes);
             }
 
-          NS_LOG_LOGIC ("Requested VBCD volume for RC: " << (uint32_t)(rc) << " is " << vbdcKBytes << " KBytes with CAC: " << cac);
+          NS_LOG_LOGIC ("Requested VBDC volume for RC: " << (uint32_t)(rc) << " is " << vbdcKBytes << " KBytes with CAC: " << cac);
         }
 
       // RBDC + VBDC
