@@ -71,6 +71,11 @@ SatUtMac::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatUtMac::m_utScheduler),
                    MakePointerChecker<SatUtScheduler> ())
+    .AddAttribute ("UseCrdsaOnlyForControlPackets",
+                   "CRDSA utilized only for control packets or also for user data.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatUtMac::m_crdsaOnlyForControl),
+                   MakeBooleanChecker ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
                      MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace))
@@ -93,11 +98,12 @@ SatUtMac::SatUtMac ()
    m_randomAccess (NULL),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0),
-   m_crdsaUniquePacketId (1)
+   m_crdsaUniquePacketId (1),
+   m_crdsaOnlyForControl (false)
 {
   NS_LOG_FUNCTION (this);
 
-  // default construtctor should not be used
+  // default constructor should not be used
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
@@ -107,7 +113,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
    m_timingAdvanceCb (0),
    m_guardTime (MicroSeconds (1)),
    m_raChannel (0),
-   m_crdsaUniquePacketId (1)
+   m_crdsaUniquePacketId (1),
+   m_crdsaOnlyForControl (false)
 {
 	NS_LOG_FUNCTION (this);
 
@@ -171,6 +178,17 @@ SatUtMac::SetRandomAccess (Ptr<SatRandomAccess> randomAccess)
   m_randomAccess = randomAccess;
   m_randomAccess->SetIsDamaAvailableCallback (MakeCallback(&SatTbtpContainer::HasScheduledTimeSlots, m_tbtpContainer));
 }
+
+bool
+SatUtMac::ControlMsgTransmissionPossible () const
+{
+  NS_LOG_FUNCTION (this);
+
+  bool da = m_tbtpContainer->HasScheduledTimeSlots ();
+  bool ra = ((m_randomAccess != NULL) && (m_randomAccess->CrdsaHasBackoffTimePassed (m_raChannel)));
+  return da || ra;
+}
+
 
 void
 SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
@@ -882,9 +900,21 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
       NS_FATAL_ERROR ("SatUtMac::CreateCrdsaPacketInstances - Not enough capacity in CRDSA payload");
     }
 
+  /// CRDSA can be utilized to transmit only control messages or
+  /// both control and user data
+  SatUtScheduler::SatCompliancePolicy_t policy;
+  if (m_crdsaOnlyForControl)
+    {
+      policy = SatUtScheduler::STRICT;
+    }
+  else
+    {
+      policy = SatUtScheduler::LOOSE;
+    }
+
   /// get the next packet
   SatPhy::PacketContainer_t uniq;
-  m_utScheduler->DoScheduling (uniq, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
+  m_utScheduler->DoScheduling (uniq, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, uint8_t (SatEnums::CONTROL_FID), policy);
 
   NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Processing the packet container, fragments: " << uniq.size ());
 

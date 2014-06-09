@@ -743,12 +743,12 @@ SatLowerLayerServiceConf::GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdc
   if (reqRbdcKbps < m_rbdcQuantizationThresholdKbps)
     {
       quantValue =
-          (uint32_t)(floor(reqRbdcKbps / m_rbdcQuantizationSmallStepKbps) * m_rbdcQuantizationSmallStepKbps);
+          (uint32_t)(ceil((double)reqRbdcKbps / m_rbdcQuantizationSmallStepKbps) * m_rbdcQuantizationSmallStepKbps);
     }
   else if (reqRbdcKbps < maxRbdc)
     {
       quantValue =
-          (uint32_t)(floor(reqRbdcKbps / m_rbdcQuantizationLargeStepKbps) * m_rbdcQuantizationLargeStepKbps);
+          (uint32_t)(ceil((double)reqRbdcKbps / m_rbdcQuantizationLargeStepKbps) * m_rbdcQuantizationLargeStepKbps);
   }
   else
     {
@@ -767,12 +767,12 @@ SatLowerLayerServiceConf::GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdc
   if (reqVbdcKBytes < m_vbdcQuantizationThresholdKB)
     {
       quantValue =
-          (uint32_t)(floor(reqVbdcKBytes / m_vbdcQuantizationSmallStepKB) * m_vbdcQuantizationSmallStepKB);
+          (uint32_t)(ceil((double)(reqVbdcKBytes) / m_vbdcQuantizationSmallStepKB) * m_vbdcQuantizationSmallStepKB);
     }
   else if (reqVbdcKBytes < maxBacklog)
     {
       quantValue =
-          (uint32_t)(floor(reqVbdcKBytes / m_vbdcQuantizationLargeStepKB) * m_vbdcQuantizationLargeStepKB);
+          (uint32_t)(ceil(double(reqVbdcKBytes) / m_vbdcQuantizationLargeStepKB) * m_vbdcQuantizationLargeStepKB);
   }
   else
     {

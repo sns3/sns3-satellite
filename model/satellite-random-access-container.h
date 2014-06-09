@@ -186,6 +186,13 @@ public:
    */
   uint32_t GetSlottedAlohaSignalingOverheadInBytes ();
 
+  /**
+   * \brief Function for checking whether the backoff time has passed for this allocation channel
+   * \param allocationChannel allocation channel
+   * \return Has backoff time passed
+   */
+  bool CrdsaHasBackoffTimePassed (uint32_t allocationChannel) const;
+
 protected:
 
   /**
@@ -225,13 +232,6 @@ private:
    * \return CRDSA algorithm results (Tx opportunities)
    */
   SatRandomAccess::RandomAccessTxOpportunities_s DoCrdsa (uint32_t allocationChannel);
-
-  /**
-   * \brief Function for checking whether the backoff time has passed for this allocation channel
-   * \param allocationChannel allocation channel
-   * \return Has backoff time passed
-   */
-  bool CrdsaHasBackoffTimePassed (uint32_t allocationChannel);
 
   /**
    * \brief Function for evaluating the backoff for this allocation channel

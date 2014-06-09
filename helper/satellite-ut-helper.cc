@@ -316,6 +316,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetRequestManager (rm);
   rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
 
+  // Set the callback to check whether control msg transmissions are possible
+  rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatUtMac::ControlMsgTransmissionPossible, mac));
+
   // Set TBTP callback to UT MAC
   mac->SetAssignedDaResourcesCallback (MakeCallback (&SatRequestManager::AssignedDaResources, rm));
 

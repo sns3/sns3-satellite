@@ -542,7 +542,7 @@ SatRandomAccess::GetCrdsaSignalingOverheadInBytes ()
 }
 
 bool
-SatRandomAccess::CrdsaHasBackoffTimePassed (uint32_t allocationChannel)
+SatRandomAccess::CrdsaHasBackoffTimePassed (uint32_t allocationChannel) const
 {
   NS_LOG_FUNCTION (this);
 

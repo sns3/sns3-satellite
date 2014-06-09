@@ -62,16 +62,20 @@ public:
    * \brief Control message sending callback
    * \param Ptr<SatControlMessage> The message to be sent
    * \param Address Packet destination address
-   * \return bool
+   * \return boolean indicating whether the send was successful
    */
   typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
 
   /**
-   * Container for the pending RBDC requests
-   * Key = pair of RC index and CAC
-   * Value = deque of values
+   * \brief Callback to check whether control msg transmission is possible
+   * \return boolean indicating whether control msg transmission is possible
    */
-  typedef std::vector<std::deque<uint32_t> > PendingRbdcRequestsContainer_t;
+  typedef Callback<bool> CtrlMsgTxPossibleCallback;
+
+  /**
+   * Container for the pending RBDC requests
+   */
+  typedef std::vector<std::deque<std::pair<Time, uint32_t> > > PendingRbdcRequestsContainer_t;
 
   /**
    * \brief Receive a queue event
@@ -92,6 +96,13 @@ public:
    * \param cb callback to send control messages.
    */
   void SetCtrlMsgCallback (SatRequestManager::SendCtrlCallback cb);
+
+  /**
+   * \brief Set the callback to check the possibility of sending a
+   * control message.
+   * \param cb callback to check whether ctrl message sending is possible.
+   */
+  void SetCtrlMsgTxPossibleCallback (SatRequestManager::CtrlMsgTxPossibleCallback cb);
 
   /**
    * \brief Set the GW address needed for CR transmission.
@@ -139,9 +150,8 @@ private:
   /**
    * \brief Do evaluation of the buffer status and decide whether or not
    * to send CRs.
-   * \param periodical Flag indicating whether the evaluation was periodical or on-demand.
    */
-  void DoEvaluation (bool periodical);
+  void DoEvaluation ();
 
   /**
    * \brief Do RBDC calculation for a RC
@@ -231,11 +241,6 @@ private:
   void Reset (uint8_t rc);
 
   /**
-   * \brief Reset all RC index statistics
-   */
-  void ResetAll ();
-
-  /**
    * The queue enque/deque rate getter callback
    */
   CallbackContainer_t m_queueCallbacks;
@@ -244,6 +249,12 @@ private:
    * Callback to send control messages.
   */
   SendCtrlCallback m_ctrlCallback;
+
+  /**
+   * Callback to check from MAC if a control msg may be
+   * transmitted in the near future.
+   */
+  CtrlMsgTxPossibleCallback m_ctrlMsgTxPossibleCallback;
 
   /**
    * GW address
@@ -268,6 +279,11 @@ private:
   Time m_evaluationInterval;
 
   /**
+   * Time when CR evaluation was previously done
+   */
+  Time m_previousEvaluationTime;
+
+  /**
    * Interval to send C/N0 report.
    */
   Time m_cnoReportInterval;
@@ -282,18 +298,6 @@ private:
    * capacity requests on the air.
    */
   Time m_rttEstimate;
-
-  /**
-   * Maximum values to take into account in estimation of capacity
-   * requests on the air. Calculated based on m_rttEstimate and
-   * evaluation period.
-   */
-  uint32_t m_maxPendingCrEntries;
-
-  /**
-   * Gain value K utilized for RBDC/VBDC calculation
-   */
-  double m_gainValueK;
 
   /**
    * Key = RC index

@@ -171,6 +171,15 @@ public:
    */
   void SetRandomAccess (Ptr<SatRandomAccess> randomAccess);
 
+  /**
+   * \brief Method to check whether a transmission of a control msg
+   * is somewhat possible. Transmission cannot be guaranteed, but at least
+   * the possibility to do so (e.g. random access / CRDSA enabled, TBTP with
+   * time slots received).
+   * \return Boolean to indicate whether a control msg transmission is possible
+   */
+  bool ControlMsgTransmissionPossible () const;
+
 protected:
 
    void DoDispose (void);
@@ -414,6 +423,13 @@ private:
    * CRDSA packet ID (per frame)
    */
   uint8_t m_crdsaUniquePacketId;
+
+  /**
+   * Planned CRDSA usage:
+   * - true -> only for control
+   * - false -> for control and user data
+   */
+  bool m_crdsaOnlyForControl;
 };
 
 } // namespace ns3
