@@ -27,7 +27,7 @@ main (int argc, char *argv[])
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 80% system load according to NCC-2
+  uint32_t utsPerBeam (220); // 80% system load according to NCC-2
   uint32_t nccConf (0);
   uint32_t fadingConf (0);
 

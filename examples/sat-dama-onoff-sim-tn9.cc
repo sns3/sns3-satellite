@@ -27,12 +27,13 @@ main (int argc, char *argv[])
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 70% system load according to CRA 1 kbps
+  uint32_t utsPerBeam (220); // 70% system load according to CRA 1 kbps
   uint32_t packetSize (1280); // in bytes
   double simLength (300.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
   DataRate dataRate (32000); // in bps
+  uint32_t damaConf (0);
   uint32_t crTxConf (0);
 
   // To read attributes from file
@@ -56,6 +57,10 @@ main (int argc, char *argv[])
    *     - 8 x 0.625 MHz  -> 5 MHz
    *     - 4 x 1.25 MHz   -> 5 MHz
    *     - 1 x 1.25 MHz   -> 1.25 MHz
+   *
+   * DAMA configuration mode (selected from command line argument):
+   *   - RBDC
+   *   - VBDC
    *
    * NCC configuration mode:
    *   - Conf-2 scheduling mode (dynamic time slots)
@@ -87,6 +92,7 @@ main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
   cmd.Parse (argc, argv);
 
@@ -104,11 +110,31 @@ main (int argc, char *argv[])
   // Disable Markov fading
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
-  // RBDC
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (16));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+  switch (crTxConf)
+  {
+    // RBDC
+    case 0:
+      {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (16));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+        break;
+      }
+    // VBDC
+    case 1:
+      {
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
+        break;
+      }
+  }
 
   switch (crTxConf)
   {
@@ -124,7 +150,7 @@ main (int argc, char *argv[])
       {
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
-        /// \todo Add configuration for STRICT 0
+        Config::SetDefault ("ns3::SatUtMac::UseCrdsaOnlyForControlPackets", BooleanValue (true));
         break;
       }
     // Periodical control slots

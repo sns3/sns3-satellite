@@ -25,12 +25,12 @@ int
 main (int argc, char *argv[])
 {
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1); /// \todo Make it equivalent with 70% system load according to CRA 1 kbps
+  uint32_t utsPerBeam (220); // expected to be equivalent with 70% system load
   DataRate dataRate (32000); // in bps
   uint32_t beamConf (0);
 
   uint32_t packetSize (1280); // in bytes
-  double simLength (300.0); // in seconds
+  double simLength (50.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file

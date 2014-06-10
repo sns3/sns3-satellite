@@ -401,7 +401,7 @@
  <default name="ns3::SatEnvVariables::DataPath" value="src/satellite/data"/>
  <default name="ns3::SatBeamHelper::FadingModel" value="FadingMarkov"/>
  <default name="ns3::SatBeamHelper::RandomAccessModel" value="RaOff"/>
- <default name="ns3::SatBeamHelper::RaInterferenceModel" value="Constant"/>
+ <default name="ns3::SatBeamHelper::RaInterferenceModel" value="PerPacket"/>
  <default name="ns3::SatBeamHelper::RaCollisionModel" value="RaCollisionCheckAgainstSinr"/>
  <default name="ns3::SatBeamHelper::PropagationDelayModel" value="ConstantSpeed"/>
  <default name="ns3::SatBeamHelper::ConstantPropagationDelay" value="+130000000.0ns"/>
