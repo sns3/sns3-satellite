@@ -168,7 +168,7 @@ private:
    * \param &vbdcBytes Reference to vbdcBytes
    * \return SatCapacityAllocationCategory_t Capacity allocation category
    */
-  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcKBytes);
+  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcBytes);
 
   /**
    * \brief Calculate the needed VBDC bytes for a RC
@@ -176,7 +176,7 @@ private:
    * \param stats Queue statistics
    * \return Requested VBDC kilobytes
    */
-  uint32_t GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
+  uint32_t GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
 
   /**
    * \brief Calculate the needed AVBDC bytes for a RC
@@ -184,7 +184,7 @@ private:
    * \param stats Queue statistics
    * \return Requested AVBDC kilobytes
    */
-  uint32_t GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
+  uint32_t GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
 
   /**
    * Check whether VBDC volume backlog persistence shall expire and
@@ -197,14 +197,20 @@ private:
    * \param rc Request class index
    * \return Pending sum in kbps or Bytes
    */
-  uint32_t GetPendingRbdcSumKbps (uint8_t rc) const;
+  uint32_t GetPendingRbdcSumKbps (uint8_t rc);
 
   /**
    * \brief Update the pending RBDC counters with new request information
    * \param rc Request class index
-   * \param value Requested value in kbps or Bytes
+   * \param kbps Requested value in kbps or Bytes
    */
-  void UpdatePendingRbdcCounters (uint8_t rc, uint32_t value);
+  void UpdatePendingRbdcCounters (uint8_t rc, uint32_t kbps);
+
+  /**
+   * Clean-up the pending RBDC container from old samples.
+   * \param rc Request class index
+   */
+  void RemoveOldEntriesFromPendingRbdcContainer (uint8_t rc);
 
   /**
    * Update pending VBDC counters for all RCs
@@ -239,6 +245,27 @@ private:
    * \param rc RC index
    */
   void Reset (uint8_t rc);
+
+  /**
+   * The RBDC value is signalled with 8 bits, which means that to be able to signal
+   * larger than 256 values, we need to use quantization and coding to convert the
+   * raw values into defined discrete values.
+   * \param index RC index
+   * \param reqRbdcKbps Raw RBDC request
+   * \return uint16_t Quantized RBDC value
+   */
+  uint16_t GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) const;
+
+  /**
+   * The RBDC value is signalled with 8 bits, which means that to be able to signal
+   * larger than 256 values, we need to use quantization and coding to convert the
+   * raw values into defined discrete values.
+   * \param index RC index
+   * \param reqVbdcBytes Raw VBDC request in Bytes
+   * \return uint16_t Quantized VBDC value
+   */
+  uint16_t GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdcBytes) const;
+
 
   /**
    * The queue enque/deque rate getter callback
@@ -322,11 +349,6 @@ private:
   std::vector<uint32_t> m_assignedDaResourcesBytes;
 
   /**
-   * Sum of VBDC volume in
-   */
-  std::vector<uint32_t> m_sumVbdcVolumeIn;
-
-  /**
    * Time when the last CR including VBDC request was sent
    */
   Time m_lastVbdcCrSent;
@@ -342,6 +364,10 @@ private:
    * requested bytes.
    */
   bool m_forcedAvbdcUpdate;
+
+  uint32_t m_numValues;
+  static const uint32_t m_rbdcScalingFactors [4];
+  static const uint32_t m_vbdcScalingFactors [4];
 
   /**
    * Trace callback used for CR tracing.

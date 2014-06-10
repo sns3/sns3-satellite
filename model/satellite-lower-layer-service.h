@@ -513,31 +513,6 @@ public:
    */
   double GetRaAverageNormalizedOfferedLoadThreshold (uint8_t index) const;
 
-  /**
-   * Check the DA service entry parameters so that they make sense.
-   */
-  void CheckAttributes () const;
-
-  /**
-   * The RBDC value is signalled with 8 bits, which means that to be able to signal
-   * larger than 256 values, we need to use quantization and coding to convert the
-   * raw values into defined discrete values.
-   * \param index RC index
-   * \param reqRbdcKbps Raw RBDC request
-   * \return uint16_t Quantized RBDC value
-   */
-  uint16_t GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) const;
-
-  /**
-   * The RBDC value is signalled with 8 bits, which means that to be able to signal
-   * larger than 256 values, we need to use quantization and coding to convert the
-   * raw values into defined discrete values.
-   * \param index RC index
-   * \param reqRbdcKbps Raw VBDC request
-   * \return uint16_t Quantized VBDC value
-   */
-  uint16_t GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdcKBytes) const;
-
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
@@ -546,23 +521,6 @@ private:
   SatLowerLayerServiceDaEntry              m_daServiceEntries[m_maxDaServiceEntries];
   uint8_t                                  m_raServiceEntryCount;
   SatLowerLayerServiceRaEntry              m_raServiceEntries[m_maxRaServiceEntries];
-
-  uint16_t m_rbdcQuantizationSmallStepKbps;
-  uint16_t m_rbdcQuantizationLargeStepKbps;
-  uint16_t m_rbdcQuantizationThresholdKbps;
-  uint16_t m_vbdcQuantizationSmallStepKB;
-  uint16_t m_vbdcQuantizationLargeStepKB;
-  uint16_t m_vbdcQuantizationThresholdKB;
-
-  /**
-   * Check the DA service entry parameters so that they make sense.
-   */
-  void CheckRbdcAttributes (uint8_t index) const;
-
-  /**
-   * Check the DA service entry parameters so that they make sense.
-   */
-  void CheckVbdcAttributes (uint8_t index) const;
 
   /**
    * Template method to convert number to string

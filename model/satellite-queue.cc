@@ -39,7 +39,7 @@ TypeId SatQueue::GetTypeId (void)
     .AddConstructor<SatQueue> ()
     .AddAttribute ("MaxPackets",
                    "The maximum number of packets accepted by this SatQueue.",
-                   UintegerValue (100),
+                   UintegerValue (1000),
                    MakeUintegerAccessor (&SatQueue::m_maxPackets),
                    MakeUintegerChecker<uint32_t> ())
     .AddTraceSource ("Enqueue",
@@ -329,8 +329,8 @@ SatQueue::GetQueueStatistics (bool reset)
 
   if (duration.IsPositive())
     {
-      queueStats.m_incomingRateKbps = SatUtils::BITS_PER_BYTE * m_nEnqueBytesSinceReset / 1000.0 / duration.GetSeconds ();
-      queueStats.m_outgoingRateKbps = SatUtils::BITS_PER_BYTE * m_nDequeBytesSinceReset / 1000.0 / duration.GetSeconds ();
+      queueStats.m_incomingRateKbps = SatUtils::BITS_PER_BYTE * m_nEnqueBytesSinceReset / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ();
+      queueStats.m_outgoingRateKbps = SatUtils::BITS_PER_BYTE * m_nDequeBytesSinceReset / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ();
       queueStats.m_volumeInBytes = m_nEnqueBytesSinceReset;
       queueStats.m_volumeOutBytes = m_nDequeBytesSinceReset;
       queueStats.m_queueSizeBytes = GetNBytes ();

@@ -79,14 +79,14 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
             case SatEnums::DA_VBDC:
               {
                 m_damaEntry->ResetVolumeBacklogPersistence ();
-                m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
+                m_damaEntry->UpdateVbdcInBytes (descriptorIt->first.first, descriptorIt->second);
                 break;
               }
 
             case SatEnums::DA_AVBDC:
               {
                 m_damaEntry->ResetVolumeBacklogPersistence ();
-                m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second * 1024);
+                m_damaEntry->SetVbdcInBytes (descriptorIt->first.first, descriptorIt->second);
                 break;
               }
 
@@ -516,12 +516,12 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
         {
           double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
 
-          it->second.m_reqPerRc[i].m_craBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
-          it->second.m_reqPerRc[i].m_rbdcBytes = ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_craBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
+          it->second.m_reqPerRc[i].m_rbdcBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
           it->second.m_reqPerRc[i].m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
-          it->second.m_reqPerRc[i].m_minRbdcBytes = ( 1000.0 * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+          it->second.m_reqPerRc[i].m_minRbdcBytes = (SatUtils::BITS_IN_KBIT * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
 
           NS_ASSERT (it->second.m_reqPerRc[i].m_minRbdcBytes <= it->second.m_reqPerRc[i].m_rbdcBytes);
 
@@ -590,8 +590,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
 
         for (uint32_t i = 0; i < allocInfo->second.first.size (); i++ )
           {
-            uint32_t rateBasedBytes = ( 1000.0 * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
-            rateBasedBytes += ( 1000.0 * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / SatUtils::BITS_PER_BYTE;
+            uint32_t rateBasedBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
+            rateBasedBytes += (SatUtils::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
 
             if ( rateBasedBytes < allocInfo->second.first[i] )
               {

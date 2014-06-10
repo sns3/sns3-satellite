@@ -102,7 +102,6 @@ SatBaseTestCase::DoRun ()
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
   Ptr<SatLowerLayerServiceConf> llsConf = CreateObject<SatLowerLayerServiceConf>  ();
-  llsConf->CheckAttributes ();
 
   Time superFrameDuration (MilliSeconds (100));
 

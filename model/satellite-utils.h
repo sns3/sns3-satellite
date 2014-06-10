@@ -53,6 +53,16 @@ public:
   static const uint32_t BITS_PER_BYTE = 8;
 
   /**
+   * \brief Number of bytes consisting a kilobyte
+   */
+  static const uint32_t BYTES_IN_KBYTE = 1000;
+
+  /**
+   * \brief Number of bits consisting a kilobit
+   */
+  static const uint32_t BITS_IN_KBIT = 1024;
+
+  /**
    * \brief Converts radians to degrees
    *
    * \param radian value to convert as radians

@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <iomanip>
-#include "kpi-helper.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/packet.h"
@@ -31,6 +30,8 @@
 #include "ns3/flow-monitor.h"
 #include "ns3/ipv4-flow-classifier.h"
 
+#include "kpi-helper.h"
+#include "../model/satellite-utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("KpiHelper");
 
@@ -375,7 +376,7 @@ KpiHelper::AddressToString (const Ipv4Address address)
 double
 KpiHelper::GetKbps (uint64_t bytes, Time duration)
 {
-  return static_cast<double> (bytes * 8) / 1000.0 / duration.GetSeconds ();
+  return (bytes * SatUtils::BITS_PER_BYTE / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ());
 }
 
 

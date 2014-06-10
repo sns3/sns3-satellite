@@ -70,7 +70,7 @@ SatDamaEntry::GetCraBasedBytes (Time duration) const
     {
       if (m_llsConf->GetDaConstantAssignmentProvided (i))
         {
-          totalBytes += (1000.0 * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
+          totalBytes += (SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps (i) * duration.GetSeconds ()) / (double)(SatUtils::BITS_PER_BYTE);
         }
     }
 
@@ -101,7 +101,7 @@ SatDamaEntry::GetMinRateBasedBytes (Time duration) const
           minRateInKbps = m_llsConf->GetDaMinimumServiceRateInKbps (i);
         }
 
-      totalBytes += (1000.0 * minRateInKbps * duration.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
+      totalBytes += (SatUtils::BITS_IN_KBIT * minRateInKbps * duration.GetSeconds ()) / (double)(SatUtils::BITS_PER_BYTE);
     }
 
   return totalBytes;
@@ -116,7 +116,7 @@ SatDamaEntry::GetRbdcBasedBytes (Time duration) const
 
   for ( uint8_t i = 0; i < m_dynamicRateRequestedInKbps.size (); i++)
     {
-      totalBytes += (1000.0 * m_dynamicRateRequestedInKbps[i] * duration.GetSeconds ()) / SatUtils::BITS_PER_BYTE;
+      totalBytes += (SatUtils::BITS_IN_KBIT * m_dynamicRateRequestedInKbps[i] * duration.GetSeconds ()) / (double)(SatUtils::BITS_PER_BYTE);
     }
 
   return totalBytes;
@@ -244,9 +244,9 @@ SatDamaEntry::SetVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
     {
       m_volumeBacklogRequestedInBytes[index] = volumeInBytes;
 
-      if ( m_volumeBacklogRequestedInBytes[index] > (1024 * m_llsConf->GetDaMaximumBacklogInKbytes (index)))
+      if ( m_volumeBacklogRequestedInBytes[index] > (SatUtils::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index)))
         {
-          m_volumeBacklogRequestedInBytes[index] = (1024 * m_llsConf->GetDaMaximumBacklogInKbytes (index));
+          m_volumeBacklogRequestedInBytes[index] = (SatUtils::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index));
         }
     }
 }

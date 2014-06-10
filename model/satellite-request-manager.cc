@@ -33,6 +33,8 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatRequestManager);
 
+const uint32_t SatRequestManager::m_rbdcScalingFactors[4] = {1, 4, 16, 64};
+const uint32_t SatRequestManager::m_vbdcScalingFactors[4] = {1, 8, 64, 512};
 
 SatRequestManager::SatRequestManager ()
 :m_gwAddress (),
@@ -45,7 +47,8 @@ SatRequestManager::SatRequestManager ()
  m_pendingVbdcBytes (),
  m_lastVbdcCrSent (Seconds (0)),
  m_superFrameDuration (Seconds (0)),
- m_forcedAvbdcUpdate (false)
+ m_forcedAvbdcUpdate (false),
+ m_numValues (256)
 {
   NS_LOG_FUNCTION (this);
 
@@ -67,7 +70,6 @@ SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf, Time super
   m_pendingRbdcRequestsKbps = std::vector< std::deque<std::pair<Time, uint32_t> > > (m_llsConf->GetDaServiceCount (), std::deque<std::pair<Time, uint32_t> > ());
   m_pendingVbdcBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
   m_assignedDaResourcesBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
-  m_sumVbdcVolumeIn = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
 
   // Superframe duration
   m_superFrameDuration = superFrameDuration;
@@ -241,14 +243,14 @@ SatRequestManager::DoEvaluation ()
             {
               NS_LOG_LOGIC ("Evaluation VBDC for RC: " << (uint32_t)(rc));
 
-              uint32_t vbdcKBytes (0);
+              uint32_t vbdcBytes (0);
 
-              SatEnums::SatCapacityAllocationCategory_t cac = DoVbdc (rc, stats, vbdcKBytes);
+              SatEnums::SatCapacityAllocationCategory_t cac = DoVbdc (rc, stats, vbdcBytes);
 
-              if (vbdcKBytes > 0)
+              if (vbdcBytes > 0)
                 {
                   // Add control element only if UT needs some bytes
-                  crMsg->AddControlElement (rc, cac, vbdcKBytes);
+                  crMsg->AddControlElement (rc, cac, vbdcBytes);
 
                   // Update the time when VBDC CR is sent
                   m_lastVbdcCrSent = Simulator::Now ();
@@ -258,13 +260,13 @@ SatRequestManager::DoEvaluation ()
                      << m_nodeInfo->GetNodeId () << ", "
                      << static_cast<uint32_t> (rc) << ", "
                      << cac << ", "
-                     << vbdcKBytes << ", "
+                     << vbdcBytes << ", "
                      << stats.m_queueSizeBytes;
                   m_crTraceLog (ss.str ());
-                  m_vbdcTrace (vbdcKBytes);
+                  m_vbdcTrace (vbdcBytes);
                 }
 
-              NS_LOG_LOGIC ("Requested VBDC volume for RC: " << (uint32_t)(rc) << " is " << vbdcKBytes << " KBytes with CAC: " << cac);
+              NS_LOG_LOGIC ("Requested VBDC volume for RC: " << (uint32_t)(rc) << " is " << vbdcBytes << " Bytes with CAC: " << cac);
             }
 
           // RBDC + VBDC
@@ -369,7 +371,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
   double previousRbdcKbits = GetPendingRbdcSumKbps (rc) * duration.GetSeconds ();
 
   double reqRbdcKbps (stats.m_incomingRateKbps);
-  double totalQueueSizeInKBits = SatUtils::BITS_PER_BYTE * stats.m_queueSizeBytes / 1000.0;
+  double totalQueueSizeInKBits = SatUtils::BITS_PER_BYTE * stats.m_queueSizeBytes / (double)(SatUtils::BITS_IN_KBIT);
 
   double rbdcSumKbits = thisRbdcKbits + previousRbdcKbits;
   if (totalQueueSizeInKBits > rbdcSumKbits)
@@ -410,7 +412,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
 
   NS_LOG_LOGIC("RBDC bitrate after CRA as been taken off: " << reqRbdcKbps << " kbps");
 
-  uint32_t crRbdcKbps = m_llsConf->GetQuantizedRbdcValue (rc, reqRbdcKbps);
+  uint32_t crRbdcKbps = GetQuantizedRbdcValue (rc, reqRbdcKbps);
 
   NS_LOG_LOGIC("Quantized RBDC bitrate: " << crRbdcKbps << " kbps");
 
@@ -421,18 +423,18 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
 
 
 SatEnums::SatCapacityAllocationCategory_t
-SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcKBytes)
+SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcBytes)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
-  uint32_t vbdcKBytes (0);
+  uint32_t vbdcBytes (0);
 
   SatEnums::SatCapacityAllocationCategory_t cac = SatEnums::DA_VBDC;
 
   if (m_forcedAvbdcUpdate == true)
     {
       cac = SatEnums::DA_AVBDC;
-      vbdcKBytes = GetAvbdcKBytes (rc, stats);
+      vbdcBytes = GetAvbdcBytes (rc, stats);
     }
   else
     {
@@ -446,23 +448,23 @@ SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint3
           if (m_pendingVbdcBytes.at (rc) == 0)
             {
               cac = SatEnums::DA_AVBDC;
-              vbdcKBytes = GetAvbdcKBytes (rc, stats);
+              vbdcBytes = GetAvbdcBytes (rc, stats);
             }
           else
             {
               cac = SatEnums::DA_VBDC;
-              vbdcKBytes = GetVbdcKBytes (rc, stats);
+              vbdcBytes = GetVbdcBytes (rc, stats);
             }
         }
     }
   // Return the VBDC as referenced uint32_t
-  rcVbdcKBytes = vbdcKBytes;
+  rcVbdcBytes = vbdcBytes;
 
   return cac;
 }
 
 uint32_t
-SatRequestManager::GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
+SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
@@ -470,7 +472,6 @@ SatRequestManager::GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stat
 
   uint32_t craBytes (0);
   uint32_t vbdcBytes = stats.m_queueSizeBytes;
-  uint32_t vbdcKBytes (0);
 
   // If CRA enabled, substract the CRA Bytes from VBDC
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
@@ -481,39 +482,34 @@ SatRequestManager::GetAvbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stat
       Time duration = Simulator::Now () - m_previousEvaluationTime;
 
       // Calculate how much bytes would be given to this RC index with configured CRA
-      craBytes = (uint32_t)((1000.0 * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
-          / SatUtils::BITS_PER_BYTE);
+      craBytes = (uint32_t)((SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
+          / (double)(SatUtils::BITS_PER_BYTE));
     }
 
   // If there is still need for Bytes after CRA
   if (craBytes < vbdcBytes)
     {
       vbdcBytes -= craBytes;
-
-      // Convert Bytes to KBytes and quantize the request to set of
-      // predefined values
-      vbdcKBytes = (uint32_t)(ceil (vbdcBytes / 1000.0));
-      vbdcKBytes = m_llsConf->GetQuantizedVbdcValue (rc, vbdcKBytes);
+      vbdcBytes = GetQuantizedVbdcValue (rc, vbdcBytes);
 
       // Update the pending counters
-      m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + 1000 * vbdcKBytes;
+      m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + vbdcBytes;
 
       NS_LOG_LOGIC("Pending VBDC bytes: " << (uint32_t)(rc) << ": " << m_pendingVbdcBytes.at (rc)<< " Bytes");
 
-      return vbdcKBytes;
+      return vbdcBytes;
     }
 
   return 0;
 }
 
 uint32_t
-SatRequestManager::GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
+SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   uint32_t craBytes (0);
   uint32_t vbdcBytes = stats.m_volumeInBytes;
-  uint32_t vbdcKBytes (0);
 
   // If CRA enabled, substract the CRA Bytes from VBDC
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
@@ -524,8 +520,8 @@ SatRequestManager::GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats
       Time duration = Simulator::Now () - m_previousEvaluationTime;
 
       // Calculate how much bytes would be given to this RC index with configured CRA
-      craBytes = (uint32_t)((1000.0 * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
-          / SatUtils::BITS_PER_BYTE);
+      craBytes = (uint32_t)((SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
+          / (double)(SatUtils::BITS_PER_BYTE));
     }
 
   // If there is still need for Bytes after CRA
@@ -533,34 +529,16 @@ SatRequestManager::GetVbdcKBytes (uint8_t rc, const SatQueue::QueueStats_t stats
     {
       vbdcBytes -= craBytes;
 
-      // Update the sum of VBDC volume in
-      m_sumVbdcVolumeIn.at (rc) = m_sumVbdcVolumeIn.at (rc) + vbdcBytes;
-
       NS_LOG_LOGIC("VBDC volume after CRA for RC: " << (uint32_t)(rc) << ": " << vbdcBytes << " Bytes");
 
-      // If the sum of volume in is more than the previously requested bytes, then
-      // we need to ask some more
-      if (m_pendingVbdcBytes.at (rc) < m_sumVbdcVolumeIn.at (rc))
-        {
-          vbdcBytes = m_sumVbdcVolumeIn.at (rc) - m_pendingVbdcBytes.at (rc);
+      vbdcBytes = GetQuantizedVbdcValue (rc, vbdcBytes);
+      m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + vbdcBytes;
 
-          // Convert Bytes to KBytes and quantize the request to set of
-          // predefined values
-          vbdcKBytes = (uint32_t)(ceil (vbdcBytes / 1000.0));
-          vbdcKBytes = m_llsConf->GetQuantizedVbdcValue (rc, vbdcKBytes);
-
-          NS_LOG_LOGIC("VBDC bytes after quantization: " << vbdcKBytes << " KBytes");
-
-          // Update the pending counters
-          m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + 1000 * vbdcKBytes;
-        }
-
-      NS_LOG_LOGIC("SumVolumeIn: " << (uint32_t)(rc) << ": " << m_sumVbdcVolumeIn.at (rc) << " Bytes");
       NS_LOG_LOGIC("Pending VBDC bytes: " << (uint32_t)(rc) << ": " << m_pendingVbdcBytes.at (rc)<< " Bytes");
       NS_LOG_LOGIC("VBDC volume after pending: " << (uint32_t)(rc) << ": " << vbdcBytes << " Bytes");
     }
 
-  return vbdcKBytes;
+  return vbdcBytes;
 }
 
 void
@@ -594,9 +572,11 @@ SatRequestManager::CheckForVolumeBacklogPersistence ()
 }
 
 uint32_t
-SatRequestManager::GetPendingRbdcSumKbps (uint8_t rc) const
+SatRequestManager::GetPendingRbdcSumKbps (uint8_t rc)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
+
+  RemoveOldEntriesFromPendingRbdcContainer (rc);
 
   uint32_t value (0);
   std::deque<std::pair<Time, uint32_t> > cont = m_pendingRbdcRequestsKbps.at (rc);
@@ -605,7 +585,7 @@ SatRequestManager::GetPendingRbdcSumKbps (uint8_t rc) const
       it != cont.end ();
       ++it)
     {
-      // Add the bytes
+      // Add the kbps
       value += (*it).second;
     }
 
@@ -616,18 +596,34 @@ SatRequestManager::GetPendingRbdcSumKbps (uint8_t rc) const
 
 
 void
-SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t value)
+SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t kbps)
 {
-  NS_LOG_FUNCTION (this << (uint32_t)(rc) << value);
+  NS_LOG_FUNCTION (this << (uint32_t)(rc) << kbps);
 
   Time now = Simulator::Now ();
-  std::pair<Time, uint32_t> item = std::make_pair<Time, uint32_t> (now, value);
+  std::pair<Time, uint32_t> item = std::make_pair<Time, uint32_t> (now, kbps);
   m_pendingRbdcRequestsKbps.at(rc).push_back (item);
+}
 
-  // If the oldest RBDC sampel is too old, remove it
-  if (m_pendingRbdcRequestsKbps.at(rc).front ().first < (Simulator::Now () - m_rttEstimate))
+void
+SatRequestManager::RemoveOldEntriesFromPendingRbdcContainer (uint8_t rc)
+{
+  NS_LOG_LOGIC (this << (uint32_t)(rc));
+
+  std::deque<std::pair<Time, uint32_t> > &cont = m_pendingRbdcRequestsKbps.at (rc);
+  std::deque<std::pair<Time, uint32_t> >::const_iterator it = cont.begin ();
+
+  while (it != cont.end ())
     {
-      m_pendingRbdcRequestsKbps.at (rc).pop_front ();
+      if ((*it).first < (Simulator::Now () - m_rttEstimate))
+        {
+          cont.pop_front ();
+          it = cont.begin ();
+        }
+      else
+        {
+          break;
+        }
     }
 }
 
@@ -747,8 +743,70 @@ SatRequestManager::Reset (uint8_t rc)
 
   m_assignedDaResourcesBytes.at (rc) = 0;
   m_pendingVbdcBytes.at (rc) = 0;
-  m_sumVbdcVolumeIn.at (rc) = 0;
 }
+
+uint16_t
+SatRequestManager::GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t)(index) << reqRbdcKbps);
+
+  uint32_t maxRbdc = m_llsConf->GetDaMaximumServiceRateInKbps (index);
+  uint32_t quantValue (0);
+
+  // Maximum configured RBDC rate
+  if (reqRbdcKbps > maxRbdc)
+    {
+      return maxRbdc;
+    }
+
+  // Else quantize based on the predefined scaling factors from the specification
+  for (uint32_t i = 0; i < 4; i++)
+    {
+
+      // If the value can be represented with this scaling value
+      if (reqRbdcKbps <= m_rbdcScalingFactors[i] * m_numValues)
+        {
+          quantValue = (uint16_t)( ceil( reqRbdcKbps / (double)(m_rbdcScalingFactors[i])) * m_rbdcScalingFactors[i] );
+          return quantValue;
+        }
+    }
+
+  NS_FATAL_ERROR ("Quantized value for RBDC not calculated!");
+
+  return quantValue;
+}
+
+uint16_t
+SatRequestManager::GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdcBytes) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t)(index) << reqVbdcBytes);
+
+  uint32_t maxBacklogBytes = SatUtils::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index);
+  uint32_t quantValue (0);
+
+  // If maximum backlog reached
+  if (reqVbdcBytes > maxBacklogBytes)
+    {
+      return maxBacklogBytes;
+    }
+
+  // Else quantize based on the predefined scaling factors from the specification
+  for (uint32_t i = 0; i < 4; ++i)
+    {
+
+      // If the value can be represented with this scaling value
+      if (reqVbdcBytes <= m_vbdcScalingFactors[i] * m_numValues)
+        {
+          quantValue = (uint16_t)( ceil( reqVbdcBytes / (double)(m_vbdcScalingFactors[i])) * m_vbdcScalingFactors[i] );
+          return quantValue;
+        }
+    }
+
+  NS_FATAL_ERROR ("Quantized value for VBDC not calculated!");
+
+  return quantValue;
+}
+
 
 }
 

@@ -53,9 +53,6 @@ main (int argc, char *argv[])
   cmd.AddValue ("profilingConf", "Profiling configuration", profilingConf);
   cmd.Parse (argc, argv);
 
-  // use 5 seconds store time for control messages
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
-
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 

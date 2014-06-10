@@ -436,7 +436,6 @@ private:
    * Least margin transmission mode request = 1 Byte
    */
   static const uint32_t CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES = 3;
-
 };
 
 
@@ -450,12 +449,12 @@ class SatArqAckMessage : public SatControlMessage
 public:
 
   /**
-   * Constructor for SatCrMessage
+   * Constructor for SatArqAckMessage
    */
   SatArqAckMessage ();
 
   /**
-   * Destructor for SatCrMessage
+   * Destructor for SatArqAckMessage
    */
   ~SatArqAckMessage ();
 

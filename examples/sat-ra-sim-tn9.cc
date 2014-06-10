@@ -48,8 +48,6 @@ main (int argc, char *argv[])
   ConfigStore inputConfig;
   inputConfig.ConfigureDefaults ();
 
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (350)));
-
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
@@ -60,9 +58,6 @@ main (int argc, char *argv[])
   cmd.AddValue ("onTime", "Time for packet sending is on in seconds", onTime);
   cmd.AddValue ("offTime", "Time for packet sending is off in seconds", offTime);
   cmd.Parse (argc, argv);
-
-  // use 5 seconds store time for control messages
-  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (Seconds (5)));
 
   // Enable Random Access with all available modules
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));

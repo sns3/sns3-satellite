@@ -27,10 +27,12 @@
 #include "ns3/pointer.h"
 #include "ns3/random-variable-stream.h"
 #include "satellite-lower-layer-service.h"
+#include "../model/satellite-utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLowerLayerServiceConf");
 
 namespace ns3 {
+
 
  SatLowerLayerServiceDaEntry::SatLowerLayerServiceDaEntry ()
   : m_constantAssignmentProvided (false),
@@ -75,13 +77,7 @@ SatLowerLayerServiceConf::SatLowerLayerServiceConf ()
    m_volumeBacklogPersistence (0),
    m_defaultControlRandomizationInterval (0.0),
    m_daServiceEntryCount (0),
-   m_raServiceEntryCount (0),
-   m_rbdcQuantizationSmallStepKbps (8),
-   m_rbdcQuantizationLargeStepKbps (64),
-   m_rbdcQuantizationThresholdKbps (1024),
-   m_vbdcQuantizationSmallStepKB (1),
-   m_vbdcQuantizationLargeStepKB (4),
-   m_vbdcQuantizationThresholdKB (128)
+   m_raServiceEntryCount (0)
 {
    NS_LOG_FUNCTION (this);
 
@@ -123,9 +119,9 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a1    'Constant assignment provided' attribute value [true or false]
  * \param a2    'RBDC allowed' attribute value [true or false]
  * \param a3    'Volume allowed' attribute value [true or false]
- * \param a4    'Constant service rate' attribute value [KBps]
- * \param a5    'Maximum service rate' attribute value [KBps]
- * \param a6    'Minimum service rate' attribute value [KBps]
+ * \param a4    'Constant service rate' attribute value [Kbps]
+ * \param a5    'Maximum service rate' attribute value [Kbps]
+ * \param a6    'Minimum service rate' attribute value [Kbps]
  * \param a7    'Maximum backlog size' attribute value [KBytes]
  *
  * \return TypeId
@@ -279,36 +275,6 @@ SatLowerLayerServiceConf::GetTypeId (void)
                      TimeValue (MilliSeconds (100)),
                      MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
                      MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
-    .AddAttribute ( "RbdcQuantizationSmallStepKbps",
-                    "Smaller quantization step for RBDC in kbps.",
-                     UintegerValue (8),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationSmallStepKbps),
-                     MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ( "RbdcQuantizationLargeStepKbps",
-                    "Larger quantization step for RBDC in kbps.",
-                     UintegerValue (64),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationLargeStepKbps),
-                     MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ( "RbdcQuantizationThresholdKbps",
-                    "Quantization threshold for RBDC in kbps.",
-                     UintegerValue (1024),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_rbdcQuantizationThresholdKbps),
-                     MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ( "VbdcQuantizationSmallStepKB",
-                    "Smaller quantization step for VBDC in kB.",
-                     UintegerValue (1),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationSmallStepKB),
-                     MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ( "VbdcQuantizationLargeStepKB",
-                    "Larger quantization step for VBDC in kB.",
-                     UintegerValue (2),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationLargeStepKB),
-                     MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ( "VbdcQuantizationThresholdKB",
-                    "Quantization threshold for VBDC in kB.",
-                     UintegerValue (128),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_vbdcQuantizationThresholdKB),
-                     MakeUintegerChecker<uint16_t> ())
     /*
      * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
      */
@@ -321,47 +287,6 @@ SatLowerLayerServiceConf::GetTypeId (void)
   ;
 
   return tid;
-}
-
-void SatLowerLayerServiceConf::CheckAttributes () const
-{
-  NS_LOG_FUNCTION (this);
-
-  for (uint32_t i = 0; i < m_daServiceEntryCount; ++i)
-    {
-      CheckRbdcAttributes (i);
-      CheckVbdcAttributes (i);
-    }
-}
-
-void SatLowerLayerServiceConf::CheckRbdcAttributes (uint8_t index) const
-{
-  NS_LOG_FUNCTION (this << index);
-
-  uint32_t numValidQuantizedValues =  m_rbdcQuantizationThresholdKbps / m_rbdcQuantizationSmallStepKbps
-      + ( GetDaMaximumServiceRateInKbps (index) - m_rbdcQuantizationThresholdKbps ) / m_rbdcQuantizationLargeStepKbps;
-
-  NS_LOG_LOGIC ("Number of quantized samples for RBDC and RC index " << index << ": " << numValidQuantizedValues);
-
-  if (numValidQuantizedValues > 256)
-    {
-      NS_FATAL_ERROR ("Too many quantized samples for RBDC: " << numValidQuantizedValues);
-    }
-}
-
-void SatLowerLayerServiceConf::CheckVbdcAttributes (uint8_t index) const
-{
-  NS_LOG_FUNCTION (this << index);
-
-  uint32_t numValidQuantizedValues =  m_vbdcQuantizationThresholdKB / m_vbdcQuantizationSmallStepKB
-      + ( GetDaMaximumBacklogInKbytes (index) - m_vbdcQuantizationThresholdKB ) / m_vbdcQuantizationLargeStepKB;
-
-  NS_LOG_LOGIC ("Number of quantized samples for VBDC and RC index " << index << ": " << numValidQuantizedValues);
-
-  if (numValidQuantizedValues > 256)
-    {
-      NS_FATAL_ERROR ("Too many quantized samples for RBDC: " << numValidQuantizedValues);
-    }
 }
 
 TypeId
@@ -732,54 +657,6 @@ SatLowerLayerServiceConf::SetRaAverageNormalizedOfferedLoadThreshold (uint8_t in
     }
 
   m_raServiceEntries[index].SetAverageNormalizedOfferedLoadThreshold (averageNormalizedOfferedLoadThreshold);
-}
-
-uint16_t
-SatLowerLayerServiceConf::GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) const
-{
-  uint32_t maxRbdc = GetDaMaximumServiceRateInKbps (index);
-  uint32_t quantValue (0);
-
-  if (reqRbdcKbps < m_rbdcQuantizationThresholdKbps)
-    {
-      quantValue =
-          (uint32_t)(ceil((double)reqRbdcKbps / m_rbdcQuantizationSmallStepKbps) * m_rbdcQuantizationSmallStepKbps);
-    }
-  else if (reqRbdcKbps < maxRbdc)
-    {
-      quantValue =
-          (uint32_t)(ceil((double)reqRbdcKbps / m_rbdcQuantizationLargeStepKbps) * m_rbdcQuantizationLargeStepKbps);
-  }
-  else
-    {
-      quantValue = maxRbdc;
-    }
-
-  return quantValue;
-}
-
-uint16_t
-SatLowerLayerServiceConf::GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdcKBytes) const
-{
-  uint32_t maxBacklog = GetDaMaximumBacklogInKbytes (index);
-  uint32_t quantValue (0);
-
-  if (reqVbdcKBytes < m_vbdcQuantizationThresholdKB)
-    {
-      quantValue =
-          (uint32_t)(ceil((double)(reqVbdcKBytes) / m_vbdcQuantizationSmallStepKB) * m_vbdcQuantizationSmallStepKB);
-    }
-  else if (reqVbdcKBytes < maxBacklog)
-    {
-      quantValue =
-          (uint32_t)(ceil(double(reqVbdcKBytes) / m_vbdcQuantizationLargeStepKB) * m_vbdcQuantizationLargeStepKB);
-  }
-  else
-    {
-      quantValue = maxBacklog;
-    }
-
-  return quantValue;
 }
 
 } // namespace ns3
