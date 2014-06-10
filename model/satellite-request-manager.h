@@ -327,6 +327,13 @@ private:
   Time m_rttEstimate;
 
   /**
+   * Over-estimation factor used for estimating a bit more resources
+   * than there are in the buffers. The purpose is to compensate the
+   * RLE and FPDU header overhead.
+   */
+  double m_overEstimationFactor;
+
+  /**
    * Key = RC index
    * Value -> Key   = Time when the request was sent
    * Value -> Value = Requested bitrate or bytes

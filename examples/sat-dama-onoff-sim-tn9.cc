@@ -110,7 +110,7 @@ main (int argc, char *argv[])
   // Disable Markov fading
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
-  switch (crTxConf)
+  switch (damaConf)
   {
     // RBDC
     case 0:

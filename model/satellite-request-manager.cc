@@ -43,6 +43,7 @@ SatRequestManager::SatRequestManager ()
  m_evaluationInterval (Seconds (0.1)),
  m_previousEvaluationTime (Seconds (0.0)),
  m_rttEstimate (MilliSeconds (560)),
+ m_overEstimationFactor (1.1),
  m_pendingRbdcRequestsKbps (),
  m_pendingVbdcBytes (),
  m_lastVbdcCrSent (Seconds (0)),
@@ -102,6 +103,11 @@ SatRequestManager::GetTypeId (void)
                    TimeValue (MilliSeconds (560)),
                    MakeTimeAccessor (&SatRequestManager::m_rttEstimate),
                    MakeTimeChecker ())
+    .AddAttribute( "OverEstimationFactor",
+                   "Over-estimation due to RLE and FPDU overhead.",
+                   DoubleValue (1.1),
+                   MakeDoubleAccessor (&SatRequestManager::m_overEstimationFactor),
+                   MakeDoubleChecker<double_t> ())
     .AddTraceSource ("CrTrace",
                      "Capacity request trace",
                      MakeTraceSourceAccessor (&SatRequestManager::m_crTrace))
@@ -365,7 +371,8 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
   double coeff = gainValueK / duration.GetSeconds ();
 
   // This round kbits
-  double thisRbdcKbits = stats.m_incomingRateKbps * duration.GetSeconds ();
+  double inRate = m_overEstimationFactor * stats.m_incomingRateKbps;
+  double thisRbdcKbits = inRate * duration.GetSeconds ();
 
   // Previous rounds kbits
   double previousRbdcKbits = GetPendingRbdcSumKbps (rc) * duration.GetSeconds ();
@@ -379,6 +386,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
       reqRbdcKbps += coeff * (totalQueueSizeInKBits - rbdcSumKbits);
     }
   // Else the latter term would be negative
+
 
   NS_LOG_LOGIC("Raw RBDC bitrate: " << reqRbdcKbps << " kbps");
 
@@ -472,6 +480,7 @@ SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats
 
   uint32_t craBytes (0);
   uint32_t vbdcBytes = stats.m_queueSizeBytes;
+  vbdcBytes = m_overEstimationFactor * vbdcBytes;
 
   // If CRA enabled, substract the CRA Bytes from VBDC
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
@@ -510,6 +519,7 @@ SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
 
   uint32_t craBytes (0);
   uint32_t vbdcBytes = stats.m_volumeInBytes;
+  vbdcBytes = m_overEstimationFactor * vbdcBytes;
 
   // If CRA enabled, substract the CRA Bytes from VBDC
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
