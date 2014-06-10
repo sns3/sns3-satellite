@@ -147,6 +147,8 @@ void SatRequestManager::DoDispose ()
 
   m_ctrlCallback.Nullify ();
 
+  m_ctrlMsgTxPossibleCallback.Nullify ();
+
   m_llsConf = NULL;
 
   Object::DoDispose ();

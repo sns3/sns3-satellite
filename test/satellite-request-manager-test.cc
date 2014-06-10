@@ -65,6 +65,12 @@ public:
    */
   SatQueue::QueueStats_t GetQueueStatistics (bool reset);
 
+  /**
+   * Check whether a control message transmission is possible.
+   * \return Boolean indicating the possibility
+   */
+  bool ControlMsgTxPossible () const;
+
 private:
   virtual void DoRun (void);
 
@@ -110,6 +116,8 @@ SatBaseTestCase::DoRun ()
   Ptr<SatRequestManager> rm = CreateObject <SatRequestManager> ();
   rm->SetNodeInfo (nodeInfo);
   rm->Initialize (llsConf, superFrameDuration);
+
+  rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatBaseTestCase::ControlMsgTxPossible, this));
 
   // Set send control message callback
   rm->SetCtrlMsgCallback (MakeCallback (&SatBaseTestCase::SendControlMsg, this));
@@ -161,6 +169,12 @@ SatBaseTestCase::GetQueueStatistics (bool reset)
   queueStats.m_queueSizeBytes = 10;
 
   return queueStats;
+}
+
+bool
+SatBaseTestCase::ControlMsgTxPossible () const
+{
+  return true;
 }
 
 /**
