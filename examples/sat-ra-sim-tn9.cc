@@ -93,6 +93,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (5.0));
   Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (0.05));
 
+  Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (600)));
+
   switch (raMode)
   {
     // CRDSA + VBDC
