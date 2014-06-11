@@ -62,14 +62,13 @@ public:
   void SetAttribute (std::string name, const AttributeValue &value);
 
   /**
-   * Helper function to set a constant rate source.  Equivalent to
-   * setting the attribute Interval to constant 1 second and
-   * the DataRate and PacketSize set accordingly.
+   * Helper function to set a constant constant traffic. Equivalent to
+   * setting the attributes Interval and DataRate accordingly.
    *
-   * \param dataRate DataRate object for the sending rate
+   * \param interval Interval for the sending packets
    * \param packetSize size in bytes of the packet payloads generated
    */
-  void SetConstantRate (DataRate dataRate, uint32_t packetSize = 512);
+  void SetConstantTraffic (Time interval, uint32_t packetSize = 512);
 
   /**
    * Install an ns3::CbrApplication on each node of the input container

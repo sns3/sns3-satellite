@@ -121,11 +121,9 @@ main (int argc, char *argv[])
     {
       ApplicationContainer gwOnOff = onOffHelper.Install (gwUsers.Get (0));
       gwOnOff.Start (Seconds (1.0));
-      gwOnOff.Stop (Seconds (8.0));
 
       ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
       utSink.Start (Seconds (0.1));
-      utSink.Stop (Seconds (10.0));
     }
 
   // in case of sender is UT or Both, create OnOff application to UT connected user
@@ -138,11 +136,9 @@ main (int argc, char *argv[])
 
       ApplicationContainer utOnOff = onOffHelper.Install (utUsers.Get (0));
       utOnOff.Start (Seconds (2.0));
-      utOnOff.Stop (Seconds (9.0));
 
       ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
       gwSink.Start (Seconds (0.1));
-      gwSink.Stop (Seconds (10.0));
     }
 
   // prompt info of the used parameters

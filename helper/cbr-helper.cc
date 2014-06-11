@@ -79,10 +79,9 @@ CbrHelper::InstallPriv (Ptr<Node> node) const
 }
 
 void
-CbrHelper::SetConstantRate (DataRate dataRate, uint32_t packetSize)
+CbrHelper::SetConstantTraffic (Time interval, uint32_t packetSize)
 {
-  m_factory.Set ("Interval", StringValue ("1s"));
-  m_factory.Set ("DataRate", DataRateValue (dataRate));
+  m_factory.Set ("Interval", TimeValue (interval));
   m_factory.Set ("PacketSize", UintegerValue (packetSize));
 }
 
