@@ -307,7 +307,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
 
               // check control message container tail still, if it is not empty and MODCOD match
               // control messages are used default MODCOD
-              if ( ( m_ctrlContainer.empty () == false ) && ( m_ctrlContainer.back ()->GetModcod () < itFromMerge->first ) )
+              if ( ( m_ctrlContainer.empty () == false ) && ( m_ctrlContainer.back ()->GetModcod () <= itFromMerge->first ) )
                 {
                   if (m_ctrlContainer.back ()->GetOccupancy() < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
                     {
