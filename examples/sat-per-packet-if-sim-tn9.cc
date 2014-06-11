@@ -90,6 +90,12 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
+  // Per-packet interference
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
@@ -163,7 +169,7 @@ main (int argc, char *argv[])
       itUt != utUsers.End ();
       ++itUt)
     {
-      appStartTime += MilliSeconds (10);
+      appStartTime += MilliSeconds (50);
 
       // return link
       Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();

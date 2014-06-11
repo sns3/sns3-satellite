@@ -86,9 +86,6 @@ main (int argc, char *argv[])
   // NCC configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
 
   // RBDC
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -158,8 +155,11 @@ main (int argc, char *argv[])
    * Set-up statistics
    */
   Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (60.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (0.6));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.03));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
@@ -176,6 +176,12 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
+  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
   s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 
@@ -187,6 +193,11 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-dama-http-sim-tn9 ---");
   NS_LOG_INFO("  Simulation length: " << simLength);
