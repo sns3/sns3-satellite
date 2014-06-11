@@ -364,6 +364,11 @@ private:
   SatUtMac (const SatUtMac &);
 
   /**
+   * Current super frame sequence in use. (only sequence 0 supported currently)
+   */
+  static const uint8_t m_currentSuperframeSequence = 0;
+
+  /**
    * Used superframe sequence for the return link
    */
   Ptr<SatSuperframeSeq> m_superframeSeq;

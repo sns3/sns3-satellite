@@ -156,8 +156,7 @@ SatPhyRxCarrier::BeginFrameEndScheduling ()
       /// frame end scheduling is at the moment needed only for Random Access at the GW
       if (m_isRandomAccessEnabledForThisCarrier && m_rxMode == SatPhyRxCarrierConf::NORMAL)
         {
-          /// TODO get rid of the hard coded 0
-          Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
+          Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (m_currentSuperframeSequence);
 
           if (Now () >= nextSuperFrameRxTime)
             {
@@ -765,8 +764,7 @@ SatPhyRxCarrier::DoFrameEnd ()
         }
     }
 
-  /// TODO get rid of the hard coded 0
-  Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (0);
+  Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (m_currentSuperframeSequence);
 
   if (Now () >= nextSuperFrameRxTime)
     {
@@ -810,8 +808,7 @@ SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad ()
 
   SatSignalParameters::PacketsInBurst_t::iterator iterPackets;
 
-  /// TODO get rid of the hard coded 0
-  Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (0);
+  Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (m_currentSuperframeSequence);
 
   double normalizedOfferedLoad = (m_randomAccessBitsInFrame / superFrameDuration.GetSeconds ()) / m_rxBandwidthHz;
 

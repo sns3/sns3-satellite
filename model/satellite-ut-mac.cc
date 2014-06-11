@@ -119,8 +119,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
 	NS_LOG_FUNCTION (this);
 
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
-  /// TODO get rid of the hard coded 0
-  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq->GetDuration(0));
+  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq->GetDuration(m_currentSuperframeSequence));
 }
 
 SatUtMac::~SatUtMac ()
@@ -185,7 +184,7 @@ SatUtMac::ControlMsgTransmissionPossible () const
   NS_LOG_FUNCTION (this);
 
   bool da = m_tbtpContainer->HasScheduledTimeSlots ();
-  bool ra = ((m_randomAccess != NULL) && (m_randomAccess->CrdsaHasBackoffTimePassed (m_raChannel)));
+  bool ra = (m_randomAccess != NULL);
   return da || ra;
 }
 
@@ -198,8 +197,7 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
   m_timingAdvanceCb = cb;
 
   /// schedule the next frame start
-  /// TODO get rid of hard coded superframe sequence ID 0
-  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (0);
+  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (m_currentSuperframeSequence);
 
   if (Now () >= nextSuperFrameTxTime)
     {
@@ -843,8 +841,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
   NS_LOG_FUNCTION (this);
 
   /// get current superframe ID
-  /// TODO get rid of the hard coded superframe sequence 0
-  uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
+  uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (m_currentSuperframeSequence, m_timingAdvanceCb ());
 
   NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel << ", SF: " << superFrameId << ", num of opportunities: " << txOpportunities.crdsaTxOpportunities.size ());
 
@@ -880,8 +877,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel);
 
-  /// TODO get rid of the hard coded 0
-  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
+  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
   uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
@@ -1002,8 +998,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
           /// carrier
-          /// TODO get rid of the hard coded 0
-          uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
+          uint32_t carrierId = m_superframeSeq->GetCarrierId (m_currentSuperframeSequence, frameId, timeSlotConf->GetCarrierId () );
 
           /// create CRDSA Tx params
           SatSignalParameters::txInfo_s txInfo;
