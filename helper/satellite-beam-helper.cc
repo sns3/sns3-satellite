@@ -87,7 +87,8 @@ SatBeamHelper::GetTypeId (void)
                       MakeEnumAccessor (&SatBeamHelper::m_raCollisionModel),
                       MakeEnumChecker (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED, "RaCollisionNotDefined",
                                        SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS, "RaCollisionAlwaysDropCollidingPackets",
-                                       SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR, "RaCollisionCheckAgainstSinr"))
+                                       SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR, "RaCollisionCheckAgainstSinr",
+                                       SatPhyRxCarrierConf::RA_CONSTANT_COLLISION_PROBABILITY, "RaCollisionConstantErrorProbability"))
       .AddAttribute ("PropagationDelayModel",
                       "Propagation delay model",
                       EnumValue (SatEnums::PD_CONSTANT_SPEED),

@@ -674,6 +674,15 @@ SatPhyRxCarrier::ProcessSlottedAlohaCollisions (double cSinr, Ptr<SatSignalParam
       phyError = CheckAgainstLinkResults (cSinr,rxParams);
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Composite SINR mode, phyError: " << phyError);
     }
+  else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_CONSTANT_COLLISION_PROBABILITY)
+    {
+      double r = m_uniformVariable->GetValue (0, 1);
+      if (r <  m_constantErrorRate)
+        {
+          phyError = true;
+        }
+      NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Constant collision probability mode, phyError: " << phyError);
+    }
   else
     {
       NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Random access collision model not defined");

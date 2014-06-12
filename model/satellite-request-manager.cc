@@ -120,6 +120,9 @@ SatRequestManager::GetTypeId (void)
     .AddTraceSource ("VbdcTrace",
                      "Trace for all sent VBDC capacity requests.",
                      MakeTraceSourceAccessor (&SatRequestManager::m_vbdcTrace))
+    .AddTraceSource ("AvbdcTrace",
+                     "Trace for all sent AVBDC capacity requests.",
+                     MakeTraceSourceAccessor (&SatRequestManager::m_aVbdcTrace))
   ;
   return tid;
 }
@@ -268,7 +271,15 @@ SatRequestManager::DoEvaluation ()
                      << vbdcBytes << ", "
                      << stats.m_queueSizeBytes;
                   m_crTraceLog (ss.str ());
-                  m_vbdcTrace (vbdcBytes);
+
+                  if (cac == SatEnums::DA_AVBDC)
+                    {
+                      m_aVbdcTrace (vbdcBytes);
+                    }
+                  else
+                    {
+                      m_vbdcTrace (vbdcBytes);
+                    }
                 }
 
               NS_LOG_LOGIC ("Requested VBDC volume for RC: " << (uint32_t)(rc) << " is " << vbdcBytes << " Bytes with CAC: " << cac);
@@ -361,7 +372,7 @@ SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId
 
 
 uint32_t
-SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
+SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
@@ -425,7 +436,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
 
 
 SatEnums::SatCapacityAllocationCategory_t
-SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcBytes)
+SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
@@ -466,15 +477,14 @@ SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint3
 }
 
 uint32_t
-SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
+SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stats)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   Reset (rc);
 
   uint32_t craBytes (0);
-  uint32_t vbdcBytes = stats.m_queueSizeBytes;
-  vbdcBytes = m_overEstimationFactor * vbdcBytes;
+  uint32_t vbdcBytes = m_overEstimationFactor * stats.m_queueSizeBytes;
 
   // If CRA enabled, substract the CRA Bytes from VBDC
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
@@ -496,24 +506,25 @@ SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats
       vbdcBytes = GetQuantizedVbdcValue (rc, vbdcBytes);
 
       // Update the pending counters
-      m_pendingVbdcBytes.at (rc) = m_pendingVbdcBytes.at (rc) + vbdcBytes;
+      m_pendingVbdcBytes.at (rc) = vbdcBytes;
 
       NS_LOG_LOGIC("Pending VBDC bytes: " << (uint32_t)(rc) << ": " << m_pendingVbdcBytes.at (rc)<< " Bytes");
-
-      return vbdcBytes;
+    }
+  else
+    {
+      vbdcBytes = 0;
     }
 
-  return 0;
+  return vbdcBytes;
 }
 
 uint32_t
-SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
+SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stats)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   uint32_t craBytes (0);
-  uint32_t vbdcBytes = stats.m_volumeInBytes;
-  vbdcBytes = m_overEstimationFactor * vbdcBytes;
+  uint32_t vbdcBytes = m_overEstimationFactor * stats.m_volumeInBytes;
 
   // If CRA enabled, substract the CRA Bytes from VBDC
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
@@ -540,6 +551,10 @@ SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats)
 
       NS_LOG_LOGIC("Pending VBDC bytes: " << (uint32_t)(rc) << ": " << m_pendingVbdcBytes.at (rc)<< " Bytes");
       NS_LOG_LOGIC("VBDC volume after pending: " << (uint32_t)(rc) << ": " << vbdcBytes << " Bytes");
+    }
+  else
+    {
+      vbdcBytes = 0;
     }
 
   return vbdcBytes;
@@ -769,7 +784,6 @@ SatRequestManager::GetQuantizedRbdcValue (uint8_t index, uint16_t reqRbdcKbps) c
   // Else quantize based on the predefined scaling factors from the specification
   for (uint32_t i = 0; i < 4; i++)
     {
-
       // If the value can be represented with this scaling value
       if (reqRbdcKbps <= m_rbdcScalingFactors[i] * m_numValues)
         {

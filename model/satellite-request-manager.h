@@ -159,7 +159,7 @@ private:
    * \param stats Queue statistics
    * \return uint32_t Requested bytes
    */
-  uint32_t DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats);
+  uint32_t DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats);
 
   /**
    * \brief Do VBDC calculation for a RC
@@ -168,7 +168,7 @@ private:
    * \param &vbdcBytes Reference to vbdcBytes
    * \return SatCapacityAllocationCategory_t Capacity allocation category
    */
-  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t stats, uint32_t &rcVbdcBytes);
+  SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes);
 
   /**
    * \brief Calculate the needed VBDC bytes for a RC
@@ -176,7 +176,7 @@ private:
    * \param stats Queue statistics
    * \return Requested VBDC kilobytes
    */
-  uint32_t GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
+  uint32_t GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stats);
 
   /**
    * \brief Calculate the needed AVBDC bytes for a RC
@@ -184,7 +184,7 @@ private:
    * \param stats Queue statistics
    * \return Requested AVBDC kilobytes
    */
-  uint32_t GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t stats);
+  uint32_t GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stats);
 
   /**
    * Check whether VBDC volume backlog persistence shall expire and
@@ -394,7 +394,7 @@ private:
    */
   TracedCallback< uint32_t> m_rbdcTrace;
   TracedCallback< uint32_t> m_vbdcTrace;
-
+  TracedCallback< uint32_t> m_aVbdcTrace;
 };
 
 } // namespace

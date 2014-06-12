@@ -17,24 +17,39 @@ using namespace ns3;
 * satellite system tests.
 *
 * To get help of the command line arguments for the example,
-* execute command -> ./waf --run "sat-dama-onoff-sim-tn9 --PrintHelp"
+* execute command -> ./waf --run "sat-rtn-system-test --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-rtn-sys-test");
 
 
-// callback called when packet is received by phy RX carrier
+// Callback called when RBDC CR has been sent by request manager
 static void RbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At: " << Simulator::Now ().GetSeconds () << " RBDC request generated with " << value << " kbps");
+  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s RBDC request generated with " << value << " kbps");
 }
 
+// Callback called when AVBDC CR has been sent by request manager
+static void AvbcdRcvdCb (uint32_t value)
+{
+  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s AVBDC request generated with " << value << " Bytes");
+}
 
-// callback called when packet is received by phy RX carrier
+// Callback called when VBDC CR has been sent by request manager
 static void VbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At: " << Simulator::Now ().GetSeconds () << " VBDC request generated with " << value << " Bytes");
+  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s VBDC request generated with " << value << " Bytes");
 }
+
+// Callback called when VBDC CR has been sent by request manager
+static void TbtpResources (uint32_t value)
+{
+  if (value > 0)
+    {
+      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s " << value << " Bytes allocated within TBTP");
+    }
+}
+
 
 int
 main (int argc, char *argv[])
@@ -172,14 +187,24 @@ main (int argc, char *argv[])
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
       // Change ways of sending the capacity requests!
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
-      //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
-      //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
+
+      // CRA
+      //Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
-      //Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+
+      // Slotted Aloha
+      Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
+      //Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", StringValue ("RaCollisionConstantErrorProbability"));
+      //Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (0.3));
+
+      // CRDSA
+      //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
       //Config::SetDefault ("ns3::SatUtMac::UseCrdsaOnlyForControlPackets", BooleanValue (true));
 
-      Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=10.0|Bound=0.0]"));
+      // Periodical control slots
+      //Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+
+      Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
       endUsersPerUt = 1;
       utsPerBeam = 1;
@@ -206,12 +231,22 @@ main (int argc, char *argv[])
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
 
       // Change ways of sending the capacity requests!
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
-      //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
-      //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
+
+      // CRA
+      //Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
-      //Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+
+      // Slotted Aloha
+      Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
+      //Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", StringValue ("RaCollisionConstantErrorProbability"));
+      //Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (0.3));
+
+      // CRDSA
+      //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
       //Config::SetDefault ("ns3::SatUtMac::UseCrdsaOnlyForControlPackets", BooleanValue (true));
+
+      // Periodical control slots
+      //Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
       Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=10.0|Bound=0.0]"));
 
@@ -243,6 +278,15 @@ main (int argc, char *argv[])
 
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/VbdcTrace",
                                  MakeCallback (&VbcdRcvdCb));
+
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/AvbdcTrace",
+                                 MakeCallback (&AvbcdRcvdCb));
+
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatMac/DaResourcesTrace",
+                                 MakeCallback (&TbtpResources));
+
+  //Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatEncapsulator/SatQueue/Enqueue",
+  //                               MakeCallback (&PacketEnqueu));
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
