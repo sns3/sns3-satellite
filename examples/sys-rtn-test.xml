@@ -210,8 +210,8 @@
  <default name="ns3::SatSuperframeConf3::Frame9_RandomAccessFrame" value="false"/>
 <default name="ns3::SatLowerLayerServiceConf::DaServiceCount" value="4"/>
  <default name="ns3::SatLowerLayerServiceConf::RaServiceCount" value="1"/>
- <default name="ns3::SatLowerLayerServiceConf::DynamicRatePersistence" value="5"/>
- <default name="ns3::SatLowerLayerServiceConf::VolumeBacklogPersistence" value="5"/>
+ <default name="ns3::SatLowerLayerServiceConf::DynamicRatePersistence" value="10"/>
+ <default name="ns3::SatLowerLayerServiceConf::VolumeBacklogPersistence" value="10"/>
  <default name="ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval" value="+100000000.0ns"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided" value="false"/>
  <default name="ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed" value="false"/>
