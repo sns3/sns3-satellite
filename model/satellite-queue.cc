@@ -327,7 +327,7 @@ SatQueue::GetQueueStatistics (bool reset)
   QueueStats_t queueStats;
   Time duration = Simulator::Now () - m_statResetTime;
 
-  if (duration.IsPositive())
+  if (duration.IsStrictlyPositive())
     {
       queueStats.m_incomingRateKbps = SatUtils::BITS_PER_BYTE * m_nEnqueBytesSinceReset / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ();
       queueStats.m_outgoingRateKbps = SatUtils::BITS_PER_BYTE * m_nDequeBytesSinceReset / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ();

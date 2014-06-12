@@ -41,6 +41,12 @@ SatUtLlc::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtLlc")
     .SetParent<SatLlc> ()
     .AddConstructor<SatUtLlc> ()
+    .AddAttribute ("SatRequestManager",
+                   "The request manager of this UT.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatUtLlc::GetRequestManager,
+                                         &SatUtLlc::SetRequestManager),
+                                         MakePointerChecker<SatRequestManager> ())
   ;
   return tid;
 }

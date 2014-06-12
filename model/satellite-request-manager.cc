@@ -164,7 +164,7 @@ SatRequestManager::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIn
       NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << (uint32_t)(rcIndex));
       NS_LOG_LOGIC ("Do on-demand CR evaluation for RC index: " << (uint32_t)(rcIndex));
 
-      DoEvaluation ();
+      //DoEvaluation ();
     }
   // Other queue events not handled here
 }
@@ -195,9 +195,6 @@ SatRequestManager::DoEvaluation ()
   // evaluation interval.
   if (ctrlMsgTxPossible)
     {
-      // Update evaluation time
-      m_previousEvaluationTime = Simulator::Now ();
-
       // Update the VBDC counters based on received TBTP
       // resources
       UpdatePendingVbdcCounters ();
@@ -295,6 +292,9 @@ SatRequestManager::DoEvaluation ()
             }
         }
 
+      // Update evaluation time
+      m_previousEvaluationTime = Simulator::Now ();
+
       // If CR has some valid elements
       if (crMsg->IsNotEmpty ())
         {
@@ -369,28 +369,20 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t stats)
   Time duration = Simulator::Now () - m_previousEvaluationTime;
 
   // Calculate the raw RBDC request
-  double gainValueK = 1.0 / (2.0 * m_evaluationInterval.GetSeconds ());
-  double coeff = gainValueK / duration.GetSeconds ();
+  double gainValueK = 1.0 / (2.0 * duration.GetSeconds ());
 
   // This round kbits
-  double inRate = m_overEstimationFactor * stats.m_incomingRateKbps;
-  double thisRbdcKbits = inRate * duration.GetSeconds ();
+  double inRateKbps = m_overEstimationFactor * stats.m_incomingRateKbps;
+  double thisRbdcInKbits = inRateKbps * duration.GetSeconds ();
+  double previousRbdcInKbits = GetPendingRbdcSumKbps (rc) * duration.GetSeconds ();
+  double queueSizeInKbits = SatUtils::BITS_PER_BYTE * stats.m_queueSizeBytes / (double)(SatUtils::BITS_IN_KBIT);
 
-  // Previous rounds kbits
-  double previousRbdcKbits = GetPendingRbdcSumKbps (rc) * duration.GetSeconds ();
+  double queueOccupancy = std::max(0.0, gainValueK * (queueSizeInKbits - thisRbdcInKbits - previousRbdcInKbits) / duration.GetSeconds ());
+  double reqRbdcKbps = inRateKbps + queueOccupancy;
 
-  double reqRbdcKbps (stats.m_incomingRateKbps);
-  double totalQueueSizeInKBits = SatUtils::BITS_PER_BYTE * stats.m_queueSizeBytes / (double)(SatUtils::BITS_IN_KBIT);
-
-  double rbdcSumKbits = thisRbdcKbits + previousRbdcKbits;
-  if (totalQueueSizeInKBits > rbdcSumKbits)
-    {
-      reqRbdcKbps += coeff * (totalQueueSizeInKBits - rbdcSumKbits);
-    }
-  // Else the latter term would be negative
-
-
-  NS_LOG_LOGIC("Raw RBDC bitrate: " << reqRbdcKbps << " kbps");
+  NS_LOG_LOGIC ("queueSizeInKbits: " << queueSizeInKbits << " thisRbdcInKbits: " << thisRbdcInKbits << " previousRbdcInKbits " << previousRbdcInKbits);
+  NS_LOG_LOGIC ("gainValueK: " << gainValueK);
+  NS_LOG_LOGIC ("In rate: " << inRateKbps << " queueOccupancy: " << queueOccupancy);
 
   // If CRA enabled, substract the CRA bitrate from the calculated RBDC bitrate
   if (m_llsConf->GetDaConstantAssignmentProvided (rc))
@@ -612,9 +604,12 @@ SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t kbps)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc) << kbps);
 
-  Time now = Simulator::Now ();
-  std::pair<Time, uint32_t> item = std::make_pair<Time, uint32_t> (now, kbps);
-  m_pendingRbdcRequestsKbps.at(rc).push_back (item);
+  if (kbps > 0)
+    {
+      Time now = Simulator::Now ();
+      std::pair<Time, uint32_t> item = std::make_pair<Time, uint32_t> (now, kbps);
+      m_pendingRbdcRequestsKbps.at(rc).push_back (item);
+    }
 }
 
 void
