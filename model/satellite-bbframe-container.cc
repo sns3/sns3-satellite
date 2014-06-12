@@ -76,6 +76,9 @@ SatBbFrameContainer::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatBbFrameContainer")
     .SetParent<Object> ()
     .AddConstructor<SatBbFrameContainer> ()
+    .AddTraceSource ("BBFrameMergeTrace",
+                    "Trace for merged BB Frames.",
+                    MakeTraceSourceAccessor (&SatBbFrameContainer::m_bbFrameMergeTrace))
   ;
   return tid;
 }
@@ -114,8 +117,6 @@ SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums
     {
       payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType), m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
     }
-
-  payloadBytes -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
   return payloadBytes;
 }
@@ -160,9 +161,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
       else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
                 ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
-          m_totalDuration -= m_container.at (modcod).back ()->GetDuration ();
-          m_container.at (modcod).back ()->Extend (m_bbFrameConf);
-          m_totalDuration += m_container.at (modcod).back ()->GetDuration ();
+          m_totalDuration += m_container.at (modcod).back ()->Extend (m_bbFrameConf);
         }
 
       m_container.at (modcod).back ()->AddPayload (data);
@@ -179,9 +178,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
       else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
                 ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
-          m_totalDuration -= m_ctrlContainer.back ()->GetDuration ();
-          m_ctrlContainer.back ()->Extend (m_bbFrameConf);
-          m_totalDuration += m_ctrlContainer.back ()->GetDuration ();
+          m_totalDuration += m_ctrlContainer.back ()->Extend (m_bbFrameConf);
         }
 
       m_ctrlContainer.back ()->AddPayload (data);
@@ -329,7 +326,8 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
                   if ( newWeightedOccupancyIfMerged > weightedOccupancy )
                     {
                       // Merge two frames
-                      if ( frameToMerge->MergeWithFrame (itFromMerge->second.back ()) )
+
+                      if ( frameToMerge->MergeWithFrame (itFromMerge->second.back (), m_bbFrameMergeTrace) )
                         {
                           m_totalDuration -= itFromMerge->second.back ()->GetDuration();
                           itFromMerge->second.pop_back ();
@@ -349,13 +347,13 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
           {
             if ( it->second.empty () == false)
               {
-                it->second.back ()->Shrink (m_bbFrameConf);
+                m_totalDuration -= it->second.back ()->Shrink (m_bbFrameConf);
               }
           }
 
         if ( m_ctrlContainer.empty () == false )
           {
-            m_ctrlContainer.back ()->Shrink (m_bbFrameConf);
+            m_totalDuration -= m_ctrlContainer.back ()->Shrink (m_bbFrameConf);
           }
       }
 }

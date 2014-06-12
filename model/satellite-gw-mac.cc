@@ -62,6 +62,9 @@ SatGwMac::GetTypeId (void)
                    TimeValue (MicroSeconds (1)),
                    MakeTimeAccessor (&SatGwMac::m_guardTime),
                    MakeTimeChecker ())
+    .AddTraceSource ("BBFrameTxTrace",
+                    "Trace for transmitted BB Frames.",
+                    MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace))
   ;
   return tid;
 }
@@ -198,6 +201,9 @@ SatGwMac::StartTransmission (uint32_t carrierId)
   // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
   if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
     {
+      // trace out BB frames sent.
+      m_bbFrameTxTrace (bbFrame);
+
       // Add packet trace entry:
       m_packetTrace (Simulator::Now (),
                      SatEnums::PACKET_SENT,

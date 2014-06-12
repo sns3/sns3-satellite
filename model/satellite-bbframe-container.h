@@ -118,6 +118,13 @@ private:
   SatEnums::SatBbFrameType_t    m_defaultBbFrameType;
 
   /**
+   * Trace for merged BB frames.
+   * \param BB frame merge to
+   * \parma BB frame merge from
+   */
+  TracedCallback<Ptr<SatBbFrame>, Ptr<SatBbFrame> > m_bbFrameMergeTrace;
+
+  /**
    * Create short or normal frame according to MODCOD and member #m_bbFrameUsageMode.
    * Created frame is added back of appropriate container.
    *
