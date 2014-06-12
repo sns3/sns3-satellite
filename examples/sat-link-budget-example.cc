@@ -84,21 +84,9 @@ main (int argc, char *argv[])
   Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper();
   Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper();
 
-  // set assuming file is found same directory than script (executed with waf)
-  std::string inputFileNameWithPath( "./src/satellite/examples/sat-link-budget-input-attributes.xml");
-
-  // check is this the case?
-  std::ifstream *ifs = new std::ifstream (inputFileNameWithPath.c_str (), std::ifstream::in);
-  if (!ifs->is_open ())
-    {
-      // script might be launched by test.py, try a different base path
-      inputFileNameWithPath = "../../src/satellite/examples/sat-link-budget-input-attributes.xml";
-    }
-
-  delete ifs;
-
   // To change attributes having affect on link budget,
   // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/sat-link-budget-input-attributes.xml";
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));

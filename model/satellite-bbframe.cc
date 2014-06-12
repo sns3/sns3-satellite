@@ -67,8 +67,6 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
       NS_FATAL_ERROR ("Invalid BBFrame type!!!");
       break;
   }
-
-  m_freeSpaceInBytes = m_maxSpaceInBytes;
 }
 
 SatBbFrame::~SatBbFrame ()
@@ -138,11 +136,11 @@ SatBbFrame::GetOccupancyIfMerged (Ptr<SatBbFrame> mergedFrame) const
 
   double ifMergedOccupancy = 0.0;
 
-  uint32_t dataBytes = mergedFrame->GetSpaceUsedInBytes () - mergedFrame->GetFrameHeaderSize ();
+  uint32_t mergedFrameDataBytes = mergedFrame->GetSpaceUsedInBytes () - mergedFrame->GetFrameHeaderSize ();
 
-  if ( dataBytes <= m_freeSpaceInBytes )
+  if ( mergedFrameDataBytes <= m_freeSpaceInBytes )
     {
-      ifMergedOccupancy = ((double) GetSpaceUsedInBytes () + (double) mergedFrame->GetSpaceUsedInBytes ()) / (double) m_maxSpaceInBytes;
+      ifMergedOccupancy = ((double) GetSpaceUsedInBytes () + (double) mergedFrameDataBytes) / (double) m_maxSpaceInBytes;
     }
 
   return ifMergedOccupancy;
@@ -157,7 +155,7 @@ SatBbFrame::GetSpectralEfficiency (double carrierBandwidthInHz) const
 }
 
 bool
-SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame)
+SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame, TracedCallback<Ptr<SatBbFrame>, Ptr<SatBbFrame> > mergeTraceCb)
 {
   NS_LOG_FUNCTION (this);
 
@@ -167,6 +165,7 @@ SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame)
 
   if ( dataBytes <= m_freeSpaceInBytes )
     {
+      mergeTraceCb (this, mergedFrame);
       m_framePayload.insert( m_framePayload.end (), mergedFrame->GetPayload ().begin (), mergedFrame->GetPayload ().end () );
       merged = true;
     }
@@ -174,9 +173,11 @@ SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame)
   return merged;
 }
 
-void SatBbFrame::Shrink (Ptr<SatBbFrameConf> conf)
+Time SatBbFrame::Shrink (Ptr<SatBbFrameConf> conf)
 {
   NS_LOG_FUNCTION (this);
+
+  Time durationDecrease (0);
 
   if ( m_frameType == SatEnums::NORMAL_FRAME )
     {
@@ -187,16 +188,23 @@ void SatBbFrame::Shrink (Ptr<SatBbFrameConf> conf)
       if ( spaceUsedInbytes < maxShortFrameSpaceInBytes)
         {
           m_frameType = SatEnums::SHORT_FRAME;
-          m_maxSpaceInBytes = maxShortFrameSpaceInBytes;
+          m_maxSpaceInBytes = maxShortFrameSpaceInBytes - m_headerSizeInBytes;
           m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
+
+          Time oldDuration = m_duration;
           m_duration = conf->GetBbFrameDuration (m_modCod, SatEnums::SHORT_FRAME);
+          durationDecrease = oldDuration - m_duration;
         }
     }
+
+  return durationDecrease;
 }
 
-void SatBbFrame::Extend (Ptr<SatBbFrameConf> conf)
+Time SatBbFrame::Extend (Ptr<SatBbFrameConf> conf)
 {
   NS_LOG_FUNCTION (this);
+
+  Time durationIncrease (0);
 
   if ( m_frameType == SatEnums::SHORT_FRAME )
     {
@@ -205,8 +213,13 @@ void SatBbFrame::Extend (Ptr<SatBbFrameConf> conf)
       m_frameType = SatEnums::NORMAL_FRAME;
       m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE) ;
       m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
+
+      Time oldDuration = m_duration;
       m_duration = conf->GetBbFrameDuration (m_modCod, SatEnums::NORMAL_FRAME);
+      durationIncrease = m_duration - oldDuration;
     }
+
+  return durationIncrease;
 }
 
 

@@ -254,6 +254,32 @@ public:
     DUMMY_FRAME = 3
   } SatBbFrameType_t;
 
+  static inline std::string GetFrameTypeName (SatBbFrameType_t frameType)
+  {
+    std::string typeName = "UNDEFINED_FRAME";
+
+    switch (frameType)
+    {
+      case SHORT_FRAME:
+        typeName = "SHORT_FRAME";
+        break;
+
+      case NORMAL_FRAME:
+        typeName = "NORMAL_FRAME";
+        break;
+
+      case DUMMY_FRAME:
+        typeName = "DUMMY_FRAME";
+        break;
+
+      default:
+          NS_FATAL_ERROR ("SatEnums::GetFrameTypeName - Invalid frame type");
+          break;
+    }
+
+    return typeName;
+  };
+
   /**
    * \enum SatFlowId_t
    *

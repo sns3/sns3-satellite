@@ -137,11 +137,14 @@ SatFwdLinkScheduler::GetTypeId (void)
                                     SatCnoEstimator::AVERAGE, "AverageValueInWindow"))
     .AddAttribute( "CnoEstimationWindow",
                    "Time window for C/N0 estimation.",
-                   TimeValue (MilliSeconds (500)),
+                   TimeValue (Seconds (5000)),
                    MakeTimeAccessor (&SatFwdLinkScheduler::m_cnoEstimationWindow),
                    MakeTimeChecker ())
-
-
+    .AddAttribute( "BBFrameContainer",
+                   "BB frame container of this scheduler.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameContainer),
+                   MakePointerChecker<SatBbFrameContainer> ())
   ;
   return tid;
 }

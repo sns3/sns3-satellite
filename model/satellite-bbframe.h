@@ -26,6 +26,7 @@
 #include "ns3/simple-ref-count.h"
 #include "ns3/packet.h"
 #include "ns3/nstime.h"
+#include "ns3/traced-callback.h"
 #include "ns3/satellite-bbframe-conf.h"
 #include "satellite-enums.h"
 
@@ -121,20 +122,22 @@ public:
    * \param mergedFrame Another frame to be merged with this frame.
    * \return true if merging done, false otherwise.
    */
-  bool MergeWithFrame (Ptr<SatBbFrame> mergedFrame);
+  bool MergeWithFrame (Ptr<SatBbFrame> mergedFrame, TracedCallback<Ptr<SatBbFrame>, Ptr<SatBbFrame> > mergeTraceCb);
 
   /**
    * Shrink BB frame to the shortest type possible according to
    * current load in the frame.
    * \param conf Pointer to BB frame configuration
+   * \return Decrease of the frame duration after shrinking it
    */
-  void Shrink (Ptr<SatBbFrameConf> conf);
+  Time Shrink (Ptr<SatBbFrameConf> conf);
 
   /**
    * Extent BB frame to the longest type.
    * \param conf Pointer to BB frame configuration
+   * \return Increase of the frame duration after extending it
    */
-  void Extend (Ptr<SatBbFrameConf> conf);
+  Time Extend (Ptr<SatBbFrameConf> conf);
 
   /**
    * Get duration of the frame transmission.

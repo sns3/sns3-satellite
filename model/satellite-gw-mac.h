@@ -164,6 +164,11 @@ private:
   Time m_guardTime;
 
   /**
+   * Trace for transmitted BB frames.
+   */
+  TracedCallback<Ptr<SatBbFrame> > m_bbFrameTxTrace;
+
+  /**
    * Capacity request receive callback.
    */
   SatGwMac::CrReceiveCallback  m_crReceiveCallback;

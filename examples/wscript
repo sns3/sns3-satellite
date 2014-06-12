@@ -119,6 +119,8 @@ def build(bld):
     obj = bld.create_ns3_program('sat-rtn-system-test', ['satellite'])
     obj.source = 'sat-rtn-system-test-example.cc'
     
+    obj = bld.create_ns3_program('sat-fwd-system-test', ['satellite'])
+    obj.source = 'sat-fwd-system-test-example.cc'
         
     obj = bld.create_ns3_program('sat-tutorial-example', ['satellite'])
     obj.source = 'sat-tutorial-example.cc'    
