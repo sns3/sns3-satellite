@@ -91,7 +91,7 @@ SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cn
 void
 SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
-  NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
+  NS_LOG_FUNCTION (this << beamId << carrierId << (uint32_t) allocationChannelId << averageNormalizedOfferedLoad);
 
   bool isLowRandomAccessLoad = true;
   std::map<std::pair<uint32_t,uint8_t>,bool>::iterator findResult;
@@ -276,7 +276,7 @@ SatNcc::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t bea
 void
 SatNcc::SetRandomAccessLowLoadBackoffProbability (uint8_t allocationChannelId, uint16_t lowLoadBackOffProbability)
 {
-  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << lowLoadBackOffProbability);
+  NS_LOG_FUNCTION (this << (uint32_t) allocationChannelId << lowLoadBackOffProbability);
 
   NS_LOG_INFO ("SatNcc::SetRandomAccessLowLoadBackoffProbability - AC: " << (uint32_t)allocationChannelId << ", low load backoff probability: " << lowLoadBackOffProbability);
   m_lowLoadBackOffProbability[allocationChannelId] = lowLoadBackOffProbability;
@@ -294,7 +294,7 @@ SatNcc::SetRandomAccessHighLoadBackoffProbability (uint8_t allocationChannelId, 
 void
 SatNcc::SetRandomAccessLowLoadBackoffTime (uint8_t allocationChannelId, uint16_t lowLoadBackOffTime)
 {
-  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << lowLoadBackOffTime);
+  NS_LOG_FUNCTION (this << (uint32_t) allocationChannelId << lowLoadBackOffTime);
 
   NS_LOG_INFO ("SatNcc::SetRandomAccessLowLoadBackoffTime - AC: " << (uint32_t)allocationChannelId << ", low load backoff time: " << lowLoadBackOffTime);
   m_lowLoadBackOffTime[allocationChannelId] = lowLoadBackOffTime;
@@ -312,7 +312,7 @@ SatNcc::SetRandomAccessHighLoadBackoffTime (uint8_t allocationChannelId, uint16_
 void
 SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocationChannelId, double threshold)
 {
-  NS_LOG_FUNCTION (this << (uint32_t)allocationChannelId << threshold);
+  NS_LOG_FUNCTION (this << (uint32_t) allocationChannelId << threshold);
 
   NS_LOG_INFO ("SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold - AC: " << (uint32_t)allocationChannelId << ", average normalized offered load threshold: " << threshold);
   m_randomAccessAverageNormalizedOfferedLoadThreshold[allocationChannelId] = threshold;

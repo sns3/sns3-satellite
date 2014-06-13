@@ -225,7 +225,7 @@ void SatPPduHeader::SetPPduLength (uint16_t bytes)
 
 void SatPPduHeader::SetFragmentId (uint8_t id)
 {
-  NS_LOG_FUNCTION (this << id);
+  NS_LOG_FUNCTION (this << (uint32_t) id);
 
   m_fragmentId = id;
 }
@@ -239,7 +239,7 @@ void SatPPduHeader::SetTotalLength (uint16_t bytes)
 
 uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
 {
-  NS_LOG_FUNCTION (this << type);
+  NS_LOG_FUNCTION (this << (uint32_t) type);
 
   uint32_t size (0);
   switch (type)

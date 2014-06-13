@@ -290,7 +290,7 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 void
 SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
   NS_LOG_LOGIC ("At UT: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
@@ -332,7 +332,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 void
 SatReturnLinkEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
 {
-  NS_LOG_FUNCTION (this << sequenceNumber);
+  NS_LOG_FUNCTION (this << (uint32_t) sequenceNumber);
 
   // Release sequence number
   m_seqNo->Release (sequenceNumber);
@@ -476,7 +476,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 uint32_t
 SatReturnLinkEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
   uint32_t globalSeqNo (0);
 
@@ -555,7 +555,7 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive ()
 void
 SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired (uint32_t seqNo)
 {
-  NS_LOG_FUNCTION (this << (uint8_t)(seqNo));
+  NS_LOG_FUNCTION (this << seqNo);
 
   NS_LOG_LOGIC ("For UT: " << m_sourceAddress << " max waiting time reached for SeqNo: " << seqNo << " at: " << Now ().GetSeconds ());
   NS_LOG_LOGIC ("Mark the PDU received and move forward!");
@@ -587,7 +587,7 @@ SatReturnLinkEncapsulatorArq::GetTxBufferSizeInBytes () const
 void
 SatReturnLinkEncapsulatorArq::SendAck (uint8_t seqNo) const
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
   NS_LOG_LOGIC ("GW: " << m_destAddress << " send ACK to UT: " << m_sourceAddress << " with flowId: " << (uint32_t)(m_flowId) << " with SN: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 

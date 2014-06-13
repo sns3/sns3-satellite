@@ -95,7 +95,7 @@ SatLlc::DoDispose ()
 bool
 SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
-  NS_LOG_FUNCTION (this << packet << dest);
+  NS_LOG_FUNCTION (this << packet << dest << (uint32_t) flowId);
   NS_LOG_LOGIC ("p=" << packet );
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
@@ -135,7 +135,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 Ptr<Packet>
 SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << bytes << macAddr << flowId);
+  NS_LOG_FUNCTION (this << bytes << macAddr << (uint32_t) flowId);
   NS_ASSERT (true);
 
   Ptr<Packet> packet;
@@ -256,7 +256,7 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr)
 void
 SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t flowId)
 {
-  NS_LOG_FUNCTION (this << macAddr << flowId);
+  NS_LOG_FUNCTION (this << macAddr << (uint32_t) flowId);
 
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
   EncapContainer_t::iterator it = m_encaps.find (key);
@@ -274,7 +274,7 @@ SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t fl
 void
 SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> dec, uint8_t flowId)
 {
-  NS_LOG_FUNCTION (this << macAddr << flowId);
+  NS_LOG_FUNCTION (this << macAddr << (uint32_t) flowId);
 
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
   EncapContainer_t::iterator it = m_decaps.find (key);

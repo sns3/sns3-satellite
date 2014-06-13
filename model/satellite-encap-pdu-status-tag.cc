@@ -36,7 +36,7 @@ SatEncapPduStatusTag::SatEncapPduStatusTag ()
 void
 SatEncapPduStatusTag::SetStatus (uint8_t status)
 {
-  NS_LOG_FUNCTION (this << status);
+  NS_LOG_FUNCTION (this << (uint32_t) status);
   m_pduStatus = status;
 }
 

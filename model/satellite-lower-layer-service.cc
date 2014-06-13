@@ -299,6 +299,8 @@ SatLowerLayerServiceConf::GetInstanceTypeId (void) const
 
 bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -310,6 +312,8 @@ bool SatLowerLayerServiceConf::GetDaConstantAssignmentProvided (uint8_t index) c
 void
 SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint8_t index, bool constAssignmentProvided)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << constAssignmentProvided);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -321,6 +325,8 @@ SatLowerLayerServiceConf::SetDaConstantAssignmentProvided (uint8_t index, bool c
 bool
 SatLowerLayerServiceConf::GetDaRbdcAllowed (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -331,6 +337,8 @@ SatLowerLayerServiceConf::GetDaRbdcAllowed (uint8_t index) const
 
 void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint8_t index, bool bdcAllowed)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << bdcAllowed);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -341,6 +349,8 @@ void SatLowerLayerServiceConf::SetDaRbdcAllowed (uint8_t index, bool bdcAllowed)
 
 bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -352,6 +362,8 @@ bool SatLowerLayerServiceConf::GetDaVolumeAllowed (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaVolumeAllowed (uint8_t index, bool volumeAllowed)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << volumeAllowed);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -363,6 +375,8 @@ SatLowerLayerServiceConf::SetDaVolumeAllowed (uint8_t index, bool volumeAllowed)
 uint16_t
 SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -375,6 +389,8 @@ SatLowerLayerServiceConf::GetDaConstantServiceRateInKbps (uint8_t index) const
 Ptr<RandomVariableStream>
 SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -386,6 +402,8 @@ SatLowerLayerServiceConf::GetDaConstantServiceRateStream (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint8_t index, Ptr<RandomVariableStream> constantServiceRateStream)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -397,6 +415,8 @@ SatLowerLayerServiceConf::SetDaConstantServiceRateStream (uint8_t index, Ptr<Ran
 uint16_t
 SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -408,6 +428,8 @@ SatLowerLayerServiceConf::GetDaMaximumServiceRateInKbps (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint8_t index, uint16_t maximumServiceRateKbps)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << maximumServiceRateKbps);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -419,6 +441,8 @@ SatLowerLayerServiceConf::SetDaMaximumServiceRateInKbps (uint8_t index, uint16_t
 uint16_t
 SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -430,6 +454,8 @@ SatLowerLayerServiceConf::GetDaMinimumServiceRateInKbps (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t minimumServiceRateKbps)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << minimumServiceRateKbps);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -441,6 +467,8 @@ SatLowerLayerServiceConf::SetDaMinimumServiceRateInKbps (uint8_t index, uint16_t
 uint16_t
 SatLowerLayerServiceConf::GetDaMaximumBacklogInKbytes (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxDaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -452,7 +480,7 @@ SatLowerLayerServiceConf::GetDaMaximumBacklogInKbytes (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetDaMaximumBacklogInKbytes (uint8_t index, uint16_t maximumBacklogInKbytes)
 {
-  NS_LOG_FUNCTION (this << index);
+  NS_LOG_FUNCTION (this << (uint32_t) index << maximumBacklogInKbytes);
 
   if (index >= m_maxDaServiceEntries)
     {
@@ -465,6 +493,8 @@ SatLowerLayerServiceConf::SetDaMaximumBacklogInKbytes (uint8_t index, uint16_t m
 uint8_t
 SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -476,6 +506,8 @@ SatLowerLayerServiceConf::GetRaMaximumUniquePayloadPerBlock (uint8_t index) cons
 void
 SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint8_t index, uint8_t uniquePayloadPerBlock)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << uniquePayloadPerBlock);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -487,6 +519,8 @@ SatLowerLayerServiceConf::SetRaMaximumUniquePayloadPerBlock (uint8_t index, uint
 uint8_t
 SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -498,6 +532,8 @@ SatLowerLayerServiceConf::GetRaMaximumConsecutiveBlockAccessed (uint8_t index) c
 void
 SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint8_t index, uint8_t consecutiveBlockAccessed)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << consecutiveBlockAccessed);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -509,6 +545,8 @@ SatLowerLayerServiceConf::SetRaMaximumConsecutiveBlockAccessed (uint8_t index, u
 uint8_t
 SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -520,6 +558,8 @@ SatLowerLayerServiceConf::GetRaMinimumIdleBlock (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumIdleBlock)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << minimumIdleBlock);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -531,6 +571,8 @@ SatLowerLayerServiceConf::SetRaMinimumIdleBlock (uint8_t index, uint8_t minimumI
 uint16_t
 SatLowerLayerServiceConf::GetRaBackOffTimeInMilliSeconds (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -542,6 +584,8 @@ SatLowerLayerServiceConf::GetRaBackOffTimeInMilliSeconds (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << backOffTimeInMilliSeconds);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -553,6 +597,8 @@ SatLowerLayerServiceConf::SetRaBackOffTimeInMilliSeconds (uint8_t index, uint16_
 uint16_t
 SatLowerLayerServiceConf::GetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -564,6 +610,8 @@ SatLowerLayerServiceConf::GetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index)
 void
 SatLowerLayerServiceConf::SetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index, uint16_t backOffTimeInMilliSeconds)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << backOffTimeInMilliSeconds);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -575,6 +623,8 @@ SatLowerLayerServiceConf::SetRaHighLoadBackOffTimeInMilliSeconds (uint8_t index,
 uint16_t
 SatLowerLayerServiceConf::GetRaBackOffProbability (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -586,6 +636,8 @@ SatLowerLayerServiceConf::GetRaBackOffProbability (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaBackOffProbability (uint8_t index, uint16_t backOffProbability)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << backOffProbability);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -596,6 +648,8 @@ SatLowerLayerServiceConf::SetRaBackOffProbability (uint8_t index, uint16_t backO
 uint16_t
 SatLowerLayerServiceConf::GetRaHighLoadBackOffProbability (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -607,6 +661,8 @@ SatLowerLayerServiceConf::GetRaHighLoadBackOffProbability (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaHighLoadBackOffProbability (uint8_t index, uint16_t highLoadBackOffProbability)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << highLoadBackOffProbability );
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -618,6 +674,8 @@ SatLowerLayerServiceConf::SetRaHighLoadBackOffProbability (uint8_t index, uint16
 uint8_t
 SatLowerLayerServiceConf::GetRaNumberOfInstances (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -629,6 +687,8 @@ SatLowerLayerServiceConf::GetRaNumberOfInstances (uint8_t index) const
 void
 SatLowerLayerServiceConf::SetRaNumberOfInstances (uint8_t index, uint8_t numberOfInstances)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << (uint32_t) numberOfInstances);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -640,6 +700,8 @@ SatLowerLayerServiceConf::SetRaNumberOfInstances (uint8_t index, uint8_t numberO
 double
 SatLowerLayerServiceConf::GetRaAverageNormalizedOfferedLoadThreshold (uint8_t index) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");
@@ -651,6 +713,8 @@ SatLowerLayerServiceConf::GetRaAverageNormalizedOfferedLoadThreshold (uint8_t in
 void
 SatLowerLayerServiceConf::SetRaAverageNormalizedOfferedLoadThreshold (uint8_t index, double averageNormalizedOfferedLoadThreshold)
 {
+  NS_LOG_FUNCTION (this << (uint32_t) index << averageNormalizedOfferedLoadThreshold);
+
   if (index >= m_maxRaServiceEntries)
     {
       NS_FATAL_ERROR ("Service index out of range!!!");

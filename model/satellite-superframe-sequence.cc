@@ -104,7 +104,7 @@ SatSuperframeSeq::GetCarrierCount () const
 uint32_t
 SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
   NS_ASSERT ( seqId < m_superframe.size() );
 
@@ -114,7 +114,7 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
 Time
 SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
   NS_ASSERT ( seqId < m_superframe.size() );
 
@@ -124,7 +124,7 @@ SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
 Ptr<SatSuperframeConf>
 SatSuperframeSeq::GetSuperframeConf (uint8_t seqId) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
   NS_ASSERT ( seqId < m_superframe.size());
 

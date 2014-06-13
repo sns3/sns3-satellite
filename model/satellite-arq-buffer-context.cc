@@ -51,7 +51,7 @@ SatArqBufferContext::GetTypeId ()
 void
 SatArqBufferContext::DoDispose ()
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_FUNCTION (this);
 
   m_pdu = 0;
   m_waitingTimer.Cancel ();

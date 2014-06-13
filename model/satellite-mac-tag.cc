@@ -160,7 +160,7 @@ SatFlowIdTag::GetInstanceTypeId () const
 void
 SatFlowIdTag::SetFlowId (uint8_t flowId)
 {
-  NS_LOG_FUNCTION (this << flowId);
+  NS_LOG_FUNCTION (this << (uint32_t) flowId);
   m_flowId = flowId;
 }
 

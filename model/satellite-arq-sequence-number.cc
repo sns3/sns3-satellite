@@ -43,7 +43,7 @@ SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)
  m_windowSize (windowSize),
  m_maxSn (std::numeric_limits<uint8_t>::max())
 {
-
+  NS_LOG_FUNCTION (this << (uint32_t) windowSize );
 }
 
 bool
@@ -70,7 +70,7 @@ SatArqSequenceNumber::NextSequenceNumber ()
 void
 SatArqSequenceNumber::Release (uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
   uint32_t factor = uint32_t(m_currSeqNo / m_maxSn);
   uint32_t mod = uint32_t(m_currSeqNo % m_maxSn);

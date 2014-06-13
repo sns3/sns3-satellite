@@ -121,9 +121,8 @@ SatUtScheduler::SetSchedContextCallback (SatUtScheduler::SchedContextCallback cb
 void
 SatUtScheduler::SetTxOpportunityCallback (SatUtScheduler::TxOpportunityCallback cb)
 {
-  NS_LOG_LOGIC (this << &cb);
-
   NS_LOG_FUNCTION (this << &cb);
+
   m_txOpportunityCallback = cb;
 }
 
@@ -131,7 +130,7 @@ SatUtScheduler::SetTxOpportunityCallback (SatUtScheduler::TxOpportunityCallback 
 void
 SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatCompliancePolicy_t policy)
 {
-  NS_LOG_FUNCTION (this << payloadBytes << rcIndex << policy);
+  NS_LOG_FUNCTION (this << payloadBytes << (uint32_t) rcIndex << policy);
 
   NS_LOG_LOGIC ("UT scheduling RC: " << (uint32_t)(rcIndex) << " with " << payloadBytes << " bytes");
 
@@ -194,7 +193,7 @@ SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t paylo
 uint32_t
 SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint32_t &payloadBytes, uint8_t rcIndex)
 {
-  NS_LOG_FUNCTION (this << payloadBytes << rcIndex);
+  NS_LOG_FUNCTION (this << payloadBytes << (uint32_t) rcIndex);
 
   uint32_t schedBytes (0);
   uint32_t bytesLeft (0);

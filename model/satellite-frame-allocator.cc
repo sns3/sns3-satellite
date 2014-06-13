@@ -49,7 +49,7 @@ SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo (uint8_t countOfRcs)
    m_rbdcSymbols (0.0),
    m_vbdcSymbols (0.0)
 {
-  NS_LOG_FUNCTION (this << countOfRcs);
+  NS_LOG_FUNCTION (this << (uint32_t) countOfRcs);
 
   m_allocInfoPerRc = SatFrameAllocInfoItemContainer_t (countOfRcs, SatFrameAllocInfoItem ());
 }
@@ -186,7 +186,7 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frame
     m_frameId (frameId),
     m_frameConf (frameConf)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) frameId);
 
   m_waveformConf = m_frameConf->GetWaveformConf ();
   m_maxSymbolsPerCarrier = frameConf->GetCarrierMaxSymbols ();

@@ -220,6 +220,8 @@ SatUtMac::SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback 
 Time
 SatUtMac::GetNextSuperFrameTxTime (uint8_t superFrameSeqId) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) superFrameSeqId);
+
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
@@ -228,6 +230,8 @@ SatUtMac::GetNextSuperFrameTxTime (uint8_t superFrameSeqId) const
 Time
 SatUtMac::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
 {
+  NS_LOG_FUNCTION (this << (uint32_t) superFrameSeqId);
+
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
@@ -358,7 +362,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 void
 SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << waveform->GetPayloadInBytes () << carrierId << rcIndex);
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << waveform->GetPayloadInBytes () << carrierId << (uint32_t) rcIndex);
   NS_LOG_INFO ("SatUtMac::DoSlottedAlohaTransmit - Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << ": duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << rcIndex);
 
   SatPhy::PacketContainer_t packets;
@@ -467,7 +471,7 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
 void
 SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 {
-  NS_LOG_FUNCTION (this << event << rcIndex);
+  NS_LOG_FUNCTION (this << event << (uint32_t) rcIndex);
 
   NS_LOG_INFO ("SatUtMac::ReceiveQueueEvent - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " Queue: " << (uint32_t)rcIndex);
 
@@ -1143,7 +1147,7 @@ SatUtMac::DoFrameStart ()
 bool
 SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_FUNCTION (this);
   SatTbtpMessage::DaTimeSlotInfoContainer_t slots = tbtp->GetDaTimeslots (m_nodeInfo->GetMacAddress ());
 
   Time prevEnd;

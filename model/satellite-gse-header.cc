@@ -253,7 +253,7 @@ void SatGseHeader::SetTotalLength (uint32_t bytes)
 
 uint32_t SatGseHeader::GetGseHeaderSizeInBytes (uint8_t type) const
 {
-  NS_LOG_FUNCTION (this << type);
+  NS_LOG_FUNCTION (this << (uint32_t) type);
 
   uint32_t size (0);
   switch (type)

@@ -46,7 +46,7 @@ SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, uin
    m_holDelay (holDelay),
    m_flowId (flowId)
 {
-  NS_LOG_FUNCTION (this << addr << bytes << holDelay << flowId);
+  NS_LOG_FUNCTION (this << addr << bytes << holDelay << (uint32_t) flowId);
 }
 
 SatSchedulingObject::~SatSchedulingObject ()

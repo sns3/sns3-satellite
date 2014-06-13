@@ -1631,7 +1631,7 @@ SatPhyRxCarrier::CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s ob
 void
 SatPhyRxCarrier::SetRandomAccessAllocationChannelId (uint8_t randomAccessAllocationChannelId)
 {
-  NS_LOG_FUNCTION (this << randomAccessAllocationChannelId);
+  NS_LOG_FUNCTION (this << (uint32_t) randomAccessAllocationChannelId);
 
   m_randomAccessAllocationChannelId = randomAccessAllocationChannelId;
 }

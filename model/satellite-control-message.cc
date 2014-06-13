@@ -155,7 +155,7 @@ SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
    m_superframeSeqId (seqId),
    m_assignmentFormat (0)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) seqId);
 }
 
 SatTbtpMessage::~SatTbtpMessage ()
@@ -259,7 +259,7 @@ SatTbtpMessage::GetRaChannels () const
 void
 SatTbtpMessage::SetRaChannel (uint32_t raChannel, uint8_t frameId, uint16_t timeSlotCount)
 {
-  NS_LOG_FUNCTION (this << raChannel << frameId << timeSlotCount);
+  NS_LOG_FUNCTION (this << raChannel << (uint32_t) frameId << timeSlotCount);
 
   // find index for the RA channel from map
   RaChannelMap_t::iterator it = m_raChannels.find (raChannel);
@@ -422,7 +422,7 @@ SatCrMessage::~SatCrMessage ()
 void
 SatCrMessage::AddControlElement (uint8_t rcIndex, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value)
 {
-  NS_LOG_FUNCTION (this << rcIndex << cac << value);
+  NS_LOG_FUNCTION (this << (uint32_t) rcIndex << cac << value);
 
   RequestDescriptor_t p = std::make_pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rcIndex, cac);
   m_requestData.insert (std::make_pair<RequestDescriptor_t, uint32_t> (p, value));
@@ -568,7 +568,7 @@ SatRaMessage::~SatRaMessage ()
 void
 SatRaMessage::SetAllocationChannelId (uint8_t allocationChannelId)
 {
-  NS_LOG_FUNCTION (this << allocationChannelId);
+  NS_LOG_FUNCTION (this << (uint32_t) allocationChannelId);
 
   m_allocationChannelId = allocationChannelId;
 }

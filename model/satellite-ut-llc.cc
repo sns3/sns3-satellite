@@ -79,7 +79,7 @@ SatUtLlc::DoDispose ()
 Ptr<Packet>
 SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << macAddr << bytes << rcIndex);
+  NS_LOG_FUNCTION (this << macAddr << bytes << (uint32_t) rcIndex);
 
   Ptr<Packet> packet;
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, rcIndex);

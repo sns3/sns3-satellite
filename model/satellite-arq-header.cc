@@ -90,7 +90,7 @@ uint8_t SatArqHeader::GetSeqNo () const
 
 void SatArqHeader::SetSeqNo (uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
   m_seqNo = seqNo;
 }
 

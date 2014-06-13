@@ -138,7 +138,7 @@ SatDamaEntry::GetVbdcBasedBytes () const
 uint16_t
 SatDamaEntry::GetCraInKbps (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index);
 
   if ( index >= m_llsConf->GetDaServiceCount ())
     {
@@ -157,7 +157,7 @@ SatDamaEntry::GetCraInKbps (uint8_t index) const
 uint16_t
 SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index);
 
   if ( index >= m_llsConf->GetDaServiceCount ())
     {
@@ -177,7 +177,7 @@ SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
 uint16_t
 SatDamaEntry::GetRbdcInKbps (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index);
 
   if ( index >= m_dynamicRateRequestedInKbps.size ())
     {
@@ -190,7 +190,7 @@ SatDamaEntry::GetRbdcInKbps (uint8_t index) const
 void
 SatDamaEntry::UpdateRbdcInKbps (uint8_t index, uint16_t rateInKbps)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index << rateInKbps);
 
   if ( m_llsConf->GetDaRbdcAllowed (index) )
     {
@@ -214,7 +214,7 @@ SatDamaEntry::UpdateRbdcInKbps (uint8_t index, uint16_t rateInKbps)
 uint32_t
 SatDamaEntry::GetVbdcInBytes (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index);
 
   if ( index >= m_volumeBacklogRequestedInBytes.size ())
     {
@@ -227,7 +227,7 @@ SatDamaEntry::GetVbdcInBytes (uint8_t index) const
 void
 SatDamaEntry::UpdateVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index << volumeInBytes);
 
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
@@ -238,7 +238,7 @@ SatDamaEntry::UpdateVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 void
 SatDamaEntry::SetVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index << volumeInBytes);
 
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
