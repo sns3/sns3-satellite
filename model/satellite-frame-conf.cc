@@ -345,7 +345,7 @@ SatSuperframeConf::CreateSuperframeConf (SuperFrameConfiguration_t conf)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  Ptr<SatSuperframeConf> superFrameConf = CreateObject<SatSuperframeConf0> ();
+  Ptr<SatSuperframeConf> superFrameConf;
 
   switch (conf)
   {
@@ -438,7 +438,7 @@ SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
 Ptr<SatFrameConf>
 SatSuperframeConf::GetFrameConf (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) index);
+  NS_LOG_FUNCTION (this);
 
   return m_frames[index];
 }
@@ -454,7 +454,7 @@ SatSuperframeConf::GetCarrierCount () const
 uint32_t
 SatSuperframeConf::GetCarrierId ( uint8_t frameId, uint16_t frameCarrierId ) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameId << frameCarrierId);
+  NS_LOG_FUNCTION (this);
 
   uint32_t carrierId = frameCarrierId;
 
@@ -515,7 +515,7 @@ SatSuperframeConf::IsRandomAccessCarrier (uint32_t carrierId) const
 void
 SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex << bandwidthHz);
+  NS_LOG_FUNCTION (this << frameIndex << bandwidthHz);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -528,7 +528,7 @@ SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double band
 void
 SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex << bandwidthHz);
+  NS_LOG_FUNCTION (this << frameIndex << bandwidthHz);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -541,7 +541,7 @@ SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, doub
 void
 SatSuperframeConf::SetFrameCarrierSpacing (uint8_t frameIndex, double spacing)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex << spacing);
+  NS_LOG_FUNCTION (this << frameIndex << spacing);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -554,7 +554,7 @@ SatSuperframeConf::SetFrameCarrierSpacing (uint8_t frameIndex, double spacing)
 void
 SatSuperframeConf::SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex << rollOff);
+  NS_LOG_FUNCTION (this << frameIndex << rollOff);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -567,7 +567,7 @@ SatSuperframeConf::SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff)
 void
 SatSuperframeConf::SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex << randomAccess);
+  NS_LOG_FUNCTION (this << frameIndex << randomAccess);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -580,7 +580,7 @@ SatSuperframeConf::SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess)
 double
 SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex);
+  NS_LOG_FUNCTION (this << frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -593,7 +593,7 @@ SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const
 double
 SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex);
+  NS_LOG_FUNCTION (this << frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -606,7 +606,7 @@ SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) cons
 double
 SatSuperframeConf::GetFrameCarrierSpacing (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex);
+  NS_LOG_FUNCTION (this << frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -619,7 +619,7 @@ SatSuperframeConf::GetFrameCarrierSpacing (uint8_t frameIndex) const
 double
 SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex);
+  NS_LOG_FUNCTION (this << frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -632,7 +632,7 @@ SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
 bool
 SatSuperframeConf::IsFrameRandomAccess (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) frameIndex);
+  NS_LOG_FUNCTION (this << frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -714,7 +714,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 SatFrameConf::SatTimeSlotConfContainer_t
 SatSuperframeConf::GetRaSlots (uint8_t raChannel)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) raChannel);
+  NS_LOG_FUNCTION (this);
 
   SatFrameConf::SatTimeSlotConfContainer_t timeSlots;
 
@@ -736,7 +736,7 @@ SatSuperframeConf::GetRaSlots (uint8_t raChannel)
 uint16_t
 SatSuperframeConf::GetRaSlotCount (uint8_t raChannel)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) raChannel);
+  NS_LOG_FUNCTION (this);
 
   uint16_t slotCount = 0;
 
@@ -765,7 +765,7 @@ SatSuperframeConf::GetRaChannelCount () const
 uint8_t
 SatSuperframeConf::GetRaChannelFrameId (uint8_t raChannel) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) raChannel);
+  NS_LOG_FUNCTION (this);
 
   uint8_t frameId = 0;
 
@@ -784,7 +784,7 @@ SatSuperframeConf::GetRaChannelFrameId (uint8_t raChannel) const
 uint32_t
 SatSuperframeConf::GetRaChannelTimeSlotPayloadInBytes (uint8_t raChannel) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) raChannel);
+  NS_LOG_FUNCTION (this);
 
   uint32_t payloadInBytes = 0;
 
