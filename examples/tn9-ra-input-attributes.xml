@@ -375,6 +375,7 @@
  <default name="ns3::SatSuperframeSeq::TargetDuration" value="+100000000.0ns"/>
  <default name="ns3::SatTbtpContainer::MaxStoredTbtps" value="100"/>
  <default name="ns3::SatUtMac::GuardTime" value="+1000.0ns"/>
+ <default name="ns3::SatUtMac::UseCrdsaOnlyForControlPackets" value="false"/>
  <default name="ns3::SatUtPhy::RxTemperatureDbk" value="24.6"/>
  <default name="ns3::SatUtPhy::RxMaxAntennaGainDb" value="44.6"/>
  <default name="ns3::SatUtPhy::TxMaxAntennaGainDb" value="45.2"/>
@@ -387,6 +388,7 @@
  <default name="ns3::SatUtPhy::DefaultFadingValue" value="1"/>
  <default name="ns3::SatUtPhy::OtherSysIfCOverIDb" value="24.7"/>
  <default name="ns3::SatUtScheduler::FramePduHeaderSize" value="1"/>
+ <default name="ns3::SatUtScheduler::StrictPriorityForControl" value="true"/>
  <default name="ns3::SatWaveformConf::TargetBLER" value="1e-05"/>
  <default name="ns3::SatWaveformConf::AcmEnabled" value="true"/>
  <default name="ns3::SatWaveformConf::DefaultWfId" value="3"/>
