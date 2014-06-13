@@ -22,6 +22,7 @@
 #include "ns3/log.h"
 #include "ns3/double.h"
 #include "ns3/simulator.h"
+#include "ns3/boolean.h"
 #include "ns3/nstime.h"
 #include "satellite-request-manager.h"
 #include "satellite-enums.h"
@@ -44,6 +45,7 @@ SatRequestManager::SatRequestManager ()
  m_previousEvaluationTime (Seconds (0.0)),
  m_rttEstimate (MilliSeconds (560)),
  m_overEstimationFactor (1.1),
+ m_enableOnDemandEvaluation (false),
  m_pendingRbdcRequestsKbps (),
  m_pendingVbdcBytes (),
  m_lastVbdcCrSent (Seconds (0)),
@@ -108,6 +110,11 @@ SatRequestManager::GetTypeId (void)
                    DoubleValue (1.1),
                    MakeDoubleAccessor (&SatRequestManager::m_overEstimationFactor),
                    MakeDoubleChecker<double_t> ())
+    .AddAttribute( "EnableOnDemandEvaluation",
+                   "Enable on-demand resource evaluation.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatRequestManager::m_enableOnDemandEvaluation),
+                   MakeBooleanChecker ())
     .AddTraceSource ("CrTrace",
                      "Capacity request trace",
                      MakeTraceSourceAccessor (&SatRequestManager::m_crTrace))
@@ -165,9 +172,12 @@ SatRequestManager::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIn
   if (event == SatQueue::FIRST_BUFFERED_PKT)
     {
       NS_LOG_LOGIC ("FIRST_BUFFERED_PKT event received from queue: " << (uint32_t)(rcIndex));
-      NS_LOG_LOGIC ("Do on-demand CR evaluation for RC index: " << (uint32_t)(rcIndex));
 
-      //DoEvaluation ();
+      if (m_enableOnDemandEvaluation)
+        {
+          NS_LOG_LOGIC ("Do on-demand CR evaluation for RC index: " << (uint32_t)(rcIndex));
+          DoEvaluation ();
+        }
     }
   // Other queue events not handled here
 }

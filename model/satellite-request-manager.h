@@ -334,6 +334,11 @@ private:
   double m_overEstimationFactor;
 
   /**
+   * Enable
+   */
+  bool m_enableOnDemandEvaluation;
+
+  /**
    * Key = RC index
    * Value -> Key   = Time when the request was sent
    * Value -> Value = Requested bitrate or bytes
