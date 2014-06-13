@@ -54,8 +54,7 @@ static void TbtpResources (uint32_t value)
 int
 main (int argc, char *argv[])
 {
-  // Spot-beam over Finland
-  uint32_t beamId = 18;
+  uint32_t beamId = 26;
   uint32_t endUsersPerUt = 10;
   uint32_t utsPerBeam = 10;
   Time utAppStartTime = Seconds (0.1);
@@ -89,35 +88,14 @@ main (int argc, char *argv[])
   ConfigStore inputFrameConfig;
   inputFrameConfig.ConfigureDefaults ();
 
-  /**
-   * Attributes:
-   * -----------
-   *
-   * Scenario:
-   *   - 1 beam (beam id = 18)
-   *
-   * Frame configurations (configured in sys-test-frame-confs.xml):
-   *   - 4 frames (13.75 MHz user bandwidth)
-   *     - 8 x 0.3125 MHz -> 2.5 MHz
-   *     - 8 x 0.625 MHz  -> 5 MHz
-   *     - 4 x 1.25 MHz   -> 5 MHz
-   *     - 1 x 1.25 MHz   -> 1.25 MHz
-   *
-   * FWD link
-   *   - ACM disabled / enabled
-   *   - Markov enabled
-   *   - External fading input trace enabled
-   *   - No error model
-   *   - ARQ disabled
-   *
-   */
-
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("testCase", "Test case to execute", testCase);
   cmd.AddValue ("frameConf", "Pre-defined super frame configuration", preDefinedFrameConfig);
   cmd.AddValue ("trafficModel", "Traffic model to use (0 = CBR, 1 = OnOff)", trafficModel);
   cmd.AddValue ("simLength", "Simulation length", simLength);
+  cmd.AddValue ("beamId", "Beam Id", beamId);
+  cmd.AddValue ("utAppStartTime", "Application (first) start time.", utAppStartTime);
   cmd.Parse (argc, argv);
 
   // select pre-defined super frame configuration wanted to use.
@@ -125,20 +103,28 @@ main (int argc, char *argv[])
 
   switch (testCase)
   {
-    case 0: // scheduler, CRA
+    case 0: // scheduler, CRA, ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=5]"));
+      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
       Config::SetDefault ("ns3::SatSuperframeAllocator::FcaEnabled", BooleanValue (false));
       break;
 
-    case 1: // scheduler, FCA (CRA + VBDC)
+    case 1: // scheduler, FCA (CRA + VBDC), ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (true));
+      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
+      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
       Config::SetDefault ("ns3::SatSuperframeAllocator::FcaEnabled", BooleanValue (true));
       break;
 
-    case 2: // ACM, one UT with one user, SA enabled, CRDSA disabled, MARKOV fading on
+    case 2: // ACM, one UT with one user, MARKOV fading on, external fading on
+      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
+      Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
+      Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
+      Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
+      Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
+      Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
+      endUsersPerUt = 1;
+      utsPerBeam = 1;
       break;
 
     case 3: // RM, one UT with one user, CRA only

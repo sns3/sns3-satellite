@@ -106,6 +106,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("simLength", "Length of simulation", simLength);
   cmd.AddValue ("traceFrameInfo", "Trace (print) BB frame info", traceFrameInfo);
   cmd.AddValue ("traceMergeInfo", "Trace (print) BB frame merge info", traceMergeInfo);
+  cmd.AddValue ("beamId", "Beam Id", beamId);
   cmd.AddValue ("senderAppStartTime", "Sender application (first) start time", senderAppStartTime);
   cmd.Parse (argc, argv);
 
@@ -231,7 +232,7 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("sat-sys-test.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("sat-fwd-sys-test.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
