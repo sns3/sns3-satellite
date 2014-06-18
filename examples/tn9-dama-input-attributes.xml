@@ -437,6 +437,7 @@
  <default name="ns3::SatUtHelper::EnableChannelEstimationError" value="true"/>
  <default name="ns3::SatUtHelper::EnableRtnLinkArq" value="false"/>
  <default name="ns3::SatUtHelper::EnableFwdLinkArq" value="false"/>
+ <default name="ns3::TcpL4Protocol::SocketType" value="ns3::TcpNewReno"/>
  <global name="RngSeed" value="1"/>
  <global name="RngRun" value="1"/>
  <global name="ChecksumEnabled" value="false"/>

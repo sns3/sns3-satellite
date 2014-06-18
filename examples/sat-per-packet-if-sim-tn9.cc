@@ -28,6 +28,7 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (220); // expected to be equivalent with 70% system load
   DataRate dataRate (32000); // in bps
   uint32_t beamConf (0);
+  uint32_t fadingConf (0);
 
   uint32_t packetSize (1280); // in bytes
   double simLength (50.0); // in seconds
@@ -59,6 +60,10 @@ main (int argc, char *argv[])
    *   - Conf-2 scheduling mode (dynamic time slots)
    *   - FCA disabled
    *
+   * Fading configuration (selected from command line argument):
+   *   - Markov
+   *   - Rain
+   *
    * RTN link
    *   - Per-packet interference
    *   - AVI error model
@@ -76,6 +81,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("beamConf", "Beam configuration", beamConf);
+  cmd.AddValue ("fadingConf", "Fading configuration (0: Markov, 1: Rain)", fadingConf);
   cmd.Parse (argc, argv);
 
   // NCC configuration
@@ -95,6 +101,32 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+
+  switch (fadingConf)
+  {
+    case 0:
+      {
+        // Markov fading
+        Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_MARKOV));
+        break;
+      }
+    case 1:
+      {
+        // Rain fading
+        Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
+        Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
+        Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
+                            StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
+        Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
+                            StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported fadingConf: " << fadingConf);
+        break;
+      }
+  }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -200,19 +232,18 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
-  s->AddPerUtRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerUtFwdSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamFwdSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO("--- sat-per-packet-if-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);

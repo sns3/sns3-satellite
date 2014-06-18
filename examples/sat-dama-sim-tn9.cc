@@ -221,14 +221,17 @@ main (int argc, char *argv[])
   s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddAverageUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddAverageUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   NS_LOG_INFO("--- sat-dama-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);

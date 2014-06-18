@@ -168,13 +168,12 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
-
-  s->AddAverageUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddAverageUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -182,17 +181,18 @@ main (int argc, char *argv[])
   s->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
-
-  s->AddAverageUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddAverageUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   s->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
