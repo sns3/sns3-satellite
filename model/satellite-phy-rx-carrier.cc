@@ -196,9 +196,15 @@ SatPhyRxCarrier::GetTypeId (void)
     .AddTraceSource ("PacketTrace",
                      "The trace for calculated interferences of the received packets",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
+    .AddTraceSource ("RxPowerTrace",
+                     "The trace for received signal power in dBW",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_rxPowerTrace))
     .AddTraceSource ("Sinr",
                      "The trace for composite SINR in dB",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrTrace))
+    .AddTraceSource ("LinkSinr",
+                     "The trace for link specific SINR in dB",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_linkSinrTrace))
     .AddTraceSource ("DaRx",
                      "Received a packet burst through Dedicated Channel",
                       MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace))
@@ -397,6 +403,10 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               m_rxParamsMap.insert (std::make_pair (key, rxParamsStruct));
 
               NS_LOG_LOGIC (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
+
+              // Update link specific received signal power
+              m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W));
+
               Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
 
               IncreaseNumOfRxState (rxParams->m_txInfo.packetType);
@@ -526,6 +536,9 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
                                     m_rxExtNoisePowerW,
                                     m_sinrCalculate);
 
+      // Update link specific SINR trace
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+
       /// PHY transmission decoded successfully. Note, that at transparent satellite,
       /// all the transmissions are not decoded.
       bool phyError (false);
@@ -552,6 +565,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
           NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
         }
 
+      // Update composite SINR trace
       m_sinrTrace (SatUtils::LinearToDb (cSinr), iter->second.sourceAddress);
 
       /// composite sinr output trace

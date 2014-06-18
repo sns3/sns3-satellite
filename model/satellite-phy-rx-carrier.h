@@ -478,6 +478,11 @@ private:
                   >
      m_packetTrace;
 
+  /**
+   * \brief A callback for received signal power in dBW
+   *
+   */
+  TracedCallback<double> m_rxPowerTrace;
 
   /**
    * \brief A callback for transmission composite SINR at UT (BBFrame) or GW
@@ -487,6 +492,12 @@ private:
    * of the node where the signal originates from.
    */
   TracedCallback<double, const Address &> m_sinrTrace;
+
+  /**
+   * \brief A callback for link specific SINR in dB.
+   *
+   */
+  TracedCallback<double> m_linkSinrTrace;
 
   /**
    * \brief `DaRx` trace source.
