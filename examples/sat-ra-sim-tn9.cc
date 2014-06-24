@@ -271,8 +271,8 @@ main (int argc, char *argv[])
   //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   //s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);

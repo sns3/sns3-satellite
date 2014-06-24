@@ -232,15 +232,15 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
-  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddGlobalRtnSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddGlobalFwdSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);

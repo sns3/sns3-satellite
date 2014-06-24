@@ -49,16 +49,16 @@
 #include <ns3/gnuplot-aggregator.h>
 
 #include <sstream>
-#include "satellite-stats-sinr-helper.h"
+#include "satellite-stats-composite-sinr-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsSinrHelper");
+NS_LOG_COMPONENT_DEFINE ("SatStatsCompositeSinrHelper");
 
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsSinrHelper);
+NS_OBJECT_ENSURE_REGISTERED (SatStatsCompositeSinrHelper);
 
-SatStatsSinrHelper::SatStatsSinrHelper (Ptr<const SatHelper> satHelper)
+SatStatsCompositeSinrHelper::SatStatsCompositeSinrHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
     m_minValue (0.0),
     m_maxValue (0.0),
@@ -68,37 +68,37 @@ SatStatsSinrHelper::SatStatsSinrHelper (Ptr<const SatHelper> satHelper)
 }
 
 
-SatStatsSinrHelper::~SatStatsSinrHelper ()
+SatStatsCompositeSinrHelper::~SatStatsCompositeSinrHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 TypeId // static
-SatStatsSinrHelper::GetTypeId ()
+SatStatsCompositeSinrHelper::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsSinrHelper")
+  static TypeId tid = TypeId ("ns3::SatStatsCompositeSinrHelper")
     .SetParent<SatStatsHelper> ()
     .AddAttribute ("MinValue",
                    "Configure the MinValue attribute of the histogram, PDF, CDF output "
                    "(in dB).",
                    DoubleValue (-5.0),
-                   MakeDoubleAccessor (&SatStatsSinrHelper::SetMinValue,
-                                       &SatStatsSinrHelper::GetMinValue),
+                   MakeDoubleAccessor (&SatStatsCompositeSinrHelper::SetMinValue,
+                                       &SatStatsCompositeSinrHelper::GetMinValue),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("MaxValue",
                    "Configure the MaxValue attribute of the histogram, PDF, CDF output "
                    "(in dB).",
                    DoubleValue (20.0),
-                   MakeDoubleAccessor (&SatStatsSinrHelper::SetMaxValue,
-                                       &SatStatsSinrHelper::GetMaxValue),
+                   MakeDoubleAccessor (&SatStatsCompositeSinrHelper::SetMaxValue,
+                                       &SatStatsCompositeSinrHelper::GetMaxValue),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("BinLength",
                    "Configure the BinLength attribute of the histogram, PDF, CDF output "
                    "(in dB).",
                    DoubleValue (0.5),
-                   MakeDoubleAccessor (&SatStatsSinrHelper::SetBinLength,
-                                       &SatStatsSinrHelper::GetBinLength),
+                   MakeDoubleAccessor (&SatStatsCompositeSinrHelper::SetBinLength,
+                                       &SatStatsCompositeSinrHelper::GetBinLength),
                    MakeDoubleChecker<double> ())
   ;
   return tid;
@@ -106,7 +106,7 @@ SatStatsSinrHelper::GetTypeId ()
 
 
 void
-SatStatsSinrHelper::SetMinValue (double minValue)
+SatStatsCompositeSinrHelper::SetMinValue (double minValue)
 {
   NS_LOG_FUNCTION (this << minValue);
   m_minValue = minValue;
@@ -114,14 +114,14 @@ SatStatsSinrHelper::SetMinValue (double minValue)
 
 
 double
-SatStatsSinrHelper::GetMinValue () const
+SatStatsCompositeSinrHelper::GetMinValue () const
 {
   return m_minValue;
 }
 
 
 void
-SatStatsSinrHelper::SetMaxValue (double maxValue)
+SatStatsCompositeSinrHelper::SetMaxValue (double maxValue)
 {
   NS_LOG_FUNCTION (this << maxValue);
   m_maxValue = maxValue;
@@ -129,14 +129,14 @@ SatStatsSinrHelper::SetMaxValue (double maxValue)
 
 
 double
-SatStatsSinrHelper::GetMaxValue () const
+SatStatsCompositeSinrHelper::GetMaxValue () const
 {
   return m_maxValue;
 }
 
 
 void
-SatStatsSinrHelper::SetBinLength (double binLength)
+SatStatsCompositeSinrHelper::SetBinLength (double binLength)
 {
   NS_LOG_FUNCTION (this << binLength);
   m_binLength = binLength;
@@ -144,14 +144,14 @@ SatStatsSinrHelper::SetBinLength (double binLength)
 
 
 double
-SatStatsSinrHelper::GetBinLength () const
+SatStatsCompositeSinrHelper::GetBinLength () const
 {
   return m_binLength;
 }
 
 
 void
-SatStatsSinrHelper::DoInstall ()
+SatStatsCompositeSinrHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -310,7 +310,7 @@ SatStatsSinrHelper::DoInstall ()
       }
 
     default:
-      NS_FATAL_ERROR ("SatStatsSinrHelper - Invalid output type");
+      NS_FATAL_ERROR ("SatStatsCompositeSinrHelper - Invalid output type");
       break;
     }
 
@@ -321,7 +321,7 @@ SatStatsSinrHelper::DoInstall ()
 
 
 void
-SatStatsSinrHelper::InstallProbes ()
+SatStatsCompositeSinrHelper::InstallProbes ()
 {
   // The method below is supposed to be implemented by the child class.
   DoInstallProbes ();
@@ -330,33 +330,33 @@ SatStatsSinrHelper::InstallProbes ()
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdSinrHelper);
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdCompositeSinrHelper);
 
-SatStatsFwdSinrHelper::SatStatsFwdSinrHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsSinrHelper (satHelper)
+SatStatsFwdCompositeSinrHelper::SatStatsFwdCompositeSinrHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsCompositeSinrHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsFwdSinrHelper::~SatStatsFwdSinrHelper ()
+SatStatsFwdCompositeSinrHelper::~SatStatsFwdCompositeSinrHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 TypeId // static
-SatStatsFwdSinrHelper::GetTypeId ()
+SatStatsFwdCompositeSinrHelper::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFwdSinrHelper")
-    .SetParent<SatStatsSinrHelper> ()
+  static TypeId tid = TypeId ("ns3::SatStatsFwdCompositeSinrHelper")
+    .SetParent<SatStatsCompositeSinrHelper> ()
   ;
   return tid;
 }
 
 
 void
-SatStatsFwdSinrHelper::DoInstallProbes ()
+SatStatsFwdCompositeSinrHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
@@ -462,33 +462,33 @@ SatStatsFwdSinrHelper::DoInstallProbes ()
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnSinrHelper);
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnCompositeSinrHelper);
 
-SatStatsRtnSinrHelper::SatStatsRtnSinrHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsSinrHelper (satHelper)
+SatStatsRtnCompositeSinrHelper::SatStatsRtnCompositeSinrHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsCompositeSinrHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsRtnSinrHelper::~SatStatsRtnSinrHelper ()
+SatStatsRtnCompositeSinrHelper::~SatStatsRtnCompositeSinrHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 TypeId // static
-SatStatsRtnSinrHelper::GetTypeId ()
+SatStatsRtnCompositeSinrHelper::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnSinrHelper")
-    .SetParent<SatStatsSinrHelper> ()
+  static TypeId tid = TypeId ("ns3::SatStatsRtnCompositeSinrHelper")
+    .SetParent<SatStatsCompositeSinrHelper> ()
   ;
   return tid;
 }
 
 
 void
-SatStatsRtnSinrHelper::DoInstallProbes ()
+SatStatsRtnCompositeSinrHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -503,7 +503,7 @@ SatStatsRtnSinrHelper::DoInstallProbes ()
 
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
   Callback<void, double, const Address &> callback
-    = MakeCallback (&SatStatsRtnSinrHelper::SinrCallback, this);
+    = MakeCallback (&SatStatsRtnCompositeSinrHelper::SinrCallback, this);
 
   for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
     {
@@ -554,7 +554,7 @@ SatStatsRtnSinrHelper::DoInstallProbes ()
 
 
 void
-SatStatsRtnSinrHelper::SinrCallback (double sinrDb, const Address &from)
+SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from)
 {
   //NS_LOG_FUNCTION (this << sinrDb << from);
 
@@ -629,7 +629,7 @@ SatStatsRtnSinrHelper::SinrCallback (double sinrDb, const Address &from)
 
 
 void
-SatStatsRtnSinrHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
+SatStatsRtnCompositeSinrHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 {
   NS_LOG_FUNCTION (this << utNode->GetId ());
 

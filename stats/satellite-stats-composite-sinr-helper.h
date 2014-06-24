@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SATELLITE_STATS_SINR_HELPER_H
-#define SATELLITE_STATS_SINR_HELPER_H
+#ifndef SATELLITE_STATS_COMPOSITE_SINR_HELPER_H
+#define SATELLITE_STATS_COMPOSITE_SINR_HELPER_H
 
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
@@ -44,14 +44,14 @@ class DataCollectionObject;
  * \ingroup satstats
  * \brief
  */
-class SatStatsSinrHelper : public SatStatsHelper
+class SatStatsCompositeSinrHelper : public SatStatsHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsSinrHelper (Ptr<const SatHelper> satHelper);
+  SatStatsCompositeSinrHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
-  virtual ~SatStatsSinrHelper ();
+  virtual ~SatStatsCompositeSinrHelper ();
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
@@ -112,7 +112,7 @@ private:
   double m_maxValue;   ///< `MaxValue` attribute.
   double m_binLength;  ///< `BinLength` attribute.
 
-}; // end of class SatStatsSinrHelper
+}; // end of class SatStatsCompositeSinrHelper
 
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
@@ -121,71 +121,71 @@ class Probe;
 
 /**
  * \ingroup satstats
- * \brief Produce forward link SINR statistics from a satellite module
- *        simulation.
+ * \brief Produce forward link composite SINR statistics from a satellite
+ *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFwdPhyDelayHelper> s = Create<SatStatsFwdPhyDelayHelper> (satHelper);
+ * Ptr<SatStatsFwdCompositeSinrHelper> s = Create<SatStatsFwdCompositeSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsFwdSinrHelper : public SatStatsSinrHelper
+class SatStatsFwdCompositeSinrHelper : public SatStatsCompositeSinrHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsFwdSinrHelper (Ptr<const SatHelper> satHelper);
+  SatStatsFwdCompositeSinrHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
-  virtual ~SatStatsFwdSinrHelper ();
+  virtual ~SatStatsFwdCompositeSinrHelper ();
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
 
 protected:
-  // inherited from SatStatsDelayHelper base class
+  // inherited from SatStatsCompositeSinrHelper base class
   void DoInstallProbes ();
 
 private:
   /// Maintains a list of probes created by this helper.
   std::list<Ptr<Probe> > m_probes;
 
-};
+}; // end of class SatStatsFwdCompositeSinrHelper
 
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
- * \brief Produce return link SINR statistics from a satellite module
- *        simulation.
+ * \brief Produce return link composite SINR statistics from a satellite
+ *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsRtnSinrHelper> s = Create<SatStatsRtnSinrHelper> (satHelper);
+ * Ptr<SatStatsRtnCompositeSinrHelper> s = Create<SatStatsRtnCompositeSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsRtnSinrHelper : public SatStatsSinrHelper
+class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsRtnSinrHelper (Ptr<const SatHelper> satHelper);
+  SatStatsRtnCompositeSinrHelper (Ptr<const SatHelper> satHelper);
 
   /// Destructor.
-  virtual ~SatStatsRtnSinrHelper ();
+  virtual ~SatStatsRtnCompositeSinrHelper ();
 
   // inherited from ObjectBase base class
   static TypeId GetTypeId ();
@@ -199,7 +199,7 @@ public:
   void SinrCallback (double sinrDb, const Address &from);
 
 protected:
-  // inherited from SatStatsDelayHelper base class
+  // inherited from SatStatsCompositeSinrHelper base class
   void DoInstallProbes ();
 
 private:
@@ -218,10 +218,10 @@ private:
   /// Map of address and the identifier associated with it (for return link).
   std::map<const Address, uint32_t> m_identifierMap;
 
-}; // end of class SatStatsRtnSinrHelper
+}; // end of class SatStatsRtnCompositeSinrHelper
 
 
 } // end of namespace ns3
 
 
-#endif /* SATELLITE_STATS_SINR_HELPER_H */
+#endif /* SATELLITE_STATS_COMPOSITE_SINR_HELPER_H */

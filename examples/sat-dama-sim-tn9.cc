@@ -224,8 +224,8 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamRtnSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
   s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
