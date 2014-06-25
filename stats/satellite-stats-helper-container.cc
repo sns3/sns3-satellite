@@ -29,6 +29,7 @@
 #include <ns3/satellite-stats-composite-sinr-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-frame-load-helper.h>
+#include <ns3/satellite-stats-link-sinr-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
@@ -83,6 +84,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam] BackloggedRequest
  * - [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - [Global,PerGw,PerBeam] WaveformUsage
+ * - Global [Fwd,Rtn] [Feeder,User] LinkSinr
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -346,112 +348,95 @@ SatStatsHelperContainer::GetTypeId ()
                                         "Random Access CRDSA packet collision rate statistics")
 
     // Capacity request statistics.
-    .AddAttribute ("GlobalCapacityRequest",
-                   "Enable the output of capacity request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalCapacityRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
-    .AddAttribute ("PerGwCapacityRequest",
-                   "Enable the output of capacity request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwCapacityRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
-    .AddAttribute ("PerBeamCapacityRequest",
-                   "Enable the output of capacity request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamCapacityRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
-    .AddAttribute ("PerUtCapacityRequest",
-                   "Enable the output of capacity request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerUtCapacityRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalCapacityRequest,
+                                  "global capacity request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwCapacityRequest,
+                                  "per GW capacity request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamCapacityRequest,
+                                  "per beam capacity request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtCapacityRequest,
+                                  "per UT capacity request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Resources granted statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (ResourcesGranted,
                                                "resources granted statistics")
 
     // Backlogged request statistics.
-    .AddAttribute ("GlobalBackloggedRequest",
-                   "Enable the output of backlogged request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalBackloggedRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
-    .AddAttribute ("PerGwBackloggedRequest",
-                   "Enable the output of backlogged request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwBackloggedRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
-    .AddAttribute ("PerBeamBackloggedRequest",
-                   "Enable the output of backlogged request statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamBackloggedRequest),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                                    SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalBackloggedRequest,
+                                  "global backlogged request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwBackloggedRequest,
+                                  "per GW backlogged request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamBackloggedRequest,
+                                  "per beam backlogged request statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Frame load statistics.
-    .AddAttribute ("GlobalFrameSymbolLoad",
-                   "Enable the output of frame load (in ratio of allocated symbols) statistics ",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFrameSymbolLoad),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerGwFrameSymbolLoad",
-                   "Enable the output of frame load (in ratio of allocated symbols) statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFrameSymbolLoad),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerBeamFrameSymbolLoad",
-                   "Enable the output of frame load (in ratio of allocated symbols) statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameSymbolLoad),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("GlobalFrameUserLoad",
-                   "Enable the output of frame load (in number of scheduled users) statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalFrameUserLoad),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerGwFrameUserLoad",
-                   "Enable the output of frame load (in number of scheduled users) statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwFrameUserLoad),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerBeamFrameUserLoad",
-                   "Enable the output of frame load (in number of scheduled users) statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamFrameUserLoad),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFrameSymbolLoad,
+                                  "global frame load (in ratio of allocated symbols) statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwFrameSymbolLoad,
+                                  "per GW frame load (in ratio of allocated symbols) statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamFrameSymbolLoad,
+                                  "per beam frame load (in ratio of allocated symbols) statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFrameUserLoad,
+                                  "global frame load (in number of scheduled users) statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwFrameUserLoad,
+                                  "per GW frame load (in number of scheduled users) statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamFrameUserLoad,
+                                  "per UT frame load (in number of scheduled users) statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Waveform usage statistics.
-    .AddAttribute ("GlobalWaveformUsage",
-                   "Enable the output of waveform usage statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddGlobalWaveformUsage),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerGwWaveformUsage",
-                   "Enable the output of waveform usage statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerGwWaveformUsage),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
-    .AddAttribute ("PerBeamWaveformUsage",
-                   "Enable the output of waveform usage statistics",
-                   EnumValue (SatStatsHelper::OUTPUT_NONE),
-                   MakeEnumAccessor (&SatStatsHelperContainer::AddPerBeamWaveformUsage),
-                   MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                                    SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalWaveformUsage,
+                                  "global waveform usage statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                         SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwWaveformUsage,
+                                  "per GW waveform usage statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                         SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamWaveformUsage,
+                                  "per beam waveform usage statistics")
+        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                         SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+
+    // Link SINR statistics.
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdFeederLinkSinr,
+                                  "global forward feeder link SINR statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdUserLinkSinr,
+                                  "global forward user link SINR statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnFeederLinkSinr,
+                                  "global return feeder link SINR statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnUserLinkSinr,
+                                  "global return user link SINR statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
   ;
   return tid;
 }
@@ -488,8 +473,8 @@ SatStatsHelperContainer::GetName () const
  *
  * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay (#)
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay (#)
+ * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay
+ * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
  * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] CompositeSinr
@@ -504,6 +489,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
  * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - Add [Global,PerGw,PerBeam] WaveformUsage
+ * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -904,6 +890,12 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FrameUserLoad, "frame-user-load")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (WaveformUsage, "waveform-usage")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (WaveformUsage, "waveform-usage")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (WaveformUsage, "waveform-usage")
+
+// Link SINR statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdUserLinkSinr,   "fwd-user-link-sinr")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkSinr,   "rtn-user-link-sinr")
 
 
 std::string // static

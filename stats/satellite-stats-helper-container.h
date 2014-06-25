@@ -53,6 +53,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam] BackloggedRequest
  * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - Add [Global,PerGw,PerBeam] WaveformUsage
+ * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -262,6 +263,12 @@ public:
 
   // Waveform usage statistics.
   SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (WaveformUsage)
+
+  // Link SINR statistics.
+  void AddGlobalFwdFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.

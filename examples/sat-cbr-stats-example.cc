@@ -238,7 +238,7 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueueBytes)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdQueuePackets)
 //  CALL_SAT_STATS_BASIC_SET (FwdSignallingLoad)
-  CALL_SAT_STATS_DISTRIBUTION_SET (FwdCompositeSinr)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdCompositeSinr)
 //  CALL_SAT_STATS_BASIC_SET (FwdAppThroughput)
 //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -282,7 +282,7 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueueBytes)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnQueuePackets)
 //  CALL_SAT_STATS_BASIC_SET (RtnSignallingLoad)
-  CALL_SAT_STATS_DISTRIBUTION_SET (RtnCompositeSinr)
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnCompositeSinr)
 //  CALL_SAT_STATS_BASIC_SET (RtnAppThroughput)
 //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -350,6 +350,10 @@ main (int argc, char *argv[])
   s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);
   s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_PDF_PLOT);
+  s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerGwFwdSignallingLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);

@@ -37,7 +37,6 @@ namespace ns3 {
 
 class SatHelper;
 class Node;
-class Time;
 class DataCollectionObject;
 
 /**
