@@ -224,26 +224,25 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (400.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (4.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (6.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.05));
+  Config::SetDefault ("ns3::SatStatsCompositeSinrHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsCompositeSinrHelper::MaxValue", DoubleValue (25.0));
+  Config::SetDefault ("ns3::SatStatsCompositeSinrHelper::BinLength", DoubleValue (0.25));
+  Config::SetDefault ("ns3::SatStatsLinkSinrHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsLinkSinrHelper::MaxValue", DoubleValue (25.0));
+  Config::SetDefault ("ns3::SatStatsLinkSinrHelper::BinLength", DoubleValue (0.25));
+  Config::SetDefault ("ns3::SatStatsLinkRxPowerHelper::MinValue", DoubleValue (-140.0));
+  Config::SetDefault ("ns3::SatStatsLinkRxPowerHelper::MaxValue", DoubleValue (-100.0));
+  Config::SetDefault ("ns3::SatStatsLinkRxPowerHelper::BinLength", DoubleValue (0.4));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
-  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
 
-  s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+
+  s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_CDF_FILE);
 
   NS_LOG_INFO("--- sat-per-packet-if-sim-tn9 ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
