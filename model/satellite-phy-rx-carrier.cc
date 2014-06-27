@@ -472,6 +472,9 @@ SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
 
+  // Update link specific SINR trace
+  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+
   NS_ASSERT (m_rxMode == SatPhyRxCarrierConf::TRANSPARENT && iter->second.rxParams->m_sinr == 0);
 
   /// PHY transmission decoded successfully. Note, that at transparent satellite,
