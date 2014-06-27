@@ -29,6 +29,7 @@
 #include <ns3/satellite-stats-composite-sinr-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-frame-load-helper.h>
+#include <ns3/satellite-stats-link-rx-power-helper.h>
 #include <ns3/satellite-stats-link-sinr-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
@@ -85,6 +86,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - [Global,PerGw,PerBeam] WaveformUsage
  * - Global [Fwd,Rtn] [Feeder,User] LinkSinr
+ * - Global [Fwd,Rtn] [Feeder,User] LinkRxPower
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -437,6 +439,19 @@ SatStatsHelperContainer::GetTypeId ()
                                   "global return user link SINR statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
+    // Link Rx power statistics.
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdFeederLinkRxPower,
+                                  "global forward feeder link Rx power statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdUserLinkRxPower,
+                                  "global forward user link Rx power statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnFeederLinkRxPower,
+                                  "global return feeder link Rx power statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnUserLinkRxPower,
+                                  "global return user link Rx power statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
   ;
   return tid;
 }
@@ -490,6 +505,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - Add [Global,PerGw,PerBeam] WaveformUsage
  * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
+ * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkRxPower
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -896,6 +912,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdFeederLinkSinr, "fwd-feeder-link-sin
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdUserLinkSinr,   "fwd-user-link-sinr")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkSinr,   "rtn-user-link-sinr")
+
+// Link Rx power statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdUserLinkRxPower,   "fwd-user-link-rx-power")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkRxPower,   "rtn-user-link-rx-power")
 
 
 std::string // static

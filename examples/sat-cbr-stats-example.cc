@@ -323,6 +323,14 @@ main (int argc, char *argv[])
 //  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdFeederLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdUserLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnFeederLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnUserLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdFeederLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdUserLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnFeederLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnUserLinkRxPower);
 
   /*
    * The following is the statements for enabling some satellite statistics
@@ -354,6 +362,11 @@ main (int argc, char *argv[])
   s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
   s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_PDF_PLOT);
   s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+  s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
+  s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_PDF_FILE);
+  s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_CDF_FILE);
+
   s->AddPerGwFwdSignallingLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnSignallingLoad (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);

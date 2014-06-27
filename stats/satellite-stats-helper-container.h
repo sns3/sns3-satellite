@@ -54,6 +54,7 @@ namespace ns3 {
  * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
  * - Add [Global,PerGw,PerBeam] WaveformUsage
  * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
+ * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkRxPower
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -269,6 +270,12 @@ public:
   void AddGlobalFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+
+  // Link Rx power statistics.
+  void AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalFwdUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.
