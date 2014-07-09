@@ -399,6 +399,8 @@ SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& u
         }
     }
 
+  m_utPositions->SetToBegin ();
+
   // create as user wants
   DoCreateScenario (beamUserInfos, m_gwUsers);
 

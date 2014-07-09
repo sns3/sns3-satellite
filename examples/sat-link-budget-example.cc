@@ -52,7 +52,6 @@ static void PacketTraceCb ( std::string context, Ptr<SatSignalParameters> params
 int
 main (int argc, char *argv[])
 {
-  // parameters for link budget calculation
   uint32_t beamId = 11;
   double latitude = 50.00;
   double longitude = -1.00;
