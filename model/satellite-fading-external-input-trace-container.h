@@ -160,6 +160,9 @@ private:
   /// data path to find trace input files
   std::string m_dataPath;
 
+	/// Maximum distance allowed to the external fading trace source
+  double m_maxDistanceToFading;
+
   /**
    * Initialize index files
    */
@@ -188,6 +191,7 @@ private:
   void ReadIndexFile (std::string indexFile, TraceFileContainer_t& container);
 
   /**
+   * Create (or load) fading trace source for the requested UT/GW.
    *
    * \param fileType Type of the trace file
    * \param container Container reference to find out needed trace file info
@@ -197,6 +201,17 @@ private:
    */
   Ptr<SatFadingExternalInputTrace> CreateFadingTrace (SatFadingExternalInputTrace::TraceFileType_e fileType,
                                                       TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility);
+  /**
+   *  Find the nearest fading trace source file for the requested UT/GW based on given mobility.
+   *  Only external fading sources which are closer than (equal to) maximum allowed distance are accepted.
+   *  Maximum allowed distance is defined by attribute.
+   *
+   * \param container Container reference to find out needed trace file info
+   * \param id Id of the node GW or UT (from SatIdMapper)
+   * \param mobility Mobility for given node
+   * \return The name of the nearest external fading source.
+   */
+  std::string FindSourceBasedOnPosition (TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility);
 };
 
 } // namespace ns3

@@ -21,6 +21,7 @@
 #include <fstream>
 #include "ns3/log.h"
 #include "ns3/enum.h"
+#include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-env-variables.h"
@@ -64,7 +65,12 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
                    "Index file defining trace source files for return down link/GWs.",
                    StringValue ("GW_fading_rtndwn_traces.txt"),
                    MakeStringAccessor (&SatFadingExternalInputTraceContainer::m_gwRtnDownIndexFileName),
-                   MakeStringChecker ());
+                   MakeStringChecker ())
+  .AddAttribute ("MaxDistance",
+                 "Maximum distance to allowed fading source in position based mode [m].",
+                  DoubleValue (5000),
+                  MakeDoubleAccessor (&SatFadingExternalInputTraceContainer::m_maxDistanceToFading),
+                  MakeDoubleChecker<double> ());
   return tid;
 }
 
@@ -75,7 +81,8 @@ TypeId SatFadingExternalInputTraceContainer::GetInstanceTypeId (void) const
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
  : m_inputMode (LIST_MODE),
-   m_indexFilesLoaded (false)
+   m_indexFilesLoaded (false),
+   m_maxDistanceToFading (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -349,12 +356,27 @@ SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputT
         }
       break;
 
-    case POSITION_MODE:
     case RANDOM_MODE:
+      if ( container.empty ())
+        {
+          NS_FATAL_ERROR ("No input available!");
+        }
+      else
+        {
+          fileName = container.at (std::rand () % container.size ()).first;
+        }
+      break;
+
+    case POSITION_MODE:
+      fileName = FindSourceBasedOnPosition (container, id, mobility);
+      break;
+
     default:
       NS_FATAL_ERROR ("Not supported mode.");
       break;
   }
+
+  NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Creation info: Mode=" << m_inputMode << ", ID (GW/UT)=" << id << ", FileName=" << fileName);
 
   // find from loaded list
 
@@ -371,7 +393,40 @@ SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputT
     }
 
   return trace;
+}
 
+std::string
+SatFadingExternalInputTraceContainer::FindSourceBasedOnPosition (TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility)
+{
+  NS_LOG_FUNCTION (this << mobility);
+
+  std::string fileName;
+  double currentDistanceToFading = std::numeric_limits<double>::max ();
+  Vector position = mobility->GetPosition ();
+
+  for (TraceFileContainer_t::iterator it = container.begin (); it != container.end (); it++)
+    {
+      Vector fadingPosition = it->second.ToVector();
+
+      double distanceToFading = CalculateDistance ( position, fadingPosition );
+
+      if ( distanceToFading < currentDistanceToFading )
+        {
+          currentDistanceToFading = distanceToFading;
+          fileName = it->first;
+        }
+    }
+
+  if ( currentDistanceToFading > m_maxDistanceToFading )
+    {
+      NS_FATAL_ERROR ("No valid fading based on position (min found distance, max allowed distance): " << currentDistanceToFading << ", " << m_maxDistanceToFading);
+    }
+  else
+    {
+      NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Minimum distance to fading trace source: " << currentDistanceToFading);
+    }
+
+  return fileName;
 }
 
 } // namespace ns3

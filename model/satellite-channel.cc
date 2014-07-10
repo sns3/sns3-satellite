@@ -535,7 +535,7 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
     case SatEnums::FORWARD_FEEDER_CH:
       {
         nodeId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (GetSourceAddress (rxParams));
-        rxParams->m_phyTx->GetMobility ();
+        mobility = rxParams->m_phyTx->GetMobility ();
         break;
       }
     default:
