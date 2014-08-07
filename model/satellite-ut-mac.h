@@ -76,7 +76,7 @@ public:
    *
    * This is the constructor for the SatUtMac
    *
-   * \param seq   Pointer to superframe sequence.
+   * \param seq Pointer to superframe sequence.
    * \param beamId Id of the beam.
    * \param randomAccessConf
    * \param randomAccessModel

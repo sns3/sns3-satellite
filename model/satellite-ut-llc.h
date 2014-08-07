@@ -50,7 +50,7 @@ public:
   virtual ~SatUtLlc ();
 
   /**
-    *  Called from lower layer (MAC) to inform a Tx
+    *  \brief Called from lower layer (MAC) to inform a Tx
     *  opportunity of certain amount of bytes
     *
     * \param macAddr Mac address of the UT with Tx opportunity
@@ -63,25 +63,25 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
-   * Set a request manager for UT's LLC instance.
-   * @param rm Ptr to request manager
+   * \brief Set a request manager for UT's LLC instance.
+   * \param rm Ptr to request manager
    */
   void SetRequestManager (Ptr<SatRequestManager> rm);
 
   /**
-   * Getter for the request manager
+   * \brief Getter for the request manager
    * \return Pointer to SatRequestManager
    */
   Ptr<SatRequestManager> GetRequestManager () const;
 
   /**
-   * Set queue statistics callbacks for each UT packet queue. Callbacks are
+   * \brief Set queue statistics callbacks for each UT packet queue. Callbacks are
    * passed on to request manager.
    */
   void SetQueueStatisticsCallbacks ();
 
   /**
-   * Method checks how many packets are smaller or equal in size than the
+   * \brief Method checks how many packets are smaller or equal in size than the
    * maximum packets size threshold specified as an argument. Note, that each
    * queue is gone through from the front up until there is first packet larger
    * than threshold.
@@ -91,7 +91,7 @@ public:
   virtual uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
 
   /**
-   * Set the node info
+   * \brief Set the node info
    * \param nodeInfo containing node specific information
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);

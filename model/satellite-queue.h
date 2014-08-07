@@ -44,6 +44,10 @@ class SatQueue : public Object
 public:
   static TypeId GetTypeId (void);
 
+  /**
+   * QueueStats_t definition for passing queue related statistics
+   * to any interested modules.
+   */
   struct QueueStats_t
   {
     QueueStats_t ()
@@ -81,7 +85,7 @@ public:
   virtual void DoDispose ();
 
   /**
-   * Callback to indicate queue related event
+   * \brief Callback to indicate queue related event
    * \param SatQueue::QueueEvent_t Event type
    * \param uint32_t Queue id
    * \return void
@@ -89,131 +93,138 @@ public:
   typedef Callback<void, SatQueue::QueueEvent_t, uint8_t> QueueEventCallback;
 
   /**
-   * Is the queue empty
+   * \brief Is the queue empty
    * \return true if the queue is empty; false otherwise
    */
   virtual bool IsEmpty (void) const;
 
   /**
-   * Enque pushes packet to the packet container (back)
+   * \brief Enque pushes packet to the packet container (back)
    * \param p Packet
    * \return bool indicating whether the enque was successfull
    */
   virtual bool Enqueue (Ptr<Packet> p);
 
   /**
-   * Deque takes packet from the packet container (front)
+   * \brief Deque takes packet from the packet container (front)
    * \return p Packet
    */
   virtual Ptr<Packet> Dequeue (void);
 
   /**
-   * PushFront pushes a fragmented packet back to the front
+   * \brief PushFront pushes a fragmented packet back to the front
    * of the packet container
    * \param p Packet
    */
   virtual void PushFront (Ptr<Packet> p);
 
   /**
-   * Get a copy of the item at the front of the queue without removing it
+   * \brief Get a copy of the item at the front of the queue without removing it
    * \return Pointer to the packet
    */
   virtual Ptr<const Packet> Peek (void) const;
 
   /**
-   * Flush the queue.
+   * \brief Flush the queue.
    */
   void DequeueAll (void);
 
   /**
-   * Configured flow index for this queue
+   * \brief Configured flow index for this queue
    * \param flowId
    */
   void SetFlowId (uint32_t flowId);
 
   /**
-   * Add queue event callback
+   * \brief Add queue event callback
    * \param cb Callback
    */
   void AddQueueEventCallback (SatQueue::QueueEventCallback cb);
 
   /**
-   * \return The number of packets currently stored in the Queue
+   * \brief Get number of packets currently stored in the queue
+   * \return Number of packets in queue
    */
   uint32_t GetNPackets (void) const;
 
   /**
-   * \return The number of bytes currently occupied by the packets in the Queue
+   * \brief Get number of bytes currently stored in the queue
+   * \return Bytes in queue
    */
   uint32_t GetNBytes (void) const;
 
   /**
-   * \return The total number of bytes received by this Queue since the
+   * \brief Get total number of bytes received by this queue since the
    * simulation began, or since ResetStatistics was called, according to
    * whichever happened more recently
-   *
+   * \return Received bytes
    */
   uint32_t GetTotalReceivedBytes (void) const;
+
   /**
-   * \return The total number of packets received by this Queue since the
+   * \brief Get total number of packets received by this Queue since the
    * simulation began, or since ResetStatistics was called, according to
    * whichever happened more recently
+   * \return Received packets
    */
   uint32_t GetTotalReceivedPackets (void) const;
   /**
-   * \return The total number of bytes dropped by this Queue since the
+   * \brief Get total number of bytes dropped by this Queue since the
    * simulation began, or since ResetStatistics was called, according to
    * whichever happened more recently
+   * \return Dropped bytes
    */
   uint32_t GetTotalDroppedBytes (void) const;
+
   /**
-   * \return The total number of bytes dropped by this Queue since the
+   * \brief Get total number of bytes dropped by this Queue since the
    * simulation began, or since ResetStatistics was called, according to
    * whichever happened more recently
+   * \return Dropped packets
    */
   uint32_t GetTotalDroppedPackets (void) const;
+
   /**
-   * Resets the counts for dropped packets, dropped bytes, received packets, and
+   * \brief Resets the counts for dropped packets, dropped bytes, received packets, and
    * received bytes.
    */
   void ResetStatistics (void);
 
   /**
-   * GetQueueStatistics returns a struct of KPIs
+   * \brief GetQueueStatistics returns a struct of KPIs
    * \param reset Reset flag indicating whether the statistics should be reset now
    * \return QueueStats_t Struct of KPIs
    */
   QueueStats_t GetQueueStatistics (bool reset);
 
   /**
-   * Method checks how many packets are smaller or equal in size than the
+   * \brief Method checks how many packets are smaller or equal in size than the
    * maximum packets size threshold specified as an argument. Note, that each
    * queue is gone through from the front up until there is first packet larger
    * than threshold.
    * \param maxPacketSize Maximum packet size threshold in Bytes
-   * \return uint32_t Number of packets
+   * \return Number of packets
    */
   uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
 
 protected:
 
   /**
-   *  \brief Drop a packet
-   *  \param packet packet that was dropped
-   *  This method is called by subclasses to notify parent (this class) of packet drops.
+   * \brief Drop a packet
+   * \param packet packet that was dropped
    */
   void Drop (Ptr<Packet> packet);
 
 private:
 
   /**
-   * Send queue event to all registered callbacks
-   * /param event Queue event
+   * \brief Send queue event to all registered callbacks
+   * \param event Queue event
    */
   void SendEvent (QueueEvent_t event);
 
   /**
-   * Reset the short term statistics. Short term reflects here e.g. to
+   * \brief Reset the short term statistics. Short term reflects here e.g. to
    * superframe duration.
    */
   void ResetShortTermStatistics ();

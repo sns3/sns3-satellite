@@ -125,22 +125,22 @@ public:
   typedef std::vector<uint32_t> ByteCounterContainer_t;
 
   /**
-   * Method to set Tx opportunity callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    *
-    */
+   * \brief Method to set Tx opportunity callback.
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   *
+   */
   void SetSchedContextCallback (SatUtScheduler::SchedContextCallback cb);
 
   /**
-   * Method to set Tx opportunity callback.
+   * \brief Method to set Tx opportunity callback.
    * \param cb callback to invoke whenever a packet has been received and must
    *        be forwarded to the higher layers.
    */
   void SetTxOpportunityCallback (SatUtScheduler::TxOpportunityCallback cb);
 
   /**
-   * UT scheduling is responsible of selecting with which RC index to
+   * \brief UT scheduling is responsible of selecting with which RC index to
    * use when requesting packets from higher layer. If RC index is set,
    * then it just utilizes it.
    * \param   packets Vector of packets to be sent in a time slot
@@ -153,7 +153,7 @@ public:
   void DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatCompliancePolicy_t policy);
 
   /**
-   * Set the node info
+   * \brief Set the node info
    * \param nodeInfo containing node specific information
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
@@ -161,7 +161,7 @@ public:
 private:
 
   /**
-   * Do scheduling for a given RC index
+   * \brief Do scheduling for a given RC index
    * \param packets       Reference to a vector of packets to be sent
    * \param payloadBytes  Payload bytes available for this time slot
    * \param rcIndex       RC index to be scheduled
@@ -170,9 +170,9 @@ private:
   uint32_t DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint32_t &payloadBytes, uint8_t rcIndex);
 
   /**
-   * Get a prioritized order of the available RC indices for
+   * \brief Get a prioritized order of the available RC indices for
    * LOOSE policy UT scheduling.
-   * @return Vector of RC indices
+   * \return Vector of RC indices
    */
   std::vector<uint8_t> GetPrioritizedRcIndexOrder ();
 

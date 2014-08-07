@@ -272,8 +272,6 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
   NS_LOG_INFO ("Time to start sending the superframe for this UT: " << txTime.GetSeconds ());
   NS_LOG_INFO ("Waiting delay before the superframe start: " << startDelay.GetSeconds ());
 
-  //tbtp->Dump ();
-
   SatTbtpMessage::DaTimeSlotInfoContainer_t slots = tbtp->GetDaTimeslots (m_nodeInfo->GetMacAddress ());
 
   // Counters for allocated TBTP resources
@@ -316,7 +314,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
-          //ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf->GetSlotType (), timeSlotConf->GetRcIndex (), carrierId);
+          // Schedule individual time slot
           ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf, carrierId);
 
           payloadSumInSuperFrame += wf->GetPayloadInBytes ();
@@ -411,15 +409,16 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
 SatPhy::PacketContainer_t
 SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << payloadBytes << (uint32_t) (rcIndex));
 
-  // Packet container to be sent to lower layers.
-  // Packet container models FPDU.
+  /**
+   * Instruct the UT scheduler to fill the packet container based on given
+   * input; e.g. payload, RC index. The packet container models the FPDU,
+   * which may contain several RLE PDUs
+   */
   SatPhy::PacketContainer_t packets;
 
   NS_ASSERT (payloadBytes > 0);
-
-  NS_LOG_LOGIC ("Tx opportunity: payloadBytes: " << payloadBytes);
 
   m_utScheduler->DoScheduling (packets, payloadBytes, type, rcIndex, policy);
 
@@ -444,7 +443,7 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_
         }
     }
 
-  NS_LOG_LOGIC ("The Frame PDU holds " << packets.size () << " packets");
+  NS_LOG_LOGIC ("The Frame PDU holds " << packets.size () << " RLE PDUs");
 
   return packets;
 }
