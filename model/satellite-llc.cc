@@ -27,7 +27,6 @@
 
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
-#include "satellite-time-tag.h"
 #include "satellite-base-encapsulator.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-control-message.h"
@@ -109,7 +108,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 
   if (it != m_encaps.end ())
     {
-      it->second->TransmitPdu (packet, Mac48Address::ConvertFrom (dest));
+      it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
     }
   else
     {

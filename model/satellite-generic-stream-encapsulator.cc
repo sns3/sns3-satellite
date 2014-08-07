@@ -96,7 +96,7 @@ SatGenericStreamEncapsulator::DoDispose ()
 }
 
 void
-SatGenericStreamEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address /*mac*/)
+SatGenericStreamEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*mac*/)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 

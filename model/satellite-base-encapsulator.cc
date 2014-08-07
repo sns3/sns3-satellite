@@ -84,7 +84,7 @@ SatBaseEncapsulator::DoDispose ()
 }
 
 void
-SatBaseEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address mac)
+SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address mac)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 

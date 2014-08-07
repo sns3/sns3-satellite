@@ -108,7 +108,7 @@ SatGseTestCase::DoRun (void)
       uint32_t packetSize = unif->GetInteger (3, 10000);
       Ptr<Packet> packet = Create<Packet> (packetSize);
       m_sentPacketSizes.push_back (packetSize);
-      gse->TransmitPdu (packet, dest);
+      gse->EnquePdu (packet, dest);
     }
 
   /**

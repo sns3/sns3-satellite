@@ -94,7 +94,7 @@ SatReturnLinkEncapsulator::DoDispose ()
 }
 
 void
-SatReturnLinkEncapsulator::TransmitPdu (Ptr<Packet> p, Mac48Address /*mac*/)
+SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*mac*/)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 

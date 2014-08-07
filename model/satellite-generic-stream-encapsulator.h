@@ -62,7 +62,7 @@ public:
    * \param p To be buffered packet
    * \param mac Target MAC address
    */
-  virtual void TransmitPdu (Ptr<Packet> p, Mac48Address mac);
+  virtual void EnquePdu (Ptr<Packet> p, Mac48Address mac);
 
   /**
    * Notify a Tx opportunity to this encapsulator.

@@ -256,7 +256,7 @@ void SatRtnArqTestCase::TransmitPdus (uint32_t numPackets)
       uint32_t packetSize = m_unif->GetInteger (3, 500);
       Ptr<Packet> packet = Create<Packet> (packetSize);
       m_sentPacketSizes.push_back (packetSize);
-      m_rle->TransmitPdu (packet, m_dest);
+      m_rle->EnquePdu (packet, m_dest);
     }
 }
 
@@ -546,7 +546,7 @@ void SatFwdArqTestCase::TransmitPdus (uint32_t numPackets)
       uint32_t packetSize = m_unif->GetInteger (3, 500);
       Ptr<Packet> packet = Create<Packet> (packetSize);
       m_sentPacketSizes.push_back (packetSize);
-      m_gse->TransmitPdu (packet, m_dest);
+      m_gse->EnquePdu (packet, m_dest);
     }
 }
 

@@ -108,7 +108,7 @@ SatRleTestCase::DoRun (void)
       uint32_t packetSize = unif->GetInteger (3, 1500);
       Ptr<Packet> packet = Create<Packet> (packetSize);
       m_sentPacketSizes.push_back (packetSize);
-      rle->TransmitPdu (packet, dest);
+      rle->EnquePdu (packet, dest);
     }
 
   /**
