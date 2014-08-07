@@ -34,10 +34,11 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatRequestManager analyzes periodically UT's
- * buffer status for different RC indices (= queues), and
- * sends Capacity Requests to NCC according to need and lower
- * layer service configuration (CRA, RBDC, VBDC for each RC).
+ * \brief SatRequestManager analyzes periodically or on-a-need-basis UT's buffer status for
+ * different RC indices (= queues), and sends Capacity Requests to NCC according to need and
+ * lower layer service configuration. Request manager supports currently RBDC, AVBDC and VBDC
+ * request classes. However, RBDC and VBDC may not be configured in the same simulation for
+ * the same RC index.
  */
 class SatRequestManager : public Object
 {
@@ -306,11 +307,6 @@ private:
   Time m_evaluationInterval;
 
   /**
-   * Time when CR evaluation was previously done
-   */
-  Time m_previousEvaluationTime;
-
-  /**
    * Interval to send C/N0 report.
    */
   Time m_cnoReportInterval;
@@ -319,6 +315,11 @@ private:
    * Event id for the C/NO report.
    */
   EventId m_cnoReportEvent;
+
+  /**
+   * Gain value K for the RBDC calculation
+   */
+  double m_gainValueK;
 
   /**
    * Round trip time estimate. Used to estimate the amount of
@@ -334,7 +335,7 @@ private:
   double m_overEstimationFactor;
 
   /**
-   * Enable
+   * Enable on demand / ad hoc CR evaluation.
    */
   bool m_enableOnDemandEvaluation;
 
@@ -349,6 +350,11 @@ private:
    * Pending VBDC counter for each RC index
    */
   std::vector<uint32_t> m_pendingVbdcBytes;
+
+  /**
+   * Time when CR evaluation was previously done
+   */
+  std::vector<Time> m_previousEvaluationTime;
 
   /**
    * Node information

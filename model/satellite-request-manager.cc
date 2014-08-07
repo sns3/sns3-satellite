@@ -42,12 +42,14 @@ SatRequestManager::SatRequestManager ()
  m_lastCno (NAN),
  m_llsConf (),
  m_evaluationInterval (Seconds (0.1)),
- m_previousEvaluationTime (Seconds (0.0)),
+ m_cnoReportInterval (Seconds (0.0)),
+ m_gainValueK (1.0),
  m_rttEstimate (MilliSeconds (560)),
  m_overEstimationFactor (1.1),
  m_enableOnDemandEvaluation (false),
  m_pendingRbdcRequestsKbps (),
  m_pendingVbdcBytes (),
+ m_previousEvaluationTime (),
  m_lastVbdcCrSent (Seconds (0)),
  m_superFrameDuration (Seconds (0)),
  m_forcedAvbdcUpdate (false),
@@ -73,6 +75,7 @@ SatRequestManager::Initialize (Ptr<SatLowerLayerServiceConf> llsConf, Time super
   m_pendingRbdcRequestsKbps = std::vector< std::deque<std::pair<Time, uint32_t> > > (m_llsConf->GetDaServiceCount (), std::deque<std::pair<Time, uint32_t> > ());
   m_pendingVbdcBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
   m_assignedDaResourcesBytes = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
+  m_previousEvaluationTime = std::vector<Time> (m_llsConf->GetDaServiceCount (), Seconds (0.0));
 
   // Superframe duration
   m_superFrameDuration = superFrameDuration;
@@ -115,6 +118,11 @@ SatRequestManager::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatRequestManager::m_enableOnDemandEvaluation),
                    MakeBooleanChecker ())
+    .AddAttribute( "GainValueK",
+                   "Gain value K for RBDC calculation.",
+                   DoubleValue (1.0),
+                   MakeDoubleAccessor (&SatRequestManager::m_gainValueK),
+                   MakeDoubleChecker<double_t> ())
     .AddTraceSource ("CrTrace",
                      "Capacity request trace",
                      MakeTraceSourceAccessor (&SatRequestManager::m_crTrace))
@@ -311,10 +319,10 @@ SatRequestManager::DoEvaluation ()
             {
               NS_LOG_LOGIC ("RBDC nor VBDC was configured for RC: " << (uint32_t)(rc));
             }
-        }
 
-      // Update evaluation time
-      m_previousEvaluationTime = Simulator::Now ();
+          // Update evaluation time
+          m_previousEvaluationTime.at (rc) = Simulator::Now ();
+        }
 
       // If CR has some valid elements
       if (crMsg->IsNotEmpty ())
@@ -387,10 +395,10 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   // Duration from last evaluation time
-  Time duration = Simulator::Now () - m_previousEvaluationTime;
+  Time duration = Simulator::Now () - m_previousEvaluationTime.at (rc);
 
   // Calculate the raw RBDC request
-  double gainValueK = 1.0 / (2.0 * duration.GetSeconds ());
+  //double gainValueK = 1.0 / (2.0 * duration.GetSeconds ());
 
   // This round kbits
   double inRateKbps = m_overEstimationFactor * stats.m_incomingRateKbps;
@@ -398,11 +406,12 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
   double previousRbdcInKbits = GetPendingRbdcSumKbps (rc) * duration.GetSeconds ();
   double queueSizeInKbits = SatUtils::BITS_PER_BYTE * stats.m_queueSizeBytes / (double)(SatUtils::BITS_IN_KBIT);
 
-  double queueOccupancy = std::max(0.0, gainValueK * (queueSizeInKbits - thisRbdcInKbits - previousRbdcInKbits) / duration.GetSeconds ());
+  double queueOccupancy = std::max(0.0, m_gainValueK * (queueSizeInKbits - thisRbdcInKbits - previousRbdcInKbits) / duration.GetSeconds ());
+
   double reqRbdcKbps = inRateKbps + queueOccupancy;
 
   NS_LOG_LOGIC ("queueSizeInKbits: " << queueSizeInKbits << " thisRbdcInKbits: " << thisRbdcInKbits << " previousRbdcInKbits " << previousRbdcInKbits);
-  NS_LOG_LOGIC ("gainValueK: " << gainValueK);
+  NS_LOG_LOGIC ("gainValueK: " << m_gainValueK);
   NS_LOG_LOGIC ("In rate: " << inRateKbps << " queueOccupancy: " << queueOccupancy);
 
   // If CRA enabled, substract the CRA bitrate from the calculated RBDC bitrate
@@ -502,7 +511,7 @@ SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stat
       NS_LOG_LOGIC("CRA is enabled together with VBDC for RC: " << (uint32_t)(rc));
 
       // Duration from last evaluation time
-      Time duration = Simulator::Now () - m_previousEvaluationTime;
+      Time duration = Simulator::Now () - m_previousEvaluationTime.at (rc);
 
       // Calculate how much bytes would be given to this RC index with configured CRA
       craBytes = (uint32_t)((SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
@@ -542,7 +551,7 @@ SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stats
       NS_LOG_LOGIC("CRA is enabled together with VBDC for RC: " << (uint32_t)(rc));
 
       // Duration from last evaluation time
-      Time duration = Simulator::Now () - m_previousEvaluationTime;
+      Time duration = Simulator::Now () - m_previousEvaluationTime.at (rc);
 
       // Calculate how much bytes would be given to this RC index with configured CRA
       craBytes = (uint32_t)((SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
