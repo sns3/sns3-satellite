@@ -235,11 +235,11 @@ SatRequestManager::DoEvaluation ()
               struct SatQueue::QueueStats_t stats = m_queueCallbacks.at(rc)(true);
 
               NS_LOG_LOGIC ("Evaluating the needs for RC: " << (uint32_t)(rc));
-              NS_LOG_LOGIC ("Incoming kbitrate: " << stats.m_incomingRateKbps);
-              NS_LOG_LOGIC ("Outgoing kbitrate: " << stats.m_outgoingRateKbps);
-              NS_LOG_LOGIC ("Volume in bytes: " << stats.m_volumeInBytes);
-              NS_LOG_LOGIC ("Volume out bytes: " << stats.m_volumeOutBytes);
-              NS_LOG_LOGIC ("Total queue size: " << stats.m_queueSizeBytes);
+              NS_LOG_LOGIC ("RC: " << (uint32_t)(rc) << " incoming rate: " << stats.m_incomingRateKbps << " kbps");
+              NS_LOG_LOGIC ("RC: " << (uint32_t)(rc) << " outgoing rate: " << stats.m_outgoingRateKbps << " kbps");
+              NS_LOG_LOGIC ("RC: " << (uint32_t)(rc) << " volume in: " << stats.m_volumeInBytes << " bytes");
+              NS_LOG_LOGIC ("RC: " << (uint32_t)(rc) << " volume out: " << stats.m_volumeOutBytes << " bytes");
+              NS_LOG_LOGIC ("RC: " << (uint32_t)(rc) << " total queue size: " << stats.m_queueSizeBytes << " bytes");
 
               // RBDC only
               if (m_llsConf->GetDaRbdcAllowed (rc) && !m_llsConf->GetDaVolumeAllowed (rc))
@@ -652,7 +652,7 @@ SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t kbps)
 void
 SatRequestManager::RemoveOldEntriesFromPendingRbdcContainer (uint8_t rc)
 {
-  NS_LOG_LOGIC (this << (uint32_t)(rc));
+  NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   std::deque<std::pair<Time, uint32_t> > &cont = m_pendingRbdcRequestsKbps.at (rc);
   std::deque<std::pair<Time, uint32_t> >::const_iterator it = cont.begin ();
@@ -674,7 +674,8 @@ SatRequestManager::RemoveOldEntriesFromPendingRbdcContainer (uint8_t rc)
 void
 SatRequestManager::UpdatePendingVbdcCounters ()
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_FUNCTION (this);
+
   for (uint8_t rc = 0; rc < m_llsConf->GetDaServiceCount (); rc++)
     {
       UpdatePendingVbdcCounters (rc);
@@ -684,7 +685,7 @@ SatRequestManager::UpdatePendingVbdcCounters ()
 void
 SatRequestManager::UpdatePendingVbdcCounters (uint8_t rc)
 {
-  NS_LOG_LOGIC (this << (uint32_t)(rc));
+  NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   /*
    * m_pendingVbdcBytes is updated with requested bytes and reduce by allocated
@@ -783,7 +784,7 @@ SatRequestManager::ResetAssignedResources ()
 void
 SatRequestManager::Reset (uint8_t rc)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   m_assignedDaResourcesBytes.at (rc) = 0;
   m_pendingVbdcBytes.at (rc) = 0;

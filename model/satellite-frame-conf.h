@@ -108,8 +108,8 @@ public:
   typedef enum
   {
     SLOT_TYPE_C, //!< Control slot
-    SLOT_TYPE_TR,//!< User traffic slot
-    SLOT_TYPE_TRC//!< User or traffic slot
+    SLOT_TYPE_TR,//!< Traffic slot
+    SLOT_TYPE_TRC//!< Control or traffic slot
 
   } SatTimeSlotType_t;
 

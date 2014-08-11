@@ -55,12 +55,12 @@ public:
   /**
    * \brief Number of bytes consisting a kilobyte
    */
-  static const uint32_t BYTES_IN_KBYTE = 1000;
+  static const uint32_t BYTES_IN_KBYTE = 1024;
 
   /**
    * \brief Number of bits consisting a kilobit
    */
-  static const uint32_t BITS_IN_KBIT = 1024;
+  static const uint32_t BITS_IN_KBIT = 1000;
 
   /**
    * \brief Converts radians to degrees

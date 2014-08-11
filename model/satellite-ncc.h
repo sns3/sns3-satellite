@@ -64,17 +64,6 @@ public:
   ~SatNcc ();
 
   /**
-   * Receive a packet from a beam.
-   *
-   * The SatNcc receives CR packets from its connected GWs (CRs sent by UT)
-   * and takes CRs into account when making schedule decisions.
-   *
-   * \param p       Pointer to the received CR packet.
-   * \param beamId  The id of the beam where packet is from.
-   */
-  void Receive (Ptr<Packet> p, uint32_t beamId);
-
-  /**
    * Update UT specific C/N0 information.
    *
    * The SatNcc receives C/N0 information of packet receptions from UTs

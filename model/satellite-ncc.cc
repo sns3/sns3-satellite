@@ -74,11 +74,6 @@ SatNcc::DoDispose ()
   Object::DoDispose ();
 }
 
-void
-SatNcc::Receive (Ptr<Packet> packet, uint32_t beamId)
-{
-  NS_LOG_FUNCTION (this << packet << beamId);
-}
 
 void
 SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cno)
