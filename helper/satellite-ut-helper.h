@@ -201,9 +201,6 @@ private:
      * The used random access model settings
      */
     RandomAccessSettings_s m_raSettings;
-
-    bool m_enableRtnLinkArq;
-    bool m_enableFwdLinkArq;
 };
 
 } // namespace ns3

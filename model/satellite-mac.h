@@ -94,10 +94,11 @@ public:
 
   /**
    * Callback to receive packet by upper layer.
-   * \param MAC address related to the received packet connection
+   * \param Source MAC address
+   * \param Destination MAC address
    * \param packet the packet received
    */
-  typedef Callback<void, Ptr<Packet>, Mac48Address> ReceiveCallback;
+  typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
   /**
    * Method to set receive callback.

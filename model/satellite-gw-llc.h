@@ -72,6 +72,23 @@ public:
 protected:
 
   void DoDispose ();
+
+  /**
+   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key pair holding the MAC address and flow id
+   * \param source Source MAC address of the flow
+   * \param dest Destination MAC address of the flow
+   */
+  virtual void CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest);
+
+  /**
+   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key pair holding the MAC address and flow id
+   * \param source Source MAC address of the flow
+   * \param dest Destination MAC address of the flow
+   */
+  virtual void CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest);
+
 };
 
 } // namespace ns3

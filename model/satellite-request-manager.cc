@@ -229,99 +229,102 @@ SatRequestManager::DoEvaluation ()
       // Go through the RC indices
       for (uint8_t rc = 0; rc < m_llsConf->GetDaServiceCount(); ++rc)
         {
-          // Get statistics for LLC/SatQueue
-          struct SatQueue::QueueStats_t stats = m_queueCallbacks.at(rc)(true);
-
-          NS_LOG_LOGIC ("Evaluating the needs for RC: " << (uint32_t)(rc));
-          NS_LOG_LOGIC ("Incoming kbitrate: " << stats.m_incomingRateKbps);
-          NS_LOG_LOGIC ("Outgoing kbitrate: " << stats.m_outgoingRateKbps);
-          NS_LOG_LOGIC ("Volume in bytes: " << stats.m_volumeInBytes);
-          NS_LOG_LOGIC ("Volume out bytes: " << stats.m_volumeOutBytes);
-          NS_LOG_LOGIC ("Total queue size: " << stats.m_queueSizeBytes);
-
-          // RBDC only
-          if (m_llsConf->GetDaRbdcAllowed (rc) && !m_llsConf->GetDaVolumeAllowed (rc))
+          if (m_queueCallbacks.find (rc) != m_queueCallbacks.end ())
             {
-              NS_LOG_LOGIC ("Evaluating RBDC needs for RC: " << (uint32_t)(rc));
-              uint32_t rbdcRateKbps = DoRbdc (rc, stats);
+              // Get statistics for LLC/SatQueue
+              struct SatQueue::QueueStats_t stats = m_queueCallbacks.at(rc)(true);
 
-              NS_LOG_LOGIC ("Requested RBDC rate for RC: " << (uint32_t)(rc) << " is " << rbdcRateKbps << " kbps");
+              NS_LOG_LOGIC ("Evaluating the needs for RC: " << (uint32_t)(rc));
+              NS_LOG_LOGIC ("Incoming kbitrate: " << stats.m_incomingRateKbps);
+              NS_LOG_LOGIC ("Outgoing kbitrate: " << stats.m_outgoingRateKbps);
+              NS_LOG_LOGIC ("Volume in bytes: " << stats.m_volumeInBytes);
+              NS_LOG_LOGIC ("Volume out bytes: " << stats.m_volumeOutBytes);
+              NS_LOG_LOGIC ("Total queue size: " << stats.m_queueSizeBytes);
 
-              if (rbdcRateKbps > 0)
+              // RBDC only
+              if (m_llsConf->GetDaRbdcAllowed (rc) && !m_llsConf->GetDaVolumeAllowed (rc))
                 {
-                  // Add control element only if UT needs some rate
-                  crMsg->AddControlElement (rc, SatEnums::DA_RBDC, rbdcRateKbps);
+                  NS_LOG_LOGIC ("Evaluating RBDC needs for RC: " << (uint32_t)(rc));
+                  uint32_t rbdcRateKbps = DoRbdc (rc, stats);
 
-                  std::stringstream ss;
-                  ss << Simulator::Now ().GetSeconds () << ", "
-                     << m_nodeInfo->GetNodeId () << ", "
-                     << static_cast<uint32_t> (rc) << ", "
-                     << SatEnums::DA_RBDC << ", "
-                     << rbdcRateKbps << ", "
-                     << stats.m_queueSizeBytes;
-                  m_crTraceLog (ss.str ());
-                  m_rbdcTrace (rbdcRateKbps);
-                }
-            }
+                  NS_LOG_LOGIC ("Requested RBDC rate for RC: " << (uint32_t)(rc) << " is " << rbdcRateKbps << " kbps");
 
-          // VBDC only
-          else if (m_llsConf->GetDaVolumeAllowed (rc) && !m_llsConf->GetDaRbdcAllowed (rc))
-            {
-              NS_LOG_LOGIC ("Evaluation VBDC for RC: " << (uint32_t)(rc));
-
-              uint32_t vbdcBytes (0);
-
-              SatEnums::SatCapacityAllocationCategory_t cac = DoVbdc (rc, stats, vbdcBytes);
-
-              if (vbdcBytes > 0)
-                {
-                  // Add control element only if UT needs some bytes
-                  crMsg->AddControlElement (rc, cac, vbdcBytes);
-
-                  // Update the time when VBDC CR is sent
-                  m_lastVbdcCrSent = Simulator::Now ();
-
-                  std::stringstream ss;
-                  ss << Simulator::Now ().GetSeconds () << ", "
-                     << m_nodeInfo->GetNodeId () << ", "
-                     << static_cast<uint32_t> (rc) << ", "
-                     << cac << ", "
-                     << vbdcBytes << ", "
-                     << stats.m_queueSizeBytes;
-                  m_crTraceLog (ss.str ());
-
-                  if (cac == SatEnums::DA_AVBDC)
+                  if (rbdcRateKbps > 0)
                     {
-                      m_aVbdcTrace (vbdcBytes);
-                    }
-                  else
-                    {
-                      m_vbdcTrace (vbdcBytes);
+                      // Add control element only if UT needs some rate
+                      crMsg->AddControlElement (rc, SatEnums::DA_RBDC, rbdcRateKbps);
+
+                      std::stringstream ss;
+                      ss << Simulator::Now ().GetSeconds () << ", "
+                         << m_nodeInfo->GetNodeId () << ", "
+                         << static_cast<uint32_t> (rc) << ", "
+                         << SatEnums::DA_RBDC << ", "
+                         << rbdcRateKbps << ", "
+                         << stats.m_queueSizeBytes;
+                      m_crTraceLog (ss.str ());
+                      m_rbdcTrace (rbdcRateKbps);
                     }
                 }
 
-              NS_LOG_LOGIC ("Requested VBDC volume for RC: " << (uint32_t)(rc) << " is " << vbdcBytes << " Bytes with CAC: " << cac);
-            }
+              // VBDC only
+              else if (m_llsConf->GetDaVolumeAllowed (rc) && !m_llsConf->GetDaRbdcAllowed (rc))
+                {
+                  NS_LOG_LOGIC ("Evaluation VBDC for RC: " << (uint32_t)(rc));
 
-          // RBDC + VBDC
-          else if (m_llsConf->GetDaRbdcAllowed (rc) && m_llsConf->GetDaVolumeAllowed (rc))
-            {
-              NS_LOG_LOGIC ("Evaluation RBDC+VBDC for RC: " << (uint32_t)(rc));
+                  uint32_t vbdcBytes (0);
 
-              /**
-               * TODO: add functionality here which handles a RC with both RBDC and
-               * VBDC enabled!
-               */
-              NS_FATAL_ERROR ("Simultaneous RBDC and VBDC for one RC is not currently supported!");
-            }
-          // No dynamic DA configured
-          else
-            {
-              NS_LOG_LOGIC ("RBDC nor VBDC was configured for RC: " << (uint32_t)(rc));
-            }
+                  SatEnums::SatCapacityAllocationCategory_t cac = DoVbdc (rc, stats, vbdcBytes);
 
-          // Update evaluation time
-          m_previousEvaluationTime.at (rc) = Simulator::Now ();
+                  if (vbdcBytes > 0)
+                    {
+                      // Add control element only if UT needs some bytes
+                      crMsg->AddControlElement (rc, cac, vbdcBytes);
+
+                      // Update the time when VBDC CR is sent
+                      m_lastVbdcCrSent = Simulator::Now ();
+
+                      std::stringstream ss;
+                      ss << Simulator::Now ().GetSeconds () << ", "
+                         << m_nodeInfo->GetNodeId () << ", "
+                         << static_cast<uint32_t> (rc) << ", "
+                         << cac << ", "
+                         << vbdcBytes << ", "
+                         << stats.m_queueSizeBytes;
+                      m_crTraceLog (ss.str ());
+
+                      if (cac == SatEnums::DA_AVBDC)
+                        {
+                          m_aVbdcTrace (vbdcBytes);
+                        }
+                      else
+                        {
+                          m_vbdcTrace (vbdcBytes);
+                        }
+                    }
+
+                  NS_LOG_LOGIC ("Requested VBDC volume for RC: " << (uint32_t)(rc) << " is " << vbdcBytes << " Bytes with CAC: " << cac);
+                }
+
+              // RBDC + VBDC
+              else if (m_llsConf->GetDaRbdcAllowed (rc) && m_llsConf->GetDaVolumeAllowed (rc))
+                {
+                  NS_LOG_LOGIC ("Evaluation RBDC+VBDC for RC: " << (uint32_t)(rc));
+
+                  /**
+                   * TODO: add functionality here which handles a RC with both RBDC and
+                   * VBDC enabled!
+                   */
+                  NS_FATAL_ERROR ("Simultaneous RBDC and VBDC for one RC is not currently supported!");
+                }
+              // No dynamic DA configured
+              else
+                {
+                  NS_LOG_LOGIC ("RBDC nor VBDC was configured for RC: " << (uint32_t)(rc));
+                }
+
+              // Update evaluation time
+              m_previousEvaluationTime.at (rc) = Simulator::Now ();
+            }
         }
 
       // If CR has some valid elements

@@ -162,9 +162,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  Mac48Address sourceAddress = macTag.GetSourceAddress ();
-
-                  ReceiveSignalingPacket (sourceAddress, *i);
+                  ReceiveSignalingPacket (*i);
                 }
               else
                 {
@@ -174,7 +172,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           else
             {
               // Pass the source address to LLC
-              m_rxCallback (*i, macTag.GetSourceAddress ());
+              m_rxCallback (*i, macTag.GetSourceAddress (), macTag.GetDestAddress ());
             }
         }
       else
@@ -231,7 +229,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 }
 
 void
-SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet)
+SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
 
@@ -259,11 +257,11 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
         // TODO: Should we crash or just silently ignore it.
         if ( crMsg != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress(), crMsg->GetCnoEstimate ());
 
             if ( m_crReceiveCallback.IsNull () == false )
               {
-                m_crReceiveCallback (m_beamId, sourceAddress, crMsg);
+                m_crReceiveCallback (m_beamId, macTag.GetSourceAddress(), crMsg);
               }
           }
 
@@ -281,7 +279,7 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
         // TODO: Should we crash or just silently ignore it.
         if ( cnoReport != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (sourceAddress, cnoReport->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress(), cnoReport->GetCnoEstimate ());
           }
 
         packet->RemovePacketTag (macTag);
@@ -292,8 +290,7 @@ SatGwMac::ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        Mac48Address sourceAddress = macTag.GetSourceAddress ();
-        m_rxCallback (packet, sourceAddress);
+        m_rxCallback (packet, macTag.GetSourceAddress (), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_TBTP_CTRL_MSG:

@@ -23,6 +23,10 @@
 
 #include "satellite-gw-llc.h"
 #include "satellite-scheduling-object.h"
+#include "satellite-return-link-encapsulator.h"
+#include "satellite-return-link-encapsulator-arq.h"
+#include "satellite-generic-stream-encapsulator.h"
+#include "satellite-generic-stream-encapsulator-arq.h"
 #include "satellite-node-info.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
@@ -112,6 +116,53 @@ SatGwLlc::ControlEncapsulatorCreated () const
     }
 
   return false;
+}
+
+
+void
+SatGwLlc::CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest)
+{
+  NS_LOG_FUNCTION (this << key.first << (uint32_t)(key.second) << source << dest);
+
+  Ptr<SatBaseEncapsulator> gwEncap;
+
+  if (m_fwdLinkArqEnabled)
+    {
+     gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (source, dest, key.second);
+    }
+  else
+    {
+      gwEncap = CreateObject<SatGenericStreamEncapsulator> (source, dest, key.second);
+    }
+
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (key.second);
+  gwEncap->SetQueue (queue);
+
+  // Store the encapsulator
+  m_encaps.insert(std::make_pair (key, gwEncap));
+}
+
+void
+SatGwLlc::CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest)
+{
+  NS_LOG_FUNCTION (this << key.first << (uint32_t)(key.second) << source << dest);
+
+  Ptr<SatBaseEncapsulator> gwDecap;
+
+  if (m_rtnLinkArqEnabled)
+    {
+     gwDecap = CreateObject<SatReturnLinkEncapsulatorArq> (source, dest, key.second);
+    }
+  else
+    {
+      gwDecap = CreateObject<SatReturnLinkEncapsulator> (source, dest, key.second);
+    }
+
+  gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
+  gwDecap->SetCtrlMsgCallback (m_sendCtrlCallback);
+
+  // Store the decapsulator
+  m_decaps.insert(std::make_pair (key, gwDecap));
 }
 
 

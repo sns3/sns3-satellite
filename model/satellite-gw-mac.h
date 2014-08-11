@@ -140,11 +140,9 @@ private:
   /**
    * Signaling packet receiver, which handles all the signaling packet
    * receptions.
-   *
-   * \param sourceAddress Address of the packet sender.
    * \param packet Received signaling packet
    */
-  void ReceiveSignalingPacket (Mac48Address sourceAddress, Ptr<Packet> packet);
+  void ReceiveSignalingPacket (Ptr<Packet> packet);
 
   /**
    * Scheduler for the forward link.

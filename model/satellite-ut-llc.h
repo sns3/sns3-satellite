@@ -96,9 +96,30 @@ public:
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
+  /**
+   * \param cb callback to send control messages.
+   */
+  void SetMacQueueEventCallback (SatQueue::QueueEventCallback cb);
+
 protected:
 
   void DoDispose ();
+
+  /**
+   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key pair holding the MAC address and flow id
+   * \param source Source MAC address of the flow
+   * \param dest Destination MAC address of the flow
+   */
+  virtual void CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest);
+
+  /**
+   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key pair holding the MAC address and flow id
+   * \param source Source MAC address of the flow
+   * \param dest Destination MAC address of the flow
+   */
+  virtual void CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest);
 
 private:
 
@@ -106,6 +127,13 @@ private:
    * Request manager handling the capacity requests
    */
   Ptr<SatRequestManager> m_requestManager;
+
+  /**
+   * Callback to send queue events to e.g. MAC layer. Note, that this
+   * is not actually used by the LLC but the encapsulators. It is just
+   * stored here.
+  */
+  SatQueue::QueueEventCallback m_macQueueEventCb;
 
 };
 

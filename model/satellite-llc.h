@@ -80,6 +80,10 @@ public:
    */
   virtual ~SatLlc ();
 
+  /**
+   * Mac48Address = UT address
+   * uint8_t = RC index
+   */
   typedef std::pair<Mac48Address, uint8_t> EncapKey_t;
   typedef std::map<EncapKey_t, Ptr<SatBaseEncapsulator> > EncapContainer_t;
 
@@ -131,7 +135,7 @@ public:
    * \param macAddr MAC address of the UT (either as transmitter or receiver)
    * \param packet Pointer to packet received.
    */
-  virtual void Receive (Ptr<Packet> packet, Mac48Address macAddr);
+  virtual void Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest);
 
   /**
    * Receive HL PDU from encapsulator/decapsulator entity
@@ -226,12 +230,35 @@ public:
    */
   virtual uint32_t GetNPacketsInQueue () const;
 
+  /**
+   * \param cb callback to send control messages.
+   */
+  void SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb);
+
 protected:
 
   void DoDispose ();
 
   /**
-   * Receive a control msg (ARQ ACK) from lower layer.
+   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * Method is implemented in the inherited class which knows which type of encapsulator to create.
+   * \param key Encapsulator key pair holding the MAC address and flow id
+   * \param source Source MAC address of the flow
+   * \param dest Destination MAC address of the flow
+   */
+  virtual void CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest) {};
+
+  /**
+   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+   * Method is implemented in the inherited class which knows which type of decapsulator to create.
+   * \param key Encapsulator key pair holding the MAC address and flow id
+   * \param source Source MAC address of the flow
+   * \param dest Destination MAC address of the flow
+   */
+  virtual void CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest) {};
+
+  /**
+   * \brief Receive a control msg (ARQ ACK) from lower layer.
    * \param ack ARQ ACK message
    * \param macAddr MAC address of the UT (either as transmitter or receiver)
    */
@@ -267,6 +294,16 @@ protected:
   EncapContainer_t m_decaps;
 
   /**
+   * Is FWD link ARQ enabled
+   */
+  bool m_fwdLinkArqEnabled;
+
+  /**
+   * Is RTN link ARQ enabled
+   */
+  bool m_rtnLinkArqEnabled;
+
+  /**
    * The upper layer package receive callback.
    */
   ReceiveCallback m_rxCallback;
@@ -275,6 +312,13 @@ protected:
    * The read control message callback.
    */
   SatLlc::ReadCtrlMsgCallback m_readCtrlCallback;
+
+  /**
+   * Callback to send control messages. Note, that this is not
+   * actually used by the LLC but the encapsulators. It is just
+   * stored here.
+  */
+  SatBaseEncapsulator::SendCtrlCallback m_sendCtrlCallback;
 
 };
 

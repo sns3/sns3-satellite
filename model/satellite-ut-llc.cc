@@ -23,6 +23,9 @@
 
 #include "satellite-ut-llc.h"
 #include "satellite-return-link-encapsulator.h"
+#include "satellite-return-link-encapsulator-arq.h"
+#include "satellite-generic-stream-encapsulator.h"
+#include "satellite-generic-stream-encapsulator-arq.h"
 #include "satellite-node-info.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
@@ -89,10 +92,6 @@ SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcI
   if (it != m_encaps.end ())
     {
       packet = it->second->NotifyTxOpportunity (bytes, bytesLeft, nextMinTxO);
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Key: (" << macAddr << ", " << rcIndex << ") not found in the encapsulator container!");
     }
 
   if (packet)
@@ -170,6 +169,68 @@ SatUtLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   SatLlc::SetNodeInfo (nodeInfo);
 }
 
+void
+SatUtLlc::CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest)
+{
+  NS_LOG_FUNCTION (this << key.first << (uint32_t)(key.second) << source << dest);
+
+  Ptr<SatBaseEncapsulator> utEncap;
+
+  if (m_rtnLinkArqEnabled)
+    {
+      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (source, dest, key.second);
+    }
+  else
+    {
+      utEncap = CreateObject<SatReturnLinkEncapsulator> (source, dest, key.second);
+    }
+
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (key.second);
+  queue->AddQueueEventCallback (m_macQueueEventCb);
+  queue->AddQueueEventCallback (MakeCallback (&SatRequestManager::ReceiveQueueEvent, m_requestManager));
+
+  // Set the callback for each RLE queue
+  SatRequestManager::QueueCallback queueCb = MakeCallback (&SatQueue::GetQueueStatistics, queue);
+  m_requestManager->AddQueueCallback (key.second, queueCb);
+
+  utEncap->SetQueue (queue);
+
+  NS_LOG_LOGIC ("Add encapsulator with key: MAC = " << key.first << " flowId = " << key.second);
+
+  // Store the encapsulator
+  m_encaps.insert(std::make_pair (key, utEncap));
+}
+
+void
+SatUtLlc::CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest)
+{
+  NS_LOG_FUNCTION (this << key.first << (uint32_t)(key.second) << source << dest);
+
+  Ptr<SatBaseEncapsulator> utDecap;
+
+  if (m_fwdLinkArqEnabled)
+    {
+      utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (source, dest, key.second);
+    }
+  else
+    {
+      utDecap = CreateObject<SatGenericStreamEncapsulator> (source, dest, key.second);
+    }
+
+  utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
+  utDecap->SetCtrlMsgCallback (m_sendCtrlCallback);
+
+  // Store the decapsulator
+  m_decaps.insert(std::make_pair (key, utDecap));
+}
+
+void
+SatUtLlc::SetMacQueueEventCallback (SatQueue::QueueEventCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_macQueueEventCb = cb;
+}
 } // namespace ns3
 
 

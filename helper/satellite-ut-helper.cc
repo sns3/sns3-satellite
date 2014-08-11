@@ -93,16 +93,6 @@ SatUtHelper::GetTypeId (void)
                       BooleanValue (true),
                       MakeBooleanAccessor (&SatUtHelper::m_enableChannelEstimationError),
                       MakeBooleanChecker ())
-       .AddAttribute ("EnableRtnLinkArq",
-                      "Enable ARQ in return link.",
-                      BooleanValue (false),
-                      MakeBooleanAccessor (&SatUtHelper::m_enableRtnLinkArq),
-                      MakeBooleanChecker ())
-       .AddAttribute ("EnableFwdLinkArq",
-                      "Enable ARQ in forward link.",
-                      BooleanValue (false),
-                      MakeBooleanAccessor (&SatUtHelper::m_enableFwdLinkArq),
-                      MakeBooleanChecker ())
        .AddTraceSource ("Creation",
                         "Creation traces",
                         MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace))
@@ -127,9 +117,7 @@ SatUtHelper::SatUtHelper ()
    m_linkResults (),
    m_llsConf (),
    m_enableChannelEstimationError (false),
-   m_raSettings (),
-   m_enableRtnLinkArq (false),
-   m_enableFwdLinkArq (false)
+   m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -155,9 +143,7 @@ SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
    m_linkResults (),
    m_llsConf (),
    m_enableChannelEstimationError (false),
-   m_raSettings (randomAccessSettings),
-   m_enableRtnLinkArq (false),
-   m_enableFwdLinkArq (false)
+   m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
@@ -348,16 +334,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
 
-  Ptr<SatLlc> gwLlc = gwNd->GetLlc ();
-
-  // --- RETURN LINK ENCAPSULATORS ---
-
-  // Control messages are using flow id (RC index) 0. No need for decapsulator for
-  // RC index 0 at the GW, since control messages are terminated already at lower
-  // layer.
+  // Create an encapsulator for control messages.
+  // Source = UT address
+  // Destination = GW address
+  // Flow id = 0
   Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
 
-  // Create queue event callbacks to MAC and RM
+  // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
   SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
@@ -366,74 +349,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   queue->AddQueueEventCallback (macCb);
   queue->AddQueueEventCallback (rmCb);
   utEncap->SetQueue (queue);
-  llc->AddEncap (addr, utEncap, SatEnums::CONTROL_FID); // Tx
+  llc->AddEncap (addr, utEncap, SatEnums::CONTROL_FID);
+  rm->AddQueueCallback (SatEnums::CONTROL_FID, MakeCallback (&SatQueue::GetQueueStatistics, queue));
 
-  Ptr<SatBaseEncapsulator> gwDecap;
-
-  for (uint8_t rc = 1; rc < SatEnums::NUM_FIDS; ++rc)
-    {
-      if (m_enableRtnLinkArq)
-        {
-          utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (addr, gwAddr, rc);
-          gwDecap = CreateObject<SatReturnLinkEncapsulatorArq> (addr, gwAddr, rc);
-        }
-      else
-        {
-          utEncap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
-          gwDecap = CreateObject<SatReturnLinkEncapsulator> (addr, gwAddr, rc);
-        }
-
-      queue = CreateObject<SatQueue> (rc);
-      queue->AddQueueEventCallback (macCb);
-      queue->AddQueueEventCallback (rmCb);
-      utEncap->SetQueue (queue);
-      llc->AddEncap (addr, utEncap, rc); // Tx
-
-      // Create encapsulator and add it to GW's LLC
-      gwLlc->AddDecap (addr, gwDecap, rc); // Rx
-      gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, gwLlc));
-      gwDecap->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, gwNd));
-    }
-
-  // --- FORWARD LINK ENCAPSULATORS ---
-
-  // Control messages are using flow id (RC index) 0. Forward link is using only one container
-  // for control messages, which is configured to send packets to broadcast address.
-  Ptr<SatBaseEncapsulator> gwEncap;
-  Ptr<SatBaseEncapsulator> utDecap;
-
-  // Create control container for each LLC only once.
-  Ptr<SatGwLlc> gatewayLlc = DynamicCast<SatGwLlc> (gwLlc);
-  if (gatewayLlc && !gatewayLlc->ControlEncapsulatorCreated ())
-    {
-      queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
-      gwEncap = CreateObject<SatBaseEncapsulator> (gwAddr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID);
-      gwEncap->SetQueue (queue);
-      gwLlc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, SatEnums::CONTROL_FID); // Tx
-    }
-
-  // User data
-  for (uint8_t fid = 1; fid < SatEnums::NUM_FIDS; ++fid)
-    {
-      if (m_enableFwdLinkArq)
-        {
-          gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (gwAddr, addr, fid);
-          utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (gwAddr, addr, fid);
-        }
-      else
-        {
-          gwEncap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
-          utDecap = CreateObject<SatGenericStreamEncapsulator> (gwAddr, addr, fid);
-        }
-
-      queue = CreateObject<SatQueue> (fid);
-      gwEncap->SetQueue (queue);
-      gwLlc->AddEncap (addr, gwEncap, fid); // Tx
-
-      utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, llc));
-      llc->AddDecap (addr, utDecap, fid); // Rx
-      utDecap->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
-    }
+  // Add callbacks to LLC for future need. LLC creates encapsulators and
+  // decapsulators dynamically 'on-a-need-basis'.
+  llc->SetCtrlMsgCallback(MakeCallback (&SatNetDevice::SendControlMsg, dev));
+  llc->SetMacQueueEventCallback (macCb);
 
   // set serving GW MAC address to RM
   rm->SetGwAddress (gwAddr);
@@ -454,7 +376,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetRaChannel (raChannel);
 
   phy->Initialize ();
-  llc->SetQueueStatisticsCallbacks ();
 
   // Create UT scheduler for MAC and connect callbacks to LLC
   Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);

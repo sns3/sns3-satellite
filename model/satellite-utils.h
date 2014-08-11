@@ -35,7 +35,7 @@ namespace ns3 {
  * \ingroup satellite
  * 
  * \brief SatUtils class is for general conversions and constants used in satellite module.
- * This class is not planned to be instantiated or inherted.
+ * This class is not planned to be instantiated or inherited.
  */
 class SatUtils
 {

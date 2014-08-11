@@ -552,7 +552,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           else
             {
               // Pass the receiver address to LLC
-              m_rxCallback (*i, destAddress);
+              m_rxCallback (*i, macTag.GetSourceAddress (), destAddress);
             }
         }
     }
@@ -599,8 +599,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        Mac48Address destAddress = macTag.GetDestAddress ();
-        m_rxCallback (packet, destAddress);
+        m_rxCallback (packet, macTag.GetSourceAddress(), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:

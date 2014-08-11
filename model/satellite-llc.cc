@@ -46,6 +46,16 @@ SatLlc::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatLlc")
     .SetParent<Object> ()
     .AddConstructor<SatLlc> ()
+    .AddAttribute ("FwdLinkArqEnabled",
+                   "Enable ARQ in forward link.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatLlc::m_fwdLinkArqEnabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("RntLinkArqEnabled",
+                   "Enable ARQ in return link.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatLlc::m_rtnLinkArqEnabled),
+                   MakeBooleanChecker ())
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatLlc::m_packetTrace))
@@ -56,7 +66,9 @@ SatLlc::GetTypeId (void)
 SatLlc::SatLlc ()
 :m_nodeInfo (),
  m_encaps (),
- m_decaps ()
+ m_decaps (),
+ m_fwdLinkArqEnabled (false),
+ m_rtnLinkArqEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -99,21 +111,26 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
-  // UT: user own mac address
-  // GW: use destination address
   Mac48Address mac = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? m_nodeInfo->GetMacAddress () : Mac48Address::ConvertFrom (dest) );
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (mac, flowId);
 
   EncapContainer_t::iterator it = m_encaps.find (key);
 
-  if (it != m_encaps.end ())
+  if (it == m_encaps.end ())
     {
-      it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
+      /**
+       * Encapsulator not found, thus create a new one. This method is
+       * implemented in the inherited classes, which knows which type
+       * of encapsulator to create.
+       */
+
+      NS_LOG_LOGIC ("Create encapsulator with key: MAC = " << mac << " flowId = " << flowId);
+
+      CreateEncap (key, m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest));
+      it = m_encaps.find (key);
     }
-  else
-    {
-      NS_FATAL_ERROR ("Key: (" << mac << ", " << flowId << ") not found in the encapsulator container!");
-    }
+
+  it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
 
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
@@ -142,12 +159,14 @@ SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowI
 }
 
 void
-SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
+SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << macAddr << packet);
+  NS_LOG_FUNCTION (this << source << dest << packet);
 
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  Mac48Address macAddr = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? dest : source );
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now(),
@@ -169,22 +188,27 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address macAddr)
       EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
       EncapContainer_t::iterator it = m_decaps.find (key);
 
-      // Note: control messages should not be seen at the LLC layer, since
-      // they are received already at the MAC layer and received as control
-      // messages.
+      // Control messages not received by this method
       if (flowId == SatEnums::CONTROL_FID)
         {
-          NS_FATAL_ERROR ("Control messages should be terminated already at lower layer!");
+          NS_FATAL_ERROR ("Control messages should not be received by SatLlc::Receive () method!");
         }
         
-      if (it != m_decaps.end ())
+      if (it == m_decaps.end ())
         {
-          it->second->ReceivePdu (packet);
+          /**
+           * Decapsulator not found, thus create a new one. This method is
+           * implemented in the inherited classes, which knows which type
+           * of decapsulator to create.
+           */
+
+          NS_LOG_LOGIC ("Create decapsulator with key: MAC = " << macAddr << " flowId = " << flowId);
+
+          CreateDecap (key, source, dest);
+          it = m_decaps.find (key);
         }
-	    else
-  	 	 {
-	  	   NS_FATAL_ERROR ("MAC tag not found in the packet!");
-  			}
+
+      it->second->ReceivePdu (packet);
     }
 }
 
@@ -203,8 +227,6 @@ SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
   EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
   EncapContainer_t::iterator it = m_encaps.find (key);
 
-  // Note: control messages should not be seen at the LLC layer, since
-  // they are received already at the MAC layer.
   if (it != m_encaps.end ())
     {
       it->second->ReceiveAck (ack);
@@ -430,6 +452,13 @@ SatLlc::SetReadCtrlCallback (SatLlc::ReadCtrlMsgCallback cb)
   m_readCtrlCallback = cb;
 }
 
+void
+SatLlc::SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_sendCtrlCallback = cb;
+}
 
 } // namespace ns3
 

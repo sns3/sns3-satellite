@@ -187,7 +187,7 @@ protected:
 private:
 
    /**
-    * Get start time for the current superframe.
+    * \brief Get start time for the current superframe.
     * \param superFrameSeqId Superframe sequence id
     * \return Time Time to transmit
     */

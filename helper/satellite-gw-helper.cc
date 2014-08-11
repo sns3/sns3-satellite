@@ -319,6 +319,16 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
 
+  // Create an encapsulator for control messages.
+  // Source = GW address
+  // Destination = broadcast address
+  // Flow id = 0
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
+  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID);
+  gwEncap->SetQueue (queue);
+  llc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, SatEnums::CONTROL_FID);
+  llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+
   phy->Initialize();
 
   // Create a node info to all the protocol layers
