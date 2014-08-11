@@ -42,11 +42,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue(errorRate));
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_CONSTANT));
-  Config::SetDefault ("ns3::SatUtHelper::EnableRtnLinkArq", BooleanValue(true));
 
   // Enable ARQ
-  Config::SetDefault ("ns3::SatUtHelper::EnableRtnLinkArq", BooleanValue(true));
-  Config::SetDefault ("ns3::SatUtHelper::EnableFwdLinkArq", BooleanValue(false));
+  Config::SetDefault ("ns3::SatLlc::RtnLinkArqEnabled", BooleanValue(true));
+  Config::SetDefault ("ns3::SatLlc::FwdLinkArqEnabled", BooleanValue(false));
 
   // RTN link ARQ attributes
   Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue(2));

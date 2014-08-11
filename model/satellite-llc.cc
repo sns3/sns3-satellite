@@ -51,7 +51,7 @@ SatLlc::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatLlc::m_fwdLinkArqEnabled),
                    MakeBooleanChecker ())
-    .AddAttribute ("RntLinkArqEnabled",
+    .AddAttribute ("RtnLinkArqEnabled",
                    "Enable ARQ in return link.",
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatLlc::m_rtnLinkArqEnabled),
