@@ -205,7 +205,16 @@ SatBeamScheduler::GetTypeId (void)
                       MakeTraceSourceAccessor (&SatBeamScheduler::m_frameUtLoadTrace))
     .AddTraceSource ("FrameLoadTrace", "Trace load per the frame allocates symbols / total symbols.",
                       MakeTraceSourceAccessor (&SatBeamScheduler::m_frameLoadTrace))
-;
+    .AddTraceSource ("UsableCapacityTrace",
+                     "Trace usable capacity per beam in kbps.",
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_usableCapacityTrace))
+    .AddTraceSource ("UnmetCapacityTrace",
+                     "Trace unmet capacity per beam in kbps.",
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_unmetCapacityTrace))
+    .AddTraceSource ("ExceedingCapacityTrace",
+                     "Trace exceeding capacity per beam in kbps.",
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_exceedingCapacityTrace))
+                     ;
   return tid;
 }
 
@@ -400,10 +409,13 @@ SatBeamScheduler::Schedule ()
 {
   NS_LOG_FUNCTION (this);
 
+  uint32_t requestedKbpsSum (0);
+  uint32_t offeredKbpsSum (0);
+
   // check that there is UTs to schedule
   if ( m_utInfos.size() > 0 )
     {
-      UpdateDamaEntriesWithReqs ();
+      requestedKbpsSum = UpdateDamaEntriesWithReqs ();
 
       DoPreResourceAllocation ();
 
@@ -423,7 +435,7 @@ SatBeamScheduler::Schedule ()
       m_superframeAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace, m_frameLoadTrace);
 
       // update VBDC counter of the UT/RCs
-      UpdateDamaEntriesWithAllocs (utAllocs);
+      offeredKbpsSum += UpdateDamaEntriesWithAllocs (utAllocs);
 
       // send TBTPs
       for ( std::vector <Ptr<SatTbtpMessage> > ::const_iterator it = tbtps.begin (); it != tbtps.end (); it++ )
@@ -438,6 +450,13 @@ SatBeamScheduler::Schedule ()
 
       NS_LOG_LOGIC ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
     }
+
+  uint32_t usableCapacity = std::min (offeredKbpsSum, requestedKbpsSum);
+  uint32_t unmetCapacity = requestedKbpsSum - usableCapacity;
+  uint32_t exceedingCapacity = (uint32_t)(std::max(((double)(offeredKbpsSum) - requestedKbpsSum), 0.0) + 0.5);
+  m_usableCapacityTrace (usableCapacity);
+  m_unmetCapacityTrace (unmetCapacity);
+  m_exceedingCapacityTrace (exceedingCapacity);
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule ( m_superframeSeq->GetDuration (m_currentSequence), &SatBeamScheduler::Schedule, this);
@@ -492,10 +511,12 @@ SatBeamScheduler::AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContain
     }
 }
 
-void
+uint32_t
 SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 {
   NS_LOG_FUNCTION (this);
+
+  uint32_t requestedCraRbdcKbps (0);
 
   for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
     {
@@ -519,6 +540,10 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
           it->second.m_reqPerRc[i].m_craBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
           it->second.m_reqPerRc[i].m_rbdcBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
           it->second.m_reqPerRc[i].m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
+
+          // Collect the requested rate for all UTs per beam
+          requestedCraRbdcKbps += damaEntry->GetCraInKbps (i);
+          requestedCraRbdcKbps += damaEntry->GetRbdcInKbps (i);
 
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
           it->second.m_reqPerRc[i].m_minRbdcBytes = (SatUtils::BITS_IN_KBIT * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
@@ -545,6 +570,8 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
           // ... write backlog requests traces ends
         }
     }
+
+  return requestedCraRbdcKbps;
 }
 
 void SatBeamScheduler::DoPreResourceAllocation ()
@@ -568,10 +595,12 @@ void SatBeamScheduler::DoPreResourceAllocation ()
     }
 }
 
-void
+uint32_t
 SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer)
 {
   NS_LOG_FUNCTION (this);
+
+  uint32_t offeredCraRbdcKbps (0);
 
   for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
     {
@@ -592,6 +621,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
           {
             uint32_t rateBasedBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
             rateBasedBytes += (SatUtils::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
+
+            offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatUtils::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatUtils::BITS_IN_KBIT)) + 0.5);
 
             if ( rateBasedBytes < allocInfo->second.first[i] )
               {
@@ -614,6 +645,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
       damaEntry->DecrementVolumeBacklogPersistence ();
 
     }
+  return offeredCraRbdcKbps;
 }
 
 } // namespace ns3

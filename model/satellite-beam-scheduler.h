@@ -389,6 +389,21 @@ private:
   TracedCallback<uint32_t, double> m_frameLoadTrace;
 
   /**
+   * Trace usable capacity.
+   */
+  TracedCallback<uint32_t> m_usableCapacityTrace;
+
+  /**
+   * Trace unmet capacity.
+   */
+  TracedCallback<uint32_t> m_unmetCapacityTrace;
+
+  /**
+   * Trace exceeding capacity.
+   */
+  TracedCallback<uint32_t> m_exceedingCapacityTrace;
+
+  /**
    * Dispose actions for SatBeamScheduler.
    */
   void DoDispose (void);
@@ -401,14 +416,14 @@ private:
   /**
    * Update dama entries with received requests at beginning of the scheduling.
    */
-  void UpdateDamaEntriesWithReqs ();
+  uint32_t UpdateDamaEntriesWithReqs ();
 
   /**
    * Update dama entries with given allocations at end of the scheduling.
    *
    * \param utAllocContainer Reference to container including granted allocations per UT.
    */
-  void UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
+  uint32_t UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
 
   /**
    * Do pre-allocation of the symbols per UT/RC, before time slot generation.
