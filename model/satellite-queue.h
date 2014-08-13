@@ -221,7 +221,7 @@ private:
    * \brief Send queue event to all registered callbacks
    * \param event Queue event
    */
-  void SendEvent (QueueEvent_t event);
+  void SendEvent (SatQueue::QueueEvent_t event);
 
   /**
    * \brief Reset the short term statistics. Short term reflects here e.g. to

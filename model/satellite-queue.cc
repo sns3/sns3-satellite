@@ -141,15 +141,6 @@ SatQueue::Enqueue (Ptr<Packet> p)
       return false;
     }
 
-  if (m_packets.empty ())
-    {
-      SendEvent (SatQueue::FIRST_BUFFERED_PKT);
-    }
-  else
-    {
-      SendEvent (SatQueue::BUFFERED_PKT);
-    }
-
   m_nBytes += p->GetSize ();
   ++m_nPackets;
 
@@ -163,6 +154,15 @@ SatQueue::Enqueue (Ptr<Packet> p)
   NS_LOG_LOGIC ("Number packets " << m_packets.size ());
   NS_LOG_LOGIC ("Number bytes " << m_nBytes);
   m_traceEnqueue (p);
+
+  if (m_packets.empty ())
+    {
+      SendEvent (SatQueue::FIRST_BUFFERED_PKT);
+    }
+  else
+    {
+      SendEvent (SatQueue::BUFFERED_PKT);
+    }
 
   return true;
 }
@@ -256,7 +256,7 @@ SatQueue::AddQueueEventCallback (SatQueue::QueueEventCallback cb)
 }
 
 void
-SatQueue::SendEvent (QueueEvent_t event)
+SatQueue::SendEvent (SatQueue::QueueEvent_t event)
 {
   NS_LOG_FUNCTION (this);
 

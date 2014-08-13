@@ -299,7 +299,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
               NS_FATAL_ERROR ("Error in TBTP: slot allocate from different frames for same UT!!!");
             }
 
-          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
+          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
           Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
           Ptr<SatTimeSlotConf> timeSlotConf = it->second;
 
@@ -451,7 +451,7 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_
 void
 SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
-  NS_LOG_FUNCTION (this << packets.size () << duration << carrierId);
+  NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
 
   // If there are packets to send
   if (!packets.empty ())
@@ -459,11 +459,11 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
       NS_LOG_LOGIC ("SatUtMac::TransmitPackets - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << ", transmitting " << packets.size () << " packets, duration: " << duration.GetSeconds () << ", carrier: " << carrierId);
 
       // Decrease a guard time from time slot duration.
-      Time durationWithGuardPeriod (duration - m_guardTime);
-      NS_LOG_LOGIC ("Duration: " << duration.GetSeconds () << " duration with guard period: " << duration.GetSeconds ());
-      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds () << " duration: " << durationWithGuardPeriod.GetSeconds ());
+      Time durationWithoutGuardPeriod (duration - m_guardTime);
+      NS_LOG_LOGIC ("Duration: " << duration.GetSeconds () << " duration with guard period: " << durationWithoutGuardPeriod.GetSeconds ());
+      NS_LOG_LOGIC ("UT: " << m_nodeInfo->GetMacAddress () << " send packet at time: " << Simulator::Now ().GetSeconds () << " duration: " << durationWithoutGuardPeriod.GetSeconds ());
 
-      SendPacket (packets, carrierId, durationWithGuardPeriod, txInfo);
+      SendPacket (packets, carrierId, durationWithoutGuardPeriod, txInfo);
     }
 }
 
@@ -699,13 +699,13 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
     {
       NS_LOG_LOGIC ("SatUtMac::ScheduleSlottedAlohaTransmission @ " << Now ().GetSeconds () << " - No known DAMA, selecting a slot for Slotted ALOHA");
 
-      Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
+      Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
       uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
       Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
       uint32_t timeSlotCount = frameConf->GetTimeSlotCount ();
 
       std::pair<bool, uint32_t> result = std::make_pair (false, 0);
-      Time superframeStartTime = GetCurrentSuperFrameStartTime (0);
+      Time superframeStartTime = GetCurrentSuperFrameStartTime (m_currentSuperframeSequence);
 
       if ( Now () < superframeStartTime )
         {
@@ -1129,7 +1129,7 @@ SatUtMac::DoFrameStart ()
       DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
     }
 
-  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (0);
+  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (m_currentSuperframeSequence);
 
   if (Now () >= nextSuperFrameTxTime)
     {
@@ -1174,7 +1174,7 @@ SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
               NS_FATAL_ERROR ("Error in TBTP: slot allocate from different frames for same UT!!!");
             }
 
-          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (0);
+          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
           Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
           Ptr<SatTimeSlotConf> timeSlotConf = it->second;
 

@@ -78,9 +78,10 @@ main (int argc, char *argv[])
   SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
-  helper->EnablePacketTrace ();
 
   helper->CreateUserDefinedScenario (beamMap);
+
+  helper->EnablePacketTrace ();
 
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/CrTrace",
                                  MakeCallback (&CrTraceCb));

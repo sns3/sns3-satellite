@@ -125,9 +125,10 @@ main (int argc, char *argv[])
   SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[beamId] = beamInfo;
-  helper->EnablePacketTrace ();
 
   helper->CreateUserDefinedScenario (beamMap);
+
+  helper->EnablePacketTrace ();
 
   // Get users
   NodeContainer utUsers = helper->GetUtUsers();
