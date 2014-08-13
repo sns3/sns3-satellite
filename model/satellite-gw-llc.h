@@ -50,7 +50,7 @@ public:
   virtual ~SatGwLlc ();
 
   /**
-    *  Called from lower layer (MAC) to inform a tx
+    *  \brief Called from lower layer (MAC) to inform a tx
     *  opportunity of certain amount of bytes
     *
     * \param utAddr MAC address of the UT with tx opportunity
@@ -63,7 +63,7 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
-   * Create and fill the scheduling objects based on LLC layer information.
+   * \brief Create and fill the scheduling objects based on LLC layer information.
    * Scheduling objects may be used at the MAC layer to assist in scheduling.
    * \param output reference to an output vector that will be filled with
    *               pointer to scheduling objects
@@ -71,7 +71,7 @@ public:
   virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
 
   /**
-   * Get the number of (new) bytes at LLC queue for a certain UT. Method
+   * \brief Get the number of (new) bytes at LLC queue for a certain UT. Method
    * checks only the SatQueue for packets, thus it does not count possible
    * packets buffered at the encapsulator (e.g. in case of ARQ).
    * \param utAddress the MAC address that identifies a particular UT node.
@@ -81,7 +81,7 @@ public:
   virtual uint32_t GetNBytesInQueue (Mac48Address utAddress) const;
 
   /**
-    Get the number of (new) packets at LLC queues for a certain UT. Method
+   * \brief Get the number of (new) packets at LLC queues for a certain UT. Method
    * checks only the SatQueue for packets, thus it does not count possible
    * packets buffered at the encapsulator (e.g. in case of ARQ).
    * \param utAddress the MAC address that identifies a particular UT node.

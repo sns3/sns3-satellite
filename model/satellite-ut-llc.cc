@@ -284,6 +284,17 @@ SatUtLlc::GetNPacketsInQueue (Mac48Address utAddress) const
 }
 
 void
+SatUtLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (true);
+
+  /**
+   * This is not yet implemented to the UT LLC
+   */
+}
+
+void
 SatUtLlc::SetMacQueueEventCallback (SatQueue::QueueEventCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);

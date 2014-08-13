@@ -45,7 +45,6 @@ SatLlc::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLlc")
     .SetParent<Object> ()
-    .AddConstructor<SatLlc> ()
     .AddAttribute ("FwdLinkArqEnabled",
                    "Enable ARQ in forward link.",
                    BooleanValue (false),
@@ -143,20 +142,6 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
                  SatUtils::GetPacketInfo (packet));
 
   return true;
-}
-
-Ptr<Packet>
-SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
-{
-  NS_LOG_FUNCTION (this << bytes << utAddr << (uint32_t) flowId);
-  NS_ASSERT (true);
-
-  /**
-   * This method is not to be used. It is to be implemented into the
-   * inherited classes.
-   */
-  Ptr<Packet> packet;
-  return packet;
 }
 
 void
@@ -328,18 +313,6 @@ SatLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
-{
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
-
-  /**
-   * This method is not to be used. It is to be implemented into the
-   * inherited classes.
-   */
-}
-
-void
 SatLlc::SetReceiveCallback (SatLlc::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
@@ -360,34 +333,6 @@ SatLlc::BuffersEmpty () const
         }
     }
   return true;
-}
-
-uint32_t
-SatLlc::GetNBytesInQueue (Mac48Address utAddress) const
-{
-  NS_LOG_FUNCTION (this << utAddress);
-  NS_ASSERT (true);
-
-  /**
-   * This method is not to be used. It is to be implemented into the
-   * inherited classes.
-   */
-
-  return 0;
-}
-
-uint32_t
-SatLlc::GetNPacketsInQueue (Mac48Address utAddress) const
-{
-  NS_LOG_FUNCTION (this << utAddress);
-  NS_ASSERT (true);
-
-  /**
-   * This method is not to be used. It is to be implemented into the
-   * inherited classes.
-   */
-
-  return 0;
 }
 
 uint32_t
