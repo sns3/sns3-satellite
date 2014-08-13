@@ -306,6 +306,38 @@ public:
   } SatCapacityAllocationCategory_t;
 
 
+  static inline std::string GetCapacityAllocationCategory (SatCapacityAllocationCategory_t cac)
+  {
+    switch (cac)
+    {
+      case DA_UNKNOWN:
+        {
+          return "UNKNOWN";
+        }
+      case DA_RBDC:
+        {
+          return "RBDC";
+        }
+      case DA_VBDC:
+        {
+          return "VBDC";
+        }
+      case DA_AVBDC:
+        {
+          return "AVBDC";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetCapacityAllocationCategory - invalid CAC");
+          break;
+        }
+    }
+    NS_FATAL_ERROR ("SatEnums::GetCapacityAllocationCategory - invalid CAC");
+    return "";
+  };
+
+
+
   static inline void GetAvailableBbFrameTypes (std::vector<SatBbFrameType_t>& frameTypes)
   {
     frameTypes.push_back (SHORT_FRAME);

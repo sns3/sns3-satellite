@@ -258,7 +258,7 @@ SatRequestManager::DoEvaluation ()
                       ss << Simulator::Now ().GetSeconds () << ", "
                          << m_nodeInfo->GetNodeId () << ", "
                          << static_cast<uint32_t> (rc) << ", "
-                         << SatEnums::DA_RBDC << ", "
+                         << SatEnums::GetCapacityAllocationCategory (SatEnums::DA_RBDC) << ", "
                          << rbdcRateKbps << ", "
                          << stats.m_queueSizeBytes;
                       m_crTraceLog (ss.str ());
@@ -287,7 +287,7 @@ SatRequestManager::DoEvaluation ()
                       ss << Simulator::Now ().GetSeconds () << ", "
                          << m_nodeInfo->GetNodeId () << ", "
                          << static_cast<uint32_t> (rc) << ", "
-                         << cac << ", "
+                         << SatEnums::GetCapacityAllocationCategory(cac) << ", "
                          << vbdcBytes << ", "
                          << stats.m_queueSizeBytes;
                       m_crTraceLog (ss.str ());

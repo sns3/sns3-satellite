@@ -366,6 +366,7 @@
  <default name="ns3::SatRequestManager::EvaluationInterval" value="+100000000.0ns"/>
  <default name="ns3::SatRequestManager::CnoReportInterval" value="+1100000000.0ns"/>
  <default name="ns3::SatRequestManager::EnableOnDemandEvaluation" value="false"/>
+ <default name="ns3::SatRequestManager::OverEstimationFactor" value="1.1"/>
  <default name="ns3::SatRequestManager::RttEstimate" value="+560000000.0ns"/>
  <default name="ns3::SatReturnLinkEncapsulatorArq::MaxRtnArqSegmentSize" value="38"/>
  <default name="ns3::SatReturnLinkEncapsulatorArq::MaxNoOfRetransmissions" value="2"/>
