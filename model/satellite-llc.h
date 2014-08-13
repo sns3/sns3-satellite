@@ -37,6 +37,55 @@
 
 namespace ns3 {
 
+
+/**
+ * \ingroup satellite
+ * \brief EncapKey class is used as a key in the encapsulator/decapsulator container. It
+ * will hold the flow information related to one single encapsulator/decapsulator.
+ */
+class EncapKey : public SimpleRefCount <EncapKey>
+{
+public:
+  Mac48Address  m_source;
+  Mac48Address  m_destination;
+  int8_t        m_flowId;
+
+  EncapKey (const Mac48Address source, const Mac48Address dest, const uint8_t flowId)
+  :m_source (source),
+   m_destination (dest),
+   m_flowId (flowId)
+  {
+  }
+};
+
+/**
+ * \ingroup satellite
+ * \brief EncapKeyCompare is used as a custom compare method within
+ * EncapContainer map.
+ */
+class EncapKeyCompare
+{
+public:
+  bool operator() (Ptr<EncapKey> key1, Ptr<EncapKey> key2)
+  {
+    if ( key1->m_source == key2->m_source )
+      {
+        if ( key1->m_destination == key2->m_destination )
+          {
+            return key1->m_flowId < key2->m_flowId;
+          }
+        else
+          {
+            return key1->m_destination < key2->m_destination;
+          }
+      }
+    else
+      {
+        return key1->m_source < key2->m_source;
+      }
+  }
+};
+
 /**
  * \ingroup satellite
  * \brief SatLlc base class holds the UT specific SatBaseEncapsulator instances, which are responsible
@@ -61,8 +110,6 @@ namespace ns3 {
  *  A proper version of the SatLlc is inherited: SatUtLlc at the UT and SatGwLlc at the GW. There is no
  *  LLC layer at the satellite.
  */
-
-
 class SatLlc : public Object
 {
 public:
@@ -81,11 +128,11 @@ public:
   virtual ~SatLlc ();
 
   /**
-   * Mac48Address = UT address
-   * uint8_t = RC index
+   * Key = Ptr<EncapKey> (source, dest, flowId)
+   * Value = Ptr<SatBaseEncapsulator>
+   * Compare class = EncapKeyCompare
    */
-  typedef std::pair<Mac48Address, uint8_t> EncapKey_t;
-  typedef std::map<EncapKey_t, Ptr<SatBaseEncapsulator> > EncapContainer_t;
+  typedef std::map<Ptr<EncapKey>, Ptr<SatBaseEncapsulator>, EncapKeyCompare > EncapContainer_t;
 
   /**
    * Receive callback used for sending packet to netdevice layer.
@@ -119,16 +166,18 @@ public:
 
   /**
     *  Called from lower layer (MAC) to inform a Tx
-    *  opportunity of certain amount of bytes
+    *  opportunity of certain amount of bytes. Note, that this
+    *  method is not to be used in this class, but the real
+    *  implementation is located in inherited classes.
     *
-    * \param macAddr Mac address of the UT with the Tx opportunity
+    * \param UtAddr MAC address of the UT with the Tx opportunity
     * \param bytes Size of the Tx opportunity
     * \param flowId Flow identifier
     * \param &bytesLeft Bytes left after TxOpportunity
     * \param &nextMinTxO Minimum TxO after this TxO
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
    * Receive user data packet from lower layer.
@@ -141,9 +190,10 @@ public:
    * Receive HL PDU from encapsulator/decapsulator entity
    *
    * \param packet Pointer to packet received.
-   * \param macAddress  MAC address of the UT (either as transmitter or receiver)
+   * \param source MAC address of the source
+   * \param dest MAC address of the destination
    */
-  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr);
+  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest);
 
   /**
    * Set Receive callback to forward packet to upper layer
@@ -155,24 +205,22 @@ public:
   /**
    * Add an encapsulator entry for the LLC. This is called from the helpers
    * at initialization phase.
-   * Key = UT's MAC address
-   * Value = encap entity
-   * \param macAddr UT's MAC address
-   * \param enc encap entity
+   * \param source Source MAC address
+   * \param dest Destination MAC address
    * \param flowId Flow id of this encapsulator queue
+   * \param enc Encapsulator pointer
    */
-  void AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t flowId);
+  void AddEncap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<SatBaseEncapsulator> enc);
 
   /**
    * Add an decapsulator entry for the LLC. This is called from the helpers
    * at initialization phase.
-   * Key = UT's MAC address
-   * Value = decap entity
-   * \param macAddr UT's MAC address
-   * \param dec decap entity
-   * \param flowId FlowId of this encapsulator queue
+   * \param source Source MAC address
+   * \param dest Destination MAC address
+   * \param flowId Flow id of this encapsulator queue
+   * \param enc Decapsulator pointer
    */
-  void AddDecap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> dec, uint8_t flowId);
+  void AddDecap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<SatBaseEncapsulator> dec);
 
   /**
    * Set the node info
@@ -186,7 +234,7 @@ public:
    * \param output reference to an output vector that will be filled with
    *               pointer to scheduling objects
    */
-  void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
+  virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
 
   /**
    * Are buffers empty?
@@ -235,6 +283,12 @@ public:
    */
   void SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb);
 
+  /**
+   * \brief Set the GW address
+   * \param address GW MAC address
+   */
+  void SetGwAddress (Mac48Address address);
+
 protected:
 
   void DoDispose ();
@@ -242,27 +296,24 @@ protected:
   /**
    * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
    * Method is implemented in the inherited class which knows which type of encapsulator to create.
-   * \param key Encapsulator key pair holding the MAC address and flow id
-   * \param source Source MAC address of the flow
-   * \param dest Destination MAC address of the flow
+   * \param key Encapsulator key class
    */
-  virtual void CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest) {};
+  virtual void CreateEncap (Ptr<EncapKey> key) {};
 
   /**
    * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
    * Method is implemented in the inherited class which knows which type of decapsulator to create.
-   * \param key Encapsulator key pair holding the MAC address and flow id
-   * \param source Source MAC address of the flow
-   * \param dest Destination MAC address of the flow
+   * \param key Encapsulator key class
    */
-  virtual void CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest) {};
+  virtual void CreateDecap (Ptr<EncapKey> key) {};
 
   /**
    * \brief Receive a control msg (ARQ ACK) from lower layer.
    * \param ack ARQ ACK message
-   * \param macAddr MAC address of the UT (either as transmitter or receiver)
+   * \param source Source MAC address
+   * \param dest Destination MAC address
    */
-  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr);
+  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address source, Mac48Address dest);
 
   /**
    * Trace callback used for packet tracing:
@@ -302,6 +353,11 @@ protected:
    * Is RTN link ARQ enabled
    */
   bool m_rtnLinkArqEnabled;
+
+  /**
+   * GW address
+   */
+  Mac48Address m_gwAddress;
 
   /**
    * The upper layer package receive callback.

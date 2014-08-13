@@ -322,11 +322,11 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Create an encapsulator for control messages.
   // Source = GW address
   // Destination = broadcast address
-  // Flow id = 0
+  // Flow id = by default 0
   Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
   Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID);
   gwEncap->SetQueue (queue);
-  llc->AddEncap (Mac48Address::GetBroadcast(), gwEncap, SatEnums::CONTROL_FID);
+  llc->AddEncap (addr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID, gwEncap);
   llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
 
   phy->Initialize();

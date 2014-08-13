@@ -96,7 +96,7 @@ SatGenericStreamEncapsulator::DoDispose ()
 }
 
 void
-SatGenericStreamEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*mac*/)
+SatGenericStreamEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
@@ -130,8 +130,7 @@ Ptr<Packet>
 SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytesLeft);
-
-  NS_LOG_LOGIC ("TxOpportunity: " << bytes);
+  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_destAddress << " flowId: " << m_flowId << " of " << bytes << " bytes");
 
   // GSE PDU
   Ptr<Packet> packet;
@@ -377,7 +376,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
 
       Reset ();
 
-      m_rxCallback (packet, m_destAddress);
+      m_rxCallback (packet, m_sourceAddress, m_destAddress);
     }
 
   // START_PDU
@@ -430,7 +429,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
           else
             {
               m_currRxPacketFragment->AddAtEnd (packet);
-              m_rxCallback (m_currRxPacketFragment, m_destAddress);
+              m_rxCallback (m_currRxPacketFragment, m_sourceAddress, m_destAddress);
             }
         }
       else

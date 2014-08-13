@@ -80,34 +80,39 @@ SatUtLlc::DoDispose ()
 
 
 Ptr<Packet>
-SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO)
+SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << macAddr << bytes << (uint32_t) rcIndex);
+  NS_LOG_FUNCTION (this << utAddr << bytes << (uint32_t) rcIndex);
 
   Ptr<Packet> packet;
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, rcIndex);
-
+  Ptr<EncapKey> key = Create<EncapKey> (utAddr, m_gwAddress, rcIndex);
   EncapContainer_t::iterator it = m_encaps.find (key);
 
   if (it != m_encaps.end ())
     {
       packet = it->second->NotifyTxOpportunity (bytes, bytesLeft, nextMinTxO);
-    }
 
-  if (packet)
-    {
-      SatEnums::SatLinkDir_t ld = SatEnums::LD_RETURN;
+      if (packet)
+        {
+          SatEnums::SatLinkDir_t ld = SatEnums::LD_RETURN;
 
-      // Add packet trace entry:
-      m_packetTrace (Simulator::Now(),
-                     SatEnums::PACKET_SENT,
-                     m_nodeInfo->GetNodeType (),
-                     m_nodeInfo->GetNodeId (),
-                     m_nodeInfo->GetMacAddress (),
-                     SatEnums::LL_LLC,
-                     ld,
-                     SatUtils::GetPacketInfo (packet));
+          // Add packet trace entry:
+          m_packetTrace (Simulator::Now(),
+                         SatEnums::PACKET_SENT,
+                         m_nodeInfo->GetNodeType (),
+                         m_nodeInfo->GetNodeId (),
+                         m_nodeInfo->GetMacAddress (),
+                         SatEnums::LL_LLC,
+                         ld,
+                         SatUtils::GetPacketInfo (packet));
+        }
     }
+  /*
+   * At the UT the UT scheduler may give a Tx opportunity to a encapsulator which
+   * does not exist, since it does not exact knowledge that which encapsulators
+   * have been dynamically created. Thus, it is not an error case, where the
+   * encapsulator is not found!
+  */
 
   return packet;
 }
@@ -141,7 +146,7 @@ SatUtLlc::SetQueueStatisticsCallbacks ()
     {
       // Set the callback for each RLE queue
       queueCb = MakeCallback (&SatQueue::GetQueueStatistics, it->second->GetQueue ());
-      m_requestManager->AddQueueCallback (it->first.second, queueCb);
+      m_requestManager->AddQueueCallback (it->first->m_flowId, queueCb);
     }
  }
 
@@ -163,65 +168,119 @@ SatUtLlc::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
 void
 SatUtLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_LOG_FUNCTION (this << nodeInfo);
+  NS_LOG_FUNCTION (this);
 
   m_requestManager->SetNodeInfo (nodeInfo);
   SatLlc::SetNodeInfo (nodeInfo);
 }
 
 void
-SatUtLlc::CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest)
+SatUtLlc::CreateEncap (Ptr<EncapKey> key)
 {
-  NS_LOG_FUNCTION (this << key.first << (uint32_t)(key.second) << source << dest);
+  NS_LOG_FUNCTION (this << key->m_source << key->m_destination << (uint32_t)(key->m_flowId));
 
   Ptr<SatBaseEncapsulator> utEncap;
 
   if (m_rtnLinkArqEnabled)
     {
-      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (source, dest, key.second);
+      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
     }
   else
     {
-      utEncap = CreateObject<SatReturnLinkEncapsulator> (source, dest, key.second);
+      utEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
     }
 
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (key.second);
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
   queue->AddQueueEventCallback (m_macQueueEventCb);
   queue->AddQueueEventCallback (MakeCallback (&SatRequestManager::ReceiveQueueEvent, m_requestManager));
 
   // Set the callback for each RLE queue
   SatRequestManager::QueueCallback queueCb = MakeCallback (&SatQueue::GetQueueStatistics, queue);
-  m_requestManager->AddQueueCallback (key.second, queueCb);
+  m_requestManager->AddQueueCallback (key->m_flowId, queueCb);
 
   utEncap->SetQueue (queue);
 
-  NS_LOG_LOGIC ("Add encapsulator with key: MAC = " << key.first << " flowId = " << key.second);
+  NS_LOG_LOGIC ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the encapsulator
-  m_encaps.insert(std::make_pair (key, utEncap));
+  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert(std::make_pair (key, utEncap));
+  if (result.second == false)
+    {
+      NS_FATAL_ERROR ("Insert to map with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ") failed!");
+    }
 }
 
 void
-SatUtLlc::CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest)
+SatUtLlc::CreateDecap (Ptr<EncapKey> key)
 {
-  NS_LOG_FUNCTION (this << key.first << (uint32_t)(key.second) << source << dest);
+  NS_LOG_FUNCTION (this << key->m_source << key->m_destination << (uint32_t)(key->m_flowId));
 
   Ptr<SatBaseEncapsulator> utDecap;
 
   if (m_fwdLinkArqEnabled)
     {
-      utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (source, dest, key.second);
+      utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
     }
   else
     {
-      utDecap = CreateObject<SatGenericStreamEncapsulator> (source, dest, key.second);
+      utDecap = CreateObject<SatGenericStreamEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
     }
 
   utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
   utDecap->SetCtrlMsgCallback (m_sendCtrlCallback);
 
+  NS_LOG_LOGIC ("Create decapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
+
   // Store the decapsulator
-  m_decaps.insert(std::make_pair (key, utDecap));
+  std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert(std::make_pair (key, utDecap));
+  if (result.second == false)
+    {
+      NS_FATAL_ERROR ("Insert to map with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ") failed!");
+    }
+}
+
+uint32_t
+SatUtLlc::GetNBytesInQueue (Mac48Address utAddress) const
+{
+  NS_LOG_FUNCTION (this << utAddress);
+
+  uint32_t sum = 0;
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end (); ++it)
+    {
+      if (it->first->m_source == utAddress)
+        {
+          NS_ASSERT (it->second != 0);
+          Ptr<SatQueue> queue = it->second->GetQueue ();
+          NS_ASSERT (queue != 0);
+          sum += queue->GetNBytes ();
+        }
+    }
+
+  return sum;
+}
+
+uint32_t
+SatUtLlc::GetNPacketsInQueue (Mac48Address utAddress) const
+{
+  NS_LOG_FUNCTION (this << utAddress);
+
+  uint32_t sum = 0;
+
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end (); ++it)
+    {
+      if (it->first->m_source == utAddress)
+        {
+          NS_ASSERT (it->second != 0);
+          Ptr<SatQueue> queue = it->second->GetQueue ();
+          NS_ASSERT (queue != 0);
+          sum += queue->GetNPackets ();
+        }
+    }
+
+  return sum;
 }
 
 void

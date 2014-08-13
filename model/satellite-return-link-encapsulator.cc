@@ -94,7 +94,7 @@ SatReturnLinkEncapsulator::DoDispose ()
 }
 
 void
-SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*mac*/)
+SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
@@ -133,7 +133,7 @@ Ptr<Packet>
 SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
+  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -384,7 +384,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
 
       Reset ();
 
-      m_rxCallback (p, m_sourceAddress);
+      m_rxCallback (p, m_sourceAddress, m_destAddress);
     }
 
   // START_PPDU
@@ -437,7 +437,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
           else
             {
               m_currRxPacketFragment->AddAtEnd (p);
-              m_rxCallback (m_currRxPacketFragment, m_sourceAddress);
+              m_rxCallback (m_currRxPacketFragment, m_sourceAddress, m_destAddress);
             }
         }
       else

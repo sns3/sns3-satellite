@@ -335,9 +335,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
 
   // Create an encapsulator for control messages.
-  // Source = UT address
-  // Destination = GW address
-  // Flow id = 0
+  // Source = UT MAC address
+  // Destination = GW MAC address
+  // Flow id = by default 0
   Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
 
   // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
@@ -349,7 +349,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   queue->AddQueueEventCallback (macCb);
   queue->AddQueueEventCallback (rmCb);
   utEncap->SetQueue (queue);
-  llc->AddEncap (addr, utEncap, SatEnums::CONTROL_FID);
+  llc->AddEncap (addr, gwAddr, SatEnums::CONTROL_FID, utEncap);
   rm->AddQueueCallback (SatEnums::CONTROL_FID, MakeCallback (&SatQueue::GetQueueStatistics, queue));
 
   // Add callbacks to LLC for future need. LLC creates encapsulators and
@@ -359,6 +359,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // set serving GW MAC address to RM
   rm->SetGwAddress (gwAddr);
+  llc->SetGwAddress (gwAddr);
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));

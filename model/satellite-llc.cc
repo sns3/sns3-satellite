@@ -68,7 +68,8 @@ SatLlc::SatLlc ()
  m_encaps (),
  m_decaps (),
  m_fwdLinkArqEnabled (false),
- m_rtnLinkArqEnabled (false)
+ m_rtnLinkArqEnabled (false),
+ m_gwAddress ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -111,8 +112,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_LOGIC ("dest=" << dest );
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
-  Mac48Address mac = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? m_nodeInfo->GetMacAddress () : Mac48Address::ConvertFrom (dest) );
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (mac, flowId);
+  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId);
 
   EncapContainer_t::iterator it = m_encaps.find (key);
 
@@ -123,10 +123,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
        * implemented in the inherited classes, which knows which type
        * of encapsulator to create.
        */
-
-      NS_LOG_LOGIC ("Create encapsulator with key: MAC = " << mac << " flowId = " << flowId);
-
-      CreateEncap (key, m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest));
+      CreateEncap (key);
       it = m_encaps.find (key);
     }
 
@@ -149,11 +146,15 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 }
 
 Ptr<Packet>
-SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
+SatLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << bytes << macAddr << (uint32_t) flowId);
+  NS_LOG_FUNCTION (this << bytes << utAddr << (uint32_t) flowId);
   NS_ASSERT (true);
 
+  /**
+   * This method is not to be used. It is to be implemented into the
+   * inherited classes.
+   */
   Ptr<Packet> packet;
   return packet;
 }
@@ -165,8 +166,6 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 
   SatEnums::SatLinkDir_t ld =
       (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
-
-  Mac48Address macAddr = ( m_nodeInfo->GetNodeType () == SatEnums::NT_UT ? dest : source );
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now(),
@@ -185,7 +184,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
   if (mSuccess)
     {
       uint32_t flowId = flowIdTag.GetFlowId ();
-      EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
+      Ptr<EncapKey> key = Create<EncapKey> (source, dest, flowId);
       EncapContainer_t::iterator it = m_decaps.find (key);
 
       // Control messages not received by this method
@@ -201,10 +200,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
            * implemented in the inherited classes, which knows which type
            * of decapsulator to create.
            */
-
-          NS_LOG_LOGIC ("Create decapsulator with key: MAC = " << macAddr << " flowId = " << flowId);
-
-          CreateDecap (key, source, dest);
+          CreateDecap (key);
           it = m_decaps.find (key);
         }
 
@@ -214,17 +210,19 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 
 
 void
-SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
+SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address source, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << macAddr);
+  NS_LOG_FUNCTION (this << source << dest);
 
   /**
    * Note, that the received ACK is forwarded to the proper encapsulator
-   * instead of a decapsulator. The macAddress is the address of the UT
-   * in case of both RTN and FWD links.
+   * instead of a decapsulator. The source and destination MAC addresses reflect
+   * to the ACK direction, thus they are turned around to represent the other direction
+   * when mapping it to the encapsulator.
    */
   uint32_t flowId = ack->GetFlowId ();
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
+
+  Ptr<EncapKey> key = Create<EncapKey> (dest, source, flowId);
   EncapContainer_t::iterator it = m_encaps.find (key);
 
   if (it != m_encaps.end ())
@@ -233,15 +231,15 @@ SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address macAddr)
     }
   else
     {
-      NS_FATAL_ERROR ("Key: (" << macAddr << ", " << flowId << ") not found in the encapsulator container!");
+      NS_FATAL_ERROR ("Encapsulator not found for key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
     }
 }
 
 
 void
-SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr)
+SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_FUNCTION (this << packet << source << dest);
 
   // Remove control msg tag
   SatControlMsgTag ctrlTag;
@@ -264,7 +262,7 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr)
           NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
         }
 
-      ReceiveAck (ack, macAddr);
+      ReceiveAck (ack, source, dest);
     }
   // Higher layer packet
   else
@@ -275,38 +273,50 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address macAddr)
 }
 
 void
-SatLlc::AddEncap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> enc, uint8_t flowId)
+SatLlc::AddEncap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<SatBaseEncapsulator> enc)
 {
-  NS_LOG_FUNCTION (this << macAddr << (uint32_t) flowId);
+  NS_LOG_FUNCTION (this << source << dest << (uint32_t) flowId);
 
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
+  Ptr<EncapKey> key = Create<EncapKey> (source, dest, flowId);
   EncapContainer_t::iterator it = m_encaps.find (key);
 
   if (it == m_encaps.end ())
     {
-      m_encaps.insert(std::make_pair (key, enc));
+      NS_LOG_LOGIC ("Add encapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
+
+      std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert(std::make_pair (key, enc));
+      if (result.second == false)
+        {
+          NS_FATAL_ERROR ("Insert to map with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ") failed!");
+        }
     }
   else
     {
-      NS_FATAL_ERROR ("Encapsulator container already holds (" << macAddr << ", " << flowId << ") key!");
+      NS_FATAL_ERROR ("Encapsulator container already holds key (" << source << ", " << dest << ", " <<  (uint32_t) flowId << ") key!");
     }
 }
 
 void
-SatLlc::AddDecap (Mac48Address macAddr, Ptr<SatBaseEncapsulator> dec, uint8_t flowId)
+SatLlc::AddDecap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<SatBaseEncapsulator> dec)
 {
-  NS_LOG_FUNCTION (this << macAddr << (uint32_t) flowId);
+  NS_LOG_FUNCTION (this << source << dest << (uint32_t) flowId);
 
-  EncapKey_t key = std::make_pair<Mac48Address, uint8_t> (macAddr, flowId);
+  Ptr<EncapKey> key = Create<EncapKey> (source, dest, flowId);
   EncapContainer_t::iterator it = m_decaps.find (key);
 
   if (it == m_decaps.end ())
     {
-      m_decaps.insert(std::make_pair (key, dec));
+      NS_LOG_LOGIC ("Add Decapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
+
+      std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert(std::make_pair (key, dec));
+      if (result.second == false)
+        {
+          NS_FATAL_ERROR ("Insert to map with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ") failed!");
+        }
     }
   else
     {
-      NS_FATAL_ERROR ("Decapsulator container already holds (" << macAddr << ", " << flowId << ") key!");
+      NS_FATAL_ERROR ("Decapsulator container already holds (" << source << ", " << dest << ", " << (uint32_t) flowId << ") key!");
     }
 }
 
@@ -317,27 +327,16 @@ SatLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   m_nodeInfo = nodeInfo;
 }
 
-void SatLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
+void
+SatLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
 {
-  // Head of link queuing delay
-  Time holDelay;
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (true);
 
-  // Then the user data
-  for (EncapContainer_t::const_iterator cit = m_encaps.begin ();
-      cit != m_encaps.end ();
-      ++cit)
-    {
-      uint32_t buf = cit->second->GetTxBufferSizeInBytes ();
-
-      if (buf > 0)
-        {
-          holDelay = cit->second->GetHolDelay ();
-          uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
-          Ptr<SatSchedulingObject> so =
-              Create<SatSchedulingObject> (cit->first.first, buf, minTxOpportunityInBytes, holDelay, cit->first.second);
-          output.push_back (so);
-        }
-    }
+  /**
+   * This method is not to be used. It is to be implemented into the
+   * inherited classes.
+   */
 }
 
 void
@@ -367,44 +366,28 @@ uint32_t
 SatLlc::GetNBytesInQueue (Mac48Address utAddress) const
 {
   NS_LOG_FUNCTION (this << utAddress);
+  NS_ASSERT (true);
 
-  uint32_t sum = 0;
+  /**
+   * This method is not to be used. It is to be implemented into the
+   * inherited classes.
+   */
 
-  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
-       it != m_encaps.end (); ++it)
-    {
-      if (it->first.first == utAddress)
-        {
-          NS_ASSERT (it->second != 0);
-          Ptr<SatQueue> queue = it->second->GetQueue ();
-          NS_ASSERT (queue != 0);
-          sum += queue->GetNBytes ();
-        }
-    }
-
-  return sum;
+  return 0;
 }
 
 uint32_t
 SatLlc::GetNPacketsInQueue (Mac48Address utAddress) const
 {
   NS_LOG_FUNCTION (this << utAddress);
+  NS_ASSERT (true);
 
-  uint32_t sum = 0;
+  /**
+   * This method is not to be used. It is to be implemented into the
+   * inherited classes.
+   */
 
-  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
-       it != m_encaps.end (); ++it)
-    {
-      if (it->first.first == utAddress)
-        {
-          NS_ASSERT (it->second != 0);
-          Ptr<SatQueue> queue = it->second->GetQueue ();
-          NS_ASSERT (queue != 0);
-          sum += queue->GetNPackets ();
-        }
-    }
-
-  return sum;
+  return 0;
 }
 
 uint32_t
@@ -458,6 +441,13 @@ SatLlc::SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_sendCtrlCallback = cb;
+}
+
+void
+SatLlc::SetGwAddress (Mac48Address address)
+{
+  NS_LOG_FUNCTION (this << address);
+  m_gwAddress = address;
 }
 
 } // namespace ns3

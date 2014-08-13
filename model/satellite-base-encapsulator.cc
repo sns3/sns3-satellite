@@ -84,7 +84,7 @@ SatBaseEncapsulator::DoDispose ()
 }
 
 void
-SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address mac)
+SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
@@ -99,7 +99,7 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address mac)
 
   // Add MAC tag to identify the packet in lower layers
   SatMacTag mTag;
-  mTag.SetDestAddress (mac);
+  mTag.SetDestAddress (dest);
   mTag.SetSourceAddress (m_sourceAddress);
   p->AddPacketTag (mTag);
 
@@ -119,6 +119,7 @@ Ptr<Packet>
 SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
+  NS_LOG_LOGIC ("TxOpportunity for flowId: " << m_flowId << " of " << bytes << " bytes");
 
   Ptr<Packet> packet;
 

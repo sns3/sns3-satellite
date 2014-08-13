@@ -95,9 +95,10 @@ public:
   /**
    * Receive packet and check that it is of correct size
    * \param p Ptr to packet
-   * \param macAddress UT MAC address
+   * \param source Source MAC address
+   * \param dest Destination MAC address
    */
-  void Receive (Ptr<Packet> p, Mac48Address macAddress);
+  void Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
 private:
 
@@ -334,7 +335,7 @@ void SatRtnArqTestCase::ReceiveAck (Ptr<SatArqAckMessage> ack)
 }
 
 
-void SatRtnArqTestCase::Receive (Ptr<Packet> p, Mac48Address macAddr)
+void SatRtnArqTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest)
 {
   uint32_t rcvdPacketSize = p->GetSize ();
   m_rcvdPacketSizes.push_back (rcvdPacketSize);
@@ -387,9 +388,10 @@ public:
   /**
    * Receive packet and check that it is of correct size
    * \param p Ptr to packet
-   * \param macAddress UT MAC address
+   * \param source Source MAC address
+   * \param dest Destination MAC address
    */
-  void Receive (Ptr<Packet> p, Mac48Address macAddress);
+  void Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
 private:
 
@@ -645,7 +647,7 @@ void SatFwdArqTestCase::ReceiveAck (Ptr<SatArqAckMessage> ack)
 }
 
 
-void SatFwdArqTestCase::Receive (Ptr<Packet> p, Mac48Address macAddr)
+void SatFwdArqTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest)
 {
   uint32_t rcvdPacketSize = p->GetSize ();
   m_rcvdPacketSizes.push_back (rcvdPacketSize);

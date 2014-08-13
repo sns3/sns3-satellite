@@ -53,14 +53,14 @@ public:
     *  \brief Called from lower layer (MAC) to inform a Tx
     *  opportunity of certain amount of bytes
     *
-    * \param macAddr Mac address of the UT with Tx opportunity
+    * \param utAddr MAC address of the UT with Tx opportunity
     * \param bytes Size of the Tx opportunity
     * \param rcIndex RC index
     * \param &bytesLeft Bytes left after TxOpportunity
     * \param &nextMinTxO Minimum TxO after this TxO
     * \return Pointer to packet to be transmitted
     */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address macAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
    * \brief Set a request manager for UT's LLC instance.
@@ -97,6 +97,26 @@ public:
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
+   * Get the number of (new) bytes at LLC queue for a certain UT. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ).
+   * \param utAddress the MAC address that identifies a particular UT node.
+   * \return Number of bytes currently queued in the encapsulator(s)
+   *         associated with the UT.
+   */
+  virtual uint32_t GetNBytesInQueue (Mac48Address utAddress) const;
+
+  /**
+    Get the number of (new) packets at LLC queues for a certain UT. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ).
+   * \param utAddress the MAC address that identifies a particular UT node.
+   * \return Number of packets currently queued in the encapsulator(s)
+   *         associated with the UT.
+   */
+  virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
+
+  /**
    * \param cb callback to send control messages.
    */
   void SetMacQueueEventCallback (SatQueue::QueueEventCallback cb);
@@ -107,19 +127,15 @@ protected:
 
   /**
    * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
-   * \param key Encapsulator key pair holding the MAC address and flow id
-   * \param source Source MAC address of the flow
-   * \param dest Destination MAC address of the flow
+   * \param key Encapsulator key class
    */
-  virtual void CreateEncap (EncapKey_t key, Mac48Address source, Mac48Address dest);
+  virtual void CreateEncap (Ptr<EncapKey> key);
 
   /**
    * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
-   * \param key Encapsulator key pair holding the MAC address and flow id
-   * \param source Source MAC address of the flow
-   * \param dest Destination MAC address of the flow
+   * \param key Encapsulator key class
    */
-  virtual void CreateDecap (EncapKey_t key, Mac48Address source, Mac48Address dest);
+  virtual void CreateDecap (Ptr<EncapKey> key);
 
 private:
 

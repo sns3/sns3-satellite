@@ -69,8 +69,10 @@ public:
   /**
    * Callback to send packet to lower layer.
     * \param Ptr<Packet> the packet received
+    * \param Mac48Address Source MAC address
+    * \param Mac48Address Destination MAC address
     */
-  typedef Callback<void, Ptr<Packet>, Mac48Address> ReceiveCallback;
+  typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
   /**
    * Control msg sending callback
@@ -107,9 +109,9 @@ public:
   /**
    * Enqueue a packet to txBuffer.
    * \param p To be buffered packet
-   * \param mac Target MAC address
+   * \param dest Target MAC address
    */
-  virtual void EnquePdu (Ptr<Packet> p, Mac48Address mac);
+  virtual void EnquePdu (Ptr<Packet> p, Mac48Address dest);
 
   /**
    * Notify a Tx opportunity to this base encapsulator. Note, that
