@@ -119,7 +119,7 @@ Ptr<Packet>
 SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for flowId: " << m_flowId << " of " << bytes << " bytes");
+  NS_LOG_LOGIC ("TxOpportunity for flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   Ptr<Packet> packet;
 

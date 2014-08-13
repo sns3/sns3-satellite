@@ -58,7 +58,7 @@ public:
   SatReturnLinkEncapsulatorArq ();
 
   /**
-   * Constructor
+   * \brief Constructor
    * \param source Source MAC address for the encapsulator (UT address)
    * \param dest Destination MAC address for the encapsulator (GW address)
    * \param rcIndex RC index of the encapsulator
@@ -72,7 +72,7 @@ public:
   virtual void DoDispose ();
 
   /**
-   * Notify a Tx opportunity to this encapsulator.
+   * \brief Notify a Tx opportunity to this encapsulator.
    * \param bytes Notified tx opportunity bytes from lower layer
    * \param &bytesLeft Bytes left after this TxOpportunity in txBuffer
    * \param &nextMinTxO Minimum TxO after this TxO
@@ -81,7 +81,7 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
-   * Receive a packet, thus decapsulate and defragment/deconcatenate
+   * \brief Receive a packet, thus decapsulate and defragment/deconcatenate
    * if needed. The decapsuled/defragmented HL PDU is forwarded back to
    * LLC and to upper layer.
    * \param p packet pointer received from lower layer
@@ -89,13 +89,13 @@ public:
   virtual void ReceivePdu (Ptr<Packet> p);
 
   /**
-   * Receive a control message (ARQ ACK)
+   * \brief Receive a control message (ARQ ACK)
    * \param p Control message pointer received from lower layer
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 
   /**
-   * Get the buffered packets for this encapsulator
+   * \brief Get the buffered packets for this encapsulator
    * \return uint32_t buffered bytes
    */
   virtual uint32_t GetTxBufferSizeInBytes () const;
@@ -103,20 +103,20 @@ public:
 private:
 
   /**
-   * ARQ Tx timer has expired. The PDU will be flushed, if the maximum
+   * \brief ARQ Tx timer has expired. The PDU will be flushed, if the maximum
    * retransmissions has been reached. Otherwise the packet will be resent.
    * \param seqNo Sequence number
    */
   void ArqReTxTimerExpired (uint8_t seqNo);
 
   /**
-   * Clean-up a certain sequence number
+   * \brief Clean-up a certain sequence number
    * \param sequenceNumber Sequence number
    */
   void CleanUp (uint8_t sequenceNumber);
 
   /**
-   * Convert the 8-bit sequence number value from ARQ header into
+   * \brief Convert the 8-bit sequence number value from ARQ header into
    * 32-bit continuous sequence number stream at the receiver.
    * \param seqNo 8-bit sequence number
    * \return 32-bit sequence number
@@ -124,18 +124,18 @@ private:
   uint32_t ConvertSeqNo (uint8_t seqNo) const;
 
   /**
-   * Reassemble and receive the received PDUs if possible
+   * \brief Reassemble and receive the received PDUs if possible
    */
   void ReassembleAndReceive ();
 
   /**
-   * Rx waiting timer for a PDU has expired
+   * \brief Rx waiting timer for a PDU has expired
    * \param sn Sequence number
    */
   void RxWaitingTimerExpired (uint32_t sn);
 
   /**
-   * Send ACK for a given sequence number
+   * \brief Send ACK for a given sequence number
    * \param seqNo Sequence number
    */
   void SendAck (uint8_t seqNo) const;

@@ -171,7 +171,7 @@ Ptr<Packet>
 SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
+  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_destAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -341,7 +341,7 @@ SatGenericStreamEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (sequenceNumber);
   if (it != m_txedBuffer.end ())
     {
-      NS_LOG_LOGIC ("Sequence no: " << sequenceNumber << " clean up from txedBuffer!");
+      NS_LOG_LOGIC ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from txedBuffer!");
       m_txedBufferSize -= it->second->m_pdu->GetSize ();
       it->second->DoDispose ();
       it->second = 0;
@@ -352,7 +352,7 @@ SatGenericStreamEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   it = m_retxBuffer.find (sequenceNumber);
   if (it != m_retxBuffer.end ())
     {
-      NS_LOG_LOGIC ("Sequence no: " << sequenceNumber << " clean up from retxBuffer!");
+      NS_LOG_LOGIC ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from retxBuffer!");
       m_retxBufferSize -= it->second->m_pdu->GetSize ();
       it->second->DoDispose ();
       it->second = 0;
@@ -553,7 +553,7 @@ SatGenericStreamEncapsulatorArq::ReassembleAndReceive ()
 void
 SatGenericStreamEncapsulatorArq::RxWaitingTimerExpired (uint32_t seqNo)
 {
-  NS_LOG_FUNCTION (this << seqNo);
+  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
   NS_LOG_LOGIC ("For GW: " << m_sourceAddress << " max waiting time reached for SeqNo: " << seqNo << " at: " << Now ().GetSeconds ());
   NS_LOG_LOGIC ("Mark the PDU received and move forward!");

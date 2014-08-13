@@ -177,7 +177,7 @@ Ptr<Packet>
 SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for " << bytes << " bytes");
+  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -341,6 +341,7 @@ SatReturnLinkEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (sequenceNumber);
   if (it != m_txedBuffer.end ())
     {
+      NS_LOG_LOGIC ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from txedBuffer!");
       m_txedBufferSize -= it->second->m_pdu->GetSize ();
       it->second->DoDispose ();
       it->second = 0;
@@ -351,6 +352,7 @@ SatReturnLinkEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   it = m_retxBuffer.find (sequenceNumber);
   if (it != m_retxBuffer.end ())
     {
+      NS_LOG_LOGIC ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from retxBuffer!");
       m_retxBufferSize -= it->second->m_pdu->GetSize ();
       it->second->DoDispose ();
       it->second = 0;

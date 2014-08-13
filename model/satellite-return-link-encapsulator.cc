@@ -133,7 +133,7 @@ Ptr<Packet>
 SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << m_flowId << " of " << bytes << " bytes");
+  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;

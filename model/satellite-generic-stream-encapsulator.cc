@@ -130,7 +130,7 @@ Ptr<Packet>
 SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytesLeft);
-  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_destAddress << " flowId: " << m_flowId << " of " << bytes << " bytes");
+  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_destAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // GSE PDU
   Ptr<Packet> packet;
