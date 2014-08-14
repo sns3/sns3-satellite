@@ -78,6 +78,57 @@ SatUtLlc::DoDispose ()
   SatLlc::DoDispose ();
 }
 
+bool
+SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
+{
+  NS_LOG_FUNCTION (this << packet << dest << (uint32_t) flowId);
+  NS_LOG_LOGIC ("p=" << packet );
+  NS_LOG_LOGIC ("dest=" << dest );
+  NS_LOG_LOGIC ("UID is " << packet->GetUid ());
+
+  Mac48Address destMacAddress = Mac48Address::ConvertFrom (dest);
+	
+	// all multicast traffic is delivered with GW address
+	// in order to avoid supporting several encaps in UT
+	// in return link there is only one receiver (GW) for the multicast traffic for the UT
+  if ( destMacAddress.IsGroup ())
+    {
+      destMacAddress = m_gwAddress;
+    }
+
+  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), destMacAddress, flowId);
+
+  EncapContainer_t::iterator it = m_encaps.find (key);
+
+  if (it == m_encaps.end ())
+    {
+      /**
+       * Encapsulator not found, thus create a new one. This method is
+       * implemented in the inherited classes, which knows which type
+       * of encapsulator to create.
+       */
+      CreateEncap (key);
+      it = m_encaps.find (key);
+    }
+
+  it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
+
+  SatEnums::SatLinkDir_t ld =
+      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now(),
+                 SatEnums::PACKET_ENQUE,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_LLC,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  return true;
+}
+
 
 Ptr<Packet>
 SatUtLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO)

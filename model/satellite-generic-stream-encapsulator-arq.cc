@@ -27,7 +27,7 @@
 #include "satellite-generic-stream-encapsulator-arq.h"
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
-#include "satellite-time-tag.h"
+#include "satellite-encap-pdu-status-tag.h"
 #include "satellite-queue.h"
 #include "satellite-arq-header.h"
 #include "satellite-arq-buffer-context.h"
@@ -382,6 +382,14 @@ void
 SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
+
+  // Remove encap PDU status tag
+  SatEncapPduStatusTag statusTag;
+  p->RemovePacketTag (statusTag);
+
+  // Remove flow id tag
+  SatFlowIdTag flowIdTag;
+  p->RemovePacketTag (flowIdTag);
 
   // Sanity check
   SatMacTag mTag;

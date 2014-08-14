@@ -27,6 +27,7 @@
 
 #include "satellite-llc.h"
 #include "satellite-mac-tag.h"
+#include "satellite-time-tag.h"
 #include "satellite-base-encapsulator.h"
 #include "satellite-scheduling-object.h"
 #include "satellite-control-message.h"
@@ -125,6 +126,10 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
       CreateEncap (key);
       it = m_encaps.find (key);
     }
+
+  // Store packet arrival time
+  SatTimeTag timeTag (Simulator::Now ());
+  packet->AddPacketTag (timeTag);
 
   it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
 
@@ -225,6 +230,10 @@ void
 SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 {
   NS_LOG_FUNCTION (this << packet << source << dest);
+
+  // Remove time tag
+  SatTimeTag timeTag;
+  packet->RemovePacketTag (timeTag);
 
   // Remove control msg tag
   SatControlMsgTag ctrlTag;

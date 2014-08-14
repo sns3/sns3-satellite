@@ -106,10 +106,6 @@ SatGenericStreamEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
       NS_FATAL_ERROR ("SatGenericStreamEncapsulator received too large HL PDU!");
     }
 
-  // Store packet arrival time
-  SatTimeTag timeTag (Simulator::Now ());
-  p->AddPacketTag (timeTag);
-
   // Mark the PDU with FULL_PDU tag
   SatEncapPduStatusTag tag;
   tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
@@ -342,6 +338,14 @@ void
 SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
+
+  // Remove encap PDU status tag
+  SatEncapPduStatusTag statusTag;
+  p->RemovePacketTag (statusTag);
+
+  // Remove flow id tag
+  SatFlowIdTag flowIdTag;
+  p->RemovePacketTag (flowIdTag);
 
   // Sanity check
   SatMacTag mTag;

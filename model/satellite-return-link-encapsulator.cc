@@ -28,7 +28,6 @@
 #include "satellite-mac-tag.h"
 #include "satellite-encap-pdu-status-tag.h"
 #include "satellite-rle-header.h"
-#include "satellite-time-tag.h"
 #include "satellite-queue.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatReturnLinkEncapsulator");
@@ -103,10 +102,6 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
     {
       NS_FATAL_ERROR ("SatReturnLinkEncapsulator received too large HL PDU!");
     }
-
-  // Store packet arrival time
-  SatTimeTag timeTag (Simulator::Now ());
-  p->AddPacketTag (timeTag);
 
   // Mark the PDU with FULL_PDU tag
   SatEncapPduStatusTag tag;
@@ -350,6 +345,14 @@ void
 SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
+
+  // Remove encap PDU status tag
+  SatEncapPduStatusTag statusTag;
+  p->RemovePacketTag (statusTag);
+
+  // Remove flow id tag
+  SatFlowIdTag flowIdTag;
+  p->RemovePacketTag (flowIdTag);
 
   // Sanity check
   SatMacTag mTag;

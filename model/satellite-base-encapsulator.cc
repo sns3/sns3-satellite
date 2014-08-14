@@ -88,10 +88,6 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
-  // Store packet arrival time
-  SatTimeTag timeTag (Simulator::Now ());
-  p->AddPacketTag (timeTag);
-
   // Add flow id tag
   SatFlowIdTag flowIdTag;
   flowIdTag.SetFlowId (m_flowId);

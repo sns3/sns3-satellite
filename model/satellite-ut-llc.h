@@ -63,6 +63,16 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t rcIndex, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
+   * \brief Called from higher layer (SatNetDevice) to enque packet to LLC
+   *
+   * \param packet packet sent from above down to SatMac
+   * \param dest Destination MAC address of the packet
+   * \param flowId Flow identifier
+   * \return Boolean indicating whether the enque operation succeeded
+   */
+  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
+
+  /**
    * \brief Set a request manager for UT's LLC instance.
    * \param rm Ptr to request manager
    */
