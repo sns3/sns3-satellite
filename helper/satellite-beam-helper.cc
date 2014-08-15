@@ -522,7 +522,7 @@ SatBeamHelper::GetUtNodes () const
 NodeContainer
 SatBeamHelper::GetUtNodes (uint32_t beamId) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << beamId);
 
   NodeContainer utNodes;
 
@@ -543,6 +543,8 @@ SatBeamHelper::GetUtNodes (uint32_t beamId) const
 std::list<uint32_t>
 SatBeamHelper::GetBeams () const
 {
+  NS_LOG_FUNCTION (this);
+
   std::list<uint32_t> ret;
 
   for (std::map<uint32_t, uint32_t>::const_iterator it = m_beam.begin ();
@@ -557,7 +559,154 @@ SatBeamHelper::GetBeams () const
 Ptr<SatNcc>
 SatBeamHelper::GetNcc () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_ncc;
+}
+
+uint32_t
+SatBeamHelper::GetUtBeamId (Ptr<Node> utNode) const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t beamId = 0;
+
+  for ( std::multimap<uint32_t, Ptr<Node> >::const_iterator it = m_utNode.begin (); ( (it != m_utNode.end () ) && (beamId == 0) ); it++ )
+    {
+      if ( it->second == utNode )
+        {
+          beamId = it->first;
+        }
+    }
+
+  return beamId;
+}
+
+NetDeviceContainer
+SatBeamHelper::AddMulticastGroupRoutes (MulticastBeamInfo_t beamInfo, Ptr<Node> sourceUtNode, Ipv4Address sourceAddress,
+                                        Ipv4Address groupAddress, bool routeToGwUsers, Ptr<NetDevice>& gwOutputDev)
+{
+  NS_LOG_FUNCTION (this);
+
+  Mac48Address groupMacAddress;
+  Ipv4StaticRoutingHelper multicast;
+  NetDeviceContainer gwInputDevices;
+  NetDeviceContainer routerGwOutputDevices;
+  Ptr<NetDevice> routerDev = NULL;
+
+  uint32_t sourceBeamId = GetUtBeamId (sourceUtNode);
+  gwOutputDev = NULL;
+
+  // Check the address sanity
+  if (groupAddress.IsMulticast ())
+    {
+      groupMacAddress = Mac48Address::GetMulticast (groupAddress);
+      NS_LOG_INFO ("IP address for multicast group: " << groupAddress << ", MAC address for multicast group: " << groupMacAddress);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Invalid address for multicast group");
+    }
+
+  NodeContainer gwNodes = GetGwNodes ();
+
+  // go through all GW nodes and devices in them
+  for (NodeContainer::Iterator it = gwNodes.Begin (); it != gwNodes.End (); it ++)
+    {
+      bool routerGw = false;
+      NetDeviceContainer gwOutputDevices;
+      Ptr<NetDevice> gwInputDev = NULL;
+
+      // go through devices in GW node
+      for (uint32_t i = 1; i < (*it)->GetNDevices (); i++)
+        {
+          Ptr<NetDevice> dev = (*it)->GetDevice (i);
+          int32_t beamId = Singleton<SatIdMapper>::Get ()->GetBeamIdWithMac (dev->GetAddress ());
+          MulticastBeamInfo_t::iterator beamIt = beamInfo.find (beamId);
+
+          // device is device serving source UT. (UT source is in question)
+          if ( beamId == (int32_t) sourceBeamId )
+            {
+              routerGw = true;  // GW node is routing GW
+              routerDev = dev;  // save device routing multicast traffic from UT
+            }
+
+          // device needs to serve multicast receiving UT(s) in the beam (beam is among of the multicast group)
+          if ( beamIt != beamInfo.end () )
+            {
+              // device must be also SatNetDevice, just sanity check it
+              if ( dev->GetInstanceTypeId ().GetName () == "ns3::SatNetDevice" )
+                {
+                  // add device to GW's output list (container) to route multicast traffic to beam's UTs
+                  gwOutputDevices.Add (dev);
+
+                  // go through UTs receiving multicast traffic in the beam
+                  // to route multicast traffic toward public network (UT users)
+                  for (std::set<Ptr<Node> >::iterator utIt = beamIt->second.begin (); utIt != beamIt->second.end (); utIt++ )
+                    {
+                      AddMulticastRouteToUt (*utIt, sourceAddress, groupAddress, false);
+                    }
+                }
+              else
+                {
+                  NS_FATAL_ERROR ("Not a satellite net device!!!");
+                }
+            }
+          else if (dev->GetInstanceTypeId ().GetName () != "ns3::SatNetDevice")
+            {
+              // save device receiving traffic from IP router
+              gwInputDev = dev;
+            }
+        }
+
+      if ( routerGw )
+        {
+          // in case that GW is source beam serving (routing) GW
+          // traffic is going to IP router, so input is output
+          gwOutputDev = gwInputDev;
+
+          // GW output devices to satellite network UTs are saved here to set later.
+          // In router case it is needed to check later that if traffic is needed to route
+          // IP router too. (GW user or some other beam behind another GW is receiving traffic)
+          routerGwOutputDevices = gwOutputDevices;
+        }
+      else if ( gwOutputDevices.GetN () > 0 ) // no router GW some device in GW belong to beam receiving multicast traffic
+        {
+          // route traffic from source beam to receiving beams
+          multicast.AddMulticastRoute (*it, sourceAddress, groupAddress, gwInputDev, gwOutputDevices);
+
+          // save devices receiving traffic from IP router (backbone network)
+          gwInputDevices.Add (gwInputDev);
+        }
+  }
+
+  // source is UT and traffic is needed to route toward backbone network
+  // add output device to routing GW's output container (list)
+  if ( sourceUtNode && (( gwInputDevices.GetN () > 0 ) || routeToGwUsers) )
+    {
+      if (!routerDev)
+        {
+          NS_FATAL_ERROR ("Router device shall exist!!!");
+        }
+
+      routerGwOutputDevices.Add (gwOutputDev);
+    }
+  else
+    {
+      gwOutputDev = NULL;
+    }
+
+  // route traffic from source beam satellite net device to satellite net devices forwarding traffic to
+  // receiving beams inside router GW and/or to backbone network (GW users).
+  // add also route to UT from public network to satellite network
+  if ( routerDev && (routerGwOutputDevices.GetN () > 0 ) )
+    {
+      multicast.AddMulticastRoute (routerDev->GetNode (), sourceAddress, groupAddress, routerDev, routerGwOutputDevices );
+      AddMulticastRouteToUt (sourceUtNode, sourceAddress, groupAddress, true);
+    }
+
+  // return list of GW net devices receiving traffic from IP router (backbone network)
+  return gwInputDevices;
 }
 
 void
@@ -853,7 +1002,7 @@ SatBeamHelper::StoreGwNode (uint32_t id, Ptr<Node> node)
     }
   else  // try to store if not stored
     {
-      std::pair<std::map<uint32_t, Ptr<Node> >::iterator, bool> result = m_gwNode.insert (std::make_pair(id, node));
+      std::pair<std::map<uint32_t, Ptr<Node> >::iterator, bool> result = m_gwNode.insert (std::make_pair (id, node));
       storingSuccess = result.second;
     }
 
@@ -978,6 +1127,52 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
         }
     }
   return fadingContainer;
+}
+
+void
+SatBeamHelper::AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddress, Ipv4Address groupAddress, bool routeToSatellite)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<NetDevice> satDev = NULL;
+  Ptr<NetDevice> publicDev = NULL;
+
+  for ( uint32_t i = 1; i < utNode->GetNDevices (); i++ )
+    {
+      Ptr<NetDevice> dev = utNode->GetDevice (i);
+
+      // in UT SatNetDevice is routing traffic to public network NetDevice e.g. CSMA
+      if ( dev->GetInstanceTypeId ().GetName () == "ns3::SatNetDevice" )
+        {
+          satDev = dev;
+        }
+      else
+        {
+          // just save last non SatNetDevice (in practice there should be only one)
+          publicDev = dev;
+        }
+    }
+
+  if ( satDev && publicDev )
+    {
+      Ipv4StaticRoutingHelper multicast;
+
+      if ( routeToSatellite )
+        {
+          multicast.AddMulticastRoute (utNode, sourceAddress, groupAddress, publicDev, satDev);
+        }
+      else
+        {
+          multicast.AddMulticastRoute (utNode, sourceAddress, groupAddress, satDev, publicDev);
+        }
+
+      // Add multicast route to UT
+
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Input of output device not found in UT node!!!");
+    }
 }
 
 

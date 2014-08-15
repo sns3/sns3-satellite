@@ -154,6 +154,16 @@ public:
   Ptr<SatUserHelper> GetUserHelper () const;
 
   /**
+   * Set multicast group to satellite network and IP router. Add needed routes to net devices.
+   *
+   * \param source Source node of the multicast group (GW or UT connected user node)
+   * \param receivers Receiver nodes of the multicast group. (GW or UT connected user nodes)
+   * \param sourceAddress Source address of the multicast group.
+   * \param address Address of the multicast group.
+   */
+  void SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, Ipv4Address sourceAddress, Ipv4Address groupAddress );
+
+  /**
    * Enables creation traces to be written in given file
    * \param filename  name to the file for trace writing
    * \param details true means that lower layer details are printed also,
@@ -173,6 +183,10 @@ public:
   void DoDispose();
 
 private:
+
+  typedef SatBeamHelper::MulticastBeamInfoItem_t  MulticastBeamInfoItem_t;
+  typedef SatBeamHelper::MulticastBeamInfo_t      MulticastBeamInfo_t;
+
   /**
    * User helper
    */
@@ -380,6 +394,54 @@ private:
 
   /// \return the initial network number of UT and UT users
   Ipv4Address GetUtNetworkAddress () const;
+
+  //\return The device belonging to same network with given device on given node.
+
+  /**
+   * Find given device's counterpart (device belonging to same network) device from given node.
+   *
+   * \param devA Pointer to the device whose counterpart device is found from given node.
+   * \param nodeB Pointer to node where given device's counterpart device is searched.
+   * \return Pointer to device belonging to same network with given device in given node.
+   *         NULL in cast that counterpart device is not found.
+   */
+  Ptr<NetDevice> FindMatchingDevice ( Ptr<NetDevice> devA, Ptr<Node> nodeB );
+
+  /// \return The device belonging to same network with given device on given node.
+  /**
+   * Find counterpart (device belonging to same network) devices from given nodes.
+   *
+   * @param nodeA Pointer to node A where given device's counterpart device is searched.
+   * @param nodeB Pointer to node A where given device's counterpart device is searched.
+   * @param matchingDevices Pair consisting pointers to found devices. first belongs to nodeA
+   *                        and second to nodeB.
+   * @return true when counterpart devices are found from given nodes, false in other cases.
+   */
+  bool FindMatchingDevices ( Ptr<Node> nodeA, Ptr<Node> nodeB, std::pair<Ptr<NetDevice>, Ptr<NetDevice> >& matchingDevices);
+
+  /**
+   * Set multicast traffic to source's nwtwork by finding source network utilizing given
+   * destination node.
+   *
+   * Note that all multicast traffic is routed by source through selected device in source node
+   * to found network.
+   *
+   * \param source Pointer to source node of the multicast traffic.
+   * \param destination Pointer to destination node where to find matching source network
+   */
+  void SetMulticastRouteToSourceNetwork (Ptr<Node> source, Ptr<Node> destination);
+
+  /**
+   * Construct multicast information from source UT node and group receivers.
+   *
+   * \param sourceUtNode Pointer to UT source node. When NULL source node is not UT.
+   * \param receivers Container of the multicast group receivers.
+   * \param beamInfo Beam information to be filled in for multicast group.
+   * \param routerUserOutputDev Pointer to router output device for backbone network (GW users). Set to NULL when traffic is
+   *        not needed to route backbone network.
+   * \return true when multicast traffic shall be routed to source's network.
+   */
+  bool ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receivers, MulticastBeamInfo_t& beamInfo, Ptr<NetDevice>& routerUserOutputDev );
 };
 
 } // namespace ns3

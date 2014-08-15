@@ -57,6 +57,9 @@ public:
   typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
 
+  typedef std::set<Ptr<Node> >                          MulticastBeamInfoItem_t;  // set container having receiving UT nodes in beam
+  typedef std::map<uint32_t, std::set<Ptr<Node> > >     MulticastBeamInfo_t;      // key = beam ID, value = receiving UT nodes in beam
+
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
@@ -223,6 +226,29 @@ public:
    */
   Ptr<SatNcc> GetNcc () const;
 
+  /**
+   * Get beam Id of the given UT.
+   *
+   * \param utNode Pointer to UT node
+   * return Id of the beam of the requested UT. O in case that given node is not UT node.
+   */
+  uint32_t GetUtBeamId (Ptr<Node> utNode) const;
+
+  /**
+   *
+   * \param beamInfo Multicast info for the beams. Receiver UTs in a  beam for the multicast group.
+   * \param sourceUtNode Source UT node. (NULL in case that source is behind gateway/backbone network)
+   * \param sourceAddress Source address of the group.
+   * \param groupAddress Address of the multicast group.
+   * \param routeToGwUsers Flag indicating if there are GW receivers in public network behind IP router.
+   * \param gwOutputDev Pointer to device which delivers multicast traffic to public/backbone network from satellite network.
+   *                    In case that traffic is not needed to deliver to backbone network gwOutputDev is set to NULL.
+   *                    (source is not UT or no receivers behind routing GW.)
+   * \return Net device container including devices where multicast traffic shall be forwarded (GWs and users in public network) by IP router.
+   */
+  NetDeviceContainer AddMulticastGroupRoutes (MulticastBeamInfo_t beamInfo, Ptr<Node> sourceUtNode, Ipv4Address sourceAddress,
+                                              Ipv4Address groupAddress, bool routeToGwUsers, Ptr<NetDevice>& gwOutputDev );
+  
   virtual void DoDispose ();
 
   /**
@@ -363,6 +389,16 @@ private:
    * \return Pointer to fading container
    */
   Ptr<SatBaseFading>  InstallFadingContainer (Ptr<Node> node) const;
+
+  /**
+   * Add multicast route to UT node.
+   *
+   * \param utNode Pointer to UT node where to add route.
+   * \param sourceAddress Source address of the multicast group.
+   * \param groupAddress Address of the multicast group.
+   * \param routeToSatellite Flag indicating if traffic is going toward satellite network.
+   */
+  void AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddress, Ipv4Address groupAddress, bool routeToSatellite);
 
 };
 

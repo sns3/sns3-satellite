@@ -28,6 +28,8 @@
 #include "ns3/internet-stack-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/singleton.h"
+#include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/ipv4-routing-table-entry.h"
 #include "../model/satellite-position-allocator.h"
 #include "../model/satellite-rtn-link-time.h"
 #include "satellite-helper.h"
@@ -428,20 +430,20 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
       SetUtMobility (uts, info->first);
       internet.Install (uts);
 
-      for ( uint32_t i = 0; i < info->second.GetUtCount(); i++ )
+      for ( uint32_t i = 0; i < info->second.GetUtCount (); i++ )
         {
           // create and install needed users
-          m_userHelper->InstallUt(uts.Get(i), info->second.GetUtUserCount(i));
+          m_userHelper->InstallUt (uts.Get(i), info->second.GetUtUserCount (i));
         }
 
-      std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration(info->first);
+      std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (info->first);
 
       // gw index starts from 1 and we have stored them starting from 0
       Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX]-1);
       m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
     }
 
-  m_userHelper->InstallGw(m_beamHelper->GetGwNodes (), gwUsers);
+  m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 }
 
 void
@@ -456,7 +458,7 @@ SatHelper::SetGwMobility (NodeContainer gwNodes)
   for (uint32_t i = 0; i < gwNodes.GetN (); i++)
     {
       // GW id start from 1
-      gwPosAllocator->Add(m_satConf->GetGwPosition (i + 1));
+      gwPosAllocator->Add (m_satConf->GetGwPosition (i + 1));
     }
 
   mobility.SetPositionAllocator (gwPosAllocator);
@@ -500,7 +502,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 }
 
 void
-SatHelper::SetGeoSatMobility(Ptr<Node> node)
+SatHelper::SetGeoSatMobility (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this);
 
@@ -519,14 +521,14 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
 {
   NS_LOG_FUNCTION (this);
 
-  for ( NodeContainer::Iterator i = nodes.Begin();  i != nodes.End (); i++ )
+  for ( NodeContainer::Iterator i = nodes.Begin ();  i != nodes.End (); i++ )
     {
       Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
 
       if (observer == 0)
         {
           Ptr<SatMobilityModel> ownMobility = (*i)->GetObject<SatMobilityModel> ();
-          Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNode()->GetObject<SatMobilityModel> ();
+          Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
 
           NS_ASSERT (ownMobility != NULL);
           NS_ASSERT (satMobility != NULL);
@@ -564,6 +566,8 @@ SatHelper::SetBeamNetworkAddress (Ipv4Address addr)
 Ipv4Address
 SatHelper::GetBeamNetworkAddress () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_beamNetworkAddress;
 }
 
@@ -593,6 +597,8 @@ SatHelper::SetGwNetworkAddress (Ipv4Address addr)
 Ipv4Address
 SatHelper::GetGwNetworkAddress () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_gwNetworkAddress;
 }
 
@@ -622,42 +628,303 @@ SatHelper::SetUtNetworkAddress (Ipv4Address addr)
 Ipv4Address
 SatHelper::GetUtNetworkAddress () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_utNetworkAddress;
 }
 
 void
-SatHelper::CreationDetailsSink(Ptr<OutputStreamWrapper> stream, std::string context, std::string info)
+SatHelper::SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, Ipv4Address sourceAddress, Ipv4Address groupAddress)
+{
+  NS_LOG_FUNCTION (this);
+
+  MulticastBeamInfo_t beamInfo;
+  Ptr<NetDevice> routerUserOutputDev;
+  Ptr<Node> sourceUtNode = m_userHelper->GetUtNode (source);
+
+  // Construct multicast info from source UT node and receivers. In case that sourceUtNode is
+  // NULL, source is some GW user. As a result is given flag indicating if traffic shall be forwarded to
+  // source's own network
+
+  if ( ConstructMulticastInfo (sourceUtNode, receivers, beamInfo, routerUserOutputDev) )
+    {
+      // Some multicast receiver belongs to same group with source
+
+      // select destination node
+      Ptr<Node> destNode = m_userHelper->GetRouter ();
+
+      if ( sourceUtNode )
+        {
+          destNode = sourceUtNode;
+        }
+
+      // add default route for multicast group to source's network
+      SetMulticastRouteToSourceNetwork (source, destNode);
+    }
+
+  // set routes outside source's network only when there are receivers
+  if ( !beamInfo.empty () || (sourceUtNode && routerUserOutputDev ) )
+    {
+      Ptr<Node> routerNode = m_userHelper->GetRouter ();
+
+      Ptr<NetDevice> routerInputDev = NULL;
+      Ptr<NetDevice> gwOutputDev = NULL;
+
+      // set multicast routes to satellite network utilizing beam helper
+      NetDeviceContainer gwInputDevices = m_beamHelper->AddMulticastGroupRoutes (beamInfo, sourceUtNode, sourceAddress,
+                                                                                 groupAddress, (bool) routerUserOutputDev, gwOutputDev );
+
+      Ipv4StaticRoutingHelper multicast;
+
+      // select input device in IP router
+      if ( gwOutputDev )
+        {
+          // traffic coming from some GW to router (satellite network and source is UT)
+          // find matching input device using GW output device
+          routerInputDev = FindMatchingDevice (gwOutputDev, routerNode);
+        }
+      else if ( !sourceUtNode )
+        {
+          // traffic is coming form user network (some GW user)
+
+          // find matching device using source node
+          std::pair<Ptr<NetDevice>,Ptr<NetDevice> > devices;
+
+          if ( FindMatchingDevices (source, routerNode, devices) )
+            {
+              routerInputDev = devices.second;
+            }
+         }
+
+      NetDeviceContainer routerOutputDevices;
+
+      if (routerUserOutputDev)
+        {
+          routerOutputDevices.Add (routerUserOutputDev);
+        }
+
+      for (NetDeviceContainer::Iterator it = gwInputDevices.Begin (); it != gwInputDevices.End (); it++ )
+        {
+          Ptr<NetDevice> matchingDevice = FindMatchingDevice ( *it, routerNode );
+
+          if ( matchingDevice )
+            {
+              routerOutputDevices.Add (matchingDevice);
+            }
+        }
+
+      // Add multicast route over IP router
+      // Input device is getting traffic from user network (GW users) or from some GW
+      // Output devices are forwarding traffic to user network (GW users) and/or GWs
+      if ( routerInputDev && ( routerOutputDevices.GetN () > 0 ) )
+        {
+          multicast.AddMulticastRoute (routerNode, sourceAddress, groupAddress, routerInputDev, routerOutputDevices);
+        }
+    }
+}
+
+void
+SatHelper::CreationDetailsSink (Ptr<OutputStreamWrapper> stream, std::string context, std::string info)
 {
   *stream->GetStream () << context << ", " << info << std::endl;
 }
 
 void
-SatHelper::CreationSummarySink(std::string title)
+SatHelper::CreationSummarySink (std::string title)
 {
+  NS_LOG_FUNCTION (this);
+
   *m_creationTraceStream->GetStream () << CreateCreationSummary (title);
-  *m_utTraceStream->GetStream() << m_beamHelper->GetUtInfo ();
+  *m_utTraceStream->GetStream () << m_beamHelper->GetUtInfo ();
 }
 
 std::string
-SatHelper::CreateCreationSummary(std::string title)
+SatHelper::CreateCreationSummary (std::string title)
 {
+  NS_LOG_FUNCTION (this);
+
   std::ostringstream oss;
 
   oss << std::endl << std::endl << title << std::endl << std::endl;
   oss << "--- User Info ---" << std::endl << std::endl;
-  oss << "Created GW users: " << m_userHelper->GetGwUserCount() << ", ";
-  oss << "Created UT users: " << m_userHelper->GetUtUserCount() << std::endl << std::endl;
+  oss << "Created GW users: " << m_userHelper->GetGwUserCount () << ", ";
+  oss << "Created UT users: " << m_userHelper->GetUtUserCount () << std::endl << std::endl;
   oss << m_userHelper->GetRouterInfo () << std::endl << std:: endl;
   oss << m_beamHelper->GetBeamInfo () << std::endl;
 
-  return oss.str();
+  return oss.str ();
 }
 
 void
-SatHelper::DoDispose()
+SatHelper::DoDispose ()
 {
+  NS_LOG_FUNCTION (this);
+}
+
+bool
+SatHelper::FindMatchingDevices ( Ptr<Node> nodeA, Ptr<Node> nodeB, std::pair<Ptr<NetDevice>, Ptr<NetDevice> >& matchingDevices)
+{
+  bool found = false;
+
+  for ( uint32_t i = 1; ( (i < nodeA->GetNDevices ()) && !found ); i++)
+    {
+      Ptr<NetDevice> devA = nodeA->GetDevice (i);
+      Ptr<NetDevice> devB = FindMatchingDevice (devA, nodeB);
+
+      if ( devB )
+        {
+          matchingDevices = std::make_pair (devA, devB);
+          found = true;
+        }
+    }
+
+  return found;
+}
+
+Ptr<NetDevice>
+SatHelper::FindMatchingDevice ( Ptr<NetDevice> devA, Ptr<Node> nodeB )
+{
+  Ptr<NetDevice> matchingDevice = NULL;
+
+  Ipv4Address addressA = devA->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (devA->GetIfIndex (), 0).GetLocal ();
+  Ipv4Mask maskA = devA->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (devA->GetIfIndex (), 0).GetMask ();
+
+  Ipv4Address netAddressA = addressA.CombineMask (maskA);
+
+  for ( uint32_t j = 1; j < nodeB->GetNDevices (); j++)
+    {
+      Ipv4Address addressB = nodeB->GetObject<Ipv4L3Protocol> ()->GetAddress (j, 0).GetLocal ();
+      Ipv4Mask maskB = nodeB->GetObject<Ipv4L3Protocol> ()->GetAddress (j, 0).GetMask ();
+
+      Ipv4Address netAddressB = addressB.CombineMask (maskB);
+
+      if ( netAddressA.IsEqual (netAddressB))
+        {
+          matchingDevice = nodeB->GetDevice (j);
+        }
+    }
+
+  return matchingDevice;
+}
+
+void
+SatHelper::SetMulticastRouteToSourceNetwork (Ptr<Node> source, Ptr<Node> dest)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::pair<Ptr<NetDevice>, Ptr<NetDevice> > devices;
+
+  if ( FindMatchingDevices (source, dest, devices) )
+    {
+      Ipv4StaticRoutingHelper multicast;
+      Ptr<Ipv4StaticRouting> staticRouting = multicast.GetStaticRouting (source->GetObject<ns3::Ipv4> ());
+
+      // check if default multicast route already exists
+      bool defaultMulticastRouteExists = false;
+      Ipv4Address defMulticastNetwork = Ipv4Address ("224.0.0.0");
+      Ipv4Mask defMulticastNetworkMask = Ipv4Mask ("240.0.0.0");
+
+      for ( uint32_t i = 0; i < staticRouting->GetNRoutes (); i++ )
+        {
+          if (staticRouting->GetRoute (i).GetDestNetwork ().IsEqual (defMulticastNetwork) &&
+              staticRouting->GetRoute (i).GetDestNetworkMask ().IsEqual (defMulticastNetworkMask) )
+            {
+              defaultMulticastRouteExists = true;
+            }
+        }
+
+      // add default multicast route only if it does not exist already
+      if ( !defaultMulticastRouteExists )
+        {
+          multicast.SetDefaultMulticastRoute (source, devices.first);
+        }
+    }
+}
+
+bool
+SatHelper::ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receivers, MulticastBeamInfo_t& beamInfo, Ptr<NetDevice>& routerUserOutputDev )
+{
+  NS_LOG_FUNCTION (this);
+
+  bool routeToSourceNertwork = false;
+
+  routerUserOutputDev = NULL;
+
+  // go through all receivers
+  for (uint32_t i = 0; i < receivers.GetN (); i++ )
+    {
+      Ptr<Node> receiverNode = receivers.Get (i);
+      Ptr<Node> utNode = m_userHelper->GetUtNode (receiverNode);
+
+      // check if user is connected to UT or GW
+
+      if ( utNode ) // connected to UT
+        {
+          uint32_t beamId = m_beamHelper->GetUtBeamId (utNode);
+
+          if ( beamId != 0 )  // beam ID is found
+            {
+              if (sourceUtNode == utNode)
+                {
+                  // Source UT node is same than current UT node. Set flag to indicate that
+                  // multicast group traffic shall be routed to source own network.
+                  routeToSourceNertwork = true;
+                }
+              else
+                {
+                  // store other UT nodes beam ID and pointer to multicast group info for later routing
+                  MulticastBeamInfo_t::iterator it = beamInfo.find (beamId);
+
+                    // find or create first storage for the beam
+                  if ( it == beamInfo.end () )
+                    {
+                      std::pair<MulticastBeamInfo_t::iterator, bool> result = beamInfo.insert (std::make_pair (beamId, MulticastBeamInfoItem_t ()));
+
+                      if ( result.second )
+                        {
+                          it = result.first;
+                        }
+                      else
+                        {
+                          NS_FATAL_ERROR ("Cannot insert beam to map container");
+                        }
+                    }
+
+                  // Add to UT node to beam storage (map)
+                  it->second.insert (utNode);
+                }
+            }
+          else
+            {
+              NS_FATAL_ERROR ("UT node's beam ID is invalid!!");
+            }
+        }
+      else if (m_userHelper->IsGwUser (receiverNode)) // connected to GW
+        {
+          if ( !routerUserOutputDev )
+            {
+              if (sourceUtNode)
+                {
+                  std::pair<Ptr<NetDevice>, Ptr<NetDevice> > devices;
+
+                  if ( FindMatchingDevices (receiverNode, m_userHelper->GetRouter(), devices ) )
+                    {
+                      routerUserOutputDev = devices.second;
+                    }
+                }
+              else
+                {
+                  routeToSourceNertwork = true;
+                }
+            }
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Multicast receiver node is expected to be connected UT or GW node!!!");
+        }
+    }
+
+  return routeToSourceNertwork;
 }
 
 } // namespace ns3
-
-

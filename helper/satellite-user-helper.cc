@@ -255,6 +255,25 @@ SatUserHelper::GetGwUsers () const
   return m_gwUsers;
 }
 
+bool
+SatUserHelper::IsGwUser (Ptr<Node> node) const
+{
+  NS_LOG_FUNCTION (this);
+
+  bool isGwUser = false;
+
+  for ( NodeContainer::Iterator it = m_gwUsers.Begin (); ( (it != m_gwUsers.End ()) && !isGwUser ); it++)
+    {
+      if ( *it == node )
+        {
+          isGwUser = true;
+        }
+    }
+
+  return isGwUser;
+}
+
+
 NodeContainer
 SatUserHelper::GetUtUsers () const
 {

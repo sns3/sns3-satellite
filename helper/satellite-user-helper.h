@@ -182,6 +182,14 @@ public:
   NodeContainer GetGwUsers () const;
 
   /**
+   * Check if node is GW user or not.
+   *
+   * \param node Pointer to node checked if it is GW user or not
+   * \return true when requested node is GW user node, false in other case.
+   */
+  bool IsGwUser (Ptr<Node> node ) const;
+
+  /**
    * \return A container having all UT user nodes in satellite network.
    */
   NodeContainer GetUtUsers () const;
@@ -191,11 +199,6 @@ public:
    * \return A container having UT specific user nodes in satellite network.
    */
   NodeContainer GetUtUsers (Ptr<Node> ut) const;
-
-  /**
-   * \return A pointer to the GW router node in satellite network.
-   */
-  NodeContainer GetGwRouter () const;
 
   /**
    * \return number of GW users in satellite network.

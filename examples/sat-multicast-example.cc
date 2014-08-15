@@ -12,28 +12,172 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  Multicast example application based on Cbr example to use satellite network.
-*         Interval, packet size and test scenario can be given
-*         in command line as user argument.
-*         To see help for user arguments:
+* \brief  Multicast example application to test multicasting in satellite network.
+*         Test scenario (larger of full), pre-defined multicast for larger scenario
+*         can be given in command line as user argument.
+*
+*         To see help and more info for user arguments:
 *         execute command -> ./waf --run "sat-multicast-example --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-multicast-example");
 
+/**
+ * Receive RX traces from packet sinks
+ *
+ * \param context Context of the receive (multicast group and UT/GW user info)
+ * \param
+ * \param
+ */
+static void SinkReceive (std::string context, Ptr<const Packet>, const Address &)
+{
+  NS_LOG_INFO (" Packet received from/by: " << context);
+}
+
+/**
+ * Construct information of the given user node.
+ *
+ * \param helper Pointer to satellite helper
+ * \param node Pointer to user node connected to UT or GW
+ * \return Information of the user (UT or GW node connected user with user index in the node)
+ */
+static std::string GetUserInfo (Ptr<SatHelper> helper, Ptr<Node> node)
+{
+  std::stringstream ss;   //create a string stream
+  Ptr<Node> utNode = helper->GetUserHelper ()->GetUtNode (node);
+  NodeContainer nodeUsers;
+
+  if ( utNode )
+    {
+      nodeUsers = helper->GetUserHelper ()->GetUtUsers (utNode);
+      ss << "UT" << Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (utNode)) << "-user-";
+    }
+  else
+    {
+      nodeUsers = helper->GetUserHelper ()->GetGwUsers ();
+      ss << "GW-user-";
+    }
+
+  uint32_t userIndex = 0;
+
+  for ( uint32_t j = 0; ((j < nodeUsers.GetN ()) && (userIndex == 0)) ; j++)
+    {
+      if ( nodeUsers.Get (j) == node )
+        {
+          userIndex = j+1;
+        }
+    }
+
+  ss << userIndex;
+
+  return ss.str ();
+}
+
+/**
+ * Log empty line. Used to trim log outputs between multicast groups.
+ */
+static void LogEmptyLine ()
+{
+  NS_LOG_INFO ("");
+}
+
+/**
+ * Establish multicast group and generate traffic in that group.
+ *
+ * \param helper Pointer to satellite helper
+ * \param source Pointer to source node of the multicast group
+ * \param groupReceivers Container of the receiver node pointers of the multicast group
+ * \param groupAddress Address of the multicast group
+ * \param port Port of the multicast group
+ * \param startTime Time to start group traffic (sending start with some delay).
+ * \param sinkToAll Add packet sink to all users for multicast group.
+ * \return Time when all group packets should have been received by group receivers.
+ */
+static Time EstablishMulticastGroup (Ptr<SatHelper> helper, Ptr<Node> source, NodeContainer groupReceivers, Ipv4Address groupAddress, uint16_t port, Time startTime, bool sinkToAll )
+{
+  Time time = startTime;
+
+  NS_LOG_INFO ("--- Create multicast group " << groupAddress << " ---");
+
+  helper->SetMulticastGroupRoutes (source, groupReceivers, helper->GetUserAddress (source), groupAddress);
+
+  NS_LOG_INFO ("--- Creating traffic generator for " << groupAddress << " ---");
+
+  // CBR traffic generator for multicast group with interval 0.4s and packet size 512 bytes
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (groupAddress, port));
+  cbrHelper.SetAttribute ("Interval", StringValue ("0.4s"));
+  cbrHelper.SetAttribute ("PacketSize", UintegerValue (512));
+
+  ApplicationContainer cbr = cbrHelper.Install (source);
+  cbr.Start (startTime + Seconds (0.4));
+  cbr.Stop (startTime + Seconds (1.0));
+
+  NS_LOG_INFO ("--- Group " << groupAddress << " source: " << GetUserInfo (helper, source) << " ---");
+
+  ApplicationContainer sink;
+
+  std::stringstream receiverInfo;
+  receiverInfo << "--- Group " << groupAddress << " receivers: ";
+
+  if ( sinkToAll )
+    {
+      NodeContainer users = NodeContainer (helper->GetUserHelper ()->GetGwUsers (), helper->GetUserHelper ()->GetUtUsers () );
+
+      PacketSinkHelper sinkHelperGroup ("ns3::UdpSocketFactory", InetSocketAddress (groupAddress, port));
+
+      // Sinks for group receivers
+      for (uint32_t i = 0; i < users.GetN (); i++)
+        {
+          sink.Add (sinkHelperGroup.Install (users.Get (i)));
+
+          std::string nodeName = GetUserInfo (helper, users.Get (i));
+          std::stringstream context;
+          context << groupAddress <<  "/" << nodeName;
+
+          DynamicCast<PacketSink>(sink.Get (i))->TraceConnect ("Rx", context.str (), MakeCallback (&SinkReceive));
+        }
+
+      // output real group receivers
+      for (uint32_t i = 0; i < groupReceivers.GetN (); i++)
+        {
+          std::string nodeName = GetUserInfo (helper, groupReceivers.Get (i));
+          receiverInfo << nodeName << " ";
+        }
+    }
+  else
+    {
+      PacketSinkHelper sinkHelperGroup ("ns3::UdpSocketFactory", InetSocketAddress (groupAddress, port));
+
+      // Sinks for group receivers
+      for (uint32_t i = 0; i < groupReceivers.GetN (); i++)
+        {
+          sink.Add (sinkHelperGroup.Install (groupReceivers.Get (i)));
+
+          std::string nodeName = GetUserInfo (helper, groupReceivers.Get (i));
+          receiverInfo << nodeName << " ";
+
+          std::stringstream context;
+          context << groupAddress <<  "/" << nodeName;
+
+          DynamicCast<PacketSink>(sink.Get (i))->TraceConnect ("Rx", context.str (), MakeCallback (&SinkReceive));
+        }
+    }
+
+  receiverInfo << "---";
+  NS_LOG_INFO (receiverInfo.str ());
+
+  sink.Start (startTime);
+  sink.Stop (startTime + Seconds (2));
+
+  Simulator::Schedule (startTime + Seconds (1.41), &LogEmptyLine);
+
+  return startTime + Seconds (1);
+}
+
+
 int
 main (int argc, char *argv[])
 {
-  /// GWs 1,3
-  /// UTs 1,2,3,4
-  /// UT users 1,2,3,4,5
-  bool enableMulticastGroup_1 = true;
-
-  /// GWs 1,3
-  /// UTs 1,2,4
-  /// UT users 2,3,5
-  bool enableMulticastGroup_2 = true;
-
   /// Enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
@@ -41,17 +185,40 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("--- Starting sat-multicast-example ---");
 
-  uint32_t packetSize = 512;
-  std::string interval = "1s";
+  enum PreDefinedGroup
+  {
+    ALL_GROUPS,
+    GROUP_1,
+    GROUP_2,
+    GROUP_3,
+    GROUP_4,
+    GROUP_5,
+    GROUP_6,
+    GROUP_7,
+    GROUP_8,
+    GROUP_9,
+    GROUP_10,
+    GROUP_11,
+    GROUP_12,
+    END_OF_GROUP
+  };
+
+  uint32_t preDefinedGroup = (uint32_t) GROUP_1;
+  uint32_t fullScenarioReceivers = 10;
   std::string scenario = "larger";
   std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
+  bool sinkToAll = false; // when set sink(s) are added to all user nodes in order to test that unnecessary routes are not added
+
+  Ptr<Node> groupSource;
+  NodeContainer groupReceivers;
 
   /// Read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
-  cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue("scenario", "Test scenario to use. (larger or full", scenario);
+  cmd.AddValue("preDefinedGroup", "Pre-defined multicast group for larger scenario. (0 = all)", preDefinedGroup);
+  cmd.AddValue ("fullScenarioReceivers", "Number of the receivers in full scenario", fullScenarioReceivers);
+  cmd.AddValue("sinkToAll", "Add multicast sink to all users.", sinkToAll);
   cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
@@ -67,11 +234,15 @@ main (int argc, char *argv[])
     {
       satScenario = SatHelper::FULL;
     }
+  else
+    {
+      NS_FATAL_ERROR (satScenario << " not supported!!!");
+    }
 
   /// Remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
 
-  /// Create satellite helper with given scenario default=simple
+  /// Create satellite helper with given scenario default=larger
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -79,7 +250,13 @@ main (int argc, char *argv[])
   // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
 
-  NS_LOG_INFO ("--- Creating scenario ---");
+  NS_LOG_INFO ("--- Creating scenario: " << scenario << " ---");
+
+  if (sinkToAll)
+    {
+      NS_LOG_INFO ("--- Add sink to each users ---");
+    }
+
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   if ( scenarioLogFile != "" )
@@ -90,500 +267,180 @@ main (int argc, char *argv[])
   helper->CreatePredefinedScenario (satScenario);
   helper->EnablePacketTrace ();
 
-  /// Device IDs for different nodes
-  uint32_t ipRouterInputDeviceId = 3;
-  uint32_t ipRouterOutputDeviceId_1 = 1;
-  uint32_t ipRouterOutputDeviceId_2 = 2;
-
-  uint32_t gw_1_InputDeviceId = 3;
-  uint32_t gw_1_OutputDeviceId_1 = 1;
-  uint32_t gw_1_OutputDeviceId_2 = 2;
-
-  uint32_t gw_3_InputDeviceId = 2;
-  uint32_t gw_3_OutputDeviceId_1 = 1;
-
-  uint32_t ut_1_InputDeviceId = 2;
-  uint32_t ut_1_OutputDeviceId_1 = 1;
-
-  uint32_t ut_2_InputDeviceId = 2;
-  uint32_t ut_2_OutputDeviceId_1 = 1;
-
-  uint32_t ut_3_InputDeviceId = 2;
-  uint32_t ut_3_OutputDeviceId_1 = 1;
-
-  uint32_t ut_4_InputDeviceId = 2;
-  uint32_t ut_4_OutputDeviceId_1 = 1;
-
   uint16_t multicastPort = 9;   // Discard port (RFC 863)
 
   /// Get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
 
-  NS_LOG_INFO ("UT users: " << utUsers.GetN () << ", GW users: " << gwUsers.GetN ());
+  Time startTime = Seconds (1.2);
 
-  NS_LOG_INFO ("--- Creating multicast groups ---");
+  if ( scenario == "larger")
+  {
+    uint32_t currentGroup = preDefinedGroup;
 
-  /// Create multicast groups
-  Ipv4Address multicastSource_1 (helper->GetUserAddress (gwUsers.Get (0)));
-  Ipv4Address multicastGroup_1 ("225.1.1.1");
-  Mac48Address multicastMacGroup_1;
+    if ( preDefinedGroup == ALL_GROUPS )
+      {
+        currentGroup = 1;
+      }
 
-  Ipv4Address multicastSource_2 (helper->GetUserAddress (gwUsers.Get (0)));
-  Ipv4Address multicastGroup_2 ("225.1.2.1");
-  Mac48Address multicastMacGroup_2;
+    for ( uint32_t i = currentGroup; i < END_OF_GROUP; i++ )
+      {
+        groupReceivers = NodeContainer ();
 
-  /// Check the address sanity
-  if (multicastGroup_1.IsMulticast ())
-    {
-      multicastMacGroup_1 = Mac48Address::GetMulticast (multicastGroup_1);
-      NS_LOG_INFO ("IP address for multicast group 1: " << multicastGroup_1 << ", MAC address for multicast group 1: " << multicastMacGroup_1);
+        switch (i)
+        {
+          // Pre-defined group 1, Source= GW-user-1, Receivers= UT1-user-1, UT1-user-2, UT2-user-1, UT3-user-1, UT4-user-1
+          case GROUP_1:
+            groupSource = gwUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (0));
+            groupReceivers.Add (utUsers.Get (1));
+            groupReceivers.Add (utUsers.Get (2));
+            groupReceivers.Add (utUsers.Get (3));
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_2:
+            // Pre-defined group 2, Source= GW-user-1, Receivers= UT1-user-2, UT2-user-1, UT4-user-1
+            groupSource = gwUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (1));
+            groupReceivers.Add (utUsers.Get (2));
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_3:
+            // Pre-defined group 3, Source= UT1-user-1, Receivers= UT1-user-2, UT2-user-1, UT4-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (1));
+            groupReceivers.Add (utUsers.Get (2));
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_4:
+            // Pre-defined group 4, Source= UT1-user-2, Receivers= UT2-user-1, UT4-user-1
+            groupSource = utUsers.Get (1);
+            groupReceivers.Add (utUsers.Get (2));
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_5:
+            // Pre-defined group 5, Source= UT1-user-1, Receivers= UT3-user-1, UT4-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (3));
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_6:
+            // Pre-defined group 6, Source= UT1-user-2, Receivers= UT2-user-1, GW-user-1
+            groupSource = utUsers.Get (1);
+            groupReceivers.Add (utUsers.Get (2));
+            groupReceivers.Add (gwUsers.Get (0));
+            break;
+
+          case GROUP_7:
+            // Pre-defined group 7, Source= UT1-user-1, Receivers= GW-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (gwUsers.Get (0));
+            break;
+
+          case GROUP_8:
+            // Pre-defined group 8, Source= UT1-user-2, Receivers= UT2-user-1
+            groupSource = utUsers.Get (1);
+            groupReceivers.Add (utUsers.Get (2));
+            break;
+
+          case GROUP_9:
+            // Pre-defined group 9, Source= UT1-user-1, Receivers= GW-user-1, UT4-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (gwUsers.Get (0));
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_10:
+            // Pre-defined group 10, Source= UT1-user-1, UT3-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (3));
+            break;
+
+          case GROUP_11:
+            // Pre-defined group 10, Source= UT1-user-1, UT4-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (4));
+            break;
+
+          case GROUP_12:
+            // Pre-defined group 10, Source= UT1-user-1, UT2-user-1
+            groupSource = utUsers.Get (0);
+            groupReceivers.Add (utUsers.Get (2));
+            break;
+
+          default:
+            NS_FATAL_ERROR ("Not supported pre-defined group!!!");
+            break;
+        }
+
+        NS_LOG_INFO ("--- Creating multicast pre-defined group " << preDefinedGroup << " ---");
+
+        /// Create multicast groups 255.1.x.1, x predefined group number
+
+        std::stringstream groupAddress;
+        groupAddress << "225.1." << i << ".1";
+        Ipv4Address multicastGroup (groupAddress.str ().c_str ());
+
+        startTime = EstablishMulticastGroup (helper, groupSource, groupReceivers, multicastGroup, multicastPort, startTime, sinkToAll );
+      }
     }
   else
     {
-      NS_FATAL_ERROR ("Invalid address for multicast group 1");
+      NS_LOG_INFO ("--- Creating multicast group in full scenario ---");
+
+      // get all users
+      NodeContainer users = NodeContainer (gwUsers, utUsers);
+
+      // add two sources from GW users and UT users randomly
+      std::vector<uint32_t> sources;
+      sources.push_back (std::rand () % gwUsers.GetN ());
+      sources.push_back ( (std::rand () % utUsers.GetN ()) + gwUsers.GetN ());
+
+      // create two multicast groups with UT and GW sources
+      for (uint32_t i = 0; i < sources.size (); i++)
+        {
+          std::vector<uint32_t> ids;
+
+          for (uint32_t j = 0; j < users.GetN (); j++)
+            {
+              // add user only to possible receivers only if not source
+              if (j != sources[i] )
+                {
+                  ids.push_back (j);
+                }
+            }
+
+          // randomize users
+          std::random_shuffle (ids.begin (), ids.end ());
+
+          // set source GW or UT users
+          groupSource = users.Get (sources[i]);
+
+          // select reeivers
+          groupReceivers = NodeContainer ();
+
+          for ( uint32_t j = 0; ( (j < fullScenarioReceivers) && ( j < ids.size ())); j++ )
+            {
+              groupReceivers.Add (users.Get (ids.at (j)));
+            }
+
+          std::stringstream groupAddress;
+          groupAddress << "225.1." << i << ".1";
+          Ipv4Address multicastGroup (groupAddress.str ().c_str ());
+
+          startTime = EstablishMulticastGroup (helper, groupSource, groupReceivers, multicastGroup, multicastPort, startTime, sinkToAll );
+        }
     }
-
-  if (multicastGroup_2.IsMulticast ())
-    {
-      multicastMacGroup_2 = Mac48Address::GetMulticast (multicastGroup_2);
-      NS_LOG_INFO ("IP address for multicast group 1: " << multicastGroup_2 << ", MAC address for multicast group 1: " << multicastMacGroup_2);
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Invalid address for multicast group 2");
-    }
-
-  NS_LOG_INFO ("--- Creating multicast routes ---");
-
-  Ipv4StaticRoutingHelper multicast;                               // Routing helper
-  Ptr<Node> multicastRouter;                                       // The node in question
-  Ptr<NetDevice> inputDevice;                                      // The input NetDevice
-  NodeContainer utNodes = helper->GetBeamHelper ()->GetUtNodes (); // UT nodes
-  Ptr<SatLlc> llc;                                                 // LLC
-  Ptr<SatQueue> queue;                                             // Queue
-
-  if (enableMulticastGroup_1)
-    {
-      NS_LOG_INFO ("--- Routes for multicast group 1 ---");
-
-      /// Configure a (static) multicast route for group 1 on GW 1
-      /// Behind this Router are GWs 1, 2 and UTs 1, 2, 3, 4
-      /// Get IP router node
-      multicastRouter = helper->GetUserHelper ()->GetRouter ();
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ipRouterInputDeviceId);
-
-      /// A container of IP router output NetDevices
-      NetDeviceContainer outputDevicesRouter;
-
-      /// Add output NetDevices
-      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_1));
-      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_2));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesRouter);
-
-      NS_LOG_INFO ("--- IP Router ---");
-      NS_LOG_INFO ("IP Router num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("IP Router input device: " << ipRouterInputDeviceId);
-      NS_LOG_INFO ("IP Router output devices: " << ipRouterOutputDeviceId_1 << ", " << ipRouterOutputDeviceId_2);
-
-      /// Configure a (static) multicast route for group 1 on GW 1
-      /// Behind this GW are UTs 1, 2, 3
-      /// Get GW 1 node
-      multicastRouter = helper->GetBeamHelper ()->GetGwNode (1);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (gw_1_InputDeviceId);
-
-      /// A container of GW 1 output NetDevices
-      NetDeviceContainer outputDevicesGW1;
-
-      /// Add output NetDevices
-      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_1));
-      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_2));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesGW1);
-
-      NS_LOG_INFO ("--- GW 1 ---");
-      NS_LOG_INFO ("GW 1 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("GW 1 input device: " << gw_1_InputDeviceId);
-      NS_LOG_INFO ("GW 1 output devices: " << gw_1_OutputDeviceId_1 << ", " << gw_1_OutputDeviceId_2);
-
-      /// Configure a (static) multicast route for group 1 on GW 3
-      /// Behind this GW is UT 4
-      /// Get GW 3 node
-      multicastRouter = helper->GetBeamHelper ()->GetGwNode (3);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (gw_3_InputDeviceId);
-
-      /// A container of GW 3 output NetDevices
-      NetDeviceContainer outputDevicesGW3;
-
-      /// Add output NetDevices
-      outputDevicesGW3.Add (multicastRouter->GetDevice (gw_3_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesGW3);
-
-      NS_LOG_INFO ("--- GW 3 ---");
-      NS_LOG_INFO ("GW 3 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("GW 3 input device: " << gw_3_InputDeviceId);
-      NS_LOG_INFO ("GW 3 output devices: " << gw_3_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 1 on UT 1
-      /// Get UT 1 node
-      multicastRouter = utNodes.Get (0);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_1_InputDeviceId);
-
-      /// A container of UT 1 output NetDevices
-      NetDeviceContainer outputDevicesUT1;
-
-      /// Add output NetDevices
-      outputDevicesUT1.Add (multicastRouter->GetDevice (ut_1_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesUT1);
-
-      NS_LOG_INFO ("--- UT 1 ---");
-      NS_LOG_INFO ("UT 1 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 1 input device: " << ut_1_InputDeviceId);
-      NS_LOG_INFO ("UT 1 output devices: " << ut_1_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 1 on UT 2
-      /// Get UT 2 node
-      multicastRouter = utNodes.Get (1);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_2_InputDeviceId);
-
-      /// A container of UT 2 output NetDevices
-      NetDeviceContainer outputDevicesUT2;
-
-      /// Add output NetDevices
-      outputDevicesUT2.Add (multicastRouter->GetDevice (ut_2_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesUT2);
-
-      NS_LOG_INFO ("--- UT 2 ---");
-      NS_LOG_INFO ("UT 2 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 2 input device: " << ut_2_InputDeviceId);
-      NS_LOG_INFO ("UT 2 output devices: " << ut_2_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 1 on UT 3
-      /// Get UT 3 node
-      multicastRouter = utNodes.Get (2);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_3_InputDeviceId);
-
-      /// A container of UT 3 output NetDevices
-      NetDeviceContainer outputDevicesUT3;
-
-      /// Add output NetDevices
-      outputDevicesUT3.Add (multicastRouter->GetDevice (ut_3_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesUT3);
-
-      NS_LOG_INFO ("--- UT 3 ---");
-      NS_LOG_INFO ("UT 3 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 3 input device: " << ut_3_InputDeviceId);
-      NS_LOG_INFO ("UT 3 output devices: " << ut_3_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 1 on UT 4
-      /// Get UT 4 node
-      multicastRouter = utNodes.Get (3);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_4_InputDeviceId);
-
-      /// A container of UT 4 output NetDevices
-      NetDeviceContainer outputDevicesUT4;
-
-      /// Add output NetDevices
-      outputDevicesUT4.Add (multicastRouter->GetDevice (ut_4_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_1,
-                                   multicastGroup_1,
-                                   inputDevice,
-                                   outputDevicesUT4);
-
-      NS_LOG_INFO ("--- UT 4 ---");
-      NS_LOG_INFO ("UT 4 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 4 input device: " << ut_4_InputDeviceId);
-      NS_LOG_INFO ("UT 4 output devices: " << ut_4_OutputDeviceId_1);
-
-      NS_LOG_INFO ("--- Creating traffic generator for multicast group 1 ---");
-
-      /// Traffic generators for multicast group 1
-      CbrHelper gwCbrHelper_1 ("ns3::UdpSocketFactory",
-                               InetSocketAddress (multicastGroup_1,
-                                                  multicastPort));
-      gwCbrHelper_1.SetAttribute ("Interval",
-                                  StringValue (interval));
-      gwCbrHelper_1.SetAttribute ("PacketSize",
-                                  UintegerValue (packetSize));
-
-      ApplicationContainer gwCbr_1 = gwCbrHelper_1.Install (gwUsers.Get (0));
-      gwCbr_1.Start (Seconds (2.0));
-      gwCbr_1.Stop (Seconds (3.1));
-    }
-
-  if (enableMulticastGroup_2)
-    {
-      NS_LOG_INFO ("--- Routes for multicast group 2 ---");
-
-      /// Configure a (static) multicast route for group 2 on GW 1
-      /// Behind this Router are GWs 1, 2 and UTs 1, 2, 4
-      /// Get IP router node
-      multicastRouter = helper->GetUserHelper ()->GetRouter ();
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ipRouterInputDeviceId);
-
-      /// A container of IP router output NetDevices
-      NetDeviceContainer outputDevicesRouter;
-
-      /// Add output NetDevices
-      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_1));
-      outputDevicesRouter.Add (multicastRouter->GetDevice (ipRouterOutputDeviceId_2));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_2,
-                                   multicastGroup_2,
-                                   inputDevice,
-                                   outputDevicesRouter);
-
-      NS_LOG_INFO ("--- IP Router ---");
-      NS_LOG_INFO ("IP Router num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("IP Router input device: " << ipRouterInputDeviceId);
-      NS_LOG_INFO ("IP Router output devices: " << ipRouterOutputDeviceId_1 << ", " << ipRouterOutputDeviceId_2);
-
-      /// Configure a (static) multicast route for group 2 on GW 1
-      /// Behind this GW are UTs 1, 2
-      /// Get GW 1 node
-      multicastRouter = helper->GetBeamHelper ()->GetGwNode (1);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (gw_1_InputDeviceId);
-
-      /// A container of GW 1 output NetDevices
-      NetDeviceContainer outputDevicesGW1;
-
-      /// Add output NetDevices
-      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_1));
-      outputDevicesGW1.Add (multicastRouter->GetDevice (gw_1_OutputDeviceId_2));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_2,
-                                   multicastGroup_2,
-                                   inputDevice,
-                                   outputDevicesGW1);
-
-      NS_LOG_INFO ("--- GW 1 ---");
-      NS_LOG_INFO ("GW 1 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("GW 1 input device: " << gw_1_InputDeviceId);
-      NS_LOG_INFO ("GW 1 output devices: " << gw_1_OutputDeviceId_1 << ", " << gw_1_OutputDeviceId_2);
-
-      /// Configure a (static) multicast route for group 1 on GW 3
-      /// Behind this GW is UT 4
-      /// Get GW 3 node
-      multicastRouter = helper->GetBeamHelper ()->GetGwNode (3);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (gw_3_InputDeviceId);
-
-      /// A container of GW 3 output NetDevices
-      NetDeviceContainer outputDevicesGW3;
-
-      /// Add output NetDevices
-      outputDevicesGW3.Add (multicastRouter->GetDevice (gw_3_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_2,
-                                   multicastGroup_2,
-                                   inputDevice,
-                                   outputDevicesGW3);
-
-      NS_LOG_INFO ("--- GW 3 ---");
-      NS_LOG_INFO ("GW 3 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("GW 3 input device: " << gw_3_InputDeviceId);
-      NS_LOG_INFO ("GW 3 output devices: " << gw_3_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 2 on UT 1
-      /// Get UT 1 node
-      multicastRouter = utNodes.Get (0);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_1_InputDeviceId);
-
-      /// A container of UT 1 output NetDevices
-      NetDeviceContainer outputDevicesUT1;
-
-      /// Add output NetDevices
-      outputDevicesUT1.Add (multicastRouter->GetDevice (ut_1_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_2,
-                                   multicastGroup_2,
-                                   inputDevice,
-                                   outputDevicesUT1);
-
-      NS_LOG_INFO ("--- UT 1 ---");
-      NS_LOG_INFO ("UT 1 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 1 input device: " << ut_1_InputDeviceId);
-      NS_LOG_INFO ("UT 1 output devices: " << ut_1_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 2 on UT 2
-      /// Get UT 2 node
-      multicastRouter = utNodes.Get (1);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_2_InputDeviceId);
-
-      /// A container of UT 2 output NetDevices
-      NetDeviceContainer outputDevicesUT2;
-
-      /// Add output NetDevices
-      outputDevicesUT2.Add (multicastRouter->GetDevice (ut_2_OutputDeviceId_1));
-
-      /// Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_2,
-                                   multicastGroup_2,
-                                   inputDevice,
-                                   outputDevicesUT2);
-
-      NS_LOG_INFO ("--- UT 2 ---");
-      NS_LOG_INFO ("UT 2 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 2 input device: " << ut_2_InputDeviceId);
-      NS_LOG_INFO ("UT 2 output devices: " << ut_2_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 1 on UT 3
-      /// Get UT 3 node
-      multicastRouter = utNodes.Get (2);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_3_InputDeviceId);
-
-      //NS_LOG_INFO ("--- UT 3 ---");
-      //NS_LOG_INFO ("UT 3 num of devices: " << multicastRouter->GetNDevices ());
-      //NS_LOG_INFO ("UT 3 input device: " << ut_3_InputDeviceId);
-      //NS_LOG_INFO ("UT 3 output devices: " << ut_3_OutputDeviceId_1);
-
-      /// Configure a (static) multicast route for group 2 on UT 4
-      /// Get UT 4 node
-      multicastRouter = utNodes.Get (3);
-
-      /// Get input NetDevice
-      inputDevice = multicastRouter->GetDevice (ut_4_InputDeviceId);
-
-      /// A container of UT 4 output NetDevices
-      NetDeviceContainer outputDevicesUT4;
-
-      /// Add output NetDevices
-      outputDevicesUT4.Add (multicastRouter->GetDevice (ut_4_OutputDeviceId_1));
-
-      // Add multicast route
-      multicast.AddMulticastRoute (multicastRouter,
-                                   multicastSource_2,
-                                   multicastGroup_2,
-                                   inputDevice,
-                                   outputDevicesUT4);
-
-      NS_LOG_INFO ("--- UT 4 ---");
-      NS_LOG_INFO ("UT 4 num of devices: " << multicastRouter->GetNDevices ());
-      NS_LOG_INFO ("UT 4 input device: " << ut_4_InputDeviceId);
-      NS_LOG_INFO ("UT 4 output devices: " << ut_4_OutputDeviceId_1);
-
-      NS_LOG_INFO ("--- Create traffic generator for multicast group 2 ---");
-
-      /// Traffic generators for multicast group 1
-      CbrHelper gwCbrHelper_2 ("ns3::UdpSocketFactory",
-                               InetSocketAddress (multicastGroup_2,
-                                                  multicastPort));
-      gwCbrHelper_2.SetAttribute ("Interval",
-                                  StringValue (interval));
-      gwCbrHelper_2.SetAttribute ("PacketSize",
-                                  UintegerValue (packetSize));
-
-      ApplicationContainer gwCbr_2 = gwCbrHelper_2.Install (gwUsers.Get (0));
-      gwCbr_2.Start (Seconds (5.0));
-      gwCbr_2.Stop (Seconds (6.1));
-    }
-
-  NS_LOG_INFO ("--- Creating UT sinks ---");
-
-  /// Create sink on UT user for receiving the traffic
-  ApplicationContainer utSink;
-
-  /// Sinks for group 1, all UT users will receive the traffic
-  for (uint32_t i = 0; i < utUsers.GetN (); i++)
-    {
-      PacketSinkHelper utSinkHelperGroup_1 ("ns3::UdpSocketFactory", InetSocketAddress (multicastGroup_1, multicastPort));
-      utSink = utSinkHelperGroup_1.Install (utUsers.Get (i));
-    }
-
-  /// Sinks for group 2, one non-multicast user will not have a sink.
-  /// Excluding the user needs to be done on sink level (no application
-  /// to receive the transmission) as it is sharing the same link from the UT with a multicast user.
-  for (uint32_t i = 1; i < utUsers.GetN (); i++)
-    {
-      PacketSinkHelper utSinkHelperGroup_2 ("ns3::UdpSocketFactory", InetSocketAddress (multicastGroup_2, multicastPort));
-      utSink = utSinkHelperGroup_2.Install (utUsers.Get (i));
-    }
-
-  utSink.Start (Seconds (1.0));
-  utSink.Stop (Seconds (10.0));
-
-  NS_LOG_INFO ("--- Traffic information ---");
-  NS_LOG_INFO ("  Scenario used: " << scenario);
-  NS_LOG_INFO ("  PacketSize: " << packetSize);
-  NS_LOG_INFO ("  Interval: " << interval);
-  NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
-  NS_LOG_INFO ("  ");
 
   NS_LOG_INFO ("--- Running simulation ---");
 
-  Simulator::Stop (Seconds(11));
+  Simulator::Stop (startTime + Seconds (3.0));
   Simulator::Run ();
   Simulator::Destroy ();
 
