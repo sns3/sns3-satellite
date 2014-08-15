@@ -64,7 +64,7 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * \brief Function for getting the fading value
+   * \brief Function for getting the fading value.
    * \param macAddress
    * \param channelType channel type
    * \return fading value
@@ -72,7 +72,8 @@ public:
   double GetFading (Address macAddress, SatEnums::ChannelType_t channelType);
 
   /**
-   * \brief Function for getting the fading value
+   * \brief Function for getting the fading value. This is an abstract method,
+   * thus it is implemented in the inherited fading classes.
    * \param macAddress
    * \param channelType channel type
    * \return fading value

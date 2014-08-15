@@ -291,6 +291,8 @@
  <default name="ns3::SatGwPhy::ImIfCOverIDb" value="22"/>
  <default name="ns3::SatGwPhy::AciIfWrtNoisePercent" value="10"/>
  <default name="ns3::SatLinkResultsDvbS2::EsNoOffsetForShortFrame" value="0.4"/>
+ <default name="ns3::SatLlc::FwdLinkArqEnabled" value="false"/>
+ <default name="ns3::SatLlc::RtnLinkArqEnabled" value="false"/>
  <default name="ns3::SatLooConf::ElevationCount" value="1"/>
  <default name="ns3::SatLooConf::StateCount" value="3"/>
  <default name="ns3::SatLowerLayerServiceConf::DaServiceCount" value="4"/>
@@ -436,8 +438,6 @@
  <default name="ns3::SatUtHelper::FwdLinkErrorModel" value="None"/>
  <default name="ns3::SatUtHelper::DaFwdLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatUtHelper::EnableChannelEstimationError" value="true"/>
- <default name="ns3::SatUtHelper::EnableRtnLinkArq" value="false"/>
- <default name="ns3::SatUtHelper::EnableFwdLinkArq" value="false"/>
  <global name="RngSeed" value="1"/>
  <global name="RngRun" value="1"/>
  <global name="ChecksumEnabled" value="false"/>

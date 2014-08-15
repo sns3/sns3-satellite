@@ -70,7 +70,12 @@ public:
   void DoDispose ();
 
   /**
-   * \brief Function for getting the fading
+   * \brief Function for getting the fading. SatMarkovContainer is inherited from SatBaseFading
+   * abstract base class, which defines an abstract interface method DoGetFading with Address and
+   * ChannelType as input parameters. DoGetFading is implemented in the inherited classes
+   * SatMarkovContainer and SatFadingInputTrace. SatFadingInputTrace needs the Address as a parameter
+   * in DoGetFading method to be able to get the fading from the correct fading file. Note, that
+   * the Address parameter is not utilized in SatMarkovContainer::DoGetFading () at all.
    * \param macAddress MAC address
    * \param channeltype channel type
    * \return fading value
