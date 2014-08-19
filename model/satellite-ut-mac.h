@@ -44,9 +44,9 @@ class SortTimeSlots
 public:
   SortTimeSlots () {};
 
-  bool operator() (std::pair<uint8_t, Ptr<SatTimeSlotConf> > p1, std::pair<uint8_t, Ptr<SatTimeSlotConf> > p2)
+  bool operator() (Ptr<SatTimeSlotConf> p1, Ptr<SatTimeSlotConf> p2)
   {
-    return p1.second->GetStartTime () < p2.second->GetStartTime ();
+    return p1->GetStartTime () < p2->GetStartTime ();
   }
 };
 

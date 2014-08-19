@@ -189,7 +189,7 @@ SatTbtpMessage::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-const SatTbtpMessage::DaTimeSlotInfoContainer_t&
+const SatTbtpMessage::DaTimeSlotInfoItem_t&
 SatTbtpMessage::GetDaTimeslots (Address utId)
 {
   NS_LOG_FUNCTION (this << utId);
@@ -216,7 +216,7 @@ SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSl
   // otherwise use container found from map
   if ( it == m_daTimeSlots.end () )
     {
-      std::pair<DaTimeSlotMap_t::iterator, bool> result = m_daTimeSlots.insert (std::make_pair (utId, DaTimeSlotInfoContainer_t()));
+      std::pair<DaTimeSlotMap_t::iterator, bool> result = m_daTimeSlots.insert (std::make_pair (utId, DaTimeSlotInfoItem_t ()));
 
       if ( result.second )
         {
@@ -224,18 +224,14 @@ SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSl
         }
       else
         {
-          it = m_daTimeSlots.end ();
+          // container creation for UT has failed, so we need to crash
+          NS_FATAL_ERROR ("Cannot insert slot to container!!!");
         }
     }
 
-  // container creation for UT has failed, so we need to crash
-  if (it == m_daTimeSlots.end ())
-    {
-      NS_FATAL_ERROR ("Cannot insert slot to container!!!");
-    }
-
   // store time slot info to user specific container
-  it->second.push_back (std::make_pair (frameId, conf) );
+  it->second.first = frameId;
+  it->second.second.push_back( conf  );
 
   // store frame ID to count used frames
   m_frameIds.insert (frameId);
@@ -346,7 +342,7 @@ uint32_t SatTbtpMessage::GetSizeInBytes () const
   // add size of DA time slots
   for (DaTimeSlotMap_t::const_iterator it = m_daTimeSlots.begin (); it != m_daTimeSlots.end (); it++ )
     {
-      sizeInBytes += (it->second.size () * assignmentIdSizeInBytes);
+      sizeInBytes += (it->second.second.size () * assignmentIdSizeInBytes);
     }
 
   // add size of RA time slots
@@ -370,12 +366,8 @@ void SatTbtpMessage::Dump () const
       ++mit)
     {
       std::cout << "UT: " << mit->first << ": ";
-      for (DaTimeSlotInfoContainer_t::const_iterator sit = mit->second.begin ();
-          sit != mit->second.end ();
-          ++sit)
-        {
-          std::cout << sit->second << " ";
-        }
+      std::cout << "Frame ID: " << mit->second.first << ": ";
+      std::cout << mit->second.second.size () << " ";
       std::cout << std::endl;
     }
 

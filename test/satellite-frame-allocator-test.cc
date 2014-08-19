@@ -270,14 +270,14 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
 
   for ( SatFrameAllocator::TbtpMsgContainer_t::const_iterator it = tbtpContainer.begin (); it != tbtpContainer.end (); it++)
     {
-      SatTbtpMessage::DaTimeSlotInfoContainer_t slots = (*it)->GetDaTimeslots (req.m_address);
+      SatTbtpMessage::DaTimeSlotInfoItem_t info = (*it)->GetDaTimeslots (req.m_address);
 
-      for (SatTbtpMessage::DaTimeSlotInfoContainer_t::const_iterator it2 = slots.begin (); it2 != slots.end (); it2++ )
+      for (SatTbtpMessage::DaTimeSlotConfContainer_t::const_iterator it2 = info.second.begin (); it2 != info.second.end (); it2++ )
         {
-          tbtpAllocatedBytes += m_frameConf->GetWaveformConf ()->GetWaveform(it2->second->GetWaveFormId ())->GetPayloadInBytes ();
+          tbtpAllocatedBytes += m_frameConf->GetWaveformConf ()->GetWaveform((*it2)->GetWaveFormId ())->GetPayloadInBytes ();
         }
 
-      slotsAllocated += slots.size ();
+      slotsAllocated += info.second.size ();
     }
 
     // check that information is identical in TBTP container and UT allocation container

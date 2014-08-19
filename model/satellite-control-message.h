@@ -76,7 +76,7 @@ public:
   void SetMsgType (SatControlMsgType_t type);
 
   /**
-   * Get type of the contol message.
+   * Get type of the control message.
    *
    * \return The type of the control message
    */
@@ -154,21 +154,29 @@ private:
  * \brief The packet for the Terminal Burst Time Plan (TBTP) messages.
  * (Tagged by SatControlMsgTag with type value SAT_TBTP_CTRL_MSG)
  * NOTE! Message implementation doesn't follow specification (ETSI EN 301 542-2).
- * However it introduced method GetSizeInBytes which can be used when real size is simulated.
+ * However it implements method GetSizeInBytes, which can be used when real size is simulated.
  */
 
 class SatTbtpMessage : public SatControlMessage
 {
 public:
+  /**
+   * Maximum value for time slot ID.
+   */
   static const uint16_t maximumTimeSlotId = 2047;
 
   /**
-   * Container for DA time slot information.
+   * Container for time slot configurations in time slot map item DaTimeSlotMapItem_t.
+   */
+  typedef std::vector< Ptr<SatTimeSlotConf> >  DaTimeSlotConfContainer_t;
+
+  /**
+   * Item for DA time slot information.
    *
    * Stored information is pair, which member first holds frame id
-   * and member second holds time slot id.
+   * of the time slots and member second holds container of time slot configurations.
    */
-  typedef std::vector< std::pair<uint8_t, Ptr<SatTimeSlotConf> > >  DaTimeSlotInfoContainer_t;
+  typedef std::pair<uint8_t, DaTimeSlotConfContainer_t>  DaTimeSlotInfoItem_t;
 
   /**
    * Container for RA channel information
@@ -215,7 +223,7 @@ public:
    * Constructor for SatTbtpHeader to construct TBTP with given sequence id.
    * \param seqId sequence id
    */
-  SatTbtpMessage ( uint8_t seqId );
+  SatTbtpMessage (uint8_t seqId);
 
   /**
    * Destructor for SatTbtpHeader
@@ -263,7 +271,7 @@ public:
    * \param utId  id of the UT which time slot information is requested
    * \return vector containing DA time slot info
    */
-  const DaTimeSlotInfoContainer_t& GetDaTimeslots (Address utId);
+  const DaTimeSlotInfoItem_t& GetDaTimeslots (Address utId);
 
   /**
    * Set a DA time slot information
@@ -312,7 +320,7 @@ public:
 private:
 
   typedef std::map <uint8_t, uint16_t >  RaChannelMap_t;
-  typedef std::map<Address, DaTimeSlotInfoContainer_t > DaTimeSlotMap_t;
+  typedef std::map<Address, DaTimeSlotInfoItem_t > DaTimeSlotMap_t;
 
   DaTimeSlotMap_t   m_daTimeSlots;
   RaChannelMap_t    m_raChannels;
@@ -324,7 +332,7 @@ private:
   /**
    * Empty DA slot container to be returned if there are not DA time slots
    */
-  const DaTimeSlotInfoContainer_t m_emptyDaSlotContainer;
+  const DaTimeSlotInfoItem_t m_emptyDaSlotContainer;
 };
 
 /**

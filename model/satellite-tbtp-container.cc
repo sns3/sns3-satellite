@@ -130,13 +130,13 @@ SatTbtpContainer::HasScheduledTimeSlots ()
     {
       RemovePastTbtps ();
 
-      SatTbtpMessage::DaTimeSlotInfoContainer_t slots;
+      SatTbtpMessage::DaTimeSlotInfoItem_t info;
       for (TbtpMap_t::const_reverse_iterator it = m_tbtps.rbegin ();
           it != m_tbtps.rend ();
           ++it)
         {
-          slots = it->second->GetDaTimeslots (m_address);
-          if (!slots.empty ())
+          info = it->second->GetDaTimeslots (m_address);
+          if (!info.second.empty ())
             {
               hasScheduledTimeSlots = true;
               break;
