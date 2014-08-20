@@ -64,7 +64,7 @@ SatAddressTag::GetInstanceTypeId () const
 uint32_t
 SatAddressTag::GetSerializedSize () const
 {
-  return (m_sourceAddress.GetLength () + sizeof (uint32_t));
+  return m_sourceAddress.GetSerializedSize ();
 }
 
 
@@ -73,10 +73,7 @@ SatAddressTag::Serialize (TagBuffer i) const
 {
   NS_LOG_FUNCTION (this << &i);
 
-  uint8_t buff[Address::MAX_SIZE];
-  uint32_t len = m_sourceAddress.CopyTo (buff);
-  i.WriteU32 (len);
-  i.Write (buff, len);
+  m_sourceAddress.Serialize (i);
 }
 
 
@@ -85,10 +82,7 @@ SatAddressTag::Deserialize (TagBuffer i)
 {
   NS_LOG_FUNCTION (this << &i);
 
-  uint8_t buff[Address::MAX_SIZE];
-  uint32_t len = i.ReadU32 ();
-  i.Read (buff, len);
-  m_sourceAddress.CopyFrom (buff, len);
+  m_sourceAddress.Deserialize (i);
 }
 
 
