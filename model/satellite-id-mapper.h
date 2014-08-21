@@ -32,7 +32,7 @@ class Address;
 /**
  * \ingroup satellite
  *
- * \brief Class for ID -mapper
+ * \brief Class for ID-mapper
  */
 class SatIdMapper : public Object
 {

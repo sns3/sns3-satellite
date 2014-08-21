@@ -350,7 +350,7 @@ SatPhy::SetBeamId (uint32_t beamId)
 void
 SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
-  NS_LOG_FUNCTION (this << rxParams);
+  NS_LOG_FUNCTION (this << rxParams << phyError);
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =

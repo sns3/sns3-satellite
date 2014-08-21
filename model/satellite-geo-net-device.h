@@ -38,13 +38,8 @@
 namespace ns3 {
 
 /**
- * \defgroup satellite Satellite Models
- *
- */
-
-/**
  * \ingroup satellite
- * SatGeoNetDevice to be utilized in the UT, GW and satellite.
+ * SatGeoNetDevice to be utilized in geostationary satellite.
  */
 class SatGeoNetDevice : public NetDevice
 {
@@ -129,15 +124,6 @@ private:
   std::map<uint32_t, Ptr<SatPhy> > m_userPhy;
   std::map<uint32_t, Ptr<SatPhy> > m_feederPhy;
 
-  /**
-   * The trace source fired when the phy layer drops a packet it has received
-   * due to the error model being active.  Although SatGeoNetDevice doesn't
-   * really have a Phy model, we choose this trace source name for alignment
-   * with other trace sources.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_phyRxDropTrace;
 };
 
 } // namespace ns3

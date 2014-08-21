@@ -44,14 +44,14 @@ class SatNodeInfo;
 class SatControlMessage;
 
 /**
- * \defgroup satellite Satellite Models
+ * \defgroup satellite Satellite
  *
  */
 
 
 /**
  * \ingroup satellite
- * SatNetDevice to be utilized in the UT, GW and satellite.
+ * SatNetDevice to be utilized in the UT and GW nodes.
  */
 class SatNetDevice : public NetDevice
 {
@@ -60,64 +60,66 @@ public:
   SatNetDevice ();
 
   /*
-   * Receive the packet from mac layer
+   * \brief Receive the packet from mac layer
    * \param packet Pointer to the packet to be received.
    */
   void Receive (Ptr<const Packet> packet);
 
   /*
-   * Attach the SatPhy physical layer to this netdevice.
+   * \brief Attach the SatPhy physical layer to this netdevice.
    * \param phy SatPhy pointer to be added
    */
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
-   * Get a Phy pointer
+   * \brief Get a Phy pointer
    *
    * \returns Ptr to the SatPhy object.
    */
   Ptr<SatPhy> GetPhy (void) const;
 
   /*
-   * Attach the SatMac mac layer to this netdevice.
-   * @param mac SatMac pointer to be added
+   * \brief Attach the SatMac mac layer to this netdevice.
+   * \param mac SatMac pointer to be added
    */
    void SetMac (Ptr<SatMac> mac);
 
    /**
-    * Get a Mac pointer
+    * \brief Get a Mac pointer
     *
     * \returns Ptr to the SatMac object.
     */
    Ptr<SatMac> GetMac (void) const;
 
    /**
-    * Attach the SatLlc llc layer to this netdevice.
-    * @param llc SatLlc pointer to be added
+    * \brief Attach the SatLlc llc layer to this netdevice.
+    * \param llc SatLlc pointer to be added
     */
     void SetLlc (Ptr<SatLlc> llc);
 
     /**
-     * Get Llc pointer
+     * \brief Get Llc pointer
      *
      * \returns Ptr to the SatLlc object.
      */
     Ptr<SatLlc> GetLlc (void) const;
 
     /**
-     * Set the packet classifier class
-     * @param classifier
+     * \brief Set the packet classifier class
+     * \param classifier
      */
     void SetPacketClassifier (Ptr<SatPacketClassifier> classifier);
 
     /**
-     * Get a pointer to packet classifier class
+     * \brief Get a pointer to packet classifier class
      * \return Ptr<SatPacketClassifier Packet classifier
      */
     Ptr<SatPacketClassifier> GetPacketClassifier () const;
 
     /**
-   * Attach a receive ErrorModel to the SatNetDevice.
+   * \brief Attach a receive ErrorModel to the SatNetDevice. Note,
+   * that this method is not used in the satellite module, since the error
+   * model is located within the implemented sublayers (PHY).
    * \param em Ptr to the ErrorModel.
    */
   void SetReceiveErrorModel (Ptr<ErrorModel> em);
@@ -152,7 +154,7 @@ public:
   virtual Ptr<Channel> GetChannel (void) const;
 
   /**
-   * Set the node info
+   * \brief Set the node info
    * \param nodeInfo containing node specific information
    */
   void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
@@ -209,15 +211,6 @@ private:
    */
   TracedCallback<Time, const Address &> m_rxDelayTrace;
 
-  /**
-   * The trace source fired when the phy layer drops a packet it has received
-   * due to the error model being active.  Although SatNetDevice doesn't
-   * really have a Phy model, we choose this trace source name for alignment
-   * with other trace sources.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_phyRxDropTrace;
 };
 
 } // namespace ns3

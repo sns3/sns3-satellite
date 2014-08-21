@@ -80,7 +80,7 @@ SatTracedInterference::~SatTracedInterference ()
 Ptr<SatInterference::InterferenceChangeEvent>
 SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << power << rxAddress);
 
   Ptr<SatInterference::InterferenceChangeEvent> event;
   event = Create<SatInterference::InterferenceChangeEvent> (0, duration, power, rxAddress);
@@ -99,7 +99,7 @@ SatTracedInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent
 }
 
 void
-SatTracedInterference::DoReset (void)
+SatTracedInterference::DoReset ()
 {
   NS_LOG_FUNCTION (this);
 }

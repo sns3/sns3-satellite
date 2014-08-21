@@ -18,9 +18,14 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "satellite-propagation-delay-model.h"
+#include "ns3/log.h"
+#include "ns3/object.h"
 #include "ns3/double.h"
 #include "ns3/string.h"
+
+#include "satellite-propagation-delay-model.h"
+
+NS_LOG_COMPONENT_DEFINE ("SatConstantPropagationDelayModel");
 
 namespace ns3 {
 
@@ -48,26 +53,29 @@ SatConstantPropagationDelayModel::SatConstantPropagationDelayModel ()
 Time
 SatConstantPropagationDelayModel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
 {
+  NS_LOG_FUNCTION (this);
   return m_delay;
 }
 
 void
 SatConstantPropagationDelayModel::SetDelay (Time delay)
 {
+  NS_LOG_FUNCTION (this << delay.GetSeconds ());
   m_delay = delay;
 }
 
 Time
-SatConstantPropagationDelayModel::GetDelay (void) const
+SatConstantPropagationDelayModel::GetDelay () const
 {
+  NS_LOG_FUNCTION (this);
   return m_delay;
 }
 
 int64_t
-SatConstantPropagationDelayModel::DoAssignStreams (int64_t stream)
+SatConstantPropagationDelayModel::DoAssignStreams(int64_t s)
 {
+  NS_LOG_FUNCTION (this);
   return 0;
 }
-
 
 } // namespace ns3

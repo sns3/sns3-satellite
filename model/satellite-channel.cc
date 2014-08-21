@@ -110,13 +110,7 @@ SatChannel::GetTypeId (void)
                    MakeEnumChecker (SatChannel::ONLY_DEST_NODE, "OnlyDestNode",
                                     SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
                                     SatChannel::ALL_BEAMS, "AllBeams"))
-    .AddTraceSource ("TxRxPointToPoint",
-                     "Trace source indicating transmission of packet from the SatChannel, used by the Animation interface.",
-                     MakeTraceSourceAccessor (&SatChannel::m_txrxPointToPoint))
-    .AddTraceSource ("PacketTrace",
-                     "Packet event trace",
-                     MakeTraceSourceAccessor (&SatChannel::m_packetTrace))
-                     ;
+     ;
   return tid;
 }
 

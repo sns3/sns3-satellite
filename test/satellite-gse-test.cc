@@ -54,6 +54,9 @@ public:
 
   /**
    * Receive packet and check that it is of correct size
+   * \param p Ptr to packet
+   * \param source Source MAC address
+   * \param dest Destination MAC address
    */
   void Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 

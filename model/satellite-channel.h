@@ -222,35 +222,6 @@ private:
   bool m_enableExternalFadingInputTrace;
 
   /**
-   * The trace source for the packet transmission animation events that the
-   * device can fire.
-   * Arguments to the callback are the packet, transmitting
-   * net device, receiving net device, transmission time and
-   * packet receipt time.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet>, // Packet being transmitted
-                 Ptr<NetDevice>,    // Transmitting NetDevice
-                 Ptr<NetDevice>,    // Receiving NetDevice
-                 Time,              // Amount of time to transmit the pkt
-                 Time               // Last bit receive time (relative to now)
-                > m_txrxPointToPoint;
-
-  /**
-   * Trace callback used for packet tracing:
-   */
-  TracedCallback< Time,
-                  SatEnums::SatPacketEvent_t,
-                  SatEnums::SatNodeType_t,
-                  uint32_t,
-                  Mac48Address,
-                  SatEnums::SatLogLevel_t,
-                  SatEnums::SatLinkDir_t,
-                  std::string
-                  > m_packetTrace;
-
-  /**
    * Dispose SatChannel.
    */
   virtual void DoDispose ();

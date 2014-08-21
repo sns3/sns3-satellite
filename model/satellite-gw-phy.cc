@@ -96,7 +96,7 @@ SatGwPhy::GetTypeId (void)
                     MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
                     MakeDoubleChecker<double_t> ())
     .AddAttribute( "ImIfCOverIDb",
-                   "Intermodultation interference, C over I in dB.",
+                   "Intermodulation interference, C over I in dB.",
                     DoubleValue (22.0),
                     MakeDoubleAccessor (&SatGwPhy::m_imInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())

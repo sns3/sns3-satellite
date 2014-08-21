@@ -36,7 +36,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatGeoFeederPhy models the physical layer of the satellite system (UT, GW, satellite)
+ * The SatGeoFeederPhy models the physical layer of the satellite node.
  */
 class SatGeoFeederPhy : public SatPhy
 {
@@ -60,23 +60,28 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+   * \brief Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
    * \param rxParams Transmission parameters
    */
   virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * Receives packets from lower layer (phyRx)
+   * \brief Receives packets from lower layer.
    *
    * \param rxParams Packet reception parameters
+   * \param phyError Boolean indicating whether the packet successfully
+   * received or not? Note, that this parameter is not used in the GEO satellite,
+   * but exists since we are using a general interface defined in the parent
+   * class.
    */
-  virtual void Receive (Ptr<SatSignalParameters> rxParams);
+  virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
-   * Geo Feeder specific SINR calculator.
+   * \brief Geo Feeder specific SINR calculator.
    * Calculate SINR with Geo Feeder PHY specific parameters and given SINR.
    *
-   * \param sinr Calculated (C/NI)
+   * \param sinr Calculated link specific SINR
+   * \return SINR with IM interference
    */
   virtual double CalculateSinr (double sinr);
 

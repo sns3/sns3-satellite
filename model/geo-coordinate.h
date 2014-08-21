@@ -29,6 +29,7 @@
 namespace ns3 {
 
 /**
+ * \ingroup satellite
  * \brief GeoCoordinate class is used to store and operate with geodetic coordinates.
  * Latitude is in the degree range (-90, 90) with negative values -> south
  * Longitude is in the degree range (-180, 180) with negative values -> west

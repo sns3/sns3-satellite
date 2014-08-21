@@ -36,7 +36,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatGeoUserPhy models the physical layer of the satellite system (UT, GW, satellite)
+ * The SatGeoUserPhy models the physical layer of the satellite node.
  */
 class SatGeoUserPhy : public SatPhy
 {
@@ -66,11 +66,15 @@ public:
   virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * Receives packets from lower layer (phyRx)
+   * \brief Receives packets from lower layer.
    *
    * \param rxParams Packet reception parameters
+   * \param phyError Boolean indicating whether the packet successfully
+   * received or not? Note, that this parameter is not used in the GEO satellite,
+   * but exists since we are using a general interface defined in the parent
+   * class.
    */
-  virtual void Receive (Ptr<SatSignalParameters> rxParams);
+  virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
    * Geo User specific SINR calculator.

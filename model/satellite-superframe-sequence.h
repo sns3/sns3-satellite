@@ -56,25 +56,25 @@ public:
   ~SatSuperframeSeq ();
 
   /**
-   * Add waveform configuration class instance to this superframe sequence
+   * \brief Add waveform configuration class instance to this superframe sequence
    * \param wfConf Waveform conf to add
    */
   void AddWaveformConf (Ptr<SatWaveformConf> wfConf);
 
   /**
-   * Get waveform configuration
+   * \brief Get waveform configuration
    * \return SatWaveformConf Waveform configuration class instance
    */
   Ptr<SatWaveformConf> GetWaveformConf () const;
 
   /**
-   * Add super frame (configuration) to super frame sequence
+   * \brief Add super frame (configuration) to super frame sequence
    * \param conf Super frame configuration to add. (id of the sequence is order number of addition starting from 0)
    */
   void AddSuperframe (Ptr<SatSuperframeConf> conf);
 
   /**
-   * Get superframe conf of the sequence.
+   * \brief Get superframe conf of the sequence.
    *
    * \param seqId    Id of the super frame sequence requested.
    * \return The requested super frame conf of the sequence.
@@ -82,7 +82,7 @@ public:
   Ptr<SatSuperframeConf> GetSuperframeConf  (uint8_t seqId ) const;
 
   /**
-   * Get global carrier id. Converts super frame specific id to global carrier id.
+   * \brief Get global carrier id. Converts super frame specific id to global carrier id.
    *
    * \param superframeId       Id of the super frame requested.
    * \param frameId            Id of the frame inside super frame requested.
@@ -93,14 +93,14 @@ public:
   uint32_t GetCarrierId( uint8_t superframeId, uint8_t frameId, uint16_t frameCarrierId ) const;
 
   /**
-   * Get carrier count of the super frame sequence.
+   * \brief Get carrier count of the super frame sequence.
    *
    * \return The super frame sequence carrier count.
    */
   uint32_t GetCarrierCount () const;
 
   /**
-   * Get carrier count in the super frame.
+   * \brief Get carrier count in the super frame.
    *
    * \param seqId Sequence id of the super frame which carrier count is requested.
    *
@@ -109,7 +109,7 @@ public:
   uint32_t GetCarrierCount ( uint8_t seqId ) const;
 
   /**
-   * Get duration of the super frame.
+   * \brief Get duration of the super frame.
    *
    * \param seqId Sequence id of the super frame which duration is requested.
    *
@@ -118,7 +118,7 @@ public:
   Time GetDuration ( uint8_t seqId ) const;
 
   /**
-   * Get the center frequency of the requested carrier.
+   * \brief Get the center frequency of the requested carrier.
    *
    * \param carrierId  Id of the carrier inside super frame which center frequency is requested.
    *
@@ -127,7 +127,7 @@ public:
   double GetCarrierFrequencyHz (uint32_t carrierId) const;
 
   /**
-   * Get the bandwidth of the requested carrier.
+   * \brief Get the bandwidth of the requested carrier.
    *
    * \param carrierId  Id of the carrier inside super frame which bandwidth is requested.
    * \param bandwidthType Type of bandwidth requested.
@@ -137,7 +137,7 @@ public:
   double GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
-   * Get target duration for sequence.
+   * \brief Get target duration for sequence.
    * \return target duration for sequence
    */
   inline Time GetTargetDuration () const { return m_targetDuration; }

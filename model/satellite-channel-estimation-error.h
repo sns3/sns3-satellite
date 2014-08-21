@@ -29,7 +29,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * SatChannelEstimatorError holds the error mean and STD
+ * \brief SatChannelEstimatorError holds the error mean and STD
  * for a set of SINR values. A proper value for a given SINR is
  * interpolated between two points.
  *

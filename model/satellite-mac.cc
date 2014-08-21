@@ -62,7 +62,8 @@ SatMac::GetTypeId (void)
 }
 
 SatMac::SatMac ()
- : m_nodeInfo (),
+ : m_isStatisticsTagsEnabled (false),
+   m_nodeInfo (),
    m_beamId (0)
 {
   NS_LOG_FUNCTION (this);
@@ -70,8 +71,9 @@ SatMac::SatMac ()
 }
 
 SatMac::SatMac (uint32_t beamId)
- : m_nodeInfo (),
-   m_beamId (beamId)
+: m_isStatisticsTagsEnabled (false),
+  m_nodeInfo (),
+  m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
 }

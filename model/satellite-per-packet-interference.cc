@@ -59,15 +59,15 @@ SatPerPacketInterference::SatPerPacketInterference ()
   NS_LOG_FUNCTION (this);
 }
 
-SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth)
+SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz)
   : m_residualPowerW (0.0),
     m_rxing (false),
     m_nextEventId (0),
     m_enableTraceOutput (true),
-    m_channelType (channeltype),
-    m_rxBandwidth_Hz (rxBandwidth)
+    m_channelType (channelType),
+    m_rxBandwidth_Hz (rxBandwidthHz)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << channelType << rxBandwidthHz);
 
   if (!m_rxBandwidth_Hz > 0)
     {
@@ -217,7 +217,7 @@ SatPerPacketInterference::DoNotifyRxStart (Ptr<SatInterference::InterferenceChan
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<std::set<uint32_t>::iterator, bool> result = m_events.insert (event->GetId ());
+  std::pair<std::set<uint32_t>::iterator, bool> result = m_rxEventIds.insert (event->GetId ());
 
   NS_ASSERT (result.second);
   m_rxing = true;
@@ -228,9 +228,9 @@ SatPerPacketInterference::DoNotifyRxEnd (Ptr<SatInterference::InterferenceChange
 {
   NS_LOG_FUNCTION (this);
 
-  m_events.erase (event->GetId ());
+  m_rxEventIds.erase (event->GetId ());
 
-  if (m_events.empty ())
+  if (m_rxEventIds.empty ())
     {
       m_rxing = false;
     }
@@ -247,7 +247,7 @@ SatPerPacketInterference::DoDispose ()
 void
 SatPerPacketInterference::SetRxBandwidth (double rxBandwidth)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << rxBandwidth);
 
   if (!m_rxBandwidth_Hz > 0)
     {

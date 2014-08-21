@@ -39,20 +39,22 @@ public:
   ~SatFreeSpaceLoss () {}
 
   /**
+   * \brief Calculate the free-space loss in linear format
+   * \param a Mobility model of node a
+   * \param b Mobility model of node b
+   * \param frequencyHz Frequency in Hertz
    * \return the free space loss as ratio.
    */
-  virtual double GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const;
+  virtual double GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
 
   /**
+   * \brief Calculate the free-space loss in dB
+   * \param a Mobility model of node a
+   * \param b Mobility model of node b
+   * \param frequencyHz Frequency in Hertz
    * \return the free space loss as dBs.
    */
-  virtual double GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const;
-
-private:
-  virtual int64_t DoAssignStreams (int64_t stream);
-
-  // the speed of light in m/s
-  static const double C = 299792458.0;
+  virtual double GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
 };
 
 

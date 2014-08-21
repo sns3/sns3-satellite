@@ -56,9 +56,6 @@ SatNetDevice::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatNetDevice::m_receiveErrorModel),
                    MakePointerChecker<ErrorModel> ())
-    .AddTraceSource ("PhyRxDrop",
-                     "Trace source indicating a packet has been dropped by the device during reception",
-                     MakeTraceSourceAccessor (&SatNetDevice::m_phyRxDropTrace))
     .AddAttribute ("SatMac", "The Satellite MAC layer attached to this device.",
                     PointerValue (),
                     MakePointerAccessor (&SatNetDevice::GetMac,

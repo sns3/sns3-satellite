@@ -23,8 +23,9 @@
 #include "ns3/string.h"
 #include "satellite-free-space-loss.h"
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE ("SatFreeSpaceLoss");
 
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatFreeSpaceLoss);
 
@@ -42,30 +43,28 @@ SatFreeSpaceLoss::SatFreeSpaceLoss ()
 }
 
 double
-SatFreeSpaceLoss::GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const
+SatFreeSpaceLoss::GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const
 {
+  NS_LOG_FUNCTION (this << frequencyHz);
+
   double fsl_dB;
 
-  fsl_dB = SatUtils::LinearToDb( GetFsl(a,b, frequency) );
+  fsl_dB = SatUtils::LinearToDb( GetFsl(a,b, frequencyHz) );
 
   return fsl_dB;
 }
 
 double
-SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequency) const
+SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const
 {
+  NS_LOG_FUNCTION (this << frequencyHz);
+
   double fsl;
   double distance = a->GetDistanceFrom(b);
 
-  fsl = std::pow( ( (4.0 * M_PI * distance * frequency ) / SatUtils::SPEED_OF_LIGHT ), 2.0 );
+  fsl = std::pow( ( (4.0 * M_PI * distance * frequencyHz ) / SatUtils::SPEED_OF_LIGHT ), 2.0 );
 
   return fsl;
-}
-
-int64_t
-SatFreeSpaceLoss::DoAssignStreams (int64_t stream)
-{
-  return 0;
 }
 
 

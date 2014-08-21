@@ -28,7 +28,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Satellite mobility model for which the current position does not change once it has been set and until it is set again explicitely to a new value.
+ * \brief Satellite mobility model for which the current position does not change
+ * once it has been set and until it is set again explicitly to a new value.
  */
 class SatConstantPositionMobilityModel : public SatMobilityModel
 {

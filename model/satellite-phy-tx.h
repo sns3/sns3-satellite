@@ -40,7 +40,7 @@ class SatChannel;
 /**
  * \ingroup satellite
  *
- * The SatellitePhyTx models the physical layer transmitter of satellite system
+ * \brief The SatellitePhyTx models the physical layer transmitter of satellite system
  *
  */
 class SatPhyTx : public Object

@@ -29,7 +29,7 @@
  * \ingroup satellite
  *
  * \brief SatGseHeader implementation. GSE header is added to full
- * or fragmented HL packets at the GW and decapsuled at the UT. Header
+ * or fragmented HL packets at the GW and decapsulated at the UT. Header
  * size affects the total packet size.
  */
 namespace ns3 {

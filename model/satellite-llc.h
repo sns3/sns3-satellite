@@ -59,7 +59,6 @@ public:
 };
 
 /**
- * \ingroup satellite
  * \brief EncapKeyCompare is used as a custom compare method within
  * EncapContainer map.
  */

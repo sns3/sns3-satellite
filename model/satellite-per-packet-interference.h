@@ -31,7 +31,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Packet by packet interference. Interference is calculated packet
+ * \brief Packet by packet interference. Interference is calculated
+ * separately for each packet by listening to all transmissions within
+ * the same SatChannel.
  */
 class SatPerPacketInterference : public SatInterference
 {
@@ -55,10 +57,10 @@ public:
 
   /**
    *
-   * \param channeltype
-   * \param rxBandwidth
+   * \param channelType
+   * \param rxBandwidthHz Receiver bandwidth in Hertz
    */
-  SatPerPacketInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth);
+  SatPerPacketInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz);
 
   /**
    *
@@ -147,7 +149,7 @@ private:
   /**
    * \brief notified interference event IDs
    */
-  std::set <uint32_t> m_events;
+  std::set <uint32_t> m_rxEventIds;
 
   /**
    * \brief Residual power value for interference.

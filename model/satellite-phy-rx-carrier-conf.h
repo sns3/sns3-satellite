@@ -30,6 +30,8 @@
 namespace ns3 {
 
 /**
+ * \ingroup satellite
+ *
  * \brief Information of beam users liken UTs and their users.
  * Used e.g. when creating beams.
  *

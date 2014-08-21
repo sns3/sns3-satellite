@@ -200,7 +200,7 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 }
 
 void
-SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams)
+SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool /*phyError*/)
 {
   NS_LOG_FUNCTION (this << rxParams);
 

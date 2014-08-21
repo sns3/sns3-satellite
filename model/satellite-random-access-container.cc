@@ -341,8 +341,6 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
   NS_LOG_INFO ("------ Random Access FINISHED ------");
   NS_LOG_INFO ("------------------------------------");
 
-  txOpportunities.allocationChannel = allocationChannel;
-
   return txOpportunities;
 }
 

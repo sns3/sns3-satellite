@@ -29,7 +29,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief the propagation delay is constant (for satellite use)
+ * \brief The propagation delay is constant in time.
  */
 class SatConstantPropagationDelayModel : public PropagationDelayModel
 {
@@ -39,17 +39,33 @@ public:
   SatConstantPropagationDelayModel ();
 
   /**
+   * \brief Get the propagation delay in Time
    * \param a the source
    * \param b the destination
-   * \returns the propagation delay (s).
+   * \returns Propagation delay.
    */
   virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
+  /**
+   * \brief Get the propagation delay in Time
+   * \returns Propagation delay.
+   */
   virtual Time GetDelay (void) const;
+
+  /**
+   * Set constant propagation delay.
+   * \param delay Delay in Time.
+   */
   void SetDelay (Time delay);
 
+  /**
+   * DoAssignStreams need to be implemented due to inheritance from
+   * PropagationDelayModel
+   */
+  int64_t DoAssignStreams(int64_t s);
+
 private:
-  virtual int64_t DoAssignStreams (int64_t stream);
+
   Time m_delay;
 };
 

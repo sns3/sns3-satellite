@@ -45,7 +45,7 @@ class SatSuperframeAllocator : public Object
 {
 public:
   /**
-   * Construct SatSuperframeAllocator
+   * \brief Construct SatSuperframeAllocator
    * \param superFrameConf Super frame configuration
    * \param maxRcCount Maximum number of the RCs
    */
@@ -61,14 +61,14 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Get super frame duration.
+   * \brief Get super frame duration.
    *
    *  \return Super frame duration.
    **/
   inline Time GetSuperframeDuration () const { return m_superframeConf->GetDuration(); }
 
   /**
-   * Reserve minimum rate from the allocator. This method is called to perform CAC functionality.
+   * \brief Reserve minimum rate from the allocator. This method is called to perform CAC functionality.
    *
    * \param minimumRateBytes Minimum rate based bytes needed to reserve
    * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
@@ -76,13 +76,13 @@ public:
   void ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
 
   /**
-   * Preallocate symbols for given to UTs in superframe.
+   * \brief Preallocate symbols for given to UTs in superframe.
    * Pre-allocation is done in fairly manner between UTs and RCs.
    */
   void PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
 
   /**
-   * Generate time slots in TBTP(s) for the UT/RC.
+   * \brief Generate time slots in TBTP(s) for the UT/RC.
    *
    * \param tbtpContainer TBTP message container to add/fill TBTPs.
    * \param maxFrameSizeInBytes Maximum size for a TBTP message.

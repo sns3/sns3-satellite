@@ -62,9 +62,6 @@ SatGeoNetDevice::GetTypeId (void)
                     ObjectMapValue (),
                     MakeObjectMapAccessor (&SatGeoNetDevice::m_feederPhy),
                     MakeObjectMapChecker<SatPhy> ())
-    .AddTraceSource ("PhyRxDrop",
-                     "Trace source indicating a packet has been dropped by the device during reception",
-                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_phyRxDropTrace))
   ;
   return tid;
 }
@@ -72,15 +69,17 @@ SatGeoNetDevice::GetTypeId (void)
 SatGeoNetDevice::SatGeoNetDevice ()
   : m_node (0),
     m_mtu (0xffff),
-    m_ifIndex (0)
+    m_ifIndex (0),
+    m_phyCount (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
+
 void
 SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << rxParams);
+  NS_LOG_FUNCTION (this << packets.size () << rxParams);
   NS_LOG_LOGIC (this << " receiving a packet at the satellite from user link");
   m_feederPhy[rxParams->m_beamId]->SendPduWithParams (rxParams);
 }
@@ -88,7 +87,7 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
 void
 SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this  << rxParams);
+  NS_LOG_FUNCTION (this << packets.size () << rxParams);
   NS_LOG_LOGIC (this << " receiving a packet at the satellite from feeder link");
   m_userPhy[rxParams->m_beamId]->SendPduWithParams (rxParams);
 }

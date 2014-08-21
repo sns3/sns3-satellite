@@ -63,8 +63,10 @@ SatPositionAllocator::~SatPositionAllocator ()
 }
 
 Vector
-SatPositionAllocator::GetNext(void) const
+SatPositionAllocator::GetNext() const
 {
+  NS_LOG_LOGIC (this);
+
   GeoCoordinate pos = GetNextGeo();
 
   if ( m_GetAsGeoCoordinates )
@@ -100,12 +102,16 @@ SatListPositionAllocator::SatListPositionAllocator ()
 void
 SatListPositionAllocator::Add (GeoCoordinate coordinate)
 {
+  NS_LOG_LOGIC (this << coordinate.GetLatitude () << coordinate.GetLongitude () << coordinate.GetAltitude ());
+
   m_positions.push_back (coordinate);
   m_current = m_positions.begin ();
 }
 GeoCoordinate
-SatListPositionAllocator::GetNextGeo (void) const
+SatListPositionAllocator::GetNextGeo () const
 {
+  NS_LOG_LOGIC (this);
+
   GeoCoordinate coordinate = *m_current;
   m_current++;
 
@@ -155,28 +161,35 @@ SatRandomBoxPositionAllocator::~SatRandomBoxPositionAllocator ()
 void
 SatRandomBoxPositionAllocator::SetLongitude (Ptr<RandomVariableStream> longitude)
 {
+  NS_LOG_LOGIC (this);
+
   m_longitude = longitude;
 }
 void
 SatRandomBoxPositionAllocator::SetLatitude (Ptr<RandomVariableStream> latitude)
 {
+  NS_LOG_LOGIC (this);
+
   m_latitude = latitude;
 }
 
 void
 SatRandomBoxPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 {
+  NS_LOG_LOGIC (this);
+
   m_altitude = altitude;
 }
 
 GeoCoordinate
-SatRandomBoxPositionAllocator::GetNextGeo (void) const
+SatRandomBoxPositionAllocator::GetNextGeo () const
 {
-    double longitude = m_longitude->GetValue ();
-    double latitude = m_latitude->GetValue ();
-    double altitude = m_altitude->GetValue ();
+  NS_LOG_LOGIC (this);
+  double longitude = m_longitude->GetValue ();
+  double latitude = m_latitude->GetValue ();
+  double altitude = m_altitude->GetValue ();
 
-    return GeoCoordinate (latitude, longitude, altitude);
+  return GeoCoordinate (latitude, longitude, altitude);
 }
 
 int64_t
@@ -213,12 +226,15 @@ SatSpotBeamPositionAllocator::GetTypeId (void)
 }
 
 SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator ()
+:m_targetBeamId (0),
+ m_minElevationAngleInDeg (1)
 {
 
 }
 
 SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patterns, GeoCoordinate geoPos)
  :m_targetBeamId (beamId),
+  m_minElevationAngleInDeg (1),
   m_antennaGainPatterns (patterns),
   m_geoPos (geoPos)
 {
@@ -232,12 +248,16 @@ SatSpotBeamPositionAllocator::~SatSpotBeamPositionAllocator ()
 void
 SatSpotBeamPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 {
+  NS_LOG_FUNCTION (this);
+
   m_altitude = altitude;
 }
 
 GeoCoordinate
-SatSpotBeamPositionAllocator::GetNextGeo (void) const
+SatSpotBeamPositionAllocator::GetNextGeo () const
 {
+  NS_LOG_FUNCTION (this);
+
   uint32_t bestBeamId (std::numeric_limits<uint32_t>::max());
   Ptr<SatAntennaGainPattern> agp = m_antennaGainPatterns->GetAntennaGainPattern (m_targetBeamId);
   uint32_t tries (0);
@@ -289,6 +309,8 @@ SatSpotBeamPositionAllocator::GetNextGeo (void) const
 int64_t
 SatSpotBeamPositionAllocator::AssignStreams (int64_t stream)
 {
+  NS_LOG_FUNCTION (this);
+
   m_altitude->SetStream (stream + 2);
   return 3;
 }

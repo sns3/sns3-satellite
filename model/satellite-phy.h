@@ -114,7 +114,7 @@ public:
    * Calculate final SINR with PHY specific parameters and given calculated SINR.
    * Objects inheriting this PHY object must implement this method.
    *
-   * \param sinr Calculated C/NI
+   * \param sinr Calculated SINR
    */
   virtual double CalculateSinr (double sinr) = 0;
 
@@ -328,9 +328,11 @@ public:
   void SetBeamId (uint32_t beamId);
 
   /**
-   * Receives packets from lower layer (phyRx)
+   * \brief Receives packets from lower layer.
    *
    * \param rxParams Packet reception parameters
+   * \param phyError Boolean indicating whether the packet successfully
+   * received or not?
    */
   virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 

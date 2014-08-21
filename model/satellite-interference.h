@@ -30,7 +30,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief abstract class defining interface for interference calculations objects
+ * \brief Abstract class defining interface for interference calculations objects
  */
 class SatInterference : public Object
 {

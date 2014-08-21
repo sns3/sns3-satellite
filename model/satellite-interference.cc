@@ -39,38 +39,50 @@ SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent ()
 }
 
 uint32_t
-SatInterference::InterferenceChangeEvent::GetId (void) const
+SatInterference::InterferenceChangeEvent::GetId () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_id;
 }
 
 Time
-SatInterference::InterferenceChangeEvent::GetDuration (void) const
+SatInterference::InterferenceChangeEvent::GetDuration () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_endTime - m_startTime;
 }
 
 Time
-SatInterference::InterferenceChangeEvent::GetStartTime (void) const
+SatInterference::InterferenceChangeEvent::GetStartTime () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_startTime;
 }
 
 Time
-SatInterference::InterferenceChangeEvent::GetEndTime (void) const
+SatInterference::InterferenceChangeEvent::GetEndTime () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_endTime;
 }
 
 double
-SatInterference::InterferenceChangeEvent::GetRxPower (void) const
+SatInterference::InterferenceChangeEvent::GetRxPower () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_rxPower;
 }
 
 Address
-SatInterference::InterferenceChangeEvent::GetSatEarthStationAddress (void) const
+SatInterference::InterferenceChangeEvent::GetSatEarthStationAddress () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_satEarthStationAddress;
 }
 /****************************************************************
@@ -108,12 +120,16 @@ SatInterference::~SatInterference ()
 Ptr<SatInterference::InterferenceChangeEvent>
 SatInterference::Add (Time duration, double power, Address rxAddress)
 {
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << power << rxAddress);
+
   return DoAdd (duration, power, rxAddress);
 }
 
 double
 SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
+  NS_LOG_FUNCTION (this);
+
   if (m_currentlyReceiving > 1)
     {
       std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator iter;
@@ -137,8 +153,10 @@ SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 }
 
 void
-SatInterference::Reset (void)
+SatInterference::Reset ()
 {
+  NS_LOG_FUNCTION (this);
+
   m_packetCollisions.clear ();
   m_currentlyReceiving = 0;
 
@@ -148,6 +166,8 @@ SatInterference::Reset (void)
 void
 SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
+  NS_LOG_FUNCTION (this);
+
   m_currentlyReceiving++;
 
   std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator,bool> result;
@@ -155,7 +175,7 @@ SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> ev
 
   if (!result.second)
     {
-      NS_FATAL_ERROR ("SatConstantInterference::DoAdd - Event already exists");
+      NS_FATAL_ERROR ("SatInterference::NotifyRxStart - Event already exists");
     }
 
   DoNotifyRxStart (event);
@@ -164,6 +184,8 @@ SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> ev
 void
 SatInterference::NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
+  NS_LOG_FUNCTION (this);
+
   if (m_currentlyReceiving > 0)
     {
       m_currentlyReceiving--;
@@ -177,11 +199,13 @@ SatInterference::NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> even
 bool
 SatInterference::HasCollision (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
+  NS_LOG_FUNCTION (this);
+
   std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator result = m_packetCollisions.find (event);
 
   if (result == m_packetCollisions.end ())
     {
-      NS_FATAL_ERROR ("SatConstantInterference::DoHasCollision - Event not found");
+      NS_FATAL_ERROR ("SatInterference::HasCollision - Event not found");
     }
 
   return result->second;

@@ -30,7 +30,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * SatChannelEstimationErrorContainer is responsible of adding a channel
+ * \brief SatChannelEstimationErrorContainer is responsible of adding a channel
  * estimation error on top of raw measured SINR. Channel estimation error
  * functions in dB domain. Abstract base class SatChannelEstimationErrorContainer
  * defines the interface method, but the actual implementation is in inherited
