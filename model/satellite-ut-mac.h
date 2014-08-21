@@ -35,20 +35,6 @@
 
 namespace ns3 {
 
-/**
- * This class sorts time slots within TBTP into increasing order based
- * on start time.
- */
-class SortTimeSlots
-{
-public:
-  SortTimeSlots () {};
-
-  bool operator() (Ptr<SatTimeSlotConf> p1, Ptr<SatTimeSlotConf> p2)
-  {
-    return p1->GetStartTime () < p2->GetStartTime ();
-  }
-};
 
 /**
  * \ingroup satellite
@@ -63,6 +49,7 @@ public:
  * more RLE PDUs.
  *
  */
+
 class SatUtMac : public SatMac
 {
 public:
@@ -352,13 +339,6 @@ private:
    * \brief Function which is executed at every frame start.
    */
   void DoFrameStart ();
-
-  /**
-   * \brief Check TBTP time slots so that they do no overlap!
-   * \param tbtp Received TBTP
-   * \return bool True if TBTP is valid
-   */
-  bool CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const;
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);

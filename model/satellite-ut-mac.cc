@@ -49,7 +49,6 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatUtMac);
 
-//#define SAT_CHECK_TBTP_CONTENT
 
 TypeId 
 SatUtMac::GetTypeId (void)
@@ -249,10 +248,6 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * send the time slots at different times so that the transmissions are received at the GW
    * at correct time.
    */
-
-#ifdef SAT_CHECK_TBTP_CONTENT
-  CheckTbtpMessage (tbtp);
-#endif
 
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
@@ -1129,58 +1124,5 @@ SatUtMac::DoFrameStart ()
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
 }
 
-
-bool
-SatUtMac::CheckTbtpMessage (Ptr<SatTbtpMessage> tbtp) const
-{
-  NS_LOG_FUNCTION (this);
-  SatTbtpMessage::DaTimeSlotInfoItem_t info = tbtp->GetDaTimeslots (m_nodeInfo->GetMacAddress ());
-
-  Time prevEnd;
-  bool first (true);
-
-  if (!info.second.empty ())
-    {
-      NS_LOG_LOGIC ("Number of time slots: " << info.second.size ());
-
-      // Ensure that the time slots are in increasing order
-      // based on start time
-      std::sort (info.second.begin (), info.second.end (), SortTimeSlots ());
-
-      uint32_t i (0);
-      uint8_t frameId (info.first);
-
-      for ( SatTbtpMessage::DaTimeSlotConfContainer_t::iterator it = info.second.begin (); it != info.second.end (); it++ )
-        {
-          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
-          Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
-          Ptr<SatTimeSlotConf> timeSlotConf = *it;
-
-          // Start time
-          Time startTime = timeSlotConf->GetStartTime ();
-
-          // Carrier
-          uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
-
-          NS_LOG_LOGIC ("Time slot: " << i << " start time: " << startTime.GetSeconds () << " carrier id: " << carrierId);
-          if (first != true && prevEnd >= startTime)
-            {
-              NS_FATAL_ERROR ("Time slots in TBTP are overlapping! Current start time: " << startTime.GetSeconds () << " previous timeslot end time: " << prevEnd.GetSeconds () <<  " carrier id: " << carrierId);
-            }
-
-          // Duration
-          Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (timeSlotConf->GetWaveFormId ());
-          Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-          prevEnd = startTime + duration - m_guardTime;
-
-          NS_LOG_LOGIC ("Time slot: " << i << " end time: " << prevEnd.GetSeconds () << " carrier id: " << carrierId);
-
-          first = false;
-          ++i;
-        }
-    }
-
-  return true;
-}
 
 } // namespace ns3

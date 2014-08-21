@@ -18,6 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include <algorithm>
+#include <iostream>
 #include "ns3/mac48-address.h"
 #include "ns3/uinteger.h"
 #include "ns3/nstime.h"
@@ -119,6 +121,7 @@ SatTbtpContainer::RemovePastTbtps ()
     }
 }
 
+
 bool
 SatTbtpContainer::HasScheduledTimeSlots ()
 {
@@ -136,16 +139,54 @@ SatTbtpContainer::HasScheduledTimeSlots ()
           ++it)
         {
           info = it->second->GetDaTimeslots (m_address);
+
+          // This TBTP has time slots for this UT
           if (!info.second.empty ())
             {
-              hasScheduledTimeSlots = true;
-              break;
+              Time superframeStartTime = it->first;
+
+              // If superframe start time is in the future
+              if (superframeStartTime >= Simulator::Now ())
+                {
+                  NS_LOG_INFO ("Superframe counter: " << it->second->GetSuperframeCounter () <<
+                               ", start time: " << superframeStartTime.GetSeconds ());
+
+                  hasScheduledTimeSlots = true;
+                  break;
+                }
+              // On-going superframe
+              else
+                {
+                  /**
+                   * The time slots are not necessarily in increasing order in the TBTP.
+                   * Sort the time slots into increasing order based on time.
+                   */
+                  std::sort (info.second.begin (), info.second.end (), SortTimeSlots ());
+
+                  // Start time offset for the last time slot for this UT
+                  Time startTimeOffsetForLastSlot = (*(info.second.rbegin ()))->GetStartTime ();
+
+                  NS_LOG_INFO ("Superframe counter: " << it->second->GetSuperframeCounter () <<
+                               ", start time: " << superframeStartTime.GetSeconds () <<
+                               ", last allocated slot time: " << (superframeStartTime + startTimeOffsetForLastSlot).GetSeconds());
+
+                  /**
+                   * Check that the TBTP has a time slot which is in the future. It does not matter
+                   * how long to the future the time slot is, since the same method may be used for both
+                   * CRDSA and SA, and we do not have any idea of what are their randomization intervals etc.
+                   */
+                  if (superframeStartTime + startTimeOffsetForLastSlot > Simulator::Now())
+                    {
+                      hasScheduledTimeSlots = true;
+                    }
+                  break;
+                }
             }
         }
     }
+
   return hasScheduledTimeSlots;
 }
-
 
 } // namespace
 

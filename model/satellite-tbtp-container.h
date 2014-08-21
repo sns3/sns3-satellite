@@ -25,10 +25,29 @@
 #include "ns3/object.h"
 #include "ns3/mac48-address.h"
 #include "satellite-control-message.h"
+#include "satellite-frame-conf.h"
 
 namespace ns3 {
 
+
 /**
+ * \ingroup satellite
+ * This class sorts time slots within TBTP into increasing order based
+ * on start time.
+ */
+class SortTimeSlots
+{
+public:
+  SortTimeSlots () {};
+
+  bool operator() (Ptr<SatTimeSlotConf> p1, Ptr<SatTimeSlotConf> p2)
+  {
+    return p1->GetStartTime () < p2->GetStartTime ();
+  }
+};
+
+/**
+ * \ingroup satellite
  * \brief A container of received TBTPs. All the received TBTPs with
  * the calculated transmit time are stored here. The container may be
  * used to check whether the UT has known scheduled time slots in the
