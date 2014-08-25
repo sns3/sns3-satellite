@@ -54,7 +54,6 @@ class SatMac;
 class SatPhy : public Object
 {
 public:
-  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
   typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;
   typedef SatSignalParameters::PacketsInBurst_t PacketContainer_t;

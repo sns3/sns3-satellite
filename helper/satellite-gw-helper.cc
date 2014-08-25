@@ -100,7 +100,7 @@ SatGwHelper::SatGwHelper ()
   NS_FATAL_ERROR ("Default constructor not supported!!!");
 }
 
-SatGwHelper::SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
                           uint32_t rtnLinkCarrierCount,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
@@ -238,7 +238,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   parameters.m_errorModel = m_errorModel;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
-  parameters.m_converter = m_carrierBandwidthConverter;
+  parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_rtnLinkCarrierCount;
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;

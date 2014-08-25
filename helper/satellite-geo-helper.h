@@ -32,6 +32,7 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
 
 namespace ns3 {
 
@@ -42,7 +43,6 @@ namespace ns3 {
 class SatGeoHelper : public Object
 {
 public:
-  typedef SatPhy::CarrierBandwidthConverter CarrierBandwidthConverter;
 
   typedef struct
   {
@@ -60,7 +60,7 @@ public:
    * Create a SatGeoHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb,
+  SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                 uint32_t rtnLinkCarrierCount,
                 uint32_t fwdLinkCarrierCount,
                 Ptr<SatSuperframeSeq> seq,
@@ -166,7 +166,7 @@ private:
 	 */
     uint32_t m_nodeId;
 
-    CarrierBandwidthConverter m_carrierBandwidthConverter;
+    SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
     uint32_t m_rtnLinkCarrierCount;
 

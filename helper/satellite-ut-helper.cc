@@ -125,7 +125,7 @@ SatUtHelper::SatUtHelper ()
   NS_FATAL_ERROR ("SatUtHelper::SatUtHelper - Constructor not in use");
 }
 
-SatUtHelper::SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
                           uint32_t fwdLinkCarrierCount,
                           Ptr<SatSuperframeSeq> seq,
                           SatMac::ReadCtrlMsgCallback readCb,
@@ -247,7 +247,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   parameters.m_errorModel = m_errorModel;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
-  parameters.m_converter = m_carrierBandwidthConverter;
+  parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;

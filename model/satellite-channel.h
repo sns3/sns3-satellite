@@ -30,7 +30,9 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-free-space-loss.h"
 #include "satellite-phy-rx.h"
+#include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-enums.h"
+#include "satellite-typedefs.h"
 
 namespace ns3 {
 
@@ -67,7 +69,7 @@ public:
    * ONLY_DEST_BEAM = only the receivers within the proper spot-beam shall receive the packet
    * ALL_BEAMS = all receivers in the channel shall receive the packet
    */
-  enum SatChannelRxMode_e
+  enum SatChannelFwdMode_e
     {
       ONLY_DEST_NODE,
       ONLY_DEST_BEAM,
@@ -76,7 +78,7 @@ public:
 
   static TypeId GetTypeId (void);
 
-  typedef std::vector<Ptr<SatPhyRx> > PhyList;
+  typedef std::vector<Ptr<SatPhyRx> > PhyRxContainer;
 
   /**
    * \brief
@@ -117,6 +119,13 @@ public:
    * \param converter The frequency converter callback.
    */
   virtual void SetFrequencyConverter (CarrierFreqConverter converter);
+
+  /**
+   * \brief Set the bandwidth converter callback.
+   *
+   * \param converter The bandwidth converter callback.
+   */
+  virtual void SetBandwidthConverter (SatTypedefs::CarrierBandwidthConverter_t converter);
 
   /**
    * \brief Get the type of the channel.
@@ -165,16 +174,16 @@ public:
 private:
 
   /**
-   * Receiving mode of the SatChannel:
+   * Forwarding mode of the SatChannel:
    * SINGLE_RX = only the proper receiver of the packet shall receive the packet
    * MULTI_RX = all receivers in the channel shall receive the packet
    */
-  SatChannelRxMode_e m_rxMode;
+  SatChannelFwdMode_e m_fwdMode;
 
   /**
-   * \brief list of SatPhyRx instances attached to the channel
+   * \brief Container of SatPhyRx instances attached to the channel
    */
-  PhyList m_phyList;
+  PhyRxContainer m_phyRxContainer;
 
   /**
    * \brief Type of the channel
@@ -182,9 +191,14 @@ private:
   SatEnums::ChannelType_t m_channelType;
 
   /**
-   * \brief Frequency coverter callback.
+   * \brief Frequency converter callback.
    */
   CarrierFreqConverter m_carrierFreqConverter;
+
+  /**
+   * \brief Bandwidth converter callback.
+   */
+  SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
 
   /**
    * \brief Frequency id of the channel

@@ -37,6 +37,8 @@
 #include "../model/satellite-antenna-gain-pattern-container.h"
 #include "../model/satellite-packet-trace.h"
 #include "../model/satellite-utils.h"
+#include "../model/satellite-enums.h"
+#include "../model/satellite-typedefs.h"
 #include "satellite-beam-helper.h"
 #include "ns3/satellite-fading-input-trace-container.h"
 #include "ns3/satellite-fading-input-trace.h"
@@ -143,11 +145,12 @@ SatBeamHelper::SatBeamHelper () :
 }
 
 SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
-                              CarrierBandwidthConverter bandwidthConverterCb,
+                              SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                               uint32_t rtnLinkCarrierCount,
                               uint32_t fwdLinkCarrierCount,
                               Ptr<SatSuperframeSeq> seq)
-  : m_superframeSeq (seq),
+  : m_carrierBandwidthConverter (bandwidthConverterCb),
+    m_superframeSeq (seq),
     m_printDetailedInformationToCreationTraces (false),
     m_fadingModel (SatEnums::FADING_MARKOV),
     m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
@@ -943,6 +946,9 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
 
         forwardCh->SetFrequencyConverter (m_carrierFreqConverter);
         returnCh->SetFrequencyConverter (m_carrierFreqConverter);
+
+        forwardCh->SetBandwidthConverter (m_carrierBandwidthConverter);
+        returnCh->SetBandwidthConverter (m_carrierBandwidthConverter);
 
         forwardCh->SetFrequencyId (frequencyId);
         returnCh->SetFrequencyId (frequencyId);

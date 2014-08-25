@@ -289,6 +289,7 @@ def build(bld):
         'model/satellite-tbtp-container.h',
         'model/satellite-time-tag.h',
         'model/satellite-traced-interference.h',
+        'model/satellite-typedefs.h',
         'model/satellite-ut-llc.h',        
         'model/satellite-ut-mac.h',
         'model/satellite-ut-phy.h',

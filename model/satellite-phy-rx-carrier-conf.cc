@@ -64,7 +64,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
    m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
    m_rxMode (createParams.m_rxMode),
    m_carrierCount (createParams.m_carrierCount),
-   m_carrierBandwidthConverter (createParams.m_converter),
+   m_carrierBandwidthConverter (createParams.m_bwConverter),
    m_channelType (createParams.m_chType),
    m_channelEstimationError (createParams.m_cec),
    m_sinrCalculate (),

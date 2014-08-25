@@ -33,6 +33,7 @@
 #include "ns3/satellite-mac.h"
 #include "ns3/satellite-bbframe-conf.h"
 #include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
 
 namespace ns3 {
 
@@ -43,7 +44,6 @@ namespace ns3 {
 class SatGwHelper : public Object
 {
 public:
-  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
 
   typedef struct
   {
@@ -60,7 +60,7 @@ public:
    * Create a SatGwHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatGwHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+  SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
                uint32_t fwdLinkCarrierCount,
                Ptr<SatSuperframeSeq> seq,
                SatMac::ReadCtrlMsgCallback readCb,
@@ -156,7 +156,7 @@ public:
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
-  CarrierBandwidthConverter  m_carrierBandwidthConverter;
+  SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   uint32_t m_rtnLinkCarrierCount;
   Ptr<SatSuperframeSeq> m_superframeSeq;
 

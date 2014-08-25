@@ -96,7 +96,7 @@ SatGeoHelper::SatGeoHelper()
   NS_ASSERT (false);
 }
 
-SatGeoHelper::SatGeoHelper (CarrierBandwidthConverter bandwidthConverterCb,
+SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                             uint32_t rtnLinkCarrierCount,
                             uint32_t fwdLinkCarrierCount,
                             Ptr<SatSuperframeSeq> seq,
@@ -209,7 +209,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
   parametersUser.m_raIfModel = m_raSettings.m_raInterferenceModel;
-  parametersUser.m_converter = m_carrierBandwidthConverter;
+  parametersUser.m_bwConverter = m_carrierBandwidthConverter;
   parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
   parametersUser.m_cec = cec;
   parametersUser.m_raCollisionModel = m_raSettings.m_raCollisionModel;
@@ -217,7 +217,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
   parametersFeeder.m_raIfModel = m_raSettings.m_raInterferenceModel;
-  parametersFeeder.m_converter = m_carrierBandwidthConverter;
+  parametersFeeder.m_bwConverter = m_carrierBandwidthConverter;
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
   parametersFeeder.m_cec = cec;
   parametersFeeder.m_raCollisionModel = m_raSettings.m_raCollisionModel;

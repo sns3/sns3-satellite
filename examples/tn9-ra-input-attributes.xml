@@ -22,8 +22,8 @@
  <default name="ns3::SatChannel::EnableRxPowerOutputTrace" value="false"/>
  <default name="ns3::SatChannel::EnableFadingOutputTrace" value="false"/>
  <default name="ns3::SatChannel::EnableExternalFadingInputTrace" value="false"/>
+ <default name="ns3::SatChannel::ForwardingMode" value="AllBeams"/>
  <default name="ns3::SatChannel::RxPowerCalculationMode" value="RxPowerCalculation"/>
- <default name="ns3::SatChannel::RxMode" value="AllBeams"/>
  <default name="ns3::SatConstantInterference::ConstantInterferencePower" value="0"/>
  <default name="ns3::SatMobilityModel::AsGeoCoordinates" value="true"/>
  <default name="ns3::SatTbtpMessage::AssigmentFormat" value="0"/>

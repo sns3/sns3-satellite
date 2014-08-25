@@ -35,6 +35,7 @@
 #include "ns3/satellite-mac.h"
 #include "ns3/satellite-random-access-container.h"
 #include "ns3/satellite-random-access-container-conf.h"
+#include "ns3/satellite-typedefs.h"
 
 namespace ns3 {
 
@@ -45,7 +46,6 @@ namespace ns3 {
 class SatUtHelper : public Object
 {
 public:
-  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
 
   typedef struct
   {
@@ -63,7 +63,7 @@ public:
    * Create a SatUtHelper to make life easier when creating Satellite point to
    * point network connections.
    */
-  SatUtHelper (CarrierBandwidthConverter carrierBandwidthConverter,
+  SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
                uint32_t rtnLinkCarrierCount,
                Ptr<SatSuperframeSeq> seq,
                SatMac::ReadCtrlMsgCallback readCb,
@@ -152,54 +152,54 @@ public:
 
 private:
 
-    CarrierBandwidthConverter m_carrierBandwidthConverter;
-    uint32_t m_fwdLinkCarrierCount;
-    Ptr<SatSuperframeSeq> m_superframeSeq;
+  SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
+  uint32_t m_fwdLinkCarrierCount;
+  Ptr<SatSuperframeSeq> m_superframeSeq;
 
-    // Control message container callbacks
-    SatMac::ReadCtrlMsgCallback     m_readCtrlCb;
-    SatMac::ReserveCtrlMsgCallback  m_reserveCtrlCb;
-    SatMac::SendCtrlMsgCallback     m_sendCtrlCb;
+  // Control message container callbacks
+  SatMac::ReadCtrlMsgCallback     m_readCtrlCb;
+  SatMac::ReserveCtrlMsgCallback  m_reserveCtrlCb;
+  SatMac::SendCtrlMsgCallback     m_sendCtrlCb;
 
-    ObjectFactory m_channelFactory;
-    ObjectFactory m_deviceFactory;
+  ObjectFactory m_channelFactory;
+  ObjectFactory m_deviceFactory;
 
-    /*
-     * Configured dedicated access interference model for the forward link. Set as an attribute.
-     */
-    SatPhy::InterferenceModel m_daInterferenceModel;
+  /*
+   * Configured dedicated access interference model for the forward link. Set as an attribute.
+   */
+  SatPhy::InterferenceModel m_daInterferenceModel;
 
-    /*
-     * Configured error model for the forward link. Set as an attribute.
-     */
-    SatPhy::ErrorModel m_errorModel;
+  /*
+   * Configured error model for the forward link. Set as an attribute.
+   */
+  SatPhy::ErrorModel m_errorModel;
 
-    /*
-     * Forward channel link results (DVB-S2) are created if ErrorModel
-     * is configured to be AVI. Note, that only one instance of the
-     * link results is needed for all UTs.
-     */
-    Ptr<SatLinkResults> m_linkResults;
+  /*
+   * Forward channel link results (DVB-S2) are created if ErrorModel
+   * is configured to be AVI. Note, that only one instance of the
+   * link results is needed for all UTs.
+   */
+  Ptr<SatLinkResults> m_linkResults;
 
-    /**
-     * \brief Trace callback for creation traces
-     */
-    TracedCallback<std::string> m_creationTrace;
+  /**
+   * \brief Trace callback for creation traces
+   */
+  TracedCallback<std::string> m_creationTrace;
 
-    /**
-     * Configured lower layer service configuration.
-     */
-    Ptr<SatLowerLayerServiceConf> m_llsConf;
+  /**
+   * Configured lower layer service configuration.
+   */
+  Ptr<SatLowerLayerServiceConf> m_llsConf;
 
-    /**
-     * Enable channel estimation error modeling at forward link
-     * receiver (= UT).
-     */
-    bool m_enableChannelEstimationError;
+  /**
+   * Enable channel estimation error modeling at forward link
+   * receiver (= UT).
+   */
+  bool m_enableChannelEstimationError;
 
-    /**
-     * The used random access model settings
-     */
+  /**
+   * The used random access model settings
+   */
     RandomAccessSettings_s m_raSettings;
 };
 

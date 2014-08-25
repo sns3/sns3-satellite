@@ -36,6 +36,7 @@
 #include "ns3/satellite-markov-container.h"
 #include "ns3/satellite-packet-trace.h"
 #include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -51,7 +52,7 @@ class SatBeamHelper : public Object
 {
 public:
   typedef SatChannel::CarrierFreqConverter CarrierFreqConverter;
-  typedef SatPhyRxCarrierConf::CarrierBandwidthConverter CarrierBandwidthConverter;
+  typedef SatTypedefs::CarrierBandwidthConverter_t CarrierBandwidthConverter;
 
   typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> >  ChannelPair_t;    //forward = first, return  = second
   typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
@@ -77,8 +78,11 @@ public:
    * \param rtnLinkCarrierCount   Number of carriers used in return link
    * \param seq                   Pointer to used superframe sequence configuration (containing superframe configurations).
    */
-  SatBeamHelper (Ptr<Node> geoNode, CarrierBandwidthConverter bandwidthConverterCb,
-                 uint32_t fwdLinkCarrierCount, uint32_t rtnLinkCarrierCount, Ptr<SatSuperframeSeq> seq);
+  SatBeamHelper (Ptr<Node> geoNode,
+                 SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
+                 uint32_t fwdLinkCarrierCount,
+                 uint32_t rtnLinkCarrierCount,
+                 Ptr<SatSuperframeSeq> seq);
 
   /**
    * Destructor for SatBeamHelper.
@@ -259,6 +263,8 @@ public:
 
 private:
   CarrierFreqConverter m_carrierFreqConverter;
+  SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
+
   Ptr<SatSuperframeSeq> m_superframeSeq;
 
   ObjectFactory         m_channelFactory;

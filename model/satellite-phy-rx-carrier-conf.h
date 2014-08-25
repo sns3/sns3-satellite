@@ -26,6 +26,7 @@
 #include "satellite-channel.h"
 #include "satellite-link-results.h"
 #include "satellite-channel-estimation-error-container.h"
+#include "satellite-typedefs.h"
 
 namespace ns3 {
 
@@ -46,16 +47,6 @@ public:
    * \return Calculated Final SINR in linear
    */
   typedef Callback<double, double> SinrCalculatorCallback;
-
-  /**
-   * \brief Callback for carrier bandwidth
-   * \param channelType     The type of the channel
-   * \param carrierId       The id of the carrier
-   * \param bandwidthType   The type of the bandwidth
-   *
-   * \return The bandwidth of the carrier.
-   */
-  typedef Callback<double, SatEnums::ChannelType_t, uint32_t, SatEnums::CarrierBandwidthType_t > CarrierBandwidthConverter;
 
   /**
    *  \brief RX mode enum
@@ -107,19 +98,19 @@ public:
    */
   typedef struct RxCarrierCreateParams_s
   {
-    double                                  m_rxTemperatureK;
-    double                                  m_extNoiseDensityWhz;
-    double                                  m_aciIfWrtNoiseFactor;
-    ErrorModel                              m_errorModel;
-    InterferenceModel                       m_daIfModel;
-    InterferenceModel                       m_raIfModel;
-    RxMode                                  m_rxMode;
-    SatEnums::ChannelType_t                 m_chType;
-    CarrierBandwidthConverter               m_converter;
-    uint32_t                                m_carrierCount;
-    Ptr<SatChannelEstimationErrorContainer> m_cec;
-    RandomAccessCollisionModel              m_raCollisionModel;
-    bool                                    m_isRandomAccessEnabled;
+    double                                   m_rxTemperatureK;
+    double                                   m_extNoiseDensityWhz;
+    double                                   m_aciIfWrtNoiseFactor;
+    ErrorModel                               m_errorModel;
+    InterferenceModel                        m_daIfModel;
+    InterferenceModel                        m_raIfModel;
+    RxMode                                   m_rxMode;
+    SatEnums::ChannelType_t                  m_chType;
+    SatTypedefs::CarrierBandwidthConverter_t m_bwConverter;
+    uint32_t                                 m_carrierCount;
+    Ptr<SatChannelEstimationErrorContainer>  m_cec;
+    RandomAccessCollisionModel               m_raCollisionModel;
+    bool                                     m_isRandomAccessEnabled;
 
     RxCarrierCreateParams_s () :
       m_rxTemperatureK (0.0),
@@ -130,7 +121,7 @@ public:
       m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
       m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
       m_chType (SatEnums::RETURN_USER_CH),
-      m_converter (),
+      m_bwConverter (),
       m_carrierCount (0),
       m_cec (NULL),
       m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
@@ -294,7 +285,7 @@ private:
   double m_rxAciIfWrtNoiseFactor;
   RxMode m_rxMode;
   uint32_t m_carrierCount;
-  CarrierBandwidthConverter m_carrierBandwidthConverter;
+  SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   SatEnums::ChannelType_t m_channelType;
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
   SinrCalculatorCallback m_sinrCalculate;
