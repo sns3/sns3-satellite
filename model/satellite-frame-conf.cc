@@ -25,6 +25,7 @@
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
 #include "ns3/boolean.h"
+#include "ns3/object.h"
 
 #include "satellite-frame-conf.h"
 

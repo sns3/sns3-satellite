@@ -24,6 +24,7 @@
 #include "ns3/uinteger.h"
 #include "satellite-queue.h"
 #include "satellite-utils.h"
+#include "satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatQueue");
 
@@ -329,8 +330,8 @@ SatQueue::GetQueueStatistics (bool reset)
 
   if (duration.IsStrictlyPositive())
     {
-      queueStats.m_incomingRateKbps = SatUtils::BITS_PER_BYTE * m_nEnqueBytesSinceReset / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ();
-      queueStats.m_outgoingRateKbps = SatUtils::BITS_PER_BYTE * m_nDequeBytesSinceReset / (double)(SatUtils::BITS_IN_KBIT) / duration.GetSeconds ();
+      queueStats.m_incomingRateKbps = SatConstVariables::BITS_PER_BYTE * m_nEnqueBytesSinceReset / (double)(SatConstVariables::BITS_IN_KBIT) / duration.GetSeconds ();
+      queueStats.m_outgoingRateKbps = SatConstVariables::BITS_PER_BYTE * m_nDequeBytesSinceReset / (double)(SatConstVariables::BITS_IN_KBIT) / duration.GetSeconds ();
       queueStats.m_volumeInBytes = m_nEnqueBytesSinceReset;
       queueStats.m_volumeOutBytes = m_nDequeBytesSinceReset;
       queueStats.m_queueSizeBytes = GetNBytes ();

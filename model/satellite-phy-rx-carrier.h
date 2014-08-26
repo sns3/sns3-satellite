@@ -177,17 +177,6 @@ public:
 private:
 
   /**
-   * \brief Boltzmann Constant
-   */
-  static const double BoltzmannConstant = 1.3806488e-23;
-
-  /**
-   * Current super frame sequence in use. (only sequence 0 supported currently)
-   */
-  static const uint8_t m_currentSuperframeSequence = 0;
-
-
-  /**
    * \brief Function for composite SINR output tracing
    * \param cSinr composite SINR
    */

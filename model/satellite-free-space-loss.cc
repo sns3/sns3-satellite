@@ -18,10 +18,13 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "satellite-utils.h"
+
 #include "ns3/double.h"
 #include "ns3/string.h"
+
+#include "satellite-utils.h"
 #include "satellite-free-space-loss.h"
+#include "satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFreeSpaceLoss");
 
@@ -62,7 +65,7 @@ SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double fre
   double fsl;
   double distance = a->GetDistanceFrom(b);
 
-  fsl = std::pow( ( (4.0 * M_PI * distance * frequencyHz ) / SatUtils::SPEED_OF_LIGHT ), 2.0 );
+  fsl = std::pow( ( (4.0 * M_PI * distance * frequencyHz ) / SatConstVariables::SPEED_OF_LIGHT ), 2.0 );
 
   return fsl;
 }

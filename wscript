@@ -210,6 +210,7 @@ def build(bld):
         'model/satellite-channel-estimation-error-container.h',
         'model/satellite-cno-estimator.h',
         'model/satellite-composite-sinr-output-trace-container.h',
+        "model/satellite-const-variables.h",
         'model/satellite-constant-interference.h',
         'model/satellite-constant-position-mobility-model.h',
         'model/satellite-control-message.h',

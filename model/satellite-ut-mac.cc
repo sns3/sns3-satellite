@@ -33,6 +33,8 @@
 #include "ns3/packet.h"
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/singleton.h"
+
+#include "satellite-const-variables.h"
 #include "satellite-ut-mac.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
@@ -118,7 +120,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
 	NS_LOG_FUNCTION (this);
 
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
-  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq->GetDuration(m_currentSuperframeSequence));
+  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE));
 }
 
 SatUtMac::~SatUtMac ()
@@ -196,7 +198,7 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
   m_timingAdvanceCb = cb;
 
   /// schedule the next frame start
-  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (m_currentSuperframeSequence);
+  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   if (Now () >= nextSuperFrameTxTime)
     {
@@ -282,7 +284,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
       // schedule time slots
       for ( SatTbtpMessage::DaTimeSlotConfContainer_t::iterator it = info.second.begin (); it != info.second.end (); it++ )
         {
-          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
+          Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
           Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
           Ptr<SatTimeSlotConf> timeSlotConf = *it;
 
@@ -682,13 +684,13 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
     {
       NS_LOG_LOGIC ("SatUtMac::ScheduleSlottedAlohaTransmission @ " << Now ().GetSeconds () << " - No known DAMA, selecting a slot for Slotted ALOHA");
 
-      Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
+      Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
       uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
       Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
       uint32_t timeSlotCount = frameConf->GetTimeSlotCount ();
 
       std::pair<bool, uint32_t> result = std::make_pair (false, 0);
-      Time superframeStartTime = GetCurrentSuperFrameStartTime (m_currentSuperframeSequence);
+      Time superframeStartTime = GetCurrentSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
 
       if ( Now () < superframeStartTime )
         {
@@ -826,7 +828,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
   NS_LOG_FUNCTION (this << allocationChannel);
 
   /// get current superframe ID
-  uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (m_currentSuperframeSequence, m_timingAdvanceCb ());
+  uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE, m_timingAdvanceCb ());
 
   NS_LOG_LOGIC ("SatUtMac::ScheduleCrdsaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel << ", SF: " << superFrameId << ", num of opportunities: " << txOpportunities.crdsaTxOpportunities.size ());
 
@@ -862,7 +864,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   NS_LOG_LOGIC ("SatUtMac::CreateCrdsaPacketInstances - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel);
 
-  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (m_currentSuperframeSequence);
+  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
   uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
@@ -983,7 +985,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
           /// carrier
-          uint32_t carrierId = m_superframeSeq->GetCarrierId (m_currentSuperframeSequence, frameId, timeSlotConf->GetCarrierId () );
+          uint32_t carrierId = m_superframeSeq->GetCarrierId (SatConstVariables::SUPERFRAME_SEQUENCE, frameId, timeSlotConf->GetCarrierId () );
 
           /// create CRDSA Tx params
           SatSignalParameters::txInfo_s txInfo;
@@ -1112,7 +1114,7 @@ SatUtMac::DoFrameStart ()
       DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
     }
 
-  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (m_currentSuperframeSequence);
+  Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   if (Now () >= nextSuperFrameTxTime)
     {

@@ -27,6 +27,7 @@
 #include "ns3/enum.h"
 #include "ns3/pointer.h"
 #include "ns3/config.h"
+#include "../model/satellite-const-variables.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -409,7 +410,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
       frameType = SatEnums::SHORT_FRAME;
     }
 
-  uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatUtils::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
+  uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatConstVariables::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
   m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)), m_superframeSeq, rcMaxCount, maxBbFrameDataSizeInBytes );
 
@@ -958,7 +959,7 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
         if (m_propagationDelayModel == SatEnums::PD_CONSTANT_SPEED)
           {
             pDelay = CreateObject<ConstantSpeedPropagationDelayModel> ();
-            DynamicCast<ConstantSpeedPropagationDelayModel> (pDelay)->SetSpeed (SatUtils::SPEED_OF_LIGHT);
+            DynamicCast<ConstantSpeedPropagationDelayModel> (pDelay)->SetSpeed (SatConstVariables::SPEED_OF_LIGHT);
           }
         else if (m_propagationDelayModel == SatEnums::PD_CONSTANT)
           {

@@ -22,6 +22,7 @@
 #include "ns3/log.h"
 #include "ns3/enum.h"
 #include "satellite-utils.h"
+#include "satellite-const-variables.h"
 #include "satellite-bbframe-container.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrameContainer");
@@ -111,11 +112,11 @@ SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums
 
   if ( priorityClass > 0)
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
+      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, m_defaultBbFrameType) / SatConstVariables::BITS_PER_BYTE;
     }
   else
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType), m_defaultBbFrameType) / SatUtils::BITS_PER_BYTE;
+      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType), m_defaultBbFrameType) / SatConstVariables::BITS_PER_BYTE;
     }
 
   return payloadBytes;

@@ -285,11 +285,6 @@ private:
   };
 
   /**
-   * Current super frame sequence in use. (only sequence 0 supported currently)
-   */
-  static const uint8_t  m_currentSequence = 0;
-
-  /**
    * ID of the beam
    */
   uint32_t m_beamId;

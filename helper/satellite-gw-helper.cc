@@ -25,6 +25,7 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/config.h"
+#include "../model/satellite-const-variables.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-gw-llc.h"
@@ -252,11 +253,10 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
       parameters.m_isRandomAccessEnabled = false;
     }
 
-  /// TODO get rid of the hard coded 0
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf(0));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

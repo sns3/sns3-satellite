@@ -24,6 +24,7 @@
 #include "ns3/simulator.h"
 #include "ns3/boolean.h"
 #include "ns3/nstime.h"
+#include "satellite-const-variables.h"
 #include "satellite-request-manager.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
@@ -407,7 +408,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
   double inRateKbps = m_overEstimationFactor * stats.m_incomingRateKbps;
   double thisRbdcInKbits = inRateKbps * duration.GetSeconds ();
   double previousRbdcInKbits = GetPendingRbdcSumKbps (rc) * duration.GetSeconds ();
-  double queueSizeInKbits = SatUtils::BITS_PER_BYTE * stats.m_queueSizeBytes / (double)(SatUtils::BITS_IN_KBIT);
+  double queueSizeInKbits = SatConstVariables::BITS_PER_BYTE * stats.m_queueSizeBytes / (double)(SatConstVariables::BITS_IN_KBIT);
 
   double queueOccupancy = std::max(0.0, m_gainValueK * (queueSizeInKbits - thisRbdcInKbits - previousRbdcInKbits) / duration.GetSeconds ());
 
@@ -517,8 +518,8 @@ SatRequestManager::GetAvbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stat
       Time duration = Simulator::Now () - m_previousEvaluationTime.at (rc);
 
       // Calculate how much bytes would be given to this RC index with configured CRA
-      craBytes = (uint32_t)((SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
-          / (double)(SatUtils::BITS_PER_BYTE));
+      craBytes = (uint32_t)((SatConstVariables::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
+          / (double)(SatConstVariables::BITS_PER_BYTE));
     }
 
   // If there is still need for Bytes after CRA
@@ -557,8 +558,8 @@ SatRequestManager::GetVbdcBytes (uint8_t rc, const SatQueue::QueueStats_t &stats
       Time duration = Simulator::Now () - m_previousEvaluationTime.at (rc);
 
       // Calculate how much bytes would be given to this RC index with configured CRA
-      craBytes = (uint32_t)((SatUtils::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
-          / (double)(SatUtils::BITS_PER_BYTE));
+      craBytes = (uint32_t)((SatConstVariables::BITS_IN_KBIT * m_llsConf->GetDaConstantServiceRateInKbps(rc) * duration.GetSeconds ())
+          / (double)(SatConstVariables::BITS_PER_BYTE));
     }
 
   // If there is still need for Bytes after CRA
@@ -825,7 +826,7 @@ SatRequestManager::GetQuantizedVbdcValue (uint8_t index, uint16_t reqVbdcBytes) 
 {
   NS_LOG_FUNCTION (this << (uint32_t)(index) << reqVbdcBytes);
 
-  uint32_t maxBacklogBytes = SatUtils::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index);
+  uint32_t maxBacklogBytes = SatConstVariables::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index);
   uint32_t quantValue (0);
 
   // If maximum backlog reached

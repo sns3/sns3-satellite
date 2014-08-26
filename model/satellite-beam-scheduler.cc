@@ -29,6 +29,7 @@
 #include "satellite-id-mapper.h"
 #include "satellite-rtn-link-time.h"
 #include "satellite-beam-scheduler.h"
+#include "satellite-const-variables.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
@@ -274,7 +275,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   uint32_t sfCountOffset = (uint32_t)(totalDelay.GetInteger () / seq->GetDuration (0).GetInteger () + 1);
 
   // Scheduling starts after one empty super frame.
-  m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (m_currentSequence) + sfCountOffset;
+  m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE) + sfCountOffset;
 
   // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
   // this part of implementation is needed to change
@@ -284,18 +285,18 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   // by default we give index 0, even if there is no RA channels configured.
   uint32_t maxIndex = 0;
 
-  if ( m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetRaChannelCount () > 0 )
+  if ( m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount () > 0 )
     {
-      maxIndex = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetRaChannelCount () - 1;
+      maxIndex = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount () - 1;
     }
 
   m_raChRandomIndex->SetAttribute("Max", DoubleValue (maxIndex));
-  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (m_currentSequence), maxRcCount);
+  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE), maxRcCount);
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
   Time delay;
-  Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (m_currentSequence);
+  Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   if (txTime > Now ())
     {
@@ -321,10 +322,10 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   Time firstCtrlSlotInterval = m_controlSlotInterval;
 
-  if (m_superframeSeq->GetDuration (m_currentSequence) < m_controlSlotInterval  )
+  if (m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE) < m_controlSlotInterval  )
     {
       Ptr<UniformRandomVariable> m_randomInterval = CreateObject<UniformRandomVariable> ();
-      uint32_t randomOffset = m_randomInterval->GetInteger (m_superframeSeq->GetDuration (m_currentSequence).GetInteger (), m_controlSlotInterval.GetInteger () );
+      uint32_t randomOffset = m_randomInterval->GetInteger (m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE).GetInteger (), m_controlSlotInterval.GetInteger () );
 
       firstCtrlSlotInterval = Time (randomOffset);
     }
@@ -348,7 +349,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
       NS_FATAL_ERROR ("UT (Address: " << utId << ") already added to Beam scheduler.");
     }
 
-  m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetRaChannelCount ();
+  m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount ();
 
   // return random RA channel index for the UT.
   return m_raChRandomIndex->GetInteger ();
@@ -420,7 +421,7 @@ SatBeamScheduler::Schedule ()
       DoPreResourceAllocation ();
 
       // generate time slots
-      Ptr<SatTbtpMessage> firstTbtp = CreateObject<SatTbtpMessage> (m_currentSequence);
+      Ptr<SatTbtpMessage> firstTbtp = CreateObject<SatTbtpMessage> (SatConstVariables::SUPERFRAME_SEQUENCE);
       firstTbtp->SetSuperframeCounter (m_superFrameCounter++);
 
       std::vector<Ptr<SatTbtpMessage> > tbtps;
@@ -459,7 +460,7 @@ SatBeamScheduler::Schedule ()
   m_exceedingCapacityTrace (exceedingCapacity);
 
   // re-schedule next TBTP sending (call of this function)
-  Simulator::Schedule ( m_superframeSeq->GetDuration (m_currentSequence), &SatBeamScheduler::Schedule, this);
+  Simulator::Schedule ( m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE), &SatBeamScheduler::Schedule, this);
 }
 
 void
@@ -474,7 +475,7 @@ SatBeamScheduler::AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContain
 
   Ptr<SatTbtpMessage> tbtpToFill = tbtpContainer.back ();
 
-  Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (m_currentSequence);
+  Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   int32_t prevFrameId = -1;
 
@@ -535,10 +536,10 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
 
       for (uint8_t i = 0; i < damaEntry->GetRcCount (); i++ )
         {
-          double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+          double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ().GetSeconds ();
 
-          it->second.m_reqPerRc[i].m_craBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
-          it->second.m_reqPerRc[i].m_rbdcBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
+          it->second.m_reqPerRc[i].m_craBytes = (SatConstVariables::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
+          it->second.m_reqPerRc[i].m_rbdcBytes = (SatConstVariables::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
           it->second.m_reqPerRc[i].m_vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
           // Collect the requested rate for all UTs per beam
@@ -546,7 +547,7 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
           requestedCraRbdcKbps += damaEntry->GetRbdcInKbps (i);
 
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
-          it->second.m_reqPerRc[i].m_minRbdcBytes = (SatUtils::BITS_IN_KBIT * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
+          it->second.m_reqPerRc[i].m_minRbdcBytes = (SatConstVariables::BITS_IN_KBIT * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
 
           NS_ASSERT (it->second.m_reqPerRc[i].m_minRbdcBytes <= it->second.m_reqPerRc[i].m_rbdcBytes);
 
@@ -615,14 +616,14 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
             m_utInfos.at (allocInfo->first)->SetControlSlotGenerationTime (m_controlSlotInterval);
           }
 
-        double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (m_currentSequence)->GetDuration ().GetSeconds ();
+        double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ().GetSeconds ();
 
         for (uint32_t i = 0; i < allocInfo->second.first.size (); i++ )
           {
-            uint32_t rateBasedBytes = (SatUtils::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
-            rateBasedBytes += (SatUtils::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatUtils::BITS_PER_BYTE);
+            uint32_t rateBasedBytes = (SatConstVariables::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
+            rateBasedBytes += (SatConstVariables::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
 
-            offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatUtils::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatUtils::BITS_IN_KBIT)) + 0.5);
+            offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
 
             if ( rateBasedBytes < allocInfo->second.first[i] )
               {

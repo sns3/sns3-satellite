@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "satellite-utils.h"
 #include "satellite-bbframe.h"
+#include "satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrame");
 
@@ -49,7 +50,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
   {
     case SatEnums::SHORT_FRAME:
     case SatEnums::NORMAL_FRAME:
-      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (modCod, type) / SatUtils::BITS_PER_BYTE) ;
+      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (modCod, type) / SatConstVariables::BITS_PER_BYTE) ;
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;
       m_duration = conf->GetBbFrameDuration (modCod, type);
@@ -57,7 +58,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
 
     case SatEnums::DUMMY_FRAME:
       // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
-      m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatUtils::BITS_PER_BYTE;
+      m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;
       m_duration = conf->GetDummyBbFrameDuration ();
@@ -151,7 +152,7 @@ SatBbFrame::GetSpectralEfficiency (double carrierBandwidthInHz) const
 {
   NS_LOG_FUNCTION (this << carrierBandwidthInHz);
 
-  return ( (double) (SatUtils::BITS_PER_BYTE * m_maxSpaceInBytes) / m_duration.GetSeconds () / carrierBandwidthInHz);
+  return ( (double) (SatConstVariables::BITS_PER_BYTE * m_maxSpaceInBytes) / m_duration.GetSeconds () / carrierBandwidthInHz);
 }
 
 bool
@@ -181,7 +182,7 @@ Time SatBbFrame::Shrink (Ptr<SatBbFrameConf> conf)
 
   if ( m_frameType == SatEnums::NORMAL_FRAME )
     {
-      uint32_t maxShortFrameSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::SHORT_FRAME) / SatUtils::BITS_PER_BYTE) ;
+      uint32_t maxShortFrameSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE);
       uint32_t spaceUsedInbytes = GetSpaceUsedInBytes ();
 
       // shrink only if data used in normal frame can fit in short frame
@@ -211,7 +212,7 @@ Time SatBbFrame::Extend (Ptr<SatBbFrameConf> conf)
       uint32_t spaceUsedInbytes = GetSpaceUsedInBytes ();
 
       m_frameType = SatEnums::NORMAL_FRAME;
-      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::NORMAL_FRAME) / SatUtils::BITS_PER_BYTE) ;
+      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (m_modCod, SatEnums::NORMAL_FRAME) / SatConstVariables::BITS_PER_BYTE);
       m_freeSpaceInBytes = m_maxSpaceInBytes - spaceUsedInbytes;
 
       Time oldDuration = m_duration;

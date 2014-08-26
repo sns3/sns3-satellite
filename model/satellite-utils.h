@@ -34,33 +34,12 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * 
- * \brief SatUtils class is for general conversions and constants used in satellite module.
+ * \brief SatUtils class is for general conversions used in satellite module.
  * This class is not planned to be instantiated or inherited.
  */
 class SatUtils
 {
 public:
-
-
-  /**
-   * \brief Constant definition for the speed of light in m/s
-   */
-  static const double SPEED_OF_LIGHT = 299792458.0;
-
-  /**
-   * \brief Number of bits in a byte
-   */
-  static const uint32_t BITS_PER_BYTE = 8;
-
-  /**
-   * \brief Number of bytes consisting a kilobyte
-   */
-  static const uint32_t BYTES_IN_KBYTE = 1024;
-
-  /**
-   * \brief Number of bits consisting a kilobit
-   */
-  static const uint32_t BITS_IN_KBIT = 1000;
 
   /**
    * \brief Converts radians to degrees

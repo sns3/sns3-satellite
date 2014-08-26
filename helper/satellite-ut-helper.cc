@@ -29,6 +29,7 @@
 #include "ns3/callback.h"
 #include "ns3/config.h"
 #include "ns3/nstime.h"
+#include "../model/satellite-const-variables.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-mobility-observer.h"
@@ -261,11 +262,10 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       parameters.m_isRandomAccessEnabled = false;
     }
 
-  /// TODO get rid of the hard coded 0
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (0));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
@@ -404,9 +404,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));
 
       /// define which allocation channels should be used with each of the random access models
-      /// TODO get rid of the hard coded allocation channel 0
-      randomAccess->AddCrdsaAllocationChannel (0);
-      randomAccess->AddSlottedAlohaAllocationChannel (0);
+      randomAccess->AddCrdsaAllocationChannel (SatConstVariables::CRDSA_ALLOCATION_CHANNEL);
+      randomAccess->AddSlottedAlohaAllocationChannel (SatConstVariables::SLOTTED_ALOHA_ALLOCATION_CHANNEL);
 
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);

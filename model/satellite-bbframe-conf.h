@@ -23,8 +23,9 @@
 
 #include <map>
 #include "ns3/object.h"
-#include "ns3/satellite-enums.h"
-#include "ns3/satellite-link-results.h"
+
+#include "satellite-enums.h"
+#include "satellite-link-results.h"
 
 namespace ns3 {
 

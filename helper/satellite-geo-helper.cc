@@ -27,6 +27,7 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/config.h"
+#include "../model/satellite-const-variables.h"
 #include "../model/satellite-utils.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-geo-feeder-phy.h"
@@ -233,18 +234,16 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
       parametersFeeder.m_isRandomAccessEnabled = false;
     }
 
-  /// TODO get rid of the hard coded 0
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
                                                          parametersUser,
-                                                         m_superframeSeq->GetSuperframeConf (0));
+                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
   params.m_txCh = fr;
   params.m_rxCh = ff;
 
-  /// TODO get rid of the hard coded 0
   Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,
                                                              parametersFeeder,
-                                                             m_superframeSeq->GetSuperframeConf (0));
+                                                             m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

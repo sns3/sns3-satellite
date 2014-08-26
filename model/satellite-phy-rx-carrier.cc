@@ -39,6 +39,7 @@
 #include "satellite-phy-tx.h"
 #include "satellite-crdsa-replica-tag.h"
 #include "satellite-rtn-link-time.h"
+#include "satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -115,7 +116,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_rxTemperatureK = carrierConf->GetRxTemperatureK ();
 
   // calculate RX noise
-  m_rxNoisePowerW = BoltzmannConstant * m_rxTemperatureK * m_rxBandwidthHz;
+  m_rxNoisePowerW = SatConstVariables::BOLTZMANN_CONSTANT * m_rxTemperatureK * m_rxBandwidthHz;
 
   // calculate RX ACI power
   m_rxAciIfPowerW = m_rxNoisePowerW * carrierConf->GetRxAciInterferenceWrtNoiseFactor ();
@@ -156,7 +157,7 @@ SatPhyRxCarrier::BeginFrameEndScheduling ()
       /// frame end scheduling is at the moment needed only for Random Access at the GW
       if (m_isRandomAccessEnabledForThisCarrier && m_rxMode == SatPhyRxCarrierConf::NORMAL)
         {
-          Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (m_currentSuperframeSequence);
+          Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
 
           if (Now () >= nextSuperFrameRxTime)
             {
@@ -583,7 +584,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
           for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
             {
-              m_randomAccessBitsInFrame += ((*it)->GetSize () * SatUtils::BITS_PER_BYTE);
+              m_randomAccessBitsInFrame += ((*it)->GetSize () * SatConstVariables::BITS_PER_BYTE);
             }
 
           /// check for slotted aloha packet collisions
@@ -649,7 +650,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
       for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
         {
-          m_randomAccessBitsInFrame += ((*it)->GetSize () * SatUtils::BITS_PER_BYTE);
+          m_randomAccessBitsInFrame += ((*it)->GetSize () * SatConstVariables::BITS_PER_BYTE);
           NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Fragment (HL packet) UID: " << (*it)->GetUid ());
         }
 
@@ -790,7 +791,7 @@ SatPhyRxCarrier::DoFrameEnd ()
         }
     }
 
-  Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (m_currentSuperframeSequence);
+  Time nextSuperFrameRxTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   if (Now () >= nextSuperFrameRxTime)
     {
@@ -834,7 +835,7 @@ SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad ()
 
   SatSignalParameters::PacketsInBurst_t::iterator iterPackets;
 
-  Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (m_currentSuperframeSequence);
+  Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   double normalizedOfferedLoad = (m_randomAccessBitsInFrame / superFrameDuration.GetSeconds ()) / m_rxBandwidthHz;
 

@@ -27,9 +27,12 @@
 #include "ns3/double.h"
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
+#include "satellite-const-variables.h"
 #include "satellite-wave-form-conf.h"
-#include "../model/satellite-link-results.h"
-#include "../model/satellite-utils.h"
+#include "satellite-link-results.h"
+#include "satellite-utils.h"
+#include "satellite-const-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatWaveformConf");
 
@@ -100,14 +103,14 @@ double
 SatWaveform::GetSpectralEfficiency (double carrierBandwidthInHz, double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
-  return ( SatUtils::BITS_PER_BYTE * m_payloadBytes ) / (m_lengthInSymbols / symbolRateInBaud) / carrierBandwidthInHz;
+  return ( SatConstVariables::BITS_PER_BYTE * m_payloadBytes ) / (m_lengthInSymbols / symbolRateInBaud) / carrierBandwidthInHz;
 }
 
 double
 SatWaveform::GetThroughputInBitsPerSecond (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
-  return SatUtils::BITS_PER_BYTE * m_payloadBytes / ( m_lengthInSymbols / symbolRateInBaud );
+  return SatConstVariables::BITS_PER_BYTE * m_payloadBytes / ( m_lengthInSymbols / symbolRateInBaud );
 }
 
 double
