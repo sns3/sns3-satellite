@@ -30,7 +30,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for fading output trace container
+ * \brief Class for fading output trace container. The class contains
+ * multiple fading output sample traces and provides an interface to them.
  */
 class SatFadingOutputTraceContainer : public SatBaseTraceContainer
 {

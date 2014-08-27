@@ -34,7 +34,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Container for Markov model
+ * \brief Container for Markov-model. This class contains the
+ * Markov-model state machines and implements the fading interface.
+ * The class implements, e.g., the state machine selection and
+ * contains the logic for deciding when the new fading value will
+ * be calculated and state change evaluation should happen.
  */
 class SatMarkovContainer : public SatBaseFading
 {

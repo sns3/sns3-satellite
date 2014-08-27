@@ -32,7 +32,10 @@ class Address;
 /**
  * \ingroup satellite
  *
- * \brief Class for ID-mapper
+ * \brief Class for ID-mapper. The class enables mapping of a specific
+ * MAC-address to UT/GW/user/beam ID. These IDs can be obtained with
+ * MAC-address by using the provided functions. It is also possible to
+ * obtain the MAC-address with node.
  */
 class SatIdMapper : public Object
 {

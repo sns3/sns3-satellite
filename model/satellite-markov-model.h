@@ -28,7 +28,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for Markov model based fading
+ * \brief Class for Markov state machine. This class implements the state machine
+ * for Markov-model and is responsible for evaluating the state changes within
+ * the state machine.
  */
 class SatMarkovModel : public Object
 {

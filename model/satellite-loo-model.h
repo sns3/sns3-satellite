@@ -31,7 +31,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for Loo model fader
+ * \brief Class for Loo's model fader. The class implements Loo's
+ * model fader for the Markov -based fading model. The model
+ * uses multiple oscillators to form the fading (inspired by Jakes model).
  */
 class SatLooModel : public SatBaseFader
 {

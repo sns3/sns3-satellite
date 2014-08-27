@@ -30,8 +30,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for random access allocation channel configuration. This class holds the allocation channel
- * specific variables and configuration used by the random access module
+ * \brief Class for random access allocation channel configuration.
+ * This class holds the allocation channel specific variables and
+ * the configuration parameters used by the random access module
  */
 class SatRandomAccessAllocationChannel : public Object
 {

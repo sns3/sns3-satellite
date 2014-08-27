@@ -30,7 +30,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for interference output trace container
+ * \brief Class for interference output trace container. The class contains
+ * multiple interference output sample traces and provides an interface to them.
  */
 class SatInterferenceOutputTraceContainer : public SatBaseTraceContainer
 {

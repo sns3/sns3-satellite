@@ -28,7 +28,12 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements a tag that carries information about the slot IDs of CRDSA packet replicas
+ * \brief This class implements a tag that carries information
+ * about the slot IDs of CRDSA packet replicas. This information
+ * is used to determine the CRDSA replicas within the CRDSA frame.
+ * The tag is added to each created CRDSA packet on the
+ * transmitter side and read from the CRDSA packet on the
+ * receiver side.
  */
 class SatCrdsaReplicaTag : public Tag
 {

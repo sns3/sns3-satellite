@@ -34,7 +34,8 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Satellite fading external input trace container
+ * \brief Container class for external input fading traces. The class
+ * provides an interface for accessing the correct fading trace object.
  */
 class SatFadingExternalInputTraceContainer : public Object
 {

@@ -28,7 +28,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Satellite fading external input trace
+ * \brief The class for satellite fading external input trace. The class reads
+ * fading trace input samples from a file and provides the current fading value
+ * for this specific fading file.
  */
 class SatFadingExternalInputTrace : public SimpleRefCount <SatFadingExternalInputTrace>
 {

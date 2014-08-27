@@ -30,7 +30,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for faders
+ * \brief Base class for faders such as the Rayleigh fader.
+ * This class defines the functions which all the inherited
+ * faders must implement for the Markov-fading model. This
+ * base class itself is abstract and will not implement
+ * any real functionality.
  */
 class SatBaseFader : public Object
 {

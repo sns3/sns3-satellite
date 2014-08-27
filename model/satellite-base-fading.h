@@ -32,7 +32,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for fading models
+ * \brief Base class for fading models such as Markov-based fading
+ * or fading trace. This class defines the functions which all the
+ * different fading models must implement for the fading
+ * interface. This base class itself is abstract and will not
+ * implement any real functionality.
  */
 class SatBaseFading : public Object
 {

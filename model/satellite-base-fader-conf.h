@@ -30,7 +30,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for fader configuration classes
+ * \brief Base class for fader configuration classes. This class
+ * defines the functions which all the inherited fader
+ * configuration classes must implement for the Markov-fading
+ * model faders. This base class itself is abstract and will not
+ * implement any real functionality.
  */
 class SatBaseFaderConf : public Object
 {

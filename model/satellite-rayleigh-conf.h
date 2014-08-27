@@ -28,7 +28,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief A configuration class for Rayleigh model fader
+ * \brief A configuration class for Rayleigh model fader. The class provides
+ * configuration parameters for Rayleigh fader used with Markov-based
+ * fading model.
  */
 class SatRayleighConf : public SatBaseFaderConf
 {

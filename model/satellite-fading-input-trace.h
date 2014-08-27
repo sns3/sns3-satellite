@@ -28,7 +28,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for fading input trace
+ * \brief Class for fading input trace. The class implements the fading
+ * interface and provides access to the container of input fading files.
  */
 class SatFadingInputTrace : public SatBaseFading
 {

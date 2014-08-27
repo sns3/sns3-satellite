@@ -30,7 +30,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for composite sinr output trace container
+ * \brief Class for composite SINR output trace container. The class contains
+ * multiple fading output sample traces and provides an interface to them.
  */
 class SatCompositeSinrOutputTraceContainer : public SatBaseTraceContainer
 {

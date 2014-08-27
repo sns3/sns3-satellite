@@ -30,8 +30,12 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Base class for trace containers
+ * \brief Base class for trace containers such as interference or fading traces.
+ * This class defines the functions which all the different trace models must
+ * implement for the trace interface. This base class itself is abstract and will not
+ * implement any real functionality.
  */
+
 class SatBaseTraceContainer : public Object
 {
 public:

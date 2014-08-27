@@ -30,7 +30,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * 
- * \brief SatEnums class is for general enumerators used in satellite module.
+ * \brief SatEnums class is for simplifying the use of enumerators
+ * in the satellite module. The enums specified in this class mainly
+ * consist of enums used in multiple classes.
  */
 class SatEnums
 {

@@ -36,7 +36,10 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief A configuration class for three state Markov model
+ * \brief A configuration class for three state Markov model. This class provides
+ * configuration parameters for the Markov-based fading. It also acts as an
+ * interface for the configurations used by the different faders in Markov-based
+ * fading.
  */
 class SatMarkovConf : public Object
 {

@@ -31,7 +31,10 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Oscillator class for faders
+ * \brief Oscillator class for faders. This class implements
+ * the oscillators required by the faders for Markov-fading.
+ * The provided oscillator values are used to form individual
+ * fading samples.
  */
 class SatFadingOscillator : public Object
 {

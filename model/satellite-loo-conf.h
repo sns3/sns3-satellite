@@ -28,7 +28,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief A configuration class for Loo's model
+ * \brief A configuration class for Loo's model fader. The class provides
+ * configuration parameters for Loo's fader used with Markov-based
+ * fading model.
  */
 class SatLooConf : public SatBaseFaderConf
 {

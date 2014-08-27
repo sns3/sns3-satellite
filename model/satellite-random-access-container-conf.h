@@ -34,8 +34,10 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for random access configuration. This class holds the non allocation channel specific
- * random access configuration in addition to the allocation channel configuration objects
+ * \brief Class for random access configuration. This class holds
+ * the non-allocation channel specific random access configuration
+ * in addition to the configuration objects specific for each
+ * allocation channel.
  */
 class SatRandomAccessConf : public Object
 {

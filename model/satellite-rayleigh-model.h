@@ -31,7 +31,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for Rayleigh model fader
+ * \brief Class for Rayleigh model fader. The class implements Rayleigh
+ * model fader for the Markov -based fading model. The model
+ * uses multiple oscillators to form the fading (inspired by Jakes model).
  */
 class SatRayleighModel : public SatBaseFader
 {

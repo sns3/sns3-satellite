@@ -30,7 +30,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for Rx power output trace container
+ * \brief Class for Rx power output trace container. The class contains
+ * multiple Rx power output sample traces and provides an interface to them.
  */
 class SatRxPowerOutputTraceContainer : public SatBaseTraceContainer
 {
