@@ -42,12 +42,11 @@ class Packet;
 
 /**
  * \ingroup satellite
-  * \brief Base Mac class for Sat Net Devices.
- *
- * This SatMac class specializes the Mac base class.
- *
- * Classed derived from this base class can add more realistic schedulers and
- * add more needed queues.
+  * \brief Base MAC class for SatNetDevices. SatMac implements the common
+  * MAC layer functionality for both UT and GW. More specialized implementations
+  * are located at the inherited classes. Satellite does not have a MAC sublayer at all.
+  * - SatUtMac
+  * - SatGwMac
  */
 class SatMac : public Object
 {
@@ -63,22 +62,20 @@ public:
   SatMac ();
 
   /**
-   * Construct a SatMac
-   *
-   * This is the constructor for the SatMac
+   * \brief Construct a SatMac
    * \param beamId
    */
   SatMac (uint32_t beamId);
 
   /**
-   * Destroy a SatMac
+   * \brief Destroy a SatMac
    *
    * This is the destructor for the SatMac.
    */
   ~SatMac ();
 
   /**
-   * Callback to send packet to lower layer.
+   * \brief Callback to send packet to lower layer.
    * \param Container of the pointers to the packets received
    * \param uint32_t carrierId
    * \param  Time duration
@@ -86,14 +83,14 @@ public:
   typedef Callback<void, SatPhy::PacketContainer_t, uint32_t, Time, SatSignalParameters::txInfo_s> TransmitCallback;
 
   /**
-   * Method to set transmit callback.
+   * \brief Method to set transmit callback.
    * \param cb callback to invoke whenever a packet needs to be sent
    * to lower layer (PHY)
    */
   void SetTransmitCallback (SatMac::TransmitCallback cb);
 
   /**
-   * Callback to receive packet by upper layer.
+   * \brief Callback to receive packet by upper layer.
    * \param Source MAC address
    * \param Destination MAC address
    * \param packet the packet received
@@ -101,14 +98,14 @@ public:
   typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
   /**
-   * Method to set receive callback.
+   * \brief Method to set receive callback.
    * \param cb callback to invoke whenever a packet has been received and must
    *        be forwarded to the higher layers.
    */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
 
   /**
-   * Callback to read control messages from container storing control messages.
+   * \brief Callback to read control messages from container storing control messages.
    * Real length of the control messages are simulated in a packet, but not structure.
    * \param uint32_t ID of the message to read.
    * \return Pointer to read packet. (NULL if not found).
@@ -116,7 +113,7 @@ public:
   typedef Callback<Ptr<SatControlMessage>, uint32_t> ReadCtrlMsgCallback;
 
   /**
-   * Callback to reserve an id and initially store the control
+   * \brief Callback to reserve an id and initially store the control
    * message.
    * \param Pointer to the message to be stored.
    * \return uint32_t ID of the stored message.
@@ -124,39 +121,39 @@ public:
   typedef Callback<uint32_t, Ptr<SatControlMessage> > ReserveCtrlMsgCallback;
 
   /**
-   * Callback to send a control message and allocate a recv ID for it.
+   * \brief Callback to send a control message and allocate a recv ID for it.
    * \param uint32_t Internal ID used for initial storing of the control msg.
    * \return uint32_t ID for the control message read operation.
    */
   typedef Callback<uint32_t, uint32_t> SendCtrlMsgCallback;
 
   /**
-   * Method to set read control message callback.
+   * \brief Method to set read control message callback.
    * \param cb callback to invoke whenever a control message is wanted to read.
    */
   void SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb);
 
   /**
-   * Method to set reserve control message id callback.
+   * \brief Method to set reserve control message id callback.
    * \param cb callback to invoke whenever an id is wanted to
    * be reserved for a control message.
    */
   void SetReserveCtrlCallback (SatMac::ReserveCtrlMsgCallback cb);
 
   /**
-   * Method to set send control message callback.
+   * \brief Method to set send control message callback.
    * \param cb callback to invoke whenever a control message is wanted to sent.
    */
   void SetSendCtrlCallback (SatMac::SendCtrlMsgCallback cb);
 
   /**
-   * Set the node info
+   * \brief Set the node info
    * \param nodeInfo containing node specific information
    */
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * Reserve id and store the control message.
+   * \brief Reserve id and store the control message.
    *
    * \param msg Control message to store to the container.
    * \return Id of the internally stored message (send ID).
@@ -164,7 +161,7 @@ public:
   uint32_t ReserveIdAndStoreCtrlMsgToContainer (Ptr<SatControlMessage> msg);
 
   /**
-   * Send the control message from the container.
+   * \brief Send the control message from the container.
    *
    * \param sendId Id of the internally stored message.
    * \return ID to be used in the control packet reception (recv ID).
@@ -172,11 +169,11 @@ public:
   uint32_t SendCtrlMsgFromContainer (uint32_t sendId);
 
   /**
-   * Receive a queue event:
+   * \brief Receive a queue event:
    * - FIRST_BUFFER_RCVD
    * - BUFFER_EMPTY
-   * /param event Queue event from SatQueue
-   * /param flowIndex Identifier of the queue
+   * \param event Queue event from SatQueue
+   * \param flowIndex Identifier of the queue
    */
   virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t flowIndex);
 
@@ -189,13 +186,13 @@ protected:
   void DoDispose (void);
 
   /**
-   * Send packet to lower layer by using a callback
+   * \brief Send packet to lower layer by using a callback
    * \param packets Packets to be sent.
    */
   void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s);
 
   /**
-   * Invoke the `Rx` trace source for each received packet.
+   * \brief Invoke the `Rx` trace source for each received packet.
    * \param packets Container of the pointers to the packets received.
    */
   void RxTraces (SatPhy::PacketContainer_t packets);

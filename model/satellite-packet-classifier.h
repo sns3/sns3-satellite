@@ -35,9 +35,9 @@ namespace ns3 {
  * flow identifier. Classification is done based on IP header DSCP field
  * value.
  * Control -> flow index 0 (Note, that this is not using IP header DSCP field)
- * Default (0) -> flow index 1
+ * Default (0) -> flow index 3
  * Assured forwarding -> flow index 2
- * Expedited forwarding -> flow index 3
+ * Expedited forwarding -> flow index 1
  */
 
 class SatPacketClassifier : public SimpleRefCount<SatPacketClassifier>
@@ -47,7 +47,7 @@ public:
   virtual ~SatPacketClassifier ();
 
   /**
-   * Classify control message
+   * \brief Classify control message
    * \param type Control msg type
    * \param dest Destination address
    * \return uint8_t Flow identifier
@@ -55,7 +55,7 @@ public:
   uint8_t Classify (SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const;
 
   /**
-   * Classify a packet based on IP header DSCP to a lower layer
+   * \brief Classify a packet based on IP header DSCP to a lower layer
    * flow id.
    * \param packet Packet to be classified
    * \param dest Destination address

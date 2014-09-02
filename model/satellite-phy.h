@@ -43,9 +43,9 @@ class SatMac;
 /**
  * \ingroup satellite
  *
- * The SatPhy models the physical layer of the satellite system (UT, GW, satellite).
- * SatPhy is the base class implementing the commonalities between different satellite
- * nodes. Actual implementations are located in:
+ * The SatPhy models the basic physical layer of the satellite system. SatPhy
+ * is the base class implementing the commonalities between different satellite
+ * nodes. This is a pure virtual class and actual implementations are located in:
  * - SatUtPhy
  * - SatGwPhy
  * - SatGeoFeederPhy
@@ -110,7 +110,7 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * Calculate final SINR with PHY specific parameters and given calculated SINR.
+   * \brief Calculate final SINR with PHY specific parameters and given calculated SINR.
    * Objects inheriting this PHY object must implement this method.
    *
    * \param sinr Calculated SINR
@@ -118,144 +118,144 @@ public:
   virtual double CalculateSinr (double sinr) = 0;
 
   /**
-   * Initialize phy.
+   * \brief Initialize phy.
    */
   void Initialize();
 
   /**
-   * Get the noise temperature of the receiver in dbK.
+   * \brief Get the noise temperature of the receiver in dbK.
    * \return the receiver noise temperature in dbK.
    */
   inline double GetRxNoiseTemperatureDbk () const { return m_rxNoiseTemperatureDbk; }
 
   /**
-   * Set the noise temperature of the receiver in dbK.
+   * \brief Set the noise temperature of the receiver in dbK.
    * \param temperatureDbk the receiver noise temperature in dbK.
    */
   inline void SetRxNoiseTemperatureDbk (double temperatureDbk) { m_rxNoiseTemperatureDbk = temperatureDbk; }
 
   /**
-   * Get the maximum antenna gain of the receiver in dB.
+   * \brief Get the maximum antenna gain of the receiver in dB.
    * \return the receiver noise temperature in dB.
    */
   inline double GetRxAntennaGainDb () const { return m_rxMaxAntennaGainDb; }
 
   /**
-   * Set the maximum antenna gain of the receiver in dB.
+   * \brief Set the maximum antenna gain of the receiver in dB.
    * \param gainDb the receiver antenna gain in dB.
    */
   inline void SetRxAntennaGainDb (double gainDb) { m_rxMaxAntennaGainDb = gainDb; }
 
   /**
-   * Get the antenna loss of the receiver in dB.
+   * \brief Get the antenna loss of the receiver in dB.
    * \return the receiver antenna loss in dB.
    */
   inline double GetRxAntennaLossDb () const { return m_rxAntennaLossDb; }
 
   /**
-   * Set the antenna loss of the receiver in dB.
+   * \brief Set the antenna loss of the receiver in dB.
    * \param lossDb the receiver antenna loss in dB.
    */
   inline void SetRxAntennaLossDb (double lossDb) { m_rxAntennaLossDb = lossDb; }
 
   /**
-   * Get the maximum antenna gain of the transmitter in dB.
+   * \brief Get the maximum antenna gain of the transmitter in dB.
    * \return the transmitter noise temperature in dB.
    */
   inline double GetTxAntennaGainDb () const { return m_txMaxAntennaGainDb; }
 
   /**
-   * Set the maximum antenna gain of the transmitter in dB.
+   * \brief Set the maximum antenna gain of the transmitter in dB.
    * \param gainDb the transmitter antenna gain in dB.
    */
   inline void SetTxAntennaGainDb (double gainDb) { m_txMaxAntennaGainDb = gainDb; }
 
   /**
-   * Get the maximum transmit power of the transmitter in dB.
+   * \brief Get the maximum transmit power of the transmitter in dB.
    * \return the transmitter transmit power in dB.
    */
   inline double GetTxMaxPowerDbw () const { return m_txMaxPowerDbw; }
 
   /**
-   * Set the maximum transmit power of the transmitter in dB.
+   * \brief Set the maximum transmit power of the transmitter in dB.
    * \param powerDb the transmitter transmit power in dB.
    */
   inline void SetTxMaxPowerDbw (double powerDb) { m_txMaxPowerDbw = powerDb; }
 
   /**
-   * Get the output loss of the transmitter in dB.
+   * \brief Get the output loss of the transmitter in dB.
    * \return the transmitter output loss in dB.
    */
   inline double GetTxOutputLossDb () const { return m_txOutputLossDb; }
 
   /**
-   * Set the output loss of the transmitter in dB.
+   * \brief Set the output loss of the transmitter in dB.
    * \param lossDb the transmitter output loss in dB.
    */
   inline void SetTxOutputLossDb (double lossDb) { m_txOutputLossDb = lossDb; }
 
   /**
-   * Get the pointing loss of the transmitter in dB.
+   * \brief Get the pointing loss of the transmitter in dB.
    * \return the transmitter pointing loss in dB.
    */
   inline double GetTxPointingLossDb () const { return m_txPointingLossDb; }
 
   /**
-   * Set the pointing loss of the transmitter in dB.
+   * \brief Set the pointing loss of the transmitter in dB.
    * \param lossDb the transmitter pointing loss in dB.
    */
   inline void SetTxPointingLossDb (double lossDb) { m_txPointingLossDb = lossDb; }
 
   /**
-   * Get the OBO loss of the transmitter in dB.
+   * \brief Get the OBO loss of the transmitter in dB.
    * \return the transmitter OBO loss in dB.
    */
   inline double GetTxOboLossDb () const { return m_txOboLossDb; }
 
   /**
-   * Set the OBO loss of the transmitter in dB.
+   * \brief Set the OBO loss of the transmitter in dB.
    * \param lossDb the transmitter OBO loss in dB.
    */
   inline void SetTxOboLossDb (double lossDb) { m_txOboLossDb = lossDb; }
 
   /**
-   * Get the antenna loss of the transmitter in dB.
+   * \brief Get the antenna loss of the transmitter in dB.
    * \return the transmitter antenna loss in dB.
    */
   inline double GetTxAntennaLossDb () const { return m_txAntennaLossDb; }
 
   /**
-   * Set the antenna loss of the transmitter in dB.
+   * \brief Set the antenna loss of the transmitter in dB.
    * \param lossDb the transmitter antenna loss in dB.
    */
   inline void SetTxAntennaLossDb (double lossDb) { m_txAntennaLossDb = lossDb; }
 
   /**
-   * Get the default fading of the PHY.
+   * \brief Get the default fading of the PHY.
    * \return the default fading of the PHY.
    */
   inline double GetDefaultFading () const { return m_defaultFadingValue; }
 
   /**
-   * Set the default fading of the PHY.
+   * \brief Set the default fading of the PHY.
    * \param fading the default fading of the PHY.
    */
   inline void SetDefaultFading (double fading) { m_defaultFadingValue = fading; }
 
   /**
-   * Set the transmit antenna gain pattern.
+   * \brief Set the transmit antenna gain pattern.
    * \param agp antenna gain pattern
    */
   virtual void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
-   * Set the receive antenna gain pattern.
+   * \brief Set the receive antenna gain pattern.
    * \param agp antenna gain pattern
    */
   virtual void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
 
   /**
-   * Configure Rx carriers
+   * \brief Configure Rx carriers
    * \param carrierConf Carrier configuration class
    * \param superFrameConf Superframe configuration
    * \param isRandomAccessEnabled Is random access enabled
@@ -275,37 +275,37 @@ public:
   void SetTxFadingContainer (Ptr<SatBaseFading> fadingContainer);
 
   /**
-   * Get the SatPhyTx pointer
+   * \brief Get the SatPhyTx pointer
    * \return a pointer to the SatPhyTx instance
    */
   virtual Ptr<SatPhyTx> GetPhyTx () const;
 
   /**
-   * Get the SatPhyRx pointer
+   * \brief Get the SatPhyRx pointer
    * \return a pointer to the SatPhyRx instance
    */
   virtual Ptr<SatPhyRx> GetPhyRx () const;
 
   /**
-   * Set the SatPhyTx module
+   * \brief Set the SatPhyTx module
    * \param phyTx Transmitter PHY module
    */
   virtual void SetPhyTx (Ptr<SatPhyTx> phyTx);
 
   /**
-   * Set the SatPhyRx module
+   * \brief Set the SatPhyRx module
    * \param phyRx Receiver PHY module
    */
   virtual void SetPhyRx (Ptr<SatPhyRx> phyRx);
 
   /**
-   * Get the Tx satellite channel
+   * \brief Get the Tx satellite channel
    * \return the Tx channel
    */
   Ptr<SatChannel> GetTxChannel ();
 
   /**
-   * Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
+   * \brief Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
    * \param p packet to be sent
    * \param carrierId Carrier id for the packet transmission
    * \param duration the packet transmission duration (from MAC layer)
@@ -314,21 +314,19 @@ public:
   virtual void SendPdu (PacketContainer_t, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
 
   /**
-   * Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+   * \brief Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
    * \param rxParams Transmission parameters
    */
   virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * Set the beamId this PHY is connected with
-   *
+   * \brief Set the beamId this PHY is connected with
    * \param beamId Satellite beam id
    */
   void SetBeamId (uint32_t beamId);
 
   /**
    * \brief Receives packets from lower layer.
-   *
    * \param rxParams Packet reception parameters
    * \param phyError Boolean indicating whether the packet successfully
    * received or not?
@@ -425,7 +423,6 @@ private:
    * Average normalized offered load callback
    */
   SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
-
   /**
    * `EnableStatisticsTags` attribute.
    */

@@ -28,9 +28,15 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatEncapPduStatusTag is used to tag packets in the
- * encapsulation and fragmentation process. The same tag is used
- * in both RLE (SatReturnLinkEncapsulator) and GSE (SatGenericStreamEncapsulator).
+ * \brief SatEncapPduStatusTag is used temporarily to tag packets with the
+ * fragmentation status in the encapsulation and fragmentation process.
+ * The same generic tag is used in both RLE (SatReturnLinkEncapsulator) and
+ * GSE (SatGenericStreamEncapsulator). There are four possible status
+ * enumerators:
+ * - FULL_PDU: a complete higher layer PDU which has not been fragmented yet
+ * - START_PDU: a first piece of a fragmented higher layer PDU
+ * - CONTINUATION_PDU: a middle piece of a fragmented higher layer PDU (not first nor last)
+ * - END_PDU: a last piece of a fragmented higher layer PDU
  */
 class SatEncapPduStatusTag : public Tag
 {

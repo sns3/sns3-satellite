@@ -121,8 +121,11 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
   while (ifs->good())
     {
       // Validity of latitude and longitude
-      NS_ASSERT (lat >= -90.0 && lat <= 90.0);
-      NS_ASSERT (lon >= -180.0 && lat <= 180.0);
+      if (lat < -90.0 || lat > 90.0 ||
+          lon < -180.0 || lon > 180.0)
+        {
+          NS_FATAL_ERROR ("SatAntennaGainPattern::ReadAntennaPatternFromFile - unvalid latitude: " << lat << " or longitude. " << lon);
+        }
 
       // The antenna gain value is read to a string, so that we may check
       // that whether the value is NaN. If not, then the number is just converted
@@ -292,7 +295,7 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 
   // All the values within the grid box has to be valid! If UT is placed (or
   // is moving outside) the valid simulation area, the simulation will crash
-  // to assert.
+  // to a fatal error.
   if (isnan(m_antennaPattern[minLatIndex][minLonIndex]) ||
       isnan(m_antennaPattern[minLatIndex][minLonIndex+1]) ||
       isnan(m_antennaPattern[minLatIndex+1][minLonIndex]) ||

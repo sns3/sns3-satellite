@@ -212,7 +212,7 @@ SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 void
 SatPhy::ConfigureRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << isRandomAccessEnabled);
   m_phyRx->ConfigurePhyRxCarriers (carrierConf, superFrameConf, isRandomAccessEnabled);
 }
 
@@ -335,7 +335,12 @@ void
 SatPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 {
   NS_LOG_FUNCTION (this << txParams);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
+
+  /**
+   * This method is not meant to be used in this class. It
+   * is overriden in the inherited classes.
+   */
 }
 
 void
@@ -433,7 +438,7 @@ SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno)
 void
 SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
-  NS_LOG_FUNCTION (this << beamId << carrierId << averageNormalizedOfferedLoad);
+  NS_LOG_FUNCTION (this << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
   m_avgNormalizedOfferedLoadCallback (beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
 }
 

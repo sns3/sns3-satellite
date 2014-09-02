@@ -35,6 +35,10 @@ SatArqSequenceNumber::SatArqSequenceNumber ()
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
+
+  /**
+   * Default constructor is not meant to be used!
+   */
 }
 
 SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)

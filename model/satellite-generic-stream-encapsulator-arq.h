@@ -37,16 +37,15 @@ namespace ns3 {
  * \ingroup satellite
  *
  * \brief SatGenericStreamEncapsulatorArq class is inherited from the
- * SatGenericStreamEncapsulator class, which is used in forward link for
- * encapsulation, fragmentation and packing of higher layer packets.
- * SatGenericStreamEncapsulatorArq includes in addition the retransmission
- * functionality if packets are not received properly in the first
- * transmission. ARQ is controlled by ACK messages replied related to
- * each properly received packet.
+ * SatGenericStreamEncapsulator class, which is used in FWD link for
+ * encapsulation and fragmentation of higher layer packets. This class
+ * implements the ARQ retransmission logic in both transmission and
+ * reception side for GSE.
  *
- * The SatGenericStreamEncapsulator object is UT specific and its entities
- * are located at both UT (encapsulation, fragmentation, packing) and
- * GW (decapsulation, defragmentation, reassembly).
+ * Implemented algorithm is based on Selective Repeat ARQ.
+ * Retransmission logic is based on a set of timers and added increasing
+ * sequence numbers for each sent packet. When a packet is received, and
+ * ACK is sent to the receiver with a proper sequence number.
  */
 class SatGenericStreamEncapsulatorArq : public SatGenericStreamEncapsulator
 {

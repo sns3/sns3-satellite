@@ -34,11 +34,15 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatReturnLinkEncapsulator class used in return link for
- * encapsulation, fragmentation and packing of higher layer packets.
- * The SatReturnLinkEncapsulator object is UT specific and its entities
- * are located at both UT (encapsulation, fragmentation, packing) and
- * GW (decapsulation, defragmentation, reassembly).
+ * \brief SatReturnLinkEncapsulator class is used in the RTN link for RLE
+ * encapsulation and fragmentation of higher layer packets. SatReturnLinkEncapsulator
+ * object is flow (UT address - flow id) specific and its entities are located at both
+ * UT (encapsulation, fragmentation) and GW (decapsulation, defragmentation).
+ * Return link encapsulators/decapsulators are created dynamically when first
+ * needed (when a packet is received for this flow).
+ *
+ * \see ETSI TS 103 179 V1.1.1 Satellite Earth Stations and Systems (SES);
+ * Return Link Encapsulation (RLE) protocol
  */
 class SatReturnLinkEncapsulator : public SatBaseEncapsulator
 {

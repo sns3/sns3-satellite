@@ -53,7 +53,11 @@ SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq ()
  m_nextExpectedSeqNo (0)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
+
+  /**
+   * Default constructor is not meant to be used!
+   */
 }
 
 
@@ -74,6 +78,7 @@ SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq (Mac48Address s
 
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
+  // ARQ sequence number generator
   m_seqNo = Create<SatArqSequenceNumber> (m_arqWindowSize);
 
 }

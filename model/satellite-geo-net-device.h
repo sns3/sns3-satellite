@@ -39,7 +39,11 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * SatGeoNetDevice to be utilized in geostationary satellite.
+ * \brief SatGeoNetDevice to be utilized in geostationary satellite.
+ * SatGeoNetDevice holds a set of phy layers towards user and feeder
+ * links; one pair of phy layers for each spot-beam. The SatNetDevice
+ * implements a simple switching between all user and feeder links
+ * modeling transparent payload.
  */
 class SatGeoNetDevice : public NetDevice
 {
@@ -48,7 +52,7 @@ public:
   SatGeoNetDevice ();
 
   /**
-   * Receive the packet from the lower layers
+   * \brief Receive the packet from the lower layers
    * \param packets Container of pointers to the packets to be received.
    * \param rxParams Packet transmission parameters
    */

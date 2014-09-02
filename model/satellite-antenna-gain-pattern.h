@@ -35,7 +35,8 @@ namespace ns3 {
  * for a one single spot-beam. In initialization phase, the gain pattern
  * is read from a file to a container. Current implementation assumes
  * that the antenna pattern is using a constant longitude-latitude grid of
- * samples. This assumption is made to enable fast look-ups from the container.
+ * samples. This assumption is made to enable fast look-ups from the container
+ * (= vector<vector<double>>).
  *
  * Antenna gain patter is used also for spot-beam selection. In initialization phase
  * a valid positions list is constructed based on a minimum accepted antenna gain set
@@ -55,20 +56,20 @@ public:
   ~SatAntennaGainPattern () {}
 
   /**
-   * Calculate the antenna gain value for a certain {latitude, longitude} point
+   * \brief Calculate the antenna gain value for a certain {latitude, longitude} point
    * \return The gain value in linear format
    */
   double GetAntennaGain_lin (GeoCoordinate coord) const;
 
   /**
-   * Get a valid random position under this spot-beam coverage.
+   * \brief Get a valid random position under this spot-beam coverage.
    * \return A valid random GeoCoordinate
    */
   GeoCoordinate GetValidRandomPosition () const;
 
 private:
   /**
-   * Read the antenna gain pattern from a file
+   * \brief Read the antenna gain pattern from a file
    * \param filePathName Path and file name of the antenna pattern file
    */
   void ReadAntennaPatternFromFile (std::string filePathName);

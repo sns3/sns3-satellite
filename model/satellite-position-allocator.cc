@@ -45,7 +45,7 @@ SatPositionAllocator::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatPositionAllocator")
     .SetParent<PositionAllocator> ()
     .AddAttribute ("AsGeoCoordinates",
-                   "GetNext method returns Geodetic coordinates in returned Vector, x=longitude, y=latitude, z=altitude",
+                   "GetNext method returns geodetic coordinates in returned Vector, x=longitude, y=latitude, z=altitude",
                    BooleanValue (true),
                    MakeBooleanAccessor (&SatPositionAllocator::m_GetAsGeoCoordinates),
                    MakeBooleanChecker ());
@@ -67,7 +67,7 @@ SatPositionAllocator::GetNext() const
 {
   NS_LOG_LOGIC (this);
 
-  GeoCoordinate pos = GetNextGeo();
+  GeoCoordinate pos = GetNextGeoPosition ();
 
   if ( m_GetAsGeoCoordinates )
     {
@@ -108,7 +108,7 @@ SatListPositionAllocator::Add (GeoCoordinate coordinate)
   m_current = m_positions.begin ();
 }
 GeoCoordinate
-SatListPositionAllocator::GetNextGeo () const
+SatListPositionAllocator::GetNextGeoPosition () const
 {
   NS_LOG_LOGIC (this);
 
@@ -182,7 +182,7 @@ SatRandomBoxPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 }
 
 GeoCoordinate
-SatRandomBoxPositionAllocator::GetNextGeo () const
+SatRandomBoxPositionAllocator::GetNextGeoPosition () const
 {
   NS_LOG_LOGIC (this);
   double longitude = m_longitude->GetValue ();
@@ -254,7 +254,7 @@ SatSpotBeamPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 }
 
 GeoCoordinate
-SatSpotBeamPositionAllocator::GetNextGeo () const
+SatSpotBeamPositionAllocator::GetNextGeoPosition () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -299,9 +299,12 @@ SatSpotBeamPositionAllocator::GetNextGeo () const
   // Set a random altitude
   pos.SetAltitude (m_altitude->GetValue ());
 
-  NS_ASSERT (pos.GetLatitude() >= -90.0 && pos.GetLatitude() <= 90.0);
-  NS_ASSERT (pos.GetLongitude() >= -180.0 && pos.GetLongitude() <= 180.0);
-  NS_ASSERT (elevation >= m_minElevationAngleInDeg && elevation <= 90.0);
+  if (pos.GetLatitude() < -90.0 || pos.GetLatitude() > 90.0 ||
+      pos.GetLongitude() < -180.0 || pos.GetLongitude() > 180.0 ||
+      elevation < m_minElevationAngleInDeg || elevation > 90.0)
+    {
+      NS_FATAL_ERROR ("SatSpotBeamPositionAllocator::GetNextGeoPosition - unvalid selected position!");
+    }
 
   return pos;
 }

@@ -23,7 +23,6 @@
 #include <cmath>
 #include <limits>
 #include <vector>
-#include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/mac48-address.h"
 #include "ns3/satellite-mac-tag.h"
@@ -121,7 +120,10 @@ public:
   template <typename T>
   static inline T DbToLinear ( T db )
   {
-    NS_ASSERT( ( db >= MinDb<T> () && db <= MaxDb<T> () ) || -isinf(db)  );
+    if (db < MinDb<T> () || db > MaxDb<T> () || -isinf(db))
+      {
+        NS_FATAL_ERROR ("SatUtils::DbToLinear - unsupported value: " <<  db);
+      }
 
     return (T) std::pow ( 10.0, db / 10.0 );
   }
@@ -137,7 +139,10 @@ public:
   template <typename T>
   static inline T LinearToDb ( T linear )
   {
-    NS_ASSERT( ( linear >= MinLin<T> () && linear <= MaxLin<T> () ) || linear == 0  );
+    if (linear < MinLin<T> () || linear > MaxLin<T> () || linear == 0)
+      {
+        NS_FATAL_ERROR ("SatUtils::LinearToDb - unsupported value: " <<  linear);
+      }
 
     return (T) (10.0 * std::log10 ( linear ));
   }

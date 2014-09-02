@@ -31,19 +31,13 @@
 
 namespace ns3 {
 
+
+
+
 /**
  * \ingroup satellite
  *
- * The SatUtScheduler is responsible of getting a packet of proper size from higher
- * protocol layer. Two callbacks to LLC layer have been configured:
- * - TxOpportunity callback
- * - Scheduling requests callback
- *
- */
-
-
-/**
- * Sort metric which sorts a vector available RC indices based on "unallocated load".
+ * \brief Sort metric which sorts a vector available RC indices based on "unallocated load".
  * Unallocated load is a the amount of bytes scheduled for UT which was not indicated
  * by NCC scheduler in TBTP. The UT scheduler tries to obey the scheduling decisions made
  * by NCC, and otherwise it tries to be byte-wise fair.
@@ -67,7 +61,15 @@ class SortByMetric
       const std::vector<uint32_t> &m_cont;
 };
 
-
+/**
+ * \ingroup satellite
+ *
+ * The SatUtScheduler is responsible of getting a packet of proper size from higher
+ * protocol layer. Two callbacks to LLC layer have been configured:
+ * - TxOpportunity callback
+ * - Scheduling requests callback
+ *
+ */
 class SatUtScheduler : public Object
 {
 public:

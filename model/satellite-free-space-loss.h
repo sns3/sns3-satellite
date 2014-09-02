@@ -28,7 +28,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Free space loss (FSL) model
+ * \brief This class is responsible of calculating the free space loss (FSL)
+ * based on two given node positions and used (center) frequency.
  */
 class SatFreeSpaceLoss : public Object
 {

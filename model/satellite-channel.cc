@@ -634,6 +634,7 @@ SatEnums::ChannelType_t
 SatChannel::GetChannelType ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_channelType != SatEnums::UNKNOWN_CH);
 
   return m_channelType;
 }
@@ -650,6 +651,7 @@ Ptr<PropagationDelayModel>
 SatChannel::GetPropagationDelayModel ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_propagationDelay != 0);
 
   return m_propagationDelay;
 }

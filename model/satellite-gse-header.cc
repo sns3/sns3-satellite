@@ -93,7 +93,6 @@ uint32_t SatGseHeader::GetSerializedSize () const
           return m_continuationGseHeaderSize;
         }
     }
-  NS_ASSERT (false);
   return 0;
 }
 

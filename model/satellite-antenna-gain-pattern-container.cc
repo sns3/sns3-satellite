@@ -74,7 +74,10 @@ SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
-  NS_ASSERT (beamId > 0 && beamId <= m_antennaPatternMap.size());
+  if (beamId < 0 || beamId > m_antennaPatternMap.size())
+    {
+      NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetAntennaGainPattern - unvalid beam id: " << beamId);
+    }
 
   // Note, that now we assume that all the antenna patterns are created
   // regardless of how many beams are actually simulated.

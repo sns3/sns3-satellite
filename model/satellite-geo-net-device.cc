@@ -198,16 +198,24 @@ SatGeoNetDevice::IsBridge (void) const
 bool 
 SatGeoNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  // upper layer functionality not supported, should not be called
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
+
+  /**
+   * The satellite does not have higher protocol layers which
+   * utilize the Send method! Thus, this method should not be used!
+   */
   NS_ASSERT (false);
   return false;
 }
 bool 
 SatGeoNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
-  // upper layer functionality not supported, should not be called
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
+
+  /**
+   * The satellite does not have higher protocol layers which
+   * utilize the SendFrom method! Thus, this method should not be used!
+   */
   NS_ASSERT (false);
   return false;
 }

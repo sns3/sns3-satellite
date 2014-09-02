@@ -31,7 +31,8 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Allocate a set of satellite positions. The allocation strategy is implemented in subclasses.
+ * \brief Allocate a set of satellite positions. The allocation strategy is implemented in
+ * inherited classes.
  *
  * This is a pure abstract base class.
  */
@@ -42,22 +43,25 @@ public:
   SatPositionAllocator ();
 
   virtual ~SatPositionAllocator ();
+
   /**
-   * \return the next chosen position.
-   *
-   * This method _must_ be implement in subclasses.
+   * \brief Get next position
+   * \return The next chosen position.
    */
-  virtual GeoCoordinate GetNextGeo (void) const = 0;
+  virtual GeoCoordinate GetNextGeoPosition (void) const = 0;
 
   virtual Vector GetNext (void) const;
   virtual int64_t AssignStreams (int64_t stream);
 
 private:
-  // this is the flag for indicating that when calling method GetNext (defined by class PositionAlocator)
-  // is returned Vector filled by longitude (in x), latitude (in y) and altitude (in z)
-  // this enables using ns-3 mobility helper without to convert geo coordinates first to Cartesian
-  // but if for some reason used model needs Cartesian coordinates then this flag can be turned off
-  // through attribute 'AsGeoCoordinates'.
+
+  /*
+   * This is the flag for indicating that when calling method GetNext (defined by class PositionAlocator)
+   * is returned Vector filled by longitude (in x), latitude (in y) and altitude (in z)
+   * this enables using ns-3 mobility helper without to convert geo coordinates first to Cartesian
+   * but if for some reason used model needs Cartesian coordinates then this flag can be turned off
+   * through attribute 'AsGeoCoordinates'.
+   */
   bool m_GetAsGeoCoordinates;
 };
 
@@ -78,9 +82,16 @@ public:
    * \param coordinate the position to append at the end of the list of positions to return from GetNext.
    */
   void Add (GeoCoordinate coordinate);
-  virtual GeoCoordinate GetNextGeo (void) const;
+
+  /**
+   * \brief Get next position
+   * \return The next chosen position.
+   */
+  virtual GeoCoordinate GetNextGeoPosition (void) const;
+
   inline virtual void SetToBegin () { m_current = m_positions.begin (); }
   inline virtual uint32_t GetCount () { return m_positions.size (); }
+
 private:
   std::vector<GeoCoordinate> m_positions;
   mutable std::vector<GeoCoordinate>::const_iterator m_current;
@@ -102,7 +113,11 @@ public:
    void SetLongitude (Ptr<RandomVariableStream> longitude);
    void SetAltitude (Ptr<RandomVariableStream> altitude);
 
-   virtual GeoCoordinate GetNextGeo (void) const;
+   /**
+    * \brief Get next position
+    * \return The next chosen position.
+    */
+   virtual GeoCoordinate GetNextGeoPosition (void) const;
    virtual int64_t AssignStreams (int64_t stream);
 
  private:
@@ -132,7 +147,11 @@ public:
 
   void SetAltitude (Ptr<RandomVariableStream> altitude);
 
-  virtual GeoCoordinate GetNextGeo (void) const;
+  /**
+   * \brief Get next position
+   * \return The next chosen position.
+   */
+  virtual GeoCoordinate GetNextGeoPosition (void) const;
   virtual int64_t AssignStreams (int64_t stream);
 private:
 

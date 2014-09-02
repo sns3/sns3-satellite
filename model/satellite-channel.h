@@ -55,6 +55,7 @@ namespace ns3 {
  * - Calculate the received signal power for the packet based on free-space loss model
  *   and fading (Markov/Loo)
  * - Handle the fading input/output trace functionality
+ *
  */
 
 class SatChannel : public Channel

@@ -64,7 +64,7 @@ public:
   ~SatNcc ();
 
   /**
-   * Update UT specific C/N0 information.
+   * \brief Update UT specific C/N0 information.
    *
    * The SatNcc receives C/N0 information of packet receptions from UTs
    * to take into account when making schedule decisions.
@@ -86,7 +86,7 @@ public:
   void DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad);
 
   /**
-   * Capacity request receiver.
+   * \brief Capacity request receiver.
    *
    * The SatNcc receives Capacity Rrequest (CR) messages from UTs
    * to take into account when making schedule decisions.

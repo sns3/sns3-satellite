@@ -79,6 +79,8 @@ Ptr<NetDevice>
 SatPhyRx::GetDevice ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_device != 0);
+
   return m_device;
 }
 
@@ -86,13 +88,16 @@ void
 SatPhyRx::SetDevice (Ptr<NetDevice> d)
 {
   NS_LOG_FUNCTION (this << d);
+  NS_ASSERT (m_device == 0);
+
   m_device = d;
 }
 
 void
 SatPhyRx::SetMaxAntennaGain_Db (double gain_Db)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << gain_Db);
+
   m_maxAntennaGain = SatUtils::DbWToW (gain_Db);
 }
 
@@ -111,20 +116,25 @@ SatPhyRx::GetAntennaGain (Ptr<MobilityModel> mobility)
       gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition ());
     }
 
+  /**
+   * If antenna gain pattern is not set, we use the
+   * set maximum antenna gain.
+   */
+
   return gain_W;
 }
 
 void
 SatPhyRx::SetDefaultFadingValue (double fadingValue)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << fadingValue);
   m_defaultFadingValue = fadingValue;
 }
 
 double
 SatPhyRx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << macAddress << channelType);
 
   double fadingValue = m_defaultFadingValue;
 
@@ -140,6 +150,7 @@ void
 SatPhyRx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_fadingContainer == 0);
 
   m_fadingContainer = fadingContainer;
 }
@@ -147,7 +158,7 @@ SatPhyRx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
 void
 SatPhyRx::SetAntennaLoss_Db (double gain_Db)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << gain_Db);
 
   m_antennaLoss = SatUtils::DbToLinear (gain_Db);
 }
@@ -163,13 +174,15 @@ SatPhyRx::GetLosses ()
 Mac48Address
 SatPhyRx::GetAddress () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_macAddress;
 }
 
 void
 SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_ASSERT (nodeInfo);
+  NS_LOG_FUNCTION (this << nodeInfo->GetNodeId ());
 
   m_macAddress = nodeInfo->GetMacAddress ();
 
@@ -184,6 +197,8 @@ SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 void
 SatPhyRx::BeginFrameEndScheduling ()
 {
+  NS_LOG_FUNCTION (this);
+
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
         it != m_rxCarriers.end();
         ++it)
@@ -209,7 +224,7 @@ SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
 void
 SatPhyRx::SetCnoCallback (SatPhyRx::CnoCallback cb)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << &cb);
   NS_ASSERT (!m_rxCarriers.empty ());
 
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
@@ -223,7 +238,7 @@ SatPhyRx::SetCnoCallback (SatPhyRx::CnoCallback cb)
 void
 SatPhyRx::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << &cb);
   NS_ASSERT (!m_rxCarriers.empty ());
 
   for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
@@ -238,6 +253,8 @@ Ptr<MobilityModel>
 SatPhyRx::GetMobility ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_mobility != 0);
+
   return m_mobility;
 }
 
@@ -251,12 +268,16 @@ SatPhyRx::SetMobility (Ptr<MobilityModel> m)
 void
 SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 {
+  NS_LOG_FUNCTION (this << agp);
+  NS_ASSERT (m_antennaGainPattern == 0);
+
   m_antennaGainPattern = agp;
 }
 
 void
 SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled)
 {
+  NS_LOG_FUNCTION (this << isRandomAccessEnabled);
   NS_ASSERT (m_rxCarriers.empty());
 
   Ptr<SatPhyRxCarrier> rxc;
@@ -303,6 +324,8 @@ SatPhyRx::SetBeamId (uint32_t beamId)
 uint32_t
 SatPhyRx::GetBeamId () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_beamId;
 }
 
@@ -312,7 +335,11 @@ SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
   NS_LOG_FUNCTION (this << rxParams);
 
   uint32_t cId = rxParams->m_carrierId;
-  NS_ASSERT (cId < m_rxCarriers.size());
+
+  if (cId >= m_rxCarriers.size ())
+    {
+      NS_FATAL_ERROR ("SatPhyRx::StartRx - unvalid carrier id: " << cId);
+    }
 
   m_rxCarriers[cId]->StartRx (rxParams);
 }

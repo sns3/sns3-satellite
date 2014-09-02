@@ -36,7 +36,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatGeoFeederPhy models the physical layer of the satellite node.
+ * The SatGeoFeederPhy models the feeder link physical layer of the
+ * satellite node.
  */
 class SatGeoFeederPhy : public SatPhy
 {

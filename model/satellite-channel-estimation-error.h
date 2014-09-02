@@ -29,10 +29,12 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatChannelEstimatorError holds the error mean and STD
- * for a set of SINR values. A proper value for a given SINR is
- * interpolated between two points.
- *
+ * \brief SatChannelEstimatorError reads from file and stores the channel
+ * estimation error mean and standard deviation values for a set of SINR values.
+ * Channel estimation error mean and standard deviation is dependent on calculated
+ * SINR. A proper error for a given SINR is interpolated between two closest SINR
+ * points. The channel estimation error is added to a given measurement by using
+ * the AddError method.
  */
 class SatChannelEstimationError : public Object
 {
@@ -54,7 +56,7 @@ public:
   /**
    * \brief Add channel estimation error to SINR.
    * \param sinrInDb Measured SINR in dB
-   * @return SINR including channel estimation error in dB
+   * \return SINR including channel estimation error in dB
    */
   double AddError (double sinrInDb) const;
 
@@ -62,7 +64,7 @@ private:
 
   /**
    * \brief Read the distribution mean and STD values from file.
-   * @param filePathName File name
+   * \param filePathName File name
    */
   void ReadFile (std::string filePathName);
 

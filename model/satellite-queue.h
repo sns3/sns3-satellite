@@ -34,8 +34,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatQueue implements a queue utilized in the satellite module.
- * It is utilized in both FWD and RTN links for both control and user data.
+ * \brief SatQueue implements a queue utilized in the satellite module. SatQueue
+ * is utilized in both FWD and RTN link to store incoming packets inside either
+ * SatGenericStreamEncapsulator (FWD link) or SatReturnLinkEncapsulator (RTN link).
+ * SatQueue is capable of collecting statistics from the incoming and outgoing
+ * bits and packets.
  *
 */
 

@@ -48,7 +48,11 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
  MAX_HL_PDU_PACKET_SIZE (4096)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
+
+  /**
+   * Default constuctor is not meant to be used!
+   */
 }
 
 

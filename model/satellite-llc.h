@@ -59,8 +59,11 @@ public:
 };
 
 /**
+ * \ingroup satellite
  * \brief EncapKeyCompare is used as a custom compare method within
- * EncapContainer map.
+ * EncapContainer map. Encap key has three member variables (source
+ * address, dest address and flow id) and to be able to store them in
+ * a map container, a custom compare method needs to be implemented.
  */
 class EncapKeyCompare
 {
@@ -106,8 +109,8 @@ public:
  * control packets without encapsulation, decapsulation, fragmentation and packing is implemented to the
  * SatBaseEncapsulator class.
  *
- *  A proper version of the SatLlc is inherited: SatUtLlc at the UT and SatGwLlc at the GW. There is no
- *  LLC layer at the satellite.
+ *  SatLlc is a pure virtual class, thus it is not supposed to be instantiated. A proper version of the
+ *  SatLlc is inherited: SatUtLlc at the UT and SatGwLlc at the GW. There is no LLC layer at the satellite.
  */
 class SatLlc : public Object
 {

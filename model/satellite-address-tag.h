@@ -29,7 +29,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * \brief This class implements a tag that carries the MAC address of the sender
- *        of the packet.
+ *        of the packet. Address tag is used for statistics purposes.
  */
 class SatAddressTag : public Tag
 {
@@ -44,11 +44,13 @@ public:
   SatAddressTag (Address addr);
 
   /**
+   * \brief Set the source address.
    * \param addr the source address.
    */
   void SetSourceAddress (Address addr);
 
   /**
+   * \brief Get the source address.
    * \return the source address.
    */
   Address GetSourceAddress () const;

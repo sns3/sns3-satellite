@@ -403,7 +403,10 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_
    */
   SatPhy::PacketContainer_t packets;
 
-  NS_ASSERT (payloadBytes > 0);
+  if (payloadBytes <= 0)
+    {
+      NS_FATAL_ERROR ("SatUtMac::FetchPackets - unvalid slot payload: " << payloadBytes);
+    }
 
   m_utScheduler->DoScheduling (packets, payloadBytes, type, rcIndex, policy);
 

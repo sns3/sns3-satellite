@@ -33,8 +33,10 @@ class SatPhyTx;
 
 /**
 * \ingroup satellite
-* The transmission-reception related parameters needed e.g. for
-* received signal strength calculation.
+* \brief Actual physical layer transmission container. SatSignalParameters is passed
+* through the SatChannel from the transmitter to the receiver. It includes e.g. the packet
+* container (BBFrame in FWD link, FPDU in RTN link) as well as all the transmission related
+* information (MODCODs, frequency, tx power, etc.).
 */
 class SatSignalParameters : public Object
 {

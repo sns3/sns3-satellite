@@ -380,7 +380,7 @@ SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& u
 
   for ( uint32_t j = 0; j < utInfo.GetUtCount (); j++ )
     {
-      uint32_t beamId = m_antennaGainPatterns->GetBestBeamId (m_utPositions->GetNextGeo ());
+      uint32_t beamId = m_antennaGainPatterns->GetBestBeamId (m_utPositions->GetNextGeoPosition ());
 
       if ( beamInfo.empty () || ( beamInfo.find (beamId) != beamInfo.end () ) )
         {

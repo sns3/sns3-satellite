@@ -35,7 +35,11 @@ SatSchedulingObject::SatSchedulingObject ()
  m_flowId ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
+
+  /**
+   * Default constructor is not meant to be used!
+   */
 }
 
 

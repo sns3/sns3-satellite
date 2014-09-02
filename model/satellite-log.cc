@@ -53,6 +53,8 @@ SatLog::SatLog () :
   m_simulationTag ("")
 {
   NS_LOG_FUNCTION (this);
+
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 }
 
 SatLog::~SatLog ()

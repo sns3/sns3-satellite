@@ -30,10 +30,10 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief Observes given mobilities and keeps track of properties wanted to observe related to mobilities.
- * Properties can be observed are currently the timing advance and elevation angle. (elevation angel always available).
+ * \brief Observes given mobilities and keeps track of certain wanted properties.
+ * Properties can be observed are currently the timing advance and elevation angle.
  *
- * Observing of timing advance is set by @method ObserveTimingAdvance
+ * Observing of timing advance is set by \method ObserveTimingAdvance
  *
  * This is a base class for all satellite mobility models.
  */
@@ -44,12 +44,12 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Default constructor of the mobility observer (should not be called)
+   * \brief Default constructor of the mobility observer (should not be called)
    */
   SatMobilityObserver ();
 
   /**
-   * Constructor for mobility observer
+   * \brief Constructor for mobility observer
    *
    * @param ownMobility Own mobility to observe
    * @param geoSatMobility Satellite mobility to observe
@@ -57,14 +57,14 @@ public:
   SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility);
 
   /**
-   * Destructor of the mobility observer
+   * \brief Destructor of the mobility observer
    */
   virtual ~SatMobilityObserver ();
 
   virtual void DoDispose (void);
 
   /**
-   * Enable observing of the timing advance.
+   * \brief Enable observing of the timing advance.
    *
    * \param ownDelayModel Own propagation delay model.
    * \param anotherDelayModel Propagation delay model of the another end.
@@ -75,30 +75,30 @@ public:
                               Ptr<SatMobilityModel> anotherMobility);
 
   /**
-   * Get elevation angle.
+   * \brief Get elevation angle.
    *
-   * @return the current elevation angle as degrees.
+   * @\eturn the current elevation angle as degrees.
    */
   double GetElevationAngle (void);
 
   /**
-   * Get velocity of own movement (speed).
+   * \brief Get velocity of own movement (speed).
    *
-   * @return the current velocity.
+   * \return the current velocity.
    */
   double GetVelocity (void);
 
   /**
-   * Get timing advance.
+   * \brief Get timing advance.
    *
-   * @return the current timing advance.
+   * \return the current timing advance.
    */
   Time GetTimingAdvance (void);
 
 private:
 
   /**
-   * Notify listeners about some property is changed
+   * \brief Notify listeners about some property is changed
    */
   void NotifyPropertyChange (void) const;
 
@@ -108,17 +108,17 @@ private:
   void UpdateElevationAngle ();
 
   /**
-   * Update timing advance.
+   * \brief Update timing advance.
    */
   void UpdateTimingAdvance ();
 
   /**
-   * Do actions needed when satellite position is changed.
+   * \brief Do actions needed when satellite position is changed.
    */
   void SatelliteStatusChanged();
 
   /**
-   * Listener (callback) for mobility position changes
+   * \brief Listener (callback) for mobility position changes
    *
    * @param context Context of the mobility whose position is changed
    * @param position Mobility whose position is changed

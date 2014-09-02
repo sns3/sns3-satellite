@@ -27,10 +27,9 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief An ARP cache interface for satellite module.
- * In satellite module, the ARP cache entries are pre-filled
- * by the helpers and n "infinite" timeout is set for all
- * ARP cache entries. Thus, ARP (cache) is enabled but the
+ * \brief An ARP cache interface for satellite module. In satellite module,
+ * the ARP cache entries are pre-filled by the helpers and n "infinite"
+ * timeout is set for all ARP cache entries. Thus, ARP is enabled but the
  * ARP messages do not need to be actively sent.
  */
 class SatArpCache : public ArpCache

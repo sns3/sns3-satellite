@@ -21,10 +21,12 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/enum.h"
+#include "ns3/singleton.h"
 #include "ns3/uinteger.h"
 #include "satellite-queue.h"
 #include "satellite-utils.h"
 #include "satellite-const-variables.h"
+#include "satellite-log.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatQueue");
 
@@ -138,6 +140,13 @@ SatQueue::Enqueue (Ptr<Packet> p)
   if (m_packets.size () >= m_maxPackets)
     {
       NS_LOG_LOGIC ("Queue full (at max packets) -- dropping pkt");
+
+      std::stringstream msg;
+      msg << "SatQueue is full: packet dropped!";
+      msg << " at: " << Now ().GetSeconds () << "s";
+      msg << " MaxPackets: " << m_maxPackets;
+      Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+
       Drop (p);
       return false;
     }

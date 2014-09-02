@@ -88,7 +88,7 @@ uint32_t SatPPduHeader::GetSerializedSize () const
           return m_continuationPpduHeaderSize;
         }
     }
-  NS_ASSERT (false);
+
   return 0;
 }
 

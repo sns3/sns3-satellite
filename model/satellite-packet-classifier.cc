@@ -18,6 +18,7 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "ns3/log.h"
 #include "ns3/ipv4-header.h"
 #include "ns3/ipv4-l3-protocol.h"
 #include "satellite-packet-classifier.h"

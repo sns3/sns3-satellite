@@ -28,9 +28,16 @@
 /**
  * \ingroup satellite
  *
- * \brief SatGseHeader implementation. GSE header is added to full
- * or fragmented HL packets at the GW and decapsulated at the UT. Header
- * size affects the total packet size.
+ * \brief SatGseHeader implementation. GSE header is added to each
+ * of the transmitted GSE packets at the GW in FWD link direction. The header
+ * is detached and interpreted at the GSE receiver at the UT. Based on the
+ * content the receiver can do the defragmentation of the higher layer packet.
+ * The size of the GSE header is determined by the Serialize and GetSerializedSize
+ * methods. The GSE header has the proper content and size according to
+ * specification.
+ *
+ * \see ETSI TS 102 606 V1.1.1 Digital Video Broadcasting (DVB);
+ * Generic Stream Encapsulation (GSE) Protocol
  */
 namespace ns3 {
 

@@ -32,7 +32,7 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief ARQ header implementation includes only the sequence number related
+ * \brief ARQ header implementation contains the sequence number related
  * to the packet in question. Sequence number is identified with one byte, thus
  * it may range between 0 - 255.
  */
@@ -55,19 +55,22 @@ public:
   virtual void Print (std::ostream &os) const;
 
   /**
-   * Get sequence number
+   * \brief Get sequence number
    * \return Sequence number
    */
   uint8_t GetSeqNo () const;
 
   /**
-   * Set sequence number
+   * \brief Set sequence number
    * \param seqNo Sequence number
    */
   void SetSeqNo (uint8_t seqNo);
 
 private:
 
+  /**
+   * Sequence number represented by one Byte
+   */
   uint8_t m_seqNo;
 
 };

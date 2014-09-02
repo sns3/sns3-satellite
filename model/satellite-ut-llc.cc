@@ -338,7 +338,7 @@ void
 SatUtLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
 
   /**
    * This is not yet implemented to the UT LLC

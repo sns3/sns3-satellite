@@ -61,7 +61,11 @@ SatDvbS2Waveform::SatDvbS2Waveform ()
  m_cnoRequirement (0.0)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
+
+  /**
+   * Default constructor is not meant to be used!
+   */
 }
 
 SatDvbS2Waveform::SatDvbS2Waveform(SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t fType, Time frameDur, uint32_t payloadBits)

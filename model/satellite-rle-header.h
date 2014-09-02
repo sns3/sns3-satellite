@@ -28,9 +28,16 @@
 /**
  * \ingroup satellite
  *
- * \brief SatPPduHeader implementation (RLE). PPDU header is added to full
- * or fragmented HL packets at the UT and decapsuled at the GW. Header
- * size affects the total packet size.
+ * \brief SatPPduHeader implementation. RLE header is added to each
+ * of the transmitted RLE packets at the UT in RTN link direction. The header
+ * is detached and interpreted at the RLE receiver at the GW. Based on the
+ * content the receiver can do the defragmentation of the higher layer packet.
+ * The size of the RLE header is determined by the Serialize and GetSerializedSize
+ * methods. The RLE header has the proper content and size according to
+ * specification.
+ *
+ * \see ETSI TS 103 179 V1.1.1 Satellite Earth Stations and Systems (SES);
+ * Return Link Encapsulation (RLE) protocol
  */
 namespace ns3 {
 

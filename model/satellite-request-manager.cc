@@ -432,7 +432,10 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
           reqRbdcKbps -= m_llsConf->GetDaConstantServiceRateInKbps(rc);
         }
 
-      NS_ASSERT (m_llsConf->GetDaConstantServiceRateInKbps(rc) < m_llsConf->GetDaMaximumServiceRateInKbps (rc));
+      if (m_llsConf->GetDaConstantServiceRateInKbps(rc) > m_llsConf->GetDaMaximumServiceRateInKbps (rc))
+        {
+          NS_FATAL_ERROR ("SatRequestManager::DoRbdc - configured CRA is bigger than maximum RBDC for RC: " << uint32_t (rc));
+        }
 
       // CRA + RBDC is too much
       if ((m_llsConf->GetDaConstantServiceRateInKbps(rc) + reqRbdcKbps) > m_llsConf->GetDaMaximumServiceRateInKbps (rc))

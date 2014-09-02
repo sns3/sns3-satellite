@@ -39,7 +39,11 @@ SatBaseEncapsulator::SatBaseEncapsulator ()
  m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (true);
+  NS_ASSERT (false);
+
+  /**
+   * Default constructor is not meant to be used!
+   */
 }
 
 SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)

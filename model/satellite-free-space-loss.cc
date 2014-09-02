@@ -21,6 +21,7 @@
 
 #include "ns3/double.h"
 #include "ns3/string.h"
+#include "ns3/log.h"
 
 #include "satellite-utils.h"
 #include "satellite-free-space-loss.h"

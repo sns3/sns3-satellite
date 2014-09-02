@@ -2,6 +2,9 @@
 
 def build(bld):
 
+    obj = bld.create_ns3_program('sat-dama-verification-sim', ['satellite'])
+    obj.source = 'sat-dama-verification-sim.cc'
+
     obj = bld.create_ns3_program('sat-arq-fwd-example', ['satellite'])
     obj.source = 'sat-arq-fwd-example.cc'
 

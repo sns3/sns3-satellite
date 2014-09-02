@@ -48,7 +48,7 @@ SatWaveform::SatWaveform ()
  m_lengthInSymbols (0),
  m_ebnoRequirement (0.0)
 {
-  NS_ASSERT (true);
+  NS_ASSERT (false);
 }
 
 
@@ -260,7 +260,10 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
           output.push_back (i);
         }
 
-      NS_ASSERT (output.size () == 2);
+      if (output.size () != 2)
+        {
+          NS_FATAL_ERROR ("SatWaveformConf::ReadFromFile - Temp fraction vector has unexpected amount of elements!");
+        }
 
       double dCodingRate = double(output[0]) / output[1];
 
@@ -306,7 +309,11 @@ Ptr<SatWaveform>
 SatWaveformConf::GetWaveform (uint32_t wfId) const
 {
   NS_LOG_FUNCTION (this << wfId);
-  NS_ASSERT(m_minWfId <= wfId && wfId <= m_maxWfId);
+
+  if (m_minWfId > wfId || wfId > m_maxWfId )
+    {
+      NS_FATAL_ERROR ("SatWaveformConf::GetWaveform - unsupported waveform id: " << wfId);
+    }
 
   return m_waveforms.at(wfId);
 }
@@ -315,7 +322,11 @@ uint32_t
 SatWaveformConf::GetDefaultWaveformId () const
 {
   NS_LOG_FUNCTION (this << m_defaultWfId);
-  NS_ASSERT(m_minWfId <= m_defaultWfId && m_defaultWfId <= m_maxWfId);
+
+  if (m_minWfId > m_defaultWfId || m_defaultWfId > m_maxWfId )
+    {
+      NS_FATAL_ERROR ("SatWaveformConf::GetDefaultWaveformId - unsupported waveform id: " << m_defaultWfId);
+    }
 
   return m_defaultWfId;
 }
@@ -403,7 +414,11 @@ SatEnums::SatModcod_t
 SatWaveformConf::GetModCod (uint32_t wfId) const
 {
   NS_LOG_FUNCTION (this << wfId);
-  NS_ASSERT(m_minWfId <= wfId && wfId <= m_maxWfId);
+
+  if (m_minWfId > wfId || wfId > m_maxWfId )
+    {
+      NS_FATAL_ERROR ("SatWaveformConf::GetModCod - unsupported waveform id: " << wfId);
+    }
 
   std::map< uint32_t, Ptr<SatWaveform> >::const_iterator it = m_waveforms.find (wfId);
 

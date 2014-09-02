@@ -77,7 +77,8 @@ private:
 };
 
 /**
- * \brief This class implements a tag that carries the flow identifier
+ * \ingroup satellite
+ * \brief SatFlowIdTag implements a tag which carries the flow identifier
  * of a packet.
  */
 class SatFlowIdTag : public Tag

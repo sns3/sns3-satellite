@@ -101,7 +101,8 @@ SatPhyTx::GetTypeId (void)
 void
 SatPhyTx::SetMaxAntennaGain_Db (double gain_db)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << gain_db);
+
   m_maxAntennaGain = SatUtils::DbToLinear (gain_db);
 }
 
@@ -120,20 +121,26 @@ SatPhyTx::GetAntennaGain (Ptr<MobilityModel> mobility)
       gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition ());
     }
 
+  /**
+   * If antenna gain pattern is not set, we use the
+   * set maximum antenna gain.
+   */
+
   return gain_W;
 }
 
 void
 SatPhyTx::SetDefaultFadingValue (double fadingValue)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << fadingValue);
+
   m_defaultFadingValue = fadingValue;
 }
 
 double
 SatPhyTx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << macAddress << channelType);
 
   double fadingValue = m_defaultFadingValue;
 
@@ -149,6 +156,7 @@ void
 SatPhyTx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_fadingContainer == 0);
 
   m_fadingContainer = fadingContainer;
 }
@@ -157,6 +165,8 @@ Ptr<MobilityModel>
 SatPhyTx::GetMobility ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_mobility != 0);
+
   return m_mobility;
 }
 
@@ -164,12 +174,17 @@ void
 SatPhyTx::SetMobility (Ptr<MobilityModel> m)
 {
   NS_LOG_FUNCTION (this << m);
+  NS_ASSERT (m_mobility == 0);
+
   m_mobility = m;
 }
 
 void
 SatPhyTx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 {
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_antennaGainPattern == 0);
+
   m_antennaGainPattern = agp;
 }
 
@@ -177,6 +192,8 @@ void
 SatPhyTx::SetChannel (Ptr<SatChannel> c)
 {
   NS_LOG_FUNCTION (this << c);
+  NS_ASSERT (m_channel == 0);
+
   m_channel = c;
 }
 
@@ -184,6 +201,8 @@ Ptr<SatChannel>
 SatPhyTx::GetChannel ()
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_channel != 0);
+
   return m_channel;
 }
 
@@ -239,7 +258,11 @@ SatPhyTx::EndTx ()
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC (this << " state: " << m_state);
-  NS_ASSERT (m_state == TX);
+
+  if (m_state != TX)
+    {
+      NS_FATAL_ERROR ("SatPhyTx::EndTx - unexpected state!");
+    }
 
   ChangeState (IDLE);
 }

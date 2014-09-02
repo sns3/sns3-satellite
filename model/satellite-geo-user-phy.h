@@ -36,7 +36,8 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * The SatGeoUserPhy models the physical layer of the satellite node.
+ * The SatGeoUserPhy models the user link physical layer of the
+ * satellite node.
  */
 class SatGeoUserPhy : public SatPhy
 {

@@ -39,7 +39,8 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements a tag that is used to identify control messages (packages)
+ * \brief This class implements a tag that is used to identify
+ * control messages (packages).
  */
 class SatControlMsgTag : public Tag
 {
@@ -68,30 +69,26 @@ public:
   ~SatControlMsgTag ();
 
   /**
-   * Set type of the control message. In construction phase initialized
+   * \brief Set type of the control message. In construction phase initialized
    * to value SAT_UNKNOWN_CTRL_MSG.
-   *
    * \param type The type of the control message
    */
   void SetMsgType (SatControlMsgType_t type);
 
   /**
-   * Get type of the control message.
-   *
+   * \brief Get type of the control message.
    * \return The type of the control message
    */
   SatControlMsgType_t GetMsgType (void) const;
 
   /**
-   * Set message type specific identifier.
-   *
+   * \brief Set message type specific identifier.
    * \param msgId Message type specific identifier. May be ignored by some message types.
    */
   virtual void SetMsgId (uint32_t msgId);
 
   /**
-   * Get message type specific identifier.
-   *
+   * \brief Get message type specific identifier.
    * \return Message type specific identifier.
    */
   virtual uint32_t GetMsgId () const;
@@ -111,7 +108,8 @@ private:
 
 /**
  * \ingroup satellite
- * \brief Abstract satellite control message class
+ * \brief Abstract satellite control message class. The real
+ * control messages are inherited from it.
  */
 
 class SatControlMessage : public Object
@@ -127,12 +125,13 @@ public:
   SatControlMessage () {};
 
   /**
-   * Destructor for  Set sequence id to 0.
+   * Destructor
    */
   ~SatControlMessage () {};
 
   /**
-   * Get real size of the control message, which can be used to e.g. simulate real size.
+   * Get real size of the control message. This can be used to
+   * simulate real packet size.
    *
    * \return Real size of the control message.
    */
@@ -154,7 +153,8 @@ private:
  * \brief The packet for the Terminal Burst Time Plan (TBTP) messages.
  * (Tagged by SatControlMsgTag with type value SAT_TBTP_CTRL_MSG)
  * NOTE! Message implementation doesn't follow specification (ETSI EN 301 542-2).
- * However it implements method GetSizeInBytes, which can be used when real size is simulated.
+ * However it implements method GetSizeInBytes, which can be used to simulate
+ * real TBTP message size.
  */
 
 class SatTbtpMessage : public SatControlMessage
@@ -337,10 +337,12 @@ private:
 
 /**
  * \ingroup satellite
- * \brief Capacity request message
+ * \brief The packet for the Capacity Request (CR) messages.
  * (Tagged by SatControlMsgTag with type value SAT_CR_CTRL_MSG)
+ * NOTE! Message implementation doesn't follow specification (ETSI EN 301 542-2).
+ * However it implements method GetSizeInBytes, which can be used to simulate
+ * real CR message size.
  */
-
 class SatCrMessage : public SatControlMessage
 {
 public:
@@ -369,49 +371,48 @@ public:
   typedef std::map<RequestDescriptor_t, uint16_t > RequestContainer_t;
 
   /**
-   * Get type of the message.
-   *
+   * \brief Get type of the message.
    * \return SatControlMsgTag::SAT_CR_CTRL_MSG
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CR_CTRL_MSG; }
 
   /**
-   * Add a control element to capacity request
+   * \brief Add a control element to capacity request
    */
   void AddControlElement (uint8_t rcIndex, SatEnums::SatCapacityAllocationCategory_t cac, uint32_t value);
 
   /**
-   * Get the capacity request content
+   * \brief Get the capacity request content
    * \return RequestContainer_t Capacity request container
    */
   const RequestContainer_t GetCapacityRequestContent () const;
 
   /**
-   * The number of capacity request elements
+   * \brief The number of capacity request elements
    * \return uint32_t Number of CR elements
    */
   uint32_t GetNumCapacityRequestElements () const;
 
   /**
-   * Get C/N0 estimate.
+   * \brief Get C/N0 estimate.
    * \return Estimate of the C/N0.
    */
   double GetCnoEstimate () const;
 
   /**
-   * Set C/N0 estimate.
+   * \brief Set C/N0 estimate.
    * \param cno The estimate of the C/N0.
    */
   void SetCnoEstimate (double cno);
 
   /**
-   * Get real size of the CR message, which can be used to e.g. simulate real size.
+   * \brief Get real size of the CR message, which can be used to e.g. simulate real size.
    * \return Real size of the CR message.
    */
   virtual uint32_t GetSizeInBytes () const;
 
   /**
-   * Has the CR non-zero content
+   * \brief Has the CR non-zero content
    * \return bool Flag to indicate whether the CR has non-zero content
    */
   bool IsNotEmpty () const;
@@ -449,7 +450,9 @@ private:
 
 /**
  * \ingroup satellite
- * \brief ARQ ACK message
+ * \brief The packet for the Automatic Repeat reQuest (ARQ)
+ * acknowledgment (ACK) messages.
+ * (Tagged by SatControlMsgTag with type value SAT_ARQ_ACK)
  */
 
 class SatArqAckMessage : public SatControlMessage
@@ -471,38 +474,37 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Get type of the message.
-   *
+   * \brief Get type of the message.
    * \return SatControlMsgTag::SAT_ARQ_ACK
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_ARQ_ACK; }
 
   /**
-   * Set the sequence number to be ACK'ed
+   * \brief Set the sequence number to be ACK'ed
    * \param sn Sequence number
    */
   void SetSequenceNumber (uint8_t sn);
 
   /**
-   * Get the sequence number to be ACK'ed
+   * \brief Get the sequence number to be ACK'ed
    * \return uint32_t Sequence number
    */
   uint8_t GetSequenceNumber () const;
 
   /**
-   * Set the flow id to be ACK'ed
+   * \brief Set the flow id to be ACK'ed
    * \param sn Sequence number
    */
   void SetFlowId (uint8_t sn);
 
   /**
-   * Get the sequence number to be ACK'ed
+   * \brief Get the sequence number to be ACK'ed
    * \return uint32_t Sequence number
    */
   uint8_t GetFlowId () const;
 
   /**
-   * Get real size of the ACK message, which can be used to e.g. simulate real size.
+   * \brief Get real size of the ACK message, which can be used to e.g. simulate real size.
    * \return Real size of the ARQ ACK
    */
   virtual uint32_t GetSizeInBytes () const;
@@ -541,26 +543,26 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Get type of the message.
+   * \brief Get type of the message.
    *
    * \return SatControlMsgTag::SAT_CN0_REPORT
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CN0_REPORT; }
 
   /**
-   * Get C/N0 estimate.
+   * \brief Get C/N0 estimate.
    * \return Estimate of the C/N0.
    */
   double GetCnoEstimate () const;
 
   /**
-   * Set C/N0 estimate.
+   * \brief Set C/N0 estimate.
    * \param cno The estimate of the C/N0.
    */
   void SetCnoEstimate (double cno);
 
   /**
-   * Get real size of the CR message, which can be used to e.g. simulate real size.
+   * \brief Get real size of the CR message, which can be used to e.g. simulate real size.
    * \return Real size of the CR message.
    */
   virtual uint32_t GetSizeInBytes () const;
@@ -598,38 +600,38 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Get type of the message.
+   * \brief Get type of the message.
    *
    * \return SatControlMsgTag::SAT_RA_CTRL_MSG
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_RA_CTRL_MSG; }
 
   /**
-   * Get backoff probability
+   * \brief Get backoff probability
    * \return backoff probability
    */
   uint16_t GetBackoffProbability () const;
 
   /**
-   * Set backoff probability
+   * \brief Set backoff probability
    * \param backoffProbability Backoff probability
    */
   void SetBackoffProbability (uint16_t backoffProbability);
 
   /**
-   * Get backoff time
+   * \brief Get backoff time
    * \return backoff time
    */
   uint16_t GetBackoffTime () const;
 
   /**
-   * Set backoff time
+   * \brief Set backoff time
    * \param backoffProbability Backoff time
    */
   void SetBackoffTime (uint16_t backoffTime);
 
   /**
-   * Get allocation chanel ID
+   * \brief Get allocation chanel ID
    * \return Allocation channel ID
    */
   uint8_t GetAllocationChannelId () const;
@@ -641,7 +643,7 @@ public:
   void SetAllocationChannelId (uint8_t allocationChannel);
 
   /**
-   * Get real size of the random access message, which can be used to e.g. simulate real size.
+   * \brief Get real size of the random access message, which can be used to e.g. simulate real size.
    * \return Real size of the random access message.
    */
   virtual uint32_t GetSizeInBytes () const;
@@ -705,7 +707,7 @@ public:
   ~SatControlMsgContainer ();
 
   /**
-   * Reserve an id and store a control message.
+   * \brief Reserve an id and store a control message.
    *
    * \param Pointer to message to be added.
    * \return Reserved send ID of the created added message.
@@ -713,7 +715,7 @@ public:
   uint32_t ReserveIdAndStore (Ptr<SatControlMessage> controlMsg);
 
   /**
-   * Add a control message.
+   * \brief Add a control message.
    *
    * \param sendId of the message to add.
    * \return Receive id given by the container.
@@ -721,7 +723,7 @@ public:
   uint32_t Send (uint32_t sendId);
 
   /**
-   * Read a control message.
+   * \brief Read a control message.
    *
    * \param Id of the message to read.
    * \return Pointer to message.
@@ -731,15 +733,15 @@ public:
 private:
 
   /**
-   * Erase first item from container. Schedules a new erase call to this function with time left
+   * \brief Erase first item from container. Schedules a new erase call to this function with time left
    * for next item in list (if container is not empty).
    */
   void EraseFirst ();
 
   /**
-   * Do clean up for the Ctrl msg id map. Currently it needs to erase
+   * \brief Do clean up for the Ctrl msg id map. Currently it needs to erase
    * a map entry based on value, which is not very efficient.
-   * @param recvId Ctrl msg id
+   * \param recvId Ctrl msg id
    */
   void CleanUpIdMap (uint32_t recvId);
 

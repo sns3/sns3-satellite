@@ -32,14 +32,13 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements the available waveform configurations of DVB-RCS2
- * return link. Currently the waveforms 3-22 are in use: 3-12 with shorter burst
- * duration and 13-22 with longer burst duration.
+ * \brief This class implements the content of one individual DVB-RCS2 waveform.
+ * Waveform is defined by modulation scheme, coding rate, payload size in bytes and
+ * burst length in symbols.
  * \see ETSI EN 301 545-2 Digital Video Broadcasting (DVB); Second Generation
  * Interactive Satellite System (DVB-RCS2); Part 2: Lower Layers for Satellite Standard
  * - Annex A Reference waveforms
  */
-
 class SatWaveform : public SimpleRefCount<SatWaveform>
 {
 public:
@@ -168,7 +167,15 @@ private:
   double m_ebnoRequirement;
 };
 
-
+/**
+ * \ingroup satellite
+ * \brief This class implements the available waveform configurations of DVB-RCS2
+ * return link. Currently the waveforms 3-22 are in use: 3-12 with shorter burst
+ * duration and 13-22 with longer burst duration.
+ * \see ETSI EN 301 545-2 Digital Video Broadcasting (DVB); Second Generation
+ * Interactive Satellite System (DVB-RCS2); Part 2: Lower Layers for Satellite Standard
+ * - Annex A Reference waveforms
+ */
 class SatWaveformConf : public Object
 {
 public:

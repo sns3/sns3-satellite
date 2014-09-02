@@ -37,12 +37,15 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief This class implements a base encapsulator class. Basically,
- * it is a packet container using SatQueue class. It does not support
- * encapsulator nor fragmentation / packing. Return Link Encapsulator (RLE)
- * and Generic Stream Encapsulator (GSE) are inherited from this base
- * class. Note, that this base class is meant to be utilized to enque
- * control packets.
+ * \brief A base encapsulator implementation which does not support
+ * encapsulation, fragmentation or packing. Base encapsulator is used
+ * for flows which do not need encapsulation or fragmentation, such as
+ * lower layer control flows. Base encapsulator basically just stores
+ * packets in SatQueue and sends them as they are.
+ *
+ * Return Link Encapsulator (RLE) and Generic Stream Encapsulator (GSE),
+ * as well as their ARQ supportive versions, are inherited from this base
+ * class.
  */
 class SatBaseEncapsulator : public Object
 {

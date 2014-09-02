@@ -33,11 +33,15 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief SatGenericStreamEncapsulator class is used in the FWD link for
- * GSE encapsulation and fragmentation of higher layer packets. The
- * SatGenericStreamEncapsulator object is UT specific and its entities
- * are located at both GW (encapsulation, fragmentation) and
- * UT (decapsulation, defragmentation).
+ * \brief SatGenericStreamEncapsulator class is used in the FWD link for GSE
+ * encapsulation and fragmentation of higher layer packets. SatGenericStreamEncapsulator
+ * object is flow (UT address - flow id) specific and its entities are located at both
+ * GW (encapsulation, fragmentation) and UT (decapsulation, defragmentation).
+ * Generic stream encapsulators/decapsulators are created dynamically when first
+ * needed (when a packet is received for this flow).
+ *
+ * \see ETSI TS 102 606 V1.1.1 Digital Video Broadcasting (DVB);
+ * Generic Stream Encapsulation (GSE) Protocol
  */
 class SatGenericStreamEncapsulator : public SatBaseEncapsulator
 {

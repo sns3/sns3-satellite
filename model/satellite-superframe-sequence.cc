@@ -106,7 +106,10 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
-  NS_ASSERT ( seqId < m_superframe.size() );
+  if (seqId >= m_superframe.size())
+    {
+      NS_FATAL_ERROR ("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << seqId);
+    }
 
   return m_superframe[seqId]->GetCarrierCount();
 }
@@ -116,7 +119,10 @@ SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
-  NS_ASSERT ( seqId < m_superframe.size() );
+  if (seqId >= m_superframe.size())
+    {
+      NS_FATAL_ERROR ("SatSuperframeSeq::GetDuration - unsupported sequence id: " << seqId);
+    }
 
   return m_superframe[seqId]->GetDuration();
 }
@@ -126,7 +132,10 @@ SatSuperframeSeq::GetSuperframeConf (uint8_t seqId) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
-  NS_ASSERT ( seqId < m_superframe.size());
+  if (seqId >= m_superframe.size())
+    {
+      NS_FATAL_ERROR ("SatSuperframeSeq::GetSuperframeConf - unsupported sequence id: " << seqId);
+    }
 
   return m_superframe[seqId];
 }
@@ -136,7 +145,10 @@ SatSuperframeSeq::GetCarrierId ( uint8_t superframeId, uint8_t frameId, uint16_t
 {
   NS_LOG_FUNCTION (this << superframeId << frameId << frameCarrierId);
 
-  NS_ASSERT ( superframeId < m_superframe.size());
+  if (superframeId >= m_superframe.size())
+    {
+      NS_FATAL_ERROR ("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << superframeId);
+    }
 
   uint32_t carrierId = m_superframe[superframeId]->GetCarrierId(frameId, frameCarrierId );
 

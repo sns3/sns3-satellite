@@ -32,12 +32,12 @@ namespace ns3 {
  * \ingroup satellite
  * \brief SatChannelEstimationErrorContainer is responsible of adding a channel
  * estimation error on top of raw measured SINR. Channel estimation error
- * functions in dB domain. Abstract base class SatChannelEstimationErrorContainer
+ * functions in logarithmic (dB) domain. Abstract base class SatChannelEstimationErrorContainer
  * defines the interface method, but the actual implementation is in inherited
  * classes:
  * - SatSimpleChannelEstimatinoErrorContainer - returns always SINR without errors
- * - SatFwdLinkChannelEstimationErrorContainer - uses FWD link error tables
- * - SatRtnLinkChannelEstimationErrorContainer - uses FWD link error tables
+ * - SatFwdLinkChannelEstimationErrorContainer - uses FWD channel estimation error tables
+ * - SatRtnLinkChannelEstimationErrorContainer - uses RTN channel estimation error tables
  */
 
 class SatChannelEstimationErrorContainer : public SimpleRefCount<SatChannelEstimationErrorContainer>
