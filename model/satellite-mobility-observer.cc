@@ -102,7 +102,7 @@ SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr
   GeoCoordinate ownPosition = m_ownMobility->GetGeoPosition ();
 
   // same reference ellipsoide must be used by mobilities
-  NS_ASSERT (satellitePosition.GetRefEllipsoide() == ownPosition.GetRefEllipsoide() );
+  NS_ASSERT (satellitePosition.GetRefEllipsoid() == ownPosition.GetRefEllipsoid() );
 
   double satelliteAltitude = satellitePosition.GetAltitude ();
 
@@ -157,7 +157,7 @@ SatMobilityObserver::ObserveTimingAdvance (Ptr<PropagationDelayModel> ownDelayMo
   m_anotherMobility = anotherMobility;
 
   // same reference ellipsoide must be used by mobilities
-  NS_ASSERT (m_anotherMobility->GetGeoPosition().GetRefEllipsoide() == m_ownMobility->GetGeoPosition().GetRefEllipsoide() );
+  NS_ASSERT (m_anotherMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
 
   m_anotherMobility->TraceConnect("SatCourseChange", "Another", MakeCallback(&SatMobilityObserver::PositionChanged, this));
 }
@@ -170,7 +170,7 @@ SatMobilityObserver::GetElevationAngle (void)
   if ( m_updateElevationAngle == true )
     {
       // same reference ellipsoide must be used by mobilities
-      NS_ASSERT (m_geoSatMobility->GetGeoPosition().GetRefEllipsoide() == m_ownMobility->GetGeoPosition().GetRefEllipsoide() );
+      NS_ASSERT (m_geoSatMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
 
       UpdateElevationAngle();
       m_updateElevationAngle = false;
@@ -202,10 +202,10 @@ SatMobilityObserver::GetTimingAdvance (void)
       NS_ASSERT ( m_anotherProgDelayModel != NULL );
 
       // same reference ellipsoide must be used by mobilities
-      NS_ASSERT (m_geoSatMobility->GetGeoPosition().GetRefEllipsoide() == m_ownMobility->GetGeoPosition().GetRefEllipsoide() );
+      NS_ASSERT (m_geoSatMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
 
       // same reference ellipsoide must be used by mobilities
-      NS_ASSERT (m_anotherMobility->GetGeoPosition().GetRefEllipsoide() == m_ownMobility->GetGeoPosition().GetRefEllipsoide() );
+      NS_ASSERT (m_anotherMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
 
       UpdateTimingAdvance();
       m_updateTimingAdvance = false;

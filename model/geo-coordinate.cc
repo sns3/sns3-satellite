@@ -34,8 +34,8 @@ namespace ns3 {
 
 ATTRIBUTE_HELPER_CPP (GeoCoordinate);
 
-GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoide_t refEllipsoide)
-  :m_refEllipsoide (refEllipsoide)
+GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid)
+  :m_refEllipsoid (refEllipsoid)
 {
   NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
@@ -43,7 +43,7 @@ GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude
 }
 
 GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude)
- : m_refEllipsoide (GeoCoordinate::SPHERE)
+ : m_refEllipsoid (GeoCoordinate::SPHERE)
 {
   NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
@@ -51,15 +51,15 @@ GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude
 }
 
 GeoCoordinate::GeoCoordinate (Vector vector)
- :m_refEllipsoide (GeoCoordinate::SPHERE)
+ :m_refEllipsoid (GeoCoordinate::SPHERE)
 {
   NS_LOG_FUNCTION (this << vector);
 
   ConstructFromVector (vector);
 }
 
-GeoCoordinate::GeoCoordinate (Vector vector, ReferenceEllipsoide_t refEllipsoide)
- : m_refEllipsoide (refEllipsoide)
+GeoCoordinate::GeoCoordinate (Vector vector, ReferenceEllipsoid_t refEllipsoid)
+ : m_refEllipsoid (refEllipsoid)
 {
   NS_LOG_FUNCTION (this << vector);
 
@@ -70,7 +70,7 @@ GeoCoordinate::GeoCoordinate ()
   : m_latitude (NAN),
     m_longitude (NAN),
     m_altitude (NAN),
-    m_refEllipsoide (GeoCoordinate::SPHERE)
+    m_refEllipsoid (GeoCoordinate::SPHERE)
 {
   NS_LOG_FUNCTION (this);
 
@@ -92,7 +92,7 @@ GeoCoordinate::Construct (double latitude, double longitude, double altitude)
       NS_FATAL_ERROR ("Invalid longitude!!!");
     }
 
-  if (IsValidAltitude (altitude, m_refEllipsoide) == false)
+  if (IsValidAltitude (altitude, m_refEllipsoid) == false)
     {
       NS_FATAL_ERROR ("Invalid altitude!!!");
     }
@@ -124,7 +124,7 @@ GeoCoordinate::Initialize ()
 {
   NS_LOG_FUNCTION (this);
 
-  switch ( m_refEllipsoide )
+  switch ( m_refEllipsoid )
   {
     case SPHERE:
       m_polarRadius = GeoCoordinate::polarRadius_sphere;
@@ -193,7 +193,7 @@ void GeoCoordinate::SetAltitude (double altitude)
 {
   NS_LOG_FUNCTION (this << altitude);
 
-  if ( IsValidAltitude (altitude, m_refEllipsoide) == false)
+  if ( IsValidAltitude (altitude, m_refEllipsoid) == false)
      {
        NS_FATAL_ERROR ("Invalid altitude!!!");
      }
@@ -238,7 +238,7 @@ void GeoCoordinate::ConstructFromVector (const Vector &v)
       // Geocentric latitude
       double latG = std::atan (v.z/(std::sqrt ( v.x * v.x + v.y * v.y )));
 
-      // Geodetic latitude (of point Q, Q is intersection point of segment OP and reference ellipsoid)
+      // Geocentric latitude (of point Q, Q is intersection point of segment OP and reference ellipsoid)
       double latQ = std::atan (v.z/( (1 - m_e2Param ) * (std::sqrt ( v.x * v.x + v.y * v.y ))) );
 
       // calculate radius of the curvature
@@ -271,11 +271,11 @@ GeoCoordinate::GetRadiusCurvature (double latitude)
 }
 
 bool
-GeoCoordinate::IsValidAltitude (double altitude, ReferenceEllipsoide_t refEllipsoide)
+GeoCoordinate::IsValidAltitude (double altitude, ReferenceEllipsoid_t refEllipsoid)
 {
   double polarRadius = NAN;
 
-  switch ( refEllipsoide )
+  switch ( refEllipsoid )
   {
     case SPHERE:
       polarRadius = GeoCoordinate::polarRadius_sphere;

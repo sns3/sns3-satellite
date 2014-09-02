@@ -41,7 +41,7 @@ static void PrintPositionInfo (GeoCoordinate pos)
    // sets number of decimal places
   std::cout.setf(std::ios::fixed, std::ios::floatfield);
   std::cout.precision(15);
-  std::cout << pos.GetRefEllipsoide() << " position="  "x=" << pos2.x << ", y=" << pos2.y
+  std::cout << pos.GetRefEllipsoid () << " position="  "x=" << pos2.x << ", y=" << pos2.y
                                  << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude()
                                  << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude()  << std::endl;
 }
