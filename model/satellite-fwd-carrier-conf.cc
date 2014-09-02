@@ -19,6 +19,7 @@
  */
 
 #include "ns3/log.h"
+#include "ns3/fatal-error.h"
 #include "satellite-fwd-carrier-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatFwdCarrierConf");
@@ -39,7 +40,7 @@ SatFwdCarrierConf::SatFwdCarrierConf ()
 SatFwdCarrierConf::SatFwdCarrierConf (double bandwidthInHz, double rollOff, double spacing)
   : m_allocatedBandwidthInHz (bandwidthInHz)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << bandwidthInHz << rollOff << spacing);
 
   if ((spacing < 0.00 ) || ( spacing > 1.00 ) ||
       (rollOff < 0.00 ) || ( rollOff > 1.00 ))
