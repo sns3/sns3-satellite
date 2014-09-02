@@ -109,18 +109,18 @@ public:
   static inline T WToDbW ( T w ) { return (T) LinearToDb<T> (w); }
 
   /**
-   * \brief Converts Decibels to linear.
+   * \brief Converts decibels to linear.
    * Accepted values for conversion are between minimum decibel value and
-   * maximum decibel value. Zero is also accepted and it converts to -inf.
+   * maximum decibel value. Negative infinity is also an accepted value
+   * and it is converted to zero.
    *
-   * \param db value in Decibels to convert, NAN means 0 Watt
-   *
+   * \param db value in Decibels to convert
    * \return linear converted from Decibels
    */
   template <typename T>
   static inline T DbToLinear ( T db )
   {
-    if (db < MinDb<T> () || db > MaxDb<T> () || -isinf(db))
+    if ((db < MinDb<T> () && (isinf(-db) != false)) || db > MaxDb<T> ())
       {
         NS_FATAL_ERROR ("SatUtils::DbToLinear - unsupported value: " <<  db);
       }
@@ -129,17 +129,17 @@ public:
   }
 
   /**
-   * \brief Converts linear to Decibels.
+   * \brief Converts linear to decibels.
    * Accepted values for conversion are between minimum linear value (greater than zero and
-   * maximum linear value. -inf is also accepted and it converts to 0.
+   * maximum linear value. Zero is also accepted and it is converted to -INF.
    *
-   * \param linear value in linear to convert
+   * \param Linear value to convert
    * \return Decibels converted from linear
    */
   template <typename T>
   static inline T LinearToDb ( T linear )
   {
-    if (linear < MinLin<T> () || linear > MaxLin<T> () || linear == 0)
+    if ((linear < MinLin<T> () && linear != 0) || linear > MaxLin<T> ())
       {
         NS_FATAL_ERROR ("SatUtils::LinearToDb - unsupported value: " <<  linear);
       }

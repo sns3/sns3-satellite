@@ -2,9 +2,6 @@
 
 def build(bld):
 
-    obj = bld.create_ns3_program('sat-dama-verification-sim', ['satellite'])
-    obj.source = 'sat-dama-verification-sim.cc'
-
     obj = bld.create_ns3_program('sat-arq-fwd-example', ['satellite'])
     obj.source = 'sat-arq-fwd-example.cc'
 
@@ -23,14 +20,17 @@ def build(bld):
     obj = bld.create_ns3_program('sat-cbr-user-defined-example', ['satellite', 'traffic', 'flow-monitor'])
     obj.source = 'sat-cbr-user-defined-example.cc'
 
-    obj = bld.create_ns3_program('sat-dama-sim-tn9', ['satellite'])
-    obj.source = 'sat-dama-sim-tn9.cc'
+    obj = bld.create_ns3_program('sat-dama-http-sim-tn9', ['satellite', 'traffic'])
+    obj.source = 'sat-dama-http-sim-tn9.cc'
 
     obj = bld.create_ns3_program('sat-dama-onoff-sim-tn9', ['satellite'])
     obj.source = 'sat-dama-onoff-sim-tn9.cc'
 
-    obj = bld.create_ns3_program('sat-dama-http-sim-tn9', ['satellite', 'traffic'])
-    obj.source = 'sat-dama-http-sim-tn9.cc'
+    obj = bld.create_ns3_program('sat-dama-sim-tn9', ['satellite'])
+    obj.source = 'sat-dama-sim-tn9.cc'
+
+    obj = bld.create_ns3_program('sat-dama-verification-sim', ['satellite'])
+    obj.source = 'sat-dama-verification-sim.cc'
 
     obj = bld.create_ns3_program('sat-per-packet-if-sim-tn9', ['satellite'])
     obj.source = 'sat-per-packet-if-sim-tn9.cc'
