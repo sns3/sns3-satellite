@@ -12,7 +12,8 @@ using namespace ns3;
 * \ingroup satellite
 *
 * \brief Example for environmental variables class.
-* Demonstrates various functions for locating directories.
+* Demonstrates various functions for locating directories
+* used by the satellite module.
 *
 */
 

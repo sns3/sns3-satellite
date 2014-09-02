@@ -11,8 +11,9 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Example for Rayleigh fader class.
-*
+* \brief Example for Rayleigh fader class. Demonstrates the functionality
+* of the Rayleigh fader used by the Markov-fading. The example creates
+* a single Rayleigh fader and outputs the fading values in time.
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-rayleigh-example");

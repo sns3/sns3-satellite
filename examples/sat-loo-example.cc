@@ -11,8 +11,10 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Example for Loo's model fader class.
-*
+* \brief Example for Loo's model fader class. Demonstrates the functionality
+* of the Loo's model fader used by the Markov-fading. The example creates
+* three faders with different parameters, switches the faders in time and
+* outputs the fading values.
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-loo-example");

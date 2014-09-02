@@ -30,7 +30,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for input file stream container for double values. Row format is [time, value1, ..., value n].
+ * \brief Class for input file stream container for storing double values.
+ * The class implements reading the values from a file, storing the values
+ * and iterating the stored values.
+ *
+ * Row format is [time, value1, ..., value n].
  */
 class SatInputFileStreamTimeDoubleContainer : public Object
 {

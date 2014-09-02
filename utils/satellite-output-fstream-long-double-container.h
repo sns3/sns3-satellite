@@ -31,7 +31,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for output file stream container for long double values
+ * \brief Class for output file stream container for long double values.
+ * The class implements storing the values and writing the stored
+ * values into a file. A figure output in two dimensions is also supported.
  */
 class SatOutputFileStreamLongDoubleContainer : public Object
 {

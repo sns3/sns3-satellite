@@ -11,8 +11,9 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief Example for Markov model class logic.
-*
+* \brief Example for Markov model class logic. Demonstrates the functionality
+* of Markov-fading. The example creates Markov-fading object and executes the
+* fading calculations with different elevation angles.
 */
 NS_LOG_COMPONENT_DEFINE ("sat-markov-logic-example");
 

@@ -31,7 +31,9 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for output file stream container for strings
+ * \brief Class for output file stream container for strings.
+ * The class implements storing the values and writing the stored
+ * values into a file.
  */
 class SatOutputFileStreamStringContainer : public Object
 {

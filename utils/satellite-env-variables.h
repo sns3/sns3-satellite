@@ -29,7 +29,11 @@ namespace ns3 {
 /**
  * \ingroup satellite
  *
- * \brief Class for environmental variables
+ * \brief Class for environmental variables. The class is used for
+ * storing information on environmental variables, e.g., the current
+ * working directory and path to data folder. The class implements
+ * functionality for locating directories within the NS-3 simulator
+ * folder. Certain variables can be overwritten with attributes.
  */
 class SatEnvVariables : public Object
 {

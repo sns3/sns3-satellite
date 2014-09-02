@@ -97,7 +97,7 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
   {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {
-          for( uint32_t j = 0; j < m_valuesInRow; j++ )
+          for (uint32_t j = 0; j < m_valuesInRow; j++ )
             {
               if (j + 1 == m_valuesInRow)
                 {
