@@ -41,6 +41,8 @@ public:
    */
   static TypeId GetTypeId (void);
 
+  virtual TypeId GetInstanceTypeId (void) const;
+
   /**
    * \brief Constructor
    */

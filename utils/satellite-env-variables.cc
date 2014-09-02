@@ -17,13 +17,15 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-env-variables.h"
-#include "ns3/string.h"
+
 #include <stdio.h>
 #include <unistd.h>
-#include "ns3/fatal-error.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "ns3/fatal-error.h"
+#include "ns3/string.h"
+#include "satellite-env-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatEnvVariables");
 
@@ -55,6 +57,12 @@ SatEnvVariables::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatEnvVariables::GetInstanceTypeId (void) const
+{
+  return GetTypeId();
+}
+
 SatEnvVariables::SatEnvVariables () :
   m_currentWorkingDirectory (""),
   m_pathToExecutable (""),
@@ -64,6 +72,11 @@ SatEnvVariables::SatEnvVariables () :
   m_dataPath ("src/satellite/data")
 {
   NS_LOG_FUNCTION (this);
+
+  // Attributes are needed already in construction phase:
+  // - ConstructSelf call in constructor
+  // - GetInstanceTypeId is needed to be implemented
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   char currentWorkingDirectory[FILENAME_MAX] = "";
 
