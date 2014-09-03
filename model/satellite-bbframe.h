@@ -34,8 +34,11 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief BB Frame class.
+ *
+ * \brief SatBbFrame class implements functionality for BB frames.
  * Holds information of a BB Frame for forward link scheduling.
+ * It also provides methods to query information of the frame and methods
+ * to modify frames like shrink, extend and merge.
  *
  */
 class SatBbFrame : public SimpleRefCount<SatBbFrame>
@@ -50,15 +53,16 @@ public:
   SatBbFrame ();
 
   /**
-   * Constructor to create BB frame according to given type and MODCOD.
+   * Constructor to create BB frame according to given type and MODCOD, type and BB frame configuration.
+   *
    * \param modCod Used ModCod
-   * \param type Type if the frame
+   * \param type Type of the frame
    * \param conf Pointer to BBFrame configuration
    */
   SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf);
 
   /**
-   * Destructor
+   * Destructor fro BB frame.
    */
   virtual ~SatBbFrame ();
 
@@ -173,7 +177,6 @@ private:
   Time m_duration;
   SatEnums::SatBbFrameType_t m_frameType;
 };
-
 
 } // namespace ns3
 

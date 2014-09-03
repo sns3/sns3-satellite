@@ -32,8 +32,15 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
+ *
  * \brief BB Frame container class.
  * Holds information of BB Frames for forward link scheduling.
+ *
+ * SatBbFrameContainer implements own queues (container) for every used MODCODs.
+ * These MODCOD queues are used for non control packets (priority class different than 0).
+ *
+ * For control messages (priority class 0) is used only one queue with most robust MODCOD.
+ *
  *
  */
 class SatBbFrameContainer :  public Object

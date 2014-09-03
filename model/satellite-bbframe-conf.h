@@ -32,6 +32,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
+ *
  * \brief This class implements the content of one individual DVB-S2 waveform.
  * Waveform is defined by modulation scheme, coding rate, payload size in bytes and
  * frame duration in Time.
@@ -127,7 +128,8 @@ private:
 
 /**
  * \ingroup satellite
- * \brief This class implements the BBFrame configurations for DVB-S2. Available
+ *
+ * \brief This class implements the BB Frame configurations for DVB-S2. Available
  * waveforms are for two BB frame types (short and normal) and for all supported
  * DVB-S2 MODCODs defined in SatEnums.
  */
@@ -239,7 +241,7 @@ public:
   /**
    * \brief Get the most robust MODCOD with a given BB frame type.
    * \param frameType Used BBFrame type (short OR normal)
-   * \return SatModcod_t The most robuts MODCOD
+   * \return SatModcod_t The most robust MODCOD
    */
   SatEnums::SatModcod_t GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const;
 
@@ -349,7 +351,7 @@ private:
   SatEnums::SatModcod_t m_mostRobustShortFrameModcod;
 
   /**
-   * The most robust MODCOD fro long frame.
+   * The most robust MODCOD for long frame.
    */
   SatEnums::SatModcod_t m_mostRobustNormalFrameModcod;
 };
