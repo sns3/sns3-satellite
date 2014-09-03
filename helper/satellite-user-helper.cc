@@ -24,7 +24,7 @@
 #include "ns3/ipv4-routing-table-entry.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/csma-helper.h"
-#include "../model/ideal-net-device.h"
+#include "../model/satellite-simple-net-device.h"
 #include "satellite-user-helper.h"
 #include <ns3/singleton.h>
 #include <ns3/satellite-id-mapper.h>
@@ -43,15 +43,15 @@ SatUserHelper::GetTypeId (void)
       .AddConstructor<SatUserHelper> ()
       .AddAttribute ("BackboneNetworkType",
                      "Network used between GW and Router, and between Router and Users in operator network",
-                      EnumValue (SatUserHelper::NETWORK_TYPE_IDEAL),
+                      EnumValue (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
                       MakeEnumAccessor (&SatUserHelper::m_backboneNetworkType),
-                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
+                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
                                        SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
       .AddAttribute ("SubscriberNetworkType",
                      "Network used between UTs and Users in subscriber network",
                       EnumValue (SatUserHelper::NETWORK_TYPE_CSMA),
                       MakeEnumAccessor (&SatUserHelper::m_subscriberNetworkType),
-                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_IDEAL, "Ideal",
+                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
                                        SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
       .AddTraceSource ("Creation", "Creation traces",
                        MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace))
@@ -66,7 +66,7 @@ SatUserHelper::GetInstanceTypeId (void) const
 }
 
 SatUserHelper::SatUserHelper ()
-  : m_backboneNetworkType (SatUserHelper::NETWORK_TYPE_IDEAL),
+  : m_backboneNetworkType (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
     m_subscriberNetworkType (SatUserHelper::NETWORK_TYPE_CSMA),
     m_router (0)
 
@@ -404,8 +404,8 @@ SatUserHelper::InstallSubscriberNetwork (const NodeContainer &c ) const
 
   switch (m_subscriberNetworkType)
   {
-    case NETWORK_TYPE_IDEAL:
-      devs =  InstallIdealNetwork(c);
+    case NETWORK_TYPE_SAT_SIMPLE:
+      devs =  InstallSatSimpleNetwork(c);
       break;
 
     case NETWORK_TYPE_CSMA:
@@ -429,8 +429,8 @@ SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
 
   switch (m_backboneNetworkType)
   {
-    case NETWORK_TYPE_IDEAL:
-      devs =  InstallIdealNetwork(c);
+    case NETWORK_TYPE_SAT_SIMPLE:
+      devs =  InstallSatSimpleNetwork(c);
       break;
 
     case NETWORK_TYPE_CSMA:
@@ -446,16 +446,16 @@ SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
 }
 
 NetDeviceContainer
-SatUserHelper::InstallIdealNetwork (const NodeContainer &c ) const
+SatUserHelper::InstallSatSimpleNetwork (const NodeContainer &c ) const
 {
   NS_LOG_FUNCTION (this);
 
   NetDeviceContainer devs;
-  Ptr<SimpleChannel> channel = CreateObject<SimpleChannel>();
+  Ptr<SatSimpleChannel> channel = CreateObject<SatSimpleChannel>();
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      Ptr<IdealNetDevice> device = CreateObject<IdealNetDevice> ();
+      Ptr<SatSimpleNetDevice> device = CreateObject<SatSimpleNetDevice> ();
       device->SetAddress (Mac48Address::Allocate ());
       (*i)->AddDevice (device);
       device->SetChannel(channel);

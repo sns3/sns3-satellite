@@ -47,7 +47,7 @@ public:
    */
   enum NetworkType
    {
-     NETWORK_TYPE_IDEAL, NETWORK_TYPE_CSMA
+     NETWORK_TYPE_SAT_SIMPLE, NETWORK_TYPE_CSMA
    };
 
   typedef std::map<Ptr<Node>, NodeContainer>    UtUsersContainer_t;
@@ -248,7 +248,7 @@ private:
   /**
    * Install network between UT and its users
    *
-   * \param c nodecontainer having UT and its users
+   * \param c node container having UT and its users
    * \return container of the installed net devices
    */
   NetDeviceContainer InstallSubscriberNetwork (const NodeContainer &c ) const;
@@ -256,18 +256,18 @@ private:
   /**
    * Install network between GW and Router (or users) or Router and its users.
    *
-   * \param c nodecontainer having UT and its users
+   * \param c node container having UT and its users
    * \return container of the installed net devices
    */
   NetDeviceContainer InstallBackboneNetwork (const NodeContainer &c ) const;
 
   /**
-   * Install ideal network.
+   * Install satellite simple network.
    *
-   * \param c nodecontainer having UT and its users
+   * \param c node container having UT and its users
    * \return container of the installed net devices
    */
-  NetDeviceContainer InstallIdealNetwork (const NodeContainer &c ) const;
+  NetDeviceContainer InstallSatSimpleNetwork (const NodeContainer &c ) const;
 
   /**
    * Install IP router to to Gateways. Creates csma link between gateways and router.

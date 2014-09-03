@@ -431,7 +431,7 @@
  <default name="ns3::SatHelper::BeamNetworkAddress" value="10.1.1.0"/>
  <default name="ns3::SatHelper::GwNetworkAddress" value="10.2.1.0"/>
  <default name="ns3::SatHelper::UtNetworkAddress" value="10.3.1.0"/>
- <default name="ns3::SatUserHelper::BackboneNetworkType" value="Ideal"/>
+ <default name="ns3::SatUserHelper::BackboneNetworkType" value="SatSimple"/>
  <default name="ns3::SatUserHelper::SubscriberNetworkType" value="Csma"/>
  <default name="ns3::SatUtHelper::FwdLinkErrorModel" value="None"/>
  <default name="ns3::SatUtHelper::DaFwdLinkInterferenceModel" value="Constant"/>

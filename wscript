@@ -5,7 +5,6 @@ def build(bld):
     module.source = [
         'model/cbr-application.cc',
         'model/geo-coordinate.cc',
-        'model/ideal-net-device.cc',
         'model/satellite-address-tag.cc',
         'model/satellite-antenna-gain-pattern.cc',
         'model/satellite-antenna-gain-pattern-container.cc',
@@ -100,6 +99,8 @@ def build(bld):
         'model/satellite-rx-power-output-trace-container.cc',
         'model/satellite-scheduling-object.cc',
         'model/satellite-signal-parameters.cc',
+        'model/satellite-simple-channel.cc',
+        'model/satellite-simple-net-device.cc',
         'model/satellite-superframe-allocator.cc',
         'model/satellite-superframe-sequence.cc',        
         'model/satellite-tbtp-container.cc',
@@ -188,7 +189,6 @@ def build(bld):
     headers.source = [
         'model/cbr-application.h',
         'model/geo-coordinate.h',
-        'model/ideal-net-device.h',
         'model/satellite-address-tag.h',
         'model/satellite-antenna-gain-pattern.h',
         'model/satellite-antenna-gain-pattern-container.h',
@@ -285,6 +285,8 @@ def build(bld):
         'model/satellite-rx-power-output-trace-container.h',
         'model/satellite-scheduling-object.h',
         'model/satellite-signal-parameters.h',
+        'model/satellite-simple-channel.h',
+		'model/satellite-simple-net-device.h',        
         'model/satellite-superframe-allocator.h',
         'model/satellite-superframe-sequence.h',
         'model/satellite-tbtp-container.h',
