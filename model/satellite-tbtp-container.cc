@@ -27,7 +27,9 @@
 #include "ns3/log.h"
 
 #include "satellite-tbtp-container.h"
+#include "satellite-const-variables.h"
 #include "satellite-control-message.h"
+#include "satellite-superframe-sequence.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatTbtpContainer");
 
@@ -59,11 +61,12 @@ SatTbtpContainer::SatTbtpContainer ()
   NS_FATAL_ERROR ("SatTbtpContainer::SatTbtpContainer - Constructor not in use");
 }
 
-SatTbtpContainer::SatTbtpContainer (Time superFrameDuration)
+SatTbtpContainer::SatTbtpContainer (Ptr<SatSuperframeSeq> seq)
 :m_address (),
+ m_superframeSeq (seq),
  m_maxStoredTbtps (100),
  m_rcvdTbtps (0),
- m_superFrameDuration (superFrameDuration)
+ m_superFrameDuration (seq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ())
 {
 
 }
@@ -166,16 +169,28 @@ SatTbtpContainer::HasScheduledTimeSlots ()
                   // Start time offset for the last time slot for this UT
                   Time startTimeOffsetForLastSlot = (*(info.second.rbegin ()))->GetStartTime ();
 
+                  /**
+                   * Calculate the duration of the last slot. To be able to do that we need the
+                   * superframe conf, frame conf, time slot conf and symbol rate.
+                   */
+                  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+                  uint8_t frameId = info.first;
+                  Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+                  uint32_t wfId = (*(info.second.rbegin ()))->GetWaveFormId ();
+                  Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (wfId);
+                  Time lastSlotDuration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+
                   NS_LOG_INFO ("Superframe counter: " << it->second->GetSuperframeCounter () <<
                                ", start time: " << superframeStartTime.GetSeconds () <<
-                               ", last allocated slot time: " << (superframeStartTime + startTimeOffsetForLastSlot).GetSeconds());
+                               ", last allocated slot start time: " << (superframeStartTime + startTimeOffsetForLastSlot).GetSeconds () <<
+                               ", last allocated slot end time: " << (superframeStartTime + startTimeOffsetForLastSlot + lastSlotDuration).GetSeconds ());
 
                   /**
                    * Check that the TBTP has a time slot which is in the future. It does not matter
                    * how long to the future the time slot is, since the same method may be used for both
                    * CRDSA and SA, and we do not have any idea of what are their randomization intervals etc.
                    */
-                  if (superframeStartTime + startTimeOffsetForLastSlot > Simulator::Now())
+                  if ((superframeStartTime + startTimeOffsetForLastSlot + lastSlotDuration) > Simulator::Now())
                     {
                       hasScheduledTimeSlots = true;
                     }

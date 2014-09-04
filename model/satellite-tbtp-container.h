@@ -26,6 +26,7 @@
 #include "ns3/mac48-address.h"
 #include "satellite-control-message.h"
 #include "satellite-frame-conf.h"
+#include "satellite-superframe-sequence.h"
 
 namespace ns3 {
 
@@ -57,7 +58,7 @@ class SatTbtpContainer : public Object
 {
 public:
   SatTbtpContainer ();
-  SatTbtpContainer (Time superFrameDuration);
+  SatTbtpContainer (Ptr<SatSuperframeSeq> seq);
   ~SatTbtpContainer ();
 
   static TypeId GetTypeId (void);
@@ -99,6 +100,11 @@ private:
    * Address of this UT
    */
   Mac48Address m_address;
+
+  /**
+   * Superframe sequence
+   */
+  Ptr<SatSuperframeSeq> m_superframeSeq;
 
   /**
    * Maximum stored TBTPs in the container

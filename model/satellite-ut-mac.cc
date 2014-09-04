@@ -120,7 +120,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
 	NS_LOG_FUNCTION (this);
 
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
-  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE));
+  m_tbtpContainer = CreateObject<SatTbtpContainer> (m_superframeSeq);
 }
 
 SatUtMac::~SatUtMac ()
