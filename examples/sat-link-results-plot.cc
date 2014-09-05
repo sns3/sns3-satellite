@@ -414,8 +414,7 @@ SatLinkResultsPlot::GetGnuplot (std::string outputName, std::string title)
   ret.AppendExtra ("set ytics 10");
   ret.AppendExtra ("set mxtics 5");
   ret.AppendExtra ("set grid xtics mxtics ytics");
-  // TODO probably better if the X axis and its labels are on top
-  // TODO and maybe emphasize major grid lines more than minor ones
+  // TODO probably better if the X axis and its labels are on top and maybe emphasize major grid lines more than minor ones
   return ret;
 }
 

@@ -35,6 +35,7 @@ static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
       * State 2  {number of oscillators, Doppler in Hz}
       * State 3  {number of oscillators, Doppler in Hz}}
       */
+     /// TODO: these values should eventually be formed from attributes for each state
 
      /* Elevation 30 degrees */
      {{10,10},
@@ -43,7 +44,7 @@ static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
     };
 
 TypeId
-SatRayleighConf::GetTypeId (void) //TODO: add attribute m_rayleighParameters
+SatRayleighConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRayleighConf")
       .SetParent<SatBaseFaderConf> ()

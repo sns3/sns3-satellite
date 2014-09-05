@@ -848,7 +848,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
           /// check and update used slots
           if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, (*iterSet)))
             {
-              /// TODO this needs to be handled better when multiple allocation channels are in use
+              /// TODO this needs to be handled when multiple allocation channels are implemented
               /// In that case a slot exclusion list should be used when randomizing the Tx slots
               NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable");
             }
@@ -872,7 +872,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
 
   /// CRDSA is evaluated only at the frame start
-  /// TODO this has to be updated when a proper mobility model is added
+  /// TODO this has to be changed when a proper mobility model is implemented
   Time superframeStartTime = Now ();
 
   /// get the slot payload

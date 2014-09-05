@@ -55,7 +55,7 @@ SatChannel::SatChannel ()
    m_freqId (),
    m_propagationDelay (),
    m_freeSpaceLoss (),
-   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO tie this properly to e.g. fading (do not create fading objects!)
+   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO optimization: tie this properly to e.g. fading (do not create fading objects!)
    m_enableRxPowerOutputTrace (false),
    m_enableFadingOutputTrace (false),
    m_enableExternalFadingInputTrace (false)

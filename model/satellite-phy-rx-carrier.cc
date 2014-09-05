@@ -1522,7 +1522,10 @@ SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarr
                        " IF gnd: " << iterList->rxParams->m_ifPower_W);
 
           /// reduce interference power for the colliding packets
-          /// TODO more novel way to eliminate partially overlapping interference should be considered. Inaccuracies with double needs to be taken into account
+          /// TODO more novel way to eliminate partially overlapping interference should be considered.
+          /// Additionally, as the interference values are extremely small, the use of long double
+          /// with interference throughout the satellite module should be considered to improve the
+          /// accuracy.
           iterList->rxParams->m_ifPowerInSatellite_W -= processedPacket.rxParams->m_rxPowerInSatellite_W;
           iterList->rxParams->m_ifPower_W -= processedPacket.rxParams->m_rxPower_W;
 

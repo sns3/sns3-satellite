@@ -143,7 +143,12 @@ SatLooModel::ConstructDirectSignalOscillators ()
           /// 1b. Initiate rotation speed:
           double omega = 2.0 * M_PI * m_looParameters[i][5] * std::cos (alpha);
           /// 2. Initiate amplitude:
-          /// TODO: Direct signal amplitude calculations will need to be verified, especially applying the std. deviation with multiple oscillators
+
+          /// TODO: Direct signal amplitude calculations will need to be verified,
+          /// especially the target std. deviation with combined oscillators.
+          /// Currently the std. dev is applied to individual oscillators. Combining
+          /// these averages these and may result in too small std. dev with the combined
+          /// value.
           double amplitude = m_normalRandomVariable->GetValue (m_looParameters[i][0], m_looParameters[i][1]);
           amplitude = pow (10,amplitude / 10) / m_looParameters[i][3];
 

@@ -82,7 +82,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
       /// this assumes that the slot IDs for each allocation channel start at 0
       GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
-      /// TODO Get rid of the hard coded 0
+      /// TODO Get rid of the hard coded 0 in GetSuperframeConf
       /// this assumes that the slot IDs for each allocation channel start at 0
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount(i) - 1);
 

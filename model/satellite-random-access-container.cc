@@ -308,7 +308,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
     }
 
   /// For debugging purposes
-  /// TODO: comment out this code at later stage
+  /// TODO: this could be optimized to be enabled only with debug build
   if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
     {
       std::map<uint32_t, std::set<uint32_t> >::iterator iter;
