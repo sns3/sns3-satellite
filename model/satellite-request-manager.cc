@@ -312,8 +312,8 @@ SatRequestManager::DoEvaluation ()
                   NS_LOG_LOGIC ("Evaluation RBDC+VBDC for RC: " << (uint32_t)(rc));
 
                   /**
-                   * TODO: add functionality here which handles a RC with both RBDC and
-                   * VBDC enabled!
+                   * TODO: Add the functionality here which handles a RC with both RBDC and
+                   * VBDC enabled at the same time!
                    */
                   NS_FATAL_ERROR ("Simultaneous RBDC and VBDC for one RC is not currently supported!");
                 }

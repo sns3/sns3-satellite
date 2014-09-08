@@ -204,7 +204,7 @@ SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrame
   /**
    * Short BB frame is assumed to be requiring m_shortFrameOffsetInDb dB
    * higher Es/No if compared to normal BB frame.
-   * TODO: a proper link result to be added for short BB frame.
+   * TODO: Proper link results need to be added for short BB frame in FWD link.
    */
   if (frameType == SatEnums::SHORT_FRAME)
     {
@@ -230,7 +230,7 @@ SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFra
   /**
    * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB
    * higher Es/No if compared to normal BB frame.
-   * TODO: a proper link result to be added for short BB frame.
+   * TODO: Proper link results need to be added for short BB frame in FWD link.
    */
   if (frameType == SatEnums::SHORT_FRAME)
     {

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -277,14 +277,15 @@ SatMobilityObserver::UpdateElevationAngle()
 
       double longitudeDelta = satLongitude - earthLongitude;
 
-      // calculate cosini of the central angle
-      // TODO: now we assumed that reference ellipsoide is sphere
-      // This should be accurate enough for elevation angle calculation with other reference ellipsoides too.
-      // But if later more accurate calculation is needed, then used refrence ellipsoide is needed to take into account
+      // Calculate cosini of the central angle
+      // TODO: Currently we have assumed that the reference ellipsoide is a sphere.
+      // This should be accurate enough for elevation angle calculation with also other
+      // reference ellipsoides. But, if more accurate calculation is needed, then the used
+      // reference ellipsoide is needed to be take into account.
       double centralAngleCos = ( std::cos (earthLatitude) * std::cos (satLatitude) * std::cos (longitudeDelta) ) +
                                ( std::sin (earthLatitude) * std::sin (satLatitude ) );
 
-      // calculate cosini of the elavation angle
+      // Calculate cosini of the elavation angle
       double elCos = std::sin ( std::acos (centralAngleCos)) / std::sqrt( 1 + std::pow (m_radiusRatio, 2) - 2 * m_radiusRatio * centralAngleCos);
 
       m_elevationAngle = SatUtils::RadiansToDegrees (std::acos (elCos) );

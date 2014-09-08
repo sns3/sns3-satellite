@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -414,12 +414,12 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             }
           break;
         }
-        default:
-          {
-            NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Unknown state");
-            break;
-          }
-      }
+      default:
+        {
+          NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Unknown state");
+          break;
+        }
+    }
 }
 
 void
@@ -624,9 +624,9 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, cSinr);
 
       /// send packet upwards
-      m_rxCallback ( iter->second.rxParams, phyError );
-      /// uses composite sinr
+      m_rxCallback (iter->second.rxParams, phyError);
 
+      /// uses composite sinr
       if (!m_cnoCallback.IsNull ())
         {
           double cno = cSinr * m_rxBandwidthHz;
@@ -939,13 +939,12 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                   error = true;
                 }
 
-              /*
               NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
                         << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
                         << " rand: " << r
                         << " ber: " << ber
                         << " error: " << error);
-               */
+
               break;
             }
           case SatEnums::RETURN_FEEDER_CH:
@@ -967,13 +966,12 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                   error = true;
                 }
 
-              /*
               NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
                         << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
                         << " rand: " << r
                         << " ber: " << ber
                         << " error: " << error);
-               */
+
               break;
             }
           case SatEnums::FORWARD_FEEDER_CH:
@@ -1522,10 +1520,9 @@ SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarr
                        " IF gnd: " << iterList->rxParams->m_ifPower_W);
 
           /// reduce interference power for the colliding packets
-          /// TODO more novel way to eliminate partially overlapping interference should be considered.
-          /// Additionally, as the interference values are extremely small, the use of long double
-          /// with interference throughout the satellite module should be considered to improve the
-          /// accuracy.
+          /// TODO A more novel way to eliminate partially overlapping interference should be considered!
+          /// In addition, as the interference values are extremely small, the use of long double (instead
+          /// of double) should be considered to improve the accuracy.
           iterList->rxParams->m_ifPowerInSatellite_W -= processedPacket.rxParams->m_rxPowerInSatellite_W;
           iterList->rxParams->m_ifPower_W -= processedPacket.rxParams->m_rxPower_W;
 

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2014 Magister Solutions Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -232,10 +232,15 @@ SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
       ChangeState (TX);
       m_channel->StartTx (txParams);
 
-      // TODO: Currently transparent mode enables concurrent sending
-      // through different carriers (TX is ended already here without waiting transmission end time).
-      // This functionality is needed in geo satellite. Another option is to use multiple phy TXs.
-      // It's needed to consider which of these option is better in long term
+      /**
+       * The SatPhyTx is mapped to a spot-beam, which means that there may be several
+       * carriers handled by the same SatPhyTx. This is why the SatPhyTx state machine
+       * needs to be overtaken, thus the SatPhyTx is allowed to send several overlapping
+       * packets; in different carriers though.
+       * TODO: The SatPhyTx state machine may need some (code quality) improvements.
+       * E.g. different inherited implementations may be done for satellite and terrestrial
+       * domain nodes.
+       */
       if ( m_txMode == TRANSPARENT )
         {
           EndTx();

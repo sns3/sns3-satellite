@@ -184,7 +184,7 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a6    'Back off probability' attribute value
  * \param a7    'High load back off probability' attribute value
  * \param a8    'Number of instances' attribute value
- * \param a10    'Average normalized offered load threshold' attribute value
+ * \param a9    'Average normalized offered load threshold' attribute value
  *
  * \return TypeId
  */

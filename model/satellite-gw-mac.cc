@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -23,6 +23,7 @@
 #include "ns3/mac48-address.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/uinteger.h"
+#include "ns3/singleton.h"
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/enum.h"
@@ -34,6 +35,7 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-gw-mac.h"
 #include "satellite-utils.h"
+#include "satellite-log.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGwMac");
 
@@ -112,7 +114,13 @@ SatGwMac::StartPeriodicTransmissions()
       NS_FATAL_ERROR ("Scheduler not set for GW MAC!!!");
     }
 
-  /// TODO Note, carrierId currently set by default to 0
+  /**
+   * It is currently assumed that there is only one carrier in FWD link. This
+   * carrier has a default index of 0.
+   * TODO: When enabling multi-carrier support for FWD link, we need to
+   * modify the FWD link scheduler to schedule separately each FWD link
+   * carrier.
+   */
   Simulator::Schedule (Seconds (0), &SatGwMac::StartTransmission, this, 0);
 }
 
@@ -218,13 +226,19 @@ SatGwMac::StartTransmission (uint32_t carrierId)
       txInfo.frameType = bbFrame->GetFrameType ();
       txInfo.waveformId = 0;
 
-      /* TODO: The carrierId should be acquired from somewhere. Now
-       * we assume only one carrier in forward link, so it is safe to use 0.
+      /**
+       * Decrease a guard time from BB frame duration.
        */
-      // Decrease a guard time from BB frame duration.
       SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
     }
 
+  /**
+   * It is currently assumed that there is only one carrier in FWD link. This
+   * carrier has a default index of 0.
+   * TODO: When enabling multi-carrier support for FWD link, we need to
+   * modify the FWD link scheduler to schedule separately each FWD link
+   * carrier.
+   */
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);
 }
 
@@ -253,8 +267,6 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         uint32_t msgId = ctrlTag.GetMsgId ();
         Ptr<SatCrMessage> crMsg = DynamicCast<SatCrMessage> ( m_readCtrlCallback (msgId) );
 
-        // Control message NOT found in container anymore, so silently ignore it.
-        // TODO: Should we crash or just silently ignore it.
         if ( crMsg != NULL )
           {
             m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress(), crMsg->GetCnoEstimate ());
@@ -263,6 +275,18 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
               {
                 m_crReceiveCallback (m_beamId, macTag.GetSourceAddress(), crMsg);
               }
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInRtnLink attribute may be set to too short value
+             * or there are something wrong in the RTN link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the RTN link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
 
         packet->RemovePacketTag (macTag);
@@ -275,11 +299,21 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         uint32_t msgId = ctrlTag.GetMsgId ();
         Ptr<SatCnoReportMessage> cnoReport = DynamicCast<SatCnoReportMessage> ( m_readCtrlCallback (msgId) );
 
-        // Control message NOT found in container anymore, so silently ignore it.
-        // TODO: Should we crash or just silently ignore it.
         if ( cnoReport != NULL )
           {
             m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress(), cnoReport->GetCnoEstimate ());
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInRtnLink attribute may be set to too short value
+             * or there are something wrong in the RTN link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the RTN link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
 
         packet->RemovePacketTag (macTag);

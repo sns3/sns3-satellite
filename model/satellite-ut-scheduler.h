@@ -42,7 +42,7 @@ class SatSchedulingObject;
  * Unallocated load is a the amount of bytes scheduled for UT which was not indicated
  * by NCC scheduler in TBTP. The UT scheduler tries to obey the scheduling decisions made
  * by NCC, and otherwise it tries to be byte-wise fair.
- * TODO: Note, that there possible would need to be some forgetting factor or sliding
+ * TODO: There possibly would need to be some forgetting factor or sliding
  * window not to remember too old samples.
  */
 class SortByMetric

@@ -277,8 +277,11 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   // Scheduling starts after one empty super frame.
   m_superFrameCounter = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE) + sfCountOffset;
 
-  // TODO: If RA channel is wanted to allocate to UT with some other means than randomizing
-  // this part of implementation is needed to change
+  /**
+   * It is assumed currently, that a random RA channel index is selected
+   * for each UT. If there is only one RA possible RA channel, then all
+   * UTs shall be using the same channel.
+   */
   m_raChRandomIndex = CreateObject<UniformRandomVariable> ();
   m_raChRandomIndex->SetAttribute ("Min", DoubleValue (0));
 

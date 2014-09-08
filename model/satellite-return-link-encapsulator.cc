@@ -113,8 +113,8 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
   p->AddPacketTag (tag);
 
   /**
-   * TODO: This is the place to encapsulate the HL packet
-   * with Addressed Link (AL) header.
+   * TODO: This is the place to encapsulate the higher layer packet
+   * with Addressed Link (AL) header, if needed.
    */
 
   NS_LOG_LOGIC ("Tx Buffer: New packet added of size: " << p->GetSize ());
