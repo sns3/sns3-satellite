@@ -20,11 +20,6 @@
 #ifndef SATELLITE_ENUMS_H
 #define SATELLITE_ENUMS_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-
 namespace ns3 {
 
 /**
@@ -90,33 +85,33 @@ public:
   typedef enum
   {
     SAT_NONVALID_MODCOD = 0,
-    SAT_MODCOD_QPSK_1_TO_3,
-    SAT_MODCOD_QPSK_1_TO_2,
-    SAT_MODCOD_QPSK_2_TO_3,
-    SAT_MODCOD_QPSK_3_TO_5,
-    SAT_MODCOD_QPSK_3_TO_4,
-    SAT_MODCOD_QPSK_4_TO_5,
-    SAT_MODCOD_QPSK_5_TO_6,
-    SAT_MODCOD_QPSK_8_TO_9,
-    SAT_MODCOD_QPSK_9_TO_10,
-    SAT_MODCOD_8PSK_2_TO_3,
-    SAT_MODCOD_8PSK_3_TO_5,
-    SAT_MODCOD_8PSK_3_TO_4,
-    SAT_MODCOD_8PSK_5_TO_6,
-    SAT_MODCOD_8PSK_8_TO_9,
-    SAT_MODCOD_8PSK_9_TO_10,
-    SAT_MODCOD_16APSK_2_TO_3,
-    SAT_MODCOD_16APSK_3_TO_4,
-    SAT_MODCOD_16APSK_4_TO_5,
-    SAT_MODCOD_16APSK_5_TO_6,
-    SAT_MODCOD_16APSK_8_TO_9,
-    SAT_MODCOD_16APSK_9_TO_10,
-    SAT_MODCOD_16QAM_3_TO_4,
-    SAT_MODCOD_16QAM_5_TO_6,
-    SAT_MODCOD_32APSK_3_TO_4,
-    SAT_MODCOD_32APSK_4_TO_5,
-    SAT_MODCOD_32APSK_5_TO_6,
-    SAT_MODCOD_32APSK_8_TO_9
+    SAT_MODCOD_QPSK_1_TO_3,    // 0.33
+    SAT_MODCOD_QPSK_1_TO_2,    // 0.50
+    SAT_MODCOD_QPSK_3_TO_5,    // 0.60
+    SAT_MODCOD_QPSK_2_TO_3,    // 0.67
+    SAT_MODCOD_QPSK_3_TO_4,    // 0.75
+    SAT_MODCOD_QPSK_4_TO_5,    // 0.80
+    SAT_MODCOD_QPSK_5_TO_6,    // 0.83
+    SAT_MODCOD_QPSK_8_TO_9,    // 0.89
+    SAT_MODCOD_QPSK_9_TO_10,   // 0.90
+    SAT_MODCOD_8PSK_3_TO_5,    // 0.60
+    SAT_MODCOD_8PSK_2_TO_3,    // 0.67
+    SAT_MODCOD_8PSK_3_TO_4,    // 0.75
+    SAT_MODCOD_8PSK_5_TO_6,    // 0.83
+    SAT_MODCOD_8PSK_8_TO_9,    // 0.89
+    SAT_MODCOD_8PSK_9_TO_10,   // 0.90
+    SAT_MODCOD_16APSK_2_TO_3,  // 0.67
+    SAT_MODCOD_16APSK_3_TO_4,  // 0.75
+    SAT_MODCOD_16APSK_4_TO_5,  // 0.80
+    SAT_MODCOD_16APSK_5_TO_6,  // 0.83
+    SAT_MODCOD_16APSK_8_TO_9,  // 0.89
+    SAT_MODCOD_16APSK_9_TO_10, // 0.90
+    SAT_MODCOD_16QAM_3_TO_4,   // 0.75
+    SAT_MODCOD_16QAM_5_TO_6,   // 0.83
+    SAT_MODCOD_32APSK_3_TO_4,  // 0.75
+    SAT_MODCOD_32APSK_4_TO_5,  // 0.80
+    SAT_MODCOD_32APSK_5_TO_6,  // 0.83
+    SAT_MODCOD_32APSK_8_TO_9   // 0.89
   } SatModcod_t;
 
 
@@ -126,17 +121,21 @@ public:
      * Note that the order of MODCODs have a meaning in ACM.
      * The MODCODs should be in decreasing order based on
      * coding rate.
+     *
+     * Also note that three MODCODs (QPSK 1/3, 16QAM 3/4, and 16QAM 5/6) are
+     * not included because we currently don't have the link results for them.
      */
+    //modcods.push_back (SAT_MODCOD_QPSK_1_TO_3);
     modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
-    modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
     modcods.push_back (SAT_MODCOD_QPSK_3_TO_5);
+    modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
     modcods.push_back (SAT_MODCOD_QPSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_QPSK_4_TO_5);
     modcods.push_back (SAT_MODCOD_QPSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_QPSK_8_TO_9);
     modcods.push_back (SAT_MODCOD_QPSK_9_TO_10);
-    modcods.push_back (SAT_MODCOD_8PSK_2_TO_3);
     modcods.push_back (SAT_MODCOD_8PSK_3_TO_5);
+    modcods.push_back (SAT_MODCOD_8PSK_2_TO_3);
     modcods.push_back (SAT_MODCOD_8PSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_8PSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_8PSK_8_TO_9);
@@ -147,6 +146,8 @@ public:
     modcods.push_back (SAT_MODCOD_16APSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_16APSK_8_TO_9);
     modcods.push_back (SAT_MODCOD_16APSK_9_TO_10);
+    //modcods.push_back (SAT_MODCOD_16QAM_3_TO_4);
+    //modcods.push_back (SAT_MODCOD_16QAM_5_TO_6);
     modcods.push_back (SAT_MODCOD_32APSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_32APSK_4_TO_5);
     modcods.push_back (SAT_MODCOD_32APSK_5_TO_6);

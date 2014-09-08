@@ -214,9 +214,9 @@ public:
     {
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
+      case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
       case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_3_TO_4:
-      case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
       case SatEnums::SAT_MODCOD_QPSK_4_TO_5:
       case SatEnums::SAT_MODCOD_QPSK_5_TO_6:
       case SatEnums::SAT_MODCOD_QPSK_8_TO_9:
@@ -225,16 +225,16 @@ public:
           return 2;
           break;
         }
+      case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
       case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
       case SatEnums::SAT_MODCOD_8PSK_3_TO_4:
-      case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
       case SatEnums::SAT_MODCOD_8PSK_5_TO_6:
       case SatEnums::SAT_MODCOD_8PSK_8_TO_9:
       case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
-      {
-         return 3;
-         break;
-       }
+        {
+          return 3;
+          break;
+        }
       case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
       case SatEnums::SAT_MODCOD_16APSK_3_TO_4:
       case SatEnums::SAT_MODCOD_16APSK_4_TO_5:
@@ -244,9 +244,9 @@ public:
       case SatEnums::SAT_MODCOD_16QAM_3_TO_4:
       case SatEnums::SAT_MODCOD_16QAM_5_TO_6:
         {
-           return 4;
-           break;
-         }
+          return 4;
+          break;
+        }
       case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
       case SatEnums::SAT_MODCOD_32APSK_4_TO_5:
       case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
@@ -274,11 +274,16 @@ public:
   {
     switch (modcod)
     {
+      case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
+        {
+          return 1.0/3.0;
+          break;
+        }
       case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
-      {
-        return 1.0/2.0;
-        break;
-      }
+        {
+          return 1.0/2.0;
+          break;
+        }
       case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
       case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
       case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
@@ -290,6 +295,7 @@ public:
       case SatEnums::SAT_MODCOD_8PSK_3_TO_4:
       case SatEnums::SAT_MODCOD_16APSK_3_TO_4:
       case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
+      case SatEnums::SAT_MODCOD_16QAM_3_TO_4:
         {
           return 3.0/4.0;
           break;
@@ -311,6 +317,7 @@ public:
       case SatEnums::SAT_MODCOD_8PSK_5_TO_6:
       case SatEnums::SAT_MODCOD_16APSK_5_TO_6:
       case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
+      case SatEnums::SAT_MODCOD_16QAM_5_TO_6:
         {
           return 5.0/6.0;
           break;
@@ -319,10 +326,10 @@ public:
       case SatEnums::SAT_MODCOD_8PSK_8_TO_9:
       case SatEnums::SAT_MODCOD_16APSK_8_TO_9:
       case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
-      {
-        return 8.0/9.0;
-        break;
-      }
+        {
+          return 8.0/9.0;
+          break;
+        }
       case SatEnums::SAT_MODCOD_QPSK_9_TO_10:
       case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
       case SatEnums::SAT_MODCOD_16APSK_9_TO_10:

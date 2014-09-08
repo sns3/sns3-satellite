@@ -197,7 +197,7 @@ SatWaveformConf::GetTypeId (void)
                    "Default waveform id",
                    UintegerValue (3),
                    MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
-                   MakeUintegerChecker<uint32_t> ())
+                   MakeUintegerChecker<uint32_t> (3, 22))
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
