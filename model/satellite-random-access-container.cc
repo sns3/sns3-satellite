@@ -307,8 +307,9 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA is disabled");
     }
 
-  /// For debugging purposes
-  /// TODO: this could be optimized to be enabled only with debug build
+  /// For logging/debugging purposes
+  /// TODO: This if statement is utilized only for logging, and thus could be optimized
+  /// to be enabled only with debug build.
   if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
     {
       std::map<uint32_t, std::set<uint32_t> >::iterator iter;

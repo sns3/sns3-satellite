@@ -35,7 +35,7 @@ static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
       * State 2  {number of oscillators, Doppler in Hz}
       * State 3  {number of oscillators, Doppler in Hz}}
       */
-     /// TODO: these values should eventually be formed from attributes for each state
+     /// TODO: The elevation values should eventually be formed from attributes for each state!
 
      /* Elevation 30 degrees */
      {{10,10},

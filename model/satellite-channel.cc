@@ -55,7 +55,14 @@ SatChannel::SatChannel ()
    m_freqId (),
    m_propagationDelay (),
    m_freeSpaceLoss (),
-   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION), /// TODO optimization: tie this properly to e.g. fading (do not create fading objects!)
+   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
+   /*
+    * Currently, the Rx power calculation mode is fully independent of other
+    * possible satellite network configurations, e.g. fading, antenna patterns.
+    * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
+    * configurations. If using input Rx trace, there is no need to enable e.g. Markov
+    * fading, nor antenna patterns.
+    */
    m_enableRxPowerOutputTrace (false),
    m_enableFadingOutputTrace (false),
    m_enableExternalFadingInputTrace (false)
@@ -268,30 +275,38 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
     {
       delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
 
-      // TODO: This still needed to check
-      // Transmission time is needed to decrease from second link delay
-      // to prevent overlapping receiving and in second hand this closer
-      // to real receiving time (because sending start already when first bit arrives)
+      /**
+       * In transparent mode (at the satellite), the satellite should start transmitting
+       * the packet right away when its reception is started. Thus, there is no delay of
+       * the burst duration (between the reception and transmission) at the satellite at all.
+       * However, in there reception we need to receive the whole burst duration so that
+       * we can calculate the experienced interference and SINR. This is compensated at the
+       * channel by reducing the "second-link" propagation delay by burst duration.
+       * Note, that this also means, that the burst duration cannot be longer than the one-link
+       * propagation delay!
+       * TODO: Improve the transparent payload modeling at the satellite such that the
+       * burst duration is taken properly into account!
+       */
       switch (m_channelType)
       {
         case SatEnums::RETURN_FEEDER_CH:
         case SatEnums::FORWARD_USER_CH:
           {
             if ( delay > txParams->m_duration)
-            {
-              delay -= txParams->m_duration;
-            }
-          else
-            {
-              delay = Seconds (0);
-            }
-          break;
-        }
+              {
+                delay -= txParams->m_duration;
+              }
+            else
+              {
+                NS_FATAL_ERROR ("SatChannel::ScheduleRx - PHY packet burst duration " << (txParams->m_duration).GetSeconds () <<  "s is longer than one-link propagation delay " << delay.GetSeconds () << "s!");
+              }
+            break;
+          }
 
-      default:
-        {
-          break;
-        }
+        default:
+          {
+            break;
+          }
       }
     }
   /**

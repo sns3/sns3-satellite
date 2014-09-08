@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2014 Magister Solutions Ltd
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -31,6 +31,7 @@
 #include "ns3/nstime.h"
 #include "ns3/pointer.h"
 #include "ns3/packet.h"
+#include "ns3/singleton.h"
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/singleton.h"
 
@@ -44,6 +45,7 @@
 #include "satellite-rtn-link-time.h"
 #include "satellite-wave-form-conf.h"
 #include "satellite-crdsa-replica-tag.h"
+#include "satellite-log.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
 
@@ -572,9 +574,14 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         Ptr<SatTbtpMessage> tbtp = DynamicCast<SatTbtpMessage> (m_readCtrlCallback (tbtpId));
 
+        /**
+         * Control message NOT found in container anymore! This means, that the
+         * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
+         * or there are something wrong in the FWD link RRM.
+         */
         if (tbtp == NULL)
           {
-            NS_FATAL_ERROR ("TBTP not found, check that control message storage time is set long enough for superframe sequence!!!");
+            NS_FATAL_ERROR ("TBTP not found, check SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute is long enough!");
           }
 
         ScheduleTimeSlots (tbtp);
@@ -595,22 +602,32 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         uint32_t raCtrlId = ctrlTag.GetMsgId();
         Ptr<SatRaMessage> raMsg = DynamicCast<SatRaMessage> (m_readCtrlCallback (raCtrlId));
 
-        if (raMsg == NULL)
+        if (raMsg != NULL)
           {
-            NS_FATAL_ERROR ("Random access control message not found, check that control message storage time is long enough");
+            uint32_t allocationChannelId = raMsg->GetAllocationChannelId ();
+            uint16_t backoffProbability = raMsg->GetBackoffProbability ();
+            uint16_t backoffTime = raMsg->GetBackoffTime ();
+
+            NS_LOG_LOGIC ("SatUtMac::ReceiveSignalingPacket - UT: " << m_nodeInfo->GetMacAddress () << " @ time: " << Now ().GetSeconds () << " - Updating RA backoff probability for AC: " << allocationChannelId << " to: " << backoffProbability);
+
+            m_randomAccess->SetCrdsaBackoffProbability (allocationChannelId, backoffProbability);
+            m_randomAccess->SetCrdsaBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
+
+            packet->RemovePacketTag (macTag);
+            packet->RemovePacketTag (ctrlTag);
           }
-
-        uint32_t allocationChannelId = raMsg->GetAllocationChannelId ();
-        uint16_t backoffProbability = raMsg->GetBackoffProbability ();
-        uint16_t backoffTime = raMsg->GetBackoffTime ();
-
-        NS_LOG_LOGIC ("SatUtMac::ReceiveSignalingPacket - UT: " << m_nodeInfo->GetMacAddress () << " @ time: " << Now ().GetSeconds () << " - Updating RA backoff probability for AC: " << allocationChannelId << " to: " << backoffProbability);
-
-        m_randomAccess->SetCrdsaBackoffProbability (allocationChannelId, backoffProbability);
-        m_randomAccess->SetCrdsaBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
-
-        packet->RemovePacketTag (macTag);
-        packet->RemovePacketTag (ctrlTag);
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
+             * or there are something wrong in the FWD link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the FWD link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
 
         break;
       }

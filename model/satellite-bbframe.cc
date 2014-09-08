@@ -57,7 +57,9 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
       break;
 
     case SatEnums::DUMMY_FRAME:
-      // TODO: now we use given MODCOD and short frame. Configuration needed if normal frame is wanted to use.
+      /**
+       * Dummy frame is assumed to be a short frame but with no valid data.
+       */
       m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;

@@ -31,7 +31,7 @@ main (int argc, char *argv[])
 
   // CBR
   uint32_t packetSize (1280); // in bytes
-  double intervalSeconds = 0.02;
+  double intervalSeconds = 0.01;
 
   double simLength (50.0); // in seconds
   Time appStartTime = Seconds (0.1);
@@ -49,13 +49,13 @@ main (int argc, char *argv[])
   cmd.AddValue ("packetSize", "Packet size in bytes", packetSize);
   cmd.Parse (argc, argv);
 
-  // 20 ms -> 50 packets per second
-  // 125 B -> 50 kbps
-  // 250 B -> 100 kbps
-  // 500 B -> 200 kbps
-  // 750 B -> 300 kbps
-  // 1000 B -> 400 kbps
-  // 1250 B -> 500 kbps
+  // 10 ms -> 100 packets per second
+  // 125 B -> 100 kbps
+  // 250 B -> 200 kbps
+  // 500 B -> 400 kbps
+  // 750 B -> 600 kbps
+  // 1000 B -> 800 kbps
+  // 1250 B -> 1000 kbps
 
   // RBDC + periodical control slots
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -65,7 +65,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (Seconds (1)));
 
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 0"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_MARKOV));
