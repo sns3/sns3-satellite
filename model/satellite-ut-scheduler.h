@@ -21,18 +21,19 @@
 #ifndef SATELLITE_UT_SCHEDULER_H_
 #define SATELLITE_UT_SCHEDULER_H_
 
-#include "ns3/callback.h"
-#include "ns3/packet.h"
-#include "ns3/mac48-address.h"
-#include "satellite-lower-layer-service.h"
-#include "satellite-scheduling-object.h"
-#include "satellite-frame-conf.h"
-#include "satellite-node-info.h"
+#include <vector>
+#include <ns3/object.h>
+#include <ns3/callback.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-frame-conf.h>
 
 namespace ns3 {
 
 
-
+class Packet;
+class SatNodeInfo;
+class SatLowerLayerServiceConf;
+class SatSchedulingObject;
 
 /**
  * \ingroup satellite

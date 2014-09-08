@@ -19,22 +19,17 @@
  */
 
 
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <algorithm>
-
-#include "ns3/log.h"
-#include "ns3/ptr.h"
-#include "ns3/double.h"
-#include "ns3/uinteger.h"
-#include "ns3/boolean.h"
-#include "ns3/enum.h"
-
-#include "satellite-enums.h"
-#include "satellite-link-results.h"
-#include "satellite-utils.h"
-
+#include <iostream>
+#include <limits>
+#include <utility>
+#include <vector>
+#include <ns3/log.h>
+#include <ns3/double.h>
+#include <ns3/uinteger.h>
+#include <ns3/boolean.h>
+#include <ns3/enum.h>
+#include <ns3/satellite-link-results.h>
+#include <ns3/satellite-utils.h>
 #include "satellite-bbframe-conf.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrameConf");

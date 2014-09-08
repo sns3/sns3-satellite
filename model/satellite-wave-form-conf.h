@@ -22,13 +22,15 @@
 #define SATELLITE_WAVE_FORM_CONF_H
 
 #include <vector>
-#include "ns3/simple-ref-count.h"
-#include "ns3/object.h"
-
-#include "satellite-link-results.h"
+#include <ns3/nstime.h>
+#include <ns3/ptr.h>
+#include <ns3/simple-ref-count.h>
+#include <ns3/object.h>
+#include <ns3/satellite-enums.h>
 
 namespace ns3 {
 
+class SatLinkResultsDvbRcs2;
 
 /**
  * \ingroup satellite

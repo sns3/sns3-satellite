@@ -22,8 +22,9 @@
 #ifndef SATELLITE_NODE_INFO_H_
 #define SATELLITE_NODE_INFO_H_
 
-#include "ns3/simple-ref-count.h"
-#include "satellite-enums.h"
+#include <ns3/simple-ref-count.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-enums.h>
 
 namespace ns3 {
 

@@ -20,6 +20,9 @@
 #ifndef SATELLITE_ENUMS_H
 #define SATELLITE_ENUMS_H
 
+#include <string>
+#include <vector>
+
 namespace ns3 {
 
 /**
