@@ -552,7 +552,16 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
           uint16_t minRbdcCraDeltaRateInKbps = std::max (0, damaEntry->GetMinRbdcInKbps (i) - damaEntry->GetCraInKbps (i));
           it->second.m_reqPerRc[i].m_minRbdcBytes = (SatConstVariables::BITS_IN_KBIT * minRbdcCraDeltaRateInKbps  * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
 
-          NS_ASSERT (it->second.m_reqPerRc[i].m_minRbdcBytes <= it->second.m_reqPerRc[i].m_rbdcBytes);
+          // if UT is not requesting any RBDC for this RC then set minimum RBDC 0
+          // This means that no RBDC is actively requested for this RC
+          if (it->second.m_reqPerRc[i].m_rbdcBytes == 0)
+            {
+              it->second.m_reqPerRc[i].m_minRbdcBytes = 0;
+            }
+
+          NS_ASSERT ((it->second.m_reqPerRc[i].m_minRbdcBytes <= it->second.m_reqPerRc[i].m_rbdcBytes));
+
+          //it->second.m_reqPerRc[i].m_rbdcBytes = std::max(it->second.m_reqPerRc[i].m_minRbdcBytes, it->second.m_reqPerRc[i].m_rbdcBytes);
 
           // write backlog requests traces starts ...
           std::stringstream head;
