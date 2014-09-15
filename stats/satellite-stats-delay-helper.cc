@@ -193,7 +193,7 @@ SatStatsDelayHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier delay_sec"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("delay_sec")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -213,7 +213,7 @@ SatStatsDelayHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec delay_sec"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("delay_sec")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -237,7 +237,7 @@ SatStatsDelayHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()),
                                              "MultiFileMode", BooleanValue (false),
                                              "EnableContextPrinting", BooleanValue (false),
-                                             "GeneralHeading", StringValue ("% delay_sec freq"));
+                                             "GeneralHeading", StringValue (GetDistributionHeading ("delay_sec")));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
             NS_ASSERT (fileAggregator != 0);
 
@@ -286,7 +286,7 @@ SatStatsDelayHelper::DoInstall ()
             // Setup aggregator.
             m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                              "OutputFileName", StringValue (GetName ()),
-                                             "GeneralHeading", StringValue ("% delay_sec freq"));
+                                             "GeneralHeading", StringValue (GetDistributionHeading ("delay_sec")));
 
             // Setup collectors.
             m_terminalCollectors.SetType ("ns3::DistributionCollector");
@@ -361,6 +361,7 @@ SatStatsDelayHelper::DoInstall ()
                                        "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
             plotAggregator->Add2dDataset (GetName (), GetName ());
+            /// \todo Find a better dataset name.
             m_aggregator = plotAggregator;
 
             // Setup the final-level collector.
@@ -384,6 +385,7 @@ SatStatsDelayHelper::DoInstall ()
                                                 GetName (),
                                                 MakeCallback (&GnuplotAggregator::Write2d,
                                                               plotAggregator));
+            /// \todo Find a better dataset name.
 
             // Setup collectors.
             m_terminalCollectors.SetType ("ns3::ScalarCollector");

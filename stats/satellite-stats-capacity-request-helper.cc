@@ -98,16 +98,16 @@ SatStatsCapacityRequestHelper::DoInstall ()
       switch (GetIdentifierType ())
         {
         case SatStatsHelper::IDENTIFIER_GLOBAL:
-          context << "global";
+          context << "0";
           break;
         case SatStatsHelper::IDENTIFIER_GW:
-          context << "gw-" << GetIdentifierForUt (*it);
+          context << GetIdentifierForUt (*it);
           break;
         case SatStatsHelper::IDENTIFIER_BEAM:
-          context << "beam-" << GetIdentifierForUt (*it);
+          context << GetIdentifierForUt (*it);
           break;
         case SatStatsHelper::IDENTIFIER_UT:
-          context << "ut-" << GetIdentifierForUt (*it);
+          context << GetIdentifierForUt (*it);
           break;
         default:
           NS_FATAL_ERROR ("SatStatsCapacityRequestHelper - Invalid identifier type");

@@ -167,7 +167,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier sinr_db"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("sinr_db")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -187,7 +187,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec sinr_db"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("sinr_db")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -207,7 +207,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% sinr_db freq"));
+                                         "GeneralHeading", StringValue (GetDistributionHeading ("sinr_db")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");

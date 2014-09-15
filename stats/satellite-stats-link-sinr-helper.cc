@@ -215,15 +215,15 @@ SatStatsLinkSinrHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier sinr_db"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("sinr_db")));
         Ptr<MultiFileAggregator> aggregator = m_aggregator->GetObject<MultiFileAggregator> ();
 
         // Setup collector.
         Ptr<ScalarCollector> collector = CreateObject<ScalarCollector> ();
-        collector->SetName ("global");
+        collector->SetName ("0");
         collector->SetInputDataType (ScalarCollector::INPUT_DATA_TYPE_DOUBLE);
         collector->SetOutputType (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE);
-        collector->TraceConnect ("Output", "global",
+        collector->TraceConnect ("Output", "0",
                                  MakeCallback (&MultiFileAggregator::Write1d,
                                                aggregator));
         m_collector = collector->GetObject<DataCollectionObject> ();
@@ -236,14 +236,14 @@ SatStatsLinkSinrHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec sinr_db"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("sinr_db")));
         Ptr<MultiFileAggregator> aggregator = m_aggregator->GetObject<MultiFileAggregator> ();
 
         // Setup collector.
         Ptr<UnitConversionCollector> collector = CreateObject<UnitConversionCollector> ();
-        collector->SetName ("global");
+        collector->SetName ("0");
         collector->SetConversionType (UnitConversionCollector::TRANSPARENT);
-        collector->TraceConnect ("OutputTimeValue", "global",
+        collector->TraceConnect ("OutputTimeValue", "0",
                                  MakeCallback (&MultiFileAggregator::Write2d,
                                                aggregator));
         m_collector = collector->GetObject<DataCollectionObject> ();
@@ -258,12 +258,12 @@ SatStatsLinkSinrHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% sinr_db freq"));
+                                         "GeneralHeading", StringValue (GetDistributionHeading ("sinr_db")));
         Ptr<MultiFileAggregator> aggregator = m_aggregator->GetObject<MultiFileAggregator> ();
 
         // Setup collector.
         Ptr<DistributionCollector> collector = CreateObject<DistributionCollector> ();
-        collector->SetName ("global");
+        collector->SetName ("0");
         if (GetOutputType () == SatStatsHelper::OUTPUT_HISTOGRAM_FILE)
           {
             collector->SetOutputType (DistributionCollector::OUTPUT_TYPE_HISTOGRAM);
@@ -279,10 +279,10 @@ SatStatsLinkSinrHelper::DoInstall ()
         collector->SetMinValue (m_minValue);
         collector->SetMaxValue (m_maxValue);
         collector->SetBinLength (m_binLength);
-        collector->TraceConnect ("Output", "global",
+        collector->TraceConnect ("Output", "0",
                                  MakeCallback (&MultiFileAggregator::Write2d,
                                                aggregator));
-        collector->TraceConnect ("OutputString", "global",
+        collector->TraceConnect ("OutputString", "0",
                                  MakeCallback (&MultiFileAggregator::AddContextHeading,
                                                aggregator));
         m_collector = collector->GetObject<DataCollectionObject> ();
@@ -302,15 +302,15 @@ SatStatsLinkSinrHelper::DoInstall ()
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "SINR (in dB)");
-        plotAggregator->Add2dDataset ("global", "global");
+        plotAggregator->Add2dDataset ("0", "0");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
         m_aggregator = plotAggregator;
 
         // Setup collector.
         Ptr<UnitConversionCollector> collector = CreateObject<UnitConversionCollector> ();
-        collector->SetName ("global");
+        collector->SetName ("0");
         collector->SetConversionType (UnitConversionCollector::TRANSPARENT);
-        collector->TraceConnect ("OutputTimeValue", "global",
+        collector->TraceConnect ("OutputTimeValue", "0",
                                  MakeCallback (&GnuplotAggregator::Write2d,
                                                plotAggregator));
         m_collector = collector->GetObject<DataCollectionObject> ();
@@ -327,13 +327,13 @@ SatStatsLinkSinrHelper::DoInstall ()
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("SINR (in dB)",
                                    "Frequency");
-        plotAggregator->Add2dDataset ("global", "global");
+        plotAggregator->Add2dDataset ("0", "0");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
         m_aggregator = plotAggregator;
 
         // Setup collector.
         Ptr<DistributionCollector> collector = CreateObject<DistributionCollector> ();
-        collector->SetName ("global");
+        collector->SetName ("0");
         if (GetOutputType () == SatStatsHelper::OUTPUT_HISTOGRAM_PLOT)
           {
             collector->SetOutputType (DistributionCollector::OUTPUT_TYPE_HISTOGRAM);
@@ -349,7 +349,7 @@ SatStatsLinkSinrHelper::DoInstall ()
         collector->SetMinValue (m_minValue);
         collector->SetMaxValue (m_maxValue);
         collector->SetBinLength (m_binLength);
-        collector->TraceConnect ("Output", "global",
+        collector->TraceConnect ("Output", "0",
                                  MakeCallback (&GnuplotAggregator::Write2d,
                                                plotAggregator));
         m_collector = collector->GetObject<DataCollectionObject> ();

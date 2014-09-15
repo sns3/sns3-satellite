@@ -159,7 +159,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier resources_bytes"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("resources_bytes")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -187,7 +187,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec resources_bytes"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("resources_bytes")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -215,7 +215,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% resources_bytes freq"));
+                                         "GeneralHeading", StringValue (GetDistributionHeading ("resources_bytes")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");

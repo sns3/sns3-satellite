@@ -194,7 +194,7 @@ SatStatsThroughputHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier throughput_kbps"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("throughput_kbps")));
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -223,7 +223,7 @@ SatStatsThroughputHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec throughput_kbps"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("throughput_kbps")));
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
@@ -262,7 +262,7 @@ SatStatsThroughputHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (false),
-                                         "GeneralHeading", StringValue ("% throughput_kbps freq"));
+                                         "GeneralHeading", StringValue (GetDistributionHeading ("throughput_kbps")));
         Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
         NS_ASSERT (fileAggregator != 0);
 
@@ -374,6 +374,7 @@ SatStatsThroughputHelper::DoInstall ()
                                    "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
         plotAggregator->Add2dDataset (GetName (), GetName ());
+        /// \todo Find a better dataset name.
         m_aggregator = plotAggregator;
 
         // Setup the final-level collector.
@@ -397,6 +398,7 @@ SatStatsThroughputHelper::DoInstall ()
                                             GetName (),
                                             MakeCallback (&GnuplotAggregator::Write2d,
                                                           plotAggregator));
+        /// \todo Find a better dataset name.
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");

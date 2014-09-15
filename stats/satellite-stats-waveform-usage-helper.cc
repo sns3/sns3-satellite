@@ -94,7 +94,7 @@ SatStatsWaveformUsageHelper::DoInstall ()
                                    "OutputFileName", StringValue (GetName ()),
                                    "MultiFileMode", BooleanValue (false),
                                    "EnableContextPrinting", BooleanValue (true),
-                                   "GeneralHeading", StringValue ("% identifier_and_waveform usage_count"));
+                                   "GeneralHeading", StringValue (GetIdentifierHeading ("usage_count")));
 
   Callback<void, std::string, uint32_t> waveformUsageCallback
       = MakeCallback (&SatStatsWaveformUsageHelper::WaveformUsageCallback, this);
@@ -126,6 +126,28 @@ SatStatsWaveformUsageHelper::DoInstall ()
 } // end of `void DoInstall ();`
 
 
+std::string
+SatStatsWaveformUsageHelper::GetIdentifierHeading (std::string dataLabel) const
+{
+  switch (GetIdentifierType ())
+    {
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
+      return "% global waveform_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_GW:
+      return "% gw_id waveform_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_BEAM:
+      return "% beam_id waveform_id " + dataLabel;
+
+    default:
+      NS_FATAL_ERROR ("SatStatsWaveformUsageHelper - Invalid identifier type");
+      break;
+    }
+  return "";
+}
+
+
 void
 SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
                                                     uint32_t waveformId)
@@ -153,12 +175,18 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
                                  EnumValue (ScalarCollector::OUTPUT_TYPE_SUM));
       uint32_t n = 0;
 
+      /*
+       * Create a new set of collectors. Its name consists of two integers:
+       *   - the first is the identifier ID (beam ID, GW ID, or simply zero for
+       *     global);
+       *   - the second is the frame ID.
+       */
       switch (GetIdentifierType ())
         {
         case SatStatsHelper::IDENTIFIER_GLOBAL:
           {
             std::ostringstream name;
-            name << "global-waveform-" << waveformId;
+            name << "0 " << waveformId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (0);
             n++;
@@ -172,7 +200,7 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
               {
                 const uint32_t gwId = GetGwId (*it);
                 std::ostringstream name;
-                name << "gw-" << gwId << "-waveform-" << waveformId;
+                name << gwId << " " << waveformId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
                 collectorMap.Create (gwId);
                 n++;
@@ -188,7 +216,7 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
               {
                 const uint32_t beamId = (*it);
                 std::ostringstream name;
-                name << "beam-" << beamId << "-waveform-" << waveformId;
+                name << beamId << " " << waveformId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
                 collectorMap.Create (beamId);
                 n++;

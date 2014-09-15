@@ -53,6 +53,7 @@ public:
 protected:
   // inherited from SatStatsHelper base class
   void DoInstall ();
+  std::string GetIdentifierHeading (std::string dataLabel) const;
 
 private:
   /**

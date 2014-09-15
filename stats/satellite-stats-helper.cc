@@ -302,7 +302,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
     {
     case SatStatsHelper::IDENTIFIER_GLOBAL:
       {
-        collectorMap.SetAttribute ("Name", StringValue ("global"));
+        collectorMap.SetAttribute ("Name", StringValue ("0"));
         collectorMap.Create (0);
         n++;
         break;
@@ -315,7 +315,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
           {
             const uint32_t gwId = GetGwId (*it);
             std::ostringstream name;
-            name << "gw-" << gwId;
+            name << gwId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (gwId);
             n++;
@@ -331,7 +331,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
           {
             const uint32_t beamId = (*it);
             std::ostringstream name;
-            name << "beam-" << beamId;
+            name << beamId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (beamId);
             n++;
@@ -346,7 +346,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
           {
             const uint32_t utId = GetUtId (*it);
             std::ostringstream name;
-            name << "ut-" << utId;
+            name << utId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (utId);
             n++;
@@ -362,7 +362,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
           {
             const uint32_t utUserId = GetUtUserId (*it);
             std::ostringstream name;
-            name << "ut-user-" << utUserId;
+            name << utUserId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (utUserId);
             n++;
@@ -383,6 +383,47 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 
 } // end of `uint32_t CreateCollectorPerIdentifier (CollectorMap &);`
 
+
+std::string
+SatStatsHelper::GetIdentifierHeading (std::string dataLabel) const
+{
+  switch (GetIdentifierType ())
+    {
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
+      return "% global " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_GW:
+      return "% gw_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_BEAM:
+      return "% beam_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_UT:
+      return "% ut_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_UT_USER:
+      return "% ut_user_id " + dataLabel;
+
+    default:
+      NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
+      break;
+    }
+  return "";
+}
+
+
+std::string
+SatStatsHelper::GetTimeHeading (std::string dataLabel) const
+{
+  return "% time_sec " + dataLabel;
+}
+
+
+std::string
+SatStatsHelper::GetDistributionHeading (std::string dataLabel) const
+{
+  return "% " + dataLabel + " freq";
+}
 
 
 // IDENTIFIER RELATED METHODS /////////////////////////////////////////////////

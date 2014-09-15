@@ -364,12 +364,11 @@ SatStatsQueueHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
       {
         // Setup aggregator.
-        const std::string heading = "% identifier " + m_shortLabel;
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (heading));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading (m_shortLabel)));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -387,10 +386,9 @@ SatStatsQueueHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
       {
         // Setup aggregator.
-        const std::string heading = "% time_sec " + m_shortLabel;
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue (heading));
+                                         "GeneralHeading", StringValue (GetTimeHeading (m_shortLabel)));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -408,10 +406,9 @@ SatStatsQueueHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_CDF_FILE:
       {
         // Setup aggregator.
-        const std::string heading = "% " + m_shortLabel + " freq";
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue (heading));
+                                         "GeneralHeading", StringValue (GetDistributionHeading (m_shortLabel)));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");

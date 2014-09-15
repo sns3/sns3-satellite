@@ -130,7 +130,7 @@ SatStatsPacketErrorHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier error_rate"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("error_rate")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -150,7 +150,7 @@ SatStatsPacketErrorHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec error_rate"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("error_rate")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");

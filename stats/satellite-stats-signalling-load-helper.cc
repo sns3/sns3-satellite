@@ -95,7 +95,7 @@ SatStatsSignallingLoadHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier signalling_kbps"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("signalling_kbps")));
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -124,7 +124,7 @@ SatStatsSignallingLoadHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec signalling_kbps"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("signalling_kbps")));
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");

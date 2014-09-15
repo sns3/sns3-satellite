@@ -215,6 +215,27 @@ protected:
   virtual void DoInstall () = 0;
 
   /**
+   * \param dataLabel the short name of the main data of this statistics
+   * \return a string to be printed as the first line of output, consisting of
+   *         the identifier title and the given data label
+   */
+  virtual std::string GetIdentifierHeading (std::string dataLabel) const;
+
+  /**
+   * \param dataLabel the short name of the main data of this statistics
+   * \return a string to be printed as the first line of output, consisting of
+   *         the title of the time column and the given data label
+   */
+  virtual std::string GetTimeHeading (std::string dataLabel) const;
+
+  /**
+   * \param dataLabel the short name of the main data of this statistics
+   * \return a string to be printed as the first line of output, consisting of
+   *         the given data label and the title of the distribution column
+   */
+  virtual std::string GetDistributionHeading (std::string dataLabel) const;
+
+  /**
    * \brief Create the aggregator according to the output type.
    * \param aggregatorTypeId the type of aggregator to be created.
    * \param n1 the name of the attribute to be set on the aggregator created.

@@ -149,12 +149,11 @@ SatStatsFrameLoadHelper::DoInstall ()
     }
 
   // Setup aggregator.
-  const std::string heading = "% identifier_and_frame_number " + m_shortLabel;
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                    "OutputFileName", StringValue (GetName ()),
                                    "MultiFileMode", BooleanValue (false),
                                    "EnableContextPrinting", BooleanValue (true),
-                                   "GeneralHeading", StringValue (heading));
+                                   "GeneralHeading", StringValue (GetIdentifierHeading (m_shortLabel)));
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
@@ -196,6 +195,28 @@ SatStatsFrameLoadHelper::DoInstall ()
 
 
 } // end of `void DoInstall ();`
+
+
+std::string
+SatStatsFrameLoadHelper::GetIdentifierHeading (std::string dataLabel) const
+{
+  switch (GetIdentifierType ())
+    {
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
+      return "% global frame_number " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_GW:
+      return "% gw_id frame_number " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_BEAM:
+      return "% beam_id frame_number " + dataLabel;
+
+    default:
+      NS_FATAL_ERROR ("SatStatsFrameLoadHelper - Invalid identifier type");
+      break;
+    }
+  return "";
+}
 
 
 void
@@ -273,12 +294,18 @@ SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
                                      EnumValue (ScalarCollector::OUTPUT_TYPE_SUM));
         }
 
+      /*
+       * Create a new set of collectors. Its name consists of two integers:
+       *   - the first is the identifier ID (beam ID, GW ID, or simply zero for
+       *     global);
+       *   - the second is the frame ID.
+       */
       switch (GetIdentifierType ())
         {
         case SatStatsHelper::IDENTIFIER_GLOBAL:
           {
             std::ostringstream name;
-            name << "global-frame-" << frameId;
+            name << "0 " << frameId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (0);
             n++;
@@ -292,7 +319,7 @@ SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
               {
                 const uint32_t gwId = GetGwId (*it);
                 std::ostringstream name;
-                name << "gw-" << gwId << "-frame-" << frameId;
+                name << gwId << " " << frameId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
                 collectorMap.Create (gwId);
                 n++;
@@ -308,7 +335,7 @@ SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
               {
                 const uint32_t beamId = (*it);
                 std::ostringstream name;
-                name << "beam-" << beamId << "-frame-" << frameId;
+                name << beamId << " " << frameId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
                 collectorMap.Create (beamId);
                 n++;

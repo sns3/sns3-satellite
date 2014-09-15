@@ -9,63 +9,35 @@
 
 using namespace ns3;
 
+#define CALL_SAT_STATS_BASIC_ELEMENT(id)                                      \
+  s->Add ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                          \
+  s->Add ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                         \
+  s->Add ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                         \
+
 #define CALL_SAT_STATS_BASIC_SET(id)                                          \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                    \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                   \
-                                                                              \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-                                                                              \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                   \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                  \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                  \
-                                                                              \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
+  CALL_SAT_STATS_BASIC_ELEMENT(Global ## id)                                  \
+  CALL_SAT_STATS_BASIC_ELEMENT(PerGw ## id)                                   \
+  CALL_SAT_STATS_BASIC_ELEMENT(PerBeam ## id)                                 \
+  CALL_SAT_STATS_BASIC_ELEMENT(PerUt ## id)                                   \
+
+
+#define CALL_SAT_STATS_DISTRIBUTION_ELEMENT(id)                               \
+  s->Add ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                          \
+  s->Add ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                         \
+  s->Add ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                       \
+  s->Add ## id (SatStatsHelper::OUTPUT_PDF_FILE);                             \
+  s->Add ## id (SatStatsHelper::OUTPUT_CDF_FILE);                             \
+  s->Add ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                         \
+  s->Add ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                       \
+  s->Add ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                             \
+  s->Add ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                             \
 
 #define CALL_SAT_STATS_DISTRIBUTION_SET(id)                                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                    \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                 \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_PDF_FILE);                       \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_CDF_FILE);                       \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                   \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                 \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                       \
-  s->AddGlobal ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                       \
-                                                                              \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                  \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_PDF_FILE);                        \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_CDF_FILE);                        \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
-  s->AddPerGw ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                        \
-                                                                              \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                   \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                  \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_PDF_FILE);                      \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_CDF_FILE);                      \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                  \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                      \
-  s->AddPerBeam ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                      \
-                                                                              \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCALAR_FILE);                     \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_FILE);                    \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);                  \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_FILE);                        \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_FILE);                        \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                    \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);                  \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_PDF_PLOT);                        \
-  s->AddPerUt ## id (SatStatsHelper::OUTPUT_CDF_PLOT);
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(Global ## id)                           \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(PerGw ## id)                            \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(PerBeam ## id)                          \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(PerUt ## id)                            \
+
 
 #define CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET(id)                          \
   s->AddAverageBeam ## id (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);            \
@@ -213,15 +185,7 @@ main (int argc, char *argv[])
    * statistics.
    */
 //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdAppDelay)
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
-//  s->AddPerUtUserFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (PerUtUserFwdAppDelay)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdAppDelay)
 //  s->AddAverageUtUserFwdAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
 //  s->AddAverageUtUserFwdAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
@@ -240,9 +204,7 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_BASIC_SET (FwdSignallingLoad)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (FwdCompositeSinr)
 //  CALL_SAT_STATS_BASIC_SET (FwdAppThroughput)
-//  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-//  s->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  CALL_SAT_STATS_BASIC_ELEMENT (PerUtUserFwdAppThroughput)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdAppThroughput)
 //  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
 //  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_PDF_FILE);
@@ -257,15 +219,7 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_BASIC_SET (FwdPhyThroughput)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdPhyThroughput)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnAppDelay)
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_PLOT);
-//  s->AddPerUtUserRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (PerUtUserRtnAppDelay)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnAppDelay)
 //  s->AddAverageUtUserRtnAppDelay (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
 //  s->AddAverageUtUserRtnAppDelay (SatStatsHelper::OUTPUT_PDF_FILE);
@@ -284,9 +238,7 @@ main (int argc, char *argv[])
 //  CALL_SAT_STATS_BASIC_SET (RtnSignallingLoad)
 //  CALL_SAT_STATS_DISTRIBUTION_SET (RtnCompositeSinr)
 //  CALL_SAT_STATS_BASIC_SET (RtnAppThroughput)
-//  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-//  s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+//  CALL_SAT_STATS_BASIC_ELEMENT (PerUtUserRtnAppThroughput)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnAppThroughput)
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_PDF_FILE);
@@ -323,14 +275,14 @@ main (int argc, char *argv[])
 //  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 //  s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdFeederLinkSinr);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdUserLinkSinr);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnFeederLinkSinr);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnUserLinkSinr);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdFeederLinkRxPower);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (FwdUserLinkRxPower);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnFeederLinkRxPower);
-//  CALL_SAT_STATS_DISTRIBUTION_SET (RtnUserLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalFwdFeederLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalFwdUserLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalRtnFeederLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalRtnUserLinkSinr);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalFwdFeederLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalFwdUserLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalRtnFeederLinkRxPower);
+//  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (GlobalRtnUserLinkRxPower);
 
   /*
    * The following is the statements for enabling some satellite statistics

@@ -112,7 +112,7 @@ SatStatsPacketCollisionHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue ("% identifier collision_rate"));
+                                         "GeneralHeading", StringValue (GetIdentifierHeading ("collision_rate")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -132,7 +132,7 @@ SatStatsPacketCollisionHelper::DoInstall ()
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
                                          "OutputFileName", StringValue (GetName ()),
-                                         "GeneralHeading", StringValue ("% time_sec collision_rate"));
+                                         "GeneralHeading", StringValue (GetTimeHeading ("collision_rate")));
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
