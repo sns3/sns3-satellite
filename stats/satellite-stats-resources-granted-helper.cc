@@ -168,6 +168,9 @@ SatStatsResourcesGrantedHelper::DoInstall ()
         m_terminalCollectors.ConnectToAggregator ("OutputString",
                                                   m_aggregator,
                                                   &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.ConnectToAggregator ("Warning",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::EnableContextWarning);
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();

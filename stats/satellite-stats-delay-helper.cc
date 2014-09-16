@@ -192,6 +192,9 @@ SatStatsDelayHelper::DoInstall ()
             m_averagingCollector->TraceConnect ("OutputString", "0",
                                                 MakeCallback (&MultiFileAggregator::AddContextHeading,
                                                               fileAggregator));
+            m_averagingCollector->TraceConnect ("Warning", "0",
+                                                MakeCallback (&MultiFileAggregator::EnableContextWarning,
+                                                              fileAggregator));
 
             // Setup collectors.
             m_terminalCollectors.SetType ("ns3::ScalarCollector");
@@ -236,6 +239,9 @@ SatStatsDelayHelper::DoInstall ()
             m_terminalCollectors.ConnectToAggregator ("OutputString",
                                                       m_aggregator,
                                                       &MultiFileAggregator::AddContextHeading);
+            m_terminalCollectors.ConnectToAggregator ("Warning",
+                                                      m_aggregator,
+                                                      &MultiFileAggregator::EnableContextWarning);
           }
 
         break;

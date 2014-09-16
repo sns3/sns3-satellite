@@ -213,6 +213,9 @@ SatStatsLinkRxPowerHelper::DoInstall ()
         collector->TraceConnect ("OutputString", "0",
                                  MakeCallback (&MultiFileAggregator::AddContextHeading,
                                                aggregator));
+        collector->TraceConnect ("Warning", "0",
+                                 MakeCallback (&MultiFileAggregator::EnableContextWarning,
+                                               aggregator));
         m_collector = collector->GetObject<DataCollectionObject> ();
 
         break;

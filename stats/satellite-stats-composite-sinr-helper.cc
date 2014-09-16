@@ -160,6 +160,9 @@ SatStatsCompositeSinrHelper::DoInstall ()
         m_terminalCollectors.ConnectToAggregator ("OutputString",
                                                   m_aggregator,
                                                   &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.ConnectToAggregator ("Warning",
+                                                  m_aggregator,
+                                                  &MultiFileAggregator::EnableContextWarning);
         break;
       }
 
