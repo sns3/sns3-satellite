@@ -63,9 +63,6 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsThroughputHelper);
 
 SatStatsThroughputHelper::SatStatsThroughputHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_minValue (0.0),
-    m_maxValue (0.0),
-    m_binLength (0.0),
     m_averagingMode (false)
 {
   NS_LOG_FUNCTION (this << satHelper);
@@ -83,27 +80,6 @@ SatStatsThroughputHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsThroughputHelper")
     .SetParent<SatStatsHelper> ()
-    .AddAttribute ("MinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
-                   "(in kbps).",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetMinValue,
-                                       &SatStatsThroughputHelper::GetMinValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("MaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
-                   "(in kbps).",
-                   DoubleValue (5000.0),
-                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetMaxValue,
-                                       &SatStatsThroughputHelper::GetMaxValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
-                   "(in kbps).",
-                   DoubleValue (100.0),
-                   MakeDoubleAccessor (&SatStatsThroughputHelper::SetBinLength,
-                                       &SatStatsThroughputHelper::GetBinLength),
-                   MakeDoubleChecker<double> ())
     .AddAttribute ("AveragingMode",
                    "If true, all samples will be averaged before passed to aggregator. "
                    "Only affects histogram, PDF, and CDF output types.",
@@ -113,51 +89,6 @@ SatStatsThroughputHelper::GetTypeId ()
                    MakeBooleanChecker ())
   ;
   return tid;
-}
-
-
-void
-SatStatsThroughputHelper::SetMinValue (double minValue)
-{
-  NS_LOG_FUNCTION (this << minValue);
-  m_minValue = minValue;
-}
-
-
-double
-SatStatsThroughputHelper::GetMinValue () const
-{
-  return m_minValue;
-}
-
-
-void
-SatStatsThroughputHelper::SetMaxValue (double maxValue)
-{
-  NS_LOG_FUNCTION (this << maxValue);
-  m_maxValue = maxValue;
-}
-
-
-double
-SatStatsThroughputHelper::GetMaxValue () const
-{
-  return m_maxValue;
-}
-
-
-void
-SatStatsThroughputHelper::SetBinLength (double binLength)
-{
-  NS_LOG_FUNCTION (this << binLength);
-  m_binLength = binLength;
-}
-
-
-double
-SatStatsThroughputHelper::GetBinLength () const
-{
-  return m_binLength;
 }
 
 
@@ -279,9 +210,6 @@ SatStatsThroughputHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_averagingCollector->SetOutputType (outputType);
-        m_averagingCollector->SetMinValue (m_minValue);
-        m_averagingCollector->SetMaxValue (m_maxValue);
-        m_averagingCollector->SetBinLength (m_binLength);
         m_averagingCollector->SetName ("0");
         m_averagingCollector->TraceConnect ("Output", "0",
                                             MakeCallback (&MultiFileAggregator::Write2d,
@@ -390,9 +318,6 @@ SatStatsThroughputHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_averagingCollector->SetOutputType (outputType);
-        m_averagingCollector->SetMinValue (m_minValue);
-        m_averagingCollector->SetMaxValue (m_maxValue);
-        m_averagingCollector->SetBinLength (m_binLength);
         m_averagingCollector->SetName ("0");
         m_averagingCollector->TraceConnect ("Output",
                                             GetName (),

@@ -81,13 +81,7 @@ SatStatsQueueHelper::SatStatsQueueHelper (Ptr<const SatHelper> satHelper)
     m_pollInterval (MilliSeconds (10)),
     m_unitType (SatStatsQueueHelper::UNIT_BYTES),
     m_shortLabel (""),
-    m_longLabel (""),
-    m_bytesMinValue (0.0),
-    m_bytesMaxValue (0.0),
-    m_bytesBinLength (0.0),
-    m_packetsMinValue (0.0),
-    m_packetsMaxValue (0.0),
-    m_packetsBinLength (0.0)
+    m_longLabel ("")
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -110,48 +104,6 @@ SatStatsQueueHelper::GetTypeId ()
                    MakeTimeAccessor (&SatStatsQueueHelper::SetPollInterval,
                                      &SatStatsQueueHelper::GetPollInterval),
                    MakeTimeChecker ())
-    .AddAttribute ("BytesMinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, "
-                   "and CDF output in bytes unit.",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&SatStatsQueueHelper::SetBytesMinValue,
-                                       &SatStatsQueueHelper::GetBytesMinValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BytesMaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, "
-                   "and CDF output in bytes unit.",
-                   DoubleValue (1000.0),
-                   MakeDoubleAccessor (&SatStatsQueueHelper::SetBytesMaxValue,
-                                       &SatStatsQueueHelper::GetBytesMaxValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BytesBinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, "
-                   "and CDF output in bytes unit.",
-                   DoubleValue (20.0),
-                   MakeDoubleAccessor (&SatStatsQueueHelper::SetBytesBinLength,
-                                       &SatStatsQueueHelper::GetBytesBinLength),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("PacketsMinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, "
-                   "and CDF output in packets unit.",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&SatStatsQueueHelper::SetPacketsMinValue,
-                                       &SatStatsQueueHelper::GetPacketsMinValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("PacketsMaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, "
-                   "and CDF output in packets unit.",
-                   DoubleValue (50.0),
-                   MakeDoubleAccessor (&SatStatsQueueHelper::SetPacketsMaxValue,
-                                       &SatStatsQueueHelper::GetPacketsMaxValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("PacketsBinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, "
-                   "and CDF output in packets unit.",
-                   DoubleValue (1.0),
-                   MakeDoubleAccessor (&SatStatsQueueHelper::SetPacketsBinLength,
-                                       &SatStatsQueueHelper::GetPacketsBinLength),
-                   MakeDoubleChecker<double> ())
   ;
   return tid;
 }
@@ -200,153 +152,6 @@ Time
 SatStatsQueueHelper::GetPollInterval () const
 {
   return m_pollInterval;
-}
-
-
-void
-SatStatsQueueHelper::SetBytesMinValue (double minValue)
-{
-  NS_LOG_FUNCTION (this << minValue);
-  m_bytesMinValue = minValue;
-}
-
-
-double
-SatStatsQueueHelper::GetBytesMinValue () const
-{
-  return m_bytesMinValue;
-}
-
-
-void
-SatStatsQueueHelper::SetBytesMaxValue (double maxValue)
-{
-  NS_LOG_FUNCTION (this << maxValue);
-  m_bytesMaxValue = maxValue;
-}
-
-
-double
-SatStatsQueueHelper::GetBytesMaxValue () const
-{
-  return m_bytesMaxValue;
-}
-
-
-void
-SatStatsQueueHelper::SetBytesBinLength (double binLength)
-{
-  NS_LOG_FUNCTION (this << binLength);
-  m_bytesBinLength = binLength;
-}
-
-
-double
-SatStatsQueueHelper::GetBytesBinLength () const
-{
-  return m_bytesBinLength;
-}
-
-
-void
-SatStatsQueueHelper::SetPacketsMinValue (double minValue)
-{
-  NS_LOG_FUNCTION (this << minValue);
-  m_packetsMinValue = minValue;
-}
-
-
-double
-SatStatsQueueHelper::GetPacketsMinValue () const
-{
-  return m_packetsMinValue;
-}
-
-
-void
-SatStatsQueueHelper::SetPacketsMaxValue (double maxValue)
-{
-  NS_LOG_FUNCTION (this << maxValue);
-  m_packetsMaxValue = maxValue;
-}
-
-
-double
-SatStatsQueueHelper::GetPacketsMaxValue () const
-{
-  return m_packetsMaxValue;
-}
-
-
-void
-SatStatsQueueHelper::SetPacketsBinLength (double binLength)
-{
-  NS_LOG_FUNCTION (this << binLength);
-  m_packetsBinLength = binLength;
-}
-
-
-double
-SatStatsQueueHelper::GetPacketsBinLength () const
-{
-  return m_packetsBinLength;
-}
-
-
-double
-SatStatsQueueHelper::GetMinValue () const
-{
-  if (m_unitType == SatStatsQueueHelper::UNIT_BYTES)
-    {
-      return m_bytesMinValue;
-    }
-  else if (m_unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
-    {
-      return m_packetsMinValue;
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
-      return 0.0;
-    }
-}
-
-
-double
-SatStatsQueueHelper::GetMaxValue () const
-{
-  if (m_unitType == SatStatsQueueHelper::UNIT_BYTES)
-    {
-      return m_bytesMaxValue;
-    }
-  else if (m_unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
-    {
-      return m_packetsMaxValue;
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
-      return 0.0;
-    }
-}
-
-
-double
-SatStatsQueueHelper::GetBinLength () const
-{
-  if (m_unitType == SatStatsQueueHelper::UNIT_BYTES)
-    {
-      return m_bytesBinLength;
-    }
-  else if (m_unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
-    {
-      return m_packetsBinLength;
-    }
-  else
-    {
-      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
-      return 0.0;
-    }
 }
 
 
@@ -423,9 +228,6 @@ SatStatsQueueHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (GetMinValue ()));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (GetMaxValue ()));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (GetBinLength ()));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
@@ -491,9 +293,6 @@ SatStatsQueueHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (GetMinValue ()));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (GetMaxValue ()));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (GetBinLength ()));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
              it != m_terminalCollectors.End (); ++it)

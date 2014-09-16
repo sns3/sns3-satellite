@@ -224,15 +224,6 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
-  Config::SetDefault ("ns3::SatStatsCompositeSinrHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsCompositeSinrHelper::MaxValue", DoubleValue (25.0));
-  Config::SetDefault ("ns3::SatStatsCompositeSinrHelper::BinLength", DoubleValue (0.25));
-  Config::SetDefault ("ns3::SatStatsLinkSinrHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsLinkSinrHelper::MaxValue", DoubleValue (25.0));
-  Config::SetDefault ("ns3::SatStatsLinkSinrHelper::BinLength", DoubleValue (0.25));
-  Config::SetDefault ("ns3::SatStatsLinkRxPowerHelper::MinValue", DoubleValue (-140.0));
-  Config::SetDefault ("ns3::SatStatsLinkRxPowerHelper::MaxValue", DoubleValue (-100.0));
-  Config::SetDefault ("ns3::SatStatsLinkRxPowerHelper::BinLength", DoubleValue (0.4));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);

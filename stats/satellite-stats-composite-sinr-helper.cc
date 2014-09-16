@@ -58,10 +58,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatStatsCompositeSinrHelper);
 
 SatStatsCompositeSinrHelper::SatStatsCompositeSinrHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper),
-    m_minValue (0.0),
-    m_maxValue (0.0),
-    m_binLength (0.0)
+  : SatStatsHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -78,74 +75,8 @@ SatStatsCompositeSinrHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsCompositeSinrHelper")
     .SetParent<SatStatsHelper> ()
-    .AddAttribute ("MinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
-                   "(in dB).",
-                   DoubleValue (-5.0),
-                   MakeDoubleAccessor (&SatStatsCompositeSinrHelper::SetMinValue,
-                                       &SatStatsCompositeSinrHelper::GetMinValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("MaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
-                   "(in dB).",
-                   DoubleValue (20.0),
-                   MakeDoubleAccessor (&SatStatsCompositeSinrHelper::SetMaxValue,
-                                       &SatStatsCompositeSinrHelper::GetMaxValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
-                   "(in dB).",
-                   DoubleValue (0.5),
-                   MakeDoubleAccessor (&SatStatsCompositeSinrHelper::SetBinLength,
-                                       &SatStatsCompositeSinrHelper::GetBinLength),
-                   MakeDoubleChecker<double> ())
   ;
   return tid;
-}
-
-
-void
-SatStatsCompositeSinrHelper::SetMinValue (double minValue)
-{
-  NS_LOG_FUNCTION (this << minValue);
-  m_minValue = minValue;
-}
-
-
-double
-SatStatsCompositeSinrHelper::GetMinValue () const
-{
-  return m_minValue;
-}
-
-
-void
-SatStatsCompositeSinrHelper::SetMaxValue (double maxValue)
-{
-  NS_LOG_FUNCTION (this << maxValue);
-  m_maxValue = maxValue;
-}
-
-
-double
-SatStatsCompositeSinrHelper::GetMaxValue () const
-{
-  return m_maxValue;
-}
-
-
-void
-SatStatsCompositeSinrHelper::SetBinLength (double binLength)
-{
-  NS_LOG_FUNCTION (this << binLength);
-  m_binLength = binLength;
-}
-
-
-double
-SatStatsCompositeSinrHelper::GetBinLength () const
-{
-  return m_binLength;
 }
 
 
@@ -222,9 +153,6 @@ SatStatsCompositeSinrHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
@@ -292,9 +220,6 @@ SatStatsCompositeSinrHelper::DoInstall ()
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
           }
         m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
-        m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
-        m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
         CreateCollectorPerIdentifier (m_terminalCollectors);
         for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
              it != m_terminalCollectors.End (); ++it)

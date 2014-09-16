@@ -82,96 +82,6 @@ public:
   Time GetPollInterval () const;
 
   /**
-   * \param minValue the MinValue attribute of the histogram, PDF, CDF output
-   *                 in bytes unit.
-   */
-  void SetBytesMinValue (double minValue);
-
-  /**
-   * \return the MinValue attribute of the histogram, PDF, CDF output
-   *         in bytes unit.
-   */
-  double GetBytesMinValue () const;
-
-  /**
-   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output
-   *                 in bytes unit.
-   */
-  void SetBytesMaxValue (double maxValue);
-
-  /**
-   * \return the MaxValue attribute of the histogram, PDF, CDF output
-   *         in bytes unit.
-   */
-  double GetBytesMaxValue () const;
-
-  /**
-   * \param binLength the BinLength attribute of the histogram, PDF, CDF output
-   *                 in bytes unit.
-   */
-  void SetBytesBinLength (double binLength);
-
-  /**
-   * \return the BinLength attribute of the histogram, PDF, CDF output
-   *         in bytes unit.
-   */
-  double GetBytesBinLength () const;
-
-  /**
-   * \param minValue the MinValue attribute of the histogram, PDF, CDF output
-   *                 in packets unit.
-   */
-  void SetPacketsMinValue (double minValue);
-
-  /**
-   * \return the MinValue attribute of the histogram, PDF, CDF output
-   *         in packets unit.
-   */
-  double GetPacketsMinValue () const;
-
-  /**
-   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output
-   *                 in packets unit.
-   */
-  void SetPacketsMaxValue (double maxValue);
-
-  /**
-   * \return the MaxValue attribute of the histogram, PDF, CDF output
-   *         in packets unit.
-   */
-  double GetPacketsMaxValue () const;
-
-  /**
-   * \param binLength the BinLength attribute of the histogram, PDF, CDF output
-   *                 in packets unit.
-   */
-  void SetPacketsBinLength (double binLength);
-
-  /**
-   * \return the BinLength attribute of the histogram, PDF, CDF output
-   *         in packets unit.
-   */
-  double GetPacketsBinLength () const;
-
-  /**
-   * \return the MinValue attribute of the histogram, PDF, CDF output
-   *         in currently selected unit type.
-   */
-  double GetMinValue () const;
-
-  /**
-   * \return the MaxValue attribute of the histogram, PDF, CDF output
-   *         in currently selected unit type.
-   */
-  double GetMaxValue () const;
-
-  /**
-   * \return the BinLength attribute of the histogram, PDF, CDF output
-   *         in currently selected unit type.
-   */
-  double GetBinLength () const;
-
-  /**
    * \param unitType
    */
   void SetUnitType (UnitType_t unitType);
@@ -193,6 +103,7 @@ public:
   void Poll ();
 
 protected:
+
   // inherited from SatStatsHelper base class
   void DoInstall ();
 
@@ -220,18 +131,10 @@ protected:
   Ptr<DataCollectionObject> m_aggregator;
 
 private:
-  Time         m_pollInterval;  ///<
+  Time         m_pollInterval;  ///< `PollInterval` attribute.
   UnitType_t   m_unitType;      ///<
   std::string  m_shortLabel;    ///<
   std::string  m_longLabel;     ///<
-
-  double m_bytesMinValue;   ///<
-  double m_bytesMaxValue;   ///<
-  double m_bytesBinLength;  ///<
-
-  double m_packetsMinValue;   ///<
-  double m_packetsMaxValue;   ///<
-  double m_packetsBinLength;  ///<
 
 }; // end of class SatStatsQueueHelper
 

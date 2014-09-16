@@ -234,12 +234,6 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (30.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (0.3));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (3.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.03));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);

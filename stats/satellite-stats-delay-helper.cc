@@ -62,9 +62,6 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsDelayHelper);
 
 SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_minValue (0.0),
-    m_maxValue (0.0),
-    m_binLength (0.0),
     m_averagingMode (false)
 {
   NS_LOG_FUNCTION (this << satHelper);
@@ -82,27 +79,6 @@ SatStatsDelayHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsDelayHelper")
     .SetParent<SatStatsHelper> ()
-    .AddAttribute ("MinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
-                   "(in seconds).",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&SatStatsDelayHelper::SetMinValue,
-                                       &SatStatsDelayHelper::GetMinValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("MaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
-                   "(in seconds).",
-                   DoubleValue (1.0),
-                   MakeDoubleAccessor (&SatStatsDelayHelper::SetMaxValue,
-                                       &SatStatsDelayHelper::GetMaxValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
-                   "(in seconds).",
-                   DoubleValue (0.02),
-                   MakeDoubleAccessor (&SatStatsDelayHelper::SetBinLength,
-                                       &SatStatsDelayHelper::GetBinLength),
-                   MakeDoubleChecker<double> ())
     .AddAttribute ("AveragingMode",
                    "If true, all samples will be averaged before passed to aggregator. "
                    "Only affects histogram, PDF, and CDF output types.",
@@ -112,51 +88,6 @@ SatStatsDelayHelper::GetTypeId ()
                    MakeBooleanChecker ())
   ;
   return tid;
-}
-
-
-void
-SatStatsDelayHelper::SetMinValue (double minValue)
-{
-  NS_LOG_FUNCTION (this << minValue);
-  m_minValue = minValue;
-}
-
-
-double
-SatStatsDelayHelper::GetMinValue () const
-{
-  return m_minValue;
-}
-
-
-void
-SatStatsDelayHelper::SetMaxValue (double maxValue)
-{
-  NS_LOG_FUNCTION (this << maxValue);
-  m_maxValue = maxValue;
-}
-
-
-double
-SatStatsDelayHelper::GetMaxValue () const
-{
-  return m_maxValue;
-}
-
-
-void
-SatStatsDelayHelper::SetBinLength (double binLength)
-{
-  NS_LOG_FUNCTION (this << binLength);
-  m_binLength = binLength;
-}
-
-
-double
-SatStatsDelayHelper::GetBinLength () const
-{
-  return m_binLength;
 }
 
 
@@ -254,9 +185,6 @@ SatStatsDelayHelper::DoInstall ()
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
               }
             m_averagingCollector->SetOutputType (outputType);
-            m_averagingCollector->SetMinValue (m_minValue);
-            m_averagingCollector->SetMaxValue (m_maxValue);
-            m_averagingCollector->SetBinLength (m_binLength);
             m_averagingCollector->SetName ("0");
             m_averagingCollector->TraceConnect ("Output", "0",
                                                 MakeCallback (&MultiFileAggregator::Write2d,
@@ -301,9 +229,6 @@ SatStatsDelayHelper::DoInstall ()
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
               }
             m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-            m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
-            m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
-            m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
             CreateCollectorPerIdentifier (m_terminalCollectors);
             m_terminalCollectors.ConnectToAggregator ("Output",
                                                       m_aggregator,
@@ -377,9 +302,6 @@ SatStatsDelayHelper::DoInstall ()
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
               }
             m_averagingCollector->SetOutputType (outputType);
-            m_averagingCollector->SetMinValue (m_minValue);
-            m_averagingCollector->SetMaxValue (m_maxValue);
-            m_averagingCollector->SetBinLength (m_binLength);
             m_averagingCollector->SetName ("0");
             m_averagingCollector->TraceConnect ("Output",
                                                 GetName (),
@@ -426,9 +348,6 @@ SatStatsDelayHelper::DoInstall ()
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
               }
             m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-            m_terminalCollectors.SetAttribute ("MinValue", DoubleValue (m_minValue));
-            m_terminalCollectors.SetAttribute ("MaxValue", DoubleValue (m_maxValue));
-            m_terminalCollectors.SetAttribute ("BinLength", DoubleValue (m_binLength));
             CreateCollectorPerIdentifier (m_terminalCollectors);
             for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
                  it != m_terminalCollectors.End (); ++it)

@@ -174,9 +174,6 @@ main (int argc, char *argv[])
       (*it)->AddApplication (ps);
     }
 
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (250.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (5.0));
-
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
   s->SetName ("cbr");
 

@@ -53,36 +53,6 @@ public:
   static TypeId GetTypeId ();
 
   /**
-   * \param minValue the MinValue attribute of the histogram, PDF, CDF output.
-   */
-  void SetMinValue (double minValue);
-
-  /**
-   * \return the MinValue attribute of the histogram, PDF, CDF output.
-   */
-  double GetMinValue () const;
-
-  /**
-   * \param maxValue the MaxValue attribute of the histogram, PDF, CDF output.
-   */
-  void SetMaxValue (double maxValue);
-
-  /**
-   * \return the MaxValue attribute of the histogram, PDF, CDF output.
-   */
-  double GetMaxValue () const;
-
-  /**
-   * \param binLength the BinLength attribute of the histogram, PDF, CDF output.
-   */
-  void SetBinLength (double binLength);
-
-  /**
-   * \return the BinLength attribute of the histogram, PDF, CDF output.
-   */
-  double GetBinLength () const;
-
-  /**
    * \brief Set up several probes or other means of listeners and connect them
    *        to the collectors.
    */
@@ -115,10 +85,6 @@ protected:
   Ptr<DataCollectionObject> m_aggregator;
 
 private:
-  double m_minValue;   ///< `MinValue` attribute.
-  double m_maxValue;   ///< `MaxValue` attribute.
-  double m_binLength;  ///< `BinLength` attribute.
-
   ///
   Callback<void, double> m_traceSinkCallback;
 

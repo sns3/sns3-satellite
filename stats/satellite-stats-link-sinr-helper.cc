@@ -52,9 +52,6 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsLinkSinrHelper);
 
 SatStatsLinkSinrHelper::SatStatsLinkSinrHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_minValue (0.0),
-    m_maxValue (0.0),
-    m_binLength (0.0),
     m_traceSinkCallback (MakeCallback (&SatStatsLinkSinrHelper::SinrCallback, this))
 {
   NS_LOG_FUNCTION (this << satHelper);
@@ -72,74 +69,8 @@ SatStatsLinkSinrHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsLinkSinrHelper")
     .SetParent<SatStatsHelper> ()
-    .AddAttribute ("MinValue",
-                   "Configure the MinValue attribute of the histogram, PDF, CDF output "
-                   "(in dB).",
-                   DoubleValue (-5.0),
-                   MakeDoubleAccessor (&SatStatsLinkSinrHelper::SetMinValue,
-                                       &SatStatsLinkSinrHelper::GetMinValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("MaxValue",
-                   "Configure the MaxValue attribute of the histogram, PDF, CDF output "
-                   "(in dB).",
-                   DoubleValue (20.0),
-                   MakeDoubleAccessor (&SatStatsLinkSinrHelper::SetMaxValue,
-                                       &SatStatsLinkSinrHelper::GetMaxValue),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BinLength",
-                   "Configure the BinLength attribute of the histogram, PDF, CDF output "
-                   "(in dB).",
-                   DoubleValue (0.5),
-                   MakeDoubleAccessor (&SatStatsLinkSinrHelper::SetBinLength,
-                                       &SatStatsLinkSinrHelper::GetBinLength),
-                   MakeDoubleChecker<double> ())
   ;
   return tid;
-}
-
-
-void
-SatStatsLinkSinrHelper::SetMinValue (double minValue)
-{
-  NS_LOG_FUNCTION (this << minValue);
-  m_minValue = minValue;
-}
-
-
-double
-SatStatsLinkSinrHelper::GetMinValue () const
-{
-  return m_minValue;
-}
-
-
-void
-SatStatsLinkSinrHelper::SetMaxValue (double maxValue)
-{
-  NS_LOG_FUNCTION (this << maxValue);
-  m_maxValue = maxValue;
-}
-
-
-double
-SatStatsLinkSinrHelper::GetMaxValue () const
-{
-  return m_maxValue;
-}
-
-
-void
-SatStatsLinkSinrHelper::SetBinLength (double binLength)
-{
-  NS_LOG_FUNCTION (this << binLength);
-  m_binLength = binLength;
-}
-
-
-double
-SatStatsLinkSinrHelper::GetBinLength () const
-{
-  return m_binLength;
 }
 
 
@@ -276,9 +207,6 @@ SatStatsLinkSinrHelper::DoInstall ()
           {
             collector->SetOutputType (DistributionCollector::OUTPUT_TYPE_CUMULATIVE);
           }
-        collector->SetMinValue (m_minValue);
-        collector->SetMaxValue (m_maxValue);
-        collector->SetBinLength (m_binLength);
         collector->TraceConnect ("Output", "0",
                                  MakeCallback (&MultiFileAggregator::Write2d,
                                                aggregator));
@@ -346,9 +274,6 @@ SatStatsLinkSinrHelper::DoInstall ()
           {
             collector->SetOutputType (DistributionCollector::OUTPUT_TYPE_CUMULATIVE);
           }
-        collector->SetMinValue (m_minValue);
-        collector->SetMaxValue (m_maxValue);
-        collector->SetBinLength (m_binLength);
         collector->TraceConnect ("Output", "0",
                                  MakeCallback (&GnuplotAggregator::Write2d,
                                                plotAggregator));
