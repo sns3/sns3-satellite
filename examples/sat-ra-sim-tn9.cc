@@ -42,7 +42,8 @@ main (int argc, char *argv[])
   double simLength (300.0); // in seconds
 
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-ra-input-attributes.xml"));
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/tn9-ra-input-attributes.xml";
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
