@@ -16,7 +16,7 @@ using namespace ns3;
 * \brief Simulation script to execute system tests for the forward link.
 *
 * To get help of the command line arguments for the example,
-* execute command -> ./waf --run "sat-dama-onoff-sim-tn9 --PrintHelp"
+* execute command -> ./waf --run "sat-fwd-sys-test --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-fwd-sys-test");
@@ -70,6 +70,9 @@ static void PrintBbFrameMergeInfo (Ptr<SatBbFrame> mergeTo, Ptr<SatBbFrame> merg
 int
 main (int argc, char *argv[])
 {
+  // Enable some logs.
+  LogComponentEnable ("sat-fwd-sys-test", LOG_INFO);
+
   // Spot-beam served by GW1
   uint32_t beamId = 26;
   uint32_t gwEndUsers = 10;
@@ -214,14 +217,7 @@ main (int argc, char *argv[])
       senderAppStartTime += MicroSeconds (20);
     }
 
-  // enable info logs on Apps
-    //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-    //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-
-  // Enable some logs.
-  LogComponentEnable ("sat-fwd-sys-test", LOG_INFO);
-
-  NS_LOG_INFO("--- sat-sys-test ---");
+  NS_LOG_INFO("--- sat-fwd-sys-test ---");
   NS_LOG_INFO("  Packet size: " << packetSize.Get ());
   NS_LOG_INFO("  Interval (CBR): " << interval.Get ().GetSeconds ());
   NS_LOG_INFO("  Data rate (OnOff): " << dataRate.Get ());

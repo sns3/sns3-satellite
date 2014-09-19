@@ -154,7 +154,7 @@ main (int argc, char *argv[])
   Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel> ();
 
   // print used parameters using log info
-  NS_LOG_INFO ("--- Satellite link budget ---");
+  NS_LOG_INFO ("--- satellite-link-budget-example ---");
   NS_LOG_INFO (" Beam ID: " << beamId);
   NS_LOG_INFO (" Geo position: " << geoMob->GetGeoPosition () << " " << geoMob->GetPosition () );
   NS_LOG_INFO (" GW position: " << gwMob->GetGeoPosition () << " " << gwMob->GetPosition () );

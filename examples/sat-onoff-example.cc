@@ -142,7 +142,7 @@ main (int argc, char *argv[])
     }
 
   // prompt info of the used parameters
-  NS_LOG_INFO("--- OnOff-example ---");
+  NS_LOG_INFO("--- sat-onoff-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  Sender: " << sender);
   NS_LOG_INFO("  PacketSize: " << packetSize);

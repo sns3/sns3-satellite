@@ -52,7 +52,7 @@ using namespace ns3;
 *         using CBR and On-Off may be configured by command line argument.
 */
 
-NS_LOG_COMPONENT_DEFINE ("MultiApplicationFwd-example");
+NS_LOG_COMPONENT_DEFINE ("sat-multi-application-fwd-example");
 
 int
 main (int argc, char *argv[])
@@ -60,7 +60,7 @@ main (int argc, char *argv[])
 //  LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
 //  LogComponentEnable ("CbrApplication", LOG_LEVEL_ALL);
 //  LogComponentEnable ("PacketSink", LOG_LEVEL_ALL);
-  LogComponentEnable ("MultiApplicationFwd-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-multi-application-fwd-example", LOG_LEVEL_INFO);
 //  LogComponentEnable ("KpiHelper", LOG_LEVEL_INFO);
 //  LogComponentEnable ("CbrKpiHelper", LOG_LEVEL_INFO);
 //  LogComponentEnable ("OnOffKpiHelper", LOG_LEVEL_INFO);
@@ -275,8 +275,12 @@ main (int argc, char *argv[])
   //---- Stop OnOff application definitions
 
   // prompt info of the used parameters
-  NS_LOG_INFO("--- sat-multi-application-example ---");
-  NS_LOG_INFO("  Scenario used: " << scenarioName);
+  NS_LOG_INFO("--- sat-multi-application-fwd-example ---");
+  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO("  Packet sending interval: " << interval);
+  NS_LOG_INFO("  Simulation length: " << simLength);
+  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO("  ");
 
   Simulator::Stop (Seconds (simLength));

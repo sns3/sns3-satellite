@@ -12,9 +12,9 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  An example to test ARQ functionality
+* \brief  An example to test FWD link ARQ functionality
 *
-*         execute command -> ./waf --run "sat-arq-example --PrintHelp"
+*         execute command -> ./waf --run "sat-arq-fwd-example --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-arq-fwd-example");
@@ -30,6 +30,11 @@ main (int argc, char *argv[])
   Time interval (Seconds(0.3));
   Time simLength (Seconds(100.0));
   Time appStartTime = Seconds(0.1);
+
+  // enable info logs
+  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  //LogComponentEnable ("sat-arq-fwd-example", LOG_LEVEL_INFO);
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -69,11 +74,6 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   helper->EnablePacketTrace ();
-
-  // enable info logs
-  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  //LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
@@ -131,7 +131,7 @@ main (int argc, char *argv[])
   //---- Stop CBR application definitions
 
 
-  NS_LOG_INFO("--- Cbr-user-defined-example ---");
+  NS_LOG_INFO("--- sat-arq-fwd-example ---");
   NS_LOG_INFO("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());

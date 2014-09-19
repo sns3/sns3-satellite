@@ -24,6 +24,8 @@ NS_LOG_COMPONENT_DEFINE ("sat-dama-verification-sim");
 int
 main (int argc, char *argv[])
 {
+  // LogComponentEnable ("sat-dama-verification-sim", LOG_LEVEL_INFO);
+
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
@@ -31,14 +33,13 @@ main (int argc, char *argv[])
 
   // CBR
   uint32_t packetSize (1280); // in bytes
-  double intervalSeconds = 0.01;
+  double intervalSeconds = 0.005;
 
   double simLength (50.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/tn9-dama-input-attributes.xml";
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
@@ -50,13 +51,12 @@ main (int argc, char *argv[])
   cmd.AddValue ("packetSize", "Packet size in bytes", packetSize);
   cmd.Parse (argc, argv);
 
-  // 10 ms -> 100 packets per second
-  // 125 B -> 100 kbps
-  // 250 B -> 200 kbps
-  // 500 B -> 400 kbps
-  // 750 B -> 600 kbps
-  // 1000 B -> 800 kbps
-  // 1250 B -> 1000 kbps
+  // 5 ms -> 200 packets per second
+  // 250 B -> 400 kbps
+  // 500 B -> 800 kbps
+  // 750 B -> 1200 kbps
+  // 1000 B -> 1600 kbps
+  // 1250 B -> 2000 kbps
 
   // RBDC + periodical control slots
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -66,7 +66,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (Seconds (1)));
 
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_MARKOV));
@@ -135,6 +135,12 @@ main (int argc, char *argv[])
   /**
    * Set-up statistics
    */
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (1500.0));
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (1.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (5.0));
+  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -147,7 +153,7 @@ main (int argc, char *argv[])
   s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
 
-  NS_LOG_INFO("--- sat-dama-sim-tn9 ---");
+  NS_LOG_INFO("--- sat-dama-verification-sim ---");
   NS_LOG_INFO("  Packet size: " << packetSize);
   NS_LOG_INFO("  Simulation length: " << simLength);
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);

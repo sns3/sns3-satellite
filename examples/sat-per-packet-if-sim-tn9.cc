@@ -85,7 +85,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   // NCC configuration
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
   // RBDC

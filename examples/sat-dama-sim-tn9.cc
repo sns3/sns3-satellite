@@ -24,6 +24,8 @@ NS_LOG_COMPONENT_DEFINE ("sat-dama-sim-tn9");
 int
 main (int argc, char *argv[])
 {
+  // LogComponentEnable ("sat-dama-sim-tn9", LOG_LEVEL_INFO);
+
   // Spot-beam over Finland
   uint32_t beamId = 18;
   uint32_t endUsersPerUt (1);
@@ -103,19 +105,19 @@ main (int argc, char *argv[])
   {
     case 0:
       {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 0"));
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_0"));
         Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
         break;
       }
     case 1:
       {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 1"));
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_1"));
         Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
         break;
       }
     case 2:
       {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
         Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
         break;
       }

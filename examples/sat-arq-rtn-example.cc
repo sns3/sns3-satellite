@@ -12,12 +12,12 @@ using namespace ns3;
 /**
 * \ingroup satellite
 *
-* \brief  An example to test ARQ functionality
+* \brief  An example to test RTN link ARQ functionality
 *
-*         execute command -> ./waf --run "sat-arq-example --PrintHelp"
+*         execute command -> ./waf --run "sat-arq-rtn-example --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-arq-example");
+NS_LOG_COMPONENT_DEFINE ("sat-arq-rtn-example");
 
 
 int
@@ -30,6 +30,11 @@ main (int argc, char *argv[])
   Time interval (Seconds(0.3));
   Time simLength (Seconds(100.0));
   Time appStartTime = Seconds(0.1);
+
+  // enable info logs
+  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  //LogComponentEnable ("sat-arq-rtn-example", LOG_LEVEL_INFO);
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -80,11 +85,6 @@ main (int argc, char *argv[])
 
   helper->EnablePacketTrace ();
 
-  // enable info logs
-  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  //LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
-
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
@@ -131,7 +131,7 @@ main (int argc, char *argv[])
   utApps.Start (appStartTime);
   utApps.Stop (simLength);
 
-  NS_LOG_INFO("--- Cbr-user-defined-example ---");
+  NS_LOG_INFO("--- sat-arq-rtn-example ---");
   NS_LOG_INFO("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());

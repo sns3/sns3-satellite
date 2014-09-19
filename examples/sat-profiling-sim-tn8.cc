@@ -57,7 +57,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("profilingConf", "Profiling configuration", profilingConf);
   cmd.Parse (argc, argv);
 
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("Config type 2"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));

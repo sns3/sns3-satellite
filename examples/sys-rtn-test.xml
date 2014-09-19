@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns3>
  <default name="ns3::SatSuperframeConf0::FrameCount" value="4"/>
- <default name="ns3::SatSuperframeConf0::FrameConfigType" value="Config type 2"/>
+ <default name="ns3::SatSuperframeConf0::FrameConfigType" value="ConfigType_2"/>
  <default name="ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz" value="2.5e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz" value="0.3125e+06"/>
  <default name="ns3::SatSuperframeConf0::Frame0_CarrierRollOff" value="0.2"/>
@@ -53,7 +53,7 @@
  <default name="ns3::SatSuperframeConf0::Frame9_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf0::Frame9_RandomAccessFrame" value="false"/>
  <default name="ns3::SatSuperframeConf1::FrameCount" value="3"/>
- <default name="ns3::SatSuperframeConf1::FrameConfigType" value="Config type 1"/>
+ <default name="ns3::SatSuperframeConf1::FrameConfigType" value="ConfigType_1"/>
  <default name="ns3::SatSuperframeConf1::Frame0_AllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf1::Frame0_CarrierAllocatedBandwidthHz" value="125000"/>
  <default name="ns3::SatSuperframeConf1::Frame0_CarrierRollOff" value="0.2"/>
@@ -105,7 +105,7 @@
  <default name="ns3::SatSuperframeConf1::Frame9_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf1::Frame9_RandomAccessFrame" value="false"/>
  <default name="ns3::SatSuperframeConf2::FrameCount" value="2"/>
- <default name="ns3::SatSuperframeConf2::FrameConfigType" value="Config type 2"/>
+ <default name="ns3::SatSuperframeConf2::FrameConfigType" value="ConfigType_2"/>
  <default name="ns3::SatSuperframeConf2::Frame0_AllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf2::Frame0_CarrierAllocatedBandwidthHz" value="125000"/>
  <default name="ns3::SatSuperframeConf2::Frame0_CarrierRollOff" value="0.2"/>
@@ -157,7 +157,7 @@
  <default name="ns3::SatSuperframeConf2::Frame9_CarrierSpacing" value="0.3"/>
  <default name="ns3::SatSuperframeConf2::Frame9_RandomAccessFrame" value="false"/>
  <default name="ns3::SatSuperframeConf3::FrameCount" value="10"/>
- <default name="ns3::SatSuperframeConf3::FrameConfigType" value="Config type 2"/>
+ <default name="ns3::SatSuperframeConf3::FrameConfigType" value="ConfigType_2"/>
  <default name="ns3::SatSuperframeConf3::Frame0_AllocatedBandwidthHz" value="1.25e+06"/>
  <default name="ns3::SatSuperframeConf3::Frame0_CarrierAllocatedBandwidthHz" value="1250000"/>
  <default name="ns3::SatSuperframeConf3::Frame0_CarrierRollOff" value="0.2"/>

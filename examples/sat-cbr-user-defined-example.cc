@@ -22,7 +22,7 @@ using namespace ns3;
 *         End user may change the number of UTs and end users from
 *         the command line.
 *
-*         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
+*         execute command -> ./waf --run "sat-cbr-user-defined-example --PrintHelp"
 */
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-user-defined-example");
@@ -49,6 +49,11 @@ static void CrTraceCb (Time now, Mac48Address addr, Ptr<SatCrMessage> crMsg)
 int
 main (int argc, char *argv[])
 {
+  // enable info logs
+  // LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  // LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  // LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
+
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (3);
   uint32_t utsPerBeam (3);
@@ -85,11 +90,6 @@ main (int argc, char *argv[])
 
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/CrTrace",
                                  MakeCallback (&CrTraceCb));
-
-  // enable info logs
-  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
-  //LogComponentEnable ("sat-cbr-user-defined-example", LOG_LEVEL_INFO);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();
@@ -137,7 +137,7 @@ main (int argc, char *argv[])
   utApps.Start (appStartTime);
   utApps.Stop (simLength);
 
-  NS_LOG_INFO("--- Cbr-user-defined-example ---");
+  NS_LOG_INFO("--- sat-cbr-user-defined-example ---");
   NS_LOG_INFO("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());

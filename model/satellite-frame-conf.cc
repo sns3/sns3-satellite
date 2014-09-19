@@ -867,9 +867,9 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                   EnumValue (configType), \
                   MakeEnumAccessor ( &SatSuperframeConf::SetConfigType, \
                                      &SatSuperframeConf::GetConfigType), \
-                  MakeEnumChecker ( SatSuperframeConf::CONFIG_TYPE_0, "Config type 0", \
-                                    SatSuperframeConf::CONFIG_TYPE_1, "Config type 1", \
-                                    SatSuperframeConf::CONFIG_TYPE_2, "Config type 2"))
+                  MakeEnumChecker ( SatSuperframeConf::CONFIG_TYPE_0, "ConfigType_0", \
+                                    SatSuperframeConf::CONFIG_TYPE_1, "ConfigType_1", \
+                                    SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2"))
 
 
 uint8_t

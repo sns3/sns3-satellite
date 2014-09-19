@@ -32,14 +32,23 @@
 
 using namespace ns3;
 
+/**
+* \ingroup satellite
+*
+* \brief  An example to run CBR application in full satellite scenario and FWD link.
+*
+*         execute command -> ./waf --run "sat-cbr-full-example --PrintHelp"
+*/
+
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-full-example");
 
 int
 main (int argc, char *argv[])
 {
-//  LogComponentEnable ("CbrKpiHelper", LOG_LEVEL_ALL);
-//  LogComponentEnable ("CbrApplication", LOG_LEVEL_ALL);
-//  LogComponentEnable ("PacketSink", LOG_LEVEL_ALL);
+  // LogComponentEnable ("CbrKpiHelper", LOG_LEVEL_ALL);
+  // LogComponentEnable ("CbrApplication", LOG_LEVEL_ALL);
+  // LogComponentEnable ("PacketSink", LOG_LEVEL_ALL);
+  // LogComponentEnable ("sat-arq-rtn-example", LOG_LEVEL_INFO);
 
   uint32_t endUsersPerUt (3);
   uint32_t utsPerBeam (3);
@@ -125,6 +134,14 @@ main (int argc, char *argv[])
 
   utApps.Start (appStartTime);
   utApps.Stop (Seconds (simLength));
+
+  NS_LOG_INFO("--- sat-cbr-full-example ---");
+  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO("  Packet sending interval: " << interval);
+  NS_LOG_INFO("  Simulation length: " << simLength);
+  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO("  ");
 
   Simulator::Stop (Seconds (simLength));
   Simulator::Run ();

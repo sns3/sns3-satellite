@@ -98,7 +98,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   // NCC configuration
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("Config type 2"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
   // Rain fading
@@ -204,7 +204,7 @@ main (int argc, char *argv[])
   const std::string protocol = "ns3::UdpSocketFactory";
 
   /**
-   * Set-up CBR traffic
+   * Set-up on-off traffic
    */
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 

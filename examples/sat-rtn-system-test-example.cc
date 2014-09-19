@@ -17,10 +17,10 @@ using namespace ns3;
 * satellite system tests.
 *
 * To get help of the command line arguments for the example,
-* execute command -> ./waf --run "sat-rtn-system-test --PrintHelp"
+* execute command -> ./waf --run "sat-rtn-system-test-example --PrintHelp"
 */
 
-NS_LOG_COMPONENT_DEFINE ("sat-rtn-sys-test");
+NS_LOG_COMPONENT_DEFINE ("sat-rtn-sys-test-example");
 
 
 // Callback called when RBDC CR has been sent by request manager
