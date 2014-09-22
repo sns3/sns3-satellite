@@ -5,20 +5,21 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/traffic-module.h"
-#include "ns3/config-store.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to run example simulation results with HTTP traffic
-* model. Currently only one beam is simulated with one user and
-* and DAMA configuration.
-*
-* execute command -> ./waf --run "sat-dama-http-sim-tn9 --PrintHelp"
-*/
+ * \file sat-dama-http-sim-tn9.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to run example simulation results with HTTP traffic
+ * model. Currently only one beam is simulated with one user and
+ * and DAMA configuration.
+ *
+ * execute command -> ./waf --run "sat-dama-http-sim-tn9 --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-dama-http-sim-tn9");
 

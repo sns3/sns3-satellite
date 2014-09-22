@@ -1,9 +1,8 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'flow-monitor'])
+    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'traffic', 'flow-monitor'])
     module.source = [
-        'model/cbr-application.cc',
         'model/geo-coordinate.cc',
         'model/satellite-address-tag.cc',
         'model/satellite-antenna-gain-pattern.cc',
@@ -119,7 +118,6 @@ def build(bld):
         'utils/satellite-output-fstream-long-double-container.cc',
         'utils/satellite-output-fstream-string-container.cc',
         'utils/satellite-output-fstream-wrapper.cc',
-        'helper/cbr-helper.cc',
         'helper/cbr-kpi-helper.cc',
         'helper/kpi-helper.cc',
         'helper/onoff-kpi-helper.cc',
@@ -156,10 +154,6 @@ def build(bld):
 
     module_test = bld.create_ns3_module_test_library('satellite')
     module_test.source = [
-        'test/cbr-test.cc',
-        'test/geo-coordinate-test.cc',
-        'test/link-results-test.cc',
-        'test/performance-memory-test.cc',
         'test/satellite-antenna-pattern-test.cc',
         'test/satellite-arq-test.cc',
         'test/satellite-arq-seqno-test.cc',
@@ -170,15 +164,18 @@ def build(bld):
         'test/satellite-fading-external-input-trace-test.cc',
         'test/satellite-frame-allocator-test.cc',
         'test/satellite-fsl-test.cc',
+        'test/satellite-geo-coordinate-test.cc',
         'test/satellite-gse-test.cc',
         'test/satellite-interference-test.cc',
+        'test/satellite-link-results-test.cc',
         'test/satellite-mobility-test.cc',
         'test/satellite-mobility-observer-test.cc',
+        'test/satellite-per-packet-if-test.cc',
+        'test/satellite-performance-memory-test.cc',
+        'test/satellite-periodic-control-message-test.cc',
         'test/satellite-random-access-test.cc',
         'test/satellite-request-manager-test.cc',
         'test/satellite-rle-test.cc',
-        'test/satellite-per-packet-if-test.cc',
-        'test/satellite-periodic-control-message-test.cc',
         'test/satellite-scenario-creation.cc',
         'test/satellite-simple-unicast.cc',
         'test/satellite-waveform-conf-test.cc',
@@ -187,7 +184,6 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'satellite'
     headers.source = [
-        'model/cbr-application.h',
         'model/geo-coordinate.h',
         'model/satellite-address-tag.h',
         'model/satellite-antenna-gain-pattern.h',
@@ -307,7 +303,6 @@ def build(bld):
         'utils/satellite-output-fstream-long-double-container.h',
         'utils/satellite-output-fstream-string-container.h',
         'utils/satellite-output-fstream-wrapper.h',
-        'helper/cbr-helper.h',
         'helper/cbr-kpi-helper.h',
         'helper/kpi-helper.h',
         'helper/onoff-kpi-helper.h',

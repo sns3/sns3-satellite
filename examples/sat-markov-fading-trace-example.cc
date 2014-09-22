@@ -1,34 +1,32 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/satellite-module.h"
-#include "ns3/applications-module.h"
-#include <ns3/gnuplot.h>
 #include <fstream>
 #include <vector>
+#include "ns3/core-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/gnuplot.h"
 
 NS_LOG_COMPONENT_DEFINE ("sat-markov-trace-example");
 
 namespace ns3 {
 
 /**
-* \ingroup satellite
-*
-* \brief Example for Markov fading calculations. Can be used to produce simple fading traces.
-*
-* This example can be run as it is, without any argument, i.e.:
-*
-*     ./waf --run="src/satellite/examples/markov-trace-example"
-*
-* Gnuplot file (markov_fading_trace.plt) will be generated as output. This
-* file can be converted to a PNG file, for example by this command:
-*
-*     gnuplot markov_fading_trace.plt
-*
-* which will produce `markov_fading_trace.png` file in the same directory.
-*/
+ * \file sat-markov-fading-trace-example.cc
+ * \ingroup satellite
+ *
+ * \brief Example for Markov fading calculations. Can be used to produce simple fading traces.
+ *
+ * This example can be run as it is, without any argument, i.e.:
+ *
+ *     ./waf --run="src/satellite/examples/markov-trace-example"
+ *
+ * Gnuplot file (markov_fading_trace.plt) will be generated as output. This
+ * file can be converted to a PNG file, for example by this command:
+ *
+ *     gnuplot markov_fading_trace.plt
+ *
+ * which will produce `markov_fading_trace.png` file in the same directory.
+ */
 
 class SatMarkovFadingExamplePlot : public Object
 {

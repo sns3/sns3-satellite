@@ -19,7 +19,7 @@
  */
 
 /**
- * \file performance-memory.cc
+ * \file satellite-performance-memory-test.cc
  * \ingroup satellite
  * \brief 'Performance and Memory Consumption Test Cases' implementation of TN4.
  *
@@ -36,8 +36,8 @@
 #include "ns3/simulator.h"
 #include "ns3/config.h"
 #include "ns3/enum.h"
-#include "../model/cbr-application.h"
-#include "../helper/cbr-helper.h"
+#include "ns3/cbr-application.h"
+#include "ns3/cbr-helper.h"
 #include "../helper/satellite-helper.h"
 
 using namespace ns3;

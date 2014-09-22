@@ -23,7 +23,7 @@
 namespace ns3 {
 
 /*
- * There are 5 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
+ * There are 4 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
  * SatDevTimeTag, and SatAppTimeTag. Except of the name difference, they share
  * exactly the same definitions.
  */
@@ -307,77 +307,6 @@ SatDevTimeTag::GetSenderTimestamp (void) const
 
 void
 SatDevTimeTag::SetSenderTimestamp (Time senderTimestamp)
-{
-  this->m_senderTimestamp = senderTimestamp;
-}
-
-
-// APP ////////////////////////////////////////////////////////////////////////
-
-NS_OBJECT_ENSURE_REGISTERED (SatAppTimeTag);
-
-SatAppTimeTag::SatAppTimeTag ()
-  : m_senderTimestamp (Seconds (0))
-{
-  // Nothing to do here
-}
-
-SatAppTimeTag::SatAppTimeTag (Time senderTimestamp)
-  : m_senderTimestamp (senderTimestamp)
-{
-  // Nothing to do here
-}
-
-TypeId
-SatAppTimeTag::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatAppTimeTag")
-    .SetParent<Tag> ()
-    .AddConstructor<SatAppTimeTag> ();
-  return tid;
-}
-
-TypeId
-SatAppTimeTag::GetInstanceTypeId (void) const
-{
-  return GetTypeId ();
-}
-
-uint32_t
-SatAppTimeTag::GetSerializedSize (void) const
-{
-  return sizeof(Time);
-}
-
-void
-SatAppTimeTag::Serialize (TagBuffer i) const
-{
-  int64_t senderTimestamp = m_senderTimestamp.GetNanoSeconds ();
-  i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
-}
-
-void
-SatAppTimeTag::Deserialize (TagBuffer i)
-{
-  int64_t senderTimestamp;
-  i.Read ((uint8_t *)&senderTimestamp, 8);
-  m_senderTimestamp = NanoSeconds (senderTimestamp);
-}
-
-void
-SatAppTimeTag::Print (std::ostream &os) const
-{
-  os << m_senderTimestamp;
-}
-
-Time
-SatAppTimeTag::GetSenderTimestamp (void) const
-{
-  return m_senderTimestamp;
-}
-
-void
-SatAppTimeTag::SetSenderTimestamp (Time senderTimestamp)
 {
   this->m_senderTimestamp = senderTimestamp;
 }

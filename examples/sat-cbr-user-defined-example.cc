@@ -5,25 +5,26 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  Another example of CBR application usage in satellite network.
-*         The scripts is using user defined scenario, which means that user
-*         can change the scenario size quite to be whatever between 1 and
-*         full scenario (72 beams). Currently it is configured to using only
-*         one beam. CBR application is sending packets in RTN link, i.e. from UT
-*         side to GW side. Packet trace and KpiHelper are enabled by default.
-*         End user may change the number of UTs and end users from
-*         the command line.
-*
-*         execute command -> ./waf --run "sat-cbr-user-defined-example --PrintHelp"
-*/
+ * \file sat-cbr-user-defined-example.cc
+ * \ingroup satellite
+ *
+ * \brief  Another example of CBR application usage in satellite network.
+ *         The scripts is using user defined scenario, which means that user
+ *         can change the scenario size quite to be whatever between 1 and
+ *         full scenario (72 beams). Currently it is configured to using only
+ *         one beam. CBR application is sending packets in RTN link, i.e. from UT
+ *         side to GW side. Packet trace and KpiHelper are enabled by default.
+ *         End user may change the number of UTs and end users from
+ *         the command line.
+ *
+ *         execute command -> ./waf --run "sat-cbr-user-defined-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-user-defined-example");
 

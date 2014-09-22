@@ -5,19 +5,20 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/config-store.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to run example simulation results related to per-packet
-* interference performance.
-*
-* execute command -> ./waf --run "sat-per-packet-if-sim-tn9 --PrintHelp"
-*/
+ * \file sat-per-packet-if-sim-tn9.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to run example simulation results related to per-packet
+ * interference performance.
+ *
+ * execute command -> ./waf --run "sat-per-packet-if-sim-tn9 --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-per-packet-if-sim-tn9");
 

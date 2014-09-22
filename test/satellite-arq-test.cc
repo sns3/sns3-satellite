@@ -19,8 +19,8 @@
  */
 
 /**
- * \ingroup satellite
  * \file satellite-arq-test.cc
+ * \ingroup satellite
  * \brief Automatic Repeat reQuest test suite. Test suite holds two test cases:
  * - RTN link ARQ
  * - FWD link ARQ
@@ -52,7 +52,8 @@
 using namespace ns3;
 
 /**
- * RTN link ARQ test case
+ * \ingroup satellite
+ * \brief RTN link ARQ test case
  */
 
 class SatRtnArqTestCase : public TestCase
@@ -344,10 +345,9 @@ void SatRtnArqTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Addres
 }
 
 /**
- * FWD link ARQ test case
+ * \ingroup satellite
+ * \brief FWD link ARQ test case
  */
-
-
 class SatFwdArqTestCase : public TestCase
 {
 public:
@@ -656,6 +656,7 @@ void SatFwdArqTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Addres
 }
 
 /**
+ * \ingroup satellite
  * \brief Test suite for ARQ.
  */
 class SatArqTestSuite : public TestSuite

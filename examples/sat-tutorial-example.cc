@@ -6,20 +6,21 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  Tutorial example application guides how to build up different scenarios of satellite network.
-*         It also guides how to configure the satellite network e.g. modifying attributes.
-*         Interval, packet size and test scenario can be given
-*         in command line as user argument.
-*         To see help for user arguments:
-*         execute command -> ./waf --run "sat-tutorial-example --PrintHelp"
-*/
+ * \file sat-tutorial-example.cc
+ * \ingroup satellite
+ *
+ * \brief  Tutorial example application guides how to build up different scenarios of satellite network.
+ *         It also guides how to configure the satellite network e.g. modifying attributes.
+ *         Interval, packet size and test scenario can be given
+ *         in command line as user argument.
+ *         To see help for user arguments:
+ *         execute command -> ./waf --run "sat-tutorial-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-tutorial-example");
 

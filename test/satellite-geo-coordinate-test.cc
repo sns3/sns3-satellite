@@ -19,7 +19,7 @@
  */
 
 /**
- * \file geo-coordinate-test.cc
+ * \file satellite-geo-coordinate-test.cc
  * \ingroup satellite
  * \brief Test cases to unit test GeoCoordinate class.
  *

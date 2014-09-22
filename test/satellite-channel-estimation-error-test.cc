@@ -19,9 +19,9 @@
  */
 
 /**
+ * \file satellite-channel-estimation-error-test.cc
  * \ingroup satellite
- * \file satellite-waveform-conf-test.cc
- * \brief Waveform conf test suite
+ * \brief Channel estimation error test suite
  */
 
 #include "ns3/log.h"
@@ -38,7 +38,7 @@ using namespace ns3;
 
 /**
  * \ingroup satellite
- * \brief Test case to unit test
+ * \brief Test case for FWD link channel estimation error
  */
 
 class SatFwdChannelEstimationErrorTestCase : public TestCase
@@ -75,7 +75,10 @@ SatFwdChannelEstimationErrorTestCase::DoRun (void)
     }
 }
 
-
+/**
+ * \ingroup satellite
+ * \brief Test case for RTN link channel estimation error
+ */
 class SatRtnChannelEstimationErrorTestCase : public TestCase
 {
 public:
@@ -114,7 +117,8 @@ SatRtnChannelEstimationErrorTestCase::DoRun (void)
 }
 
 /**
- * \brief Test suite for Satellite free space loss unit test cases.
+ * \ingroup satellite
+ * \brief Test suite for satellite channel estimation error
  */
 class SatChannelEstimationErrorTestSuite : public TestSuite
 {

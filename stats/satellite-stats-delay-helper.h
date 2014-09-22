@@ -175,7 +175,7 @@ public:
    * \brief Receive inputs from trace sources and determine the right collector
    *        to forward the inputs to.
    * \param packet the received packet, expected to have been tagged with
-   *               SatAppTimeTag.
+   *               TrafficTimeTag.
    * \param from the InetSocketAddress of the sender of the packet.
    */
   static void RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
@@ -355,7 +355,7 @@ public:
    * \brief Receive inputs from trace sources and determine the right collector
    *        to forward the inputs to.
    * \param packet the received packet, expected to have been tagged with
-   *               SatAppTimeTag.
+   *               TrafficTimeTag.
    * \param from the InetSocketAddress of the sender of the packet.
    */
   void RxCallback (Ptr<const Packet> packet, const Address &from);

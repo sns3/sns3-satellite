@@ -5,24 +5,24 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/on-off-helper.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  OnOff example application to use satellite network.
-*         Data rate, packet size, sender(s), on/off times, test scenario and
-*         creation log file name can be given in command line as user argument.
-*         To see help for user arguments:
-*         execute command -> ./waf --run "on-off-example --PrintHelp"
-*
-*         On-Off application send packets from GW connected user
-*         to UT connected user and after that from UT connected user to GW connected
-*         user according to given parameters.
-*/
+ * \file sat-onoff-example.cc
+ * \ingroup satellite
+ *
+ * \brief  OnOff example application to use satellite network.
+ *         Data rate, packet size, sender(s), on/off times, test scenario and
+ *         creation log file name can be given in command line as user argument.
+ *         To see help for user arguments:
+ *         execute command -> ./waf --run "on-off-example --PrintHelp"
+ *
+ *         On-Off application send packets from GW connected user
+ *         to UT connected user and after that from UT connected user to GW connected
+ *         user according to given parameters.
+ */
 
 NS_LOG_COMPONENT_DEFINE ("OnOff-example");
 

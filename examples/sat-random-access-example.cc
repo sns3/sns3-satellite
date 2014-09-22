@@ -5,33 +5,35 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  This is an example of Random Access usage in satellite network. This
-*         example uses RA models based on DVB-RCS2 specification. CRA
-*         is disabled in this example. The example allows to set various
-*         RA parameters such as the maximum rate limitation related
-*         parameters, back off and load control related parameters.
-*
-*         By default, the RA dynamic load control is disabled in this
-*         example. As defined in specification, the operation mode between
-*         Slotted ALOHA and CRDSA is determined by the number of instances
-*         parameter.
-*
-*         The script is using CBR application in user defined scenario,
-*         which means that user can change the scenario size quite to be
-*         whatever between 1 and full scenario (72 beams). Currently it
-*         is configured to using only one beam. CBR application is sending
-*         packets in RTN link, i.e. from UT side to GW side. Packet trace
-*         and KpiHelper are enabled by default. End user may change the
-*         number of UTs and end users from the command line.
-*
-*         execute command -> ./waf --run "sat-random-access-example --PrintHelp"
-*/
+ * \file sat-random-access-example.cc
+ * \ingroup satellite
+ *
+ * \brief  This is an example of Random Access usage in satellite network. This
+ *         example uses RA models based on DVB-RCS2 specification. CRA
+ *         is disabled in this example. The example allows to set various
+ *         RA parameters such as the maximum rate limitation related
+ *         parameters, back off and load control related parameters.
+ *
+ *         By default, the RA dynamic load control is disabled in this
+ *         example. As defined in specification, the operation mode between
+ *         Slotted ALOHA and CRDSA is determined by the number of instances
+ *         parameter.
+ *
+ *         The script is using CBR application in user defined scenario,
+ *         which means that user can change the scenario size quite to be
+ *         whatever between 1 and full scenario (72 beams). Currently it
+ *         is configured to using only one beam. CBR application is sending
+ *         packets in RTN link, i.e. from UT side to GW side. Packet trace
+ *         and KpiHelper are enabled by default. End user may change the
+ *         number of UTs and end users from the command line.
+ *
+ *         execute command -> ./waf --run "sat-random-access-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-random-access-example");
 

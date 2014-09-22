@@ -1,20 +1,18 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
-#include "ns3/applications-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Example for Rayleigh fader class. Demonstrates the functionality
-* of the Rayleigh fader used by the Markov-fading. The example creates
-* a single Rayleigh fader and outputs the fading values in time.
-*/
+ * \file sat-rayleigh-example.cc
+ * \ingroup satellite
+ *
+ * \brief Example for Rayleigh fader class. Demonstrates the functionality
+ * of the Rayleigh fader used by the Markov-fading. The example creates
+ * a single Rayleigh fader and outputs the fading values in time.
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-rayleigh-example");
 

@@ -5,11 +5,12 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
+ * \file sat-trace-input-interference-example.cc
  * \ingroup satellite
  *
  * \brief  Trace input interference example application based on CBR example for satellite network.

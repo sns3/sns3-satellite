@@ -34,6 +34,8 @@
 using namespace ns3;
 
 /**
+ * \file satellite-arq-seqno-test.cc
+ * \ingroup satellite
  * \brief ARQ sequence number handler test
  */
 class SatSeqNoTestCase : public TestCase
@@ -89,6 +91,7 @@ SatSeqNoTestCase::DoRun (void)
 }
 
 /**
+ * \ingroup satellite
  * \brief Test suite for RLE.
  */
 class SatArqSeqNoTraceSuite : public TestSuite

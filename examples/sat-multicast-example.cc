@@ -5,20 +5,21 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  Multicast example application to test multicasting in satellite network.
-*         Test scenario (larger of full), pre-defined multicast for larger scenario
-*         can be given in command line as user argument.
-*
-*         To see help and more info for user arguments:
-*         execute command -> ./waf --run "sat-multicast-example --PrintHelp"
-*/
+ * \file sat-multicast-example.cc
+ * \ingroup satellite
+ *
+ * \brief  Multicast example application to test multicasting in satellite network.
+ *         Test scenario (larger of full), pre-defined multicast for larger scenario
+ *         can be given in command line as user argument.
+ *
+ *         To see help and more info for user arguments:
+ *         execute command -> ./waf --run "sat-multicast-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-multicast-example");
 

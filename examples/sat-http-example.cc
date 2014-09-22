@@ -19,16 +19,17 @@
  *
  */
 
-#include <ns3/core-module.h>
-#include <ns3/network-module.h>
-#include <ns3/internet-module.h>
-#include <ns3/satellite-module.h>
-#include <ns3/traffic-module.h>
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 
 /**
+ * \file sat-http-example.cc
  * \ingroup satellite
  * \brief Example of using HTTP traffic model in a satellite network.
  *

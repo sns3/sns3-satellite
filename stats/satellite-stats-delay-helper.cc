@@ -49,6 +49,7 @@
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/gnuplot-aggregator.h>
+#include <ns3/traffic-time-tag.h>
 
 #include <sstream>
 #include "satellite-stats-delay-helper.h"
@@ -710,12 +711,12 @@ SatStatsFwdAppDelayHelper::RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
   //    {
   //      ByteTagIterator::Item item = it.Next ();
   //
-  //      if (item.GetTypeId () == SatAppTimeTag::GetTypeId ())
+  //      if (item.GetTypeId () == TrafficTimeTag::GetTypeId ())
   //        {
-  //          NS_LOG_DEBUG ("Contains a SatAppTimeTag tag:"
+  //          NS_LOG_DEBUG ("Contains a TrafficTimeTag tag:"
   //                        << " start=" << item.GetStart ()
   //                        << " end=" << item.GetEnd ());
-  //          SatAppTimeTag timeTag;
+  //          TrafficTimeTag timeTag;
   //          item.GetTag (timeTag);
   //          const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
   //          helper->PassSampleToCollector (delay, identifier);
@@ -727,13 +728,13 @@ SatStatsFwdAppDelayHelper::RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
   //    {
   //      NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
   //                   << " from statistics collection"
-  //                   << " because it does not contain any SatAppTimeTag");
+  //                   << " because it does not contain any TrafficTimeTag");
   //    }
 
-  SatAppTimeTag timeTag;
+  TrafficTimeTag timeTag;
   if (packet->PeekPacketTag (timeTag))
     {
-      NS_LOG_DEBUG ("Contains a SatAppTimeTag tag");
+      NS_LOG_DEBUG ("Contains a TrafficTimeTag tag");
       const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
       helper->PassSampleToCollector (delay, identifier);
     }
@@ -741,7 +742,7 @@ SatStatsFwdAppDelayHelper::RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
     {
       NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
                    << " from statistics collection"
-                   << " because it does not contain any SatAppTimeTag");
+                   << " because it does not contain any TrafficTimeTag");
     }
 }
 
@@ -1143,12 +1144,12 @@ SatStatsRtnAppDelayHelper::RxCallback (Ptr<const Packet> packet,
   //    {
   //      ByteTagIterator::Item item = it.Next ();
   //
-  //      if (item.GetTypeId () == SatAppTimeTag::GetTypeId ())
+  //      if (item.GetTypeId () == TrafficTimeTag::GetTypeId ())
   //        {
-  //          NS_LOG_DEBUG ("Contains a SatAppTimeTag tag:"
+  //          NS_LOG_DEBUG ("Contains a TrafficTimeTag tag:"
   //                        << " start=" << item.GetStart ()
   //                        << " end=" << item.GetEnd ());
-  //          SatAppTimeTag timeTag;
+  //          TrafficTimeTag timeTag;
   //          item.GetTag (timeTag);
   //          const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
   //          helper->PassSampleToCollector (delay, identifier);
@@ -1160,21 +1161,21 @@ SatStatsRtnAppDelayHelper::RxCallback (Ptr<const Packet> packet,
   //    {
   //      NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
   //                   << " from statistics collection"
-  //                   << " because it does not contain any SatAppTimeTag");
+  //                   << " because it does not contain any TrafficTimeTag");
   //    }
 
 
-  SatAppTimeTag timeTag;
+  TrafficTimeTag timeTag;
   if (packet->PeekPacketTag (timeTag))
     {
-      NS_LOG_DEBUG (this << " contains a SatAppTimeTag tag");
+      NS_LOG_DEBUG (this << " contains a TrafficTimeTag tag");
       Ipv4Callback (Simulator::Now () - timeTag.GetSenderTimestamp (), from);
     }
   else
     {
       NS_LOG_WARN (this << " discarding a packet of " << packet->GetSize ()
                         << " from statistics collection"
-                        << " because it does not contain any SatAppTimeTag");
+                        << " because it does not contain any TrafficTimeTag");
     }
 
 } // end of `void RxCallback (Ptr<const Packet>, const Address);`

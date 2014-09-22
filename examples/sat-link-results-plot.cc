@@ -19,14 +19,15 @@
  *
  */
 
-#include <ns3/core-module.h>
-#include <ns3/satellite-look-up-table.h>
-#include <ns3/gnuplot.h>
 #include <fstream>
+#include "ns3/core-module.h"
+#include "ns3/gnuplot.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-look-up-table.h"
 
 /**
+ * \file sat-link-results-plot.cc
  * \ingroup satellite
  * \brief Example for plotting satellite link results data.
  *

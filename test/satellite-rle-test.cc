@@ -37,6 +37,7 @@
 using namespace ns3;
 
 /**
+ * \ingroup satellite
  * \brief Return Link Encapsulation (RLE) test case implementation.
  *
  * Expected results
@@ -148,6 +149,7 @@ void SatRleTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Address d
 }
 
 /**
+ * \ingroup satellite
  * \brief Test suite for RLE.
  */
 class SatRleTraceSuite : public TestSuite

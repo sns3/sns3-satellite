@@ -6,24 +6,25 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  Cbr example application to use satellite network.
-*         Interval, packet size and test scenario can be given
-*         in command line as user argument.
-*         To see help for user arguments:
-*         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
-*
-*         Cbr example application sends first packets from GW connected user
-*         to UT connected users and after that from UT connected user to GW connected
-*         user.
-*
-*/
+ * \file sat-cbr-example.cc
+ * \ingroup satellite
+ *
+ * \brief  Cbr example application to use satellite network.
+ *          Interval, packet size and test scenario can be given
+ *         in command line as user argument.
+ *         To see help for user arguments:
+ *         execute command -> ./waf --run "sat-cbr-example --PrintHelp"
+ *
+ *         Cbr example application sends first packets from GW connected user
+ *         to UT connected users and after that from UT connected user to GW connected
+ *         user.
+ *
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-example");
 
@@ -135,7 +136,7 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
 
-  NS_LOG_INFO("--- Cbr-example ---");
+  NS_LOG_INFO("--- sat-cbr-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
   if ( scenario == "full" )
     {

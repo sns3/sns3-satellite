@@ -20,7 +20,7 @@
  */
 
 /**
- * \file link-results-test.cc
+ * \file satellite-link-results-test.cc
  * \ingroup satellite
  * \brief Test cases for satellite link results.
  */

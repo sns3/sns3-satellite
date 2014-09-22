@@ -1,10 +1,11 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-#include <ns3/core-module.h>
-#include <ns3/network-module.h>
-#include <ns3/internet-module.h>
-#include <ns3/satellite-module.h>
-#include <ns3/applications-module.h>
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/traffic-module.h"
 
 
 using namespace ns3;
@@ -55,16 +56,17 @@ using namespace ns3;
   s->AddAverageUt ## id (SatStatsHelper::OUTPUT_CDF_PLOT);
 
 /**
-* \ingroup satellite
-*
-* \brief  Cbr example application to use satellite network and to produce
-*         the full range of statistics. Only some of the statistics are enabled
-*         by default.
-*         Interval, packet size and test scenario can be given
-*         in command line as user argument.
-*         To see help for user arguments:
-*         execute command -> ./waf --run "sat-cbr-stats-example --PrintHelp"
-*/
+ * \file sat-cbr-stats-example.cc
+ * \ingroup satellite
+ *
+ * \brief  Cbr example application to use satellite network and to produce
+ *         the full range of statistics. Only some of the statistics are enabled
+ *         by default.
+ *         Interval, packet size and test scenario can be given
+ *         in command line as user argument.
+ *         To see help for user arguments:
+ *         execute command -> ./waf --run "sat-cbr-stats-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-stats-example");
 

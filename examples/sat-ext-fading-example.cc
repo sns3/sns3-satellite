@@ -6,26 +6,27 @@
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/config-store-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  External fading example to demonstrate how to set user defined positions
-*         and to set external fading on/off.
-*
-*         Some parameter can be set as command line arguments.
-*         To see help for user arguments:
-*         execute command -> ./waf --run "sat-ext-fading-example --PrintHelp"
-*
-*         Example sends packets from GW connected user to every UT users and
-*         from every UT users to GW connected user.
-*
-*         Information of the created UTs and link budget info for every received packet
-*         are printed as log info.
-*/
+ * \file sat-ext-fading-example.cc
+ * \ingroup satellite
+ *
+ * \brief  External fading example to demonstrate how to set user defined positions
+ *         and to set external fading on/off.
+ *
+ *         Some parameter can be set as command line arguments.
+ *         To see help for user arguments:
+ *         execute command -> ./waf --run "sat-ext-fading-example --PrintHelp"
+ *
+ *         Example sends packets from GW connected user to every UT users and
+ *         from every UT users to GW connected user.
+ *
+ *         Information of the created UTs and link budget info for every received packet
+ *         are printed as log info.
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-ext-fading-example");
 

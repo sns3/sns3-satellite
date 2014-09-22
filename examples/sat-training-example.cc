@@ -1,37 +1,38 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 
-#include <ns3/core-module.h>
-#include <ns3/network-module.h>
-#include <ns3/internet-module.h>
-#include <ns3/satellite-module.h>
-#include <ns3/traffic-module.h>
-#include "ns3/config-store.h"
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/traffic-module.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to be utilized in SNS3 training. The script illustrates
-* the simulation script process starting from command line arguments to running the
-* actual simulation.
-*
-* int main (int argc, char *argv[])
-* {
-*   // Set default attribute values
-*   // Parse command-line arguments
-*   // Configure the topology; nodes, channels, devices, mobility
-*   // Add (Internet) stack to nodes
-*   // Configure IP addressing and routing
-*   // Add and configure applications
-*   // Configure tracing
-*   // Run simulation
-* }
-*
-* execute command -> ./waf --run "sat-training-example --PrintHelp"
-*/
+ * \file sat-training-example.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to be utilized in SNS3 training. The script illustrates
+ * the simulation script process starting from command line arguments to running the
+ * actual simulation.
+ *
+ * int main (int argc, char *argv[])
+ * {
+ *   // Set default attribute values
+ *   // Parse command-line arguments
+ *   // Configure the topology; nodes, channels, devices, mobility
+ *   // Add (Internet) stack to nodes
+ *   // Configure IP addressing and routing
+ *   // Add and configure applications
+ *   // Configure tracing
+ *   // Run simulation
+ * }
+ *
+ * execute command -> ./waf --run "sat-training-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-training-example");
 
@@ -79,13 +80,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (5e+06));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_AllocatedBandwidthHz", DoubleValue (10e+06));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_AllocatedBandwidthHz", DoubleValue (10e+06));
-
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::MaxValue", DoubleValue (1500.0));
-  Config::SetDefault ("ns3::SatStatsThroughputHelper::BinLength", DoubleValue (1.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MinValue", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::MaxValue", DoubleValue (5.0));
-  Config::SetDefault ("ns3::SatStatsDelayHelper::BinLength", DoubleValue (0.01));
 
   /**
    * Configure traces

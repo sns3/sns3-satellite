@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-interference-test.cc
+ * \file satellite-control-msg-container-test.cc
  * \ingroup satellite
- * \brief Test cases to unit test Satellite control message container.
+ * \brief Test cases to unit test satellite control message container.
  */
 
 // Include a header file from your module to test.

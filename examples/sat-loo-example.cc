@@ -1,21 +1,19 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
-#include "ns3/applications-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Example for Loo's model fader class. Demonstrates the functionality
-* of the Loo's model fader used by the Markov-fading. The example creates
-* three faders with different parameters, switches the faders in time and
-* outputs the fading values.
-*/
+ * \file sat-loo-example.cc
+ * \ingroup satellite
+ *
+ * \brief Example for Loo's model fader class. Demonstrates the functionality
+ * of the Loo's model fader used by the Markov-fading. The example creates
+ * three faders with different parameters, switches the faders in time and
+ * outputs the fading values.
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-loo-example");
 

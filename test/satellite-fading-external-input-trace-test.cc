@@ -19,8 +19,9 @@
  */
 
 /**
- * \file satellite-fading-trace-test.cc
- * \brief Test cases to unit test Satellite Antenna Pattern
+ * \file satellite-fading-external-input-trace-test.cc
+ * \ingroup satellite
+ * \brief Test cases to unit test external fading traces
  */
 
 #include <vector>
@@ -35,6 +36,7 @@
 using namespace ns3;
 
 /**
+ * \ingroup satellite
  * \brief Test case to unit test satellite fading external input trace and container for these
  * objects.
  *
@@ -100,7 +102,8 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
 }
 
 /**
- * \brief Test suite for Satellite free space loss unit test cases.
+ * \ingroup satellite
+ * \brief Test suite for satellite fading external input trace
  */
 class SatFadingExternalInputTraceTestSuite : public TestSuite
 {

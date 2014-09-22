@@ -5,20 +5,22 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/config-store.h"
+#include "ns3/traffic-module.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to run example simulation results related to
-* satellite system tests.
-*
-* To get help of the command line arguments for the example,
-* execute command -> ./waf --run "sat-rtn-system-test-example --PrintHelp"
-*/
+ * \file sat-rtn-system-test-example.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to run example simulation results related to
+ * satellite system tests.
+ *
+ * To get help of the command line arguments for the example,
+ * execute command -> ./waf --run "sat-rtn-system-test-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-rtn-sys-test-example");
 

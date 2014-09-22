@@ -5,21 +5,23 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/config-store.h"
+#include "ns3/traffic-module.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-*\brief An example used for running the performance profiling simulations
-* presented in TN8. The example supports a selection between a single beam
-* simulation and a full scenario. Additionally, it is possible to select
-* the number of UTs per beam.
-*
-* execute command -> ./waf --run "sat-profiling-sim-tn8 --PrintHelp"
-*/
+ * \file sat-profiling-sim-tn8.cc
+ * \ingroup satellite
+ *
+ *\brief An example used for running the performance profiling simulations
+ * presented in TN8. The example supports a selection between a single beam
+ * simulation and a full scenario. Additionally, it is possible to select
+ * the number of UTs per beam.
+ *
+ * execute command -> ./waf --run "sat-profiling-sim-tn8 --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-profiling-sim-tn8");
 

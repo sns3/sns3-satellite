@@ -20,25 +20,23 @@
  */
 
 #include "ns3/core-module.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/uinteger.h"
-#include "../model/cbr-application.h"
-#include "../helper/cbr-helper.h"
-#include "../helper/cbr-kpi-helper.h"
-#include "../helper/satellite-helper.h"
+#include "ns3/config-store-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  An example to run CBR application in full satellite scenario and FWD link.
-*
-*         execute command -> ./waf --run "sat-cbr-full-example --PrintHelp"
-*/
+ * \file sat-cbr-full-example.cc
+ * \ingroup satellite
+ *
+ * \brief  An example to run CBR application in full satellite scenario and FWD link.
+ *
+ *         execute command -> ./waf --run "sat-cbr-full-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-cbr-full-example");
 

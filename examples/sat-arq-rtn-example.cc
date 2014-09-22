@@ -5,17 +5,18 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  An example to test RTN link ARQ functionality
-*
-*         execute command -> ./waf --run "sat-arq-rtn-example --PrintHelp"
-*/
+ * \file sat-arq-rtn-example.cc
+ * \ingroup satellite
+ *
+ * \brief  An example to test RTN link ARQ functionality
+ *
+ *         execute command -> ./waf --run "sat-arq-rtn-example --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-arq-rtn-example");
 

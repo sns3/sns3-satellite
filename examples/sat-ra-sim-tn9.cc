@@ -5,25 +5,25 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/config-store.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to run example simulation results related to satellite RTN
-* link performance. Currently only one beam is simulated with variable amount of users
-* and RA-DAMA configuration. The script supports three different setups: SA + VBDC,
-* CRDSA + VBDC and CRDSA only. As output, the example provides statistics about RA
-* collision and error rate, throughput, packet delay, SINR, resources granted, frame
-* load and waveform usage. The random access results for TN9 were obtained by using
-* this script.
-*
-* execute command -> ./waf --run "sat-ra-sim-tn9 --PrintHelp"
-*/
+ * \file sat-ra-sim-tn9.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to run example simulation results related to satellite RTN
+ * link performance. Currently only one beam is simulated with variable amount of users
+ * and RA-DAMA configuration. The script supports three different setups: SA + VBDC,
+ * CRDSA + VBDC and CRDSA only. As output, the example provides statistics about RA
+ * collision and error rate, throughput, packet delay, SINR, resources granted, frame
+ * load and waveform usage. The random access results for TN9 were obtained by using
+ * this script.
+ *
+ * execute command -> ./waf --run "sat-ra-sim-tn9 --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-ra-sim-tn9");
 

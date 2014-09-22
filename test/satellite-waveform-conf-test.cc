@@ -40,6 +40,7 @@
 using namespace ns3;
 
 /**
+ * \file satellite-waveform-conf-test.cc
  * \ingroup satellite
  * \brief Test case to unit test the waveform configuration table for DVB-RCS2
  *
@@ -193,6 +194,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
 
 
 /**
+ * \ingroup satellite
  * \brief Test suite for Satellite free space loss unit test cases.
  */
 class SatWaveformConfTestSuite : public TestSuite

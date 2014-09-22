@@ -26,6 +26,8 @@
 using namespace ns3;
 
 /**
+ * \file satellite-antenna-pattern-test.cc
+ * \ingroup satellite
  * \brief Satellite antenna pattern test case implementation.
  *
  * This case creates the antenna gain patterns classes and compares the
@@ -109,7 +111,10 @@ SatAntennaPatternTestCase::DoRun (void)
     }
 }
 
-//Test suite for testing the satellite antenna gain patterns
+/**
+ * \ingroup satellite
+ * \brief Satellite antenna pattern test suite
+ */
 class SatAntennaPatternTestSuite : public TestSuite
 {
 public:

@@ -23,7 +23,7 @@
 #include <ns3/boolean.h>
 #include <ns3/simulator.h>
 #include <ns3/packet.h>
-#include "satellite-time-tag.h"
+#include <ns3/traffic-time-tag.h>
 #include "satellite-on-off-application.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatOnOffApplication");
@@ -93,8 +93,8 @@ bool SatOnOffApplication::IsStatisticTagsEnabled () const
 
 void SatOnOffApplication::SendPacketTrace (Ptr<const Packet> packet)
 {
-   // Add a SatAppTimeTag tag for packet delay computation at the receiver end.
-   packet->AddPacketTag (SatAppTimeTag (Simulator::Now ()));
+   // Add a TrafficTimeTag tag for packet delay computation at the receiver end.
+   packet->AddPacketTag (TrafficTimeTag (Simulator::Now ()));
 }
 
 } // Namespace ns3

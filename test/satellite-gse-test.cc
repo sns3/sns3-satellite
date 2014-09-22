@@ -36,6 +36,7 @@
 using namespace ns3;
 
 /**
+ * \ingroup satellite
  * \brief Generic Stream Encapsulation (GSE) test case implementation.
  *
  * Expected results
@@ -159,7 +160,8 @@ void SatGseTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Address d
 }
 
 /**
- * \brief Test suite for Gse.
+ * \ingroup satellite
+ * \brief Test suite for GSE.
  */
 class SatGseTraceSuite : public TestSuite
 {

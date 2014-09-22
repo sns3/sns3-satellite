@@ -5,36 +5,37 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/config-store.h"
+#include "ns3/traffic-module.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to run example simulation results related to satellite RTN
-* link performance. Currently only one beam is simulated with variable amount of users
-* and RA-DAMA configuration. This example is a CRDSA decoder test for providing comparison
-* results with the following parameters:
-* - 1 unique payload per frame per UT
-* - 1 beam simulated (Beam ID 18)
-* - 0% backoff probability
-* - DAMA and CRA disabled
-* - Fading disabled
-* - CBR with 1 burst per frame
-* - 30, 60, 90, 120, 150, 180, 210, 240 UTs
-* - 2 and 3 replicas
-* - infinite max num of consecutive blocks accessed
-* - dynamic load control off
-*
-* As output, the example provides statistics about RA collision and error rate,
-* throughput, packet delay, SINR, resources granted, frame load and waveform usage.
-* The random access CRDSA decoder comparison results for TN9 were obtained by using this script.
-*
-* execute command -> ./waf --run "sat-ra-sim-tn9-comparison --PrintHelp"
-*/
+ * \file sat-ra-sim-tn9-comparison.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to run example simulation results related to satellite RTN
+ * link performance. Currently only one beam is simulated with variable amount of users
+ * and RA-DAMA configuration. This example is a CRDSA decoder test for providing comparison
+ * results with the following parameters:
+ * - 1 unique payload per frame per UT
+ * - 1 beam simulated (Beam ID 18)
+ * - 0% backoff probability
+ * - DAMA and CRA disabled
+ * - Fading disabled
+ * - CBR with 1 burst per frame
+ * - 30, 60, 90, 120, 150, 180, 210, 240 UTs
+ * - 2 and 3 replicas
+ * - infinite max num of consecutive blocks accessed
+ * - dynamic load control off
+ *
+ * As output, the example provides statistics about RA collision and error rate,
+ * throughput, packet delay, SINR, resources granted, frame load and waveform usage.
+ * The random access CRDSA decoder comparison results for TN9 were obtained by using this script.
+ *
+ * execute command -> ./waf --run "sat-ra-sim-tn9-comparison --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-ra-sim-tn9-comparison");
 

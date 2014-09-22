@@ -5,19 +5,21 @@
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/config-store.h"
+#include "ns3/traffic-module.h"
+#include "ns3/config-store-module.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief Simulation script to execute system tests for the forward link.
-*
-* To get help of the command line arguments for the example,
-* execute command -> ./waf --run "sat-fwd-sys-test --PrintHelp"
-*/
+ * \file sat-fwd-system-test-example.cc
+ * \ingroup satellite
+ *
+ * \brief Simulation script to execute system tests for the forward link.
+ *
+ * To get help of the command line arguments for the example,
+ * execute command -> ./waf --run "sat-fwd-sys-test --PrintHelp"
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-fwd-sys-test");
 

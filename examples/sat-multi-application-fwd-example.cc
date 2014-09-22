@@ -20,37 +20,30 @@
  */
 
 #include "ns3/core-module.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
+#include "ns3/network-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/traffic-module.h"
+#include "ns3/satellite-module.h"
 #include "ns3/ipv4-l3-protocol.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/uinteger.h"
-#include "ns3/on-off-helper.h"
-
-#include "../model/cbr-application.h"
-#include "../helper/cbr-helper.h"
-#include "../helper/cbr-kpi-helper.h"
-#include "../helper/onoff-kpi-helper.h"
-#include "../helper/satellite-helper.h"
 
 
 using namespace ns3;
 
 /**
-* \ingroup satellite
-*
-* \brief  MultiApplicationFwd-example using satellite network in FWD link. The example
-*         utilizes OnOff and CBR application and presents how to sent the ToS field values
-*         for them.
-*
-*         To see help for user arguments:
-*         execute command -> ./waf --run "sat-multi-application-fwd-example --PrintHelp"
-*
-*         On-Off and CBR applications have been configured to send packets from users
-*         connected to GWs to users connected to UTs (FWD link). The share of end users
-*         using CBR and On-Off may be configured by command line argument.
-*/
+ * \file sat-multi-application-fwd-example.cc
+ * \ingroup satellite
+ *
+ * \brief  MultiApplicationFwd-example using satellite network in FWD link. The example
+ *         utilizes OnOff and CBR application and presents how to sent the ToS field values
+ *         for them.
+ *
+ *         To see help for user arguments:
+ *         execute command -> ./waf --run "sat-multi-application-fwd-example --PrintHelp"
+ *
+ *         On-Off and CBR applications have been configured to send packets from users
+ *         connected to GWs to users connected to UTs (FWD link). The share of end users
+ *         using CBR and On-Off may be configured by command line argument.
+ */
 
 NS_LOG_COMPONENT_DEFINE ("sat-multi-application-fwd-example");
 
