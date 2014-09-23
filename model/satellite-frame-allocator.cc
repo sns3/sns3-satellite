@@ -480,6 +480,9 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
 {
   NS_LOG_FUNCTION (this);
 
+  // variable to watch limit for maximum allowed time slot
+  uint32_t timeslotCount = 0;
+
   if (tbtpContainer.empty ())
     {
       NS_FATAL_ERROR ("TBTP container must contain at least one message.");
@@ -565,7 +568,14 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
                 }
 
               timeSlot->SetRcIndex (*currentRcIndex);
+
+              if (timeslotCount > SatFrameConf::m_maxTimeSlotCount)
+                {
+                  NS_FATAL_ERROR ("Maximum limit for time slots in a frame reached. Check frame configuration!!!");
+                }
+
               tbtpToFill->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);
+              timeslotCount++;
 
               // store needed information to UT allocation container
               Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ());

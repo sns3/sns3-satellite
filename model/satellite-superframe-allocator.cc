@@ -172,11 +172,11 @@ void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool
 
   if ( rateBasedByteToCheck > m_minCarrierPayloadInBytes )
     {
-      NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes available in minimum carrier bytes: " << m_minCarrierPayloadInBytes);
+      NS_FATAL_ERROR ("Minimum requested bytes (" << minimumRateBytes << ") for UT is greater than bytes in minimum carrier (" << m_minCarrierPayloadInBytes<< ")");
     }
   else if ( rateBasedByteToCheck > m_minimumRateBasedBytesLeft )
     {
-      NS_FATAL_ERROR ("Minimum requested bytes: " << minimumRateBytes << " requested for UT is greater than bytes minimum bytes left: " << m_minimumRateBasedBytesLeft);
+      NS_FATAL_ERROR ("Minimum requested bytes (" << minimumRateBytes << ") for UT is greater than minimum bytes left (" << m_minimumRateBasedBytesLeft << ")");
     }
   else
     {

@@ -161,11 +161,6 @@ class SatTbtpMessage : public SatControlMessage
 {
 public:
   /**
-   * Maximum value for time slot ID.
-   */
-  static const uint16_t maximumTimeSlotId = 2047;
-
-  /**
    * Container for time slot configurations in time slot map item DaTimeSlotMapItem_t.
    */
   typedef std::vector< Ptr<SatTimeSlotConf> >  DaTimeSlotConfContainer_t;

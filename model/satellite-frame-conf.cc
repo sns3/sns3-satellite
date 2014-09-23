@@ -120,8 +120,8 @@ SatFrameConf::SatFrameConf ()
   NS_ASSERT (false);
 }
 
-SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf,
-                             Ptr<SatWaveformConf> waveformConf, bool isRandomAccess, bool defaultWaveformInUse )
+SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf, Ptr<SatWaveformConf> waveformConf,
+                             bool isRandomAccess, bool defaultWaveformInUse, bool checkSlotLimit )
   : m_bandwidthHz (bandwidthHz),
     m_isRandomAccess (isRandomAccess),
     m_btuConf (btuConf),
@@ -168,6 +168,8 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
       m_minPayloadPerCarrierInBytes = carrierSlotCount * waveform->GetPayloadInBytes ();
     }
 
+  uint32_t frameTimeSlotCount = 0;
+
   // Created time slots for every carrier and add them to frame configuration
   for (uint32_t i = 0; i < m_carrierCount; i++)
     {
@@ -175,6 +177,13 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
         {
           Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger()), defWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
           AddTimeSlotConf (timeSlot);
+
+          frameTimeSlotCount++;
+
+          if ( checkSlotLimit && (frameTimeSlotCount > m_maxTimeSlotCount) )
+            {
+              NS_FATAL_ERROR ("Time slot count is over limit. Check frame configuration!!!");
+            }
         }
     }
 }
@@ -652,6 +661,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
   DoConfigure ();
 
   bool useDefaultWaveform = false;
+  bool checkSlotLimit = true;
 
   // make actual configuration
 
@@ -670,15 +680,20 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
               useDefaultWaveform = true;
             }
 
+          if ( m_configType == CONFIG_TYPE_2)
+            {
+              checkSlotLimit = false;
+            }
+
           for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
             {
               // Create BTU conf according to given attributes
               Ptr<SatBtuConf> btuConf = Create<SatBtuConf> ( m_frameCarrierAllocatedBandwidth[frameIndex],
                                                              m_frameCarrierRollOff[frameIndex], m_frameCarrierSpacing[frameIndex] );
 
-              // Created frame to be used utilizing earlier created BTU
+              // Create frame utilizing earlier created BTU
               Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (m_frameAllocatedBandwidth[frameIndex], targetDuration, btuConf,
-                                                                  waveformConf, m_frameIsRandomAccess[frameIndex], useDefaultWaveform );
+                                                                  waveformConf, m_frameIsRandomAccess[frameIndex], useDefaultWaveform, checkSlotLimit );
 
 
               m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];

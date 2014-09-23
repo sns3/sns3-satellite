@@ -133,13 +133,19 @@ void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t confi
     Ptr<SatBtuConf> btu = Create<SatBtuConf> (10e4, 0.4, 0.1);
 
     bool defaultWaveformInUse = false;
+    bool checkSlotLimit = true;
 
     if ( configType == SatSuperframeConf::CONFIG_TYPE_0 )
       {
         defaultWaveformInUse = true;
       }
 
-    m_frameConf = Create<SatFrameConf> (10e4 * 2, MilliSeconds (125), btu, m_waveFormConf, false, defaultWaveformInUse );
+    if ( configType == SatSuperframeConf::CONFIG_TYPE_2 )
+      {
+        checkSlotLimit = false;
+      }
+
+    m_frameConf = Create<SatFrameConf> (10e4 * 2, MilliSeconds (125), btu, m_waveFormConf, false, defaultWaveformInUse, checkSlotLimit );
     m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType);
 }
 

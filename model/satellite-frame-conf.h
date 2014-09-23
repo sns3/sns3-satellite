@@ -27,6 +27,7 @@
 #include "ns3/random-variable-stream.h"
 
 #include "satellite-enums.h"
+#include "satellite-const-variables.h"
 #include "satellite-wave-form-conf.h"
 
 namespace ns3 {
@@ -200,11 +201,9 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
+  typedef std::vector<Ptr<SatTimeSlotConf> > SatTimeSlotConfContainer_t;
 
-  typedef std::vector<Ptr<SatTimeSlotConf> >              SatTimeSlotConfContainer_t;
-
-  static const uint16_t maxTimeSlotCount = 2048;
-  static const uint16_t maxTimeSlotIndex = maxTimeSlotCount - 1;
+  static const uint16_t m_maxTimeSlotCount = SatConstVariables::MAXIMUM_TIME_SLOT_ID + 1;
 
   /**
    * Default constructor for SatFrameConf
@@ -220,9 +219,10 @@ public:
    * \param waveformConf          Waveform configuration
    * \param isRandomAccess        Flag telling if random access frame
    * \param defaultwaveformInUse  Flag telling if default waveform should be used with frame
+   * \param checkSlotLimit        Flag telling if slot limit should be checked already in frame creation phase
    */
-  SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf,
-                 Ptr<SatWaveformConf> waveformConf, bool isRandomAccess, bool defaultWaveformInUse );
+  SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf, Ptr<SatWaveformConf> waveformConf,
+                 bool isRandomAccess, bool defaultWaveformInUse, bool checkSlotLimit );
 
   /**
    * Destructor for SatFrameConf

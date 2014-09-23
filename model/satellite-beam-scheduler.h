@@ -131,7 +131,7 @@ private:
   {
     public:
       /**
-       * Contruct SatUtInfo.
+       * Construct SatUtInfo.
        *
        * \param damaEntry DamaEntry for created UT info.
        * \param cnoEstimator C/N0 estimator for the UT info.
@@ -155,7 +155,7 @@ private:
       /**
        * Add C/N0 sample to UT info's estimator.
        *
-       * \param sample C/N0 samp value to add.
+       * \param sample C/N0 sample value to add.
        */
       void AddCnoSample (double sample);
 
@@ -242,7 +242,7 @@ private:
   {
   public:
     /**
-     * Contruct CnoCompare object
+     * Construct CnoCompare object
      *
      * \param utInfoMap Reference to map container for the UT information
      */

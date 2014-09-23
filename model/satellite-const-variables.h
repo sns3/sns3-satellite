@@ -75,6 +75,11 @@ public:
    */
   static const uint8_t SLOTTED_ALOHA_ALLOCATION_CHANNEL = 0;
 
+  /**
+   * \brief Maximum value for time slot ID as specified in ETSI EN 301 542-2, chapter 7.5.1.3.
+   */
+  static const uint16_t MAXIMUM_TIME_SLOT_ID = 2047;
+
 private:
   /**
    * Destructor

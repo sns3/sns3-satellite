@@ -233,7 +233,7 @@ SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSl
   it->second.first = frameId;
   it->second.second.push_back( conf  );
 
-  // store frame ID to count used frames
+  // store frame ID to keep track of the used frames count
   m_frameIds.insert (frameId);
 }
 
