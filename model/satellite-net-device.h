@@ -43,11 +43,6 @@ class ErrorModel;
 class SatNodeInfo;
 class SatControlMessage;
 
-/**
- * \defgroup satellite Satellite
- *
- */
-
 
 /**
  * \ingroup satellite

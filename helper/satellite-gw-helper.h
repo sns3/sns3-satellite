@@ -155,6 +155,11 @@ public:
    */
   void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
+  /**
+   * Dump the BB frame duration for debugging purposes
+   */
+  void DumpBbFrameDurations () const;
+
 private:
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   uint32_t m_rtnLinkCarrierCount;
