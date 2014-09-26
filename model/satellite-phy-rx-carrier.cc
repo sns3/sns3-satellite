@@ -194,9 +194,9 @@ SatPhyRxCarrier::GetTypeId (void)
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrier::m_enableCompositeSinrOutputTrace),
                     MakeBooleanChecker ())
-    .AddTraceSource ("PacketTrace",
-                     "The trace for calculated interferences of the received packets",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_packetTrace))
+    .AddTraceSource ("LinkBudgetTrace",
+                     "The trace for link budget related quantities",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_linkBudgetTrace))
     .AddTraceSource ("RxPowerTrace",
                      "The trace for received signal power in dBW",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_rxPowerTrace))
@@ -486,7 +486,7 @@ SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
   iter->second.rxParams->m_sinr = sinr;
 
   /// uses 1st link sinr
-  m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, sinr);
+  m_linkBudgetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, sinr);
 
   m_satInterference->NotifyRxEnd (iter->second.interferenceEvent);
 
@@ -621,7 +621,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       iter->second.rxParams->m_sinr = sinr;
 
       /// uses composite sinr
-      m_packetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, cSinr);
+      m_linkBudgetTrace (iter->second.rxParams, m_ownAddress, iter->second.destAddress, iter->second.rxParams->m_ifPower_W, cSinr);
 
       /// send packet upwards
       m_rxCallback (iter->second.rxParams, phyError);
@@ -753,11 +753,11 @@ SatPhyRxCarrier::DoFrameEnd ()
                 }
 
               /// uses composite sinr
-              m_packetTrace (results[i].rxParams,
-                             m_ownAddress,
-                             results[i].destAddress,
-                             results[i].ifPower,
-                             results[i].cSinr);
+              m_linkBudgetTrace (results[i].rxParams,
+                                 m_ownAddress,
+                                 results[i].destAddress,
+                                 results[i].ifPower,
+                                 results[i].cSinr);
               /// CRDSA trace
               m_crdsaUniquePayloadRxTrace (results[i].rxParams->m_packetsInBurst.size (),  // number of packets
                                            results[i].sourceAddress,  // sender address

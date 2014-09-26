@@ -455,7 +455,7 @@ private:
   double m_constantErrorRate;
 
   /**
-   * \brief The trace source fired for added interference
+   * \brief The trace source on packet receptiong
    *
    * \see class CallBackTraceSource
    */
@@ -465,7 +465,7 @@ private:
                   double,                   // interference power
                   double                    // composite SINR
                   >
-     m_packetTrace;
+     m_linkBudgetTrace;
 
   /**
    * \brief A callback for received signal power in dBW

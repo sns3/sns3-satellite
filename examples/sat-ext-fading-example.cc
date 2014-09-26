@@ -140,13 +140,13 @@ main (int argc, char *argv[])
   // instead of version we are using here
 
   // set callback traces where we want results out
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                                MakeCallback (&PacketTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                                MakeCallback (&PacketTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                                  MakeCallback (&PacketTraceCb));
 
   // get users

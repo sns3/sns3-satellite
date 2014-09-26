@@ -40,9 +40,9 @@
 
 using namespace ns3;
 
-static void PacketTraceCb ( std::string context, Ptr<SatSignalParameters> params,
-                            Mac48Address ownAdd , Mac48Address destAdd,
-                            double ifPower, double cSinr)
+static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> params,
+                                Mac48Address ownAdd , Mac48Address destAdd,
+                                double ifPower, double cSinr)
 {
   // print only unicast message to prevent printing control messages like TBTP messages
   if ( !destAdd.IsBroadcast() )
@@ -269,14 +269,14 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
 
   // set callback traces where we want results out
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                   MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                   MakeCallback (&LinkBudgetTraceCb));
 
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
@@ -416,14 +416,14 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
 
   // set callback traces where we want results out
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                   MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                   MakeCallback (&LinkBudgetTraceCb));
 
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
@@ -567,14 +567,14 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
 
   // set callback traces where we want results out
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                   MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                   MakeCallback (&LinkBudgetTraceCb));
 
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
@@ -686,14 +686,14 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
 
   // set callback traces where we want results out
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                 MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                 MakeCallback (&LinkBudgetTraceCb));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/PacketTrace",
-                                   MakeCallback (&PacketTraceCb));
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
+                                   MakeCallback (&LinkBudgetTraceCb));
 
   NodeContainer utUsers = helper->GetUtUsers();
   NodeContainer gwUsers = helper->GetGwUsers();
