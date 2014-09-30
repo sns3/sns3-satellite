@@ -13,7 +13,7 @@ close all;
 % the ones you are interested.
 % ---------------------------------------------------------
 
-beamId = 51;
+beamId = 39;
 
 dir = '$NS3_ROOT/src/satellite/data/ext-fadingtraces/input/';
 subDir = ['BeamId-' int2str(beamId) '_256_Terminals/'];
@@ -26,7 +26,7 @@ outputPosFileName = ['BeamId-' int2str(beamId) '_256_UT_Positions.txt'];
 loc = load([dir subDir locFileName]);
 terminals = length(loc.terminals.pos.lat);
 
-earthRadius = 6371000;
+earthRadius = 6378137;
 
 lat = loc.terminals.pos.lat .* 180/pi;
 lon = loc.terminals.pos.lon .* 180/pi;
