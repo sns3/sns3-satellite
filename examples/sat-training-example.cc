@@ -60,12 +60,14 @@ main (int argc, char *argv[])
 {
   LogComponentEnable ("sat-training-example", LOG_LEVEL_INFO);
 
+  NS_LOG_INFO("--- sat-training-example ---");
+
   /**
    * Initialize simulation script variables
    */
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
-  double simLength (10.0); // in seconds
+  double simDuration (10.0); // in seconds
 
   /**
    * Enable all co-channel beams for user frequency id 1.
@@ -108,12 +110,23 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace", BooleanValue (true));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
+  Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+  Singleton<SatInterferenceOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+  Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+  Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->EnableFigureOutput (false);
+
+  //Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("fadingExampleTag_");
+  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("interferenceExampleTag_");
+  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("rxPowerExampleTag_");
+  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("compositeSinrExampleTag_");
+
   /**
    * Read the command line arguments. Note, that this allows the user to change
    * the ns3 attributes also from command line when running the script.
    */
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("simDurationInSeconds", "Simulation duration in seconds", simDuration);
   cmd.Parse (argc, argv);
 
   /**
@@ -212,11 +225,10 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-training-example ---");
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("Simulation variables:");
+  NS_LOG_INFO (" - Simulation duration: " << simDuration);
+  NS_LOG_INFO (" - Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO (" - Number of end users per UT: " << endUsersPerUt);
 
   /**
    * Store attributes into XML output
@@ -238,7 +250,7 @@ main (int argc, char *argv[])
    */
   NS_LOG_INFO ("Running network simulator 3");
 
-  Simulator::Stop (Seconds (simLength));
+  Simulator::Stop (Seconds (simDuration));
   Simulator::Run ();
 
   Simulator::Destroy ();
