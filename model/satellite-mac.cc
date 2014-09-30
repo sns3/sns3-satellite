@@ -205,38 +205,51 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
       for (SatPhy::PacketContainer_t::const_iterator it1 = packets.begin ();
            it1 != packets.end (); ++it1)
         {
-          Address addr; // invalid address.
-          bool isTaggedWithAddress = false;
-          ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
-
-          while (!isTaggedWithAddress && it2.HasNext ())
+          // Remove packet tag
+          SatMacTag macTag;
+          bool mSuccess = (*it1)->PeekPacketTag (macTag);
+          if (!mSuccess)
             {
-              ByteTagIterator::Item item = it2.Next ();
+              NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+            }
 
-              if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+          // If the packet is intended for this receiver
+          Mac48Address destAddress = macTag.GetDestAddress ();
+
+          if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
+            {
+              Address addr; // invalid address.
+
+              bool isTaggedWithAddress = false;
+              ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+
+              while (!isTaggedWithAddress && it2.HasNext ())
                 {
-                  NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                     << " start=" << item.GetStart ()
-                                     << " end=" << item.GetEnd ());
-                  SatAddressTag addrTag;
-                  item.GetTag (addrTag);
-                  addr = addrTag.GetSourceAddress ();
-                  isTaggedWithAddress = true; // this will exit the while loop.
+                  ByteTagIterator::Item item = it2.Next ();
+
+                  if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+                    {
+                      NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                    << " start=" << item.GetStart ()
+                                    << " end=" << item.GetEnd ());
+                      SatAddressTag addrTag;
+                      item.GetTag (addrTag);
+                      addr = addrTag.GetSourceAddress ();
+                      isTaggedWithAddress = true; // this will exit the while loop.
+                    }
                 }
-            }
 
-          m_rxTrace (*it1, addr);
+              m_rxTrace (*it1, addr);
 
-          SatMacTimeTag timeTag;
-          if ((*it1)->RemovePacketTag (timeTag))
-            {
-              NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
-              m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
-                              addr);
-            }
-
+              SatMacTimeTag timeTag;
+              if ((*it1)->RemovePacketTag (timeTag))
+                {
+                  NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+                  m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
+                                  addr);
+                }
+            } // end of `if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())`
         } // end of `for it1 = packets.begin () -> packets.end ()`
-
     } // end of `if (m_isStatisticsTagsEnabled)`
 }
 
