@@ -93,7 +93,7 @@ main (int argc, char *argv[])
   // Given file must locate in /satellite/data folder
   //
   // This enables user defined positions used instead of default positions defined file UtPos.txt,
-  Config::SetDefault ("ns3::SatConf::UtPositionInputFileName", StringValue ("UserDefinedUtPos.txt"));
+  Config::SetDefault ("ns3::SatConf::UtPositionInputFileName", StringValue ("utpositions/BeamId-1_256_UT_Positions.txt"));
 
   // Set external fading input trace container mode as list mode
   // Now external fading input file used for UT1 is input file defined in row one in set index file,
@@ -104,10 +104,10 @@ main (int argc, char *argv[])
   // Set index files defining external tracing input files for UTs
   // Given index files must locate in /satellite/data/ext-fadingtraces/input folder
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
-                       StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
+                       StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
 
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
-                       StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
+                       StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
 
   // for GWs we don't set up index files, so default ones are used (GW_fading_fwdup_traces.txt and GW_fading_rtndwn_traces.txt)
 
@@ -116,6 +116,8 @@ main (int argc, char *argv[])
 
   // create helper
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+
+  helper->EnableCreationTraces ("ext-fading", false);
 
   /** create user defined scenario */
 
