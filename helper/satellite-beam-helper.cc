@@ -781,7 +781,7 @@ SatBeamHelper::GetUtInfo () const
 
   std::ostringstream oss;
 
-  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+  for (std::multimap<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
        i != m_utNode.end (); ++i)
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
