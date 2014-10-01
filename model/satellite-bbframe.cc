@@ -170,6 +170,7 @@ SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame, TracedCallback<Ptr<SatB
     {
       mergeTraceCb (this, mergedFrame);
       m_framePayload.insert( m_framePayload.end (), mergedFrame->GetPayload ().begin (), mergedFrame->GetPayload ().end () );
+      m_freeSpaceInBytes -= dataBytes;
       merged = true;
     }
 
