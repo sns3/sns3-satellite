@@ -382,6 +382,18 @@ SatBbFrameConf::InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults 
     }
 }
 
+void
+SatBbFrameConf::DumpWaveforms () const
+{
+  NS_LOG_FUNCTION (this);
+
+  for (waveformMap_t::const_iterator it = m_waveforms.begin ();
+      it != m_waveforms.end ();
+      ++it)
+    {
+      it->second->Dump ();
+    }
+}
 
 uint32_t
 SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const
@@ -409,6 +421,7 @@ SatBbFrameConf::CalculateBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEn
         break;
       }
   }
+
   return (uint32_t)(dataSlots * m_symbolsPerSlot * modulatedBits * SatUtils::GetCodingRate (modcod));
 }
 

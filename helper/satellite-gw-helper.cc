@@ -148,31 +148,9 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDv
   m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate);
   m_bbFrameConf->InitializeCNoRequirements (lrS2);
 
-  //DumpBbFrameDurations ();
+  //m_bbFrameConf->DumpWaveforms ();
 }
 
-void
-SatGwHelper::DumpBbFrameDurations () const
-{
-  std::vector<SatEnums::SatModcod_t> modcods;
-  SatEnums::GetAvailableModcodsFwdLink (modcods);
-
-  std::vector<SatEnums::SatBbFrameType_t> frames;
-  SatEnums::GetAvailableBbFrameTypes (frames);
-
-  NS_LOG_INFO ("--- DUMP BB frame durations ---");
-
-  for (unsigned int i = 0; i < modcods.size (); ++i)
-    {
-      for (unsigned int j = 0; j < frames.size (); ++j)
-        {
-          Time duration = m_bbFrameConf->GetBbFrameDuration (modcods.at (i), frames.at (j));
-
-          NS_LOG_INFO ("ModCod: " << SatEnums::GetModcodTypeName (modcods.at (i)) << ", frame: " << SatEnums::GetFrameTypeName (frames.at (j)) << ", duration: " << duration.GetMicroSeconds () << " us");
-        }
-    }
-  NS_LOG_INFO ("----------------------------");
-}
 
 Ptr<SatBbFrameConf>
 SatGwHelper::GetBbFrameConf () const

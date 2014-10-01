@@ -247,6 +247,11 @@ public:
    */
   SatEnums::SatModcod_t GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const;
 
+	/**
+	 * \brief Dump waveform details for debugging purposes
+	 */
+  void DumpWaveforms () const;
+
 private:
 
   /**
