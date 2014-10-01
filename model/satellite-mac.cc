@@ -216,7 +216,7 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
           // If the packet is intended for this receiver
           Mac48Address destAddress = macTag.GetDestAddress ();
 
-          if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
+          if (destAddress == m_nodeInfo->GetMacAddress ())
             {
               Address addr; // invalid address.
 
