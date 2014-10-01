@@ -58,25 +58,29 @@ NS_LOG_COMPONENT_DEFINE ("sat-training-example");
 int
 main (int argc, char *argv[])
 {
+  // Enabling logging in this program
   LogComponentEnable ("sat-training-example", LOG_LEVEL_INFO);
 
   NS_LOG_INFO("--- sat-training-example ---");
 
   /**
+   * --------------------------------------
    * Initialize simulation script variables
+   * --------------------------------------
    */
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
   double simDuration (10.0); // in seconds
 
-  /**
-   * Enable all co-channel beams for user frequency id 1.
-   */
+  // All the co-channel beams enabled for user link
+  // frequency color 1
   const unsigned int BEAMS (16);
   unsigned int coChannelBeams [BEAMS] = {1, 3, 5, 7, 9, 22, 24, 26, 28, 30, 44, 46, 48, 50,  59, 61};
 
   /**
+   * ---------------------------------------------------
    * Read the default attributes from XML attribute file
+   * ---------------------------------------------------
    */
 
   NS_LOG_INFO ("Reading the XML input: training-input-attributes.xml");
@@ -88,8 +92,12 @@ main (int argc, char *argv[])
   inputConfig.ConfigureDefaults ();
 
   /**
+   * -----------------------------------------------
    * Overwrite some attribute values for this script
+   * -----------------------------------------------
    */
+
+  // Enable RBDC for BE
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (40));
@@ -97,14 +105,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (Seconds (1)));
 
+  // Tune the superframe configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameCount", UintegerValue (3));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (5e+06));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_AllocatedBandwidthHz", DoubleValue (10e+06));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_AllocatedBandwidthHz", DoubleValue (10e+06));
 
-  /**
-   * Configure traces
-   */
+  // Enable traces
   Config::SetDefault ("ns3::SatChannel::EnableRxPowerOutputTrace", BooleanValue (true));
   Config::SetDefault ("ns3::SatChannel::EnableFadingOutputTrace", BooleanValue (true));
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace", BooleanValue (true));
@@ -115,14 +122,11 @@ main (int argc, char *argv[])
   Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->EnableFigureOutput (false);
 
-  //Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("fadingExampleTag_");
-  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("interferenceExampleTag_");
-  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("rxPowerExampleTag_");
-  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("compositeSinrExampleTag_");
-
   /**
-   * Read the command line arguments. Note, that this allows the user to change
-   * the ns3 attributes also from command line when running the script.
+   * ----------------------------------------------------------------
+   * Read the command line arguments. Note, that this allows the user
+   * to change also the ns3 attributes from command line.
+   * ----------------------------------------------------------------
    */
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
@@ -130,7 +134,13 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   /**
-   * Create satellite system by the usage of satellite helper structures
+   * --------------------------------------------------------------------
+   * Create satellite system by the usage of satellite helper structures:
+   * - helper->CreateSimpleScenario ();
+   * - helper->CreateLargerScenario ();
+   * - helper->CreateFullScenario ();
+   * - helper->CreateUserDefinedScenario (beamMap);
+   * --------------------------------------------------------------------
    */
   NS_LOG_INFO ("Creating the satellite scenario");
 
@@ -138,8 +148,11 @@ main (int argc, char *argv[])
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   std::string st ("creation-trace-training");
-  helper->EnableCreationTraces (st, true);
+  helper->EnableCreationTraces (st, false);
 
+  // Each beam will have 'utsPerBeam' user terminals and 'endUsersPerUt'
+  // end users per UT. Note, that this allows also different configurations
+  // per spot-beam.
   SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   for (unsigned i = 0; i < BEAMS; ++i)
@@ -149,17 +162,18 @@ main (int argc, char *argv[])
 
   helper->CreateUserDefinedScenario (beamMap);
 
-  // Other pre-defined satellite simulation scenario options:
-  //helper->CreateSimpleScenario ();
-  //helper->CreateLargerScenario ();
-  //helper->CreateFullScenario ();
-
+  // Enable packet trace from satellite netdevice layers.
   helper->EnablePacketTrace ();
 
   /**
-   * Configure end user applications. In the training example, the users use
-   * on-off application in return link.
+   * --------------------------------------------------------
+   * Configure end user applications.
+   * In the training example, the users are configured on-off
+   * application in return link. In addition, e.g. HTTP, NRTV
+   * and CBR traffic models are supported.
    */
+
+  NS_LOG_INFO ("Configuring the on-off application!");
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -167,23 +181,25 @@ main (int argc, char *argv[])
   uint32_t packetSize (1280); // in bytes
   DataRate dataRate (128000); // in bps
 
-  NS_LOG_INFO ("Configuring the on-off application; data rate: " << dataRate << " bps, packet size: " << packetSize << " bytes");
-
-  // get users (first GW side user and first UT connected users)
+  // UT users are the senders
   NodeContainer utUsers = helper->GetUtUsers();
+  // GW users are the receivers
   NodeContainer gwUsers = helper->GetGwUsers();
 
+  // The application start time is varied to avoid the situation
+  // in the beginning that all applications start at the same time.
   Time appStartTime (MilliSeconds (100));
-
+  // Destination address
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
+  Ptr<UniformRandomVariable> rnd = CreateObject<UniformRandomVariable> ();
+
+  OnOffKpiHelper onoffKpiHelper (KpiHelper::KPI_RTN);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
       itUt != utUsers.End ();
       ++itUt)
     {
-      appStartTime += MilliSeconds (50);
-
-      // return link
+      // Create an OnOff application
       Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();
       rtnApp->SetAttribute ("Protocol", StringValue (protocol));
       rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
@@ -193,19 +209,29 @@ main (int argc, char *argv[])
       rtnApp->SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
       rtnApp->SetStartTime (appStartTime);
       (*itUt)->AddApplication (rtnApp);
+
+      onoffKpiHelper.AddSender (rtnApp);
+
+      appStartTime += MilliSeconds (rnd->GetInteger (0, 50));
     }
 
-  // setup packet sinks at all users
+  // Create and install a packet sink to receiver the packets
   Ptr<PacketSink> ps = CreateObject<PacketSink> ();
   ps->SetAttribute ("Protocol", StringValue (protocol));
   ps->SetAttribute ("Local", AddressValue (gwAddr));
   gwUsers.Get (0)->AddApplication (ps);
 
+  onoffKpiHelper.AddSink (ps);
+
   /**
+   * -----------------
    * Set-up statistics
+   * -----------------
    */
   NS_LOG_INFO ("Setting up statistics");
 
+  // SatStatsHelperContainer is the interface for satellite related
+  // statistics configuration.
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
 
   // Delay
@@ -225,13 +251,10 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO ("Simulation variables:");
-  NS_LOG_INFO (" - Simulation duration: " << simDuration);
-  NS_LOG_INFO (" - Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO (" - Number of end users per UT: " << endUsersPerUt);
-
   /**
+   * --------------------------------
    * Store attributes into XML output
+   * --------------------------------
    */
 
   NS_LOG_INFO ("Storing the used attributes to XML file: training-output-attributes-ut-" << utsPerBeam << ".xml");
@@ -246,12 +269,17 @@ main (int argc, char *argv[])
   outputConfig.ConfigureAttributes ();
 
   /**
+   * --------------
    * Run simulation
+   * --------------
    */
   NS_LOG_INFO ("Running network simulator 3");
 
   Simulator::Stop (Seconds (simDuration));
   Simulator::Run ();
+
+  NS_LOG_INFO("--- OnOff KPIs ---");
+  onoffKpiHelper.Print ();
 
   Simulator::Destroy ();
 
