@@ -107,6 +107,18 @@ main (int argc, char *argv[])
   // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
 
+  /*****************************************************************************
+     'To Select super frame configuration, Option 1'
+     -- Start --                                                                */
+
+//    Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::CONFIG_TYPE_2));
+//    Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue ("Configuration_2"));
+
+                                                                                 /**
+     -- End --
+     'To Select super frame configuration, Option 1'
+   ******************************************************************************/
+
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   if ( scenarioLogFile != "" )
@@ -123,18 +135,6 @@ main (int argc, char *argv[])
    -- End --
    Create helper and simulation scenario
   ******************************************************************************/
-
-  /*****************************************************************************
-   'To Select super frame configuration, Option 1'
-   -- Start --                                                                */
-
-  //Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::CONFIG_TYPE_2));
-  //Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue ("Configuration_2"));
-                                                                               /**
-   -- End --
-   'To Select super frame configuration, Option 1'
-  ******************************************************************************/
-
 
   /*****************************************************************************
     Creating an installing application (users) to satellite network
