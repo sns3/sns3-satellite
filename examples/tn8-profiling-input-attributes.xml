@@ -358,7 +358,7 @@
  <default name="ns3::SatSpotBeamPositionAllocator::Altitude" value="ns3::UniformRandomVariable[Min=0.0]"/>
  <default name="ns3::SatSpotBeamPositionAllocator::MinElevationAngleInDegForUT" value="5"/>
  <default name="ns3::SatConstantPropagationDelayModel::Delay" value="+130000000.0ns"/>
- <default name="ns3::SatQueue::MaxPackets" value="100"/>
+ <default name="ns3::SatQueue::MaxPackets" value="1000"/>
  <default name="ns3::SatRandomAccessConf::CrdsaSignalingOverheadInBytes" value="5"/>
  <default name="ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes" value="3"/>
  <default name="ns3::SatRayleighConf::ElevationCount" value="1"/>
