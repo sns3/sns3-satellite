@@ -146,10 +146,17 @@ private:
   void DumpSimulationInformation ();
 
   /**
-   * \brief Function for getting the revision information for this simulation
+   * \brief
+   * \param dataPath
+   */
+  void DumpRevisionDiff (std::string dataPath);
+
+  /**
+   * \brief Function for executing the command and inserting the output into a string container
+   * \param command command to be executed
    * \param outputContainer pointer to output container
    */
-  void GetRevisionInformation (Ptr<SatOutputFileStreamStringContainer> outputContainer);
+  void ExecuteCommandAndReadOutput (std::string command, Ptr<SatOutputFileStreamStringContainer> outputContainer);
 
   /**
    * \brief Function for forming the next level of a path
@@ -234,6 +241,12 @@ private:
    * \brief Is output path initialized
    */
   bool m_isOutputPathInitialized;
+
+  bool m_enableSimInfoOutput;
+
+  bool m_enableSimInfoDiffOutput;
+
+  bool m_excludeDataFolderFromDiff;
 };
 
 } // namespace ns3

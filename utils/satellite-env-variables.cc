@@ -73,6 +73,21 @@ SatEnvVariables::GetTypeId (void)
                    "Enable simulation output overwrite.",
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatEnvVariables::m_enableOutputOverwrite),
+                   MakeBooleanChecker ())
+    .AddAttribute ("EnableSimInfoOutput",
+                   "Enable simulation information output.",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatEnvVariables::m_enableSimInfoOutput),
+                   MakeBooleanChecker ())
+    .AddAttribute ("EnableSimInfoDiffOutput",
+                   "Enable simulation information diff output.",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatEnvVariables::m_enableSimInfoDiffOutput),
+                   MakeBooleanChecker ())
+    .AddAttribute ("ExcludeSatelliteDataFolderFromSimInfoDiff",
+                   "Exclude satellite data folder from the revision diff.",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatEnvVariables::m_excludeDataFolderFromDiff),
                    MakeBooleanChecker ());
   return tid;
 }
@@ -95,7 +110,10 @@ SatEnvVariables::SatEnvVariables () :
   m_simRootPath ("sims"),
   m_simTag ("default"),
   m_enableOutputOverwrite (false),
-  m_isOutputPathInitialized (false)
+  m_isOutputPathInitialized (false),
+  m_enableSimInfoOutput (true),
+  m_enableSimInfoDiffOutput (true),
+  m_excludeDataFolderFromDiff (true)
 {
   NS_LOG_FUNCTION (this);
 
@@ -170,7 +188,7 @@ SatEnvVariables::~SatEnvVariables ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_isOutputPathInitialized)
+  if (m_isOutputPathInitialized && m_enableSimInfoOutput)
   {
       DumpSimulationInformation ();
   }
@@ -423,10 +441,8 @@ SatEnvVariables::GetCurrentDateAndTime ()
 }
 
 void
-SatEnvVariables::GetRevisionInformation (Ptr<SatOutputFileStreamStringContainer> outputContainer)
+SatEnvVariables::ExecuteCommandAndReadOutput (std::string command, Ptr<SatOutputFileStreamStringContainer> outputContainer)
 {
-  std::string command = "hg log | head -n 5 2>&1";
-
   FILE* pipe = popen(command.c_str (), "r");
   if (pipe)
     {
@@ -450,16 +466,46 @@ void
 SatEnvVariables::DumpSimulationInformation ()
 {
   std::string dataPath = LocateDirectory (m_outputPath);
+  std::string revisionCommand = "hg log | head -n 5 2>&1";
   std::stringstream fileName;
+
   fileName << dataPath << "/SimInfo.log";
   Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
 
-  GetRevisionInformation (outputContainer);
+  ExecuteCommandAndReadOutput (revisionCommand, outputContainer);
 
   std::stringstream line1;
   line1 << "Simulation finished at " << GetCurrentDateAndTime ();
 
   outputContainer->AddToContainer (line1.str ());
+
+  outputContainer->WriteContainerToFile ();
+
+  if (m_enableSimInfoDiffOutput)
+    {
+      DumpRevisionDiff (dataPath);
+    }
+}
+
+void
+SatEnvVariables::DumpRevisionDiff (std::string dataPath)
+{
+  std::string diffCommand;
+  std::stringstream fileName;
+
+  fileName << dataPath << "/SimDiff.log";
+  Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
+
+  if (m_excludeDataFolderFromDiff)
+    {
+      diffCommand = "hg diff -p -w -b -B -X " + m_dataPath + " 2>&1";
+    }
+  else
+    {
+      diffCommand = "hg diff -p -w -b -B 2>&1";
+    }
+
+  ExecuteCommandAndReadOutput (diffCommand, outputContainer);
 
   outputContainer->WriteContainerToFile ();
 }
