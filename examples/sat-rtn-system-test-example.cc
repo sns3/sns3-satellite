@@ -41,7 +41,7 @@ using namespace ns3;
  * execute command -> ./waf --run "sat-rtn-system-test-example --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-rtn-sys-test-example");
+NS_LOG_COMPONENT_DEFINE ("sat-rtn-system-test-example");
 
 
 // Callback called when RBDC CR has been sent by request manager
@@ -80,23 +80,23 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam = 10;
   Time utAppStartTime = Seconds (0.1);
 
-  UintegerValue packetSize (1280); // in bytes
-  TimeValue interval (MilliSeconds (50));
-  DataRateValue dataRate (16000);
+  //UintegerValue packetSize (1280); // in bytes
+  //TimeValue interval (MilliSeconds (500));
+  //DataRateValue dataRate (16000);
 
   double simLength (30.0); // in seconds
   std::string preDefinedFrameConfig = "Configuration_0";
   uint32_t testCase = 0;
   uint32_t trafficModel = 0;
 
-  LogComponentEnable ("sat-rtn-sys-test", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-rtn-system-test-example", LOG_LEVEL_INFO);
   
   // set default values for traffic model apps here
   // attributes can be overridden by command line arguments or input xml when needed
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", packetSize);
-  Config::SetDefault ("ns3::CbrApplication::Interval", interval);
-  Config::SetDefault ("ns3::OnOffApplication::PacketSize", packetSize);
-  Config::SetDefault ("ns3::OnOffApplication::DataRate", dataRate);
+  //Config::SetDefault ("ns3::CbrApplication::PacketSize", packetSize);
+  //Config::SetDefault ("ns3::CbrApplication::Interval", interval);
+  //Config::SetDefault ("ns3::OnOffApplication::PacketSize", packetSize);
+  //Config::SetDefault ("ns3::OnOffApplication::DataRate", dataRate);
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
@@ -325,14 +325,14 @@ main (int argc, char *argv[])
         {
           case 0: // CBR
             appAdded = cbr.Install (*it);
-            DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-            DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("Interval", interval );
+            //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
+            //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("Interval", interval );
             break;
 
           case 1: // On-Off
             appAdded = onOff.Install (*it);
-            DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-            DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("DataRate", dataRate );
+            //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
+            //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("DataRate", dataRate );
             break;
 
           default:
@@ -341,7 +341,7 @@ main (int argc, char *argv[])
         }
 
       appAdded.Get (0)->SetStartTime (utAppStartTime);
-      utAppStartTime += MilliSeconds (500);
+      utAppStartTime += MilliSeconds (100);
     }
 
   /**
@@ -367,21 +367,18 @@ main (int argc, char *argv[])
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  // Enable some logs.
-  LogComponentEnable ("sat-rtn-sys-test", LOG_INFO);
-
   // enable application info logs
-  LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
+  //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
+  //LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
 
 
   NS_LOG_INFO("--- sat-rtn-sys-test ---");
   NS_LOG_INFO("  Test case: " << testCase);
   NS_LOG_INFO("  Traffic model: " << trafficModel);
-  NS_LOG_INFO("  Packet size: " << packetSize.Get ());
-  NS_LOG_INFO("  Data rate (on-off): " << dataRate.Get ());
-  NS_LOG_INFO("  Interval (CBR): " << interval.Get ().GetSeconds ());
+  //NS_LOG_INFO("  Packet size: " << packetSize.Get ());
+  //NS_LOG_INFO("  Data rate (on-off): " << dataRate.Get ());
+  //NS_LOG_INFO("  Interval (CBR): " << interval.Get ().GetSeconds ());
   NS_LOG_INFO("  Simulation length: " << simLength);
   NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
   NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
