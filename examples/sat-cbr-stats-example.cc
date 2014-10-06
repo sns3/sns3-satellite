@@ -198,7 +198,6 @@ main (int argc, char *argv[])
     }
 
   Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
-  s->SetName ("cbr");
 
   /*
    * The following is the statements for enabling *all* the satellite

@@ -84,7 +84,7 @@ SatStatsBackloggedRequestHelper::DoInstall ()
 
   // Setup aggregator.
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                   "OutputFileName", StringValue (GetName ()),
+                                   "OutputFileName", StringValue (GetOutputFileName ()),
                                    "GeneralHeading",
                                    StringValue ("% time_sec, beam_id, ut_id, type, requests"));
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();

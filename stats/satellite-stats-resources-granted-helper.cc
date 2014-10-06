@@ -38,7 +38,7 @@
 #include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
-#include <ns3/gnuplot-aggregator.h>
+#include <ns3/magister-gnuplot-aggregator.h>
 
 #include "satellite-stats-resources-granted-helper.h"
 
@@ -87,7 +87,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
                                          "GeneralHeading", StringValue (GetIdentifierHeading ("resources_bytes")));
@@ -117,7 +117,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetTimeHeading ("resources_bytes")));
 
         // Setup collectors.
@@ -145,7 +145,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetDistributionHeading ("resources_bytes")));
 
         // Setup collectors.
@@ -190,12 +190,16 @@ SatStatsResourcesGrantedHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Resources granted (in bytes)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES_POINTS);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -210,7 +214,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
@@ -227,12 +231,16 @@ SatStatsResourcesGrantedHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Resources granted (in bytes)",
                                    "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
@@ -256,7 +264,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();

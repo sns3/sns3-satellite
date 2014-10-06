@@ -48,7 +48,7 @@
 #include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
-#include <ns3/gnuplot-aggregator.h>
+#include <ns3/magister-gnuplot-aggregator.h>
 
 #include <sstream>
 #include "satellite-stats-throughput-helper.h"
@@ -122,7 +122,7 @@ SatStatsThroughputHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
                                          "GeneralHeading", StringValue (GetIdentifierHeading ("throughput_kbps")));
@@ -153,7 +153,7 @@ SatStatsThroughputHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetTimeHeading ("throughput_kbps")));
 
         // Setup second-level collectors.
@@ -190,7 +190,7 @@ SatStatsThroughputHelper::DoInstall ()
 
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (false),
                                          "GeneralHeading", StringValue (GetDistributionHeading ("throughput_kbps")));
@@ -256,12 +256,16 @@ SatStatsThroughputHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Received throughput (in kilobits per second)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
@@ -276,7 +280,7 @@ SatStatsThroughputHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
 
         // Setup first-level collectors.
         m_conversionCollectors.SetType ("ns3::UnitConversionCollector");
@@ -299,14 +303,18 @@ SatStatsThroughputHelper::DoInstall ()
           }
 
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Received throughput (in kilobits per second)",
                                    "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
         plotAggregator->Add2dDataset (GetName (), GetName ());
         /// \todo Find a better dataset name.
-        m_aggregator = plotAggregator;
 
         // Setup the final-level collector.
         m_averagingCollector = CreateObject<DistributionCollector> ();
@@ -324,7 +332,7 @@ SatStatsThroughputHelper::DoInstall ()
         m_averagingCollector->SetName ("0");
         m_averagingCollector->TraceConnect ("Output",
                                             GetName (),
-                                            MakeCallback (&GnuplotAggregator::Write2d,
+                                            MakeCallback (&MagisterGnuplotAggregator::Write2d,
                                                           plotAggregator));
         /// \todo Find a better dataset name.
 

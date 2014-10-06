@@ -45,7 +45,7 @@
 #include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
-#include <ns3/gnuplot-aggregator.h>
+#include <ns3/magister-gnuplot-aggregator.h>
 
 #include <sstream>
 #include "satellite-stats-composite-sinr-helper.h"
@@ -95,7 +95,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
                                          "GeneralHeading", StringValue (GetIdentifierHeading ("sinr_db")));
@@ -117,7 +117,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetTimeHeading ("sinr_db")));
 
         // Setup collectors.
@@ -137,7 +137,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetDistributionHeading ("sinr_db")));
 
         // Setup collectors.
@@ -174,12 +174,16 @@ SatStatsCompositeSinrHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "SINR (in dB)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -194,7 +198,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
         break;
       }
 
@@ -203,12 +207,16 @@ SatStatsCompositeSinrHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("SINR (in dB)",
                                    "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
@@ -232,7 +240,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
         break;
       }
 

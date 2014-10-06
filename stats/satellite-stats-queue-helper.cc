@@ -43,7 +43,7 @@
 #include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/multi-file-aggregator.h>
-#include <ns3/gnuplot-aggregator.h>
+#include <ns3/magister-gnuplot-aggregator.h>
 
 #include "satellite-stats-queue-helper.h"
 
@@ -170,7 +170,7 @@ SatStatsQueueHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
                                          "GeneralHeading", StringValue (GetIdentifierHeading (m_shortLabel)));
@@ -192,7 +192,7 @@ SatStatsQueueHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetTimeHeading (m_shortLabel)));
 
         // Setup collectors.
@@ -212,7 +212,7 @@ SatStatsQueueHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetDistributionHeading (m_shortLabel)));
 
         // Setup collectors.
@@ -249,11 +249,15 @@ SatStatsQueueHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)", m_longLabel);
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
@@ -268,7 +272,7 @@ SatStatsQueueHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
         break;
       }
 
@@ -277,11 +281,15 @@ SatStatsQueueHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend (m_longLabel, "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::DistributionCollector");
@@ -305,7 +313,7 @@ SatStatsQueueHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("Output",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
         break;
       }
 

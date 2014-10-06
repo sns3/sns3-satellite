@@ -215,6 +215,23 @@ protected:
   virtual void DoInstall () = 0;
 
   /**
+   * \return the path where statistics output should be written to.
+   *
+   * Path is determined by the SatEnvVariables singleton class.
+   */
+  virtual std::string GetOutputPath () const;
+
+  /**
+   * \brief Compute the path and file name where statistics output should be
+   *        written to.
+   * \return path and file name (without extension)
+   *
+   * Path is determined by the SatEnvVariables singleton class. The file name
+   * is determined by the name of this class instance.
+   */
+  virtual std::string GetOutputFileName () const;
+
+  /**
    * \param dataLabel the short name of the main data of this statistics
    * \return a string to be printed as the first line of output, consisting of
    *         the identifier title and the given data label

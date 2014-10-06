@@ -42,7 +42,7 @@
 #include <ns3/scalar-collector.h>
 #include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
-#include <ns3/gnuplot-aggregator.h>
+#include <ns3/magister-gnuplot-aggregator.h>
 
 #include <sstream>
 #include "satellite-stats-packet-error-helper.h"
@@ -127,7 +127,7 @@ SatStatsPacketErrorHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "MultiFileMode", BooleanValue (false),
                                          "EnableContextPrinting", BooleanValue (true),
                                          "GeneralHeading", StringValue (GetIdentifierHeading ("error_rate")));
@@ -149,7 +149,7 @@ SatStatsPacketErrorHelper::DoInstall ()
       {
         // Setup aggregator.
         m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetName ()),
+                                         "OutputFileName", StringValue (GetOutputFileName ()),
                                          "GeneralHeading", StringValue (GetTimeHeading ("error_rate")));
 
         // Setup collectors.
@@ -182,12 +182,16 @@ SatStatsPacketErrorHelper::DoInstall ()
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         // Setup aggregator.
-        Ptr<GnuplotAggregator> plotAggregator = CreateObject<GnuplotAggregator> (GetName ());
+        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                         "OutputPath", StringValue (GetOutputPath ()),
+                                         "OutputFileName", StringValue (GetName ()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator
+          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+        NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Packet error rate");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-        m_aggregator = plotAggregator;
 
         // Setup collectors.
         m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
@@ -204,7 +208,7 @@ SatStatsPacketErrorHelper::DoInstall ()
           }
         m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
                                                   m_aggregator,
-                                                  &GnuplotAggregator::Write2d);
+                                                  &MagisterGnuplotAggregator::Write2d);
         break;
       }
 

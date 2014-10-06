@@ -82,7 +82,7 @@ SatStatsCapacityRequestHelper::DoInstall ()
 
   // Setup aggregator.
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                   "OutputFileName", StringValue (GetName ()),
+                                   "OutputFileName", StringValue (GetOutputFileName ()),
                                    "GeneralHeading",
                                    StringValue ("% time_sec, node_id, rc_id, type, kbps / bytes, queue_bytes"));
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();

@@ -91,7 +91,7 @@ SatStatsWaveformUsageHelper::DoInstall ()
 
   // Setup aggregator.
   m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                   "OutputFileName", StringValue (GetName ()),
+                                   "OutputFileName", StringValue (GetOutputFileName ()),
                                    "MultiFileMode", BooleanValue (false),
                                    "EnableContextPrinting", BooleanValue (true),
                                    "GeneralHeading", StringValue (GetIdentifierHeading ("usage_count")));

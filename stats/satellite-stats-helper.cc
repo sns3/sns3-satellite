@@ -24,6 +24,7 @@
 #include <ns3/satellite-beam-helper.h>
 #include <ns3/satellite-user-helper.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-env-variables.h>
 #include <ns3/singleton.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
@@ -382,6 +383,20 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
   return n;
 
 } // end of `uint32_t CreateCollectorPerIdentifier (CollectorMap &);`
+
+
+std::string
+SatStatsHelper::GetOutputPath () const
+{
+  return Singleton<SatEnvVariables>::Get ()->GetOutputPath ();
+}
+
+
+std::string
+SatStatsHelper::GetOutputFileName () const
+{
+  return GetOutputPath () + "/" + GetName ();
+}
 
 
 std::string
