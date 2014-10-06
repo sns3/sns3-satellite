@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 #include "ns3/fatal-error.h"
 #include "ns3/string.h"
+#include "ns3/boolean.h"
 #include "satellite-env-variables.h"
 
 
@@ -53,7 +54,27 @@ SatEnvVariables::GetTypeId (void)
                    "Path to the data folder.",
                    StringValue ("src/satellite/data"),
                    MakeStringAccessor (&SatEnvVariables::m_dataPath),
-                   MakeStringChecker ());
+                   MakeStringChecker ())
+    .AddAttribute ("SimulationCampaignName",
+                   "Simulation campaign name. Affects the simulation folder.",
+                   StringValue (""),
+                   MakeStringAccessor (&SatEnvVariables::m_campaignName),
+                   MakeStringChecker ())
+    .AddAttribute ("SimulationRootName",
+                   "Path to the simulation root folder.",
+                   StringValue ("sims"),
+                   MakeStringAccessor (&SatEnvVariables::m_simRootPath),
+                   MakeStringChecker ())
+    .AddAttribute ("SimulationTag",
+                   "Tag related to the current simulation.",
+                   StringValue ("default"),
+                   MakeStringAccessor (&SatEnvVariables::m_simTag),
+                   MakeStringChecker ())
+    .AddAttribute ("EnableSimulationOutputOverwrite",
+                   "Enable simulation output overwrite.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatEnvVariables::m_enableOutputOverwrite),
+                   MakeBooleanChecker ());
   return tid;
 }
 
@@ -69,7 +90,13 @@ SatEnvVariables::SatEnvVariables () :
   m_currentWorkingDirectoryFromAttribute (""),
   m_pathToExecutableFromAttribute (""),
   m_levelsToCheck (10),
-  m_dataPath ("src/satellite/data")
+  m_dataPath ("src/satellite/data"),
+  m_outputPath (""),
+  m_campaignName (""),
+  m_simRootPath ("sims"),
+  m_simTag ("default"),
+  m_enableOutputOverwrite (false),
+  m_isOutputPathInitialized (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -102,13 +129,42 @@ SatEnvVariables::SatEnvVariables () :
 void
 SatEnvVariables::SetCurrentWorkingDirectory (std::string currentWorkingDirectory)
 {
+  NS_LOG_FUNCTION (this);
+
   m_currentWorkingDirectory = currentWorkingDirectory;
 }
 
 void
 SatEnvVariables::SetPathToExecutable (std::string pathToExecutable)
 {
+  NS_LOG_FUNCTION (this);
+
   m_pathToExecutable = pathToExecutable;
+}
+
+std::string
+SatEnvVariables::GetOutputPath ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_isOutputPathInitialized)
+    {
+      InitializeOutputFolders (m_simRootPath, m_campaignName, m_simTag, m_enableOutputOverwrite);
+      m_isOutputPathInitialized = true;
+    }
+  return m_outputPath;
+}
+
+void
+SatEnvVariables::SetOutputVariables (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite)
+{
+  m_campaignName = campaignName;
+  m_simRootPath = simRootPath;
+  m_simTag = simTag;
+  m_enableOutputOverwrite = enableOutputOverwrite;
+
+  InitializeOutputFolders (simRootPath, campaignName, simTag, enableOutputOverwrite);
+  m_isOutputPathInitialized = true;
 }
 
 SatEnvVariables::~SatEnvVariables ()
@@ -185,6 +241,8 @@ SatEnvVariables::IsValidDirectory (std::string path)
 std::string
 SatEnvVariables::LocateDataDirectory ()
 {
+  NS_LOG_FUNCTION (this);
+
   return LocateDirectory (GetDataPath ());
 }
 
@@ -226,6 +284,138 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
     }
 
   return path;
+}
+
+std::string
+SatEnvVariables::InitializeOutputFolders (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatEnvVariables::CreateOutputDirectory - Creating output directory");
+
+  uint32_t safety = 0;
+  std::string safetyTag = "";
+  std::string outputPath = "";
+  bool directoryExists = true;
+
+  if (!simRootPath.empty())
+    {
+      if (!IsValidDirectory (simRootPath))
+        {
+          CreateDirectory (simRootPath);
+        }
+    }
+
+  if (!campaignName.empty())
+    {
+      std::string tempString = AddToPath(simRootPath, campaignName);
+
+      if (!IsValidDirectory (tempString))
+        {
+          CreateDirectory (tempString);
+        }
+    }
+
+  while (directoryExists)
+    {
+      outputPath = FormOutputPath (simRootPath, campaignName, simTag, safetyTag);
+      directoryExists = IsValidDirectory (outputPath);
+
+      if( (!directoryExists && !enableOutputOverwrite) || enableOutputOverwrite)
+        {
+          CreateDirectory (outputPath);
+          directoryExists = false;
+        }
+      else
+        {
+          safety++;
+
+          NS_LOG_INFO ("SatEnvVariables::CreateOutputDirectory - Directory " << outputPath << " exists, increasing safety number to " << safety);
+
+          std::stringstream ss;
+          ss << safety;
+          safetyTag = ss.str();
+        }
+    }
+
+  m_outputPath = outputPath;
+  return outputPath;
+}
+
+std::string
+SatEnvVariables::FormOutputPath (std::string simRootPath, std::string campaignName, std::string simTag, std::string safetyTag)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::string outputPath = "";
+  std::stringstream tempTag;
+
+  tempTag << simTag;
+
+  if (!safetyTag.empty())
+    {
+      tempTag << safetyTag;
+    }
+
+  outputPath = AddToPath(outputPath, simRootPath);
+  outputPath = AddToPath(outputPath, campaignName);
+  outputPath = AddToPath(outputPath, tempTag.str ());
+
+  NS_LOG_INFO ("SatEnvVariables::FormOutputPath - Formed path " + outputPath);
+
+  return outputPath;
+}
+
+std::string
+SatEnvVariables::AddToPath (std::string path, std::string stringToAdd)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::stringstream tempPath;
+  tempPath << path;
+
+  if (!stringToAdd.empty())
+    {
+      if (tempPath.str ().empty())
+        {
+          tempPath << stringToAdd;
+        }
+      else
+        {
+          tempPath << "/" << stringToAdd;
+        }
+    }
+  return tempPath.str ();
+}
+
+void
+SatEnvVariables::CreateDirectory (std::string path)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("SatEnvVariables::CreateDirectory - Creating directory " + path);
+
+  mkdir (path.c_str(), 0777);
+}
+
+std::string
+SatEnvVariables::GetCurrentDateAndTime ()
+{
+  NS_LOG_FUNCTION (this);
+
+  time_t rawtime;
+  struct tm * timeinfo;
+  char buffer[80];
+
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+
+  strftime (buffer,80,"%d-%m-%Y %I:%M:%S",timeinfo);
+  std::string str (buffer);
+
+  NS_LOG_INFO ("SatEnvVariables::GetCurrentRealDateAndTime - " + str);
+
+  return str;
 }
 
 } // namespace ns3

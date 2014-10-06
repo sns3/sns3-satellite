@@ -992,25 +992,25 @@ SimpleUnicastTestSuite::SimpleUnicastTestSuite ()
   AddTestCase (new SimpleUnicast1, TestCase::QUICK);
 
   // add simple-unicast-2 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast2, TestCase::EXTENSIVE);
+  AddTestCase (new SimpleUnicast2, TestCase::QUICK);
 
   // add simple_unicast-3 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast3, TestCase::EXTENSIVE);
+  AddTestCase (new SimpleUnicast3, TestCase::QUICK);
 
   // add simple-unicast-4 case to suite sat-simple-unicast
   AddTestCase (new SimpleUnicast4, TestCase::QUICK);
 
   // add simple-unicast-5 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast5, TestCase::EXTENSIVE);
+  AddTestCase (new SimpleUnicast5, TestCase::QUICK);
 
   // add simple-unicast-6 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast6, TestCase::EXTENSIVE);
+  AddTestCase (new SimpleUnicast6, TestCase::QUICK);
 
   // add simple-unicast-7 case to suite sat-simple-unicast
   AddTestCase (new SimpleUnicast7, TestCase::QUICK);
 
   // add simple-unicast-8 case to suite sat-simple-unicast
-  AddTestCase (new SimpleUnicast8, TestCase::EXTENSIVE);
+  AddTestCase (new SimpleUnicast8, TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite

@@ -165,11 +165,10 @@ public:
 
   /**
    * Enables creation traces to be written in given file
-   * \param filename  name to the file for trace writing
    * \param details true means that lower layer details are printed also,
    *                false means that only creation summary is printed
    */
-  void EnableCreationTraces(std::string filename, bool details);
+  void EnableCreationTraces(bool details);
 
   /**
    * Enable packet traces
@@ -269,6 +268,16 @@ private:
    * Info is set by attribute BeamInfo
    */
   BeamUserInfoMap_t m_beamUserInfos;
+
+  /**
+   * File name for scenario creation trace output
+   */
+  std::string m_scenarioCreationFileName;
+
+  /**
+   * File name for UT creation trace output
+   */
+  std::string m_utCreationFileName;
 
   /**
    * Antenna gain patterns for all spot-beams. Used for beam selection.

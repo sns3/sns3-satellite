@@ -54,7 +54,6 @@ main (int argc, char *argv[])
   std::string offTime = "0.5";
   std::string scenario = "simple";
   std::string sender = "both";
-  std::string scenarioLogFile = "";
   std::string simDuration = "11s";
 
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
@@ -68,7 +67,6 @@ main (int argc, char *argv[])
   cmd.AddValue("sender", "Packet sender (ut, gw, or both).", sender);
   cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
   cmd.AddValue("simDuration", "Duration of the simulation (Time)", simDuration);
-  cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
   // select scenario, if correct one given, by default simple scenarion is used.
@@ -86,6 +84,12 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue (dataRate));
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-onoff"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // enable info logs
   LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
@@ -105,11 +109,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  // create scenarion creation log if file name is given
-  if ( scenarioLogFile != "" )
-    {
-      helper->EnableCreationTraces(scenarioLogFile, false);
-    }
+  helper->EnableCreationTraces(false);
 
   // create scenario
   helper->CreatePredefinedScenario(satScenario);
@@ -169,7 +169,6 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  OnTime: " << onTime);
   NS_LOG_INFO("  OffTime: " << offTime);
   NS_LOG_INFO("  Duration: " << simDuration);
-  NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
 
   // run simulation and finally destroy it

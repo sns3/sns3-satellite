@@ -63,7 +63,6 @@ main (int argc, char *argv[])
   uint32_t packetSize = 512;
   std::string interval = "1s";
   std::string scenario = "simple";
-  std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   /// Read command line parameters given by user
@@ -71,7 +70,6 @@ main (int argc, char *argv[])
   cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
-  cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
   /// Enable Rx power calculation & Rx power density output trace
@@ -91,6 +89,12 @@ main (int argc, char *argv[])
 
   /// Enable composite SINR output trace
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-trace-output"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   /// Disable figure output
   //Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
@@ -134,10 +138,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  if ( scenarioLogFile != "" )
-    {
-      helper->EnableCreationTraces(scenarioLogFile, false);
-    }
+  helper->EnableCreationTraces(false);
 
   helper->CreatePredefinedScenario(satScenario);
 
@@ -177,7 +178,6 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);
-  NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
 
   Simulator::Stop (Seconds(11));

@@ -226,7 +226,6 @@ main (int argc, char *argv[])
   uint32_t preDefinedGroup = (uint32_t) GROUP_1;
   uint32_t fullScenarioReceivers = 10;
   std::string scenario = "larger";
-  std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
   bool sinkToAll = false; // when set sink(s) are added to all user nodes in order to test that unnecessary routes are not added
 
@@ -239,12 +238,17 @@ main (int argc, char *argv[])
   cmd.AddValue("preDefinedGroup", "Pre-defined multicast group for larger scenario. (0 = all)", preDefinedGroup);
   cmd.AddValue ("fullScenarioReceivers", "Number of the receivers in full scenario", fullScenarioReceivers);
   cmd.AddValue("sinkToAll", "Add multicast sink to all users.", sinkToAll);
-  cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
   /// Set network types which support multicast
   Config::SetDefault ("ns3::SatUserHelper::BackboneNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
   Config::SetDefault ("ns3::SatUserHelper::SubscriberNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-multicast"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   if ( scenario == "larger")
     {
@@ -279,10 +283,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  if ( scenarioLogFile != "" )
-    {
-      helper->EnableCreationTraces (scenarioLogFile, false);
-    }
+  helper->EnableCreationTraces (false);
 
   helper->CreatePredefinedScenario (satScenario);
   helper->EnablePacketTrace ();

@@ -30,6 +30,8 @@
 #include "../model/satellite-mobility-model.h"
 #include "../model/satellite-free-space-loss.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -81,7 +83,6 @@ SatFreeSpaceLossTestCase::DoRun (void)
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->EnableCreationTraces("fsl-test.log", false);
   helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
   NodeContainer gw = helper->GwNodes();

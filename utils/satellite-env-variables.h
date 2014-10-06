@@ -88,6 +88,12 @@ public:
   std::string GetDataPath () { return m_dataPath; }
 
   /**
+   * \brief Function for getting the simulation folder
+   * \return path to the simulation folder
+   */
+  std::string GetOutputPath ();
+
+  /**
    * \brief Function for locating the data directory within the NS-3 simulator folder
    * \return path to the data directory
    */
@@ -106,8 +112,56 @@ public:
    */
   bool IsValidDirectory (std::string path);
 
+  /**
+   * \brief Returns current real world date and time
+   * \return date and time as a string
+   */
+  std::string GetCurrentDateAndTime ();
+
+  /**
+   * \brief Function for forming the output path and directory structure
+   * \param simRootPath simulation output root path
+   * \param campaignName simulation campaign name
+   * \param simTag simulation tag
+   * \param enableOutputOverwrite is simulation output overwrite enabled
+   * \return path to the created folder
+   */
+  std::string InitializeOutputFolders (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite);
+
+  /**
+   * \brief Function for setting the output variables. The function also creates the output folder based on the new variables
+   * \param simRootPath simulation output root path
+   * \param campaignName simulation campaign name
+   * \param simTag simulation tag
+   * \param enableOutputOverwrite is simulation output overwrite enabled
+   */
+  void SetOutputVariables (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite);
 
 private:
+
+  /**
+   * \brief Function for forming the next level of a path
+   * \param path path
+   * \param stringToAdd string to be added to the path
+   * \return combined path
+   */
+  std::string AddToPath (std::string path, std::string stringToAdd);
+
+  /**
+   * \brief Function for forming the output path
+   * \param simRootPath simulation output root path
+   * \param campaignName simulation campaign name
+   * \param simTag simulation tag
+   * \param safetyTag safety tag for avoiding overwrites
+   * \return path to the created folder
+   */
+  std::string FormOutputPath (std::string simRootPath, std::string campaignName, std::string simTag, std::string safetyTag);
+
+  /**
+   * Function for creating a directory
+   * \param path path to the directory to be created
+   */
+  void CreateDirectory (std::string path);
 
   /**
    * \brief Path to current working directory
@@ -138,6 +192,36 @@ private:
    * \brief Default data path
    */
   std::string m_dataPath;
+
+  /**
+   * \brief Result output path
+   */
+  std::string m_outputPath;
+
+  /**
+   * \brief Simulation campaign name. Affects the simulation output folder.
+   */
+  std::string m_campaignName;
+
+  /**
+   * \brief Path to the simulation output root folder
+   */
+  std::string m_simRootPath;
+
+  /**
+   * \brief Tag related to the current simulation
+   */
+  std::string m_simTag;
+
+  /**
+   * \brief Enable simulation output overwrite
+   */
+  bool m_enableOutputOverwrite;
+
+  /**
+   * \brief Is output path initialized
+   */
+  bool m_isOutputPathInitialized;
 };
 
 } // namespace ns3

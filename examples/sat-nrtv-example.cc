@@ -65,7 +65,6 @@ main (int argc, char *argv[])
 
   std::string scenario = "simple";
   double duration = 100;
-  std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   // read command line parameters given by user
@@ -74,8 +73,6 @@ main (int argc, char *argv[])
                 scenario);
   cmd.AddValue ("duration", "Simulation duration (in seconds)",
                 duration);
-  cmd.AddValue ("logFile", "File name for scenario creation log",
-                scenarioLogFile);
   cmd.Parse (argc, argv);
 
   if (scenario == "larger")
@@ -86,6 +83,12 @@ main (int argc, char *argv[])
     {
       satScenario = SatHelper::FULL;
     }
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-nrtv"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   //LogComponentEnableAll (LOG_PREFIX_ALL);
   //LogComponentEnable ("NrtvClient", LOG_LEVEL_ALL);
@@ -103,10 +106,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  if (scenarioLogFile != "")
-    {
-      helper->EnableCreationTraces (scenarioLogFile, false);
-    }
+  helper->EnableCreationTraces (false);
 
   helper->CreatePredefinedScenario (satScenario);
 
@@ -124,7 +124,6 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("--- sat-nrtv-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
-  NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO ("  ");
 
   Simulator::Stop (Seconds (duration));

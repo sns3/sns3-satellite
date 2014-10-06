@@ -42,6 +42,12 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-environmental-variables-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatEnvVariables", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("exampleCampaign"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("exampleTag"));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   /// Create default environmental variables
   Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
 
@@ -49,9 +55,11 @@ main (int argc, char *argv[])
   Simulator::Schedule (MilliSeconds(0), &SatEnvVariables::GetCurrentWorkingDirectory, envVariables);
   Simulator::Schedule (MilliSeconds(1), &SatEnvVariables::GetPathToExecutable, envVariables);
   Simulator::Schedule (MilliSeconds(2), &SatEnvVariables::GetDataPath, envVariables);
-  Simulator::Schedule (MilliSeconds(3), &SatEnvVariables::LocateDataDirectory, envVariables);
-  Simulator::Schedule (MilliSeconds(4), &SatEnvVariables::LocateDirectory, envVariables, "src/satellite/data");
-  Simulator::Schedule (MilliSeconds(5), &SatEnvVariables::IsValidDirectory, envVariables, "src/satellite/data/notfound");
+  Simulator::Schedule (MilliSeconds(3), &SatEnvVariables::GetOutputPath, envVariables);
+  Simulator::Schedule (MilliSeconds(4), &SatEnvVariables::LocateDataDirectory, envVariables);
+  Simulator::Schedule (MilliSeconds(5), &SatEnvVariables::LocateDirectory, envVariables, "src/satellite/data");
+  Simulator::Schedule (MilliSeconds(6), &SatEnvVariables::IsValidDirectory, envVariables, "src/satellite/data/notfound");
+  Simulator::Schedule (MilliSeconds(7), &SatEnvVariables::GetCurrentDateAndTime, envVariables);
 
   Simulator::Run ();
   Simulator::Destroy ();

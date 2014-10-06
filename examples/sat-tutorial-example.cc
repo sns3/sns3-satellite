@@ -48,7 +48,6 @@ main (int argc, char *argv[])
 {
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
   std::string scenario = "Simple";
-  std::string scenarioLogFile = "tutorial-creation.log";
 
   /*****************************************************************************
    'To Select super frame configuration, Option 2'
@@ -71,7 +70,6 @@ main (int argc, char *argv[])
    -- Start --                                                                */
 
   CommandLine cmd;
-  cmd.AddValue ("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.AddValue ("scenario", "Scenario to be created", scenario);
   cmd.Parse (argc, argv);
                                                                               /**
@@ -92,6 +90,12 @@ main (int argc, char *argv[])
     {
       satScenario = SatHelper::FULL;
     }
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-tutorial"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -121,12 +125,10 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  if ( scenarioLogFile != "" )
-    {
-      helper->EnableCreationTraces (scenarioLogFile, false);
-    }
+  // Enable creation traces.
+  helper->EnableCreationTraces (false);
 
-  // create satellite helper with given scenario default=simple
+  // Create satellite helper with given scenario default=simple
   helper->CreatePredefinedScenario (satScenario);
 
   // Enable packet traces (to file PacketTrace.log).
@@ -194,7 +196,6 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("--- Tutorial-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
-  NS_LOG_INFO ("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO ("  ");
 
   /*****************************************************************************

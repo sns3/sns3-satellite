@@ -34,6 +34,8 @@
 #include "../model/satellite-rtn-link-time.h"
 #include "satellite-helper.h"
 #include "../model/satellite-log.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -83,6 +85,16 @@ SatHelper::GetTypeId (void)
                      MakeIpv4AddressAccessor (&SatHelper::SetUtNetworkAddress,
                                               &SatHelper::GetUtNetworkAddress),
                      MakeIpv4AddressChecker ())
+      .AddAttribute ("ScenarioCreationTraceFileName",
+                     "File name for the scenario creation trace output",
+                     StringValue ("CreationTraceScenario"),
+                     MakeStringAccessor (&SatHelper::m_scenarioCreationFileName),
+                     MakeStringChecker ())
+      .AddAttribute ("UtCreationTraceFileName",
+                     "File name for the UT creation trace output",
+                     StringValue ("CreationTraceUt"),
+                     MakeStringAccessor (&SatHelper::m_utCreationFileName),
+                     MakeStringChecker ())
       .AddTraceSource ("Creation", "Creation traces",
                         MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace))
       .AddTraceSource ("CreationSummary", "Creation summary traces",
@@ -191,23 +203,21 @@ void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
       NS_FATAL_ERROR ("Not supported predefined scenario.");
       break;
   }
-
 }
 
-void SatHelper::EnableCreationTraces (std::string filename, bool details)
+void SatHelper::EnableCreationTraces (bool details)
 {
   NS_LOG_FUNCTION (this);
 
   AsciiTraceHelper asciiTraceHelper;
-  std::string outputFile = "creation.log";
 
-  if (!filename.empty())
-    {
-      outputFile = filename;
-    }
+  std::stringstream outputPathCreation;
+  std::stringstream outputPathUt;
+  outputPathCreation << Singleton<SatEnvVariables>::Get ()->GetOutputPath () << "/" << m_scenarioCreationFileName << ".log";
+  outputPathUt << Singleton<SatEnvVariables>::Get ()->GetOutputPath () << "/" << m_utCreationFileName << ".log";
 
-  m_creationTraceStream = asciiTraceHelper.CreateFileStream (outputFile);
-  m_utTraceStream = asciiTraceHelper.CreateFileStream ("ut-pos-" + outputFile);
+  m_creationTraceStream = asciiTraceHelper.CreateFileStream (outputPathCreation.str ());
+  m_utTraceStream = asciiTraceHelper.CreateFileStream (outputPathUt.str ());
 
   TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 

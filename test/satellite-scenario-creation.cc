@@ -34,6 +34,7 @@
 #include "../helper/satellite-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -78,8 +79,11 @@ ScenarioCreationSimple::~ScenarioCreationSimple ()
 void
 ScenarioCreationSimple::DoRun (void)
 {
-  // Reset ID mapper
+  // Reset singletons
   Singleton<SatIdMapper>::Get ()->Reset ();
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "simple-scenario", true);
 
   // Create simple scenario
 
@@ -90,7 +94,7 @@ ScenarioCreationSimple::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->EnableCreationTraces("simple-scenario-creation.log", false);
+  helper->EnableCreationTraces (false);
   helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -141,8 +145,11 @@ ScenarioCreationLarger::~ScenarioCreationLarger ()
 void
 ScenarioCreationLarger::DoRun (void)
 {
-  // Reset ID mapper
+  // Reset singletons
   Singleton<SatIdMapper>::Get ()->Reset ();
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "larger-scenario", true);
 
   // Create larger scenario
 
@@ -153,7 +160,7 @@ ScenarioCreationLarger::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->EnableCreationTraces("larger-scenario-creation.log", false);
+  helper->EnableCreationTraces (false);
   helper->CreatePredefinedScenario(SatHelper::LARGER);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -204,8 +211,11 @@ ScenarioCreationFull::~ScenarioCreationFull ()
 void
 ScenarioCreationFull::DoRun (void)
 {
-  // Reset ID mapper
+  // Reset singletons
   Singleton<SatIdMapper>::Get ()->Reset ();
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "full-scenario", true);
 
   // Create full scenario
 
@@ -216,7 +226,7 @@ ScenarioCreationFull::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->EnableCreationTraces("full-scenario-creation.log", false );
+  helper->EnableCreationTraces (false);
   helper->CreatePredefinedScenario(SatHelper::FULL);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -272,8 +282,11 @@ ScenarioCreationUser::~ScenarioCreationUser ()
 void
 ScenarioCreationUser::DoRun (void)
 {
-  // Reset ID mapper
+  // Reset singletons
   Singleton<SatIdMapper>::Get ()->Reset ();
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "user-scenario", true);
 
   // Create user scenario
 
@@ -291,7 +304,7 @@ ScenarioCreationUser::DoRun (void)
   beamInfo.AppendUt(2);
   beamMap[2] = beamInfo;
 
-  helper->EnableCreationTraces("user-scenario-creation.log", false );
+  helper->EnableCreationTraces (false);
 
   helper->CreateUserDefinedScenario (beamMap);
 
@@ -319,13 +332,13 @@ ScenarioCreationTestSuite::ScenarioCreationTestSuite ()
   AddTestCase (new ScenarioCreationSimple, TestCase::QUICK);
 
   // add ScenarioCreationLarger case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationLarger, TestCase::EXTENSIVE);
+  AddTestCase (new ScenarioCreationLarger, TestCase::QUICK);
 
   // add ScenarioCreationFull case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationFull, TestCase::EXTENSIVE);
+  AddTestCase (new ScenarioCreationFull, TestCase::QUICK);
 
   // add ScenarioCreationUser case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationUser, TestCase::EXTENSIVE);
+  AddTestCase (new ScenarioCreationUser, TestCase::QUICK);
 
 }
 

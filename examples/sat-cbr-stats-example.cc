@@ -96,7 +96,6 @@ main (int argc, char *argv[])
   uint32_t packetSize = 512;
   std::string interval = "1s";
   std::string scenario = "larger";
-  std::string scenarioLogFile = "";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
   double duration = 4;
 
@@ -106,7 +105,6 @@ main (int argc, char *argv[])
   cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue("duration", "Simulation duration (in seconds)", duration);
   cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
-  cmd.AddValue("logFile", "File name for scenario creation log", scenarioLogFile);
   cmd.Parse (argc, argv);
 
   if ( scenario == "larger")
@@ -117,6 +115,12 @@ main (int argc, char *argv[])
     {
       satScenario = SatHelper::FULL;
     }
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr-stats"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // enable info logs
   //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -136,10 +140,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  if ( scenarioLogFile != "" )
-    {
-      helper->EnableCreationTraces(scenarioLogFile, false);
-    }
+  helper->EnableCreationTraces(false);
 
   helper->CreatePredefinedScenario(satScenario);
 
@@ -351,7 +352,6 @@ main (int argc, char *argv[])
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);
-  NS_LOG_INFO("  Creation logFile: " << scenarioLogFile);
   NS_LOG_INFO("  ");
 
   Simulator::Stop (Seconds (duration));

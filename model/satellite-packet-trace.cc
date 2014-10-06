@@ -24,9 +24,9 @@
 #include "ns3/trace-helper.h"
 #include "ns3/string.h"
 #include "ns3/mac48-address.h"
-
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 #include "satellite-packet-trace.h"
-
 
 NS_LOG_COMPONENT_DEFINE ("SatPacketTrace");
 
@@ -39,9 +39,11 @@ SatPacketTrace::SatPacketTrace ()
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   AsciiTraceHelper asciiTraceHelper;
-  std::string outputFile = "packetTrace.log";
 
-  m_packetTraceStream = asciiTraceHelper.CreateFileStream (m_fileName + ".log");
+  std::stringstream outputPath;
+  outputPath << Singleton<SatEnvVariables>::Get ()->GetOutputPath () << "/" << m_fileName << ".log";
+
+  m_packetTraceStream = asciiTraceHelper.CreateFileStream (outputPath.str ());
 
   PrintHeader ();
 }

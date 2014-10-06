@@ -97,6 +97,11 @@ main (int argc, char *argv[])
    * -----------------------------------------------
    */
 
+  // Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("example-training"));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // Enable RBDC for BE
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
@@ -147,8 +152,8 @@ main (int argc, char *argv[])
   std::string scenarioName = "Scenario72";
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  std::string st ("creation-trace-training");
-  helper->EnableCreationTraces (st, false);
+  // Enable creation traces
+  helper->EnableCreationTraces (false);
 
   // Each beam will have 'utsPerBeam' user terminals and 'endUsersPerUt'
   // end users per UT. Note, that this allows also different configurations

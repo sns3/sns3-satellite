@@ -80,6 +80,12 @@ main (int argc, char *argv[])
   cmd.AddValue ("extFadingOn", "External fading on/off (true/false).", extFadingOn);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("example-external-fading"));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // enable info logs
   LogComponentEnable ("sat-ext-fading-example", LOG_LEVEL_INFO);
 
@@ -117,7 +123,7 @@ main (int argc, char *argv[])
   // create helper
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->EnableCreationTraces ("ext-fading", false);
+  helper->EnableCreationTraces (false);
 
   /** create user defined scenario */
 

@@ -170,7 +170,7 @@ PerfMemTestSuite::PerfMemTestSuite ()
   : TestSuite ("sat-perf-mem", SYSTEM)
 {
   // add pm-1 case to suite sat-perf-mem
-  AddTestCase (new Pm1, TestCase::EXTENSIVE);
+  AddTestCase (new Pm1, TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite
