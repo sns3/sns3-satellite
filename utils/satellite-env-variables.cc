@@ -27,7 +27,6 @@
 #include "ns3/boolean.h"
 #include "satellite-env-variables.h"
 
-
 NS_LOG_COMPONENT_DEFINE ("SatEnvVariables");
 
 namespace ns3 {
@@ -170,6 +169,8 @@ SatEnvVariables::SetOutputVariables (std::string simRootPath, std::string campai
 SatEnvVariables::~SatEnvVariables ()
 {
   NS_LOG_FUNCTION (this);
+
+  DumpSimulationInformation ();
 
   m_currentWorkingDirectory = "";
   m_pathToExecutable = "";
@@ -416,6 +417,47 @@ SatEnvVariables::GetCurrentDateAndTime ()
   NS_LOG_INFO ("SatEnvVariables::GetCurrentRealDateAndTime - " + str);
 
   return str;
+}
+
+void
+SatEnvVariables::GetRevisionInformation (Ptr<SatOutputFileStreamStringContainer> outputContainer)
+{
+  std::string command = "hg log | head -n 5 2>&1";
+
+  FILE* pipe = popen(command.c_str (), "r");
+  if (pipe)
+    {
+      std::string data = "";
+      char buffer[1024];
+      while(!feof(pipe))
+        {
+          if(fgets(buffer, 1024, pipe) != NULL)
+            {
+              buffer[strlen(buffer)-1] = '\0';
+              data.append (buffer);
+              outputContainer->AddToContainer (data);
+              data = "";
+            }
+        }
+      pclose(pipe);
+    }
+}
+
+void
+SatEnvVariables::DumpSimulationInformation ()
+{
+  std::stringstream fileName;
+  fileName << m_outputPath << "/SimInfo.log";
+  Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
+
+  GetRevisionInformation (outputContainer);
+
+  std::stringstream line1;
+  line1 << "Simulation finished at " << GetCurrentDateAndTime ();
+
+  outputContainer->AddToContainer (line1.str ());
+
+  outputContainer->WriteContainerToFile ();
 }
 
 } // namespace ns3

@@ -23,6 +23,7 @@
 #include "ns3/object.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "satellite-output-fstream-string-container.h"
 
 namespace ns3 {
 
@@ -138,6 +139,17 @@ public:
   void SetOutputVariables (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite);
 
 private:
+
+  /**
+   * \brief Function for outputting the most essential simulation specific environmental information
+   */
+  void DumpSimulationInformation ();
+
+  /**
+   * \brief Function for getting the revision information for this simulation
+   * \param outputContainer pointer to output container
+   */
+  void GetRevisionInformation (Ptr<SatOutputFileStreamStringContainer> outputContainer);
 
   /**
    * \brief Function for forming the next level of a path
