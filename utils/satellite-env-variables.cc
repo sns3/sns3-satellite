@@ -170,7 +170,10 @@ SatEnvVariables::~SatEnvVariables ()
 {
   NS_LOG_FUNCTION (this);
 
-  DumpSimulationInformation ();
+  if (m_isOutputPathInitialized)
+  {
+      DumpSimulationInformation ();
+  }
 
   m_currentWorkingDirectory = "";
   m_pathToExecutable = "";
@@ -446,8 +449,9 @@ SatEnvVariables::GetRevisionInformation (Ptr<SatOutputFileStreamStringContainer>
 void
 SatEnvVariables::DumpSimulationInformation ()
 {
+  std::string dataPath = LocateDirectory (m_outputPath);
   std::stringstream fileName;
-  fileName << m_outputPath << "/SimInfo.log";
+  fileName << dataPath << "/SimInfo.log";
   Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
 
   GetRevisionInformation (outputContainer);
