@@ -117,6 +117,11 @@ main (int argc, char *argv[])
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-dama-onoff-sim-tn9"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // NCC configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));

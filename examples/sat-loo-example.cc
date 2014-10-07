@@ -43,6 +43,11 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-loo-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatLooModel", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-loo"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   /// Load default configuration
   Ptr<SatLooConf> looConf = CreateObject<SatLooConf> ();
 

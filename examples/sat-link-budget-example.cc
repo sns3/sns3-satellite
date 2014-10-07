@@ -85,6 +85,11 @@ main (int argc, char *argv[])
   cmd.AddValue ("altitude", "Altitude of UT position (meters)", altitude);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-link-budget"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // enable info logs
   LogComponentEnable ("sat-link-budget-example", LOG_LEVEL_INFO);
 

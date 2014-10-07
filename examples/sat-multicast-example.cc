@@ -245,7 +245,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatUserHelper::SubscriberNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-multicast"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));

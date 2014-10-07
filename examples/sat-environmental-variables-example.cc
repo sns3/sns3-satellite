@@ -43,7 +43,6 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatEnvVariables", LOG_LEVEL_INFO);
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("exampleCampaign"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("exampleTag"));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));

@@ -83,6 +83,11 @@ main (int argc, char *argv[])
   cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-random-access-dynamic-load-control"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // Configure error model
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_AVI);
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));

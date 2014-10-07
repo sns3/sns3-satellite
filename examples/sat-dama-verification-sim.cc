@@ -72,6 +72,11 @@ main (int argc, char *argv[])
   cmd.AddValue ("packetSize", "Packet size in bytes", packetSize);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-dama-verification-sim"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // 5 ms -> 200 packets per second
   // 250 B -> 400 kbps
   // 500 B -> 800 kbps

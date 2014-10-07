@@ -83,7 +83,8 @@ ScenarioCreationSimple::DoRun (void)
   Singleton<SatIdMapper>::Get ()->Reset ();
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "simple-scenario", true);
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-scenario-creation", "simple-scenario", true);
 
   // Create simple scenario
 
@@ -100,6 +101,8 @@ ScenarioCreationSimple::DoRun (void)
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
   NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 1, "UT User count is not what expected!");
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 
   Simulator::Destroy();
 }
@@ -149,7 +152,8 @@ ScenarioCreationLarger::DoRun (void)
   Singleton<SatIdMapper>::Get ()->Reset ();
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "larger-scenario", true);
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-scenario-creation", "larger-scenario", true);
 
   // Create larger scenario
 
@@ -166,6 +170,8 @@ ScenarioCreationLarger::DoRun (void)
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
   NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 
   Simulator::Destroy();
 }
@@ -215,7 +221,8 @@ ScenarioCreationFull::DoRun (void)
   Singleton<SatIdMapper>::Get ()->Reset ();
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "full-scenario", true);
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-scenario-creation", "full-scenario", true);
 
   // Create full scenario
 
@@ -236,6 +243,8 @@ ScenarioCreationFull::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
   //NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what expected!");
   NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 72*3*3, "UT User count is not what expected!");
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 
   Simulator::Destroy();
 }
@@ -286,7 +295,8 @@ ScenarioCreationUser::DoRun (void)
   Singleton<SatIdMapper>::Get ()->Reset ();
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sims", "test-scenario-creation", "user-scenario", true);
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-scenario-creation", "user-scenario", true);
 
   // Create user scenario
 
@@ -311,6 +321,8 @@ ScenarioCreationUser::DoRun (void)
   // check results what can be done at this level. More checking done in module level with traces
   NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
   NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 
   Simulator::Destroy();
 }

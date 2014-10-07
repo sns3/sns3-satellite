@@ -92,6 +92,12 @@ main (int argc, char *argv[])
       LogComponentEnable ("sat-ra-sim-tn9", LOG_INFO);
     }
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-ra-sim-tn9-comparison"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+
   // Enable Random Access with all available modules
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
 

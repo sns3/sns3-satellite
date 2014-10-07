@@ -98,7 +98,6 @@ main (int argc, char *argv[])
    */
 
   // Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("example-training"));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 

@@ -119,6 +119,11 @@ main (int argc, char *argv[])
   cmd.AddValue ("utAppStartTime", "Application (first) start time.", utAppStartTime);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-rtn-system-test"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // select pre-defined super frame configuration wanted to use.
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue (preDefinedFrameConfig));
 

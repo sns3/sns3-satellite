@@ -81,9 +81,8 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("example-external-fading"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-external-fading"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // enable info logs

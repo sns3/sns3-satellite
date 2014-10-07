@@ -132,6 +132,11 @@ SatMarkovFadingExamplePlot::GetGnuplot (std::string outputName, std::string titl
 void
 SatMarkovFadingExamplePlot::Run ()
 {
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-markov-fading-trace"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   /// Create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 

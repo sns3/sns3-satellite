@@ -145,6 +145,8 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string satPos = scenarioName + "GeoPos.txt";
   std::string wfConf = "dvbRcs2Waveforms.txt";
 
+  Singleton<SatEnvVariables>::Get ()->Initialize ();
+
   m_satConf = CreateObject<SatConf> ();
 
   m_satConf->Initialize (satConf, gwPos, satPos, wfConf);

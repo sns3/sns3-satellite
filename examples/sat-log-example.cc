@@ -59,6 +59,11 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-log-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatLog", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-log"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_GENERIC, "", "Logging for generic messages started");
   Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_INFO, "", "Logging for info messages started");
   Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", "Logging for warning messages started");

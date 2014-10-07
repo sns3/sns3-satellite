@@ -91,7 +91,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-trace-output"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));

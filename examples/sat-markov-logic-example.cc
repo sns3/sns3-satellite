@@ -68,6 +68,11 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatMarkovModel", LOG_LEVEL_INFO);
   LogComponentEnable ("SatMarkovConf", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-markov-logic"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   /// Create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 

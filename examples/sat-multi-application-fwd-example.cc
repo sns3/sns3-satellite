@@ -68,7 +68,6 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds(0.001);
   Time appStopTime = Seconds(10.0);
 
-
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
@@ -76,6 +75,11 @@ main (int argc, char *argv[])
   cmd.AddValue("cbrProbability", "Probability of CBR end users", cbrProbability);
   cmd.AddValue("simLength", "Simulation length in seconds", simLength);
   cmd.Parse (argc, argv);
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-multi-application-fwd"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // No PHY errors
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);

@@ -134,6 +134,11 @@ main (int argc, char *argv[])
   cmd.AddValue ("senderAppStartTime", "Sender application (first) start time", senderAppStartTime);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-fwd-system-test"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   /**
    * Select test case to execute
    */

@@ -77,7 +77,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationRootName", StringValue ("sims"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-trace-input-interference"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));

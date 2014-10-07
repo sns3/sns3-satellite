@@ -42,6 +42,11 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-rayleigh-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRayleighModel", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-rayleigh"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   /// Create fader
   Ptr<SatRayleighConf> rayleighConf = CreateObject<SatRayleighConf> ();
   Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel> (rayleighConf,0,0);

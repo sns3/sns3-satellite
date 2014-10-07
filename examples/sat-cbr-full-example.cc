@@ -65,6 +65,11 @@ main (int argc, char *argv[])
   cmd.AddValue("simLength", "Simulation length in seconds", simLength);
   cmd.Parse (argc, argv);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr-full"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue(utsPerBeam));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue(endUsersPerUt));
 

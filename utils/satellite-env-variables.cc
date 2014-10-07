@@ -59,11 +59,6 @@ SatEnvVariables::GetTypeId (void)
                    StringValue (""),
                    MakeStringAccessor (&SatEnvVariables::m_campaignName),
                    MakeStringChecker ())
-    .AddAttribute ("SimulationRootName",
-                   "Path to the simulation root folder.",
-                   StringValue ("sims"),
-                   MakeStringAccessor (&SatEnvVariables::m_simRootPath),
-                   MakeStringChecker ())
     .AddAttribute ("SimulationTag",
                    "Tag related to the current simulation.",
                    StringValue ("default"),
@@ -71,7 +66,7 @@ SatEnvVariables::GetTypeId (void)
                    MakeStringChecker ())
     .AddAttribute ("EnableSimulationOutputOverwrite",
                    "Enable simulation output overwrite.",
-                   BooleanValue (false),
+                   BooleanValue (true),
                    MakeBooleanAccessor (&SatEnvVariables::m_enableOutputOverwrite),
                    MakeBooleanChecker ())
     .AddAttribute ("EnableSimInfoOutput",
@@ -107,40 +102,77 @@ SatEnvVariables::SatEnvVariables () :
   m_dataPath ("src/satellite/data"),
   m_outputPath (""),
   m_campaignName (""),
-  m_simRootPath ("sims"),
+  m_simRootPath ("src/satellite/data/sims"),
   m_simTag ("default"),
-  m_enableOutputOverwrite (false),
+  m_enableOutputOverwrite (true),
   m_isOutputPathInitialized (false),
   m_enableSimInfoOutput (true),
   m_enableSimInfoDiffOutput (true),
-  m_excludeDataFolderFromDiff (true)
+  m_excludeDataFolderFromDiff (true),
+  m_isInitialized (false)
 {
   NS_LOG_FUNCTION (this);
 
   // Attributes are needed already in construction phase:
   // - ConstructSelf call in constructor
-  // - GetInstanceTypeId is needed to be implemented
+  // - GetInstanceTypeId needs to be implemented
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
-  char currentWorkingDirectory[FILENAME_MAX] = "";
+  Initialize ();
+}
 
-  if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
+void
+SatEnvVariables::DoInitialize ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_isInitialized)
     {
-      NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
+      char currentWorkingDirectory[FILENAME_MAX] = "";
+
+      if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
+        {
+          NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
+        }
+      currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
+      m_currentWorkingDirectory = std::string (currentWorkingDirectory);
+
+      char pathToExecutable[FILENAME_MAX] = "";
+
+      if (readlink ("/proc/self/exe",
+                    pathToExecutable,
+                    sizeof (pathToExecutable)) < 0)
+        {
+          NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
+        }
+      pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
+      m_pathToExecutable = std::string (pathToExecutable);
+      m_isInitialized = true;
     }
-  currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
-  m_currentWorkingDirectory = std::string (currentWorkingDirectory);
+}
 
-  char pathToExecutable[FILENAME_MAX] = "";
+void
+SatEnvVariables::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
 
-  if (readlink ("/proc/self/exe",
-                pathToExecutable,
-                sizeof (pathToExecutable)) < 0)
+  if (m_isInitialized)
     {
-      NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
+      if (m_enableSimInfoOutput)
+        {
+          if (!m_isOutputPathInitialized)
+            {
+              InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
+            }
+
+          DumpSimulationInformation ();
+      }
+
+      m_currentWorkingDirectory = "";
+      m_pathToExecutable = "";
+      m_isOutputPathInitialized = false;
+      m_isInitialized = false;
     }
-  pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
-  m_pathToExecutable = std::string (pathToExecutable);
 }
 
 void
@@ -166,37 +198,29 @@ SatEnvVariables::GetOutputPath ()
 
   if (!m_isOutputPathInitialized)
     {
-      InitializeOutputFolders (m_simRootPath, m_campaignName, m_simTag, m_enableOutputOverwrite);
-      m_isOutputPathInitialized = true;
+      InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
     }
+
   return m_outputPath;
 }
 
 void
-SatEnvVariables::SetOutputVariables (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite)
+SatEnvVariables::SetOutputVariables (std::string campaignName, std::string simTag, bool enableOutputOverwrite)
 {
+  NS_LOG_FUNCTION (this);
+
   m_campaignName = campaignName;
-  m_simRootPath = simRootPath;
   m_simTag = simTag;
   m_enableOutputOverwrite = enableOutputOverwrite;
 
-  InitializeOutputFolders (simRootPath, campaignName, simTag, enableOutputOverwrite);
-  m_isOutputPathInitialized = true;
+  InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
 }
 
 SatEnvVariables::~SatEnvVariables ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_isOutputPathInitialized && m_enableSimInfoOutput)
-  {
-      DumpSimulationInformation ();
-  }
-
-  m_currentWorkingDirectory = "";
-  m_pathToExecutable = "";
-  m_currentWorkingDirectoryFromAttribute = "";
-  m_pathToExecutableFromAttribute = "";
+  Dispose ();
 }
 
 std::string
@@ -309,7 +333,7 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
 }
 
 std::string
-SatEnvVariables::InitializeOutputFolders (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite)
+SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string simTag, bool enableOutputOverwrite)
 {
   NS_LOG_FUNCTION (this);
 
@@ -319,14 +343,7 @@ SatEnvVariables::InitializeOutputFolders (std::string simRootPath, std::string c
   std::string safetyTag = "";
   std::string outputPath = "";
   bool directoryExists = true;
-
-  if (!simRootPath.empty())
-    {
-      if (!IsValidDirectory (simRootPath))
-        {
-          CreateDirectory (simRootPath);
-        }
-    }
+  std::string simRootPath = this->LocateDirectory (m_simRootPath);
 
   if (!campaignName.empty())
     {
@@ -360,6 +377,7 @@ SatEnvVariables::InitializeOutputFolders (std::string simRootPath, std::string c
         }
     }
 
+  m_isOutputPathInitialized = true;
   m_outputPath = outputPath;
   return outputPath;
 }
@@ -443,6 +461,8 @@ SatEnvVariables::GetCurrentDateAndTime ()
 void
 SatEnvVariables::ExecuteCommandAndReadOutput (std::string command, Ptr<SatOutputFileStreamStringContainer> outputContainer)
 {
+  NS_LOG_FUNCTION (this);
+
   FILE* pipe = popen(command.c_str (), "r");
   if (pipe)
     {
@@ -465,6 +485,8 @@ SatEnvVariables::ExecuteCommandAndReadOutput (std::string command, Ptr<SatOutput
 void
 SatEnvVariables::DumpSimulationInformation ()
 {
+  NS_LOG_FUNCTION (this);
+
   std::string dataPath = LocateDirectory (m_outputPath);
   std::string revisionCommand = "hg log | head -n 5 2>&1";
   std::stringstream fileName;
@@ -490,6 +512,8 @@ SatEnvVariables::DumpSimulationInformation ()
 void
 SatEnvVariables::DumpRevisionDiff (std::string dataPath)
 {
+  NS_LOG_FUNCTION (this);
+
   std::string diffCommand;
   std::stringstream fileName;
 

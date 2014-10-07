@@ -120,25 +120,37 @@ public:
   std::string GetCurrentDateAndTime ();
 
   /**
+   * \brief Function for setting the output variables. The function also creates the output folder based on the new variables.
+   * NOTICE: this function is meant to me used only in test cases, where issues with singletons might arise. In any other case
+   * the class attributes should be used instead.
+   * \param campaignName simulation campaign name
+   * \param simTag simulation tag
+   * \param enableOutputOverwrite is simulation output overwrite enabled
+   */
+  void SetOutputVariables (std::string campaignName, std::string simTag, bool enableOutputOverwrite);
+
+  /**
+   * \brief Initialize class
+   * NOTICE: this function is meant to me used only in test cases, where issues with singletons might arise.
+   */
+  void DoInitialize ();
+
+  /**
+   * \brief Reset class
+   * NOTICE: this function is meant to me used only in test cases, where issues with singletons might arise.
+   */
+  void DoDispose ();
+
+private:
+
+  /**
    * \brief Function for forming the output path and directory structure
-   * \param simRootPath simulation output root path
    * \param campaignName simulation campaign name
    * \param simTag simulation tag
    * \param enableOutputOverwrite is simulation output overwrite enabled
    * \return path to the created folder
    */
-  std::string InitializeOutputFolders (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite);
-
-  /**
-   * \brief Function for setting the output variables. The function also creates the output folder based on the new variables
-   * \param simRootPath simulation output root path
-   * \param campaignName simulation campaign name
-   * \param simTag simulation tag
-   * \param enableOutputOverwrite is simulation output overwrite enabled
-   */
-  void SetOutputVariables (std::string simRootPath, std::string campaignName, std::string simTag, bool enableOutputOverwrite);
-
-private:
+  std::string InitializeOutputFolders (std::string campaignName, std::string simTag, bool enableOutputOverwrite);
 
   /**
    * \brief Function for outputting the most essential simulation specific environmental information
@@ -242,11 +254,25 @@ private:
    */
   bool m_isOutputPathInitialized;
 
+  /**
+   * \brief Is simulation information output enabled
+   */
   bool m_enableSimInfoOutput;
 
+  /**
+   * \brief Is simulation information diff output enabled
+   */
   bool m_enableSimInfoDiffOutput;
 
+  /**
+   * \brief Is data folder excluded from the simulation information diff
+   */
   bool m_excludeDataFolderFromDiff;
+
+  /**
+   * \brief Flag for disposing and initializing
+   */
+  bool m_isInitialized;
 };
 
 } // namespace ns3
