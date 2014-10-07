@@ -18,8 +18,10 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/node.h"
+#include <ns3/log.h>
+#include <ns3/node.h>
+#include <ns3/pointer.h>
+#include <ns3/uinteger.h>
 #include "satellite-simple-net-device.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatSimpleNetDevice");
@@ -34,6 +36,20 @@ SatSimpleNetDevice::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSimpleNetDevice")
     .SetParent<NetDevice> ()
     .AddConstructor<SatSimpleNetDevice> ()
+    .AddAttribute ("Mtu",
+                   "The MAC-level Maximum Transmission Unit",
+                   UintegerValue (0xffff),  // 65535 bytes.
+                   MakeUintegerAccessor (&SatSimpleNetDevice::SetMtu,
+                                         &SatSimpleNetDevice::GetMtu),
+                   MakeUintegerChecker<uint16_t> ())
+    .AddAttribute ("ReceiveErrorModel",
+                   "The receiver error model used to simulate packet loss",
+                   PointerValue (),
+                   MakePointerAccessor (&SatSimpleNetDevice::m_receiveErrorModel),
+                   MakePointerChecker<ErrorModel> ())
+    .AddTraceSource ("PhyRxDrop",
+                     "Trace source indicating a packet has been dropped by the device during reception",
+                     MakeTraceSourceAccessor (&SatSimpleNetDevice::m_phyRxDropTrace))
   ;
   return tid;
 }
@@ -55,8 +71,6 @@ SatSimpleNetDevice::~SatSimpleNetDevice ()
 void
 SatSimpleNetDevice::Receive (Ptr<Packet> packet, uint16_t protocol, Mac48Address to, Mac48Address from)
 {
-  NS_LOG_FUNCTION (this);
-
   NS_LOG_FUNCTION (this << packet << protocol << to << from);
   NetDevice::PacketType packetType;
 
