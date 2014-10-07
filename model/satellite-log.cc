@@ -33,11 +33,7 @@ SatLog::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLog")
     .SetParent<Object> ()
-    .AddConstructor<SatLog> ()
-    .AddAttribute ("SimulationTag", "The simulation specific tag which is appended to the log file name",
-                    StringValue (""),
-                    MakeStringAccessor (&SatLog::m_simulationTag),
-                    MakeStringChecker ());
+    .AddConstructor<SatLog> ();
   return tid;
 }
 
@@ -49,8 +45,7 @@ SatLog::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatLog::SatLog () :
-  m_simulationTag ("")
+SatLog::SatLog ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -83,7 +78,6 @@ SatLog::Reset ()
 
       m_container.clear ();
     }
-  m_simulationTag = "";
 }
 
 Ptr<SatOutputFileStreamStringContainer>
@@ -92,9 +86,9 @@ SatLog::CreateLog (LogType_t logType, std::string fileTag)
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetOutputPath ();
 
-  filename << dataPath << "/logs/log" << fileTag << m_simulationTag;
+  filename << dataPath << "/log" << fileTag;
 
   key_t key = std::make_pair (logType, fileTag);
 
@@ -105,7 +99,7 @@ SatLog::CreateLog (LogType_t logType, std::string fileTag)
       NS_FATAL_ERROR ("SatLog::CreateLog failed");
     }
 
-  NS_LOG_INFO ("SatLog::CreateLog - Created type " << logType << " log with file tag " << fileTag << " and simulation tag " << m_simulationTag);
+  NS_LOG_INFO ("SatLog::CreateLog - Created type " << logType << " log with file tag " << fileTag);
 
   return result.first->second;
 }

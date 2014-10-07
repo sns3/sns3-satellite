@@ -115,15 +115,6 @@ public:
    */
   void Reset ();
 
-  /**
-   * Function for inserting / replacing a simulation specific tag. This is used for simulation campaigns to avoid overwriting the logs
-   * \param tag
-   */
-  void InsertSimulationTag (std::string simulationTag)
-  {
-    m_simulationTag = simulationTag;
-  }
-
 private:
 
   /**
@@ -158,11 +149,6 @@ private:
    * \brief Map for containers
    */
   container_t m_container;
-
-  /**
-   * \brief Simulation tag
-   */
-  std::string m_simulationTag;
 };
 
 } // namespace ns3

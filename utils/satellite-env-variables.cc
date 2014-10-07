@@ -342,8 +342,8 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
   uint32_t safety = 0;
   std::string safetyTag = "";
   std::string outputPath = "";
-  bool directoryExists = true;
-  std::string simRootPath = this->LocateDirectory (m_simRootPath);
+  bool directoryExists = false;
+  std::string simRootPath = LocateDirectory (m_simRootPath);
 
   if (!campaignName.empty())
     {
@@ -355,7 +355,7 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
         }
     }
 
-  while (directoryExists)
+  while (!directoryExists)
     {
       outputPath = FormOutputPath (simRootPath, campaignName, simTag, safetyTag);
       directoryExists = IsValidDirectory (outputPath);
@@ -363,7 +363,7 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
       if( (!directoryExists && !enableOutputOverwrite) || enableOutputOverwrite)
         {
           CreateDirectory (outputPath);
-          directoryExists = false;
+          directoryExists = true;
         }
       else
         {
