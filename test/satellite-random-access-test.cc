@@ -38,6 +38,8 @@
 #include "ns3/cbr-application.h"
 #include "ns3/cbr-helper.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -82,6 +84,10 @@ SatCrdsaTest1::~SatCrdsaTest1 ()
 void
 SatCrdsaTest1::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-random-access", "crdsa", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -179,6 +185,7 @@ SatCrdsaTest1::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost !");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 
@@ -225,6 +232,10 @@ SatSlottedAlohaTest1::~SatSlottedAlohaTest1 ()
 void
 SatSlottedAlohaTest1::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-random-access", "slottedAloha", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -320,6 +331,7 @@ SatSlottedAlohaTest1::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost !");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 

@@ -33,6 +33,8 @@
 #include "ns3/boolean.h"
 #include "ns3/string.h"
 #include "../model/satellite-control-message.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -102,6 +104,10 @@ protected:
 void
 SatCtrlMsgContDelOnTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-ctrl-msg-container-unit", "delon", true);
+
   // create container with store time 100 ms and flag deletedOnRead set
   m_container = Create<SatControlMsgContainer> (Seconds (0.10), true);
   Ptr<SatControlMessage> crMsg = Create<SatCrMessage> ();
@@ -134,6 +140,8 @@ SatCtrlMsgContDelOnTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg) , true, "fourth message incorrect");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -165,6 +173,10 @@ protected:
 void
 SatCtrlMsgContDelOffTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-ctrl-msg-container-unit", "deloff", true);
+
   // create container with store time 100 ms and flag deletedOnRead NOT set
   m_container = Create<SatControlMsgContainer> (Seconds (0.10), false);
   Ptr<SatControlMessage> crMsg = Create<SatCrMessage> ();
@@ -197,6 +209,8 @@ SatCtrlMsgContDelOffTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg) , true, "fourth message incorrect");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

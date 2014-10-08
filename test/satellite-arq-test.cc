@@ -48,6 +48,8 @@
 #include "../model/satellite-generic-stream-encapsulator-arq.h"
 #include "../model/satellite-return-link-encapsulator-arq.h"
 #include "../model/satellite-queue.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -230,6 +232,10 @@ void SatRtnArqTestCase::Initialize ()
 void
 SatRtnArqTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-arq", "rtn", true);
+
   Initialize ();
 
   // Enque packets to RLE
@@ -248,6 +254,8 @@ SatRtnArqTestCase::DoRun (void)
   //std::cout << "Tx: " << m_txs << " txErrors: " << m_txErrors << " Acks: " << m_acks << " ackErrors: " << m_ackErrors << std::endl;
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 void SatRtnArqTestCase::TransmitPdus (uint32_t numPackets)
@@ -519,6 +527,10 @@ SatFwdArqTestCase::Initialize ()
 void
 SatFwdArqTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-arq", "fwd", true);
+
   Initialize ();
 
   // Enque packets to RLE
@@ -538,6 +550,8 @@ SatFwdArqTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_LT(errorProb, m_errorProbabilityThreshold, "HL packet error probability is higher than threshold!");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 void SatFwdArqTestCase::TransmitPdus (uint32_t numPackets)

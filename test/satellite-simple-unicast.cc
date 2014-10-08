@@ -39,6 +39,8 @@
 #include "ns3/cbr-application.h"
 #include "ns3/cbr-helper.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -86,6 +88,10 @@ SimpleUnicast1::~SimpleUnicast1 ()
 void
 SimpleUnicast1::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast1", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -137,6 +143,7 @@ SimpleUnicast1::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent!");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost!");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 
@@ -184,6 +191,10 @@ SimpleUnicast2::~SimpleUnicast2 ()
 void
 SimpleUnicast2::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast2", true);
+
   // Create larger scenario
 
   // Configure a static error probability
@@ -256,6 +267,7 @@ SimpleUnicast2::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender2->GetSent (), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver2->GetTotalRx (), sender2->GetSent (), "Packets were lost between sender 2 and receiver 2!");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Larger scenario <<<
 }
 
@@ -304,6 +316,10 @@ SimpleUnicast3::~SimpleUnicast3 ()
 void
 SimpleUnicast3::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast3", true);
+
   // Create full scenario
 
   // Configure a static error probability
@@ -381,6 +397,7 @@ SimpleUnicast3::DoRun (void)
       NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent(), "Packets were lost between sender and receiver" << i << "!");
     }
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Full scenario <<<
 }
 
@@ -428,6 +445,10 @@ SimpleUnicast4::~SimpleUnicast4 ()
 void
 SimpleUnicast4::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast4", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -479,6 +500,7 @@ SimpleUnicast4::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost !");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 
@@ -527,6 +549,10 @@ SimpleUnicast5::~SimpleUnicast5 ()
 void
 SimpleUnicast5::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast5", true);
+
   // Create larger scenario
 
   // Configure a static error probability
@@ -588,6 +614,7 @@ SimpleUnicast5::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender2->GetSent (), (uint32_t)0, "Nothing sent by sender 2!");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender1->GetSent () + sender2->GetSent (), "Packets were lost!");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Larger scenario <<<
 }
 
@@ -635,6 +662,10 @@ SimpleUnicast6::~SimpleUnicast6 ()
 void
 SimpleUnicast6::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast6", true);
+
   // Create full scenario
 
   // Configure a static error probability
@@ -715,6 +746,7 @@ SimpleUnicast6::DoRun (void)
 
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), totalTxBytes, "Packets were lost!");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Full scenario <<<
 }
 
@@ -762,6 +794,10 @@ SimpleUnicast7::~SimpleUnicast7 ()
 void
 SimpleUnicast7::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast7", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -834,6 +870,7 @@ SimpleUnicast7::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (utSender->GetSent(), (uint32_t)0, "Nothing sent by UT app!");
   NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx(), utSender->GetSent(), "Packets were lost to GW!");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 
@@ -881,6 +918,10 @@ SimpleUnicast8::~SimpleUnicast8 ()
 void
 SimpleUnicast8::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast8", true);
+
   // Create Larger scenario
 
   // Configure a static error probability
@@ -971,6 +1012,7 @@ SimpleUnicast8::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (utSender2->GetSent(), (uint32_t)0, "Nothing sent by UT app 2!");
   NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx(), utSender1->GetSent() + utSender2->GetSent(), "Packets were lost to GW!");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Larger scenario <<<
 }
 

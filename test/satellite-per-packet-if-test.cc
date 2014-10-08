@@ -238,7 +238,11 @@ SatPerPacketFwdLinkUserTestCase::~SatPerPacketFwdLinkUserTestCase ()
 void
 SatPerPacketFwdLinkUserTestCase::DoRun (void)
 {
-  InitOutput (true );
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "fwdLinkUser" + m_extName, true);
+
+  InitOutput (true);
 
   // Configure a static error probability
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
@@ -319,6 +323,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   PrintTraceInfo ();
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -392,6 +398,10 @@ SatPerPacketFwdLinkFullTestCase::~SatPerPacketFwdLinkFullTestCase ()
 void
 SatPerPacketFwdLinkFullTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "fwdLinkFull" + m_extName, true);
+
   InitOutput ( false );
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
@@ -466,6 +476,8 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   PrintTraceInfo ();
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -535,6 +547,10 @@ SatPerPacketRtnLinkUserTestCase::~SatPerPacketRtnLinkUserTestCase ()
 void
 SatPerPacketRtnLinkUserTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "rtnLinkUser" + m_extName, true);
+
   InitOutput (false);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
@@ -611,6 +627,8 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   PrintTraceInfo ();
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 // Default name to show for test. When the second constructor is used, the text to append this name can be given.
@@ -661,6 +679,10 @@ SatPerPacketRtnLinkFullTestCase::~SatPerPacketRtnLinkFullTestCase ()
 void
 SatPerPacketRtnLinkFullTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "rtnLinkFull" + m_extName, true);
+
   InitOutput (false);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
@@ -730,6 +752,8 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   PrintTraceInfo ();
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

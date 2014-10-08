@@ -70,6 +70,10 @@ SatFreeSpaceLossTestCase::~SatFreeSpaceLossTestCase ()
 void
 SatFreeSpaceLossTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-fsl", "", true);
+
   SatFreeSpaceLoss fsl;
   double frequency = 17.9 * std::pow(10.0, 9); // reference frequency
 
@@ -120,6 +124,8 @@ SatFreeSpaceLossTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 208.86016171367487, 0.1, "FSL (GW-GEO) in dBs incorrect");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

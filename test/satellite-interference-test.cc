@@ -36,6 +36,8 @@
 #include "../model/satellite-constant-interference.h"
 #include "../model/satellite-traced-interference.h"
 #include "../model/satellite-per-packet-interference.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -75,6 +77,10 @@ SatConstantInterferenceTestCase::~SatConstantInterferenceTestCase ()
 void
 SatConstantInterferenceTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-if-unit", "constant", true);
+
   Ptr<SatConstantInterference> interference = CreateObject<SatConstantInterference> ();
   interference->SetAttribute ("ConstantInterferencePower", DoubleValue(100.0));
 
@@ -102,6 +108,8 @@ SatConstantInterferenceTestCase::DoRun (void)
   power = interference->Calculate (event);
 
   NS_TEST_ASSERT_MSG_EQ (50, power, "Calculated power not correct");
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -189,6 +197,10 @@ SatPerPacketInterferenceTestCase::Receive (uint32_t rxIndex)
 void
 SatPerPacketInterferenceTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-if-unit", "perpacket", true);
+
   // simulate interferences and receiving (4 receivers), adding and calculation done in callback routines
   Simulator::Schedule(Time(0), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(60), 60, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
   Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 70, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
@@ -224,6 +236,7 @@ SatPerPacketInterferenceTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_LT( finalDiff, 0.00000000000001, "Final power incorrect");
 
   Simulator::Destroy ();
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

@@ -33,6 +33,8 @@
 #include "../model/satellite-constant-position-mobility-model.h"
 #include "../model/satellite-mobility-observer.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -273,6 +275,10 @@ SatMobilityObserverTestCase::~SatMobilityObserverTestCase ()
 void
 SatMobilityObserverTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-mobility-observer", "", true);
+
   // create mobilities
   Ptr<SatConstantPositionMobilityModel> gwMob = CreateObject<SatConstantPositionMobilityModel> ();
   Ptr<SatConstantPositionMobilityModel> utMob = CreateObject<SatConstantPositionMobilityModel> ();
@@ -429,6 +435,8 @@ SatMobilityObserverTestCase::DoRun (void)
     }
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

@@ -38,6 +38,8 @@
 #include "ns3/cbr-application.h"
 #include "ns3/cbr-helper.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -84,6 +86,10 @@ SatPeriodicControlMessageTest1::~SatPeriodicControlMessageTest1 ()
 void
 SatPeriodicControlMessageTest1::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-periodic-control-message", "", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -158,6 +164,7 @@ SatPeriodicControlMessageTest1::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost !");
 
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 

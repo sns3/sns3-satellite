@@ -23,6 +23,9 @@
 #include "ns3/simulator.h"
 #include "../model/satellite-antenna-gain-pattern.h"
 #include "../model/satellite-antenna-gain-pattern-container.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
+
 using namespace ns3;
 
 /**
@@ -56,6 +59,10 @@ SatAntennaPatternTestCase::~SatAntennaPatternTestCase ()
 void
 SatAntennaPatternTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-antenna-gain-pattern", "", true);
+
   // Create antenna gain container
   SatAntennaGainPatternContainer gpContainer;
 
@@ -109,6 +116,8 @@ SatAntennaPatternTestCase::DoRun (void)
       NS_TEST_ASSERT_MSG_EQ_TOL( gain_dB, expectedGains[i], 0.001, "Expected gain not within tolerance");
       NS_TEST_ASSERT_MSG_EQ( bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
     }
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

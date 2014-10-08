@@ -28,6 +28,8 @@
 #include "ns3/geo-coordinate.h"
 #include "ns3/test.h"
 #include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -76,6 +78,10 @@ GeoCoordinateTestCase::DoRun (void)
   GeoCoordinate position1;
   GeoCoordinate position2;
 
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-geo-coordinate", "", true);
+
   for (int i = -180; i <= 180; i += 30)
     {
       position1 = GeoCoordinate (i/2, i, i*30);
@@ -98,6 +104,8 @@ GeoCoordinateTestCase::DoRun (void)
 
       Validate ( position1, position2 );
     }
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 void

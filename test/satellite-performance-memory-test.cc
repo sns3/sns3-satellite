@@ -39,6 +39,8 @@
 #include "ns3/cbr-application.h"
 #include "ns3/cbr-helper.h"
 #include "../helper/satellite-helper.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -89,6 +91,10 @@ Pm1::~Pm1 ()
 void
 Pm1::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-perf-mem", "", true);
+
   // Create simple scenario
 
   // Configure a static error probability
@@ -151,7 +157,7 @@ Pm1::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (gwSender->GetSent(), (uint32_t)0, "Nothing sent by GW user!");
   NS_TEST_ASSERT_MSG_EQ (utReceiver->GetTotalRx(), gwSender->GetSent(), "Packets were lost between GW and UT!");
 
-
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
 }
 

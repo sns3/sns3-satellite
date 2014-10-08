@@ -30,6 +30,8 @@
 #include "ns3/test.h"
 #include "ns3/ptr.h"
 #include "../model/satellite-arq-sequence-number.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -62,6 +64,10 @@ SatSeqNoTestCase::~SatSeqNoTestCase ()
 void
 SatSeqNoTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-arq-seqno", "", true);
+
   uint32_t windowSize (10);
   Ptr<SatArqSequenceNumber> seqNo = Create<SatArqSequenceNumber> (windowSize);
 
@@ -88,6 +94,8 @@ SatSeqNoTestCase::DoRun (void)
     {
       std::cout << "SN: " << allSeqNos[i] << std::endl;
     }
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

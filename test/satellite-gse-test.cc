@@ -32,6 +32,8 @@
 #include "ns3/callback.h"
 #include "ns3/random-variable-stream.h"
 #include "../model/satellite-generic-stream-encapsulator.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -88,6 +90,10 @@ SatGseTestCase::~SatGseTestCase ()
 void
 SatGseTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-gse", "", true);
+
   Mac48Address source = Mac48Address::Allocate();
   Mac48Address dest = Mac48Address::Allocate();
 
@@ -144,6 +150,8 @@ SatGseTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ( m_sentPacketSizes.size(), m_rcvdPacketSizes.size(), "All sent packets are not received");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 void SatGseTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest)

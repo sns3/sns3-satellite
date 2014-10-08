@@ -32,6 +32,7 @@
 #include "../model/satellite-fading-external-input-trace-container.h"
 #include "../model/satellite-channel.h"
 #include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -79,6 +80,10 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
   uint32_t numUts (2);
   uint32_t numGws (5);
 
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-fading-external-input-trace", "", true);
+
   // Test the fading traces
   bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts,numGws);
   NS_TEST_ASSERT_MSG_EQ (success, true, "SatChannelFadingTrace test failed");
@@ -99,6 +104,8 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
     }
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

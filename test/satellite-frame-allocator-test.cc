@@ -592,6 +592,10 @@ SatFrameAllocatorTestCase::ContructRequestForUt ( uint32_t& totalBytes, uint32_t
 void
 SatFrameAllocatorTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sat-frame-allocator", "", true);
+
   // test single UT with all configuration types, ACM and FCA disabled
   RunSingleUtTest (SatSuperframeConf::CONFIG_TYPE_0, false, false);
   RunSingleUtTest (SatSuperframeConf::CONFIG_TYPE_1, false, false);
@@ -614,6 +618,8 @@ SatFrameAllocatorTestCase::DoRun (void)
 
   // test with two and three UTs
   RunMultiUtTest ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

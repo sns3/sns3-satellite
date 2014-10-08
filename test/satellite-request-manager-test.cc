@@ -34,6 +34,8 @@
 #include "../model/satellite-request-manager.h"
 #include "../model/satellite-queue.h"
 #include "../model/satellite-control-message.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -92,6 +94,10 @@ SatBaseTestCase::~SatBaseTestCase ()
 void
 SatBaseTestCase::DoRun ()
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-rm", "", true);
+
   // Base test case tests that no Capacity Requests are generated when CRA, RBDC
   // and VBDC are disabled for all lower layer service RC indices.
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
@@ -135,6 +141,8 @@ SatBaseTestCase::DoRun ()
   NS_TEST_ASSERT_MSG_EQ (m_rcvdCapacityRequests.empty (), true, "Capacity requests received!" );
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 bool

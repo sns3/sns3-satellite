@@ -29,10 +29,9 @@
 #include "ns3/ptr.h"
 #include "ns3/boolean.h"
 #include "ns3/config.h"
-
 #include "../model/satellite-channel-estimation-error-container.h"
-
-
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -65,6 +64,10 @@ SatFwdChannelEstimationErrorTestCase::~SatFwdChannelEstimationErrorTestCase ()
 void
 SatFwdChannelEstimationErrorTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-channel-estimation-error", "fwd", true);
+
   Ptr<SatChannelEstimationErrorContainer> ceError = Create<SatFwdLinkChannelEstimationErrorContainer> ();
 
   for (double in = -20.0; in < 20.0; in += 0.1)
@@ -73,6 +76,8 @@ SatFwdChannelEstimationErrorTestCase::DoRun (void)
 
       std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
     }
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -102,6 +107,10 @@ SatRtnChannelEstimationErrorTestCase::~SatRtnChannelEstimationErrorTestCase ()
 void
 SatRtnChannelEstimationErrorTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-channel-estimation-error", "rtn", true);
+
   Ptr<SatChannelEstimationErrorContainer> ceError = Create<SatFwdLinkChannelEstimationErrorContainer> ();
 
   for (uint32_t wf = 3; wf <= 23; ++wf)
@@ -114,6 +123,7 @@ SatRtnChannelEstimationErrorTestCase::DoRun (void)
           std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
         }
     }
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**

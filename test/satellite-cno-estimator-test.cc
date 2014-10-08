@@ -33,6 +33,8 @@
 #include "ns3/boolean.h"
 #include "ns3/string.h"
 #include "../model/satellite-cno-estimator.h"
+#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -107,6 +109,10 @@ protected:
 void
 SatBasicEstimatorLastTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cno-estimator-unit", "last", true);
+
   // create estimator with window 100 ms
   Simulator::Schedule (Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::LAST, Seconds (0.10) );
 
@@ -158,6 +164,8 @@ SatBasicEstimatorLastTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[10]), true, "eleventh estimation incorrect");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -190,6 +198,10 @@ protected:
 void
 SatBasicEstimatorMinTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cno-estimator-unit", "min", true);
+
   // create estimator with window 200 ms
   Simulator::Schedule(Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::MINIMUM, Seconds (0.20) );
 
@@ -220,6 +232,8 @@ SatBasicEstimatorMinTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 /**
@@ -252,6 +266,10 @@ protected:
 void
 SatBasicEstimatorAverageTestCase::DoRun (void)
 {
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cno-estimator-unit", "average", true);
+
   // create estimator with window 200 ms
   Simulator::Schedule(Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::AVERAGE, Seconds (0.20) );
 
@@ -282,6 +300,8 @@ SatBasicEstimatorAverageTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
 
   Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
 
 
