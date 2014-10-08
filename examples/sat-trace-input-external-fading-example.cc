@@ -189,7 +189,7 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
 
-  NS_LOG_INFO("--- Trace-output-example ---");
+  NS_LOG_INFO("--- input-external-fading-example ---");
   NS_LOG_INFO("  Scenario used: " << scenario);
   NS_LOG_INFO("  PacketSize: " << packetSize);
   NS_LOG_INFO("  Interval: " << interval);
