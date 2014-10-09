@@ -48,11 +48,8 @@ using namespace ns3;
  *         - fading trace
  *         - composite SINR
  *
- *         The output folders are:
- *         {NS-3-root-folder}/src/satellite/data/interferencetraces/output
- *         {NS-3-root-folder}/src/satellite/data/rxpowertraces/output
- *         {NS-3-root-folder}/src/satellite/data/fadingtraces/output
- *         {NS-3-root-folder}/src/satellite/data/compositesinrtraces/output
+ *         The output folder is:
+ *         {NS-3-root-folder}/src/satellite/data/sims/example-trace-output/{scenario}
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-trace-output-example");
@@ -100,12 +97,6 @@ main (int argc, char *argv[])
   //Singleton<SatInterferenceOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   //Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->EnableFigureOutput (false);
-
-  /// Add tag to file name (useful when running multiple consecutive simulations)
-  //Singleton<SatFadingOutputTraceContainer>::Get ()->InsertTag ("fadingExampleTag_");
-  //Singleton<SatInterferenceOutputTraceContainer>::Get ()->InsertTag ("interferenceExampleTag_");
-  //Singleton<SatRxPowerOutputTraceContainer>::Get ()->InsertTag ("rxPowerExampleTag_");
-  //Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->InsertTag ("compositeSinrExampleTag_");
 
   /// Enable the printing of ID mapper trace IDs
   Singleton<SatIdMapper>::Get ()->EnableMapPrint (true);

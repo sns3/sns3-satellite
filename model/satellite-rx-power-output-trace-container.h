@@ -82,15 +82,6 @@ public:
   void AddToContainer (key_t key, std::vector<double> newItem);
 
   /**
-   * Function for inserting / replacing a tag
-   * \param tag
-   */
-  void InsertTag (std::string tag)
-  {
-    m_tag = tag;
-  }
-
-  /**
    * Function for enabling / disabling figure output
    * \param enableFigureOutput
    */
@@ -134,11 +125,6 @@ private:
    * \brief Switch for figure output
    */
   bool m_enableFigureOutput;
-
-  /**
-   * \brief Info tag
-   */
-  std::string m_tag;
 };
 
 } // namespace ns3

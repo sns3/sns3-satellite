@@ -154,10 +154,7 @@ SatPerPacketBaseTestCase::InitOutput( bool figureOutput )
       pos = m_extName.find('.');
     }
 
-  m_extName.insert (m_extName.end (), '_');
-
   ptrCont->EnableFigureOutput (figureOutput);
-  ptrCont->InsertTag (m_extName);
 }
 
 void
@@ -238,11 +235,12 @@ SatPerPacketFwdLinkUserTestCase::~SatPerPacketFwdLinkUserTestCase ()
 void
 SatPerPacketFwdLinkUserTestCase::DoRun (void)
 {
-  // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "fwdLinkUser" + m_extName, true);
 
   InitOutput (true);
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
 
   // Configure a static error probability
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
@@ -398,11 +396,13 @@ SatPerPacketFwdLinkFullTestCase::~SatPerPacketFwdLinkFullTestCase ()
 void
 SatPerPacketFwdLinkFullTestCase::DoRun (void)
 {
-  // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "fwdLinkFull" + m_extName, true);
 
   InitOutput ( false );
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
+
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
   Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
@@ -547,11 +547,13 @@ SatPerPacketRtnLinkUserTestCase::~SatPerPacketRtnLinkUserTestCase ()
 void
 SatPerPacketRtnLinkUserTestCase::DoRun (void)
 {
-  // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "rtnLinkUser" + m_extName, true);
 
   InitOutput (false);
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
+
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
   Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
@@ -679,11 +681,12 @@ SatPerPacketRtnLinkFullTestCase::~SatPerPacketRtnLinkFullTestCase ()
 void
 SatPerPacketRtnLinkFullTestCase::DoRun (void)
 {
-  // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", "rtnLinkFull" + m_extName, true);
 
   InitOutput (false);
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
   Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));

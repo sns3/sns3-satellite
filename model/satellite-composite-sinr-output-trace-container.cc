@@ -48,8 +48,7 @@ SatCompositeSinrOutputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatCompositeSinrOutputTraceContainer::SatCompositeSinrOutputTraceContainer () :
-  m_enableFigureOutput (true),
-  m_tag ("")
+  m_enableFigureOutput (true)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -83,7 +82,6 @@ SatCompositeSinrOutputTraceContainer::Reset ()
       m_container.clear ();
     }
   m_enableFigureOutput = true;
-  m_tag = "";
 }
 
 Ptr<SatOutputFileStreamDoubleContainer>
@@ -92,7 +90,7 @@ SatCompositeSinrOutputTraceContainer::AddNode (key_t key)
   NS_LOG_FUNCTION (this);
 
   std::stringstream filename;
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetOutputPath ();
 
   int32_t gwId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (key.first);
   int32_t utId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (key.first);
@@ -106,12 +104,12 @@ SatCompositeSinrOutputTraceContainer::AddNode (key_t key)
     {
       if (utId >= 0 && gwId < 0)
         {
-          filename << dataPath << "/compositesinrtraces/output/" << m_tag << "BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+          filename << dataPath << "/composite_sinr_output_trace_BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
         }
 
       if (gwId >= 0 && utId < 0)
         {
-          filename << dataPath << "/compositesinrtraces/output/" << m_tag << "BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+          filename << dataPath << "/composite_sinr_output_trace_BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
         }
 
       std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatOutputFileStreamDoubleContainer> (filename.str ().c_str (), std::ios::out, SatBaseTraceContainer::CSINR_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
