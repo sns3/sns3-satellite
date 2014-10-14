@@ -119,13 +119,13 @@ main (int argc, char *argv[])
 
   // create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
-  SatHelper::BeamIdInfo_t beamIdInfo;
-  beamIdInfo.insert (beamId);
+  SatHelper::BeamUserInfoMap_t beamMap;
+  beamMap[beamId] = beamInfo;
 
   Ptr<SatListPositionAllocator> posAllocator = CreateObject<SatListPositionAllocator> ();
   posAllocator->Add ( GeoCoordinate (latitude, longitude, altitude));
 
-  helper->CreateUserDefinedScenario (beamIdInfo, beamInfo, posAllocator);
+  helper->CreateUserDefinedScenarioFromListPositions (beamMap, false);
 
   // set callback traces where we want results out
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",

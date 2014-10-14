@@ -57,11 +57,6 @@ public:
   typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
 
   /**
-   * definition for beam info used when creating user defined scenario.
-   */
-  typedef std::set<uint32_t> BeamIdInfo_t;
-
-  /**
    * \enum values for pre-defined scenarios to be used by helper when building
              satellite network topology base.
    *
@@ -110,21 +105,13 @@ public:
 
   /**
    * Creates satellite objects according to user defined scenario.
+   * Positions are read from different input files from file set by attribute ns3::SatConf::UtPositionInputFileName.
    *
-   * \param beamInfo Information of the beam to locate UTs, if empty whole reference scenario used to select beam
-   * \param info information of the UT and users in beams
-   * \param utPositions Position to set for UTs
+   * \param info information of the beams, and beam UTs and users in beams
+   * \param checkBeam Check that positions (set through SatConf) match with given beam
+   * (the beam is the best according to configured antenna patterns).
    */
-  void CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& info, Ptr<SatListPositionAllocator> utPositions);
-
-  /**
-   * Creates satellite objects according to user defined scenario.
-   * Positions are read from different input file set by attribute ns3::SatConf::UtPositionInputFileName.
-   *
-   * \param beamInfo Information of the beam to locate UTs, if empty whole reference scenario used to select beam
-   * \param info information of the UT and users in beams
-   */
-  void CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& info);
+  void CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& info, bool checkBeam);
 
   /**
    * \param  node pointer to user node.
@@ -285,7 +272,7 @@ private:
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
   /**
-   * User defined UT positions.
+   * User defined UT positions from SatConf.
    */
   Ptr<SatListPositionAllocator> m_utPositions;
 

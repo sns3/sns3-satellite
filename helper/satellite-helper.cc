@@ -362,61 +362,45 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
 }
 
 void
-SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& utInfo)
+SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos, bool checkBeam)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatListPositionAllocator> utPositions = CreateObject<SatListPositionAllocator> ();
+  uint32_t positionIndex = 1;
 
-  for ( uint32_t i = 0; i < m_satConf->GetUtCount (); i++ )
+  // construct list position allocator and fill it with position
+  // configured through SatConf
+
+  m_utPositions = CreateObject<SatListPositionAllocator> ();
+
+  for ( BeamUserInfoMap_t::iterator it = infos.begin (); it !=  infos.end (); it++ )
     {
-      utPositions->Add ( m_satConf->GetUtPosition (i+1) );
-    }
-
-  CreateUserDefinedScenario (beamInfo, utInfo, utPositions);
-}
-
-void
-SatHelper::CreateUserDefinedScenario (BeamIdInfo_t& beamInfo, SatBeamUserInfo& utInfo, Ptr<SatListPositionAllocator> utPositions)
-{
-  NS_LOG_FUNCTION (this);
-
-  m_utPositions = utPositions;
-
-  if ( m_utPositions->GetCount () < utInfo.GetUtCount ())
-    {
-      NS_FATAL_ERROR ("Not enough position available for UTs!");
-    }
-
-  BeamUserInfoMap_t beamUserInfos;
-
-  for ( uint32_t j = 0; j < utInfo.GetUtCount (); j++ )
-    {
-      uint32_t beamId = m_antennaGainPatterns->GetBestBeamId (m_utPositions->GetNextGeoPosition ());
-
-      if ( beamInfo.empty () || ( beamInfo.find (beamId) != beamInfo.end () ) )
+      for (uint32_t i = 0; i < it->second.GetUtCount (); i++ )
         {
-          BeamUserInfoMap_t::iterator beamMap = beamUserInfos.find (beamId);
-
-          if ( beamMap != beamUserInfos.end ())
+          if (positionIndex > m_satConf->GetUtCount ())
             {
-              beamMap->second.AppendUt (utInfo.GetUtUserCount (j));
+              NS_FATAL_ERROR ("Not enough positions available in SatConf for UTs!!!");
             }
-          else
+
+          GeoCoordinate position = m_satConf->GetUtPosition (positionIndex);
+          m_utPositions->Add (position);
+          positionIndex++;
+
+          // if requested, check that the given beam is the best in the configured position
+          if (checkBeam)
             {
-              beamUserInfos[beamId] = SatBeamUserInfo (1, utInfo.GetUtUserCount (j));
+              uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position);
+
+              if ( bestBeamId != it->first )
+                {
+                  NS_FATAL_ERROR ("The beam: " << it->first << " is not the best beam (" << bestBeamId << ") for the position: " << position);
+                }
             }
         }
-      else
-        {
-          NS_FATAL_ERROR ("Position not valid for beam (s).");
-        }
     }
-
-  m_utPositions->SetToBegin ();
 
   // create as user wants
-  DoCreateScenario (beamUserInfos, m_gwUsers);
+  DoCreateScenario(infos, m_gwUsers);
 
   m_creationSummaryTrace("*** User Defined Scenario Creation Summary ***");
 }
@@ -489,6 +473,8 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 
   Ptr<SatPositionAllocator> allocator;
 
+  // if position allocator (list) for UTs is created by helper already use it,
+  // in other case use the spot beam position allocator
   if ( m_utPositions != NULL )
     {
       allocator = m_utPositions;

@@ -39,10 +39,10 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatFadingExternalInputTraceContainer")
     .SetParent<Object> ()
     .AddConstructor<SatFadingExternalInputTraceContainer> ()
-    .AddAttribute ("InputMode",
+    .AddAttribute ("UtInputMode",
                    "Input mode to read trace source files from given index table.",
                     EnumValue (SatFadingExternalInputTraceContainer::LIST_MODE),
-                    MakeEnumAccessor (&SatFadingExternalInputTraceContainer::m_inputMode),
+                    MakeEnumAccessor (&SatFadingExternalInputTraceContainer::m_utInputMode),
                     MakeEnumChecker (SatFadingExternalInputTraceContainer::LIST_MODE, "ListMode",
                                      SatFadingExternalInputTraceContainer::POSITION_MODE, "PositionMode",
                                      SatFadingExternalInputTraceContainer::RANDOM_MODE, "RandomMode"))
@@ -67,7 +67,7 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
                    MakeStringAccessor (&SatFadingExternalInputTraceContainer::m_gwRtnDownIndexFileName),
                    MakeStringChecker ())
   .AddAttribute ("MaxDistance",
-                 "Maximum distance to allowed fading source in position based mode [m].",
+                 "Maximum distance allowed to fading source in position based mode [m].",
                   DoubleValue (5000),
                   MakeDoubleAccessor (&SatFadingExternalInputTraceContainer::m_maxDistanceToFading),
                   MakeDoubleChecker<double> ());
@@ -80,7 +80,7 @@ TypeId SatFadingExternalInputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
- : m_inputMode (LIST_MODE),
+ : m_utInputMode (LIST_MODE),
    m_indexFilesLoaded (false),
    m_maxDistanceToFading (0)
 {
@@ -124,8 +124,8 @@ SatFadingExternalInputTraceContainer::CreateUtFadingTrace (uint32_t utId, Ptr<Mo
       LoadIndexFiles ();
     }
 
-  Ptr<SatFadingExternalInputTrace> ftRet = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, m_utRtnUpFileNames, utId - 1, mobility);
-  Ptr<SatFadingExternalInputTrace> ftFwd = CreateFadingTrace (SatFadingExternalInputTrace::FT_THREE_COLUMN, m_utFwdDownFileNames, utId - 1, mobility);
+  Ptr<SatFadingExternalInputTrace> ftRet = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, m_utInputMode, m_utRtnUpFileNames, utId - 1, mobility);
+  Ptr<SatFadingExternalInputTrace> ftFwd = CreateFadingTrace (SatFadingExternalInputTrace::FT_THREE_COLUMN, m_utInputMode, m_utFwdDownFileNames, utId - 1, mobility);
 
   // First = RETURN_USER
   // Second = FORWARD_USER
@@ -143,8 +143,8 @@ SatFadingExternalInputTraceContainer::CreateGwFadingTrace (uint32_t gwId, Ptr<Mo
       LoadIndexFiles ();
     }
 
-  Ptr<SatFadingExternalInputTrace> ftRet = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, m_gwRtnDownFileNames, gwId - 1, mobility);
-  Ptr<SatFadingExternalInputTrace> ftFwd = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, m_gwFwdUpFileNames, gwId - 1, mobility);
+  Ptr<SatFadingExternalInputTrace> ftRet = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, LIST_MODE, m_gwRtnDownFileNames, gwId - 1, mobility);
+  Ptr<SatFadingExternalInputTrace> ftFwd = CreateFadingTrace (SatFadingExternalInputTrace::FT_TWO_COLUMN, LIST_MODE, m_gwFwdUpFileNames, gwId - 1, mobility);
 
   // First = RETURN_FEEDER
   // Second = FORWARD_FEEDR
@@ -336,14 +336,15 @@ SatFadingExternalInputTraceContainer::ReadIndexFile (std::string indexFile, Trac
 }
 
 Ptr<SatFadingExternalInputTrace>
-SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputTrace::TraceFileType_e fileType, TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility)
+SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputTrace::TraceFileType_e fileType, InputMode_t inputMode,
+                                                         TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this << mobility);
 
   Ptr<SatFadingExternalInputTrace> trace;
   std::string fileName;
 
-  switch (m_inputMode)
+  switch (inputMode)
   {
     case LIST_MODE:
       if ( container.empty () || ( id > container.size () ))
@@ -376,7 +377,7 @@ SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputT
       break;
   }
 
-  NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Creation info: Mode=" << m_inputMode << ", ID (GW/UT)=" << id << ", FileName=" << fileName);
+  NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Creation info: Mode=" << m_utInputMode << ", ID (GW/UT)=" << id << ", FileName=" << fileName);
 
   // find from loaded list
 

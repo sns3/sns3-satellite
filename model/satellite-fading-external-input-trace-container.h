@@ -102,9 +102,9 @@ private:
   std::map< uint32_t, ChannelTracePair_t> m_gwFadingMap;
 
   /**
-   * \brief Input mode to read trace files form given index table (file)
+   * \brief Input mode to read trace files form given index table (file) for UTs
    */
-  InputMode_t m_inputMode;
+  InputMode_t m_utInputMode;
 
   /**
    * The name of file which defines the index table to be used for trace input of forward down link for UT.
@@ -195,12 +195,13 @@ private:
    * Create (or load) fading trace source for the requested UT/GW.
    *
    * \param fileType Type of the trace file
+   * \param inputMode used when reading input traces from trace file
    * \param container Container reference to find out needed trace file info
    * \param id Id of the node GW or UT (from SatIdMapper)
    * \param mobility Mobility for given node
    * \return Created trace input (or found trace input if queried trace input already created)
    */
-  Ptr<SatFadingExternalInputTrace> CreateFadingTrace (SatFadingExternalInputTrace::TraceFileType_e fileType,
+  Ptr<SatFadingExternalInputTrace> CreateFadingTrace (SatFadingExternalInputTrace::TraceFileType_e fileType, InputMode_t inputMode,
                                                       TraceFileContainer_t& container, uint32_t id, Ptr<MobilityModel> mobility);
   /**
    *  Find the nearest fading trace source file for the requested UT/GW based on given mobility.
