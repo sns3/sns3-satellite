@@ -232,6 +232,9 @@ main (int argc, char *argv[])
   Ptr<Node> groupSource;
   NodeContainer groupReceivers;
 
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   /// Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("scenario", "Test scenario to use. (larger or full", scenario);
@@ -282,10 +285,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->EnableCreationTraces (false);
-
   helper->CreatePredefinedScenario (satScenario);
-  helper->EnablePacketTrace ();
 
   uint16_t multicastPort = 9;   // Discard port (RFC 863)
 

@@ -126,6 +126,12 @@ main (int argc, char *argv[])
   Singleton<SatRxPowerOutputTraceContainer>::Get ()->EnableFigureOutput (false);
   Singleton<SatCompositeSinrOutputTraceContainer>::Get ()->EnableFigureOutput (false);
 
+  // Enable creation traces
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
+  // Enable packet traces
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   /**
    * ----------------------------------------------------------------
    * Read the command line arguments. Note, that this allows the user
@@ -151,9 +157,6 @@ main (int argc, char *argv[])
   std::string scenarioName = "Scenario72";
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  // Enable creation traces
-  helper->EnableCreationTraces (false);
-
   // Each beam will have 'utsPerBeam' user terminals and 'endUsersPerUt'
   // end users per UT. Note, that this allows also different configurations
   // per spot-beam.
@@ -165,9 +168,6 @@ main (int argc, char *argv[])
     }
 
   helper->CreateUserDefinedScenario (beamMap);
-
-  // Enable packet trace from satellite netdevice layers.
-  helper->EnablePacketTrace ();
 
   /**
    * --------------------------------------------------------

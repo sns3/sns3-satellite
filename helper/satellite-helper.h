@@ -150,18 +150,6 @@ public:
    */
   void SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, Ipv4Address sourceAddress, Ipv4Address groupAddress );
 
-  /**
-   * Enables creation traces to be written in given file
-   * \param details true means that lower layer details are printed also,
-   *                false means that only creation summary is printed
-   */
-  void EnableCreationTraces(bool details);
-
-  /**
-   * Enable packet traces
-   */
-  void EnablePacketTrace ();
-
   inline NodeContainer GwNodes () { return m_beamHelper->GetGwNodes(); }
   inline NodeContainer UtNodes () { return m_beamHelper->GetUtNodes(); }
   inline Ptr<Node> GeoSatNode () { return m_beamHelper->GetGeoSatNode(); }
@@ -223,14 +211,24 @@ private:
   Ipv4Address m_utNetworkAddress;    ///< Initial network number of UT and UT users, e.g., 10.3.1.0.
 
   /**
-   * flag to check if scenario is alreay created.
+   * flag to check if scenario is already created.
    */
   bool m_scenarioCreated;
 
   /**
-   * flag to indicate if detailed trace should be enables before scenario creation.
+   * flag to indicate if creation trace should be enabled for scenario creation.
+   */
+  bool m_creationTraces;
+
+  /**
+   * flag to indicate if detailed creation trace should be enabled for scenario creation.
    */
   bool m_detailedCreationTraces;
+
+  /**
+   * flag to indicate if packet trace should be enabled after scenario creation.
+   */
+  bool m_packetTraces;
 
   /**
    * Number of UTs created per Beam in full or user-defined scenario
@@ -277,9 +275,20 @@ private:
   Ptr<SatListPositionAllocator> m_utPositions;
 
   /**
+   * Enables creation traces to be written in given file
+   */
+  void EnableCreationTraces ();
+
+  /**
    * Enables creation traces in sub-helpers.
    */
   void EnableDetailedCreationTraces ();
+
+  /**
+   * Enable packet traces
+   */
+  void EnablePacketTrace ();
+
   /**
    * Sink for creation details traces
    * \param stream stream for traces

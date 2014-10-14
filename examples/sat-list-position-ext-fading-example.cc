@@ -79,6 +79,8 @@ main (int argc, char *argv[])
   uint32_t beamId = 1;
   bool checkBeam = false;
 
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
     // Set default values for some attributes for position setting and external fading trace
     // This done before command line parsing in order to overrided them if needed
 
@@ -132,8 +134,6 @@ main (int argc, char *argv[])
 
   // create helper
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->EnableCreationTraces (false);
 
   /** create user defined scenario */
 

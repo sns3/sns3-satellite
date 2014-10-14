@@ -63,6 +63,9 @@ main (int argc, char *argv[])
 //  ConfigStore inputConfig;
 //  inputConfig.ConfigureDefaults ();
 
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("beamIdInFullScenario", "Id where Sending/Receiving UT is selected in FULL scenario. (used only when scenario is full) ", beamIdInFullScenario);
@@ -103,11 +106,7 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->EnableCreationTraces (false);
-
   helper->CreatePredefinedScenario (satScenario);
-
-  helper->EnablePacketTrace ();
 
   // get users
 

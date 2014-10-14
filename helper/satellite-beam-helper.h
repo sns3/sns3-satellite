@@ -257,7 +257,8 @@ public:
 
   /**
    * Enable packet traces.
-   * This is to be called from the actual simulation script.
+   * (Called by SatHelper after scenario creation, if packet traces are enabled.)
+   *
    */
   void EnablePacketTrace ();
 

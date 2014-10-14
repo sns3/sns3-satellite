@@ -82,6 +82,8 @@ main (int argc, char *argv[])
   Time simLength (Seconds(20.0));
   Time appStartTime = Seconds(0.1);
 
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
@@ -110,8 +112,6 @@ main (int argc, char *argv[])
   beamMap[beamId] = beamInfo;
 
   helper->CreateUserDefinedScenario (beamMap);
-
-  helper->EnablePacketTrace ();
 
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/CrTrace",
                                  MakeCallback (&CrTraceCb));

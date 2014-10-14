@@ -62,6 +62,8 @@ main (int argc, char *argv[])
   std::string scenario = "simple";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
   /// Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
@@ -127,8 +129,6 @@ main (int argc, char *argv[])
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->EnableCreationTraces(false);
 
   helper->CreatePredefinedScenario(satScenario);
 

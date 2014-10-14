@@ -56,6 +56,8 @@ main (int argc, char *argv[])
 
   Time appStartTime = Seconds(0.001);
 
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
@@ -90,8 +92,6 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreatePredefinedScenario (SatHelper::FULL);
-
-  helper->EnablePacketTrace ();
 
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();

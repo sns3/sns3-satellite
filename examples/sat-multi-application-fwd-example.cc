@@ -68,6 +68,8 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds(0.001);
   Time appStopTime = Seconds(10.0);
 
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
@@ -104,7 +106,6 @@ main (int argc, char *argv[])
   beamMap[22] = beamInfo;
 
   helper->CreateUserDefinedScenario (beamMap);
-  helper->EnablePacketTrace ();
 
   // Get the end users so that it is possible to attach
   // applications on them

@@ -63,6 +63,8 @@ main (int argc, char *argv[])
   double duration = 1000;
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full)",
@@ -100,8 +102,6 @@ main (int argc, char *argv[])
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->EnableCreationTraces (false);
 
   helper->CreatePredefinedScenario (satScenario);
 

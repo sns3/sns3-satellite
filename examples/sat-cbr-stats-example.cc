@@ -99,6 +99,8 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
   double duration = 4;
 
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
@@ -139,11 +141,9 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->EnableCreationTraces(false);
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
   helper->CreatePredefinedScenario(satScenario);
-
-  helper->EnablePacketTrace ();
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();

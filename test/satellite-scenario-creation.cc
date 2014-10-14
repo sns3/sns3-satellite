@@ -31,6 +31,7 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 #include "ns3/simulator.h"
+#include "ns3/core-module.h"
 #include "../helper/satellite-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -95,7 +96,10 @@ ScenarioCreationSimple::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->EnableCreationTraces (false);
+
+  // Enable creation traces
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
   helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -164,7 +168,10 @@ ScenarioCreationLarger::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->EnableCreationTraces (false);
+
+  // Enable creation traces
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
   helper->CreatePredefinedScenario(SatHelper::LARGER);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -233,7 +240,10 @@ ScenarioCreationFull::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->EnableCreationTraces (false);
+
+  // Enable creation traces
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
   helper->CreatePredefinedScenario(SatHelper::FULL);
 
   // check results what can be done at this level. More checking done in module level with traces
@@ -314,7 +324,8 @@ ScenarioCreationUser::DoRun (void)
   beamInfo.AppendUt(2);
   beamMap[2] = beamInfo;
 
-  helper->EnableCreationTraces (false);
+  // Enable creation traces
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
   helper->CreateUserDefinedScenario (beamMap);
 

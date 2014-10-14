@@ -49,6 +49,12 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
   std::string scenario = "Simple";
 
+  // Enable creation traces
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
+  // Enable packet traces (to file PacketTrace.log).
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   /*****************************************************************************
    'To Select super frame configuration, Option 2'
    -- Start --                                                                */
@@ -124,14 +130,8 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  // Enable creation traces.
-  helper->EnableCreationTraces (false);
-
   // Create satellite helper with given scenario default=simple
   helper->CreatePredefinedScenario (satScenario);
-
-  // Enable packet traces (to file PacketTrace.log).
-  helper->EnablePacketTrace ();
                                                                               /**
    -- End --
    Create helper and simulation scenario

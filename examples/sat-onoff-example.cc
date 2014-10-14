@@ -56,6 +56,11 @@ main (int argc, char *argv[])
   std::string sender = "both";
   std::string simDuration = "11s";
 
+  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+
+  // enable packet traces on satellite modules
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   // read command line parameters given by user
@@ -108,13 +113,8 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->EnableCreationTraces(false);
-
   // create scenario
   helper->CreatePredefinedScenario(satScenario);
-
-  // enable packet traces on satellite modules
-  helper->EnablePacketTrace ();
 
   // --- Create applications according to given user parameters
 

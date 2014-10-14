@@ -56,6 +56,8 @@ main (int argc, char *argv[])
   //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   //LogComponentEnable ("sat-arq-fwd-example", LOG_LEVEL_INFO);
 
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
@@ -97,8 +99,6 @@ main (int argc, char *argv[])
   beamMap[beamId] = beamInfo;
 
   helper->CreateUserDefinedScenario (beamMap);
-
-  helper->EnablePacketTrace ();
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers();

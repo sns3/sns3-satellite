@@ -85,6 +85,21 @@ SatHelper::GetTypeId (void)
                      MakeIpv4AddressAccessor (&SatHelper::SetUtNetworkAddress,
                                               &SatHelper::GetUtNetworkAddress),
                      MakeIpv4AddressChecker ())
+      .AddAttribute ("PacketTraceEnabled",
+                     "Packet tracing enable status.",
+                     BooleanValue (false),
+                     MakeBooleanAccessor (&SatHelper::m_packetTraces),
+                     MakeBooleanChecker ())
+      .AddAttribute ("ScenarioCreationTraceEnabled",
+                     "Scenario creation trace output enable status.",
+                     BooleanValue (false),
+                     MakeBooleanAccessor (&SatHelper::m_creationTraces),
+                     MakeBooleanChecker ())
+      .AddAttribute ("DetailedScenarioCreationTraceEnabled",
+                     "Detailed scenario creation trace output enable status.",
+                     BooleanValue (false),
+                     MakeBooleanAccessor (&SatHelper::m_detailedCreationTraces),
+                     MakeBooleanChecker ())
       .AddAttribute ("ScenarioCreationTraceFileName",
                      "File name for the scenario creation trace output",
                      StringValue ("CreationTraceScenario"),
@@ -117,7 +132,9 @@ SatHelper::SatHelper ()
   m_hasGwNetworkSet (false),
   m_hasUtNetworkSet (false),
   m_scenarioCreated (false),
+  m_creationTraces (false),
   m_detailedCreationTraces (false),
+  m_packetTraces (false),
   m_utsInBeam (0),
   m_gwUsers (0),
   m_utUsers (0)
@@ -172,11 +189,6 @@ SatHelper::SatHelper (std::string scenarioName)
 
   m_userHelper = CreateObject<SatUserHelper> ();
 
-  if ( m_detailedCreationTraces )
-    {
-      EnableDetailedCreationTraces();
-    }
-
   // Set the antenna patterns to beam helper
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 }
@@ -184,8 +196,6 @@ SatHelper::SatHelper (std::string scenarioName)
 void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_ASSERT(m_scenarioCreated == false);
 
   switch(scenario)
   {
@@ -207,7 +217,7 @@ void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
   }
 }
 
-void SatHelper::EnableCreationTraces (bool details)
+void SatHelper::EnableCreationTraces ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -223,7 +233,10 @@ void SatHelper::EnableCreationTraces (bool details)
 
   TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 
-  m_detailedCreationTraces = details;
+  if ( m_detailedCreationTraces )
+    {
+      EnableDetailedCreationTraces();
+    }
 }
 
 void
@@ -402,7 +415,7 @@ SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos,
   // create as user wants
   DoCreateScenario(infos, m_gwUsers);
 
-  m_creationSummaryTrace("*** User Defined Scenario Creation Summary ***");
+  m_creationSummaryTrace("*** User Defined Scenario with List Positions Creation Summary ***");
 }
 
 void
@@ -410,36 +423,55 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
 {
   NS_LOG_FUNCTION (this);
 
-  InternetStackHelper internet;
-
-  // create all possible GW nodes, set mobility to them and install to Internet
-  NodeContainer gwNodes;
-  gwNodes.Create (m_satConf->GetGwCount ());
-  SetGwMobility (gwNodes);
-  internet.Install (gwNodes);
-
-  for ( BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
+  if (m_scenarioCreated)
     {
-      // create UTs of the beam, set mobility to them and install to Internet
-      NodeContainer uts;
-      uts.Create (info->second.GetUtCount ());
-      SetUtMobility (uts, info->first);
-      internet.Install (uts);
-
-      for ( uint32_t i = 0; i < info->second.GetUtCount (); i++ )
+      Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", "Scenario tried to re-create with SatHelper. Creation can be done only once.");
+    }
+  else
+    {
+      if (m_creationTraces)
         {
-          // create and install needed users
-          m_userHelper->InstallUt (uts.Get(i), info->second.GetUtUserCount (i));
+          EnableCreationTraces();
         }
 
-      std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (info->first);
+      InternetStackHelper internet;
 
-      // gw index starts from 1 and we have stored them starting from 0
-      Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX]-1);
-      m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+      // create all possible GW nodes, set mobility to them and install to Internet
+      NodeContainer gwNodes;
+      gwNodes.Create (m_satConf->GetGwCount ());
+      SetGwMobility (gwNodes);
+      internet.Install (gwNodes);
+
+      for ( BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
+        {
+          // create UTs of the beam, set mobility to them and install to Internet
+          NodeContainer uts;
+          uts.Create (info->second.GetUtCount ());
+          SetUtMobility (uts, info->first);
+          internet.Install (uts);
+
+          for ( uint32_t i = 0; i < info->second.GetUtCount (); i++ )
+            {
+              // create and install needed users
+              m_userHelper->InstallUt (uts.Get(i), info->second.GetUtUserCount (i));
+            }
+
+          std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (info->first);
+
+          // gw index starts from 1 and we have stored them starting from 0
+          Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX]-1);
+          m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+        }
+
+      m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
+
+      if (m_packetTraces)
+        {
+          EnablePacketTrace ();
+        }
+
+      m_scenarioCreated = true;
     }
-
-  m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 }
 
 void
