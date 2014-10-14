@@ -103,6 +103,11 @@ private:
  * This SatCnoEstimator class holds information of a satellite DAMA entry.
  * It's is created and used by NCC.
  *
+ * It supports three dirrent modes:
+ *  - LAST: The last value in the window given when requested.
+ *  - MINIMUM: The minimum value in the window given when requested.
+ *  - AVERAGE: The average of the samples in window given when requested.
+ *
  */
 class SatBasicCnoEstimator : public SatCnoEstimator
 {

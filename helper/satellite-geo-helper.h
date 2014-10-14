@@ -37,7 +37,8 @@
 namespace ns3 {
 
 /**
- * \brief Build a set SatGeoNetDevice object and configuring it
+ * \brief Creates needed objects for Geo Satellite node like SatGeoNetDevice objects.
+ *        Handles needed configuration for the Geo Satellite node.
  *
  */
 class SatGeoHelper : public Object

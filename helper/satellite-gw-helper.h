@@ -38,7 +38,8 @@
 namespace ns3 {
 
 /**
- * \brief Build a set of SatNetDevice objects
+ * \brief Creates needed objects for GW nodes like SatGeoNetDevice objects.
+ *        Handles needed configuration for the GW nodes.
  *
  */
 class SatGwHelper : public Object

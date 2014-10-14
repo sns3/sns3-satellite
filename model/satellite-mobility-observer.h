@@ -31,11 +31,10 @@ namespace ns3 {
 /**
  * \ingroup satellite
  * \brief Observes given mobilities and keeps track of certain wanted properties.
- * Properties can be observed are currently the timing advance and elevation angle.
+ * Properties can be observed currently are; the timing advance and elevation angle.
  *
  * Observing of timing advance is set by \method ObserveTimingAdvance
  *
- * This is a base class for all satellite mobility models.
  */
 class SatMobilityObserver : public Object
 {

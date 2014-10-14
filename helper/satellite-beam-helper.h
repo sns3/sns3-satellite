@@ -45,7 +45,11 @@
 namespace ns3 {
 
 /**
- * \brief Build a set Satellite beams with needed objects and configuration
+ * \brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
+ *        It utilizes SatUtHelper, SatGwHelper and SatGeoHelper to create needed objects.
+ *
+ *        SatBeamHelper creates needed routes between nodes inside satellite network.
+ *
  *
  */
 class SatBeamHelper : public Object

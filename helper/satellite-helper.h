@@ -44,8 +44,8 @@
 namespace ns3 {
 
 /**
- * \brief Build a satellite network set with needed objects and configuration
- *
+ * \brief Build a satellite network set with needed objects and configuration.
+ *        Utilizes SatUserHelper and SatBeamHelper helper objects.
  */
 class SatHelper : public Object
 {

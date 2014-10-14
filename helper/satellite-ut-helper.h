@@ -40,7 +40,8 @@
 namespace ns3 {
 
 /**
- * \brief Build a set of SatNetDevice objects
+ * \brief Creates needed objects for UT nodes like SatGeoNetDevice objects.
+ *        Handles needed configuration for the UT nodes.
  *
  */
 class SatUtHelper : public Object

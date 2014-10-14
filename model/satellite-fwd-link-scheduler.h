@@ -48,9 +48,15 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
-  * \brief GW specific Mac class for Sat Net Devices.
+ * \brief SatFwdLinkScheduler schedules BB frames for forward link. In every GW MAC is assigned own
+ *        instance of the SatFwdLinkScheduler. To handle BB frames and maintain queues for the them,
+ *        it utilizes BB frame container given as attribute.
  *
- * This SatGwMac class specializes the Mac class with GW characteristics.
+ *        SatFwdLinkScheduler communicated through callback functions to request scheduling objects and
+ *        notifying TX opportunities.
+ *
+ *        GW MAC requests frames from scheduler through method GetNextFrame.
+ *
  */
 
 class SatFwdLinkScheduler : public Object

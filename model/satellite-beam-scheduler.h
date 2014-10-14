@@ -44,6 +44,16 @@ namespace ns3 {
  * This SatBeamScheduler class implements scheduler used to for one specific beam.
  * It's is created and used by NCC.
  *
+ * The scheduling process is briefly:
+ *   - SatDamaEntry/CR update
+ *   - Preliminary resource allocation
+ *   - Time slot generation
+ *   - SatDamaEntry update
+ *   - TBTP signaling (generation)
+ *    - Schedule next scheduling time for the next SF
+ *
+ *    One scheduler per spot-beam is created and utilized.
+ *
  */
 class SatBeamScheduler : public Object
 {
