@@ -176,7 +176,7 @@ SatFadingExternalInputTrace::TestFadingTrace () const
 
           // Test that the the time samples are from constant interval and
           // the time samples are always increasing.
-          if ( diff > 0.0001 || currTime < prevTime)
+          if ( diff > 0.0003 || currTime < prevTime)
             {
               return false;
             }
