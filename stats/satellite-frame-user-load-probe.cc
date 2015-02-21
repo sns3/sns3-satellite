@@ -48,7 +48,8 @@ SatFrameUserLoadProbe::GetTypeId ()
     .AddConstructor<SatFrameUserLoadProbe> ()
     .AddTraceSource ( "Output",
                       "The frame ID and the number of scheduled users that serve as the output for this probe",
-                      MakeTraceSourceAccessor (&SatFrameUserLoadProbe::m_output))
+                      MakeTraceSourceAccessor (&SatFrameUserLoadProbe::m_output),
+                      "ns3::SatFrameUserLoadProbe::FrameUserLoadCallback")
   ;
   return tid;
 }

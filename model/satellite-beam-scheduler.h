@@ -21,21 +21,29 @@
 #ifndef SAT_BEAM_SCHEDULER_H
 #define SAT_BEAM_SCHEDULER_H
 
-#include <set>
-
-#include "ns3/object.h"
-#include "ns3/ptr.h"
-#include "ns3/callback.h"
-#include "ns3/packet.h"
-#include "ns3/traced-callback.h"
-#include "ns3/mac48-address.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include "satellite-dama-entry.h"
-#include "satellite-cno-estimator.h"
-#include "satellite-superframe-allocator.h"
-#include "satellite-control-message.h"
+#include <vector>
+#include <list>
+#include <map>
+#include <ns3/object.h>
+#include <ns3/simple-ref-count.h>
+#include <ns3/ptr.h>
+#include <ns3/callback.h>
+#include <ns3/nstime.h>
+#include <ns3/traced-callback.h>
+#include <ns3/satellite-cno-estimator.h>
+#include <ns3/satellite-frame-allocator.h>
 
 namespace ns3 {
+
+class Address;
+class SatControlMessage;
+class SatCrMessage;
+class SatTbtpMessage;
+class SatSuperframeSeq;
+class SatSuperframeAllocator;
+class SatLowerLayerServiceConf;
+class SatDamaEntry;
+
 
 /**
  * \ingroup satellite
@@ -130,6 +138,48 @@ public:
    * \return true if sending is success, false otherwise.
    */
   bool Send (Ptr<SatControlMessage> message);
+
+  /**
+   * Callback signature for `BacklogRequestsTrace` trace source.
+   *
+   * \param trace A string containing the following information:
+   *                 - the current simulation time (in seconds),
+   *                 - beam ID,
+   *                 - UT ID,
+   *                 - type (RBDC or VBDC), and
+   *                 - request size (in kbps for RBDC or in bytes for VBDC).
+   */
+  typedef void (* BacklogRequestsTraceCallback) (std::string trace);
+
+  /**
+   * Callback signature for `WaveformTrace` trace source.
+   *
+   * \param waveformId The first waveform scheduled for a UT.
+   */
+  typedef void (* WaveformTraceCallback) (uint32_t waveformId);
+
+  /**
+   * Callback signature for the `UsableCapacityTrace` trace source.
+   *
+   * \param usableCapacity The amount of capacity allocated, in kbps.
+   */
+  typedef void (* UsableCapacityTraceCallback) (uint32_t usableCapacity);
+
+  /**
+   * Callback signature for the `UnmetCapacityTrace` trace source.
+   *
+   * \param unmetCapacity The amount of capacity requested but not used,
+   *                      in kbps.
+   */
+  typedef void (* UnmetCapacityTraceCallback) (uint32_t unmetCapacity);
+
+  /**
+   * Callback signature for the `ExceedingCapacityTrace` trace source.
+   *
+   * \param exceedingCapacity The amount capacity offered exceeds capacity
+   *                          requested, in kbps.
+   */
+  typedef void (* ExceedingCapacityTraceCallback) (uint32_t exceedingCapacity);
 
 private:
   /**

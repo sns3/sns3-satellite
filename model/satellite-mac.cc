@@ -29,6 +29,7 @@
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/satellite-address-tag.h>
 #include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-typedefs.h>
 #include "satellite-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatMac");
@@ -50,13 +51,16 @@ SatMac::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
-                     MakeTraceSourceAccessor (&SatMac::m_packetTrace))
+                     MakeTraceSourceAccessor (&SatMac::m_packetTrace),
+                     "ns3::SatTypedefs::PacketTraceCallback")
     .AddTraceSource ("Rx",
                      "A packet received",
-                     MakeTraceSourceAccessor (&SatMac::m_rxTrace))
+                     MakeTraceSourceAccessor (&SatMac::m_rxTrace),
+                     "ns3::SatTypedefs::PacketSenderAddressCallback")
     .AddTraceSource ("RxDelay",
                      "A packet is received with delay information",
-                     MakeTraceSourceAccessor (&SatMac::m_rxDelayTrace))
+                     MakeTraceSourceAccessor (&SatMac::m_rxDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
   ;
   return tid;
 }

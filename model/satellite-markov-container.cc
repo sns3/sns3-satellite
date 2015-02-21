@@ -35,7 +35,8 @@ SatMarkovContainer::GetTypeId (void)
     .AddConstructor<SatMarkovContainer> ()
     .AddTraceSource ("FadingTrace",
                      "The trace for fading values",
-                     MakeTraceSourceAccessor (&SatMarkovContainer::m_fadingTrace));
+                     MakeTraceSourceAccessor (&SatMarkovContainer::m_fadingTrace),
+                     "ns3::SatMarkovContainer::FadingTraceCallback");
   return tid;
 }
 

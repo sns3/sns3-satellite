@@ -26,12 +26,13 @@
  * - Budiarto Herman (budiarto.herman@magister.fi)
  */
 
-#include "ns3/satellite-sinr-probe.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/config.h"
-#include "ns3/simulator.h"
-#include "ns3/callback.h"
+#include <ns3/satellite-sinr-probe.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/config.h>
+#include <ns3/simulator.h>
+#include <ns3/callback.h>
+#include <ns3/traced-value.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatSinrProbe");
 
@@ -48,10 +49,12 @@ SatSinrProbe::GetTypeId ()
     .AddConstructor<SatSinrProbe> ()
     .AddTraceSource ( "Output",
                       "The SINR plus its socket address that serve as the output for this probe",
-                      MakeTraceSourceAccessor (&SatSinrProbe::m_output))
+                      MakeTraceSourceAccessor (&SatSinrProbe::m_output),
+                      "ns3::SatSinrProbe::SinrCallback")
     .AddTraceSource ( "OutputSinr",
                       "The SINR",
-                      MakeTraceSourceAccessor (&SatSinrProbe::m_outputSinr))
+                      MakeTraceSourceAccessor (&SatSinrProbe::m_outputSinr),
+                      "ns3::TracedValue::DoubleCallback")
   ;
   return tid;
 }

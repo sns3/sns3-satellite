@@ -76,7 +76,7 @@ public:
   /**
    * \brief Get elevation angle.
    *
-   * @\eturn the current elevation angle as degrees.
+   * \return the current elevation angle as degrees.
    */
   double GetElevationAngle (void);
 
@@ -93,6 +93,15 @@ public:
    * \return the current timing advance.
    */
   Time GetTimingAdvance (void);
+
+  /**
+   * \brief Callback signature for `PropertyChanged` trace source.
+   *
+   * \param mobilityObserver An instance of SatMobilityObserver which property
+   *                         has changed.
+   */
+  typedef void (* PropertyChangedCallback)
+    (Ptr<const SatMobilityObserver> mobilityObserver);
 
 private:
 

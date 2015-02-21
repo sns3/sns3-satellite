@@ -18,7 +18,12 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+#include <ns3/satellite-control-message.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-lower-layer-service.h>
+#include <ns3/packet.h>
+#include <ns3/address.h>
 #include "satellite-ncc.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNcc");
@@ -38,10 +43,12 @@ SatNcc::GetTypeId (void)
     //
     .AddTraceSource ("NccRx",
                      "Trace source indicating a CR has received by NCC",
-                     MakeTraceSourceAccessor (&SatNcc::m_nccRxTrace))
+                     MakeTraceSourceAccessor (&SatNcc::m_nccRxTrace),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("NccTx",
                      "Trace source indicating a TBTP has sent by NCC",
-                     MakeTraceSourceAccessor (&SatNcc::m_nccTxTrace))
+                     MakeTraceSourceAccessor (&SatNcc::m_nccTxTrace),
+                     "ns3::Packet::TracedCallback")
   ;
   return tid;
 }

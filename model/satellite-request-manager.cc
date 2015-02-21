@@ -126,19 +126,24 @@ SatRequestManager::GetTypeId (void)
                    MakeDoubleChecker<double_t> ())
     .AddTraceSource ("CrTrace",
                      "Capacity request trace",
-                     MakeTraceSourceAccessor (&SatRequestManager::m_crTrace))
+                     MakeTraceSourceAccessor (&SatRequestManager::m_crTrace),
+                     "ns3::SatRequestManager::CapacityRequestTraceCallback")
     .AddTraceSource ("CrTraceLog",
                      "Capacity request trace log",
-                     MakeTraceSourceAccessor (&SatRequestManager::m_crTraceLog))
+                     MakeTraceSourceAccessor (&SatRequestManager::m_crTraceLog),
+                     "ns3::SatRequestManager::CapacityRequestTraceLogCallback")
     .AddTraceSource ("RbdcTrace",
                      "Trace for all sent RBDC capacity requests.",
-                     MakeTraceSourceAccessor (&SatRequestManager::m_rbdcTrace))
+                     MakeTraceSourceAccessor (&SatRequestManager::m_rbdcTrace),
+                     "ns3::SatRequestManager::RbdcTraceCallback")
     .AddTraceSource ("VbdcTrace",
                      "Trace for all sent VBDC capacity requests.",
-                     MakeTraceSourceAccessor (&SatRequestManager::m_vbdcTrace))
+                     MakeTraceSourceAccessor (&SatRequestManager::m_vbdcTrace),
+                     "ns3::SatRequestManager::VbdcTraceCallback")
     .AddTraceSource ("AvbdcTrace",
                      "Trace for all sent AVBDC capacity requests.",
-                     MakeTraceSourceAccessor (&SatRequestManager::m_aVbdcTrace))
+                     MakeTraceSourceAccessor (&SatRequestManager::m_aVbdcTrace),
+                     "ns3::SatRequestManager::AvbdcTraceCallback")
   ;
   return tid;
 }

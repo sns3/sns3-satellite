@@ -190,15 +190,6 @@ protected:
   */
   SendCtrlCallback m_ctrlCallback;
 
-  /**
-   * Used to inform of a PDU delivery
-   */
-  TracedCallback<uint16_t, uint8_t, uint32_t> m_txPdu;
-  /**
-   * Used to inform of a PDU reception
-   */
-  TracedCallback<uint16_t, uint8_t, uint32_t, uint64_t> m_rxPdu;
-
 };
 
 

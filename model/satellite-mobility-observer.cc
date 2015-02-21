@@ -67,7 +67,8 @@ SatMobilityObserver::GetTypeId (void)
                     MakeDoubleChecker<double>())
     .AddTraceSource ("PropertyChanged",
                     "The value of the some property has changed",
-                    MakeTraceSourceAccessor (&SatMobilityObserver::m_propertyChangeTrace))
+                    MakeTraceSourceAccessor (&SatMobilityObserver::m_propertyChangeTrace),
+                    "ns3::SatMobilityObserver::PropertyChangedCallback")
   ;
   return tid;
 }

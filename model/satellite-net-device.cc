@@ -18,26 +18,27 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/node.h"
-#include "ns3/packet.h"
-#include "ns3/log.h"
-#include "ns3/pointer.h"
-#include "ns3/boolean.h"
-#include "ns3/error-model.h"
-#include "ns3/trace-source-accessor.h"
-#include "ns3/ipv4-header.h"
-#include "ns3/ipv4-l3-protocol.h"
-#include "ns3/channel.h"
+#include <ns3/node.h>
+#include <ns3/packet.h>
+#include <ns3/log.h>
+#include <ns3/pointer.h>
+#include <ns3/boolean.h>
+#include <ns3/error-model.h>
+#include <ns3/trace-source-accessor.h>
+#include <ns3/ipv4-header.h>
+#include <ns3/ipv4-l3-protocol.h>
+#include <ns3/channel.h>
 
 #include "satellite-net-device.h"
-#include "satellite-phy.h"
-#include "satellite-mac.h"
-#include "satellite-llc.h"
-#include "satellite-control-message.h"
-#include "satellite-utils.h"
-#include "satellite-node-info.h"
-#include "satellite-address-tag.h"
-#include "satellite-time-tag.h"
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-llc.h>
+#include <ns3/satellite-control-message.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-address-tag.h>
+#include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -83,19 +84,24 @@ SatNetDevice::GetTypeId (void)
                     MakeBooleanChecker ())
      .AddTraceSource ("PacketTrace",
                       "Packet event trace",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_packetTrace))
+                      MakeTraceSourceAccessor (&SatNetDevice::m_packetTrace),
+                      "ns3::SatTypedefs::PacketTraceCallback")
      .AddTraceSource ("Tx",
                       "A packet to be sent",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_txTrace))
+                      MakeTraceSourceAccessor (&SatNetDevice::m_txTrace),
+                      "ns3::Packet::TracedCallback")
      .AddTraceSource ("SignallingTx",
                       "A signalling packet to be sent",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_signallingTxTrace))
+                      MakeTraceSourceAccessor (&SatNetDevice::m_signallingTxTrace),
+                      "ns3::SatTypedefs::PacketDestinationAddressCallback")
      .AddTraceSource ("Rx",
                       "A packet received",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace))
+                      MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace),
+                      "ns3::SatTypedefs::PacketSourceAddressCallback")
      .AddTraceSource ("RxDelay",
                       "A packet is received with delay information",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_rxDelayTrace))
+                      MakeTraceSourceAccessor (&SatNetDevice::m_rxDelayTrace),
+                      "ns3::SatTypedefs::PacketDelayAddressCallback")
   ;
   return tid;
 }

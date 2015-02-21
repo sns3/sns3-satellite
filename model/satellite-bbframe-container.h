@@ -19,8 +19,8 @@
  */
 
 
-#ifndef SATELLITE_BBFRAME_CONTAINER_H_
-#define SATELLITE_BBFRAME_CONTAINER_H_
+#ifndef SATELLITE_BBFRAME_CONTAINER_H
+#define SATELLITE_BBFRAME_CONTAINER_H
 
 #include <vector>
 #include <deque>
@@ -145,4 +145,4 @@ private:
 } // namespace ns3
 
 
-#endif /* SATELLITE_BBFRAME_CONTAINER_H_ */
+#endif /* SATELLITE_BBFRAME_CONTAINER_H */

@@ -23,20 +23,21 @@
 
 #include <vector>
 #include <map>
-#include "ns3/object.h"
-#include "ns3/traced-callback.h"
-#include "ns3/nstime.h"
-#include "ns3/pointer.h"
-#include "ns3/ptr.h"
-#include "ns3/mac48-address.h"
-
-#include "satellite-node-info.h"
-#include "satellite-base-encapsulator.h"
-#include "satellite-scheduling-object.h"
-#include "satellite-control-message.h"
+#include <ns3/object.h>
+#include <ns3/traced-callback.h>
+#include <ns3/ptr.h>
+#include <ns3/simple-ref-count.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-base-encapsulator.h>
 
 namespace ns3 {
 
+class Time;
+class Address;
+class Packet;
+class SatControlMessage;
+class SatSchedulingObject;
+class SatNodeInfo;
 
 /**
  * \ingroup satellite

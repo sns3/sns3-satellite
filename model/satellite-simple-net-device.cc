@@ -49,7 +49,8 @@ SatSimpleNetDevice::GetTypeId (void)
                    MakePointerChecker<ErrorModel> ())
     .AddTraceSource ("PhyRxDrop",
                      "Trace source indicating a packet has been dropped by the device during reception",
-                     MakeTraceSourceAccessor (&SatSimpleNetDevice::m_phyRxDropTrace))
+                     MakeTraceSourceAccessor (&SatSimpleNetDevice::m_phyRxDropTrace),
+                     "ns3::Packet::TracedCallback")
   ;
   return tid;
 }

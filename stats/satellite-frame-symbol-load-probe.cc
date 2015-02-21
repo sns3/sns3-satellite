@@ -48,7 +48,8 @@ SatFrameSymbolLoadProbe::GetTypeId ()
     .AddConstructor<SatFrameSymbolLoadProbe> ()
     .AddTraceSource ( "Output",
                       "The frame ID and the ratio of allocated symbols that serve as the output for this probe",
-                      MakeTraceSourceAccessor (&SatFrameSymbolLoadProbe::m_output))
+                      MakeTraceSourceAccessor (&SatFrameSymbolLoadProbe::m_output),
+                      "ns3::SatFrameSymbolLoadProbe::FrameSymbolLoadCallback")
   ;
   return tid;
 }

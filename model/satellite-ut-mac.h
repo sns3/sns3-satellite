@@ -21,24 +21,36 @@
 #ifndef SATELLITE_UT_MAC_H
 #define SATELLITE_UT_MAC_H
 
-#include "satellite-mac.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include "satellite-control-message.h"
-#include "satellite-phy.h"
-#include "satellite-random-access-container.h"
-#include "satellite-random-access-container-conf.h"
-#include "satellite-tbtp-container.h"
-#include "satellite-lower-layer-service.h"
-#include "satellite-queue.h"
-#include "satellite-ut-scheduler.h"
+#include <ns3/ptr.h>
+#include <ns3/callback.h>
+#include <ns3/traced-callback.h>
 #include <ns3/traced-value.h>
+#include <ns3/nstime.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-queue.h>
+#include <ns3/satellite-ut-scheduler.h>
+#include <ns3/satellite-signal-parameters.h>
+#include <ns3/satellite-random-access-container.h>
+#include <ns3/satellite-enums.h>
+#include <utility>
 
 namespace ns3 {
 
+class Packet;
+class Mac48Address;
+class SatSuperframeSeq;
+class SatNodeInfo;
+class SatFrameConf;
+class SatTbtpMessage;
+class SatWaveform;
+class SatTimeSlotConf;
+class SatTbtpContainer;
+class UniformRandomVariable;
 
 /**
  * \ingroup satellite
-  * \brief UT specific Mac class for Sat Net Devices.
+ * \brief UT specific Mac class for Sat Net Devices.
  *
  * This SatUtMac class specializes the MAC class with UT characteristics. UT MAC
  * receives BB frames intended for it (including at least one packet intended for it)
@@ -49,7 +61,6 @@ namespace ns3 {
  * more RLE PDUs.
  *
  */
-
 class SatUtMac : public SatMac
 {
 public:
@@ -166,6 +177,13 @@ public:
    * \return Boolean to indicate whether a control msg transmission is possible
    */
   bool ControlMsgTransmissionPossible () const;
+
+  /**
+   * \brief Callback signature for `DaResourcesTrace` trace source.
+   * \param size the amount of assigned TBTP resources (in bytes) in the
+   *             superframe for this UT
+   */
+  typedef void (* TbtpResourcesTraceCallback) (uint32_t size);
 
 protected:
 

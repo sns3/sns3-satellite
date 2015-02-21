@@ -37,6 +37,7 @@
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-address-tag.h>
 #include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-typedefs.h>
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhy");
@@ -119,13 +120,16 @@ SatPhy::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
-                     MakeTraceSourceAccessor (&SatPhy::m_packetTrace))
+                     MakeTraceSourceAccessor (&SatPhy::m_packetTrace),
+                     "ns3::SatTypedefs::PacketTraceCallback")
     .AddTraceSource ("Rx",
                      "A packet received",
-                     MakeTraceSourceAccessor (&SatPhy::m_rxTrace))
+                     MakeTraceSourceAccessor (&SatPhy::m_rxTrace),
+                     "ns3::SatTypedefs::PacketSourceAddressCallback")
     .AddTraceSource ("RxDelay",
                      "A packet is received with delay information",
-                     MakeTraceSourceAccessor (&SatPhy::m_rxDelayTrace))
+                     MakeTraceSourceAccessor (&SatPhy::m_rxDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
   ;
   return tid;
 }

@@ -65,13 +65,7 @@ TypeId SatBaseEncapsulator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatBaseEncapsulator")
     .SetParent<Object> ()
-    .AddTraceSource ("TxPDU",
-                     "PDU transmission notified to the MAC.",
-                     MakeTraceSourceAccessor (&SatBaseEncapsulator::m_txPdu))
-    .AddTraceSource ("RxPDU",
-                     "PDU received.",
-                     MakeTraceSourceAccessor (&SatBaseEncapsulator::m_rxPdu))
-    ;
+  ;
   return tid;
 }
 

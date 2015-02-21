@@ -21,26 +21,22 @@
 #ifndef SAT_GW_MAC_H
 #define SAT_GW_MAC_H
 
-#include <cstring>
-
-#include "ns3/address.h"
-#include "ns3/ptr.h"
-#include "ns3/node.h"
-#include "ns3/callback.h"
-#include "ns3/packet.h"
-#include "ns3/traced-callback.h"
-#include "ns3/nstime.h"
-#include "ns3/mac48-address.h"
-#include "ns3/random-variable-stream.h"
-
-#include "satellite-mac.h"
-#include "satellite-net-device.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-control-message.h"
-#include "satellite-phy.h"
-#include "satellite-fwd-link-scheduler.h"
+#include <ns3/ptr.h>
+#include <ns3/callback.h>
+#include <ns3/traced-callback.h>
+#include <ns3/nstime.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-phy.h>
 
 namespace ns3 {
+
+class Packet;
+class Address;
+class Mac48Address;
+class SatBbFrame;
+class SatCrMessage;
+class SatSignalParameters;
+class SatFwdLinkScheduler;
 
 /**
  * \ingroup satellite

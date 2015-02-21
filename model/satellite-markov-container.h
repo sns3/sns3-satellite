@@ -115,6 +115,17 @@ public:
    */
   void RandomizeLockedState (uint32_t set);
 
+  /**
+   * \brief Callback for `FadingTrace` trace source.
+   * \param time the current simulation time (in seconds)
+   * \param channelType the type of the relevant channel, e.g.,
+   *                    FORWARD_FEEDER_CH, FORWARD_USER_CH, RETURN_USER_CH,
+   *                    or RETURN_FEEDER_CH
+   * \param value fading value, in unit determined by configuration
+   */
+  typedef void (* FadingTraceCallback)
+    (double time, SatEnums::ChannelType_t channelType, double value);
+
 private:
 
   /**

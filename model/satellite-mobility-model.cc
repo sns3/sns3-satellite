@@ -46,7 +46,8 @@ SatMobilityModel::GetTypeId (void)
                     MakeBooleanChecker ())
     .AddTraceSource ("SatCourseChange",
                      "The value of the position and/or velocity coordinate changed",
-                     MakeTraceSourceAccessor (&SatMobilityModel::m_satCourseChangeTrace))
+                     MakeTraceSourceAccessor (&SatMobilityModel::m_satCourseChangeTrace),
+                     "ns3::SatMobilityModel::CourseChangeCallback")
   ;
   return tid;
 }

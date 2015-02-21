@@ -91,6 +91,16 @@ public:
    */
   virtual void ConnectByPath (std::string path);
 
+  /**
+   * \brief Callback signature for frame load in unit of symbols.
+   *
+   * \param frameId The current frame number.
+   * \param loadRatio the ratio of allocated symbols over the total number of
+   *                  symbols in the frame.
+   */
+  typedef void (* FrameSymbolLoadCallback)
+    (uint32_t frameId, double loadRatio);
+
 private:
   /**
    * \brief Method to connect to an underlying ns3::TraceSource with

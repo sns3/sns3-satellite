@@ -38,6 +38,7 @@
 #include "../model/satellite-channel-estimation-error-container.h"
 #include "satellite-geo-helper.h"
 #include "satellite-helper.h"
+#include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoHelper");
 
@@ -66,7 +67,8 @@ SatGeoHelper::GetTypeId (void)
                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
      .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace))
+                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
+                      "ns3::SatTypedefs::CreationCallback")
     ;
     return tid;
 }

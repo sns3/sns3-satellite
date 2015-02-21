@@ -79,7 +79,8 @@ SatBbFrameContainer::GetTypeId (void)
     .AddConstructor<SatBbFrameContainer> ()
     .AddTraceSource ("BBFrameMergeTrace",
                     "Trace for merged BB Frames.",
-                    MakeTraceSourceAccessor (&SatBbFrameContainer::m_bbFrameMergeTrace))
+                    MakeTraceSourceAccessor (&SatBbFrameContainer::m_bbFrameMergeTrace),
+                    "ns3::SatBbFrame::BbFrameMergeCallback")
   ;
   return tid;
 }

@@ -29,10 +29,10 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_PACKET_PROBE_H
 #define SATELLITE_PHY_RX_CARRIER_PACKET_PROBE_H
 
-#include "ns3/nstime.h"
-#include "ns3/traced-callback.h"
-#include "ns3/address.h"
-#include "ns3/probe.h"
+#include <ns3/nstime.h>
+#include <ns3/traced-callback.h>
+#include <ns3/address.h>
+#include <ns3/probe.h>
 
 namespace ns3 {
 
@@ -96,6 +96,16 @@ public:
    * to anything.
    */
   virtual void ConnectByPath (std::string path);
+
+  /**
+   * \brief Common callback signature for trace sources related to packets
+   *        reception by PHY and its status.
+   * \param nPackets number of upper layer packets in the received packet burst.
+   * \param from the MAC48 address of the sender of the packets.
+   * \param status whether a PHY error or collision has occurred.
+   */
+  typedef void (* RxStatusCallback)
+    (uint32_t nPackets, const Address &from, bool status);
 
 private:
   /**

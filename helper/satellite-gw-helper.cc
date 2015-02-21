@@ -44,6 +44,8 @@
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
+#include <ns3/satellite-fwd-link-scheduler.h>
+#include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
 
@@ -78,7 +80,8 @@ SatGwHelper::GetTypeId (void)
                      MakeBooleanChecker ())
       .AddTraceSource ("Creation",
                        "Creation traces",
-                        MakeTraceSourceAccessor (&SatGwHelper::m_creationTrace))
+                       MakeTraceSourceAccessor (&SatGwHelper::m_creationTrace),
+                       "ns3::SatTypedefs::CreationCallback")
     ;
     return tid;
 }

@@ -18,34 +18,27 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/string.h"
-#include "ns3/log.h"
-#include "ns3/ptr.h"
-#include "ns3/double.h"
-#include "ns3/random-variable.h"
-#include "ns3/simulator.h"
-#include "ns3/mac48-address.h"
-#include "ns3/uinteger.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
-#include "ns3/nstime.h"
-#include "ns3/pointer.h"
-#include "ns3/packet.h"
-#include "ns3/singleton.h"
-#include "ns3/ipv4-l3-protocol.h"
-#include "ns3/singleton.h"
+#include <ns3/log.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/simulator.h>
+#include <ns3/mac48-address.h>
+#include <ns3/boolean.h>
+#include <ns3/pointer.h>
+#include <ns3/packet.h>
+#include <ns3/singleton.h>
 
-#include "satellite-const-variables.h"
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-tbtp-container.h>
+#include <ns3/satellite-rtn-link-time.h>
+#include <ns3/satellite-wave-form-conf.h>
+#include <ns3/satellite-crdsa-replica-tag.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-control-message.h>
+#include <ns3/satellite-frame-conf.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-log.h>
 #include "satellite-ut-mac.h"
-#include "satellite-enums.h"
-#include "satellite-utils.h"
-#include "satellite-tbtp-container.h"
-#include "satellite-queue.h"
-#include "satellite-ut-scheduler.h"
-#include "satellite-rtn-link-time.h"
-#include "satellite-wave-form-conf.h"
-#include "satellite-crdsa-replica-tag.h"
-#include "satellite-log.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
 
@@ -81,7 +74,8 @@ SatUtMac::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
-                     MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace))
+                     MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace),
+                     "ns3::SatUtMac::TbtpResourcesTraceCallback")
   ;
   return tid;
 }

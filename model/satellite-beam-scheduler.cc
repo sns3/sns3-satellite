@@ -19,17 +19,26 @@
  */
 
 #include <algorithm>
-#include "ns3/log.h"
-#include "ns3/double.h"
-#include "ns3/boolean.h"
-#include "ns3/enum.h"
-#include "ns3/ipv4-l3-protocol.h"
-#include "ns3/singleton.h"
-#include "satellite-utils.h"
-#include "satellite-id-mapper.h"
-#include "satellite-rtn-link-time.h"
+#include <utility>
+#include <sstream>
+#include <ns3/log.h>
+#include <ns3/double.h>
+#include <ns3/boolean.h>
+#include <ns3/enum.h>
+#include <ns3/singleton.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-rtn-link-time.h>
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-frame-symbol-load-probe.h>
+#include <ns3/satellite-frame-user-load-probe.h>
+#include <ns3/address.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-superframe-allocator.h>
+#include <ns3/satellite-dama-entry.h>
+#include <ns3/satellite-control-message.h>
+#include <ns3/satellite-lower-layer-service.h>
 #include "satellite-beam-scheduler.h"
-#include "satellite-const-variables.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamScheduler");
@@ -199,23 +208,33 @@ SatBeamScheduler::GetTypeId (void)
                    MakeTimeChecker ())
     .AddTraceSource ("BacklogRequestsTrace",
                      "Trace for backlog requests done to beam scheduler.",
-                      MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace))
-    .AddTraceSource ("WaveformTrace", "Trace scheduled wave forms (called once per UT per round).",
-                      MakeTraceSourceAccessor (&SatBeamScheduler::m_waveformTrace))
-    .AddTraceSource ("FrameUtLoadTrace", "Trace UT load per the frame.",
-                      MakeTraceSourceAccessor (&SatBeamScheduler::m_frameUtLoadTrace))
-    .AddTraceSource ("FrameLoadTrace", "Trace load per the frame allocates symbols / total symbols.",
-                      MakeTraceSourceAccessor (&SatBeamScheduler::m_frameLoadTrace))
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace),
+                     "ns3::SatBeamScheduler::BacklogRequestsTraceCallback")
+    .AddTraceSource ("WaveformTrace",
+                     "Trace scheduled wave forms (called once per UT per round).",
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_waveformTrace),
+                     "ns3::SatBeamScheduler::WaveformTrace")
+    .AddTraceSource ("FrameUtLoadTrace",
+                     "Trace UT load per the frame.",
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_frameUtLoadTrace),
+                     "ns3::SatFrameUserLoadProbe::FrameUserLoadCallback")
+    .AddTraceSource ("FrameLoadTrace",
+                     "Trace load per the frame allocated symbols / total symbols.",
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_frameLoadTrace),
+                     "ns3::SatFrameSymbolLoadProbe::FrameSymbolLoadCallback")
     .AddTraceSource ("UsableCapacityTrace",
                      "Trace usable capacity per beam in kbps.",
-                     MakeTraceSourceAccessor (&SatBeamScheduler::m_usableCapacityTrace))
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_usableCapacityTrace),
+                     "ns3::SatBeamScheduler::UsableCapacityTraceCallback")
     .AddTraceSource ("UnmetCapacityTrace",
                      "Trace unmet capacity per beam in kbps.",
-                     MakeTraceSourceAccessor (&SatBeamScheduler::m_unmetCapacityTrace))
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_unmetCapacityTrace),
+                     "ns3::SatBeamScheduler::UnmetCapacityTrace")
     .AddTraceSource ("ExceedingCapacityTrace",
                      "Trace exceeding capacity per beam in kbps.",
-                     MakeTraceSourceAccessor (&SatBeamScheduler::m_exceedingCapacityTrace))
-                     ;
+                     MakeTraceSourceAccessor (&SatBeamScheduler::m_exceedingCapacityTrace),
+                     "ns3::SatBeamScheduler::ExceedingCapacityTrace")
+  ;
   return tid;
 }
 
@@ -662,3 +681,4 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
 }
 
 } // namespace ns3
+

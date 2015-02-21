@@ -28,6 +28,7 @@
 #include "satellite-user-helper.h"
 #include <ns3/singleton.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
 
@@ -54,7 +55,8 @@ SatUserHelper::GetTypeId (void)
                       MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
                                        SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
       .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace))
+                       MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace),
+                       "ns3::SatTypedefs::CreationCallback")
     ;
     return tid;
 }

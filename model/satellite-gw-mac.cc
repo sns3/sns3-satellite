@@ -18,24 +18,25 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/mac48-address.h"
-#include "ns3/trace-source-accessor.h"
-#include "ns3/uinteger.h"
-#include "ns3/singleton.h"
-#include "ns3/nstime.h"
-#include "ns3/pointer.h"
-#include "ns3/enum.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/uinteger.h>
+#include <ns3/singleton.h>
+#include <ns3/pointer.h>
+#include <ns3/boolean.h>
 
-#include "satellite-mac-tag.h"
-#include "satellite-net-device.h"
-#include "satellite-signal-parameters.h"
+#include <ns3/satellite-mac-tag.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-log.h>
 #include "satellite-gw-mac.h"
-#include "satellite-utils.h"
-#include "satellite-log.h"
+
+#include <ns3/packet.h>
+#include <ns3/address.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-bbframe.h>
+#include <ns3/satellite-signal-parameters.h>
+#include <ns3/satellite-control-message.h>
+#include <ns3/satellite-fwd-link-scheduler.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatGwMac");
 
@@ -65,8 +66,9 @@ SatGwMac::GetTypeId (void)
                    MakeTimeAccessor (&SatGwMac::m_guardTime),
                    MakeTimeChecker ())
     .AddTraceSource ("BBFrameTxTrace",
-                    "Trace for transmitted BB Frames.",
-                    MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace))
+                     "Trace for transmitted BB Frames.",
+                     MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace),
+                     "ns3::SatBbFrame::BbFrameCallback")
   ;
   return tid;
 }

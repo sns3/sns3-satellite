@@ -18,18 +18,24 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/pointer.h>
 
 #include "satellite-ut-llc.h"
-#include "satellite-return-link-encapsulator.h"
-#include "satellite-return-link-encapsulator-arq.h"
-#include "satellite-generic-stream-encapsulator.h"
-#include "satellite-generic-stream-encapsulator-arq.h"
-#include "satellite-node-info.h"
-#include "satellite-enums.h"
-#include "satellite-utils.h"
-#include "satellite-queue.h"
+#include <ns3/satellite-base-encapsulator.h>
+#include <ns3/satellite-return-link-encapsulator.h>
+#include <ns3/satellite-return-link-encapsulator-arq.h>
+#include <ns3/satellite-generic-stream-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator-arq.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-request-manager.h>
+#include <ns3/packet.h>
+#include <ns3/address.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-scheduling-object.h>
 
 
 NS_LOG_COMPONENT_DEFINE ("SatUtLlc");

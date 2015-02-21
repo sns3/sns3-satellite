@@ -29,10 +29,10 @@
 #ifndef SATELLITE_SINR_PROBE_H
 #define SATELLITE_SINR_PROBE_H
 
-#include "ns3/nstime.h"
-#include "ns3/traced-callback.h"
-#include "ns3/address.h"
-#include "ns3/probe.h"
+#include <ns3/nstime.h>
+#include <ns3/traced-callback.h>
+#include <ns3/address.h>
+#include <ns3/probe.h>
 
 namespace ns3 {
 
@@ -92,6 +92,13 @@ public:
    * to anything.
    */
   virtual void ConnectByPath (std::string path);
+
+  /**
+   * \brief Callback signature for SINR and an address.
+   * \param sinr composite SINR (in dB)
+   * \param from the address of the node where the signal originates from
+   */
+  typedef void (* SinrCallback) (double sinr, const Address &from);
 
 private:
   /**

@@ -138,6 +138,51 @@ public:
    */
   void AssignedDaResources (uint8_t rcIndex, uint32_t bytes);
 
+  /**
+   * \brief Callback signature for `CrTrace` trace source.
+   * \param time the current simulation time.
+   * \param address the MAC address of the current node.
+   * \param message the CR message to be transmitted.
+   */
+  typedef void (* CapacityRequestTraceCallback)
+    (Time time, Mac48Address address, Ptr<SatCrMessage> message);
+
+  /**
+   * \brief Callback signature for `CrLogTrace` trace source.
+   * \param traceLog A string containing the following information:
+   *                    - the current simulation time (in seconds),
+   *                    - node ID,
+   *                    - RC index,
+   *                    - type of capacity allocation category, e.g., RBDC,
+   *                      VBDC, or AVBDC,
+   *                    - request size (in kbps for RBDC or in bytes for VBDC),
+   *                      and
+   *                    - queue size (in bytes).
+   */
+  typedef void (* CapacityRequestTraceLogCallback)
+    (std::string traceLog);
+
+  /**
+   * \brief Callback signature for `RbdcTrace` trace source.
+   * \param requestSize amount of requested size via RBDC (in kbps).
+   */
+  typedef void (* RbdcTraceCallback)
+    (uint32_t requestSize);
+
+  /**
+   * \brief Callback signature for `VbdcTrace` trace source.
+   * \param requestSize amount of requested size via VBDC (in bytes).
+   */
+  typedef void (* VbdcTraceCallback)
+    (uint32_t requestSize);
+
+  /**
+   * \brief Callback signature for `AvbdcTrace` trace source.
+   * \param requestSize amount of requested size via AVBDC (in bytes).
+   */
+  typedef void (* AvbdcTraceCallback)
+    (uint32_t requestSize);
+
 private:
 
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;

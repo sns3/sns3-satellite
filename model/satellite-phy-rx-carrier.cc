@@ -18,28 +18,29 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <math.h>
-#include <algorithm>
-#include "ns3/log.h"
-#include "ns3/object.h"
-#include "ns3/simulator.h"
-#include "ns3/boolean.h"
-#include "satellite-utils.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-constant-interference.h>
+#include <ns3/satellite-per-packet-interference.h>
+#include <ns3/satellite-traced-interference.h>
+#include <ns3/satellite-mac-tag.h>
+#include <ns3/singleton.h>
+#include <ns3/satellite-composite-sinr-output-trace-container.h>
+#include <ns3/satellite-rtn-link-time.h>
+#include <ns3/satellite-crdsa-replica-tag.h>
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-phy-rx-carrier-packet-probe.h>
+#include <ns3/address.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-signal-parameters.h>
 #include "satellite-phy-rx-carrier.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-channel.h"
-#include "satellite-interference.h"
-#include "satellite-constant-interference.h"
-#include "satellite-per-packet-interference.h"
-#include "satellite-traced-interference.h"
-#include "satellite-mac-tag.h"
-#include "satellite-mac.h"
-#include "ns3/singleton.h"
-#include "satellite-composite-sinr-output-trace-container.h"
-#include "satellite-phy-tx.h"
-#include "satellite-crdsa-replica-tag.h"
-#include "satellite-rtn-link-time.h"
-#include "satellite-const-variables.h"
+
+#include <algorithm>
+#include <ostream>
+#include <limits>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 
@@ -196,32 +197,41 @@ SatPhyRxCarrier::GetTypeId (void)
                     MakeBooleanChecker ())
     .AddTraceSource ("LinkBudgetTrace",
                      "The trace for link budget related quantities",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_linkBudgetTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_linkBudgetTrace),
+                     "ns3::SatPhyRxCarrier::LinkBudgetTraceCallback")
     .AddTraceSource ("RxPowerTrace",
                      "The trace for received signal power in dBW",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_rxPowerTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_rxPowerTrace),
+                     "ns3::SatPhyRxCarrier::RxPowerTraceCallback")
     .AddTraceSource ("Sinr",
                      "The trace for composite SINR in dB",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_sinrTrace),
+                     "ns3::SatPhyRxCarrier::SinrTraceCallback")
     .AddTraceSource ("LinkSinr",
                      "The trace for link specific SINR in dB",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_linkSinrTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_linkSinrTrace),
+                     "ns3::SatPhyRxCarrier::LinkSinrTraceCallback")
     .AddTraceSource ("DaRx",
                      "Received a packet burst through Dedicated Channel",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
     .AddTraceSource ("SlottedAlohaRxCollision",
                      "Received a packet burst through Random Access Slotted ALOHA",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_slottedAlohaRxCollisionTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_slottedAlohaRxCollisionTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
     .AddTraceSource ("SlottedAlohaRxError",
                      "Received a packet burst through Random Access Slotted ALOHA",
-                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_slottedAlohaRxErrorTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_slottedAlohaRxErrorTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
     .AddTraceSource ("CrdsaReplicaRx",
                      "Received a CRDSA packet replica through Random Access",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_crdsaReplicaRxTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_crdsaReplicaRxTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
     .AddTraceSource ("CrdsaUniquePayloadRx",
                      "Received a unique CRDSA payload (after frame processing) "
                      "through Random Access CRDSA",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_crdsaUniquePayloadRxTrace))
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_crdsaUniquePayloadRxTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
   ;
   return tid;
 }

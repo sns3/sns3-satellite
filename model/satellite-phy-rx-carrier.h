@@ -22,19 +22,27 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_H
 #define SATELLITE_PHY_RX_CARRIER_H
 
-#include "ns3/object.h"
-
-#include "satellite-phy.h"
-#include "satellite-phy-rx.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-channel.h"
-#include "satellite-interference.h"
-#include "satellite-phy-rx-carrier-conf.h"
+#include <ns3/object.h>
+#include <ns3/ptr.h>
+#include <ns3/traced-callback.h>
+#include <ns3/mac48-address.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-interference.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <vector>
 #include <map>
 #include <list>
 #include <deque>
 
 namespace ns3 {
+
+class Address;
+class SatPhy;
+class SatSignalParameters;
+class SatLinkResults;
+class SatChannelEstimationErrorContainer;
+class SatNodeInfo;
+
 
 /**
  * \ingroup satellite
@@ -173,6 +181,53 @@ public:
    * \return randomAccessAllocationChannelId
    */
   uint8_t GetRandomAccessAllocationChannelId () const;
+
+  /**
+   * \brief Callback signature for `LinkBudgetTrace` trace source.
+   * \param rxParams RX signalling parameters
+   * \param receiverAddress receiver address
+   * \param destinationAddress packet destination address
+   * \param interference interference power (in W)
+   * \param sinr composite SINR (in linear unit)
+   */
+  typedef void (* LinkBudgetTraceCallback)
+    (Ptr<SatSignalParameters> rxParams,
+     Mac48Address receiverAddress,
+     Mac48Address destinationAddress,
+     double interference,
+     double sinr);
+
+  /**
+   * \brief Callback signature for `RxPowerTrace` trace source.
+   * \param rxPower received signal power (in dbW)
+   */
+  typedef void (* RxPowerTraceCallback) (double rxPower);
+
+  /**
+   * \brief Callback signature for `LinkSinrTrace` trace source.
+   * \param sinr link-specific SINR (in dB)
+   */
+  typedef void (* LinkSinrTraceCallback) (double sinr);
+
+  /**
+   * \brief Common callback signature for trace sources related to packets
+   *        reception by PHY and its error.
+   * \param nPackets number of upper layer packets in the received packet burst.
+   * \param from the MAC48 address of the sender of the packets.
+   * \param isError whether a PHY error has occurred.
+   */
+  typedef void (* PhyRxErrorCallback)
+    (uint32_t nPackets, const Address &from, bool isError);
+
+  /**
+   * \brief Common callback signature for trace sources related to packets
+   *        reception by PHY and its collision.
+   * \param nPackets number of packets in the received packet burst.
+   * \param from the MAC48 address of the sender of the packets.
+   * \param isCollided whether a collision has occurred.
+   */
+  typedef void (* PhyRxCollisionCallback)
+    (uint32_t nPackets, const Address &from, bool isCollided);
 
 private:
 

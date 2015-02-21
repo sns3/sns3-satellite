@@ -26,6 +26,7 @@
 #include <ns3/node-container.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-ut-llc.h>
+#include <ns3/satellite-request-manager.h>
 #include <ns3/satellite-helper.h>
 
 #include <ns3/data-collection-object.h>

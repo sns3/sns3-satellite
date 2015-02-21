@@ -26,12 +26,13 @@
  * - Budiarto Herman (budiarto.herman@magister.fi)
  */
 
-#include "ns3/satellite-phy-rx-carrier-packet-probe.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/config.h"
-#include "ns3/simulator.h"
-#include "ns3/callback.h"
+#include <ns3/satellite-phy-rx-carrier-packet-probe.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/config.h>
+#include <ns3/simulator.h>
+#include <ns3/callback.h>
+#include <ns3/traced-value.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPacketProbe");
 
@@ -50,13 +51,16 @@ SatPhyRxCarrierPacketProbe::GetTypeId ()
                       "The number of packets in the packet burst, its "
                       "associated socket address, and a status flag, that "
                       "serve as the output for this probe",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrierPacketProbe::m_output))
+                      MakeTraceSourceAccessor (&SatPhyRxCarrierPacketProbe::m_output),
+                      "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
     .AddTraceSource ( "OutputUinteger",
                       "The number of packets",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrierPacketProbe::m_outputUinteger))
+                      MakeTraceSourceAccessor (&SatPhyRxCarrierPacketProbe::m_outputUinteger),
+                      "ns3::TracedValue::UintCallback")
     .AddTraceSource ( "OutputBool",
                       "The status flag",
-                      MakeTraceSourceAccessor (&SatPhyRxCarrierPacketProbe::m_outputBool))
+                      MakeTraceSourceAccessor (&SatPhyRxCarrierPacketProbe::m_outputBool),
+                      "ns3::TracedValue::BoolCallback")
   ;
   return tid;
 }

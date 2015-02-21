@@ -18,13 +18,21 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#ifndef SATELLITE_UT_LLC_H_
-#define SATELLITE_UT_LLC_H_
+#ifndef SATELLITE_UT_LLC_H
+#define SATELLITE_UT_LLC_H
 
-#include "satellite-request-manager.h"
-#include "satellite-llc.h"
+#include <ns3/ptr.h>
+#include <ns3/satellite-llc.h>
+#include <ns3/satellite-queue.h>
 
 namespace ns3 {
+
+class Packet;
+class Address;
+class Mac48Address;
+class SatRequestManager;
+class SatSchedulingObject;
+class SatNodeInfo;
 
 /**
  * \ingroup satellite
@@ -174,4 +182,4 @@ private:
 } // namespace ns3
 
 
-#endif /* SATELLITE_UT_LLC_H_ */
+#endif /* SATELLITE_UT_LLC_H */

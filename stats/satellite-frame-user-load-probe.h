@@ -91,6 +91,15 @@ public:
    */
   virtual void ConnectByPath (std::string path);
 
+  /**
+   * \brief Callback signature for frame load in unit of users.
+   *
+   * \param frameId The current frame number.
+   * \param utCount The number of scheduled users.
+   */
+  typedef void (* FrameUserLoadCallback)
+    (uint32_t frameId, uint32_t utCount);
+
 private:
   /**
    * \brief Method to connect to an underlying ns3::TraceSource with

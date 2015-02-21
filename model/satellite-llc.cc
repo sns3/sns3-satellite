@@ -18,22 +18,20 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/queue.h"
-#include "ns3/satellite-queue.h"
-#include "ns3/trace-source-accessor.h"
-#include "ns3/mac48-address.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/satellite-queue.h>
+#include <ns3/nstime.h>
 
 #include "satellite-llc.h"
-#include "satellite-mac-tag.h"
-#include "satellite-time-tag.h"
-#include "satellite-base-encapsulator.h"
-#include "satellite-scheduling-object.h"
-#include "satellite-control-message.h"
-#include "satellite-node-info.h"
-#include "satellite-enums.h"
-#include "satellite-utils.h"
+#include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-scheduling-object.h>
+#include <ns3/satellite-control-message.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-typedefs.h>
+
 
 NS_LOG_COMPONENT_DEFINE ("SatLlc");
 
@@ -58,7 +56,8 @@ SatLlc::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
-                     MakeTraceSourceAccessor (&SatLlc::m_packetTrace))
+                     MakeTraceSourceAccessor (&SatLlc::m_packetTrace),
+                     "ns3::PacketTraceCallback")
   ;
   return tid;
 }

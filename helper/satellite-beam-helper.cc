@@ -45,6 +45,7 @@
 #include "ns3/satellite-fading-input-trace.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
+#include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 
@@ -117,7 +118,8 @@ SatBeamHelper::GetTypeId (void)
                       MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeRtnLink),
                       MakeTimeChecker ())
       .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace))
+                       MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
+                       "ns3::SatTypedefs::CreationCallback")
     ;
     return tid;
 }

@@ -36,6 +36,7 @@
 #include "../model/satellite-log.h"
 #include "ns3/singleton.h"
 #include "../utils/satellite-env-variables.h"
+#include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -111,9 +112,11 @@ SatHelper::GetTypeId (void)
                      MakeStringAccessor (&SatHelper::m_utCreationFileName),
                      MakeStringChecker ())
       .AddTraceSource ("Creation", "Creation traces",
-                        MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace))
+                       MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace),
+                       "ns3::SatTypedefs::CreationCallback")
       .AddTraceSource ("CreationSummary", "Creation summary traces",
-                        MakeTraceSourceAccessor (&SatHelper::m_creationSummaryTrace))
+                       MakeTraceSourceAccessor (&SatHelper::m_creationSummaryTrace),
+                       "ns3::SatTypedefs::CreationCallback")
 
     ;
     return tid;

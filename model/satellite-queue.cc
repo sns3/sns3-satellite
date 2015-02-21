@@ -47,13 +47,16 @@ TypeId SatQueue::GetTypeId (void)
                    MakeUintegerChecker<uint32_t> ())
     .AddTraceSource ("Enqueue",
                      "Enqueue a packet in the queue.",
-                     MakeTraceSourceAccessor (&SatQueue::m_traceEnqueue))
+                     MakeTraceSourceAccessor (&SatQueue::m_traceEnqueue),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("Dequeue",
                      "Dequeue a packet from the queue.",
-                     MakeTraceSourceAccessor (&SatQueue::m_traceDequeue))
+                     MakeTraceSourceAccessor (&SatQueue::m_traceDequeue),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("Drop",
                      "Drop a packet stored in the queue.",
-                     MakeTraceSourceAccessor (&SatQueue::m_traceDrop))
+                     MakeTraceSourceAccessor (&SatQueue::m_traceDrop),
+                     "ns3::Packet::TracedCallback")
   ;
 
   return tid;

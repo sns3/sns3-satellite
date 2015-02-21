@@ -22,17 +22,19 @@
 #define SAT_NCC_H
 
 #include <map>
-
-#include "ns3/object.h"
-#include "ns3/ptr.h"
-#include "ns3/callback.h"
-#include "ns3/packet.h"
-#include "ns3/traced-callback.h"
-#include "ns3/mac48-address.h"
-#include "satellite-beam-scheduler.h"
-#include "ns3/satellite-superframe-sequence.h"
+#include <utility>
+#include <ns3/object.h>
+#include <ns3/ptr.h>
+#include <ns3/traced-callback.h>
+#include <ns3/satellite-beam-scheduler.h>
 
 namespace ns3 {
+
+class Packet;
+class Address;
+class SatCrMessage;
+class SatSuperframeSeq;
+class SatLowerLayerServiceConf;
 
 /**
  * \ingroup satellite

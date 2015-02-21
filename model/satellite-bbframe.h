@@ -162,10 +162,24 @@ public:
   inline SatEnums::SatModcod_t GetModcod () const { return m_modCod; }
 
   /**
-   * Get header size of the frame .
+   * Get header size of the frame.
    * \return Header size in bytes.
    */
   inline uint32_t GetFrameHeaderSize () const { return m_headerSizeInBytes; }
+
+  /**
+   * Callback signature for Ptr<SatBbFrame>.
+   * \param bbFrame The BB frame.
+   */
+  typedef void (* BbFrameCallback) (Ptr<SatBbFrame> bbFrame);
+
+  /**
+   * Callback signature for merging of two instances of SatBbFrame.
+   * \param to The frame merged to.
+   * \param to The frame merged from.
+   */
+  typedef void (* BbFrameMergeCallback)
+    (Ptr<SatBbFrame> to, Ptr<SatBbFrame> from);
 
 private:
 

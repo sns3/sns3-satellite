@@ -55,6 +55,14 @@ public:
 
   void NotifyGeoCourseChange (void) const;
 
+  /**
+   * Callback signature for `SatCourseChange` trace source.
+   *
+   * \param model the SatMobilityModel which is changing course
+   */
+  typedef void (* CourseChangeCallback)
+    (const Ptr<const SatMobilityModel> model);
+
 private:
   /**
    * \return the current position.
@@ -99,7 +107,7 @@ private:
    * Used to alert subscribers that a change in direction, velocity,
    * or position has occurred.
    */
-  TracedCallback<Ptr<const SatMobilityModel> > m_satCourseChangeTrace;
+  ns3::TracedCallback<Ptr<const SatMobilityModel> > m_satCourseChangeTrace;
 
   // These are defined as mutable in order to support 'lazy' update.
 
