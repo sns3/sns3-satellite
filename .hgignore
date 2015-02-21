@@ -1,0 +1,10 @@
+^data/antennapatterns
+^data/linkresults
+^data/utpositions
+^data/ext-fadingtraces
+^data/fadingtraces
+^data/rxpowertraces
+^data/interferencetraces
+^data/sinrmeaserror
+^data/sims
+\.xz$
