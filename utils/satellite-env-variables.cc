@@ -51,7 +51,7 @@ SatEnvVariables::GetTypeId (void)
                    MakeStringChecker ())
     .AddAttribute ("DataPath",
                    "Path to the data folder.",
-                   StringValue ("src/satellite/data"),
+                   StringValue ("contrib/satellite/data"),
                    MakeStringAccessor (&SatEnvVariables::m_dataPath),
                    MakeStringChecker ())
     .AddAttribute ("SimulationCampaignName",
@@ -99,10 +99,10 @@ SatEnvVariables::SatEnvVariables () :
   m_currentWorkingDirectoryFromAttribute (""),
   m_pathToExecutableFromAttribute (""),
   m_levelsToCheck (10),
-  m_dataPath ("src/satellite/data"),
+  m_dataPath ("contrib/satellite/data"),
   m_outputPath (""),
   m_campaignName (""),
-  m_simRootPath ("src/satellite/data/sims"),
+  m_simRootPath ("contrib/satellite/data/sims"),
   m_simTag ("default"),
   m_enableOutputOverwrite (true),
   m_isOutputPathInitialized (false),
@@ -488,13 +488,15 @@ SatEnvVariables::DumpSimulationInformation ()
   NS_LOG_FUNCTION (this);
 
   std::string dataPath = LocateDirectory (m_outputPath);
-  std::string revisionCommand = "hg log | head -n 5 2>&1";
-  std::stringstream fileName;
 
+  std::ostringstream fileName;
   fileName << dataPath << "/SimInfo.log";
   Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
 
-  ExecuteCommandAndReadOutput (revisionCommand, outputContainer);
+  std::ostringstream revisionCommand;
+  revisionCommand << "cd contrib/satellite"
+                  << " && hg log | head --lines=5 2>&1";
+  ExecuteCommandAndReadOutput (revisionCommand.str (), outputContainer);
 
   std::stringstream line1;
   line1 << "Simulation finished at " << GetCurrentDateAndTime ();
@@ -514,22 +516,26 @@ SatEnvVariables::DumpRevisionDiff (std::string dataPath)
 {
   NS_LOG_FUNCTION (this);
 
-  std::string diffCommand;
-  std::stringstream fileName;
-
+  std::ostringstream fileName;
   fileName << dataPath << "/SimDiff.log";
   Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
 
+  std::ostringstream diffCommand;
+  diffCommand << "cd contrib/satellite"
+              << " && hg diff"
+              << " --show-function"
+              << " --ignore-all-space"
+              << " --ignore-space-change"
+              << " --ignore-blank-lines";
+
   if (m_excludeDataFolderFromDiff)
     {
-      diffCommand = "hg diff -p -w -b -B -X " + m_dataPath + " 2>&1";
-    }
-  else
-    {
-      diffCommand = "hg diff -p -w -b -B 2>&1";
+      diffCommand << " --exclude " << m_dataPath;
     }
 
-  ExecuteCommandAndReadOutput (diffCommand, outputContainer);
+  diffCommand << " 2>&1";
+
+  ExecuteCommandAndReadOutput (diffCommand.str (), outputContainer);
 
   outputContainer->WriteContainerToFile ();
 }

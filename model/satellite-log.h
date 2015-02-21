@@ -42,7 +42,7 @@ namespace ns3 {
  * LOG_ERROR - for error messages
  * LOG_CUSTOM - for custom messages specified by the second parameter
  *
- * The output files are located in src/satellite/data/logs folder. The output file
+ * The output files are located in contrib/satellite/data/logs folder. The output file
  * format is the following: log<type><custom file tag><simulation tag>
  *
  * With (LOG_CUSTOM, "_exampleTag", "Example message for custom log") and simulation tag

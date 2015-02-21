@@ -49,7 +49,7 @@ using namespace ns3;
  *         - composite SINR
  *
  *         The output folder is:
- *         {NS-3-root-folder}/src/satellite/data/sims/example-trace-output/{scenario}
+ *         {NS-3-root-folder}/contrib/satellite/data/sims/example-trace-output/{scenario}
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-trace-output-example");

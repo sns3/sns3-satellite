@@ -398,7 +398,7 @@
  <default name="ns3::SatWaveformConf::DefaultWfId" value="3"/>
  <default name="ns3::SatEnvVariables::CurrentWorkingDirectory" value=""/>
  <default name="ns3::SatEnvVariables::PathToExecutable" value=""/>
- <default name="ns3::SatEnvVariables::DataPath" value="src/satellite/data"/>
+ <default name="ns3::SatEnvVariables::DataPath" value="contrib/satellite/data"/>
  <default name="ns3::SatBeamHelper::FadingModel" value="FadingOff"/>
  <default name="ns3::SatBeamHelper::RandomAccessModel" value="RaOff"/>
  <default name="ns3::SatBeamHelper::RaInterferenceModel" value="Constant"/>

@@ -62,7 +62,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/tn9-dama-input-attributes.xml";
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/tn9-dama-input-attributes.xml";
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));

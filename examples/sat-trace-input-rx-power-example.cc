@@ -46,7 +46,7 @@ using namespace ns3;
  *         - rx power density trace
  *
  *         The input folder is:
- *         {NS-3-root-folder}/src/satellite/data/rxpowertraces/input
+ *         {NS-3-root-folder}/contrib/satellite/data/rxpowertraces/input
  *
  *         The input data files must be available in the folder stated above for the example
  *         program to read, otherwise the program will fail. Trace output example can be

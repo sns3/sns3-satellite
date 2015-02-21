@@ -15,7 +15,7 @@ close all;
 
 beamId = 39;
 
-dir = '$NS3_ROOT/src/satellite/data/ext-fadingtraces/input/';
+dir = '$NS3_ROOT/contrib/satellite/data/ext-fadingtraces/input/';
 subDir = ['BeamId-' int2str(beamId) '_256_Terminals/'];
 locFileName = ['terminal_locations_beamId_' int2str(beamId) '.mat'];
 

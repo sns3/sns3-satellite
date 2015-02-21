@@ -101,7 +101,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
   // To read input attributes from input xml-file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/sys-rtn-test.xml";
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sys-rtn-test.xml";
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));

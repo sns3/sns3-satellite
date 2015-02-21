@@ -118,7 +118,8 @@ SatFrameAllocatorTestCase::SatFrameAllocatorTestCase ()
   m_cnoValues[8] = NAN;
   m_cnoValues[9] = SatUtils::DbToLinear (60.0);
 
-  std::string fileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory( "src/satellite/data") + "/dvbRcs2Waveforms.txt";
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
+  std::string fileNameWithPath = dataPath + "/dvbRcs2Waveforms.txt";
   m_waveFormConf = CreateObject<SatWaveformConf> (fileNameWithPath);
 }
 

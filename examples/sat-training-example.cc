@@ -85,7 +85,7 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("Reading the XML input: training-input-attributes.xml");
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/training-input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./contrib/satellite/examples/training-input-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;

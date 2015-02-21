@@ -37,7 +37,7 @@ namespace ns3 {
  *
  * This example can be run as it is, without any argument, i.e.:
  *
- *     ./waf --run="src/satellite/examples/markov-trace-example"
+ *     ./waf --run="contrib/satellite/examples/markov-trace-example"
  *
  * Gnuplot file (markov_fading_trace.plt) will be generated as output. This
  * file can be converted to a PNG file, for example by this command:

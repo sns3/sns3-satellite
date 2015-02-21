@@ -50,7 +50,7 @@ using namespace ns3;
  *         - external fading trace
  *
  *         The input folder is:
- *         {NS-3-root-folder}/src/satellite/data/fadingtraces
+ *         {NS-3-root-folder}/contrib/satellite/data/fadingtraces
  *
  *         The input data files must be available in the folder stated above for the example
  *         program to read, otherwise the program will fail.
@@ -62,10 +62,10 @@ using namespace ns3;
  *         - composite SINR
  *
  *         The output folders are:
- *         {NS-3-root-folder}/src/satellite/data/interferencetraces/output
- *         {NS-3-root-folder}/src/satellite/data/rxpowertraces/output
- *         {NS-3-root-folder}/src/satellite/data/fadingtraces/output
- *         {NS-3-root-folder}/src/satellite/data/compositesinrtraces/output
+ *         {NS-3-root-folder}/contrib/satellite/data/interferencetraces/output
+ *         {NS-3-root-folder}/contrib/satellite/data/rxpowertraces/output
+ *         {NS-3-root-folder}/contrib/satellite/data/fadingtraces/output
+ *         {NS-3-root-folder}/contrib/satellite/data/compositesinrtraces/output
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-trace-input-external-fading-example");

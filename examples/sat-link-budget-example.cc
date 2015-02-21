@@ -110,7 +110,7 @@ main (int argc, char *argv[])
 
   // To change attributes having affect on link budget,
   // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("src/satellite/examples") + "/sat-link-budget-input-attributes.xml";
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sat-link-budget-input-attributes.xml";
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));

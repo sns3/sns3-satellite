@@ -55,7 +55,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./src/satellite/examples/tn9-dama-input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./contrib/satellite/examples/tn9-dama-input-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
