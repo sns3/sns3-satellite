@@ -14,8 +14,8 @@
 # Author: Frans Laakso <frans.laakso@magister.fi>
 #
 
-archive_name="sns3-data-default-latest.tar.xz"
-direct_link="https://docs.google.com/a/magister.fi/uc?id=0Bx03Cn0AzYGGaDlFVnJHWDdwX3M"
+archive_name="sns3-data-package.tar.xz"
+direct_link="https://docs.google.com/a/magister.fi/uc?id=0Bx03Cn0AzYGGd0VkOGxnTFBLSjg"
 
 if [ -d data ]
 then
