@@ -3,7 +3,7 @@
 ##
 # Create a new compressed archive from the currently active SNS3 data files.
 # The archive will be saved in the current working directory using the name
-# "sns3-data-default-latest.tar.xz".
+# "sns3-data-package.tar.xz".
 #
 # The resulting archive can then be distributed, for example to be hosted in
 # the Internet.
@@ -14,7 +14,7 @@
 # Author: Frans Laakso <frans.laakso@magister.fi>
 #
 
-archive_name="sns3-data-default-latest.tar.xz"
+archive_name="sns3-data-package.tar.xz"
 
 if [ -d data ]
 then
