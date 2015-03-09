@@ -40,7 +40,6 @@ class Address;
 class SatIdMapper : public Object
 {
 public:
-
   /**
    * \brief Constructor
    */
@@ -205,7 +204,6 @@ public:
   }
 
 private:
-
   /**
    * \brief Running trace index number
    */

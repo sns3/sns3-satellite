@@ -163,7 +163,6 @@ public:
   Ptr<SatBeamScheduler> GetBeamScheduler (uint32_t beamId) const;
 
 private:
-
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
 

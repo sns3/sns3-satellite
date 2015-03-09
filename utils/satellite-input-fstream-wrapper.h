@@ -33,13 +33,12 @@ namespace ns3 {
  * This class wraps a pointer to a C++ std::ifstream and provides
  * reference counting of the object.
  *
- * This class uses a basic ns-3 reference counting base class but is not 
+ * This class uses a basic ns-3 reference counting base class but is not
  * an ns3::Object with attributes, TypeId, or aggregation.
  */
 class SatInputFileStreamWrapper : public SimpleRefCount<SatInputFileStreamWrapper>
 {
 public:
-
   /**
    * \brief Constructor
    * \param filename file name
@@ -56,7 +55,7 @@ public:
    * \brief Return a pointer to an ifstream previously set in the wrapper.
    * \return a pointer to the encapsulated std::ifstream
    */
-  std::ifstream *GetStream (void);
+  std::ifstream * GetStream (void);
 
 private:
   /**

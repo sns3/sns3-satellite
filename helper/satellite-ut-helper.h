@@ -47,7 +47,6 @@ namespace ns3 {
 class SatUtHelper : public Object
 {
 public:
-
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
@@ -72,7 +71,9 @@ public:
                SatMac::SendCtrlMsgCallback sendCb,
                RandomAccessSettings_s randomAccessSettings);
 
-  virtual ~SatUtHelper () {}
+  virtual ~SatUtHelper ()
+  {
+  }
 
   /*
    * Initializes the UT helper based on attributes
@@ -125,9 +126,9 @@ public:
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatUtHelper::SetChannelAttribute,
-   * then, for each node in the input container, we create a 
+   * then, for each node in the input container, we create a
    * ns3::SatNetDevice with the requested attributes,
-   * a queue for this ns3::NetDevice, and associate the resulting 
+   * a queue for this ns3::NetDevice, and associate the resulting
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
   NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc);
@@ -152,7 +153,6 @@ public:
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
-
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   uint32_t m_fwdLinkCarrierCount;
   Ptr<SatSuperframeSeq> m_superframeSeq;
@@ -201,7 +201,7 @@ private:
   /**
    * The used random access model settings
    */
-    RandomAccessSettings_s m_raSettings;
+  RandomAccessSettings_s m_raSettings;
 };
 
 } // namespace ns3

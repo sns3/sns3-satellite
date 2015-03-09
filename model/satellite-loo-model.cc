@@ -30,31 +30,31 @@ NS_OBJECT_ENSURE_REGISTERED (SatLooModel);
 TypeId SatLooModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLooModel")
-      .SetParent<SatBaseFader> ()
-      .AddConstructor<SatLooModel> ();
+    .SetParent<SatBaseFader> ()
+    .AddConstructor<SatLooModel> ();
   return tid;
 }
 
-SatLooModel::SatLooModel () :
-  m_numOfStates (0),
-  m_currentSet (0),
-  m_currentState (0),
-  m_looConf (NULL),
-  m_normalRandomVariable (NULL),
-  m_uniformVariable (NULL)
+SatLooModel::SatLooModel ()
+  : m_numOfStates (0),
+    m_currentSet (0),
+    m_currentState (0),
+    m_looConf (NULL),
+    m_normalRandomVariable (NULL),
+    m_uniformVariable (NULL)
 {
   NS_LOG_FUNCTION (this);
 
   NS_FATAL_ERROR ("SatLooModel::SatLooModel - Constructor not in use");
 }
 
-SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState) :
-  m_numOfStates (numOfStates),
-  m_currentSet (initialSet),
-  m_currentState (initialState),
-  m_looConf (looConf),
-  m_normalRandomVariable (NULL),
-  m_uniformVariable (NULL)
+SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState)
+  : m_numOfStates (numOfStates),
+    m_currentSet (initialSet),
+    m_currentState (initialState),
+    m_looConf (looConf),
+    m_normalRandomVariable (NULL),
+    m_uniformVariable (NULL)
 {
   NS_LOG_FUNCTION (this << numOfStates << " " << initialSet << " " << initialState);
 
@@ -81,7 +81,7 @@ SatLooModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatBaseFader::DoDispose();
+  SatBaseFader::DoDispose ();
 }
 
 void
@@ -93,7 +93,7 @@ SatLooModel::Reset ()
   m_normalRandomVariable = NULL;
   m_uniformVariable = NULL;
 
-  if (!m_directSignalOscillators.empty())
+  if (!m_directSignalOscillators.empty ())
     {
       for (uint32_t i = 0; i < m_numOfStates; i++)
         {
@@ -105,7 +105,7 @@ SatLooModel::Reset ()
       m_directSignalOscillators.clear ();
     }
 
-  if (!m_multipathOscillators.empty())
+  if (!m_multipathOscillators.empty ())
     {
       for (uint32_t i = 0; i < m_numOfStates; i++)
         {
@@ -216,7 +216,7 @@ SatLooModel::GetChannelGain ()
 
   /// Combining
   std::complex<double> fadingGain = directComplexGain + multipathComplexGain;
-  return sqrt((pow (fadingGain.real (), 2) + pow (fadingGain.imag (), 2)));
+  return sqrt ((pow (fadingGain.real (), 2) + pow (fadingGain.imag (), 2)));
 }
 
 std::complex<double>
@@ -276,7 +276,7 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
 
   ChangeState (newState);
 
-  if (!m_directSignalOscillators.empty())
+  if (!m_directSignalOscillators.empty ())
     {
       for (uint32_t i = 0; i < m_numOfStates; i++)
         {
@@ -288,7 +288,7 @@ SatLooModel::ChangeSet (uint32_t newSet, uint32_t newState)
       m_directSignalOscillators.clear ();
     }
 
-  if (!m_multipathOscillators.empty())
+  if (!m_multipathOscillators.empty ())
     {
       for (uint32_t i = 0; i < m_numOfStates; i++)
         {

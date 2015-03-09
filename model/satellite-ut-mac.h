@@ -183,168 +183,166 @@ public:
    * \param size the amount of assigned TBTP resources (in bytes) in the
    *             superframe for this UT
    */
-  typedef void (* TbtpResourcesTraceCallback) (uint32_t size);
+  typedef void (* TbtpResourcesTraceCallback)(uint32_t size);
 
 protected:
-
-   void DoDispose (void);
+  void DoDispose (void);
 
 private:
+  /**
+   * \brief Get start time for the current superframe.
+   * \param superFrameSeqId Superframe sequence id
+   * \return Time Time to transmit
+   */
+  Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
 
-   /**
-    * \brief Get start time for the current superframe.
-    * \param superFrameSeqId Superframe sequence id
-    * \return Time Time to transmit
-    */
-   Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
+  /**
+   * \brief Do random access evaluation for Tx opportunities
+   * \param randomAccessTriggerType
+   */
+  void DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTriggerType);
 
-   /**
-    * \brief Do random access evaluation for Tx opportunities
-    * \param randomAccessTriggerType
-    */
-   void DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTriggerType);
+  /**
+   * \brief Function for selecting the allocation channel for the current RA evaluation
+   * \return allocation channel ID
+   */
+  uint32_t GetNextRandomAccessAllocationChannel ();
 
-   /**
-    * \brief Function for selecting the allocation channel for the current RA evaluation
-    * \return allocation channel ID
-    */
-   uint32_t GetNextRandomAccessAllocationChannel ();
+  /**
+   * \brief Function for scheduling the Slotted ALOHA transmissions
+   * \param allocationChannel allocation channel
+   */
+  void ScheduleSlottedAlohaTransmission (uint32_t allocationChannel);
 
-   /**
-    * \brief Function for scheduling the Slotted ALOHA transmissions
-    * \param allocationChannel allocation channel
-    */
-   void ScheduleSlottedAlohaTransmission (uint32_t allocationChannel);
+  /**
+   * \brief Function for scheduling the CRDSA transmissions
+   * \param allocationChannel RA allocation channel
+   * \param txOpportunities Tx opportunities
+   */
+  void ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
 
-   /**
-    * \brief Function for scheduling the CRDSA transmissions
-    * \param allocationChannel RA allocation channel
-    * \param txOpportunities Tx opportunities
-    */
-   void ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
+  /**
+   *
+   */
+  void CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint32_t> slots);
 
-   /**
-    *
-    */
-   void CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint32_t> slots);
+  /**
+   * \brief Function for removing the past used RA slots
+   * \param superFrameId super frame ID
+   */
+  void RemovePastRandomAccessSlots (uint32_t superFrameId);
 
-   /**
-    * \brief Function for removing the past used RA slots
-    * \param superFrameId super frame ID
-    */
-   void RemovePastRandomAccessSlots (uint32_t superFrameId);
+  /**
+   * \brief Function for updating the used RA slots
+   * \param superFrameId super frame ID
+   * \param allocationChannel allocation channel
+   * \param slot RA slot
+   * \return was the update successful
+   */
+  bool UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannel, uint32_t slot);
 
-   /**
-    * \brief Function for updating the used RA slots
-    * \param superFrameId super frame ID
-    * \param allocationChannel allocation channel
-    * \param slot RA slot
-    * \return was the update successful
-    */
-   bool UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocationChannel, uint32_t slot);
+  /**
+   *
+   * \param opportunityOffset
+   * \param frameConf
+   * \param timeSlotCount
+   * \param superFrameId
+   * \param allocationChannel
+   * \return
+   */
+  std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
+                                                              Ptr<SatFrameConf> frameConf,
+                                                              uint32_t timeSlotCount,
+                                                              uint32_t superFrameId,
+                                                              uint32_t allocationChannel);
 
-   /**
-    *
-    * \param opportunityOffset
-    * \param frameConf
-    * \param timeSlotCount
-    * \param superFrameId
-    * \param allocationChannel
-    * \return
-    */
-   std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
-                                                               Ptr<SatFrameConf> frameConf,
-                                                               uint32_t timeSlotCount,
-                                                               uint32_t superFrameId,
-                                                               uint32_t allocationChannel);
+  /**
+   *
+   * \param superframeStartTime
+   * \param frameConf
+   * \param timeSlotCount
+   * \param superFrameId
+   * \param allocationChannel
+   * \return
+   */
+  std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
+                                                        Ptr<SatFrameConf> frameConf,
+                                                        uint32_t timeSlotCount,
+                                                        uint32_t superFrameId,
+                                                        uint32_t allocationChannel);
 
-   /**
-    *
-    * \param superframeStartTime
-    * \param frameConf
-    * \param timeSlotCount
-    * \param superFrameId
-    * \param allocationChannel
-    * \return
-    */
-   std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
-                                                         Ptr<SatFrameConf> frameConf,
-                                                         uint32_t timeSlotCount,
-                                                         uint32_t superFrameId,
-                                                         uint32_t allocationChannel);
+  /**
+   *
+   * \param superFrameId
+   * \param allocationChannelId
+   * \param slotId
+   * \return
+   */
+  bool IsRandomAccessSlotAvailable (uint32_t superFrameId, uint32_t allocationChannelId, uint32_t slotId);
 
-   /**
-    *
-    * \param superFrameId
-    * \param allocationChannelId
-    * \param slotId
-    * \return
-    */
-   bool IsRandomAccessSlotAvailable (uint32_t superFrameId, uint32_t allocationChannelId, uint32_t slotId);
+  /**
+   *
+   */
+  void PrintUsedRandomAccessSlots ();
 
-   /**
-    *
-    */
-   void PrintUsedRandomAccessSlots ();
+  /**
+   *  Schedules time slots according to received TBTP message.
+   *
+   * \param tbtp Pointer to TBTP message.
+   */
+  void ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp);
 
-   /**
-    *  Schedules time slots according to received TBTP message.
-    *
-    * \param tbtp Pointer to TBTP message.
-    */
-   void ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp);
+  /**
+   * Schdules one Tx opportunity, i.e. time slot.
+   * \param transmitDelay time when transmit possibility starts
+   * \param duration duration of the burst
+   * \param wf waveform
+   * \param tsConf Time slot conf
+   * \param carrierId Carrier id used for the transmission
+   */
+  void ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, uint32_t carrierId);
 
-   /**
-    * Schdules one Tx opportunity, i.e. time slot.
-    * \param transmitDelay time when transmit possibility starts
-    * \param duration duration of the burst
-    * \param wf waveform
-    * \param tsConf Time slot conf
-    * \param carrierId Carrier id used for the transmission
-    */
-   void ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, uint32_t carrierId);
+  /**
+   * Notify the upper layer about the Tx opportunity. If upper layer
+   * returns a PDU, send it to lower layer.
+   *
+   * \param duration duration of the burst
+   * \param carrierId Carrier id used for the transmission
+   * \param wf waveform
+   * \param tsConf Time slot conf
+   * \param policy UT scheduler policy
+   */
+  void DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
-   /**
-    * Notify the upper layer about the Tx opportunity. If upper layer
-    * returns a PDU, send it to lower layer.
-    *
-    * \param duration duration of the burst
-    * \param carrierId Carrier id used for the transmission
-    * \param wf waveform
-    * \param tsConf Time slot conf
-    * \param policy UT scheduler policy
-    */
-   void DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+  /**
+   * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
+   * returns a PDU, send it to lower layer.
+   *
+   * \param duration duration of the burst
+   * \param waveform waveform
+   * \param carrierId Carrier id used for the transmission
+   * \param rcIndex RC index
+   */
+  void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
-   /**
-    * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
-    * returns a PDU, send it to lower layer.
-    *
-    * \param duration duration of the burst
-    * \param waveform waveform
-    * \param carrierId Carrier id used for the transmission
-    * \param rcIndex RC index
-    */
-   void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+  /**
+   *
+   * \param payloadBytes Tx opportunity payload
+   * \param type Time slot type
+   * \param rcIndex RC index
+   * \param policy Scheduler policy
+   * \return
+   */
+  SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
 
-   /**
-    *
-    * \param payloadBytes Tx opportunity payload
-    * \param type Time slot type
-    * \param rcIndex RC index
-    * \param policy Scheduler policy
-    * \return
-    */
-   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
-
-   /**
-    *
-    * \param packets
-    * \param duration
-    * \param carrierId
-    * \param txInfo
-    */
-   void TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo);
+  /**
+   *
+   * \param packets
+   * \param duration
+   * \param carrierId
+   * \param txInfo
+   */
+  void TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * Signaling packet receiver, which handles all the signaling packet
@@ -376,9 +374,9 @@ private:
    */
   AssignedDaResourcesCallback m_assignedDaResourcesCallback;
 
- /**
-  * \brief RA main module
-  */ 
+  /**
+   * \brief RA main module
+   */
   Ptr<SatRandomAccess> m_randomAccess;
 
   /**

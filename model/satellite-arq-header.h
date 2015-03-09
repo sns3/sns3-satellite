@@ -40,7 +40,6 @@ namespace ns3 {
 class SatArqHeader : public Header
 {
 public:
-
   /**
    * Constructor
    */
@@ -67,7 +66,6 @@ public:
   void SetSeqNo (uint8_t seqNo);
 
 private:
-
   /**
    * Sequence number represented by one Byte
    */

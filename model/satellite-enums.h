@@ -27,7 +27,7 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * 
+ *
  * \brief SatEnums class is for simplifying the use of enumerators
  * in the satellite module. The enums specified in this class mainly
  * consist of enums used in multiple classes.
@@ -35,7 +35,6 @@ namespace ns3 {
 class SatEnums
 {
 public:
-
   /**
    * \enum ChannelType_t
    * \brief Types of channel.
@@ -155,7 +154,7 @@ public:
     modcods.push_back (SAT_MODCOD_32APSK_4_TO_5);
     modcods.push_back (SAT_MODCOD_32APSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_32APSK_8_TO_9);
-  };
+  }
 
   static inline void GetAvailableModcodsRtnLink (std::vector<SatModcod_t>& modcods)
   {
@@ -169,18 +168,18 @@ public:
     modcods.push_back (SAT_MODCOD_QPSK_2_TO_3);
     modcods.push_back (SAT_MODCOD_QPSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_QPSK_4_TO_5);
-    modcods.push_back (SAT_MODCOD_QPSK_5_TO_6);;
+    modcods.push_back (SAT_MODCOD_QPSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_8PSK_2_TO_3);
     modcods.push_back (SAT_MODCOD_8PSK_3_TO_4);
     modcods.push_back (SAT_MODCOD_8PSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_16QAM_3_TO_4);
     modcods.push_back (SAT_MODCOD_16QAM_5_TO_6);
-  };
+  }
 
   static inline std::string GetModcodTypeName (SatModcod_t modcod)
   {
     switch (modcod)
-    {
+      {
       case SAT_NONVALID_MODCOD:
         return "SAT_NONVALID_MODCOD";
       case SAT_MODCOD_QPSK_1_TO_3:
@@ -242,10 +241,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetModcodTypeName - Invalid modcod type");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetModcodTypeName - Invalid modcod type");
     return "";
-  };
+  }
 
   /**
    * \enum SatBbFrameType_t
@@ -265,7 +264,7 @@ public:
     std::string typeName = "UNDEFINED_FRAME";
 
     switch (frameType)
-    {
+      {
       case SHORT_FRAME:
         typeName = "SHORT_FRAME";
         break;
@@ -279,12 +278,12 @@ public:
         break;
 
       default:
-          NS_FATAL_ERROR ("SatEnums::GetFrameTypeName - Invalid frame type");
-          break;
-    }
+        NS_FATAL_ERROR ("SatEnums::GetFrameTypeName - Invalid frame type");
+        break;
+      }
 
     return typeName;
-  };
+  }
 
   /**
    * \enum SatFlowId_t
@@ -315,7 +314,7 @@ public:
   static inline std::string GetCapacityAllocationCategory (SatCapacityAllocationCategory_t cac)
   {
     switch (cac)
-    {
+      {
       case DA_UNKNOWN:
         {
           return "UNKNOWN";
@@ -337,10 +336,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetCapacityAllocationCategory - invalid CAC");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetCapacityAllocationCategory - invalid CAC");
     return "";
-  };
+  }
 
 
 
@@ -348,7 +347,7 @@ public:
   {
     frameTypes.push_back (SHORT_FRAME);
     frameTypes.push_back (NORMAL_FRAME);
-  };
+  }
 
   /**
    * \enum RxPowerCalculationMode_t
@@ -363,7 +362,7 @@ public:
   static inline std::string GetChannelTypeName (ChannelType_t channelType)
   {
     switch (channelType)
-    {
+      {
       case UNKNOWN_CH:
         {
           return "UNKNOWN_CH";
@@ -389,10 +388,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetChannelTypeName - Invalid channel type");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetChannelTypeName - Invalid channel type");
     return "";
-  };
+  }
 
   /**
    * \enum SatPacketEvent_t
@@ -410,7 +409,7 @@ public:
   static inline std::string GetPacketEventName (SatPacketEvent_t packetEvent)
   {
     switch (packetEvent)
-    {
+      {
       case PACKET_SENT:
         {
           return "SND";
@@ -432,10 +431,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetPacketEventName - Invalid packet event");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetPacketEventName - Invalid packet event");
     return "";
-  };
+  }
 
   /**
    * \enum SatNodeType_t
@@ -455,7 +454,7 @@ public:
   static inline std::string GetNodeTypeName (SatNodeType_t nodeType)
   {
     switch (nodeType)
-    {
+      {
       case NT_UT:
         {
           return "UT";
@@ -485,10 +484,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetNodeTypeName - Invalid node type");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetNodeTypeName - Invalid node type");
     return "";
-  };
+  }
 
   /**
    * \enum SatLinkDir_t
@@ -505,7 +504,7 @@ public:
   static inline std::string GetLinkDirName (SatLinkDir_t linkDir)
   {
     switch (linkDir)
-    {
+      {
       case LD_FORWARD:
         {
           return "FWD";
@@ -523,10 +522,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetLinkDirName - Invalid link direction");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetLinkDirName - Invalid link direction");
     return "";
-  };
+  }
 
   /**
    * \enum SatLogLevel_t
@@ -545,7 +544,7 @@ public:
   static inline std::string GetLogLevelName (SatLogLevel_t logLevel)
   {
     switch (logLevel)
-    {
+      {
       case LL_ND:
         {
           return "ND";
@@ -571,10 +570,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetLogLevelName - Invalid log level");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetLogLevelName - Invalid log level");
     return "";
-  };
+  }
 
   /**
    * \enum RandomAccessTriggerType_t
@@ -590,7 +589,7 @@ public:
   static inline std::string GetRandomAccessTriggerTypeName (RandomAccessTriggerType_t triggerType)
   {
     switch (triggerType)
-    {
+      {
       case RA_TRIGGER_TYPE_SLOTTED_ALOHA:
         {
           return "RA_TRIGGER_TYPE_SLOTTED_ALOHA";
@@ -604,10 +603,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetRandomAccessTriggerTypeName - Invalid trigger type");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetRandomAccessTriggerTypeName - Invalid trigger type");
     return "";
-  };
+  }
 
   /**
    * \enum RandomAccessModel_t
@@ -624,7 +623,7 @@ public:
   static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)
   {
     switch (model)
-    {
+      {
       case RA_MODEL_OFF:
         {
           return "RA_MODEL_OFF";
@@ -646,10 +645,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetRandomAccessModelName - Invalid model");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetRandomAccessModelName - Invalid model");
     return "";
-  };
+  }
 
   /**
    * \enum RandomAccessTxOpportunityType_t
@@ -666,7 +665,7 @@ public:
   static inline std::string GetRandomAccessOpportunityTypeName (RandomAccessTxOpportunityType_t opportunityType)
   {
     switch (opportunityType)
-    {
+      {
       case RA_TX_OPPORTUNITY_DO_NOTHING:
         {
           return "RA_TX_OPPORTUNITY_DO_NOTHING";
@@ -684,10 +683,10 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetRandomAccessOpportunityTypeName - Invalid opportunity type");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetRandomAccessOpportunityTypeName - Invalid opportunity type");
     return "";
-  };
+  }
 
   /**
    * \enum PacketType_t
@@ -703,7 +702,7 @@ public:
   static inline std::string GetPacketTypeName (PacketType_t packetType)
   {
     switch (packetType)
-    {
+      {
       case PACKET_TYPE_DEDICATED_ACCESS:
         {
           return "PACKET_TYPE_DEDICATED_ACCESS";
@@ -721,20 +720,19 @@ public:
           NS_FATAL_ERROR ("SatEnums::GetPacketTypeName - Invalid packet type");
           break;
         }
-    }
+      }
     NS_FATAL_ERROR ("SatEnums::GetPacketTypeName - Invalid packet type");
     return "";
-  };
+  }
 
 private:
-
   /**
    * Destructor
    *
    * Made Pure Virtual because the class is not planned be instantiated or inherited
    *
    */
-  virtual ~SatEnums() = 0;
+  virtual ~SatEnums () = 0;
 };
 
 

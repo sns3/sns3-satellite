@@ -149,21 +149,21 @@ public:
    *                 - type (RBDC or VBDC), and
    *                 - request size (in kbps for RBDC or in bytes for VBDC).
    */
-  typedef void (* BacklogRequestsTraceCallback) (std::string trace);
+  typedef void (*BacklogRequestsTraceCallback)(std::string trace);
 
   /**
    * Callback signature for `WaveformTrace` trace source.
    *
    * \param waveformId The first waveform scheduled for a UT.
    */
-  typedef void (* WaveformTraceCallback) (uint32_t waveformId);
+  typedef void (*WaveformTraceCallback)(uint32_t waveformId);
 
   /**
    * Callback signature for the `UsableCapacityTrace` trace source.
    *
    * \param usableCapacity The amount of capacity allocated, in kbps.
    */
-  typedef void (* UsableCapacityTraceCallback) (uint32_t usableCapacity);
+  typedef void (*UsableCapacityTraceCallback)(uint32_t usableCapacity);
 
   /**
    * Callback signature for the `UnmetCapacityTrace` trace source.
@@ -171,7 +171,7 @@ public:
    * \param unmetCapacity The amount of capacity requested but not used,
    *                      in kbps.
    */
-  typedef void (* UnmetCapacityTraceCallback) (uint32_t unmetCapacity);
+  typedef void (*UnmetCapacityTraceCallback)(uint32_t unmetCapacity);
 
   /**
    * Callback signature for the `ExceedingCapacityTrace` trace source.
@@ -179,7 +179,7 @@ public:
    * \param exceedingCapacity The amount capacity offered exceeds capacity
    *                          requested, in kbps.
    */
-  typedef void (* ExceedingCapacityTraceCallback) (uint32_t exceedingCapacity);
+  typedef void (*ExceedingCapacityTraceCallback)(uint32_t exceedingCapacity);
 
 private:
   /**
@@ -189,95 +189,95 @@ private:
    */
   class SatUtInfo : public SimpleRefCount<SatUtInfo>
   {
-    public:
-      /**
-       * Construct SatUtInfo.
-       *
-       * \param damaEntry DamaEntry for created UT info.
-       * \param cnoEstimator C/N0 estimator for the UT info.
-       * \param controlSlotOffset Offset of the current moment to generate control slot.
-       * \param controlSlotsEnabled Flag to tell if control slots generation is enabled according to controlSlotOffset
-       */
-      SatUtInfo( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator, Time controlSlotOffset, bool controlSlotsEnabled );
+public:
+    /**
+     * Construct SatUtInfo.
+     *
+     * \param damaEntry DamaEntry for created UT info.
+     * \param cnoEstimator C/N0 estimator for the UT info.
+     * \param controlSlotOffset Offset of the current moment to generate control slot.
+     * \param controlSlotsEnabled Flag to tell if control slots generation is enabled according to controlSlotOffset
+     */
+    SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator, Time controlSlotOffset, bool controlSlotsEnabled );
 
-      /**
-       * Get damaEntry of the UT info.
-       *
-       * \return Pointer to DamEntry of the UT info.
-       */
-      Ptr<SatDamaEntry> GetDamaEntry ();
+    /**
+     * Get damaEntry of the UT info.
+     *
+     * \return Pointer to DamEntry of the UT info.
+     */
+    Ptr<SatDamaEntry> GetDamaEntry ();
 
-      /**
-       * Update DamaEntry with information of the received CR messages.
-       */
-      void UpdateDamaEntryFromCrs ();
+    /**
+     * Update DamaEntry with information of the received CR messages.
+     */
+    void UpdateDamaEntryFromCrs ();
 
-      /**
-       * Add C/N0 sample to UT info's estimator.
-       *
-       * \param sample C/N0 sample value to add.
-       */
-      void AddCnoSample (double sample);
+    /**
+     * Add C/N0 sample to UT info's estimator.
+     *
+     * \param sample C/N0 sample value to add.
+     */
+    void AddCnoSample (double sample);
 
-      /**
-       * Get estimated C/N0 value based on added samples.
-       *
-       * \return C/N0 estimation.
-       */
-      double GetCnoEstimation ();
+    /**
+     * Get estimated C/N0 value based on added samples.
+     *
+     * \return C/N0 estimation.
+     */
+    double GetCnoEstimation ();
 
-      /**
-       * Add CR message to UT info to be used when capacity request is calculated
-       * next time (method UpdateDamaEntryFromCrs is called).
-       *
-       * \param crMsg
-       */
-      void AddCrMsg (Ptr<SatCrMessage> crMsg);
+    /**
+     * Add CR message to UT info to be used when capacity request is calculated
+     * next time (method UpdateDamaEntryFromCrs is called).
+     *
+     * \param crMsg
+     */
+    void AddCrMsg (Ptr<SatCrMessage> crMsg);
 
-      /**
-       * Check if time is expired to send control slot.
-       *
-       * \return Status of control slot generation time.
-       */
-      bool IsControlSlotGenerationTime () const;
+    /**
+     * Check if time is expired to send control slot.
+     *
+     * \return Status of control slot generation time.
+     */
+    bool IsControlSlotGenerationTime () const;
 
-      /**
-       * Set time for next time slot generation for this UT.
-       *
-       * \param offset Offset of the current moment to generate control slot.
-       */
-      void SetControlSlotGenerationTime (Time offset);
+    /**
+     * Set time for next time slot generation for this UT.
+     *
+     * \param offset Offset of the current moment to generate control slot.
+     */
+    void SetControlSlotGenerationTime (Time offset);
 
-    private:
-      /**
-       * Container to store received CR messages.
-       */
-      typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
+private:
+    /**
+     * Container to store received CR messages.
+     */
+    typedef std::vector< Ptr<SatCrMessage> > CrMsgContainer_t;
 
-      /**
-       * DamaEntry of this UT info.
-       */
-      Ptr<SatDamaEntry>  m_damaEntry;
+    /**
+     * DamaEntry of this UT info.
+     */
+    Ptr<SatDamaEntry>  m_damaEntry;
 
-      /**
-       *  Estimator for the C/N0.
-       */
-      Ptr<SatCnoEstimator>  m_cnoEstimator;
+    /**
+     *  Estimator for the C/N0.
+     */
+    Ptr<SatCnoEstimator>  m_cnoEstimator;
 
-      /**
-       *  Received CRs since last update round (call of the method UpdateDamaEntryFromCrs).
-       */
-      CrMsgContainer_t  m_crContainer;
+    /**
+     *  Received CRs since last update round (call of the method UpdateDamaEntryFromCrs).
+     */
+    CrMsgContainer_t  m_crContainer;
 
-      /**
-       * Time to send next control time slot.
-       */
-      Time  m_controlSlotGenerationTime;
+    /**
+     * Time to send next control time slot.
+     */
+    Time  m_controlSlotGenerationTime;
 
-      /**
-       * Flag to indicated if control time slots generation is enabled.
-       */
-      bool  m_controlSlotsEnabled;
+    /**
+     * Flag to indicated if control time slots generation is enabled.
+     */
+    bool  m_controlSlotsEnabled;
   };
 
   /**
@@ -300,14 +300,16 @@ private:
    */
   class CnoCompare
   {
-  public:
+public:
     /**
      * Construct CnoCompare object
      *
      * \param utInfoMap Reference to map container for the UT information
      */
     CnoCompare (const UtInfoMap_t& utInfoMap)
-      : m_utInfoMap (utInfoMap) {}
+      : m_utInfoMap (utInfoMap)
+    {
+    }
 
     /**
      * Compare operator to compare request information of the two UTs.
@@ -325,19 +327,19 @@ private:
 
       if ( !isnan (cnoFirst) )
         {
-           if ( isnan (cnoSecond) )
-             {
-               result = false;
-             }
-           else
-             {
-               result = (cnoFirst < cnoSecond);
-             }
+          if ( isnan (cnoSecond) )
+            {
+              result = false;
+            }
+          else
+            {
+              result = (cnoFirst < cnoSecond);
+            }
         }
 
       return result;
     }
-  private:
+private:
     /**
      * Reference to map container for the UT information
      */

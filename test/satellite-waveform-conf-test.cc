@@ -76,7 +76,7 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-waveform-conf", "dvbrcs2", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-waveform-conf", "dvbrcs2", true);
 
   std::string path = Singleton<SatEnvVariables>::Get ()->GetDataPath () + "/";
   std::string fileName = "dvbRcs2Waveforms.txt";
@@ -87,8 +87,8 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   Ptr<SatLinkResultsDvbRcs2> lr = CreateObject<SatLinkResultsDvbRcs2> ();
   lr->Initialize ();
 
-  Ptr<SatWaveformConf> wf = CreateObject<SatWaveformConf> (path+fileName);
-  wf->InitializeEbNoRequirements( lr );
+  Ptr<SatWaveformConf> wf = CreateObject<SatWaveformConf> (path + fileName);
+  wf->InitializeEbNoRequirements ( lr );
 
   uint32_t refResults [21] = {7, 7, 7, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
 
@@ -106,10 +106,10 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   for (double d = 60.0; d <= 70.0; d += 0.5)
     {
       uint32_t wfid (0);
-      bool success = wf->GetBestWaveformId(SatUtils::DbToLinear (d), symbolRate, wfid);
+      bool success = wf->GetBestWaveformId (SatUtils::DbToLinear (d), symbolRate, wfid);
 
-      NS_TEST_ASSERT_MSG_EQ(success, true, "A suitable waveform not found");
-      NS_TEST_ASSERT_MSG_EQ(wfid, refResults[i], "Not expected waveform id");
+      NS_TEST_ASSERT_MSG_EQ (success, true, "A suitable waveform not found");
+      NS_TEST_ASSERT_MSG_EQ (wfid, refResults[i], "Not expected waveform id");
       ++i;
     }
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
@@ -150,7 +150,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-waveform-conf", "dvbs2", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-waveform-conf", "dvbs2", true);
 
   // Tested symbol rate in baud
   double symbolRate (93750000);
@@ -184,8 +184,8 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
     {
       // Modcods
       for (std::vector<SatEnums::SatModcod_t>::iterator it = modcods.begin ();
-          it != modcods.end ();
-          ++it)
+           it != modcods.end ();
+           ++it)
         {
           // Get BBFrame length in Time
           Time l = bbFrameConf->GetBbFrameDuration ((*it), frameTypes[i]);
@@ -193,10 +193,10 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
           // Get BBFrame payload in bits
           uint32_t p = bbFrameConf->GetBbFramePayloadBits (*it, frameTypes[i]);
 
-          std::cout << "MODCOD: " << SatEnums::GetModcodTypeName(*it) <<
-              ", frameType: " << frameTypes[i] <<
-              ", length [s]: " << l.GetSeconds () <<
-              ", payload [b]: " << p << std::endl;
+          std::cout << "MODCOD: " << SatEnums::GetModcodTypeName (*it) <<
+          ", frameType: " << frameTypes[i] <<
+          ", length [s]: " << l.GetSeconds () <<
+          ", payload [b]: " << p << std::endl;
         }
     }
   Singleton<SatEnvVariables>::Get ()->DoDispose ();

@@ -104,7 +104,6 @@ public:
   void Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
 private:
-
   /**
    * Initialize is called in DoRun method, since the test.py calls
    * the test case constructors even if the test suite is not run.
@@ -208,11 +207,11 @@ void SatRtnArqTestCase::Initialize ()
   m_dest = Mac48Address::Allocate ();
 
   // The parameters of RLE ARQ may be reconfigured
-  Config::SetDefault ("ns3::SatQueue::MaxPackets", UintegerValue(1001));
-  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue(3));
-  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::WindowSize", UintegerValue(50));
-  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RetransmissionTimer", TimeValue(Seconds (0.6)));
-  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RxWaitingTime", TimeValue(Seconds (2.3)));
+  Config::SetDefault ("ns3::SatQueue::MaxPackets", UintegerValue (1001));
+  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue (3));
+  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::WindowSize", UintegerValue (50));
+  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RetransmissionTimer", TimeValue (Seconds (0.6)));
+  Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RxWaitingTime", TimeValue (Seconds (2.3)));
 
   Ptr<SatQueue> queue = CreateObject<SatQueue> (m_rcIndex);
   m_rle = CreateObject<SatReturnLinkEncapsulatorArq> (m_source, m_dest, m_rcIndex);
@@ -234,7 +233,7 @@ SatRtnArqTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-arq", "rtn", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-arq", "rtn", true);
 
   Initialize ();
 
@@ -247,8 +246,8 @@ SatRtnArqTestCase::DoRun (void)
   Simulator::Run ();
 
   // Calculate HL error probability
-  double errorProb = 1.0 - (m_rcvdPacketSizes.size() / (double)m_sentPacketSizes.size());
-  NS_TEST_ASSERT_MSG_LT(errorProb, m_errorProbabilityThreshold, "HL packet error probability is higher than threshold!");
+  double errorProb = 1.0 - (m_rcvdPacketSizes.size () / (double)m_sentPacketSizes.size ());
+  NS_TEST_ASSERT_MSG_LT (errorProb, m_errorProbabilityThreshold, "HL packet error probability is higher than threshold!");
 
   //std::cout << "RTN: Sent packets: " << m_sentPacketSizes.size () << " received packets: " << m_rcvdPacketSizes.size () << std::endl;
   //std::cout << "Tx: " << m_txs << " txErrors: " << m_txErrors << " Acks: " << m_acks << " ackErrors: " << m_ackErrors << std::endl;
@@ -402,7 +401,6 @@ public:
   void Receive (Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
 private:
-
   /**
    * Initialize is called in DoRun method, since the test.py calls
    * the test case constructors even if the test suite is not run.
@@ -504,11 +502,11 @@ SatFwdArqTestCase::Initialize ()
   m_dest = Mac48Address::Allocate ();
 
   // The parameters of RLE ARQ may be reconfigured
-  Config::SetDefault ("ns3::SatQueue::MaxPackets", UintegerValue(1001));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue(3));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::WindowSize", UintegerValue(50));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RetransmissionTimer", TimeValue(Seconds (0.6)));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RxWaitingTime", TimeValue(Seconds (2.3)));
+  Config::SetDefault ("ns3::SatQueue::MaxPackets", UintegerValue (1001));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue (3));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::WindowSize", UintegerValue (50));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RetransmissionTimer", TimeValue (Seconds (0.6)));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RxWaitingTime", TimeValue (Seconds (2.3)));
 
   Ptr<SatQueue> queue = CreateObject<SatQueue> (m_flowIndex);
   m_gse = CreateObject<SatGenericStreamEncapsulatorArq> (m_source, m_dest, m_flowIndex);
@@ -529,7 +527,7 @@ SatFwdArqTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-arq", "fwd", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-arq", "fwd", true);
 
   Initialize ();
 
@@ -542,12 +540,12 @@ SatFwdArqTestCase::DoRun (void)
   Simulator::Run ();
 
   // Calculate HL error probability
-  double errorProb = 1.0 - (m_rcvdPacketSizes.size() / (double)m_sentPacketSizes.size());
+  double errorProb = 1.0 - (m_rcvdPacketSizes.size () / (double)m_sentPacketSizes.size ());
 
   //std::cout << "FWD: Sent packets: " << m_sentPacketSizes.size () << " received packets: " << m_rcvdPacketSizes.size () << std::endl;
   //std::cout << "Tx: " << m_txs << " txErrors: " << m_txErrors << " Acks: " << m_acks << " ackErrors: " << m_ackErrors << std::endl;
 
-  NS_TEST_ASSERT_MSG_LT(errorProb, m_errorProbabilityThreshold, "HL packet error probability is higher than threshold!");
+  NS_TEST_ASSERT_MSG_LT (errorProb, m_errorProbabilityThreshold, "HL packet error probability is higher than threshold!");
 
   Simulator::Destroy ();
 
@@ -605,8 +603,8 @@ void SatFwdArqTestCase::NotifyTxOpportunity ()
       if (m_frameErrorRatio < m_unif->GetValue (0.0, 1.0))
         {
           for (std::vector<Ptr<Packet> >::iterator it = bbFrame.begin ();
-              it != bbFrame.end ();
-              ++it)
+               it != bbFrame.end ();
+               ++it)
             {
               // Schedule packet receive
               Simulator::Schedule (m_propagationDelay, &SatFwdArqTestCase::ReceivePdu, this, *it);

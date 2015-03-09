@@ -38,13 +38,13 @@ NS_OBJECT_ENSURE_REGISTERED (SatGenericStreamEncapsulator);
 
 
 SatGenericStreamEncapsulator::SatGenericStreamEncapsulator ()
-:SatBaseEncapsulator (),
- m_maxGsePduSize (4095),
- m_txFragmentId (0),
- m_currRxFragmentId (0),
- m_currRxPacketSize (0),
- m_currRxPacketFragmentBytes (0),
- m_minGseTxOpportunity (0)
+  : SatBaseEncapsulator (),
+    m_maxGsePduSize (4095),
+    m_txFragmentId (0),
+    m_currRxFragmentId (0),
+    m_currRxPacketSize (0),
+    m_currRxPacketFragmentBytes (0),
+    m_minGseTxOpportunity (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (true);
@@ -53,7 +53,7 @@ SatGenericStreamEncapsulator::SatGenericStreamEncapsulator ()
 
 
 SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-   :SatBaseEncapsulator (source, dest, flowId),
+  : SatBaseEncapsulator (source, dest, flowId),
     m_maxGsePduSize (4095),
     m_txFragmentId (0),
     m_currRxFragmentId (0),
@@ -83,7 +83,7 @@ SatGenericStreamEncapsulator::GetTypeId (void)
                    UintegerValue (4096),
                    MakeUintegerAccessor (&SatGenericStreamEncapsulator::m_maxGsePduSize),
                    MakeUintegerChecker<uint32_t> ())
-                   ;
+  ;
   return tid;
 }
 
@@ -118,7 +118,7 @@ SatGenericStreamEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
       NS_LOG_LOGIC ("Packet is dropped!");
     }
 
-  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets() );
+  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets () );
   NS_LOG_LOGIC ("NumBytes = " << m_txQueue->GetNBytes ());
 }
 
@@ -186,7 +186,7 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
   peekPacket->PeekPacketTag (peekTag);
 
   // Too small TxOpportunity!
-  uint32_t headerSize = gseHeader.GetGseHeaderSizeInBytes(peekTag.GetStatus ()) + additionalHeaderSize;
+  uint32_t headerSize = gseHeader.GetGseHeaderSizeInBytes (peekTag.GetStatus ()) + additionalHeaderSize;
   if (txOpportunityBytes <= headerSize)
     {
       NS_LOG_LOGIC ("TX opportunity too small = " << txOpportunityBytes);
@@ -194,7 +194,7 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
     }
 
   // Build Data field
-  uint32_t maxGsePayload = std::min(txOpportunityBytes, maxGsePduSize) - headerSize;
+  uint32_t maxGsePayload = std::min (txOpportunityBytes, maxGsePduSize) - headerSize;
 
   NS_LOG_LOGIC ("GSE header size: " << gseHeader.GetGseHeaderSizeInBytes (peekTag.GetStatus ()));
 
@@ -219,13 +219,13 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
         {
           IncreaseFragmentId ();
           gseHeader.SetStartIndicator ();
-          gseHeader.SetTotalLength (firstPacket->GetSize());
+          gseHeader.SetTotalLength (firstPacket->GetSize ());
           newTag.SetStatus (SatEncapPduStatusTag::START_PDU);
           oldTag.SetStatus (SatEncapPduStatusTag::END_PDU);
 
-          uint32_t newMaxGsePayload = std::min(txOpportunityBytes, maxGsePduSize) -
-              gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::START_PDU) -
-              additionalHeaderSize;
+          uint32_t newMaxGsePayload = std::min (txOpportunityBytes, maxGsePduSize) -
+            gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::START_PDU) -
+            additionalHeaderSize;
 
           NS_LOG_LOGIC ("Packet size: " << firstPacket->GetSize () << " max GSE payload: " << maxGsePayload);
 
@@ -239,9 +239,9 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
           // oldTag still is left with the END_PDU tag
           newTag.SetStatus (SatEncapPduStatusTag::CONTINUATION_PDU);
 
-          uint32_t newMaxGsePayload = std::min(txOpportunityBytes, maxGsePduSize) -
-              gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::CONTINUATION_PDU) -
-              additionalHeaderSize;
+          uint32_t newMaxGsePayload = std::min (txOpportunityBytes, maxGsePduSize) -
+            gseHeader.GetGseHeaderSizeInBytes (SatEncapPduStatusTag::CONTINUATION_PDU) -
+            additionalHeaderSize;
 
           NS_LOG_LOGIC ("Packet size: " << firstPacket->GetSize () << " max GSE payload: " << maxGsePayload);
 
@@ -259,7 +259,7 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
       NS_LOG_LOGIC ("Create fragment of size: " << fragment->GetSize ());
 
       // Add proper payload length of the GSE packet
-      gseHeader.SetGsePduLength (fragment->GetSize());
+      gseHeader.SetGsePduLength (fragment->GetSize ());
 
       // Give back the remaining segment to the transmission buffer
       firstPacket->RemoveAtStart (maxGsePayload);
@@ -285,7 +285,7 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
       NS_LOG_LOGIC ("In fragmentation - packet size: " << peekPacket->GetSize () << " max GSE payload: " << maxGsePayload);
 
       // Take the packe away from the queue
-      Ptr<Packet> firstPacket= m_txQueue->Dequeue ();
+      Ptr<Packet> firstPacket = m_txQueue->Dequeue ();
 
       // Create new GSE header
       SatGseHeader gseHeader;
@@ -295,7 +295,7 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
 
       if (tag.GetStatus () == SatEncapPduStatusTag::FULL_PDU)
         {
-          gseHeader.SetTotalLength (firstPacket->GetSize());
+          gseHeader.SetTotalLength (firstPacket->GetSize ());
           gseHeader.SetStartIndicator ();
         }
       // Fragment id is added to all fragmented packets
@@ -304,7 +304,7 @@ SatGenericStreamEncapsulator::GetNewGsePdu (uint32_t txOpportunityBytes, uint32_
           gseHeader.SetFragmentId (m_txFragmentId);
         }
 
-      gseHeader.SetGsePduLength (firstPacket->GetSize());
+      gseHeader.SetGsePduLength (firstPacket->GetSize ());
       gseHeader.SetEndIndicator ();
 
       // Add PDU header
@@ -354,7 +354,7 @@ SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
-  else if (mTag.GetDestAddress() != m_destAddress)
+  else if (mTag.GetDestAddress () != m_destAddress)
     {
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
@@ -374,7 +374,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
   packet->RemoveHeader (gseHeader);
 
   // FULL_PDU
-  if (gseHeader.GetStartIndicator() == true && gseHeader.GetEndIndicator() == true)
+  if (gseHeader.GetStartIndicator () == true && gseHeader.GetEndIndicator () == true)
     {
       NS_LOG_LOGIC ("FULL PDU received");
 
@@ -384,7 +384,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
     }
 
   // START_PDU
-  else if (gseHeader.GetStartIndicator() == true && gseHeader.GetEndIndicator() == false)
+  else if (gseHeader.GetStartIndicator () == true && gseHeader.GetEndIndicator () == false)
     {
       NS_LOG_LOGIC ("START PDU received");
 
@@ -397,7 +397,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
     }
 
   // CONTINUATION_PDU
-  else if (gseHeader.GetStartIndicator() == false && gseHeader.GetEndIndicator() == false)
+  else if (gseHeader.GetStartIndicator () == false && gseHeader.GetEndIndicator () == false)
     {
       NS_LOG_LOGIC ("CONTINUATION PDU received");
 
@@ -415,7 +415,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
     }
 
   // END_PDU
-  else if (gseHeader.GetStartIndicator() == false && gseHeader.GetEndIndicator() == true)
+  else if (gseHeader.GetStartIndicator () == false && gseHeader.GetEndIndicator () == true)
     {
       NS_LOG_LOGIC ("END PDU received");
 

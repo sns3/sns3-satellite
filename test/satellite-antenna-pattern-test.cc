@@ -61,22 +61,22 @@ SatAntennaPatternTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-antenna-gain-pattern", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-antenna-gain-pattern", "", true);
 
   // Create antenna gain container
   SatAntennaGainPatternContainer gpContainer;
 
   // Test positions (= GW positions from 72 spot-beam reference system)
   std::vector<GeoCoordinate> coordinates;
-  GeoCoordinate g1 = GeoCoordinate(50.25, 3.75, 0.0);
+  GeoCoordinate g1 = GeoCoordinate (50.25, 3.75, 0.0);
   coordinates.push_back (g1);
-  GeoCoordinate g2 = GeoCoordinate(64.00, 8.25, 0.0);
+  GeoCoordinate g2 = GeoCoordinate (64.00, 8.25, 0.0);
   coordinates.push_back (g2);
-  GeoCoordinate g3 = GeoCoordinate(42.25, -4.50, 0.0);
+  GeoCoordinate g3 = GeoCoordinate (42.25, -4.50, 0.0);
   coordinates.push_back (g3);
-  GeoCoordinate g4 = GeoCoordinate(44.50, 13.50, 0.0);
+  GeoCoordinate g4 = GeoCoordinate (44.50, 13.50, 0.0);
   coordinates.push_back (g4);
-  GeoCoordinate g5 = GeoCoordinate(37.25, 23.75, 0.0);
+  GeoCoordinate g5 = GeoCoordinate (37.25, 23.75, 0.0);
   coordinates.push_back (g5);
 
   /* Reference results
@@ -113,8 +113,8 @@ SatAntennaPatternTestCase::DoRun (void)
           ", gain: " << gain_dB << std::endl;
       */
 
-      NS_TEST_ASSERT_MSG_EQ_TOL( gain_dB, expectedGains[i], 0.001, "Expected gain not within tolerance");
-      NS_TEST_ASSERT_MSG_EQ( bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
+      NS_TEST_ASSERT_MSG_EQ_TOL ( gain_dB, expectedGains[i], 0.001, "Expected gain not within tolerance");
+      NS_TEST_ASSERT_MSG_EQ ( bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
     }
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();

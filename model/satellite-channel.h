@@ -61,7 +61,6 @@ namespace ns3 {
 class SatChannel : public Channel
 {
 public:
-
   SatChannel ();
   virtual ~SatChannel ();
 
@@ -71,11 +70,11 @@ public:
    * ALL_BEAMS = all receivers in the channel shall receive the packet
    */
   enum SatChannelFwdMode_e
-    {
-      ONLY_DEST_NODE,
-      ONLY_DEST_BEAM,
-      ALL_BEAMS
-    };
+  {
+    ONLY_DEST_NODE,
+    ONLY_DEST_BEAM,
+    ALL_BEAMS
+  };
 
   static TypeId GetTypeId (void);
 
@@ -173,7 +172,6 @@ public:
   virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
 
 private:
-
   /**
    * Forwarding mode of the SatChannel:
    * SINGLE_RX = only the proper receiver of the packet shall receive the packet

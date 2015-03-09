@@ -39,32 +39,32 @@ NS_OBJECT_ENSURE_REGISTERED (SatUserHelper);
 TypeId
 SatUserHelper::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatUserHelper")
-      .SetParent<Object> ()
-      .AddConstructor<SatUserHelper> ()
-      .AddAttribute ("BackboneNetworkType",
-                     "Network used between GW and Router, and between Router and Users in operator network",
-                      EnumValue (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
-                      MakeEnumAccessor (&SatUserHelper::m_backboneNetworkType),
-                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
-                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
-      .AddAttribute ("SubscriberNetworkType",
-                     "Network used between UTs and Users in subscriber network",
-                      EnumValue (SatUserHelper::NETWORK_TYPE_CSMA),
-                      MakeEnumAccessor (&SatUserHelper::m_subscriberNetworkType),
-                      MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
-                                       SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
-      .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace),
-                       "ns3::SatTypedefs::CreationCallback")
-    ;
-    return tid;
+  static TypeId tid = TypeId ("ns3::SatUserHelper")
+    .SetParent<Object> ()
+    .AddConstructor<SatUserHelper> ()
+    .AddAttribute ("BackboneNetworkType",
+                   "Network used between GW and Router, and between Router and Users in operator network",
+                   EnumValue (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
+                   MakeEnumAccessor (&SatUserHelper::m_backboneNetworkType),
+                   MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
+                                    SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
+    .AddAttribute ("SubscriberNetworkType",
+                   "Network used between UTs and Users in subscriber network",
+                   EnumValue (SatUserHelper::NETWORK_TYPE_CSMA),
+                   MakeEnumAccessor (&SatUserHelper::m_subscriberNetworkType),
+                   MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
+                                    SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
+    .AddTraceSource ("Creation", "Creation traces",
+                     MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace),
+                     "ns3::SatTypedefs::CreationCallback")
+  ;
+  return tid;
 }
 
 TypeId
 SatUserHelper::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatUserHelper::SatUserHelper ()
@@ -76,7 +76,7 @@ SatUserHelper::SatUserHelper ()
   NS_LOG_FUNCTION (this);
 }
 
-void 
+void
 SatUserHelper::SetCsmaQueue (std::string type,
                              std::string name1, const AttributeValue &value1,
                              std::string name2, const AttributeValue &value2,
@@ -109,14 +109,14 @@ void SatUserHelper::SetUtBaseAddress ( const Ipv4Address network, const Ipv4Mask
 {
   NS_LOG_FUNCTION (this);
 
-  m_ipv4Ut.SetBase(network, mask, address);
+  m_ipv4Ut.SetBase (network, mask, address);
 }
 
 void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
 {
   NS_LOG_FUNCTION (this);
 
-  m_ipv4Gw.SetBase(network, mask, address);
+  m_ipv4Gw.SetBase (network, mask, address);
 }
 
 NodeContainer
@@ -129,7 +129,7 @@ SatUserHelper::InstallUt (NodeContainer ut, uint32_t userCount )
   // create users and csma links between UTs and users and add IP routes
   for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
     {
-      createdUsers.Add(InstallUt(*i, userCount));
+      createdUsers.Add (InstallUt (*i, userCount));
     }
 
   return createdUsers;
@@ -148,8 +148,8 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
   InternetStackHelper internet;
 
   NodeContainer users;
-  users.Create(userCount);
-  NodeContainer utUsers = NodeContainer(ut, users);
+  users.Create (userCount);
+  NodeContainer utUsers = NodeContainer (ut, users);
 
   internet.Install (users);
 
@@ -176,11 +176,11 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
 
       // Set default route for users toward satellite (UTs address)
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
-      routing->SetDefaultRoute (addresses.GetAddress(0), 1);
-      NS_LOG_INFO ("SatUserHelper::InstallUt, User default route: " << addresses.GetAddress(0) );
+      routing->SetDefaultRoute (addresses.GetAddress (0), 1);
+      NS_LOG_INFO ("SatUserHelper::InstallUt, User default route: " << addresses.GetAddress (0) );
     }
 
-  m_ipv4Ut.NewNetwork();
+  m_ipv4Ut.NewNetwork ();
 
   std::pair<UtUsersContainer_t::const_iterator, bool> result = m_utUsers.insert ( std::make_pair (ut, users) );
 
@@ -210,20 +210,20 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 
   // create users and csma links between Router and users and add IP routes
   NodeContainer users;
-  users.Create(userCount);
-  NodeContainer routerUsers = NodeContainer(m_router, users);
+  users.Create (userCount);
+  NodeContainer routerUsers = NodeContainer (m_router, users);
 
   internet.Install (users);
 
-  NetDeviceContainer nd = InstallBackboneNetwork(routerUsers);
+  NetDeviceContainer nd = InstallBackboneNetwork (routerUsers);
   Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
   Ptr<Ipv4> ipv4Router = m_router->GetObject<Ipv4> ();
   uint32_t lastRouterIf = ipv4Router->GetNInterfaces () - 1;
   Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
-  routingRouter->SetDefaultRoute(addresses.GetAddress(1), lastRouterIf);
-  NS_LOG_INFO ("SatUserHelper::InstallGw, Router default route: " << addresses.GetAddress(1) );
+  routingRouter->SetDefaultRoute (addresses.GetAddress (1), lastRouterIf);
+  NS_LOG_INFO ("SatUserHelper::InstallGw, Router default route: " << addresses.GetAddress (1) );
 
   for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
     {
@@ -239,12 +239,12 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
 
       // Set default route toward router (GW) for users
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
-      routing->SetDefaultRoute (addresses.GetAddress(0), 1);
-      NS_LOG_INFO ("SatUserHelper::InstallGw, User default route: " << addresses.GetAddress(0));
+      routing->SetDefaultRoute (addresses.GetAddress (0), 1);
+      NS_LOG_INFO ("SatUserHelper::InstallGw, User default route: " << addresses.GetAddress (0));
     }
 
-   m_gwUsers.Add(users);
-   m_ipv4Gw.NewNetwork();
+  m_gwUsers.Add (users);
+  m_ipv4Gw.NewNetwork ();
 
   return m_gwUsers;
 }
@@ -322,10 +322,10 @@ SatUserHelper::GetUtUserCount (Ptr<Node> ut) const
 
   UtUsersContainer_t::const_iterator it = m_utUsers.find (ut);
 
-    if ( it == m_utUsers.end ())
-      {
-        NS_FATAL_ERROR ("UT which user count is requested in not installed!!!");
-      }
+  if ( it == m_utUsers.end ())
+    {
+      NS_FATAL_ERROR ("UT which user count is requested in not installed!!!");
+    }
 
   return it->second.GetN ();
 }
@@ -347,54 +347,54 @@ SatUserHelper::GetUtNode (Ptr<Node> utUserNode) const
 }
 
 void
-SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+SatUserHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
   NS_LOG_FUNCTION (this);
 
-  TraceConnect("Creation", "SatUserHelper", cb);
+  TraceConnect ("Creation", "SatUserHelper", cb);
 }
 
 void
-SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
+SatUserHelper::InstallRouter (NodeContainer gw, Ptr<Node> router)
 {
   NS_LOG_FUNCTION (this);
 
   for (NodeContainer::Iterator i = gw.Begin (); i != gw.End (); i++)
-  {
-    NodeContainer gwRouter = NodeContainer((*i), router);
+    {
+      NodeContainer gwRouter = NodeContainer ((*i), router);
 
-    NetDeviceContainer nd = InstallBackboneNetwork(gwRouter);
-    Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
-    Ipv4StaticRoutingHelper ipv4RoutingHelper;
+      NetDeviceContainer nd = InstallBackboneNetwork (gwRouter);
+      Ipv4InterfaceContainer addresses = m_ipv4Gw.Assign (nd);
+      Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
-    // Get IPv4 protocol implementations
-    Ptr<Ipv4> ipv4Gw = (*i)->GetObject<Ipv4> ();
-    uint32_t lastGwIf = ipv4Gw->GetNInterfaces() - 1;
-    Ptr<Ipv4StaticRouting> routingGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
-    routingGw->SetDefaultRoute (addresses.GetAddress(1), lastGwIf);
-    NS_LOG_INFO ("SatUserHelper::InstallRouter  GW default route: " << addresses.GetAddress(1) );
+      // Get IPv4 protocol implementations
+      Ptr<Ipv4> ipv4Gw = (*i)->GetObject<Ipv4> ();
+      uint32_t lastGwIf = ipv4Gw->GetNInterfaces () - 1;
+      Ptr<Ipv4StaticRouting> routingGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
+      routingGw->SetDefaultRoute (addresses.GetAddress (1), lastGwIf);
+      NS_LOG_INFO ("SatUserHelper::InstallRouter  GW default route: " << addresses.GetAddress (1) );
 
-    for (uint32_t  routeIndex = 0; routeIndex < routingGw->GetNRoutes(); routeIndex++)
-      {
-        // Get IPv4 protocol implementations
-        Ptr<Ipv4> ipv4Router = router->GetObject<Ipv4> ();
-        uint32_t lastRouterIf = ipv4Router->GetNInterfaces() - 1;
-        Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
+      for (uint32_t  routeIndex = 0; routeIndex < routingGw->GetNRoutes (); routeIndex++)
+        {
+          // Get IPv4 protocol implementations
+          Ptr<Ipv4> ipv4Router = router->GetObject<Ipv4> ();
+          uint32_t lastRouterIf = ipv4Router->GetNInterfaces () - 1;
+          Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
 
-        Ipv4RoutingTableEntry route = routingGw->GetRoute(routeIndex);
-        uint32_t interface = route.GetInterface();
+          Ipv4RoutingTableEntry route = routingGw->GetRoute (routeIndex);
+          uint32_t interface = route.GetInterface ();
 
-        // set only routes for interfaces created earlier (and not for local delivery index 0)
-        if ((interface != 0) && (interface != lastGwIf))
-          {
-            routingRouter->AddNetworkRouteTo (route.GetDest(), route.GetDestNetworkMask(), addresses.GetAddress(0), lastRouterIf);
-            NS_LOG_INFO ("SatUserHelper::InstallRouter, Router network route:" << route.GetDest()
-                         << ", " << route.GetDestNetworkMask() << ", " << addresses.GetAddress(0));
-          }
-      }
+          // set only routes for interfaces created earlier (and not for local delivery index 0)
+          if ((interface != 0) && (interface != lastGwIf))
+            {
+              routingRouter->AddNetworkRouteTo (route.GetDest (), route.GetDestNetworkMask (), addresses.GetAddress (0), lastRouterIf);
+              NS_LOG_INFO ("SatUserHelper::InstallRouter, Router network route:" << route.GetDest ()
+                                                                                 << ", " << route.GetDestNetworkMask () << ", " << addresses.GetAddress (0));
+            }
+        }
 
-    m_ipv4Gw.NewNetwork();
-  }
+      m_ipv4Gw.NewNetwork ();
+    }
 }
 
 NetDeviceContainer
@@ -405,9 +405,9 @@ SatUserHelper::InstallSubscriberNetwork (const NodeContainer &c ) const
   NetDeviceContainer devs;
 
   switch (m_subscriberNetworkType)
-  {
+    {
     case NETWORK_TYPE_SAT_SIMPLE:
-      devs =  InstallSatSimpleNetwork(c);
+      devs =  InstallSatSimpleNetwork (c);
       break;
 
     case NETWORK_TYPE_CSMA:
@@ -415,9 +415,9 @@ SatUserHelper::InstallSubscriberNetwork (const NodeContainer &c ) const
       break;
 
     default:
-      NS_ASSERT(false);
+      NS_ASSERT (false);
       break;
-  }
+    }
 
   return devs;
 }
@@ -430,9 +430,9 @@ SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
   NetDeviceContainer devs;
 
   switch (m_backboneNetworkType)
-  {
+    {
     case NETWORK_TYPE_SAT_SIMPLE:
-      devs =  InstallSatSimpleNetwork(c);
+      devs =  InstallSatSimpleNetwork (c);
       break;
 
     case NETWORK_TYPE_CSMA:
@@ -440,9 +440,9 @@ SatUserHelper::InstallBackboneNetwork (const NodeContainer &c ) const
       break;
 
     default:
-      NS_ASSERT(false);
+      NS_ASSERT (false);
       break;
-  }
+    }
 
   return devs;
 }
@@ -453,14 +453,14 @@ SatUserHelper::InstallSatSimpleNetwork (const NodeContainer &c ) const
   NS_LOG_FUNCTION (this);
 
   NetDeviceContainer devs;
-  Ptr<SatSimpleChannel> channel = CreateObject<SatSimpleChannel>();
+  Ptr<SatSimpleChannel> channel = CreateObject<SatSimpleChannel> ();
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
       Ptr<SatSimpleNetDevice> device = CreateObject<SatSimpleNetDevice> ();
       device->SetAddress (Mac48Address::Allocate ());
       (*i)->AddDevice (device);
-      device->SetChannel(channel);
+      device->SetChannel (channel);
       devs.Add (device);
     }
 
@@ -489,7 +489,7 @@ SatUserHelper::GetRouterInfo () const
 
       oss << device->GetInstanceTypeId ().GetName () << " ";
       oss << device->GetAddress () << " ";
-      oss << ipv4->GetAddress (j, 0).GetLocal() << " ";
+      oss << ipv4->GetAddress (j, 0).GetLocal () << " ";
     }
 
   return oss.str ();

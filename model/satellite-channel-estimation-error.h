@@ -61,7 +61,6 @@ public:
   double AddError (double sinrInDb) const;
 
 private:
-
   /**
    * \brief Read the distribution mean and STD values from file.
    * \param filePathName File name

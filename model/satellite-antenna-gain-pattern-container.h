@@ -43,7 +43,9 @@ public:
   static TypeId GetTypeId (void);
 
   SatAntennaGainPatternContainer ();
-  ~SatAntennaGainPatternContainer () {}
+  ~SatAntennaGainPatternContainer ()
+  {
+  }
 
   /**
    * Definition of number of beams (72-beam reference scenario)

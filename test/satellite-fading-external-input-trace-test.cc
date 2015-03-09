@@ -82,7 +82,7 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
 
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-fading-external-input-trace", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-fading-external-input-trace", "", true);
 
   // Test the fading traces
   bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts,numGws);
@@ -91,10 +91,10 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
   double time [4] = {1.434, 40.923, 80.503, 140.3};
   double preCalcRes [4] = {1.06879, 1.0087, 1.03093, 1.01242};
 
-  Simulator::Schedule (Seconds(time[0]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
-  Simulator::Schedule (Seconds(time[1]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
-  Simulator::Schedule (Seconds(time[2]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Seconds(time[3]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::FORWARD_FEEDER_CH);
+  Simulator::Schedule (Seconds (time[0]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
+  Simulator::Schedule (Seconds (time[1]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
+  Simulator::Schedule (Seconds (time[2]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::FORWARD_USER_CH);
+  Simulator::Schedule (Seconds (time[3]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::FORWARD_FEEDER_CH);
 
   Simulator::Run ();
 

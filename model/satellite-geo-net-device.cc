@@ -43,7 +43,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatGeoNetDevice);
 
-TypeId 
+TypeId
 SatGeoNetDevice::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatGeoNetDevice")
@@ -55,13 +55,13 @@ SatGeoNetDevice::GetTypeId (void)
                    MakePointerAccessor (&SatGeoNetDevice::m_receiveErrorModel),
                    MakePointerChecker<ErrorModel> ())
     .AddAttribute ("UserPhy", "The User Phy objects attached to this device.",
-                    ObjectMapValue (),
-                    MakeObjectMapAccessor (&SatGeoNetDevice::m_userPhy),
-                    MakeObjectMapChecker<SatPhy> ())
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&SatGeoNetDevice::m_userPhy),
+                   MakeObjectMapChecker<SatPhy> ())
     .AddAttribute ("FeederPhy", "The Feeder Phy objects attached to this device.",
-                    ObjectMapValue (),
-                    MakeObjectMapAccessor (&SatGeoNetDevice::m_feederPhy),
-                    MakeObjectMapChecker<SatPhy> ())
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&SatGeoNetDevice::m_feederPhy),
+                   MakeObjectMapChecker<SatPhy> ())
   ;
   return tid;
 }
@@ -99,13 +99,13 @@ SatGeoNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
   m_receiveErrorModel = em;
 }
 
-void 
+void
 SatGeoNetDevice::SetIfIndex (const uint32_t index)
 {
   NS_LOG_FUNCTION (this << index);
   m_ifIndex = index;
 }
-uint32_t 
+uint32_t
 SatGeoNetDevice::GetIfIndex (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -117,7 +117,7 @@ SatGeoNetDevice::SetAddress (Address address)
   NS_LOG_FUNCTION (this << address);
   m_address = Mac48Address::ConvertFrom (address);
 }
-Address 
+Address
 SatGeoNetDevice::GetAddress (void) const
 {
   //
@@ -126,31 +126,31 @@ SatGeoNetDevice::GetAddress (void) const
   NS_LOG_FUNCTION (this);
   return m_address;
 }
-bool 
+bool
 SatGeoNetDevice::SetMtu (const uint16_t mtu)
 {
   NS_LOG_FUNCTION (this << mtu);
   m_mtu = mtu;
   return true;
 }
-uint16_t 
+uint16_t
 SatGeoNetDevice::GetMtu (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_mtu;
 }
-bool 
+bool
 SatGeoNetDevice::IsLinkUp (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
-void 
+void
 SatGeoNetDevice::AddLinkChangeCallback (Callback<void> callback)
 {
- NS_LOG_FUNCTION (this << &callback);
+  NS_LOG_FUNCTION (this << &callback);
 }
-bool 
+bool
 SatGeoNetDevice::IsBroadcast (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -162,13 +162,13 @@ SatGeoNetDevice::GetBroadcast (void) const
   NS_LOG_FUNCTION (this);
   return Mac48Address ("ff:ff:ff:ff:ff:ff");
 }
-bool 
+bool
 SatGeoNetDevice::IsMulticast (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
-Address 
+Address
 SatGeoNetDevice::GetMulticast (Ipv4Address multicastGroup) const
 {
   NS_LOG_FUNCTION (this << multicastGroup);
@@ -181,21 +181,21 @@ Address SatGeoNetDevice::GetMulticast (Ipv6Address addr) const
   return Mac48Address::GetMulticast (addr);
 }
 
-bool 
+bool
 SatGeoNetDevice::IsPointToPoint (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
 
-bool 
+bool
 SatGeoNetDevice::IsBridge (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
 
-bool 
+bool
 SatGeoNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
@@ -207,7 +207,7 @@ SatGeoNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protoco
   NS_ASSERT (false);
   return false;
 }
-bool 
+bool
 SatGeoNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
@@ -220,25 +220,25 @@ SatGeoNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Addr
   return false;
 }
 
-Ptr<Node> 
+Ptr<Node>
 SatGeoNetDevice::GetNode (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_node;
 }
-void 
+void
 SatGeoNetDevice::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
   m_node = node;
 }
-bool 
+bool
 SatGeoNetDevice::NeedsArp (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
-void 
+void
 SatGeoNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
@@ -250,8 +250,8 @@ SatGeoNetDevice::DoDispose (void)
   NS_LOG_FUNCTION (this);
   m_node = 0;
   m_receiveErrorModel = 0;
-  m_userPhy.clear();
-  m_feederPhy.clear();
+  m_userPhy.clear ();
+  m_feederPhy.clear ();
   NetDevice::DoDispose ();
 }
 
@@ -280,14 +280,14 @@ void
 SatGeoNetDevice::AddUserPhy (Ptr<SatPhy> phy, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << phy << beamId);
-  m_userPhy.insert(std::pair<uint32_t, Ptr<SatPhy> >(beamId, phy));
+  m_userPhy.insert (std::pair<uint32_t, Ptr<SatPhy> > (beamId, phy));
 }
 
 void
 SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << phy << beamId);
-  m_feederPhy.insert(std::pair<uint32_t, Ptr<SatPhy> >(beamId, phy));
+  m_feederPhy.insert (std::pair<uint32_t, Ptr<SatPhy> > (beamId, phy));
 }
 
 } // namespace ns3

@@ -64,14 +64,14 @@ SatCnoEstimator::GetCnoEstimation ()
 // class for Basic C/N0 estimator
 
 SatBasicCnoEstimator::SatBasicCnoEstimator ()
- : m_mode (LAST)
+  : m_mode (LAST)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatBasicCnoEstimator::SatBasicCnoEstimator (SatCnoEstimator::EstimationMode_t mode, Time window)
- : m_window (window),
-   m_mode (mode)
+  : m_window (window),
+    m_mode (mode)
 
 {
   NS_LOG_FUNCTION (this);
@@ -89,24 +89,24 @@ SatBasicCnoEstimator::DoAddSample (double sample)
 
   switch (m_mode)
     {
-      case LAST:
-        m_samples.clear ();
-        m_samples.insert (std::make_pair (Simulator::Now (), sample) );
-        break;
+    case LAST:
+      m_samples.clear ();
+      m_samples.insert (std::make_pair (Simulator::Now (), sample) );
+      break;
 
-      case MINIMUM:
-        ClearOutdatedSamples ();
-        m_samples.insert (std::make_pair (Simulator::Now (), sample) );
-        break;
+    case MINIMUM:
+      ClearOutdatedSamples ();
+      m_samples.insert (std::make_pair (Simulator::Now (), sample) );
+      break;
 
-      case AVERAGE:
-        ClearOutdatedSamples ();
-        m_samples.insert (std::make_pair (Simulator::Now (), sample) );
-        break;
+    case AVERAGE:
+      ClearOutdatedSamples ();
+      m_samples.insert (std::make_pair (Simulator::Now (), sample) );
+      break;
 
-      default:
-        NS_FATAL_ERROR ("Not supported estimation mode!!!");
-        break;
+    default:
+      NS_FATAL_ERROR ("Not supported estimation mode!!!");
+      break;
     }
 }
 
@@ -122,7 +122,7 @@ SatBasicCnoEstimator::DoGetCnoEstimation ()
   if (  m_samples.empty () == false )
     {
       switch (m_mode)
-      {
+        {
         case LAST:
           estimatedCno = m_samples.begin ()->second;
           break;
@@ -130,7 +130,7 @@ SatBasicCnoEstimator::DoGetCnoEstimation ()
         case MINIMUM:
           for ( SampleMap_t::const_iterator it = m_samples.begin (); it != m_samples.end (); it++ )
             {
-              if ( isnan (estimatedCno) || (( !isnan(it->second)) && (it->second < estimatedCno)) )
+              if ( isnan (estimatedCno) || (( !isnan (it->second)) && (it->second < estimatedCno)) )
                 {
                   estimatedCno = it->second;
                 }
@@ -144,7 +144,7 @@ SatBasicCnoEstimator::DoGetCnoEstimation ()
         default:
           NS_FATAL_ERROR ("Not supported estimation mode!!!");
           break;
-      }
+        }
     }
 
   return estimatedCno;

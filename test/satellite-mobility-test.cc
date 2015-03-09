@@ -43,14 +43,14 @@ using namespace ns3;
 static void
 SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
 {
-  GeoCoordinate pos = position->GetGeoPosition();
-  Vector pos2 = pos.ToVector();
+  GeoCoordinate pos = position->GetGeoPosition ();
+  Vector pos2 = pos.ToVector ();
 
-   // sets number of decimal places
+  // sets number of decimal places
 
-  std::cout << std::cout.precision(15) << std::cout.setf(std::ios::fixed, std::ios::floatfield) << Simulator::Now () << ", x=" << pos2.x << ", y=" << pos2.y
-                                 << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude()
-                                 << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude()  << std::endl;
+  std::cout << std::cout.precision (15) << std::cout.setf (std::ios::fixed, std::ios::floatfield) << Simulator::Now () << ", x=" << pos2.x << ", y=" << pos2.y
+            << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude ()
+            << ", latitude=" << pos.GetLatitude () << ", altitude=" << pos.GetAltitude ()  << std::endl;
 }
 
 /**
@@ -92,10 +92,10 @@ SatMobilityRandomTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-mobility", "random", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-mobility", "random", true);
 
   Config::Connect ("/NodeList/*/$ns3::SatMobilityModel/SatCourseChange",
-                                   MakeCallback (&SatCourseChange));
+                   MakeCallback (&SatCourseChange));
 
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::SatRandomBoxPositionAllocator",
@@ -110,19 +110,19 @@ SatMobilityRandomTestCase::DoRun (void)
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (c);
 
-  for ( uint32_t i=0; i < c.GetN(); i++ )
+  for ( uint32_t i = 0; i < c.GetN (); i++ )
     {
-      Ptr<SatMobilityModel> model = c.Get(i)->GetObject<SatMobilityModel>();
-      GeoCoordinate pos = model->GetGeoPosition();
+      Ptr<SatMobilityModel> model = c.Get (i)->GetObject<SatMobilityModel> ();
+      GeoCoordinate pos = model->GetGeoPosition ();
 
       // check that position is in limit
-      NS_TEST_ASSERT_MSG_LT( pos.GetLatitude(), 80.1, "Latitude is too big.");
-      NS_TEST_ASSERT_MSG_LT( pos.GetLongitude(), 180.1, "Longitude is too big.");
-      NS_TEST_ASSERT_MSG_LT( pos.GetAltitude(), 100.1, "Altitude is too big.");
+      NS_TEST_ASSERT_MSG_LT ( pos.GetLatitude (), 80.1, "Latitude is too big.");
+      NS_TEST_ASSERT_MSG_LT ( pos.GetLongitude (), 180.1, "Longitude is too big.");
+      NS_TEST_ASSERT_MSG_LT ( pos.GetAltitude (), 100.1, "Altitude is too big.");
 
-      NS_TEST_ASSERT_MSG_GT( pos.GetLatitude(), -45.1, "Latitude is too small.");
-      NS_TEST_ASSERT_MSG_GT( pos.GetLongitude(), -10.1, "Longitude is too small.");
-      NS_TEST_ASSERT_MSG_GT( pos.GetAltitude(), -0.1, "Altitude is too small.");
+      NS_TEST_ASSERT_MSG_GT ( pos.GetLatitude (), -45.1, "Latitude is too small.");
+      NS_TEST_ASSERT_MSG_GT ( pos.GetLongitude (), -10.1, "Longitude is too small.");
+      NS_TEST_ASSERT_MSG_GT ( pos.GetAltitude (), -0.1, "Altitude is too small.");
     }
 
   Simulator::Destroy ();
@@ -175,7 +175,7 @@ SatMobilityList1TestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-mobility", "list1", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-mobility", "list1", true);
 
   MobilityHelper mobility;
   Ptr<SatListPositionAllocator> positionAlloc = CreateObject<SatListPositionAllocator> ();
@@ -212,15 +212,15 @@ SatMobilityList1TestCase::DoRun (void)
       double altitude = longitude * 30;
 
       // check that position is equal with set one
-      NS_TEST_ASSERT_MSG_EQ(pos.GetLatitude (),
-                            latitude,
-                            "Latitude is different.");
-      NS_TEST_ASSERT_MSG_EQ(pos.GetLongitude (),
-                            longitude,
-                            "Longitude is different.");
-      NS_TEST_ASSERT_MSG_EQ(pos.GetAltitude (),
-                            altitude,
-                            "Altitude is different.");
+      NS_TEST_ASSERT_MSG_EQ (pos.GetLatitude (),
+                             latitude,
+                             "Latitude is different.");
+      NS_TEST_ASSERT_MSG_EQ (pos.GetLongitude (),
+                             longitude,
+                             "Longitude is different.");
+      NS_TEST_ASSERT_MSG_EQ (pos.GetAltitude (),
+                             altitude,
+                             "Altitude is different.");
     }
 
   Simulator::Destroy ();
@@ -274,7 +274,7 @@ SatMobilityList2TestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-mobility", "list2", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-mobility", "list2", true);
 
   // now do same with Cartesian coordinates used by SatMobilityModel SetPosition
   // and SatPositionAllocator GetNext
@@ -284,7 +284,7 @@ SatMobilityList2TestCase::DoRun (void)
   MobilityHelper mobility;
   Ptr<SatListPositionAllocator> positionAlloc = CreateObject<SatListPositionAllocator> ();
 
-  positionAlloc->Add(GeoCoordinate(30, 45, 1000));
+  positionAlloc->Add (GeoCoordinate (30, 45, 1000));
 
   // create node
   NodeContainer c;
@@ -300,13 +300,13 @@ SatMobilityList2TestCase::DoRun (void)
   // now check that model is set and position is correct but not too accurate because now
   // is made conversion from Cartesian to Geodetic and back
   // lon=39, lat=45 alt=1000 is value which doesn't converts exact
-  Ptr<SatMobilityModel> model = c.Get(0)->GetObject<SatMobilityModel>();
-  GeoCoordinate pos = model->GetGeoPosition();
+  Ptr<SatMobilityModel> model = c.Get (0)->GetObject<SatMobilityModel> ();
+  GeoCoordinate pos = model->GetGeoPosition ();
 
   // check that position is close enough
-  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLatitude() - 30), 0.000001, "Latitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetLongitude() - 45), 0.000001, "Longitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(std::abs(pos.GetAltitude() - 1000), 0.000001, "Altitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT (std::abs (pos.GetLatitude () - 30), 0.000001, "Latitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT (std::abs (pos.GetLongitude () - 45), 0.000001, "Longitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT (std::abs (pos.GetAltitude () - 1000), 0.000001, "Altitude difference too big!");
 
   Simulator::Destroy ();
 

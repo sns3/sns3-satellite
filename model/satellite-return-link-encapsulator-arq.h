@@ -51,7 +51,6 @@ namespace ns3 {
 class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
 {
 public:
-
   /**
    * Default constructor, not used
    */
@@ -101,7 +100,6 @@ public:
   virtual uint32_t GetTxBufferSizeInBytes () const;
 
 private:
-
   /**
    * \brief ARQ Tx timer has expired. The PDU will be flushed, if the maximum
    * retransmissions has been reached. Otherwise the packet will be resent.

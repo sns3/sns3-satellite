@@ -35,7 +35,6 @@ namespace ns3 {
 class SatRtnLinkTime : public SimpleRefCount<SatRtnLinkTime>
 {
 public:
-
   /**
    * Default constructor
    */
@@ -125,7 +124,6 @@ public:
   Time GetNextSuperFrameTxTime (uint8_t superFrameSeqId, Time timingAdvance) const;
 
 private:
-
   Ptr<SatSuperframeSeq> m_superframeSeq;
 };
 

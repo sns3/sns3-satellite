@@ -49,14 +49,14 @@ static void PrintSoContent (std::string context, std::vector< Ptr<SatSchedulingO
 {
   std::cout << context << std::endl;
 
-  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin();
-        it != so.end(); it++ )
+  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
+        it != so.end (); it++ )
     {
       std::cout << "So-Content (ptr, priority, load, hol): "
                 << (*it) << ", "
-                << (*it)->GetPriority() << ", "
-                << (*it)->GetBufferedBytes() << ", "
-                << (*it)->GetHolDelay() << std::endl;
+                << (*it)->GetPriority () << ", "
+                << (*it)->GetBufferedBytes () << ", "
+                << (*it)->GetHolDelay () << std::endl;
     }
 
   std::cout << std::endl;
@@ -76,7 +76,7 @@ SatFwdLinkScheduler::CompareSoPriorityLoad (Ptr<SatSchedulingObject> obj1, Ptr<S
 
   if ( obj1->GetFlowId () == obj2->GetFlowId () )
     {
-      result = (bool) ( obj1->GetBufferedBytes() > obj2->GetBufferedBytes() );
+      result = (bool) ( obj1->GetBufferedBytes () > obj2->GetBufferedBytes () );
     }
 
   return result;
@@ -89,7 +89,7 @@ SatFwdLinkScheduler::CompareSoPriorityHol (Ptr<SatSchedulingObject> obj1, Ptr<Sa
 
   if ( obj1->GetFlowId () == obj2->GetFlowId () )
     {
-      result = (bool) ( obj1->GetHolDelay() > obj2->GetHolDelay() );
+      result = (bool) ( obj1->GetHolDelay () > obj2->GetHolDelay () );
     }
 
   return result;
@@ -103,31 +103,31 @@ SatFwdLinkScheduler::GetTypeId (void)
     .AddConstructor<SatFwdLinkScheduler> ()
     .AddAttribute ("Interval",
                    "The time for periodic scheduling",
-                    TimeValue (MilliSeconds (20)),
-                    MakeTimeAccessor (&SatFwdLinkScheduler::m_periodicInterval),
-                    MakeTimeChecker ())
+                   TimeValue (MilliSeconds (20)),
+                   MakeTimeAccessor (&SatFwdLinkScheduler::m_periodicInterval),
+                   MakeTimeChecker ())
     .AddAttribute ("BBFrameConf",
                    "BB Frame configuration for this scheduler.",
-                    PointerValue(),
-                    MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameConf),
-                    MakePointerChecker<SatBbFrameConf> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameConf),
+                   MakePointerChecker<SatBbFrameConf> ())
     .AddAttribute ("SchedulingStartThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
-                    TimeValue (MilliSeconds (5)),
-                    MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStartThresholdTime),
-                    MakeTimeChecker ())
+                   TimeValue (MilliSeconds (5)),
+                   MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStartThresholdTime),
+                   MakeTimeChecker ())
     .AddAttribute ("SchedulingStopThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
-                    TimeValue (MilliSeconds (15)),
-                    MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStopThresholdTime),
-                    MakeTimeChecker ())
+                   TimeValue (MilliSeconds (15)),
+                   MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStopThresholdTime),
+                   MakeTimeChecker ())
     .AddAttribute ("AdditionalSortCriteria",
                    "Sorting criteria after priority for scheduling objects from LLC.",
-                    EnumValue (SatFwdLinkScheduler::NO_SORT),
-                    MakeEnumAccessor (&SatFwdLinkScheduler::m_additionalSortCriteria),
-                    MakeEnumChecker (SatFwdLinkScheduler::NO_SORT, "NoSorting",
-                                     SatFwdLinkScheduler::BUFFERING_DELAY_SORT, "DelaySort",
-                                     SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "LoadSort"))
+                   EnumValue (SatFwdLinkScheduler::NO_SORT),
+                   MakeEnumAccessor (&SatFwdLinkScheduler::m_additionalSortCriteria),
+                   MakeEnumChecker (SatFwdLinkScheduler::NO_SORT, "NoSorting",
+                                    SatFwdLinkScheduler::BUFFERING_DELAY_SORT, "DelaySort",
+                                    SatFwdLinkScheduler::BUFFERING_LOAD_SORT, "LoadSort"))
     .AddAttribute ("CnoEstimationMode",
                    "Mode of the C/N0 estimator",
                    EnumValue (SatCnoEstimator::LAST),
@@ -135,35 +135,35 @@ SatFwdLinkScheduler::GetTypeId (void)
                    MakeEnumChecker (SatCnoEstimator::LAST, "LastValueInWindow",
                                     SatCnoEstimator::MINIMUM, "MinValueInWindow",
                                     SatCnoEstimator::AVERAGE, "AverageValueInWindow"))
-    .AddAttribute( "CnoEstimationWindow",
-                   "Time window for C/N0 estimation.",
-                   TimeValue (Seconds (5000)),
-                   MakeTimeAccessor (&SatFwdLinkScheduler::m_cnoEstimationWindow),
-                   MakeTimeChecker ())
-    .AddAttribute( "BBFrameContainer",
-                   "BB frame container of this scheduler.",
-                   PointerValue (),
-                   MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameContainer),
-                   MakePointerChecker<SatBbFrameContainer> ())
+    .AddAttribute ( "CnoEstimationWindow",
+                    "Time window for C/N0 estimation.",
+                    TimeValue (Seconds (5000)),
+                    MakeTimeAccessor (&SatFwdLinkScheduler::m_cnoEstimationWindow),
+                    MakeTimeChecker ())
+    .AddAttribute ( "BBFrameContainer",
+                    "BB frame container of this scheduler.",
+                    PointerValue (),
+                    MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameContainer),
+                    MakePointerChecker<SatBbFrameContainer> ())
   ;
   return tid;
 }
 
 SatFwdLinkScheduler::SatFwdLinkScheduler ()
-: m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
-  m_cnoEstimatorMode (SatCnoEstimator::LAST),
-  m_carrierBandwidthInHz (0.0)
+  : m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
+    m_cnoEstimatorMode (SatCnoEstimator::LAST),
+    m_carrierBandwidthInHz (0.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
 }
 
 SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz)
- : m_macAddress (address),
-   m_bbFrameConf (conf),
-   m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
-   m_cnoEstimatorMode (SatCnoEstimator::LAST),
-   m_carrierBandwidthInHz (carrierBandwidthInHz)
+  : m_macAddress (address),
+    m_bbFrameConf (conf),
+    m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
+    m_cnoEstimatorMode (SatCnoEstimator::LAST),
+    m_carrierBandwidthInHz (carrierBandwidthInHz)
 {
   NS_LOG_FUNCTION (this);
 
@@ -290,12 +290,12 @@ SatFwdLinkScheduler::ScheduleBbFrames ()
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
       uint8_t flowId = (*it)->GetFlowId ();
-      SatEnums::SatModcod_t modcod = m_bbFrameContainer->GetModcod( flowId, GetSchedulingObjectCno (*it));
+      SatEnums::SatModcod_t modcod = m_bbFrameContainer->GetModcod ( flowId, GetSchedulingObjectCno (*it));
 
       uint32_t frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
 
-      while ( ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime )) &&
-               (currentObBytes > 0) )
+      while ( ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ))
+              && (currentObBytes > 0) )
         {
           if ( frameBytes < currentObMinReqBytes)
             {
@@ -349,7 +349,7 @@ SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject
   NS_LOG_FUNCTION (this);
 
   // sort only if there is need to sort
-  if ( ( so.empty () == false ) && ( so.size() > 1 ) )
+  if ( ( so.empty () == false ) && ( so.size () > 1 ) )
     {
 #ifdef SAT_FWD_LINK_SCHEDULER_PRINT_SORT_RESULT
       PrintSoContent ("Before sort",  so);
@@ -357,25 +357,25 @@ SatFwdLinkScheduler::SortSchedulingObjects (std::vector< Ptr<SatSchedulingObject
 
       switch (m_additionalSortCriteria)
         {
-          case SatFwdLinkScheduler::NO_SORT:
-            std::sort (so.begin (), so.end (), CompareSoFlowId);
-            break;
+        case SatFwdLinkScheduler::NO_SORT:
+          std::sort (so.begin (), so.end (), CompareSoFlowId);
+          break;
 
-          case SatFwdLinkScheduler::BUFFERING_DELAY_SORT:
-            std::sort (so.begin (), so.end (), CompareSoPriorityHol);
-            break;
+        case SatFwdLinkScheduler::BUFFERING_DELAY_SORT:
+          std::sort (so.begin (), so.end (), CompareSoPriorityHol);
+          break;
 
-          case SatFwdLinkScheduler::BUFFERING_LOAD_SORT:
-            std::sort (so.begin (), so.end (), CompareSoPriorityLoad);
-            break;
+        case SatFwdLinkScheduler::BUFFERING_LOAD_SORT:
+          std::sort (so.begin (), so.end (), CompareSoPriorityLoad);
+          break;
 
-          default:
-            NS_FATAL_ERROR ("Not supported sorting criteria!!!");
-            break;
+        default:
+          NS_FATAL_ERROR ("Not supported sorting criteria!!!");
+          break;
         }
 
 #ifdef SAT_FWD_LINK_SCHEDULER_PRINT_SORT_RESULT
-        PrintSoContent ("After sort",  so);
+      PrintSoContent ("After sort",  so);
 #endif
     }
 }
@@ -422,7 +422,7 @@ SatFwdLinkScheduler::CreateCnoEstimator ()
   Ptr<SatCnoEstimator> estimator = NULL;
 
   switch (m_cnoEstimatorMode)
-  {
+    {
     case SatCnoEstimator::LAST:
     case SatCnoEstimator::MINIMUM:
     case SatCnoEstimator::AVERAGE:
@@ -433,7 +433,7 @@ SatFwdLinkScheduler::CreateCnoEstimator ()
       NS_FATAL_ERROR ("Not supported C/N0 estimation mode!!!");
       break;
 
-  }
+    }
 
   return estimator;
 }

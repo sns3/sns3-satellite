@@ -61,7 +61,7 @@ private:
    */
   template<typename R, typename C, typename P>
   void InstallProbe (Ptr<Node> utNode,
-                     R (C::*collectorTraceSink) (P, P));
+                     R (C::*collectorTraceSink)(P, P));
 
   /// Maintains a list of probes created by this helper.
   std::list<Ptr<Probe> > m_probes;

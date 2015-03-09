@@ -25,7 +25,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatFadingInputTrace);
 
-TypeId 
+TypeId
 SatFadingInputTrace::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingInputTrace")
@@ -34,14 +34,14 @@ SatFadingInputTrace::GetTypeId (void)
   return tid;
 }
 
-SatFadingInputTrace::SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer) :
-  m_satFadingInputTraceContainer (satFadingInputTraceContainer)
+SatFadingInputTrace::SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer)
+  : m_satFadingInputTraceContainer (satFadingInputTraceContainer)
 {
   NS_LOG_FUNCTION (this);
 }
 
-SatFadingInputTrace::SatFadingInputTrace () :
-  m_satFadingInputTraceContainer ()
+SatFadingInputTrace::SatFadingInputTrace ()
+  : m_satFadingInputTraceContainer ()
 {
   NS_LOG_FUNCTION (this);
 

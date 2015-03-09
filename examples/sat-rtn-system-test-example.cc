@@ -90,7 +90,7 @@ main (int argc, char *argv[])
   uint32_t trafficModel = 0;
 
   LogComponentEnable ("sat-rtn-system-test-example", LOG_LEVEL_INFO);
-  
+
   // set default values for traffic model apps here
   // attributes can be overridden by command line arguments or input xml when needed
   //Config::SetDefault ("ns3::CbrApplication::PacketSize", packetSize);
@@ -128,7 +128,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue (preDefinedFrameConfig));
 
   switch (testCase)
-  {
+    {
     case 0: // scheduler, CRA, ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
@@ -268,7 +268,7 @@ main (int argc, char *argv[])
 
     default:
       break;
-  }
+    }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -301,8 +301,8 @@ main (int argc, char *argv[])
   //                               MakeCallback (&PacketEnqueu));
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -328,21 +328,21 @@ main (int argc, char *argv[])
 
       switch (trafficModel)
         {
-          case 0: // CBR
-            appAdded = cbr.Install (*it);
-            //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-            //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("Interval", interval );
-            break;
+        case 0:   // CBR
+          appAdded = cbr.Install (*it);
+          //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
+          //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("Interval", interval );
+          break;
 
-          case 1: // On-Off
-            appAdded = onOff.Install (*it);
-            //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-            //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("DataRate", dataRate );
-            break;
+        case 1:   // On-Off
+          appAdded = onOff.Install (*it);
+          //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
+          //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("DataRate", dataRate );
+          break;
 
-          default:
-            NS_FATAL_ERROR ("Not Supported Traffic Model!");
-            break;
+        default:
+          NS_FATAL_ERROR ("Not Supported Traffic Model!");
+          break;
         }
 
       appAdded.Get (0)->SetStartTime (utAppStartTime);
@@ -378,16 +378,16 @@ main (int argc, char *argv[])
   //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
 
 
-  NS_LOG_INFO("--- sat-rtn-sys-test ---");
-  NS_LOG_INFO("  Test case: " << testCase);
-  NS_LOG_INFO("  Traffic model: " << trafficModel);
+  NS_LOG_INFO ("--- sat-rtn-sys-test ---");
+  NS_LOG_INFO ("  Test case: " << testCase);
+  NS_LOG_INFO ("  Traffic model: " << trafficModel);
   //NS_LOG_INFO("  Packet size: " << packetSize.Get ());
   //NS_LOG_INFO("  Data rate (on-off): " << dataRate.Get ());
   //NS_LOG_INFO("  Interval (CBR): " << interval.Get ().GetSeconds ());
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

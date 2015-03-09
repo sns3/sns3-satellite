@@ -37,7 +37,9 @@ public:
   static TypeId GetTypeId (void);
 
   SatFreeSpaceLoss ();
-  ~SatFreeSpaceLoss () {}
+  ~SatFreeSpaceLoss ()
+  {
+  }
 
   /**
    * \brief Calculate the free-space loss in linear format

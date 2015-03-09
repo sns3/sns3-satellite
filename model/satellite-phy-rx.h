@@ -113,17 +113,17 @@ public:
    */
   double GetLosses ();
 
-  /** 
+  /**
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
   void SetBeamId (uint32_t beamId);
 
-   /**
-    * \brief Get beam id of this receiver
-    * \return uint32_t beam id
-    */
-   uint32_t GetBeamId () const;
+  /**
+   * \brief Get beam id of this receiver
+   * \return uint32_t beam id
+   */
+  uint32_t GetBeamId () const;
 
   /**
    * \param carrierConf Carrier configuration class
@@ -165,7 +165,7 @@ public:
    * Set the upper layer receive callback
    * \param cb receive callback funtion pointer
    */
-   void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
+  void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
 
   /**
    * Set C/N0 receiver
@@ -179,25 +179,24 @@ public:
    */
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb);
 
-   /**
-    * \brief Get MAC address of this PHY/MAC
-    * \return Mac48Address MAC address of this PHY
-    */
-   Mac48Address GetAddress () const;
+  /**
+   * \brief Get MAC address of this PHY/MAC
+   * \return Mac48Address MAC address of this PHY
+   */
+  Mac48Address GetAddress () const;
 
-   /**
-    * \brief Set the node info class
-    * \param nodeInfo Node information related to this SatPhyRx
-    */
-   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
+  /**
+   * \brief Set the node info class
+   * \param nodeInfo Node information related to this SatPhyRx
+   */
+  void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
-   /**
-    * \brief Begin frame end scheduling for processes utilizing frame length as interval
-    */
-   void BeginFrameEndScheduling ();
+  /**
+   * \brief Begin frame end scheduling for processes utilizing frame length as interval
+   */
+  void BeginFrameEndScheduling ();
 
 private:
-
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;
 

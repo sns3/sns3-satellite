@@ -46,56 +46,56 @@ SatUtPhy::GetTypeId (void)
     .SetParent<SatPhy> ()
     .AddConstructor<SatUtPhy> ()
     .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatUtPhy::GetPhyRx, &SatUtPhy::SetPhyRx),
-                    MakePointerChecker<SatPhyRx> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatUtPhy::GetPhyRx, &SatUtPhy::SetPhyRx),
+                   MakePointerChecker<SatPhyRx> ())
     .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatUtPhy::GetPhyTx, &SatUtPhy::SetPhyTx),
-                    MakePointerChecker<SatPhyTx> ())
-    .AddAttribute( "RxTemperatureDbk",
-                   "RX noise temperature in UT in dBK.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatUtPhy::GetPhyTx, &SatUtPhy::SetPhyTx),
+                   MakePointerChecker<SatPhyTx> ())
+    .AddAttribute ( "RxTemperatureDbk",
+                    "RX noise temperature in UT in dBK.",
                     DoubleValue (24.6),  // ~290K
                     MakeDoubleAccessor (&SatPhy::GetRxNoiseTemperatureDbk, &SatPhy::SetRxNoiseTemperatureDbk),
                     MakeDoubleChecker<double> ())
     .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX gain in dB",
-                    DoubleValue (44.60),
-                    MakeDoubleAccessor (&SatPhy::GetRxAntennaGainDb, &SatPhy::SetRxAntennaGainDb),
-                    MakeDoubleChecker<double_t> ())
+                   DoubleValue (44.60),
+                   MakeDoubleAccessor (&SatPhy::GetRxAntennaGainDb, &SatPhy::SetRxAntennaGainDb),
+                   MakeDoubleChecker<double_t> ())
     .AddAttribute ("TxMaxAntennaGainDb", "Maximum TX gain in dB",
-                    DoubleValue (45.20),
-                    MakeDoubleAccessor (&SatPhy::GetTxAntennaGainDb, &SatPhy::SetTxAntennaGainDb),
-                    MakeDoubleChecker<double_t> ())
+                   DoubleValue (45.20),
+                   MakeDoubleAccessor (&SatPhy::GetTxAntennaGainDb, &SatPhy::SetTxAntennaGainDb),
+                   MakeDoubleChecker<double_t> ())
     .AddAttribute ("TxMaxPowerDbw", "Maximum TX power in dB",
-                    DoubleValue (4.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxMaxPowerDbw, &SatPhy::SetTxMaxPowerDbw),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (4.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxMaxPowerDbw, &SatPhy::SetTxMaxPowerDbw),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxOutputLossDb", "TX Output loss in dB",
-                    DoubleValue (0.50),
-                    MakeDoubleAccessor (&SatPhy::GetTxOutputLossDb, &SatPhy::SetTxOutputLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (0.50),
+                   MakeDoubleAccessor (&SatPhy::GetTxOutputLossDb, &SatPhy::SetTxOutputLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxPointingLossDb", "TX Pointing loss in dB",
-                    DoubleValue (1.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxPointingLossDb, &SatPhy::SetTxPointingLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (1.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxPointingLossDb, &SatPhy::SetTxPointingLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxOboLossDb", "TX OBO loss in dB",
-                    DoubleValue (0.50),
-                    MakeDoubleAccessor (&SatPhy::GetTxOboLossDb, &SatPhy::SetTxOboLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (0.50),
+                   MakeDoubleAccessor (&SatPhy::GetTxOboLossDb, &SatPhy::SetTxOboLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxAntennaLossDb", "TX Antenna loss in dB",
-                    DoubleValue (1.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxAntennaLossDb, &SatPhy::SetTxAntennaLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (1.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxAntennaLossDb, &SatPhy::SetTxAntennaLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("RxAntennaLossDb", "RX Antenna loss in dB",
-                    DoubleValue (0.00),
-                    MakeDoubleAccessor (&SatPhy::GetRxAntennaLossDb, &SatPhy::SetRxAntennaLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (0.00),
+                   MakeDoubleAccessor (&SatPhy::GetRxAntennaLossDb, &SatPhy::SetRxAntennaLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("DefaultFadingValue", "Default value for fading",
-                    DoubleValue (1.00),
-                    MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
-                    MakeDoubleChecker<double_t> ())
-    .AddAttribute( "OtherSysIfCOverIDb",
-                   "Other system interference, C over I in dB.",
+                   DoubleValue (1.00),
+                   MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
+                   MakeDoubleChecker<double_t> ())
+    .AddAttribute ( "OtherSysIfCOverIDb",
+                    "Other system interference, C over I in dB.",
                     DoubleValue (24.7),
                     MakeDoubleAccessor (&SatUtPhy::m_otherSysInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
@@ -111,8 +111,8 @@ SatUtPhy::GetInstanceTypeId (void) const
 }
 
 SatUtPhy::SatUtPhy (void)
-:m_otherSysInterferenceCOverIDb (24.7),
- m_otherSysInterferenceCOverI (SatUtils::DbToLinear(m_otherSysInterferenceCOverIDb))
+  : m_otherSysInterferenceCOverIDb (24.7),
+    m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatUtPhy default constructor is not allowed to be used");
@@ -122,11 +122,11 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                     Ptr<SatSuperframeConf> superFrameConf)
-  : SatPhy(params)
+  : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
 
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
 
@@ -140,7 +140,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
 
   if (linkResults)
     {
-       carrierConf->SetLinkResults (linkResults);
+      carrierConf->SetLinkResults (linkResults);
     }
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatUtPhy::CalculateSinr, this));

@@ -36,10 +36,10 @@ using namespace ns3;
   s->Add ## id (SatStatsHelper::OUTPUT_SCATTER_PLOT);                         \
 
 #define CALL_SAT_STATS_BASIC_SET(id)                                          \
-  CALL_SAT_STATS_BASIC_ELEMENT(Global ## id)                                  \
-  CALL_SAT_STATS_BASIC_ELEMENT(PerGw ## id)                                   \
-  CALL_SAT_STATS_BASIC_ELEMENT(PerBeam ## id)                                 \
-  CALL_SAT_STATS_BASIC_ELEMENT(PerUt ## id)                                   \
+  CALL_SAT_STATS_BASIC_ELEMENT (Global ## id)                                  \
+  CALL_SAT_STATS_BASIC_ELEMENT (PerGw ## id)                                   \
+  CALL_SAT_STATS_BASIC_ELEMENT (PerBeam ## id)                                 \
+  CALL_SAT_STATS_BASIC_ELEMENT (PerUt ## id)                                   \
 
 
 #define CALL_SAT_STATS_DISTRIBUTION_ELEMENT(id)                               \
@@ -54,10 +54,10 @@ using namespace ns3;
   s->Add ## id (SatStatsHelper::OUTPUT_CDF_PLOT);                             \
 
 #define CALL_SAT_STATS_DISTRIBUTION_SET(id)                                   \
-  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(Global ## id)                           \
-  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(PerGw ## id)                            \
-  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(PerBeam ## id)                          \
-  CALL_SAT_STATS_DISTRIBUTION_ELEMENT(PerUt ## id)                            \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (Global ## id)                           \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (PerGw ## id)                            \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (PerBeam ## id)                          \
+  CALL_SAT_STATS_DISTRIBUTION_ELEMENT (PerUt ## id)                            \
 
 
 #define CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET(id)                          \
@@ -103,10 +103,10 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
-  cmd.AddValue("duration", "Simulation duration (in seconds)", duration);
-  cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue ("duration", "Simulation duration (in seconds)", duration);
+  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
   cmd.Parse (argc, argv);
 
   if ( scenario == "larger")
@@ -143,11 +143,11 @@ main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
-  helper->CreatePredefinedScenario(satScenario);
+  helper->CreatePredefinedScenario (satScenario);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   uint16_t port = 9;
   const std::string protocol = "ns3::UdpSocketFactory";
@@ -346,11 +346,11 @@ main (int argc, char *argv[])
   s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- Cbr-stats-example ---");
-  NS_LOG_INFO("  Scenario used: " << scenario);
-  NS_LOG_INFO("  PacketSize: " << packetSize);
-  NS_LOG_INFO("  Interval: " << interval);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- Cbr-stats-example ---");
+  NS_LOG_INFO ("  Scenario used: " << scenario);
+  NS_LOG_INFO ("  PacketSize: " << packetSize);
+  NS_LOG_INFO ("  Interval: " << interval);
+  NS_LOG_INFO ("  ");
 
   Simulator::Stop (Seconds (duration));
   Simulator::Run ();

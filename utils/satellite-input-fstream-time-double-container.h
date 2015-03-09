@@ -39,7 +39,6 @@ namespace ns3 {
 class SatInputFileStreamTimeDoubleContainer : public Object
 {
 public:
-
   /**
    * \brief NS-3 function for type id
    * \return type id
@@ -84,7 +83,6 @@ public:
   void DoDispose ();
 
 private:
-
   /**
    * \brief Function for resetting the variables
    */

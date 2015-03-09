@@ -89,7 +89,10 @@ public:
    *
    * \return  reference ellipsoid.
    */
-  ReferenceEllipsoid_t GetRefEllipsoid () { return m_refEllipsoid; }
+  ReferenceEllipsoid_t GetRefEllipsoid ()
+  {
+    return m_refEllipsoid;
+  }
 
   /**
    * Gets longitude value of coordinate.
@@ -157,14 +160,20 @@ private:
    * \param longtitude to check
    * \return bool true longitude valid, false invalid
    */
-  static inline bool IsValidLongtitude (double longtitude) {return (longtitude >= -180 && longtitude <= 180);}
+  static inline bool IsValidLongtitude (double longtitude)
+  {
+    return (longtitude >= -180 && longtitude <= 180);
+  }
   /**
    * Checks if latitude is in valid range
    *
    * \param latitude to check
    * \return bool true latitude valid, false invalid
    */
-  static inline bool IsValidLatitude (double latitude) {return (latitude >= -90 && latitude <= 90);}
+  static inline bool IsValidLatitude (double latitude)
+  {
+    return (latitude >= -90 && latitude <= 90);
+  }
   /**
    * Checks if altitude is in valid range
    *

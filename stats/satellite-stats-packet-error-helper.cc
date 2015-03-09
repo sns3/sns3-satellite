@@ -224,12 +224,12 @@ SatStatsPacketErrorHelper::DoInstall ()
     }
 
   switch (m_linkDirection)
-  {
+    {
     case SatEnums::LD_FORWARD:
       {
         // Connect to trace sources at UT nodes.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
             InstallProbeOnUt (*it);
           }
@@ -259,7 +259,7 @@ SatStatsPacketErrorHelper::DoInstall ()
     default:
       NS_FATAL_ERROR ("SatStatsPacketErrorHelper - Invalid link direction");
       break;
-  }
+    }
 
 } // end of `void DoInstall ();`
 
@@ -380,7 +380,7 @@ SatStatsPacketErrorHelper::InstallProbeOnGw (Ptr<Node> gwNode)
            itCarrier != carriers.End (); ++itCarrier)
         {
           const bool ret = itCarrier->second->TraceConnectWithoutContext (
-                             GetTraceSourceName (), callback);
+              GetTraceSourceName (), callback);
           if (ret)
             {
               NS_LOG_INFO (this << " successfully connected with node ID "

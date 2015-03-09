@@ -89,11 +89,11 @@ SatStatsCapacityRequestHelper::DoInstall ()
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
   NS_ASSERT (multiFileAggregator != 0);
   Callback<void, std::string, std::string> aggregatorSink
-      = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
+    = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
 
   // Setup probes.
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
       std::ostringstream context;
       switch (GetIdentifierType ())

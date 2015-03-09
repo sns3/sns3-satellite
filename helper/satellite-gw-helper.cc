@@ -56,49 +56,49 @@ NS_OBJECT_ENSURE_REGISTERED (SatGwHelper);
 TypeId
 SatGwHelper::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatGwHelper")
-      .SetParent<Object> ()
-      .AddConstructor<SatGwHelper> ()
-      .AddAttribute ("RtnLinkErrorModel",
-                     "Return link error model for",
-                      EnumValue (SatPhyRxCarrierConf::EM_AVI),
-                      MakeEnumAccessor (&SatGwHelper::m_errorModel),
-                      MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
-                                      SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
-                                      SatPhyRxCarrierConf::EM_AVI, "AVI"))
-      .AddAttribute ("DaRtnLinkInterferenceModel",
-                     "Return link interference model for dedicated access",
-                      EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
-                      MakeEnumAccessor (&SatGwHelper::m_daInterferenceModel),
-                      MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
-                                       SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                       SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute ("EnableChannelEstimationError",
-                     "Enable channel estimation error in return link receiver at GW.",
-                     BooleanValue (true),
-                     MakeBooleanAccessor (&SatGwHelper::m_enableChannelEstimationError),
-                     MakeBooleanChecker ())
-      .AddTraceSource ("Creation",
-                       "Creation traces",
-                       MakeTraceSourceAccessor (&SatGwHelper::m_creationTrace),
-                       "ns3::SatTypedefs::CreationCallback")
-    ;
-    return tid;
+  static TypeId tid = TypeId ("ns3::SatGwHelper")
+    .SetParent<Object> ()
+    .AddConstructor<SatGwHelper> ()
+    .AddAttribute ("RtnLinkErrorModel",
+                   "Return link error model for",
+                   EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                   MakeEnumAccessor (&SatGwHelper::m_errorModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
+    .AddAttribute ("DaRtnLinkInterferenceModel",
+                   "Return link interference model for dedicated access",
+                   EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
+                   MakeEnumAccessor (&SatGwHelper::m_daInterferenceModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::IF_TRACE, "Trace",
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+    .AddAttribute ("EnableChannelEstimationError",
+                   "Enable channel estimation error in return link receiver at GW.",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatGwHelper::m_enableChannelEstimationError),
+                   MakeBooleanChecker ())
+    .AddTraceSource ("Creation",
+                     "Creation traces",
+                     MakeTraceSourceAccessor (&SatGwHelper::m_creationTrace),
+                     "ns3::SatTypedefs::CreationCallback")
+  ;
+  return tid;
 }
 
 TypeId
 SatGwHelper::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatGwHelper::SatGwHelper ()
- : m_rtnLinkCarrierCount (0),
-   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-   m_symbolRate (0.0),
-   m_enableChannelEstimationError (false),
-   m_raSettings ()
+  : m_rtnLinkCarrierCount (0),
+    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_symbolRate (0.0),
+    m_enableChannelEstimationError (false),
+    m_raSettings ()
 {
   // this default constructor should be never called
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -111,17 +111,17 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
                           SatMac::ReserveCtrlMsgCallback reserveCb,
                           SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
- : m_carrierBandwidthConverter (carrierBandwidthConverter),
-   m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-   m_superframeSeq (seq),
-   m_readCtrlCb (readCb),
-   m_reserveCtrlCb (reserveCb),
-   m_sendCtrlCb (sendCb),
-   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-   m_symbolRate (0.0),
-   m_enableChannelEstimationError (false),
-   m_raSettings (randomAccessSettings)
+  : m_carrierBandwidthConverter (carrierBandwidthConverter),
+    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+    m_superframeSeq (seq),
+    m_readCtrlCb (readCb),
+    m_reserveCtrlCb (reserveCb),
+    m_sendCtrlCb (sendCb),
+    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_symbolRate (0.0),
+    m_enableChannelEstimationError (false),
+    m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 
@@ -163,7 +163,7 @@ SatGwHelper::GetBbFrameConf () const
   return m_bbFrameConf;
 }
 
-void 
+void
 SatGwHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
@@ -171,7 +171,7 @@ SatGwHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
   m_deviceFactory.Set (n1, v1);
 }
 
-void 
+void
 SatGwHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
@@ -187,7 +187,7 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
   Config::SetDefault ("ns3::SatGwPhy::" + n1, v1);
 }
 
-NetDeviceContainer 
+NetDeviceContainer
 SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
@@ -195,9 +195,9 @@ SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatCh
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-  {
-    devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc));
-  }
+    {
+      devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc));
+    }
 
   return devs;
 }
@@ -330,12 +330,12 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Destination = broadcast address
   // Flow id = by default 0
   Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
-  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID);
+  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
   gwEncap->SetQueue (queue);
-  llc->AddEncap (addr, Mac48Address::GetBroadcast(), SatEnums::CONTROL_FID, gwEncap);
+  llc->AddEncap (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID, gwEncap);
   llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
 
-  phy->Initialize();
+  phy->Initialize ();
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), addr);
@@ -357,7 +357,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   fdwLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // set scheduler to Mac
-  mac->SetAttribute("Scheduler", PointerValue (fdwLinkScheduler));
+  mac->SetAttribute ("Scheduler", PointerValue (fdwLinkScheduler));
 
   mac->StartPeriodicTransmissions ();
 
@@ -365,7 +365,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 }
 
 void
-SatGwHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+SatGwHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
   NS_LOG_FUNCTION (this );
 

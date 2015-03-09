@@ -33,21 +33,21 @@ namespace ns3 {
 // helper classes defined inside SatFrameAllocator
 
 SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo ()
- : m_ctrlSlotPresent (false),
-   m_craSymbols (0.0),
-   m_minRbdcSymbols (0.0),
-   m_rbdcSymbols (0.0),
-   m_vbdcSymbols (0.0)
+  : m_ctrlSlotPresent (false),
+    m_craSymbols (0.0),
+    m_minRbdcSymbols (0.0),
+    m_rbdcSymbols (0.0),
+    m_vbdcSymbols (0.0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo (uint8_t countOfRcs)
- : m_ctrlSlotPresent (false),
-   m_craSymbols (0.0),
-   m_minRbdcSymbols (0.0),
-   m_rbdcSymbols (0.0),
-   m_vbdcSymbols (0.0)
+  : m_ctrlSlotPresent (false),
+    m_craSymbols (0.0),
+    m_minRbdcSymbols (0.0),
+    m_rbdcSymbols (0.0),
+    m_vbdcSymbols (0.0)
 {
   NS_LOG_FUNCTION (this << (uint32_t) countOfRcs);
 
@@ -125,8 +125,9 @@ SatFrameAllocator::SatFrameAllocInfo::GetTotalSymbols ()
   return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);
 }
 
-SatFrameAllocator::CcReqCompare::CcReqCompare(const UtAllocContainer_t& utAllocContainer, CcReqCompare::CcReqType_t ccReqType)
-  : m_utAllocContainer (utAllocContainer), m_ccReqType (ccReqType)
+SatFrameAllocator::CcReqCompare::CcReqCompare (const UtAllocContainer_t& utAllocContainer, CcReqCompare::CcReqType_t ccReqType)
+  : m_utAllocContainer (utAllocContainer),
+    m_ccReqType (ccReqType)
 {
 
 }
@@ -137,26 +138,26 @@ SatFrameAllocator::CcReqCompare::operator() (RcAllocItem_t rcAlloc1, RcAllocItem
   bool result = false;
 
   switch (m_ccReqType)
-  {
+    {
     case CC_TYPE_MIN_RBDC:
-      result = ( m_utAllocContainer.at(rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_minRbdcSymbols <
-                 m_utAllocContainer.at(rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_minRbdcSymbols );
+      result = ( m_utAllocContainer.at (rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_minRbdcSymbols <
+                 m_utAllocContainer.at (rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_minRbdcSymbols );
       break;
 
     case CC_TYPE_RBDC:
-      result = ( m_utAllocContainer.at(rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_rbdcSymbols <
-                 m_utAllocContainer.at(rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_rbdcSymbols );
+      result = ( m_utAllocContainer.at (rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_rbdcSymbols <
+                 m_utAllocContainer.at (rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_rbdcSymbols );
       break;
 
     case CC_TYPE_VBDC:
-      result = ( m_utAllocContainer.at(rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_vbdcSymbols <
-                 m_utAllocContainer.at(rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_vbdcSymbols );
+      result = ( m_utAllocContainer.at (rcAlloc1.first).m_request.m_allocInfoPerRc[rcAlloc1.second].m_vbdcSymbols <
+                 m_utAllocContainer.at (rcAlloc2.first).m_request.m_allocInfoPerRc[rcAlloc2.second].m_vbdcSymbols );
       break;
 
     default:
       NS_FATAL_ERROR ("Invalid CC type!!!");
       break;
-  }
+    }
 
   return result;
 }
@@ -164,17 +165,17 @@ SatFrameAllocator::CcReqCompare::operator() (RcAllocItem_t rcAlloc1, RcAllocItem
 // SatFrameAllocator
 
 SatFrameAllocator::SatFrameAllocator ()
-: m_allocationDenied (true),
-  m_totalSymbolsInFrame (0.0),
-  m_availableSymbolsInFrame (0.0),
-  m_preAllocatedCraSymbols (0.0),
-  m_preAllocatedMinRdbcSymbols (0.0),
-  m_preAllocatedRdbcSymbols (0.0),
-  m_preAllocatedVdbcSymbols (0.0),
-  m_maxSymbolsPerCarrier (0),
-  m_configType (SatSuperframeConf::CONFIG_TYPE_0),
-  m_frameId (0),
-  m_rcBasedAllocation (false)
+  : m_allocationDenied (true),
+    m_totalSymbolsInFrame (0.0),
+    m_availableSymbolsInFrame (0.0),
+    m_preAllocatedCraSymbols (0.0),
+    m_preAllocatedMinRdbcSymbols (0.0),
+    m_preAllocatedRdbcSymbols (0.0),
+    m_preAllocatedVdbcSymbols (0.0),
+    m_maxSymbolsPerCarrier (0),
+    m_configType (SatSuperframeConf::CONFIG_TYPE_0),
+    m_frameId (0),
+    m_rcBasedAllocation (false)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -194,57 +195,57 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frame
 
   switch ( m_configType )
     {
-      case SatSuperframeConf::CONFIG_TYPE_0:
-        {
-          m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
-          m_mostRobustWaveform = m_waveformConf->GetWaveform (m_waveformConf->GetDefaultWaveformId ());
-          break;
-        }
-
-      case SatSuperframeConf::CONFIG_TYPE_1:
-        {
-          m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
-
-          uint32_t mostRobustWaveformId = 0;
-
-          if ( m_waveformConf->GetMostRobustWaveformId (mostRobustWaveformId, m_waveformConf->GetDefaultBurstLength ()) )
-           {
-             m_mostRobustWaveform = m_waveformConf->GetWaveform (mostRobustWaveformId);
-           }
-          else
-           {
-             NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
-           }
-          break;
-        }
-
-      case SatSuperframeConf::CONFIG_TYPE_2:
-        {
-          if ( frameConf->GetWaveformConf ()->IsAcmEnabled () )
-            {
-              m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
-            }
-          else
-            {
-              m_burstLenghts.push_back( m_waveformConf->GetDefaultBurstLength ());
-            }
-
-          uint32_t mostRobustWaveformId = 0;
-
-          if ( m_waveformConf->GetMostRobustWaveformId (mostRobustWaveformId, SatWaveformConf::SHORT_BURST_LENGTH) )
-            {
-              m_mostRobustWaveform = m_waveformConf->GetWaveform (mostRobustWaveformId);
-            }
-          else
-            {
-              NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
-            }
-          break;
-        }
-
-      default:
-        NS_FATAL_ERROR ("Not supported configuration type");
+    case SatSuperframeConf::CONFIG_TYPE_0:
+      {
+        m_burstLenghts.push_back ( m_waveformConf->GetDefaultBurstLength ());
+        m_mostRobustWaveform = m_waveformConf->GetWaveform (m_waveformConf->GetDefaultWaveformId ());
         break;
+      }
+
+    case SatSuperframeConf::CONFIG_TYPE_1:
+      {
+        m_burstLenghts.push_back ( m_waveformConf->GetDefaultBurstLength ());
+
+        uint32_t mostRobustWaveformId = 0;
+
+        if ( m_waveformConf->GetMostRobustWaveformId (mostRobustWaveformId, m_waveformConf->GetDefaultBurstLength ()) )
+          {
+            m_mostRobustWaveform = m_waveformConf->GetWaveform (mostRobustWaveformId);
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
+          }
+        break;
+      }
+
+    case SatSuperframeConf::CONFIG_TYPE_2:
+      {
+        if ( frameConf->GetWaveformConf ()->IsAcmEnabled () )
+          {
+            m_burstLenghts = frameConf->GetWaveformConf ()->GetSupportedBurstLengths ();
+          }
+        else
+          {
+            m_burstLenghts.push_back ( m_waveformConf->GetDefaultBurstLength ());
+          }
+
+        uint32_t mostRobustWaveformId = 0;
+
+        if ( m_waveformConf->GetMostRobustWaveformId (mostRobustWaveformId, SatWaveformConf::SHORT_BURST_LENGTH) )
+          {
+            m_mostRobustWaveform = m_waveformConf->GetWaveform (mostRobustWaveformId);
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Most robust waveform not found, error in waveform configuration ???");
+          }
+        break;
+      }
+
+    default:
+      NS_FATAL_ERROR ("Not supported configuration type");
+      break;
     }
 
   Reset ();
@@ -275,13 +276,13 @@ SatFrameAllocator::GetCcLoad (CcLevel_t ccLevel)
   double load = NAN;
 
   switch (ccLevel)
-  {
+    {
     case CC_LEVEL_CRA:
       load = m_preAllocatedCraSymbols - m_totalSymbolsInFrame;
       break;
 
     case CC_LEVEL_CRA_MIN_RBDC:
-      load = (m_preAllocatedCraSymbols + m_preAllocatedMinRdbcSymbols) - m_totalSymbolsInFrame ;
+      load = (m_preAllocatedCraSymbols + m_preAllocatedMinRdbcSymbols) - m_totalSymbolsInFrame;
       break;
 
     case CC_LEVEL_CRA_RBDC:
@@ -295,7 +296,7 @@ SatFrameAllocator::GetCcLoad (CcLevel_t ccLevel)
     default:
       NS_FATAL_ERROR ("Not supported CC level!!!");
       break;
-  }
+    }
 
   return load;
 }
@@ -309,22 +310,22 @@ SatFrameAllocator::GetBestWaveform (double cno, uint32_t & waveFormId) const
 
   switch ( m_configType )
     {
-      case SatSuperframeConf::CONFIG_TYPE_0:
-        cnoSupported = true;
-        waveFormId = m_waveformConf->GetDefaultWaveformId ();
-        break;
+    case SatSuperframeConf::CONFIG_TYPE_0:
+      cnoSupported = true;
+      waveFormId = m_waveformConf->GetDefaultWaveformId ();
+      break;
 
-      case SatSuperframeConf::CONFIG_TYPE_1:
-        cnoSupported = m_waveformConf->GetBestWaveformId ( cno, m_frameConf->GetBtuConf ()->GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLength ());
-        break;
+    case SatSuperframeConf::CONFIG_TYPE_1:
+      cnoSupported = m_waveformConf->GetBestWaveformId ( cno, m_frameConf->GetBtuConf ()->GetSymbolRateInBauds (), waveFormId, m_waveformConf->GetDefaultBurstLength ());
+      break;
 
-      case SatSuperframeConf::CONFIG_TYPE_2:
-        cnoSupported = m_waveformConf->GetBestWaveformId ( cno, m_frameConf->GetBtuConf ()->GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH);
-        break;
+    case SatSuperframeConf::CONFIG_TYPE_2:
+      cnoSupported = m_waveformConf->GetBestWaveformId ( cno, m_frameConf->GetBtuConf ()->GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH);
+      break;
 
-      default:
-        NS_FATAL_ERROR ("Not supported configuration type");
-        break;
+    default:
+      NS_FATAL_ERROR ("Not supported configuration type");
+      break;
     }
 
   return cnoSupported;
@@ -349,8 +350,8 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
 
       switch (ccLevel)
         {
-          case CC_LEVEL_CRA:
-            {
+        case CC_LEVEL_CRA:
+          {
             m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
 
             if ( (reqInSymbols.m_craSymbols) <= m_maxSymbolsPerCarrier )
@@ -374,73 +375,73 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
               }
 
             allocated = true;
-            }
-            break;
+          }
+          break;
 
-          case CC_LEVEL_CRA_MIN_RBDC:
-            {
-              double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedMinRdbcSymbols;
-              double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
+        case CC_LEVEL_CRA_MIN_RBDC:
+          {
+            double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedMinRdbcSymbols;
+            double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
 
-              if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_minRbdcSymbols))
-                {
-                  m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
-                  m_preAllocatedMinRdbcSymbols += reqInSymbols.m_minRbdcSymbols;
+            if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_minRbdcSymbols))
+              {
+                m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
+                m_preAllocatedMinRdbcSymbols += reqInSymbols.m_minRbdcSymbols;
 
-                  double symbolsLeftInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_minRbdcSymbols;
+                double symbolsLeftInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_minRbdcSymbols;
 
-                  m_preAllocatedRdbcSymbols += std::min<double> (reqInSymbols.m_rbdcSymbols, symbolsLeftInCarrier + reqInSymbols.m_minRbdcSymbols);
+                m_preAllocatedRdbcSymbols += std::min<double> (reqInSymbols.m_rbdcSymbols, symbolsLeftInCarrier + reqInSymbols.m_minRbdcSymbols);
 
-                  if (symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
-                    {
-                      double vbdcSymbolsInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_rbdcSymbols;
-                      m_preAllocatedVdbcSymbols += std::min<double> (reqInSymbols.m_vbdcSymbols, vbdcSymbolsInCarrier);
-                    }
+                if (symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
+                  {
+                    double vbdcSymbolsInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_rbdcSymbols;
+                    m_preAllocatedVdbcSymbols += std::min<double> (reqInSymbols.m_vbdcSymbols, vbdcSymbolsInCarrier);
+                  }
 
-                  allocated = true;
-                }
-            }
-            break;
+                allocated = true;
+              }
+          }
+          break;
 
-          case CC_LEVEL_CRA_RBDC:
-            {
-              double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols;
-              double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
+        case CC_LEVEL_CRA_RBDC:
+          {
+            double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols;
+            double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
 
-              if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
-                {
-                  double symbolsLeftInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_rbdcSymbols;
+            if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols))
+              {
+                double symbolsLeftInCarrier = m_maxSymbolsPerCarrier - reqInSymbols.m_craSymbols - reqInSymbols.m_rbdcSymbols;
 
-                  m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
-                  m_preAllocatedMinRdbcSymbols += reqInSymbols.m_minRbdcSymbols;
-                  m_preAllocatedRdbcSymbols += reqInSymbols.m_rbdcSymbols;
-                  m_preAllocatedVdbcSymbols += std::min<double> (reqInSymbols.m_vbdcSymbols, symbolsLeftInCarrier);
+                m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
+                m_preAllocatedMinRdbcSymbols += reqInSymbols.m_minRbdcSymbols;
+                m_preAllocatedRdbcSymbols += reqInSymbols.m_rbdcSymbols;
+                m_preAllocatedVdbcSymbols += std::min<double> (reqInSymbols.m_vbdcSymbols, symbolsLeftInCarrier);
 
-                  allocated = true;
-                }
-            }
-            break;
+                allocated = true;
+              }
+          }
+          break;
 
-          case CC_LEVEL_CRA_RBDC_VBDC:
-            {
-              double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols- m_preAllocatedVdbcSymbols;
-              double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
+        case CC_LEVEL_CRA_RBDC_VBDC:
+          {
+            double symbolsLeftInFrame = m_totalSymbolsInFrame - m_preAllocatedCraSymbols - m_preAllocatedRdbcSymbols - m_preAllocatedVdbcSymbols;
+            double symbolsToUse = std::min<double> (symbolsLeftInFrame, m_maxSymbolsPerCarrier);
 
-              if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols + reqInSymbols.m_vbdcSymbols))
-                {
-                  m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
-                  m_preAllocatedMinRdbcSymbols += reqInSymbols.m_minRbdcSymbols;
-                  m_preAllocatedRdbcSymbols += reqInSymbols.m_rbdcSymbols;
-                  m_preAllocatedVdbcSymbols += reqInSymbols.m_vbdcSymbols;
+            if ( symbolsToUse >= (reqInSymbols.m_craSymbols + reqInSymbols.m_rbdcSymbols + reqInSymbols.m_vbdcSymbols))
+              {
+                m_preAllocatedCraSymbols += reqInSymbols.m_craSymbols;
+                m_preAllocatedMinRdbcSymbols += reqInSymbols.m_minRbdcSymbols;
+                m_preAllocatedRdbcSymbols += reqInSymbols.m_rbdcSymbols;
+                m_preAllocatedVdbcSymbols += reqInSymbols.m_vbdcSymbols;
 
-                  allocated = true;
-                }
-            }
-            break;
+                allocated = true;
+              }
+          }
+          break;
 
-          default:
-            NS_FATAL_ERROR ("Not supported CC level!!!");
-            break;
+        default:
+          NS_FATAL_ERROR ("Not supported CC level!!!");
+          break;
         }
 
       if ( allocated )
@@ -448,7 +449,7 @@ SatFrameAllocator::Allocate (CcLevel_t ccLevel, SatFrameAllocReq * allocReq, uin
           // update request according to carrier limit and store allocation request
           UpdateAndStoreAllocReq (allocReq->m_address, allocReq->m_cno, reqInSymbols);
         }
-      }
+    }
 
   return allocated;
 }
@@ -530,8 +531,8 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
 
           // try to first create Control slot if present in request and is not already created
           // otherwise create TRC slot
-          if ( (currentRcIndex == rcIndices.begin ()) && m_utAllocs[*it].m_request.m_ctrlSlotPresent &&
-               (m_utAllocs[*it].m_allocation.m_ctrlSlotPresent == false ))
+          if ( (currentRcIndex == rcIndices.begin ()) && m_utAllocs[*it].m_request.m_ctrlSlotPresent
+               && (m_utAllocs[*it].m_allocation.m_ctrlSlotPresent == false ))
             {
               timeSlot = CreateCtrlTimeSlot (*currentCarrier, utSymbolsToUse, carrierSymbolsToUse, utSymbolsLeft, rcSymbolsLeft, rcBasedAllocationEnabled );
 
@@ -581,7 +582,7 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
               Ptr<SatWaveform> waveform = m_waveformConf->GetWaveform (timeSlot->GetWaveFormId ());
 
               UtAllocInfoContainer_t::iterator utAlloc = GetUtAllocItem (utAllocContainer, *it);
-              utAlloc->second.first.at(*currentRcIndex) += waveform->GetPayloadInBytes ();
+              utAlloc->second.first.at (*currentRcIndex) += waveform->GetPayloadInBytes ();
               utAlloc->second.second |= m_utAllocs[*it].m_allocation.m_ctrlSlotPresent;
 
               symbolsAllocated += waveform->GetBurstLengthInSymbols ();
@@ -664,8 +665,8 @@ void SatFrameAllocator::ShareSymbols (bool fcaEnabled)
               double symbolsToAdd = std::min<double> (freeUtSymbols, (vbdcSymbolsLeft / rcAllocsLeft));
 
               // only share symbols to RCs requested RBDC or VBDC
-              if ( ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_rbdcSymbols > 0 ) ||
-                   ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_vbdcSymbols > 0 ) )
+              if ( ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_rbdcSymbols > 0 )
+                   || ( m_utAllocs.at (it->first).m_request.m_allocInfoPerRc[it->second].m_vbdcSymbols > 0 ) )
                 {
                   m_utAllocs.at (it->first).m_allocation.m_allocInfoPerRc[it->second].m_vbdcSymbols += symbolsToAdd;
                   m_utAllocs.at (it->first).m_allocation.m_vbdcSymbols += symbolsToAdd;
@@ -825,7 +826,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
   else if (rcSymbolsLeft > 0)
     {
       switch (m_configType)
-      {
+        {
         case SatSuperframeConf::CONFIG_TYPE_0:
           {
             uint16_t index = (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / timeSlotSymbols;
@@ -836,7 +837,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
         case SatSuperframeConf::CONFIG_TYPE_1:
         case SatSuperframeConf::CONFIG_TYPE_2:
           {
-            Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+            Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
             timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_TRC);
           }
           break;
@@ -845,7 +846,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
         default:
           NS_FATAL_ERROR ("Not supported configuration type!!!");
           break;
-      }
+        }
 
       if (timeSlotConf)
         {
@@ -881,7 +882,7 @@ SatFrameAllocator::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToU
 
   if ( timeSlotSymbols <= symbolsToUse )
     {
-      Time startTime = Seconds( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+      Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
       timeSlotConf = Create<SatTimeSlotConf> (startTime, m_mostRobustWaveform->GetWaveformId (), carrierId, SatTimeSlotConf::SLOT_TYPE_C);
 
       carrierSymbolsToUse -= timeSlotSymbols;
@@ -910,7 +911,7 @@ SatFrameAllocator::GetOptimalBurtsLengthInSymbols (int64_t symbolsToUse, int64_t
   uint32_t burstLength = 0;
 
   for (SatWaveformConf::BurstLengthContainer_t::const_iterator it = m_burstLenghts.begin (); it != m_burstLenghts.end (); it++)
-  {
+    {
       uint32_t newLength = *it;
       uint32_t selectedWaveformId = 0;
 
@@ -929,22 +930,22 @@ SatFrameAllocator::GetOptimalBurtsLengthInSymbols (int64_t symbolsToUse, int64_t
         }
 
       if ( symbolsToUse >= newLength )
-      {
-        if ( burstLength < symbolsLeft)
-          {
-            if ( burstLength < newLength )
-              {
-                burstLength = newLength;
-                waveformId = selectedWaveformId;
-              }
-          }
-        else if ( (newLength - symbolsLeft) < (burstLength - symbolsLeft))
-          {
-            burstLength = newLength;
-            waveformId = selectedWaveformId;
-          }
-      }
-  }
+        {
+          if ( burstLength < symbolsLeft)
+            {
+              if ( burstLength < newLength )
+                {
+                  burstLength = newLength;
+                  waveformId = selectedWaveformId;
+                }
+            }
+          else if ( (newLength - symbolsLeft) < (burstLength - symbolsLeft))
+            {
+              burstLength = newLength;
+              waveformId = selectedWaveformId;
+            }
+        }
+    }
 
   return burstLength;
 }
@@ -958,7 +959,7 @@ SatFrameAllocator::AcceptRequests (CcLevel_t ccLevel)
     {
       // accept first UT level total requests by updating allocation counters
       switch (ccLevel)
-      {
+        {
         case CC_LEVEL_CRA:
           it->second.m_allocation.m_craSymbols = it->second.m_request.m_craSymbols;
           it->second.m_allocation.m_minRbdcSymbols = 0.0;
@@ -990,13 +991,13 @@ SatFrameAllocator::AcceptRequests (CcLevel_t ccLevel)
         default:
           NS_FATAL_ERROR ("Not supported CC level!!!");
           break;
-      }
+        }
 
       // accept first RC specific requests by updating allocation counters
       for ( uint32_t i = 0; i < it->second.m_request.m_allocInfoPerRc.size (); i++ )
         {
           switch (ccLevel)
-          {
+            {
             case CC_LEVEL_CRA:
               it->second.m_allocation.m_allocInfoPerRc[i].m_craSymbols = it->second.m_request.m_allocInfoPerRc[i].m_craSymbols;
               it->second.m_allocation.m_allocInfoPerRc[i].m_minRbdcSymbols = 0.0;
@@ -1028,7 +1029,7 @@ SatFrameAllocator::AcceptRequests (CcLevel_t ccLevel)
             default:
               NS_FATAL_ERROR ("Not supported CC level!!!");
               break;
-          }
+            }
         }
     }
 }

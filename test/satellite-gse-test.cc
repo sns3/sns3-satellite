@@ -92,10 +92,10 @@ SatGseTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-gse", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-gse", "", true);
 
-  Mac48Address source = Mac48Address::Allocate();
-  Mac48Address dest = Mac48Address::Allocate();
+  Mac48Address source = Mac48Address::Allocate ();
+  Mac48Address dest = Mac48Address::Allocate ();
 
   uint8_t flowId (0);
   Ptr<SatQueue> queue = CreateObject<SatQueue> (flowId);
@@ -147,7 +147,7 @@ SatGseTestCase::DoRun (void)
   /**
    * Test that the amount of sent packets is the same as the amount of received packets.
    */
-  NS_TEST_ASSERT_MSG_EQ( m_sentPacketSizes.size(), m_rcvdPacketSizes.size(), "All sent packets are not received");
+  NS_TEST_ASSERT_MSG_EQ ( m_sentPacketSizes.size (), m_rcvdPacketSizes.size (), "All sent packets are not received");
 
   Simulator::Destroy ();
 
@@ -164,7 +164,7 @@ void SatGseTestCase::Receive (Ptr<Packet> p, Mac48Address source, Mac48Address d
    * Test the sent packet size is the same as the received packet size. This tests the
    * encapsulation, fragmentation and packing functionality as well as reassembly.
    */
-  NS_TEST_ASSERT_MSG_EQ( m_sentPacketSizes[numRcvdPackets-1], m_rcvdPacketSizes[numRcvdPackets-1], "Wrong size packet received");
+  NS_TEST_ASSERT_MSG_EQ ( m_sentPacketSizes[numRcvdPackets - 1], m_rcvdPacketSizes[numRcvdPackets - 1], "Wrong size packet received");
 }
 
 /**

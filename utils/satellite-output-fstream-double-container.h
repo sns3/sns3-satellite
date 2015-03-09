@@ -38,7 +38,6 @@ namespace ns3 {
 class SatOutputFileStreamDoubleContainer : public Object
 {
 public:
-
   typedef enum
   {
     RAW,
@@ -102,7 +101,6 @@ public:
                            Gnuplot2dDataset::Style style);
 
 private:
-
   /**
    * \brief Function for resetting the variables
    */

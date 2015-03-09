@@ -63,7 +63,6 @@ public:
   virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;
 
 private:
-
 };
 
 } // namespace ns3

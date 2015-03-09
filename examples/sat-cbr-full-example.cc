@@ -54,17 +54,17 @@ main (int argc, char *argv[])
   std::string interval ("1s");
   double simLength (10.0);
 
-  Time appStartTime = Seconds(0.001);
+  Time appStartTime = Seconds (0.001);
 
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
-  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
-  cmd.AddValue("simLength", "Simulation length in seconds", simLength);
+  cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue ("simLength", "Simulation length in seconds", simLength);
   cmd.Parse (argc, argv);
 
   /// Set simulation output details
@@ -72,13 +72,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue(utsPerBeam));
-  Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue(endUsersPerUt));
+  Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (utsPerBeam));
+  Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (endUsersPerUt));
 
   // Configure a static error probability
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_CONSTANT);
   double errorRate (0.2);
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue(errorRate));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (errorRate));
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
@@ -102,8 +102,8 @@ main (int argc, char *argv[])
   uint16_t port = 9; // Discard port (RFC 863)
 
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute("Interval", StringValue (interval));
-  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
+  cbrHelper.SetAttribute ("Interval", StringValue (interval));
+  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
 
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
@@ -118,16 +118,16 @@ main (int argc, char *argv[])
   // Cbr and Sink applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
 
-      gwApps.Add(cbrHelper.Install (gwUsers.Get (4)));
-      utApps.Add(sinkHelper.Install (utUsers.Get (i)));
+      gwApps.Add (cbrHelper.Install (gwUsers.Get (4)));
+      utApps.Add (sinkHelper.Install (utUsers.Get (i)));
 
       cbrStartDelay += Seconds (0.001);
 
-      gwApps.Get(i)->SetStartTime (cbrStartDelay);
-      gwApps.Get(i)->SetStopTime (Seconds (simLength));
+      gwApps.Get (i)->SetStartTime (cbrStartDelay);
+      gwApps.Get (i)->SetStopTime (Seconds (simLength));
     }
 
   // Add the created applications to CbrKpiHelper
@@ -138,13 +138,13 @@ main (int argc, char *argv[])
   utApps.Start (appStartTime);
   utApps.Stop (Seconds (simLength));
 
-  NS_LOG_INFO("--- sat-cbr-full-example ---");
-  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
-  NS_LOG_INFO("  Packet sending interval: " << interval);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-cbr-full-example ---");
+  NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO ("  Packet sending interval: " << interval);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   Simulator::Stop (Seconds (simLength));
   Simulator::Run ();

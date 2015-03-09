@@ -41,7 +41,7 @@ namespace ns3 {
 
 
 KpiHelper::KpiHelper (KpiHelper::KpiMode_t mode)
-:m_mode (mode)
+  : m_mode (mode)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -54,13 +54,13 @@ KpiHelper::~KpiHelper ()
 void
 KpiHelper::AddSender (ApplicationContainer apps   )
 {
-  NS_ASSERT(true);
+  NS_ASSERT (true);
 }
 
 void
 KpiHelper::AddServer (Ptr<Application> app)
 {
-  NS_ASSERT(true);
+  NS_ASSERT (true);
 }
 
 void
@@ -80,7 +80,7 @@ KpiHelper::AddSink (Ptr<Application> app)
 {
   NS_LOG_FUNCTION (this << app);
 
-  Ptr<PacketSink> sink = DynamicCast<PacketSink>(app);
+  Ptr<PacketSink> sink = DynamicCast<PacketSink> (app);
   Ipv4Address address;
 
   // Return link sink
@@ -127,7 +127,7 @@ KpiHelper::ConfigureAsServer (Ptr<Application> app)
   else
     {
       std::vector<Ipv4Address>::const_iterator cit =
-          std::find(m_serverAddresses.begin (), m_serverAddresses.end (), serverAddr);
+        std::find (m_serverAddresses.begin (), m_serverAddresses.end (), serverAddr);
 
       // If the server address was not found
       if (cit == m_serverAddresses.end ())
@@ -197,7 +197,7 @@ KpiHelper::Print ()
       if (m_mode == KPI_FWD)
         {
           std::vector<Ipv4Address>::const_iterator cit =
-              std::find(m_serverAddresses.begin (), m_serverAddresses.end (), t.sourceAddress);
+            std::find (m_serverAddresses.begin (), m_serverAddresses.end (), t.sourceAddress);
 
           if (cit != m_serverAddresses.end ()) // only DL direction is considered
             {
@@ -209,7 +209,7 @@ KpiHelper::Print ()
       else if (m_mode == KPI_RTN)
         {
           std::vector<Ipv4Address>::const_iterator cit =
-              std::find(m_serverAddresses.begin (), m_serverAddresses.end (), t.destinationAddress);
+            std::find (m_serverAddresses.begin (), m_serverAddresses.end (), t.destinationAddress);
 
           if (cit != m_serverAddresses.end ()) // only DL direction is considered
             {
@@ -339,7 +339,7 @@ KpiHelper::RxCallback (std::string context, Ptr<const Packet> packet, const Addr
   // found we use the "from" address to identify the transmitter.
   if (m_clientCounters.find (address) == m_clientCounters.end ())
     {
-      address = InetSocketAddress::ConvertFrom(from).GetIpv4 ();
+      address = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
 
       // If the context is not found
       if (m_clientCounters.find (address) == m_clientCounters.end ())

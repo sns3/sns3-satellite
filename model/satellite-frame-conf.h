@@ -40,7 +40,6 @@ namespace ns3 {
 class SatBtuConf : public SimpleRefCount<SatBtuConf>
 {
 public:
-
   /**
    * Default constructor for SatBtuConf
    */
@@ -65,28 +64,40 @@ public:
    *
    * \return The bandwidth of BTU in hertz.
    */
-  inline double GetAllocatedBandwidthInHz () const { return m_allocatedBandwidthInHz; }
+  inline double GetAllocatedBandwidthInHz () const
+  {
+    return m_allocatedBandwidthInHz;
+  }
 
   /**
    * Get occupied bandwidth of BTU.
    *
    * \return The occupied bandwidth of BTU in hertz.
    */
-  inline double GetOccupiedBandwidthInHz () const { return m_occupiedBandwidthInHz; }
+  inline double GetOccupiedBandwidthInHz () const
+  {
+    return m_occupiedBandwidthInHz;
+  }
 
   /**
    * Get occupied bandwidth of BTU.
    *
    * \return The occupied bandwidth of BTU in hertz.
    */
-  inline double GetEffectiveBandwidthInHz () const { return m_effectiveBandwidthInHz; }
+  inline double GetEffectiveBandwidthInHz () const
+  {
+    return m_effectiveBandwidthInHz;
+  }
 
   /**
    * Get symbol rate of BTU.
    *
    * \return The symbol rate of BTU in bauds.
    */
-  inline double GetSymbolRateInBauds () const { return GetEffectiveBandwidthInHz ();}
+  inline double GetSymbolRateInBauds () const
+  {
+    return GetEffectiveBandwidthInHz ();
+  }
 
 private:
   double m_allocatedBandwidthInHz;
@@ -103,15 +114,14 @@ private:
 class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
 {
 public:
-
   /**
    * Types for time slot.
    */
   typedef enum
   {
     SLOT_TYPE_C, //!< Control slot
-    SLOT_TYPE_TR,//!< Traffic slot
-    SLOT_TYPE_TRC//!< Control or traffic slot
+    SLOT_TYPE_TR, //!< Traffic slot
+    SLOT_TYPE_TRC //!< Control or traffic slot
 
   } SatTimeSlotType_t;
 
@@ -140,49 +150,70 @@ public:
    *
    * \return The start time of time slot.
    */
-  inline Time GetStartTime () const { return m_startTime; }
+  inline Time GetStartTime () const
+  {
+    return m_startTime;
+  }
 
   /**
    * Get wave form id of time slot.
    *
    * \return The wave form id of time slot.
    */
-  inline uint32_t GetWaveFormId () const { return m_waveFormId; }
+  inline uint32_t GetWaveFormId () const
+  {
+    return m_waveFormId;
+  }
 
   /**
    * Get carrier id of time slot (inside frame).
    *
    * \return The carrier id of time slot.
    */
-  inline uint16_t GetCarrierId () const { return m_frameCarrierId; }
+  inline uint16_t GetCarrierId () const
+  {
+    return m_frameCarrierId;
+  }
 
   /**
    * Set RC index of the time slot.
    *
    * \param RC index of the time slot.
    */
-  inline void SetRcIndex (uint8_t rcIndex) { m_rcIndex = rcIndex; }
+  inline void SetRcIndex (uint8_t rcIndex)
+  {
+    m_rcIndex = rcIndex;
+  }
 
   /**
    * Get RC index of the time slot.
    *
    * \return RC index of the time slot.
    */
-  inline uint8_t GetRcIndex () { return m_rcIndex; }
+  inline uint8_t GetRcIndex ()
+  {
+    return m_rcIndex;
+  }
 
   /**
    * Get time slot type.
    *
    * \return Type of the time slot.
    */
-  inline SatTimeSlotConf::SatTimeSlotType_t GetSlotType () const { return m_slotType; }
+  inline SatTimeSlotConf::SatTimeSlotType_t GetSlotType () const
+  {
+    return m_slotType;
+  }
 
   /**
    * Set time slot type.
    *
    * \param Type of the time slot to set.
    */
-  inline void SetSlotType (SatTimeSlotConf::SatTimeSlotType_t slotType) { m_slotType = slotType; }
+  inline void SetSlotType (SatTimeSlotConf::SatTimeSlotType_t slotType)
+  {
+    m_slotType = slotType;
+  }
 
 private:
   Time     m_startTime;
@@ -251,28 +282,40 @@ public:
    *
    * \return The bandwidth of frame in Hertz.
    */
-  inline double GetBandwidthHz () const { return m_bandwidthHz; }
+  inline double GetBandwidthHz () const
+  {
+    return m_bandwidthHz;
+  }
 
   /**
    * Get duration of frame.
    *
    * \return The duration of frame.
    */
-  inline Time GetDuration () const { return m_duration; }
+  inline Time GetDuration () const
+  {
+    return m_duration;
+  }
 
   /**
    * Get maximum symbols in carrier
    *
    * \return maximum symbols in carrier
    */
-  inline uint32_t GetCarrierMaxSymbols () const { return m_maxSymbolsPerCarrier; }
+  inline uint32_t GetCarrierMaxSymbols () const
+  {
+    return m_maxSymbolsPerCarrier;
+  }
 
   /**
    * Get minimum payload of a carrier in bytes
    *
    * \return minimum payload of a carrier in bytes
    */
-  inline uint32_t GetCarrierMinPayloadInBytes () const { return m_minPayloadPerCarrierInBytes; }
+  inline uint32_t GetCarrierMinPayloadInBytes () const
+  {
+    return m_minPayloadPerCarrierInBytes;
+  }
 
   /**
    * Get carrier center frequency in frame.
@@ -294,14 +337,20 @@ public:
    *
    * \return The BTU conf of frame.
    */
-  inline Ptr<SatBtuConf> GetBtuConf () const { return m_btuConf; }
+  inline Ptr<SatBtuConf> GetBtuConf () const
+  {
+    return m_btuConf;
+  }
 
   /**
    * Get carrier count of the frame.
    *
    * \return The carrier count of the frame.
    */
-  inline uint16_t GetCarrierCount () { return m_carrierCount; }
+  inline uint16_t GetCarrierCount ()
+  {
+    return m_carrierCount;
+  }
 
   /**
    * Get time slot count of the frame.
@@ -323,12 +372,18 @@ public:
    *
    * \return Is frame random access frame [true or false]
    */
-  inline bool IsRandomAccess () const { return m_isRandomAccess;}
+  inline bool IsRandomAccess () const
+  {
+    return m_isRandomAccess;
+  }
 
   /**
    * Get waveform configuration of this frame
    */
-  inline Ptr<SatWaveformConf> GetWaveformConf () const { return m_waveformConf; }
+  inline Ptr<SatWaveformConf> GetWaveformConf () const
+  {
+    return m_waveformConf;
+  }
 
 private:
   typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
@@ -365,12 +420,12 @@ public:
    * Configurable Super Frames
    */
   typedef enum
-    {
-      SUPER_FRAME_CONFIG_0,//!< SUPER_FRAME_CONFIG_0
-      SUPER_FRAME_CONFIG_1,//!< SUPER_FRAME_CONFIG_1
-      SUPER_FRAME_CONFIG_2,//!< SUPER_FRAME_CONFIG_2
-      SUPER_FRAME_CONFIG_3,//!< SUPER_FRAME_CONFIG_3
-    } SuperFrameConfiguration_t;
+  {
+    SUPER_FRAME_CONFIG_0,  //!< SUPER_FRAME_CONFIG_0
+    SUPER_FRAME_CONFIG_1,  //!< SUPER_FRAME_CONFIG_1
+    SUPER_FRAME_CONFIG_2,  //!< SUPER_FRAME_CONFIG_2
+    SUPER_FRAME_CONFIG_3,  //!< SUPER_FRAME_CONFIG_3
+  } SuperFrameConfiguration_t;
 
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
@@ -379,9 +434,9 @@ public:
    */
   typedef enum
   {
-    CONFIG_TYPE_0,//!< Configuration type 0
-    CONFIG_TYPE_1,//!< Configuration type 1
-    CONFIG_TYPE_2,//!< Configuration type 2
+    CONFIG_TYPE_0, //!< Configuration type 0
+    CONFIG_TYPE_1, //!< Configuration type 1
+    CONFIG_TYPE_2, //!< Configuration type 2
     CONFIG_TYPE_3 //!< Configuration type 3
   } ConfigType_t;
 
@@ -406,7 +461,7 @@ public:
     std::stringstream ss;   //create a string stream
     ss << number;           //add number to the stream
 
-    return ss.str();
+    return ss.str ();
   }
 
   /**
@@ -415,7 +470,7 @@ public:
    * \param index index to convert as frame name
    * \return frame name
    */
-  static std::string GetIndexAsFrameName(uint32_t index);
+  static std::string GetIndexAsFrameName (uint32_t index);
 
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
@@ -435,14 +490,20 @@ public:
    *
    * \return The bandwidth of super frame in hertz.
    */
-  inline double GetBandwidthHz () const { return m_usedBandwidthHz; }
+  inline double GetBandwidthHz () const
+  {
+    return m_usedBandwidthHz;
+  }
 
   /**
    * Get duration of super frame.
    *
    * \return The duration of super frame in seconds.
    */
-  inline Time GetDuration () const { return m_duration; }
+  inline Time GetDuration () const
+  {
+    return m_duration;
+  }
 
   /**
    * Get frame conf of the super frame.
@@ -563,27 +624,39 @@ public:
    *
    * \param frameCount Number of the frames in use
    */
-  inline void SetFrameCount (uint8_t frameCount) { m_frameCount = frameCount; }
+  inline void SetFrameCount (uint8_t frameCount)
+  {
+    m_frameCount = frameCount;
+  }
 
   /**
    * Get number of frames to be used in super frame.
    *
    * \return Number of the frames in use
    */
-  inline uint8_t GetFrameCount () const { return m_frameCount; }
+  inline uint8_t GetFrameCount () const
+  {
+    return m_frameCount;
+  }
 
   /**
    * Set frame configuration type to be used in super frame.
    *
    * \param configType index of the frame configuration type
    */
-  inline void SetConfigType (SatSuperframeConf::ConfigType_t type) { m_configType = type; }
+  inline void SetConfigType (SatSuperframeConf::ConfigType_t type)
+  {
+    m_configType = type;
+  }
 
   /**
    * Get frame configuration type to be used in super frame.
    * \return the frame configuration type
    */
-  inline SatSuperframeConf::ConfigType_t GetConfigType () const { return m_configType; }
+  inline SatSuperframeConf::ConfigType_t GetConfigType () const
+  {
+    return m_configType;
+  }
 
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
   void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
@@ -636,26 +709,27 @@ private:
 public:
   // macro to ease definition of access methods for frame specific attributes
   #define FRAME_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
-    inline void SetFrame ## index ## AllocatedBandwidthHz (double value)  \
-      { return SetFrameAllocatedBandwidthHz (index, value); } \
-    inline double GetFrame ## index ## AllocatedBandwidthHz () const  \
-      { return GetFrameAllocatedBandwidthHz (index); }  \
-    inline void SetFrame ## index ## CarrierAllocatedBandwidthHz (double value)  \
-      { return SetFrameCarrierAllocatedBandwidthHz (index, value); } \
-    inline double GetFrame ## index ## CarrierAllocatedBandwidthHz () const      \
-      { return GetFrameCarrierAllocatedBandwidthHz (index); } \
-    inline void SetFrame ## index ## CarrierSpacing (double value)  \
-      { return SetFrameCarrierSpacing (index, value); } \
-    inline double GetFrame ## index ## CarrierSpacing () const      \
-      { return GetFrameCarrierSpacing (index); } \
-    inline void SetFrame ## index ## CarrierRollOff (double value)  \
-      { return SetFrameCarrierRollOff (index, value); } \
-    inline double GetFrame ## index ## CarrierRollOff () const      \
-      { return GetFrameCarrierRollOff (index); } \
-    inline void SetFrame ## index ## RandomAccess (bool value)  \
-      { return SetFrameRandomAccess (index, value); } \
-    inline double IsFrame ## index ## RandomAccess () const      \
-      { return IsFrameRandomAccess (index); }
+  inline void SetFrame ## index ## AllocatedBandwidthHz (double value)  \
+  { return SetFrameAllocatedBandwidthHz (index, value); \
+  } \
+  inline double GetFrame ## index ## AllocatedBandwidthHz () const  \
+  { return GetFrameAllocatedBandwidthHz (index); }  \
+  inline void SetFrame ## index ## CarrierAllocatedBandwidthHz (double value)  \
+  { return SetFrameCarrierAllocatedBandwidthHz (index, value); } \
+  inline double GetFrame ## index ## CarrierAllocatedBandwidthHz () const      \
+  { return GetFrameCarrierAllocatedBandwidthHz (index); } \
+  inline void SetFrame ## index ## CarrierSpacing (double value)  \
+  { return SetFrameCarrierSpacing (index, value); } \
+  inline double GetFrame ## index ## CarrierSpacing () const      \
+  { return GetFrameCarrierSpacing (index); } \
+  inline void SetFrame ## index ## CarrierRollOff (double value)  \
+  { return SetFrameCarrierRollOff (index, value); } \
+  inline double GetFrame ## index ## CarrierRollOff () const      \
+  { return GetFrameCarrierRollOff (index); } \
+  inline void SetFrame ## index ## RandomAccess (bool value)  \
+  { return SetFrameRandomAccess (index, value); } \
+  inline double IsFrame ## index ## RandomAccess () const      \
+  { return IsFrameRandomAccess (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines
@@ -679,7 +753,6 @@ public:
 class SatSuperframeConf0 : public SatSuperframeConf
 {
 public:
-
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
@@ -696,7 +769,6 @@ public:
   virtual void DoConfigure ();
 
 private:
-
 };
 
 /**
@@ -706,7 +778,6 @@ private:
 class SatSuperframeConf1 : public SatSuperframeConf
 {
 public:
-
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
@@ -723,7 +794,6 @@ public:
   virtual void DoConfigure ();
 
 private:
-
 };
 
 /**
@@ -734,7 +804,6 @@ private:
 class SatSuperframeConf2 : public SatSuperframeConf
 {
 public:
-
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
@@ -751,7 +820,6 @@ public:
   virtual void DoConfigure ();
 
 private:
-
 };
 
 /**
@@ -761,7 +829,6 @@ private:
 class SatSuperframeConf3 : public SatSuperframeConf
 {
 public:
-
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
@@ -778,7 +845,6 @@ public:
   virtual void DoConfigure ();
 
 private:
-
 };
 
 

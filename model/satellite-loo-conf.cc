@@ -28,39 +28,39 @@ NS_OBJECT_ENSURE_REGISTERED (SatLooConf);
 NS_LOG_COMPONENT_DEFINE ("SatLooConf");
 
 static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
-    {
-     /**
-      * Parameters
-      * {State 1 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
-      *  State 2 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
-      *  State 3 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
-      */
+{
+  /**
+   * Parameters
+   * {State 1 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
+   *  State 2 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
+   *  State 3 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
+   */
 
-     /* Elevation 30 degrees */
-     {{  0.0, 0.5, -25.0, 10, 10, 2, 30},
-      {-10.0, 3.0, -25.0, 10, 10, 2, 30},
-      {-21.0, 4.0, -25.0, 10, 10, 2, 30}}
-    };
+  /* Elevation 30 degrees */
+  {{  0.0, 0.5, -25.0, 10, 10, 2, 30},
+   {-10.0, 3.0, -25.0, 10, 10, 2, 30},
+   {-21.0, 4.0, -25.0, 10, 10, 2, 30}}
+};
 
 TypeId
 SatLooConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLooConf")
-      .SetParent<SatBaseFaderConf> ()
-      .AddConstructor<SatLooConf> ()
-      .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
-                     UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-                     MakeUintegerAccessor (&SatLooConf::m_elevationCount),
-                     MakeUintegerChecker<uint32_t> ())
-      .AddAttribute ("StateCount", "Number of states in the Markov model.",
-                     UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
-                     MakeUintegerAccessor (&SatLooConf::m_stateCount),
-                     MakeUintegerChecker<uint32_t> ());
+    .SetParent<SatBaseFaderConf> ()
+    .AddConstructor<SatLooConf> ()
+    .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
+                   UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+                   MakeUintegerAccessor (&SatLooConf::m_elevationCount),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("StateCount", "Number of states in the Markov model.",
+                   UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
+                   MakeUintegerAccessor (&SatLooConf::m_stateCount),
+                   MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
-SatLooConf::SatLooConf () :
-    m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+SatLooConf::SatLooConf ()
+  : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
@@ -107,7 +107,7 @@ SatLooConf::GetParameters (uint32_t set)
 }
 
 void
-SatLooConf::Reset()
+SatLooConf::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -121,12 +121,12 @@ SatLooConf::Reset()
 }
 
 void
-SatLooConf::DoDispose()
+SatLooConf::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatBaseFaderConf::DoDispose();
+  SatBaseFaderConf::DoDispose ();
 }
 
 } // namespace ns3

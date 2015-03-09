@@ -39,7 +39,6 @@ namespace ns3 {
 class SatFadingOscillator : public Object
 {
 public:
-
   /**
    * \brief NS-3 function for type id
    * @return type id
@@ -92,7 +91,6 @@ public:
   void DoDispose ();
 
 private:
-
   /**
    * \brief Complex amplitude
    */

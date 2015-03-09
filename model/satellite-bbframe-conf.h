@@ -100,7 +100,6 @@ public:
   void Dump () const;
 
 private:
-
   /**
    * MODCOD
    */
@@ -145,7 +144,7 @@ public:
   {
     SHORT_FRAMES,          //!< SHORT_FRAMES
     NORMAL_FRAMES,         //!< NORMAL_FRAMES
-    SHORT_AND_NORMAL_FRAMES//!< SHORT_AND_NORMAL_FRAMES
+    SHORT_AND_NORMAL_FRAMES //!< SHORT_AND_NORMAL_FRAMES
   } BbFrameUsageMode_t;
 
   /**
@@ -174,35 +173,47 @@ public:
    *
    * \return BB frame header size in bytes
    */
-  inline uint32_t GetBbFrameHeaderSizeInBytes () const { return m_bbFrameHeaderSizeInBytes; }
+  inline uint32_t GetBbFrameHeaderSizeInBytes () const
+  {
+    return m_bbFrameHeaderSizeInBytes;
+  }
 
   /**
    * \brief Get configured BB frame high occupancy threshold.
    *
    * \return BB frame high occupancy threshold
    */
-  inline double GetBbFrameHighOccupancyThreshold () const { return m_bbFrameHighOccupancyThreshold; }
+  inline double GetBbFrameHighOccupancyThreshold () const
+  {
+    return m_bbFrameHighOccupancyThreshold;
+  }
 
   /**
    * \brief Get configured BB frame low occupancy threshold.
    *
    * \return BB frame low occupancy threshold
    */
-  inline double GetBbFrameLowOccupancyThreshold () const { return m_bbFrameLowOccupancyThreshold; }
+  inline double GetBbFrameLowOccupancyThreshold () const
+  {
+    return m_bbFrameLowOccupancyThreshold;
+  }
 
   /**
    * Get configured BB frame usage mode.
    *
    * \return BB frame usage mode
    */
-  inline SatBbFrameConf::BbFrameUsageMode_t GetBbFrameUsageMode () const { return m_bbFrameUsageMode; }
+  inline SatBbFrameConf::BbFrameUsageMode_t GetBbFrameUsageMode () const
+  {
+    return m_bbFrameUsageMode;
+  }
 
   /**
    * \brief Initialize the C/No requirements for a given BLER target.
    *
    * \param linkResults DVB-S2 link results
    */
-  void InitializeCNoRequirements( Ptr<SatLinkResultsDvbS2> linkResults );
+  void InitializeCNoRequirements ( Ptr<SatLinkResultsDvbS2> linkResults );
 
   /**
    * \brief Get the dummy frame duration in Time.
@@ -247,13 +258,12 @@ public:
    */
   SatEnums::SatModcod_t GetMostRobustModcod (SatEnums::SatBbFrameType_t frameType) const;
 
-	/**
-	 * \brief Dump waveform details for debugging purposes
-	 */
+  /**
+   * \brief Dump waveform details for debugging purposes
+   */
   void DumpWaveforms () const;
 
 private:
-
   /**
    * \brief Calculate the BBrame higher layer payload in bits.
    * \param modcod Used MODCOD in the BBFrame

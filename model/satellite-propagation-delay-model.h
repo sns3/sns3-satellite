@@ -62,10 +62,9 @@ public:
    * DoAssignStreams need to be implemented due to inheritance from
    * PropagationDelayModel
    */
-  int64_t DoAssignStreams(int64_t s);
+  int64_t DoAssignStreams (int64_t s);
 
 private:
-
   Time m_delay;
 };
 

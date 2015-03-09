@@ -31,7 +31,7 @@ namespace ns3 {
 
 
 SatRtnLinkTime::SatRtnLinkTime ()
- :m_superframeSeq ()
+  : m_superframeSeq ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -79,7 +79,7 @@ SatRtnLinkTime::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
   NS_LOG_FUNCTION (this << (uint32_t) superFrameSeqId);
 
   uint32_t count = GetCurrentSuperFrameCount (superFrameSeqId);
-  return Time (count * m_superframeSeq->GetDuration (superFrameSeqId).GetInteger());
+  return Time (count * m_superframeSeq->GetDuration (superFrameSeqId).GetInteger ());
 }
 
 Time

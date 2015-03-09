@@ -42,7 +42,6 @@ namespace ns3 {
 class SatGeoUserPhy : public SatPhy
 {
 public:
-
   /**
    * Default constructor
    */
@@ -86,7 +85,6 @@ public:
   virtual double CalculateSinr (double sinr);
 
 private:
-
   /**
    * Configured Adjacent Channel Interference (ACI) in dB.
    */

@@ -98,7 +98,7 @@ public:
    * \param sinr composite SINR (in dB)
    * \param from the address of the node where the signal originates from
    */
-  typedef void (* SinrCallback) (double sinr, const Address &from);
+  typedef void (*SinrCallback)(double sinr, const Address &from);
 
 private:
   /**

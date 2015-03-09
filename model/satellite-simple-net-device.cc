@@ -30,7 +30,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatSimpleNetDevice);
 
-TypeId 
+TypeId
 SatSimpleNetDevice::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatSimpleNetDevice")
@@ -56,10 +56,10 @@ SatSimpleNetDevice::GetTypeId (void)
 }
 
 SatSimpleNetDevice::SatSimpleNetDevice ()
- : m_channel (0),
-   m_node (0),
-   m_mtu (0xffff),
-   m_ifIndex (0)
+  : m_channel (0),
+    m_node (0),
+    m_mtu (0xffff),
+    m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -100,12 +100,12 @@ SatSimpleNetDevice::Receive (Ptr<Packet> packet, uint16_t protocol, Mac48Address
 
       if (packetType != NetDevice::PACKET_OTHERHOST)
         {
-            m_rxCallback (this, packet, protocol, from);
+          m_rxCallback (this, packet, protocol, from);
 
-            if (!m_promiscCallback.IsNull ())
-              {
-                m_promiscCallback (this, packet, protocol, from, to, packetType);
-              }
+          if (!m_promiscCallback.IsNull ())
+            {
+              m_promiscCallback (this, packet, protocol, from, to, packetType);
+            }
         }
     }
 }
@@ -180,7 +180,7 @@ SatSimpleNetDevice::IsLinkUp (void) const
 void
 SatSimpleNetDevice::AddLinkChangeCallback (Callback<void> callback)
 {
- NS_LOG_FUNCTION (this << &callback);
+  NS_LOG_FUNCTION (this << &callback);
 }
 bool
 SatSimpleNetDevice::IsBroadcast (void) const
@@ -263,7 +263,7 @@ SatSimpleNetDevice::NeedsArp (void) const
   NS_LOG_FUNCTION (this);
   return true;
 }
-void 
+void
 SatSimpleNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);

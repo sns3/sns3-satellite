@@ -48,9 +48,9 @@ main (int argc, char *argv[])
 
   /// Read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
-  cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
   cmd.Parse (argc, argv);
 
   /// Enable fading input trace
@@ -91,19 +91,19 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->CreatePredefinedScenario(satScenario);
+  helper->CreatePredefinedScenario (satScenario);
 
   /// Get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   uint16_t port = 9;
 
   /// Create application on GW user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
-  cbrHelper.SetAttribute("Interval", StringValue (interval));
-  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
+  cbrHelper.SetAttribute ("Interval", StringValue (interval));
+  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
 
   ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
   gwSink.Start (Seconds (1.0));
@@ -114,8 +114,8 @@ main (int argc, char *argv[])
   gwCbr.Stop (Seconds (5.1));
 
   /// Create application on UT user
-  sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
-  cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
   utSink.Start (Seconds (1.0));
@@ -125,13 +125,13 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
 
-  NS_LOG_INFO("--- Trace-input-fading-example ---");
-  NS_LOG_INFO("  Scenario used: " << scenario);
-  NS_LOG_INFO("  PacketSize: " << packetSize);
-  NS_LOG_INFO("  Interval: " << interval);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- Trace-input-fading-example ---");
+  NS_LOG_INFO ("  Scenario used: " << scenario);
+  NS_LOG_INFO ("  PacketSize: " << packetSize);
+  NS_LOG_INFO ("  Interval: " << interval);
+  NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds(11));
+  Simulator::Stop (Seconds (11));
   Simulator::Run ();
   Simulator::Destroy ();
 

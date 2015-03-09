@@ -31,18 +31,18 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatGseHeader);
 
 SatGseHeader::SatGseHeader ()
-:m_startIndicator (0),
- m_endIndicator (0),
- m_gsePduLengthInBytes (0),
- m_fragmentId (0),
- m_totalLengthInBytes (0),
- m_protocolType (0),
- m_labelByte (0),
- m_crc (0),
- m_fullGseHeaderSize (8),
- m_startGseHeaderSize (8),
- m_endGseHeaderSize (8),
- m_continuationGseHeaderSize (3)
+  : m_startIndicator (0),
+    m_endIndicator (0),
+    m_gsePduLengthInBytes (0),
+    m_fragmentId (0),
+    m_totalLengthInBytes (0),
+    m_protocolType (0),
+    m_labelByte (0),
+    m_crc (0),
+    m_fullGseHeaderSize (8),
+    m_startGseHeaderSize (8),
+    m_endGseHeaderSize (8),
+    m_continuationGseHeaderSize (3)
 {
 
 }
@@ -171,7 +171,7 @@ uint32_t SatGseHeader::Deserialize (Buffer::Iterator start)
    * that the header size is correct.
    */
 
-  return GetSerializedSize();
+  return GetSerializedSize ();
 }
 
 void SatGseHeader::Print (std::ostream &os) const
@@ -179,9 +179,9 @@ void SatGseHeader::Print (std::ostream &os) const
   NS_LOG_FUNCTION (this);
 
   os << m_startIndicator << " " << m_endIndicator << " "
-      << m_gsePduLengthInBytes << " " << m_fragmentId << " "
-      << m_totalLengthInBytes << " " << m_protocolType << " "
-      << m_labelByte << " " << m_crc << std::endl;
+     << m_gsePduLengthInBytes << " " << m_fragmentId << " "
+     << m_totalLengthInBytes << " " << m_protocolType << " "
+     << m_labelByte << " " << m_crc << std::endl;
 }
 
 TypeId
@@ -256,7 +256,7 @@ uint32_t SatGseHeader::GetGseHeaderSizeInBytes (uint8_t type) const
 
   uint32_t size (0);
   switch (type)
-  {
+    {
     case SatEncapPduStatusTag::START_PDU:
       {
         size = m_startGseHeaderSize + m_labelFieldLengthInBytes;
@@ -282,7 +282,7 @@ uint32_t SatGseHeader::GetGseHeaderSizeInBytes (uint8_t type) const
         NS_FATAL_ERROR ("Unsupported SatEncapPduStatusTag!");
         break;
       }
-  }
+    }
   return size;
 }
 
@@ -292,8 +292,8 @@ uint32_t SatGseHeader::GetMaxGseHeaderSizeInBytes () const
 
   return std::max (std::max ( (m_fullGseHeaderSize + m_labelFieldLengthInBytes),
                               (m_startGseHeaderSize + m_labelFieldLengthInBytes) ),
-                  (std::max ( m_endGseHeaderSize,
-                              m_continuationGseHeaderSize)));
+                   (std::max ( m_endGseHeaderSize,
+                               m_continuationGseHeaderSize)));
 }
 
 }; // namespace ns3

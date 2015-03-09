@@ -41,22 +41,22 @@ static double g_velocity = 0;
 
 static double GetElevation ()
 {
-   return g_elevation;
+  return g_elevation;
 }
 
 static void SetElevation (double elevation)
 {
-   g_elevation = elevation;
+  g_elevation = elevation;
 }
 
 static double GetVelocity ()
 {
-   return g_velocity;
+  return g_velocity;
 }
 
 static void SetVelocity (double velocity)
 {
-   g_velocity = velocity;
+  g_velocity = velocity;
 }
 
 int

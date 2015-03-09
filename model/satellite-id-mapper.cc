@@ -31,7 +31,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatIdMapper);
 
-TypeId 
+TypeId
 SatIdMapper::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatIdMapper")
@@ -40,12 +40,12 @@ SatIdMapper::GetTypeId (void)
   return tid;
 }
 
-SatIdMapper::SatIdMapper () :
-  m_traceIdIndex (1),
-  m_utIdIndex (1),
-  m_utUserIdIndex (1),
-  m_gwUserIdIndex (1),
-  m_enableMapPrint (false)
+SatIdMapper::SatIdMapper ()
+  : m_traceIdIndex (1),
+    m_utIdIndex (1),
+    m_utUserIdIndex (1),
+    m_gwUserIdIndex (1),
+    m_enableMapPrint (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -505,7 +505,7 @@ SatIdMapper::PrintTraceMap () const
 
   std::map<Address, uint32_t>::const_iterator iter;
 
-  for (iter = m_macToTraceIdMap.begin(); iter != m_macToTraceIdMap.end(); ++iter)
+  for (iter = m_macToTraceIdMap.begin (); iter != m_macToTraceIdMap.end (); ++iter)
     {
       std::cout << GetMacInfo (iter->first) << std::endl;
     }

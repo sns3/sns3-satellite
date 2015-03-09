@@ -80,11 +80,11 @@ static std::string GetUserInfo (Ptr<SatHelper> helper, Ptr<Node> node)
 
   uint32_t userIndex = 0;
 
-  for ( uint32_t j = 0; ((j < nodeUsers.GetN ()) && (userIndex == 0)) ; j++)
+  for ( uint32_t j = 0; ((j < nodeUsers.GetN ()) && (userIndex == 0)); j++)
     {
       if ( nodeUsers.Get (j) == node )
         {
-          userIndex = j+1;
+          userIndex = j + 1;
         }
     }
 
@@ -154,7 +154,7 @@ static Time EstablishMulticastGroup (Ptr<SatHelper> helper, Ptr<Node> source, No
           std::stringstream context;
           context << groupAddress <<  "/" << nodeName;
 
-          DynamicCast<PacketSink>(sink.Get (i))->TraceConnect ("Rx", context.str (), MakeCallback (&SinkReceive));
+          DynamicCast<PacketSink> (sink.Get (i))->TraceConnect ("Rx", context.str (), MakeCallback (&SinkReceive));
         }
 
       // output real group receivers
@@ -179,7 +179,7 @@ static Time EstablishMulticastGroup (Ptr<SatHelper> helper, Ptr<Node> source, No
           std::stringstream context;
           context << groupAddress <<  "/" << nodeName;
 
-          DynamicCast<PacketSink>(sink.Get (i))->TraceConnect ("Rx", context.str (), MakeCallback (&SinkReceive));
+          DynamicCast<PacketSink> (sink.Get (i))->TraceConnect ("Rx", context.str (), MakeCallback (&SinkReceive));
         }
     }
 
@@ -237,10 +237,10 @@ main (int argc, char *argv[])
 
   /// Read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("scenario", "Test scenario to use. (larger or full", scenario);
-  cmd.AddValue("preDefinedGroup", "Pre-defined multicast group for larger scenario. (0 = all)", preDefinedGroup);
+  cmd.AddValue ("scenario", "Test scenario to use. (larger or full", scenario);
+  cmd.AddValue ("preDefinedGroup", "Pre-defined multicast group for larger scenario. (0 = all)", preDefinedGroup);
   cmd.AddValue ("fullScenarioReceivers", "Number of the receivers in full scenario", fullScenarioReceivers);
-  cmd.AddValue("sinkToAll", "Add multicast sink to all users.", sinkToAll);
+  cmd.AddValue ("sinkToAll", "Add multicast sink to all users.", sinkToAll);
   cmd.Parse (argc, argv);
 
   /// Set network types which support multicast
@@ -290,125 +290,125 @@ main (int argc, char *argv[])
   uint16_t multicastPort = 9;   // Discard port (RFC 863)
 
   /// Get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   Time startTime = Seconds (1.2);
 
   if ( scenario == "larger")
-  {
-    uint32_t currentGroup = preDefinedGroup;
+    {
+      uint32_t currentGroup = preDefinedGroup;
 
-    if ( preDefinedGroup == ALL_GROUPS )
-      {
-        currentGroup = 1;
-      }
-
-    for ( uint32_t i = currentGroup; i < END_OF_GROUP; i++ )
-      {
-        groupReceivers = NodeContainer ();
-
-        switch (i)
+      if ( preDefinedGroup == ALL_GROUPS )
         {
-          // Pre-defined group 1, Source= GW-user-1, Receivers= UT1-user-1, UT1-user-2, UT2-user-1, UT3-user-1, UT4-user-1
-          case GROUP_1:
-            groupSource = gwUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (0));
-            groupReceivers.Add (utUsers.Get (1));
-            groupReceivers.Add (utUsers.Get (2));
-            groupReceivers.Add (utUsers.Get (3));
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_2:
-            // Pre-defined group 2, Source= GW-user-1, Receivers= UT1-user-2, UT2-user-1, UT4-user-1
-            groupSource = gwUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (1));
-            groupReceivers.Add (utUsers.Get (2));
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_3:
-            // Pre-defined group 3, Source= UT1-user-1, Receivers= UT1-user-2, UT2-user-1, UT4-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (1));
-            groupReceivers.Add (utUsers.Get (2));
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_4:
-            // Pre-defined group 4, Source= UT1-user-2, Receivers= UT2-user-1, UT4-user-1
-            groupSource = utUsers.Get (1);
-            groupReceivers.Add (utUsers.Get (2));
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_5:
-            // Pre-defined group 5, Source= UT1-user-1, Receivers= UT3-user-1, UT4-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (3));
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_6:
-            // Pre-defined group 6, Source= UT1-user-2, Receivers= UT2-user-1, GW-user-1
-            groupSource = utUsers.Get (1);
-            groupReceivers.Add (utUsers.Get (2));
-            groupReceivers.Add (gwUsers.Get (0));
-            break;
-
-          case GROUP_7:
-            // Pre-defined group 7, Source= UT1-user-1, Receivers= GW-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (gwUsers.Get (0));
-            break;
-
-          case GROUP_8:
-            // Pre-defined group 8, Source= UT1-user-2, Receivers= UT2-user-1
-            groupSource = utUsers.Get (1);
-            groupReceivers.Add (utUsers.Get (2));
-            break;
-
-          case GROUP_9:
-            // Pre-defined group 9, Source= UT1-user-1, Receivers= GW-user-1, UT4-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (gwUsers.Get (0));
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_10:
-            // Pre-defined group 10, Source= UT1-user-1, UT3-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (3));
-            break;
-
-          case GROUP_11:
-            // Pre-defined group 10, Source= UT1-user-1, UT4-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (4));
-            break;
-
-          case GROUP_12:
-            // Pre-defined group 10, Source= UT1-user-1, UT2-user-1
-            groupSource = utUsers.Get (0);
-            groupReceivers.Add (utUsers.Get (2));
-            break;
-
-          default:
-            NS_FATAL_ERROR ("Not supported pre-defined group!!!");
-            break;
+          currentGroup = 1;
         }
 
-        NS_LOG_INFO ("--- Creating multicast pre-defined group " << preDefinedGroup << " ---");
+      for ( uint32_t i = currentGroup; i < END_OF_GROUP; i++ )
+        {
+          groupReceivers = NodeContainer ();
 
-        /// Create multicast groups 255.1.x.1, x predefined group number
+          switch (i)
+            {
+            // Pre-defined group 1, Source= GW-user-1, Receivers= UT1-user-1, UT1-user-2, UT2-user-1, UT3-user-1, UT4-user-1
+            case GROUP_1:
+              groupSource = gwUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (0));
+              groupReceivers.Add (utUsers.Get (1));
+              groupReceivers.Add (utUsers.Get (2));
+              groupReceivers.Add (utUsers.Get (3));
+              groupReceivers.Add (utUsers.Get (4));
+              break;
 
-        std::stringstream groupAddress;
-        groupAddress << "225.1." << i << ".1";
-        Ipv4Address multicastGroup (groupAddress.str ().c_str ());
+            case GROUP_2:
+              // Pre-defined group 2, Source= GW-user-1, Receivers= UT1-user-2, UT2-user-1, UT4-user-1
+              groupSource = gwUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (1));
+              groupReceivers.Add (utUsers.Get (2));
+              groupReceivers.Add (utUsers.Get (4));
+              break;
 
-        startTime = EstablishMulticastGroup (helper, groupSource, groupReceivers, multicastGroup, multicastPort, startTime, sinkToAll );
-      }
+            case GROUP_3:
+              // Pre-defined group 3, Source= UT1-user-1, Receivers= UT1-user-2, UT2-user-1, UT4-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (1));
+              groupReceivers.Add (utUsers.Get (2));
+              groupReceivers.Add (utUsers.Get (4));
+              break;
+
+            case GROUP_4:
+              // Pre-defined group 4, Source= UT1-user-2, Receivers= UT2-user-1, UT4-user-1
+              groupSource = utUsers.Get (1);
+              groupReceivers.Add (utUsers.Get (2));
+              groupReceivers.Add (utUsers.Get (4));
+              break;
+
+            case GROUP_5:
+              // Pre-defined group 5, Source= UT1-user-1, Receivers= UT3-user-1, UT4-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (3));
+              groupReceivers.Add (utUsers.Get (4));
+              break;
+
+            case GROUP_6:
+              // Pre-defined group 6, Source= UT1-user-2, Receivers= UT2-user-1, GW-user-1
+              groupSource = utUsers.Get (1);
+              groupReceivers.Add (utUsers.Get (2));
+              groupReceivers.Add (gwUsers.Get (0));
+              break;
+
+            case GROUP_7:
+              // Pre-defined group 7, Source= UT1-user-1, Receivers= GW-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (gwUsers.Get (0));
+              break;
+
+            case GROUP_8:
+              // Pre-defined group 8, Source= UT1-user-2, Receivers= UT2-user-1
+              groupSource = utUsers.Get (1);
+              groupReceivers.Add (utUsers.Get (2));
+              break;
+
+            case GROUP_9:
+              // Pre-defined group 9, Source= UT1-user-1, Receivers= GW-user-1, UT4-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (gwUsers.Get (0));
+              groupReceivers.Add (utUsers.Get (4));
+              break;
+
+            case GROUP_10:
+              // Pre-defined group 10, Source= UT1-user-1, UT3-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (3));
+              break;
+
+            case GROUP_11:
+              // Pre-defined group 10, Source= UT1-user-1, UT4-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (4));
+              break;
+
+            case GROUP_12:
+              // Pre-defined group 10, Source= UT1-user-1, UT2-user-1
+              groupSource = utUsers.Get (0);
+              groupReceivers.Add (utUsers.Get (2));
+              break;
+
+            default:
+              NS_FATAL_ERROR ("Not supported pre-defined group!!!");
+              break;
+            }
+
+          NS_LOG_INFO ("--- Creating multicast pre-defined group " << preDefinedGroup << " ---");
+
+          /// Create multicast groups 255.1.x.1, x predefined group number
+
+          std::stringstream groupAddress;
+          groupAddress << "225.1." << i << ".1";
+          Ipv4Address multicastGroup (groupAddress.str ().c_str ());
+
+          startTime = EstablishMulticastGroup (helper, groupSource, groupReceivers, multicastGroup, multicastPort, startTime, sinkToAll );
+        }
     }
   else
     {

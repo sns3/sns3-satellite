@@ -68,39 +68,39 @@ NS_OBJECT_ENSURE_REGISTERED (SatUtHelper);
 TypeId
 SatUtHelper::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatUtHelper")
-      .SetParent<Object> ()
-      .AddConstructor<SatUtHelper> ()
-      .AddAttribute ("FwdLinkErrorModel",
-                     "Forward link error model",
-                     EnumValue (SatPhyRxCarrierConf::EM_AVI),
-                     MakeEnumAccessor (&SatUtHelper::m_errorModel),
-                     MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
-                                      SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
-                                      SatPhyRxCarrierConf::EM_AVI, "AVI"))
-      .AddAttribute ("DaFwdLinkInterferenceModel",
-                     "Forward link interference model for dedicated access",
-                     EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
-                     MakeEnumAccessor (&SatUtHelper::m_daInterferenceModel),
-                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
-                                      SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute ("LowerLayerServiceConf",
-                     "Pointer to lower layer service configuration.",
-                     PointerValue (),
-                     MakePointerAccessor (&SatUtHelper::m_llsConf),
-                     MakePointerChecker<SatLowerLayerServiceConf> ())
-       .AddAttribute ("EnableChannelEstimationError",
-                      "Enable channel estimation error in forward link receiver at UT.",
-                      BooleanValue (true),
-                      MakeBooleanAccessor (&SatUtHelper::m_enableChannelEstimationError),
-                      MakeBooleanChecker ())
-       .AddTraceSource ("Creation",
-                        "Creation traces",
-                        MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace),
-                        "ns3::SatTypedefs::CreationCallback")
-    ;
-    return tid;
+  static TypeId tid = TypeId ("ns3::SatUtHelper")
+    .SetParent<Object> ()
+    .AddConstructor<SatUtHelper> ()
+    .AddAttribute ("FwdLinkErrorModel",
+                   "Forward link error model",
+                   EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                   MakeEnumAccessor (&SatUtHelper::m_errorModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
+    .AddAttribute ("DaFwdLinkInterferenceModel",
+                   "Forward link interference model for dedicated access",
+                   EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
+                   MakeEnumAccessor (&SatUtHelper::m_daInterferenceModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::IF_TRACE, "Trace",
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+    .AddAttribute ("LowerLayerServiceConf",
+                   "Pointer to lower layer service configuration.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatUtHelper::m_llsConf),
+                   MakePointerChecker<SatLowerLayerServiceConf> ())
+    .AddAttribute ("EnableChannelEstimationError",
+                   "Enable channel estimation error in forward link receiver at UT.",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatUtHelper::m_enableChannelEstimationError),
+                   MakeBooleanChecker ())
+    .AddTraceSource ("Creation",
+                     "Creation traces",
+                     MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace),
+                     "ns3::SatTypedefs::CreationCallback")
+  ;
+  return tid;
 }
 
 TypeId
@@ -108,19 +108,19 @@ SatUtHelper::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatUtHelper::SatUtHelper ()
- : m_carrierBandwidthConverter (),
-   m_fwdLinkCarrierCount (),
-   m_superframeSeq (),
-   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-   m_linkResults (),
-   m_llsConf (),
-   m_enableChannelEstimationError (false),
-   m_raSettings ()
+  : m_carrierBandwidthConverter (),
+    m_fwdLinkCarrierCount (),
+    m_superframeSeq (),
+    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_linkResults (),
+    m_llsConf (),
+    m_enableChannelEstimationError (false),
+    m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -135,18 +135,18 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
                           SatMac::ReserveCtrlMsgCallback reserveCb,
                           SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
- : m_carrierBandwidthConverter (carrierBandwidthConverter),
-   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-   m_superframeSeq (seq),
-   m_readCtrlCb (readCb),
-   m_reserveCtrlCb (reserveCb),
-   m_sendCtrlCb (sendCb),
-   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-   m_linkResults (),
-   m_llsConf (),
-   m_enableChannelEstimationError (false),
-   m_raSettings (randomAccessSettings)
+  : m_carrierBandwidthConverter (carrierBandwidthConverter),
+    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+    m_superframeSeq (seq),
+    m_readCtrlCb (readCb),
+    m_reserveCtrlCb (reserveCb),
+    m_sendCtrlCb (sendCb),
+    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_linkResults (),
+    m_llsConf (),
+    m_enableChannelEstimationError (false),
+    m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
@@ -170,7 +170,7 @@ SatUtHelper::Initialize (Ptr<SatLinkResultsDvbS2> lrS2)
     }
 }
 
-void 
+void
 SatUtHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
@@ -178,7 +178,7 @@ SatUtHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
   m_deviceFactory.Set (n1, v1);
 }
 
-void 
+void
 SatUtHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
@@ -194,7 +194,7 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
   Config::SetDefault ("ns3::SatUtPhy::" + n1, v1);
 }
 
-NetDeviceContainer 
+NetDeviceContainer
 SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
@@ -202,9 +202,9 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-  {
-    devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
-  }
+    {
+      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
+    }
 
   return devs;
 }
@@ -290,7 +290,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
 
-  phy->SetAttribute ("ReceiveCb", CallbackValue(recCb));
+  phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
 
   // Create Logical Link Control (LLC) layer
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
@@ -334,7 +334,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (),beamId);
 
   // Create encapsulator and add it to UT's LLC
-  Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress());
+  Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
 
   // Create an encapsulator for control messages.
   // Source = UT MAC address
@@ -356,7 +356,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Add callbacks to LLC for future need. LLC creates encapsulators and
   // decapsulators dynamically 'on-a-need-basis'.
-  llc->SetCtrlMsgCallback(MakeCallback (&SatNetDevice::SendControlMsg, dev));
+  llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
   llc->SetMacQueueEventCallback (macCb);
 
   // set serving GW MAC address to RM
@@ -382,9 +382,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   // Create UT scheduler for MAC and connect callbacks to LLC
   Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);
-  utScheduler->SetTxOpportunityCallback(MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
+  utScheduler->SetTxOpportunityCallback (MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
   utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
-  mac->SetAttribute("Scheduler", PointerValue (utScheduler));
+  mac->SetAttribute ("Scheduler", PointerValue (utScheduler));
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), addr);
@@ -403,7 +403,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
 
       /// attach callbacks
-      randomAccess->SetAreBuffersEmptyCallback (MakeCallback(&SatLlc::BuffersEmpty, llc));
+      randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
 
       /// define which allocation channels should be used with each of the random access models
       randomAccess->AddCrdsaAllocationChannel (SatConstVariables::CRDSA_ALLOCATION_CHANNEL);
@@ -417,11 +417,11 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 }
 
 void
-SatUtHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+SatUtHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
   NS_LOG_FUNCTION (this);
 
-  TraceConnect("Creation", "SatUtHelper", cb);
+  TraceConnect ("Creation", "SatUtHelper", cb);
 }
 
 } // namespace ns3

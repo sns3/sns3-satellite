@@ -66,7 +66,7 @@ SatSeqNoTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-arq-seqno", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-arq-seqno", "", true);
 
   uint32_t windowSize (10);
   Ptr<SatArqSequenceNumber> seqNo = Create<SatArqSequenceNumber> (windowSize);
@@ -76,9 +76,9 @@ SatSeqNoTestCase::DoRun (void)
 
   for (uint32_t i = 0; i < 550; ++i)
     {
-      if (seqNo->SeqNoAvailable())
+      if (seqNo->SeqNoAvailable ())
         {
-          uint32_t sn = uint32_t(seqNo->NextSequenceNumber ());
+          uint32_t sn = uint32_t (seqNo->NextSequenceNumber ());
           allSeqNos.push_back (sn);
           seqNoWindow.push_back (sn);
         }

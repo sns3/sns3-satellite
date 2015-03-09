@@ -28,7 +28,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatFadingInputTraceContainer);
 
-TypeId 
+TypeId
 SatFadingInputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingInputTraceContainer")

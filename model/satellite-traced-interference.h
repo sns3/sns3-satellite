@@ -34,7 +34,6 @@ namespace ns3 {
 class SatTracedInterference : public SatInterference
 {
 public:
-
   /**
    *
    * \return
@@ -75,7 +74,6 @@ public:
   void SetRxBandwidth (double rxBandwidth);
 
 private:
-
   /**
    * Adds interference power to interference object.
    * No effect in this implementation.

@@ -40,7 +40,6 @@ namespace ns3 {
 class SatPhyRxCarrierConf : public Object
 {
 public:
-
   /**
    * \brief Callback for SINR calculation
    * \param Calculated C/NI
@@ -112,20 +111,20 @@ public:
     RandomAccessCollisionModel               m_raCollisionModel;
     bool                                     m_isRandomAccessEnabled;
 
-    RxCarrierCreateParams_s () :
-      m_rxTemperatureK (0.0),
-      m_extNoiseDensityWhz (0.0),
-      m_aciIfWrtNoiseFactor (0.0),
-      m_errorModel (SatPhyRxCarrierConf::EM_NONE),
-      m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-      m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-      m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
-      m_chType (SatEnums::RETURN_USER_CH),
-      m_bwConverter (),
-      m_carrierCount (0),
-      m_cec (NULL),
-      m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-      m_isRandomAccessEnabled (false)
+    RxCarrierCreateParams_s ()
+      : m_rxTemperatureK (0.0),
+        m_extNoiseDensityWhz (0.0),
+        m_aciIfWrtNoiseFactor (0.0),
+        m_errorModel (SatPhyRxCarrierConf::EM_NONE),
+        m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+        m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+        m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
+        m_chType (SatEnums::RETURN_USER_CH),
+        m_bwConverter (),
+        m_carrierCount (0),
+        m_cec (NULL),
+        m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+        m_isRandomAccessEnabled (false)
     {
       // do nothing
     }
@@ -145,7 +144,9 @@ public:
   /**
    * Destructor for SatPhyRxCarrierConf
    */
-  virtual ~SatPhyRxCarrierConf () {}
+  virtual ~SatPhyRxCarrierConf ()
+  {
+  }
 
   static TypeId GetTypeId (void);
 
@@ -238,13 +239,19 @@ public:
    * \brief Get callback function to calculate final SINR
    * \return final SINR
    */
-  inline SinrCalculatorCallback  GetSinrCalculatorCb () {return m_sinrCalculate;}
+  inline SinrCalculatorCallback  GetSinrCalculatorCb ()
+  {
+    return m_sinrCalculate;
+  }
 
   /**
    * \brief Set callback function to calculate final SINR
    * \param sinrCalculator SINR calculator callback
    */
-  inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator) {m_sinrCalculate = sinrCalculator;}
+  inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator)
+  {
+    m_sinrCalculate = sinrCalculator;
+  }
 
   /**
    * \brief Get channel estimator container
@@ -271,7 +278,6 @@ public:
   bool IsRandomAccessDynamicLoadControlEnabled () const;
 
 private:
-
   /*
    * Note, that different carriers may be different bandwidth (symbol rate).
    * This might be one place to have the frame configuration as well, so that

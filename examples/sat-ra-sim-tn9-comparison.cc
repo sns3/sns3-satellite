@@ -161,8 +161,8 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -175,8 +175,8 @@ main (int argc, char *argv[])
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
-      itUt != utUsers.End ();
-      ++itUt)
+       itUt != utUsers.End ();
+       ++itUt)
     {
       appStartTime += MilliSeconds (10);
 
@@ -257,12 +257,12 @@ main (int argc, char *argv[])
   //s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   //s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-ra-sim-tn9-comparison ---");
-  NS_LOG_INFO("  Packet size: " << packetSize);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-ra-sim-tn9-comparison ---");
+  NS_LOG_INFO ("  Packet size: " << packetSize);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

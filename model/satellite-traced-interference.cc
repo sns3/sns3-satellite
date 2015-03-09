@@ -34,7 +34,7 @@ SatTracedInterference::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatTracedInterference")
     .SetParent<SatInterference> ()
-    .AddConstructor<SatTracedInterference>();
+    .AddConstructor<SatTracedInterference> ();
 
   return tid;
 }
@@ -42,11 +42,11 @@ SatTracedInterference::GetTypeId (void)
 TypeId
 SatTracedInterference::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
-SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth) :
-    m_rxing (false),
+SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth)
+  : m_rxing (false),
     m_power (0),
     m_channelType (channeltype),
     m_rxBandwidth_Hz (rxBandwidth)
@@ -59,8 +59,8 @@ SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltyp
     }
 }
 
-SatTracedInterference::SatTracedInterference () :
-    m_rxing (false),
+SatTracedInterference::SatTracedInterference ()
+  : m_rxing (false),
     m_power (),
     m_channelType (),
     m_rxBandwidth_Hz ()
@@ -125,7 +125,7 @@ SatTracedInterference::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  SatInterference::DoDispose();
+  SatInterference::DoDispose ();
 }
 
 void

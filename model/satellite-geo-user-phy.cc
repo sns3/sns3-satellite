@@ -47,61 +47,61 @@ SatGeoUserPhy::GetTypeId (void)
     .SetParent<SatPhy> ()
     .AddConstructor<SatGeoUserPhy> ()
     .AddAttribute ("PhyRx", "The PhyRx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatPhy::GetPhyRx, &SatPhy::SetPhyRx),
-                    MakePointerChecker<SatPhyRx> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatPhy::GetPhyRx, &SatPhy::SetPhyRx),
+                   MakePointerChecker<SatPhyRx> ())
     .AddAttribute ("PhyTx", "The PhyTx layer attached to this phy.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
-                    MakePointerChecker<SatPhyTx> ())
-    .AddAttribute( "RxTemperatureDbk",
-                   "RX noise temperature in Geo User in dBK.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
+                   MakePointerChecker<SatPhyTx> ())
+    .AddAttribute ( "RxTemperatureDbk",
+                    "RX noise temperature in Geo User in dBK.",
                     DoubleValue (28.4),
                     MakeDoubleAccessor (&SatPhy::GetRxNoiseTemperatureDbk, &SatPhy::SetRxNoiseTemperatureDbk),
-                    MakeDoubleChecker<double>())
+                    MakeDoubleChecker<double> ())
     .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX antenna gain in Db",
-                    DoubleValue (54.00),
-                    MakeDoubleAccessor (&SatPhy::GetRxAntennaGainDb, &SatPhy::SetRxAntennaGainDb),
-                    MakeDoubleChecker<double_t> ())
+                   DoubleValue (54.00),
+                   MakeDoubleAccessor (&SatPhy::GetRxAntennaGainDb, &SatPhy::SetRxAntennaGainDb),
+                   MakeDoubleChecker<double_t> ())
     .AddAttribute ("TxMaxAntennaGainDb", "Maximum TX gain in dB",
-                    DoubleValue (54.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxAntennaGainDb, &SatPhy::SetTxAntennaGainDb),
-                    MakeDoubleChecker<double_t> ())
+                   DoubleValue (54.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxAntennaGainDb, &SatPhy::SetTxAntennaGainDb),
+                   MakeDoubleChecker<double_t> ())
     .AddAttribute ("TxMaxPowerDbw", "Maximum TX power in dB",
-                    DoubleValue (15.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxMaxPowerDbw, &SatPhy::SetTxMaxPowerDbw),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (15.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxMaxPowerDbw, &SatPhy::SetTxMaxPowerDbw),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxOutputLossDb", "TX Output loss in dB",
-                    DoubleValue (2.85),
-                    MakeDoubleAccessor (&SatPhy::GetTxOutputLossDb, &SatPhy::SetTxOutputLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (2.85),
+                   MakeDoubleAccessor (&SatPhy::GetTxOutputLossDb, &SatPhy::SetTxOutputLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxPointingLossDb", "TX Pointing loss in dB",
-                    DoubleValue (0.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxPointingLossDb, &SatPhy::SetTxPointingLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (0.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxPointingLossDb, &SatPhy::SetTxPointingLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxOboLossDb", "TX OBO loss in dB",
-                    DoubleValue (0.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxOboLossDb, &SatPhy::SetTxOboLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (0.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxOboLossDb, &SatPhy::SetTxOboLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("TxAntennaLossDb", "TX Antenna loss in dB",
-                    DoubleValue (1.00),
-                    MakeDoubleAccessor (&SatPhy::GetTxAntennaLossDb, &SatPhy::SetTxAntennaLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (1.00),
+                   MakeDoubleAccessor (&SatPhy::GetTxAntennaLossDb, &SatPhy::SetTxAntennaLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("RxAntennaLossDb", "RX Antenna loss in dB",
-                    DoubleValue (1.00),
-                    MakeDoubleAccessor (&SatPhy::GetRxAntennaLossDb, &SatPhy::SetRxAntennaLossDb),
-                    MakeDoubleChecker<double> ())
+                   DoubleValue (1.00),
+                   MakeDoubleAccessor (&SatPhy::GetRxAntennaLossDb, &SatPhy::SetRxAntennaLossDb),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("DefaultFadingValue", "Default value for fading",
-                    DoubleValue (1.00),
-                    MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
-                    MakeDoubleChecker<double_t> ())
-    .AddAttribute( "OtherSysIfCOverIDb",
-                   "Other system interference, C over I in dB.",
+                   DoubleValue (1.00),
+                   MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
+                   MakeDoubleChecker<double_t> ())
+    .AddAttribute ( "OtherSysIfCOverIDb",
+                    "Other system interference, C over I in dB.",
                     DoubleValue (27.5),
                     MakeDoubleAccessor (&SatGeoUserPhy::m_otherSysInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
-    .AddAttribute( "AciIfCOverIDb",
-                   "Adjacent channel interference, C over I in dB.",
+    .AddAttribute ( "AciIfCOverIDb",
+                    "Adjacent channel interference, C over I in dB.",
                     DoubleValue (17.0),
                     MakeDoubleAccessor (&SatGeoUserPhy::m_aciInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
@@ -118,10 +118,10 @@ SatGeoUserPhy::GetInstanceTypeId (void) const
 }
 
 SatGeoUserPhy::SatGeoUserPhy (void)
-:m_aciInterferenceCOverIDb (17.0),
- m_otherSysInterferenceCOverIDb (27.5),
- m_aciInterferenceCOverI (SatUtils::DbToLinear (m_aciInterferenceCOverIDb)),
- m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
+  : m_aciInterferenceCOverIDb (17.0),
+    m_otherSysInterferenceCOverIDb (27.5),
+    m_aciInterferenceCOverI (SatUtils::DbToLinear (m_aciInterferenceCOverIDb)),
+    m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoUserPhy default constructor is not allowed to use");
@@ -134,9 +134,9 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
 {
   NS_LOG_FUNCTION (this);
 
-  SatPhy::GetPhyTx()->SetAttribute("TxMode", EnumValue(SatPhyTx::TRANSPARENT));
+  SatPhy::GetPhyTx ()->SetAttribute ("TxMode", EnumValue (SatPhyTx::TRANSPARENT));
 
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   m_aciInterferenceCOverI = SatUtils::DbToLinear (m_aciInterferenceCOverIDb);
   m_otherSysInterferenceCOverI = SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb);
@@ -181,7 +181,7 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
   // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -205,7 +205,7 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool /*phyError*/)
   NS_LOG_FUNCTION (this << rxParams);
 
   // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_RECV,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),

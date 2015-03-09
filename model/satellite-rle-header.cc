@@ -30,15 +30,15 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPPduHeader);
 
 SatPPduHeader::SatPPduHeader ()
-:m_startIndicator (0),
- m_endIndicator (0),
- m_ppduLengthInBytes (0),
- m_fragmentId (0),
- m_totalLengthInBytes (0),
- m_fullPpduHeaderSize (2),
- m_startPpduHeaderSize (4),
- m_endPpduHeaderSize (2),
- m_continuationPpduHeaderSize (2)
+  : m_startIndicator (0),
+    m_endIndicator (0),
+    m_ppduLengthInBytes (0),
+    m_fragmentId (0),
+    m_totalLengthInBytes (0),
+    m_fullPpduHeaderSize (2),
+    m_startPpduHeaderSize (4),
+    m_endPpduHeaderSize (2),
+    m_continuationPpduHeaderSize (2)
 {
 }
 
@@ -151,7 +151,7 @@ uint32_t SatPPduHeader::Deserialize (Buffer::Iterator start)
    * LT, T and C flags and PPDU_Label are not currently used.
    */
 
-  return GetSerializedSize();
+  return GetSerializedSize ();
 }
 
 void SatPPduHeader::Print (std::ostream &os) const
@@ -243,7 +243,7 @@ uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
 
   uint32_t size (0);
   switch (type)
-  {
+    {
     case SatEncapPduStatusTag::START_PDU:
       {
         size = m_startPpduHeaderSize;
@@ -269,7 +269,7 @@ uint32_t SatPPduHeader::GetHeaderSizeInBytes (uint8_t type) const
         NS_FATAL_ERROR ("Unsupported SatEncapPduStatusTag: " << type);
         break;
       }
-  }
+    }
   return size;
 }
 

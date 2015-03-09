@@ -28,7 +28,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatInterferenceInputTraceContainer);
 
-TypeId 
+TypeId
 SatInterferenceInputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatInterferenceInputTraceContainer")
@@ -42,7 +42,7 @@ SatInterferenceInputTraceContainer::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer ()

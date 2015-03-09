@@ -98,7 +98,7 @@ public:
    * \param loadRatio the ratio of allocated symbols over the total number of
    *                  symbols in the frame.
    */
-  typedef void (* FrameSymbolLoadCallback)
+  typedef void (*FrameSymbolLoadCallback)
     (uint32_t frameId, double loadRatio);
 
 private:

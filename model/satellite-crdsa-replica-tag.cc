@@ -28,8 +28,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatCrdsaReplicaTag);
 
 
-SatCrdsaReplicaTag::SatCrdsaReplicaTag () :
-    m_numOfIds (0)
+SatCrdsaReplicaTag::SatCrdsaReplicaTag ()
+  : m_numOfIds (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -100,7 +100,7 @@ SatCrdsaReplicaTag::Deserialize (TagBuffer buffer)
 
   m_numOfIds = buffer.ReadU8 ();
 
-  for(uint8_t i = 0; i < m_numOfIds; i++)
+  for (uint8_t i = 0; i < m_numOfIds; i++)
     {
       m_slotIds.push_back (buffer.ReadU16 ());
     }
@@ -113,7 +113,7 @@ SatCrdsaReplicaTag::Print (std::ostream &os) const
 
   os << "id=";
 
-  for(uint8_t i = 0; i < m_numOfIds; i++)
+  for (uint8_t i = 0; i < m_numOfIds; i++)
     {
       os << m_slotIds[i] << " ";
     }

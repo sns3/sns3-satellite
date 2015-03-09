@@ -78,7 +78,7 @@ public:
    * \param flowId Flow identifier
    * \return Boolean indicating whether the enque operation succeeded
    */
-  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
+  virtual bool Enque (Ptr<Packet> packet, Address dest, uint8_t flowId);
 
   /**
    * \brief Set a request manager for UT's LLC instance.
@@ -140,7 +140,6 @@ public:
   void SetMacQueueEventCallback (SatQueue::QueueEventCallback cb);
 
 protected:
-
   void DoDispose ();
 
   /**
@@ -164,7 +163,6 @@ protected:
   virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
 
 private:
-
   /**
    * Request manager handling the capacity requests
    */

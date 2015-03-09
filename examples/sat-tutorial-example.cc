@@ -66,22 +66,22 @@ main (int argc, char *argv[])
 //  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
 //  ConfigStore inputConfig;
 //  inputConfig.ConfigureDefaults ();
-                                                                             /**
-   -- End --
-   'To Select super frame configuration, Option 2'
-  ******************************************************************************/
+/**
+-- End --
+'To Select super frame configuration, Option 2'
+******************************************************************************/
 
- /******************************************************************************
-   Read command line arguments
-   -- Start --                                                                */
+  /******************************************************************************
+    Read command line arguments
+    -- Start --                                                                */
 
   CommandLine cmd;
   cmd.AddValue ("scenario", "Scenario to be created", scenario);
   cmd.Parse (argc, argv);
-                                                                              /**
-   -- End --
-   Read command line arguments
-  ******************************************************************************/
+  /**
+-- End --
+Read command line arguments
+******************************************************************************/
 
   /*****************************************************************************
     Create helper and simulation scenario
@@ -123,19 +123,19 @@ main (int argc, char *argv[])
 //    Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::CONFIG_TYPE_2));
 //    Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue ("Configuration_2"));
 
-                                                                                 /**
-     -- End --
-     'To Select super frame configuration, Option 1'
-   ******************************************************************************/
+  /**
+-- End --
+'To Select super frame configuration, Option 1'
+******************************************************************************/
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   // Create satellite helper with given scenario default=simple
   helper->CreatePredefinedScenario (satScenario);
-                                                                              /**
-   -- End --
-   Create helper and simulation scenario
-  ******************************************************************************/
+  /**
+-- End --
+Create helper and simulation scenario
+******************************************************************************/
 
   /*****************************************************************************
     Creating an installing application (users) to satellite network
@@ -149,7 +149,7 @@ main (int argc, char *argv[])
   if ( scenario == "full")
     {
       NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (1);
-      utUsers = helper->GetUserHelper()->GetUtUsers (uts.Get (0));
+      utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
     }
   else
     {
@@ -176,8 +176,8 @@ main (int argc, char *argv[])
   gwCbr.Stop (Seconds (2.1));
 
   // create applications on UT user
-  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
-  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   // install sink to receive packets from GW
   ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
@@ -188,10 +188,10 @@ main (int argc, char *argv[])
   ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
-                                                                              /**
-   -- End --
-   Creating and installing application (users) to satellite network
-  ******************************************************************************/
+  /**
+-- End --
+Creating and installing application (users) to satellite network
+******************************************************************************/
 
   NS_LOG_INFO ("--- Tutorial-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
@@ -207,22 +207,22 @@ main (int argc, char *argv[])
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
   outputConfig.ConfigureAttributes ();
-                                                                             /**
-   -- End --
-   Store set attribute values to XML output file
-  ******************************************************************************/
+  /**
+-- End --
+Store set attribute values to XML output file
+******************************************************************************/
 
   /*****************************************************************************
    Run, stop and destroy simulation
    -- Start --                                                                */
 
-  Simulator::Stop (Seconds(11));
+  Simulator::Stop (Seconds (11));
   Simulator::Run ();
   Simulator::Destroy ();
-                                                                             /**
-   -- End --
-   Run, stop and destroy simulation
-  ******************************************************************************/
+  /**
+-- End --
+Run, stop and destroy simulation
+******************************************************************************/
 
   return 0;
 }

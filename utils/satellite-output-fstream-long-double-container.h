@@ -38,7 +38,6 @@ namespace ns3 {
 class SatOutputFileStreamLongDoubleContainer : public Object
 {
 public:
-
   typedef enum
   {
     RAW,
@@ -96,7 +95,6 @@ public:
   void EnableFigureOutput (std::string title, std::string legendY, std::string legendX, std::string keyPosition, FigureUnitConversion_t figureUnitConversionType);
 
 private:
-
   /**
    * \brief Function for resetting the variables
    */

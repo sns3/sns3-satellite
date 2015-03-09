@@ -773,7 +773,7 @@ SatStatsHelper::GetGwSatNetDevice (Ptr<Node> gwNode)
    * backbone network device, and devices #1 until #(N-2) are for satellite
    * beam device.
    */
-  for (uint32_t i = 1; i <= gwNode->GetNDevices ()-2; i++)
+  for (uint32_t i = 1; i <= gwNode->GetNDevices () - 2; i++)
     {
       Ptr<NetDevice> dev = gwNode->GetDevice (i);
 

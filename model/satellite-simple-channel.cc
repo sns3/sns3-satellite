@@ -29,9 +29,9 @@ NS_LOG_COMPONENT_DEFINE ("SatSimpleChannel");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatSimpleChannel)
-  ;
+;
 
-TypeId 
+TypeId
 SatSimpleChannel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatSimpleChannel")
@@ -52,7 +52,7 @@ SatSimpleChannel::Send (Ptr<Packet> p, uint16_t protocol,
                         Ptr<SatSimpleNetDevice> sender)
 {
   NS_LOG_FUNCTION (this << p << protocol << to << from << sender)
-      ;
+  ;
   for (std::vector<Ptr<SatSimpleNetDevice> >::const_iterator i = m_devices.begin (); i != m_devices.end (); ++i)
     {
       Ptr<SatSimpleNetDevice> device = *i;

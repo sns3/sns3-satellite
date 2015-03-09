@@ -39,7 +39,6 @@ namespace ns3 {
 class SatSchedulingObject :  public SimpleRefCount<SatSchedulingObject>
 {
 public:
-
   /**
    * Default constructor
    */
@@ -93,7 +92,6 @@ public:
   Time GetHolDelay () const;
 
 private:
-
   Mac48Address m_macAddress;
   uint32_t m_bufferedBytes;
   uint32_t m_minTxOpportunity;

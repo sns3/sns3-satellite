@@ -46,7 +46,6 @@ namespace ns3 {
 class SatGenericStreamEncapsulator : public SatBaseEncapsulator
 {
 public:
-
   /**
    * Default constructor, not used
    */
@@ -93,7 +92,6 @@ public:
   virtual uint32_t GetMinTxOpportunityInBytes () const;
 
 protected:
-
   /**
    * Get new packet performs the GSE fragmentation and encapsulation
    * for a one single packet. Returns NULL packet if a suitable packet

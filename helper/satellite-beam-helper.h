@@ -91,7 +91,9 @@ public:
   /**
    * Destructor for SatBeamHelper.
    */
-  virtual ~SatBeamHelper () {}
+  virtual ~SatBeamHelper ()
+  {
+  }
 
   /**
    * Set the antenna gain patterns to be used when configuring the beams
@@ -256,7 +258,7 @@ public:
    */
   NetDeviceContainer AddMulticastGroupRoutes (MulticastBeamInfo_t beamInfo, Ptr<Node> sourceUtNode, Ipv4Address sourceAddress,
                                               Ipv4Address groupAddress, bool routeToGwUsers, Ptr<NetDevice>& gwOutputDev );
-  
+
   virtual void DoDispose ();
 
   /**

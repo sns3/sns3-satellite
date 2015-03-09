@@ -104,7 +104,7 @@ public:
    * \param from the MAC48 address of the sender of the packets.
    * \param status whether a PHY error or collision has occurred.
    */
-  typedef void (* RxStatusCallback)
+  typedef void (*RxStatusCallback)
     (uint32_t nPackets, const Address &from, bool status);
 
 private:

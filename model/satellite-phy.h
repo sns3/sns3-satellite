@@ -120,127 +120,187 @@ public:
   /**
    * \brief Initialize phy.
    */
-  void Initialize();
+  void Initialize ();
 
   /**
    * \brief Get the noise temperature of the receiver in dbK.
    * \return the receiver noise temperature in dbK.
    */
-  inline double GetRxNoiseTemperatureDbk () const { return m_rxNoiseTemperatureDbk; }
+  inline double GetRxNoiseTemperatureDbk () const
+  {
+    return m_rxNoiseTemperatureDbk;
+  }
 
   /**
    * \brief Set the noise temperature of the receiver in dbK.
    * \param temperatureDbk the receiver noise temperature in dbK.
    */
-  inline void SetRxNoiseTemperatureDbk (double temperatureDbk) { m_rxNoiseTemperatureDbk = temperatureDbk; }
+  inline void SetRxNoiseTemperatureDbk (double temperatureDbk)
+  {
+    m_rxNoiseTemperatureDbk = temperatureDbk;
+  }
 
   /**
    * \brief Get the maximum antenna gain of the receiver in dB.
    * \return the receiver noise temperature in dB.
    */
-  inline double GetRxAntennaGainDb () const { return m_rxMaxAntennaGainDb; }
+  inline double GetRxAntennaGainDb () const
+  {
+    return m_rxMaxAntennaGainDb;
+  }
 
   /**
    * \brief Set the maximum antenna gain of the receiver in dB.
    * \param gainDb the receiver antenna gain in dB.
    */
-  inline void SetRxAntennaGainDb (double gainDb) { m_rxMaxAntennaGainDb = gainDb; }
+  inline void SetRxAntennaGainDb (double gainDb)
+  {
+    m_rxMaxAntennaGainDb = gainDb;
+  }
 
   /**
    * \brief Get the antenna loss of the receiver in dB.
    * \return the receiver antenna loss in dB.
    */
-  inline double GetRxAntennaLossDb () const { return m_rxAntennaLossDb; }
+  inline double GetRxAntennaLossDb () const
+  {
+    return m_rxAntennaLossDb;
+  }
 
   /**
    * \brief Set the antenna loss of the receiver in dB.
    * \param lossDb the receiver antenna loss in dB.
    */
-  inline void SetRxAntennaLossDb (double lossDb) { m_rxAntennaLossDb = lossDb; }
+  inline void SetRxAntennaLossDb (double lossDb)
+  {
+    m_rxAntennaLossDb = lossDb;
+  }
 
   /**
    * \brief Get the maximum antenna gain of the transmitter in dB.
    * \return the transmitter noise temperature in dB.
    */
-  inline double GetTxAntennaGainDb () const { return m_txMaxAntennaGainDb; }
+  inline double GetTxAntennaGainDb () const
+  {
+    return m_txMaxAntennaGainDb;
+  }
 
   /**
    * \brief Set the maximum antenna gain of the transmitter in dB.
    * \param gainDb the transmitter antenna gain in dB.
    */
-  inline void SetTxAntennaGainDb (double gainDb) { m_txMaxAntennaGainDb = gainDb; }
+  inline void SetTxAntennaGainDb (double gainDb)
+  {
+    m_txMaxAntennaGainDb = gainDb;
+  }
 
   /**
    * \brief Get the maximum transmit power of the transmitter in dB.
    * \return the transmitter transmit power in dB.
    */
-  inline double GetTxMaxPowerDbw () const { return m_txMaxPowerDbw; }
+  inline double GetTxMaxPowerDbw () const
+  {
+    return m_txMaxPowerDbw;
+  }
 
   /**
    * \brief Set the maximum transmit power of the transmitter in dB.
    * \param powerDb the transmitter transmit power in dB.
    */
-  inline void SetTxMaxPowerDbw (double powerDb) { m_txMaxPowerDbw = powerDb; }
+  inline void SetTxMaxPowerDbw (double powerDb)
+  {
+    m_txMaxPowerDbw = powerDb;
+  }
 
   /**
    * \brief Get the output loss of the transmitter in dB.
    * \return the transmitter output loss in dB.
    */
-  inline double GetTxOutputLossDb () const { return m_txOutputLossDb; }
+  inline double GetTxOutputLossDb () const
+  {
+    return m_txOutputLossDb;
+  }
 
   /**
    * \brief Set the output loss of the transmitter in dB.
    * \param lossDb the transmitter output loss in dB.
    */
-  inline void SetTxOutputLossDb (double lossDb) { m_txOutputLossDb = lossDb; }
+  inline void SetTxOutputLossDb (double lossDb)
+  {
+    m_txOutputLossDb = lossDb;
+  }
 
   /**
    * \brief Get the pointing loss of the transmitter in dB.
    * \return the transmitter pointing loss in dB.
    */
-  inline double GetTxPointingLossDb () const { return m_txPointingLossDb; }
+  inline double GetTxPointingLossDb () const
+  {
+    return m_txPointingLossDb;
+  }
 
   /**
    * \brief Set the pointing loss of the transmitter in dB.
    * \param lossDb the transmitter pointing loss in dB.
    */
-  inline void SetTxPointingLossDb (double lossDb) { m_txPointingLossDb = lossDb; }
+  inline void SetTxPointingLossDb (double lossDb)
+  {
+    m_txPointingLossDb = lossDb;
+  }
 
   /**
    * \brief Get the OBO loss of the transmitter in dB.
    * \return the transmitter OBO loss in dB.
    */
-  inline double GetTxOboLossDb () const { return m_txOboLossDb; }
+  inline double GetTxOboLossDb () const
+  {
+    return m_txOboLossDb;
+  }
 
   /**
    * \brief Set the OBO loss of the transmitter in dB.
    * \param lossDb the transmitter OBO loss in dB.
    */
-  inline void SetTxOboLossDb (double lossDb) { m_txOboLossDb = lossDb; }
+  inline void SetTxOboLossDb (double lossDb)
+  {
+    m_txOboLossDb = lossDb;
+  }
 
   /**
    * \brief Get the antenna loss of the transmitter in dB.
    * \return the transmitter antenna loss in dB.
    */
-  inline double GetTxAntennaLossDb () const { return m_txAntennaLossDb; }
+  inline double GetTxAntennaLossDb () const
+  {
+    return m_txAntennaLossDb;
+  }
 
   /**
    * \brief Set the antenna loss of the transmitter in dB.
    * \param lossDb the transmitter antenna loss in dB.
    */
-  inline void SetTxAntennaLossDb (double lossDb) { m_txAntennaLossDb = lossDb; }
+  inline void SetTxAntennaLossDb (double lossDb)
+  {
+    m_txAntennaLossDb = lossDb;
+  }
 
   /**
    * \brief Get the default fading of the PHY.
    * \return the default fading of the PHY.
    */
-  inline double GetDefaultFading () const { return m_defaultFadingValue; }
+  inline double GetDefaultFading () const
+  {
+    return m_defaultFadingValue;
+  }
 
   /**
    * \brief Set the default fading of the PHY.
    * \param fading the default fading of the PHY.
    */
-  inline void SetDefaultFading (double fading) { m_defaultFadingValue = fading; }
+  inline void SetDefaultFading (double fading)
+  {
+    m_defaultFadingValue = fading;
+  }
 
   /**
    * \brief Set the transmit antenna gain pattern.
@@ -362,7 +422,6 @@ public:
   void BeginFrameEndScheduling ();
 
 protected:
-
   /**
    * The upper layer package receive callback.
    */
@@ -408,7 +467,6 @@ protected:
   double m_eirpWoGainW;
 
 private:
-
   /**
    * Beam ID
    */

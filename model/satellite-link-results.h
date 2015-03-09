@@ -52,7 +52,6 @@ namespace ns3 {
 class SatLinkResults : public Object
 {
 public:
-
   SatLinkResults ();
 
   static TypeId GetTypeId ();
@@ -103,9 +102,10 @@ protected:
 class SatLinkResultsDvbRcs2 : public SatLinkResults
 {
 public:
-
   SatLinkResultsDvbRcs2 ();
-  ~SatLinkResultsDvbRcs2 () {};
+  ~SatLinkResultsDvbRcs2 ()
+  {
+  }
 
   static TypeId GetTypeId ();
 
@@ -140,7 +140,6 @@ protected:
   void DoInitialize ();
 
 private:
-
   /**
    * \brief Map of satellite link result look up tables.
    * - key = uint32_t, i.e. waveform id
@@ -163,9 +162,10 @@ private:
 class SatLinkResultsDvbS2 : public SatLinkResults
 {
 public:
-
   SatLinkResultsDvbS2 ();
-  ~SatLinkResultsDvbS2 () {};
+  ~SatLinkResultsDvbS2 ()
+  {
+  }
 
   static TypeId GetTypeId ();
 
@@ -202,7 +202,6 @@ protected:
   void DoInitialize ();
 
 private:
-
   /**
    * \brief Map of satellite link result look up tables.
    * - key = SatModcod_e, i.e. modulation and coding scheme

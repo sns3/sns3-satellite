@@ -43,7 +43,6 @@ namespace ns3 {
 class SatRandomAccess : public Object
 {
 public:
-
   /**
    * \brief Typedef of callback for known DAMA status
    * \return Is there known DAMA allocations
@@ -194,14 +193,12 @@ public:
   bool CrdsaHasBackoffTimePassed (uint32_t allocationChannel) const;
 
 protected:
-
   /**
    * \brief Function for disposing the module and its variables
    */
   void DoDispose ();
 
 private:
-
   /**
    * \brief Function for printing out various module variables to console
    */

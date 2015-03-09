@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE ("SatLowerLayerServiceConf");
 namespace ns3 {
 
 
- SatLowerLayerServiceDaEntry::SatLowerLayerServiceDaEntry ()
+SatLowerLayerServiceDaEntry::SatLowerLayerServiceDaEntry ()
   : m_constantAssignmentProvided (false),
     m_rbdcAllowed (false),
     m_volumeAllowed (false),
@@ -43,58 +43,58 @@ namespace ns3 {
     m_minimumServiceRateKbps (0.0),
     m_maximumBacklogInKbytes (0)
 {
-   NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 SatLowerLayerServiceDaEntry::~SatLowerLayerServiceDaEntry ()
 {
-   NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
-: m_maxUniquePayloadPerBlock (0),
-  m_maxConsecutiveBlockAccessed (0),
-  m_minimumIdleBlock (0),
-  m_backOffTimeInMilliSeconds (0),
-  m_highLoadBackOffTimeInMilliSeconds (0),
-  m_backOffProbability (0),
-  m_highLoadBackOffProbability (0),
-  m_numberOfInstances (0),
-  m_averageNormalizedOfferedLoadThreshold (0.0)
+  : m_maxUniquePayloadPerBlock (0),
+    m_maxConsecutiveBlockAccessed (0),
+    m_minimumIdleBlock (0),
+    m_backOffTimeInMilliSeconds (0),
+    m_highLoadBackOffTimeInMilliSeconds (0),
+    m_backOffProbability (0),
+    m_highLoadBackOffProbability (0),
+    m_numberOfInstances (0),
+    m_averageNormalizedOfferedLoadThreshold (0.0)
 {
-   NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 SatLowerLayerServiceRaEntry::~SatLowerLayerServiceRaEntry ()
 {
-   NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatLowerLayerServiceConf);
 
 SatLowerLayerServiceConf::SatLowerLayerServiceConf ()
- : m_dynamicRatePersistence (0),
-   m_volumeBacklogPersistence (0),
-   m_defaultControlRandomizationInterval (0.0),
-   m_daServiceEntryCount (0),
-   m_raServiceEntryCount (0)
+  : m_dynamicRatePersistence (0),
+    m_volumeBacklogPersistence (0),
+    m_defaultControlRandomizationInterval (0.0),
+    m_daServiceEntryCount (0),
+    m_raServiceEntryCount (0)
 {
-   NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 
-   if (m_minRaServiceEntries > m_maxRaServiceEntries)
-     {
-       NS_FATAL_ERROR ("SatLowerLayerServiceConf::SatLowerLayerServiceConf - m_minRaServiceEntries > m_maxRaServiceEntries");
-     }
+  if (m_minRaServiceEntries > m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("SatLowerLayerServiceConf::SatLowerLayerServiceConf - m_minRaServiceEntries > m_maxRaServiceEntries");
+    }
 
-   if (m_minDaServiceEntries > m_maxDaServiceEntries)
-     {
-       NS_FATAL_ERROR ("SatLowerLayerServiceConf::SatLowerLayerServiceConf - m_minDaServiceEntries > m_maxDaServiceEntries");
-     }
+  if (m_minDaServiceEntries > m_maxDaServiceEntries)
+    {
+      NS_FATAL_ERROR ("SatLowerLayerServiceConf::SatLowerLayerServiceConf - m_minDaServiceEntries > m_maxDaServiceEntries");
+    }
 }
 
 SatLowerLayerServiceConf::~SatLowerLayerServiceConf ()
 {
-   NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 std::string
@@ -127,12 +127,12 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \return TypeId
  */
 #define SAT_ADD_DA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7) \
-   AddAttribute ( GetIndexAsDaServiceName (index) + "_ConstantAssignmentProvided", \
-                  "Constant Assignment provided for " + GetIndexAsDaServiceName (index), \
-                  BooleanValue (a1), \
-                  MakeBooleanAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## ConstantAssignmentProvided, \
-                                       &SatLowerLayerServiceConf::GetDaServ ## index ## ConstantAssignmentProvided), \
-                  MakeBooleanChecker ()) \
+  AddAttribute ( GetIndexAsDaServiceName (index) + "_ConstantAssignmentProvided", \
+                 "Constant Assignment provided for " + GetIndexAsDaServiceName (index), \
+                 BooleanValue (a1), \
+                 MakeBooleanAccessor (&SatLowerLayerServiceConf::SetDaServ ## index ## ConstantAssignmentProvided, \
+                                      &SatLowerLayerServiceConf::GetDaServ ## index ## ConstantAssignmentProvided), \
+                 MakeBooleanChecker ()) \
   .AddAttribute ( GetIndexAsDaServiceName (index) + "_RbdcAllowed", \
                   "RBDC allowed for DA " + GetIndexAsDaServiceName (index), \
                   BooleanValue (a2), \
@@ -189,12 +189,12 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \return TypeId
  */
 #define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9) \
-   AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
-                  "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
-                  UintegerValue (a1), \
-                  MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumUniquePayloadPerBlock, \
-                                        &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
-                  MakeUintegerChecker<uint8_t> ()) \
+  AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
+                 "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
+                 UintegerValue (a1), \
+                 MakeUintegerAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## MaximumUniquePayloadPerBlock, \
+                                       &SatLowerLayerServiceConf::GetRaServ ## index ## MaximumUniquePayloadPerBlock), \
+                 MakeUintegerChecker<uint8_t> ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumConsecutiveBlockAccessed", \
                   "Maximum consecutive block accessed for RA " + GetIndexAsRaServiceName (index), \
                   UintegerValue (a2), \
@@ -252,29 +252,29 @@ SatLowerLayerServiceConf::GetTypeId (void)
     .AddConstructor<SatLowerLayerServiceConf> ()
     .AddAttribute ( "DaServiceCount",
                     "DA services in use.",
-                     UintegerValue (4),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
-                     MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minDaServiceEntries, SatLowerLayerServiceConf::m_maxDaServiceEntries))
+                    UintegerValue (4),
+                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_daServiceEntryCount),
+                    MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minDaServiceEntries, SatLowerLayerServiceConf::m_maxDaServiceEntries))
     .AddAttribute ( "RaServiceCount",
                     "RA services in use.",
-                     UintegerValue (1),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
-                     MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minRaServiceEntries, SatLowerLayerServiceConf::m_maxRaServiceEntries))
+                    UintegerValue (1),
+                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
+                    MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minRaServiceEntries, SatLowerLayerServiceConf::m_maxRaServiceEntries))
     .AddAttribute ( "DynamicRatePersistence",
                     "Dynamic rate persistence for the lower layer service.",
-                     UintegerValue (5),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_dynamicRatePersistence),
-                     MakeUintegerChecker<uint8_t> ())
+                    UintegerValue (5),
+                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_dynamicRatePersistence),
+                    MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "VolumeBacklogPersistence",
                     "Volume backlog persistence for the lower layer service",
-                     UintegerValue (7),
-                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_volumeBacklogPersistence),
-                     MakeUintegerChecker<uint8_t> ())
+                    UintegerValue (7),
+                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_volumeBacklogPersistence),
+                    MakeUintegerChecker<uint8_t> ())
     .AddAttribute ( "DefaultControlRandomizationInterval",
                     "Default control randomization interval for the lower layer service",
-                     TimeValue (MilliSeconds (100)),
-                     MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
-                     MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
+                    TimeValue (MilliSeconds (100)),
+                    MakeTimeAccessor (&SatLowerLayerServiceConf::m_defaultControlRandomizationInterval),
+                    MakeTimeChecker (MilliSeconds (0), MilliSeconds (std::numeric_limits<uint8_t>::max ())))
     /*
      * RC index, CRA allowed, RBDC allowed, VBDC allowed, CRA rate, Max RBDC rate, Min RBDC rate, Max volume backlog
      */

@@ -36,7 +36,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatPacketTrace);
 
 SatPacketTrace::SatPacketTrace ()
 {
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   AsciiTraceHelper asciiTraceHelper;
 
@@ -132,7 +132,7 @@ SatPacketTrace::AddTraceEntry (Time now,
       << SatEnums::GetLinkDirName (linkDir) << " "
       << packetInfo;
 
-  *m_packetTraceStream->GetStream () << oss.str() << std::endl;
+  *m_packetTraceStream->GetStream () << oss.str () << std::endl;
 }
 
 }

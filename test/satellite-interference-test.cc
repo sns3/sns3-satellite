@@ -79,10 +79,10 @@ SatConstantInterferenceTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-if-unit", "constant", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-if-unit", "constant", true);
 
   Ptr<SatConstantInterference> interference = CreateObject<SatConstantInterference> ();
-  interference->SetAttribute ("ConstantInterferencePower", DoubleValue(100.0));
+  interference->SetAttribute ("ConstantInterferencePower", DoubleValue (100.0));
 
   // just test that we can call add. However, It shouldn't have any effect on interference.
   Ptr<SatInterference::InterferenceChangeEvent> event =  interference->Add (Time (10), 55, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
@@ -101,7 +101,7 @@ SatConstantInterferenceTestCase::DoRun (void)
   interference->NotifyRxEnd (event);
 
   // just test that we can set interference again
-  interference->SetAttribute ("ConstantInterferencePower", DoubleValue(50.0));
+  interference->SetAttribute ("ConstantInterferencePower", DoubleValue (50.0));
 
   interference->NotifyRxStart (event);
 
@@ -133,10 +133,10 @@ public:
   virtual ~SatPerPacketInterferenceTestCase ();
 
   // adds interference to model object
-  void AddInterference(Time duration, double power, Address rxAddress);
+  void AddInterference (Time duration, double power, Address rxAddress);
 
   // adds receivers own interference to model object and schedules receiving
-  void StartReceiver(Time duration, double power, Address rxAddress);
+  void StartReceiver (Time duration, double power, Address rxAddress);
 
   // receives packets i.e. calculates interference and stops receiving.
   void Receive (uint32_t rxIndex);
@@ -199,41 +199,41 @@ SatPerPacketInterferenceTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-if-unit", "perpacket", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-if-unit", "perpacket", true);
 
   // simulate interferences and receiving (4 receivers), adding and calculation done in callback routines
-  Simulator::Schedule(Time(0), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(60), 60, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
-  Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 70, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
-  Simulator::Schedule(Time(30), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(50), 10, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
-  Simulator::Schedule(Time(50), &SatPerPacketInterferenceTestCase::AddInterference, this, Time(40), 20, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
-  Simulator::Schedule(Time(10), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(90), 50, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[0]
-  Simulator::Schedule(Time(20), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(50), 5, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));   //event[1]
-  Simulator::Schedule(Time(30), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(60), 30, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[2]
-  Simulator::Schedule(Time(50), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time(20), 40, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[3]
+  Simulator::Schedule (Time (0), &SatPerPacketInterferenceTestCase::AddInterference, this, Time (60), 60, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule (Time (10), &SatPerPacketInterferenceTestCase::AddInterference, this, Time (40), 70, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule (Time (30), &SatPerPacketInterferenceTestCase::AddInterference, this, Time (50), 10, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule (Time (50), &SatPerPacketInterferenceTestCase::AddInterference, this, Time (40), 20, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));
+  Simulator::Schedule (Time (10), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time (90), 50, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[0]
+  Simulator::Schedule (Time (20), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time (50), 5, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));   //event[1]
+  Simulator::Schedule (Time (30), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time (60), 30, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[2]
+  Simulator::Schedule (Time (50), &SatPerPacketInterferenceTestCase::StartReceiver, this, Time (20), 40, Mac48Address::ConvertFrom (Mac48Address::Allocate ()));  //event[3]
 
   Simulator::Run ();
 
   // After simulation check that calculated results are as planned
 
   // check first receiver
-  double finalDiff = std::abs((double)995/(double)9 - finalPower[0]);
+  double finalDiff = std::abs ((double)995 / (double)9 - finalPower[0]);
 
-  NS_TEST_ASSERT_MSG_LT( finalDiff, 0.0000000000001, "Final power incorrect");
+  NS_TEST_ASSERT_MSG_LT ( finalDiff, 0.0000000000001, "Final power incorrect");
 
   // check second receiver
-  finalDiff = std::abs((double)196 - finalPower[1]);
+  finalDiff = std::abs ((double)196 - finalPower[1]);
 
-  NS_TEST_ASSERT_MSG_LT( finalDiff, 0.0000000000001, "Final power incorrect");
+  NS_TEST_ASSERT_MSG_LT ( finalDiff, 0.0000000000001, "Final power incorrect");
 
   // check third receiver
-  finalDiff = std::abs((double)850/(double)6 - finalPower[2]);
+  finalDiff = std::abs ((double)850 / (double)6 - finalPower[2]);
 
-  NS_TEST_ASSERT_MSG_LT( finalDiff, 0.0000000000001, "Final power incorrect");
+  NS_TEST_ASSERT_MSG_LT ( finalDiff, 0.0000000000001, "Final power incorrect");
 
   // check fourth receiver
-  finalDiff = std::abs((double)145 - finalPower[3]);
+  finalDiff = std::abs ((double)145 - finalPower[3]);
 
-  NS_TEST_ASSERT_MSG_LT( finalDiff, 0.00000000000001, "Final power incorrect");
+  NS_TEST_ASSERT_MSG_LT ( finalDiff, 0.00000000000001, "Final power incorrect");
 
   Simulator::Destroy ();
   Singleton<SatEnvVariables>::Get ()->DoDispose ();

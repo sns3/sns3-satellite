@@ -41,11 +41,11 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
     .AddConstructor<SatFadingExternalInputTraceContainer> ()
     .AddAttribute ("UtInputMode",
                    "Input mode to read trace source files from given index table.",
-                    EnumValue (SatFadingExternalInputTraceContainer::LIST_MODE),
-                    MakeEnumAccessor (&SatFadingExternalInputTraceContainer::m_utInputMode),
-                    MakeEnumChecker (SatFadingExternalInputTraceContainer::LIST_MODE, "ListMode",
-                                     SatFadingExternalInputTraceContainer::POSITION_MODE, "PositionMode",
-                                     SatFadingExternalInputTraceContainer::RANDOM_MODE, "RandomMode"))
+                   EnumValue (SatFadingExternalInputTraceContainer::LIST_MODE),
+                   MakeEnumAccessor (&SatFadingExternalInputTraceContainer::m_utInputMode),
+                   MakeEnumChecker (SatFadingExternalInputTraceContainer::LIST_MODE, "ListMode",
+                                    SatFadingExternalInputTraceContainer::POSITION_MODE, "PositionMode",
+                                    SatFadingExternalInputTraceContainer::RANDOM_MODE, "RandomMode"))
     .AddAttribute ("UtRtnUpIndexFileName",
                    "Index file defining trace source files for return up link/UTs.",
                    StringValue ("UT_fading_rtnup_traces.txt"),
@@ -66,11 +66,11 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
                    StringValue ("GW_fading_rtndwn_traces.txt"),
                    MakeStringAccessor (&SatFadingExternalInputTraceContainer::m_gwRtnDownIndexFileName),
                    MakeStringChecker ())
-  .AddAttribute ("MaxDistance",
-                 "Maximum distance allowed to fading source in position based mode [m].",
-                  DoubleValue (5000),
-                  MakeDoubleAccessor (&SatFadingExternalInputTraceContainer::m_maxDistanceToFading),
-                  MakeDoubleChecker<double> ());
+    .AddAttribute ("MaxDistance",
+                   "Maximum distance allowed to fading source in position based mode [m].",
+                   DoubleValue (5000),
+                   MakeDoubleAccessor (&SatFadingExternalInputTraceContainer::m_maxDistanceToFading),
+                   MakeDoubleChecker<double> ());
   return tid;
 }
 
@@ -80,9 +80,9 @@ TypeId SatFadingExternalInputTraceContainer::GetInstanceTypeId (void) const
 }
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
- : m_utInputMode (LIST_MODE),
-   m_indexFilesLoaded (false),
-   m_maxDistanceToFading (0)
+  : m_utInputMode (LIST_MODE),
+    m_indexFilesLoaded (false),
+    m_maxDistanceToFading (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -159,7 +159,7 @@ SatFadingExternalInputTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums:
 
   Ptr<SatFadingExternalInputTrace> ft;
   switch (channelType)
-  {
+    {
     case SatEnums::FORWARD_USER_CH:
       {
         std::map< uint32_t, ChannelTracePair_t>::iterator iter = m_utFadingMap.find (nodeId);
@@ -213,7 +213,7 @@ SatFadingExternalInputTraceContainer::GetFadingTrace (uint32_t nodeId, SatEnums:
         NS_LOG_ERROR (this << " not valid channel type!");
         break;
       }
-  }
+    }
   return ft;
 }
 
@@ -309,21 +309,21 @@ SatFadingExternalInputTraceContainer::ReadIndexFile (std::string indexFile, Trac
 
       *ifs >> id >> fileName >> lat >> lon >> alt;
 
-        while (ifs->good ())
-          {
-            NS_LOG_DEBUG (this <<
-                          " id = " << id <<
-                          " file = " << fileName <<
-                          " latitude [deg] = " << lat <<
-                          " longitude [deg] = " << lon);
+      while (ifs->good ())
+        {
+          NS_LOG_DEBUG (this <<
+                        " id = " << id <<
+                        " file = " << fileName <<
+                        " latitude [deg] = " << lat <<
+                        " longitude [deg] = " << lon);
 
-            // Store the values
-            TraceFileContainerItem_t item = std::make_pair( fileName, GeoCoordinate (lat, lon, alt) );
-            container.push_back( item );
+          // Store the values
+          TraceFileContainerItem_t item = std::make_pair ( fileName, GeoCoordinate (lat, lon, alt) );
+          container.push_back ( item );
 
-            // get next row
-            *ifs >> id >> fileName >> lat >> lon >> alt;
-          }
+          // get next row
+          *ifs >> id >> fileName >> lat >> lon >> alt;
+        }
 
       ifs->close ();
     }
@@ -345,7 +345,7 @@ SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputT
   std::string fileName;
 
   switch (inputMode)
-  {
+    {
     case LIST_MODE:
       if ( container.empty () || ( id > container.size () ))
         {
@@ -375,7 +375,7 @@ SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputT
     default:
       NS_FATAL_ERROR ("Not supported mode.");
       break;
-  }
+    }
 
   NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Creation info: Mode=" << m_utInputMode << ", ID (GW/UT)=" << id << ", FileName=" << fileName);
 
@@ -407,7 +407,7 @@ SatFadingExternalInputTraceContainer::FindSourceBasedOnPosition (TraceFileContai
 
   for (TraceFileContainer_t::iterator it = container.begin (); it != container.end (); it++)
     {
-      Vector fadingPosition = it->second.ToVector();
+      Vector fadingPosition = it->second.ToVector ();
 
       double distanceToFading = CalculateDistance ( position, fadingPosition );
 

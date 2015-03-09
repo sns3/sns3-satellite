@@ -50,22 +50,22 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
 
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabledForThisCarrier)
-  :m_state (IDLE),
-   m_receivingDedicatedAccess (false),
-   m_beamId (),
-   m_carrierId (carrierId),
-   m_satInterference (),
-   m_channelType (carrierConf->GetChannelType ()),
-   m_enableCompositeSinrOutputTrace (false),
-   m_numOfOngoingRx (0),
-   m_rxPacketCounter (0),
-   m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
-   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
-   m_isRandomAccessEnabledForThisCarrier (isRandomAccessEnabledForThisCarrier),
-   m_randomAccessBitsInFrame (0),
-   m_frameEndSchedulingInitialized (false),
-   m_randomAccessAllocationChannelId (0),
-   m_enableRandomAccessDynamicLoadControl (false)
+  : m_state (IDLE),
+    m_receivingDedicatedAccess (false),
+    m_beamId (),
+    m_carrierId (carrierId),
+    m_satInterference (),
+    m_channelType (carrierConf->GetChannelType ()),
+    m_enableCompositeSinrOutputTrace (false),
+    m_numOfOngoingRx (0),
+    m_rxPacketCounter (0),
+    m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
+    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
+    m_isRandomAccessEnabledForThisCarrier (isRandomAccessEnabledForThisCarrier),
+    m_randomAccessBitsInFrame (0),
+    m_frameEndSchedulingInitialized (false),
+    m_randomAccessAllocationChannelId (0),
+    m_enableRandomAccessDynamicLoadControl (false)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -73,7 +73,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   // Create proper interference object for carrier i
   switch (carrierConf->GetInterferenceModel (m_isRandomAccessEnabledForThisCarrier))
-  {
+    {
     case SatPhyRxCarrierConf::IF_CONSTANT:
       NS_LOG_LOGIC (this << " Constant interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatConstantInterference> ();
@@ -100,7 +100,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     default:
       NS_LOG_ERROR (this << " Not a valid interference model!");
       break;
-  }
+    }
 
   m_rxMode = carrierConf->GetRxMode ();
 
@@ -190,8 +190,8 @@ SatPhyRxCarrier::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrier")
     .SetParent<Object> ()
-    .AddAttribute( "EnableCompositeSinrOutputTrace",
-                   "Enable composite SINR output trace.",
+    .AddAttribute ( "EnableCompositeSinrOutputTrace",
+                    "Enable composite SINR output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrier::m_enableCompositeSinrOutputTrace),
                     MakeBooleanChecker ())
@@ -313,122 +313,123 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
   uint32_t key;
 
-  NS_LOG_LOGIC ("Node: " << m_nodeInfo->GetMacAddress () << " starts receiving packet at: " << Simulator::Now().GetSeconds () << " in carrier: " << rxParams->m_carrierId);  NS_LOG_LOGIC ("Sender: " << rxParams->m_phyTx);
+  NS_LOG_LOGIC ("Node: " << m_nodeInfo->GetMacAddress () << " starts receiving packet at: " << Simulator::Now ().GetSeconds () << " in carrier: " << rxParams->m_carrierId);
+  NS_LOG_LOGIC ("Sender: " << rxParams->m_phyTx);
 
   switch (m_state)
     {
-      case IDLE:
-      case RX:
-        {
-          bool receivePacket = false;
-          bool ownAddressFound = false;
-          Mac48Address source;
-          Mac48Address dest;
-          Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
+    case IDLE:
+    case RX:
+      {
+        bool receivePacket = false;
+        bool ownAddressFound = false;
+        Mac48Address source;
+        Mac48Address dest;
+        Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
 
-          for (SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
-                ((i != rxParams->m_packetsInBurst.end ()) && (ownAddressFound == false) ); i++)
-            {
-              SatMacTag tag;
-              (*i)->PeekPacketTag (tag);
-
-              dest = tag.GetDestAddress ();
-              source = tag.GetSourceAddress ();
-
-              if (( dest == m_ownAddress ))
-                {
-                  NS_LOG_LOGIC ("Packet intended for this specific receiver: " << dest);
-
-                  receivePacket = true;
-                  ownAddressFound = true;
-                }
-              else if ( dest.IsBroadcast () )
-                {
-                  NS_LOG_LOGIC ("Destination is broadcast address: " << dest);
-
-                  receivePacket = true;
-                }
-              else if ( dest.IsGroup () )
-                {
-                  NS_LOG_LOGIC ("Destination is multicast address: " << dest);
-
-                  receivePacket = true;
-                }
-            }
-
-          if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
-            {
-              NS_LOG_LOGIC ("Receiver is attached to satellite node");
-              receivePacket = true;
-            }
-
-          // add interference in any case
-          switch (m_channelType)
+        for (SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
+             ((i != rxParams->m_packetsInBurst.end ()) && (ownAddressFound == false) ); i++)
           {
-            case SatEnums::FORWARD_FEEDER_CH:
-            case SatEnums::RETURN_USER_CH:
+            SatMacTag tag;
+            (*i)->PeekPacketTag (tag);
+
+            dest = tag.GetDestAddress ();
+            source = tag.GetSourceAddress ();
+
+            if (( dest == m_ownAddress ))
               {
-                interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, source);
-                break;
+                NS_LOG_LOGIC ("Packet intended for this specific receiver: " << dest);
+
+                receivePacket = true;
+                ownAddressFound = true;
               }
-            case SatEnums::FORWARD_USER_CH:
-            case SatEnums::RETURN_FEEDER_CH:
+            else if ( dest.IsBroadcast () )
               {
-                interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
-                break;
+                NS_LOG_LOGIC ("Destination is broadcast address: " << dest);
+
+                receivePacket = true;
               }
-            case SatEnums::UNKNOWN_CH:
-            default :
+            else if ( dest.IsGroup () )
               {
-                NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Invalid channel type");
-                break;
+                NS_LOG_LOGIC ("Destination is multicast address: " << dest);
+
+                receivePacket = true;
               }
           }
 
-          // Check whether the packet is sent to our beam.
-          // In case that RX mode is something else than transparent
-          // additionally check that whether the packet was intended for this specific receiver
+        if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
+          {
+            NS_LOG_LOGIC ("Receiver is attached to satellite node");
+            receivePacket = true;
+          }
 
-          if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
+        // add interference in any case
+        switch (m_channelType)
+          {
+          case SatEnums::FORWARD_FEEDER_CH:
+          case SatEnums::RETURN_USER_CH:
             {
-              if (m_receivingDedicatedAccess && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
-                {
-                  NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission!");
-                }
-
-              // Now, we are starting to receive a packet, set the source and
-              // destination addresses of packet
-
-              rxParams_s rxParamsStruct;
-
-              rxParamsStruct.destAddress = dest;
-              rxParamsStruct.sourceAddress = source;
-              rxParamsStruct.interferenceEvent = interferenceEvent;
-              rxParamsStruct.rxParams = rxParams;
-
-              m_satInterference->NotifyRxStart (rxParamsStruct.interferenceEvent);
-
-              key = m_rxPacketCounter;
-              m_rxPacketCounter++;
-
-              m_rxParamsMap.insert (std::make_pair (key, rxParamsStruct));
-
-              NS_LOG_LOGIC (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
-
-              // Update link specific received signal power
-              m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W));
-
-              Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
-
-              IncreaseNumOfRxState (rxParams->m_txInfo.packetType);
+              interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, source);
+              break;
             }
-          break;
-        }
-      default:
-        {
-          NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Unknown state");
-          break;
-        }
+          case SatEnums::FORWARD_USER_CH:
+          case SatEnums::RETURN_FEEDER_CH:
+            {
+              interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
+              break;
+            }
+          case SatEnums::UNKNOWN_CH:
+          default:
+            {
+              NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Invalid channel type");
+              break;
+            }
+          }
+
+        // Check whether the packet is sent to our beam.
+        // In case that RX mode is something else than transparent
+        // additionally check that whether the packet was intended for this specific receiver
+
+        if ( receivePacket && ( rxParams->m_beamId == m_beamId ) )
+          {
+            if (m_receivingDedicatedAccess && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
+              {
+                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission!");
+              }
+
+            // Now, we are starting to receive a packet, set the source and
+            // destination addresses of packet
+
+            rxParams_s rxParamsStruct;
+
+            rxParamsStruct.destAddress = dest;
+            rxParamsStruct.sourceAddress = source;
+            rxParamsStruct.interferenceEvent = interferenceEvent;
+            rxParamsStruct.rxParams = rxParams;
+
+            m_satInterference->NotifyRxStart (rxParamsStruct.interferenceEvent);
+
+            key = m_rxPacketCounter;
+            m_rxPacketCounter++;
+
+            m_rxParamsMap.insert (std::make_pair (key, rxParamsStruct));
+
+            NS_LOG_LOGIC (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
+
+            // Update link specific received signal power
+            m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W));
+
+            Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
+
+            IncreaseNumOfRxState (rxParams->m_txInfo.packetType);
+          }
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatPhyRxCarrier::StartRx - Unknown state");
+        break;
+      }
     }
 }
 
@@ -567,12 +568,12 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       // Forward link
       if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
         {
-          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb(cSinr)));
+          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cSinr)));
         }
       // Return link
       else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
         {
-          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb(cSinr), iter->second.rxParams->m_txInfo.waveformId));
+          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cSinr), iter->second.rxParams->m_txInfo.waveformId));
         }
       else
         {
@@ -644,7 +645,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
         }
 
       iter->second.rxParams = NULL;
-     }
+    }
   else
     {
       NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - CRDSA packet received");
@@ -742,7 +743,7 @@ SatPhyRxCarrier::DoFrameEnd ()
 
           if (!m_crdsaPacketContainer.empty ())
             {
-              NS_FATAL_ERROR("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
+              NS_FATAL_ERROR ("SatPhyRxCarrier::DoFrameEnd - All CRDSA packets in the frame were not processed");
             }
 
           /// sort the results based on CRDSA packet IDs to make sure the packets are processed in correct order
@@ -950,10 +951,10 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                 }
 
               NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
-                        << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
-                        << " rand: " << r
-                        << " ber: " << ber
-                        << " error: " << error);
+                           << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
+                           << " rand: " << r
+                           << " ber: " << ber
+                           << " error: " << error);
 
               break;
             }
@@ -965,7 +966,7 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
               */
 
-              double ebNo = cSinr * (1/log2(SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)));
+              double ebNo = cSinr * (1 / log2 (SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)));
 
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
                                                                                            SatUtils::LinearToDb (ebNo));
@@ -977,17 +978,17 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                 }
 
               NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
-                        << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
-                        << " rand: " << r
-                        << " ber: " << ber
-                        << " error: " << error);
+                           << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
+                           << " rand: " << r
+                           << " ber: " << ber
+                           << " error: " << error);
 
               break;
             }
           case SatEnums::FORWARD_FEEDER_CH:
           case SatEnums::RETURN_USER_CH:
           case SatEnums::UNKNOWN_CH:
-          default :
+          default:
             {
               NS_FATAL_ERROR ("SatPhyRxCarrier::CheckAgainstLinkResults - Invalid channel type");
               break;
@@ -1011,7 +1012,7 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
       }
     default:
       {
-        NS_FATAL_ERROR("SatPhyRxCarrier::EndRxData - Error model not defined");
+        NS_FATAL_ERROR ("SatPhyRxCarrier::EndRxData - Error model not defined");
         break;
       }
     }
@@ -1306,7 +1307,8 @@ SatPhyRxCarrier::ProcessFrame ()
           /// save the the received packet
           combinedPacketsForFrame.push_back (processedPacket);
         }
-    } while (!nothingToProcess);
+    }
+  while (!nothingToProcess);
 
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - All successfully received packets processed, packets left in container: " << m_crdsaPacketContainer.size ());
 
@@ -1327,7 +1329,7 @@ SatPhyRxCarrier::ProcessFrame ()
 
               if (!iterList->packetHasBeenProcessed || !iterList->phyError)
                 {
-                   NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessFrame - All successfully received packets should have been processed by now");
+                  NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessFrame - All successfully received packets should have been processed by now");
                 }
 
               /// find and remove replicas of the received packet
@@ -1351,7 +1353,8 @@ SatPhyRxCarrier::ProcessFrame ()
               m_crdsaPacketContainer.erase (iter);
             }
         }
-    } while (!m_crdsaPacketContainer.empty ());
+    }
+  while (!m_crdsaPacketContainer.empty ());
 
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Container processed, packets left: " << m_crdsaPacketContainer.size ());
 
@@ -1536,12 +1539,12 @@ SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarr
           iterList->rxParams->m_ifPowerInSatellite_W -= processedPacket.rxParams->m_rxPowerInSatellite_W;
           iterList->rxParams->m_ifPower_W -= processedPacket.rxParams->m_rxPower_W;
 
-          if (fabs(iterList->rxParams->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
+          if (fabs (iterList->rxParams->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
             {
               iterList->rxParams->m_ifPowerInSatellite_W = 0;
             }
 
-          if (fabs(iterList->rxParams->m_ifPower_W) < std::numeric_limits<double>::epsilon ())
+          if (fabs (iterList->rxParams->m_ifPower_W) < std::numeric_limits<double>::epsilon ())
             {
               iterList->rxParams->m_ifPower_W = 0;
             }

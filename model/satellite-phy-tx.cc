@@ -42,12 +42,12 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyTx);
 
 
-SatPhyTx::SatPhyTx () :
-  m_maxAntennaGain (),
-  m_state (IDLE),
-  m_beamId (),
-  m_txMode (),
-  m_defaultFadingValue ()
+SatPhyTx::SatPhyTx ()
+  : m_maxAntennaGain (),
+    m_state (IDLE),
+    m_beamId (),
+    m_txMode (),
+    m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -65,7 +65,7 @@ void SatPhyTx::DoDispose ()
   m_mobility = 0;
   m_fadingContainer = 0;
   Object::DoDispose ();
-} 
+}
 
 std::ostream& operator<< (std::ostream& os, SatPhyTx::State s)
 {
@@ -89,11 +89,11 @@ SatPhyTx::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyTx")
     .SetParent<Object> ()
-    .AddAttribute("TxMode", "Tx mode of this Phy Tx.",
-                  EnumValue(SatPhyTx::NORMAL),
-                  MakeEnumAccessor(&SatPhyTx::m_txMode),
-                  MakeEnumChecker(SatPhyTx::NORMAL, "Normal Tx mode",
-                                  SatPhyTx::TRANSPARENT, "Transparent Tx mode"))
+    .AddAttribute ("TxMode", "Tx mode of this Phy Tx.",
+                   EnumValue (SatPhyTx::NORMAL),
+                   MakeEnumAccessor (&SatPhyTx::m_txMode),
+                   MakeEnumChecker (SatPhyTx::NORMAL, "Normal Tx mode",
+                                    SatPhyTx::TRANSPARENT, "Transparent Tx mode"))
   ;
   return tid;
 }
@@ -221,41 +221,41 @@ SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
   NS_LOG_LOGIC (this << " state: " << m_state);
 
   switch (m_state)
-  {
+    {
     case TX:
       NS_FATAL_ERROR ("cannot TX while already TX: the MAC should avoid this");
       break;
-      
-    case IDLE:
-    {
-      NS_ASSERT (m_channel);
-      ChangeState (TX);
-      m_channel->StartTx (txParams);
 
-      /**
-       * The SatPhyTx is mapped to a spot-beam, which means that there may be several
-       * carriers handled by the same SatPhyTx. This is why the SatPhyTx state machine
-       * needs to be overtaken, thus the SatPhyTx is allowed to send several overlapping
-       * packets; in different carriers though.
-       * TODO: The SatPhyTx state machine may need some (code quality) improvements.
-       * E.g. different inherited implementations may be done for satellite and terrestrial
-       * domain nodes.
-       */
-      if ( m_txMode == TRANSPARENT )
-        {
-          EndTx();
-        }
-      else
-        {
-          Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
-        }
-    }
-    break;
-    
+    case IDLE:
+      {
+        NS_ASSERT (m_channel);
+        ChangeState (TX);
+        m_channel->StartTx (txParams);
+
+        /**
+         * The SatPhyTx is mapped to a spot-beam, which means that there may be several
+         * carriers handled by the same SatPhyTx. This is why the SatPhyTx state machine
+         * needs to be overtaken, thus the SatPhyTx is allowed to send several overlapping
+         * packets; in different carriers though.
+         * TODO: The SatPhyTx state machine may need some (code quality) improvements.
+         * E.g. different inherited implementations may be done for satellite and terrestrial
+         * domain nodes.
+         */
+        if ( m_txMode == TRANSPARENT )
+          {
+            EndTx ();
+          }
+        else
+          {
+            Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
+          }
+      }
+      break;
+
     default:
       NS_FATAL_ERROR ("unknown state");
       break;
-  }
+    }
 }
 
 void
@@ -272,7 +272,7 @@ SatPhyTx::EndTx ()
   ChangeState (IDLE);
 }
 
-void 
+void
 SatPhyTx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);

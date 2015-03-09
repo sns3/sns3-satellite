@@ -32,21 +32,21 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannelEstimationError);
 
 SatChannelEstimationError::SatChannelEstimationError ()
-:m_lastSampleIndex (0),
- m_normalRandomVariable (),
- m_sinrsDb (),
- m_mueCesDb (),
- m_stdCesDb ()
+  : m_lastSampleIndex (0),
+    m_normalRandomVariable (),
+    m_sinrsDb (),
+    m_mueCesDb (),
+    m_stdCesDb ()
 {
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
 }
 
 SatChannelEstimationError::SatChannelEstimationError (std::string filePathName)
-:m_lastSampleIndex (0),
- m_normalRandomVariable (),
- m_sinrsDb (),
- m_mueCesDb (),
- m_stdCesDb ()
+  : m_lastSampleIndex (0),
+    m_normalRandomVariable (),
+    m_sinrsDb (),
+    m_mueCesDb (),
+    m_stdCesDb ()
 {
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
   ReadFile (filePathName);
@@ -103,7 +103,7 @@ void SatChannelEstimationError::ReadFile (std::string filePathName)
   // Read a row
   *ifs >> sinrDb >> mueCe >> stdCe;
 
-  while (ifs->good())
+  while (ifs->good ())
     {
       m_sinrsDb.push_back (sinrDb);
       m_mueCesDb.push_back (mueCe);
@@ -160,8 +160,8 @@ SatChannelEstimationError::AddError (double sinrInDb) const
               /**
                * Interpolate the proper mean and std values
                */
-              mueCe = SatUtils::Interpolate (sinrInDb, m_sinrsDb[i-1], m_sinrsDb[i], m_mueCesDb[i-1], m_mueCesDb[i]);
-              stdCe = SatUtils::Interpolate (sinrInDb, m_sinrsDb[i-1], m_sinrsDb[i], m_stdCesDb[i-1], m_stdCesDb[i]);
+              mueCe = SatUtils::Interpolate (sinrInDb, m_sinrsDb[i - 1], m_sinrsDb[i], m_mueCesDb[i - 1], m_mueCesDb[i]);
+              stdCe = SatUtils::Interpolate (sinrInDb, m_sinrsDb[i - 1], m_sinrsDb[i], m_stdCesDb[i - 1], m_stdCesDb[i]);
               break;
             }
         }

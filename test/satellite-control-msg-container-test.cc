@@ -41,9 +41,15 @@ using namespace ns3;
 class SatCtrlMsgContBaseTestCase : public TestCase
 {
 public:
-  SatCtrlMsgContBaseTestCase () : TestCase("") {};
-  SatCtrlMsgContBaseTestCase (std::string info) : TestCase(info) {};
-  virtual ~SatCtrlMsgContBaseTestCase () {}
+  SatCtrlMsgContBaseTestCase () : TestCase ("")
+  {
+  }
+  SatCtrlMsgContBaseTestCase (std::string info) : TestCase (info)
+  {
+  }
+  virtual ~SatCtrlMsgContBaseTestCase ()
+  {
+  }
 
   // add message to container
   void AddMessage (Ptr<SatControlMessage> msg);
@@ -94,8 +100,12 @@ SatCtrlMsgContBaseTestCase::GetMessage (uint32_t msgId)
 class SatCtrlMsgContDelOnTestCase : public SatCtrlMsgContBaseTestCase
 {
 public:
-  SatCtrlMsgContDelOnTestCase () : SatCtrlMsgContBaseTestCase ("Test satellite control message container with flag deletedOnRead set.") {}
-  virtual ~SatCtrlMsgContDelOnTestCase () {}
+  SatCtrlMsgContDelOnTestCase () : SatCtrlMsgContBaseTestCase ("Test satellite control message container with flag deletedOnRead set.")
+  {
+  }
+  virtual ~SatCtrlMsgContDelOnTestCase ()
+  {
+  }
 
 protected:
   virtual void DoRun (void);
@@ -106,7 +116,7 @@ SatCtrlMsgContDelOnTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-ctrl-msg-container-unit", "delon", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-ctrl-msg-container-unit", "delon", true);
 
   // create container with store time 100 ms and flag deletedOnRead set
   m_container = Create<SatControlMsgContainer> (Seconds (0.10), true);
@@ -130,14 +140,14 @@ SatCtrlMsgContDelOnTestCase::DoRun (void)
   // After simulation check that messages are what expected
 
   // ref messages created successfully
-  NS_TEST_ASSERT_MSG_EQ ((crMsg == NULL ) , false, "CR message creation failed");
-  NS_TEST_ASSERT_MSG_EQ ((tbtpMsg == NULL ) , false, "TBTP message failed");
+  NS_TEST_ASSERT_MSG_EQ ((crMsg == NULL ), false, "CR message creation failed");
+  NS_TEST_ASSERT_MSG_EQ ((tbtpMsg == NULL ), false, "TBTP message failed");
 
   // container content correct at points messages got
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[0] == crMsg) , true, "first message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == tbtpMsg) , true, "second message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[2] == tbtpMsg) , true, "third message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg) , true, "fourth message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[0] == crMsg), true, "first message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == tbtpMsg), true, "second message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[2] == tbtpMsg), true, "third message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg), true, "fourth message incorrect");
 
   Simulator::Destroy ();
 
@@ -163,8 +173,12 @@ SatCtrlMsgContDelOnTestCase::DoRun (void)
 class SatCtrlMsgContDelOffTestCase : public SatCtrlMsgContBaseTestCase
 {
 public:
-  SatCtrlMsgContDelOffTestCase () : SatCtrlMsgContBaseTestCase ("Test satellite control message container with flag deletedOnRead NOT set.") {}
-  virtual ~SatCtrlMsgContDelOffTestCase () {}
+  SatCtrlMsgContDelOffTestCase () : SatCtrlMsgContBaseTestCase ("Test satellite control message container with flag deletedOnRead NOT set.")
+  {
+  }
+  virtual ~SatCtrlMsgContDelOffTestCase ()
+  {
+  }
 
 protected:
   virtual void DoRun (void);
@@ -175,7 +189,7 @@ SatCtrlMsgContDelOffTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-ctrl-msg-container-unit", "deloff", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-ctrl-msg-container-unit", "deloff", true);
 
   // create container with store time 100 ms and flag deletedOnRead NOT set
   m_container = Create<SatControlMsgContainer> (Seconds (0.10), false);
@@ -199,14 +213,14 @@ SatCtrlMsgContDelOffTestCase::DoRun (void)
   // After simulation check that messages are what expected
 
   // ref messages created successfully
-  NS_TEST_ASSERT_MSG_EQ ((crMsg == NULL ) , false, "CR message creation failed");
-  NS_TEST_ASSERT_MSG_EQ ((tbtpMsg == NULL ) , false, "TBTP message failed");
+  NS_TEST_ASSERT_MSG_EQ ((crMsg == NULL ), false, "CR message creation failed");
+  NS_TEST_ASSERT_MSG_EQ ((tbtpMsg == NULL ), false, "TBTP message failed");
 
   // container content correct at points messages got
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[0] == crMsg) , true, "first message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == tbtpMsg) , true, "second message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[2] == tbtpMsg) , true, "third message incorrect");
-  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg) , true, "fourth message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[0] == crMsg), true, "first message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[1] == tbtpMsg), true, "second message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[2] == tbtpMsg), true, "third message incorrect");
+  NS_TEST_ASSERT_MSG_EQ ((m_msgsRead[3] == crMsg), true, "fourth message incorrect");
 
   Simulator::Destroy ();
 

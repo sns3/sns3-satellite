@@ -38,7 +38,7 @@ namespace ns3 {
  *        packet type is PACKET_OTHERHOST.
  *
  * This device does not have a helper and assumes 48-bit mac addressing;
- * the default address assigned to each device is zero, so you must 
+ * the default address assigned to each device is zero, so you must
  * assign a real address to use it.  There is also the possibility to
  * add an ErrorModel, if you want to force losses on the device.
  *
@@ -47,9 +47,9 @@ class SatSimpleNetDevice : public NetDevice
 {
 public:
   static TypeId GetTypeId (void);
-  
-  SatSimpleNetDevice();
-  ~SatSimpleNetDevice();
+
+  SatSimpleNetDevice ();
+  ~SatSimpleNetDevice ();
 
   /**
    * Receive a packet from a connected SatSimpleChannel. The

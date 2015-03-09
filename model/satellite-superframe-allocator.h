@@ -65,7 +65,10 @@ public:
    *
    *  \return Super frame duration.
    **/
-  inline Time GetSuperframeDuration () const { return m_superframeConf->GetDuration(); }
+  inline Time GetSuperframeDuration () const
+  {
+    return m_superframeConf->GetDuration ();
+  }
 
   /**
    * \brief Reserve minimum rate from the allocator. This method is called to perform CAC functionality.

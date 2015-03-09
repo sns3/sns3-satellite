@@ -51,14 +51,14 @@ main (int argc, char *argv[])
   Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
 
   /// Run simulation
-  Simulator::Schedule (MilliSeconds(0), &SatEnvVariables::GetCurrentWorkingDirectory, envVariables);
-  Simulator::Schedule (MilliSeconds(1), &SatEnvVariables::GetPathToExecutable, envVariables);
-  Simulator::Schedule (MilliSeconds(2), &SatEnvVariables::GetDataPath, envVariables);
-  Simulator::Schedule (MilliSeconds(3), &SatEnvVariables::GetOutputPath, envVariables);
-  Simulator::Schedule (MilliSeconds(4), &SatEnvVariables::LocateDataDirectory, envVariables);
-  Simulator::Schedule (MilliSeconds(5), &SatEnvVariables::LocateDirectory, envVariables, "contrib/satellite/data");
-  Simulator::Schedule (MilliSeconds(6), &SatEnvVariables::IsValidDirectory, envVariables, "contrib/satellite/data/notfound");
-  Simulator::Schedule (MilliSeconds(7), &SatEnvVariables::GetCurrentDateAndTime, envVariables);
+  Simulator::Schedule (MilliSeconds (0), &SatEnvVariables::GetCurrentWorkingDirectory, envVariables);
+  Simulator::Schedule (MilliSeconds (1), &SatEnvVariables::GetPathToExecutable, envVariables);
+  Simulator::Schedule (MilliSeconds (2), &SatEnvVariables::GetDataPath, envVariables);
+  Simulator::Schedule (MilliSeconds (3), &SatEnvVariables::GetOutputPath, envVariables);
+  Simulator::Schedule (MilliSeconds (4), &SatEnvVariables::LocateDataDirectory, envVariables);
+  Simulator::Schedule (MilliSeconds (5), &SatEnvVariables::LocateDirectory, envVariables, "contrib/satellite/data");
+  Simulator::Schedule (MilliSeconds (6), &SatEnvVariables::IsValidDirectory, envVariables, "contrib/satellite/data/notfound");
+  Simulator::Schedule (MilliSeconds (7), &SatEnvVariables::GetCurrentDateAndTime, envVariables);
 
   Simulator::Run ();
   Simulator::Destroy ();

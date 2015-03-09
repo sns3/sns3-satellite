@@ -68,7 +68,7 @@ public:
   typedef enum
   {
     NO_SORT,             //!< NO_SORT
-    BUFFERING_DELAY_SORT,//!< BUFFERING_DELAY_SORT
+    BUFFERING_DELAY_SORT, //!< BUFFERING_DELAY_SORT
     BUFFERING_LOAD_SORT, //!< BUFFERING_LOAD_SORT
     RANDOM_SORT,         //!< RANDOM_SORT
     PRIORITY_SORT        //!< PRIORITY_SORT
@@ -306,7 +306,7 @@ private:
    */
   double m_carrierBandwidthInHz;
 
- };
+};
 
 } // namespace ns3
 

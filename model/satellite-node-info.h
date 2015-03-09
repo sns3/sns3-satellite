@@ -62,7 +62,6 @@ public:
   Mac48Address GetMacAddress () const;
 
 private:
-
   uint32_t m_nodeId;
   SatEnums::SatNodeType_t m_nodeType;
   Mac48Address m_macAddress;

@@ -43,7 +43,6 @@ namespace ns3 {
 class SatMarkovContainer : public SatBaseFading
 {
 public:
-
   /**
    * \brief NS-3 function for type id
    * \return type id
@@ -123,11 +122,10 @@ public:
    *                    or RETURN_FEEDER_CH
    * \param value fading value, in unit determined by configuration
    */
-  typedef void (* FadingTraceCallback)
+  typedef void (*FadingTraceCallback)
     (double time, SatEnums::ChannelType_t channelType, double value);
 
 private:
-
   /**
    * \brief Markov model object
    */
@@ -235,7 +233,7 @@ private:
                   SatEnums::ChannelType_t,    // channel type
                   double                      // fading value
                   >
-     m_fadingTrace;
+  m_fadingTrace;
 
   /**
    * \brief Function for updating the state change probabilities

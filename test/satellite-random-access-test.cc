@@ -86,7 +86,7 @@ SatCrdsaTest1::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-random-access", "crdsa", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-random-access", "crdsa", true);
 
   // Create simple scenario
 
@@ -151,14 +151,14 @@ SatCrdsaTest1::DoRun (void)
 
   // >>> Start of actual test using Simple scenario >>>
 
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
-  cbr.SetAttribute("PacketSize", UintegerValue (64) );
+  cbr.SetAttribute ("PacketSize", UintegerValue (64) );
 
   ApplicationContainer utApps = cbr.Install (helper->GetUtUsers ());
   utApps.Start (Seconds (1.0));
@@ -234,7 +234,7 @@ SatSlottedAlohaTest1::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-random-access", "slottedAloha", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-random-access", "slottedAloha", true);
 
   // Create simple scenario
 
@@ -297,14 +297,14 @@ SatSlottedAlohaTest1::DoRun (void)
 
   // >>> Start of actual test using Simple scenario >>>
 
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
-  cbr.SetAttribute("PacketSize", UintegerValue (64) );
+  cbr.SetAttribute ("PacketSize", UintegerValue (64) );
 
   ApplicationContainer utApps = cbr.Install (helper->GetUtUsers ());
   utApps.Start (Seconds (1.0));

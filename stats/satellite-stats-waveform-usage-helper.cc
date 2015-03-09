@@ -97,7 +97,7 @@ SatStatsWaveformUsageHelper::DoInstall ()
                                    "GeneralHeading", StringValue (GetIdentifierHeading ("usage_count")));
 
   Callback<void, std::string, uint32_t> waveformUsageCallback
-      = MakeCallback (&SatStatsWaveformUsageHelper::WaveformUsageCallback, this);
+    = MakeCallback (&SatStatsWaveformUsageHelper::WaveformUsageCallback, this);
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();

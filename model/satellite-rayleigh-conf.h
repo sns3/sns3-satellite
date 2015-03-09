@@ -35,7 +35,6 @@ namespace ns3 {
 class SatRayleighConf : public SatBaseFaderConf
 {
 public:
-
   /**
    * \brief Default Rayleigh parameter count
    */
@@ -70,7 +69,6 @@ public:
   void DoDispose ();
 
 private:
-
   /**
    * \brief Clear used variables
    */

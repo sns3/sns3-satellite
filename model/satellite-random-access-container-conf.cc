@@ -27,37 +27,37 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatRandomAccessConf);
 
-TypeId 
+TypeId
 SatRandomAccessConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccessConf")
     .SetParent<Object> ()
     .AddConstructor<SatRandomAccessConf> ()
     .AddAttribute ("CrdsaSignalingOverheadInBytes", "CRDSA signaling overhead in bytes.",
-                    UintegerValue (5),
-                    MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaSignalingOverheadInBytes),
-                    MakeUintegerChecker<uint32_t> ())
+                   UintegerValue (5),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_crdsaSignalingOverheadInBytes),
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("SlottedAlohaSignalingOverheadInBytes", "Slotted ALOHA signaling overhead in bytes.",
-                    UintegerValue (3),
-                    MakeUintegerAccessor (&SatRandomAccessConf::m_slottedAlohaSignalingOverheadInBytes),
-                    MakeUintegerChecker<uint32_t> ());
+                   UintegerValue (3),
+                   MakeUintegerAccessor (&SatRandomAccessConf::m_slottedAlohaSignalingOverheadInBytes),
+                   MakeUintegerChecker<uint32_t> ());
   return tid;
 }
-SatRandomAccessConf::SatRandomAccessConf () :
-  m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
-  m_allocationChannelCount (),
-  m_crdsaSignalingOverheadInBytes (),
-  m_slottedAlohaSignalingOverheadInBytes ()
+SatRandomAccessConf::SatRandomAccessConf ()
+  : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
+    m_allocationChannelCount (),
+    m_crdsaSignalingOverheadInBytes (),
+    m_slottedAlohaSignalingOverheadInBytes ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - Constructor not in use");
 }
 
-SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> superframeSeq) :
-  m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
-  m_allocationChannelCount (llsConf->GetRaServiceCount ()),
-  m_crdsaSignalingOverheadInBytes (5),
-  m_slottedAlohaSignalingOverheadInBytes (3)
+SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> superframeSeq)
+  : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
+    m_allocationChannelCount (llsConf->GetRaServiceCount ()),
+    m_crdsaSignalingOverheadInBytes (5),
+    m_slottedAlohaSignalingOverheadInBytes (3)
 {
   NS_LOG_FUNCTION (this);
 
@@ -84,7 +84,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
       /// TODO Get rid of the hard coded 0 in GetSuperframeConf
       /// this assumes that the slot IDs for each allocation channel start at 0
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount(i) - 1);
+      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount (i) - 1);
 
       GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
     }

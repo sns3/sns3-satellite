@@ -63,27 +63,27 @@ SatUtScheduler::GetInstanceTypeId (void) const
 }
 
 SatUtScheduler::SatUtScheduler ()
-:m_schedContextCallback (),
- m_txOpportunityCallback (),
- m_llsConf (),
- m_prioritizeControl (true),
- m_framePduHeaderSizeInBytes (1),
- m_nodeInfo ()
+  : m_schedContextCallback (),
+    m_txOpportunityCallback (),
+    m_llsConf (),
+    m_prioritizeControl (true),
+    m_framePduHeaderSizeInBytes (1),
+    m_nodeInfo ()
 {
 
 }
 
 SatUtScheduler::SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls)
-:m_schedContextCallback (),
- m_txOpportunityCallback (),
- m_llsConf (lls),
- m_prioritizeControl (true),
- m_framePduHeaderSizeInBytes (1),
- m_nodeInfo ()
+  : m_schedContextCallback (),
+    m_txOpportunityCallback (),
+    m_llsConf (lls),
+    m_prioritizeControl (true),
+    m_framePduHeaderSizeInBytes (1),
+    m_nodeInfo ()
 {
   NS_LOG_FUNCTION (this);
 
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   m_utScheduledByteCounters = std::vector<uint32_t> (m_llsConf->GetDaServiceCount (), 0);
 
@@ -165,8 +165,8 @@ SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t paylo
       std::vector<uint8_t> rcIndices = GetPrioritizedRcIndexOrder ();
 
       for (std::vector<uint8_t>::const_iterator it = rcIndices.begin ();
-          it != rcIndices.end ();
-          ++it)
+           it != rcIndices.end ();
+           ++it)
         {
           // No use asking the given RC index again
           if (*it != rcIndex)

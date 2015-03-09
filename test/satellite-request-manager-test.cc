@@ -96,7 +96,7 @@ SatBaseTestCase::DoRun ()
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-rm", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-rm", "", true);
 
   // Base test case tests that no Capacity Requests are generated when CRA, RBDC
   // and VBDC are disabled for all lower layer service RC indices.
@@ -130,7 +130,7 @@ SatBaseTestCase::DoRun ()
 
   // Set queue statistics callbacks
   Callback<SatQueue::QueueStats_t, bool> cb = MakeCallback (&SatBaseTestCase::GetQueueStatistics, this);
-  for (uint8_t rc = 0; rc < llsConf->GetDaServiceCount(); ++rc)
+  for (uint8_t rc = 0; rc < llsConf->GetDaServiceCount (); ++rc)
     {
       rm->AddQueueCallback (rc, cb);
     }

@@ -90,7 +90,7 @@ SimpleUnicast1::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast1", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast1", true);
 
   // Create simple scenario
 
@@ -193,7 +193,7 @@ SimpleUnicast2::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast2", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast2", true);
 
   // Create larger scenario
 
@@ -227,8 +227,8 @@ SimpleUnicast2::DoRun (void)
   ApplicationContainer gwApps = cbr.Install (helper->GetGwUsers ());
 
   // app to send receiver 2
-  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
-  gwApps.Add(cbr.Install (helper->GetGwUsers ()));
+  cbr.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
+  gwApps.Add (cbr.Install (helper->GetGwUsers ()));
 
   gwApps.Start (Seconds (1.0));
   gwApps.Stop (Seconds (2.1));
@@ -240,8 +240,8 @@ SimpleUnicast2::DoRun (void)
   ApplicationContainer utApps = sink.Install (utUsers.Get (0));
 
   // receiver 2
-  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
-  utApps.Add(sink.Install (utUsers.Get (4)));
+  sink.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
+  utApps.Add (sink.Install (utUsers.Get (4)));
 
   utApps.Start (Seconds (1.0));
   utApps.Stop (Seconds (3.0));
@@ -318,7 +318,7 @@ SimpleUnicast3::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast3", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast3", true);
 
   // Create full scenario
 
@@ -348,7 +348,7 @@ SimpleUnicast3::DoRun (void)
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 0.5s)
   Time cbrInterval = Seconds (0.5);
   CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbr.SetAttribute ("Interval", TimeValue(cbrInterval));
+  cbr.SetAttribute ("Interval", TimeValue (cbrInterval));
 
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
@@ -356,7 +356,7 @@ SimpleUnicast3::DoRun (void)
   uint32_t maxReceivers = utUsers.GetN ();
   Time cbrStartDelay = Seconds (0.01);
   Time cbrStopDelay = Seconds (0.1);
-  Time stopTime = Seconds (maxReceivers*cbrStartDelay.GetSeconds ()) + cbrInterval + cbrInterval + Seconds (5);
+  Time stopTime = Seconds (maxReceivers * cbrStartDelay.GetSeconds ()) + cbrInterval + cbrInterval + Seconds (5);
 
   ApplicationContainer gwApps;
   ApplicationContainer utApps;
@@ -364,16 +364,16 @@ SimpleUnicast3::DoRun (void)
   // Cbr and Sink applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-      sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+      cbr.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+      sink.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
 
-      gwApps.Add(cbr.Install (gwUsers.Get (4)));
-      utApps.Add(sink.Install (utUsers.Get (i)));
+      gwApps.Add (cbr.Install (gwUsers.Get (4)));
+      utApps.Add (sink.Install (utUsers.Get (i)));
 
       cbrStartDelay += Seconds (0.01);
 
-      gwApps.Get(i)->SetStartTime (cbrStartDelay);
-      gwApps.Get(i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);
+      gwApps.Get (i)->SetStartTime (cbrStartDelay);
+      gwApps.Get (i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);
     }
 
   utApps.Start (Seconds (0.00001));
@@ -394,7 +394,7 @@ SimpleUnicast3::DoRun (void)
       Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (gwApps.Get (i));
 
       NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent by sender" << i << "!");
-      NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent(), "Packets were lost between sender and receiver" << i << "!");
+      NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost between sender and receiver" << i << "!");
     }
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
@@ -447,7 +447,7 @@ SimpleUnicast4::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast4", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast4", true);
 
   // Create simple scenario
 
@@ -467,7 +467,7 @@ SimpleUnicast4::DoRun (void)
 
   // >>> Start of actual test using Simple scenario >>>
 
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
@@ -551,7 +551,7 @@ SimpleUnicast5::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast5", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast5", true);
 
   // Create larger scenario
 
@@ -567,7 +567,7 @@ SimpleUnicast5::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreatePredefinedScenario(SatHelper::LARGER);
+  helper->CreatePredefinedScenario (SatHelper::LARGER);
 
   // >>> Start of actual test using Larger scenario >>>
 
@@ -581,12 +581,12 @@ SimpleUnicast5::DoRun (void)
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
 
   // sender 1
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("1s"));
   ApplicationContainer utApps = cbr.Install (utUsers.Get (0));
 
   // sender 2
-  utApps.Add(cbr.Install(utUsers.Get(4)));
+  utApps.Add (cbr.Install (utUsers.Get (4)));
 
   utApps.Start (Seconds (1.0));
   utApps.Stop (Seconds (2.1));
@@ -664,7 +664,7 @@ SimpleUnicast6::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast6", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast6", true);
 
   // Create full scenario
 
@@ -693,16 +693,16 @@ SimpleUnicast6::DoRun (void)
   uint16_t port = 9; // Discard port (RFC 863)
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(3)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (3)), port)));
 
   // Create the Cbr applications to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 0.5s)
   Time cbrInterval = Seconds (0.01);
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(3)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (3)), port)));
   cbr.SetAttribute ("Interval", TimeValue (cbrInterval));
 
   // initialized time values for simulation
-  uint32_t maxReceivers = utUsers.GetN();
+  uint32_t maxReceivers = utUsers.GetN ();
   Time cbrStartDelay = Seconds (1.0);
   Time cbrStopDelay = Seconds (0.005);
   Time stopTime = Seconds (maxReceivers * 0.04) + cbrStartDelay + cbrInterval + cbrStopDelay;
@@ -712,16 +712,16 @@ SimpleUnicast6::DoRun (void)
   // Cbr applications creation
   for ( uint32_t i = 0; i < maxReceivers; i++)
     {
-      utApps.Add (cbr.Install (utUsers.Get(i)));
+      utApps.Add (cbr.Install (utUsers.Get (i)));
 
       cbrStartDelay += Seconds (0.03);
 
-      utApps.Get(i)->SetStartTime (cbrStartDelay);
-      utApps.Get(i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);
+      utApps.Get (i)->SetStartTime (cbrStartDelay);
+      utApps.Get (i)->SetStopTime (cbrStartDelay + cbrInterval + cbrStopDelay);
     }
 
-  ApplicationContainer gwApps = sink.Install (gwUsers.Get(3));
-  gwApps.Start (Seconds(0.001));
+  ApplicationContainer gwApps = sink.Install (gwUsers.Get (3));
+  gwApps.Start (Seconds (0.001));
   gwApps.Stop (stopTime);
 
   Simulator::Stop (stopTime);
@@ -740,7 +740,7 @@ SimpleUnicast6::DoRun (void)
     {
       Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (utApps.Get (i));
 
-      NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent by sender " << i+1);
+      NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent by sender " << i + 1);
       totalTxBytes += sender->GetSent ();
     }
 
@@ -796,7 +796,7 @@ SimpleUnicast7::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast7", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast7", true);
 
   // Create simple scenario
 
@@ -814,15 +814,15 @@ SimpleUnicast7::DoRun (void)
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
   helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // >>> Start of actual test using Simple scenario >>>
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)
   uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::TcpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::TcpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
   cbr.SetAttribute ("Interval", StringValue ("1s"));
 
@@ -832,15 +832,15 @@ SimpleUnicast7::DoRun (void)
   gwCbrApp.Stop (Seconds (2.9));
 
   // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::TcpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::TcpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
   ApplicationContainer utSinkApp = sink.Install (utUsers);
   utSinkApp.Start (Seconds (1.0));
   utSinkApp.Stop (Seconds (9.0));
 
   // set sink and cbr addresses from GW user
-  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
-  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
+  sink.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  cbr.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   ApplicationContainer gwSinkApp = sink.Install (gwUsers);
   gwSinkApp.Start (Seconds (1.0));
@@ -864,11 +864,11 @@ SimpleUnicast7::DoRun (void)
   // here we check that results are as expected.
   // * Sender has sent something
   // * Receiver got all all data sent
-  NS_TEST_ASSERT_MSG_NE (gwSender->GetSent(), (uint32_t)0, "Nothing sent by GW app!");
-  NS_TEST_ASSERT_MSG_EQ (utReceiver->GetTotalRx(), gwSender->GetSent(), "Packets were lost to UT!");
+  NS_TEST_ASSERT_MSG_NE (gwSender->GetSent (), (uint32_t)0, "Nothing sent by GW app!");
+  NS_TEST_ASSERT_MSG_EQ (utReceiver->GetTotalRx (), gwSender->GetSent (), "Packets were lost to UT!");
 
-  NS_TEST_ASSERT_MSG_NE (utSender->GetSent(), (uint32_t)0, "Nothing sent by UT app!");
-  NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx(), utSender->GetSent(), "Packets were lost to GW!");
+  NS_TEST_ASSERT_MSG_NE (utSender->GetSent (), (uint32_t)0, "Nothing sent by UT app!");
+  NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx (), utSender->GetSent (), "Packets were lost to GW!");
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<
@@ -920,7 +920,7 @@ SimpleUnicast8::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-simple-unicast", "unicast8", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-simple-unicast", "unicast8", true);
 
   // Create Larger scenario
 
@@ -953,7 +953,7 @@ SimpleUnicast8::DoRun (void)
   // create CBR applications in GW
   ApplicationContainer gwCbrApps = cbr.Install (gwUsers);
 
-  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
+  cbr.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
   gwCbrApps.Add (cbr.Install (gwUsers));
 
   gwCbrApps.Start (Seconds (1.0));
@@ -964,15 +964,15 @@ SimpleUnicast8::DoRun (void)
 
   ApplicationContainer utSinkApps = sink.Install (utUsers.Get (0));
 
-  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
+  sink.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
   utSinkApps.Add (sink.Install (utUsers.Get (4)));
 
   utSinkApps.Start (Seconds (1.0));
   utSinkApps.Stop (Seconds (9.0));
 
   // set sink and cbr addresses from GW user
-  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  sink.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  cbr.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   // create GW sink to receive packets from UTs
   ApplicationContainer gwSinkApp = sink.Install (gwUsers);
@@ -1002,15 +1002,15 @@ SimpleUnicast8::DoRun (void)
   // here we check that results are as expected.
   // * Sender has sent something
   // * Receiver got all all data sent
-  NS_TEST_ASSERT_MSG_NE (gwSender1->GetSent(), (uint32_t)0, "Nothing sent by GW app 1!");
-  NS_TEST_ASSERT_MSG_EQ (utReceiver1->GetTotalRx(), gwSender1->GetSent(), "Packets were lost to UT1!");
+  NS_TEST_ASSERT_MSG_NE (gwSender1->GetSent (), (uint32_t)0, "Nothing sent by GW app 1!");
+  NS_TEST_ASSERT_MSG_EQ (utReceiver1->GetTotalRx (), gwSender1->GetSent (), "Packets were lost to UT1!");
 
-  NS_TEST_ASSERT_MSG_NE (gwSender2->GetSent(), (uint32_t)0, "Nothing sent by GW app 2!");
-  NS_TEST_ASSERT_MSG_EQ (utReceiver2->GetTotalRx(), gwSender2->GetSent(), "Packets were lost to UT2!");
+  NS_TEST_ASSERT_MSG_NE (gwSender2->GetSent (), (uint32_t)0, "Nothing sent by GW app 2!");
+  NS_TEST_ASSERT_MSG_EQ (utReceiver2->GetTotalRx (), gwSender2->GetSent (), "Packets were lost to UT2!");
 
-  NS_TEST_ASSERT_MSG_NE (utSender1->GetSent(), (uint32_t)0, "Nothing sent by UT app 1!");
-  NS_TEST_ASSERT_MSG_NE (utSender2->GetSent(), (uint32_t)0, "Nothing sent by UT app 2!");
-  NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx(), utSender1->GetSent() + utSender2->GetSent(), "Packets were lost to GW!");
+  NS_TEST_ASSERT_MSG_NE (utSender1->GetSent (), (uint32_t)0, "Nothing sent by UT app 1!");
+  NS_TEST_ASSERT_MSG_NE (utSender2->GetSent (), (uint32_t)0, "Nothing sent by UT app 2!");
+  NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx (), utSender1->GetSent () + utSender2->GetSent (), "Packets were lost to GW!");
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Larger scenario <<<

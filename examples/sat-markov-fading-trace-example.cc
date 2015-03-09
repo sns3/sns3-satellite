@@ -93,13 +93,13 @@ SatMarkovFadingExamplePlot::FadingTraceCb (std::string context, double time, Sat
 double
 SatMarkovFadingExamplePlot::GetElevation ()
 {
-   return m_elevation;
+  return m_elevation;
 }
 
 double
 SatMarkovFadingExamplePlot::GetVelocity ()
 {
-   return m_velocity;
+  return m_velocity;
 }
 
 Gnuplot2dDataset

@@ -422,7 +422,7 @@ SatStatsFwdUserLinkRxPowerHelper::DoInstallProbes ()
   NS_LOG_FUNCTION (this);
 
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
       //const int32_t utId = GetUtId (*it);
       //NS_ASSERT_MSG (utId > 0,
@@ -495,7 +495,7 @@ SatStatsRtnFeederLinkRxPowerHelper::DoInstallProbes ()
   NS_LOG_FUNCTION (this);
 
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
     {
       NetDeviceContainer devs = GetGwSatNetDevice (*it);
 

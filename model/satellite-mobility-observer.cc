@@ -32,43 +32,43 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatMobilityObserver);
 
-TypeId 
+TypeId
 SatMobilityObserver::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMobilityObserver")
     .SetParent<Object> ()
     .AddAttribute ("OwnMobility", "Own mobility.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatMobilityObserver::m_ownMobility),
-                    MakePointerChecker<SatMobilityModel> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatMobilityObserver::m_ownMobility),
+                   MakePointerChecker<SatMobilityModel> ())
     .AddAttribute ("SatelliteMobility", "The mobility of the satellite.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatMobilityObserver::m_geoSatMobility),
-                    MakePointerChecker<SatMobilityModel> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatMobilityObserver::m_geoSatMobility),
+                   MakePointerChecker<SatMobilityModel> ())
     .AddAttribute ("AnotherMobility", "The mobility of the another end node.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatMobilityObserver::m_anotherMobility),
-                    MakePointerChecker<SatMobilityModel> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatMobilityObserver::m_anotherMobility),
+                   MakePointerChecker<SatMobilityModel> ())
     .AddAttribute ("OwnPropagation", "Own propagation delay model.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatMobilityObserver::m_ownProgDelayModel),
-                    MakePointerChecker<SatMobilityModel> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatMobilityObserver::m_ownProgDelayModel),
+                   MakePointerChecker<SatMobilityModel> ())
     .AddAttribute ("AnotherPropagation", "The propagation delay model of the another end node.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatMobilityObserver::m_anotherProgDelayModel),
-                    MakePointerChecker<SatMobilityModel> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatMobilityObserver::m_anotherProgDelayModel),
+                   MakePointerChecker<SatMobilityModel> ())
     .AddAttribute ("MinAltitude", "The minimum altitude accepted for own position.",
-                    DoubleValue (0),
-                    MakeDoubleAccessor(&SatMobilityObserver::m_minAltitude),
-                    MakeDoubleChecker<double>())
+                   DoubleValue (0),
+                   MakeDoubleAccessor (&SatMobilityObserver::m_minAltitude),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("MaxAltitude", "The maximum altitude accepted for own position.",
-                    DoubleValue (500.00),
-                    MakeDoubleAccessor(&SatMobilityObserver::m_maxAltitude),
-                    MakeDoubleChecker<double>())
+                   DoubleValue (500.00),
+                   MakeDoubleAccessor (&SatMobilityObserver::m_maxAltitude),
+                   MakeDoubleChecker<double> ())
     .AddTraceSource ("PropertyChanged",
-                    "The value of the some property has changed",
-                    MakeTraceSourceAccessor (&SatMobilityObserver::m_propertyChangeTrace),
-                    "ns3::SatMobilityObserver::PropertyChangedCallback")
+                     "The value of the some property has changed",
+                     MakeTraceSourceAccessor (&SatMobilityObserver::m_propertyChangeTrace),
+                     "ns3::SatMobilityObserver::PropertyChangedCallback")
   ;
   return tid;
 }
@@ -78,7 +78,7 @@ SatMobilityObserver::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatMobilityObserver::SatMobilityObserver ()
@@ -90,12 +90,12 @@ SatMobilityObserver::SatMobilityObserver ()
 }
 
 SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility)
- : m_ownMobility (ownMobility),
-   m_anotherMobility (NULL),
-   m_geoSatMobility (geoSatMobility),
-   m_ownProgDelayModel (NULL),
-   m_anotherProgDelayModel (NULL),
-   m_initialized (false)
+  : m_ownMobility (ownMobility),
+    m_anotherMobility (NULL),
+    m_geoSatMobility (geoSatMobility),
+    m_ownProgDelayModel (NULL),
+    m_anotherProgDelayModel (NULL),
+    m_initialized (false)
 {
   NS_LOG_FUNCTION (this << ownMobility << geoSatMobility);
 
@@ -103,7 +103,7 @@ SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr
   GeoCoordinate ownPosition = m_ownMobility->GetGeoPosition ();
 
   // same reference ellipsoide must be used by mobilities
-  NS_ASSERT (satellitePosition.GetRefEllipsoid() == ownPosition.GetRefEllipsoid() );
+  NS_ASSERT (satellitePosition.GetRefEllipsoid () == ownPosition.GetRefEllipsoid () );
 
   double satelliteAltitude = satellitePosition.GetAltitude ();
 
@@ -118,7 +118,7 @@ SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr
   m_updateTimingAdvance = true;
   m_timingAdvance_s = Seconds (0);
 
-  m_geoSatMobility->TraceConnect ("SatCourseChange", "Satellite", MakeCallback( &SatMobilityObserver::PositionChanged, this));
+  m_geoSatMobility->TraceConnect ("SatCourseChange", "Satellite", MakeCallback ( &SatMobilityObserver::PositionChanged, this));
   m_ownMobility->TraceConnect ("SatCourseChange", "Own", MakeCallback (&SatMobilityObserver::PositionChanged, this));
 
   m_velocity = 0.0;
@@ -158,9 +158,9 @@ SatMobilityObserver::ObserveTimingAdvance (Ptr<PropagationDelayModel> ownDelayMo
   m_anotherMobility = anotherMobility;
 
   // same reference ellipsoide must be used by mobilities
-  NS_ASSERT (m_anotherMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
+  NS_ASSERT (m_anotherMobility->GetGeoPosition ().GetRefEllipsoid () == m_ownMobility->GetGeoPosition ().GetRefEllipsoid () );
 
-  m_anotherMobility->TraceConnect("SatCourseChange", "Another", MakeCallback(&SatMobilityObserver::PositionChanged, this));
+  m_anotherMobility->TraceConnect ("SatCourseChange", "Another", MakeCallback (&SatMobilityObserver::PositionChanged, this));
 }
 
 double
@@ -171,9 +171,9 @@ SatMobilityObserver::GetElevationAngle (void)
   if ( m_updateElevationAngle == true )
     {
       // same reference ellipsoide must be used by mobilities
-      NS_ASSERT (m_geoSatMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
+      NS_ASSERT (m_geoSatMobility->GetGeoPosition ().GetRefEllipsoid () == m_ownMobility->GetGeoPosition ().GetRefEllipsoid () );
 
-      UpdateElevationAngle();
+      UpdateElevationAngle ();
       m_updateElevationAngle = false;
     }
 
@@ -185,8 +185,8 @@ SatMobilityObserver::GetVelocity (void)
 {
   NS_LOG_FUNCTION (this);
 
-  Vector velocity = m_ownMobility->GetVelocity();
-  m_velocity = std::sqrt( ( velocity.x * velocity.x ) + ( velocity.y * velocity.y ) + ( velocity.z * velocity.z ) );
+  Vector velocity = m_ownMobility->GetVelocity ();
+  m_velocity = std::sqrt ( ( velocity.x * velocity.x ) + ( velocity.y * velocity.y ) + ( velocity.z * velocity.z ) );
 
   return m_velocity;
 }
@@ -197,18 +197,18 @@ SatMobilityObserver::GetTimingAdvance (void)
   NS_LOG_FUNCTION (this);
 
   // update timing advance, if another end is given and update needed
-    if ( (m_anotherMobility != NULL) &&  ( m_updateTimingAdvance == true ) )
+  if ( (m_anotherMobility != NULL) &&  ( m_updateTimingAdvance == true ) )
     {
       // another propagation delay is expected to be given
       NS_ASSERT ( m_anotherProgDelayModel != NULL );
 
       // same reference ellipsoide must be used by mobilities
-      NS_ASSERT (m_geoSatMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
+      NS_ASSERT (m_geoSatMobility->GetGeoPosition ().GetRefEllipsoid () == m_ownMobility->GetGeoPosition ().GetRefEllipsoid () );
 
       // same reference ellipsoide must be used by mobilities
-      NS_ASSERT (m_anotherMobility->GetGeoPosition().GetRefEllipsoid() == m_ownMobility->GetGeoPosition().GetRefEllipsoid() );
+      NS_ASSERT (m_anotherMobility->GetGeoPosition ().GetRefEllipsoid () == m_ownMobility->GetGeoPosition ().GetRefEllipsoid () );
 
-      UpdateTimingAdvance();
+      UpdateTimingAdvance ();
       m_updateTimingAdvance = false;
     }
 
@@ -227,7 +227,7 @@ SatMobilityObserver::NotifyPropertyChange (void) const
 }
 
 void
-SatMobilityObserver::PositionChanged(std::string context, Ptr<const SatMobilityModel> position)
+SatMobilityObserver::PositionChanged (std::string context, Ptr<const SatMobilityModel> position)
 {
   NS_LOG_FUNCTION (this << context << position);
 
@@ -250,31 +250,31 @@ SatMobilityObserver::PositionChanged(std::string context, Ptr<const SatMobilityM
 }
 
 void
-SatMobilityObserver::UpdateElevationAngle()
+SatMobilityObserver::UpdateElevationAngle ()
 {
   NS_LOG_FUNCTION (this);
 
   m_elevationAngle = NAN;
 
-  GeoCoordinate ownPosition = m_ownMobility->GetGeoPosition();
-  GeoCoordinate satellitePosition = m_geoSatMobility->GetGeoPosition();
+  GeoCoordinate ownPosition = m_ownMobility->GetGeoPosition ();
+  GeoCoordinate satellitePosition = m_geoSatMobility->GetGeoPosition ();
 
-  NS_ASSERT ( ownPosition.GetAltitude() >= m_minAltitude && ownPosition.GetAltitude() <= m_maxAltitude );
+  NS_ASSERT ( ownPosition.GetAltitude () >= m_minAltitude && ownPosition.GetAltitude () <= m_maxAltitude );
 
   // elevation angle is always calculated at earth surface, so set altitude to zero
   ownPosition.SetAltitude (0);
 
   // calculate distance from Earth location to satellite
-  double distanceToSatellite = CalculateDistance (ownPosition.ToVector(), satellitePosition.ToVector() );
+  double distanceToSatellite = CalculateDistance (ownPosition.ToVector (), satellitePosition.ToVector () );
 
   // calculate elevation angle only, if satellite can be seen from own position
   if ( distanceToSatellite <= m_maxDistanceToSatellite )
     {
-      double earthLatitude = SatUtils::DegreesToRadians (ownPosition.GetLatitude());
-      double satLatitude = SatUtils::DegreesToRadians (satellitePosition.GetLatitude());
+      double earthLatitude = SatUtils::DegreesToRadians (ownPosition.GetLatitude ());
+      double satLatitude = SatUtils::DegreesToRadians (satellitePosition.GetLatitude ());
 
-      double earthLongitude = SatUtils::DegreesToRadians (ownPosition.GetLongitude());
-      double satLongitude = SatUtils::DegreesToRadians (satellitePosition.GetLongitude());
+      double earthLongitude = SatUtils::DegreesToRadians (ownPosition.GetLongitude ());
+      double satLongitude = SatUtils::DegreesToRadians (satellitePosition.GetLongitude ());
 
       double longitudeDelta = satLongitude - earthLongitude;
 
@@ -284,34 +284,34 @@ SatMobilityObserver::UpdateElevationAngle()
       // reference ellipsoides. But, if more accurate calculation is needed, then the used
       // reference ellipsoide is needed to be take into account.
       double centralAngleCos = ( std::cos (earthLatitude) * std::cos (satLatitude) * std::cos (longitudeDelta) ) +
-                               ( std::sin (earthLatitude) * std::sin (satLatitude ) );
+        ( std::sin (earthLatitude) * std::sin (satLatitude ) );
 
       // Calculate cosini of the elavation angle
-      double elCos = std::sin ( std::acos (centralAngleCos)) / std::sqrt( 1 + std::pow (m_radiusRatio, 2) - 2 * m_radiusRatio * centralAngleCos);
+      double elCos = std::sin ( std::acos (centralAngleCos)) / std::sqrt ( 1 + std::pow (m_radiusRatio, 2) - 2 * m_radiusRatio * centralAngleCos);
 
       m_elevationAngle = SatUtils::RadiansToDegrees (std::acos (elCos) );
     }
 }
 
 void
-SatMobilityObserver::UpdateTimingAdvance()
+SatMobilityObserver::UpdateTimingAdvance ()
 {
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT (m_ownProgDelayModel != NULL);
   NS_ASSERT (m_anotherProgDelayModel != NULL);
 
-  m_timingAdvance_s = m_ownProgDelayModel->GetDelay( m_ownMobility, m_geoSatMobility ) +
-                      m_anotherProgDelayModel->GetDelay( m_anotherMobility, m_geoSatMobility );
+  m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility ) +
+    m_anotherProgDelayModel->GetDelay ( m_anotherMobility, m_geoSatMobility );
 
 }
 
 
-void SatMobilityObserver::SatelliteStatusChanged()
+void SatMobilityObserver::SatelliteStatusChanged ()
 {
   NS_LOG_FUNCTION (this);
 
-  double satelliteAltitude = m_geoSatMobility->GetGeoPosition().GetAltitude();
+  double satelliteAltitude = m_geoSatMobility->GetGeoPosition ().GetAltitude ();
 
   // satellite is expected to be in the sky
   NS_ASSERT ( satelliteAltitude > 0.0 );

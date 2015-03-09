@@ -98,7 +98,7 @@ private:
   template<typename P, typename V>
   bool SetupProbe (Ptr<Object> object,
                    uint32_t identifier,
-                   void (SatStatsFrameLoadHelper::*traceSink) (std::string, uint32_t, V));
+                   void (SatStatsFrameLoadHelper::*traceSink)(std::string, uint32_t, V));
 
   /**
    * \param context
@@ -146,7 +146,7 @@ template<typename P, typename V>
 bool
 SatStatsFrameLoadHelper::SetupProbe (Ptr<Object> object,
                                      uint32_t identifier,
-                                     void (SatStatsFrameLoadHelper::*traceSink) (std::string, uint32_t, V))
+                                     void (SatStatsFrameLoadHelper::*traceSink)(std::string, uint32_t, V))
 {
   std::ostringstream oss;
   oss << identifier;

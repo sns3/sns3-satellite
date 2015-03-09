@@ -25,7 +25,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatRandomAccess);
 
-TypeId 
+TypeId
 SatRandomAccess::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccess")
@@ -34,28 +34,28 @@ SatRandomAccess::GetTypeId (void)
   return tid;
 }
 
-SatRandomAccess::SatRandomAccess () :
-  m_uniformRandomVariable (),
-  m_randomAccessModel (SatEnums::RA_MODEL_OFF),
-  m_randomAccessConf (),
-  m_numOfAllocationChannels (),
+SatRandomAccess::SatRandomAccess ()
+  : m_uniformRandomVariable (),
+    m_randomAccessModel (SatEnums::RA_MODEL_OFF),
+    m_randomAccessConf (),
+    m_numOfAllocationChannels (),
 
-  /// CRDSA variables
-  m_crdsaNewData (true)
+    /// CRDSA variables
+    m_crdsaNewData (true)
 {
   NS_LOG_FUNCTION (this);
 
   NS_FATAL_ERROR ("SatRandomAccess::SatRandomAccess - Constructor not in use");
 }
 
-SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, SatEnums::RandomAccessModel_t randomAccessModel) :
-  m_uniformRandomVariable (),
-  m_randomAccessModel (randomAccessModel),
-  m_randomAccessConf (randomAccessConf),
-  m_numOfAllocationChannels (randomAccessConf->GetNumOfAllocationChannels ()),
+SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, SatEnums::RandomAccessModel_t randomAccessModel)
+  : m_uniformRandomVariable (),
+    m_randomAccessModel (randomAccessModel),
+    m_randomAccessConf (randomAccessConf),
+    m_numOfAllocationChannels (randomAccessConf->GetNumOfAllocationChannels ()),
 
-  /// CRDSA variables
-  m_crdsaNewData (true)
+    /// CRDSA variables
+    m_crdsaNewData (true)
 {
   NS_LOG_FUNCTION (this);
 
@@ -162,7 +162,7 @@ SatRandomAccess::IsCrdsaAllocationChannel (uint32_t allocationChannel)
   std::set<uint32_t>::iterator iter;
   iter = m_crdsaAllocationChannels.find (allocationChannel);
 
-  if (iter == m_crdsaAllocationChannels.end())
+  if (iter == m_crdsaAllocationChannels.end ())
     {
       return false;
     }
@@ -177,7 +177,7 @@ SatRandomAccess::IsSlottedAlohaAllocationChannel (uint32_t allocationChannel)
   std::set<uint32_t>::iterator iter;
   iter = m_slottedAlohaAllocationChannels.find (allocationChannel);
 
-  if (iter == m_slottedAlohaAllocationChannels.end())
+  if (iter == m_slottedAlohaAllocationChannels.end ())
     {
       return false;
     }
@@ -318,7 +318,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAcc
       for (iter = txOpportunities.crdsaTxOpportunities.begin (); iter != txOpportunities.crdsaTxOpportunities.end (); iter++)
         {
           std::set<uint32_t>::iterator iterSet;
-          for (iterSet = iter->second.begin(); iterSet != iter->second.end(); iterSet++)
+          for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
             {
               NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - CRDSA transmission opportunity for unique packet: " << uniquePacketId << " at slot: " << (*iterSet));
             }
@@ -644,7 +644,7 @@ SatRandomAccess::CrdsaSetBackoffTimer (uint32_t allocationChannel)
   NS_LOG_FUNCTION (this);
 
   m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffReleaseTime (Now ()
-                      + MilliSeconds (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffTimeInMilliSeconds ()));
+                                                                                                         + MilliSeconds (m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffTimeInMilliSeconds ()));
 
   NS_LOG_INFO ("SatRandomAccess::CrdsaSetBackoffTimer - Setting backoff timer for allocation channel: " << allocationChannel);
 }
@@ -688,7 +688,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
               slots = CrdsaRandomizeTxOpportunities (allocationChannel,slots);
 
               /// save the packet specific Tx opportunities into a vector
-              txOpportunities.crdsaTxOpportunities.insert (std::make_pair(*slots.second.begin (), slots.second));
+              txOpportunities.crdsaTxOpportunities.insert (std::make_pair (*slots.second.begin (), slots.second));
 
               /// increase the number of randomized unique packets
               actualUniquePackets++;

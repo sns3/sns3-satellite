@@ -52,15 +52,14 @@ namespace ns3 {
 class SatLog : public Object
 {
 public:
-
   /**
    * \brief Enum for log types
    */
   typedef enum
   {
-    LOG_GENERIC = 0,//!< LOG_GENERIC
+    LOG_GENERIC = 0, //!< LOG_GENERIC
     LOG_INFO = 1,   //!< LOG_INFO
-    LOG_WARNING = 2,//!< LOG_WARNING
+    LOG_WARNING = 2, //!< LOG_WARNING
     LOG_ERROR = 3,  //!< LOG_ERROR
     LOG_CUSTOM = 4  //!< LOG_CUSTOM
   } LogType_t;
@@ -116,7 +115,6 @@ public:
   void Reset ();
 
 private:
-
   /**
    * \brief Function for getting the file tag for predefined log types
    * \param logType log type

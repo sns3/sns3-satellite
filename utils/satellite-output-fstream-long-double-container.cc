@@ -36,8 +36,8 @@ SatOutputFileStreamLongDoubleContainer::GetTypeId (void)
   return tid;
 }
 
-SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow) :
-    m_outputFileStreamWrapper (),
+SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
+  : m_outputFileStreamWrapper (),
     m_outputFileStream (),
     m_container (),
     m_fileName (filename),
@@ -54,8 +54,8 @@ SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (
     }
 }
 
-SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer () :
-    m_outputFileStreamWrapper (),
+SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer ()
+  : m_outputFileStreamWrapper (),
     m_outputFileStream (),
     m_container (),
     m_fileName (),
@@ -81,7 +81,7 @@ SatOutputFileStreamLongDoubleContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  Object::DoDispose();
+  Object::DoDispose ();
 }
 
 void
@@ -92,10 +92,10 @@ SatOutputFileStreamLongDoubleContainer::WriteContainerToFile ()
   OpenStream ();
 
   if (m_outputFileStream->is_open ())
-  {
+    {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {
-          for( uint32_t j = 0; j < m_valuesInRow; j++ )
+          for ( uint32_t j = 0; j < m_valuesInRow; j++ )
             {
               if (j + 1 == m_valuesInRow)
                 {
@@ -108,8 +108,8 @@ SatOutputFileStreamLongDoubleContainer::WriteContainerToFile ()
             }
           *m_outputFileStream << std::endl;
         }
-    m_outputFileStream->close ();
-  }
+      m_outputFileStream->close ();
+    }
   else
     {
       NS_ABORT_MSG ("Output stream is not valid for writing.");
@@ -199,7 +199,7 @@ SatOutputFileStreamLongDoubleContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_container.empty())
+  if (!m_container.empty ())
     {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {
@@ -223,10 +223,10 @@ SatOutputFileStreamLongDoubleContainer::GetGnuplotDataset ()
   ret.SetTitle (m_title);
   ret.SetStyle (Gnuplot2dDataset::LINES);
 
-  if (!m_container.empty())
+  if (!m_container.empty ())
     {
       switch (m_valuesInRow)
-      {
+        {
         case 2:
           {
             for (uint32_t i = 0; i < m_container.size (); i++)
@@ -239,7 +239,7 @@ SatOutputFileStreamLongDoubleContainer::GetGnuplotDataset ()
           {
             NS_ABORT_MSG ("SatOutputFileStreamLongDoubleContainer::GetGnuplotDataset - Figure output not implemented for " << m_valuesInRow << " columns.");
           }
-      }
+        }
     }
   return ret;
 }
@@ -250,7 +250,7 @@ SatOutputFileStreamLongDoubleContainer::ConvertValue (long double value)
   NS_LOG_FUNCTION (this << value);
 
   switch (m_figureUnitConversionType)
-  {
+    {
     case RAW:
       {
         return value;
@@ -276,7 +276,7 @@ SatOutputFileStreamLongDoubleContainer::ConvertValue (long double value)
         NS_ABORT_MSG ("SatOutputFileStreamLongDoubleContainer::ConvertValue - Invalid conversion type.");
         break;
       }
-  }
+    }
   return -1;
 }
 

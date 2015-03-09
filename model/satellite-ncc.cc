@@ -32,7 +32,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatNcc);
 
-TypeId 
+TypeId
 SatNcc::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatNcc")

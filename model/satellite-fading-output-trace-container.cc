@@ -30,7 +30,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatFadingOutputTraceContainer);
 
-TypeId 
+TypeId
 SatFadingOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingOutputTraceContainer")
@@ -47,8 +47,8 @@ SatFadingOutputTraceContainer::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatFadingOutputTraceContainer::SatFadingOutputTraceContainer () :
-  m_enableFigureOutput (true)
+SatFadingOutputTraceContainer::SatFadingOutputTraceContainer ()
+  : m_enableFigureOutput (true)
 {
   NS_LOG_FUNCTION (this);
 }

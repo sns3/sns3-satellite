@@ -128,7 +128,6 @@ public:
   void Dump (double carrierBandwidthInHz, double symbolRateInBaud) const;
 
 private:
-
   /**
    * Id of this waveform
    */
@@ -200,14 +199,17 @@ public:
 
   static TypeId GetTypeId (void);
 
-  inline bool IsAcmEnabled () const { return m_acmEnabled; }
+  inline bool IsAcmEnabled () const
+  {
+    return m_acmEnabled;
+  }
 
   /**
    * \brief Initialize the Eb/No requirements of the waveforms based on
    * the used DVB-RCS2 link results.
    * \param linkResults Pointer to DVB-RCS2 link results
    */
-  void InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults );
+  void InitializeEbNoRequirements ( Ptr<SatLinkResultsDvbRcs2> linkResults );
 
   /**
    * \brief Get the details of a certain waveform
@@ -233,13 +235,19 @@ public:
    * \brief Get default burst length
    * \return Configured default burst length.
    */
-  inline uint32_t GetDefaultBurstLength () const { return GetWaveform (m_defaultWfId)->GetBurstLengthInSymbols (); }
+  inline uint32_t GetDefaultBurstLength () const
+  {
+    return GetWaveform (m_defaultWfId)->GetBurstLengthInSymbols ();
+  }
 
   /**
    * \brief Get supported burst lengths.
    * \return Supported burst lengths.
    */
-  inline const BurstLengthContainer_t& GetSupportedBurstLengths () const { return m_supportedBurstLengthsInSymbols;}
+  inline const BurstLengthContainer_t& GetSupportedBurstLengths () const
+  {
+    return m_supportedBurstLengthsInSymbols;
+  }
 
   /**
    * \brief Get the best waveform id based on UT's C/No and C/No thresholds
@@ -271,13 +279,19 @@ public:
    * \brief Get minimum supported waveform id
    * return Minimum waveform id
    */
-  inline uint32_t GetMinWfId () {return m_minWfId;};
+  inline uint32_t GetMinWfId ()
+  {
+    return m_minWfId;
+  }
 
   /**
    * \brief Get maximum supported waveform id
    * return Maximum waveform id
    */
-  inline uint32_t GetMaxWfId () {return m_maxWfId;};
+  inline uint32_t GetMaxWfId ()
+  {
+    return m_maxWfId;
+  }
 
   /**
    * Static variables defining the available burst lengths
@@ -286,7 +300,6 @@ public:
   static const uint32_t LONG_BURST_LENGTH = 1616;
 
 private:
-
   /**
    * \brief Read the waveform table from a file
    * \param filePathName path and file name

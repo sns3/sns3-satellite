@@ -37,9 +37,9 @@ SatDamaEntry::SatDamaEntry ()
 }
 
 SatDamaEntry::SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf)
- : m_dynamicRatePersistence (0),
-   m_volumeBacklogPersistence (0),
-   m_llsConf (llsConf)
+  : m_dynamicRatePersistence (0),
+    m_volumeBacklogPersistence (0),
+    m_llsConf (llsConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -143,7 +143,7 @@ SatDamaEntry::GetCraInKbps (uint8_t index) const
 
   if ( index >= m_llsConf->GetDaServiceCount ())
     {
-       NS_FATAL_ERROR ("RC index requested is out of range!!!");
+      NS_FATAL_ERROR ("RC index requested is out of range!!!");
     }
 
   uint16_t cra (0);
@@ -162,7 +162,7 @@ SatDamaEntry::GetMinRbdcInKbps (uint8_t index) const
 
   if ( index >= m_llsConf->GetDaServiceCount ())
     {
-       NS_FATAL_ERROR ("RC index requested is out of range!!!");
+      NS_FATAL_ERROR ("RC index requested is out of range!!!");
     }
 
   uint16_t minRbdc (0);
@@ -182,7 +182,7 @@ SatDamaEntry::GetRbdcInKbps (uint8_t index) const
 
   if ( index >= m_dynamicRateRequestedInKbps.size ())
     {
-       NS_FATAL_ERROR ("RC index requested is out of range!!!");
+      NS_FATAL_ERROR ("RC index requested is out of range!!!");
     }
 
   return m_dynamicRateRequestedInKbps[index];
@@ -219,7 +219,7 @@ SatDamaEntry::GetVbdcInBytes (uint8_t index) const
 
   if ( index >= m_volumeBacklogRequestedInBytes.size ())
     {
-       NS_FATAL_ERROR ("RC index requested is out of range!!!");
+      NS_FATAL_ERROR ("RC index requested is out of range!!!");
     }
 
   return m_volumeBacklogRequestedInBytes[index];
@@ -295,9 +295,9 @@ SatDamaEntry::DecrementVolumeBacklogPersistence ()
     }
 
   if (m_volumeBacklogPersistence == 0)
-      {
-        std::fill (m_volumeBacklogRequestedInBytes.begin (), m_volumeBacklogRequestedInBytes.end (), 0);
-      }
+    {
+      std::fill (m_volumeBacklogRequestedInBytes.begin (), m_volumeBacklogRequestedInBytes.end (), 0);
+    }
 }
 
 } // namespace ns3

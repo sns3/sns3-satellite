@@ -47,7 +47,6 @@ namespace ns3 {
 class SatReturnLinkEncapsulator : public SatBaseEncapsulator
 {
 public:
-
   /**
    * Default constructor, not used
    */
@@ -85,7 +84,7 @@ public:
    * \param p packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
-  
+
   /**
    * Receive a control msg (ARQ ACK)
    * \param p Control message pointer received from lower layer
@@ -100,7 +99,6 @@ public:
   virtual uint32_t GetMinTxOpportunityInBytes () const;
 
 protected:
-
   /**
    * Get new packet performs the RLE fragmentation and encapsulation
    * for a one single packet. Returns NULL packet if a suitable packet

@@ -28,10 +28,10 @@ namespace ns3 {
 
 
 SatArqSequenceNumber::SatArqSequenceNumber ()
-:m_seqNoMap (),
- m_currSeqNo (-1),
- m_windowSize (0),
- m_maxSn (std::numeric_limits<uint8_t>::max())
+  : m_seqNoMap (),
+    m_currSeqNo (-1),
+    m_windowSize (0),
+    m_maxSn (std::numeric_limits<uint8_t>::max ())
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -42,10 +42,10 @@ SatArqSequenceNumber::SatArqSequenceNumber ()
 }
 
 SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)
-:m_seqNoMap (),
- m_currSeqNo (-1),
- m_windowSize (windowSize),
- m_maxSn (std::numeric_limits<uint8_t>::max())
+  : m_seqNoMap (),
+    m_currSeqNo (-1),
+    m_windowSize (windowSize),
+    m_maxSn (std::numeric_limits<uint8_t>::max ())
 {
   NS_LOG_FUNCTION (this << (uint32_t) windowSize );
 }
@@ -65,7 +65,7 @@ SatArqSequenceNumber::NextSequenceNumber ()
   NS_ASSERT (SeqNoAvailable ());
 
   m_currSeqNo++;
-  uint8_t sn = uint8_t(m_currSeqNo % m_maxSn);
+  uint8_t sn = uint8_t (m_currSeqNo % m_maxSn);
   m_seqNoMap[m_currSeqNo] = false;
 
   return sn;
@@ -76,8 +76,8 @@ SatArqSequenceNumber::Release (uint8_t seqNo)
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
-  uint32_t factor = uint32_t(m_currSeqNo / m_maxSn);
-  uint32_t mod = uint32_t(m_currSeqNo % m_maxSn);
+  uint32_t factor = uint32_t (m_currSeqNo / m_maxSn);
+  uint32_t mod = uint32_t (m_currSeqNo % m_maxSn);
   uint32_t sn;
 
   // Same seqNo window

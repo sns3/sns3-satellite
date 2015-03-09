@@ -86,7 +86,7 @@ SatCraTest1::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cra", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-cra", "", true);
 
   // Create simple scenario
 
@@ -123,7 +123,7 @@ SatCraTest1::DoRun (void)
 
   // >>> Start of actual test using Simple scenario >>>
 
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // Create the Cbr application to send UDP datagrams of size
   // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 1s)

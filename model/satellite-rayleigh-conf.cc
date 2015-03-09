@@ -28,40 +28,40 @@ NS_OBJECT_ENSURE_REGISTERED (SatRayleighConf);
 NS_LOG_COMPONENT_DEFINE ("SatRayleighConf");
 
 static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT] =
-    {
-     /**
-      * Parameters
-      * State 1 {{number of oscillators, Doppler in Hz}
-      * State 2  {number of oscillators, Doppler in Hz}
-      * State 3  {number of oscillators, Doppler in Hz}}
-      */
-     /// TODO: The elevation values should eventually be formed from attributes for each state!
+{
+  /**
+   * Parameters
+   * State 1 {{number of oscillators, Doppler in Hz}
+   * State 2  {number of oscillators, Doppler in Hz}
+   * State 3  {number of oscillators, Doppler in Hz}}
+   */
+  /// TODO: The elevation values should eventually be formed from attributes for each state!
 
-     /* Elevation 30 degrees */
-     {{10,10},
-      {10,10},
-      {10,10}}
-    };
+  /* Elevation 30 degrees */
+  {{10,10},
+   {10,10},
+   {10,10}}
+};
 
 TypeId
 SatRayleighConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRayleighConf")
-      .SetParent<SatBaseFaderConf> ()
-      .AddConstructor<SatRayleighConf> ()
-      .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
-                     UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-                     MakeUintegerAccessor (&SatRayleighConf::m_elevationCount),
-                     MakeUintegerChecker<uint32_t> ())
-      .AddAttribute ("StateCount", "Number of states in the Markov model.",
-                     UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
-                     MakeUintegerAccessor (&SatRayleighConf::m_stateCount),
-                     MakeUintegerChecker<uint32_t> ());
+    .SetParent<SatBaseFaderConf> ()
+    .AddConstructor<SatRayleighConf> ()
+    .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
+                   UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+                   MakeUintegerAccessor (&SatRayleighConf::m_elevationCount),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("StateCount", "Number of states in the Markov model.",
+                   UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
+                   MakeUintegerAccessor (&SatRayleighConf::m_stateCount),
+                   MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
-SatRayleighConf::SatRayleighConf () :
-    m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+SatRayleighConf::SatRayleighConf ()
+  : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
     m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
@@ -109,7 +109,7 @@ SatRayleighConf::GetParameters (uint32_t set)
 
 
 void
-SatRayleighConf::Reset()
+SatRayleighConf::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -123,12 +123,12 @@ SatRayleighConf::Reset()
 }
 
 void
-SatRayleighConf::DoDispose()
+SatRayleighConf::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatBaseFaderConf::DoDispose();
+  SatBaseFaderConf::DoDispose ();
 }
 
 } // namespace ns3

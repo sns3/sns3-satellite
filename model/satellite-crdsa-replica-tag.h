@@ -38,7 +38,6 @@ namespace ns3 {
 class SatCrdsaReplicaTag : public Tag
 {
 public:
-
   SatCrdsaReplicaTag ();
   ~SatCrdsaReplicaTag ();
 

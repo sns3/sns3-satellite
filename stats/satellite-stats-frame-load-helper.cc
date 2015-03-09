@@ -230,8 +230,8 @@ SatStatsFrameLoadHelper::FrameSymbolLoadCallback (std::string context,
   Ptr<ScalarCollector> collector = GetCollector (frameId, context);
   NS_ASSERT_MSG (collector != 0,
                  "Unable to get/create collector"
-                     << " for frame ID "  << frameId
-                     << " and beam " << context);
+                 << " for frame ID "  << frameId
+                 << " and beam " << context);
 
   // Pass the sample to the collector.
   collector->TraceSinkDouble (0, loadRatio);
@@ -249,8 +249,8 @@ SatStatsFrameLoadHelper::FrameUserLoadCallback (std::string context,
   Ptr<ScalarCollector> collector = GetCollector (frameId, context);
   NS_ASSERT_MSG (collector != 0,
                  "Unable to get/create collector"
-                     << " for frame ID "  << frameId
-                     << " and identifier " << context);
+                 << " for frame ID "  << frameId
+                 << " and identifier " << context);
 
   // Pass the sample to the collector.
   collector->TraceSinkUinteger32 (0, utCount);

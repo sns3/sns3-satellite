@@ -41,9 +41,15 @@ using namespace ns3;
 class SatEstimatorBaseTestCase : public TestCase
 {
 public:
-  SatEstimatorBaseTestCase () : TestCase("") {};
-  SatEstimatorBaseTestCase (std::string info) : TestCase(info) {};
-  virtual ~SatEstimatorBaseTestCase () {}
+  SatEstimatorBaseTestCase () : TestCase ("")
+  {
+  }
+  SatEstimatorBaseTestCase (std::string info) : TestCase (info)
+  {
+  }
+  virtual ~SatEstimatorBaseTestCase ()
+  {
+  }
 
   // add sample to estimator
   void AddSample (double cno);
@@ -99,8 +105,12 @@ SatEstimatorBaseTestCase::CreateEstimator (SatCnoEstimator::EstimationMode_t mod
 class SatBasicEstimatorLastTestCase : public SatEstimatorBaseTestCase
 {
 public:
-  SatBasicEstimatorLastTestCase () : SatEstimatorBaseTestCase ("Test satellite C per N0 basic estimator with mode LAST.") {}
-  virtual ~SatBasicEstimatorLastTestCase () {}
+  SatBasicEstimatorLastTestCase () : SatEstimatorBaseTestCase ("Test satellite C per N0 basic estimator with mode LAST.")
+  {
+  }
+  virtual ~SatBasicEstimatorLastTestCase ()
+  {
+  }
 
 protected:
   virtual void DoRun (void);
@@ -111,7 +121,7 @@ SatBasicEstimatorLastTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cno-estimator-unit", "last", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-cno-estimator-unit", "last", true);
 
   // create estimator with window 100 ms
   Simulator::Schedule (Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::LAST, Seconds (0.10) );
@@ -188,8 +198,12 @@ SatBasicEstimatorLastTestCase::DoRun (void)
 class SatBasicEstimatorMinTestCase : public SatEstimatorBaseTestCase
 {
 public:
-  SatBasicEstimatorMinTestCase () : SatEstimatorBaseTestCase ("Test satellite C per N0 basic estimator with mode MINIMUM.") {}
-  virtual ~SatBasicEstimatorMinTestCase () {}
+  SatBasicEstimatorMinTestCase () : SatEstimatorBaseTestCase ("Test satellite C per N0 basic estimator with mode MINIMUM.")
+  {
+  }
+  virtual ~SatBasicEstimatorMinTestCase ()
+  {
+  }
 
 protected:
   virtual void DoRun (void);
@@ -200,10 +214,10 @@ SatBasicEstimatorMinTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cno-estimator-unit", "min", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-cno-estimator-unit", "min", true);
 
   // create estimator with window 200 ms
-  Simulator::Schedule(Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::MINIMUM, Seconds (0.20) );
+  Simulator::Schedule (Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::MINIMUM, Seconds (0.20) );
 
   // simulate sample additions with window 100 ms
   Simulator::Schedule (Seconds (0.17), &SatBasicEstimatorLastTestCase::AddSample, this, -4.2 );
@@ -256,8 +270,12 @@ SatBasicEstimatorMinTestCase::DoRun (void)
 class SatBasicEstimatorAverageTestCase : public SatEstimatorBaseTestCase
 {
 public:
-  SatBasicEstimatorAverageTestCase () : SatEstimatorBaseTestCase ("Test satellite C per N0 basic estimator with mode AVERAGE.") {}
-  virtual ~SatBasicEstimatorAverageTestCase () {}
+  SatBasicEstimatorAverageTestCase () : SatEstimatorBaseTestCase ("Test satellite C per N0 basic estimator with mode AVERAGE.")
+  {
+  }
+  virtual ~SatBasicEstimatorAverageTestCase ()
+  {
+  }
 
 protected:
   virtual void DoRun (void);
@@ -268,24 +286,24 @@ SatBasicEstimatorAverageTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-cno-estimator-unit", "average", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-cno-estimator-unit", "average", true);
 
   // create estimator with window 200 ms
-  Simulator::Schedule(Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::AVERAGE, Seconds (0.20) );
+  Simulator::Schedule (Seconds (0.05), &SatBasicEstimatorLastTestCase::CreateEstimator, this, SatCnoEstimator::AVERAGE, Seconds (0.20) );
 
   // simulate sample additions with window 100 ms
-  Simulator::Schedule(Seconds (0.17), &SatBasicEstimatorLastTestCase::AddSample, this, -4.2 );
-  Simulator::Schedule(Seconds (0.22), &SatBasicEstimatorLastTestCase::AddSample, this, 8.1 );
-  Simulator::Schedule(Seconds (0.26), &SatBasicEstimatorLastTestCase::AddSample, this, -15.7 );
-  Simulator::Schedule(Seconds (0.43), &SatBasicEstimatorLastTestCase::AddSample, this, 2.4 );
+  Simulator::Schedule (Seconds (0.17), &SatBasicEstimatorLastTestCase::AddSample, this, -4.2 );
+  Simulator::Schedule (Seconds (0.22), &SatBasicEstimatorLastTestCase::AddSample, this, 8.1 );
+  Simulator::Schedule (Seconds (0.26), &SatBasicEstimatorLastTestCase::AddSample, this, -15.7 );
+  Simulator::Schedule (Seconds (0.43), &SatBasicEstimatorLastTestCase::AddSample, this, 2.4 );
 
   // simulate C/N0 estimations with window 200 ms
-  Simulator::Schedule(Seconds (0.09), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // NAN expected
-  Simulator::Schedule(Seconds (0.19), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // -4.2 expected
-  Simulator::Schedule(Seconds (0.35), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // (-4.2 + 8.1 -15.7) / 3 expected
-  Simulator::Schedule(Seconds (0.41), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // (8.1 -15.7) / 2 expected
-  Simulator::Schedule(Seconds (0.49), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // 2.4 expected
-  Simulator::Schedule(Seconds (0.69), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // NAN expected
+  Simulator::Schedule (Seconds (0.09), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // NAN expected
+  Simulator::Schedule (Seconds (0.19), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // -4.2 expected
+  Simulator::Schedule (Seconds (0.35), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // (-4.2 + 8.1 -15.7) / 3 expected
+  Simulator::Schedule (Seconds (0.41), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // (8.1 -15.7) / 2 expected
+  Simulator::Schedule (Seconds (0.49), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // 2.4 expected
+  Simulator::Schedule (Seconds (0.69), &SatBasicEstimatorLastTestCase::GetCnoEstimation, this ); // NAN expected
 
   Simulator::Run ();
 
@@ -294,8 +312,8 @@ SatBasicEstimatorAverageTestCase::DoRun (void)
   // estimations with window 200 ms
   NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[1], -4.2, 0.0001, "second estimation incorrect");
-  NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[2], (-4.2 + 8.1 -15.7) / 3, 0.0001, "third estimation incorrect");
-  NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[3], (8.1 -15.7) / 2, 0.0001, "fourth estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[2], (-4.2 + 8.1 - 15.7) / 3, 0.0001, "third estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[3], (8.1 - 15.7) / 2, 0.0001, "fourth estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[4], 2.4, 0.0001, "fifth estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
 

@@ -28,7 +28,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatRxPowerInputTraceContainer);
 
-TypeId 
+TypeId
 SatRxPowerInputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRxPowerInputTraceContainer")
@@ -42,7 +42,7 @@ SatRxPowerInputTraceContainer::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatRxPowerInputTraceContainer::SatRxPowerInputTraceContainer ()

@@ -59,9 +59,9 @@ main (int argc, char *argv[])
   /// Run simulation
   for (uint32_t i = 0; i < 1000; i++)
     {
-      Simulator::Schedule (Time (300000 + i*500000), &SatLooModel::GetChannelGainDb, looFaderLineOfSight);
-      Simulator::Schedule (Time (500000 + i*500000), &SatLooModel::GetChannelGainDb, looFaderLightShadowing);
-      Simulator::Schedule (Time (700000 + i*500000), &SatLooModel::GetChannelGainDb, looFaderHeavyShadowing);
+      Simulator::Schedule (Time (300000 + i * 500000), &SatLooModel::GetChannelGainDb, looFaderLineOfSight);
+      Simulator::Schedule (Time (500000 + i * 500000), &SatLooModel::GetChannelGainDb, looFaderLightShadowing);
+      Simulator::Schedule (Time (700000 + i * 500000), &SatLooModel::GetChannelGainDb, looFaderHeavyShadowing);
     }
 
   Simulator::Run ();

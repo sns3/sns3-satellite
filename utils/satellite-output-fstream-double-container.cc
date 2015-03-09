@@ -36,8 +36,8 @@ SatOutputFileStreamDoubleContainer::GetTypeId (void)
   return tid;
 }
 
-SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow) :
-    m_outputFileStreamWrapper (),
+SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
+  : m_outputFileStreamWrapper (),
     m_outputFileStream (),
     m_container (),
     m_fileName (filename),
@@ -55,8 +55,8 @@ SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::str
     }
 }
 
-SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer () :
-    m_outputFileStreamWrapper (),
+SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer ()
+  : m_outputFileStreamWrapper (),
     m_outputFileStream (),
     m_container (),
     m_fileName (),
@@ -83,7 +83,7 @@ SatOutputFileStreamDoubleContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  Object::DoDispose();
+  Object::DoDispose ();
 }
 
 void
@@ -94,7 +94,7 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
   OpenStream ();
 
   if (m_outputFileStream->is_open ())
-  {
+    {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {
           for (uint32_t j = 0; j < m_valuesInRow; j++ )
@@ -110,8 +110,8 @@ SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
             }
           *m_outputFileStream << std::endl;
         }
-    m_outputFileStream->close ();
-  }
+      m_outputFileStream->close ();
+    }
   else
     {
       NS_ABORT_MSG ("Output stream is not valid for writing.");
@@ -201,7 +201,7 @@ SatOutputFileStreamDoubleContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_container.empty())
+  if (!m_container.empty ())
     {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {
@@ -225,10 +225,10 @@ SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
   ret.SetTitle (m_title);
   ret.SetStyle (m_style);
 
-  if (!m_container.empty())
+  if (!m_container.empty ())
     {
       switch (m_valuesInRow)
-      {
+        {
         case 2:
           {
             for (uint32_t i = 0; i < m_container.size (); i++)
@@ -241,7 +241,7 @@ SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
           {
             NS_ABORT_MSG ("SatOutputFileStreamDoubleContainer::GetGnuplotDataset - Figure output not implemented for " << m_valuesInRow << " columns.");
           }
-      }
+        }
     }
   return ret;
 }
@@ -252,7 +252,7 @@ SatOutputFileStreamDoubleContainer::ConvertValue (double value)
   NS_LOG_FUNCTION (this << value);
 
   switch (m_figureUnitConversionType)
-  {
+    {
     case RAW:
       {
         return value;
@@ -278,7 +278,7 @@ SatOutputFileStreamDoubleContainer::ConvertValue (double value)
         NS_ABORT_MSG ("SatOutputFileStreamDoubleContainer::ConvertValue - Invalid conversion type.");
         break;
       }
-  }
+    }
   return -1;
 }
 

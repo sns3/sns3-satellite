@@ -35,7 +35,6 @@ namespace ns3 {
 class SatLooConf : public SatBaseFaderConf
 {
 public:
-
   /**
    * \brief Default Loo parameter count
    */
@@ -70,7 +69,6 @@ public:
   void DoDispose ();
 
 private:
-
   /**
    * \brief Number of parameters sets
    */

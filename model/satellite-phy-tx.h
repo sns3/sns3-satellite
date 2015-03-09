@@ -73,7 +73,7 @@ public:
 
   void SetMobility (Ptr<MobilityModel> m);
   Ptr<MobilityModel> GetMobility ();
-  
+
   /*
    * Set the transmit antenna gain pattern.
    * \param agp antenna gain pattern
@@ -120,8 +120,8 @@ public:
   * \param txParams Transmission parameters for a packet
   */
   void StartTx (Ptr<SatSignalParameters> txParams);
-  
-  /** 
+
+  /**
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */

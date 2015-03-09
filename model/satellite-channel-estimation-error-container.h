@@ -56,7 +56,6 @@ public:
   double AddError (double sinrInDb, uint32_t wfId = 0) const;
 
 protected:
-
   /**
    * \brief Pure virtual method for the implementation in derived classes.
    * \param sinrInDb Measured SINR in dB
@@ -66,7 +65,6 @@ protected:
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const = 0;
 
 private:
-
 };
 
 
@@ -86,7 +84,6 @@ protected:
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
 
 private:
-
 };
 
 class SatFwdLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
@@ -106,7 +103,6 @@ protected:
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
 
 private:
-
   /**
    * Only one channel estimator error configuration for
    * forward link.
@@ -131,7 +127,6 @@ protected:
   virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
 
 private:
-
   /**
    * Map of channel estimation errors for each waveform id
    */

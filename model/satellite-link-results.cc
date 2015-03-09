@@ -71,8 +71,8 @@ SatLinkResults::Initialize ()
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbRcs2);
 
 SatLinkResultsDvbRcs2::SatLinkResultsDvbRcs2 ()
-:SatLinkResults(),
- m_table ()
+  : SatLinkResults (),
+    m_table ()
 {
 }
 
@@ -94,8 +94,8 @@ SatLinkResultsDvbRcs2::DoInitialize ()
     {
       std::ostringstream ss;
       ss << i;
-      std::string filePathName = m_inputPath + "rcs2_waveformat" + ss.str() + ".txt";
-      m_table.insert (std::make_pair(i, CreateObject<SatLookUpTable> (filePathName)));
+      std::string filePathName = m_inputPath + "rcs2_waveformat" + ss.str () + ".txt";
+      m_table.insert (std::make_pair (i, CreateObject<SatLookUpTable> (filePathName)));
     }
 } // end of void SatLinkResultsDvbRcs2::DoInitialize
 
@@ -109,7 +109,7 @@ SatLinkResultsDvbRcs2::GetBler (uint32_t waveformId, double ebNoDb) const
       NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
     }
 
-  return m_table.at(waveformId)->GetBler (ebNoDb);
+  return m_table.at (waveformId)->GetBler (ebNoDb);
 }
 
 double
@@ -122,7 +122,7 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
       NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
     }
 
-  return m_table.at(waveformId)->GetEsNoDb (blerTarget);
+  return m_table.at (waveformId)->GetEsNoDb (blerTarget);
 }
 
 /*
@@ -131,9 +131,9 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
 
 SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
-:SatLinkResults (),
- m_table (),
- m_shortFrameOffsetInDb (0.0)
+  : SatLinkResults (),
+    m_table (),
+    m_shortFrameOffsetInDb (0.0)
 {
 
 }
@@ -143,11 +143,11 @@ SatLinkResultsDvbS2::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
     .SetParent<SatLinkResults> ()
-    .AddAttribute( "EsNoOffsetForShortFrame",
-                   "EsNo increase offset for short BB frame with a given BLER",
-                   DoubleValue (0.4),
-                   MakeDoubleAccessor (&SatLinkResultsDvbS2::m_shortFrameOffsetInDb),
-                   MakeDoubleChecker <double_t> ())
+    .AddAttribute ( "EsNoOffsetForShortFrame",
+                    "EsNo increase offset for short BB frame with a given BLER",
+                    DoubleValue (0.4),
+                    MakeDoubleAccessor (&SatLinkResultsDvbS2::m_shortFrameOffsetInDb),
+                    MakeDoubleChecker <double_t> ())
   ;
   return tid;
 }
@@ -211,7 +211,7 @@ SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrame
       esNoDb -= m_shortFrameOffsetInDb;
     }
 
-  return m_table.at(modcod)->GetBler (esNoDb);
+  return m_table.at (modcod)->GetBler (esNoDb);
 }
 
 double
@@ -225,7 +225,7 @@ SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFra
     }
 
   // Get Es/No requirement for normal BB frame
-  double esno = m_table.at(modcod)->GetEsNoDb (blerTarget);
+  double esno = m_table.at (modcod)->GetEsNoDb (blerTarget);
 
   /**
    * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB

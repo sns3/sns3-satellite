@@ -38,7 +38,7 @@ NS_LOG_COMPONENT_DEFINE ("SatFrameUserLoadProbe");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatFrameUserLoadProbe)
-  ;
+;
 
 TypeId
 SatFrameUserLoadProbe::GetTypeId ()

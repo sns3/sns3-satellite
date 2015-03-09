@@ -40,8 +40,8 @@ SatMarkovContainer::GetTypeId (void)
   return tid;
 }
 
-SatMarkovContainer::SatMarkovContainer () :
-    m_markovModel (NULL),
+SatMarkovContainer::SatMarkovContainer ()
+  : m_markovModel (NULL),
     m_markovConf (NULL),
     m_fader_up (NULL),
     m_fader_down (NULL),
@@ -65,8 +65,8 @@ SatMarkovContainer::SatMarkovContainer () :
   NS_FATAL_ERROR ("SatMarkovContainer::SatMarkovContainer - Constructor not in use");
 }
 
-SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFading::ElevationCallback elevation, SatBaseFading::VelocityCallback velocity) :
-    m_markovModel (NULL),
+SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFading::ElevationCallback elevation, SatBaseFading::VelocityCallback velocity)
+  : m_markovModel (NULL),
     m_markovConf (markovConf),
     m_fader_up (NULL),
     m_fader_down (NULL),
@@ -104,12 +104,12 @@ SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFa
   CalculateFading (SatEnums::FORWARD_USER_CH);
 
   NS_LOG_INFO ("Time " << Now ().GetSeconds ()
-              << " SatMarkovContainer::SatMarkovContainer - Creating SatMarkovContainer, States: " << m_numOfStates
-              << " Elevation: " << m_currentElevation ()
-              << " Current Set ID: " << m_currentSet
-              << " Cool down Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
-              << " Minimum Position Change In Meters: " << m_minimumPositionChangeInMeters
-  );
+                       << " SatMarkovContainer::SatMarkovContainer - Creating SatMarkovContainer, States: " << m_numOfStates
+                       << " Elevation: " << m_currentElevation ()
+                       << " Current Set ID: " << m_currentSet
+                       << " Cool down Period Length In Seconds: " << m_cooldownPeriodLength.GetSeconds ()
+                       << " Minimum Position Change In Meters: " << m_minimumPositionChangeInMeters
+               );
 }
 
 SatMarkovContainer::~SatMarkovContainer ()
@@ -125,7 +125,7 @@ SatMarkovContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatBaseFading::DoDispose();
+  SatBaseFading::DoDispose ();
 }
 
 void
@@ -138,8 +138,8 @@ SatMarkovContainer::Reset ()
   m_fader_down = NULL;
   m_markovModel = NULL;
 
-  m_currentElevation.Nullify();
-  m_velocity.Nullify();
+  m_currentElevation.Nullify ();
+  m_velocity.Nullify ();
 }
 
 void
@@ -148,7 +148,7 @@ SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
   NS_LOG_FUNCTION (this << faderType);
 
   switch (faderType)
-  {
+    {
     case SatMarkovConf::LOO_FADER:
       {
         m_fader_up = CreateObject<SatLooModel> (m_markovConf->GetLooConf (),m_numOfStates,m_currentSet,m_currentState);
@@ -161,11 +161,11 @@ SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
         m_fader_down = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (),m_currentSet,m_currentState);
         break;
       }
-    default :
+    default:
       {
         NS_FATAL_ERROR ("SatMarkovContainer::CreateFaders - Invalid fader type");
       }
-  }
+    }
 }
 
 double
@@ -204,7 +204,7 @@ SatMarkovContainer::GetCachedFadingValue (SatEnums::ChannelType_t channelType)
   NS_LOG_FUNCTION (this << channelType);
 
   switch (channelType)
-  {
+    {
     case SatEnums::RETURN_USER_CH:
     case SatEnums::FORWARD_FEEDER_CH:
       {
@@ -215,11 +215,11 @@ SatMarkovContainer::GetCachedFadingValue (SatEnums::ChannelType_t channelType)
       {
         return m_latestCalculatedFadingValue_down;
       }
-    default :
+    default:
       {
         NS_FATAL_ERROR ("SatMarkovContainer::GetCachedFadingValue - Invalid channel type");
       }
-  }
+    }
   return 0;
 }
 
@@ -238,9 +238,9 @@ SatMarkovContainer::EvaluateStateChange (SatEnums::ChannelType_t channelType)
 
           if (m_currentSet != newSetId)
             {
-              NS_LOG_INFO("Time " << Now ().GetSeconds ()
-                          << " SatMarkovContainer::EvaluateStateChange - elevation: " << m_currentElevation ()
-                          << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
+              NS_LOG_INFO ("Time " << Now ().GetSeconds ()
+                                   << " SatMarkovContainer::EvaluateStateChange - elevation: " << m_currentElevation ()
+                                   << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
 
               m_currentSet = newSetId;
               UpdateProbabilities (m_currentSet);
@@ -261,7 +261,7 @@ SatMarkovContainer::HasCooldownPeriodPassed (SatEnums::ChannelType_t channelType
   NS_LOG_FUNCTION (this << channelType);
 
   switch (channelType)
-  {
+    {
     case SatEnums::RETURN_USER_CH:
     case SatEnums::FORWARD_FEEDER_CH:
       {
@@ -280,11 +280,11 @@ SatMarkovContainer::HasCooldownPeriodPassed (SatEnums::ChannelType_t channelType
           }
         break;
       }
-    default :
+    default:
       {
         NS_FATAL_ERROR ("SatMarkovContainer::HasCooldownPeriodPassed - Invalid channel type");
       }
-  }
+    }
   return false;
 }
 
@@ -299,11 +299,11 @@ SatMarkovContainer::UpdateProbabilities (uint32_t set)
 
   for (uint32_t i = 0; i < m_numOfStates; ++i)
     {
-    for (uint32_t j = 0; j < m_numOfStates; ++j)
-      {
-        m_markovModel->SetProbability (i,j,probabilities[i][j]);
-      }
-    NS_LOG_INFO("------");
+      for (uint32_t j = 0; j < m_numOfStates; ++j)
+        {
+          m_markovModel->SetProbability (i,j,probabilities[i][j]);
+        }
+      NS_LOG_INFO ("------");
     }
 }
 
@@ -322,7 +322,7 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
   NS_ASSERT ( (m_currentState >= 0) && (m_currentState < m_numOfStates));
 
   switch (channelType)
-  {
+    {
     case SatEnums::RETURN_USER_CH:
     case SatEnums::FORWARD_FEEDER_CH:
       {
@@ -369,7 +369,7 @@ SatMarkovContainer::CalculateFading (SatEnums::ChannelType_t channelType)
       {
         NS_FATAL_ERROR ("SatMarkovContainer::CalculateFading - Invalid channel type");
       }
-  }
+    }
   return fadingValue;
 }
 
@@ -424,12 +424,12 @@ SatMarkovContainer::RandomizeLockedSetAndState ()
 
   if (m_numOfSets > 1)
     {
-      newSet = (rand() % (m_numOfSets-1));
+      newSet = (rand () % (m_numOfSets - 1));
     }
 
   if (m_numOfStates > 1)
     {
-      newState = (rand() % (m_numOfStates-1));
+      newState = (rand () % (m_numOfStates - 1));
     }
 
   LockToSetAndState (newSet,newState);
@@ -446,7 +446,7 @@ SatMarkovContainer::RandomizeLockedState (uint32_t set)
 
   if (m_numOfStates > 1)
     {
-      newState = (rand() % (m_numOfStates-1));
+      newState = (rand () % (m_numOfStates - 1));
     }
 
   m_currentState = newState;
@@ -468,7 +468,7 @@ SatMarkovContainer::CalculateDistanceSinceLastStateChange ()
 {
   NS_LOG_FUNCTION (this);
 
-  return (Now ().GetSeconds () - m_latestStateChangeTime.GetSeconds()) * m_velocity ();
+  return (Now ().GetSeconds () - m_latestStateChangeTime.GetSeconds ()) * m_velocity ();
 }
 
 } // namespace ns3

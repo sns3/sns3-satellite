@@ -54,11 +54,11 @@ public:
   struct QueueStats_t
   {
     QueueStats_t ()
-    : m_incomingRateKbps (0.0),
-      m_outgoingRateKbps (0.0),
-      m_volumeInBytes (0),
-      m_volumeOutBytes (0),
-      m_queueSizeBytes (0)
+      : m_incomingRateKbps (0.0),
+        m_outgoingRateKbps (0.0),
+        m_volumeInBytes (0),
+        m_volumeOutBytes (0),
+        m_queueSizeBytes (0)
     {
     }
     double   m_incomingRateKbps;
@@ -211,7 +211,6 @@ public:
   uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
 
 protected:
-
   /**
    * \brief Drop a packet
    * \param packet packet that was dropped
@@ -219,7 +218,6 @@ protected:
   void Drop (Ptr<Packet> packet);
 
 private:
-
   /**
    * \brief Send queue event to all registered callbacks
    * \param event Queue event

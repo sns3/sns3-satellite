@@ -49,28 +49,28 @@ NS_OBJECT_ENSURE_REGISTERED (SatGeoHelper);
 TypeId
 SatGeoHelper::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatGeoHelper")
-      .SetParent<Object> ()
-      .AddConstructor<SatGeoHelper> ()
-      .AddAttribute ("DaFwdLinkInterferenceModel",
-                     "Forward link interference model for dedicated access",
-                     EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
-                     MakeEnumAccessor (&SatGeoHelper::m_daFwdLinkInterferenceModel),
-                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
-                                      SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-      .AddAttribute ("DaRtnLinkInterferenceModel",
-                     "Return link interference model for dedicated access",
-                     EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
-                     MakeEnumAccessor (&SatGeoHelper::m_daRtnLinkInterferenceModel),
-                     MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
-                                      SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                      SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
-     .AddTraceSource ("Creation", "Creation traces",
-                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
-                      "ns3::SatTypedefs::CreationCallback")
-    ;
-    return tid;
+  static TypeId tid = TypeId ("ns3::SatGeoHelper")
+    .SetParent<Object> ()
+    .AddConstructor<SatGeoHelper> ()
+    .AddAttribute ("DaFwdLinkInterferenceModel",
+                   "Forward link interference model for dedicated access",
+                   EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
+                   MakeEnumAccessor (&SatGeoHelper::m_daFwdLinkInterferenceModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::IF_TRACE, "Trace",
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+    .AddAttribute ("DaRtnLinkInterferenceModel",
+                   "Return link interference model for dedicated access",
+                   EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
+                   MakeEnumAccessor (&SatGeoHelper::m_daRtnLinkInterferenceModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::IF_TRACE, "Trace",
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+    .AddTraceSource ("Creation", "Creation traces",
+                     MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
+                     "ns3::SatTypedefs::CreationCallback")
+  ;
+  return tid;
 }
 
 TypeId
@@ -78,20 +78,20 @@ SatGeoHelper::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this );
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 
-SatGeoHelper::SatGeoHelper()
-:m_nodeId (0),
- m_carrierBandwidthConverter (),
- m_fwdLinkCarrierCount (),
- m_rtnLinkCarrierCount (),
- m_deviceCount (0),
- m_deviceFactory (),
- m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
- m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
- m_raSettings ()
+SatGeoHelper::SatGeoHelper ()
+  : m_nodeId (0),
+    m_carrierBandwidthConverter (),
+    m_fwdLinkCarrierCount (),
+    m_rtnLinkCarrierCount (),
+    m_deviceCount (0),
+    m_deviceFactory (),
+    m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_raSettings ()
 {
   NS_LOG_FUNCTION (this );
 
@@ -104,23 +104,23 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
                             uint32_t fwdLinkCarrierCount,
                             Ptr<SatSuperframeSeq> seq,
                             RandomAccessSettings_s randomAccessSettings)
-: m_nodeId (0),
-  m_carrierBandwidthConverter (bandwidthConverterCb),
-  m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-  m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-  m_deviceCount(0),
-  m_deviceFactory (),
-  m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_superframeSeq (seq),
-  m_raSettings (randomAccessSettings)
+  : m_nodeId (0),
+    m_carrierBandwidthConverter (bandwidthConverterCb),
+    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+    m_deviceCount (0),
+    m_deviceFactory (),
+    m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+    m_superframeSeq (seq),
+    m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
   m_deviceFactory.SetTypeId ("ns3::SatGeoNetDevice");
 }
 
-void 
+void
 SatGeoHelper::SetDeviceAttribute (std::string n1, const AttributeValue &v1)
 {
   NS_LOG_FUNCTION (this << n1 );
@@ -144,7 +144,7 @@ SatGeoHelper::SetFeederPhyAttribute (std::string n1, const AttributeValue &v1)
   Config::SetDefault ("ns3::SatGeoFeederPhy::" + n1, v1);
 }
 
-NetDeviceContainer 
+NetDeviceContainer
 SatGeoHelper::Install (NodeContainer c)
 {
   NS_LOG_FUNCTION (this );
@@ -155,9 +155,9 @@ SatGeoHelper::Install (NodeContainer c)
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-  {
-    devs.Add(Install(*i));
-  }
+    {
+      devs.Add (Install (*i));
+    }
 
   return devs;
 }
@@ -173,7 +173,7 @@ SatGeoHelper::Install (Ptr<Node> n)
   Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice> ();
 
   satDev->SetAddress (Mac48Address::Allocate ());
-  n->AddDevice(satDev);
+  n->AddDevice (satDev);
   m_deviceCount++;
   m_nodeId = n->GetId ();
 
@@ -261,11 +261,11 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   fPhy->SetTxAntennaGainPattern (feederAgp);
   fPhy->SetRxAntennaGainPattern (feederAgp);
 
-  dev->AddUserPhy(uPhy, userBeamId);
-  dev->AddFeederPhy(fPhy, userBeamId);
+  dev->AddUserPhy (uPhy, userBeamId);
+  dev->AddFeederPhy (fPhy, userBeamId);
 
-  uPhy->Initialize();
-  fPhy->Initialize();
+  uPhy->Initialize ();
+  fPhy->Initialize ();
 
   // Create a node info to PHY layers
   Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
@@ -276,7 +276,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 }
 
 void
-SatGeoHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
+SatGeoHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
   NS_LOG_FUNCTION (this);
 

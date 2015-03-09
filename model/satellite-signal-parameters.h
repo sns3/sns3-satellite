@@ -41,7 +41,6 @@ class SatPhyTx;
 class SatSignalParameters : public Object
 {
 public:
-
   /**
    * \brief Struct for storing the packet specific Tx information
    */
@@ -59,12 +58,12 @@ public:
    * Real length of buffer is simulated by duration of the PDU transmission.
    */
   typedef std::vector< Ptr<Packet> > PacketsInBurst_t;
-  
+
   /**
    * default constructor
    */
   SatSignalParameters ();
-  
+
   /**
    * copy constructor
    */

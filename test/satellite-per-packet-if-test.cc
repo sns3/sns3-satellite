@@ -41,25 +41,25 @@
 using namespace ns3;
 
 static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> params,
-                                Mac48Address ownAdd , Mac48Address destAdd,
+                                Mac48Address ownAdd, Mac48Address destAdd,
                                 double ifPower, double cSinr)
 {
   // print only unicast message to prevent printing control messages like TBTP messages
-  if ( !destAdd.IsBroadcast() )
+  if ( !destAdd.IsBroadcast () )
     {
       std::cout.precision (2);
       std::cout.setf (std::cout.fixed | std::cout.showpoint);
 
-      std::cout << "Time= " << Simulator::Now()
-                << ", ChType= " << std::setw(17) << SatEnums::GetChannelTypeName (params->m_channelType)
+      std::cout << "Time= " << Simulator::Now ()
+                << ", ChType= " << std::setw (17) << SatEnums::GetChannelTypeName (params->m_channelType)
                 << ", OwnAddr= " << ownAdd
                 << ", DestAddr= " << destAdd
-                << ", Beam= " << std::setw(2) << params->m_beamId
+                << ", Beam= " << std::setw (2) << params->m_beamId
                 << ", Freq= " << params->m_carrierFreq_hz
-                << ", IFPwr= " << std::setw(8) << SatUtils::WToDbW<double> ( ifPower )
-                << ", RXPwr= " << std::setw(8) << SatUtils::WToDbW<double> ( params->m_rxPower_W )
-                << ", SINR= " << std::setw(7) << SatUtils::LinearToDb<double> (params->m_sinr)
-                << ", CSINR= " << std::setw(7) << SatUtils::LinearToDb<double> (cSinr) << std::endl;
+                << ", IFPwr= " << std::setw (8) << SatUtils::WToDbW<double> ( ifPower )
+                << ", RXPwr= " << std::setw (8) << SatUtils::WToDbW<double> ( params->m_rxPower_W )
+                << ", SINR= " << std::setw (7) << SatUtils::LinearToDb<double> (params->m_sinr)
+                << ", CSINR= " << std::setw (7) << SatUtils::LinearToDb<double> (cSinr) << std::endl;
     }
 }
 
@@ -122,36 +122,36 @@ SatPerPacketBaseTestCase::~SatPerPacketBaseTestCase ()
 }
 
 void
-SatPerPacketBaseTestCase::InitOutput( bool figureOutput )
+SatPerPacketBaseTestCase::InitOutput ( bool figureOutput )
 {
-  Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get();
+  Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get ();
   ptrMapper->Reset ();
 
-  Ptr<SatInterferenceOutputTraceContainer> ptrCont = Singleton<SatInterferenceOutputTraceContainer>::Get();
+  Ptr<SatInterferenceOutputTraceContainer> ptrCont = Singleton<SatInterferenceOutputTraceContainer>::Get ();
   ptrCont->Reset ();
 
-  std::size_t pos = m_extName.find(' ');
+  std::size_t pos = m_extName.find (' ');
 
   while ( pos != std::string::npos )
     {
       m_extName.replace ( pos, 1, "_");
-      pos = m_extName.find(' ');
+      pos = m_extName.find (' ');
     }
 
-  pos = m_extName.find(',');
+  pos = m_extName.find (',');
 
   while ( pos != std::string::npos )
     {
       m_extName.replace ( pos, 1, "\0");
-      pos = m_extName.find(',');
+      pos = m_extName.find (',');
     }
 
-  pos = m_extName.find('.');
+  pos = m_extName.find ('.');
 
   while ( pos != std::string::npos )
     {
       m_extName.replace ( pos, 1, "\0");
-      pos = m_extName.find('.');
+      pos = m_extName.find ('.');
     }
 
   ptrCont->EnableFigureOutput (figureOutput);
@@ -160,7 +160,7 @@ SatPerPacketBaseTestCase::InitOutput( bool figureOutput )
 void
 SatPerPacketBaseTestCase::PrintTraceInfo ( )
 {
-  Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get();
+  Ptr<SatIdMapper> ptrMapper = Singleton<SatIdMapper>::Get ();
 
   std::cout << m_extName << std::endl;
   ptrMapper->PrintTraceMap ();
@@ -209,21 +209,21 @@ private:
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase ()
   : SatPerPacketBaseTestCase (defFwdUserName, "IfTestFwdUsr", SatEnums::FADING_OFF, false,
-                              StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512))
+                              StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"), UintegerValue (512))
 {
 
 }
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
- : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFwdUsr_" + name, fading, dummyFrames,
-                             StringValue ("0.00015s"), UintegerValue(512), StringValue ("0.1s"), UintegerValue (512) )
+  : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFwdUsr_" + name, fading, dummyFrames,
+                              StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"), UintegerValue (512) )
 {
 
 }
 
 SatPerPacketFwdLinkUserTestCase::SatPerPacketFwdLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
- : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFwdUsr_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
+  : SatPerPacketBaseTestCase (defFwdUserName + name, "IfTestFwdUsr_" + name, fading, dummyFrames, ival1, pSize1, ival2, pSize2 )
 {
 
 }
@@ -240,7 +240,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   InitOutput (true);
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-per-packet-if", m_extName, true);
 
   // Configure a static error probability
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
@@ -248,12 +248,12 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
-  Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
-  Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
+  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
@@ -272,31 +272,31 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   // set callback traces where we want results out
 
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                   MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
   uint16_t port = 9;
 
   // create Sink helper
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress(utUsers.Get (0)), port));
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
 
   // install Sink application on UT user 1 to receive packet
   ApplicationContainer utSinks = sinkHelper.Install (utUsers.Get (0));
 
   // install Sink application on UT user 5 to receive packet
-  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(1)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (1)), port))));
   utSinks.Add (sinkHelper.Install (utUsers.Get (1)));
   utSinks.Start (Seconds (0.1));
   utSinks.Stop (Seconds (0.5));
 
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
 
   // create application on GW to sent beam 1 (UT user 1)
   cbrHelper.SetAttribute ("Interval", m_Interval1 );
@@ -308,7 +308,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   gw1Cbr.Stop (Seconds (0.5));
 
   // create application on GW to sent beam 5 (UT user 5)
-  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(1)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (1)), port))));
   cbrHelper.SetAttribute ("Interval", m_Interval2 );
   cbrHelper.SetAttribute ("PacketSize", m_PackageSize2 );
 
@@ -374,7 +374,7 @@ SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase ()
 }
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFwdFull_"+ name, fading, dummyFrames,
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFwdFull_" + name, fading, dummyFrames,
                               StringValue ("0.00015s"), UintegerValue (512), StringValue ("0.1s"),  UintegerValue (512) )
 {
 
@@ -382,7 +382,7 @@ SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string na
 
 SatPerPacketFwdLinkFullTestCase::SatPerPacketFwdLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFwdFull_"+ name, fading, dummyFrames,
+  : SatPerPacketBaseTestCase (defFwdFullName + name, "IfTestFwdFull_" + name, fading, dummyFrames,
                               ival1, pSize1, ival2, pSize2 )
 {
 
@@ -401,16 +401,16 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   InitOutput ( false );
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-per-packet-if", m_extName, true);
 
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
-  Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
-  Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
+  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
 
   // Creating the reference system. Note, currently the satellite module supports
@@ -427,31 +427,31 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   // set callback traces where we want results out
 
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                   MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
   uint16_t port = 9;
 
   // create Sink helper
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress(utUsers.Get (0)), port));
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
 
   // install Sink application on UT user 1 to receive packet
   ApplicationContainer utSinks = sinkHelper.Install (utUsers.Get (0));
 
   // install Sink application on UT user 5 to receive packet
-  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(4)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
   utSinks.Add (sinkHelper.Install (utUsers.Get (4)));
   utSinks.Start (Seconds (0.1));
   utSinks.Stop (Seconds (1.0));
 
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
 
   // create application on GW to sent beam 1 (UT user 1)
   cbrHelper.SetAttribute ("Interval", m_Interval1);
@@ -463,7 +463,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   gw1Cbr.Stop (Seconds (0.4));
 
   // create application on GW to sent beam 5 (UT user 5)
-  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (4)), port))));
   cbrHelper.SetAttribute ("Interval", m_Interval2);
   cbrHelper.SetAttribute ("PacketSize", m_PackageSize2 );
 
@@ -520,14 +520,14 @@ private:
 };
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase ()
-  : SatPerPacketBaseTestCase (defRtnUserName , "IfTestRtnUsr", SatEnums::FADING_OFF, false,
+  : SatPerPacketBaseTestCase (defRtnUserName, "IfTestRtnUsr", SatEnums::FADING_OFF, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
 }
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRtnUsr_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRtnUsr_" + name, fading, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
@@ -535,10 +535,10 @@ SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string na
 
 SatPerPacketRtnLinkUserTestCase::SatPerPacketRtnLinkUserTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRtnUsr_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnUserName + name, "IfTestRtnUsr_" + name, fading, false,
                               ival1, pSize1, ival2, pSize2 )
 {
-  }
+}
 
 SatPerPacketRtnLinkUserTestCase::~SatPerPacketRtnLinkUserTestCase ()
 {
@@ -552,20 +552,20 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   InitOutput (false);
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-per-packet-if", m_extName, true);
 
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
-  Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
-  Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
-  Config::SetDefault("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
-  Config::SetDefault("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
-  Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
-  Config::SetDefault("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
-  Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
+  Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
+  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
+  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
   Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
@@ -586,27 +586,27 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   // set callback traces where we want results out
 
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                   MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
   uint16_t port = 9;
 
   // create Sink helper
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress(gwUsers.Get (0)), port));
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
 
   // install Sink application on GW user to receive packet
   ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
   gwSink.Start (Seconds (0.1));
   gwSink.Stop (Seconds (0.5));
 
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
 
   // create applications on UT in beam 1
   cbrHelper.SetAttribute ("Interval", m_Interval1);
@@ -658,7 +658,7 @@ SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase ()
 }
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading)
-  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRtnFull_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRtnFull_" + name, fading, false,
                               StringValue ("0.01s"), UintegerValue (512), StringValue ("0.01s"), UintegerValue (32) )
 {
 
@@ -667,7 +667,7 @@ SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string na
 
 SatPerPacketRtnLinkFullTestCase::SatPerPacketRtnLinkFullTestCase (std::string name, SatEnums::FadingModel_t fading,
                                                                   StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
-  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRtnFull_"+ name, fading, false,
+  : SatPerPacketBaseTestCase (defRtnFullName + name, "IfTestRtnFull_" + name, fading, false,
                               ival1, pSize1, ival2, pSize2 )
 {
 
@@ -686,19 +686,19 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   InitOutput (false);
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-per-packet-if", m_extName, true);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
-  Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue (1));
-  Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue (1));
-  Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
-  Config::SetDefault("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
-  Config::SetDefault("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
-  Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
-  Config::SetDefault("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
-  Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
+  Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
+  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
+  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
   Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
@@ -712,27 +712,27 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   // set callback traces where we want results out
 
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                   MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
   uint16_t port = 9;
 
   // create Sink helper
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress(gwUsers.Get (0)), port));
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
 
   // install Sink application on GW user to receive packet
   ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
   gwSink.Start (Seconds (0.1));
   gwSink.Stop (Seconds (0.5));
 
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
 
   // create applications on UT in beam 1
   cbrHelper.SetAttribute ("Interval", m_Interval1);
@@ -776,30 +776,30 @@ SatPerPacketIfTestSuite::SatPerPacketIfTestSuite ()
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("DummyFrames.",
                                                     SatEnums::FADING_OFF,
                                                     true),
-                                                    TestCase::QUICK);
+               TestCase::QUICK);
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV,
                                                     false),
-                                                    TestCase::QUICK);
+               TestCase::QUICK);
   AddTestCase (new SatPerPacketFwdLinkUserTestCase ("Markov_Fading, DummyFrames.",
                                                     SatEnums::FADING_MARKOV,
                                                     true),
-                                                    TestCase::QUICK);
+               TestCase::QUICK);
   AddTestCase (new SatPerPacketFwdLinkFullTestCase, TestCase::QUICK);
 
   AddTestCase (new SatPerPacketFwdLinkFullTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV,
                                                     false),
-                                                    TestCase::QUICK);
+               TestCase::QUICK);
   AddTestCase (new SatPerPacketRtnLinkUserTestCase, TestCase::QUICK);
   AddTestCase (new SatPerPacketRtnLinkUserTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV),
-                                                    TestCase::QUICK);
+               TestCase::QUICK);
 
   AddTestCase (new SatPerPacketRtnLinkFullTestCase, TestCase::QUICK);
   AddTestCase (new SatPerPacketRtnLinkFullTestCase ("Markov_Fading.",
                                                     SatEnums::FADING_MARKOV),
-                                                    TestCase::QUICK);
+               TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

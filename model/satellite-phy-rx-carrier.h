@@ -54,7 +54,6 @@ class SatNodeInfo;
 class SatPhyRxCarrier : public Object
 {
 public:
-
   /**
    * \brief Struct for storing the packet specific Rx parameters
    */
@@ -143,13 +142,13 @@ public:
    * \brief Function for setting the receive callback
    * \param cb callback
    */
-  void SetReceiveCb(SatPhyRx::ReceiveCallback cb);
+  void SetReceiveCb (SatPhyRx::ReceiveCallback cb);
 
   /**
    * \brief Function for settign the C/NO callback
    * \param cb callback
    */
-  void SetCnoCb(SatPhyRx::CnoCallback cb);
+  void SetCnoCb (SatPhyRx::CnoCallback cb);
 
   /**
    * \brief Function for setting the AverageNormalizedOfferedLoadCallback callback
@@ -190,24 +189,24 @@ public:
    * \param interference interference power (in W)
    * \param sinr composite SINR (in linear unit)
    */
-  typedef void (* LinkBudgetTraceCallback)
+  typedef void (*LinkBudgetTraceCallback)
     (Ptr<SatSignalParameters> rxParams,
-     Mac48Address receiverAddress,
-     Mac48Address destinationAddress,
-     double interference,
-     double sinr);
+    Mac48Address receiverAddress,
+    Mac48Address destinationAddress,
+    double interference,
+    double sinr);
 
   /**
    * \brief Callback signature for `RxPowerTrace` trace source.
    * \param rxPower received signal power (in dbW)
    */
-  typedef void (* RxPowerTraceCallback) (double rxPower);
+  typedef void (*RxPowerTraceCallback)(double rxPower);
 
   /**
    * \brief Callback signature for `LinkSinrTrace` trace source.
    * \param sinr link-specific SINR (in dB)
    */
-  typedef void (* LinkSinrTraceCallback) (double sinr);
+  typedef void (*LinkSinrTraceCallback)(double sinr);
 
   /**
    * \brief Common callback signature for trace sources related to packets
@@ -216,7 +215,7 @@ public:
    * \param from the MAC48 address of the sender of the packets.
    * \param isError whether a PHY error has occurred.
    */
-  typedef void (* PhyRxErrorCallback)
+  typedef void (*PhyRxErrorCallback)
     (uint32_t nPackets, const Address &from, bool isError);
 
   /**
@@ -226,11 +225,10 @@ public:
    * \param from the MAC48 address of the sender of the packets.
    * \param isCollided whether a collision has occurred.
    */
-  typedef void (* PhyRxCollisionCallback)
+  typedef void (*PhyRxCollisionCallback)
     (uint32_t nPackets, const Address &from, bool isCollided);
 
 private:
-
   /**
    * \brief Function for composite SINR output tracing
    * \param cSinr composite SINR
@@ -297,7 +295,7 @@ private:
    * \param sinr2 SINR 2
    * \return Composite SINR
    */
-  double CalculateCompositeSinr(double sinr1, double sinr2);
+  double CalculateCompositeSinr (double sinr1, double sinr2);
 
   /**
    * \brief Function for increasing the number of ongoing transmissions
@@ -520,7 +518,7 @@ private:
                   double,                   // interference power
                   double                    // composite SINR
                   >
-     m_linkBudgetTrace;
+  m_linkBudgetTrace;
 
   /**
    * \brief A callback for received signal power in dBW

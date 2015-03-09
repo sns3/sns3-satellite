@@ -103,11 +103,11 @@ SatInterference::GetTypeId (void)
 TypeId
 SatInterference::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
-SatInterference::SatInterference () :
-  m_currentlyReceiving (0)
+SatInterference::SatInterference ()
+  : m_currentlyReceiving (0)
 {
 
 }
@@ -171,7 +171,7 @@ SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> ev
   m_currentlyReceiving++;
 
   std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator,bool> result;
-  result = m_packetCollisions.insert (std::make_pair(event,false));
+  result = m_packetCollisions.insert (std::make_pair (event,false));
 
   if (!result.second)
     {

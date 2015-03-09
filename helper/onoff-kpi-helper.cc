@@ -39,7 +39,7 @@ namespace ns3 {
 
 
 OnOffKpiHelper::OnOffKpiHelper (KpiHelper::KpiMode_t mode)
-:KpiHelper (mode)
+  : KpiHelper (mode)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -76,7 +76,7 @@ OnOffKpiHelper::AddSender (Ptr<Application> app)
       // use the client's IP address as the context
       AddressValue remoteAddress;
       onoff->GetAttribute ("Remote", remoteAddress);
-      address = InetSocketAddress::ConvertFrom(remoteAddress.Get()).GetIpv4 ();
+      address = InetSocketAddress::ConvertFrom (remoteAddress.Get ()).GetIpv4 ();
       ConfigureAsServer (app);
 
       NS_LOG_INFO ("Adding OnOff application as server with remote address: " << address);
@@ -97,7 +97,7 @@ OnOffKpiHelper::AddSender (Ptr<Application> app)
   AddClientCounter (address);
   const std::string context = AddressToString (address);
   onoff->TraceConnect ("Tx", context,
-                     MakeCallback (&KpiHelper::TxCallback, this));
+                       MakeCallback (&KpiHelper::TxCallback, this));
 }
 
 

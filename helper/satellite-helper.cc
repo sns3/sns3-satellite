@@ -47,79 +47,79 @@ NS_OBJECT_ENSURE_REGISTERED (SatHelper);
 TypeId
 SatHelper::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatHelper")
-      .SetParent<Object> ()
-      .AddConstructor<SatHelper> ()
-      .AddAttribute ("UtCount", "The count of created UTs in beam (full or user-defined scenario)",
-                      UintegerValue (3),
-                      MakeUintegerAccessor (&SatHelper::m_utsInBeam),
-                      MakeUintegerChecker<uint32_t> (1))
-      .AddAttribute ("GwUsers", "The number of created GW users (full or user-defined scenario)",
-                      UintegerValue (5),
-                      MakeUintegerAccessor (&SatHelper::m_gwUsers),
-                      MakeUintegerChecker<uint32_t> (1))
-      .AddAttribute ("UtUsers", "The number of created UT users per UT (full or user-defined scenario)",
-                      UintegerValue (3),
-                      MakeUintegerAccessor (&SatHelper::m_utUsers),
-                      MakeUintegerChecker<uint32_t> (1))
-      .AddAttribute ("BeamNetworkAddress",
-                     "Initial network number to use "
-                     "during allocation of satellite devices "
-                     "(255.255.255.0 will be used as the network mask)",
-                     Ipv4AddressValue ("10.1.1.0"),
-                     MakeIpv4AddressAccessor (&SatHelper::SetBeamNetworkAddress,
-                                              &SatHelper::GetBeamNetworkAddress),
-                     MakeIpv4AddressChecker ())
-      .AddAttribute ("GwNetworkAddress",
-                     "Initial network number to use "
-                     "during allocation of GW, router, and GW users "
-                     "(255.255.255.0 will be used as the network mask)",
-                     Ipv4AddressValue ("10.2.1.0"),
-                     MakeIpv4AddressAccessor (&SatHelper::SetGwNetworkAddress,
-                                              &SatHelper::GetGwNetworkAddress),
-                     MakeIpv4AddressChecker ())
-      .AddAttribute ("UtNetworkAddress",
-                     "Initial network number to use "
-                     "during allocation of UT and UT users "
-                     "(255.255.255.0 will be used as the network mask)",
-                     Ipv4AddressValue ("10.3.1.0"),
-                     MakeIpv4AddressAccessor (&SatHelper::SetUtNetworkAddress,
-                                              &SatHelper::GetUtNetworkAddress),
-                     MakeIpv4AddressChecker ())
-      .AddAttribute ("PacketTraceEnabled",
-                     "Packet tracing enable status.",
-                     BooleanValue (false),
-                     MakeBooleanAccessor (&SatHelper::m_packetTraces),
-                     MakeBooleanChecker ())
-      .AddAttribute ("ScenarioCreationTraceEnabled",
-                     "Scenario creation trace output enable status.",
-                     BooleanValue (false),
-                     MakeBooleanAccessor (&SatHelper::m_creationTraces),
-                     MakeBooleanChecker ())
-      .AddAttribute ("DetailedScenarioCreationTraceEnabled",
-                     "Detailed scenario creation trace output enable status.",
-                     BooleanValue (false),
-                     MakeBooleanAccessor (&SatHelper::m_detailedCreationTraces),
-                     MakeBooleanChecker ())
-      .AddAttribute ("ScenarioCreationTraceFileName",
-                     "File name for the scenario creation trace output",
-                     StringValue ("CreationTraceScenario"),
-                     MakeStringAccessor (&SatHelper::m_scenarioCreationFileName),
-                     MakeStringChecker ())
-      .AddAttribute ("UtCreationTraceFileName",
-                     "File name for the UT creation trace output",
-                     StringValue ("CreationTraceUt"),
-                     MakeStringAccessor (&SatHelper::m_utCreationFileName),
-                     MakeStringChecker ())
-      .AddTraceSource ("Creation", "Creation traces",
-                       MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace),
-                       "ns3::SatTypedefs::CreationCallback")
-      .AddTraceSource ("CreationSummary", "Creation summary traces",
-                       MakeTraceSourceAccessor (&SatHelper::m_creationSummaryTrace),
-                       "ns3::SatTypedefs::CreationCallback")
+  static TypeId tid = TypeId ("ns3::SatHelper")
+    .SetParent<Object> ()
+    .AddConstructor<SatHelper> ()
+    .AddAttribute ("UtCount", "The count of created UTs in beam (full or user-defined scenario)",
+                   UintegerValue (3),
+                   MakeUintegerAccessor (&SatHelper::m_utsInBeam),
+                   MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute ("GwUsers", "The number of created GW users (full or user-defined scenario)",
+                   UintegerValue (5),
+                   MakeUintegerAccessor (&SatHelper::m_gwUsers),
+                   MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute ("UtUsers", "The number of created UT users per UT (full or user-defined scenario)",
+                   UintegerValue (3),
+                   MakeUintegerAccessor (&SatHelper::m_utUsers),
+                   MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute ("BeamNetworkAddress",
+                   "Initial network number to use "
+                   "during allocation of satellite devices "
+                   "(255.255.255.0 will be used as the network mask)",
+                   Ipv4AddressValue ("10.1.1.0"),
+                   MakeIpv4AddressAccessor (&SatHelper::SetBeamNetworkAddress,
+                                            &SatHelper::GetBeamNetworkAddress),
+                   MakeIpv4AddressChecker ())
+    .AddAttribute ("GwNetworkAddress",
+                   "Initial network number to use "
+                   "during allocation of GW, router, and GW users "
+                   "(255.255.255.0 will be used as the network mask)",
+                   Ipv4AddressValue ("10.2.1.0"),
+                   MakeIpv4AddressAccessor (&SatHelper::SetGwNetworkAddress,
+                                            &SatHelper::GetGwNetworkAddress),
+                   MakeIpv4AddressChecker ())
+    .AddAttribute ("UtNetworkAddress",
+                   "Initial network number to use "
+                   "during allocation of UT and UT users "
+                   "(255.255.255.0 will be used as the network mask)",
+                   Ipv4AddressValue ("10.3.1.0"),
+                   MakeIpv4AddressAccessor (&SatHelper::SetUtNetworkAddress,
+                                            &SatHelper::GetUtNetworkAddress),
+                   MakeIpv4AddressChecker ())
+    .AddAttribute ("PacketTraceEnabled",
+                   "Packet tracing enable status.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatHelper::m_packetTraces),
+                   MakeBooleanChecker ())
+    .AddAttribute ("ScenarioCreationTraceEnabled",
+                   "Scenario creation trace output enable status.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatHelper::m_creationTraces),
+                   MakeBooleanChecker ())
+    .AddAttribute ("DetailedScenarioCreationTraceEnabled",
+                   "Detailed scenario creation trace output enable status.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatHelper::m_detailedCreationTraces),
+                   MakeBooleanChecker ())
+    .AddAttribute ("ScenarioCreationTraceFileName",
+                   "File name for the scenario creation trace output",
+                   StringValue ("CreationTraceScenario"),
+                   MakeStringAccessor (&SatHelper::m_scenarioCreationFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("UtCreationTraceFileName",
+                   "File name for the UT creation trace output",
+                   StringValue ("CreationTraceUt"),
+                   MakeStringAccessor (&SatHelper::m_utCreationFileName),
+                   MakeStringChecker ())
+    .AddTraceSource ("Creation", "Creation traces",
+                     MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace),
+                     "ns3::SatTypedefs::CreationCallback")
+    .AddTraceSource ("CreationSummary", "Creation summary traces",
+                     MakeTraceSourceAccessor (&SatHelper::m_creationSummaryTrace),
+                     "ns3::SatTypedefs::CreationCallback")
 
-    ;
-    return tid;
+  ;
+  return tid;
 }
 
 TypeId
@@ -127,20 +127,20 @@ SatHelper::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatHelper::SatHelper ()
-: m_hasBeamNetworkSet (false),
-  m_hasGwNetworkSet (false),
-  m_hasUtNetworkSet (false),
-  m_scenarioCreated (false),
-  m_creationTraces (false),
-  m_detailedCreationTraces (false),
-  m_packetTraces (false),
-  m_utsInBeam (0),
-  m_gwUsers (0),
-  m_utUsers (0)
+  : m_hasBeamNetworkSet (false),
+    m_hasGwNetworkSet (false),
+    m_hasUtNetworkSet (false),
+    m_scenarioCreated (false),
+    m_creationTraces (false),
+    m_detailedCreationTraces (false),
+    m_packetTraces (false),
+    m_utsInBeam (0),
+    m_gwUsers (0),
+    m_utUsers (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -149,11 +149,11 @@ SatHelper::SatHelper ()
 }
 
 SatHelper::SatHelper (std::string scenarioName)
- : m_hasBeamNetworkSet (false),
-   m_hasGwNetworkSet (false),
-   m_hasUtNetworkSet (false),
-   m_scenarioCreated (false),
-   m_detailedCreationTraces (false)
+  : m_hasBeamNetworkSet (false),
+    m_hasGwNetworkSet (false),
+    m_hasUtNetworkSet (false),
+    m_scenarioCreated (false),
+    m_detailedCreationTraces (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -175,14 +175,14 @@ SatHelper::SatHelper (std::string scenarioName)
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
 
   // create Geo Satellite node, set mobility to it
-  Ptr<Node> geoSatNode = CreateObject<Node>();
-  SetGeoSatMobility(geoSatNode);
+  Ptr<Node> geoSatNode = CreateObject<Node> ();
+  SetGeoSatMobility (geoSatNode);
 
   m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
-                                              m_satConf->GetRtnLinkCarrierCount(),
-                                              m_satConf->GetFwdLinkCarrierCount(),
-                                              m_satConf->GetSuperframeSeq());
+                                              m_satConf->GetRtnLinkCarrierCount (),
+                                              m_satConf->GetFwdLinkCarrierCount (),
+                                              m_satConf->GetSuperframeSeq ());
 
   Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get ();
   rtnTime->Initialize (m_satConf->GetSuperframeSeq ());
@@ -200,24 +200,24 @@ void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
 {
   NS_LOG_FUNCTION (this);
 
-  switch(scenario)
-  {
+  switch (scenario)
+    {
     case SIMPLE:
-      CreateSimpleScenario();
+      CreateSimpleScenario ();
       break;
 
     case LARGER:
-      CreateLargerScenario();
+      CreateLargerScenario ();
       break;
 
     case FULL:
-      CreateFullScenario();
+      CreateFullScenario ();
       break;
 
     default:
       NS_FATAL_ERROR ("Not supported predefined scenario.");
       break;
-  }
+    }
 }
 
 void SatHelper::EnableCreationTraces ()
@@ -234,11 +234,11 @@ void SatHelper::EnableCreationTraces ()
   m_creationTraceStream = asciiTraceHelper.CreateFileStream (outputPathCreation.str ());
   m_utTraceStream = asciiTraceHelper.CreateFileStream (outputPathUt.str ());
 
-  TraceConnectWithoutContext("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
+  TraceConnectWithoutContext ("CreationSummary", MakeCallback (&SatHelper::CreationSummarySink, this));
 
   if ( m_detailedCreationTraces )
     {
-      EnableDetailedCreationTraces();
+      EnableDetailedCreationTraces ();
     }
 }
 
@@ -249,24 +249,24 @@ SatHelper::EnablePacketTrace ()
 }
 
 
-void SatHelper::EnableDetailedCreationTraces()
+void SatHelper::EnableDetailedCreationTraces ()
 {
   NS_LOG_FUNCTION (this);
 
   CallbackBase creationCb = MakeBoundCallback (&SatHelper::CreationDetailsSink, m_creationTraceStream);
-  TraceConnect("Creation", "SatHelper", creationCb);
+  TraceConnect ("Creation", "SatHelper", creationCb);
 
-  m_userHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
-  m_beamHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
+  m_userHelper->EnableCreationTraces (m_creationTraceStream, creationCb);
+  m_beamHelper->EnableCreationTraces (m_creationTraceStream, creationCb);
 }
 
 Ipv4Address
-SatHelper::GetUserAddress(Ptr<Node> node)
+SatHelper::GetUserAddress (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this);
 
   Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> (); // Get Ipv4 instance of the node
-  return ipv4->GetAddress (1, 0).GetLocal(); // Get Ipv4InterfaceAddress of interface csma interface.
+  return ipv4->GetAddress (1, 0).GetLocal (); // Get Ipv4InterfaceAddress of interface csma interface.
 }
 
 NodeContainer
@@ -304,13 +304,13 @@ SatHelper::CreateSimpleScenario ()
 {
   NS_LOG_FUNCTION (this);
 
-  SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
   BeamUserInfoMap_t beamUserInfos;
   beamUserInfos[8] = beamInfo;
 
-  DoCreateScenario(beamUserInfos, 1);
+  DoCreateScenario (beamUserInfos, 1);
 
-  m_creationSummaryTrace("*** Simple Scenario Creation Summary ***");
+  m_creationSummaryTrace ("*** Simple Scenario Creation Summary ***");
 }
 
 void
@@ -319,21 +319,21 @@ SatHelper::CreateLargerScenario ()
   NS_LOG_FUNCTION (this);
 
   // install one user for UTs in beams 12 and 22
-  SatBeamUserInfo beamInfo = SatBeamUserInfo(1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
   BeamUserInfoMap_t beamUserInfos;
 
   beamUserInfos[12] = beamInfo;
   beamUserInfos[22] = beamInfo;
 
   // install two users for UT1 and one for UT2 in beam 3
-  beamInfo.SetUtUserCount(0,2);
-  beamInfo.AppendUt(1);
+  beamInfo.SetUtUserCount (0,2);
+  beamInfo.AppendUt (1);
 
   beamUserInfos[3] = beamInfo;
 
-  DoCreateScenario(beamUserInfos, 1);
+  DoCreateScenario (beamUserInfos, 1);
 
-  m_creationSummaryTrace("*** Larger Scenario Creation Summary ***");
+  m_creationSummaryTrace ("*** Larger Scenario Creation Summary ***");
 }
 
 void
@@ -341,29 +341,29 @@ SatHelper::CreateFullScenario ()
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t beamCount =  m_satConf->GetBeamCount();
+  uint32_t beamCount =  m_satConf->GetBeamCount ();
   BeamUserInfoMap_t beamUserInfos;
 
-  for ( uint32_t i = 1; i < (beamCount + 1); i ++ )
+  for ( uint32_t i = 1; i < (beamCount + 1); i++ )
     {
-      BeamUserInfoMap_t::iterator beamInfo = m_beamUserInfos.find(i);
+      BeamUserInfoMap_t::iterator beamInfo = m_beamUserInfos.find (i);
       SatBeamUserInfo info;
 
-      if ( beamInfo != m_beamUserInfos.end())
+      if ( beamInfo != m_beamUserInfos.end ())
         {
           info = beamInfo->second;
         }
       else
         {
-          info = SatBeamUserInfo(m_utsInBeam, this->m_utUsers );
+          info = SatBeamUserInfo (m_utsInBeam, this->m_utUsers );
         }
 
       beamUserInfos[i] = info;
     }
 
-  DoCreateScenario(beamUserInfos, m_gwUsers);
+  DoCreateScenario (beamUserInfos, m_gwUsers);
 
-  m_creationSummaryTrace("*** Full Scenario Creation Summary ***");
+  m_creationSummaryTrace ("*** Full Scenario Creation Summary ***");
 }
 
 void
@@ -372,9 +372,9 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
   NS_LOG_FUNCTION (this);
 
   // create as user wants
-  DoCreateScenario(infos, m_gwUsers);
+  DoCreateScenario (infos, m_gwUsers);
 
-  m_creationSummaryTrace("*** User Defined Scenario Creation Summary ***");
+  m_creationSummaryTrace ("*** User Defined Scenario Creation Summary ***");
 }
 
 void
@@ -416,9 +416,9 @@ SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos,
     }
 
   // create as user wants
-  DoCreateScenario(infos, m_gwUsers);
+  DoCreateScenario (infos, m_gwUsers);
 
-  m_creationSummaryTrace("*** User Defined Scenario with List Positions Creation Summary ***");
+  m_creationSummaryTrace ("*** User Defined Scenario with List Positions Creation Summary ***");
 }
 
 void
@@ -434,7 +434,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
     {
       if (m_creationTraces)
         {
-          EnableCreationTraces();
+          EnableCreationTraces ();
         }
 
       InternetStackHelper internet;
@@ -456,13 +456,13 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
           for ( uint32_t i = 0; i < info->second.GetUtCount (); i++ )
             {
               // create and install needed users
-              m_userHelper->InstallUt (uts.Get(i), info->second.GetUtUserCount (i));
+              m_userHelper->InstallUt (uts.Get (i), info->second.GetUtUserCount (i));
             }
 
           std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (info->first);
 
           // gw index starts from 1 and we have stored them starting from 0
-          Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX]-1);
+          Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX] - 1);
           m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
         }
 
@@ -727,7 +727,7 @@ SatHelper::SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, I
             {
               routerInputDev = devices.second;
             }
-         }
+        }
 
       NetDeviceContainer routerOutputDevices;
 
@@ -859,8 +859,8 @@ SatHelper::SetMulticastRouteToSourceNetwork (Ptr<Node> source, Ptr<Node> dest)
 
       for ( uint32_t i = 0; i < staticRouting->GetNRoutes (); i++ )
         {
-          if (staticRouting->GetRoute (i).GetDestNetwork ().IsEqual (defMulticastNetwork) &&
-              staticRouting->GetRoute (i).GetDestNetworkMask ().IsEqual (defMulticastNetworkMask) )
+          if (staticRouting->GetRoute (i).GetDestNetwork ().IsEqual (defMulticastNetwork)
+              && staticRouting->GetRoute (i).GetDestNetworkMask ().IsEqual (defMulticastNetworkMask) )
             {
               defaultMulticastRouteExists = true;
             }
@@ -908,7 +908,7 @@ SatHelper::ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receive
                   // store other UT nodes beam ID and pointer to multicast group info for later routing
                   MulticastBeamInfo_t::iterator it = beamInfo.find (beamId);
 
-                    // find or create first storage for the beam
+                  // find or create first storage for the beam
                   if ( it == beamInfo.end () )
                     {
                       std::pair<MulticastBeamInfo_t::iterator, bool> result = beamInfo.insert (std::make_pair (beamId, MulticastBeamInfoItem_t ()));
@@ -940,7 +940,7 @@ SatHelper::ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receive
                 {
                   std::pair<Ptr<NetDevice>, Ptr<NetDevice> > devices;
 
-                  if ( FindMatchingDevices (receiverNode, m_userHelper->GetRouter(), devices ) )
+                  if ( FindMatchingDevices (receiverNode, m_userHelper->GetRouter (), devices ) )
                     {
                       routerUserOutputDev = devices.second;
                     }

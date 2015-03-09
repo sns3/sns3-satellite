@@ -34,9 +34,9 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatBaseEncapsulator);
 
 SatBaseEncapsulator::SatBaseEncapsulator ()
-:m_sourceAddress (),
- m_destAddress (),
- m_flowId (0)
+  : m_sourceAddress (),
+    m_destAddress (),
+    m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -47,9 +47,9 @@ SatBaseEncapsulator::SatBaseEncapsulator ()
 }
 
 SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-:m_sourceAddress (source),
- m_destAddress (dest),
- m_flowId (flowId)
+  : m_sourceAddress (source),
+    m_destAddress (dest),
+    m_flowId (flowId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -104,7 +104,7 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
       NS_LOG_LOGIC ("Packet is dropped!");
     }
 
-  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets() );
+  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets () );
   NS_LOG_LOGIC ("NumBytes = " << m_txQueue->GetNBytes ());
 }
 
@@ -118,7 +118,7 @@ SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, u
   Ptr<Packet> packet;
 
   // No packets in buffer
-  if (m_txQueue->IsEmpty())
+  if (m_txQueue->IsEmpty ())
     {
       NS_LOG_LOGIC ("No data pending, return NULL packet");
       return packet;

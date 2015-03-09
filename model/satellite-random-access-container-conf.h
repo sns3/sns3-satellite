@@ -74,31 +74,46 @@ public:
    * \brief Function for getting the Slotted ALOHA control randomization interval
    * \return control randomization interval
    */
-  uint32_t GetSlottedAlohaControlRandomizationIntervalInMilliSeconds () { return m_slottedAlohaControlRandomizationIntervalInMilliSeconds;}
+  uint32_t GetSlottedAlohaControlRandomizationIntervalInMilliSeconds ()
+  {
+    return m_slottedAlohaControlRandomizationIntervalInMilliSeconds;
+  }
 
   /**
    * \brief Function for setting the Slotted ALOHA control randomization interval
    * \param controlRandomizationInterval control randomization interval
    */
-  void SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds) { m_slottedAlohaControlRandomizationIntervalInMilliSeconds = controlRandomizationIntervalInMilliSeconds;}
+  void SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds)
+  {
+    m_slottedAlohaControlRandomizationIntervalInMilliSeconds = controlRandomizationIntervalInMilliSeconds;
+  }
 
   /**
    * \brief Function for getting the number of available allocation channels
    * \return number of allocation channels
    */
-  uint32_t GetNumOfAllocationChannels () { return m_allocationChannelCount; }
+  uint32_t GetNumOfAllocationChannels ()
+  {
+    return m_allocationChannelCount;
+  }
 
   /**
    * \brief Function for getting the CRDSA signaling overhead in bytes
    * \return CRDSA signaling overhead in bytes
    */
-  uint32_t GetCrdsaSignalingOverheadInBytes () { return m_crdsaSignalingOverheadInBytes; }
+  uint32_t GetCrdsaSignalingOverheadInBytes ()
+  {
+    return m_crdsaSignalingOverheadInBytes;
+  }
 
   /**
    * \brief Function for getting the Slotted ALOHA signaling overhead in bytes
    * \return Slotted ALOHA signaling overhead in bytes
    */
-  uint32_t GetSlottedAlohaSignalingOverheadInBytes () { return m_slottedAlohaSignalingOverheadInBytes; }
+  uint32_t GetSlottedAlohaSignalingOverheadInBytes ()
+  {
+    return m_slottedAlohaSignalingOverheadInBytes;
+  }
 
   /**
    * \brief Function for checking the Slotted ALOHA variable sanity
@@ -106,7 +121,6 @@ public:
   void DoSlottedAlohaVariableSanityCheck ();
 
 private:
-
   /**
    * \brief Map containing the allocation channel configurations
    */

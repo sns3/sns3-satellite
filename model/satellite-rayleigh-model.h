@@ -38,7 +38,6 @@ namespace ns3 {
 class SatRayleighModel : public SatBaseFader
 {
 public:
-
   /**
    * \brief NS-3 function for type id
    * \return type id
@@ -93,7 +92,6 @@ public:
   void UpdateParameters (uint32_t set, uint32_t state);
 
 private:
-
   /**
    * \brief Function for constructing the oscillators
    */

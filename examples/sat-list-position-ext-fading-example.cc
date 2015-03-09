@@ -55,19 +55,19 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("sat-list-position-ext-fading-example");
 
 // callback called when packet is received by phy RX carrier
-static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> params, Mac48Address ownAdd , Mac48Address destAdd,
-                            double ifPower, double cSinr)
+static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> params, Mac48Address ownAdd, Mac48Address destAdd,
+                                double ifPower, double cSinr)
 {
   // print only unicast message to prevent printing control messages like TBTP messages
-  if ( !destAdd.IsBroadcast() )
+  if ( !destAdd.IsBroadcast () )
     {
-      NS_LOG_INFO ( Simulator::Now() << " "
-                    << params->m_channelType << " "
-                    << ownAdd << " "
-                    << destAdd << " "
-                    << params->m_beamId << " "
-                    << SatUtils::LinearToDb (params->m_sinr) << " "
-                    << SatUtils::LinearToDb (cSinr) );
+      NS_LOG_INFO ( Simulator::Now () << " "
+                                      << params->m_channelType << " "
+                                      << ownAdd << " "
+                                      << destAdd << " "
+                                      << params->m_beamId << " "
+                                      << SatUtils::LinearToDb (params->m_sinr) << " "
+                                      << SatUtils::LinearToDb (cSinr) );
     }
 }
 
@@ -81,8 +81,8 @@ main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
-    // Set default values for some attributes for position setting and external fading trace
-    // This done before command line parsing in order to overrided them if needed
+  // Set default values for some attributes for position setting and external fading trace
+  // This done before command line parsing in order to overrided them if needed
 
   // Set user specific UT position file (UserDefinedUtPos.txt) to be utilized by SatConf.
   // Given file must locate in /satellite/data folder
@@ -99,10 +99,10 @@ main (int argc, char *argv[])
   // Set index files defining external tracing input files for UTs
   // Given index files must locate in /satellite/data/ext-fadingtraces/input folder
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
-                       StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
+                      StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
 
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
-                       StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
+                      StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
 
   // for GWs we don't set up index files, so default ones are used (GW_fading_fwdup_traces.txt and GW_fading_rtndwn_traces.txt)
   // in case that those are wanted to change, it can be done via command line arguments
@@ -154,17 +154,17 @@ main (int argc, char *argv[])
 
   // set callback traces where we want results out
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                               MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                               MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   uint16_t port = 9;
 
@@ -190,10 +190,10 @@ main (int argc, char *argv[])
   // create sink applications on UT users, CBR applications on GW user and UT users
   for (uint32_t i = 0; i < utUsers.GetN (); i++)
     {
-      sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port))));
+      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
       sinkContainer.Add (sinkHelper.Install (utUsers.Get (i)));
 
-      gwCbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port))));
+      gwCbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
       cbrContainer.Add (gwCbrHelper.Install (gwUsers.Get (0)));
 
       cbrContainer.Add (utCbrHelper.Install (utUsers.Get (i)));

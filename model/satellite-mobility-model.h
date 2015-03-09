@@ -60,21 +60,21 @@ public:
    *
    * \param model the SatMobilityModel which is changing course
    */
-  typedef void (* CourseChangeCallback)
+  typedef void (*CourseChangeCallback)
     (const Ptr<const SatMobilityModel> model);
 
 private:
   /**
    * \return the current position.
    *
-   * Concrete subclasses of this base class must 
+   * Concrete subclasses of this base class must
    * implement this method.
    */
   virtual GeoCoordinate DoGetGeoPosition (void) const = 0;
   /**
    * \param position the position to set.
    *
-   * Concrete subclasses of this base class must 
+   * Concrete subclasses of this base class must
    * implement this method.
    */
   virtual void DoSetGeoPosition (const GeoCoordinate &position) = 0;

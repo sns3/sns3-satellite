@@ -44,7 +44,6 @@ namespace ns3 {
 class SatPPduHeader : public Header
 {
 public:
-
   /**
    * Constructor
    */
@@ -132,7 +131,6 @@ public:
   uint32_t GetMaxHeaderSizeInBytes () const;
 
 private:
-
   uint8_t m_startIndicator;
   uint8_t m_endIndicator;
   uint16_t m_ppduLengthInBytes;

@@ -54,7 +54,7 @@ main (int argc, char *argv[])
   /// Run simulation
   for (uint32_t i = 0; i < 1000; i++)
     {
-      Simulator::Schedule (Time (500000 + i*500000), &SatRayleighModel::GetChannelGainDb, rayleighFader);
+      Simulator::Schedule (Time (500000 + i * 500000), &SatRayleighModel::GetChannelGainDb, rayleighFader);
     }
 
   Simulator::Run ();

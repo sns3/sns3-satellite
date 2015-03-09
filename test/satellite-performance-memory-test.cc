@@ -93,7 +93,7 @@ Pm1::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-perf-mem", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-perf-mem", "", true);
 
   // Create simple scenario
 
@@ -109,29 +109,29 @@ Pm1::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreatePredefinedScenario(SatHelper::FULL);
+  helper->CreatePredefinedScenario (SatHelper::FULL);
 
-  NodeContainer gwUsers = helper->GetGwUsers();
-  NodeContainer utUsers = helper->GetUtUsers();
+  NodeContainer gwUsers = helper->GetGwUsers ();
+  NodeContainer utUsers = helper->GetUtUsers ();
 
   uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port)));
+  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port)));
   cbr.SetAttribute ("Interval", StringValue ("0.8s"));
 
   // Create a packet sink to receive packet and a Cbr to sent packet in UT
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port)));
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
-  ApplicationContainer utApps = sink.Install (utUsers.Get(0));
-  utApps.Add(cbr.Install(utUsers.Get(0)));
+  ApplicationContainer utApps = sink.Install (utUsers.Get (0));
+  utApps.Add (cbr.Install (utUsers.Get (0)));
   utApps.Start (Seconds (1.0));
   utApps.Stop (Seconds (2.5));
 
   // Create a packet sink to receive packet and a Cbr to sent packet in GW
-  sink.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
-  cbr.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
+  sink.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  cbr.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
 
-  ApplicationContainer gwApps = sink.Install (gwUsers.Get(0));
-  gwApps.Add(cbr.Install(gwUsers.Get(0)));
+  ApplicationContainer gwApps = sink.Install (gwUsers.Get (0));
+  gwApps.Add (cbr.Install (gwUsers.Get (0)));
 
   gwApps.Start (Seconds (1.0));
   gwApps.Stop (Seconds (2.5));
@@ -151,11 +151,11 @@ Pm1::DoRun (void)
   // here we check that results are as expected.
   // * Sender has sent something
   // * Receiver got all all data sent
-  NS_TEST_ASSERT_MSG_NE (utSender->GetSent(), (uint32_t)0, "Nothing sent by UT user!");
-  NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx(), utSender->GetSent(), "Packets were lost between UT and GW!");
+  NS_TEST_ASSERT_MSG_NE (utSender->GetSent (), (uint32_t)0, "Nothing sent by UT user!");
+  NS_TEST_ASSERT_MSG_EQ (gwReceiver->GetTotalRx (), utSender->GetSent (), "Packets were lost between UT and GW!");
 
-  NS_TEST_ASSERT_MSG_NE (gwSender->GetSent(), (uint32_t)0, "Nothing sent by GW user!");
-  NS_TEST_ASSERT_MSG_EQ (utReceiver->GetTotalRx(), gwSender->GetSent(), "Packets were lost between GW and UT!");
+  NS_TEST_ASSERT_MSG_NE (gwSender->GetSent (), (uint32_t)0, "Nothing sent by GW user!");
+  NS_TEST_ASSERT_MSG_EQ (utReceiver->GetTotalRx (), gwSender->GetSent (), "Packets were lost between GW and UT!");
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
   // <<< End of actual test using Simple scenario <<<

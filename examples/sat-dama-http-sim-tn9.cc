@@ -110,8 +110,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // NCC configuration
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
-  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
   // RBDC
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -120,7 +120,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
   switch (crTxConf)
-  {
+    {
     // Periodical control slots
     case 0:
       {
@@ -148,7 +148,7 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Unsupported crTxConf: " << crTxConf);
         break;
       }
-  }
+    }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -166,8 +166,8 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   /**
    * Set-up HTTP traffic
@@ -219,11 +219,11 @@ main (int argc, char *argv[])
   s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-dama-http-sim-tn9 ---");
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-dama-http-sim-tn9 ---");
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

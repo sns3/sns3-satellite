@@ -137,7 +137,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
   switch (damaConf)
-  {
+    {
     // RBDC
     case 0:
       {
@@ -160,10 +160,10 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Unsupported damaConf: " << damaConf);
         break;
       }
-  }
+    }
 
   switch (crTxConf)
-  {
+    {
     // RA slotted ALOHA
     case 0:
       {
@@ -189,10 +189,10 @@ main (int argc, char *argv[])
     // CRA 1 kbps
     case 3:
       {
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue(true));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue(false));
-        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue(false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
+        Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
 
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
@@ -203,7 +203,7 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Unsupported crTxConf: " << crTxConf);
         break;
       }
-  }
+    }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -221,8 +221,8 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -234,8 +234,8 @@ main (int argc, char *argv[])
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
-      itUt != utUsers.End ();
-      ++itUt)
+       itUt != utUsers.End ();
+       ++itUt)
     {
       appStartTime += MilliSeconds (50);
 
@@ -285,13 +285,13 @@ main (int argc, char *argv[])
   s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-dama-onoff-sim-tn9 ---");
-  NS_LOG_INFO("  Packet size: " << packetSize);
-  NS_LOG_INFO("  Offered data rate: " << dataRate);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-dama-onoff-sim-tn9 ---");
+  NS_LOG_INFO ("  Packet size: " << packetSize);
+  NS_LOG_INFO ("  Offered data rate: " << dataRate);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

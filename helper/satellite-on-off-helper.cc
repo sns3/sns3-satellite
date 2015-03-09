@@ -31,7 +31,7 @@ SatOnOffHelper::SatOnOffHelper (std::string protocol, Address address)
   m_factory.Set ("Remote", AddressValue (address));
 }
 
-void 
+void
 SatOnOffHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
   m_factory.Set (name, value);
@@ -64,7 +64,7 @@ SatOnOffHelper::InstallPriv (Ptr<Node> node) const
   return app;
 }
 
-void 
+void
 SatOnOffHelper::SetConstantRate (DataRate dataRate, uint32_t packetSize)
 {
   m_factory.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1000]"));

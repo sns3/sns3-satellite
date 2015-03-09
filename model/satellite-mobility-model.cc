@@ -28,7 +28,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatMobilityModel);
 
-TypeId 
+TypeId
 SatMobilityModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMobilityModel")
@@ -40,10 +40,10 @@ SatMobilityModel::GetTypeId (void)
                                               &SatMobilityModel::GetGeoPosition),
                    MakeGeoCoordinateChecker ())
     .AddAttribute ("AsGeoCoordinates",
-                    "SetPosition method takes Geodetic coordinates in given Vector, x=longitude, y=latitude, z=altitude",
-                    BooleanValue (true),
-                    MakeBooleanAccessor (&SatMobilityModel::m_GetAsGeoCoordinates),
-                    MakeBooleanChecker ())
+                   "SetPosition method takes Geodetic coordinates in given Vector, x=longitude, y=latitude, z=altitude",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatMobilityModel::m_GetAsGeoCoordinates),
+                   MakeBooleanChecker ())
     .AddTraceSource ("SatCourseChange",
                      "The value of the position and/or velocity coordinate changed",
                      MakeTraceSourceAccessor (&SatMobilityModel::m_satCourseChangeTrace),
@@ -55,11 +55,11 @@ SatMobilityModel::GetTypeId (void)
 TypeId
 SatMobilityModel::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatMobilityModel::SatMobilityModel ()
-  :m_GetAsGeoCoordinates(true)
+  : m_GetAsGeoCoordinates (true)
 {
 
 }
@@ -85,7 +85,7 @@ void
 SatMobilityModel::NotifyGeoCourseChange (void) const
 {
   m_satCourseChangeTrace (this);
-  NotifyCourseChange();
+  NotifyCourseChange ();
 }
 
 Vector
@@ -93,8 +93,8 @@ SatMobilityModel::DoGetPosition (void) const
 {
   if ( m_cartesianPositionOutdated )
     {
-      Vector position = DoGetGeoPosition().ToVector();
-      DoSetCartesianPosition(position);
+      Vector position = DoGetGeoPosition ().ToVector ();
+      DoSetCartesianPosition (position);
     }
 
   return m_cartesianPosition;
@@ -106,13 +106,13 @@ SatMobilityModel::DoSetPosition (const Vector &position)
   if ( m_GetAsGeoCoordinates )
     {
       m_cartesianPositionOutdated = true;
-      DoSetGeoPosition( GeoCoordinate(position.x, position.y, position.z) );
+      DoSetGeoPosition ( GeoCoordinate (position.x, position.y, position.z) );
     }
   else
     {
       m_cartesianPositionOutdated = false;
       m_cartesianPosition = position;
-      DoSetGeoPosition( GeoCoordinate(position) );
+      DoSetGeoPosition ( GeoCoordinate (position) );
     }
 
 }

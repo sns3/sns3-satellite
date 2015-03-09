@@ -38,11 +38,11 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRx);
 
-SatPhyRx::SatPhyRx () :
-  m_beamId (),
-  m_maxAntennaGain (),
-  m_antennaLoss (),
-  m_defaultFadingValue ()
+SatPhyRx::SatPhyRx ()
+  : m_beamId (),
+    m_maxAntennaGain (),
+    m_antennaLoss (),
+    m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -58,9 +58,9 @@ void SatPhyRx::DoDispose ()
   m_mobility = 0;
   m_device = 0;
   m_fadingContainer = 0;
-  m_rxCarriers.clear();
+  m_rxCarriers.clear ();
   Object::DoDispose ();
-} 
+}
 
 TypeId
 SatPhyRx::GetTypeId (void)
@@ -68,9 +68,9 @@ SatPhyRx::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatPhyRx")
     .SetParent<Object> ()
     .AddAttribute ("RxCarrierList", "The list of RX carriers associated to this Phy RX.",
-                    ObjectVectorValue (),
-                    MakeObjectVectorAccessor (&SatPhyRx::m_rxCarriers),
-                    MakeObjectVectorChecker<SatPhyRxCarrier> ())
+                   ObjectVectorValue (),
+                   MakeObjectVectorAccessor (&SatPhyRx::m_rxCarriers),
+                   MakeObjectVectorChecker<SatPhyRxCarrier> ())
   ;
   return tid;
 }
@@ -186,11 +186,11 @@ SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 
   m_macAddress = nodeInfo->GetMacAddress ();
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
-        it != m_rxCarriers.end();
-        ++it)
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
+       it != m_rxCarriers.end ();
+       ++it)
     {
-      (*it)->SetNodeInfo(nodeInfo);
+      (*it)->SetNodeInfo (nodeInfo);
     }
 }
 
@@ -199,9 +199,9 @@ SatPhyRx::BeginFrameEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
-        it != m_rxCarriers.end();
-        ++it)
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
+       it != m_rxCarriers.end ();
+       ++it)
     {
       (*it)->BeginFrameEndScheduling ();
     }
@@ -213,11 +213,11 @@ SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
   NS_LOG_FUNCTION (this);
   NS_ASSERT (!m_rxCarriers.empty ());
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
-      it != m_rxCarriers.end();
-      ++it)
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
+       it != m_rxCarriers.end ();
+       ++it)
     {
-      (*it)->SetReceiveCb(cb);
+      (*it)->SetReceiveCb (cb);
     }
 }
 
@@ -227,9 +227,9 @@ SatPhyRx::SetCnoCallback (SatPhyRx::CnoCallback cb)
   NS_LOG_FUNCTION (this << &cb);
   NS_ASSERT (!m_rxCarriers.empty ());
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
-      it != m_rxCarriers.end ();
-      ++it)
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
+       it != m_rxCarriers.end ();
+       ++it)
     {
       (*it)->SetCnoCb (cb);
     }
@@ -241,9 +241,9 @@ SatPhyRx::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOf
   NS_LOG_FUNCTION (this << &cb);
   NS_ASSERT (!m_rxCarriers.empty ());
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin();
-      it != m_rxCarriers.end ();
-      ++it)
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
+       it != m_rxCarriers.end ();
+       ++it)
     {
       (*it)->SetAverageNormalizedOfferedLoadCallback (cb);
     }
@@ -278,15 +278,15 @@ void
 SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled)
 {
   NS_LOG_FUNCTION (this << isRandomAccessEnabled);
-  NS_ASSERT (m_rxCarriers.empty());
+  NS_ASSERT (m_rxCarriers.empty ());
 
   Ptr<SatPhyRxCarrier> rxc;
 
   bool isRandomAccessCarrier = false;
 
-  for (uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i)
+  for (uint32_t i = 0; i < carrierConf->GetCarrierCount (); ++i)
     {
-      NS_LOG_LOGIC(this << " Create carrier: " << i);
+      NS_LOG_LOGIC (this << " Create carrier: " << i);
 
       if (isRandomAccessEnabled)
         {
@@ -311,11 +311,11 @@ SatPhyRx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
   NS_ASSERT (beamId >= 0);
-  NS_ASSERT (!m_rxCarriers.empty());
+  NS_ASSERT (!m_rxCarriers.empty ());
 
   m_beamId = beamId;
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin(); it != m_rxCarriers.end(); ++it)
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin (); it != m_rxCarriers.end (); ++it)
     {
       (*it)->SetBeamId (beamId);
     }

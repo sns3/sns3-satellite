@@ -39,7 +39,6 @@ namespace ns3 {
 class SatEnvVariables : public Object
 {
 public:
-
   /**
    * \brief NS-3 function for type id
    * \return type id
@@ -86,7 +85,10 @@ public:
    * \brief Function for locating the data folder
    * \return path to data folder
    */
-  std::string GetDataPath () { return m_dataPath; }
+  std::string GetDataPath ()
+  {
+    return m_dataPath;
+  }
 
   /**
    * \brief Function for getting the simulation folder
@@ -142,7 +144,6 @@ public:
   void DoDispose ();
 
 private:
-
   /**
    * \brief Function for forming the output path and directory structure
    * \param campaignName simulation campaign name

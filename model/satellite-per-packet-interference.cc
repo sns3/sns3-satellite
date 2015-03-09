@@ -35,7 +35,7 @@ SatPerPacketInterference::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPerPacketInterference")
     .SetParent<SatInterference> ()
-    .AddConstructor<SatPerPacketInterference>();
+    .AddConstructor<SatPerPacketInterference> ();
 
   return tid;
 }
@@ -45,7 +45,7 @@ SatPerPacketInterference::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatPerPacketInterference::SatPerPacketInterference ()
@@ -110,10 +110,10 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
       m_interferenceChanges.erase (m_interferenceChanges.begin (), nowIterator);
     }
 
-  NS_LOG_LOGIC ( "Change count before addition: " << m_interferenceChanges.size() );
+  NS_LOG_LOGIC ( "Change count before addition: " << m_interferenceChanges.size () );
 
   // if no changes in future, first power should be zero
-  if ( m_interferenceChanges.size() == 0 )
+  if ( m_interferenceChanges.size () == 0 )
     {
       if ( ( m_residualPowerW != 0 ) && std::fabs (m_residualPowerW) < std::numeric_limits<long double>::epsilon () )
         {
@@ -126,7 +126,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
   m_interferenceChanges.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));
   m_interferenceChanges.insert (std::make_pair (event->GetEndTime (), InterferenceChange (event->GetId (), -power)));
 
-  NS_LOG_LOGIC ( "Change count after addition: " << m_interferenceChanges.size() );
+  NS_LOG_LOGIC ( "Change count after addition: " << m_interferenceChanges.size () );
 
   if ( m_residualPowerW < 0 )
     {
@@ -155,11 +155,11 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   NS_LOG_LOGIC ( "Calculate: IfPower (W)= " << ifPowerW << ", Duration= " << event->GetDuration () <<
                  ", StartTime= " << event->GetStartTime () << ", EndTime= " << event->GetEndTime () );
 
-  InterferenceChanges::iterator currentItem = m_interferenceChanges.begin();
+  InterferenceChanges::iterator currentItem = m_interferenceChanges.begin ();
 
   // calculate power values until own "stop" event found (own negative power event)
-  while ( (currentItem != m_interferenceChanges.end ()) &&
-         !( (event->GetId () == currentItem->second.first) && (event->GetRxPower () == -currentItem->second.second)) )
+  while ( (currentItem != m_interferenceChanges.end ())
+          && !( (event->GetId () == currentItem->second.first) && (event->GetRxPower () == -currentItem->second.second)) )
     {
       if (event->GetId () == currentItem->second.first)
         {
@@ -171,7 +171,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
       else if (ownStartReached)
         {
           // increase/decrease interference power with relative part of duration of power change in list
-          double itemTime = currentItem->first.GetDouble();
+          double itemTime = currentItem->first.GetDouble ();
           ifPowerW += ((rxEndTime - itemTime) / rxDuration) * currentItem->second.second;
 
           NS_LOG_LOGIC ( "Update (partial): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second <<
@@ -194,7 +194,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   if (m_enableTraceOutput)
     {
       std::vector<double> tempVector;
-      tempVector.push_back (Now ().GetSeconds());
+      tempVector.push_back (Now ().GetSeconds ());
       tempVector.push_back (ifPowerW / m_rxBandwidth_Hz);
       Singleton<SatInterferenceOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (event->GetSatEarthStationAddress (), m_channelType), tempVector);
     }

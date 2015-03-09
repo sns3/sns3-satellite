@@ -65,8 +65,6 @@ public:
   uint8_t Classify (const Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) const;
 
 private:
-
-
 };
 
 }

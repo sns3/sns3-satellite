@@ -57,133 +57,199 @@ public:
    * \brief Function for getting the CRDSA backoff time
    * \return CRDSA  backoff time
    */
-  uint32_t GetCrdsaBackoffTimeInMilliSeconds () { return m_crdsaBackoffTimeInMilliSeconds; }
+  uint32_t GetCrdsaBackoffTimeInMilliSeconds ()
+  {
+    return m_crdsaBackoffTimeInMilliSeconds;
+  }
 
   /**
    * \brief Function for setting the CRDSA backoff time
    * \param crdsaBackoffTime CRDSA backoff time
    */
-  void SetCrdsaBackoffTimeInMilliSeconds (uint32_t crdsaBackoffTimeInMilliSeconds) { m_crdsaBackoffTimeInMilliSeconds = crdsaBackoffTimeInMilliSeconds; }
+  void SetCrdsaBackoffTimeInMilliSeconds (uint32_t crdsaBackoffTimeInMilliSeconds)
+  {
+    m_crdsaBackoffTimeInMilliSeconds = crdsaBackoffTimeInMilliSeconds;
+  }
 
   /**
    * \brief Function for getting the CRDSA backoff release time
    * \return CRDSA backoff release time
    */
-  Time GetCrdsaBackoffReleaseTime () { return m_crdsaBackoffReleaseTime; }
+  Time GetCrdsaBackoffReleaseTime ()
+  {
+    return m_crdsaBackoffReleaseTime;
+  }
 
   /**
    * \brief Function for setting the CRDSA backoff release time
    * \param crdsaBackoffReleaseTime CRDSA  backoff time
    */
-  void SetCrdsaBackoffReleaseTime (Time crdsaBackoffReleaseTime) { m_crdsaBackoffReleaseTime = crdsaBackoffReleaseTime; }
+  void SetCrdsaBackoffReleaseTime (Time crdsaBackoffReleaseTime)
+  {
+    m_crdsaBackoffReleaseTime = crdsaBackoffReleaseTime;
+  }
 
   /**
    * \brief Function for getting the CRDSA backoff probability
    * \return CRDSA backoff probability
    */
-  double GetCrdsaBackoffProbability () { return m_crdsaBackoffProbability; }
+  double GetCrdsaBackoffProbability ()
+  {
+    return m_crdsaBackoffProbability;
+  }
 
   /**
    * \brief Function for setting the CRDSA backoff probability
    * \param crdsaBackoffProbability CRDSA backoff probability
    */
-  void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability) { m_crdsaBackoffProbability = ((crdsaBackoffProbability - 1) * (1 / (std::pow(2,16) - 2))); }
+  void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability)
+  {
+    m_crdsaBackoffProbability = ((crdsaBackoffProbability - 1) * (1 / (std::pow (2,16) - 2)));
+  }
 
   /**
    * \brief Function for getting the CRDSA minimum randomization value
    * \return CRDSA minimum randomization value
    */
-  uint32_t GetCrdsaMinRandomizationValue () { return m_crdsaMinRandomizationValue; }
+  uint32_t GetCrdsaMinRandomizationValue ()
+  {
+    return m_crdsaMinRandomizationValue;
+  }
 
   /**
    * \brief Function for setting the CRDSA minimum randomization value
    * \param CRDSA minimum randomization value
    */
-  void SetCrdsaMinRandomizationValue (uint32_t minRandomizationValue) { m_crdsaMinRandomizationValue = minRandomizationValue; }
+  void SetCrdsaMinRandomizationValue (uint32_t minRandomizationValue)
+  {
+    m_crdsaMinRandomizationValue = minRandomizationValue;
+  }
 
   /**
    * \brief Function for getting the CRDSA maximum randomization value
    * \return CRDSA maximum randomization value
    */
-  uint32_t GetCrdsaMaxRandomizationValue () { return m_crdsaMaxRandomizationValue; }
+  uint32_t GetCrdsaMaxRandomizationValue ()
+  {
+    return m_crdsaMaxRandomizationValue;
+  }
 
   /**
    * \brief Function for setting the CRDSA maximum randomization value
    * \param CRDSA maximum randomization value
    */
-  void SetCrdsaMaxRandomizationValue (uint32_t maxRandomizationValue) { m_crdsaMaxRandomizationValue = maxRandomizationValue; }
+  void SetCrdsaMaxRandomizationValue (uint32_t maxRandomizationValue)
+  {
+    m_crdsaMaxRandomizationValue = maxRandomizationValue;
+  }
 
   /**
    * \brief Function for getting the CRDSA number of packet instances (replicas)
    * \return CRDSA number of instances
    */
-  uint32_t GetCrdsaNumOfInstances () { return m_crdsaNumOfInstances; }
+  uint32_t GetCrdsaNumOfInstances ()
+  {
+    return m_crdsaNumOfInstances;
+  }
 
   /**
    * \brief Function for setting the CRDSA number of packet instances (replicas)
    * \param CRDSA number of instances
    */
-  void SetCrdsaNumOfInstances (uint32_t numOfInstances) { m_crdsaNumOfInstances = numOfInstances; }
+  void SetCrdsaNumOfInstances (uint32_t numOfInstances)
+  {
+    m_crdsaNumOfInstances = numOfInstances;
+  }
 
   /**
    * \brief Function for getting the CRDSA minimum number of idle blocks
    * \return CRDSA minimum idle blocks
    */
-  uint32_t GetCrdsaMinIdleBlocks () { return m_crdsaMinIdleBlocks; }
+  uint32_t GetCrdsaMinIdleBlocks ()
+  {
+    return m_crdsaMinIdleBlocks;
+  }
 
   /**
    * \brief Function for setting the CRDSA minimum number of idle blocks
    * \param CRDSA minimum idle blocks
    */
-  void SetCrdsaMinIdleBlocks (uint32_t minIdleBlocks) { m_crdsaMinIdleBlocks = minIdleBlocks; }
+  void SetCrdsaMinIdleBlocks (uint32_t minIdleBlocks)
+  {
+    m_crdsaMinIdleBlocks = minIdleBlocks;
+  }
 
   /**
    * \brief Function for getting the CRDSA number of idle blocks left
    * \return CRDSA number of idle blocks left
    */
-  uint32_t GetCrdsaIdleBlocksLeft () { return m_crdsaIdleBlocksLeft; }
+  uint32_t GetCrdsaIdleBlocksLeft ()
+  {
+    return m_crdsaIdleBlocksLeft;
+  }
 
   /**
    * \brief Function for setting the CRDSA number of idle blocks left
    * \param CRDSA number of idle blocks left
    */
-  void SetCrdsaIdleBlocksLeft (uint32_t idleBlocksLeft) { m_crdsaIdleBlocksLeft = idleBlocksLeft; }
+  void SetCrdsaIdleBlocksLeft (uint32_t idleBlocksLeft)
+  {
+    m_crdsaIdleBlocksLeft = idleBlocksLeft;
+  }
 
   /**
    * \brief Function for getting the CRDSA maximum number of unique payloads per block
    * \return CRDSA maximum number of unique payloads per block
    */
-  uint32_t GetCrdsaMaxUniquePayloadPerBlock () { return m_crdsaMaxUniquePayloadPerBlock; }
+  uint32_t GetCrdsaMaxUniquePayloadPerBlock ()
+  {
+    return m_crdsaMaxUniquePayloadPerBlock;
+  }
 
   /**
    * \brief Function for setting the CRDSA maximum number of unique payloads per block
    * \param CRDSA maximum number of unique payloads per block
    */
-  void SetCrdsaMaxUniquePayloadPerBlock (uint32_t maxUniquePayloadPerBlock) { m_crdsaMaxUniquePayloadPerBlock = maxUniquePayloadPerBlock; }
+  void SetCrdsaMaxUniquePayloadPerBlock (uint32_t maxUniquePayloadPerBlock)
+  {
+    m_crdsaMaxUniquePayloadPerBlock = maxUniquePayloadPerBlock;
+  }
 
   /**
    * \brief Function for getting the CRDSA number of consecutive blocks accessed
    * \return CRDSA number of consecutive blocks accessed
    */
-  uint32_t GetCrdsaMaxConsecutiveBlocksAccessed () { return m_crdsaMaxConsecutiveBlocksAccessed; }
+  uint32_t GetCrdsaMaxConsecutiveBlocksAccessed ()
+  {
+    return m_crdsaMaxConsecutiveBlocksAccessed;
+  }
 
   /**
    * \brief Function for setting the CRDSA maximum number of consecutive blocks accessed
    * \param CRDSA maximum number of consecutive blocks accessed
    */
-  void SetCrdsaMaxConsecutiveBlocksAccessed (uint32_t maxConsecutiveBlocksAccessed) { m_crdsaMaxConsecutiveBlocksAccessed = maxConsecutiveBlocksAccessed; }
+  void SetCrdsaMaxConsecutiveBlocksAccessed (uint32_t maxConsecutiveBlocksAccessed)
+  {
+    m_crdsaMaxConsecutiveBlocksAccessed = maxConsecutiveBlocksAccessed;
+  }
 
   /**
    * \brief Function for getting the CRDSA number of consecutive blocks used
    * \return CRDSA number of consecutive blocks used
    */
-  uint32_t GetCrdsaNumOfConsecutiveBlocksUsed () { return m_crdsaNumOfConsecutiveBlocksUsed; }
+  uint32_t GetCrdsaNumOfConsecutiveBlocksUsed ()
+  {
+    return m_crdsaNumOfConsecutiveBlocksUsed;
+  }
 
   /**
    * \brief Function for setting the CRDSA number of consecutive blocks used
    * \param CRDSA number of consecutive blocks used
    */
-  void SetCrdsaNumOfConsecutiveBlocksUsed (uint32_t numOfConsecutiveBlocksUsed) { m_crdsaNumOfConsecutiveBlocksUsed = numOfConsecutiveBlocksUsed; }
+  void SetCrdsaNumOfConsecutiveBlocksUsed (uint32_t numOfConsecutiveBlocksUsed)
+  {
+    m_crdsaNumOfConsecutiveBlocksUsed = numOfConsecutiveBlocksUsed;
+  }
 
   /**
    * \brief Function for checking the CRDSA parameter sanity
@@ -191,7 +257,6 @@ public:
   void DoCrdsaVariableSanityCheck ();
 
 private:
-
   /**
    * \brief CRDSA minimum randomization value
    */

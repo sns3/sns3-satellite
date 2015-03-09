@@ -25,7 +25,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatRandomAccessAllocationChannel);
 
-TypeId 
+TypeId
 SatRandomAccessAllocationChannel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRandomAccessAllocationChannel")
@@ -34,18 +34,18 @@ SatRandomAccessAllocationChannel::GetTypeId (void)
   return tid;
 }
 
-SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel () :
-  m_crdsaMinRandomizationValue (),
-  m_crdsaMaxRandomizationValue (),
-  m_crdsaNumOfInstances (),
-  m_crdsaMinIdleBlocks (),
-  m_crdsaIdleBlocksLeft (0),
-  m_crdsaBackoffTimeInMilliSeconds (),
-  m_crdsaBackoffProbability (),
-  m_crdsaMaxUniquePayloadPerBlock (),
-  m_crdsaMaxConsecutiveBlocksAccessed (),
-  m_crdsaNumOfConsecutiveBlocksUsed (0),
-  m_crdsaBackoffReleaseTime (0)
+SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
+  : m_crdsaMinRandomizationValue (),
+    m_crdsaMaxRandomizationValue (),
+    m_crdsaNumOfInstances (),
+    m_crdsaMinIdleBlocks (),
+    m_crdsaIdleBlocksLeft (0),
+    m_crdsaBackoffTimeInMilliSeconds (),
+    m_crdsaBackoffProbability (),
+    m_crdsaMaxUniquePayloadPerBlock (),
+    m_crdsaMaxConsecutiveBlocksAccessed (),
+    m_crdsaNumOfConsecutiveBlocksUsed (0),
+    m_crdsaBackoffReleaseTime (0)
 {
   NS_LOG_FUNCTION (this);
 }

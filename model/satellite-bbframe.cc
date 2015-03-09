@@ -29,11 +29,11 @@ namespace ns3 {
 
 
 SatBbFrame::SatBbFrame ()
- : m_modCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-   m_freeSpaceInBytes (0),
-   m_maxSpaceInBytes (0),
-   m_headerSizeInBytes (0),
-   m_frameType (SatEnums::NORMAL_FRAME)
+  : m_modCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+    m_freeSpaceInBytes (0),
+    m_maxSpaceInBytes (0),
+    m_headerSizeInBytes (0),
+    m_frameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor of SatBbFrame not supported.");
@@ -41,16 +41,16 @@ SatBbFrame::SatBbFrame ()
 
 
 SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t type, Ptr<SatBbFrameConf> conf)
-  :m_modCod (modCod),
-   m_frameType (type)
+  : m_modCod (modCod),
+    m_frameType (type)
 {
   NS_LOG_FUNCTION (this << modCod << type);
 
   switch (type)
-  {
+    {
     case SatEnums::SHORT_FRAME:
     case SatEnums::NORMAL_FRAME:
-      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (modCod, type) / SatConstVariables::BITS_PER_BYTE) ;
+      m_maxSpaceInBytes = (conf->GetBbFramePayloadBits (modCod, type) / SatConstVariables::BITS_PER_BYTE);
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;
       m_duration = conf->GetBbFrameDuration (modCod, type);
@@ -69,7 +69,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
     default:
       NS_FATAL_ERROR ("Invalid BBFrame type!!!");
       break;
-  }
+    }
 }
 
 SatBbFrame::~SatBbFrame ()
@@ -101,7 +101,7 @@ SatBbFrame::AddPayload (Ptr<Packet> data)
       NS_FATAL_ERROR ("Data cannot be added to BB frame (length, free space): " << dataLengthInBytes << ", " << m_freeSpaceInBytes);
     }
 
-  return GetSpaceLeftInBytes();
+  return GetSpaceLeftInBytes ();
 }
 
 uint32_t
@@ -169,7 +169,7 @@ SatBbFrame::MergeWithFrame (Ptr<SatBbFrame> mergedFrame, TracedCallback<Ptr<SatB
   if ( dataBytes <= m_freeSpaceInBytes )
     {
       mergeTraceCb (this, mergedFrame);
-      m_framePayload.insert( m_framePayload.end (), mergedFrame->GetPayload ().begin (), mergedFrame->GetPayload ().end () );
+      m_framePayload.insert ( m_framePayload.end (), mergedFrame->GetPayload ().begin (), mergedFrame->GetPayload ().end () );
       m_freeSpaceInBytes -= dataBytes;
       merged = true;
     }

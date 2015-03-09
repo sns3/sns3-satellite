@@ -48,9 +48,9 @@ SatSuperframeSeq::GetTypeId (void)
     .SetParent<Object> ()
     .AddConstructor<SatSuperframeSeq> ()
     .AddAttribute ("TargetDuration", "Target duration time.",
-                    TimeValue (MilliSeconds (100)),
-                    MakeTimeAccessor (&SatSuperframeSeq::m_targetDuration),
-                    MakeTimeChecker ())
+                   TimeValue (MilliSeconds (100)),
+                   MakeTimeAccessor (&SatSuperframeSeq::m_targetDuration),
+                   MakeTimeChecker ())
   ;
 
   return tid;
@@ -93,9 +93,9 @@ SatSuperframeSeq::GetCarrierCount () const
 
   uint32_t carrierCount = 0;
 
-  for (uint8_t i = 0; i < m_superframe.size(); i++)
+  for (uint8_t i = 0; i < m_superframe.size (); i++)
     {
-      carrierCount += m_superframe[i]->GetCarrierCount();
+      carrierCount += m_superframe[i]->GetCarrierCount ();
     }
 
   return carrierCount;
@@ -106,12 +106,12 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
-  if (seqId >= m_superframe.size())
+  if (seqId >= m_superframe.size ())
     {
       NS_FATAL_ERROR ("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << seqId);
     }
 
-  return m_superframe[seqId]->GetCarrierCount();
+  return m_superframe[seqId]->GetCarrierCount ();
 }
 
 Time
@@ -119,12 +119,12 @@ SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
-  if (seqId >= m_superframe.size())
+  if (seqId >= m_superframe.size ())
     {
       NS_FATAL_ERROR ("SatSuperframeSeq::GetDuration - unsupported sequence id: " << seqId);
     }
 
-  return m_superframe[seqId]->GetDuration();
+  return m_superframe[seqId]->GetDuration ();
 }
 
 Ptr<SatSuperframeConf>
@@ -132,7 +132,7 @@ SatSuperframeSeq::GetSuperframeConf (uint8_t seqId) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 
-  if (seqId >= m_superframe.size())
+  if (seqId >= m_superframe.size ())
     {
       NS_FATAL_ERROR ("SatSuperframeSeq::GetSuperframeConf - unsupported sequence id: " << seqId);
     }
@@ -145,16 +145,16 @@ SatSuperframeSeq::GetCarrierId ( uint8_t superframeId, uint8_t frameId, uint16_t
 {
   NS_LOG_FUNCTION (this << superframeId << frameId << frameCarrierId);
 
-  if (superframeId >= m_superframe.size())
+  if (superframeId >= m_superframe.size ())
     {
       NS_FATAL_ERROR ("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << superframeId);
     }
 
-  uint32_t carrierId = m_superframe[superframeId]->GetCarrierId(frameId, frameCarrierId );
+  uint32_t carrierId = m_superframe[superframeId]->GetCarrierId (frameId, frameCarrierId );
 
   for (uint8_t i = 0; i < superframeId; i++)
     {
-      carrierId += m_superframe[i]->GetCarrierCount();
+      carrierId += m_superframe[i]->GetCarrierCount ();
     }
 
   return carrierId;
@@ -167,15 +167,15 @@ SatSuperframeSeq::GetCarrierFrequencyHz (uint32_t carrierId) const
 
   double superFrameStartFrequency = 0.0;
   uint32_t currentSuperframe = 0;
-  uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount() - 1;
+  uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount () - 1;
   uint32_t carrierIdInSuperframe = carrierId;
 
-  while( carrierId > lastIdInSuperframe )
+  while ( carrierId > lastIdInSuperframe )
     {
-      carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount();
-      superFrameStartFrequency += m_superframe[currentSuperframe]->GetBandwidthHz();
+      carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount ();
+      superFrameStartFrequency += m_superframe[currentSuperframe]->GetBandwidthHz ();
       currentSuperframe++;
-      lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
+      lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount ();
     }
 
   double carrierFrequencyInSuperframe = m_superframe[currentSuperframe]->GetCarrierFrequencyHz ( carrierIdInSuperframe );
@@ -189,14 +189,14 @@ SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBa
   NS_LOG_FUNCTION (this << carrierId);
 
   uint32_t currentSuperframe = 0;
-  uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount() - 1;
+  uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount () - 1;
   uint32_t carrierIdInSuperframe = carrierId;
 
-  while( carrierId > lastIdInSuperframe )
+  while ( carrierId > lastIdInSuperframe )
     {
-      carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount();
+      carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount ();
       currentSuperframe++;
-      lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
+      lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount ();
     }
 
   return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );

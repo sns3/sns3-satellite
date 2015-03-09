@@ -62,9 +62,9 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
   uint32_t packetSize (20);
-  Time interval (Seconds(0.01));
-  Time simLength (Seconds(3.00));
-  Time appStartTime = Seconds(0.01);
+  Time interval (Seconds (0.01));
+  Time simLength (Seconds (3.00));
+  Time appStartTime = Seconds (0.01);
 
   // Enable info logs
   LogComponentEnable ("sat-random-access-slotted-aloha-example", LOG_LEVEL_INFO);
@@ -78,8 +78,8 @@ main (int argc, char *argv[])
 
   // Read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
-  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.Parse (argc, argv);
 
   /// Set simulation output details
@@ -152,15 +152,15 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // Get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // Port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
 
   CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute("Interval", TimeValue (interval));
-  cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize) );
+  cbrHelper.SetAttribute ("Interval", TimeValue (interval));
+  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
 
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
 
@@ -175,16 +175,16 @@ main (int argc, char *argv[])
   // Cbr and Sink applications creation
   for ( uint32_t i = 0; i < maxTransmitters; i++)
     {
-      cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
-      utApps.Add(cbrHelper.Install (utUsers.Get (i)));
-      gwApps.Add(sinkHelper.Install (gwUsers.Get (0)));
+      utApps.Add (cbrHelper.Install (utUsers.Get (i)));
+      gwApps.Add (sinkHelper.Install (gwUsers.Get (0)));
 
       cbrStartDelay += Seconds (0.05);
 
-      utApps.Get(i)->SetStartTime (cbrStartDelay);
-      utApps.Get(i)->SetStopTime (simLength);
+      utApps.Get (i)->SetStartTime (cbrStartDelay);
+      utApps.Get (i)->SetStopTime (simLength);
     }
 
   // Add the created applications to CbrKpiHelper
@@ -195,13 +195,13 @@ main (int argc, char *argv[])
   utApps.Start (appStartTime);
   utApps.Stop (simLength);
 
-  NS_LOG_INFO("--- Cbr-user-defined-example ---");
-  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
-  NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
-  NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- Cbr-user-defined-example ---");
+  NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
+  NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   Simulator::Stop (simLength);
   Simulator::Run ();

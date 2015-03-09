@@ -483,7 +483,7 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes ()
   NS_LOG_FUNCTION (this);
   NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
 
-  for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End (); ++it)
+  for (NodeContainer::Iterator it = utUsers.Begin (); it != utUsers.End (); ++it)
     {
       const int32_t utUserId = GetUtUserId (*it);
       NS_ASSERT_MSG (utUserId > 0,
@@ -569,7 +569,7 @@ SatStatsFwdDevThroughputHelper::DoInstallProbes ()
   NS_LOG_FUNCTION (this);
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
 
-  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
       const int32_t utId = GetUtId (*it);
       NS_ASSERT_MSG (utId > 0,
@@ -617,7 +617,7 @@ SatStatsFwdDevThroughputHelper::DoInstallProbes ()
 
   // Enable statistics-related tags on the transmitting device.
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
     {
       NetDeviceContainer devs = GetGwSatNetDevice (*it);
 
@@ -665,7 +665,7 @@ SatStatsFwdMacThroughputHelper::DoInstallProbes ()
   NS_LOG_FUNCTION (this);
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
 
-  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
       const int32_t utId = GetUtId (*it);
       NS_ASSERT_MSG (utId > 0,
@@ -718,7 +718,7 @@ SatStatsFwdMacThroughputHelper::DoInstallProbes ()
 
   // Enable statistics-related tags on the transmitting device.
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
     {
       NetDeviceContainer devs = GetGwSatNetDevice (*it);
 
@@ -771,7 +771,7 @@ SatStatsFwdPhyThroughputHelper::DoInstallProbes ()
   NS_LOG_FUNCTION (this);
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
 
-  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
       const int32_t utId = GetUtId (*it);
       NS_ASSERT_MSG (utId > 0,
@@ -824,7 +824,7 @@ SatStatsFwdPhyThroughputHelper::DoInstallProbes ()
 
   // Enable statistics-related tags on the transmitting device.
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  for (NodeContainer::Iterator it = gws.Begin(); it != gws.End (); ++it)
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
     {
       NetDeviceContainer devs = GetGwSatNetDevice (*it);
 

@@ -97,7 +97,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink", TimeValue (MilliSeconds (600)));
 
   switch (raMode)
-  {
+    {
     // CRDSA + VBDC
     case 0:
       {
@@ -186,7 +186,7 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Unsupported raMode: " << raMode);
         break;
       }
-  }
+    }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -204,8 +204,8 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -215,15 +215,15 @@ main (int argc, char *argv[])
    */
   for (uint32_t i = 0; i < utUsers.GetN (); i++)
     {
-      SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (i)), port));
-      onOffHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port));
+      onOffHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
       ApplicationContainer utOnOff = onOffHelper.Install (utUsers.Get (i));
       utOnOff.Start (Seconds (0.0));
       utOnOff.Stop (Seconds (simLength - 2.0));
 
-      PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (i)), port));
-      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port));
+      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
       ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
       gwSink.Start (Seconds (0.0));
@@ -285,12 +285,12 @@ main (int argc, char *argv[])
   //s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   //s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-ra-sim-tn9 ---");
-  NS_LOG_INFO("  Packet size: " << packetSize);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-ra-sim-tn9 ---");
+  NS_LOG_INFO ("  Packet size: " << packetSize);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

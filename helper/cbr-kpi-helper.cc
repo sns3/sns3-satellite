@@ -36,7 +36,7 @@ namespace ns3 {
 
 
 CbrKpiHelper::CbrKpiHelper (KpiHelper::KpiMode_t mode)
-:KpiHelper (mode)
+  : KpiHelper (mode)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -70,7 +70,7 @@ CbrKpiHelper::AddSender (Ptr<Application> app)
   if (m_mode == KpiHelper::KPI_FWD)
     {
       // use the client's IP address as the context
-      address = InetSocketAddress::ConvertFrom(cbr->GetRemote ()).GetIpv4 ();
+      address = InetSocketAddress::ConvertFrom (cbr->GetRemote ()).GetIpv4 ();
       ConfigureAsServer (app);
 
       NS_LOG_INFO ("Adding CBR application as server with remote address: " << address);

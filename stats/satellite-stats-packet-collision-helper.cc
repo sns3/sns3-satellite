@@ -242,7 +242,7 @@ SatStatsPacketCollisionHelper::DoInstall ()
                itCarrier != carriers.End (); ++itCarrier)
             {
               const bool ret = itCarrier->second->TraceConnectWithoutContext (
-                                 GetTraceSourceName (), callback);
+                  GetTraceSourceName (), callback);
               if (ret)
                 {
                   NS_LOG_INFO (this << " successfully connected with node ID "

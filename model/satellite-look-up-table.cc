@@ -123,7 +123,7 @@ SatLookUpTable::GetBler (double esNoDb) const
       double esno0 = m_esNoDb[i - 1];
       double esno1 = m_esNoDb[i];
       double bler = SatUtils::Interpolate (esno, esno0, esno1, m_bler[i - 1], m_bler[i]);
-      NS_LOG_LOGIC (this << " Interpolate: " << esno << " to BLER = " << bler << "(sinr0: " << esno0 << ", sinr1: " << esno1 << ", bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ")");
+      NS_LOG_LOGIC (this << " Interpolate: " << esno << " to BLER = " << bler << "(sinr0: " << esno0 << ", sinr1: " << esno1 << ", bler0: " << m_bler[i - 1] << ", bler1: " << m_bler[i] << ")");
 
       return bler;
     }
@@ -143,9 +143,9 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
 
   // If the requested BLER is smaller than the smallest BLER entry
   // in the look-up-table
-  if (blerTarget < m_bler[n-1])
+  if (blerTarget < m_bler[n - 1])
     {
-      return m_esNoDb[n-1];
+      return m_esNoDb[n - 1];
     }
 
   // The requested BLER is higher than the highest BLER entry
@@ -161,8 +161,8 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
     {
       if (blerTarget >= m_bler[i])
         {
-          sinr = SatUtils::Interpolate (blerTarget, m_bler[i-1], m_bler[i], m_esNoDb[i-1], m_esNoDb[i]);
-          NS_LOG_LOGIC (this << " Interpolate: " << blerTarget << " to SINR = " << sinr << "(bler0: " << m_bler[i-1] << ", bler1: " << m_bler[i] << ", sinr0: " << m_esNoDb[i-1] << ", sinr1: " << m_esNoDb[i] << ")");
+          sinr = SatUtils::Interpolate (blerTarget, m_bler[i - 1], m_bler[i], m_esNoDb[i - 1], m_esNoDb[i]);
+          NS_LOG_LOGIC (this << " Interpolate: " << blerTarget << " to SINR = " << sinr << "(bler0: " << m_bler[i - 1] << ", bler1: " << m_bler[i] << ", sinr0: " << m_esNoDb[i - 1] << ", sinr1: " << m_esNoDb[i] << ")");
           return sinr;
         }
     }

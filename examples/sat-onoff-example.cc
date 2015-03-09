@@ -65,13 +65,13 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("packetSize", "Size of constant packet (bytes e.g 512)", packetSize);
-  cmd.AddValue("dataRate", "Data rate (e.g. 500kb/s)", dataRate);
-  cmd.AddValue("onTime", "Time for packet sending is on in seconds, (e.g. (1.0)", onTime);
-  cmd.AddValue("offTime", "Time for packet sending is off in seconds, (e.g. (0.5)", offTime);
-  cmd.AddValue("sender", "Packet sender (ut, gw, or both).", sender);
-  cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full", scenario);
-  cmd.AddValue("simDuration", "Duration of the simulation (Time)", simDuration);
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes e.g 512)", packetSize);
+  cmd.AddValue ("dataRate", "Data rate (e.g. 500kb/s)", dataRate);
+  cmd.AddValue ("onTime", "Time for packet sending is on in seconds, (e.g. (1.0)", onTime);
+  cmd.AddValue ("offTime", "Time for packet sending is off in seconds, (e.g. (0.5)", offTime);
+  cmd.AddValue ("sender", "Packet sender (ut, gw, or both).", sender);
+  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue ("simDuration", "Duration of the simulation (Time)", simDuration);
   cmd.Parse (argc, argv);
 
   // select scenario, if correct one given, by default simple scenarion is used.
@@ -114,24 +114,24 @@ main (int argc, char *argv[])
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   // create scenario
-  helper->CreatePredefinedScenario(satScenario);
+  helper->CreatePredefinedScenario (satScenario);
 
   // --- Create applications according to given user parameters
 
   // get users (first GW side user and first UT connected users)
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // select port
   uint16_t port = 9;
 
   // create helpers for application creation
   // set address of the first UT connected user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (0)), port));
-  SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utUsers.Get (0)), port));
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
+  SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
 
   // assert if sender is not valid
-  NS_ASSERT_MSG ( ( (sender == "gw") || ( sender == "ut") || ( sender == "both") ) , "Sender argument invalid.");
+  NS_ASSERT_MSG ( ( (sender == "gw") || ( sender == "ut") || ( sender == "both") ), "Sender argument invalid.");
 
   // in case of sender is GW or Both, create OnOff application to GW connected user
   // and Sink application to UT connected user
@@ -149,8 +149,8 @@ main (int argc, char *argv[])
   if (sender == "ut" || sender == "both" )
     {
       // set address of the first GW connected user
-      sinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-      onOffHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+      onOffHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
       ApplicationContainer utOnOff = onOffHelper.Install (utUsers.Get (0));
       utOnOff.Start (Seconds (2.0));
@@ -160,15 +160,15 @@ main (int argc, char *argv[])
     }
 
   // prompt info of the used parameters
-  NS_LOG_INFO("--- sat-onoff-example ---");
-  NS_LOG_INFO("  Scenario used: " << scenario);
-  NS_LOG_INFO("  Sender: " << sender);
-  NS_LOG_INFO("  PacketSize: " << packetSize);
-  NS_LOG_INFO("  DataRate: " << dataRate);
-  NS_LOG_INFO("  OnTime: " << onTime);
-  NS_LOG_INFO("  OffTime: " << offTime);
-  NS_LOG_INFO("  Duration: " << simDuration);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-onoff-example ---");
+  NS_LOG_INFO ("  Scenario used: " << scenario);
+  NS_LOG_INFO ("  Sender: " << sender);
+  NS_LOG_INFO ("  PacketSize: " << packetSize);
+  NS_LOG_INFO ("  DataRate: " << dataRate);
+  NS_LOG_INFO ("  OnTime: " << onTime);
+  NS_LOG_INFO ("  OffTime: " << offTime);
+  NS_LOG_INFO ("  Duration: " << simDuration);
+  NS_LOG_INFO ("  ");
 
   // run simulation and finally destroy it
   Simulator::Stop (Time (simDuration));

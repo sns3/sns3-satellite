@@ -30,7 +30,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatArpCache);
 
-TypeId 
+TypeId
 SatArpCache::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatArpCache")
@@ -68,7 +68,7 @@ SatArpCache::Add (Ipv4Address to, Address macAddress)
    */
   ArpCache::SetAliveTimeout ( Time (std::numeric_limits<int64_t>::max () ));
 
-  NS_LOG_LOGIC( "IP: " << to << ", MAC: " << macAddress );
+  NS_LOG_LOGIC ( "IP: " << to << ", MAC: " << macAddress );
 
   return entry;
 }

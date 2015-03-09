@@ -75,7 +75,6 @@ public:
   virtual void UpdateParameters (uint32_t newSet, uint32_t newState) = 0;
 
 private:
-
 };
 
 } // namespace ns3

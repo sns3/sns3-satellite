@@ -61,7 +61,7 @@ main (int argc, char *argv[])
   // Enabling logging in this program
   LogComponentEnable ("sat-training-example", LOG_LEVEL_INFO);
 
-  NS_LOG_INFO("--- sat-training-example ---");
+  NS_LOG_INFO ("--- sat-training-example ---");
 
   /**
    * --------------------------------------
@@ -186,9 +186,9 @@ main (int argc, char *argv[])
   DataRate dataRate (128000); // in bps
 
   // UT users are the senders
-  NodeContainer utUsers = helper->GetUtUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
   // GW users are the receivers
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // The application start time is varied to avoid the situation
   // in the beginning that all applications start at the same time.
@@ -200,8 +200,8 @@ main (int argc, char *argv[])
   OnOffKpiHelper onoffKpiHelper (KpiHelper::KPI_RTN);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
-      itUt != utUsers.End ();
-      ++itUt)
+       itUt != utUsers.End ();
+       ++itUt)
     {
       // Create an OnOff application
       Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();
@@ -282,7 +282,7 @@ main (int argc, char *argv[])
   Simulator::Stop (Seconds (simDuration));
   Simulator::Run ();
 
-  NS_LOG_INFO("--- OnOff KPIs ---");
+  NS_LOG_INFO ("--- OnOff KPIs ---");
   onoffKpiHelper.Print ();
 
   Simulator::Destroy ();

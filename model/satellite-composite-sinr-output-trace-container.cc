@@ -30,7 +30,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatCompositeSinrOutputTraceContainer);
 
-TypeId 
+TypeId
 SatCompositeSinrOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatCompositeSinrOutputTraceContainer")
@@ -44,11 +44,11 @@ SatCompositeSinrOutputTraceContainer::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
-SatCompositeSinrOutputTraceContainer::SatCompositeSinrOutputTraceContainer () :
-  m_enableFigureOutput (true)
+SatCompositeSinrOutputTraceContainer::SatCompositeSinrOutputTraceContainer ()
+  : m_enableFigureOutput (true)
 {
   NS_LOG_FUNCTION (this);
 }

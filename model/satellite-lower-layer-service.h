@@ -41,7 +41,7 @@ class SatLowerLayerServiceDaEntry
   friend class SatLowerLayerServiceConf;
 
 public:
-  SatLowerLayerServiceDaEntry () ;
+  SatLowerLayerServiceDaEntry ();
   ~SatLowerLayerServiceDaEntry ();
 
 private:
@@ -58,105 +58,150 @@ private:
    *
    * \return Is constant assignment provided [true or false]
    */
-  inline bool GetConstantAssignmentProvided () const {return m_constantAssignmentProvided;}
+  inline bool GetConstantAssignmentProvided () const
+  {
+    return m_constantAssignmentProvided;
+  }
 
   /**
    * Set state, if constant assignment is provided.
    *
    * \param constAssignmentProvided Constant assignment provided state [true or false]
    */
-  inline void SetConstantAssignmentProvided (bool constAssignmentProvided) { m_constantAssignmentProvided = constAssignmentProvided;}
+  inline void SetConstantAssignmentProvided (bool constAssignmentProvided)
+  {
+    m_constantAssignmentProvided = constAssignmentProvided;
+  }
 
   /**
    * Get state, if RBDC is allowed.
    *
    * \return Is RBDC allowed [true or false]
    */
-  inline bool GetRbdcAllowed () const {return m_rbdcAllowed;}
+  inline bool GetRbdcAllowed () const
+  {
+    return m_rbdcAllowed;
+  }
 
   /**
    * Set state, if RBDC is allowed.
    *
    * \param bdcAllowed RBDC allowed state [true or false]
    */
-  inline void SetRbdcAllowed (bool bdcAllowed) { m_rbdcAllowed = bdcAllowed;}
+  inline void SetRbdcAllowed (bool bdcAllowed)
+  {
+    m_rbdcAllowed = bdcAllowed;
+  }
 
   /**
    * Get state, if volume is allowed.
    *
    * \return Is volume allowed [true or false]
    */
-  inline bool GetVolumeAllowed () const {return m_volumeAllowed;}
+  inline bool GetVolumeAllowed () const
+  {
+    return m_volumeAllowed;
+  }
 
   /**
    * Set state, if volume is allowed.
    *
    * \param volumeAllowed Volume allowed state [true or false]
    */
-  inline void SetVolumeAllowed (bool volumeAllowed) { m_volumeAllowed = volumeAllowed;}
+  inline void SetVolumeAllowed (bool volumeAllowed)
+  {
+    m_volumeAllowed = volumeAllowed;
+  }
 
   /**
    * Get constant service rate.
    *
    * \return Constant service rate [KBps]
    */
-  inline uint16_t GetConstantServiceRateInKbps () const {return m_constantServiceRateStream->GetInteger();}
+  inline uint16_t GetConstantServiceRateInKbps () const
+  {
+    return m_constantServiceRateStream->GetInteger ();
+  }
 
   /**
    * Get constant service rate stream.
    *
    * \return Constant service rate stream.
    */
-  inline Ptr<RandomVariableStream> GetConstantServiceRateStream () const { return m_constantServiceRateStream;}
+  inline Ptr<RandomVariableStream> GetConstantServiceRateStream () const
+  {
+    return m_constantServiceRateStream;
+  }
 
   /**
    * Set constant service rate stream.
    *
    * \param constantServiceRateKbps Constant service rate [KBps]
    */
-  inline void SetConstantServiceRateStream (Ptr<RandomVariableStream> constantServiceRateStream) { m_constantServiceRateStream = constantServiceRateStream;}
+  inline void SetConstantServiceRateStream (Ptr<RandomVariableStream> constantServiceRateStream)
+  {
+    m_constantServiceRateStream = constantServiceRateStream;
+  }
 
   /**
    * Get maximum service rate.
    *
    * \return Maximum service rate [KBps]
    */
-  inline uint16_t GetMaximumServiceRateInKbps () const {return m_maximumServiceRateKbps;}
+  inline uint16_t GetMaximumServiceRateInKbps () const
+  {
+    return m_maximumServiceRateKbps;
+  }
 
   /**
    * Set maximum service rate.
    *
    * \param maximumServiceRateKbps Maximum service rate [KBps]
    */
-  inline void SetMaximumServiceRateInKbps (uint16_t maximumServiceRateKbps) { m_maximumServiceRateKbps = maximumServiceRateKbps;}
+  inline void SetMaximumServiceRateInKbps (uint16_t maximumServiceRateKbps)
+  {
+    m_maximumServiceRateKbps = maximumServiceRateKbps;
+  }
 
   /**
    * Get minimum service rate.
    *
    * \return Minimum service rate [KBps]
    */
-  inline uint16_t GetMinimumServiceRateInKbps () const {return m_minimumServiceRateKbps;}
+  inline uint16_t GetMinimumServiceRateInKbps () const
+  {
+    return m_minimumServiceRateKbps;
+  }
 
   /**
    * Set minimum service rate.
    *
    * \param minimumServiceRateKbps Minimum service rate [KBps]
    */
-  inline void SetMinimumServiceRateInKbps (uint16_t minimumServiceRateKbps) { m_minimumServiceRateKbps = minimumServiceRateKbps;}
+  inline void SetMinimumServiceRateInKbps (uint16_t minimumServiceRateKbps)
+  {
+    m_minimumServiceRateKbps = minimumServiceRateKbps;
+  }
 
   /**
    * Get maximum backlog size.
    *
    * \return Maximum backlog size [KBytes]
    */
-  inline uint16_t GetMaximumBacklogInKbytes () const {return m_maximumBacklogInKbytes;}
+  inline uint16_t GetMaximumBacklogInKbytes () const
+  {
+    return m_maximumBacklogInKbytes;
+  }
 
   /**
    * Set maximum backlog size.
    *
    * \param maximumBacklogInBytes Maximum backlog size [KBytes]
    */
-  inline void SetMaximumBacklogInKbytes (uint16_t maximumBacklogInKbytes) { m_maximumBacklogInKbytes = maximumBacklogInKbytes;}
+  inline void SetMaximumBacklogInKbytes (uint16_t maximumBacklogInKbytes)
+  {
+    m_maximumBacklogInKbytes = maximumBacklogInKbytes;
+  }
 };
 
 /**
@@ -170,7 +215,7 @@ class SatLowerLayerServiceRaEntry
   friend class SatLowerLayerServiceConf;
 
 public:
-  SatLowerLayerServiceRaEntry () ;
+  SatLowerLayerServiceRaEntry ();
   ~SatLowerLayerServiceRaEntry ();
 
 private:
@@ -189,126 +234,180 @@ private:
    *
    * \return Maximum unique payload per block
    */
-  inline uint8_t GetMaximumUniquePayloadPerBlock () const {return m_maxUniquePayloadPerBlock;}
+  inline uint8_t GetMaximumUniquePayloadPerBlock () const
+  {
+    return m_maxUniquePayloadPerBlock;
+  }
 
   /**
    * Set maximum unique payload per block.
    *
    * \param maxUniquePayloadPerBlock Maximum unique payload per block
    */
-  inline void SetMaximumUniquePayloadPerBlock (uint8_t maxUniquePayloadPerBlock) {m_maxUniquePayloadPerBlock = maxUniquePayloadPerBlock;}
+  inline void SetMaximumUniquePayloadPerBlock (uint8_t maxUniquePayloadPerBlock)
+  {
+    m_maxUniquePayloadPerBlock = maxUniquePayloadPerBlock;
+  }
 
   /**
    * Get maximum consecutive block accessed.
    *
    * \return Maximum consecutive block accessed
    */
-  inline uint8_t GetMaximumConsecutiveBlockAccessed () const {return m_maxConsecutiveBlockAccessed;}
+  inline uint8_t GetMaximumConsecutiveBlockAccessed () const
+  {
+    return m_maxConsecutiveBlockAccessed;
+  }
 
   /**
    * Set maximum consecutive block accessed.
    *
    * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed
    */
-  inline void SetMaximumConsecutiveBlockAccessed (uint8_t maxConsecutiveBlockAccessed) {m_maxConsecutiveBlockAccessed = maxConsecutiveBlockAccessed;}
+  inline void SetMaximumConsecutiveBlockAccessed (uint8_t maxConsecutiveBlockAccessed)
+  {
+    m_maxConsecutiveBlockAccessed = maxConsecutiveBlockAccessed;
+  }
 
   /**
    * Get minimum idle block.
    *
    * \return Minimum idle block
    */
-  inline uint8_t GetMinimumIdleBlock () const {return m_minimumIdleBlock;}
+  inline uint8_t GetMinimumIdleBlock () const
+  {
+    return m_minimumIdleBlock;
+  }
 
   /**
    * Set minimum idle block.
    *
    * \param minimumIdleBlock Minimum idle block
    */
-  inline void SetMinimumIdleBlock (uint8_t minimumIdleBlock) {m_minimumIdleBlock = minimumIdleBlock;}
+  inline void SetMinimumIdleBlock (uint8_t minimumIdleBlock)
+  {
+    m_minimumIdleBlock = minimumIdleBlock;
+  }
 
   /**
    * Get back off time in milliseconds.
    *
    * \return Back off time
    */
-  inline uint16_t GetBackOffTimeInMilliSeconds () const {return m_backOffTimeInMilliSeconds;}
+  inline uint16_t GetBackOffTimeInMilliSeconds () const
+  {
+    return m_backOffTimeInMilliSeconds;
+  }
 
   /**
    * Set back off time in milliseconds.
    *
    * \param backOffTimeInMilliSeconds Back off time
    */
-  inline void SetBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) {m_backOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
+  inline void SetBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds)
+  {
+    m_backOffTimeInMilliSeconds = backOffTimeInMilliSeconds;
+  }
 
   /**
    * Get high load back off time in milliseconds.
    *
    * \return Back off time
    */
-  inline uint16_t GetHighLoadBackOffTimeInMilliSeconds () const {return m_highLoadBackOffTimeInMilliSeconds;}
+  inline uint16_t GetHighLoadBackOffTimeInMilliSeconds () const
+  {
+    return m_highLoadBackOffTimeInMilliSeconds;
+  }
 
   /**
    * Set high load back off time in milliseconds.
    *
    * \param backOffTimeInMilliSeconds Back off time
    */
-  inline void SetHighLoadBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds) {m_highLoadBackOffTimeInMilliSeconds = backOffTimeInMilliSeconds;}
+  inline void SetHighLoadBackOffTimeInMilliSeconds (uint16_t backOffTimeInMilliSeconds)
+  {
+    m_highLoadBackOffTimeInMilliSeconds = backOffTimeInMilliSeconds;
+  }
 
   /**
    * Get back off probability.
    *
    * \return Back off probability
    */
-  inline uint16_t GetBackOffProbability () const {return m_backOffProbability;}
+  inline uint16_t GetBackOffProbability () const
+  {
+    return m_backOffProbability;
+  }
 
   /**
    * Set back off probability.
    *
    * \param backOffProbability Back off probability
    */
-  inline void SetBackOffProbability (uint16_t backOffProbability) {m_backOffProbability = backOffProbability;}
+  inline void SetBackOffProbability (uint16_t backOffProbability)
+  {
+    m_backOffProbability = backOffProbability;
+  }
 
   /**
    * Get high load back off probability.
    *
    * \return High load back off probability
    */
-  inline uint16_t GetHighLoadBackOffProbability () const {return m_highLoadBackOffProbability;}
+  inline uint16_t GetHighLoadBackOffProbability () const
+  {
+    return m_highLoadBackOffProbability;
+  }
 
   /**
    * Set high load back off probability.
    *
    * \param highLoadBackOffProbability High load back off probability
    */
-  inline void SetHighLoadBackOffProbability (uint16_t highLoadBackOffProbability) {m_highLoadBackOffProbability = highLoadBackOffProbability;}
+  inline void SetHighLoadBackOffProbability (uint16_t highLoadBackOffProbability)
+  {
+    m_highLoadBackOffProbability = highLoadBackOffProbability;
+  }
 
   /**
    * Get number of instances.
    *
    * \return Number of instances
    */
-  inline uint8_t GetNumberOfInstances () const {return m_numberOfInstances;}
+  inline uint8_t GetNumberOfInstances () const
+  {
+    return m_numberOfInstances;
+  }
 
   /**
    * Set number of instances.
    *
    * \param numberOfInstances Number of instances
    */
-  inline void SetNumberOfInstances (uint8_t numberOfInstances) {m_numberOfInstances = numberOfInstances;}
+  inline void SetNumberOfInstances (uint8_t numberOfInstances)
+  {
+    m_numberOfInstances = numberOfInstances;
+  }
 
   /**
    * Get average normalized offered load threshold.
    *
    * \return Average normalized offered load threshold
    */
-  inline double GetAverageNormalizedOfferedLoadThreshold () const {return m_averageNormalizedOfferedLoadThreshold;}
+  inline double GetAverageNormalizedOfferedLoadThreshold () const
+  {
+    return m_averageNormalizedOfferedLoadThreshold;
+  }
 
   /**
    * Set average normalized offered load threshold.
    *
    * \param averageNormalizedOfferedLoadThreshold Average normalized offered load threshold
    */
-  inline void SetAverageNormalizedOfferedLoadThreshold (double averageNormalizedOfferedLoadThreshold) {m_averageNormalizedOfferedLoadThreshold = averageNormalizedOfferedLoadThreshold;}
+  inline void SetAverageNormalizedOfferedLoadThreshold (double averageNormalizedOfferedLoadThreshold)
+  {
+    m_averageNormalizedOfferedLoadThreshold = averageNormalizedOfferedLoadThreshold;
+  }
 };
 
 /**
@@ -321,7 +420,6 @@ private:
 class SatLowerLayerServiceConf : public Object
 {
 public:
-
   static const uint8_t m_minDaServiceEntries = 2;
   static const uint8_t m_minRaServiceEntries = 1;
 
@@ -347,35 +445,50 @@ public:
    *
    * \return count of configured RA services.
    */
-  inline uint8_t GetRaServiceCount () const { return m_raServiceEntryCount;}
+  inline uint8_t GetRaServiceCount () const
+  {
+    return m_raServiceEntryCount;
+  }
 
   /**
    * Get count of configured DA services.
    *
    * \return count of configured DA services.
    */
-  inline uint8_t GetDaServiceCount () const { return m_daServiceEntryCount;}
+  inline uint8_t GetDaServiceCount () const
+  {
+    return m_daServiceEntryCount;
+  }
 
   /**
    * Get configured dynamic rate persistence.
    *
    * \return Dynamic rate persistence
    */
-  uint8_t GetDynamicRatePersistence () const { return m_dynamicRatePersistence; }
+  uint8_t GetDynamicRatePersistence () const
+  {
+    return m_dynamicRatePersistence;
+  }
 
   /**
    * Get configured volume backlog persistence.
    *
    * \return Volume backlog persistence
    */
-  uint8_t GetVolumeBacklogPersistence () const { return m_volumeBacklogPersistence; }
+  uint8_t GetVolumeBacklogPersistence () const
+  {
+    return m_volumeBacklogPersistence;
+  }
 
   /**
    * Get configured default control randomization interval.
    *
    * \return Default control randomization interval
    */
-  Time GetDefaultControlRandomizationInterval () const { return m_defaultControlRandomizationInterval; }
+  Time GetDefaultControlRandomizationInterval () const
+  {
+    return m_defaultControlRandomizationInterval;
+  }
 
   /**
    * Get state, if constant assignment is provided for a DA service.
@@ -533,7 +646,7 @@ private:
     std::stringstream ss;   // create a string stream
     ss << (double) number;  // add number to the stream as double always to show number correctly in outputs
 
-    return ss.str();
+    return ss.str ();
   }
 
   /**
@@ -542,7 +655,7 @@ private:
    * \param index index to convert as service name
    * \return service name
    */
-  static std::string GetIndexAsDaServiceName(uint8_t index);
+  static std::string GetIndexAsDaServiceName (uint8_t index);
 
   /**
    * Method to convert RA service index to service name.
@@ -550,7 +663,7 @@ private:
    * \param index index to convert as service name
    * \return service name
    */
-  static std::string GetIndexAsRaServiceName(uint8_t index);
+  static std::string GetIndexAsRaServiceName (uint8_t index);
 
   /**
    * Set state, if constant assignment is provided for a DA service.
@@ -705,33 +818,34 @@ private:
  */
 #define SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
   inline void SetDaServ ## index ## ConstantAssignmentProvided (bool value)  \
-    { return SetDaConstantAssignmentProvided (index, value); } \
+  { return SetDaConstantAssignmentProvided (index, value); \
+  } \
   inline bool GetDaServ ## index ## ConstantAssignmentProvided () const  \
-    { return GetDaConstantAssignmentProvided (index); } \
+  { return GetDaConstantAssignmentProvided (index); } \
   inline void SetDaServ ## index ## RbdcAllowed (bool value)  \
-    { return SetDaRbdcAllowed (index, value); } \
+  { return SetDaRbdcAllowed (index, value); } \
   inline bool GetDaServ ## index ## RbdcAllowed () const  \
-    { return GetDaRbdcAllowed (index); } \
+  { return GetDaRbdcAllowed (index); } \
   inline void SetDaServ ## index ## VolumeAllowed (bool value)  \
-    { return SetDaVolumeAllowed (index, value); } \
+  { return SetDaVolumeAllowed (index, value); } \
   inline bool GetDaServ ## index ## VolumeAllowed () const  \
-    { return GetDaVolumeAllowed (index); } \
+  { return GetDaVolumeAllowed (index); } \
   inline void SetDaServ ## index ## ConstantServiceRateStream (Ptr<RandomVariableStream> value)  \
-    { return SetDaConstantServiceRateStream (index, value); } \
+  { return SetDaConstantServiceRateStream (index, value); } \
   inline Ptr<RandomVariableStream> GetDaServ ## index ## ConstantServiceRateStream () const  \
-    { return GetDaConstantServiceRateStream (index); } \
+  { return GetDaConstantServiceRateStream (index); } \
   inline void SetDaServ ## index ## MaximumServiceRateInKbps (uint16_t value)  \
-    { return SetDaMaximumServiceRateInKbps (index, value); } \
+  { return SetDaMaximumServiceRateInKbps (index, value); } \
   inline uint16_t GetDaServ ## index ## MaximumServiceRateInKbps () const  \
-    { return GetDaMaximumServiceRateInKbps (index); } \
+  { return GetDaMaximumServiceRateInKbps (index); } \
   inline void SetDaServ ## index ## MinimumServiceRateInKbps (uint16_t value)  \
-    { return SetDaMinimumServiceRateInKbps (index, value); } \
+  { return SetDaMinimumServiceRateInKbps (index, value); } \
   inline uint16_t GetDaServ ## index ## MinimumServiceRateInKbps () const  \
-    { return GetDaMinimumServiceRateInKbps (index); } \
+  { return GetDaMinimumServiceRateInKbps (index); } \
   inline void SetDaServ ## index ## MaximumBacklogInKbytes (uint16_t value)  \
-    { return SetDaMaximumBacklogInKbytes (index, value); } \
+  { return SetDaMaximumBacklogInKbytes (index, value); } \
   inline uint8_t GetDaServ ## index ## MaximumBacklogInKbytes () const  \
-    { return GetDaMaximumBacklogInKbytes (index); }
+  { return GetDaMaximumBacklogInKbytes (index); }
 
 /**
  * SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define RA service entry
@@ -762,51 +876,51 @@ private:
  */
 #define SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                      \
   inline void SetRaServ ## index ## MaximumUniquePayloadPerBlock (uint8_t value)  \
-    { return SetRaMaximumUniquePayloadPerBlock (index, value); } \
+  { return SetRaMaximumUniquePayloadPerBlock (index, value); } \
   inline uint8_t GetRaServ ## index ## MaximumUniquePayloadPerBlock () const  \
-    { return GetRaMaximumUniquePayloadPerBlock (index); } \
+  { return GetRaMaximumUniquePayloadPerBlock (index); } \
   inline void SetRaServ ## index ## MaximumConsecutiveBlockAccessed (uint8_t value)  \
-    { return SetRaMaximumConsecutiveBlockAccessed (index, value); } \
+  { return SetRaMaximumConsecutiveBlockAccessed (index, value); } \
   inline uint8_t GetRaServ ## index ## MaximumConsecutiveBlockAccessed () const  \
-    { return GetRaMaximumConsecutiveBlockAccessed (index); } \
+  { return GetRaMaximumConsecutiveBlockAccessed (index); } \
   inline void SetRaServ ## index ## MinimumIdleBlock (uint8_t value)  \
-    { return SetRaMinimumIdleBlock (index, value); } \
+  { return SetRaMinimumIdleBlock (index, value); } \
   inline uint8_t GetRaServ ## index ## MinimumIdleBlock () const  \
-    { return GetRaMinimumIdleBlock (index); } \
+  { return GetRaMinimumIdleBlock (index); } \
   inline void SetRaServ ## index ## BackOffTimeInMilliSeconds (uint16_t value)  \
-    { return SetRaBackOffTimeInMilliSeconds (index, value); } \
+  { return SetRaBackOffTimeInMilliSeconds (index, value); } \
   inline uint16_t GetRaServ ## index ## BackOffTimeInMilliSeconds () const  \
-    { return GetRaBackOffTimeInMilliSeconds (index); } \
+  { return GetRaBackOffTimeInMilliSeconds (index); } \
   inline void SetRaServ ## index ## HighLoadBackOffTimeInMilliSeconds (uint16_t value)  \
-    { return SetRaHighLoadBackOffTimeInMilliSeconds (index, value); } \
+  { return SetRaHighLoadBackOffTimeInMilliSeconds (index, value); } \
   inline uint16_t GetRaServ ## index ## HighLoadBackOffTimeInMilliSeconds () const  \
-    { return GetRaHighLoadBackOffTimeInMilliSeconds (index); } \
+  { return GetRaHighLoadBackOffTimeInMilliSeconds (index); } \
   inline void SetRaServ ## index ## BackOffProbability (uint16_t value)  \
-    { return SetRaBackOffProbability (index, value); } \
+  { return SetRaBackOffProbability (index, value); } \
   inline uint16_t GetRaServ ## index ## BackOffProbability () const  \
-    { return GetRaBackOffProbability (index); } \
+  { return GetRaBackOffProbability (index); } \
   inline void SetRaServ ## index ## HighLoadBackOffProbability (uint16_t value)  \
-    { return SetRaHighLoadBackOffProbability (index, value); } \
+  { return SetRaHighLoadBackOffProbability (index, value); } \
   inline uint16_t GetRaServ ## index ## HighLoadBackOffProbability () const  \
-    { return GetRaHighLoadBackOffProbability (index); } \
+  { return GetRaHighLoadBackOffProbability (index); } \
   inline void SetRaServ ## index ## NumberOfInstances (uint8_t value)  \
-    { return SetRaNumberOfInstances (index, value); } \
+  { return SetRaNumberOfInstances (index, value); } \
   inline uint8_t GetRaServ ## index ## NumberOfInstances () const  \
-    { return GetRaNumberOfInstances (index); } \
+  { return GetRaNumberOfInstances (index); } \
   inline void SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold (double value)  \
-    { return SetRaAverageNormalizedOfferedLoadThreshold (index, value); } \
+  { return SetRaAverageNormalizedOfferedLoadThreshold (index, value); } \
   inline double GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold () const  \
-    { return GetRaAverageNormalizedOfferedLoadThreshold (index); }
+  { return GetRaAverageNormalizedOfferedLoadThreshold (index); }
 
-    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
-    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
-    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
-    SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
+  SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (0);
+  SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (1);
+  SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (2);
+  SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (3);
 
-    SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(0);
-    //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
-    //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
-    //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
+  SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (0);
+  //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
+  //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
+  //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
 };
 
 } // namespace ns3

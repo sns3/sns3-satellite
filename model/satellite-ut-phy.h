@@ -42,7 +42,6 @@ namespace ns3 {
 class SatUtPhy : public SatPhy
 {
 public:
-
   /**
    * Default constructor
    */

@@ -47,9 +47,9 @@ namespace ns3 {
 
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator, Time controlSlotOffset, bool controlSlotsEnabled )
- : m_damaEntry (damaEntry),
-   m_cnoEstimator (cnoEstimator),
-   m_controlSlotsEnabled (controlSlotsEnabled)
+  : m_damaEntry (damaEntry),
+    m_cnoEstimator (cnoEstimator),
+    m_controlSlotsEnabled (controlSlotsEnabled)
 {
   NS_LOG_FUNCTION (this);
 
@@ -79,7 +79,7 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
       for ( SatCrMessage::RequestContainer_t::const_iterator descriptorIt = crContent.begin (); descriptorIt != crContent.end (); descriptorIt++ )
         {
           switch (descriptorIt->first.second)
-          {
+            {
             case SatEnums::DA_RBDC:
               {
                 rbdcReqs[descriptorIt->first.first] += descriptorIt->second;
@@ -102,19 +102,19 @@ SatBeamScheduler::SatUtInfo::UpdateDamaEntryFromCrs ()
 
             default:
               break;
-          }
+            }
         }
     }
 
-		// update RBDC with summed up requests
-    for (std::map<uint8_t, uint16_t>::iterator it = rbdcReqs.begin (); it != rbdcReqs.end (); it++ )
-      {
-        m_damaEntry->ResetDynamicRatePersistence ();
-        m_damaEntry->UpdateRbdcInKbps (it->first, it->second);
-      }
+  // update RBDC with summed up requests
+  for (std::map<uint8_t, uint16_t>::iterator it = rbdcReqs.begin (); it != rbdcReqs.end (); it++ )
+    {
+      m_damaEntry->ResetDynamicRatePersistence ();
+      m_damaEntry->UpdateRbdcInKbps (it->first, it->second);
+    }
 
-    // clear container when CRs processed
-    m_crContainer.clear ();
+  // clear container when CRs processed
+  m_crContainer.clear ();
 }
 
 double
@@ -148,7 +148,7 @@ SatBeamScheduler::SatUtInfo::IsControlSlotGenerationTime () const
 
   bool isGenerationTime = false;
 
-  if ( m_controlSlotsEnabled && ( m_controlSlotGenerationTime < Simulator::Now() ) )
+  if ( m_controlSlotsEnabled && ( m_controlSlotGenerationTime < Simulator::Now () ) )
     {
       isGenerationTime = true;
     }
@@ -161,14 +161,14 @@ SatBeamScheduler::SatUtInfo::SetControlSlotGenerationTime (Time offset)
 {
   NS_LOG_FUNCTION (this);
 
-  m_controlSlotGenerationTime =  Simulator::Now() + offset;
+  m_controlSlotGenerationTime =  Simulator::Now () + offset;
 }
 
 // SatBeamScheduler
 
 NS_OBJECT_ENSURE_REGISTERED (SatBeamScheduler);
 
-TypeId 
+TypeId
 SatBeamScheduler::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatBeamScheduler")
@@ -181,31 +181,31 @@ SatBeamScheduler::GetTypeId (void)
                    MakeEnumChecker (SatCnoEstimator::LAST, "LastValueInWindow",
                                     SatCnoEstimator::MINIMUM, "MinimumValueInWindow",
                                     SatCnoEstimator::AVERAGE, "AverageValueInWindow"))
-    .AddAttribute( "CnoEstimationWindow",
-                   "Time window for C/N0 estimation.",
-                   TimeValue (MilliSeconds (1000)),
-                   MakeTimeAccessor (&SatBeamScheduler::m_cnoEstimationWindow),
-                   MakeTimeChecker ())
-    .AddAttribute( "MaxTwoWayPropagationDelay",
-                   "Maximum two way propagation delay between GW and UT.",
-                   TimeValue (MilliSeconds (560)),
-                   MakeTimeAccessor (&SatBeamScheduler::m_maxTwoWayPropagationDelay),
-                   MakeTimeChecker ())
-    .AddAttribute( "MaxTBTPTxAndProcessingDelay",
-                   "Maximum TBTP transmission and processing delay at the GW.",
-                   TimeValue (MilliSeconds (100)),
-                   MakeTimeAccessor (&SatBeamScheduler::m_maxTbtpTxAndProcessingDelay),
-                   MakeTimeChecker ())
-    .AddAttribute( "ControlSlotsEnabled",
-                   "Control slots generation enabled according to ControlSlotInterval attribute.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatBeamScheduler::m_controlSlotsEnabled),
-                   MakeBooleanChecker ())
-    .AddAttribute( "ControlSlotInterval",
-                   "Time interval to generate time slots for the UT(s).",
-                   TimeValue (MilliSeconds (1000)),
-                   MakeTimeAccessor (&SatBeamScheduler::m_controlSlotInterval),
-                   MakeTimeChecker ())
+    .AddAttribute ( "CnoEstimationWindow",
+                    "Time window for C/N0 estimation.",
+                    TimeValue (MilliSeconds (1000)),
+                    MakeTimeAccessor (&SatBeamScheduler::m_cnoEstimationWindow),
+                    MakeTimeChecker ())
+    .AddAttribute ( "MaxTwoWayPropagationDelay",
+                    "Maximum two way propagation delay between GW and UT.",
+                    TimeValue (MilliSeconds (560)),
+                    MakeTimeAccessor (&SatBeamScheduler::m_maxTwoWayPropagationDelay),
+                    MakeTimeChecker ())
+    .AddAttribute ( "MaxTBTPTxAndProcessingDelay",
+                    "Maximum TBTP transmission and processing delay at the GW.",
+                    TimeValue (MilliSeconds (100)),
+                    MakeTimeAccessor (&SatBeamScheduler::m_maxTbtpTxAndProcessingDelay),
+                    MakeTimeChecker ())
+    .AddAttribute ( "ControlSlotsEnabled",
+                    "Control slots generation enabled according to ControlSlotInterval attribute.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatBeamScheduler::m_controlSlotsEnabled),
+                    MakeBooleanChecker ())
+    .AddAttribute ( "ControlSlotInterval",
+                    "Time interval to generate time slots for the UT(s).",
+                    TimeValue (MilliSeconds (1000)),
+                    MakeTimeAccessor (&SatBeamScheduler::m_controlSlotInterval),
+                    MakeTimeChecker ())
     .AddTraceSource ("BacklogRequestsTrace",
                      "Trace for backlog requests done to beam scheduler.",
                      MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace),
@@ -312,7 +312,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
       maxIndex = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount () - 1;
     }
 
-  m_raChRandomIndex->SetAttribute("Max", DoubleValue (maxIndex));
+  m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
   m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE), maxRcCount);
 
   NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
@@ -359,7 +359,7 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   if (result.second)
     {
-      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount(), SatFrameAllocator::SatFrameAllocReqItem () );
+      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount (), SatFrameAllocator::SatFrameAllocReqItem () );
       SatFrameAllocator::SatFrameAllocReq allocReq (reqContainer);
       allocReq.m_cno = NAN;
       allocReq.m_address = utId;
@@ -411,7 +411,7 @@ SatBeamScheduler::CreateCnoEstimator ()
   Ptr<SatCnoEstimator> estimator = NULL;
 
   switch (m_cnoEstimatorMode)
-  {
+    {
     case SatCnoEstimator::LAST:
     case SatCnoEstimator::MINIMUM:
     case SatCnoEstimator::AVERAGE:
@@ -422,7 +422,7 @@ SatBeamScheduler::CreateCnoEstimator ()
       NS_FATAL_ERROR ("Not supported C/N0 estimation mode!!!");
       break;
 
-  }
+    }
 
   return estimator;
 }
@@ -436,7 +436,7 @@ SatBeamScheduler::Schedule ()
   uint32_t offeredKbpsSum (0);
 
   // check that there is UTs to schedule
-  if ( m_utInfos.size() > 0 )
+  if ( m_utInfos.size () > 0 )
     {
       requestedKbpsSum = UpdateDamaEntriesWithReqs ();
 
@@ -449,12 +449,12 @@ SatBeamScheduler::Schedule ()
       std::vector<Ptr<SatTbtpMessage> > tbtps;
       tbtps.push_back (firstTbtp);
 
-        // Add RA slots (channels)
+      // Add RA slots (channels)
       AddRaChannels (tbtps);
 
       SatFrameAllocator::UtAllocInfoContainer_t utAllocs;
 
-        // Add DA slots to TBTP(s)
+      // Add DA slots to TBTP(s)
       m_superframeAllocator->GenerateTimeSlots (tbtps, m_maxBbFrameSize, utAllocs, m_waveformTrace, m_frameUtLoadTrace, m_frameLoadTrace);
 
       // update VBDC counter of the UT/RCs
@@ -476,7 +476,7 @@ SatBeamScheduler::Schedule ()
 
   uint32_t usableCapacity = std::min (offeredKbpsSum, requestedKbpsSum);
   uint32_t unmetCapacity = requestedKbpsSum - usableCapacity;
-  uint32_t exceedingCapacity = (uint32_t)(std::max(((double)(offeredKbpsSum) - requestedKbpsSum), 0.0) + 0.5);
+  uint32_t exceedingCapacity = (uint32_t)(std::max (((double)(offeredKbpsSum) - requestedKbpsSum), 0.0) + 0.5);
   m_usableCapacityTrace (usableCapacity);
   m_unmetCapacityTrace (unmetCapacity);
   m_exceedingCapacityTrace (exceedingCapacity);
@@ -505,7 +505,7 @@ SatBeamScheduler::AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContain
     {
       uint8_t frameId = superFrameConf->GetRaChannelFrameId (i);
       Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (frameId);
-      uint16_t timeSlotCount = frameConf->GetTimeSlotCount() / frameConf->GetCarrierCount();
+      uint16_t timeSlotCount = frameConf->GetTimeSlotCount () / frameConf->GetCarrierCount ();
 
       // In case of carrier belong to same frame than previous we don't need to check
       // size for frame info when adding slot to TBTP, so it is set to 0.
@@ -640,37 +640,37 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
       SatFrameAllocator::UtAllocInfoContainer_t::const_iterator allocInfo = utAllocContainer.find (it->first);
 
       if ( allocInfo != utAllocContainer.end ())
-      {
-        // update time to send next control slot, if control slot is allocated
-        if ( allocInfo->second.second )
-          {
-            m_utInfos.at (allocInfo->first)->SetControlSlotGenerationTime (m_controlSlotInterval);
-          }
+        {
+          // update time to send next control slot, if control slot is allocated
+          if ( allocInfo->second.second )
+            {
+              m_utInfos.at (allocInfo->first)->SetControlSlotGenerationTime (m_controlSlotInterval);
+            }
 
-        double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ().GetSeconds ();
+          double superFrameDurationInSeconds = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ().GetSeconds ();
 
-        for (uint32_t i = 0; i < allocInfo->second.first.size (); i++ )
-          {
-            uint32_t rateBasedBytes = (SatConstVariables::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
-            rateBasedBytes += (SatConstVariables::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
+          for (uint32_t i = 0; i < allocInfo->second.first.size (); i++ )
+            {
+              uint32_t rateBasedBytes = (SatConstVariables::BITS_IN_KBIT * damaEntry->GetCraInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
+              rateBasedBytes += (SatConstVariables::BITS_IN_KBIT * damaEntry->GetRbdcInKbps (i) * superFrameDurationInSeconds ) / (double)(SatConstVariables::BITS_PER_BYTE);
 
-            offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
+              offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
 
-            if ( rateBasedBytes < allocInfo->second.first[i] )
-              {
-                uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
+              if ( rateBasedBytes < allocInfo->second.first[i] )
+                {
+                  uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
-                if ( vbdcBytes > (allocInfo->second.first[i] - rateBasedBytes) )
-                  {
-                    damaEntry->SetVbdcInBytes (i, (allocInfo->second.first[i] - rateBasedBytes));
-                  }
-                else
-                  {
-                    damaEntry->SetVbdcInBytes (i, 0);
-                  }
-              }
-          }
-      }
+                  if ( vbdcBytes > (allocInfo->second.first[i] - rateBasedBytes) )
+                    {
+                      damaEntry->SetVbdcInBytes (i, (allocInfo->second.first[i] - rateBasedBytes));
+                    }
+                  else
+                    {
+                      damaEntry->SetVbdcInBytes (i, 0);
+                    }
+                }
+            }
+        }
 
       // decrease persistence values
       damaEntry->DecrementDynamicRatePersistence ();

@@ -44,7 +44,7 @@ public:
   typedef enum
   {
     LAST,   //!< Last value in the given window returned
-    MINIMUM,//!< Minimum value in the given window returned
+    MINIMUM, //!< Minimum value in the given window returned
     AVERAGE //!< Average value in the given window returned
   } EstimationMode_t;
 
@@ -112,7 +112,6 @@ private:
 class SatBasicCnoEstimator : public SatCnoEstimator
 {
 public:
-
   /**
    * Method to add a sample value to current sum.
    *
@@ -121,16 +120,16 @@ public:
    * \return New sum after addition.
    */
   static inline double AddToSum (double currentSum, const std::pair<Time, double>& sample)
-    {
-      double newSum = currentSum;
+  {
+    double newSum = currentSum;
 
-      if ( !isnan (sample.second) )
-        {
-          newSum += sample.second;
-        }
+    if ( !isnan (sample.second) )
+      {
+        newSum += sample.second;
+      }
 
-      return newSum;
-    }
+    return newSum;
+  }
 
   /**
    * Default construct a SatCnoEstimator.

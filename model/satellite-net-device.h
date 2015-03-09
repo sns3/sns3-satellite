@@ -77,46 +77,46 @@ public:
    * \brief Attach the SatMac mac layer to this netdevice.
    * \param mac SatMac pointer to be added
    */
-   void SetMac (Ptr<SatMac> mac);
+  void SetMac (Ptr<SatMac> mac);
 
-   /**
-    * \brief Get a Mac pointer
-    *
-    * \returns Ptr to the SatMac object.
-    */
-   Ptr<SatMac> GetMac (void) const;
-
-   /**
-    * \brief Attach the SatLlc llc layer to this netdevice.
-    * \param llc SatLlc pointer to be added
-    */
-    void SetLlc (Ptr<SatLlc> llc);
-
-    /**
-     * \brief Get Llc pointer
-     *
-     * \returns Ptr to the SatLlc object.
-     */
-    Ptr<SatLlc> GetLlc (void) const;
-
-    /**
-     * \brief Set the packet classifier class
-     * \param classifier
-     */
-    void SetPacketClassifier (Ptr<SatPacketClassifier> classifier);
-
-    /**
-     * \brief Get a pointer to packet classifier class
-     * \return Ptr<SatPacketClassifier Packet classifier
-     */
-    Ptr<SatPacketClassifier> GetPacketClassifier () const;
-
-    /**
-   * \brief Attach a receive ErrorModel to the SatNetDevice. Note,
-   * that this method is not used in the satellite module, since the error
-   * model is located within the implemented sublayers (PHY).
-   * \param em Ptr to the ErrorModel.
+  /**
+   * \brief Get a Mac pointer
+   *
+   * \returns Ptr to the SatMac object.
    */
+  Ptr<SatMac> GetMac (void) const;
+
+  /**
+   * \brief Attach the SatLlc llc layer to this netdevice.
+   * \param llc SatLlc pointer to be added
+   */
+  void SetLlc (Ptr<SatLlc> llc);
+
+  /**
+   * \brief Get Llc pointer
+   *
+   * \returns Ptr to the SatLlc object.
+   */
+  Ptr<SatLlc> GetLlc (void) const;
+
+  /**
+   * \brief Set the packet classifier class
+   * \param classifier
+   */
+  void SetPacketClassifier (Ptr<SatPacketClassifier> classifier);
+
+  /**
+   * \brief Get a pointer to packet classifier class
+   * \return Ptr<SatPacketClassifier Packet classifier
+   */
+  Ptr<SatPacketClassifier> GetPacketClassifier () const;
+
+  /**
+ * \brief Attach a receive ErrorModel to the SatNetDevice. Note,
+ * that this method is not used in the satellite module, since the error
+ * model is located within the implemented sublayers (PHY).
+ * \param em Ptr to the ErrorModel.
+ */
   void SetReceiveErrorModel (Ptr<ErrorModel> em);
 
   // inherited from NetDevice base class.

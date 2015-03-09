@@ -34,47 +34,47 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
-: m_daIfModel (),
-  m_raIfModel (),
-  m_errorModel (),
-  m_rxTemperatureK (),
-  m_rxAciIfWrtNoiseFactor (),
-  m_rxMode (),
-  m_carrierCount (),
-  m_carrierBandwidthConverter (),
-  m_channelType (),
-  m_channelEstimationError (),
-  m_sinrCalculate (),
-  m_constantErrorRate (),
-  m_linkResults (),
-  m_rxExtNoiseDensityWhz (0),
-  m_enableIntfOutputTrace (false),
-  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-  m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
-  m_enableRandomAccessDynamicLoadControl (true)
+  : m_daIfModel (),
+    m_raIfModel (),
+    m_errorModel (),
+    m_rxTemperatureK (),
+    m_rxAciIfWrtNoiseFactor (),
+    m_rxMode (),
+    m_carrierCount (),
+    m_carrierBandwidthConverter (),
+    m_channelType (),
+    m_channelEstimationError (),
+    m_sinrCalculate (),
+    m_constantErrorRate (),
+    m_linkResults (),
+    m_rxExtNoiseDensityWhz (0),
+    m_enableIntfOutputTrace (false),
+    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
+    m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
+    m_enableRandomAccessDynamicLoadControl (true)
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
- : m_daIfModel (createParams.m_daIfModel),
-   m_raIfModel (createParams.m_raIfModel),
-   m_errorModel (createParams.m_errorModel),
-   m_rxTemperatureK (createParams.m_rxTemperatureK),
-   m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
-   m_rxMode (createParams.m_rxMode),
-   m_carrierCount (createParams.m_carrierCount),
-   m_carrierBandwidthConverter (createParams.m_bwConverter),
-   m_channelType (createParams.m_chType),
-   m_channelEstimationError (createParams.m_cec),
-   m_sinrCalculate (),
-   m_constantErrorRate (0.0),
-   m_linkResults (),
-   m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
-   m_enableIntfOutputTrace (false),
-   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-   m_raCollisionModel (createParams.m_raCollisionModel),
-   m_enableRandomAccessDynamicLoadControl (true)
+  : m_daIfModel (createParams.m_daIfModel),
+    m_raIfModel (createParams.m_raIfModel),
+    m_errorModel (createParams.m_errorModel),
+    m_rxTemperatureK (createParams.m_rxTemperatureK),
+    m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
+    m_rxMode (createParams.m_rxMode),
+    m_carrierCount (createParams.m_carrierCount),
+    m_carrierBandwidthConverter (createParams.m_bwConverter),
+    m_channelType (createParams.m_chType),
+    m_channelEstimationError (createParams.m_cec),
+    m_sinrCalculate (),
+    m_constantErrorRate (0.0),
+    m_linkResults (),
+    m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
+    m_enableIntfOutputTrace (false),
+    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
+    m_raCollisionModel (createParams.m_raCollisionModel),
+    m_enableRandomAccessDynamicLoadControl (true)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -84,23 +84,23 @@ SatPhyRxCarrierConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
     .SetParent<Object> ()
-    .AddAttribute( "EnableIntfOutputTrace",
-                   "Enable interference output trace.",
+    .AddAttribute ( "EnableIntfOutputTrace",
+                    "Enable interference output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableIntfOutputTrace),
                     MakeBooleanChecker ())
-    .AddAttribute( "RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
-                   "Random access average normalized offered load measurement window size",
+    .AddAttribute ( "RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
+                    "Random access average normalized offered load measurement window size",
                     UintegerValue (10),
                     MakeUintegerAccessor (&SatPhyRxCarrierConf::m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize),
                     MakeUintegerChecker<uint32_t> ())
-    .AddAttribute( "EnableRandomAccessDynamicLoadControl",
-                   "Enable random access dynamic load control.",
+    .AddAttribute ( "EnableRandomAccessDynamicLoadControl",
+                    "Enable random access dynamic load control.",
                     BooleanValue (true),
                     MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableRandomAccessDynamicLoadControl),
                     MakeBooleanChecker ())
-    .AddAttribute( "ConstantErrorRatio",
-                   "Constant error ratio",
+    .AddAttribute ( "ConstantErrorRatio",
+                    "Constant error ratio",
                     DoubleValue (0.01),
                     MakeDoubleAccessor (&SatPhyRxCarrierConf::m_constantErrorRate),
                     MakeDoubleChecker<double> ())
@@ -115,8 +115,8 @@ SatPhyRxCarrierConf::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   m_linkResults = NULL;
-  m_carrierBandwidthConverter.Nullify();
-  m_sinrCalculate.Nullify();
+  m_carrierBandwidthConverter.Nullify ();
+  m_sinrCalculate.Nullify ();
 
   Object::DoDispose ();
 }
@@ -162,7 +162,7 @@ SatPhyRxCarrierConf::GetLinkResults () const
 double
 SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType ) const
 {
-  return m_carrierBandwidthConverter( m_channelType, carrierId, bandwidthType );
+  return m_carrierBandwidthConverter ( m_channelType, carrierId, bandwidthType );
 }
 
 double

@@ -50,22 +50,22 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("sat-link-budget-example");
 
 // callback called when packet is received by phy RX carrier
-static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> params, Mac48Address ownAdd , Mac48Address destAdd,
+static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> params, Mac48Address ownAdd, Mac48Address destAdd,
                                 double ifPower, double cSinr)
 {
   // print only unicast message to prevent printing control messages like TBTP messages
-  if ( !destAdd.IsBroadcast() )
+  if ( !destAdd.IsBroadcast () )
     {
-      NS_LOG_INFO ( Simulator::Now() << " "
-                    << params->m_channelType << " "
-                    << ownAdd << " "
-                    << destAdd << " "
-                    << params->m_beamId << " "
-                    << params->m_carrierFreq_hz << " "
-                    << SatUtils::WToDbW (ifPower) << " "
-                    << SatUtils::WToDbW ( params->m_rxPower_W ) << " "
-                    << SatUtils::LinearToDb (params->m_sinr) << " "
-                    << SatUtils::LinearToDb (cSinr) );
+      NS_LOG_INFO ( Simulator::Now () << " "
+                                      << params->m_channelType << " "
+                                      << ownAdd << " "
+                                      << destAdd << " "
+                                      << params->m_beamId << " "
+                                      << params->m_carrierFreq_hz << " "
+                                      << SatUtils::WToDbW (ifPower) << " "
+                                      << SatUtils::WToDbW ( params->m_rxPower_W ) << " "
+                                      << SatUtils::LinearToDb (params->m_sinr) << " "
+                                      << SatUtils::LinearToDb (cSinr) );
     }
 }
 
@@ -103,10 +103,10 @@ main (int argc, char *argv[])
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   // configure helpers
-  Ptr<SatBeamHelper> beamHelper = helper->GetBeamHelper();
-  Ptr<SatUtHelper> utHelper = beamHelper->GetUtHelper();
-  Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper();
-  Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper();
+  Ptr<SatBeamHelper> beamHelper = helper->GetBeamHelper ();
+  Ptr<SatUtHelper> utHelper = beamHelper->GetUtHelper ();
+  Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper ();
+  Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper ();
 
   // To change attributes having affect on link budget,
   // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
@@ -129,26 +129,26 @@ main (int argc, char *argv[])
 
   // set callback traces where we want results out
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                               MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                               MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
 
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
-                                 MakeCallback (&LinkBudgetTraceCb));
+                   MakeCallback (&LinkBudgetTraceCb));
   // Set UT position
   NodeContainer ut = helper->UtNodes ();
   Ptr<SatMobilityModel> utMob = ut.Get (0)->GetObject<SatMobilityModel> ();
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   uint16_t port = 9;
 
   // create application on GW user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), port));
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
+  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
+  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
   cbrHelper.SetAttribute ("Interval", StringValue ("0.1s"));
   cbrHelper.SetAttribute ("PacketSize", UintegerValue (512) );
 
@@ -161,8 +161,8 @@ main (int argc, char *argv[])
   gwCbr.Stop (Seconds (0.25));
 
   // create application on UT user
-  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get(0)), port))));
-  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get(0)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
   utSink.Start (Seconds (0.1));

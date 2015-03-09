@@ -28,11 +28,11 @@ namespace ns3 {
 
 
 SatSchedulingObject::SatSchedulingObject ()
-:m_macAddress (),
- m_bufferedBytes (0),
- m_minTxOpportunity (0),
- m_holDelay (Seconds(0.0)),
- m_flowId ()
+  : m_macAddress (),
+    m_bufferedBytes (0),
+    m_minTxOpportunity (0),
+    m_holDelay (Seconds (0.0)),
+    m_flowId ()
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -44,11 +44,11 @@ SatSchedulingObject::SatSchedulingObject ()
 
 
 SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint8_t flowId)
-  :m_macAddress (addr),
-   m_bufferedBytes (bytes),
-   m_minTxOpportunity (minTxOpportunity),
-   m_holDelay (holDelay),
-   m_flowId (flowId)
+  : m_macAddress (addr),
+    m_bufferedBytes (bytes),
+    m_minTxOpportunity (minTxOpportunity),
+    m_holDelay (holDelay),
+    m_flowId (flowId)
 {
   NS_LOG_FUNCTION (this << addr << bytes << holDelay << (uint32_t) flowId);
 }

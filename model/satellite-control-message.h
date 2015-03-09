@@ -49,14 +49,14 @@ public:
    * \brief Definition for different types of control messages
    */
   typedef enum
-    {
-      SAT_NON_CTRL_MSG,   //!< SAT_NON_CTRL_MSG
-      SAT_TBTP_CTRL_MSG,  //!< SAT_TBTP_CTRL_MSG
-      SAT_CR_CTRL_MSG,    //!< SAT_CR_CTRL_MSG
-      SAT_RA_CTRL_MSG,    //!< SAT_RA_CTRL_MSG
-      SAT_ARQ_ACK,        //!< SAT_ARQ_ACK
-      SAT_CN0_REPORT      //!< SAT_CN0_REPORT
-    } SatControlMsgType_t;
+  {
+    SAT_NON_CTRL_MSG,     //!< SAT_NON_CTRL_MSG
+    SAT_TBTP_CTRL_MSG,    //!< SAT_TBTP_CTRL_MSG
+    SAT_CR_CTRL_MSG,      //!< SAT_CR_CTRL_MSG
+    SAT_RA_CTRL_MSG,      //!< SAT_RA_CTRL_MSG
+    SAT_ARQ_ACK,          //!< SAT_ARQ_ACK
+    SAT_CN0_REPORT        //!< SAT_CN0_REPORT
+  } SatControlMsgType_t;
 
   /**
    * Constructor for SatControlMsgTag
@@ -115,19 +115,22 @@ private:
 class SatControlMessage : public Object
 {
 public:
-
   // methods derived from base classes
   static TypeId GetTypeId (void);
 
   /**
    * Default constructor for SatControlMessage.
    */
-  SatControlMessage () {};
+  SatControlMessage ()
+  {
+  }
 
   /**
    * Destructor
    */
-  ~SatControlMessage () {};
+  ~SatControlMessage ()
+  {
+  }
 
   /**
    * Get real size of the control message. This can be used to
@@ -145,7 +148,6 @@ public:
   virtual SatControlMsgTag::SatControlMsgType_t GetMsgType () const = 0;
 
 private:
-
 };
 
 /**
@@ -230,35 +232,50 @@ public:
    *
    * \return SatControlMsgTag::SAT_TBTP_CTRL_MSG
    */
-  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_TBTP_CTRL_MSG; }
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_TBTP_CTRL_MSG;
+  }
 
   /**
    * Set counter of the super frame in this TBTP message.
    *
    * \param counter The super frame counter.
    */
-  inline void SetSuperframeCounter (uint32_t counter) { m_superframeCounter = counter; }
+  inline void SetSuperframeCounter (uint32_t counter)
+  {
+    m_superframeCounter = counter;
+  }
 
   /**
    * Get sequence id of the super frame in this TBTP message.
    *
    * \return The super frame sequence id.
    */
-  inline uint8_t GetSuperframeSeqId () { return m_superframeSeqId; }
+  inline uint8_t GetSuperframeSeqId ()
+  {
+    return m_superframeSeqId;
+  }
 
   /**
    * Get counter of the super frame in this TBTP message.
    *
    * \return The super frame counter.
    */
-  inline uint32_t GetSuperframeCounter () {return m_superframeCounter;}
+  inline uint32_t GetSuperframeCounter ()
+  {
+    return m_superframeCounter;
+  }
 
   /**
    * Get size of frame info size in this TBTP message.
    *
    * \return Frame info size.
    */
-  inline uint32_t GetFrameInfoSize () const { return m_tbtpFrameBodySizeInBytes; }
+  inline uint32_t GetFrameInfoSize () const
+  {
+    return m_tbtpFrameBodySizeInBytes;
+  }
 
   /**
    * Get the information of the DA time slots.
@@ -313,7 +330,6 @@ public:
   void Dump () const;
 
 private:
-
   typedef std::map <uint8_t, uint16_t >  RaChannelMap_t;
   typedef std::map<Address, DaTimeSlotInfoItem_t > DaTimeSlotMap_t;
 
@@ -341,7 +357,6 @@ private:
 class SatCrMessage : public SatControlMessage
 {
 public:
-
   typedef enum
   {
     CR_BLOCK_SMALL,
@@ -369,7 +384,10 @@ public:
    * \brief Get type of the message.
    * \return SatControlMsgTag::SAT_CR_CTRL_MSG
    */
-  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CR_CTRL_MSG; }
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_CR_CTRL_MSG;
+  }
 
   /**
    * \brief Add a control element to capacity request
@@ -413,7 +431,6 @@ public:
   bool IsNotEmpty () const;
 
 private:
-
   RequestContainer_t m_requestData;
 
   /**
@@ -453,7 +470,6 @@ private:
 class SatArqAckMessage : public SatControlMessage
 {
 public:
-
   /**
    * Constructor for SatArqAckMessage
    */
@@ -472,7 +488,10 @@ public:
    * \brief Get type of the message.
    * \return SatControlMsgTag::SAT_ARQ_ACK
    */
-  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_ARQ_ACK; }
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_ARQ_ACK;
+  }
 
   /**
    * \brief Set the sequence number to be ACK'ed
@@ -505,7 +524,6 @@ public:
   virtual uint32_t GetSizeInBytes () const;
 
 private:
-
   uint8_t m_sequenceNumber;
   uint8_t m_flowId;
 };
@@ -522,7 +540,6 @@ private:
 class SatCnoReportMessage : public SatControlMessage
 {
 public:
-
   /**
    * Constructor for SatCnoReportMessage
    */
@@ -542,7 +559,10 @@ public:
    *
    * \return SatControlMsgTag::SAT_CN0_REPORT
    */
-  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_CN0_REPORT; }
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_CN0_REPORT;
+  }
 
   /**
    * \brief Get C/N0 estimate.
@@ -563,7 +583,6 @@ public:
   virtual uint32_t GetSizeInBytes () const;
 
 private:
-
   /**
    * C/N0 estimate.
    */
@@ -579,7 +598,6 @@ private:
 class SatRaMessage : public SatControlMessage
 {
 public:
-
   /**
    * Constructor for SatRaMessage
    */
@@ -599,7 +617,10 @@ public:
    *
    * \return SatControlMsgTag::SAT_RA_CTRL_MSG
    */
-  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const { return SatControlMsgTag::SAT_RA_CTRL_MSG; }
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_RA_CTRL_MSG;
+  }
 
   /**
    * \brief Get backoff probability
@@ -644,7 +665,6 @@ public:
   virtual uint32_t GetSizeInBytes () const;
 
 private:
-
   /**
    * Common header of the random access element
    */
@@ -726,7 +746,6 @@ public:
   Ptr<SatControlMessage> Read (uint32_t recvId);
 
 private:
-
   /**
    * \brief Erase first item from container. Schedules a new erase call to this function with time left
    * for next item in list (if container is not empty).
@@ -747,7 +766,7 @@ private:
 
   ReservedCtrlMsgMap_t  m_reservedCtrlMsgs;
   CtrlMsgMap_t          m_ctrlMsgs;
-	CtrlIdMap_t						m_ctrlIdMap;
+  CtrlIdMap_t                                             m_ctrlIdMap;
   uint32_t              m_sendId;
   uint32_t              m_recvId;
   EventId               m_storeTimeout;

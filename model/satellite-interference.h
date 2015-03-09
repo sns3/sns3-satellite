@@ -35,13 +35,12 @@ namespace ns3 {
 class SatInterference : public Object
 {
 public:
-
   /**
    * Event for identifying interference change events (receiving)
    */
   class InterferenceChangeEvent : public SimpleRefCount<SatInterference::InterferenceChangeEvent>
   {
-  public:
+public:
     /**
       * Constructor of Event for satellite interference
       * \param id identifier of the event
@@ -86,7 +85,7 @@ public:
       */
     Address GetSatEarthStationAddress (void) const;
 
-  private:
+private:
     Time m_startTime;
     Time m_endTime;
     double m_rxPower;

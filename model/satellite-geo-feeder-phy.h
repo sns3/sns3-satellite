@@ -42,7 +42,6 @@ namespace ns3 {
 class SatGeoFeederPhy : public SatPhy
 {
 public:
-
   /**
    * Default constructor
    */
@@ -87,7 +86,6 @@ public:
   virtual double CalculateSinr (double sinr);
 
 private:
-
   /**
    * Configured external noise power.
    */

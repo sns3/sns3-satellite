@@ -46,7 +46,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatNetDevice);
 
-TypeId 
+TypeId
 SatNetDevice::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatNetDevice")
@@ -58,50 +58,50 @@ SatNetDevice::GetTypeId (void)
                    MakePointerAccessor (&SatNetDevice::m_receiveErrorModel),
                    MakePointerChecker<ErrorModel> ())
     .AddAttribute ("SatMac", "The Satellite MAC layer attached to this device.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatNetDevice::GetMac,
-                                         &SatNetDevice::SetMac),
-                    MakePointerChecker<SatMac> ())
+                   PointerValue (),
+                   MakePointerAccessor (&SatNetDevice::GetMac,
+                                        &SatNetDevice::SetMac),
+                   MakePointerChecker<SatMac> ())
     .AddAttribute ("SatPhy", "The Satellite Phy layer attached to this device.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatNetDevice::GetPhy,
-                                         &SatNetDevice::SetPhy),
-                    MakePointerChecker<SatPhy> ())
-     .AddAttribute ("SatLlc", "The Satellite Llc layer attached to this device.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatNetDevice::GetLlc,
-                                         &SatNetDevice::SetLlc),
-                                         MakePointerChecker<SatLlc> ())
-     .AddAttribute( "MaximumTransmissionUnit",
+                   PointerValue (),
+                   MakePointerAccessor (&SatNetDevice::GetPhy,
+                                        &SatNetDevice::SetPhy),
+                   MakePointerChecker<SatPhy> ())
+    .AddAttribute ("SatLlc", "The Satellite Llc layer attached to this device.",
+                   PointerValue (),
+                   MakePointerAccessor (&SatNetDevice::GetLlc,
+                                        &SatNetDevice::SetLlc),
+                   MakePointerChecker<SatLlc> ())
+    .AddAttribute ( "MaximumTransmissionUnit",
                     "Maximum transmission unit in Bytes",
                     UintegerValue (0xffff),
                     MakeUintegerAccessor (&SatNetDevice::m_mtu),
                     MakeUintegerChecker<uint16_t> ())
-     .AddAttribute ("EnableStatisticsTags",
-                    "If true, some tags will be added to each transmitted packet to assist with statistics computation",
-                    BooleanValue (false),
-                    MakeBooleanAccessor (&SatNetDevice::m_isStatisticsTagsEnabled),
-                    MakeBooleanChecker ())
-     .AddTraceSource ("PacketTrace",
-                      "Packet event trace",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_packetTrace),
-                      "ns3::SatTypedefs::PacketTraceCallback")
-     .AddTraceSource ("Tx",
-                      "A packet to be sent",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_txTrace),
-                      "ns3::Packet::TracedCallback")
-     .AddTraceSource ("SignallingTx",
-                      "A signalling packet to be sent",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_signallingTxTrace),
-                      "ns3::SatTypedefs::PacketDestinationAddressCallback")
-     .AddTraceSource ("Rx",
-                      "A packet received",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace),
-                      "ns3::SatTypedefs::PacketSourceAddressCallback")
-     .AddTraceSource ("RxDelay",
-                      "A packet is received with delay information",
-                      MakeTraceSourceAccessor (&SatNetDevice::m_rxDelayTrace),
-                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddAttribute ("EnableStatisticsTags",
+                   "If true, some tags will be added to each transmitted packet to assist with statistics computation",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatNetDevice::m_isStatisticsTagsEnabled),
+                   MakeBooleanChecker ())
+    .AddTraceSource ("PacketTrace",
+                     "Packet event trace",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_packetTrace),
+                     "ns3::SatTypedefs::PacketTraceCallback")
+    .AddTraceSource ("Tx",
+                     "A packet to be sent",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_txTrace),
+                     "ns3::Packet::TracedCallback")
+    .AddTraceSource ("SignallingTx",
+                     "A signalling packet to be sent",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_signallingTxTrace),
+                     "ns3::SatTypedefs::PacketDestinationAddressCallback")
+    .AddTraceSource ("Rx",
+                     "A packet received",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_rxTrace),
+                     "ns3::SatTypedefs::PacketSourceAddressCallback")
+    .AddTraceSource ("RxDelay",
+                     "A packet is received with delay information",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_rxDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
   ;
   return tid;
 }
@@ -122,13 +122,13 @@ void
 SatNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid());
+  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid ());
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
 
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_RECV,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -178,7 +178,7 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
   m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
 
-void 
+void
 SatNetDevice::SetPhy (Ptr<SatPhy> phy)
 {
   NS_LOG_FUNCTION (this << phy);
@@ -212,13 +212,13 @@ SatNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
   m_receiveErrorModel = em;
 }
 
-void 
+void
 SatNetDevice::SetIfIndex (const uint32_t index)
 {
   NS_LOG_FUNCTION (this << index);
   m_ifIndex = index;
 }
-uint32_t 
+uint32_t
 SatNetDevice::GetIfIndex (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -264,7 +264,7 @@ SatNetDevice::SetAddress (Address address)
   NS_LOG_FUNCTION (this << address);
   m_address = Mac48Address::ConvertFrom (address);
 }
-Address 
+Address
 SatNetDevice::GetAddress (void) const
 {
   //
@@ -273,31 +273,31 @@ SatNetDevice::GetAddress (void) const
   NS_LOG_FUNCTION (this);
   return m_address;
 }
-bool 
+bool
 SatNetDevice::SetMtu (const uint16_t mtu)
 {
   NS_LOG_FUNCTION (this << mtu);
   m_mtu = mtu;
   return true;
 }
-uint16_t 
+uint16_t
 SatNetDevice::GetMtu (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_mtu;
 }
-bool 
+bool
 SatNetDevice::IsLinkUp (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
-void 
+void
 SatNetDevice::AddLinkChangeCallback (Callback<void> callback)
 {
- NS_LOG_FUNCTION (this << &callback);
+  NS_LOG_FUNCTION (this << &callback);
 }
-bool 
+bool
 SatNetDevice::IsBroadcast (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -309,13 +309,13 @@ SatNetDevice::GetBroadcast (void) const
   NS_LOG_FUNCTION (this);
   return Mac48Address ("ff:ff:ff:ff:ff:ff");
 }
-bool 
+bool
 SatNetDevice::IsMulticast (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
-Address 
+Address
 SatNetDevice::GetMulticast (Ipv4Address multicastGroup) const
 {
   NS_LOG_FUNCTION (this << multicastGroup);
@@ -328,21 +328,21 @@ Address SatNetDevice::GetMulticast (Ipv6Address addr) const
   return Mac48Address::GetMulticast (addr);
 }
 
-bool 
+bool
 SatNetDevice::IsPointToPoint (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
 
-bool 
+bool
 SatNetDevice::IsBridge (void) const
 {
   NS_LOG_FUNCTION (this);
   return false;
 }
 
-bool 
+bool
 SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
@@ -358,9 +358,9 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
 
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -376,7 +376,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 
   return true;
 }
-bool 
+bool
 SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
@@ -392,9 +392,9 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
 
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -429,9 +429,9 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
 
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -456,25 +456,25 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
   return true;
 }
 
-Ptr<Node> 
+Ptr<Node>
 SatNetDevice::GetNode (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_node;
 }
-void 
+void
 SatNetDevice::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
   m_node = node;
 }
-bool 
+bool
 SatNetDevice::NeedsArp (void) const
 {
   NS_LOG_FUNCTION (this);
   return true;
 }
-void 
+void
 SatNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);

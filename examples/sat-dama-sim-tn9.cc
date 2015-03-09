@@ -128,23 +128,23 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
   switch (nccConf)
-  {
+    {
     case 0:
       {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_0"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_0"));
+        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (false));
         break;
       }
     case 1:
       {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_1"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_1"));
+        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
         break;
       }
     case 2:
       {
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
-        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
+        Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
         break;
       }
     default:
@@ -152,10 +152,10 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Unsupported nccConf: " << nccConf);
         break;
       }
-  }
+    }
 
   switch (fadingConf)
-  {
+    {
     case 0:
       {
         // Markov fading
@@ -178,7 +178,7 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Unsupported fadingConf: " << fadingConf);
         break;
       }
-  }
+    }
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -196,8 +196,8 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -209,8 +209,8 @@ main (int argc, char *argv[])
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
-      itUt != utUsers.End ();
-      ++itUt)
+       itUt != utUsers.End ();
+       ++itUt)
     {
       appStartTime += MilliSeconds (50);
 
@@ -256,12 +256,12 @@ main (int argc, char *argv[])
   s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  NS_LOG_INFO("--- sat-dama-sim-tn9 ---");
-  NS_LOG_INFO("  Packet size: " << packetSize);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-dama-sim-tn9 ---");
+  NS_LOG_INFO ("  Packet size: " << packetSize);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

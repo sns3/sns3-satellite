@@ -28,7 +28,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatLog);
 
-TypeId 
+TypeId
 SatLog::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLog")
@@ -160,7 +160,7 @@ SatLog::GetFileTag (LogType_t logType)
   std::string fileTag = "";
 
   switch (logType)
-  {
+    {
     case LOG_GENERIC:
       {
         fileTag = "";
@@ -191,7 +191,7 @@ SatLog::GetFileTag (LogType_t logType)
         NS_FATAL_ERROR ("SatLog::GetFileTag - Invalid log type");
         break;
       }
-  }
+    }
   return fileTag;
 }
 

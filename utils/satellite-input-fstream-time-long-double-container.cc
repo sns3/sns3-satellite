@@ -36,8 +36,8 @@ SatInputFileStreamTimeLongDoubleContainer::GetTypeId (void)
   return tid;
 }
 
-SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow) :
-    m_inputFileStreamWrapper (),
+SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
+  : m_inputFileStreamWrapper (),
     m_inputFileStream (),
     m_container (),
     m_fileName (filename),
@@ -53,8 +53,8 @@ SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleConta
   UpdateContainer (m_fileName, m_fileMode, m_valuesInRow);
 }
 
-SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer () :
-    m_inputFileStreamWrapper (),
+SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer ()
+  : m_inputFileStreamWrapper (),
     m_inputFileStream (),
     m_container (),
     m_fileName (),
@@ -82,7 +82,7 @@ SatInputFileStreamTimeLongDoubleContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  Object::DoDispose();
+  Object::DoDispose ();
 }
 
 void
@@ -112,7 +112,7 @@ SatInputFileStreamTimeLongDoubleContainer::UpdateContainer (std::string filename
     }
   else
     {
-      NS_ABORT_MSG("Input stream is not valid for reading.");
+      NS_ABORT_MSG ("Input stream is not valid for reading.");
     }
 
   CheckContainerSanity ();
@@ -128,7 +128,7 @@ SatInputFileStreamTimeLongDoubleContainer::ReadRow ()
   long double tempValue;
   std::vector<long double> tempVector;
 
-  for( uint32_t i = 0; i < m_valuesInRow; i++ )
+  for ( uint32_t i = 0; i < m_valuesInRow; i++ )
     {
       *m_inputFileStream >> tempValue;
       tempVector.push_back (tempValue);
@@ -173,7 +173,7 @@ SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
-  while (!FindNextClosest(m_lastValidPosition,m_timeShiftValue, Now ().GetSeconds ()))
+  while (!FindNextClosest (m_lastValidPosition,m_timeShiftValue, Now ().GetSeconds ()))
     {
       m_lastValidPosition = 0;
       m_numOfPasses++;
@@ -184,7 +184,7 @@ SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample ()
 
   if (m_numOfPasses > 0)
     {
-      std::cout << "WARNING! - SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample for " << m_fileName << " is out of samples @ time sample " << Now ().GetSeconds () << " (passes "<< m_numOfPasses << ")" << std::endl;
+      std::cout << "WARNING! - SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample for " << m_fileName << " is out of samples @ time sample " << Now ().GetSeconds () << " (passes " << m_numOfPasses << ")" << std::endl;
       std::cout << "The container will loop samples from the beginning." << std::endl;
     }
 
@@ -228,11 +228,11 @@ SatInputFileStreamTimeLongDoubleContainer::FindNextClosest (uint32_t lastValidPo
   if (valueFound && m_numOfPasses > 0 && m_lastValidPosition == 0)
     {
       long double difference1 = fabs (m_container[m_lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
-      long double difference2 = fabs (m_container[m_container.size() - 1].at (m_timeColumn) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (m_timeColumn)) - comparisonTimeValue);
+      long double difference2 = fabs (m_container[m_container.size () - 1].at (m_timeColumn) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (m_timeColumn)) - comparisonTimeValue);
 
       if (difference1 > difference2)
         {
-          m_lastValidPosition = m_container.size() - 1;
+          m_lastValidPosition = m_container.size () - 1;
           m_numOfPasses--;
           m_timeShiftValue = m_numOfPasses * m_container[m_container.size () - 1].at (m_timeColumn);
         }
@@ -270,7 +270,7 @@ SatInputFileStreamTimeLongDoubleContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_container.empty())
+  if (!m_container.empty ())
     {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {

@@ -57,7 +57,7 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (1);
   uint32_t profilingConf (0);
 
-  // 256 kbps per end user 
+  // 256 kbps per end user
   uint32_t packetSize (1280); // in bytes
   double intervalSeconds = 0.04;
 
@@ -83,13 +83,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
-  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue(false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue(64));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue(false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (64));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -100,7 +100,7 @@ main (int argc, char *argv[])
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   switch (profilingConf)
-  {
+    {
     // Single beam
     case 0:
       {
@@ -126,11 +126,11 @@ main (int argc, char *argv[])
       {
         NS_FATAL_ERROR ("Invalid profiling configuration");
       }
-  }
+    }
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -142,8 +142,8 @@ main (int argc, char *argv[])
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
-      itUt != utUsers.End ();
-      ++itUt)
+       itUt != utUsers.End ();
+       ++itUt)
     {
       appStartTime += MilliSeconds (10);
 
@@ -177,12 +177,12 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO("--- sat-profiling-sim-tn8 ---");
-  NS_LOG_INFO("  Packet size: " << packetSize);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-profiling-sim-tn8 ---");
+  NS_LOG_INFO ("  Packet size: " << packetSize);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

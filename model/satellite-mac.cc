@@ -38,7 +38,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatMac);
 
-TypeId 
+TypeId
 SatMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMac")
@@ -66,18 +66,18 @@ SatMac::GetTypeId (void)
 }
 
 SatMac::SatMac ()
- : m_isStatisticsTagsEnabled (false),
-   m_nodeInfo (),
-   m_beamId (0)
+  : m_isStatisticsTagsEnabled (false),
+    m_nodeInfo (),
+    m_beamId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
 }
 
 SatMac::SatMac (uint32_t beamId)
-: m_isStatisticsTagsEnabled (false),
-  m_nodeInfo (),
-  m_beamId (beamId)
+  : m_isStatisticsTagsEnabled (false),
+    m_nodeInfo (),
+    m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -234,8 +234,8 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
                   if (item.GetTypeId () == SatAddressTag::GetTypeId ())
                     {
                       NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                    << " start=" << item.GetStart ()
-                                    << " end=" << item.GetEnd ());
+                                         << " start=" << item.GetStart ()
+                                         << " end=" << item.GetEnd ());
                       SatAddressTag addrTag;
                       item.GetTag (addrTag);
                       addr = addrTag.GetSourceAddress ();

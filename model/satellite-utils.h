@@ -32,14 +32,13 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * 
+ *
  * \brief SatUtils class is for general conversions used in satellite module.
  * This class is not planned to be instantiated or inherited.
  */
 class SatUtils
 {
 public:
-
   /**
    * \brief Converts radians to degrees
    *
@@ -47,7 +46,10 @@ public:
    * \return degrees converted from radians
    */
   template <typename T>
-  static inline T RadiansToDegrees ( T radian ) { return (T) ( ( radian ) * ( 180.0 / M_PI ) ); }
+  static inline T RadiansToDegrees ( T radian )
+  {
+    return (T) ( ( radian ) * ( 180.0 / M_PI ) );
+  }
 
   /**
    * \brief Converts degrees to radians
@@ -56,7 +58,10 @@ public:
    * \return radians converted from degrees
    */
   template <typename T>
-  static inline T DegreesToRadians ( T degree ) { return (T) ( ( degree ) * ( M_PI / 180.0 ) ); }
+  static inline T DegreesToRadians ( T degree )
+  {
+    return (T) ( ( degree ) * ( M_PI / 180.0 ) );
+  }
 
   /**
    * \brief Get minimum value for linear. (The smallest value greater than zero)
@@ -64,7 +69,10 @@ public:
    * \return minimum linear value
    */
   template <typename T>
-  static inline T MinLin () { return (T) ( std::numeric_limits<T>::min () ); }
+  static inline T MinLin ()
+  {
+    return (T) ( std::numeric_limits<T>::min () );
+  }
 
   /**
    * \brief Get maximum value for linear
@@ -72,7 +80,10 @@ public:
    * \return maximum linear value
    */
   template <typename T>
-  static inline T MaxLin () { return (T) ( std::numeric_limits<T>::max () ); }
+  static inline T MaxLin ()
+  {
+    return (T) ( std::numeric_limits<T>::max () );
+  }
 
   /**
    * \brief Get minimum value for Decibel
@@ -80,7 +91,10 @@ public:
    * \return minimum Decibel value
    */
   template <typename T>
-  static inline T MinDb () { return (T) LinearToDb ( MinLin<T>() ); }
+  static inline T MinDb ()
+  {
+    return (T) LinearToDb ( MinLin<T> () );
+  }
 
   /**
    * \brief Get maximum value for Decibel
@@ -88,7 +102,10 @@ public:
    * \return maximum Decibel value
    */
   template <typename T>
-  static inline T MaxDb () { return (T) LinearToDb ( MaxLin<T>() ); }
+  static inline T MaxDb ()
+  {
+    return (T) LinearToDb ( MaxLin<T> () );
+  }
 
   /**
    * \brief Converts Decibel Watts to Watts
@@ -97,7 +114,10 @@ public:
    * \return Watts converted from Decibel Watts
    */
   template <typename T>
-  static inline T DbWToW ( T dbw ) { return (T) DbToLinear<T> (dbw); }
+  static inline T DbWToW ( T dbw )
+  {
+    return (T) DbToLinear<T> (dbw);
+  }
 
   /**
    * \brief Converts Watts to Decibel Watts
@@ -106,7 +126,10 @@ public:
    * \return Decibel Watts converted from Watts
    */
   template <typename T>
-  static inline T WToDbW ( T w ) { return (T) LinearToDb<T> (w); }
+  static inline T WToDbW ( T w )
+  {
+    return (T) LinearToDb<T> (w);
+  }
 
   /**
    * \brief Converts decibels to linear.
@@ -120,7 +143,7 @@ public:
   template <typename T>
   static inline T DbToLinear ( T db )
   {
-    if ((db < MinDb<T> () && (isinf(-db) != false)) || db > MaxDb<T> ())
+    if ((db < MinDb<T> () && (isinf (-db) != false)) || db > MaxDb<T> ())
       {
         NS_FATAL_ERROR ("SatUtils::DbToLinear - unsupported value: " <<  db);
       }
@@ -154,7 +177,10 @@ public:
    * \return Watts converted from Decibel milli Watts
    */
   template <typename T>
-  static inline T DbmToW ( T dbm ) { return ( DbWToW<T> ( dbm ) / 1000 ); }
+  static inline T DbmToW ( T dbm )
+  {
+    return ( DbWToW<T> ( dbm ) / 1000 );
+  }
 
   /**
    * \brief Converts Watts to Decibel milli Watts
@@ -163,7 +189,10 @@ public:
    * \return Decibel milli Watts converted from Watts
    */
   template <typename T>
-  static inline T WToDbm ( T w ) { return (T) ( WToDbW<T> ( w * 1000.0 ) ); }
+  static inline T WToDbm ( T w )
+  {
+    return (T) ( WToDbW<T> ( w * 1000.0 ) );
+  }
 
   /**
    * \brief Get packet information in std::string for printing purposes
@@ -211,7 +240,7 @@ public:
   static inline uint32_t GetModulatedBits (SatEnums::SatModcod_t modcod)
   {
     switch (modcod)
-    {
+      {
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
       case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
@@ -252,15 +281,15 @@ public:
       case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
       case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
         {
-           return 5;
-           break;
-         }
+          return 5;
+          break;
+        }
       default:
         {
           NS_FATAL_ERROR ("Unsupported enum SatModcod_t!");
           break;
         }
-    }
+      }
     return 0;
   }
 
@@ -273,22 +302,22 @@ public:
   static inline double GetCodingRate (SatEnums::SatModcod_t modcod)
   {
     switch (modcod)
-    {
+      {
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
         {
-          return 1.0/3.0;
+          return 1.0 / 3.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
         {
-          return 1.0/2.0;
+          return 1.0 / 2.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_2_TO_3:
       case SatEnums::SAT_MODCOD_8PSK_2_TO_3:
       case SatEnums::SAT_MODCOD_16APSK_2_TO_3:
         {
-          return 2.0/3.0;
+          return 2.0 / 3.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_3_TO_4:
@@ -297,20 +326,20 @@ public:
       case SatEnums::SAT_MODCOD_32APSK_3_TO_4:
       case SatEnums::SAT_MODCOD_16QAM_3_TO_4:
         {
-          return 3.0/4.0;
+          return 3.0 / 4.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
       case SatEnums::SAT_MODCOD_8PSK_3_TO_5:
         {
-          return 3.0/5.0;
+          return 3.0 / 5.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_4_TO_5:
       case SatEnums::SAT_MODCOD_16APSK_4_TO_5:
       case SatEnums::SAT_MODCOD_32APSK_4_TO_5:
         {
-          return 4.0/5.0;
+          return 4.0 / 5.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_5_TO_6:
@@ -319,7 +348,7 @@ public:
       case SatEnums::SAT_MODCOD_32APSK_5_TO_6:
       case SatEnums::SAT_MODCOD_16QAM_5_TO_6:
         {
-          return 5.0/6.0;
+          return 5.0 / 6.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_8_TO_9:
@@ -327,14 +356,14 @@ public:
       case SatEnums::SAT_MODCOD_16APSK_8_TO_9:
       case SatEnums::SAT_MODCOD_32APSK_8_TO_9:
         {
-          return 8.0/9.0;
+          return 8.0 / 9.0;
           break;
         }
       case SatEnums::SAT_MODCOD_QPSK_9_TO_10:
       case SatEnums::SAT_MODCOD_8PSK_9_TO_10:
       case SatEnums::SAT_MODCOD_16APSK_9_TO_10:
         {
-          return 9.0/10.0;
+          return 9.0 / 10.0;
           break;
         }
       default:
@@ -342,7 +371,7 @@ public:
           NS_FATAL_ERROR ("Unsupported enum SatModcod_t!");
           break;
         }
-    }
+      }
     return 0.0;
   }
 
@@ -365,7 +394,7 @@ public:
     double relY = (dY / dX) * relX;
     return y0 + relY;
   }
-  
+
 private:
   /**
    * Destructor
@@ -373,7 +402,7 @@ private:
    * Made Pure Virtual because the class is not planned be instantiated or inherited
    *
    */
-  virtual ~SatUtils() = 0;
+  virtual ~SatUtils () = 0;
 };
 
 } // namespace ns3

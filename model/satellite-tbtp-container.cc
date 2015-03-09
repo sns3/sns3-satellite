@@ -40,33 +40,33 @@ NS_OBJECT_ENSURE_REGISTERED (SatTbtpContainer);
 TypeId
 SatTbtpContainer::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatTbtpContainer")
-      .SetParent<Object> ()
-      .AddConstructor<SatTbtpContainer>()
-      .AddAttribute ("MaxStoredTbtps",
-                     "Maximum amount of stored TBTPs",
-                     UintegerValue (100),
-                     MakeUintegerAccessor (&SatTbtpContainer::m_maxStoredTbtps),
-                     MakeUintegerChecker<uint32_t> ())
-    ;
-    return tid;
+  static TypeId tid = TypeId ("ns3::SatTbtpContainer")
+    .SetParent<Object> ()
+    .AddConstructor<SatTbtpContainer> ()
+    .AddAttribute ("MaxStoredTbtps",
+                   "Maximum amount of stored TBTPs",
+                   UintegerValue (100),
+                   MakeUintegerAccessor (&SatTbtpContainer::m_maxStoredTbtps),
+                   MakeUintegerChecker<uint32_t> ())
+  ;
+  return tid;
 }
 
 SatTbtpContainer::SatTbtpContainer ()
-:m_address (),
- m_maxStoredTbtps (100),
- m_rcvdTbtps (0),
- m_superFrameDuration (0)
+  : m_address (),
+    m_maxStoredTbtps (100),
+    m_rcvdTbtps (0),
+    m_superFrameDuration (0)
 {
   NS_FATAL_ERROR ("SatTbtpContainer::SatTbtpContainer - Constructor not in use");
 }
 
 SatTbtpContainer::SatTbtpContainer (Ptr<SatSuperframeSeq> seq)
-:m_address (),
- m_superframeSeq (seq),
- m_maxStoredTbtps (100),
- m_rcvdTbtps (0),
- m_superFrameDuration (seq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ())
+  : m_address (),
+    m_superframeSeq (seq),
+    m_maxStoredTbtps (100),
+    m_rcvdTbtps (0),
+    m_superFrameDuration (seq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ())
 {
 
 }
@@ -138,8 +138,8 @@ SatTbtpContainer::HasScheduledTimeSlots ()
 
       SatTbtpMessage::DaTimeSlotInfoItem_t info;
       for (TbtpMap_t::const_reverse_iterator it = m_tbtps.rbegin ();
-          it != m_tbtps.rend ();
-          ++it)
+           it != m_tbtps.rend ();
+           ++it)
         {
           info = it->second->GetDaTimeslots (m_address);
 
@@ -177,7 +177,7 @@ SatTbtpContainer::HasScheduledTimeSlots ()
                   uint8_t frameId = info.first;
                   Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
                   uint32_t wfId = (*(info.second.rbegin ()))->GetWaveFormId ();
-                  Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf()->GetWaveform (wfId);
+                  Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (wfId);
                   Time lastSlotDuration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
                   NS_LOG_INFO ("Superframe counter: " << it->second->GetSuperframeCounter () <<
@@ -190,7 +190,7 @@ SatTbtpContainer::HasScheduledTimeSlots ()
                    * how long to the future the time slot is, since the same method may be used for both
                    * CRDSA and SA, and we do not have any idea of what are their randomization intervals etc.
                    */
-                  if ((superframeStartTime + startTimeOffsetForLastSlot + lastSlotDuration) > Simulator::Now())
+                  if ((superframeStartTime + startTimeOffsetForLastSlot + lastSlotDuration) > Simulator::Now ())
                     {
                       hasScheduledTimeSlots = true;
                     }

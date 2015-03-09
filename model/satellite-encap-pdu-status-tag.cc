@@ -29,7 +29,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatEncapPduStatusTag);
 
 SatEncapPduStatusTag::SatEncapPduStatusTag ()
-:m_pduStatus (FULL_PDU)
+  : m_pduStatus (FULL_PDU)
 {
 }
 

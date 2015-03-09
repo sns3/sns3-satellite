@@ -34,7 +34,6 @@ namespace ns3 {
 class SatConstVariables
 {
 public:
-
   /**
    * \brief Constant definition for the speed of light in m/s
    */

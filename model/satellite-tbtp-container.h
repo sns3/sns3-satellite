@@ -39,7 +39,9 @@ namespace ns3 {
 class SortTimeSlots
 {
 public:
-  SortTimeSlots () {};
+  SortTimeSlots ()
+  {
+  }
 
   bool operator() (Ptr<SatTimeSlotConf> p1, Ptr<SatTimeSlotConf> p2)
   {
@@ -87,7 +89,6 @@ public:
   bool HasScheduledTimeSlots ();
 
 private:
-
   /**
    * \brief Function for removing the TBTPs which are in the past.
    */

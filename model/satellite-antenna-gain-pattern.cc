@@ -41,46 +41,46 @@ SatAntennaGainPattern::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatAntennaGainPattern")
     .SetParent<Object> ()
     .AddConstructor<SatAntennaGainPattern> ()
-    .AddAttribute("MinAcceptableAntennaGainDb", "Minimum acceptable antenna gain in dBs",
-                   DoubleValue(40.0),
-                   MakeDoubleAccessor(&SatAntennaGainPattern::m_minAcceptableAntennaGainInDb),
+    .AddAttribute ("MinAcceptableAntennaGainDb", "Minimum acceptable antenna gain in dBs",
+                   DoubleValue (40.0),
+                   MakeDoubleAccessor (&SatAntennaGainPattern::m_minAcceptableAntennaGainInDb),
                    MakeDoubleChecker<double> ())
-                   ;
+  ;
   return tid;
 }
 
 TypeId
 SatAntennaGainPattern::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 
 SatAntennaGainPattern::SatAntennaGainPattern ()
-:m_antennaPattern (),
- m_validPositions (),
- m_minAcceptableAntennaGainInDb (40.0),
- m_uniformRandomVariable (),
- m_latitudes (),
- m_longitudes (),
- m_minLat (0.0),
- m_minLon (0.0),
- m_maxLat (0.0),
- m_maxLon (0.0),
- m_latInterval (0.0),
- m_lonInterval (0.0),
- m_nanStrings ()
+  : m_antennaPattern (),
+    m_validPositions (),
+    m_minAcceptableAntennaGainInDb (40.0),
+    m_uniformRandomVariable (),
+    m_latitudes (),
+    m_longitudes (),
+    m_minLat (0.0),
+    m_minLon (0.0),
+    m_maxLat (0.0),
+    m_maxLon (0.0),
+    m_latInterval (0.0),
+    m_lonInterval (0.0),
+    m_nanStrings ()
 {
   // Do nothing here
 }
 
 SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
- :m_nanStrings(m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
+  : m_nanStrings (m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
 {
   // Attributes are needed already in construction phase:
   // - ConstructSelf call in constructor
   // - GetInstanceTypeId is needed to be implemented
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   ReadAntennaPatternFromFile (filePathName);
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
@@ -118,11 +118,11 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
   // Read a row
   *ifs >> lat >> lon >> gainString;
 
-  while (ifs->good())
+  while (ifs->good ())
     {
       // Validity of latitude and longitude
-      if (lat < -90.0 || lat > 90.0 ||
-          lon < -180.0 || lon > 180.0)
+      if (lat < -90.0 || lat > 90.0
+          || lon < -180.0 || lon > 180.0)
         {
           NS_FATAL_ERROR ("SatAntennaGainPattern::ReadAntennaPatternFromFile - unvalid latitude: " << lat << " or longitude. " << lon);
         }
@@ -130,29 +130,29 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
       // The antenna gain value is read to a string, so that we may check
       // that whether the value is NaN. If not, then the number is just converted
       // to a double.
-      if (find (m_nanStrings.begin(), m_nanStrings.end(), gainString) != m_nanStrings.end())
+      if (find (m_nanStrings.begin (), m_nanStrings.end (), gainString) != m_nanStrings.end ())
         {
           gainDouble = NAN;
         }
       else
         {
-          gainDouble = atof(gainString.c_str());
+          gainDouble = atof (gainString.c_str ());
 
           // Add the position to valid positions vector if the gain is
           // above a specified threshold.
           if ( gainDouble >= m_minAcceptableAntennaGainInDb )
             {
-              m_validPositions.push_back (std::make_pair(lat, lon));
+              m_validPositions.push_back (std::make_pair (lat, lon));
             }
         }
 
       // Collect the valid latitude values
-      if (!m_latitudes.empty() )
+      if (!m_latitudes.empty () )
         {
-          if (m_latitudes.back() != lat)
+          if (m_latitudes.back () != lat)
             {
               firstRowDone = true;
-              m_latInterval = lat - m_latitudes.back();
+              m_latInterval = lat - m_latitudes.back ();
               m_latitudes.push_back (lat);
             }
         }
@@ -162,11 +162,11 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
         }
 
       // Collect the valid longitude values
-      if (!m_longitudes.empty() )
+      if (!m_longitudes.empty () )
         {
-          if (!firstRowDone && m_longitudes.back() != lon)
+          if (!firstRowDone && m_longitudes.back () != lon)
             {
-              m_lonInterval = lon - m_longitudes.back();
+              m_lonInterval = lon - m_longitudes.back ();
               m_longitudes.push_back (lon);
             }
         }
@@ -176,7 +176,7 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
         }
 
       // If this is the first gain entry
-      if (rowVector.empty())
+      if (rowVector.empty ())
         {
           m_minLat = lat;
           m_minLon = lon;
@@ -208,10 +208,10 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 
   // At this point, the last row should not be stored, since the storing
   // happens every time the row changes. I.e. the last row is stored here!
-  NS_ASSERT( rowVector.size () == m_longitudes.size ());
+  NS_ASSERT ( rowVector.size () == m_longitudes.size ());
 
   m_antennaPattern.push_back (rowVector);
-  rowVector.clear();
+  rowVector.clear ();
 
   ifs->close ();
   delete ifs;
@@ -229,7 +229,7 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
   while (1)
     {
       // Get random position (=lower left corner of a grid) from the valid ones
-      ind = m_uniformRandomVariable->GetInteger (0, numPosGridPoints-1);
+      ind = m_uniformRandomVariable->GetInteger (0, numPosGridPoints - 1);
       lowerLeftCoord = m_validPositions[ind];
 
       // Test if the three other corners for interpolation are found.
@@ -266,7 +266,7 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
   // Pick a random position within a grid square
   double latOffset = m_uniformRandomVariable->GetValue (0.0, m_latInterval - 0.001);
   double lonOffset = m_uniformRandomVariable->GetValue (0.0, m_lonInterval - 0.001);
-  GeoCoordinate coord (lowerLeftCoord.first+latOffset, lowerLeftCoord.second+lonOffset, 0.0);
+  GeoCoordinate coord (lowerLeftCoord.first + latOffset, lowerLeftCoord.second + lonOffset, 0.0);
 
   return coord;
 }
@@ -274,32 +274,32 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 
 double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 {
-  NS_LOG_FUNCTION (this << coord.GetLatitude() << coord.GetLongitude());
+  NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
   // Get the requested position {latitude, longitude}
   double latitude = coord.GetLatitude ();
   double longitude = coord.GetLongitude ();
 
   // Given {latitude, longitude} has to be inside the min/max latitude/longitude values
-  if (m_minLat > latitude ||
-      latitude > m_maxLat ||
-      m_minLon > longitude ||
-      longitude > m_maxLon)
+  if (m_minLat > latitude
+      || latitude > m_maxLat
+      || m_minLon > longitude
+      || longitude > m_maxLon)
     {
       NS_FATAL_ERROR (this << " given latitude and longitude out of range!");
     }
 
   // Calculate the minimum grid point {minLatIndex, minLonIndex} for the given {latitude, longitude} point
-  uint32_t minLatIndex = (uint32_t)(std::floor(std::abs(latitude - m_minLat) / m_latInterval));
-  uint32_t minLonIndex = (uint32_t)(std::floor(std::abs(longitude - m_minLon) / m_lonInterval));
+  uint32_t minLatIndex = (uint32_t)(std::floor (std::abs (latitude - m_minLat) / m_latInterval));
+  uint32_t minLonIndex = (uint32_t)(std::floor (std::abs (longitude - m_minLon) / m_lonInterval));
 
   // All the values within the grid box has to be valid! If UT is placed (or
   // is moving outside) the valid simulation area, the simulation will crash
   // to a fatal error.
-  if (isnan(m_antennaPattern[minLatIndex][minLonIndex]) ||
-      isnan(m_antennaPattern[minLatIndex][minLonIndex+1]) ||
-      isnan(m_antennaPattern[minLatIndex+1][minLonIndex]) ||
-      isnan(m_antennaPattern[minLatIndex+1][minLonIndex+1]))
+  if (isnan (m_antennaPattern[minLatIndex][minLonIndex])
+      || isnan (m_antennaPattern[minLatIndex][minLonIndex + 1])
+      || isnan (m_antennaPattern[minLatIndex + 1][minLonIndex])
+      || isnan (m_antennaPattern[minLatIndex + 1][minLonIndex + 1]))
     {
       NS_FATAL_ERROR (this << ", some value(s) of the interpolated grid point(s) is/are NAN!");
     }
@@ -312,14 +312,14 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
    */
 
   // Longitude direction with latitude minLatIndex
-  double upperLonShare = (m_longitudes[minLonIndex+1] - longitude) / m_lonInterval;
+  double upperLonShare = (m_longitudes[minLonIndex + 1] - longitude) / m_lonInterval;
   double lowerLonShare = (longitude - m_longitudes[minLonIndex]) / m_lonInterval;
 
   // Change the gains to linear values , because the interpolation is done in linear domain.
   double G11 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex][minLonIndex] );
-  double G12 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex][minLonIndex+1] );
-  double G21 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex+1][minLonIndex] );
-  double G22 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex+1][minLonIndex+1] );
+  double G12 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex][minLonIndex + 1] );
+  double G21 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex + 1][minLonIndex] );
+  double G22 = SatUtils::DbToLinear ( m_antennaPattern[minLatIndex + 1][minLonIndex + 1] );
 
   // Longitude direction with latitude minLatIndex
   double valLatLower = upperLonShare * G11 + lowerLonShare * G12;
@@ -328,8 +328,8 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   double valLatUpper = upperLonShare * G21 + lowerLonShare * G22;
 
   // Latitude direction with longitude "longitude"
-  double gain = ((m_latitudes[minLatIndex+1] - latitude) / m_latInterval) * valLatLower +
-      ((latitude - m_latitudes[minLatIndex]) / m_latInterval) * valLatUpper;
+  double gain = ((m_latitudes[minLatIndex + 1] - latitude) / m_latInterval) * valLatLower +
+    ((latitude - m_latitudes[minLatIndex]) / m_latInterval) * valLatUpper;
 
   /*
   std::cout << "minLonIndex = " << minLonIndex <<

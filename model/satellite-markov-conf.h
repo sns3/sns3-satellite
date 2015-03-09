@@ -44,7 +44,6 @@ namespace ns3 {
 class SatMarkovConf : public Object
 {
 public:
-
   /**
    * Possible types of Markov state faders
    */
@@ -153,7 +152,6 @@ public:
   void DoDispose ();
 
 private:
-
   /**
    * \brief Number of parameter sets
    */

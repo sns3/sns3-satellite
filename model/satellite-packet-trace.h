@@ -38,7 +38,6 @@ namespace ns3 {
 class SatPacketTrace : public Object
 {
 public:
-
   /**
    * \brief Constructor
    */
@@ -75,7 +74,6 @@ public:
                       std::string packetInfo);
 
 private:
-
   /**
    * \brief Print header to the packet trace log
    */

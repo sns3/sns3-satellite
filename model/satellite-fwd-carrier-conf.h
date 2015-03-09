@@ -33,7 +33,6 @@ namespace ns3 {
 class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
 {
 public:
-
   /**
    * Default constructor for SatFwdCarrierConf
    */
@@ -58,21 +57,30 @@ public:
    *
    * \return The bandwidth of Forward Link Carrier in hertz.
    */
-  inline double GetAllocatedBandwidthInHz () const { return m_allocatedBandwidthInHz; }
+  inline double GetAllocatedBandwidthInHz () const
+  {
+    return m_allocatedBandwidthInHz;
+  }
 
   /**
    * Get occupied bandwidth of Forward Link Carrier.
    *
    * \return The occupied bandwidth of Forward Link Carrier in hertz.
    */
-  inline double GetOccupiedBandwidthInHz () const { return m_occupiedBandwidthInHz; }
+  inline double GetOccupiedBandwidthInHz () const
+  {
+    return m_occupiedBandwidthInHz;
+  }
 
   /**
    * Get occupied bandwidth of Forward Link Carrier.
    *
    * \return The occupied bandwidth of Forward Link Carrier in hertz.
    */
-  inline double GetEffectiveBandwidthInHz () const { return m_effectiveBandwidthInHz; }
+  inline double GetEffectiveBandwidthInHz () const
+  {
+    return m_effectiveBandwidthInHz;
+  }
 
 private:
   double m_allocatedBandwidthInHz;

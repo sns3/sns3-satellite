@@ -54,7 +54,6 @@ public:
   virtual int64_t AssignStreams (int64_t stream);
 
 private:
-
   /*
    * This is the flag for indicating that when calling method GetNext (defined by class PositionAlocator)
    * is returned Vector filled by longitude (in x), latitude (in y) and altitude (in z)
@@ -89,8 +88,14 @@ public:
    */
   virtual GeoCoordinate GetNextGeoPosition (void) const;
 
-  inline virtual void SetToBegin () { m_current = m_positions.begin (); }
-  inline virtual uint32_t GetCount () { return m_positions.size (); }
+  inline virtual void SetToBegin ()
+  {
+    m_current = m_positions.begin ();
+  }
+  inline virtual uint32_t GetCount ()
+  {
+    return m_positions.size ();
+  }
 
 private:
   std::vector<GeoCoordinate> m_positions;
@@ -105,25 +110,25 @@ private:
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {
 public:
-   static TypeId GetTypeId (void);
-   SatRandomBoxPositionAllocator ();
-   virtual ~SatRandomBoxPositionAllocator ();
+  static TypeId GetTypeId (void);
+  SatRandomBoxPositionAllocator ();
+  virtual ~SatRandomBoxPositionAllocator ();
 
-   void SetLatitude (Ptr<RandomVariableStream> latitude);
-   void SetLongitude (Ptr<RandomVariableStream> longitude);
-   void SetAltitude (Ptr<RandomVariableStream> altitude);
+  void SetLatitude (Ptr<RandomVariableStream> latitude);
+  void SetLongitude (Ptr<RandomVariableStream> longitude);
+  void SetAltitude (Ptr<RandomVariableStream> altitude);
 
-   /**
-    * \brief Get next position
-    * \return The next chosen position.
-    */
-   virtual GeoCoordinate GetNextGeoPosition (void) const;
-   virtual int64_t AssignStreams (int64_t stream);
+  /**
+   * \brief Get next position
+   * \return The next chosen position.
+   */
+  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  virtual int64_t AssignStreams (int64_t stream);
 
- private:
-   Ptr<RandomVariableStream> m_latitude;
-   Ptr<RandomVariableStream> m_longitude;
-   Ptr<RandomVariableStream> m_altitude;
+private:
+  Ptr<RandomVariableStream> m_latitude;
+  Ptr<RandomVariableStream> m_longitude;
+  Ptr<RandomVariableStream> m_altitude;
 };
 
 /**
@@ -154,7 +159,6 @@ public:
   virtual GeoCoordinate GetNextGeoPosition (void) const;
   virtual int64_t AssignStreams (int64_t stream);
 private:
-
   /**
    * Max number of tries to pick a random position for a UT.
    */

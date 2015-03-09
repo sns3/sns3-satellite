@@ -53,7 +53,7 @@ SatPositionAllocator::GetTypeId (void)
 }
 
 SatPositionAllocator::SatPositionAllocator ()
- :m_GetAsGeoCoordinates(true)
+  : m_GetAsGeoCoordinates (true)
 {
 }
 
@@ -63,7 +63,7 @@ SatPositionAllocator::~SatPositionAllocator ()
 }
 
 Vector
-SatPositionAllocator::GetNext() const
+SatPositionAllocator::GetNext () const
 {
   NS_LOG_LOGIC (this);
 
@@ -71,11 +71,11 @@ SatPositionAllocator::GetNext() const
 
   if ( m_GetAsGeoCoordinates )
     {
-       return Vector(pos.GetLatitude(), pos.GetLongitude(), pos.GetAltitude());
+      return Vector (pos.GetLatitude (), pos.GetLongitude (), pos.GetAltitude ());
     }
   else
     {
-      return pos.ToVector();
+      return pos.ToVector ();
     }
 }
 
@@ -216,27 +216,27 @@ SatSpotBeamPositionAllocator::GetTypeId (void)
                    StringValue ("ns3::UniformRandomVariable[Min=0.0]"),
                    MakePointerAccessor (&SatSpotBeamPositionAllocator::m_altitude),
                    MakePointerChecker<RandomVariableStream> ())
-    .AddAttribute("MinElevationAngleInDegForUT",
-                  "Minimum accepted elevation angle in degrees for UTs",
-                  DoubleValue(5.00),
-                  MakeDoubleAccessor(&SatSpotBeamPositionAllocator::m_minElevationAngleInDeg),
-                  MakeDoubleChecker<double> ())
-                 ;
+    .AddAttribute ("MinElevationAngleInDegForUT",
+                   "Minimum accepted elevation angle in degrees for UTs",
+                   DoubleValue (5.00),
+                   MakeDoubleAccessor (&SatSpotBeamPositionAllocator::m_minElevationAngleInDeg),
+                   MakeDoubleChecker<double> ())
+  ;
   return tid;
 }
 
 SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator ()
-:m_targetBeamId (0),
- m_minElevationAngleInDeg (1)
+  : m_targetBeamId (0),
+    m_minElevationAngleInDeg (1)
 {
 
 }
 
 SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patterns, GeoCoordinate geoPos)
- :m_targetBeamId (beamId),
-  m_minElevationAngleInDeg (1),
-  m_antennaGainPatterns (patterns),
-  m_geoPos (geoPos)
+  : m_targetBeamId (beamId),
+    m_minElevationAngleInDeg (1),
+    m_antennaGainPatterns (patterns),
+    m_geoPos (geoPos)
 {
 }
 
@@ -258,7 +258,7 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition () const
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t bestBeamId (std::numeric_limits<uint32_t>::max());
+  uint32_t bestBeamId (std::numeric_limits<uint32_t>::max ());
   Ptr<SatAntennaGainPattern> agp = m_antennaGainPatterns->GetAntennaGainPattern (m_targetBeamId);
   uint32_t tries (0);
   GeoCoordinate pos;
@@ -269,14 +269,14 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition () const
   geoMob->SetGeoPosition (m_geoPos);
   Ptr<SatMobilityObserver> utObserver = CreateObject<SatMobilityObserver> (utMob, geoMob);
 
-  double elevation (std::numeric_limits<double>::max());
+  double elevation (std::numeric_limits<double>::max ());
 
   // Try until
   // - we have a valid position
   // - the MAX_TRIES have been exceeded
   // - elevation is NOT NaN
   // - elevation is not higher than threshold
-  while ( ( bestBeamId != m_targetBeamId || isnan(elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
+  while ( ( bestBeamId != m_targetBeamId || isnan (elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
     {
       pos = agp->GetValidRandomPosition ();
       bestBeamId = m_antennaGainPatterns->GetBestBeamId (pos);
@@ -285,7 +285,7 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition () const
       utMob->SetGeoPosition (pos);
 
       // Calculate the elevation angle
-      elevation = utObserver->GetElevationAngle();
+      elevation = utObserver->GetElevationAngle ();
 
       ++tries;
     }
@@ -299,9 +299,9 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition () const
   // Set a random altitude
   pos.SetAltitude (m_altitude->GetValue ());
 
-  if (pos.GetLatitude() < -90.0 || pos.GetLatitude() > 90.0 ||
-      pos.GetLongitude() < -180.0 || pos.GetLongitude() > 180.0 ||
-      elevation < m_minElevationAngleInDeg || elevation > 90.0)
+  if (pos.GetLatitude () < -90.0 || pos.GetLatitude () > 90.0
+      || pos.GetLongitude () < -180.0 || pos.GetLongitude () > 180.0
+      || elevation < m_minElevationAngleInDeg || elevation > 90.0)
     {
       NS_FATAL_ERROR ("SatSpotBeamPositionAllocator::GetNextGeoPosition - unvalid selected position!");
     }

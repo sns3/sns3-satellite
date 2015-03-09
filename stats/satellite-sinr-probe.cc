@@ -39,7 +39,7 @@ NS_LOG_COMPONENT_DEFINE ("SatSinrProbe");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatSinrProbe)
-  ;
+;
 
 TypeId
 SatSinrProbe::GetTypeId ()

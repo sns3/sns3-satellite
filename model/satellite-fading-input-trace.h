@@ -34,7 +34,6 @@ namespace ns3 {
 class SatFadingInputTrace : public SatBaseFading
 {
 public:
-
   /**
    * \brief Constructor
    */
@@ -65,7 +64,6 @@ public:
   double DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType);
 
 private:
-
   /**
    * \brief Pointer to input trace container
    */

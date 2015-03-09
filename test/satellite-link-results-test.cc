@@ -31,7 +31,7 @@
 #include <ns3/log.h>
 #include <ns3/ptr.h>
 
-NS_LOG_COMPONENT_DEFINE("TestLinkResult");
+NS_LOG_COMPONENT_DEFINE ("TestLinkResult");
 
 #define SAT_LINK_RESULTS_PRECISION 0.00011
 // TODO precision loss occurs somewhere, causing the test to fail if this is set to 0.00010
@@ -91,9 +91,9 @@ SatLinkResultsDvbRcs2TestCase::DoRun ()
   NS_LOG_FUNCTION (this << m_waveformId << m_sinrDb << m_bler);
   double actualBler = m_linkResults->GetBler (m_waveformId, m_sinrDb);
   NS_LOG_DEBUG (this << " actualBler=" << actualBler);
-  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
-                            "Difference of " << (actualBler - m_bler)
-                                             << " from reference BLER" );
+  NS_TEST_ASSERT_MSG_EQ_TOL (actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
+                             "Difference of " << (actualBler - m_bler)
+                                              << " from reference BLER" );
 }
 
 
@@ -151,9 +151,9 @@ SatLinkResultsDvbS2TestCase::DoRun ()
   NS_LOG_FUNCTION (this << m_modcod << m_sinrDb << m_bler);
   double actualBler = m_linkResults->GetBler (m_modcod, SatEnums::NORMAL_FRAME, m_sinrDb);
   NS_LOG_DEBUG (this << " actualBler=" << actualBler);
-  NS_TEST_ASSERT_MSG_EQ_TOL(actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
-                            "Difference of " << (actualBler - m_bler)
-                                             << " from reference BLER" );
+  NS_TEST_ASSERT_MSG_EQ_TOL (actualBler, m_bler, SAT_LINK_RESULTS_PRECISION,
+                             "Difference of " << (actualBler - m_bler)
+                                              << " from reference BLER" );
 }
 
 

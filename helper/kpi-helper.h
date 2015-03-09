@@ -48,10 +48,10 @@ namespace ns3 {
 class KpiHelper
 {
 public:
-
   // Enumerator used for for configuring the KpiHelper for
   // RTN and FWD link applications
-  typedef enum {
+  typedef enum
+  {
     KPI_FWD = 0,
     KPI_RTN = 1
   } KpiMode_t;
@@ -103,7 +103,6 @@ public:
 
 
 protected:
-
   /**
    * Add a client counter for calculating user specific
    * statistics.

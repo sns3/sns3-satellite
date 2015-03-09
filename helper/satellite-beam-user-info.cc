@@ -26,7 +26,7 @@ NS_LOG_COMPONENT_DEFINE ("SatBeamUserInfo");
 
 namespace ns3 {
 
-SatBeamUserInfo::SatBeamUserInfo()
+SatBeamUserInfo::SatBeamUserInfo ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -49,7 +49,7 @@ SatBeamUserInfo::GetUtCount ()
 {
   NS_LOG_FUNCTION (this);
 
-  return m_userCount.size();
+  return m_userCount.size ();
 }
 
 uint32_t
@@ -57,7 +57,7 @@ SatBeamUserInfo::GetUtUserCount (uint32_t utIndex)
 {
   NS_LOG_FUNCTION (this << utIndex);
 
-  NS_ASSERT(utIndex < m_userCount.size());
+  NS_ASSERT (utIndex < m_userCount.size ());
 
   return m_userCount[utIndex];
 }

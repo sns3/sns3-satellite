@@ -81,13 +81,18 @@ public:
    */
   class SatFrameAllocReqItem
   {
-  public:
+public:
     uint32_t  m_craBytes;
     uint32_t  m_minRbdcBytes;
     uint32_t  m_rbdcBytes;
     uint32_t  m_vbdcBytes;
 
-    SatFrameAllocReqItem () : m_craBytes (0), m_minRbdcBytes (0), m_rbdcBytes (0), m_vbdcBytes (0) {}
+    SatFrameAllocReqItem () : m_craBytes (0),
+                              m_minRbdcBytes (0),
+                              m_rbdcBytes (0),
+                              m_vbdcBytes (0)
+    {
+    }
   };
 
   /**
@@ -101,20 +106,27 @@ public:
    */
   class SatFrameAllocReq
   {
-  public:
+public:
     bool                              m_generateCtrlSlot;
     double                            m_cno;
     Address                           m_address;
     SatFrameAllocReqItemContainer_t   m_reqPerRc;
 
-    SatFrameAllocReq () : m_generateCtrlSlot (false), m_cno (NAN) {}
+    SatFrameAllocReq () : m_generateCtrlSlot (false),
+                          m_cno (NAN)
+    {
+    }
 
     /**
      * Construct SatFrameAllocReq
      *
      * \param req Allocation request per RC/CC
      */
-    SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : m_generateCtrlSlot (false), m_cno (NAN), m_reqPerRc (req) { }
+    SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : m_generateCtrlSlot (false),
+                                                             m_cno (NAN),
+                                                             m_reqPerRc (req)
+    {
+    }
   };
 
   /**
@@ -126,12 +138,12 @@ public:
    * Enum for CC levels
    */
   typedef enum
-    {
-      CC_LEVEL_CRA,          //!< CC level CRA
-      CC_LEVEL_CRA_MIN_RBDC, //!< CC level CRA + Minimum RBDC
-      CC_LEVEL_CRA_RBDC,     //!< CC level CRA + RBDC
-      CC_LEVEL_CRA_RBDC_VBDC,//!< CC level CRA + RBDC + VBDC
-    } CcLevel_t;
+  {
+    CC_LEVEL_CRA,            //!< CC level CRA
+    CC_LEVEL_CRA_MIN_RBDC,   //!< CC level CRA + Minimum RBDC
+    CC_LEVEL_CRA_RBDC,       //!< CC level CRA + RBDC
+    CC_LEVEL_CRA_RBDC_VBDC,  //!< CC level CRA + RBDC + VBDC
+  } CcLevel_t;
 
   /**
    * Default constructor (not in used)
@@ -152,14 +164,20 @@ public:
    *
    * \return minimum payload of a carrier in bytes
    */
-  inline uint32_t GetCarrierMinPayloadInBytes () const { return m_frameConf->GetCarrierMinPayloadInBytes (); }
+  inline uint32_t GetCarrierMinPayloadInBytes () const
+  {
+    return m_frameConf->GetCarrierMinPayloadInBytes ();
+  }
 
   /**
    * Get the most robust waveform used by this frame allocator.
    *
    * \return the most robust waveform
    */
-  inline Ptr<SatWaveform> GetMostRobustWaveform () const { return m_mostRobustWaveform; }
+  inline Ptr<SatWaveform> GetMostRobustWaveform () const
+  {
+    return m_mostRobustWaveform;
+  }
 
   /**
    * Reset frame allocator.
@@ -221,7 +239,7 @@ private:
    */
   class SatFrameAllocInfoItem
   {
-  public:
+public:
     double  m_craSymbols;
     double  m_minRbdcSymbols;
     double  m_rbdcSymbols;
@@ -230,14 +248,22 @@ private:
     /**
      * Construct SatFrameAllocInfoItem.
      */
-    SatFrameAllocInfoItem () : m_craSymbols (0.0), m_minRbdcSymbols (0.0), m_rbdcSymbols (0.0), m_vbdcSymbols (0.0) {}
+    SatFrameAllocInfoItem () : m_craSymbols (0.0),
+                               m_minRbdcSymbols (0.0),
+                               m_rbdcSymbols (0.0),
+                               m_vbdcSymbols (0.0)
+    {
+    }
 
     /**
      * Get symbols allocated/requested by this item.
      *
      * \return Total symbols allocated/requested.
      */
-    double GetTotalSymbols () { return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols); }
+    double GetTotalSymbols ()
+    {
+      return (m_craSymbols + m_rbdcSymbols + m_vbdcSymbols);
+    }
   };
 
   /**
@@ -252,7 +278,7 @@ private:
    */
   class SatFrameAllocInfo
   {
-  public:
+public:
     bool    m_ctrlSlotPresent;
     double  m_craSymbols;
     double  m_minRbdcSymbols;
@@ -329,13 +355,13 @@ private:
    */
   class CcReqCompare
   {
-  public:
+public:
     /**
      * Definition for different comparison types.
      */
     typedef enum
     {
-      CC_TYPE_MIN_RBDC,//!< CC_TYPE_MIN_RBDC
+      CC_TYPE_MIN_RBDC, //!< CC_TYPE_MIN_RBDC
       CC_TYPE_RBDC,    //!< CC_TYPE_RBDC
       CC_TYPE_VBDC,    //!< CC_TYPE_VBDC
     } CcReqType_t;
@@ -357,7 +383,7 @@ private:
      */
     bool operator() (RcAllocItem_t rcAlloc1, RcAllocItem_t rcAlloc2);
 
-  private:
+private:
     /**
      * Reference to UT allocation container
      */

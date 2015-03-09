@@ -30,17 +30,17 @@ NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTrace");
 namespace ns3 {
 
 
-SatFadingExternalInputTrace::SatFadingExternalInputTrace () :
-  m_traceFileType (),
-  m_startTime (),
-  m_timeInterval ()
+SatFadingExternalInputTrace::SatFadingExternalInputTrace ()
+  : m_traceFileType (),
+    m_startTime (),
+    m_timeInterval ()
 {
   NS_FATAL_ERROR ("SatFadingExternalInputTrace::SatFadingExternalInputTrace - Constructor not in use");
 }
 
-SatFadingExternalInputTrace::SatFadingExternalInputTrace (TraceFileType_e type, std::string fileName) :
-  m_startTime (-1.0),
-  m_timeInterval (-1.0)
+SatFadingExternalInputTrace::SatFadingExternalInputTrace (TraceFileType_e type, std::string fileName)
+  : m_startTime (-1.0),
+    m_timeInterval (-1.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -60,7 +60,7 @@ void SatFadingExternalInputTrace::ReadTrace (std::string filePathName)
   NS_LOG_FUNCTION (this << filePathName);
 
   // READ FROM THE SPECIFIED INPUT FILE
-  std::ifstream *ifs = new std::ifstream (filePathName.c_str (), std::ios::in|std::ios::binary);
+  std::ifstream *ifs = new std::ifstream (filePathName.c_str (), std::ios::in | std::ios::binary);
 
   if (!ifs->is_open ())
     {
@@ -81,7 +81,7 @@ void SatFadingExternalInputTrace::ReadTrace (std::string filePathName)
   float temp;
   int32_t count (0);
   std::vector<float> values;
-  ifs->read((char*)&temp, sizeof(float));
+  ifs->read ((char*)&temp, sizeof(float));
   m_startTime = temp;
 
   // While state is good
@@ -92,12 +92,12 @@ void SatFadingExternalInputTrace::ReadTrace (std::string filePathName)
 
       // Read the new value
       ++count;
-      ifs->read((char*)&temp, sizeof(float));
+      ifs->read ((char*)&temp, sizeof(float));
 
       // Handle previous value
       if (count % columns == 0)
         {
-          NS_ASSERT (values.size() == columns);
+          NS_ASSERT (values.size () == columns);
 
           m_traceVector.push_back (values);
           values.clear ();
@@ -109,7 +109,7 @@ void SatFadingExternalInputTrace::ReadTrace (std::string filePathName)
             }
         }
     }
-  ifs->close();
+  ifs->close ();
   delete ifs;
 }
 
@@ -127,23 +127,23 @@ SatFadingExternalInputTrace::GetFading () const
     }
 
   // Calculate the index to the time sample just before current time
-  uint32_t lowerIndex = (uint32_t)(std::floor(std::abs(simTime - m_startTime) / m_timeInterval));
+  uint32_t lowerIndex = (uint32_t)(std::floor (std::abs (simTime - m_startTime) / m_timeInterval));
 
-  if (lowerIndex >= m_traceVector.size())
+  if (lowerIndex >= m_traceVector.size ())
     {
       NS_LOG_ERROR (this << " calculated index exceeds trace file size!");
     }
 
   float lowerKey = m_traceVector.at (lowerIndex).at (TIME_INDEX);
-  float upperKey = m_traceVector.at (lowerIndex+1).at (TIME_INDEX);
+  float upperKey = m_traceVector.at (lowerIndex + 1).at (TIME_INDEX);
 
   // Interpolation in linear domain
   float lowerVal = SatUtils::DbToLinear (m_traceVector.at (lowerIndex).at (FADING_INDEX));
-  float upperVal = SatUtils::DbToLinear (m_traceVector.at (lowerIndex+1).at (FADING_INDEX));
+  float upperVal = SatUtils::DbToLinear (m_traceVector.at (lowerIndex + 1).at (FADING_INDEX));
 
   // y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
   double fading = lowerVal + (upperVal - lowerVal)
-      * (simTime - lowerKey) / (upperKey - lowerKey);
+    * (simTime - lowerKey) / (upperKey - lowerKey);
 
   /*
   std::cout << "Now: " << simTime <<
@@ -171,8 +171,8 @@ SatFadingExternalInputTrace::TestFadingTrace () const
     {
       if (prevTime > 0)
         {
-          currTime = cit->at(TIME_INDEX);
-          double diff = std::abs( std::abs(currTime - prevTime) - m_timeInterval);
+          currTime = cit->at (TIME_INDEX);
+          double diff = std::abs ( std::abs (currTime - prevTime) - m_timeInterval);
 
           // Test that the the time samples are from constant interval and
           // the time samples are always increasing.

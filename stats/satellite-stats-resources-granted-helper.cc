@@ -105,7 +105,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
             InstallProbe (*it, &ScalarCollector::TraceSinkUinteger32);
           }
@@ -131,7 +131,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
             InstallProbe (*it, &UnitConversionCollector::TraceSinkUinteger32);
           }
@@ -174,7 +174,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
             InstallProbe (*it, &DistributionCollector::TraceSinkUinteger32);
           }
@@ -218,7 +218,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
             InstallProbe (*it, &UnitConversionCollector::TraceSinkUinteger32);
           }
@@ -268,7 +268,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
 
         // Setup a probe in each UT MAC.
         NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+        for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
           {
             InstallProbe (*it, &DistributionCollector::TraceSinkUinteger32);
           }
@@ -287,7 +287,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
 template<typename R, typename C, typename P>
 void
 SatStatsResourcesGrantedHelper::InstallProbe (Ptr<Node> utNode,
-                                              R (C::*collectorTraceSink) (P, P))
+                                              R (C::*collectorTraceSink)(P, P))
 {
   NS_LOG_FUNCTION (this << utNode);
 

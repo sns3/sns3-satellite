@@ -47,7 +47,6 @@ namespace ns3 {
 class CbrKpiHelper : public KpiHelper
 {
 public:
-
   CbrKpiHelper (KpiHelper::KpiMode_t mode);
   virtual ~CbrKpiHelper ();
 

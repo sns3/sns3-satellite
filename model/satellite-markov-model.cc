@@ -30,13 +30,13 @@ NS_LOG_COMPONENT_DEFINE ("SatMarkovModel");
 TypeId SatMarkovModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatMarkovModel")
-      .SetParent<Object> ()
-      .AddConstructor<SatMarkovModel> ();
+    .SetParent<Object> ()
+    .AddConstructor<SatMarkovModel> ();
   return tid;
 }
 
-SatMarkovModel::SatMarkovModel () :
-    m_probabilities (new double[3 * 3]),
+SatMarkovModel::SatMarkovModel ()
+  : m_probabilities (new double[3 * 3]),
     m_numOfStates (3),
     m_currentState (0)
 {
@@ -45,8 +45,8 @@ SatMarkovModel::SatMarkovModel () :
   NS_FATAL_ERROR ("SatMarkovModel::SatMarkovModel - Constructor not in use");
 }
 
-SatMarkovModel::SatMarkovModel (uint32_t numOfStates, uint32_t initialState) :
-    m_probabilities (new double[numOfStates * numOfStates]),
+SatMarkovModel::SatMarkovModel (uint32_t numOfStates, uint32_t initialState)
+  : m_probabilities (new double[numOfStates * numOfStates]),
     m_numOfStates (numOfStates),
     m_currentState (initialState)
 {
@@ -76,7 +76,7 @@ SatMarkovModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  Object::DoDispose();
+  Object::DoDispose ();
 }
 
 void
@@ -125,7 +125,7 @@ SatMarkovModel::DoTransition ()
       total += m_probabilities[m_currentState * m_numOfStates + i];
     }
 
-  if ( ( fabs(total - 1.0) > std::numeric_limits<double>::epsilon ()) )
+  if ( ( fabs (total - 1.0) > std::numeric_limits<double>::epsilon ()) )
     {
       NS_FATAL_ERROR ("SatMarkovModel::DoTransition - Probability sum does not match");
     }

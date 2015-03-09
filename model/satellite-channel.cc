@@ -48,24 +48,24 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
- : m_fwdMode (SatChannel::ALL_BEAMS),
-   m_phyRxContainer (),
-   m_channelType (SatEnums::UNKNOWN_CH),
-   m_carrierFreqConverter (),
-   m_freqId (),
-   m_propagationDelay (),
-   m_freeSpaceLoss (),
-   m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
-   /*
-    * Currently, the Rx power calculation mode is fully independent of other
-    * possible satellite network configurations, e.g. fading, antenna patterns.
-    * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
-    * configurations. If using input Rx trace, there is no need to enable e.g. Markov
-    * fading, nor antenna patterns.
-    */
-   m_enableRxPowerOutputTrace (false),
-   m_enableFadingOutputTrace (false),
-   m_enableExternalFadingInputTrace (false)
+  : m_fwdMode (SatChannel::ALL_BEAMS),
+    m_phyRxContainer (),
+    m_channelType (SatEnums::UNKNOWN_CH),
+    m_carrierFreqConverter (),
+    m_freqId (),
+    m_propagationDelay (),
+    m_freeSpaceLoss (),
+    m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
+    /*
+     * Currently, the Rx power calculation mode is fully independent of other
+     * possible satellite network configurations, e.g. fading, antenna patterns.
+     * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
+     * configurations. If using input Rx trace, there is no need to enable e.g. Markov
+     * fading, nor antenna patterns.
+     */
+    m_enableRxPowerOutputTrace (false),
+    m_enableFadingOutputTrace (false),
+    m_enableExternalFadingInputTrace (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -90,27 +90,27 @@ SatChannel::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatChannel")
     .SetParent<Channel> ()
     .AddConstructor<SatChannel> ()
-    .AddAttribute( "EnableRxPowerOutputTrace",
-                   "Enable Rx power output trace.",
+    .AddAttribute ( "EnableRxPowerOutputTrace",
+                    "Enable Rx power output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatChannel::m_enableRxPowerOutputTrace),
                     MakeBooleanChecker ())
-    .AddAttribute( "EnableFadingOutputTrace",
-                   "Enable fading output trace.",
+    .AddAttribute ( "EnableFadingOutputTrace",
+                    "Enable fading output trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatChannel::m_enableFadingOutputTrace),
                     MakeBooleanChecker ())
-    .AddAttribute( "EnableExternalFadingInputTrace",
-                   "Enable external fading input trace.",
+    .AddAttribute ( "EnableExternalFadingInputTrace",
+                    "Enable external fading input trace.",
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatChannel::m_enableExternalFadingInputTrace),
                     MakeBooleanChecker ())
     .AddAttribute ("RxPowerCalculationMode",
                    "Rx Power calculation mode",
-                    EnumValue (SatEnums::RX_PWR_CALCULATION),
-                    MakeEnumAccessor (&SatChannel::m_rxPowerCalculationMode),
-                    MakeEnumChecker (SatEnums::RX_PWR_CALCULATION, "RxPowerCalculation",
-                                     SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
+                   EnumValue (SatEnums::RX_PWR_CALCULATION),
+                   MakeEnumAccessor (&SatChannel::m_rxPowerCalculationMode),
+                   MakeEnumChecker (SatEnums::RX_PWR_CALCULATION, "RxPowerCalculation",
+                                    SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
     .AddAttribute ("ForwardingMode",
                    "Channel forwarding mode.",
                    EnumValue (SatChannel::ALL_BEAMS),
@@ -118,7 +118,7 @@ SatChannel::GetTypeId (void)
                    MakeEnumChecker (SatChannel::ONLY_DEST_NODE, "OnlyDestNode",
                                     SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
                                     SatChannel::ALL_BEAMS, "AllBeams"))
-     ;
+  ;
   return tid;
 }
 
@@ -149,7 +149,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
   NS_ASSERT_MSG (txParams->m_phyTx, "NULL phyTx");
 
   switch (m_fwdMode)
-  {
+    {
     /**
      * The packet shall be received by only by the receivers to whom this transmission
      * is intended to.
@@ -160,56 +160,56 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
       {
         // For all receivers
         for (PhyRxContainer::const_iterator rxPhyIterator = m_phyRxContainer.begin ();
-            rxPhyIterator != m_phyRxContainer.end ();
-            ++rxPhyIterator)
+             rxPhyIterator != m_phyRxContainer.end ();
+             ++rxPhyIterator)
           {
             // If the same beam
-            if ( (*rxPhyIterator)->GetBeamId() == txParams->m_beamId )
+            if ( (*rxPhyIterator)->GetBeamId () == txParams->m_beamId )
               {
                 switch (m_channelType)
                   {
-                    // If the destination is satellite
-                    case SatEnums::FORWARD_FEEDER_CH:
-                    case SatEnums::RETURN_USER_CH:
-                      {
-                        // The packet burst is passed on to the satellite receiver
-                        ScheduleRx (txParams, *rxPhyIterator);
-                        break;
-                      }
-                    // If the destination is terrestrial node
-                    case SatEnums::FORWARD_USER_CH:
-                    case SatEnums::RETURN_FEEDER_CH:
-                      {
-                        // Go through the packets and check their destination address by peeking the MAC tag
-                        SatSignalParameters::PacketsInBurst_t::const_iterator it = txParams->m_packetsInBurst.begin ();
-                        for ( ; it != txParams->m_packetsInBurst.end (); ++it )
-                          {
-                            SatMacTag macTag;
-                            bool mSuccess = (*it)->PeekPacketTag (macTag);
-                            if (!mSuccess)
-                              {
-                                NS_FATAL_ERROR ("MAC tag was not found from the packet!");
-                              }
+                  // If the destination is satellite
+                  case SatEnums::FORWARD_FEEDER_CH:
+                  case SatEnums::RETURN_USER_CH:
+                    {
+                      // The packet burst is passed on to the satellite receiver
+                      ScheduleRx (txParams, *rxPhyIterator);
+                      break;
+                    }
+                  // If the destination is terrestrial node
+                  case SatEnums::FORWARD_USER_CH:
+                  case SatEnums::RETURN_FEEDER_CH:
+                    {
+                      // Go through the packets and check their destination address by peeking the MAC tag
+                      SatSignalParameters::PacketsInBurst_t::const_iterator it = txParams->m_packetsInBurst.begin ();
+                      for (; it != txParams->m_packetsInBurst.end (); ++it )
+                        {
+                          SatMacTag macTag;
+                          bool mSuccess = (*it)->PeekPacketTag (macTag);
+                          if (!mSuccess)
+                            {
+                              NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+                            }
 
-                            Mac48Address dest = macTag.GetDestAddress ();
+                          Mac48Address dest = macTag.GetDestAddress ();
 
-                            // If the packet destination is the same as the receiver MAC
-                            if (dest == (*rxPhyIterator)->GetAddress () || dest.IsBroadcast () || dest.IsGroup ())
-                              {
-                                ScheduleRx (txParams, *rxPhyIterator);
+                          // If the packet destination is the same as the receiver MAC
+                          if (dest == (*rxPhyIterator)->GetAddress () || dest.IsBroadcast () || dest.IsGroup ())
+                            {
+                              ScheduleRx (txParams, *rxPhyIterator);
 
-                                // Remember to break the packet loop, so that the transmission
-                                // is not received several times!
-                                break;
-                              }
-                          }
-                        break;
-                      }
-                    default:
-                      {
-                        NS_FATAL_ERROR ("Unsupported channel type!");
-                        break;
-                      }
+                              // Remember to break the packet loop, so that the transmission
+                              // is not received several times!
+                              break;
+                            }
+                        }
+                      break;
+                    }
+                  default:
+                    {
+                      NS_FATAL_ERROR ("Unsupported channel type!");
+                      break;
+                    }
                   }
               }
           }
@@ -223,28 +223,28 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
     case SatChannel::ONLY_DEST_BEAM:
       {
         for (PhyRxContainer::const_iterator rxPhyIterator = m_phyRxContainer.begin ();
-            rxPhyIterator != m_phyRxContainer.end ();
-            ++rxPhyIterator)
+             rxPhyIterator != m_phyRxContainer.end ();
+             ++rxPhyIterator)
           {
             // If the same beam
-            if ( (*rxPhyIterator)->GetBeamId() == txParams->m_beamId )
+            if ( (*rxPhyIterator)->GetBeamId () == txParams->m_beamId )
               {
                 ScheduleRx (txParams, *rxPhyIterator);
               }
           }
         break;
       }
-      /**
-       * The packet shall be received by all the receivers in the channel. The
-       * intended receiver shall receive the packet, while other receivers in the
-       * channel see the packet as co-channel interference. Note, that ALL_BEAMS mode
-       * is needed by the PerPacket interference.
-      */
+    /**
+     * The packet shall be received by all the receivers in the channel. The
+     * intended receiver shall receive the packet, while other receivers in the
+     * channel see the packet as co-channel interference. Note, that ALL_BEAMS mode
+     * is needed by the PerPacket interference.
+    */
     case SatChannel::ALL_BEAMS:
       {
         for (PhyRxContainer::const_iterator rxPhyIterator = m_phyRxContainer.begin ();
-            rxPhyIterator != m_phyRxContainer.end ();
-            ++rxPhyIterator)
+             rxPhyIterator != m_phyRxContainer.end ();
+             ++rxPhyIterator)
           {
             ScheduleRx (txParams, *rxPhyIterator);
           }
@@ -255,7 +255,7 @@ SatChannel::StartTx (Ptr<SatSignalParameters> txParams)
         NS_FATAL_ERROR ("Unsupported SatChannel FwdMode!");
         break;
       }
-  }
+    }
 }
 
 void
@@ -288,7 +288,7 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
        * burst duration is taken properly into account!
        */
       switch (m_channelType)
-      {
+        {
         case SatEnums::RETURN_FEEDER_CH:
         case SatEnums::FORWARD_USER_CH:
           {
@@ -307,7 +307,7 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
           {
             break;
           }
-      }
+        }
     }
   /**
    * In satellite model, propagation delay should be always set by using
@@ -318,7 +318,7 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
       NS_FATAL_ERROR ("SatChannel::ScheduleRx - propagation delay model not set!");
     }
 
-  NS_LOG_LOGIC("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
+  NS_LOG_LOGIC ("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
 
   Ptr<NetDevice> netDev = receiver->GetDevice ();
   uint32_t dstNodeId =  netDev->GetNode ()->GetId ();
@@ -336,7 +336,7 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
   rxParams->m_carrierFreq_hz = frequency_hz;
 
   switch (m_rxPowerCalculationMode)
-  {
+    {
     case SatEnums::RX_PWR_CALCULATION:
       {
         DoRxPowerCalculation (rxParams, phyRx);
@@ -352,12 +352,12 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
         DoRxPowerInputTrace (rxParams, phyRx);
         break;
       }
-    default :
+    default:
       {
         NS_FATAL_ERROR ("SatChannel::StartRx - Invalid Rx power calculation mode");
         break;
       }
-  }
+    }
 
   phyRx->StartRx (rxParams);
 }
@@ -383,23 +383,23 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 
   switch (m_channelType)
     {
-      case SatEnums::RETURN_FEEDER_CH:
-      case SatEnums::FORWARD_USER_CH:
-        {
-          Singleton<SatRxPowerOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
-          break;
-        }
-      case SatEnums::FORWARD_FEEDER_CH:
-      case SatEnums::RETURN_USER_CH:
-        {
-          Singleton<SatRxPowerOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
-          break;
-        }
-      default:
-        {
-          NS_FATAL_ERROR ("SatChannel::DoRxPowerOutputTrace - Invalid channel type");
-          break;
-        }
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+      {
+        Singleton<SatRxPowerOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
+        break;
+      }
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+      {
+        Singleton<SatRxPowerOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::DoRxPowerOutputTrace - Invalid channel type");
+        break;
+      }
     }
 }
 
@@ -413,26 +413,26 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
 
   switch (m_channelType)
     {
-      case SatEnums::RETURN_FEEDER_CH:
-      case SatEnums::FORWARD_USER_CH:
-        {
-          // Calculate the Rx power from Rx power density
-          rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+      {
+        // Calculate the Rx power from Rx power density
+        rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
 
-          break;
-        }
-      case SatEnums::FORWARD_FEEDER_CH:
-      case SatEnums::RETURN_USER_CH:
-        {
-          // Calculate the Rx power from Rx power density
-          rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
-          break;
-        }
-      default:
-        {
-          NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Invalid channel type");
-          break;
-        }
+        break;
+      }
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+      {
+        // Calculate the Rx power from Rx power density
+        rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Invalid channel type");
+        break;
+      }
     }
 
   NS_LOG_LOGIC ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
@@ -458,23 +458,23 @@ SatChannel::DoFadingOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
 
   switch (m_channelType)
     {
-      case SatEnums::RETURN_FEEDER_CH:
-      case SatEnums::FORWARD_USER_CH:
-        {
-          Singleton<SatFadingOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
-          break;
-        }
-      case SatEnums::FORWARD_FEEDER_CH:
-      case SatEnums::RETURN_USER_CH:
-        {
-          Singleton<SatFadingOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
-          break;
-        }
-      default:
-        {
-          NS_FATAL_ERROR ("SatChannel::DoFadingOutputTrace - Invalid channel type");
-          break;
-        }
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+      {
+        Singleton<SatFadingOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType), tempVector);
+        break;
+      }
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+      {
+        Singleton<SatFadingOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (GetSourceAddress (rxParams), m_channelType), tempVector);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::DoFadingOutputTrace - Invalid channel type");
+        break;
+      }
     }
 }
 
@@ -493,7 +493,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
 
   // use always UT's or GW's position when getting antenna gain
   switch (m_channelType)
-  {
+    {
     case SatEnums::RETURN_FEEDER_CH:
     case SatEnums::FORWARD_USER_CH:
       {
@@ -515,7 +515,7 @@ SatChannel::DoRxPowerCalculation (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
         NS_FATAL_ERROR ("SatChannel::DoRxPowerCalculation - Invalid channel type");
         break;
       }
-  }
+    }
 
   /**
    * Get the external (weather) fading trace value from the external
@@ -552,7 +552,7 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
   Ptr<MobilityModel> mobility;
 
   switch (m_channelType)
-  {
+    {
     case SatEnums::RETURN_FEEDER_CH:
       {
         nodeId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (phyRx->GetDevice ()->GetAddress ());
@@ -582,14 +582,14 @@ SatChannel::GetExternalFadingTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPh
         NS_FATAL_ERROR ("SatChannel::GetExternalFadingTrace - Invalid channel type");
         break;
       }
-  }
+    }
 
   if (nodeId < 0)
     {
       NS_FATAL_ERROR ("SatChannel::GetExternalFadingTrace - Invalid node ID");
     }
 
-  return (Singleton<SatFadingExternalInputTraceContainer>::Get()->GetFadingTrace ((uint32_t)nodeId, m_channelType, mobility))->GetFading ();
+  return (Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace ((uint32_t)nodeId, m_channelType, mobility))->GetFading ();
 }
 
 /// TODO get rid of source MAC address peeking
@@ -603,9 +603,9 @@ SatChannel::GetSourceAddress (Ptr<SatSignalParameters> rxParams)
   SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
 
   if (*i == NULL)
-  {
-    NS_FATAL_ERROR ("SatChannel::GetSourceAddress - Empty packet list");
-  }
+    {
+      NS_FATAL_ERROR ("SatChannel::GetSourceAddress - Empty packet list");
+    }
 
   (*i)->PeekPacketTag (tag);
 

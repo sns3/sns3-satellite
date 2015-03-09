@@ -182,7 +182,6 @@ private:
   SatMac (const SatMac &);
 
 protected:
-
   void DoDispose (void);
 
   /**

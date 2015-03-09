@@ -84,7 +84,7 @@ SatGwLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flow
           SatEnums::SatLinkDir_t ld = SatEnums::LD_FORWARD;
 
           // Add packet trace entry:
-          m_packetTrace (Simulator::Now(),
+          m_packetTrace (Simulator::Now (),
                          SatEnums::PACKET_SENT,
                          m_nodeInfo->GetNodeType (),
                          m_nodeInfo->GetNodeId (),
@@ -112,7 +112,7 @@ SatGwLlc::CreateEncap (Ptr<EncapKey> key)
 
   if (m_fwdLinkArqEnabled)
     {
-     gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
+      gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
     }
   else
     {
@@ -125,7 +125,7 @@ SatGwLlc::CreateEncap (Ptr<EncapKey> key)
   NS_LOG_LOGIC ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the encapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert(std::make_pair (key, gwEncap));
+  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, gwEncap));
   if (result.second == false)
     {
       NS_FATAL_ERROR ("Insert to map with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ") failed!");
@@ -141,7 +141,7 @@ SatGwLlc::CreateDecap (Ptr<EncapKey> key)
 
   if (m_rtnLinkArqEnabled)
     {
-     gwDecap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
+      gwDecap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
     }
   else
     {
@@ -154,7 +154,7 @@ SatGwLlc::CreateDecap (Ptr<EncapKey> key)
   NS_LOG_LOGIC ("Create decapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the decapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert(std::make_pair (key, gwDecap));
+  std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, gwDecap));
   if (result.second == false)
     {
       NS_FATAL_ERROR ("Insert to map with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ") failed!");
@@ -171,8 +171,8 @@ void SatGwLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & 
 
   // Then the user data
   for (EncapContainer_t::const_iterator cit = m_encaps.begin ();
-      cit != m_encaps.end ();
-      ++cit)
+       cit != m_encaps.end ();
+       ++cit)
     {
       uint32_t buf = cit->second->GetTxBufferSizeInBytes ();
 
@@ -181,7 +181,7 @@ void SatGwLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & 
           holDelay = cit->second->GetHolDelay ();
           uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
           Ptr<SatSchedulingObject> so =
-              Create<SatSchedulingObject> (cit->first->m_destination, buf, minTxOpportunityInBytes, holDelay, cit->first->m_flowId);
+            Create<SatSchedulingObject> (cit->first->m_destination, buf, minTxOpportunityInBytes, holDelay, cit->first->m_flowId);
           output.push_back (so);
         }
     }

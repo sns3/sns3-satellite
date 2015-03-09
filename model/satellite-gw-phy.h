@@ -42,7 +42,6 @@ namespace ns3 {
 class SatGwPhy : public SatPhy
 {
 public:
-
   /**
    * Default constructor
    */
@@ -70,7 +69,6 @@ public:
   virtual double CalculateSinr (double sinr);
 
 private:
-
   /**
    *  Configured adjacent channel interference wrt noise (percent).
    */

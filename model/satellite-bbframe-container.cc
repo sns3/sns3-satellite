@@ -32,16 +32,16 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatBbFrameContainer);
 
 SatBbFrameContainer::SatBbFrameContainer ()
-: m_totalDuration (Seconds (0)),
-  m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
+  : m_totalDuration (Seconds (0)),
+    m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor of SatBbFrameContainer not supported.");
 }
 
 SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& modcodsInUse, Ptr<SatBbFrameConf> conf)
- : m_totalDuration (Seconds (0)),
-   m_bbFrameConf (conf)
+  : m_totalDuration (Seconds (0)),
+    m_bbFrameConf (conf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -78,9 +78,9 @@ SatBbFrameContainer::GetTypeId (void)
     .SetParent<Object> ()
     .AddConstructor<SatBbFrameContainer> ()
     .AddTraceSource ("BBFrameMergeTrace",
-                    "Trace for merged BB Frames.",
-                    MakeTraceSourceAccessor (&SatBbFrameContainer::m_bbFrameMergeTrace),
-                    "ns3::SatBbFrame::BbFrameMergeCallback")
+                     "Trace for merged BB Frames.",
+                     MakeTraceSourceAccessor (&SatBbFrameContainer::m_bbFrameMergeTrace),
+                     "ns3::SatBbFrame::BbFrameMergeCallback")
   ;
   return tid;
 }
@@ -155,13 +155,13 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
 
   if ( priorityClass > 0)
     {
-      if ( m_container.at (modcod).empty () ||
-           GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
+      if ( m_container.at (modcod).empty ()
+           || GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
         {
           CreateFrameToTail (priorityClass, modcod);
         }
-      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
-                ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
+      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
+                && ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
           m_totalDuration += m_container.at (modcod).back ()->Extend (m_bbFrameConf);
         }
@@ -171,14 +171,14 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
     }
   else
     {
-      if ( m_ctrlContainer.empty () ||
-          GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
+      if ( m_ctrlContainer.empty ()
+           || GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
         {
           // create and add frame to tail
           CreateFrameToTail (priorityClass, m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType) );
         }
-      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES ) &&
-                ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
+      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
+                && ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
           m_totalDuration += m_ctrlContainer.back ()->Extend (m_bbFrameConf);
         }
@@ -202,7 +202,7 @@ SatBbFrameContainer::GetNextFrame ()
     {
       nextFrame = m_ctrlContainer.front ();
       m_ctrlContainer.pop_front ();
-      m_totalDuration -= nextFrame->GetDuration();
+      m_totalDuration -= nextFrame->GetDuration ();
     }
   else
     {
@@ -218,11 +218,11 @@ SatBbFrameContainer::GetNextFrame ()
 
       if ( nonEmptyQueues.empty () == false )
         {
-          std::random_shuffle( nonEmptyQueues.begin (), nonEmptyQueues.end ());
+          std::random_shuffle ( nonEmptyQueues.begin (), nonEmptyQueues.end ());
 
           nextFrame = (*nonEmptyQueues.begin ())->front ();
           (*nonEmptyQueues.begin ())->pop_front ();
-          m_totalDuration -= nextFrame->GetDuration();
+          m_totalDuration -= nextFrame->GetDuration ();
         }
     }
 
@@ -308,7 +308,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
               // control messages are used default MODCOD
               if ( ( m_ctrlContainer.empty () == false ) && ( m_ctrlContainer.back ()->GetModcod () <= itFromMerge->first ) )
                 {
-                  if (m_ctrlContainer.back ()->GetOccupancy() < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
+                  if (m_ctrlContainer.back ()->GetOccupancy () < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
                     {
                       double newOccupancyIfMerged = m_ctrlContainer.back ()->GetOccupancyIfMerged (itFromMerge->second.back ());
 
@@ -331,7 +331,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
 
                       if ( frameToMerge->MergeWithFrame (itFromMerge->second.back (), m_bbFrameMergeTrace) )
                         {
-                          m_totalDuration -= itFromMerge->second.back ()->GetDuration();
+                          m_totalDuration -= itFromMerge->second.back ()->GetDuration ();
                           itFromMerge->second.pop_back ();
                         }
                     }
@@ -340,24 +340,24 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
         }
     }
 
-    // if both short and normal frames are used then try to shrink normal frames
-    // which are last ones in containers
-    if ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
-      {
-        // go through all MODCOD based BB Frame containers and try to shrink last frame in the container
-        for (FrameContainer_t::reverse_iterator it = m_container.rbegin (); it != m_container.rend (); it++ )
-          {
-            if ( it->second.empty () == false)
-              {
-                m_totalDuration -= it->second.back ()->Shrink (m_bbFrameConf);
-              }
-          }
+  // if both short and normal frames are used then try to shrink normal frames
+  // which are last ones in containers
+  if ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
+    {
+      // go through all MODCOD based BB Frame containers and try to shrink last frame in the container
+      for (FrameContainer_t::reverse_iterator it = m_container.rbegin (); it != m_container.rend (); it++ )
+        {
+          if ( it->second.empty () == false)
+            {
+              m_totalDuration -= it->second.back ()->Shrink (m_bbFrameConf);
+            }
+        }
 
-        if ( m_ctrlContainer.empty () == false )
-          {
-            m_totalDuration -= m_ctrlContainer.back ()->Shrink (m_bbFrameConf);
-          }
-      }
+      if ( m_ctrlContainer.empty () == false )
+        {
+          m_totalDuration -= m_ctrlContainer.back ()->Shrink (m_bbFrameConf);
+        }
+    }
 }
 
 

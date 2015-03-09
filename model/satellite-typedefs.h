@@ -39,7 +39,6 @@ class Time;
 class SatTypedefs
 {
 public:
-
   /**
    * \brief Callback for carrier bandwidths
    * \param channelType     The type of the channel
@@ -55,7 +54,7 @@ public:
    * \param packet the packet
    * \param destinationAddress the destination address
    */
-  typedef void (* PacketDestinationAddressCallback)
+  typedef void (*PacketDestinationAddressCallback)
     (Ptr<const Packet> packet, const Address &destinationAddress);
 
   /**
@@ -63,7 +62,7 @@ public:
    * \param packet the packet
    * \param sourceAddress the source address
    */
-  typedef void (* PacketSenderAddressCallback)
+  typedef void (*PacketSenderAddressCallback)
     (Ptr<const Packet> packet, const Address &sourceAddress);
 
   /**
@@ -73,7 +72,7 @@ public:
    *
    * \todo Optimize by using const-reference of Time.
    */
-  typedef void (* PacketDelayAddressCallback)
+  typedef void (*PacketDelayAddressCallback)
     (Time delay, const Address &sourceAddress);
 
   /**
@@ -92,26 +91,25 @@ public:
    *                   and destination address
    * \todo Use const-reference for Time argument.
    */
-  typedef void (* PacketTraceCallback)
+  typedef void (*PacketTraceCallback)
     (Time                        now,
-     SatEnums::SatPacketEvent_t  eventType,
-     SatEnums::SatNodeType_t     nodeType,
-     uint32_t                    nodeId,
-     Mac48Address                nodeMacAddress,
-     SatEnums::SatLogLevel_t     logLevel,
-     SatEnums::SatLinkDir_t      linkDirection,
-     std::string                 packetInfo);
+    SatEnums::SatPacketEvent_t  eventType,
+    SatEnums::SatNodeType_t     nodeType,
+    uint32_t                    nodeId,
+    Mac48Address                nodeMacAddress,
+    SatEnums::SatLogLevel_t     logLevel,
+    SatEnums::SatLinkDir_t      linkDirection,
+    std::string                 packetInfo);
 
   /**
    * \brief Common callback signature for scenario creation trace sources by
    *        helpers.
    * \param trace textual description of the creation being done
    */
-  typedef void (* CreationCallback)
+  typedef void (*CreationCallback)
     (std::string trace);
 
 private:
-
   /**
    * Destructor
    *

@@ -71,7 +71,6 @@ public:
    */
   void SendPacketTrace (Ptr<const Packet> packet);
 private:
-
   bool  m_isStatisticsTagsEnabled;  ///< `EnableStatisticsTags` attribute.
   bool  m_isConnectedWithTraceSource;
 };

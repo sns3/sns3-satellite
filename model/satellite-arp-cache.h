@@ -45,7 +45,7 @@ public:
    * \param macAddress MAC address
    * \return ArpCache entry
    */
-  ArpCache::Entry *Add (Ipv4Address to, Address macAddress);
+  ArpCache::Entry * Add (Ipv4Address to, Address macAddress);
 };
 
 

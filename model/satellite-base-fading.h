@@ -85,7 +85,6 @@ public:
   virtual double DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType) = 0;
 
 private:
-
 };
 
 } // namespace ns3

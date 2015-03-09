@@ -40,16 +40,15 @@ namespace ns3 {
 class SatFadingExternalInputTraceContainer : public Object
 {
 public:
-
   /**
    * Definitions for different modes of using trace input files
    */
   typedef enum
-    {
-      LIST_MODE,    //!< LIST_MODE
-      POSITION_MODE,//!< POSITION_MODE
-      RANDOM_MODE   //!< RANDOM_MODE
-    } InputMode_t;
+  {
+    LIST_MODE,      //!< LIST_MODE
+    POSITION_MODE,  //!< POSITION_MODE
+    RANDOM_MODE     //!< RANDOM_MODE
+  } InputMode_t;
 
   typedef std::pair<Ptr<SatFadingExternalInputTrace>, Ptr<SatFadingExternalInputTrace> >  ChannelTracePair_t;
 
@@ -161,7 +160,7 @@ private:
   /// data path to find trace input files
   std::string m_dataPath;
 
-	/// Maximum distance allowed to the external fading trace source
+  /// Maximum distance allowed to the external fading trace source
   double m_maxDistanceToFading;
 
   /**

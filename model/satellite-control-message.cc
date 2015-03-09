@@ -36,8 +36,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatControlMsgTag);
 
 
 SatControlMsgTag::SatControlMsgTag ()
- :m_msgType (SAT_NON_CTRL_MSG),
-  m_msgId (0)
+  : m_msgType (SAT_NON_CTRL_MSG),
+    m_msgId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -151,9 +151,9 @@ SatTbtpMessage::SatTbtpMessage ( )
 }
 
 SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
- : m_superframeCounter (0),
-   m_superframeSeqId (seqId),
-   m_assignmentFormat (0)
+  : m_superframeCounter (0),
+    m_superframeSeqId (seqId),
+    m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 }
@@ -231,7 +231,7 @@ SatTbtpMessage::SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSl
 
   // store time slot info to user specific container
   it->second.first = frameId;
-  it->second.second.push_back( conf  );
+  it->second.second.push_back ( conf  );
 
   // store frame ID to keep track of the used frames count
   m_frameIds.insert (frameId);
@@ -286,7 +286,7 @@ SatTbtpMessage::GetTimeSlotInfoSizeInBytes () const
   uint32_t assignmentIdSizeInBytes = 0;
 
   switch (m_assignmentFormat)
-  {
+    {
     case 0:
       // assignment id 48 bits
       assignmentIdSizeInBytes = 6;
@@ -325,7 +325,7 @@ SatTbtpMessage::GetTimeSlotInfoSizeInBytes () const
     default:
       NS_FATAL_ERROR ("Assignment format=" << m_assignmentFormat << " not supported!!!" );
       break;
-  }
+    }
 
   return assignmentIdSizeInBytes;
 }
@@ -358,12 +358,12 @@ uint32_t SatTbtpMessage::GetSizeInBytes () const
 void SatTbtpMessage::Dump () const
 {
   std::cout << "Superframe counter: " << m_superframeCounter <<
-      ", superframe sequence id: " << m_superframeSeqId <<
-      ", assignment format: " << m_assignmentFormat << std::endl;
+  ", superframe sequence id: " << m_superframeSeqId <<
+  ", assignment format: " << m_assignmentFormat << std::endl;
 
   for (DaTimeSlotMap_t::const_iterator mit = m_daTimeSlots.begin ();
-      mit != m_daTimeSlots.end ();
-      ++mit)
+       mit != m_daTimeSlots.end ();
+       ++mit)
     {
       std::cout << "UT: " << mit->first << ": ";
       std::cout << "Frame ID: " << mit->second.first << ": ";
@@ -400,8 +400,8 @@ SatCrMessage::GetInstanceTypeId (void) const
 }
 
 SatCrMessage::SatCrMessage ()
- :m_crBlockSizeType (SatCrMessage::CR_BLOCK_SMALL),
-  m_forwardLinkCNo (NAN)
+  : m_crBlockSizeType (SatCrMessage::CR_BLOCK_SMALL),
+    m_forwardLinkCNo (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -492,7 +492,7 @@ SatCnoReportMessage::GetInstanceTypeId (void) const
 }
 
 SatCnoReportMessage::SatCnoReportMessage ()
- : m_forwardLinkCNo (NAN)
+  : m_forwardLinkCNo (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -544,10 +544,10 @@ SatRaMessage::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatRaMessage::SatRaMessage () :
-  m_allocationChannelId (0),
-  m_backoffProbability (0),
-  m_backoffTime (0)
+SatRaMessage::SatRaMessage ()
+  : m_allocationChannelId (0),
+    m_backoffProbability (0),
+    m_backoffTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -633,8 +633,8 @@ SatArqAckMessage::GetInstanceTypeId (void) const
 }
 
 SatArqAckMessage::SatArqAckMessage ()
-:m_sequenceNumber (0),
- m_flowId (0)
+  : m_sequenceNumber (0),
+    m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -676,7 +676,7 @@ SatArqAckMessage::GetSizeInBytes () const
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t size = 2*sizeof (uint8_t);
+  uint32_t size = 2 * sizeof (uint8_t);
   return size;
 }
 
@@ -685,19 +685,19 @@ SatArqAckMessage::GetSizeInBytes () const
 NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");
 
 SatControlMsgContainer::SatControlMsgContainer ()
- : m_sendId (0),
-   m_recvId (0),
-   m_storeTime (MilliSeconds (300)),
-   m_deleteOnRead (false)
+  : m_sendId (0),
+    m_recvId (0),
+    m_storeTime (MilliSeconds (300)),
+    m_deleteOnRead (false)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatControlMsgContainer::SatControlMsgContainer (Time storeTime, bool deleteOnRead)
- : m_sendId (0),
-   m_recvId (0),
-   m_storeTime (storeTime),
-   m_deleteOnRead (deleteOnRead)
+  : m_sendId (0),
+    m_recvId (0),
+    m_storeTime (storeTime),
+    m_deleteOnRead (deleteOnRead)
 
 {
   NS_LOG_FUNCTION (this);

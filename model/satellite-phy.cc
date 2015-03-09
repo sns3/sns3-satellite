@@ -66,19 +66,19 @@ SatPhy::SatPhy (void)
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
- : m_eirpWoGainW (0),
-   m_beamId (0),
-   m_isStatisticsTagsEnabled (false),
-   m_rxNoiseTemperatureDbk (0),
-   m_rxMaxAntennaGainDb (0),
-   m_rxAntennaLossDb (0),
-   m_txMaxAntennaGainDb (0),
-   m_txMaxPowerDbw (0),
-   m_txOutputLossDb (0),
-   m_txPointingLossDb (0),
-   m_txOboLossDb (0),
-   m_txAntennaLossDb (0),
-   m_defaultFadingValue (1.0)
+  : m_eirpWoGainW (0),
+    m_beamId (0),
+    m_isStatisticsTagsEnabled (false),
+    m_rxNoiseTemperatureDbk (0),
+    m_rxMaxAntennaGainDb (0),
+    m_rxAntennaLossDb (0),
+    m_txMaxAntennaGainDb (0),
+    m_txMaxPowerDbw (0),
+    m_txOutputLossDb (0),
+    m_txPointingLossDb (0),
+    m_txOboLossDb (0),
+    m_txAntennaLossDb (0),
+    m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
@@ -102,17 +102,17 @@ SatPhy::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatPhy")
     .SetParent<Object> ()
     .AddAttribute ("ReceiveCb", "The receive callback for this phy.",
-                    CallbackValue (),
-                    MakeCallbackAccessor (&SatPhy::m_rxCallback),
-                    MakeCallbackChecker ())
+                   CallbackValue (),
+                   MakeCallbackAccessor (&SatPhy::m_rxCallback),
+                   MakeCallbackChecker ())
     .AddAttribute ("CnoCb", "The C/N0 info callback for this phy.",
-                    CallbackValue (),
-                    MakeCallbackAccessor (&SatPhy::m_cnoCallback),
-                    MakeCallbackChecker ())
+                   CallbackValue (),
+                   MakeCallbackAccessor (&SatPhy::m_cnoCallback),
+                   MakeCallbackChecker ())
     .AddAttribute ("AverageNormalizedOfferedLoad", "The average offered random access load callback for this phy.",
-                    CallbackValue (),
-                    MakeCallbackAccessor (&SatPhy::m_avgNormalizedOfferedLoadCallback),
-                    MakeCallbackChecker ())
+                   CallbackValue (),
+                   MakeCallbackAccessor (&SatPhy::m_avgNormalizedOfferedLoadCallback),
+                   MakeCallbackChecker ())
     .AddAttribute ("EnableStatisticsTags",
                    "If true, some tags will be added to each transmitted packet to assist with statistics computation",
                    BooleanValue (false),
@@ -305,9 +305,9 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
 
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -363,11 +363,11 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
 
   SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
 
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  event,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),

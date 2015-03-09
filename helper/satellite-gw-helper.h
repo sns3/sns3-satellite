@@ -45,7 +45,6 @@ namespace ns3 {
 class SatGwHelper : public Object
 {
 public:
-
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
@@ -69,7 +68,9 @@ public:
                SatMac::SendCtrlMsgCallback sendCb,
                RandomAccessSettings_s randomAccessSettings);
 
-  virtual ~SatGwHelper () {}
+  virtual ~SatGwHelper ()
+  {
+  }
 
   /*
    * Initializes the GW helper based on attributes
@@ -130,7 +131,7 @@ public:
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatGwHelper::SetChannelAttribute,
-   * then, for each node in the input container, we create a 
+   * then, for each node in the input container, we create a
    * ns3::SatNetDevice with the requested attributes,
    * a queue for this ns3::SatNetDevice, and associate the resulting
    * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
@@ -154,7 +155,7 @@ public:
    * \param stream  stream for creation trace outputs
    * \param cb  callback to connect traces
    */
-  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+  void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 private:
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;

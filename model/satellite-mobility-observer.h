@@ -100,11 +100,10 @@ public:
    * \param mobilityObserver An instance of SatMobilityObserver which property
    *                         has changed.
    */
-  typedef void (* PropertyChangedCallback)
+  typedef void (*PropertyChangedCallback)
     (Ptr<const SatMobilityObserver> mobilityObserver);
 
 private:
-
   /**
    * \brief Notify listeners about some property is changed
    */
@@ -123,7 +122,7 @@ private:
   /**
    * \brief Do actions needed when satellite position is changed.
    */
-  void SatelliteStatusChanged();
+  void SatelliteStatusChanged ();
 
   /**
    * \brief Listener (callback) for mobility position changes

@@ -46,9 +46,9 @@ public:
    * Network types in user networks (subscriber or backbone)
    */
   enum NetworkType
-   {
-     NETWORK_TYPE_SAT_SIMPLE, NETWORK_TYPE_CSMA
-   };
+  {
+    NETWORK_TYPE_SAT_SIMPLE, NETWORK_TYPE_CSMA
+  };
 
   typedef std::map<Ptr<Node>, NodeContainer>    UtUsersContainer_t;
 
@@ -58,7 +58,9 @@ public:
    * Create a SatUserHelper to make life easier when creating Users and their connections to satellite network.
    */
   SatUserHelper ();
-  virtual ~SatUserHelper () {}
+  virtual ~SatUserHelper ()
+  {
+  }
 
   /**
    * \brief Set the type and the attribute values to be associated with each
@@ -174,7 +176,7 @@ public:
    * \return  node container of created users for the GWs (and router).
    *
    */
-  NodeContainer InstallGw (NodeContainer gw , uint32_t users);
+  NodeContainer InstallGw (NodeContainer gw, uint32_t users);
 
   /**
    * \return A container having all GW user nodes in satellite network.
@@ -229,7 +231,7 @@ public:
    * \param stream  stream for creation trace outputs
    * \param cb  callback to connect traces
    */
-  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+  void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
   /**
    * Get router information.
@@ -244,7 +246,6 @@ public:
   Ptr<Node> GetRouter () const;
 
 private:
-
   /**
    * Install network between UT and its users
    *

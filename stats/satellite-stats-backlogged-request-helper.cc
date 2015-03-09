@@ -90,7 +90,7 @@ SatStatsBackloggedRequestHelper::DoInstall ()
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
   NS_ASSERT (multiFileAggregator != 0);
   Callback<void, std::string, std::string> aggregatorSink
-      = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
+    = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();

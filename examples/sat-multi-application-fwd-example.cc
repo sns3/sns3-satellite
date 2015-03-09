@@ -65,17 +65,17 @@ main (int argc, char *argv[])
   std::string interval = "1s";
   double simLength (15.0);
 
-  Time appStartTime = Seconds(0.001);
-  Time appStopTime = Seconds(10.0);
+  Time appStartTime = Seconds (0.001);
+  Time appStopTime = Seconds (10.0);
 
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
-  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue("cbrProbability", "Probability of CBR end users", cbrProbability);
-  cmd.AddValue("simLength", "Simulation length in seconds", simLength);
+  cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("cbrProbability", "Probability of CBR end users", cbrProbability);
+  cmd.AddValue ("simLength", "Simulation length in seconds", simLength);
   cmd.Parse (argc, argv);
 
   /// Set simulation output details
@@ -94,7 +94,7 @@ main (int argc, char *argv[])
   // scenario name results in fatal error.
   std::string scenarioName = "Scenario72";
 
-  NS_LOG_INFO("Using: " << scenarioName);
+  NS_LOG_INFO ("Using: " << scenarioName);
 
   // Create helpers
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
@@ -157,25 +157,25 @@ main (int argc, char *argv[])
   uint8_t cbrTos (0xB8);
 
   // Divide the users into CBR and On-Off users and set the ToS values.
-  for (NodeContainer::Iterator i = utUsers.Begin();  i != utUsers.End(); i++)
+  for (NodeContainer::Iterator i = utUsers.Begin ();  i != utUsers.End (); i++)
     {
       // CBR
       if (rand->GetValue () < cbrProbability)
         {
           utCbrUsers.Add (*i);
           Ptr<Ipv4L3Protocol> ipv4Prot = (*i)->GetObject<Ipv4L3Protocol> ();
-          ipv4Prot->SetAttribute("DefaultTos", UintegerValue(cbrTos));
+          ipv4Prot->SetAttribute ("DefaultTos", UintegerValue (cbrTos));
         }
       // OnOff
       else
         {
           utOnOffUsers.Add (*i);
           Ptr<Ipv4L3Protocol> ipv4Prot = (*i)->GetObject<Ipv4L3Protocol> ();
-          ipv4Prot->SetAttribute("DefaultTos", UintegerValue(onOffTos));
+          ipv4Prot->SetAttribute ("DefaultTos", UintegerValue (onOffTos));
         }
     }
 
-  NS_LOG_INFO("Number of created CBR users: " << utCbrUsers.GetN () << ", On-Off users: " << utOnOffUsers.GetN ());
+  NS_LOG_INFO ("Number of created CBR users: " << utCbrUsers.GetN () << ", On-Off users: " << utOnOffUsers.GetN ());
 
   ApplicationContainer gwCbrApps;
   ApplicationContainer gwOnOffApps;
@@ -187,7 +187,7 @@ main (int argc, char *argv[])
 
   //---- Start CBR application definitions
 
-  NS_LOG_INFO("Creating CBR applications and sinks");
+  NS_LOG_INFO ("Creating CBR applications and sinks");
 
   uint16_t port = 9;
   Time startDelay = appStartTime;
@@ -195,28 +195,28 @@ main (int argc, char *argv[])
   if (utCbrUsers.GetN () > 0)
     {
       // create application on UT user
-      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utCbrUsers.Get(0)), port));
-      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utCbrUsers.Get(0)), port));
-      cbrHelper.SetAttribute("Interval", StringValue (interval));
-      cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize));
+      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (0)), port));
+      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (0)), port));
+      cbrHelper.SetAttribute ("Interval", StringValue (interval));
+      cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
       // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
       for ( uint32_t i = 0; i < utCbrUsers.GetN (); i++)
         {
           // CBR sends packets to GW user no 4.
-          cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (i)), port))));
-          cbrSinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (i)), port))));
+          cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (i)), port))));
+          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (i)), port))));
 
-          gwCbrApps.Add(cbrHelper.Install (gwUsers.Get (4)));
-          utCbrSinkApps.Add(cbrSinkHelper.Install (utCbrUsers.Get (i)));
+          gwCbrApps.Add (cbrHelper.Install (gwUsers.Get (4)));
+          utCbrSinkApps.Add (cbrSinkHelper.Install (utCbrUsers.Get (i)));
 
           startDelay += Seconds (0.001);
 
           // Set start and end times
-          gwCbrApps.Get(i)->SetStartTime (Seconds (0.1));
-          gwCbrApps.Get(i)->SetStopTime (appStopTime);
-          utCbrSinkApps.Get(i)->SetStartTime (startDelay);
-          utCbrSinkApps.Get(i)->SetStopTime (appStopTime);
+          gwCbrApps.Get (i)->SetStartTime (Seconds (0.1));
+          gwCbrApps.Get (i)->SetStopTime (appStopTime);
+          utCbrSinkApps.Get (i)->SetStartTime (startDelay);
+          utCbrSinkApps.Get (i)->SetStopTime (appStopTime);
         }
 
       // Add the created applications to CbrKpiHelper
@@ -229,7 +229,7 @@ main (int argc, char *argv[])
 
   if (utOnOffUsers.GetN () > 0)
     {
-      NS_LOG_INFO("Creating OnOff applications and sinks");
+      NS_LOG_INFO ("Creating OnOff applications and sinks");
 
       std::string dataRate = "100kb/s";
       std::string onTime = "2.0";
@@ -243,8 +243,8 @@ main (int argc, char *argv[])
 
       // create helpers for application creation
       // set address of the first UT connected user
-      PacketSinkHelper onOffSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utCbrUsers.Get(0)), port));
-      OnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress (utCbrUsers.Get(0)), port));
+      PacketSinkHelper onOffSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (0)), port));
+      OnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (0)), port));
 
       startDelay = appStartTime;
 
@@ -252,18 +252,18 @@ main (int argc, char *argv[])
       for ( uint32_t i = 0; i < utOnOffUsers.GetN (); i++)
         {
           // On-Off sends packets to GW user no 3.
-          onOffHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utOnOffUsers.Get(i)), port))));
-          onOffSinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utOnOffUsers.Get(i)), port))));
+          onOffHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utOnOffUsers.Get (i)), port))));
+          onOffSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utOnOffUsers.Get (i)), port))));
 
-          gwOnOffApps.Add(onOffHelper.Install (gwUsers.Get (0)));
-          utOnOffSinkApps.Add(onOffSinkHelper.Install (utOnOffUsers.Get (i)));
+          gwOnOffApps.Add (onOffHelper.Install (gwUsers.Get (0)));
+          utOnOffSinkApps.Add (onOffSinkHelper.Install (utOnOffUsers.Get (i)));
 
           startDelay += Seconds (0.001);
 
-          gwOnOffApps.Get(i)->SetStartTime (Seconds (0.1));
-          gwOnOffApps.Get(i)->SetStopTime (appStopTime);
-          utOnOffSinkApps.Get(i)->SetStartTime (startDelay);
-          utOnOffSinkApps.Get(i)->SetStopTime (appStopTime);
+          gwOnOffApps.Get (i)->SetStartTime (Seconds (0.1));
+          gwOnOffApps.Get (i)->SetStopTime (appStopTime);
+          utOnOffSinkApps.Get (i)->SetStartTime (startDelay);
+          utOnOffSinkApps.Get (i)->SetStopTime (appStopTime);
         }
 
       onoffKpiHelper.AddSink (utOnOffSinkApps);
@@ -273,21 +273,21 @@ main (int argc, char *argv[])
   //---- Stop OnOff application definitions
 
   // prompt info of the used parameters
-  NS_LOG_INFO("--- sat-multi-application-fwd-example ---");
-  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
-  NS_LOG_INFO("  Packet sending interval: " << interval);
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-multi-application-fwd-example ---");
+  NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO ("  Packet sending interval: " << interval);
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
   Simulator::Stop (Seconds (simLength));
   Simulator::Run ();
 
-  NS_LOG_INFO("--- CBR KPIs ---");
+  NS_LOG_INFO ("--- CBR KPIs ---");
   cbrKpiHelper.Print ();
 
-  NS_LOG_INFO("--- OnOff KPIs ---");
+  NS_LOG_INFO ("--- OnOff KPIs ---");
   onoffKpiHelper.Print ();
 
   Simulator::Destroy ();

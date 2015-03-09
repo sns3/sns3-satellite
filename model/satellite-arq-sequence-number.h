@@ -39,11 +39,12 @@ namespace ns3 {
 class SatArqSequenceNumber : public SimpleRefCount<SatArqSequenceNumber>
 {
 public:
-
   SatArqSequenceNumber ();
   SatArqSequenceNumber (uint8_t windowSize);
 
-  virtual ~SatArqSequenceNumber () {};
+  virtual ~SatArqSequenceNumber ()
+  {
+  }
 
   /**
    * \brief Check whether there are free (released) sequence numbers. If a
@@ -66,7 +67,6 @@ public:
   void Release (uint8_t seqNo);
 
 private:
-
   /**
    * \brief Clean ups the sequence number map
    */

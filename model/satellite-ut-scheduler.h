@@ -47,19 +47,19 @@ class SatSchedulingObject;
  */
 class SortByMetric
 {
-   public:
-    SortByMetric (const std::vector<uint32_t> &m)
-    :m_cont (m)
-      {
+public:
+  SortByMetric (const std::vector<uint32_t> &m)
+    : m_cont (m)
+  {
 
-      }
+  }
 
-      bool operator() (uint8_t p1, uint8_t p2)
-      {
-         return m_cont.at (p1) < m_cont.at (p2);
-      }
-   private:
-      const std::vector<uint32_t> &m_cont;
+  bool operator() (uint8_t p1, uint8_t p2)
+  {
+    return m_cont.at (p1) < m_cont.at (p2);
+  }
+private:
+  const std::vector<uint32_t> &m_cont;
 };
 
 /**
@@ -74,7 +74,6 @@ class SortByMetric
 class SatUtScheduler : public Object
 {
 public:
-
   /**
    * Default constructor
    */
@@ -93,7 +92,8 @@ public:
    * STRICT = UT scheduler schedules only from the given RC index
    * LOOSE = UT scheduler may schedule also from other RC indices if needed
    */
-  typedef enum {
+  typedef enum
+  {
     STRICT = 0,
     LOOSE = 1
   } SatCompliancePolicy_t;
@@ -162,7 +162,6 @@ public:
   virtual void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 private:
-
   /**
    * \brief Do scheduling for a given RC index
    * \param packets       Reference to a vector of packets to be sent

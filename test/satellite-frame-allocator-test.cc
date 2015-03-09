@@ -131,23 +131,23 @@ SatFrameAllocatorTestCase::~SatFrameAllocatorTestCase ()
 void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t configType)
 {
   // create first frame with two carriers and each carrier having three slots
-    Ptr<SatBtuConf> btu = Create<SatBtuConf> (10e4, 0.4, 0.1);
+  Ptr<SatBtuConf> btu = Create<SatBtuConf> (10e4, 0.4, 0.1);
 
-    bool defaultWaveformInUse = false;
-    bool checkSlotLimit = true;
+  bool defaultWaveformInUse = false;
+  bool checkSlotLimit = true;
 
-    if ( configType == SatSuperframeConf::CONFIG_TYPE_0 )
-      {
-        defaultWaveformInUse = true;
-      }
+  if ( configType == SatSuperframeConf::CONFIG_TYPE_0 )
+    {
+      defaultWaveformInUse = true;
+    }
 
-    if ( configType == SatSuperframeConf::CONFIG_TYPE_2 )
-      {
-        checkSlotLimit = false;
-      }
+  if ( configType == SatSuperframeConf::CONFIG_TYPE_2 )
+    {
+      checkSlotLimit = false;
+    }
 
-    m_frameConf = Create<SatFrameConf> (10e4 * 2, MilliSeconds (125), btu, m_waveFormConf, false, defaultWaveformInUse, checkSlotLimit );
-    m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType);
+  m_frameConf = Create<SatFrameConf> (10e4 * 2, MilliSeconds (125), btu, m_waveFormConf, false, defaultWaveformInUse, checkSlotLimit );
+  m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType);
 }
 
 void
@@ -158,17 +158,17 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
   InitFrame (configType);
 
   // Test with one UT and one RC
-  for ( uint32_t i = 0; i < 11; i+=2) // CRAs
+  for ( uint32_t i = 0; i < 11; i += 2) // CRAs
     {
-      for ( uint32_t j = 0; j < 15; j+=2) // minimum RBDCs
+      for ( uint32_t j = 0; j < 15; j += 2) // minimum RBDCs
         {
-          for ( uint32_t k = 0; k < 15; k+=2) // RBDCs
+          for ( uint32_t k = 0; k < 15; k += 2) // RBDCs
             {
-              for ( uint32_t l = 0; l < 15; l+=2) // VBDCs
+              for ( uint32_t l = 0; l < 15; l += 2) // VBDCs
                 {
                   uint32_t bytesReq = 0;
 
-                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, i, j, k, l, 1,(bool) std::rand() % 2 );
+                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, i, j, k, l, 1,(bool) std::rand () % 2 );
 
                   // repeat with all CC levels
                   for (uint32_t o = 0; o < m_ccLevelCount; o++ )
@@ -219,7 +219,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
           uint32_t bytesReq = 0;
           uint32_t divider = m_frameConf->GetCarrierMinPayloadInBytes () * 2;
 
-          SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, std::rand () % divider, std::rand () % divider, std::rand () % divider, std::rand () % divider, 2, (bool) std::rand() % 2 );
+          SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, std::rand () % divider, std::rand () % divider, std::rand () % divider, std::rand () % divider, 2, (bool) std::rand () % 2 );
 
           // repeat with all CC levels
           for (uint32_t o = 0; o < m_ccLevelCount; o++ )
@@ -281,13 +281,13 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
 
       for (SatTbtpMessage::DaTimeSlotConfContainer_t::const_iterator it2 = info.second.begin (); it2 != info.second.end (); it2++ )
         {
-          tbtpAllocatedBytes += m_frameConf->GetWaveformConf ()->GetWaveform((*it2)->GetWaveFormId ())->GetPayloadInBytes ();
+          tbtpAllocatedBytes += m_frameConf->GetWaveformConf ()->GetWaveform ((*it2)->GetWaveFormId ())->GetPayloadInBytes ();
         }
 
       slotsAllocated += info.second.size ();
     }
 
-    // check that information is identical in TBTP container and UT allocation container
+  // check that information is identical in TBTP container and UT allocation container
   if ( slotsAllocated > 0 )
     {
       NS_TEST_ASSERT_MSG_EQ ( utAllocContainer.at (req.m_address).second, req.m_generateCtrlSlot, "Control slot generation what expected!");
@@ -301,17 +301,17 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
         }
 
       //std::cout << i << " " << j << " " << k << " " << l << " " << m << " " << m_ccLevels[o] << " " << tbtpAllocatedBytes << " " << utAllocContainerBytes << " " << std::endl;
-      NS_TEST_ASSERT_MSG_EQ (tbtpAllocatedBytes , utAllocContainerBytes, " TBTP bytes=" << tbtpAllocatedBytes << ", UT bytes=" << utAllocContainerBytes );
+      NS_TEST_ASSERT_MSG_EQ (tbtpAllocatedBytes, utAllocContainerBytes, " TBTP bytes=" << tbtpAllocatedBytes << ", UT bytes=" << utAllocContainerBytes );
       NS_ASSERT (tbtpAllocatedBytes == utAllocContainerBytes);
 
       bool minBytesAllocated = (utAllocContainerBytes >= std::min<uint32_t> (bytesReq, minCarrierBytes) );
 
-      NS_TEST_ASSERT_MSG_EQ (minBytesAllocated , true, "Minimum bytes not allocated!" );
+      NS_TEST_ASSERT_MSG_EQ (minBytesAllocated, true, "Minimum bytes not allocated!" );
       NS_ASSERT (minBytesAllocated == true);
     }
   else
     {
-      NS_TEST_ASSERT_MSG_EQ (utAllocContainer.empty (), true ,"No allocations expected!");
+      NS_TEST_ASSERT_MSG_EQ (utAllocContainer.empty (), true,"No allocations expected!");
       NS_ASSERT (utAllocContainer.empty () == true);
     }
 
@@ -332,7 +332,7 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
         {
           bool onlyCraRequested = true;
 
-          for (uint32_t i = 0; i < req.m_reqPerRc.size(); i++)
+          for (uint32_t i = 0; i < req.m_reqPerRc.size (); i++)
             {
               if ((req.m_reqPerRc.at (i).m_rbdcBytes > 0) || (req.m_reqPerRc.at (i).m_vbdcBytes > 0))
                 {
@@ -349,12 +349,12 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
   //std::cout << i << " " << j << " " << k << " " << l << " " << m <<  " "<< m_ccLevels[o] << " " << slotsExpected << "=" << slotsAllocated << " " << bytesReq << " " << m_frameConf->GetCarrierMinPayloadInBytes () << std::endl;
 
   // check that slots are what expected
-    // in other configuration than 0 or when RC based allocation is enabled,
-    // it can be just checked that some slots are allocated (if request is not zero)
+  // in other configuration than 0 or when RC based allocation is enabled,
+  // it can be just checked that some slots are allocated (if request is not zero)
 
   if ( ( configType == SatSuperframeConf::CONFIG_TYPE_0 ) && ( rcBasedAllocation == false ) )
     {
-      NS_TEST_ASSERT_MSG_EQ (slotsAllocated, slotsExpected, " slots allocated= " << slotsAllocated  << ", slots expected= " <<slotsExpected );
+      NS_TEST_ASSERT_MSG_EQ (slotsAllocated, slotsExpected, " slots allocated= " << slotsAllocated  << ", slots expected= " << slotsExpected );
     }
   else
     {
@@ -364,7 +364,7 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
         }
       else
         {
-          NS_TEST_ASSERT_MSG_EQ (slotsAllocated, slotsExpected, " slots allocated= " << slotsAllocated  << ", slots expected= " <<slotsExpected );
+          NS_TEST_ASSERT_MSG_EQ (slotsAllocated, slotsExpected, " slots allocated= " << slotsAllocated  << ", slots expected= " << slotsExpected );
         }
     }
 }
@@ -400,7 +400,7 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
   // test with two UTs
   for (uint32_t n = 0; n < 5; n++ )
     {
-      for (uint32_t m = n+1; m < 6; m++ )
+      for (uint32_t m = n + 1; m < 6; m++ )
         {
           // repeat case all CC levels
           for (uint32_t o = 0; o < m_ccLevelCount; o++ )
@@ -434,9 +434,9 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
   // test with three UTs
   for (uint32_t n = 0; n < 4; n++ )
     {
-      for (uint32_t m = n+1; m < 5; m++ )
+      for (uint32_t m = n + 1; m < 5; m++ )
         {
-          for (uint32_t o = m+2; o < 6; o++ )
+          for (uint32_t o = m + 2; o < 6; o++ )
             {
               m_frameAllocator->Reset ();
 
@@ -464,7 +464,7 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
               reqInfo.insert (std::make_pair ( req[m].m_address, std::make_pair (req[o], utBytesReq[o])) );
 
               CheckMultiUtTestResults (utAllocContainer, reqInfo);
-           }
+            }
         }
     }
 
@@ -595,7 +595,7 @@ SatFrameAllocatorTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("sat-frame-allocator", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("sat-frame-allocator", "", true);
 
   // test single UT with all configuration types, ACM and FCA disabled
   RunSingleUtTest (SatSuperframeConf::CONFIG_TYPE_0, false, false);

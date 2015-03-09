@@ -65,11 +65,13 @@ public:
   /**
    * Fragmentation enums
    */
-  typedef enum { FULL_PDU          = 0,
-                 START_PDU         = 1,
-                 CONTINUATION_PDU  = 2,
-                 END_PDU           = 3,
-                 LAST_ELEMENT       = 4 } PduStatus_t;
+  typedef enum {
+    FULL_PDU          = 0,
+    START_PDU         = 1,
+    CONTINUATION_PDU  = 2,
+    END_PDU           = 3,
+    LAST_ELEMENT       = 4
+  } PduStatus_t;
 
 private:
   uint8_t m_pduStatus;

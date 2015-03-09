@@ -44,7 +44,6 @@ namespace ns3 {
 class SatGeoHelper : public Object
 {
 public:
-
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
@@ -67,7 +66,9 @@ public:
                 Ptr<SatSuperframeSeq> seq,
                 RandomAccessSettings_s randomAccessSettings);
 
-  virtual ~SatGeoHelper () {}
+  virtual ~SatGeoHelper ()
+  {
+  }
 
   /**
    * Set an attribute value to be propagated to each NetDevice created by the
@@ -157,49 +158,48 @@ public:
    * \param stream  stream for creation trace outputs
    * \param cb  callback to connect traces
    */
-  void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+  void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
 
 private:
+  /**
+   * GEO satellite node id
+   */
+  uint32_t m_nodeId;
 
-	/**
-	 * GEO satellite node id
-	 */
-    uint32_t m_nodeId;
+  SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
+  uint32_t m_fwdLinkCarrierCount;
+  uint32_t m_rtnLinkCarrierCount;
 
-    SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
-    uint32_t m_fwdLinkCarrierCount;
-    uint32_t m_rtnLinkCarrierCount;
+  // count for devices. Currently only one device supported by helper.
+  uint16_t m_deviceCount;
 
-    // count for devices. Currently only one device supported by helper.
-    uint16_t m_deviceCount;
+  ObjectFactory m_deviceFactory;
 
-    ObjectFactory m_deviceFactory;
+  /*
+   * Configured forward link interference model for dedicated access
+   */
+  SatPhy::InterferenceModel m_daFwdLinkInterferenceModel;
 
-    /*
-     * Configured forward link interference model for dedicated access
-     */
-    SatPhy::InterferenceModel m_daFwdLinkInterferenceModel;
+  /*
+   * Configured return link interference model for dedicated access
+   */
+  SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
 
-    /*
-     * Configured return link interference model for dedicated access
-     */
-    SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
+  /**
+   * \brief Trace callback for creation traces
+   */
+  TracedCallback<std::string> m_creationTrace;
 
-    /**
-     * \brief Trace callback for creation traces
-     */
-    TracedCallback<std::string> m_creationTrace;
+  /**
+   * \brief Superframe sequence
+   */
+  Ptr<SatSuperframeSeq> m_superframeSeq;
 
-    /**
-     * \brief Superframe sequence
-     */
-    Ptr<SatSuperframeSeq> m_superframeSeq;
-
-    /**
-     * \brief The used random access model settings
-     */
-    RandomAccessSettings_s m_raSettings;
+  /**
+   * \brief The used random access model settings
+   */
+  RandomAccessSettings_s m_raSettings;
 };
 
 } // namespace ns3

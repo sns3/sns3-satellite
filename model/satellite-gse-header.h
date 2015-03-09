@@ -44,7 +44,6 @@ namespace ns3 {
 class SatGseHeader : public Header
 {
 public:
-
   /**
    * Constructor
    */
@@ -130,7 +129,6 @@ public:
   uint32_t GetMaxGseHeaderSizeInBytes () const;
 
 private:
-
   /**
    * GSE header content
    */

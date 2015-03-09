@@ -63,12 +63,12 @@ SatLlc::GetTypeId (void)
 }
 
 SatLlc::SatLlc ()
-:m_nodeInfo (),
- m_encaps (),
- m_decaps (),
- m_fwdLinkArqEnabled (false),
- m_rtnLinkArqEnabled (false),
- m_gwAddress ()
+  : m_nodeInfo (),
+    m_encaps (),
+    m_decaps (),
+    m_fwdLinkArqEnabled (false),
+    m_rtnLinkArqEnabled (false),
+    m_gwAddress ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -86,14 +86,14 @@ SatLlc::DoDispose ()
 
   EncapContainer_t::iterator it;
 
-  for ( it = m_encaps.begin(); it != m_encaps.end(); ++it)
+  for ( it = m_encaps.begin (); it != m_encaps.end (); ++it)
     {
       it->second->DoDispose ();
       it->second = 0;
     }
   m_encaps.clear ();
 
-  for ( it = m_decaps.begin(); it != m_decaps.end(); ++it)
+  for ( it = m_decaps.begin (); it != m_decaps.end (); ++it)
     {
       it->second->DoDispose ();
       it->second = 0;
@@ -133,10 +133,10 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
 
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
 
   // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_ENQUE,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -154,10 +154,10 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
   NS_LOG_FUNCTION (this << source << dest << packet);
 
   SatEnums::SatLinkDir_t ld =
-      (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
 
   // Add packet trace entry:
-  m_packetTrace (Simulator::Now(),
+  m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_RECV,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
@@ -181,7 +181,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
         {
           NS_FATAL_ERROR ("Control messages should not be received by SatLlc::Receive () method!");
         }
-        
+
       if (it == m_decaps.end ())
         {
           /**
@@ -240,7 +240,7 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Add
 
   if (cSuccess)
     {
-      if (ctrlTag.GetMsgType() != SatControlMsgTag::SAT_ARQ_ACK)
+      if (ctrlTag.GetMsgType () != SatControlMsgTag::SAT_ARQ_ACK)
         {
           NS_FATAL_ERROR ("A control message other than ARQ ACK received at the LLC!");
         }
@@ -277,7 +277,7 @@ SatLlc::AddEncap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<Sa
     {
       NS_LOG_LOGIC ("Add encapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
 
-      std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert(std::make_pair (key, enc));
+      std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, enc));
       if (result.second == false)
         {
           NS_FATAL_ERROR ("Insert to map with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ") failed!");
@@ -301,7 +301,7 @@ SatLlc::AddDecap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<Sa
     {
       NS_LOG_LOGIC ("Add Decapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
 
-      std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert(std::make_pair (key, dec));
+      std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, dec));
       if (result.second == false)
         {
           NS_FATAL_ERROR ("Insert to map with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ") failed!");
@@ -332,8 +332,8 @@ bool
 SatLlc::BuffersEmpty () const
 {
   for (EncapContainer_t::const_iterator it = m_encaps.begin ();
-      it != m_encaps.end ();
-      ++it)
+       it != m_encaps.end ();
+       ++it)
     {
       if (it->second->GetTxBufferSizeInBytes () > 0)
         {

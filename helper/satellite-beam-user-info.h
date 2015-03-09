@@ -56,7 +56,9 @@ public:
   /**
    * Destructor for SatBeamUserInfo.
    */
-  virtual ~SatBeamUserInfo () {}
+  virtual ~SatBeamUserInfo ()
+  {
+  }
 
   /**
    * \return number of UTs in beam.
@@ -90,7 +92,7 @@ public:
 private:
   // vector to store users per UT
   std::vector<uint32_t> m_userCount;
- };
+};
 
 } // namespace ns3
 

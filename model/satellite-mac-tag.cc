@@ -130,7 +130,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatFlowIdTag);
 
 
 SatFlowIdTag::SatFlowIdTag ()
-:m_flowId (0)
+  : m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
 }

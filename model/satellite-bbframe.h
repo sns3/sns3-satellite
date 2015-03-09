@@ -44,7 +44,6 @@ namespace ns3 {
 class SatBbFrame : public SimpleRefCount<SatBbFrame>
 {
 public:
-
   typedef std::vector<Ptr<Packet > > SatBbFramePayload_t;
 
   /**
@@ -147,42 +146,53 @@ public:
    * Get duration of the frame transmission.
    * \return duration of the frame transmission
    */
-  inline Time GetDuration () const { return m_duration; }
+  inline Time GetDuration () const
+  {
+    return m_duration;
+  }
 
   /**
    * Get type of the frame.
    * \return Type of the frame
    */
-  inline SatEnums::SatBbFrameType_t GetFrameType () const { return m_frameType; }
+  inline SatEnums::SatBbFrameType_t GetFrameType () const
+  {
+    return m_frameType;
+  }
 
   /**
    * Get type of the frame.
    * \return Type of the frame
    */
-  inline SatEnums::SatModcod_t GetModcod () const { return m_modCod; }
+  inline SatEnums::SatModcod_t GetModcod () const
+  {
+    return m_modCod;
+  }
 
   /**
    * Get header size of the frame.
    * \return Header size in bytes.
    */
-  inline uint32_t GetFrameHeaderSize () const { return m_headerSizeInBytes; }
+  inline uint32_t GetFrameHeaderSize () const
+  {
+    return m_headerSizeInBytes;
+  }
 
   /**
    * Callback signature for Ptr<SatBbFrame>.
    * \param bbFrame The BB frame.
    */
-  typedef void (* BbFrameCallback) (Ptr<SatBbFrame> bbFrame);
+  typedef void (*BbFrameCallback)(Ptr<SatBbFrame> bbFrame);
 
   /**
    * Callback signature for merging of two instances of SatBbFrame.
    * \param to The frame merged to.
    * \param to The frame merged from.
    */
-  typedef void (* BbFrameMergeCallback)
+  typedef void (*BbFrameMergeCallback)
     (Ptr<SatBbFrame> to, Ptr<SatBbFrame> from);
 
 private:
-
   SatEnums::SatModcod_t m_modCod;
   uint32_t m_freeSpaceInBytes;
   uint32_t m_maxSpaceInBytes;

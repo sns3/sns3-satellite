@@ -50,7 +50,6 @@ namespace ns3 {
 class SatHelper : public Object
 {
 public:
-
   /**
    * definition for beam map key is beam ID and value is UT/user info.
    */
@@ -89,7 +88,9 @@ public:
   /**
    * Destructor for SatHelper
    */
-  virtual ~SatHelper () {}
+  virtual ~SatHelper ()
+  {
+  }
 
   /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
@@ -150,14 +151,22 @@ public:
    */
   void SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, Ipv4Address sourceAddress, Ipv4Address groupAddress );
 
-  inline NodeContainer GwNodes () { return m_beamHelper->GetGwNodes(); }
-  inline NodeContainer UtNodes () { return m_beamHelper->GetUtNodes(); }
-  inline Ptr<Node> GeoSatNode () { return m_beamHelper->GetGeoSatNode(); }
+  inline NodeContainer GwNodes ()
+  {
+    return m_beamHelper->GetGwNodes ();
+  }
+  inline NodeContainer UtNodes ()
+  {
+    return m_beamHelper->GetUtNodes ();
+  }
+  inline Ptr<Node> GeoSatNode ()
+  {
+    return m_beamHelper->GetGeoSatNode ();
+  }
 
-  void DoDispose();
+  void DoDispose ();
 
 private:
-
   typedef SatBeamHelper::MulticastBeamInfoItem_t  MulticastBeamInfoItem_t;
   typedef SatBeamHelper::MulticastBeamInfo_t      MulticastBeamInfo_t;
 
@@ -340,7 +349,7 @@ private:
    *
    * \param node node pointer of Geo Satellite to set mobility
    */
-  void SetGeoSatMobility(Ptr<Node> node);
+  void SetGeoSatMobility (Ptr<Node> node);
 
   /**
    * Sets mobility to created UT nodes.

@@ -39,7 +39,6 @@ namespace ns3 {
 class SatBaseTraceContainer : public Object
 {
 public:
-
   /**
    * \brief Default Rx power density index for Rx power traces
    */
@@ -108,7 +107,6 @@ public:
   virtual void Reset () = 0;
 
 private:
-
 };
 
 } // namespace ns3

@@ -62,7 +62,7 @@ public:
 
   /**
    * Helper function to set a constant rate source.  Equivalent to
-   * setting the attributes OnTime to constant 1000 seconds, OffTime to 
+   * setting the attributes OnTime to constant 1000 seconds, OffTime to
    * constant 0 seconds, and the DataRate and PacketSize set accordingly
    *
    * \param dataRate DataRate object for the sending rate

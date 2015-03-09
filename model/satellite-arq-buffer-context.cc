@@ -30,11 +30,11 @@ NS_OBJECT_ENSURE_REGISTERED (SatArqBufferContext);
 
 
 SatArqBufferContext::SatArqBufferContext ()
-:m_pdu (),
- m_seqNo (0),
- m_retransmissionCount (0),
- m_waitingTimer (),
- m_rxStatus (false)
+  : m_pdu (),
+    m_seqNo (0),
+    m_retransmissionCount (0),
+    m_waitingTimer (),
+    m_rxStatus (false)
 {
 
 }
@@ -44,7 +44,7 @@ SatArqBufferContext::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatArqBufferContext")
     .SetParent<Object> ()
-    ;
+  ;
   return tid;
 }
 

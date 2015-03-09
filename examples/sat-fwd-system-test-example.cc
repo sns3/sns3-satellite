@@ -45,14 +45,14 @@ NS_LOG_COMPONENT_DEFINE ("sat-fwd-sys-test");
 static void PrintBbFrameInfo (Ptr<SatBbFrame> bbFrame)
 {
   std::cout
-      << "[BBFrameTx] "
-      << "Time: " << Now ().GetSeconds ()
-      << ", Frame Type: " << SatEnums::GetFrameTypeName (bbFrame->GetFrameType ())
-      << ", ModCod: " << SatEnums::GetModcodTypeName (bbFrame->GetModcod ())
-      << ", Occupancy: " << bbFrame->GetOccupancy ()
-      << ", Duration: " << bbFrame->GetDuration()
-      << ", Space used: " << bbFrame->GetSpaceUsedInBytes ()
-      << ", Space Left: " << bbFrame->GetSpaceLeftInBytes ();
+  << "[BBFrameTx] "
+  << "Time: " << Now ().GetSeconds ()
+  << ", Frame Type: " << SatEnums::GetFrameTypeName (bbFrame->GetFrameType ())
+  << ", ModCod: " << SatEnums::GetModcodTypeName (bbFrame->GetModcod ())
+  << ", Occupancy: " << bbFrame->GetOccupancy ()
+  << ", Duration: " << bbFrame->GetDuration ()
+  << ", Space used: " << bbFrame->GetSpaceUsedInBytes ()
+  << ", Space Left: " << bbFrame->GetSpaceLeftInBytes ();
 
   std::cout << " [Receivers: ";
 
@@ -145,25 +145,25 @@ main (int argc, char *argv[])
 
   switch (testCase)
     {
-      case 0: // scheduler, ACM disabled
-        Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (false));
-        break;
+    case 0:   // scheduler, ACM disabled
+      Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (false));
+      break;
 
-      case 1: // scheduler, ACM enabled
-        Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-        break;
+    case 1:   // scheduler, ACM enabled
+      Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+      break;
 
-      case 2: // ACM enabled, one UT with one user, Markov + external fading
-        Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-        Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
-        Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
-        Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
-        Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
-        gwEndUsers = 1;
-        break;
+    case 2:   // ACM enabled, one UT with one user, Markov + external fading
+      Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+      Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
+      Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
+      Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
+      Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
+      gwEndUsers = 1;
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
 
   // Creating the reference system. Note, currently the satellite module supports
@@ -195,8 +195,8 @@ main (int argc, char *argv[])
     }
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // port used for packet delivering
   uint16_t port = 9; // Discard port (RFC 863)
@@ -213,43 +213,43 @@ main (int argc, char *argv[])
 
   for ( uint32_t i = 0; i < gwEndUsers; i++)
     {
-      sink.SetAttribute ("Local", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port)));
+      sink.SetAttribute ("Local", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port)));
       sink.Install (utUsers.Get (i));
 
       ApplicationContainer senderAppAdded;
 
       switch (trafficModel)
         {
-          case 0: // CBR
-            cbr.SetAttribute ("Remote", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port)));
-            senderAppAdded = cbr.Install (gwUsers.Get(i));
-            DynamicCast<CbrApplication> (senderAppAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-            DynamicCast<CbrApplication> (senderAppAdded.Get (0))->GetAttribute ("Interval", interval );
-            break;
+        case 0:   // CBR
+          cbr.SetAttribute ("Remote", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port)));
+          senderAppAdded = cbr.Install (gwUsers.Get (i));
+          DynamicCast<CbrApplication> (senderAppAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
+          DynamicCast<CbrApplication> (senderAppAdded.Get (0))->GetAttribute ("Interval", interval );
+          break;
 
-          case 1: // On-Off
-            onOff.SetAttribute ("Remote", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get(i)), port)));
-            senderAppAdded = onOff.Install (gwUsers.Get(i));
-            DynamicCast<OnOffApplication> (senderAppAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-            DynamicCast<OnOffApplication> (senderAppAdded.Get (0))->GetAttribute ("DataRate", dataRate );
-            break;
+        case 1:   // On-Off
+          onOff.SetAttribute ("Remote", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port)));
+          senderAppAdded = onOff.Install (gwUsers.Get (i));
+          DynamicCast<OnOffApplication> (senderAppAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
+          DynamicCast<OnOffApplication> (senderAppAdded.Get (0))->GetAttribute ("DataRate", dataRate );
+          break;
 
-          default:
-            NS_FATAL_ERROR ("Not Supported Traffic Model!");
-            break;
+        default:
+          NS_FATAL_ERROR ("Not Supported Traffic Model!");
+          break;
         }
 
       senderAppAdded.Get (0)->SetStartTime (senderAppStartTime);
       senderAppStartTime += MicroSeconds (20);
     }
 
-  NS_LOG_INFO("--- sat-fwd-sys-test ---");
-  NS_LOG_INFO("  Packet size: " << packetSize.Get ());
-  NS_LOG_INFO("  Interval (CBR): " << interval.Get ().GetSeconds ());
-  NS_LOG_INFO("  Data rate (OnOff): " << dataRate.Get ());
-  NS_LOG_INFO("  Simulation length: " << simLength);
-  NS_LOG_INFO("  Number of GW end users: " << gwEndUsers);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-fwd-sys-test ---");
+  NS_LOG_INFO ("  Packet size: " << packetSize.Get ());
+  NS_LOG_INFO ("  Interval (CBR): " << interval.Get ().GetSeconds ());
+  NS_LOG_INFO ("  Data rate (OnOff): " << dataRate.Get ());
+  NS_LOG_INFO ("  Simulation length: " << simLength);
+  NS_LOG_INFO ("  Number of GW end users: " << gwEndUsers);
+  NS_LOG_INFO ("  ");
 
   /**
    * Store attributes into XML output

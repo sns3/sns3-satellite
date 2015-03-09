@@ -111,13 +111,13 @@ main (int argc, char *argv[])
   // get users
 
   NodeContainer utUsers;
-  
+
   // in full scenario get given beam UTs and use first UT's users
   // other scenarios get all UT users.
   if ( scenario == "full")
     {
       NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (beamIdInFullScenario);
-      utUsers = helper->GetUserHelper()->GetUtUsers (uts.Get (0));
+      utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
     }
   else
     {
@@ -143,8 +143,8 @@ main (int argc, char *argv[])
   gwCbr.Stop (Seconds (2.1));
 
   // create application on UT user
-  sinkHelper.SetAttribute ("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
-  cbrHelper.SetAttribute ("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
+  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
 
   ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
   utSink.Start (Seconds (1.0));
@@ -154,15 +154,15 @@ main (int argc, char *argv[])
   utCbr.Start (Seconds (7.0));
   utCbr.Stop (Seconds (9.1));
 
-  NS_LOG_INFO("--- sat-cbr-example ---");
-  NS_LOG_INFO("  Scenario used: " << scenario);
+  NS_LOG_INFO ("--- sat-cbr-example ---");
+  NS_LOG_INFO ("  Scenario used: " << scenario);
   if ( scenario == "full" )
     {
-      NS_LOG_INFO("  UT used in full scenario from beam: " << beamIdInFullScenario );
+      NS_LOG_INFO ("  UT used in full scenario from beam: " << beamIdInFullScenario );
     }
-  NS_LOG_INFO("  PacketSize: " << packetSize);
-  NS_LOG_INFO("  Interval: " << interval);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("  PacketSize: " << packetSize);
+  NS_LOG_INFO ("  Interval: " << interval);
+  NS_LOG_INFO ("  ");
 
   //To store attributes to file
 //  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
@@ -172,7 +172,7 @@ main (int argc, char *argv[])
 //  outputConfig.ConfigureDefaults ();
 //  outputConfig.ConfigureAttributes ();
 
-  Simulator::Stop (Seconds(11));
+  Simulator::Stop (Seconds (11));
   Simulator::Run ();
   Simulator::Destroy ();
 

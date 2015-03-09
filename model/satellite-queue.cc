@@ -63,38 +63,38 @@ TypeId SatQueue::GetTypeId (void)
 }
 
 SatQueue::SatQueue ()
-: Object (),
-  m_packets (),
-  m_maxPackets (0),
-  m_flowId (0),
-  m_nBytes (0),
-  m_nTotalReceivedBytes (0),
-  m_nPackets (0),
-  m_nTotalReceivedPackets (0),
-  m_nTotalDroppedBytes (0),
-  m_nTotalDroppedPackets (),
-  m_nEnqueBytesSinceReset (0),
-  m_nDequeBytesSinceReset (0),
-  m_statResetTime (0)
+  : Object (),
+    m_packets (),
+    m_maxPackets (0),
+    m_flowId (0),
+    m_nBytes (0),
+    m_nTotalReceivedBytes (0),
+    m_nPackets (0),
+    m_nTotalReceivedPackets (0),
+    m_nTotalDroppedBytes (0),
+    m_nTotalDroppedPackets (),
+    m_nEnqueBytesSinceReset (0),
+    m_nDequeBytesSinceReset (0),
+    m_statResetTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 SatQueue::SatQueue (uint8_t flowId)
-: Object (),
-  m_packets (),
-  m_maxPackets (0),
-  m_flowId (flowId),
-  m_nBytes (0),
-  m_nTotalReceivedBytes (0),
-  m_nPackets (0),
-  m_nTotalReceivedPackets (0),
-  m_nTotalDroppedBytes (0),
-  m_nTotalDroppedPackets (),
-  m_nEnqueBytesSinceReset (0),
-  m_nDequeBytesSinceReset (0),
-  m_statResetTime (Seconds (0.0))
+  : Object (),
+    m_packets (),
+    m_maxPackets (0),
+    m_flowId (flowId),
+    m_nBytes (0),
+    m_nTotalReceivedBytes (0),
+    m_nPackets (0),
+    m_nTotalReceivedPackets (0),
+    m_nTotalDroppedBytes (0),
+    m_nTotalDroppedPackets (),
+    m_nEnqueBytesSinceReset (0),
+    m_nDequeBytesSinceReset (0),
+    m_statResetTime (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -109,8 +109,8 @@ void SatQueue::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   for (EventCallbackContainer_t::iterator it = m_queueEventCallbacks.begin ();
-      it != m_queueEventCallbacks.end ();
-      ++it)
+       it != m_queueEventCallbacks.end ();
+       ++it)
     {
       (*it).Nullify ();
     }
@@ -185,7 +185,7 @@ SatQueue::Dequeue ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (IsEmpty())
+  if (IsEmpty ())
     {
       NS_LOG_LOGIC ("Queue empty");
       return 0;
@@ -274,10 +274,10 @@ SatQueue::SendEvent (SatQueue::QueueEvent_t event)
   NS_LOG_FUNCTION (this);
 
   for (EventCallbackContainer_t::const_iterator it = m_queueEventCallbacks.begin ();
-      it != m_queueEventCallbacks.end ();
-      ++it)
+       it != m_queueEventCallbacks.end ();
+       ++it)
     {
-      if (!(*it).IsNull())
+      if (!(*it).IsNull ())
         {
           (*it)(event, m_flowId);
         }
@@ -340,7 +340,7 @@ SatQueue::GetQueueStatistics (bool reset)
   QueueStats_t queueStats;
   Time duration = Simulator::Now () - m_statResetTime;
 
-  if (duration.IsStrictlyPositive())
+  if (duration.IsStrictlyPositive ())
     {
       queueStats.m_incomingRateKbps = SatConstVariables::BITS_PER_BYTE * m_nEnqueBytesSinceReset / (double)(SatConstVariables::BITS_IN_KBIT) / duration.GetSeconds ();
       queueStats.m_outgoingRateKbps = SatConstVariables::BITS_PER_BYTE * m_nDequeBytesSinceReset / (double)(SatConstVariables::BITS_IN_KBIT) / duration.GetSeconds ();
@@ -386,10 +386,10 @@ SatQueue::GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const
 
   uint32_t packets (0);
   for (PacketContainer_t::const_iterator it = m_packets.begin ();
-      it != m_packets.end ();
-      ++it)
+       it != m_packets.end ();
+       ++it)
     {
-      if ((*it)->GetSize() <= maxPacketSizeBytes)
+      if ((*it)->GetSize () <= maxPacketSizeBytes)
         {
           ++packets;
         }

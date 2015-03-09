@@ -52,9 +52,9 @@ public:
   int8_t        m_flowId;
 
   EncapKey (const Mac48Address source, const Mac48Address dest, const uint8_t flowId)
-  :m_source (source),
-   m_destination (dest),
-   m_flowId (flowId)
+    : m_source (source),
+      m_destination (dest),
+      m_flowId (flowId)
   {
   }
 };
@@ -165,7 +165,7 @@ public:
     * \param flowId Flow identifier
     * \return Boolean indicating whether the enque operation succeeded
     */
-  virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
+  virtual bool Enque (Ptr<Packet> packet, Address dest, uint8_t flowId);
 
   /**
     * \brief Called from lower layer (MAC) to inform a Tx
@@ -296,7 +296,6 @@ public:
   void SetGwAddress (Mac48Address address);
 
 protected:
-
   virtual void DoDispose ();
 
   /**

@@ -46,7 +46,6 @@ namespace ns3 {
 class OnOffKpiHelper : public KpiHelper
 {
 public:
-
   OnOffKpiHelper (KpiHelper::KpiMode_t mode);
   virtual ~OnOffKpiHelper ();
 

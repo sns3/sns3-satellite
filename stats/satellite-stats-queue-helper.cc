@@ -441,7 +441,7 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
   const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
 
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  for (NodeContainer::Iterator it1 = gws.Begin(); it1 != gws.End (); ++it1)
+  for (NodeContainer::Iterator it1 = gws.Begin (); it1 != gws.End (); ++it1)
     {
       NetDeviceContainer devs = GetGwSatNetDevice (*it1);
 
@@ -462,7 +462,7 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
           // Go through the UTs of this beam.
           ListOfUt_t listOfUt;
           NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (beamId);
-          for (NodeContainer::Iterator it2 = uts.Begin();
+          for (NodeContainer::Iterator it2 = uts.Begin ();
                it2 != uts.End (); ++it2)
             {
               const Address addr = satIdMapper->GetUtMacWithNode (*it2);
@@ -611,7 +611,7 @@ SatStatsRtnQueueHelper::DoEnlistSource ()
   NS_LOG_FUNCTION (this);
 
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin(); it != uts.End (); ++it)
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
       const uint32_t identifier = GetIdentifierForUt (*it);
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);

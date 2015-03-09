@@ -72,7 +72,7 @@ SatConstantPropagationDelayModel::GetDelay () const
 }
 
 int64_t
-SatConstantPropagationDelayModel::DoAssignStreams(int64_t s)
+SatConstantPropagationDelayModel::DoAssignStreams (int64_t s)
 {
   NS_LOG_FUNCTION (this);
   return 0;

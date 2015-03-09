@@ -41,16 +41,16 @@ NS_OBJECT_ENSURE_REGISTERED (SatGenericStreamEncapsulatorArq);
 
 
 SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq ()
-:m_seqNo (),
- m_txedBuffer (),
- m_retxBuffer (),
- m_retxBufferSize (0),
- m_txedBufferSize (0),
- m_maxNoOfRetransmissions (2),
- m_retransmissionTimer (Seconds (0.6)),
- m_arqWindowSize (10),
- m_arqHeaderSize (1),
- m_nextExpectedSeqNo (0)
+  : m_seqNo (),
+    m_txedBuffer (),
+    m_retxBuffer (),
+    m_retxBufferSize (0),
+    m_txedBufferSize (0),
+    m_maxNoOfRetransmissions (2),
+    m_retransmissionTimer (Seconds (0.6)),
+    m_arqWindowSize (10),
+    m_arqHeaderSize (1),
+    m_nextExpectedSeqNo (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -62,21 +62,21 @@ SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq ()
 
 
 SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId)
-:SatGenericStreamEncapsulator (source, dest, flowId),
- m_seqNo (),
- m_txedBuffer (),
- m_retxBuffer (),
- m_retxBufferSize (0),
- m_txedBufferSize (0),
- m_maxNoOfRetransmissions (2),
- m_retransmissionTimer (Seconds (0.6)),
- m_arqWindowSize (10),
- m_arqHeaderSize (1),
- m_nextExpectedSeqNo (0)
+  : SatGenericStreamEncapsulator (source, dest, flowId),
+    m_seqNo (),
+    m_txedBuffer (),
+    m_retxBuffer (),
+    m_retxBufferSize (0),
+    m_txedBufferSize (0),
+    m_maxNoOfRetransmissions (2),
+    m_retransmissionTimer (Seconds (0.6)),
+    m_arqWindowSize (10),
+    m_arqHeaderSize (1),
+    m_nextExpectedSeqNo (0)
 {
   NS_LOG_FUNCTION (this);
 
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   // ARQ sequence number generator
   m_seqNo = Create<SatArqSequenceNumber> (m_arqWindowSize);
@@ -95,31 +95,31 @@ SatGenericStreamEncapsulatorArq::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGenericStreamEncapsulatorArq")
     .SetParent<SatGenericStreamEncapsulator> ()
     .AddConstructor<SatGenericStreamEncapsulatorArq> ()
-    .AddAttribute( "MaxNoOfRetransmissions",
-                   "Maximum number of retransmissions for a single GSE PDU.",
-                   UintegerValue (2),
-                   MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_maxNoOfRetransmissions),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute( "RetransmissionTimer",
-                   "Retransmission time value, i.e. how long to wait for ACK before retransmission.",
-                   TimeValue (Seconds (0.6)),
-                   MakeTimeAccessor (&SatGenericStreamEncapsulatorArq::m_retransmissionTimer),
-                   MakeTimeChecker ())
-    .AddAttribute( "WindowSize",
-                   "Window size for ARQ, i.e. how many simultaneous packets are allowed in the air.",
-                   UintegerValue (10),
-                   MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_arqWindowSize),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute( "ArqHeaderSize",
-                   "ARQ header size in Bytes.",
-                   UintegerValue (1),
-                   MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_arqHeaderSize),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute( "RxWaitingTime",
-                   "Time to wait for a packet at the reception (GW) before moving onwards with the packet reception.",
-                   TimeValue (Seconds (1.8)),
-                   MakeTimeAccessor (&SatGenericStreamEncapsulatorArq::m_rxWaitingTimer),
-                   MakeTimeChecker ())
+    .AddAttribute ( "MaxNoOfRetransmissions",
+                    "Maximum number of retransmissions for a single GSE PDU.",
+                    UintegerValue (2),
+                    MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_maxNoOfRetransmissions),
+                    MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ( "RetransmissionTimer",
+                    "Retransmission time value, i.e. how long to wait for ACK before retransmission.",
+                    TimeValue (Seconds (0.6)),
+                    MakeTimeAccessor (&SatGenericStreamEncapsulatorArq::m_retransmissionTimer),
+                    MakeTimeChecker ())
+    .AddAttribute ( "WindowSize",
+                    "Window size for ARQ, i.e. how many simultaneous packets are allowed in the air.",
+                    UintegerValue (10),
+                    MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_arqWindowSize),
+                    MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ( "ArqHeaderSize",
+                    "ARQ header size in Bytes.",
+                    UintegerValue (1),
+                    MakeUintegerAccessor (&SatGenericStreamEncapsulatorArq::m_arqHeaderSize),
+                    MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ( "RxWaitingTime",
+                    "Time to wait for a packet at the reception (GW) before moving onwards with the packet reception.",
+                    TimeValue (Seconds (1.8)),
+                    MakeTimeAccessor (&SatGenericStreamEncapsulatorArq::m_rxWaitingTimer),
+                    MakeTimeChecker ())
   ;
   return tid;
 }
@@ -231,7 +231,7 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
 
   // Check the transmission buffer. Sequence number needs to be
   // available for any new transmissions.
-  else if (!m_txQueue->IsEmpty() && m_seqNo->SeqNoAvailable ())
+  else if (!m_txQueue->IsEmpty () && m_seqNo->SeqNoAvailable ())
     {
       // Crate new GSE PDU
       packet = GetNewGsePdu (bytes, bytes, m_arqHeaderSize);
@@ -279,7 +279,7 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
             }
 
           NS_LOG_LOGIC ("GW: << " << m_sourceAddress << " sent a packet of size: " << packet->GetSize () << " with seqNo: " << (uint32_t)(seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
-          NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes());
+          NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes ());
         }
     }
 
@@ -303,9 +303,9 @@ SatGenericStreamEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 
   if (it != m_txedBuffer.end ())
     {
-    	NS_ASSERT (seqNo == it->second->m_seqNo);
+      NS_ASSERT (seqNo == it->second->m_seqNo);
       NS_ASSERT (it->second->m_pdu);
-    
+
       // Retransmission still possible
       if (it->second->m_retransmissionCount < m_maxNoOfRetransmissions)
         {
@@ -403,7 +403,7 @@ SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
-  else if (mTag.GetDestAddress() != m_destAddress)
+  else if (mTag.GetDestAddress () != m_destAddress)
     {
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
@@ -479,7 +479,7 @@ SatGenericStreamEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
       // An expected sequence number received, reassemble and receive.
       else
         {
-          ReassembleAndReceive();
+          ReassembleAndReceive ();
         }
     }
   else
@@ -505,7 +505,7 @@ SatGenericStreamEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
   if (seqNo >= rawSeqNo)
     {
       // If seqNo is from previous round
-      if ((seqNo - rawSeqNo) > 2*m_arqWindowSize)
+      if ((seqNo - rawSeqNo) > 2 * m_arqWindowSize)
         {
           rounds--;
         }
@@ -513,7 +513,7 @@ SatGenericStreamEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
   // seqNo < rawSeqNo
   else
     {
-      if ((rawSeqNo - seqNo) > 2*m_arqWindowSize)
+      if ((rawSeqNo - seqNo) > 2 * m_arqWindowSize)
         {
           rounds++;
         }

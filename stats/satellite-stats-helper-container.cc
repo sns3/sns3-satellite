@@ -119,7 +119,7 @@ SatStatsHelperContainer::DoDispose ()
                    SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
 
 #define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, desc)                                \
-  .AddAttribute (#id,                                                         \
+  .AddAttribute (# id,                                                         \
                  std::string ("Enable the output of ") + desc,                \
                  EnumValue (SatStatsHelper::OUTPUT_NONE),                     \
                  MakeEnumAccessor (&SatStatsHelperContainer::Add ## id),      \
@@ -352,20 +352,20 @@ SatStatsHelperContainer::GetTypeId ()
     // Capacity request statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalCapacityRequest,
                                   "global capacity request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwCapacityRequest,
                                   "per GW capacity request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamCapacityRequest,
                                   "per beam capacity request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtCapacityRequest,
                                   "per UT capacity request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Resources granted statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (ResourcesGranted,
@@ -374,56 +374,56 @@ SatStatsHelperContainer::GetTypeId ()
     // Backlogged request statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalBackloggedRequest,
                                   "global backlogged request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwBackloggedRequest,
                                   "per GW backlogged request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamBackloggedRequest,
                                   "per beam backlogged request statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Frame load statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFrameSymbolLoad,
                                   "global frame load (in ratio of allocated symbols) statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwFrameSymbolLoad,
                                   "per GW frame load (in ratio of allocated symbols) statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamFrameSymbolLoad,
                                   "per beam frame load (in ratio of allocated symbols) statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFrameUserLoad,
                                   "global frame load (in number of scheduled users) statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwFrameUserLoad,
                                   "per GW frame load (in number of scheduled users) statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamFrameUserLoad,
                                   "per UT frame load (in number of scheduled users) statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
-                         SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
 
     // Waveform usage statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalWaveformUsage,
                                   "global waveform usage statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                         SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwWaveformUsage,
                                   "per GW waveform usage statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                         SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamWaveformUsage,
                                   "per beam waveform usage statistics")
-        MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
-                         SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
 
     // Link SINR statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdFeederLinkSinr,
@@ -466,9 +466,9 @@ SatStatsHelperContainer::SetName (std::string name)
   for (size_t pos = name.find_first_of (" /");
        pos != std::string::npos;
        pos = name.find_first_of (" /", pos + 1, 1))
-    {
-      name[pos] = '_';
-    }
+  {
+    name[pos] = '_';
+  }
 
   m_name = name;
 }
@@ -511,151 +511,151 @@ SatStatsHelperContainer::GetName () const
  */
 
 #define SAT_STATS_GLOBAL_METHOD_DEFINITION(id, name)                          \
-void                                                                          \
-SatStatsHelperContainer::AddGlobal ## id (SatStatsHelper::OutputType_t type)  \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddGlobal ## id (SatStatsHelper::OutputType_t type)  \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-global-" + name                               \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);            \
       stat->SetOutputType (type);                                             \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_PER_GW_METHOD_DEFINITION(id, name)                          \
-void                                                                          \
-SatStatsHelperContainer::AddPerGw ## id (SatStatsHelper::OutputType_t type)   \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddPerGw ## id (SatStatsHelper::OutputType_t type)   \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-gw-" + name                               \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);                \
       stat->SetOutputType (type);                                             \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_PER_BEAM_METHOD_DEFINITION(id, name)                        \
-void                                                                          \
-SatStatsHelperContainer::AddPerBeam ## id (SatStatsHelper::OutputType_t type) \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddPerBeam ## id (SatStatsHelper::OutputType_t type) \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-beam-" + name                             \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);              \
       stat->SetOutputType (type);                                             \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_PER_UT_METHOD_DEFINITION(id, name)                          \
-void                                                                          \
-SatStatsHelperContainer::AddPerUt ## id (SatStatsHelper::OutputType_t type)   \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddPerUt ## id (SatStatsHelper::OutputType_t type)   \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-ut-" + name                               \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                \
       stat->SetOutputType (type);                                             \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_PER_UT_USER_METHOD_DEFINITION(id, name)                     \
-void                                                                          \
-SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-per-ut-user-" + name                          \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \
       stat->SetOutputType (type);                                             \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION(id, name)                    \
-void                                                                          \
-SatStatsHelperContainer::AddAverageBeam ## id (SatStatsHelper::OutputType_t type) \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddAverageBeam ## id (SatStatsHelper::OutputType_t type) \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-average-beam-" + name                             \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);              \
       stat->SetOutputType (type);                                             \
       stat->SetAveragingMode (true);                                          \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_AVERAGE_UT_METHOD_DEFINITION(id, name)                      \
-void                                                                          \
-SatStatsHelperContainer::AddAverageUt ## id (SatStatsHelper::OutputType_t type) \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddAverageUt ## id (SatStatsHelper::OutputType_t type) \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-average-ut-" + name                           \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                \
       stat->SetOutputType (type);                                             \
       stat->SetAveragingMode (true);                                          \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 #define SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION(id, name)                 \
-void                                                                          \
-SatStatsHelperContainer::AddAverageUtUser ## id (SatStatsHelper::OutputType_t type) \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
+  void                                                                          \
+  SatStatsHelperContainer::AddAverageUtUser ## id (SatStatsHelper::OutputType_t type) \
+  {                                                                             \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                    \
     {                                                                         \
       Ptr<SatStats ## id ## Helper> stat                                      \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);               \
       stat->SetName (m_name + "-average-ut-user-" + name                      \
-                            + GetOutputTypeSuffix (type));                    \
+                     + GetOutputTypeSuffix (type));                    \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);           \
       stat->SetOutputType (type);                                             \
       stat->SetAveragingMode (true);                                          \
       stat->Install ();                                                       \
       m_stats.push_back (stat);                                               \
     }                                                                         \
-}
+  }
 
 // Forward link application-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdAppDelay, "fwd-app-delay")
@@ -924,34 +924,34 @@ std::string // static
 SatStatsHelperContainer::GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType)
 {
   switch (outputType)
-    {
-    case SatStatsHelper::OUTPUT_NONE:
-      return "";
+  {
+  case SatStatsHelper::OUTPUT_NONE:
+    return "";
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      return "-scalar";
+  case SatStatsHelper::OUTPUT_SCALAR_FILE:
+  case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+    return "-scalar";
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      return "-scatter";
+  case SatStatsHelper::OUTPUT_SCATTER_FILE:
+  case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+    return "-scatter";
 
-    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
-    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
-      return "-histogram";
+  case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+  case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    return "-histogram";
 
-    case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_PDF_PLOT:
-      return "-pdf";
+  case SatStatsHelper::OUTPUT_PDF_FILE:
+  case SatStatsHelper::OUTPUT_PDF_PLOT:
+    return "-pdf";
 
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      return "-cdf";
+  case SatStatsHelper::OUTPUT_CDF_FILE:
+  case SatStatsHelper::OUTPUT_CDF_PLOT:
+    return "-cdf";
 
-    default:
-      NS_FATAL_ERROR ("SatStatsHelperContainer - Invalid output type");
-      break;
-    }
+  default:
+    NS_FATAL_ERROR ("SatStatsHelperContainer - Invalid output type");
+    break;
+  }
 
   NS_FATAL_ERROR ("SatStatsHelperContainer - Invalid output type");
   return "";

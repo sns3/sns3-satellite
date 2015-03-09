@@ -87,7 +87,6 @@ class DataCollectionObject;
 class SatStatsHelper : public Object
 {
 public:
-
   // COMMON ENUM DATA TYPES ///////////////////////////////////////////////////
 
   /**

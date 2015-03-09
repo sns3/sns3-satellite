@@ -33,7 +33,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatEnvVariables);
 
-TypeId 
+TypeId
 SatEnvVariables::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatEnvVariables")
@@ -90,33 +90,33 @@ SatEnvVariables::GetTypeId (void)
 TypeId
 SatEnvVariables::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
-SatEnvVariables::SatEnvVariables () :
-  m_currentWorkingDirectory (""),
-  m_pathToExecutable (""),
-  m_currentWorkingDirectoryFromAttribute (""),
-  m_pathToExecutableFromAttribute (""),
-  m_levelsToCheck (10),
-  m_dataPath ("contrib/satellite/data"),
-  m_outputPath (""),
-  m_campaignName (""),
-  m_simRootPath ("contrib/satellite/data/sims"),
-  m_simTag ("default"),
-  m_enableOutputOverwrite (true),
-  m_isOutputPathInitialized (false),
-  m_enableSimInfoOutput (true),
-  m_enableSimInfoDiffOutput (true),
-  m_excludeDataFolderFromDiff (true),
-  m_isInitialized (false)
+SatEnvVariables::SatEnvVariables ()
+  : m_currentWorkingDirectory (""),
+    m_pathToExecutable (""),
+    m_currentWorkingDirectoryFromAttribute (""),
+    m_pathToExecutableFromAttribute (""),
+    m_levelsToCheck (10),
+    m_dataPath ("contrib/satellite/data"),
+    m_outputPath (""),
+    m_campaignName (""),
+    m_simRootPath ("contrib/satellite/data/sims"),
+    m_simTag ("default"),
+    m_enableOutputOverwrite (true),
+    m_isOutputPathInitialized (false),
+    m_enableSimInfoOutput (true),
+    m_enableSimInfoDiffOutput (true),
+    m_excludeDataFolderFromDiff (true),
+    m_isInitialized (false)
 {
   NS_LOG_FUNCTION (this);
 
   // Attributes are needed already in construction phase:
   // - ConstructSelf call in constructor
   // - GetInstanceTypeId needs to be implemented
-  ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   Initialize ();
 }
@@ -132,7 +132,7 @@ SatEnvVariables::DoInitialize ()
 
       if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
         {
-          NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
+          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
         }
       currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
       m_currentWorkingDirectory = std::string (currentWorkingDirectory);
@@ -143,7 +143,7 @@ SatEnvVariables::DoInitialize ()
                     pathToExecutable,
                     sizeof (pathToExecutable)) < 0)
         {
-          NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
+          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
         }
       pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
       m_pathToExecutable = std::string (pathToExecutable);
@@ -166,7 +166,7 @@ SatEnvVariables::DoDispose ()
             }
 
           DumpSimulationInformation ();
-      }
+        }
 
       m_currentWorkingDirectory = "";
       m_pathToExecutable = "";
@@ -271,7 +271,7 @@ SatEnvVariables::IsValidDirectory (std::string path)
   struct stat st;
   bool validDirectory = false;
 
-  if (stat(path.c_str (),&st) == 0)
+  if (stat (path.c_str (),&st) == 0)
     {
       if (st.st_mode && S_IFDIR != 0)
         {
@@ -345,9 +345,9 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
   bool directoryExists = false;
   std::string simRootPath = LocateDirectory (m_simRootPath);
 
-  if (!campaignName.empty())
+  if (!campaignName.empty ())
     {
-      std::string tempString = AddToPath(simRootPath, campaignName);
+      std::string tempString = AddToPath (simRootPath, campaignName);
 
       if (!IsValidDirectory (tempString))
         {
@@ -360,7 +360,7 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
       outputPath = FormOutputPath (simRootPath, campaignName, simTag, safetyTag);
       directoryExists = IsValidDirectory (outputPath);
 
-      if( (!directoryExists && !enableOutputOverwrite) || enableOutputOverwrite)
+      if ( (!directoryExists && !enableOutputOverwrite) || enableOutputOverwrite)
         {
           CreateDirectory (outputPath);
           directoryExists = true;
@@ -373,7 +373,7 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
 
           std::stringstream ss;
           ss << safety;
-          safetyTag = ss.str();
+          safetyTag = ss.str ();
         }
     }
 
@@ -392,14 +392,14 @@ SatEnvVariables::FormOutputPath (std::string simRootPath, std::string campaignNa
 
   tempTag << simTag;
 
-  if (!safetyTag.empty())
+  if (!safetyTag.empty ())
     {
       tempTag << safetyTag;
     }
 
-  outputPath = AddToPath(outputPath, simRootPath);
-  outputPath = AddToPath(outputPath, campaignName);
-  outputPath = AddToPath(outputPath, tempTag.str ());
+  outputPath = AddToPath (outputPath, simRootPath);
+  outputPath = AddToPath (outputPath, campaignName);
+  outputPath = AddToPath (outputPath, tempTag.str ());
 
   NS_LOG_INFO ("SatEnvVariables::FormOutputPath - Formed path " + outputPath);
 
@@ -414,9 +414,9 @@ SatEnvVariables::AddToPath (std::string path, std::string stringToAdd)
   std::stringstream tempPath;
   tempPath << path;
 
-  if (!stringToAdd.empty())
+  if (!stringToAdd.empty ())
     {
-      if (tempPath.str ().empty())
+      if (tempPath.str ().empty ())
         {
           tempPath << stringToAdd;
         }
@@ -435,7 +435,7 @@ SatEnvVariables::CreateDirectory (std::string path)
 
   NS_LOG_INFO ("SatEnvVariables::CreateDirectory - Creating directory " + path);
 
-  mkdir (path.c_str(), 0777);
+  mkdir (path.c_str (), 0777);
 }
 
 std::string
@@ -463,22 +463,22 @@ SatEnvVariables::ExecuteCommandAndReadOutput (std::string command, Ptr<SatOutput
 {
   NS_LOG_FUNCTION (this);
 
-  FILE* pipe = popen(command.c_str (), "r");
+  FILE* pipe = popen (command.c_str (), "r");
   if (pipe)
     {
       std::string data = "";
       char buffer[1024];
-      while(!feof(pipe))
+      while (!feof (pipe))
         {
-          if(fgets(buffer, 1024, pipe) != NULL)
+          if (fgets (buffer, 1024, pipe) != NULL)
             {
-              buffer[strlen(buffer)-1] = '\0';
+              buffer[strlen (buffer) - 1] = '\0';
               data.append (buffer);
               outputContainer->AddToContainer (data);
               data = "";
             }
         }
-      pclose(pipe);
+      pclose (pipe);
     }
 }
 

@@ -90,7 +90,7 @@ public:
    *
    * \return The requested carrier id of the super frame.
    */
-  uint32_t GetCarrierId( uint8_t superframeId, uint8_t frameId, uint16_t frameCarrierId ) const;
+  uint32_t GetCarrierId ( uint8_t superframeId, uint8_t frameId, uint16_t frameCarrierId ) const;
 
   /**
    * \brief Get carrier count of the super frame sequence.
@@ -140,7 +140,10 @@ public:
    * \brief Get target duration for sequence.
    * \return target duration for sequence
    */
-  inline Time GetTargetDuration () const { return m_targetDuration; }
+  inline Time GetTargetDuration () const
+  {
+    return m_targetDuration;
+  }
 
 private:
   typedef std::map<uint32_t, Ptr<SatControlMsgContainer> > TbtpMap_t;

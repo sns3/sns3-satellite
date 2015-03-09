@@ -35,25 +35,25 @@ NS_OBJECT_ENSURE_REGISTERED (SatSuperframeAllocator);
 TypeId
 SatSuperframeAllocator::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::SatSuperframeAllocator")
-      .SetParent<Object> ()
-      .AddAttribute ("TargetLoad",
-                     "Target load limits upper bound of the symbols in a frame.",
-                      DoubleValue (0.9),
-                      MakeDoubleAccessor (&SatSuperframeAllocator::m_targetLoad),
-                      MakeDoubleChecker<double> ())
-      .AddAttribute ("FcaEnabled",
-                     "Free capacity allocation (FCA) enable status.",
-                      BooleanValue (false),
-                      MakeBooleanAccessor (&SatSuperframeAllocator::m_fcaEnabled),
-                      MakeBooleanChecker ())
-      .AddAttribute ("RcBasedAllocationEnabled",
-                     "Time slot generated per RC symbols instead of sum of UT symbols.",
-                      BooleanValue (false),
-                      MakeBooleanAccessor (&SatSuperframeAllocator::m_rcBasedAllocationEnabled),
-                      MakeBooleanChecker ())
-    ;
-    return tid;
+  static TypeId tid = TypeId ("ns3::SatSuperframeAllocator")
+    .SetParent<Object> ()
+    .AddAttribute ("TargetLoad",
+                   "Target load limits upper bound of the symbols in a frame.",
+                   DoubleValue (0.9),
+                   MakeDoubleAccessor (&SatSuperframeAllocator::m_targetLoad),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("FcaEnabled",
+                   "Free capacity allocation (FCA) enable status.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatSuperframeAllocator::m_fcaEnabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("RcBasedAllocationEnabled",
+                   "Time slot generated per RC symbols instead of sum of UT symbols.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatSuperframeAllocator::m_rcBasedAllocationEnabled),
+                   MakeBooleanChecker ())
+  ;
+  return tid;
 }
 
 TypeId
@@ -61,17 +61,17 @@ SatSuperframeAllocator::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, uint8_t maxRcCount)
- : m_superframeConf (superFrameConf),
-   m_targetLoad (0.0),
-   m_fcaEnabled (false),
-   m_maxRcCount (maxRcCount),
-   m_minCarrierPayloadInBytes (0),
-   m_minimumRateBasedBytesLeft (0),
-   m_rcBasedAllocationEnabled (false)
+  : m_superframeConf (superFrameConf),
+    m_targetLoad (0.0),
+    m_fcaEnabled (false),
+    m_maxRcCount (maxRcCount),
+    m_minCarrierPayloadInBytes (0),
+    m_minimumRateBasedBytesLeft (0),
+    m_rcBasedAllocationEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -85,7 +85,7 @@ SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFram
       if (frameConf->IsRandomAccess () == false )
         {
           Ptr<SatFrameAllocator> frameAllocator = Create<SatFrameAllocator> (frameConf, i, superFrameConf->GetConfigType ());
-          m_frameAllocators.push_back( frameAllocator );
+          m_frameAllocators.push_back ( frameAllocator );
 
           uint32_t minCarrierPayloadInBytes = frameAllocator->GetCarrierMinPayloadInBytes ();
 
@@ -172,7 +172,7 @@ void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool
 
   if ( rateBasedByteToCheck > m_minCarrierPayloadInBytes )
     {
-      NS_FATAL_ERROR ("Minimum requested bytes (" << minimumRateBytes << ") for UT is greater than bytes in minimum carrier (" << m_minCarrierPayloadInBytes<< ")");
+      NS_FATAL_ERROR ("Minimum requested bytes (" << minimumRateBytes << ") for UT is greater than bytes in minimum carrier (" << m_minCarrierPayloadInBytes << ")");
     }
   else if ( rateBasedByteToCheck > m_minimumRateBasedBytesLeft )
     {

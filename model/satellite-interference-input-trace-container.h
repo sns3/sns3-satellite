@@ -36,7 +36,6 @@ namespace ns3 {
 class SatInterferenceInputTraceContainer : public SatBaseTraceContainer
 {
 public:
-
   /**
    * \brief typedef for map key
    */
@@ -87,7 +86,6 @@ public:
   void Reset ();
 
 private:
-
   /**
    * \brief Function for adding the node to the map
    * \param key key

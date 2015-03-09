@@ -42,8 +42,8 @@ SatFwdCarrierConf::SatFwdCarrierConf (double bandwidthInHz, double rollOff, doub
 {
   NS_LOG_FUNCTION (this << bandwidthInHz << rollOff << spacing);
 
-  if ((spacing < 0.00 ) || ( spacing > 1.00 ) ||
-      (rollOff < 0.00 ) || ( rollOff > 1.00 ))
+  if ((spacing < 0.00 ) || ( spacing > 1.00 )
+      || (rollOff < 0.00 ) || ( rollOff > 1.00 ))
     {
       NS_FATAL_ERROR ("Unvalid carrier spacing and/or roll-off parameters!");
     }

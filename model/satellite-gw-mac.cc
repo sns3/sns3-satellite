@@ -74,19 +74,19 @@ SatGwMac::GetTypeId (void)
 }
 
 SatGwMac::SatGwMac ()
- : SatMac (),
-   m_fwdScheduler (),
-   m_dummyFrameSendingEnabled (false),
-   m_guardTime (MicroSeconds (1))
+  : SatMac (),
+    m_fwdScheduler (),
+    m_dummyFrameSendingEnabled (false),
+    m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatGwMac::SatGwMac (uint32_t beamId)
- : SatMac (beamId),
-   m_fwdScheduler (),
-   m_dummyFrameSendingEnabled (false),
-   m_guardTime (MicroSeconds (1))
+  : SatMac (beamId),
+    m_fwdScheduler (),
+    m_dummyFrameSendingEnabled (false),
+    m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -107,7 +107,7 @@ SatGwMac::DoDispose ()
 }
 
 void
-SatGwMac::StartPeriodicTransmissions()
+SatGwMac::StartPeriodicTransmissions ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -154,7 +154,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
         }
 
-      NS_LOG_LOGIC ("Packet from " << macTag.GetSourceAddress() << " to " << macTag.GetDestAddress());
+      NS_LOG_LOGIC ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
       NS_LOG_LOGIC ("Receiver " << m_nodeInfo->GetMacAddress ());
 
       // If the packet is intended for this receiver
@@ -187,7 +187,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
         }
       else
         {
-          NS_LOG_LOGIC("Packet intended for others received by MAC: " << m_nodeInfo->GetMacAddress ());
+          NS_LOG_LOGIC ("Packet intended for others received by MAC: " << m_nodeInfo->GetMacAddress ());
         }
     }
 }
@@ -221,7 +221,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
                      SatEnums::LL_MAC,
                      SatEnums::LD_FORWARD,
                      SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
-                     
+
       SatSignalParameters::txInfo_s txInfo;
       txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
       txInfo.modCod = bbFrame->GetModcod ();
@@ -263,7 +263,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     }
 
   switch (ctrlTag.GetMsgType ())
-  {
+    {
     case SatControlMsgTag::SAT_CR_CTRL_MSG:
       {
         uint32_t msgId = ctrlTag.GetMsgId ();
@@ -271,11 +271,11 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( crMsg != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress(), crMsg->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress (), crMsg->GetCnoEstimate ());
 
             if ( m_crReceiveCallback.IsNull () == false )
               {
-                m_crReceiveCallback (m_beamId, macTag.GetSourceAddress(), crMsg);
+                m_crReceiveCallback (m_beamId, macTag.GetSourceAddress (), crMsg);
               }
           }
         else
@@ -303,7 +303,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( cnoReport != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress(), cnoReport->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress (), cnoReport->GetCnoEstimate ());
           }
         else
           {
@@ -340,7 +340,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         NS_FATAL_ERROR ("SatGwMac received a non-supported control packet!");
         break;
       }
-  }
+    }
 }
 
 void

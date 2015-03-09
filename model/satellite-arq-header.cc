@@ -29,7 +29,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatArqHeader);
 
 SatArqHeader::SatArqHeader ()
-:m_seqNo (0)
+  : m_seqNo (0)
 {
 }
 
@@ -68,7 +68,7 @@ uint32_t SatArqHeader::Deserialize (Buffer::Iterator start)
   Buffer::Iterator i = start;
 
   m_seqNo = i.ReadU8 ();
-  return GetSerializedSize();
+  return GetSerializedSize ();
 }
 
 void SatArqHeader::Print (std::ostream &os) const

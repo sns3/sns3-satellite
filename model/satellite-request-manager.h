@@ -43,7 +43,6 @@ namespace ns3 {
 class SatRequestManager : public Object
 {
 public:
-
   SatRequestManager ();
   virtual ~SatRequestManager ();
 
@@ -144,7 +143,7 @@ public:
    * \param address the MAC address of the current node.
    * \param message the CR message to be transmitted.
    */
-  typedef void (* CapacityRequestTraceCallback)
+  typedef void (*CapacityRequestTraceCallback)
     (Time time, Mac48Address address, Ptr<SatCrMessage> message);
 
   /**
@@ -159,32 +158,31 @@ public:
    *                      and
    *                    - queue size (in bytes).
    */
-  typedef void (* CapacityRequestTraceLogCallback)
+  typedef void (*CapacityRequestTraceLogCallback)
     (std::string traceLog);
 
   /**
    * \brief Callback signature for `RbdcTrace` trace source.
    * \param requestSize amount of requested size via RBDC (in kbps).
    */
-  typedef void (* RbdcTraceCallback)
+  typedef void (*RbdcTraceCallback)
     (uint32_t requestSize);
 
   /**
    * \brief Callback signature for `VbdcTrace` trace source.
    * \param requestSize amount of requested size via VBDC (in bytes).
    */
-  typedef void (* VbdcTraceCallback)
+  typedef void (*VbdcTraceCallback)
     (uint32_t requestSize);
 
   /**
    * \brief Callback signature for `AvbdcTrace` trace source.
    * \param requestSize amount of requested size via AVBDC (in bytes).
    */
-  typedef void (* AvbdcTraceCallback)
+  typedef void (*AvbdcTraceCallback)
     (uint32_t requestSize);
 
 private:
-
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
 
   /**

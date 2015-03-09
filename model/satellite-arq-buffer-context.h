@@ -39,7 +39,9 @@ class SatArqBufferContext : public Object
 {
 public:
   SatArqBufferContext ();
-  ~SatArqBufferContext () {};
+  ~SatArqBufferContext ()
+  {
+  }
 
   static TypeId GetTypeId ();
   virtual void DoDispose ();

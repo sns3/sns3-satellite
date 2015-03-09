@@ -30,7 +30,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatRxPowerOutputTraceContainer);
 
-TypeId 
+TypeId
 SatRxPowerOutputTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRxPowerOutputTraceContainer")
@@ -47,8 +47,8 @@ SatRxPowerOutputTraceContainer::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer () :
-  m_enableFigureOutput (true)
+SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer ()
+  : m_enableFigureOutput (true)
 {
   NS_LOG_FUNCTION (this);
 }

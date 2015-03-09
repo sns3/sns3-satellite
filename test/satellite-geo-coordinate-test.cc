@@ -38,14 +38,14 @@ using namespace ns3;
 #ifdef PRINT_POSITION_INFO
 static void PrintPositionInfo (GeoCoordinate pos)
 {
-  Vector pos2 = pos.ToVector();
+  Vector pos2 = pos.ToVector ();
 
-   // sets number of decimal places
-  std::cout.setf(std::ios::fixed, std::ios::floatfield);
-  std::cout.precision(15);
+  // sets number of decimal places
+  std::cout.setf (std::ios::fixed, std::ios::floatfield);
+  std::cout.precision (15);
   std::cout << pos.GetRefEllipsoid () << " position="  "x=" << pos2.x << ", y=" << pos2.y
-                                 << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude()
-                                 << ", latitude=" << pos.GetLatitude() << ", altitude=" << pos.GetAltitude()  << std::endl;
+            << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude ()
+            << ", latitude=" << pos.GetLatitude () << ", altitude=" << pos.GetAltitude ()  << std::endl;
 }
 #endif
 
@@ -80,26 +80,26 @@ GeoCoordinateTestCase::DoRun (void)
 
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-geo-coordinate", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-geo-coordinate", "", true);
 
   for (int i = -180; i <= 180; i += 30)
     {
-      position1 = GeoCoordinate (i/2, i, i*30);
+      position1 = GeoCoordinate (i / 2, i, i * 30);
       position2 = GeoCoordinate (position1.ToVector ());
 
       Validate ( position1, position2 );
 
-      position1 = GeoCoordinate (i/2, i, i*30, GeoCoordinate::SPHERE);
+      position1 = GeoCoordinate (i / 2, i, i * 30, GeoCoordinate::SPHERE);
       position2 = GeoCoordinate (position1.ToVector (), GeoCoordinate::SPHERE);
 
       Validate ( position1, position2 );
 
-      position1 = GeoCoordinate (i/2, i, i*30, GeoCoordinate::WGS84);
+      position1 = GeoCoordinate (i / 2, i, i * 30, GeoCoordinate::WGS84);
       position2 = GeoCoordinate (position1.ToVector (), GeoCoordinate::WGS84);
 
       Validate ( position1, position2 );
 
-      position1 = GeoCoordinate (i/2, i, i*30, GeoCoordinate::GRS80);
+      position1 = GeoCoordinate (i / 2, i, i * 30, GeoCoordinate::GRS80);
       position2 = GeoCoordinate (position1.ToVector (), GeoCoordinate::GRS80);
 
       Validate ( position1, position2 );
@@ -115,26 +115,26 @@ GeoCoordinateTestCase::Validate (GeoCoordinate& position1, GeoCoordinate& positi
   bool altSignSame, lonSignSame, latSignSame = false;
 
 #ifdef PRINT_POSITION_INFO
-  PrintPositionInfo(position1);
-  PrintPositionInfo(position2);
+  PrintPositionInfo (position1);
+  PrintPositionInfo (position2);
 #endif
 
-  altDiff = std::abs(position1.GetAltitude() - position2.GetAltitude());
-  lonDiff = std::abs(position1.GetLongitude() - position2.GetLongitude());
-  latDiff = std::abs(position1.GetLatitude() - position2.GetLatitude());
+  altDiff = std::abs (position1.GetAltitude () - position2.GetAltitude ());
+  lonDiff = std::abs (position1.GetLongitude () - position2.GetLongitude ());
+  latDiff = std::abs (position1.GetLatitude () - position2.GetLatitude ());
 
-  altSignSame = ((position1.GetAltitude() > 0) ==  (position2.GetAltitude() > 0));
-  lonSignSame = ((position1.GetLongitude() > 0) ==  (position2.GetLongitude() > 0));
-  latSignSame = ((position1.GetLatitude() > 0) == (position2.GetLatitude() > 0));
+  altSignSame = ((position1.GetAltitude () > 0) ==  (position2.GetAltitude () > 0));
+  lonSignSame = ((position1.GetLongitude () > 0) ==  (position2.GetLongitude () > 0));
+  latSignSame = ((position1.GetLatitude () > 0) == (position2.GetLatitude () > 0));
 
   // check that is difference is ok
-  NS_TEST_ASSERT_MSG_LT(altDiff, 0.0001, "Altitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(lonDiff, 0.0001, "Longitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT(latDiff, 0.0001, "Latitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT (altDiff, 0.0001, "Altitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT (lonDiff, 0.0001, "Longitude difference too big!");
+  NS_TEST_ASSERT_MSG_LT (latDiff, 0.0001, "Latitude difference too big!");
 
-  NS_TEST_ASSERT_MSG_EQ( altSignSame, true, "Altitude signs are different.");
-  NS_TEST_ASSERT_MSG_EQ( lonSignSame, true, "Longitude signs are different.");
-  NS_TEST_ASSERT_MSG_EQ( latSignSame, true, "Latitude signs are different.");
+  NS_TEST_ASSERT_MSG_EQ ( altSignSame, true, "Altitude signs are different.");
+  NS_TEST_ASSERT_MSG_EQ ( lonSignSame, true, "Longitude signs are different.");
+  NS_TEST_ASSERT_MSG_EQ ( latSignSame, true, "Latitude signs are different.");
 }
 
 /**

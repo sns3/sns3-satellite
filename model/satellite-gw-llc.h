@@ -91,7 +91,6 @@ public:
   virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
 
 protected:
-
   void DoDispose ();
 
   /**

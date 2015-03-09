@@ -72,10 +72,10 @@ SatFreeSpaceLossTestCase::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables("test-sat-fsl", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-fsl", "", true);
 
   SatFreeSpaceLoss fsl;
-  double frequency = 17.9 * std::pow(10.0, 9); // reference frequency
+  double frequency = 17.9 * std::pow (10.0, 9); // reference frequency
 
   // Create simple scenario
 
@@ -87,41 +87,41 @@ SatFreeSpaceLossTestCase::DoRun (void)
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
-  helper->CreatePredefinedScenario(SatHelper::SIMPLE);
+  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
-  NodeContainer gw = helper->GwNodes();
-  NodeContainer ut = helper->UtNodes();
-  Ptr<Node> geo = helper->GeoSatNode();
+  NodeContainer gw = helper->GwNodes ();
+  NodeContainer ut = helper->UtNodes ();
+  Ptr<Node> geo = helper->GeoSatNode ();
 
   // get mobilities
-  Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel> ();
-  Ptr<SatMobilityModel> utMob = ut.Get(0)->GetObject<SatMobilityModel> ();
+  Ptr<SatMobilityModel> gwMob = gw.Get (0)->GetObject<SatMobilityModel> ();
+  Ptr<SatMobilityModel> utMob = ut.Get (0)->GetObject<SatMobilityModel> ();
   Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel> ();
 
   // set reference positions for test
-  gwMob->SetGeoPosition(GeoCoordinate(25.28, 54.689444, 0.0));
-  utMob->SetGeoPosition(GeoCoordinate(25.00, -26.20, 230.0));
-  geoMob->SetGeoPosition(GeoCoordinate(0.0, 33.0, 35786000.0));
+  gwMob->SetGeoPosition (GeoCoordinate (25.28, 54.689444, 0.0));
+  utMob->SetGeoPosition (GeoCoordinate (25.00, -26.20, 230.0));
+  geoMob->SetGeoPosition (GeoCoordinate (0.0, 33.0, 35786000.0));
 
   // test fsl calculation in path UT - Geo Satellite
   //  double fsl_ratio = fsl.GetFsl(utMob, geoMob, frequency);
-  double fsl_dB = fsl.GetFsldB(utMob, geoMob, frequency);
+  double fsl_dB = fsl.GetFsldB (utMob, geoMob, frequency);
 
   // Calculations with big double numbers there will produce results
   // with different precisions when compiled with optimized and debug flags.
   // TODO: check whether we could change e.g. the waf configure to avoid the precision problem.
   //  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 883122910318077150000.0, 1.1,"FSL (UT-GEO) ratio incorrect");
-  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 209.460211515483, 0.1, "FSL (UT-GEO) in dBs incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL ( fsl_dB, 209.460211515483, 0.1, "FSL (UT-GEO) in dBs incorrect");
 
   // test fsl calculation in path GW - Geo Satellite
   //  fsl_ratio = fsl.GetFsl(gwMob, geoMob, frequency);
-  fsl_dB = fsl.GetFsldB(gwMob, geoMob, frequency);
+  fsl_dB = fsl.GetFsldB (gwMob, geoMob, frequency);
 
   // Calculations with big double numbers there will produce results
   // with different precisions when compiled with optimized and debug flags.
   // TODO: check whether we could change e.g. the waf configure to avoid the precision problem.
 //  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 769159080122215960000.0, 1.1, "FSL (GW-GEO) ratio incorrect");
-  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_dB, 208.86016171367487, 0.1, "FSL (GW-GEO) in dBs incorrect");
+  NS_TEST_ASSERT_MSG_EQ_TOL ( fsl_dB, 208.86016171367487, 0.1, "FSL (GW-GEO) in dBs incorrect");
 
   Simulator::Destroy ();
 

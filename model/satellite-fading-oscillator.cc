@@ -28,36 +28,36 @@ NS_LOG_COMPONENT_DEFINE ("SatFadingOscillator");
 TypeId SatFadingOscillator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatFadingOscillator")
-      .SetParent<Object> ()
-      .AddConstructor<SatFadingOscillator> ();
+    .SetParent<Object> ()
+    .AddConstructor<SatFadingOscillator> ();
   return tid;
 }
 
-SatFadingOscillator::SatFadingOscillator () :
-  m_complexAmplitude (0,0),
-  m_amplitude (0),
-  m_phase (0),
-  m_omega (0)
+SatFadingOscillator::SatFadingOscillator ()
+  : m_complexAmplitude (0,0),
+    m_amplitude (0),
+    m_phase (0),
+    m_omega (0)
 {
   NS_LOG_FUNCTION (this);
 
   NS_FATAL_ERROR ("SatFadingOscillator::SatFadingOscillator - Constructor not in use");
 }
 
-SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega) :
-  m_complexAmplitude (amplitude),
-  m_amplitude (0),
-  m_phase (initialPhase),
-  m_omega (omega)
+SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega)
+  : m_complexAmplitude (amplitude),
+    m_amplitude (0),
+    m_phase (initialPhase),
+    m_omega (omega)
 {
   NS_LOG_FUNCTION (this << amplitude << " " << initialPhase << " " << omega);
 }
 
-SatFadingOscillator::SatFadingOscillator (double amplitude, double initialPhase, double omega) :
-  m_complexAmplitude (0,0),
-  m_amplitude (amplitude),
-  m_phase (initialPhase),
-  m_omega (omega)
+SatFadingOscillator::SatFadingOscillator (double amplitude, double initialPhase, double omega)
+  : m_complexAmplitude (0,0),
+    m_amplitude (amplitude),
+    m_phase (initialPhase),
+    m_omega (omega)
 {
   NS_LOG_FUNCTION (this << amplitude << " " << initialPhase << " " << omega);
 }
@@ -89,7 +89,7 @@ SatFadingOscillator::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
-  Object::DoDispose();
+  Object::DoDispose ();
 }
 
 } // namespace ns3

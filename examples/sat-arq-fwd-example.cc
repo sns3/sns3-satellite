@@ -47,9 +47,9 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt (3);
   uint32_t utsPerBeam (3);
   uint32_t packetSize (128);
-  Time interval (Seconds(0.3));
-  Time simLength (Seconds(100.0));
-  Time appStartTime = Seconds(0.1);
+  Time interval (Seconds (0.3));
+  Time simLength (Seconds (100.0));
+  Time appStartTime = Seconds (0.1);
 
   // enable info logs
   //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -60,8 +60,8 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
-  cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.Parse (argc, argv);
 
   /// Set simulation output details
@@ -71,19 +71,19 @@ main (int argc, char *argv[])
 
   // Configure error model
   double errorRate (0.10);
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue(errorRate));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (errorRate));
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_CONSTANT));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
 
   // Enable ARQ
-  Config::SetDefault ("ns3::SatLlc::RtnLinkArqEnabled", BooleanValue(false));
-  Config::SetDefault ("ns3::SatLlc::FwdLinkArqEnabled", BooleanValue(true));
+  Config::SetDefault ("ns3::SatLlc::RtnLinkArqEnabled", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLlc::FwdLinkArqEnabled", BooleanValue (true));
 
   // RTN link ARQ attributes
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue(2));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::WindowSize", UintegerValue(20));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RetransmissionTimer", TimeValue(Seconds (0.6)));
-  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RxWaitingTime", TimeValue(Seconds (1.8)));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::MaxNoOfRetransmissions", UintegerValue (2));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::WindowSize", UintegerValue (20));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RetransmissionTimer", TimeValue (Seconds (0.6)));
+  Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RxWaitingTime", TimeValue (Seconds (1.8)));
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -101,8 +101,8 @@ main (int argc, char *argv[])
   helper->CreateUserDefinedScenario (beamMap);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers();
-  NodeContainer gwUsers = helper->GetGwUsers();
+  NodeContainer utUsers = helper->GetUtUsers ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // >>> Start of actual test using Full scenario >>>
 
@@ -118,35 +118,35 @@ main (int argc, char *argv[])
 
   //---- Start CBR application definitions
 
-  NS_LOG_INFO("Creating CBR applications and sinks");
+  NS_LOG_INFO ("Creating CBR applications and sinks");
 
   Time startDelay = appStartTime;
 
   if (utUsers.GetN () > 0)
     {
       // create application on UT user
-      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
-      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress(helper->GetUserAddress(utUsers.Get(0)), port));
-      cbrHelper.SetAttribute("Interval", TimeValue (interval));
-      cbrHelper.SetAttribute("PacketSize", UintegerValue (packetSize));
+      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
+      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
+      cbrHelper.SetAttribute ("Interval", TimeValue (interval));
+      cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
       // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
       for ( uint32_t i = 0; i < utUsers.GetN (); i++)
         {
           // CBR sends packets to GW user no 4.
-          cbrHelper.SetAttribute("Remote", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-          cbrSinkHelper.SetAttribute("Local", AddressValue(Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+          cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
 
-          gwApps.Add(cbrHelper.Install (gwUsers.Get (4)));
-          utApps.Add(cbrSinkHelper.Install (utUsers.Get (i)));
+          gwApps.Add (cbrHelper.Install (gwUsers.Get (4)));
+          utApps.Add (cbrSinkHelper.Install (utUsers.Get (i)));
 
           startDelay += Seconds (0.001);
 
           // Set start and end times
-          gwApps.Get(i)->SetStartTime (Seconds (0.1));
-          gwApps.Get(i)->SetStopTime (simLength);
-          utApps.Get(i)->SetStartTime (startDelay);
-          utApps.Get(i)->SetStopTime (simLength);
+          gwApps.Get (i)->SetStartTime (Seconds (0.1));
+          gwApps.Get (i)->SetStopTime (simLength);
+          utApps.Get (i)->SetStartTime (startDelay);
+          utApps.Get (i)->SetStopTime (simLength);
         }
 
       // Add the created applications to CbrKpiHelper
@@ -156,13 +156,13 @@ main (int argc, char *argv[])
   //---- Stop CBR application definitions
 
 
-  NS_LOG_INFO("--- sat-arq-fwd-example ---");
-  NS_LOG_INFO("  Packet size in bytes: " << packetSize);
-  NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds ());
-  NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds ());
-  NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO("  ");
+  NS_LOG_INFO ("--- sat-arq-fwd-example ---");
+  NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
+  NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
+  NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
+  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  NS_LOG_INFO ("  ");
 
 
   Simulator::Stop (simLength);

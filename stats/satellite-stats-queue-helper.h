@@ -103,7 +103,6 @@ public:
   void Poll ();
 
 protected:
-
   // inherited from SatStatsHelper base class
   void DoInstall ();
 

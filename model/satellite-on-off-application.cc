@@ -56,7 +56,7 @@ SatOnOffApplication::SatOnOffApplication ()
   NS_LOG_FUNCTION (this);
 }
 
-SatOnOffApplication::~SatOnOffApplication()
+SatOnOffApplication::~SatOnOffApplication ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -93,8 +93,8 @@ bool SatOnOffApplication::IsStatisticTagsEnabled () const
 
 void SatOnOffApplication::SendPacketTrace (Ptr<const Packet> packet)
 {
-   // Add a TrafficTimeTag tag for packet delay computation at the receiver end.
-   packet->AddPacketTag (TrafficTimeTag (Simulator::Now ()));
+  // Add a TrafficTimeTag tag for packet delay computation at the receiver end.
+  packet->AddPacketTag (TrafficTimeTag (Simulator::Now ()));
 }
 
 } // Namespace ns3

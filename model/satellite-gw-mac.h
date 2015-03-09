@@ -48,7 +48,6 @@ class SatFwdLinkScheduler;
 class SatGwMac : public SatMac
 {
 public:
-
   static TypeId GetTypeId (void);
 
   /**
@@ -116,7 +115,6 @@ public:
   void SetTxOpportunityCallback (SatGwMac::TxOpportunityCallback cb);
 
 private:
-
   SatGwMac& operator = (const SatGwMac &);
   SatGwMac (const SatGwMac &);
 

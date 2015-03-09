@@ -53,7 +53,9 @@ public:
 
   SatAntennaGainPattern ();
   SatAntennaGainPattern (std::string filePathName);
-  ~SatAntennaGainPattern () {}
+  ~SatAntennaGainPattern ()
+  {
+  }
 
   /**
    * \brief Calculate the antenna gain value for a certain {latitude, longitude} point

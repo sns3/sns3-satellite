@@ -28,25 +28,25 @@ NS_LOG_COMPONENT_DEFINE ("SatRayleighModel");
 TypeId SatRayleighModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatRayleighModel")
-      .SetParent<SatBaseFader> ()
-      .AddConstructor<SatRayleighModel> ();
+    .SetParent<SatBaseFader> ()
+    .AddConstructor<SatRayleighModel> ();
   return tid;
 }
 
-SatRayleighModel::SatRayleighModel () :
-  m_currentSet (),
-  m_currentState (),
-  m_rayleighConf ()
+SatRayleighModel::SatRayleighModel ()
+  : m_currentSet (),
+    m_currentState (),
+    m_rayleighConf ()
 {
   NS_LOG_FUNCTION (this);
 
   NS_FATAL_ERROR ("SatRayleighModel - Constructor not in use");
 }
 
-SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState) :
-  m_currentSet (initialSet),
-  m_currentState (initialState),
-  m_rayleighConf (rayleighConf)
+SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState)
+  : m_currentSet (initialSet),
+    m_currentState (initialState),
+    m_rayleighConf (rayleighConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -72,7 +72,7 @@ SatRayleighModel::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  SatBaseFader::DoDispose();
+  SatBaseFader::DoDispose ();
 }
 
 void

@@ -36,8 +36,8 @@ SatOutputFileStreamStringContainer::GetTypeId (void)
   return tid;
 }
 
-SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer (std::string filename, std::ios::openmode filemode) :
-    m_outputFileStreamWrapper (),
+SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer (std::string filename, std::ios::openmode filemode)
+  : m_outputFileStreamWrapper (),
     m_outputFileStream (),
     m_container (),
     m_fileName (filename),
@@ -46,8 +46,8 @@ SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer (std::str
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 }
 
-SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer () :
-    m_outputFileStreamWrapper (),
+SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer ()
+  : m_outputFileStreamWrapper (),
     m_outputFileStream (),
     m_container (),
     m_fileName (),
@@ -70,7 +70,7 @@ SatOutputFileStreamStringContainer::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   Reset ();
-  Object::DoDispose();
+  Object::DoDispose ();
 }
 
 void
@@ -81,13 +81,13 @@ SatOutputFileStreamStringContainer::WriteContainerToFile ()
   OpenStream ();
 
   if (m_outputFileStream->is_open ())
-  {
+    {
       for (uint32_t i = 0; i < m_container.size (); i++)
         {
           *m_outputFileStream <<  m_container[i] << std::endl;
         }
-    m_outputFileStream->close ();
-  }
+      m_outputFileStream->close ();
+    }
   else
     {
       NS_ABORT_MSG ("Output stream is not valid for writing.");
@@ -143,7 +143,7 @@ SatOutputFileStreamStringContainer::ClearContainer ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_container.empty())
+  if (!m_container.empty ())
     {
       m_container.clear ();
     }

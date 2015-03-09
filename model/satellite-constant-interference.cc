@@ -34,12 +34,12 @@ SatConstantInterference::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatConstantInterference")
     .SetParent<SatInterference> ()
-    .AddConstructor<SatConstantInterference>()
-    .AddAttribute( "ConstantInterferencePower",
-                   "Constant interference power in linear format.",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&SatConstantInterference::m_power),
-                   MakeDoubleChecker<double_t> ())
+    .AddConstructor<SatConstantInterference> ()
+    .AddAttribute ( "ConstantInterferencePower",
+                    "Constant interference power in linear format.",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor (&SatConstantInterference::m_power),
+                    MakeDoubleChecker<double_t> ())
   ;
   return tid;
 }
@@ -47,7 +47,7 @@ SatConstantInterference::GetTypeId (void)
 TypeId
 SatConstantInterference::GetInstanceTypeId (void) const
 {
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatConstantInterference::SatConstantInterference ()

@@ -25,7 +25,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatBaseTraceContainer);
 
-TypeId 
+TypeId
 SatBaseTraceContainer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatBaseTraceContainer")
@@ -38,7 +38,7 @@ SatBaseTraceContainer::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
-  return GetTypeId();
+  return GetTypeId ();
 }
 
 SatBaseTraceContainer::SatBaseTraceContainer ()

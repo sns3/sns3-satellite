@@ -41,26 +41,26 @@ namespace ns3 {
 
 
 SatWaveform::SatWaveform ()
-:m_waveformId (0),
- m_modulatedBits (0),
- m_codingRate (0.0),
- m_modCod (SatEnums::SAT_NONVALID_MODCOD),
- m_payloadBytes (0),
- m_lengthInSymbols (0),
- m_ebnoRequirement (0.0)
+  : m_waveformId (0),
+    m_modulatedBits (0),
+    m_codingRate (0.0),
+    m_modCod (SatEnums::SAT_NONVALID_MODCOD),
+    m_payloadBytes (0),
+    m_lengthInSymbols (0),
+    m_ebnoRequirement (0.0)
 {
   NS_ASSERT (false);
 }
 
 
 SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols)
-:m_waveformId (wfId),
- m_modulatedBits (modulatedBits),
- m_codingRate (codingRate),
- m_modCod (modcod),
- m_payloadBytes (payloadBytes),
- m_lengthInSymbols (lengthInSymbols),
- m_ebnoRequirement (0.0)
+  : m_waveformId (wfId),
+    m_modulatedBits (modulatedBits),
+    m_codingRate (codingRate),
+    m_modCod (modcod),
+    m_payloadBytes (payloadBytes),
+    m_lengthInSymbols (lengthInSymbols),
+    m_ebnoRequirement (0.0)
 {
 
 }
@@ -140,24 +140,24 @@ SatWaveform::Dump (double carrierBandwidthInHz, double symbolRateInBaud) const
   NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
 
   std::cout << "ModulatedBits: " << m_modulatedBits << ", CodingRate: " << m_codingRate <<
-      ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
-      ", EbNoRequirement: " << SatUtils::LinearToDb (m_ebnoRequirement) <<
-      ", BurstDuration: " << GetBurstDuration (symbolRateInBaud) <<
-      ", Throughput: " << GetThroughputInBitsPerSecond (symbolRateInBaud) <<
-      ", SpectralEfficiency: " << GetSpectralEfficiency (carrierBandwidthInHz, symbolRateInBaud) <<
-      ", C/No threshold: " << SatUtils::LinearToDb (GetCNoThreshold (symbolRateInBaud)) << std::endl;
+  ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
+  ", EbNoRequirement: " << SatUtils::LinearToDb (m_ebnoRequirement) <<
+  ", BurstDuration: " << GetBurstDuration (symbolRateInBaud) <<
+  ", Throughput: " << GetThroughputInBitsPerSecond (symbolRateInBaud) <<
+  ", SpectralEfficiency: " << GetSpectralEfficiency (carrierBandwidthInHz, symbolRateInBaud) <<
+  ", C/No threshold: " << SatUtils::LinearToDb (GetCNoThreshold (symbolRateInBaud)) << std::endl;
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatWaveformConf);
 
 
 SatWaveformConf::SatWaveformConf ()
-:m_waveforms (),
- m_targetBLER (0.00001),
- m_acmEnabled (false),
- m_defaultWfId (3),
-  m_minWfId (0),
- m_maxWfId (23)
+  : m_waveforms (),
+    m_targetBLER (0.00001),
+    m_acmEnabled (false),
+    m_defaultWfId (3),
+    m_minWfId (0),
+    m_maxWfId (23)
 {
   // default constructor should not be used
   NS_ASSERT (false);
@@ -165,12 +165,12 @@ SatWaveformConf::SatWaveformConf ()
 
 
 SatWaveformConf::SatWaveformConf (std::string filePathName)
-:m_waveforms (),
- m_targetBLER (0.00001),
- m_acmEnabled (false),
- m_defaultWfId (3),
- m_minWfId (0),
- m_maxWfId (23)
+  : m_waveforms (),
+    m_targetBLER (0.00001),
+    m_acmEnabled (false),
+    m_defaultWfId (3),
+    m_minWfId (0),
+    m_maxWfId (23)
 {
   NS_LOG_FUNCTION (this);
   ReadFromFile (filePathName);
@@ -184,21 +184,21 @@ SatWaveformConf::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatWaveformConf")
     .SetParent<Object> ()
-    .AddAttribute( "TargetBLER",
-                   "Block error rate target",
+    .AddAttribute ( "TargetBLER",
+                    "Block error rate target",
                     DoubleValue (0.00001),
-                    MakeDoubleAccessor(&SatWaveformConf::m_targetBLER),
-                    MakeDoubleChecker<double>())
-    .AddAttribute( "AcmEnabled",
-                   "Enable ACM",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatWaveformConf::m_acmEnabled),
-                   MakeBooleanChecker ())
-    .AddAttribute( "DefaultWfId",
-                   "Default waveform id",
-                   UintegerValue (3),
-                   MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
-                   MakeUintegerChecker<uint32_t> (3, 22))
+                    MakeDoubleAccessor (&SatWaveformConf::m_targetBLER),
+                    MakeDoubleChecker<double> ())
+    .AddAttribute ( "AcmEnabled",
+                    "Enable ACM",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatWaveformConf::m_acmEnabled),
+                    MakeBooleanChecker ())
+    .AddAttribute ( "DefaultWfId",
+                    "Default waveform id",
+                    UintegerValue (3),
+                    MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
+                    MakeUintegerChecker<uint32_t> (3, 22))
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
@@ -242,21 +242,21 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
   // Read a row
   *ifs >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols;
 
-  while (ifs->good())
+  while (ifs->good ())
     {
       // Store temporarily all wfIds
-      wfIds.push_back(wfIndex);
+      wfIds.push_back (wfIndex);
 
       // Convert the coding rate fraction into double
-      std::istringstream ss(sCodingRate);
+      std::istringstream ss (sCodingRate);
       std::string token;
       std::vector<uint32_t> output;
 
-      while(std::getline(ss, token, '/'))
+      while (std::getline (ss, token, '/'))
         {
           uint32_t i;
           std::stringstream s;
-          s.str(token);
+          s.str (token);
           s >> i;
           output.push_back (i);
         }
@@ -283,18 +283,18 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
   delete ifs;
 
   // Note, currently we assume that the waveform ids are consecutive!
-  m_minWfId = *std::min_element(wfIds.begin (), wfIds.end ());
-  m_maxWfId = *std::max_element(wfIds.begin (), wfIds.end ());
+  m_minWfId = *std::min_element (wfIds.begin (), wfIds.end ());
+  m_maxWfId = *std::max_element (wfIds.begin (), wfIds.end ());
 }
 
 
-void SatWaveformConf::InitializeEbNoRequirements( Ptr<SatLinkResultsDvbRcs2> linkResults )
+void SatWaveformConf::InitializeEbNoRequirements ( Ptr<SatLinkResultsDvbRcs2> linkResults )
 {
   NS_LOG_FUNCTION (this);
 
   for ( std::map< uint32_t, Ptr<SatWaveform> >::iterator it = m_waveforms.begin ();
-      it != m_waveforms.end ();
-      ++it )
+        it != m_waveforms.end ();
+        ++it )
     {
       /**
        * In return link the link results are in Eb/No format. Since, the C/No is dependent
@@ -316,7 +316,7 @@ SatWaveformConf::GetWaveform (uint32_t wfId) const
       NS_FATAL_ERROR ("SatWaveformConf::GetWaveform - unsupported waveform id: " << wfId);
     }
 
-  return m_waveforms.at(wfId);
+  return m_waveforms.at (wfId);
 }
 
 uint32_t
@@ -349,12 +349,12 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
 
   // Return the waveform with best spectral efficiency
   for ( std::map< uint32_t, Ptr<SatWaveform> >::const_reverse_iterator rit = m_waveforms.rbegin ();
-      rit != m_waveforms.rend ();
-      ++rit )
+        rit != m_waveforms.rend ();
+        ++rit )
     {
-      if (rit->second->GetBurstLengthInSymbols() == burstLength)
+      if (rit->second->GetBurstLengthInSymbols () == burstLength)
         {
-          double cnoThr = rit->second->GetCNoThreshold(symbolRateInBaud);
+          double cnoThr = rit->second->GetCNoThreshold (symbolRateInBaud);
           // The first waveform over the threshold
           if (cnoThr <= cno)
             {
@@ -379,10 +379,10 @@ SatWaveformConf::GetMostRobustWaveformId (uint32_t& wfId, uint32_t burstLength) 
 
   // find the waveform with the more robust waveform than previous one
   for ( std::map< uint32_t, Ptr<SatWaveform> >::const_reverse_iterator rit = m_waveforms.rbegin ();
-      rit != m_waveforms.rend ();
-      ++rit )
+        rit != m_waveforms.rend ();
+        ++rit )
     {
-      if (rit->second->GetBurstLengthInSymbols() == burstLength)
+      if (rit->second->GetBurstLengthInSymbols () == burstLength)
         {
           // The waveform more robust than previous one
           if ( rit->second->GetPayloadInBytes () < payloadInBytes)
@@ -403,8 +403,8 @@ SatWaveformConf::Dump (double carrierBandwidthInHz, double symbolRateInBaud) con
   NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
 
   for ( std::map< uint32_t, Ptr<SatWaveform> >::const_iterator it = m_waveforms.begin ();
-      it != m_waveforms.end ();
-      ++it )
+        it != m_waveforms.end ();
+        ++it )
     {
       std::cout << "WaveformId: " << it->first << " ";
       it->second->Dump (carrierBandwidthInHz, symbolRateInBaud);
@@ -425,7 +425,7 @@ SatWaveformConf::GetModCod (uint32_t wfId) const
 
   if (it != m_waveforms.end ())
     {
-      return m_waveforms.at(wfId)->GetModCod ();
+      return m_waveforms.at (wfId)->GetModCod ();
     }
   else
     {
@@ -442,7 +442,7 @@ SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNum
   NS_LOG_FUNCTION (this << modulatedBits << codingRateNumerator << codingRateDenominator);
 
   switch (modulatedBits)
-  {
+    {
     // QPSK
     case 2:
       {
@@ -518,7 +518,7 @@ SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNum
         NS_FATAL_ERROR ("Unsupported modulated bits:" << modulatedBits);
         break;
       }
-  }
+    }
   return SatEnums::SAT_NONVALID_MODCOD;
 }
 

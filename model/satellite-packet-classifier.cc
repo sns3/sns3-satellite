@@ -71,7 +71,7 @@ SatPacketClassifier::Classify (const Ptr<Packet> packet, const Address& dest, ui
   uint8_t dscp = ipv4Header.GetDscp ();
 
   switch (dscp)
-  {
+    {
     case Ipv4Header::DscpDefault:
       {
         return SatEnums::BE_FID;
@@ -110,7 +110,7 @@ SatPacketClassifier::Classify (const Ptr<Packet> packet, const Address& dest, ui
         NS_FATAL_ERROR ("Unsupported DSCP field value: " << dscp);
         break;
       }
-  }
+    }
 
   return SatEnums::BE_FID;
 }
