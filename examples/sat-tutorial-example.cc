@@ -59,6 +59,11 @@ main (int argc, char *argv[])
    'To Select super frame configuration, Option 2'
    -- Start --                                                                */
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-tutorial"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
 //  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sat-tutorial-input.xml";
 //
 //  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
@@ -96,11 +101,6 @@ Read command line arguments
     {
       satScenario = SatHelper::FULL;
     }
-
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-tutorial"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);

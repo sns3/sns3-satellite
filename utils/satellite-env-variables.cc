@@ -345,26 +345,31 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
   bool directoryExists = false;
   std::string simRootPath = LocateDirectory (m_simRootPath);
 
+  // If we have set a campaign name
   if (!campaignName.empty ())
     {
       std::string tempString = AddToPath (simRootPath, campaignName);
 
+      // If the campaign name directory does not exist, create it
       if (!IsValidDirectory (tempString))
         {
           CreateDirectory (tempString);
         }
     }
 
+  // As long as the full output folder is created.
+  // Start with false.
   while (!directoryExists)
     {
       outputPath = FormOutputPath (simRootPath, campaignName, simTag, safetyTag);
-      directoryExists = IsValidDirectory (outputPath);
 
-      if ( (!directoryExists && !enableOutputOverwrite) || enableOutputOverwrite)
+      // Create new simulation folder or overwrite
+      if ( (!IsValidDirectory (outputPath) && !enableOutputOverwrite) || enableOutputOverwrite)
         {
           CreateDirectory (outputPath);
           directoryExists = true;
         }
+      // Do not overwrite, but add a new safety string tag to simulation folder
       else
         {
           safety++;
@@ -374,6 +379,9 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
           std::stringstream ss;
           ss << safety;
           safetyTag = ss.str ();
+
+          // Continue loop and try to create a new directory
+          directoryExists = false;
         }
     }
 

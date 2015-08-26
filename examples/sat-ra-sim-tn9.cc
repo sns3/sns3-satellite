@@ -41,6 +41,11 @@ main (int argc, char *argv[])
 
   double simLength (300.0); // in seconds
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("sat-ra-sim-tn9"));
+  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // To read attributes from file
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/tn9-ra-input-attributes.xml";
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
@@ -59,11 +64,6 @@ main (int argc, char *argv[])
   cmd.AddValue ("onTime", "Time for packet sending is on in seconds", onTime);
   cmd.AddValue ("offTime", "Time for packet sending is off in seconds", offTime);
   cmd.Parse (argc, argv);
-
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-ra-sim-tn9"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // Enable Random Access with all available modules
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
