@@ -167,6 +167,9 @@ public:
   void DoDispose ();
 
 private:
+  static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
+  static const uint16_t MAX_ADDRESS_PREFIX_LENGTH = 31;
+
   typedef SatBeamHelper::MulticastBeamInfoItem_t  MulticastBeamInfoItem_t;
   typedef SatBeamHelper::MulticastBeamInfo_t      MulticastBeamInfo_t;
 
@@ -211,13 +214,13 @@ private:
    */
   Ptr<OutputStreamWrapper> m_utTraceStream;
 
-  bool m_hasBeamNetworkSet;  ///< #m_beamNetworkAddress has been set a value.
-  bool m_hasGwNetworkSet;    ///< #m_gwNetworkAddress has been set a value.
-  bool m_hasUtNetworkSet;    ///< #m_utNetworkAddress has been set a value.
-
   Ipv4Address m_beamNetworkAddress;  ///< Initial network number of satellite devices, e.g., 10.1.1.0.
   Ipv4Address m_gwNetworkAddress;    ///< Initial network number of GW, router, and GW users, e.g., 10.2.1.0.
   Ipv4Address m_utNetworkAddress;    ///< Initial network number of UT and UT users, e.g., 10.3.1.0.
+
+  Ipv4Mask m_beamNetworkMask;        ///< Network mask number of satellite devices.
+  Ipv4Mask m_gwNetworkMask;          ///< Network mask number of GW, router, and GW users.
+  Ipv4Mask m_utNetworkMask;          ///< Network mask number of UT and UT users.
 
   /**
    * flag to check if scenario is already created.
@@ -328,7 +331,7 @@ private:
    * \param beamInfos information of the beam to create (and beams which are given in map)
    * \param gwUsers number of the users in GW(s) side
    */
-  void DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers);
+  void DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -366,50 +369,6 @@ private:
    * \param nodes Nodecontainer of nodes to install mobility observer.
    */
   void InstallMobilityObserver (NodeContainer nodes) const;
-
-  /**
-   * \brief Set the initial network number to use during allocation of satellite
-   *        devices.
-   * \param addr the initial network number, e.g., 10.1.1.0 (must be different
-   *             from network numbers of GW and UT networks)
-   * \return true if the operation is successful
-   *
-   * 255.255.255.0 will be used as the network mask.
-   */
-  bool SetBeamNetworkAddress (Ipv4Address addr);
-
-  /// \return the initial network number of satellite devices
-  Ipv4Address GetBeamNetworkAddress () const;
-
-  /**
-   * \brief Set the initial network number to use during allocation of GW,
-   *        router, and GW users.
-   * \param addr the initial network number, e.g., 10.2.1.0 (must be different
-   *             from network numbers of beam and UT networks)
-   * \return true if the operation is successful
-   *
-   * 255.255.255.0 will be used as the network mask.
-   */
-  bool SetGwNetworkAddress (Ipv4Address addr);
-
-  /// \return the initial network number of GW, router, and GW users
-  Ipv4Address GetGwNetworkAddress () const;
-
-  /**
-   * \brief Set the initial network number to use during allocation of UT and
-   *        UT users.
-   * \param addr the initial network number, e.g., 10.3.1.0 (must be different
-   *             from network numbers of beam and GW networks)
-   * \return true if the operation is successful
-   *
-   * 255.255.255.0 will be used as the network mask.
-   */
-  bool SetUtNetworkAddress (Ipv4Address addr);
-
-  /// \return the initial network number of UT and UT users
-  Ipv4Address GetUtNetworkAddress () const;
-
-  //\return The device belonging to same network with given device on given node.
 
   /**
    * Find given device's counterpart (device belonging to same network) device from given node.
@@ -456,6 +415,28 @@ private:
    * \return true when multicast traffic shall be routed to source's network.
    */
   bool ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receivers, MulticastBeamInfo_t& beamInfo, Ptr<NetDevice>& routerUserOutputDev );
+
+  /**
+   * Set configured network addresses to user and beam helpers.
+   */
+  void SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) const;
+
+  /**
+   * Check validity of the configured network space.
+   *
+   * \param networkName Name string of the network to check. To be used when printing out possible errors.
+   * \param firstNetwork Address of the first network.
+   * \param mask The mask of the networks.
+   * \param networkAddresses The container of first address values of the networks used all together.
+   * \param networkCount The number of the networks created in network.
+   * \param hostCount The maximum number of the hosts created in a network.
+   */
+  void CheckNetwork (std::string networkName,
+                     const Ipv4Address& firstNetwork,
+                     const Ipv4Mask& mask,
+                     const std::set<uint32_t>& networkAddresses,
+                     uint32_t networkCount,
+                     uint32_t hostCount) const;
 };
 
 } // namespace ns3

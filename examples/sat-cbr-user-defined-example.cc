@@ -90,6 +90,12 @@ main (int argc, char *argv[])
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.Parse (argc, argv);
 
+  // dama-input-attributes.xml
+  // tn8-profiling-input-attributes.xml
+  // tn9-dama-input-attributes.xml
+  // tn9-ra-input-attributes.xml
+  // training-input-attributes.xml
+
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr-user-defined"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));

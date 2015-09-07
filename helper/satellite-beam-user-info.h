@@ -63,14 +63,14 @@ public:
   /**
    * \return number of UTs in beam.
    */
-  uint32_t GetUtCount ();
+  uint32_t GetUtCount () const;
 
   /**
    * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
    *
    * \return number of users in a UT.
    */
-  uint32_t GetUtUserCount (uint32_t utIndex);
+  uint32_t GetUtUserCount (uint32_t utIndex) const;
 
   /**
    * Sets user count for the UT with given uIndex.

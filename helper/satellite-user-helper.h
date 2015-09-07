@@ -124,7 +124,7 @@ public:
   * IP address allocation.  Will be combined (ORed) with the network number to
   * generate the first IP address.  Defaults to 0.0.0.1.
   */
-  void SetUtBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
+  void SetUtBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, Ipv4Address base = "0.0.0.1");
 
   /**
   * \param network The Ipv4Address containing the initial network number to
@@ -137,7 +137,7 @@ public:
   * IP address allocation.  Will be combined (ORed) with the network number to
   * generate the first IP address.  Defaults to 0.0.0.1.
   */
-  void SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, Ipv4Address base = "0.0.0.1");
+  void SetGwBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, Ipv4Address base = "0.0.0.1");
 
   /**
    * \param ut a set of UT nodes

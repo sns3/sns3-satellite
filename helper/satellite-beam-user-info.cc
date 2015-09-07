@@ -45,7 +45,7 @@ SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt)
 }
 
 uint32_t
-SatBeamUserInfo::GetUtCount ()
+SatBeamUserInfo::GetUtCount () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -53,7 +53,7 @@ SatBeamUserInfo::GetUtCount ()
 }
 
 uint32_t
-SatBeamUserInfo::GetUtUserCount (uint32_t utIndex)
+SatBeamUserInfo::GetUtUserCount (uint32_t utIndex) const
 {
   NS_LOG_FUNCTION (this << utIndex);
 

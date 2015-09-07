@@ -105,14 +105,14 @@ SatUserHelper::SetCsmaChannelAttribute (std::string name,
   m_csma.SetChannelAttribute (name, value);
 }
 
-void SatUserHelper::SetUtBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
+void SatUserHelper::SetUtBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
 {
   NS_LOG_FUNCTION (this);
 
   m_ipv4Ut.SetBase (network, mask, address);
 }
 
-void SatUserHelper::SetGwBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
+void SatUserHelper::SetGwBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
 {
   NS_LOG_FUNCTION (this);
 

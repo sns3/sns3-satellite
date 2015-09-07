@@ -305,7 +305,7 @@ SatBeamHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
   m_channelFactory.Set (n1, v1);
 }
 
-void SatBeamHelper::SetBaseAddress ( const Ipv4Address network, const Ipv4Mask mask, const Ipv4Address address)
+void SatBeamHelper::SetBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
 {
   NS_LOG_FUNCTION (this << network << mask << address);
 

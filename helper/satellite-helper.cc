@@ -65,27 +65,39 @@ SatHelper::GetTypeId (void)
     .AddAttribute ("BeamNetworkAddress",
                    "Initial network number to use "
                    "during allocation of satellite devices "
-                   "(255.255.255.0 will be used as the network mask)",
-                   Ipv4AddressValue ("10.1.1.0"),
-                   MakeIpv4AddressAccessor (&SatHelper::SetBeamNetworkAddress,
-                                            &SatHelper::GetBeamNetworkAddress),
+                   "(mask set by attribute 'BeamNetworkMask' will be used as the network mask)",
+                   Ipv4AddressValue ("40.1.0.0"),
+                   MakeIpv4AddressAccessor (&SatHelper::m_beamNetworkAddress),
                    MakeIpv4AddressChecker ())
+    .AddAttribute ("BeamNetworkMask",
+                   "Network mask to use during allocation of satellite devices.",
+                   Ipv4MaskValue ("255.255.0.0"),
+                   MakeIpv4MaskAccessor (&SatHelper::m_beamNetworkMask),
+                   MakeIpv4MaskChecker ())
     .AddAttribute ("GwNetworkAddress",
                    "Initial network number to use "
                    "during allocation of GW, router, and GW users "
-                   "(255.255.255.0 will be used as the network mask)",
-                   Ipv4AddressValue ("10.2.1.0"),
-                   MakeIpv4AddressAccessor (&SatHelper::SetGwNetworkAddress,
-                                            &SatHelper::GetGwNetworkAddress),
+                   "(mask set by attribute 'GwNetworkMask' will be used as the network mask)",
+                   Ipv4AddressValue ("90.1.0.0"),
+                   MakeIpv4AddressAccessor (&SatHelper::m_gwNetworkAddress),
                    MakeIpv4AddressChecker ())
+    .AddAttribute ("GwNetworkMask",
+                   "Network mask to use during allocation of GW, router, and GW users.",
+                   Ipv4MaskValue ("255.255.0.0"),
+                   MakeIpv4MaskAccessor (&SatHelper::m_gwNetworkMask),
+                   MakeIpv4MaskChecker ())
     .AddAttribute ("UtNetworkAddress",
                    "Initial network number to use "
                    "during allocation of UT and UT users "
-                   "(255.255.255.0 will be used as the network mask)",
-                   Ipv4AddressValue ("10.3.1.0"),
-                   MakeIpv4AddressAccessor (&SatHelper::SetUtNetworkAddress,
-                                            &SatHelper::GetUtNetworkAddress),
+                   "(mask set by attribute 'UtNetworkMask' will be used as the network mask)",
+                   Ipv4AddressValue ("10.1.0.0"),
+                   MakeIpv4AddressAccessor (&SatHelper::m_utNetworkAddress),
                    MakeIpv4AddressChecker ())
+    .AddAttribute ("UtNetworkMask",
+                   "Network mask to use during allocation of UT and UT users.",
+                   Ipv4MaskValue ("255.255.0.0"),
+                   MakeIpv4MaskAccessor (&SatHelper::m_utNetworkMask),
+                   MakeIpv4MaskChecker ())
     .AddAttribute ("PacketTraceEnabled",
                    "Packet tracing enable status.",
                    BooleanValue (false),
@@ -131,10 +143,7 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
-  : m_hasBeamNetworkSet (false),
-    m_hasGwNetworkSet (false),
-    m_hasUtNetworkSet (false),
-    m_scenarioCreated (false),
+  : m_scenarioCreated (false),
     m_creationTraces (false),
     m_detailedCreationTraces (false),
     m_packetTraces (false),
@@ -149,10 +158,7 @@ SatHelper::SatHelper ()
 }
 
 SatHelper::SatHelper (std::string scenarioName)
-  : m_hasBeamNetworkSet (false),
-    m_hasGwNetworkSet (false),
-    m_hasUtNetworkSet (false),
-    m_scenarioCreated (false),
+  : m_scenarioCreated (false),
     m_detailedCreationTraces (false)
 {
   NS_LOG_FUNCTION (this);
@@ -422,7 +428,7 @@ SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos,
 }
 
 void
-SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
+SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 {
   NS_LOG_FUNCTION (this);
 
@@ -432,6 +438,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t beamInfos, uint32_t gwUsers)
     }
   else
     {
+      SetNetworkAddresses (beamInfos, gwUsers);
+
       if (m_creationTraces)
         {
           EnableCreationTraces ();
@@ -571,99 +579,6 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
           (*i)->AggregateObject (observer);
         }
     }
-}
-
-bool
-SatHelper::SetBeamNetworkAddress (Ipv4Address addr)
-{
-  NS_LOG_FUNCTION (this << addr);
-
-  if (m_hasGwNetworkSet && (addr == m_gwNetworkAddress))
-    {
-      NS_FATAL_ERROR ("Network number " << addr << " has been used in GW network");
-      return false;
-    }
-
-  if (m_hasUtNetworkSet && (addr == m_utNetworkAddress))
-    {
-      NS_FATAL_ERROR ("Network number " << addr << " has been used in UT network");
-      return false;
-    }
-
-  m_beamHelper->SetBaseAddress (addr, "255.255.255.0");
-  m_beamNetworkAddress = addr;
-  m_hasBeamNetworkSet = true;
-  return true;
-}
-
-Ipv4Address
-SatHelper::GetBeamNetworkAddress () const
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_beamNetworkAddress;
-}
-
-bool
-SatHelper::SetGwNetworkAddress (Ipv4Address addr)
-{
-  NS_LOG_FUNCTION (this << addr);
-
-  if (m_hasBeamNetworkSet && (addr == m_beamNetworkAddress))
-    {
-      NS_FATAL_ERROR ("Network number " << addr << " has been used in beam network");
-      return false;
-    }
-
-  if (m_hasUtNetworkSet && (addr == m_utNetworkAddress))
-    {
-      NS_FATAL_ERROR ("Network number " << addr << " has been used in UT network");
-      return false;
-    }
-
-  m_userHelper->SetGwBaseAddress (addr, "255.255.255.0");
-  m_gwNetworkAddress = addr;
-  m_hasGwNetworkSet = true;
-  return true;
-}
-
-Ipv4Address
-SatHelper::GetGwNetworkAddress () const
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_gwNetworkAddress;
-}
-
-bool
-SatHelper::SetUtNetworkAddress (Ipv4Address addr)
-{
-  NS_LOG_FUNCTION (this << addr);
-
-  if (m_hasBeamNetworkSet && (addr == m_beamNetworkAddress))
-    {
-      NS_FATAL_ERROR ("Network number " << addr << " has been used in beam network");
-      return false;
-    }
-
-  if (m_hasGwNetworkSet && (addr == m_gwNetworkAddress))
-    {
-      NS_FATAL_ERROR ("Network number " << addr << " has been used in GW network");
-      return false;
-    }
-
-  m_userHelper->SetUtBaseAddress (addr, "255.255.255.0");
-  m_utNetworkAddress = addr;
-  m_hasUtNetworkSet = true;
-  return true;
-}
-
-Ipv4Address
-SatHelper::GetUtNetworkAddress () const
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_utNetworkAddress;
 }
 
 void
@@ -959,5 +874,138 @@ SatHelper::ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receive
 
   return routeToSourceNertwork;
 }
+
+void
+SatHelper::SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) const
+{
+  NS_LOG_FUNCTION (this);
+
+  std::set<uint32_t> networkAddresses;
+  std::pair<std::set<uint32_t>::const_iterator, bool> addressInsertionResult;
+
+  // test first that configured initial addresses per configured address space
+  // are not same by inserting them to set container
+  networkAddresses.insert (m_beamNetworkAddress.Get ());
+  addressInsertionResult = networkAddresses.insert (m_gwNetworkAddress.Get ());
+
+  if (!addressInsertionResult.second)
+    {
+      NS_FATAL_ERROR ("GW network address is invalid (same as Beam network address)");
+    }
+
+  addressInsertionResult = networkAddresses.insert (m_utNetworkAddress.Get ());
+
+  if (!addressInsertionResult.second)
+    {
+      NS_FATAL_ERROR ("UT network address is invalid (same as Beam or GW network address)");
+    }
+
+  // calculate values to check needed network and host address counts
+  uint32_t utNetworkAddressCount = 0;   // network addresses needed in UT network
+  uint32_t utHostAddressCount = 0;      // host addresses needed in UT network
+  uint32_t beamHostAddressCount = 0;    // host addresses needed in Beam network
+  uint32_t gwNetworkAddressCount = 1;   // network addresses needed in GW network. Initially one network needed between GW users and Router needed
+  std::set<uint32_t> gwIds;             // to find out the additional network addresses needed in GW network
+
+  for (BeamUserInfoMap_t::const_iterator it = beamInfos.begin (); it != beamInfos.end (); it++)
+    {
+      uint32_t beamUtCount = it->second.GetUtCount ();
+      utNetworkAddressCount += beamUtCount;
+
+      if (beamUtCount > beamHostAddressCount)
+        {
+          beamHostAddressCount = beamUtCount;
+        }
+
+      for (uint32_t i = 0; i < beamUtCount; i++)
+        {
+          if (it->second.GetUtUserCount (i) > utHostAddressCount)
+            {
+              utHostAddressCount = it->second.GetUtUserCount (i);
+            }
+        }
+
+      // try to add GW id to container, if not existing already in the container
+      // increment GW network address count
+      if (gwIds.insert (m_beamHelper->GetGwId (it->first)).second)
+        {
+          gwNetworkAddressCount++; // one network more needed between a GW and Router
+        }
+    }
+
+  // do final checking of the configured address spaces
+  CheckNetwork ("Beam", m_beamNetworkAddress, m_beamNetworkMask, networkAddresses, beamInfos.size (), beamHostAddressCount);
+  CheckNetwork ("GW", m_gwNetworkAddress, m_gwNetworkMask, networkAddresses, gwNetworkAddressCount, gwUsers);
+  CheckNetwork ("UT", m_utNetworkAddress, m_utNetworkMask, networkAddresses, utNetworkAddressCount, utHostAddressCount);
+
+  // set base addresses of the sub-helpers
+  m_beamHelper->SetBaseAddress (m_beamNetworkAddress, m_beamNetworkMask);
+  m_userHelper->SetGwBaseAddress (m_gwNetworkAddress, m_gwNetworkMask);
+  m_userHelper->SetUtBaseAddress (m_utNetworkAddress, m_utNetworkMask);
+}
+
+void
+SatHelper::CheckNetwork (std::string networkName,
+                         const Ipv4Address& firstNetwork,
+                         const Ipv4Mask& mask,
+                         const std::set<uint32_t>& networkAddresses,
+                         uint32_t networkCount,
+                         uint32_t hostCount) const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint16_t addressPrefixLength = mask.GetPrefixLength ();
+
+  // test that configured mask is valid (address prefix length is in valid range)
+  if ((addressPrefixLength < MIN_ADDRESS_PREFIX_LENGTH) || (addressPrefixLength > MAX_ADDRESS_PREFIX_LENGTH))
+      {
+        NS_FATAL_ERROR (networkName << " network mask value out of range (0xFFFFFF70 to 0x10000000).");
+      }
+
+  // test that configured initial network number (prefix) is valid, consistent with mask
+  if ((firstNetwork.Get () & mask.GetInverse ()) != 0)
+    {
+      NS_FATAL_ERROR (networkName << " network address and mask inconsistent.");
+    }
+
+  std::set<uint32_t>::const_iterator currentAddressIt = networkAddresses.find (firstNetwork.Get ());
+
+  // test that network we are checking is in given container
+  if (currentAddressIt != networkAddresses.end ())
+    {
+      // calculate network and host count based on configured initial network address and
+      // mask for the network space
+      uint32_t hostAddressCount = std::pow (2, (32 - addressPrefixLength)) - 2;
+      uint32_t firstAddressValue = firstNetwork.Get ();
+      uint32_t networkAddressCount = mask.Get () - firstAddressValue;
+
+      currentAddressIt++;
+
+      // test in the case that checked address space is not last ('highest') in the
+      // given address container that the address space doesn't overlap with other configured address spaces
+      if ( (currentAddressIt != networkAddresses.end ()) &&
+           (firstAddressValue + (networkCount  << (32 - addressPrefixLength))) >= *currentAddressIt)
+        {
+          NS_FATAL_ERROR (networkName << " network's addresses overlaps with some other network)");
+        }
+
+      // test that enough network addresses are available in address space
+      if (networkCount > networkAddressCount)
+        {
+          NS_FATAL_ERROR ("Not enough network addresses for '" << networkName << "' network");
+        }
+
+      // test that enough host addresses are available in address space
+      if (hostCount > hostAddressCount)
+        {
+          NS_FATAL_ERROR ("Not enough host addresses for '" << networkName << "' network");
+        }
+    }
+  else
+    {
+      NS_FATAL_ERROR (networkName << "network's initial address number not among of the given addresses");
+    }
+}
+
 
 } // namespace ns3
