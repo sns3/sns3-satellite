@@ -977,7 +977,7 @@ SatHelper::CheckNetwork (std::string networkName,
       // mask for the network space
       uint32_t hostAddressCount = std::pow (2, (32 - addressPrefixLength)) - 2;
       uint32_t firstAddressValue = firstNetwork.Get ();
-      uint32_t networkAddressCount = mask.Get () - firstAddressValue;
+      uint32_t networkAddressCount = mask.Get () - firstAddressValue + 1; // increase subtraction result by one, to include also first address
 
       currentAddressIt++;
 
