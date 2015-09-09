@@ -406,8 +406,8 @@
  <default name="ns3::SatBeamHelper::PropagationDelayModel" value="ConstantSpeed"/>
  <default name="ns3::SatBeamHelper::ConstantPropagationDelay" value="+130000000.0ns"/>
  <default name="ns3::SatBeamHelper::PrintDetailedInformationToCreationTraces" value="true"/>
- <default name="ns3::SatBeamHelper::CtrlMsgStoreTimeInFwdLink" value="+350000000.0ns"/>
- <default name="ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink" value="+350000000.0ns"/>
+ <default name="ns3::SatBeamHelper::CtrlMsgStoreTimeInFwdLink" value="+1000000000.0ns"/>
+ <default name="ns3::SatBeamHelper::CtrlMsgStoreTimeInRtnLink" value="+1000000000.0ns"/>
  <default name="ns3::SatConf::FwdFeederLinkBandwidth" value="2e+09"/>
  <default name="ns3::SatConf::FwdFeederLinkBaseFrequency" value="2.75e+10"/>
  <default name="ns3::SatConf::RtnFeederLinkBandwidth" value="2e+09"/>
