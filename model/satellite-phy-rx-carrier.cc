@@ -937,7 +937,17 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
               /**
                * In forward link the link results are in Es/No format, thus here we need
                * to convert the SINR into Es/No:
+               *
+               * C/No = C/N * fs
+               * Es/No = C/N * B/fs = (C/No / fs) * B/fs
                * Es/No = (C*Ts)/No = C/No * (1/fs) = C/N
+               *
+               * where
+               * C/No = carrier to noise density
+               * C/N = signal to noise ratio (= SINR in the simulator)
+               * Es/No = energy per symbol per noise density
+               * B = channel bandwidth in Hz
+               * fs = symbol rate in baud
               */
 
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,
@@ -963,10 +973,20 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
               /**
                * In return link the link results are in Eb/No format, thus here we need
                * to convert the SINR into Eb/No:
+               * Eb/No = C/N * B/fb = (C/No / fs) * B/fb
                * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
+               *
+               * where
+               * C/No = carrier to noise density
+               * C/N = signal to noise ratio (= SINR in the simulator)
+               * Es/No = energy per symbol per noise density
+               * Eb/No = energy per bit per noise density
+               * B = channel bandwidth in Hz
+               * fs = symbol rate in baud
+               * fb = channel bitrate (after FEC) in bps (i.e. burst payloadInBits / burstDurationInSec)
               */
 
-              double ebNo = cSinr * (1 / log2 (SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)));
+              double ebNo = cSinr / SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod);
 
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
                                                                                            SatUtils::LinearToDb (ebNo));
@@ -979,6 +999,7 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
 
               NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
                            << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
+              	           << " modulated bits: " << SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)
                            << " rand: " << r
                            << " ber: " << ber
                            << " error: " << error);
