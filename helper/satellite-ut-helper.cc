@@ -95,6 +95,11 @@ SatUtHelper::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&SatUtHelper::m_enableChannelEstimationError),
                    MakeBooleanChecker ())
+    .AddAttribute ("UseCrdsaOnlyForControlPackets",
+                   "CRDSA utilized only for control packets or also for user data.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatUtHelper::m_crdsaOnlyForControl),
+                   MakeBooleanChecker ())
     .AddTraceSource ("Creation",
                      "Creation traces",
                      MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace),
@@ -120,6 +125,7 @@ SatUtHelper::SatUtHelper ()
     m_linkResults (),
     m_llsConf (),
     m_enableChannelEstimationError (false),
+    m_crdsaOnlyForControl (false),
     m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
@@ -146,6 +152,7 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
     m_linkResults (),
     m_llsConf (),
     m_enableChannelEstimationError (false),
+    m_crdsaOnlyForControl (false),
     m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
@@ -273,7 +280,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId);
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, m_crdsaOnlyForControl);
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
@@ -403,7 +410,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
       Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
 
       /// attach callbacks
-      randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
+      if (m_crdsaOnlyForControl)
+        {
+          randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::ControlBuffersEmpty, llc));
+        }
+      else
+        {
+          randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
+        }
 
       /// define which allocation channels should be used with each of the random access models
       randomAccess->AddCrdsaAllocationChannel (SatConstVariables::CRDSA_ALLOCATION_CHANNEL);

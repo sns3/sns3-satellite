@@ -176,7 +176,7 @@ main (int argc, char *argv[])
       {
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
-        Config::SetDefault ("ns3::SatUtMac::UseCrdsaOnlyForControlPackets", BooleanValue (true));
+        Config::SetDefault ("ns3::SatUtHelper::UseCrdsaOnlyForControlPackets", BooleanValue (true));
         break;
       }
     // Periodical control slots

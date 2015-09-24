@@ -247,6 +247,12 @@ public:
   virtual bool BuffersEmpty () const;
 
   /**
+   * \brief Are buffers empty?
+   * \return Boolean to indicate whether the buffers are empty or not.
+   */
+  virtual bool ControlBuffersEmpty () const;
+
+  /**
    * \brief Get the number of (new) bytes at LLC queue for a certain UT. Method
    * checks only the SatQueue for packets, thus it does not count possible
    * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure

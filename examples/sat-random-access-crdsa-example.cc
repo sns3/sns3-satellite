@@ -63,15 +63,15 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam (1);
   uint32_t packetSize (20);
   Time interval (Seconds (0.01));
-  Time simLength (Seconds (3.00));
+  Time simLength (Seconds (1.00));
   Time appStartTime = Seconds (0.01);
 
   // Enable info logs
   LogComponentEnable ("sat-random-access-crdsa-example", LOG_LEVEL_INFO);
   LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
   LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
+  //LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
   //LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
 
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));

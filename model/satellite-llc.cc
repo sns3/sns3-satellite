@@ -343,6 +343,24 @@ SatLlc::BuffersEmpty () const
   return true;
 }
 
+bool
+SatLlc::ControlBuffersEmpty () const
+{
+  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
+       it != m_encaps.end ();
+       ++it)
+    {
+      if (it->first->m_flowId == SatEnums::CONTROL_FID)
+        {
+          if (it->second->GetTxBufferSizeInBytes () > 0)
+            {
+              return false;
+            }
+        }
+    }
+  return true;
+}
+
 uint32_t
 SatLlc::GetNBytesInQueue () const
 {

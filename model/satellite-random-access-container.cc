@@ -667,7 +667,6 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
   /// This should be done by including the list of used slots in this SF as a parameter for the
   /// random access algorithm call. This functionality is needed with, e.g., multiple allocation channels
   std::pair <std::set<uint32_t>, std::set<uint32_t> > slots;
-  uint32_t actualUniquePackets = 0;
 
   for (uint32_t i = 0; i < maxUniquePackets; i++)
     {
@@ -689,9 +688,6 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
 
               /// save the packet specific Tx opportunities into a vector
               txOpportunities.crdsaTxOpportunities.insert (std::make_pair (*slots.second.begin (), slots.second));
-
-              /// increase the number of randomized unique packets
-              actualUniquePackets++;
 
               if (m_areBuffersEmptyCb ())
                 {
@@ -761,36 +757,48 @@ SatRandomAccess::DoCrdsa (uint32_t allocationChannel)
     {
       NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No DAMA, checking buffer status...");
 
-      if (m_crdsaNewData)
+      if (!m_areBuffersEmptyCb ())
         {
-          m_crdsaNewData = false;
+          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Data in buffer, continuing CRDSA");
 
-          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Evaluating back off...");
-
-          if (CrdsaDoBackoff (allocationChannel))
+          if (m_crdsaNewData)
             {
-              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Initial new data backoff triggered");
-              CrdsaSetBackoffTimer (allocationChannel);
+              m_crdsaNewData = false;
+
+              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Evaluating back off...");
+
+              if (CrdsaDoBackoff (allocationChannel))
+                {
+                  NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Initial new data backoff triggered");
+                  CrdsaSetBackoffTimer (allocationChannel);
+                }
+              else
+                {
+                  txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
+                }
             }
           else
             {
               txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
             }
+
+          if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Tx opportunity, increasing consecutive blocks used");
+
+              CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels ();
+            }
+          else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
+            {
+              NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No Tx opportunity, reducing idle blocks & resetting consecutive blocks");
+
+              CrdsaReduceIdleBlocksForAllAllocationChannels ();
+              CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();
+            }
         }
       else
         {
-          txOpportunities = CrdsaPrepareToTransmit (allocationChannel);
-        }
-
-      if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
-        {
-          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Tx opportunity, increasing consecutive blocks used");
-
-          CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels ();
-        }
-      else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
-        {
-          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - No Tx opportunity, reducing idle blocks & resetting consecutive blocks");
+          NS_LOG_INFO ("SatRandomAccess::DoCrdsa - Empty buffer, reducing idle blocks & resetting consecutive blocks, aborting CRDSA...");
 
           CrdsaReduceIdleBlocksForAllAllocationChannels ();
           CrdsaResetConsecutiveBlocksUsedForAllAllocationChannels ();

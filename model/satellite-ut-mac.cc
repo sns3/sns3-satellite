@@ -67,11 +67,6 @@ SatUtMac::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatUtMac::m_utScheduler),
                    MakePointerChecker<SatUtScheduler> ())
-    .AddAttribute ("UseCrdsaOnlyForControlPackets",
-                   "CRDSA utilized only for control packets or also for user data.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatUtMac::m_crdsaOnlyForControl),
-                   MakeBooleanChecker ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
                      MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace),
@@ -104,14 +99,14 @@ SatUtMac::SatUtMac ()
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId)
+SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyForControl)
   : SatMac (beamId),
     m_superframeSeq (seq),
     m_timingAdvanceCb (0),
     m_guardTime (MicroSeconds (1)),
     m_raChannel (0),
     m_crdsaUniquePacketId (1),
-    m_crdsaOnlyForControl (false)
+    m_crdsaOnlyForControl (crdsaOnlyForControl)
 {
   NS_LOG_FUNCTION (this);
 
@@ -349,7 +344,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
   /// get the slot payload
   uint32_t payloadBytes = waveform->GetPayloadInBytes ();
 
-  /// reduce the CRDSA signaling overhead from the payload
+  /// reduce the SA signaling overhead from the payload
   payloadBytes -= m_randomAccess->GetSlottedAlohaSignalingOverheadInBytes ();
 
   if (payloadBytes < 1)

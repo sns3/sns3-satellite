@@ -199,6 +199,13 @@ private:
   bool m_enableChannelEstimationError;
 
   /**
+   * Planned CRDSA usage:
+   * - true -> only for control
+   * - false -> for control and user data
+   */
+  bool m_crdsaOnlyForControl;
+
+  /**
    * The used random access model settings
    */
   RandomAccessSettings_s m_raSettings;

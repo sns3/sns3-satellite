@@ -76,10 +76,9 @@ public:
    *
    * \param seq Pointer to superframe sequence.
    * \param beamId Id of the beam.
-   * \param randomAccessConf
-   * \param randomAccessModel
+   * \param crdsaOnlyForControl CRDSA buffer operation mode
    */
-  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId);
+  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyForControl);
 
   /**
    * Destroy a SatUtMac
