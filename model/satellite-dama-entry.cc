@@ -126,6 +126,8 @@ SatDamaEntry::GetRbdcBasedBytes (Time duration) const
 uint32_t
 SatDamaEntry::GetVbdcBasedBytes () const
 {
+  NS_LOG_FUNCTION (this);
+
   uint32_t totalBytes = 0;
 
   for ( uint8_t i = 0; i < m_volumeBacklogRequestedInBytes.size (); i++)
@@ -232,6 +234,10 @@ SatDamaEntry::UpdateVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
+      NS_LOG_LOGIC ("Update VBDC! RC index: " << index <<
+                    " existing VBDC bytes: " << m_volumeBacklogRequestedInBytes[index] <<
+                    " updated with " << volumeInBytes << " bytes!");
+
       SetVbdcInBytes (index, m_volumeBacklogRequestedInBytes[index] + volumeInBytes);
     }
 }
@@ -243,11 +249,15 @@ SatDamaEntry::SetVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
 
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
+      NS_LOG_LOGIC ("Set VBDC bytes to " << volumeInBytes << " for RC index: " << index);
+
       m_volumeBacklogRequestedInBytes[index] = volumeInBytes;
 
       if ( m_volumeBacklogRequestedInBytes[index] > (SatConstVariables::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index)))
         {
-          m_volumeBacklogRequestedInBytes[index] = (SatConstVariables::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index));
+          uint32_t maxVolumeBacklogInBytes = SatConstVariables::BYTES_IN_KBYTE * m_llsConf->GetDaMaximumBacklogInKbytes (index);
+          NS_LOG_LOGIC ("Max volume backlog reached! Set VBDC bytes to " << maxVolumeBacklogInBytes << " for RC index: " << index);
+          m_volumeBacklogRequestedInBytes[index] = maxVolumeBacklogInBytes;
         }
     }
 }

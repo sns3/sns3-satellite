@@ -656,26 +656,47 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
 
               offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
 
+              NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<
+                            " rate based bytes: " << rateBasedBytes <<
+                            " allocated bytes: " << allocInfo->second.first[i]);
+
+              // The scheduler has allocated more than the rate based bytes (CRA+RBDC)
               if ( rateBasedBytes < allocInfo->second.first[i] )
                 {
+                  // Requested VBDC
                   uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
-                  if ( vbdcBytes > (allocInfo->second.first[i] - rateBasedBytes) )
+                  NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<" requested VBDC bytes: " << vbdcBytes);
+
+                  // Allocated VBDC for this RC index
+                  uint32_t allocVbdcBytes = allocInfo->second.first[i] - rateBasedBytes;
+
+                  // Allocated less than requested
+                  if ( vbdcBytes > allocVbdcBytes)
                     {
-                      damaEntry->SetVbdcInBytes (i, (allocInfo->second.first[i] - rateBasedBytes));
+                      uint32_t remainingVbdcBytes = vbdcBytes - allocVbdcBytes;
+
+                      NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<
+                                    " VBDC allocation: " << allocVbdcBytes <<
+                                    " remaining VBDC bytes: " << remainingVbdcBytes);
+
+                      damaEntry->SetVbdcInBytes (i, remainingVbdcBytes);
                     }
+                  // Allocated more or equal to requested bytes
                   else
                     {
+                      NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<
+                                    " VBDC allocation: " << allocVbdcBytes <<
+                                    " remaining VBDC bytes: " << 0);
+
                       damaEntry->SetVbdcInBytes (i, 0);
                     }
                 }
             }
         }
-
       // decrease persistence values
       damaEntry->DecrementDynamicRatePersistence ();
       damaEntry->DecrementVolumeBacklogPersistence ();
-
     }
   return offeredCraRbdcKbps;
 }
