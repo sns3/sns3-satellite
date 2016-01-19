@@ -580,7 +580,7 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
           NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
         }
 
-      // Update composite SINR trace
+      // Update composite SINR trace for DAMA and Slotted ALOHA packets
       m_sinrTrace (SatUtils::LinearToDb (cSinr), iter->second.sourceAddress);
 
       /// composite sinr output trace
@@ -774,6 +774,10 @@ SatPhyRxCarrier::DoFrameEnd ()
                                            results[i].sourceAddress,  // sender address
                                            results[i].phyError        // error flag
                                            );
+
+              // Update composite SINR trace for CRDSA packet after combination
+              m_sinrTrace (SatUtils::LinearToDb (results[i].cSinr), results[i].sourceAddress);
+
               /// send packet upwards
               m_rxCallback (results[i].rxParams,
                             results[i].phyError);
@@ -1415,6 +1419,13 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
+
+  /*
+   * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
+   * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
+   * method!
+   */
+  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
 
   double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
 
