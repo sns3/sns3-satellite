@@ -292,7 +292,7 @@ void
 SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << carrierId << duration);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
+  NS_LOG_INFO (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
   // Add a SatPhyTimeTag tag for packet delay computation at the receiver end.
   if (m_isStatisticsTagsEnabled)
@@ -379,7 +379,7 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
   if (phyError)
     {
       // If there was a PHY error, the packet is dropped here.
-      NS_LOG_LOGIC (this << " dropped " << rxParams->m_packetsInBurst.size ()
+      NS_LOG_INFO (this << " dropped " << rxParams->m_packetsInBurst.size ()
                          << " packets because of PHY error.");
     }
   else

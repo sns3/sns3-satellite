@@ -75,12 +75,12 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   switch (carrierConf->GetInterferenceModel (m_isRandomAccessEnabledForThisCarrier))
     {
     case SatPhyRxCarrierConf::IF_CONSTANT:
-      NS_LOG_LOGIC (this << " Constant interference model created for carrier: " << carrierId);
+      NS_LOG_INFO (this << " Constant interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatConstantInterference> ();
       break;
 
     case SatPhyRxCarrierConf::IF_PER_PACKET:
-      NS_LOG_LOGIC (this << " Per packet interference model created for carrier: " << carrierId);
+      NS_LOG_INFO (this << " Per packet interference model created for carrier: " << carrierId);
 
       if (carrierConf->IsIntfOutputTraceEnabled ())
         {
@@ -93,7 +93,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
       break;
 
     case SatPhyRxCarrierConf::IF_TRACE:
-      NS_LOG_LOGIC (this << " Traced interference model created for carrier: " << carrierId);
+      NS_LOG_INFO (this << " Traced interference model created for carrier: " << carrierId);
       m_satInterference = CreateObject<SatTracedInterference> (m_channelType, m_rxBandwidthHz);
       break;
 
@@ -110,7 +110,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   if (m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
-      NS_LOG_LOGIC (this << " link results in use in carrier: " << carrierId);
+      NS_LOG_INFO (this << " link results in use in carrier: " << carrierId);
       m_linkResults = carrierConf->GetLinkResults ();
     }
 
@@ -300,7 +300,7 @@ void
 SatPhyRxCarrier::ChangeState (State newState)
 {
   NS_LOG_FUNCTION (this << newState);
-  NS_LOG_LOGIC (this << " state: " << m_state << " -> " << newState);
+  NS_LOG_INFO (this << " state: " << m_state << " -> " << newState);
   m_state = newState;
 }
 
@@ -308,13 +308,13 @@ void
 SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+  NS_LOG_INFO (this << " state: " << m_state);
   NS_ASSERT (rxParams->m_carrierId == m_carrierId);
 
   uint32_t key;
 
-  NS_LOG_LOGIC ("Node: " << m_nodeInfo->GetMacAddress () << " starts receiving packet at: " << Simulator::Now ().GetSeconds () << " in carrier: " << rxParams->m_carrierId);
-  NS_LOG_LOGIC ("Sender: " << rxParams->m_phyTx);
+  NS_LOG_INFO ("Node: " << m_nodeInfo->GetMacAddress () << " starts receiving packet at: " << Simulator::Now ().GetSeconds () << " in carrier: " << rxParams->m_carrierId);
+  NS_LOG_INFO ("Sender: " << rxParams->m_phyTx);
 
   switch (m_state)
     {
@@ -338,20 +338,20 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
             if (( dest == m_ownAddress ))
               {
-                NS_LOG_LOGIC ("Packet intended for this specific receiver: " << dest);
+                NS_LOG_INFO ("Packet intended for this specific receiver: " << dest);
 
                 receivePacket = true;
                 ownAddressFound = true;
               }
             else if ( dest.IsBroadcast () )
               {
-                NS_LOG_LOGIC ("Destination is broadcast address: " << dest);
+                NS_LOG_INFO ("Destination is broadcast address: " << dest);
 
                 receivePacket = true;
               }
             else if ( dest.IsGroup () )
               {
-                NS_LOG_LOGIC ("Destination is multicast address: " << dest);
+                NS_LOG_INFO ("Destination is multicast address: " << dest);
 
                 receivePacket = true;
               }
@@ -359,7 +359,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
         if ( m_rxMode == SatPhyRxCarrierConf::TRANSPARENT )
           {
-            NS_LOG_LOGIC ("Receiver is attached to satellite node");
+            NS_LOG_INFO ("Receiver is attached to satellite node");
             receivePacket = true;
           }
 
@@ -414,7 +414,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 
             m_rxParamsMap.insert (std::make_pair (key, rxParamsStruct));
 
-            NS_LOG_LOGIC (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
+            NS_LOG_INFO (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
 
             // Update link specific received signal power
             m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W));
@@ -437,7 +437,7 @@ void
 SatPhyRxCarrier::EndRxData (uint32_t key)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+  NS_LOG_INFO (this << " state: " << m_state);
 
   if (m_rxMode == SatPhyRxCarrierConf::NORMAL)
     {
@@ -453,7 +453,7 @@ void
 SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+  NS_LOG_INFO (this << " state: " << m_state);
 
   NS_ASSERT (m_state == RX);
 
@@ -521,7 +521,7 @@ void
 SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+  NS_LOG_INFO (this << " state: " << m_state);
 
   NS_ASSERT (m_state == RX);
 
@@ -687,7 +687,7 @@ bool
 SatPhyRxCarrier::ProcessSlottedAlohaCollisions (double cSinr, Ptr<SatSignalParameters> rxParams, Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions");
+  NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions");
 
   bool phyError = false;
 
@@ -724,7 +724,7 @@ void
 SatPhyRxCarrier::DoFrameEnd ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::DoFrameEnd");
+  NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd");
 
   NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Time: " << Now ().GetSeconds ());
 
@@ -822,7 +822,7 @@ void
 SatPhyRxCarrier::MeasureRandomAccessLoad ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::MeasureRandomAccessLoad");
+  NS_LOG_INFO ("SatPhyRxCarrier::MeasureRandomAccessLoad");
 
   NS_LOG_INFO ("SatPhyRxCarrier::MeasureRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
@@ -844,7 +844,7 @@ double
 SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad");
+  NS_LOG_INFO ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad");
 
   NS_LOG_INFO ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
@@ -869,7 +869,7 @@ void
 SatPhyRxCarrier::SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad");
+  NS_LOG_INFO ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad");
 
   NS_LOG_INFO ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
@@ -885,7 +885,7 @@ double
 SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad");
+  NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad");
 
   NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
@@ -912,7 +912,7 @@ void
 SatPhyRxCarrier::DoCompositeSinrOutputTrace (double cSinr)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::DoCompositeSinrOutputTrace");
+  NS_LOG_INFO ("SatPhyRxCarrier::DoCompositeSinrOutputTrace");
 
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
@@ -925,7 +925,7 @@ bool
 SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::CheckAgainstLinkResults");
+  NS_LOG_INFO ("SatPhyRxCarrier::CheckAgainstLinkResults");
 
   /// Initialize with no errors
   bool error = false;
@@ -1109,7 +1109,7 @@ SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::IncreaseNumOfRxState - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::IncreaseNumOfRxState - Time: " << Now ().GetSeconds ());
 
   m_numOfOngoingRx++;
   ChangeState (RX);
@@ -1127,7 +1127,7 @@ SatPhyRxCarrier::DecreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::DecreaseNumOfRxState - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::DecreaseNumOfRxState - Time: " << Now ().GetSeconds ());
 
   if (m_numOfOngoingRx > 0)
     {
@@ -1152,7 +1152,7 @@ SatPhyRxCarrier::CheckRxStateSanity ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::CheckRxStateSanity - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::CheckRxStateSanity - Time: " << Now ().GetSeconds ());
 
   if (m_numOfOngoingRx > 0 && m_state == IDLE)
     {
@@ -1172,7 +1172,7 @@ SatPhyRxCarrier::AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s crdsaPac
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::AddCrdsaPacket - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::AddCrdsaPacket - Time: " << Now ().GetSeconds ());
 
   if (crdsaPacket.rxParams->m_packetsInBurst.size () > 0)
     {
@@ -1246,7 +1246,7 @@ SatPhyRxCarrier::ProcessFrame ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessFrame - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Time: " << Now ().GetSeconds ());
 
   std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter;
   std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> combinedPacketsForFrame;
@@ -1391,7 +1391,7 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatPhyRxCarrier::ProcessSuccessfullyReceivedCrdsaPacket - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::ProcessSuccessfullyReceivedCrdsaPacket - Time: " << Now ().GetSeconds ());
 
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Processing a packet in slot: " << packet.ownSlotId <<
                " number of packets in this slot: " << numOfPacketsForThisSlot);
@@ -1491,7 +1491,7 @@ void
 SatPhyRxCarrier::FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s packet)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::FindAndRemoveReplicas - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::FindAndRemoveReplicas - Time: " << Now ().GetSeconds ());
 
   for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
     {
@@ -1543,7 +1543,7 @@ void
 SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter, SatPhyRxCarrier::crdsaPacketRxParams_s processedPacket)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::EliminateInterference");
+  NS_LOG_INFO ("SatPhyRxCarrier::EliminateInterference");
 
   if (iter->second.empty ())
     {
@@ -1598,7 +1598,7 @@ bool
 SatPhyRxCarrier::IsReplica (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::IsReplica - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::IsReplica - Time: " << Now ().GetSeconds ());
 
   NS_LOG_INFO ("SatPhyRxCarrier::IsReplica - Checking the source addresses");
 
@@ -1621,7 +1621,7 @@ bool
 SatPhyRxCarrier::HaveSameSlotIds (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::HaveSameSlotIds - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::HaveSameSlotIds - Time: " << Now ().GetSeconds ());
 
   std::set<uint16_t> firstSet;
   std::set<uint16_t> secondSet;
@@ -1680,7 +1680,7 @@ void
 SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback)
 {
   NS_LOG_FUNCTION (this << &callback);
-  NS_LOG_LOGIC ("SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback - Time: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback - Time: " << Now ().GetSeconds ());
 
   m_avgNormalizedOfferedLoadCallback = callback;
 }

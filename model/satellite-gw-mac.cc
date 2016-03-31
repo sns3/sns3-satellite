@@ -154,8 +154,8 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
         }
 
-      NS_LOG_LOGIC ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
-      NS_LOG_LOGIC ("Receiver " << m_nodeInfo->GetMacAddress ());
+      NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
+      NS_LOG_INFO ("Receiver " << m_nodeInfo->GetMacAddress ());
 
       // If the packet is intended for this receiver
       Mac48Address destAddress = macTag.GetDestAddress ();
@@ -187,7 +187,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
         }
       else
         {
-          NS_LOG_LOGIC ("Packet intended for others received by MAC: " << m_nodeInfo->GetMacAddress ());
+          NS_LOG_INFO ("Packet intended for others received by MAC: " << m_nodeInfo->GetMacAddress ());
         }
     }
 }

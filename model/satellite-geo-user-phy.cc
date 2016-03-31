@@ -178,7 +178,7 @@ void
 SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 {
   NS_LOG_FUNCTION (this << txParams);
-  NS_LOG_LOGIC (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
+  NS_LOG_INFO (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now (),

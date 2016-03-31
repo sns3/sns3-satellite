@@ -61,7 +61,7 @@ SatArpCache::Add (Ipv4Address to, Address macAddress)
   entry->SetMacAddresss (macAddress);
   entry->MarkPermanent ();
 
-  NS_LOG_LOGIC ( "IP: " << to << ", MAC: " << macAddress );
+  NS_LOG_INFO ( "IP: " << to << ", MAC: " << macAddress );
 
   return entry;
 }

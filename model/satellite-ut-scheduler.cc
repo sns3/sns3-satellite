@@ -133,7 +133,7 @@ SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t paylo
 {
   NS_LOG_FUNCTION (this << payloadBytes << (uint32_t) rcIndex << policy);
 
-  NS_LOG_LOGIC ("UT scheduling RC: " << (uint32_t)(rcIndex) << " with " << payloadBytes << " bytes");
+  NS_LOG_INFO ("UT scheduling RC: " << (uint32_t)(rcIndex) << " with " << payloadBytes << " bytes");
 
   if (type == SatTimeSlotConf::SLOT_TYPE_C && rcIndex != SatEnums::CONTROL_FID)
     {
@@ -171,7 +171,7 @@ SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t paylo
           // No use asking the given RC index again
           if (*it != rcIndex)
             {
-              NS_LOG_LOGIC ("UT scheduling RC: " << (uint32_t)(rcIndex) << " with " << payloadBytes << " bytes");
+              NS_LOG_INFO ("UT scheduling RC: " << (uint32_t)(rcIndex) << " with " << payloadBytes << " bytes");
 
               // Schedule the requested RC index
               uint32_t bytes = DoSchedulingForRcIndex (packets, payloadBytes, *it);
@@ -211,7 +211,7 @@ SatUtScheduler::DoSchedulingForRcIndex (std::vector<Ptr<Packet> > &packets, uint
       Ptr<Packet> p = m_txOpportunityCallback (payloadBytes, m_nodeInfo->GetMacAddress (), rcIndex, bytesLeft, nextMinTxO);
       if (p)
         {
-          NS_LOG_LOGIC ("Created a packet from RC: " << (uint32_t)(rcIndex) << " size: " << p->GetSize ());
+          NS_LOG_INFO ("Created a packet from RC: " << (uint32_t)(rcIndex) << " size: " << p->GetSize ());
 
           packets.push_back (p);
 

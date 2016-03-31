@@ -631,7 +631,7 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
            */
           if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != 0)
             {
-              NS_LOG_LOGIC (this << " attempt to connect using RxDelay");
+              NS_LOG_INFO (this << " attempt to connect using RxDelay");
 
               // Create the probe.
               std::ostringstream probeName;
@@ -648,7 +648,7 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
             }
           else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
             {
-              NS_LOG_LOGIC (this << " attempt to connect using Rx");
+              NS_LOG_INFO (this << " attempt to connect using Rx");
               Callback<void, Ptr<const Packet>, const Address &> rxCallback
                 = MakeBoundCallback (&SatStatsFwdAppDelayHelper::RxCallback,
                                      this,
@@ -1234,7 +1234,7 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 
   if (ipv4 == 0)
     {
-      NS_LOG_LOGIC (this << " Node " << utUserNode->GetId ()
+      NS_LOG_INFO (this << " Node " << utUserNode->GetId ()
                          << " does not support IPv4 protocol");
     }
   else if (ipv4->GetNInterfaces () >= 2)

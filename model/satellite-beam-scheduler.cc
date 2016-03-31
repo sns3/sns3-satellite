@@ -267,7 +267,7 @@ bool
 SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 {
   NS_LOG_FUNCTION (this << msg);
-  NS_LOG_LOGIC ("p=" << msg );
+  NS_LOG_INFO ("p=" << msg );
 
   m_txCallback (msg, Mac48Address::GetBroadcast ());
 
@@ -315,7 +315,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
   m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE), maxRcCount);
 
-  NS_LOG_LOGIC ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
+  NS_LOG_INFO ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 
   Time delay;
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
@@ -471,7 +471,7 @@ SatBeamScheduler::Schedule ()
           Send (*it);
         }
 
-      NS_LOG_LOGIC ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
+      NS_LOG_INFO ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
     }
 
   uint32_t usableCapacity = std::min (offeredKbpsSum, requestedKbpsSum);
@@ -656,7 +656,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
 
               offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
 
-              NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<
+              NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
                             " rate based bytes: " << rateBasedBytes <<
                             " allocated bytes: " << allocInfo->second.first[i]);
 
@@ -666,7 +666,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                   // Requested VBDC
                   uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
-                  NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<" requested VBDC bytes: " << vbdcBytes);
+                  NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<" requested VBDC bytes: " << vbdcBytes);
 
                   // Allocated VBDC for this RC index
                   uint32_t allocVbdcBytes = allocInfo->second.first[i] - rateBasedBytes;
@@ -676,7 +676,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                     {
                       uint32_t remainingVbdcBytes = vbdcBytes - allocVbdcBytes;
 
-                      NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<
+                      NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
                                     " VBDC allocation: " << allocVbdcBytes <<
                                     " remaining VBDC bytes: " << remainingVbdcBytes);
 
@@ -685,7 +685,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                   // Allocated more or equal to requested bytes
                   else
                     {
-                      NS_LOG_LOGIC ("UT: " << allocInfo->first << " RC index: " << i <<
+                      NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
                                     " VBDC allocation: " << allocVbdcBytes <<
                                     " remaining VBDC bytes: " << 0);
 

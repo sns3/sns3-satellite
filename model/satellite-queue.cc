@@ -138,11 +138,11 @@ SatQueue::Enqueue (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
-  NS_LOG_LOGIC ("Enque " << p->GetSize () << " bytes");
+  NS_LOG_INFO ("Enque " << p->GetSize () << " bytes");
 
   if (m_packets.size () >= m_maxPackets)
     {
-      NS_LOG_LOGIC ("Queue full (at max packets) -- dropping pkt");
+      NS_LOG_INFO ("Queue full (at max packets) -- dropping pkt");
 
       std::stringstream msg;
       msg << "SatQueue is full: packet dropped!";
@@ -164,8 +164,8 @@ SatQueue::Enqueue (Ptr<Packet> p)
 
   m_packets.push_back (p);
 
-  NS_LOG_LOGIC ("Number packets " << m_packets.size ());
-  NS_LOG_LOGIC ("Number bytes " << m_nBytes);
+  NS_LOG_INFO ("Number packets " << m_packets.size ());
+  NS_LOG_INFO ("Number bytes " << m_nBytes);
   m_traceEnqueue (p);
 
   if (m_packets.empty ())
@@ -187,7 +187,7 @@ SatQueue::Dequeue ()
 
   if (IsEmpty ())
     {
-      NS_LOG_LOGIC ("Queue empty");
+      NS_LOG_INFO ("Queue empty");
       return 0;
     }
 
@@ -199,9 +199,9 @@ SatQueue::Dequeue ()
 
   m_nDequeBytesSinceReset += p->GetSize ();
 
-  NS_LOG_LOGIC ("Popped " << p);
-  NS_LOG_LOGIC ("Number packets " << m_packets.size ());
-  NS_LOG_LOGIC ("Number bytes " << m_nBytes);
+  NS_LOG_INFO ("Popped " << p);
+  NS_LOG_INFO ("Number packets " << m_packets.size ());
+  NS_LOG_INFO ("Number bytes " << m_nBytes);
   m_traceDequeue (p);
 
   return p;
@@ -214,14 +214,14 @@ SatQueue::Peek (void) const
 
   if (IsEmpty ())
     {
-      NS_LOG_LOGIC ("Queue empty");
+      NS_LOG_INFO ("Queue empty");
       return 0;
     }
 
   Ptr<Packet> p = m_packets.front ();
 
-  NS_LOG_LOGIC ("Number packets " << m_packets.size ());
-  NS_LOG_LOGIC ("Number bytes " << m_nBytes);
+  NS_LOG_INFO ("Number packets " << m_packets.size ());
+  NS_LOG_INFO ("Number bytes " << m_nBytes);
 
   return p;
 }
@@ -257,7 +257,7 @@ SatQueue::Drop (Ptr<Packet> p)
   m_nTotalDroppedPackets++;
   m_nTotalDroppedBytes += p->GetSize ();
 
-  NS_LOG_LOGIC ("m_traceDrop (p)");
+  NS_LOG_INFO ("m_traceDrop (p)");
   m_traceDrop (p);
 }
 

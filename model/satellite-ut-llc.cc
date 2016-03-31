@@ -88,9 +88,9 @@ bool
 SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
   NS_LOG_FUNCTION (this << packet << dest << (uint32_t) flowId);
-  NS_LOG_LOGIC ("p=" << packet );
-  NS_LOG_LOGIC ("dest=" << dest );
-  NS_LOG_LOGIC ("UID is " << packet->GetUid ());
+  NS_LOG_INFO ("p=" << packet );
+  NS_LOG_INFO ("dest=" << dest );
+  NS_LOG_INFO ("UID is " << packet->GetUid ());
 
   Mac48Address destMacAddress = Mac48Address::ConvertFrom (dest);
 
@@ -257,7 +257,7 @@ SatUtLlc::CreateEncap (Ptr<EncapKey> key)
 
   utEncap->SetQueue (queue);
 
-  NS_LOG_LOGIC ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
+  NS_LOG_INFO ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the encapsulator
   std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, utEncap));
@@ -286,7 +286,7 @@ SatUtLlc::CreateDecap (Ptr<EncapKey> key)
   utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
   utDecap->SetCtrlMsgCallback (m_sendCtrlCallback);
 
-  NS_LOG_LOGIC ("Create decapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
+  NS_LOG_INFO ("Create decapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the decapsulator
   std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, utDecap));

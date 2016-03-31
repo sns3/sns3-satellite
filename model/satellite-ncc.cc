@@ -209,7 +209,7 @@ SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint1
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_LOGIC ("SatNcc::CreateRandomAccessLoadControlMessage");
+  NS_LOG_INFO ("SatNcc::CreateRandomAccessLoadControlMessage");
 
   Ptr<SatRaMessage> raMsg = CreateObject<SatRaMessage> ();
   std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);

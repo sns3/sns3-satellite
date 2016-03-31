@@ -65,7 +65,7 @@ SatPositionAllocator::~SatPositionAllocator ()
 Vector
 SatPositionAllocator::GetNext () const
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_INFO (this);
 
   GeoCoordinate pos = GetNextGeoPosition ();
 
@@ -102,7 +102,7 @@ SatListPositionAllocator::SatListPositionAllocator ()
 void
 SatListPositionAllocator::Add (GeoCoordinate coordinate)
 {
-  NS_LOG_LOGIC (this << coordinate.GetLatitude () << coordinate.GetLongitude () << coordinate.GetAltitude ());
+  NS_LOG_INFO (this << coordinate.GetLatitude () << coordinate.GetLongitude () << coordinate.GetAltitude ());
 
   m_positions.push_back (coordinate);
   m_current = m_positions.begin ();
@@ -110,7 +110,7 @@ SatListPositionAllocator::Add (GeoCoordinate coordinate)
 GeoCoordinate
 SatListPositionAllocator::GetNextGeoPosition () const
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_INFO (this);
 
   GeoCoordinate coordinate = *m_current;
   m_current++;
@@ -161,14 +161,14 @@ SatRandomBoxPositionAllocator::~SatRandomBoxPositionAllocator ()
 void
 SatRandomBoxPositionAllocator::SetLongitude (Ptr<RandomVariableStream> longitude)
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_INFO (this);
 
   m_longitude = longitude;
 }
 void
 SatRandomBoxPositionAllocator::SetLatitude (Ptr<RandomVariableStream> latitude)
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_INFO (this);
 
   m_latitude = latitude;
 }
@@ -176,7 +176,7 @@ SatRandomBoxPositionAllocator::SetLatitude (Ptr<RandomVariableStream> latitude)
 void
 SatRandomBoxPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_INFO (this);
 
   m_altitude = altitude;
 }
@@ -184,7 +184,7 @@ SatRandomBoxPositionAllocator::SetAltitude (Ptr<RandomVariableStream> altitude)
 GeoCoordinate
 SatRandomBoxPositionAllocator::GetNextGeoPosition () const
 {
-  NS_LOG_LOGIC (this);
+  NS_LOG_INFO (this);
   double longitude = m_longitude->GetValue ();
   double latitude = m_latitude->GetValue ();
   double altitude = m_altitude->GetValue ();

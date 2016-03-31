@@ -93,7 +93,7 @@ SatLookUpTable::GetBler (double esNoDb) const
   if (esNoDb < m_esNoDb[0])
     {
       // edge case: very low SINR, return maximum BLER (100% error rate)
-      NS_LOG_LOGIC (this << " Very low SINR -> BLER = 1.0");
+      NS_LOG_INFO (this << " Very low SINR -> BLER = 1.0");
       return 1.0;
     }
 
@@ -110,7 +110,7 @@ SatLookUpTable::GetBler (double esNoDb) const
   if (i >= n)
     {
       // edge case: very high SINR, return minimum BLER (100% success rate)
-      NS_LOG_LOGIC (this << " Very high SINR -> BLER = 0.0");
+      NS_LOG_INFO (this << " Very high SINR -> BLER = 0.0");
       return 0.0;
     }
   else // sinrDb <= m_esNoDb[i]
@@ -123,7 +123,7 @@ SatLookUpTable::GetBler (double esNoDb) const
       double esno0 = m_esNoDb[i - 1];
       double esno1 = m_esNoDb[i];
       double bler = SatUtils::Interpolate (esno, esno0, esno1, m_bler[i - 1], m_bler[i]);
-      NS_LOG_LOGIC (this << " Interpolate: " << esno << " to BLER = " << bler << "(sinr0: " << esno0 << ", sinr1: " << esno1 << ", bler0: " << m_bler[i - 1] << ", bler1: " << m_bler[i] << ")");
+      NS_LOG_INFO (this << " Interpolate: " << esno << " to BLER = " << bler << "(sinr0: " << esno0 << ", sinr1: " << esno1 << ", bler0: " << m_bler[i - 1] << ", bler1: " << m_bler[i] << ")");
 
       return bler;
     }
@@ -162,7 +162,7 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
       if (blerTarget >= m_bler[i])
         {
           sinr = SatUtils::Interpolate (blerTarget, m_bler[i - 1], m_bler[i], m_esNoDb[i - 1], m_esNoDb[i]);
-          NS_LOG_LOGIC (this << " Interpolate: " << blerTarget << " to SINR = " << sinr << "(bler0: " << m_bler[i - 1] << ", bler1: " << m_bler[i] << ", sinr0: " << m_esNoDb[i - 1] << ", sinr1: " << m_esNoDb[i] << ")");
+          NS_LOG_INFO (this << " Interpolate: " << blerTarget << " to SINR = " << sinr << "(bler0: " << m_bler[i - 1] << ", bler1: " << m_bler[i] << ", sinr0: " << m_esNoDb[i - 1] << ", sinr1: " << m_esNoDb[i] << ")");
           return sinr;
         }
     }

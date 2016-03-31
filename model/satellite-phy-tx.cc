@@ -210,7 +210,7 @@ void
 SatPhyTx::ChangeState (State newState)
 {
   NS_LOG_FUNCTION (this << newState);
-  NS_LOG_LOGIC (this << " state: " << m_state << " -> " << newState);
+  NS_LOG_INFO (this << " state: " << m_state << " -> " << newState);
   m_state = newState;
 }
 
@@ -218,7 +218,7 @@ void
 SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this << txParams);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+  NS_LOG_INFO (this << " state: " << m_state);
 
   switch (m_state)
     {
@@ -262,7 +262,7 @@ void
 SatPhyTx::EndTx ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_LOGIC (this << " state: " << m_state);
+  NS_LOG_INFO (this << " state: " << m_state);
 
   if (m_state != TX)
     {

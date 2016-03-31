@@ -97,15 +97,15 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
   mTag.SetSourceAddress (m_sourceAddress);
   p->AddPacketTag (mTag);
 
-  NS_LOG_LOGIC ("Tx Buffer: New packet added of size: " << p->GetSize ());
+  NS_LOG_INFO ("Tx Buffer: New packet added of size: " << p->GetSize ());
 
   if (!m_txQueue->Enqueue (p))
     {
-      NS_LOG_LOGIC ("Packet is dropped!");
+      NS_LOG_INFO ("Packet is dropped!");
     }
 
-  NS_LOG_LOGIC ("NumPackets = " << m_txQueue->GetNPackets () );
-  NS_LOG_LOGIC ("NumBytes = " << m_txQueue->GetNBytes ());
+  NS_LOG_INFO ("NumPackets = " << m_txQueue->GetNPackets () );
+  NS_LOG_INFO ("NumBytes = " << m_txQueue->GetNBytes ());
 }
 
 
@@ -113,14 +113,14 @@ Ptr<Packet>
 SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
+  NS_LOG_INFO ("TxOpportunity for flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   Ptr<Packet> packet;
 
   // No packets in buffer
   if (m_txQueue->IsEmpty ())
     {
-      NS_LOG_LOGIC ("No data pending, return NULL packet");
+      NS_LOG_INFO ("No data pending, return NULL packet");
       return packet;
     }
 

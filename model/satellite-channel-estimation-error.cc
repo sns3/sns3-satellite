@@ -170,7 +170,7 @@ SatChannelEstimationError::AddError (double sinrInDb) const
   // Convert standard deviation to variance
   double varCe = pow (stdCe, 2);
 
-  NS_LOG_LOGIC ("mueCe: " << mueCe << ", stdCe: " << stdCe << ", varCe: " << varCe);
+  NS_LOG_INFO ("mueCe: " << mueCe << ", stdCe: " << stdCe << ", varCe: " << varCe);
 
   // Get normal random variable error
   double error = m_normalRandomVariable->GetValue (mueCe, varCe);
@@ -178,7 +178,7 @@ SatChannelEstimationError::AddError (double sinrInDb) const
   // Add error and correct with
   double sinrOutDb = sinrInDb + error - mueCe;
 
-  NS_LOG_LOGIC ("sinrIn: " << sinrInDb << ", sinrOut: " << sinrOutDb);
+  NS_LOG_INFO ("sinrIn: " << sinrInDb << ", sinrOut: " << sinrOutDb);
 
   return sinrOutDb;
 }

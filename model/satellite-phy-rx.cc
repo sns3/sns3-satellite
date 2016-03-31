@@ -286,7 +286,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
 
   for (uint32_t i = 0; i < carrierConf->GetCarrierCount (); ++i)
     {
-      NS_LOG_LOGIC (this << " Create carrier: " << i);
+      NS_LOG_INFO (this << " Create carrier: " << i);
 
       if (isRandomAccessEnabled)
         {

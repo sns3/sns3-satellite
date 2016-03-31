@@ -182,7 +182,7 @@ Ptr<Packet>
 SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_LOGIC ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
+  NS_LOG_INFO ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -218,14 +218,14 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           EventId t = Simulator::Schedule (m_retransmissionTimer, &SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired, this, context->m_seqNo);
           context->m_waitingTimer = t;
 
-          NS_LOG_LOGIC ("UT: << " << m_sourceAddress << " sent a retransmission packet of size: " << context->m_pdu->GetSize () << " with seqNo: " << (uint32_t)(context->m_seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
+          NS_LOG_INFO ("UT: << " << m_sourceAddress << " sent a retransmission packet of size: " << context->m_pdu->GetSize () << " with seqNo: " << (uint32_t)(context->m_seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
 
           Ptr<Packet> copy = context->m_pdu->Copy ();
           return copy;
         }
       else
         {
-          NS_LOG_LOGIC ("Retransmission PDU: " << context->m_pdu->GetUid () << " size: " << context->m_pdu->GetSize () << " does not fit into TxO: " << bytes);
+          NS_LOG_INFO ("Retransmission PDU: " << context->m_pdu->GetUid () << " size: " << context->m_pdu->GetSize () << " does not fit into TxO: " << bytes);
         }
     }
 
@@ -278,8 +278,8 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
               NS_FATAL_ERROR ("Created packet of size: " << packet->GetSize () << " is larger than the tx opportunity: " << bytes);
             }
 
-          NS_LOG_LOGIC ("UT: << " << m_sourceAddress << " sent a packet of size: " << packet->GetSize () << " with seqNo: " << (uint32_t)(seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
-          NS_LOG_LOGIC ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes ());
+          NS_LOG_INFO ("UT: << " << m_sourceAddress << " sent a packet of size: " << packet->GetSize () << " with seqNo: " << (uint32_t)(seqNo) << " flowId: " << (uint32_t)(m_flowId) << " at: " << Now ().GetSeconds ());
+          NS_LOG_INFO ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes ());
         }
     }
 
@@ -297,7 +297,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
-  NS_LOG_LOGIC ("At UT: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("At UT: " << m_sourceAddress << " ARQ retransmission timer expired for: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
   std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (seqNo);
 
@@ -309,7 +309,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
       // Retransmission still possible
       if (it->second->m_retransmissionCount < m_maxNoOfRetransmissions)
         {
-          NS_LOG_LOGIC ("Moving the ARQ context to retransmission buffer");
+          NS_LOG_INFO ("Moving the ARQ context to retransmission buffer");
 
           Ptr<SatArqBufferContext> context = it->second;
 
@@ -322,7 +322,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
       // Maximum retransmissions reached
       else
         {
-          NS_LOG_LOGIC ("For UT: " << m_sourceAddress << " max retransmissions reached for " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
+          NS_LOG_INFO ("For UT: " << m_sourceAddress << " max retransmissions reached for " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
           // Do clean-up
           CleanUp (seqNo);
@@ -330,7 +330,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
     }
   else
     {
-      NS_LOG_LOGIC ("Element not found anymore in the m_txedBuffer, thus ACK has been received already earlier");
+      NS_LOG_INFO ("Element not found anymore in the m_txedBuffer, thus ACK has been received already earlier");
     }
 }
 
@@ -346,7 +346,7 @@ SatReturnLinkEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   std::map<uint8_t, Ptr<SatArqBufferContext> >::iterator it = m_txedBuffer.find (sequenceNumber);
   if (it != m_txedBuffer.end ())
     {
-      NS_LOG_LOGIC ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from txedBuffer!");
+      NS_LOG_INFO ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from txedBuffer!");
       m_txedBufferSize -= it->second->m_pdu->GetSize ();
       it->second->DoDispose ();
       it->second = 0;
@@ -357,7 +357,7 @@ SatReturnLinkEncapsulatorArq::CleanUp (uint8_t sequenceNumber)
   it = m_retxBuffer.find (sequenceNumber);
   if (it != m_retxBuffer.end ())
     {
-      NS_LOG_LOGIC ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from retxBuffer!");
+      NS_LOG_INFO ("Sequence no: " << (uint32_t) sequenceNumber << " clean up from retxBuffer!");
       m_retxBufferSize -= it->second->m_pdu->GetSize ();
       it->second->DoDispose ();
       it->second = 0;
@@ -376,7 +376,7 @@ SatReturnLinkEncapsulatorArq::ReceiveAck (Ptr<SatArqAckMessage> ack)
    * buffer and release the sequence number for further use.
    */
 
-  NS_LOG_LOGIC ("UT: " << m_sourceAddress << " received ACK with SN: " << (uint32_t)(ack->GetSequenceNumber ()) << " at: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("UT: " << m_sourceAddress << " received ACK with SN: " << (uint32_t)(ack->GetSequenceNumber ()) << " at: " << Now ().GetSeconds ());
 
   // Do clean-up
   CleanUp (ack->GetSequenceNumber ());
@@ -412,7 +412,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
   p->RemoveHeader (arqHeader);
   uint8_t seqNo = arqHeader.GetSeqNo ();
 
-  NS_LOG_LOGIC ("UT: " << m_sourceAddress << " received a packet with SeqNo: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("UT: " << m_sourceAddress << " received a packet with SeqNo: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
   // Send ACK for the received RLE packet.
   SendAck (seqNo);
@@ -420,7 +420,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
   // Convert the 8-bit sequence number to continuous 32-bit sequence number
   uint32_t sn = ConvertSeqNo (seqNo);
 
-  NS_LOG_LOGIC ("8bit SN: " << (uint32_t)(seqNo) << " 32bit SN: " << sn);
+  NS_LOG_INFO ("8bit SN: " << (uint32_t)(seqNo) << " 32bit SN: " << sn);
 
   // If the received SN is valid. If we receive a SN from the past
   // nothing is needed to be done.
@@ -431,7 +431,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
       // If the context is not found, then we create a new one.
       if (it == m_reorderingBuffer.end ())
         {
-          NS_LOG_LOGIC ("UT: " << m_sourceAddress << " created a new ARQ buffer entry for SeqNo: " << sn << " at: " << Now ().GetSeconds ());
+          NS_LOG_INFO ("UT: " << m_sourceAddress << " created a new ARQ buffer entry for SeqNo: " << sn << " at: " << Now ().GetSeconds ());
           Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext> ();
           arqContext->m_pdu = p;
           arqContext->m_rxStatus = true;
@@ -442,13 +442,13 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
       // If the context is found, update it.
       else
         {
-          NS_LOG_LOGIC ("UT: " << m_sourceAddress << " reset an existing ARQ entry for SeqNo: " << sn << " at " << Now ().GetSeconds ());
+          NS_LOG_INFO ("UT: " << m_sourceAddress << " reset an existing ARQ entry for SeqNo: " << sn << " at " << Now ().GetSeconds ());
           it->second->m_waitingTimer.Cancel ();
           it->second->m_pdu = p;
           it->second->m_rxStatus = true;
         }
 
-      NS_LOG_LOGIC ("Received a packet with SeqNo: " << sn << ", expecting: " << m_nextExpectedSeqNo);
+      NS_LOG_INFO ("Received a packet with SeqNo: " << sn << ", expecting: " << m_nextExpectedSeqNo);
 
       // If this is not the SN we expect
       if (sn != m_nextExpectedSeqNo)
@@ -458,12 +458,12 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
             {
               std::map<uint32_t, Ptr<SatArqBufferContext > >::iterator it2 = m_reorderingBuffer.find (i);
 
-              NS_LOG_LOGIC ("Finding context for " << i);
+              NS_LOG_INFO ("Finding context for " << i);
 
               // If context not found
               if (it2 == m_reorderingBuffer.end ())
                 {
-                  NS_LOG_LOGIC ("Context NOT found for SeqNo: " << i);
+                  NS_LOG_INFO ("Context NOT found for SeqNo: " << i);
 
                   Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext> ();
                   arqContext->m_pdu = NULL;
@@ -484,7 +484,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
     }
   else
     {
-      NS_LOG_LOGIC ("UT: " << m_sourceAddress << " received a packet with SeqNo: " << sn << " which is already received!");
+      NS_LOG_INFO ("UT: " << m_sourceAddress << " received a packet with SeqNo: " << sn << " which is already received!");
     }
 }
 
@@ -499,7 +499,7 @@ SatReturnLinkEncapsulatorArq::ConvertSeqNo (uint8_t seqNo) const
   uint32_t rounds = (m_nextExpectedSeqNo / std::numeric_limits<uint8_t>::max ());
   uint32_t rawSeqNo = m_nextExpectedSeqNo % std::numeric_limits<uint8_t>::max ();
 
-  NS_LOG_LOGIC ("Input: " << (uint32_t)(seqNo) << " rounds: " << rounds << " rawSeqNo: " << rawSeqNo << " windowSize: " << m_arqWindowSize << " next expected: " << m_nextExpectedSeqNo);
+  NS_LOG_INFO ("Input: " << (uint32_t)(seqNo) << " rounds: " << rounds << " rawSeqNo: " << rawSeqNo << " windowSize: " << m_arqWindowSize << " next expected: " << m_nextExpectedSeqNo);
 
   // Received sequence number is higher than the expected one.
   if (seqNo >= rawSeqNo)
@@ -532,7 +532,7 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive ()
   // Start from the expected sequence number iterator
   std::map<uint32_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.begin ();
 
-  NS_LOG_LOGIC ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
+  NS_LOG_INFO ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
 
   /**
    * As long as the PDU is the next expected one, process the PDU
@@ -540,7 +540,7 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive ()
    */
   while (it != m_reorderingBuffer.end () && it->first == m_nextExpectedSeqNo && it->second->m_rxStatus == true)
     {
-      NS_LOG_LOGIC ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
+      NS_LOG_INFO ("Process SeqNo: " << it->first << ", expected: " << m_nextExpectedSeqNo << ", status: " << it->second->m_rxStatus);
 
       // If timer is running, cancel it.
       if (it->second->m_waitingTimer.IsRunning ())
@@ -562,7 +562,7 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive ()
       // Increase the seq no
       ++m_nextExpectedSeqNo;
 
-      NS_LOG_LOGIC ("Increasing SeqNo to " << m_nextExpectedSeqNo);
+      NS_LOG_INFO ("Increasing SeqNo to " << m_nextExpectedSeqNo);
     }
 }
 
@@ -572,8 +572,8 @@ SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired (uint32_t seqNo)
 {
   NS_LOG_FUNCTION (this << seqNo);
 
-  NS_LOG_LOGIC ("For UT: " << m_sourceAddress << " max waiting time reached for SeqNo: " << seqNo << " at: " << Now ().GetSeconds ());
-  NS_LOG_LOGIC ("Mark the PDU received and move forward!");
+  NS_LOG_INFO ("For UT: " << m_sourceAddress << " max waiting time reached for SeqNo: " << seqNo << " at: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("Mark the PDU received and move forward!");
 
   // Find waiting timer, erase it and mark the packet received.
   std::map<uint32_t, Ptr<SatArqBufferContext> >::iterator it = m_reorderingBuffer.find (seqNo);
@@ -604,7 +604,7 @@ SatReturnLinkEncapsulatorArq::SendAck (uint8_t seqNo) const
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqNo);
 
-  NS_LOG_LOGIC ("GW: " << m_destAddress << " send ACK to UT: " << m_sourceAddress << " with flowId: " << (uint32_t)(m_flowId) << " with SN: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
+  NS_LOG_INFO ("GW: " << m_destAddress << " send ACK to UT: " << m_sourceAddress << " with flowId: " << (uint32_t)(m_flowId) << " with SN: " << (uint32_t)(seqNo) << " at: " << Now ().GetSeconds ());
 
   /**
    * RLE sends the ACK control message via a callback to SatNetDevice of the GW to the

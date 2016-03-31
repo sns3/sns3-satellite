@@ -122,7 +122,7 @@ SatGwLlc::CreateEncap (Ptr<EncapKey> key)
   Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
   gwEncap->SetQueue (queue);
 
-  NS_LOG_LOGIC ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
+  NS_LOG_INFO ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the encapsulator
   std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, gwEncap));
@@ -151,7 +151,7 @@ SatGwLlc::CreateDecap (Ptr<EncapKey> key)
   gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
   gwDecap->SetCtrlMsgCallback (m_sendCtrlCallback);
 
-  NS_LOG_LOGIC ("Create decapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
+  NS_LOG_INFO ("Create decapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the decapsulator
   std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, gwDecap));

@@ -107,9 +107,9 @@ bool
 SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
   NS_LOG_FUNCTION (this << packet << dest << (uint32_t) flowId);
-  NS_LOG_LOGIC ("p=" << packet );
-  NS_LOG_LOGIC ("dest=" << dest );
-  NS_LOG_LOGIC ("UID is " << packet->GetUid ());
+  NS_LOG_INFO ("p=" << packet );
+  NS_LOG_INFO ("dest=" << dest );
+  NS_LOG_INFO ("UID is " << packet->GetUid ());
 
   Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId);
 
@@ -275,7 +275,7 @@ SatLlc::AddEncap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<Sa
 
   if (it == m_encaps.end ())
     {
-      NS_LOG_LOGIC ("Add encapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
+      NS_LOG_INFO ("Add encapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
 
       std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, enc));
       if (result.second == false)
@@ -299,7 +299,7 @@ SatLlc::AddDecap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<Sa
 
   if (it == m_decaps.end ())
     {
-      NS_LOG_LOGIC ("Add Decapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
+      NS_LOG_INFO ("Add Decapsulator with key (" << source << ", " << dest << ", " << (uint32_t) flowId << ")");
 
       std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, dec));
       if (result.second == false)

@@ -166,7 +166,7 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
   if (it == m_collectors.end ())
     {
       // Newly discovered waveform ID
-      NS_LOG_LOGIC (this << " Creating new collectors for waveform ID " << waveformId);
+      NS_LOG_INFO (this << " Creating new collectors for waveform ID " << waveformId);
       CollectorMap collectorMap;
       collectorMap.SetType ("ns3::ScalarCollector");
       collectorMap.SetAttribute ("InputDataType",

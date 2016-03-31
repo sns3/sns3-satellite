@@ -246,7 +246,7 @@ SatStatsSignallingLoadHelper::SignallingTxCallback (Ptr<const Packet> packet,
 
       if (addr.IsBroadcast ())
         {
-          NS_LOG_LOGIC (this << " broadcast control message packet");
+          NS_LOG_INFO (this << " broadcast control message packet");
 
           // Pass the sample to every first-level collectors.
           for (CollectorMap::Iterator it = m_conversionCollectors.Begin ();

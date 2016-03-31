@@ -92,7 +92,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
   event = Create<SatInterference::InterferenceChangeEvent> (m_nextEventId++, duration, power, rxAddress);
   Time now = event->GetStartTime ();
 
-  NS_LOG_LOGIC ( "Add change: Duration= " << duration << ", Power= " << power << ", Time: " << now );
+  NS_LOG_INFO ( "Add change: Duration= " << duration << ", Power= " << power << ", Time: " << now );
 
   // do update and clean-ups, if we are not receiving
   if (!m_rxing)
@@ -101,16 +101,16 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
 
       for (InterferenceChanges::iterator i = m_interferenceChanges.begin (); i != nowIterator; i++)
         {
-          NS_LOG_LOGIC ( "Change to erase: Time= " << i->first << ", Id= " << i->second.first << ", PowerValue= " << i->second.second);
+          NS_LOG_INFO ( "Change to erase: Time= " << i->first << ", Id= " << i->second.first << ", PowerValue= " << i->second.second);
 
           m_residualPowerW += i->second.second;
 
-          NS_LOG_LOGIC ( "First power after erase: " << m_residualPowerW);
+          NS_LOG_INFO ( "First power after erase: " << m_residualPowerW);
         }
       m_interferenceChanges.erase (m_interferenceChanges.begin (), nowIterator);
     }
 
-  NS_LOG_LOGIC ( "Change count before addition: " << m_interferenceChanges.size () );
+  NS_LOG_INFO ( "Change count before addition: " << m_interferenceChanges.size () );
 
   // if no changes in future, first power should be zero
   if ( m_interferenceChanges.size () == 0 )
@@ -126,7 +126,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
   m_interferenceChanges.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));
   m_interferenceChanges.insert (std::make_pair (event->GetEndTime (), InterferenceChange (event->GetId (), -power)));
 
-  NS_LOG_LOGIC ( "Change count after addition: " << m_interferenceChanges.size () );
+  NS_LOG_INFO ( "Change count after addition: " << m_interferenceChanges.size () );
 
   if ( m_residualPowerW < 0 )
     {
@@ -152,7 +152,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   double rxEndTime = event->GetEndTime ().GetDouble ();
   bool ownStartReached = false;
 
-  NS_LOG_LOGIC ( "Calculate: IfPower (W)= " << ifPowerW << ", Duration= " << event->GetDuration () <<
+  NS_LOG_INFO ( "Calculate: IfPower (W)= " << ifPowerW << ", Duration= " << event->GetDuration () <<
                  ", StartTime= " << event->GetStartTime () << ", EndTime= " << event->GetEndTime () );
 
   InterferenceChanges::iterator currentItem = m_interferenceChanges.begin ();
@@ -174,18 +174,18 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
           double itemTime = currentItem->first.GetDouble ();
           ifPowerW += ((rxEndTime - itemTime) / rxDuration) * currentItem->second.second;
 
-          NS_LOG_LOGIC ( "Update (partial): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second <<
+          NS_LOG_INFO ( "Update (partial): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second <<
                          ", Time= " << currentItem->first << ", DeltaTime= " << (rxEndTime - itemTime) );
 
-          NS_LOG_LOGIC ( "IfPower after update: " << ifPowerW );
+          NS_LOG_INFO ( "IfPower after update: " << ifPowerW );
         }
       else
         {
           // increase/decrease interference power with full power change in list
           ifPowerW += currentItem->second.second;
 
-          NS_LOG_LOGIC ( "Update (full): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second );
-          NS_LOG_LOGIC ( "IfPower after update: " << ifPowerW );
+          NS_LOG_INFO ( "Update (full): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second );
+          NS_LOG_INFO ( "IfPower after update: " << ifPowerW );
         }
 
       currentItem++;

@@ -122,7 +122,7 @@ void
 SatNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  NS_LOG_LOGIC ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid ());
+  NS_LOG_INFO ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid ());
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =

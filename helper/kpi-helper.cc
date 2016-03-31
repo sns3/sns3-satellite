@@ -313,7 +313,7 @@ KpiHelper::Print ()
 void
 KpiHelper::TxCallback (std::string context, Ptr<const Packet> packet)
 {
-  NS_LOG_LOGIC ("TxCallback: " << context << " size: " << packet->GetSize () << " id: " << packet->GetUid ());
+  NS_LOG_INFO ("TxCallback: " << context << " size: " << packet->GetSize () << " id: " << packet->GetUid ());
 
   Ipv4Address address (context.c_str ());
   NS_ASSERT (m_clientCounters.find (address) != m_clientCounters.end ());
@@ -330,7 +330,7 @@ KpiHelper::TxCallback (std::string context, Ptr<const Packet> packet)
 void
 KpiHelper::RxCallback (std::string context, Ptr<const Packet> packet, const Address &from)
 {
-  NS_LOG_LOGIC ("RxCallback: " << context << " size: " << packet->GetSize () << " id: " << packet->GetUid ());
+  NS_LOG_INFO ("RxCallback: " << context << " size: " << packet->GetSize () << " id: " << packet->GetUid ());
 
   Ipv4Address address (context.c_str ());
 

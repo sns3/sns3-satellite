@@ -713,7 +713,7 @@ SatControlMsgContainer::ReserveIdAndStore (Ptr<SatControlMessage> ctrlMsg)
 {
   NS_LOG_FUNCTION (this << ctrlMsg);
 
-  NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " reserve id (send id): " << m_sendId);
+  NS_LOG_INFO ("At: " << Now ().GetSeconds () << " reserve id (send id): " << m_sendId);
 
   uint32_t id = m_sendId;
   m_sendId++;
@@ -737,7 +737,7 @@ SatControlMsgContainer::Send (uint32_t sendId)
     {
       Time now = Simulator::Now ();
 
-      NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " send id: " << sendId << ", recv id: " << m_recvId);
+      NS_LOG_INFO ("At: " << Now ().GetSeconds () << " send id: " << sendId << ", recv id: " << m_recvId);
 
       CtrlMsgMapValue_t mapValue = std::make_pair (now, it->second);
       std::pair<CtrlMsgMap_t::iterator, bool> cResult = m_ctrlMsgs.insert (std::make_pair (recvId, mapValue));
@@ -793,7 +793,7 @@ SatControlMsgContainer::Read (uint32_t recvId)
 
   CtrlMsgMap_t::iterator it = m_ctrlMsgs.find (recvId);
 
-  NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " receive id: " << recvId);
+  NS_LOG_INFO ("At: " << Now ().GetSeconds () << " receive id: " << recvId);
 
   if (it != m_ctrlMsgs.end ())
     {
@@ -812,7 +812,7 @@ SatControlMsgContainer::Read (uint32_t recvId)
             }
           else
             {
-              NS_LOG_LOGIC ("At: " << Now ().GetSeconds () << " remove id: " << recvId);
+              NS_LOG_INFO ("At: " << Now ().GetSeconds () << " remove id: " << recvId);
               CleanUpIdMap (recvId);
               m_ctrlMsgs.erase (it);
             }
