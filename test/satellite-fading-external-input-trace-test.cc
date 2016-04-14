@@ -89,7 +89,7 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ (success, true, "SatChannelFadingTrace test failed");
 
   double time [4] = {1.434, 40.923, 80.503, 140.3};
-  double preCalcRes [4] = {1.06879, 1.0087, 1.03093, 1.01242};
+  double preCalcRes [4] = {1.020, 1.008, 1.006, 1.012};
 
   Simulator::Schedule (Seconds (time[0]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
   Simulator::Schedule (Seconds (time[1]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
