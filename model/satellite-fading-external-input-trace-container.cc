@@ -48,12 +48,12 @@ SatFadingExternalInputTraceContainer::GetTypeId (void)
                                     SatFadingExternalInputTraceContainer::RANDOM_MODE, "RandomMode"))
     .AddAttribute ("UtRtnUpIndexFileName",
                    "Index file defining trace source files for return up link/UTs.",
-                   StringValue ("UT_fading_rtnup_traces.txt"),
+                   StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"),
                    MakeStringAccessor (&SatFadingExternalInputTraceContainer::m_utRtnUpIndexFileName),
                    MakeStringChecker ())
     .AddAttribute ("UtFwdDownIndexFileName",
                    "Index file defining trace source files for forward down link/UTs.",
-                   StringValue ("UT_fading_fwddwn_traces.txt"),
+                   StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"),
                    MakeStringAccessor (&SatFadingExternalInputTraceContainer::m_utFwdDownIndexFileName),
                    MakeStringChecker ())
     .AddAttribute ("GwFwdUpIndexFileName",

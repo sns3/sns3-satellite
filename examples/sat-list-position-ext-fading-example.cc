@@ -98,11 +98,8 @@ main (int argc, char *argv[])
 
   // Set index files defining external tracing input files for UTs
   // Given index files must locate in /satellite/data/ext-fadingtraces/input folder
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
-                      StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
-
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
-                      StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
+  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
+  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
 
   // for GWs we don't set up index files, so default ones are used (GW_fading_fwdup_traces.txt and GW_fading_rtndwn_traces.txt)
   // in case that those are wanted to change, it can be done via command line arguments

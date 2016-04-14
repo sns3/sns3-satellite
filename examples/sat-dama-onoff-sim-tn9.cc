@@ -127,11 +127,11 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
   // Rain fading
+  // Note, that the positions of the fading files do not necessarily match with the
+  // beam location, since this example is not using list position allocator!
   Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName",
-                      StringValue ("Beam1_UT_fading_fwddwn_traces.txt"));
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName",
-                      StringValue ("Beam1_UT_fading_rtnup_traces.txt"));
+  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
+  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
 
   // Disable Markov fading
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
@@ -296,6 +296,7 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
+
   std::stringstream filename;
   filename << "tn9-dama-onoff-output-attributes-ut" << utsPerBeam
            << "-conf" << crTxConf << ".xml";
