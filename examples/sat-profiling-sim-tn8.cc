@@ -195,7 +195,6 @@ main (int argc, char *argv[])
 //  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
 //  ConfigStore outputConfig;
 //  outputConfig.ConfigureDefaults ();
-//  outputConfig.ConfigureAttributes ();
 
   /**
    * Install simple stdout time ticker

@@ -263,14 +263,13 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("Storing the used attributes to XML file: training-output-attributes-ut-" << utsPerBeam << ".xml");
 
-  std::stringstream filename;
-  filename << "training-output-attributes-ut" << utsPerBeam << ".xml";
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureDefaults ();
-  outputConfig.ConfigureAttributes ();
+  // std::stringstream filename;
+  // filename << "training-output-attributes-ut" << utsPerBeam << ".xml";
+  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
+  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  // ConfigStore outputConfig;
+  // outputConfig.ConfigureDefaults ();
 
   /**
    * --------------

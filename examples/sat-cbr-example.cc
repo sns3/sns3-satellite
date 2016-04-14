@@ -164,13 +164,12 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Interval: " << interval);
   NS_LOG_INFO ("  ");
 
-  //To store attributes to file
-//  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
-//  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-//  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-//  ConfigStore outputConfig;
-//  outputConfig.ConfigureDefaults ();
-//  outputConfig.ConfigureAttributes ();
+  // To store attributes to file
+  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
+  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  // ConfigStore outputConfig;
+  // outputConfig.ConfigureDefaults ();
 
   Simulator::Stop (Seconds (11));
   Simulator::Run ();

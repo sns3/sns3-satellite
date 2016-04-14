@@ -293,16 +293,15 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  std::stringstream filename;
-  filename << "tn9-ra-output-attributes-ut" << utsPerBeam
-           << "-mode" << raMode << ".xml";
-
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureDefaults ();
-  outputConfig.ConfigureAttributes ();
+  // std::stringstream filename;
+  // filename << "tn9-ra-output-attributes-ut" << utsPerBeam
+  //          << "-mode" << raMode << ".xml";
+  //
+  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
+  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  // ConfigStore outputConfig;
+  // outputConfig.ConfigureDefaults ();
 
   /**
    * Run simulation

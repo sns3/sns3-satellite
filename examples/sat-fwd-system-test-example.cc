@@ -258,12 +258,11 @@ main (int argc, char *argv[])
   /**
    * Store attributes into XML output
    */
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("sat-fwd-sys-test.xml"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureDefaults ();
-  outputConfig.ConfigureAttributes ();
+  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("sat-fwd-sys-test.xml"));
+  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  // ConfigStore outputConfig;
+  // outputConfig.ConfigureDefaults ();
 
   /**
    * Run simulation

@@ -201,16 +201,16 @@ Creating and installing application (users) to satellite network
    Store set attribute values to XML output file
    -- Start --                                                                */
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("sat-tutorial-output.xml"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureDefaults ();
-  outputConfig.ConfigureAttributes ();
+  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("sat-tutorial-output.xml"));
+  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  // ConfigStore outputConfig;
+  // outputConfig.ConfigureDefaults ();
+
   /**
--- End --
-Store set attribute values to XML output file
-******************************************************************************/
+  -- End --
+  Store set attribute values to XML output file
+  *****************************************************************************/
 
   /*****************************************************************************
    Run, stop and destroy simulation
