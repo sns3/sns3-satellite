@@ -288,7 +288,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
   phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
-  phy->SetAttribute ("AverageNormalizedOfferedLoad", CallbackValue (avgNormalizedOfferedLoadCb));
+  phy->SetAttribute ("AverageNormalizedOfferedLoadCallback", CallbackValue (avgNormalizedOfferedLoadCb));
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);

@@ -109,7 +109,7 @@ SatPhy::GetTypeId (void)
                    CallbackValue (),
                    MakeCallbackAccessor (&SatPhy::m_cnoCallback),
                    MakeCallbackChecker ())
-    .AddAttribute ("AverageNormalizedOfferedLoad", "The average offered random access load callback for this phy.",
+    .AddAttribute ("AverageNormalizedOfferedLoadCallback", "The average offered random access load callback for this phy.",
                    CallbackValue (),
                    MakeCallbackAccessor (&SatPhy::m_avgNormalizedOfferedLoadCallback),
                    MakeCallbackChecker ())
