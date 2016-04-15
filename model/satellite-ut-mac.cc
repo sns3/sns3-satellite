@@ -327,6 +327,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
   txInfo.modCod = wf->GetModCod ();
+  txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
   txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = wf->GetWaveformId ();
 
@@ -376,6 +377,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
       SatSignalParameters::txInfo_s txInfo;
       txInfo.packetType = SatEnums::PACKET_TYPE_SLOTTED_ALOHA;
       txInfo.modCod = waveform->GetModCod ();
+      txInfo.fecBlockSizeInBytes = waveform->GetPayloadInBytes ();
       txInfo.frameType = SatEnums::UNDEFINED_FRAME;
       txInfo.waveformId = waveform->GetWaveformId ();
 
@@ -1000,6 +1002,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           SatSignalParameters::txInfo_s txInfo;
           txInfo.packetType = SatEnums::PACKET_TYPE_CRDSA;
           txInfo.modCod = wf->GetModCod ();
+          txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
           txInfo.frameType = SatEnums::UNDEFINED_FRAME;
           txInfo.waveformId = wf->GetWaveformId ();
           txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId;

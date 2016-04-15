@@ -376,6 +376,12 @@ private:
                                       Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
 
   /**
+   * Update the random access load for CRDSA. Count only the
+   * received unique payloads.
+   */
+  void UpdateRandomAccessLoad ();
+
+  /**
    * \brief Function for measuring the random access load
    */
   void MeasureRandomAccessLoad ();

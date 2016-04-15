@@ -593,10 +593,8 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
         {
           NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
 
-          for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
-            {
-              m_randomAccessBitsInFrame += ((*it)->GetSize () * SatConstVariables::BITS_PER_BYTE);
-            }
+          // Update the load with FEC block size!
+          m_randomAccessBitsInFrame += (iter->second.rxParams->m_txInfo.fecBlockSizeInBytes * SatConstVariables::BITS_PER_BYTE);
 
           /// check for slotted aloha packet collisions
           phyError = ProcessSlottedAlohaCollisions (cSinr, iter->second.rxParams, iter->second.interferenceEvent);
@@ -658,12 +656,6 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       /// check for collisions
       params.hasCollision = m_satInterference->HasCollision (iter->second.interferenceEvent);
       params.packetHasBeenProcessed = false;
-
-      for (it = iter->second.rxParams->m_packetsInBurst.begin (); it != iter->second.rxParams->m_packetsInBurst.end (); it++)
-        {
-          m_randomAccessBitsInFrame += ((*it)->GetSize () * SatConstVariables::BITS_PER_BYTE);
-          NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Fragment (HL packet) UID: " << (*it)->GetUid ());
-        }
 
       if (nPackets > 0)
         {
@@ -730,13 +722,11 @@ SatPhyRxCarrier::DoFrameEnd ()
 
   if (m_isRandomAccessEnabledForThisCarrier)
     {
-      if (m_enableRandomAccessDynamicLoadControl)
-        {
-          MeasureRandomAccessLoad ();
-        }
-
       if (!m_crdsaPacketContainer.empty ())
         {
+          // Update the CRDSA random access load for unique payloads!
+          UpdateRandomAccessLoad ();
+
           NS_LOG_INFO ("SatPhyRxCarrier::DoFrameEnd - Packets in container, will process the frame");
 
           std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> results = ProcessFrame ();
@@ -797,6 +787,11 @@ SatPhyRxCarrier::DoFrameEnd ()
 
           results.clear ();
         }
+
+      if (m_enableRandomAccessDynamicLoadControl)
+        {
+          MeasureRandomAccessLoad ();
+        }
     }
   else
     {
@@ -816,6 +811,46 @@ SatPhyRxCarrier::DoFrameEnd ()
   Time schedulingDelay = nextSuperFrameRxTime - Now ();
 
   Simulator::Schedule (schedulingDelay, &SatPhyRxCarrier::DoFrameEnd, this);
+}
+
+void
+SatPhyRxCarrier::UpdateRandomAccessLoad ()
+{
+	NS_LOG_FUNCTION (this);
+
+  std::vector<uint64_t> uniquePacketIds;
+  uint32_t uniqueCrdsaBytes (0);
+
+	// Go through all the received CRDSA packets
+  std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter;
+	for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
+	  {
+	    // Go through all the packets received in the same slot id
+      std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iterList;
+      for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
+        {
+          // It is sufficient to check the first packet Uid
+          uint64_t uid = iterList->rxParams->m_packetsInBurst.front ()->GetUid();
+
+          // Check if we have already counted the bytes of this transmission
+          std::vector<uint64_t>::iterator it = std::find (uniquePacketIds.begin (),
+                                                          uniquePacketIds.end (),
+                                                          uid);
+          // Not found -> is unique
+          if (it == uniquePacketIds.end ())
+            {
+              // Push this to accounted unique transmissions vector
+              uniquePacketIds.push_back (uid);
+
+              // Update the load with FEC block size!
+              uniqueCrdsaBytes += iterList->rxParams->m_txInfo.fecBlockSizeInBytes;
+            }
+          // else, do nothing, i.e. this is a replica
+        }
+	  }
+
+	// Update with the unique FEC block sum of CRDSA frame
+	m_randomAccessBitsInFrame = uniqueCrdsaBytes * SatConstVariables::BITS_PER_BYTE;
 }
 
 void
@@ -847,8 +882,6 @@ SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad ()
   NS_LOG_INFO ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad");
 
   NS_LOG_INFO ("SatPhyRxCarrier::CalculateNormalizedOfferedRandomAccessLoad - Time: " << Now ().GetSeconds ());
-
-  SatSignalParameters::PacketsInBurst_t::iterator iterPackets;
 
   Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (SatConstVariables::SUPERFRAME_SEQUENCE);
 
