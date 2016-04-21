@@ -23,7 +23,6 @@ cpp_examples = [
 	("sat-fwd-system-test-example", "True", "True"),
 	("sat-http-example", "True", "True"),
 	("sat-link-budget-example", "True", "True"),
-	("sat-link-budget-input-attributes.xml
 	("sat-link-results-plot", "True", "True"),
 	("sat-list-position-ext-fading-example", "True", "True"),
 	("sat-log-example", "True", "True"),
