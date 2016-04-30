@@ -110,10 +110,23 @@ public:
   std::string LocateDirectory (std::string initialPath);
 
   /**
+   * \brief Function for locating a specific file within the NS-3 simulator folder
+   * \param initialPath initial search path for the file
+   * \return path to the located file
+   */
+  std::string LocateFile (std::string initialPath);
+
+  /**
    * \brief Function for checking if the directory exists
    * \return does the directory exist
    */
   bool IsValidDirectory (std::string path);
+
+  /**
+   * \brief Function for checking if the file exists
+   * \return does the file exist
+   */
+  bool IsValidFile (std::string pathToFile);
 
   /**
    * \brief Returns current real world date and time

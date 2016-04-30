@@ -284,6 +284,19 @@ SatEnvVariables::IsValidDirectory (std::string path)
   return validDirectory;
 }
 
+bool
+SatEnvVariables::IsValidFile (std::string pathToFile)
+{
+  NS_LOG_FUNCTION (this);
+
+  struct stat st;
+  bool validFile = (stat (pathToFile.c_str (), &st) == 0);
+
+  NS_LOG_INFO ("SatEnvVariables::IsValidFile - " << pathToFile << " validity: " << validFile);
+
+  return validFile;
+}
+
 std::string
 SatEnvVariables::LocateDataDirectory ()
 {
@@ -327,6 +340,46 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
   if (!directoryFound)
     {
       NS_FATAL_ERROR ("SatEnvVariables::LocateDirectory - Directory not found within " << m_levelsToCheck << " levels: " << initialPath);
+    }
+
+  return path;
+}
+
+std::string
+SatEnvVariables::LocateFile (std::string initialPath)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::string path;
+  bool fileFound = false;
+
+  NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Initial path " << initialPath);
+
+  for (uint32_t i = 0; i < m_levelsToCheck; i++)
+    {
+      std::stringstream dataPath;
+
+      for (uint32_t j = 0; j < i; j++)
+        {
+          dataPath << "../";
+        }
+
+      dataPath << initialPath;
+
+      NS_LOG_INFO ("SatEnvVariables::LocateFile - Checking " << dataPath.str ());
+
+      if (IsValidFile (dataPath.str ()))
+        {
+          NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Data directory located in " << dataPath.str ());
+          path = dataPath.str ();
+          fileFound = true;
+          break;
+        }
+    }
+
+  if (!fileFound)
+    {
+      NS_FATAL_ERROR ("SatEnvVariables::LocateFile - File not found within " << m_levelsToCheck << " levels: " << initialPath);
     }
 
   return path;

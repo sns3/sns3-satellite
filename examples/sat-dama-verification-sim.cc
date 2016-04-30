@@ -27,7 +27,6 @@
 #include "ns3/traffic-module.h"
 #include "ns3/config-store-module.h"
 
-
 using namespace ns3;
 
 /**
@@ -59,8 +58,12 @@ main (int argc, char *argv[])
   double simLength (50.0); // in seconds
   Time appStartTime = Seconds (0.1);
 
+  // Find the input xml file in case example is run from other than ns-3 root directory
+  Singleton<SatEnvVariables> satEnvVariables;
+  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/tn9-dama-input-attributes.xml");
+
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./contrib/satellite/examples/tn9-dama-input-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (pathToFile));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;

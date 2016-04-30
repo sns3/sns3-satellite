@@ -27,7 +27,6 @@
 #include "ns3/traffic-module.h"
 #include "ns3/config-store-module.h"
 
-
 using namespace ns3;
 
 /**
@@ -85,7 +84,11 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("Reading the XML input: training-input-attributes.xml");
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./contrib/satellite/examples/training-input-attributes.xml"));
+  // Find the input xml file in case example is run from other than ns-3 root directory
+  Singleton<SatEnvVariables> satEnvVariables;
+  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/training-input-attributes.xml");
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (pathToFile));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;

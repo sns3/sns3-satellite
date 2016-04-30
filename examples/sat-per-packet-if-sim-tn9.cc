@@ -26,6 +26,8 @@
 #include "ns3/applications-module.h"
 #include "ns3/config-store-module.h"
 
+#include <sys/stat.h>
+#include <unistd.h>
 
 using namespace ns3;
 
@@ -55,7 +57,10 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.1);
 
   // To read attributes from file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("./contrib/satellite/examples/tn9-dama-input-attributes.xml"));
+  Singleton<SatEnvVariables> satEnvVariables;
+  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/tn9-dama-input-attributes.xml");
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (pathToFile));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
