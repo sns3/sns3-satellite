@@ -1023,7 +1023,8 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                * fb = channel bitrate (after FEC) in bps (i.e. burst payloadInBits / burstDurationInSec)
               */
 
-              double ebNo = cSinr / SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod);
+              double ebNo = cSinr / (SatUtils::GetCodingRate (txParams->m_txInfo.modCod) * 
+                                     SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
 
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
                                                                                            SatUtils::LinearToDb (ebNo));
