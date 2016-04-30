@@ -42,6 +42,7 @@
 #include <ns3/unit-conversion-collector.h>
 #include <ns3/distribution-collector.h>
 #include <ns3/scalar-collector.h>
+#include <ns3/interval-rate-collector.h>
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/magister-gnuplot-aggregator.h>
 
@@ -190,20 +191,24 @@ SatStatsQueueHelper::DoInstall ()
 
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
       {
-        // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading (m_shortLabel)));
+          // Setup aggregator.
+          m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
+                                           "OutputFileName", StringValue (GetOutputFileName ()),
+                                           "GeneralHeading", StringValue (GetTimeHeading (m_shortLabel)));
 
-        // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        break;
+          // Setup second-level collectors.
+          m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
+          m_terminalCollectors.SetAttribute ("InputDataType",
+                                             EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+          CreateCollectorPerIdentifier (m_terminalCollectors);
+          m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
+                                                    m_aggregator,
+                                                    &MultiFileAggregator::Write2d);
+          m_terminalCollectors.ConnectToAggregator ("OutputString",
+                                                    m_aggregator,
+                                                    &MultiFileAggregator::AddContextHeading);
+
+          break;
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
@@ -248,32 +253,34 @@ SatStatsQueueHelper::DoInstall ()
 
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
-        // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)", m_longLabel);
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+          // Setup aggregator.
+          m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
+                                           "OutputPath", StringValue (GetOutputPath ()),
+                                           "OutputFileName", StringValue (GetName ()));
+          Ptr<MagisterGnuplotAggregator> plotAggregator
+            = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
+          NS_ASSERT (plotAggregator != 0);
+          //plot->SetTitle ("");
+          plotAggregator->SetLegend ("Time (in seconds)",
+                                     "Queued packets");
+          plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::STEPS);
 
-        // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
-        break;
+          // Setup second-level collectors.
+          m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
+          m_terminalCollectors.SetAttribute ("InputDataType",
+                                             EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+          CreateCollectorPerIdentifier (m_terminalCollectors);
+          for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
+               it != m_terminalCollectors.End (); ++it)
+            {
+              const std::string context = it->second->GetName ();
+              plotAggregator->Add2dDataset (context, context);
+            }
+          m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
+                                                    m_aggregator,
+                                                    &MagisterGnuplotAggregator::Write2d);
+
+          break;
       }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
@@ -378,7 +385,7 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
-        Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
+        Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
         NS_ASSERT (c != 0);
         c->TraceSinkUinteger32 (0, value);
         break;
@@ -643,6 +650,7 @@ SatStatsRtnQueueHelper::DoPoll ()
           NS_ASSERT (GetUnitType () == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
           PushToCollector (it->second, it->first->GetNPacketsInQueue ());
         }
+
     }
 }
 
