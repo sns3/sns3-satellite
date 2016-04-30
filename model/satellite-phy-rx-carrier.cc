@@ -504,13 +504,6 @@ SatPhyRxCarrier::EndRxDataTransparent (uint32_t key)
   /// Send packet upwards
   m_rxCallback ( iter->second.rxParams, phyError );
 
-  /// uses 1st link sinr
-  if (!m_cnoCallback.IsNull ())
-    {
-      double cno = sinr * m_rxBandwidthHz;
-      m_cnoCallback (iter->second.rxParams->m_beamId, iter->second.sourceAddress, m_ownAddress, cno);
-    }
-
   /// erase the used Rx params
   iter->second.rxParams = NULL;
   iter->second.interferenceEvent = NULL;
@@ -560,25 +553,6 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
       /// calculate composite SINR
       double cSinr = CalculateCompositeSinr (sinr, iter->second.rxParams->m_sinr);
-
-      /**
-       * Channel estimation error. Channel estimation error works in dB domain, thus we need
-       * to do linear-to-db and db-to-linear conversions here.
-       */
-      // Forward link
-      if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
-        {
-          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cSinr)));
-        }
-      // Return link
-      else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
-        {
-          cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cSinr), iter->second.rxParams->m_txInfo.waveformId));
-        }
-      else
-        {
-          NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
-        }
 
       // Update composite SINR trace for DAMA and Slotted ALOHA packets
       m_sinrTrace (SatUtils::LinearToDb (cSinr), iter->second.sourceAddress);
@@ -638,8 +612,33 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
       /// uses composite sinr
       if (!m_cnoCallback.IsNull ())
         {
-          double cno = cSinr * m_rxBandwidthHz;
-          m_cnoCallback (iter->second.rxParams->m_beamId, iter->second.sourceAddress, m_ownAddress, cno);
+    	  /**
+    	   * Channel estimation error is added to the cno measurement,
+    	   * which is utilized e.g. for ACM.
+    	   */
+    	  double cno = cSinr;
+
+          // Forward link
+          if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
+            {
+        	  cno = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cno)));
+            }
+          // Return link
+          else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
+            {
+        	  cno = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cno), iter->second.rxParams->m_txInfo.waveformId));
+            }
+          else
+            {
+              NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
+            }
+
+    	  cno *= m_rxBandwidthHz;
+
+          m_cnoCallback (iter->second.rxParams->m_beamId,
+        		  	  	  iter->second.sourceAddress,
+						  m_ownAddress,
+						  cno);
         }
 
       iter->second.rxParams = NULL;
@@ -771,16 +770,6 @@ SatPhyRxCarrier::DoFrameEnd ()
               /// send packet upwards
               m_rxCallback (results[i].rxParams,
                             results[i].phyError);
-
-              /// uses composite sinr
-              if (!m_cnoCallback.IsNull ())
-                {
-                  double cno = results[i].cSinr * m_rxBandwidthHz;
-                  m_cnoCallback (results[i].rxParams->m_beamId,
-                                 results[i].sourceAddress,
-                                 m_ownAddress,
-                                 cno);
-                }
 
               results[i].rxParams = NULL;
             }
@@ -1023,7 +1012,7 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
                * fb = channel bitrate (after FEC) in bps (i.e. burst payloadInBits / burstDurationInSec)
               */
 
-              double ebNo = cSinr / (SatUtils::GetCodingRate (txParams->m_txInfo.modCod) * 
+              double ebNo = cSinr / (SatUtils::GetCodingRate (rxParams->m_txInfo.modCod) * 
                                      SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
 
               double ber = (m_linkResults->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
@@ -1462,25 +1451,6 @@ SatPhyRxCarrier::ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParam
   m_linkSinrTrace (SatUtils::LinearToDb (sinr));
 
   double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
-
-  /**
-   * Channel estimation error. Channel estimation error works in dB domain, thus we need
-   * to do linear-to-db and db-to-linear conversions here.
-   */
-  // Forward link
-  if (m_nodeInfo->GetNodeType () == SatEnums::NT_UT)
-    {
-      NS_FATAL_ERROR ("SatPhyRxCarrier::ProcessReceivedCrdsaPacket - Random access is not used in forward link");
-    }
-  // Return link
-  else if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
-    {
-      cSinr = SatUtils::DbToLinear (m_channelEstimationError->AddError (SatUtils::LinearToDb (cSinr), packet.rxParams->m_txInfo.waveformId));
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
-    }
 
   packet.cSinr = cSinr;
   packet.ifPower = packet.rxParams->m_ifPower_W;
