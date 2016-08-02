@@ -90,6 +90,15 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
+  // To change attributes having affect on link budget,
+  // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sat-link-budget-input-attributes.xml";
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
+
   // enable info logs
   LogComponentEnable ("sat-link-budget-example", LOG_LEVEL_INFO);
 
@@ -107,15 +116,6 @@ main (int argc, char *argv[])
   Ptr<SatUtHelper> utHelper = beamHelper->GetUtHelper ();
   Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper ();
   Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper ();
-
-  // To change attributes having affect on link budget,
-  // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sat-link-budget-input-attributes.xml";
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
 
   // create user defined scenario
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
