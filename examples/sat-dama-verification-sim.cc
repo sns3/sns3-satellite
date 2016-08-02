@@ -98,7 +98,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
   Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_MARKOV));
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
   /**
    * Carriers:

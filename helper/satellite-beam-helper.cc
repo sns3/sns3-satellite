@@ -65,7 +65,7 @@ SatBeamHelper::GetTypeId (void)
                    MakeCallbackChecker ())
     .AddAttribute ("FadingModel",
                    "Fading model",
-                   EnumValue (SatEnums::FADING_MARKOV),
+                   EnumValue (SatEnums::FADING_OFF),
                    MakeEnumAccessor (&SatBeamHelper::m_fadingModel),
                    MakeEnumChecker (SatEnums::FADING_OFF, "FadingOff",
                                     SatEnums::FADING_TRACE, "FadingTrace",
