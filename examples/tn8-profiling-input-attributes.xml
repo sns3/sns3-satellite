@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns3>
- <default name="ns3::SatAntennaGainPattern::MinAcceptableAntennaGainDb" value="40"/>
+ <default name="ns3::SatAntennaGainPattern::MinAcceptableAntennaGainDb" value="48"/>
  <default name="ns3::SatBbFrameConf::SymbolsPerSlot" value="90"/>
  <default name="ns3::SatBbFrameConf::PilotBlockInSymbols" value="36"/>
  <default name="ns3::SatBbFrameConf::PilotBlockIntervalInSlots" value="16"/>

@@ -42,7 +42,7 @@ SatAntennaGainPattern::GetTypeId (void)
     .SetParent<Object> ()
     .AddConstructor<SatAntennaGainPattern> ()
     .AddAttribute ("MinAcceptableAntennaGainDb", "Minimum acceptable antenna gain in dBs",
-                   DoubleValue (40.0),
+                   DoubleValue (48.0),
                    MakeDoubleAccessor (&SatAntennaGainPattern::m_minAcceptableAntennaGainInDb),
                    MakeDoubleChecker<double> ())
   ;
