@@ -100,6 +100,11 @@ private:
    * Intermodulation interference in linear.
    */
   double m_imInterferenceCOverI;
+
+  /**
+   * Fixed amplification gain used in RTN link at the satellite.
+   */
+  double m_fixedAmplificationGainDb;
 };
 
 }

@@ -262,6 +262,7 @@
  <default name="ns3::SatGeoFeederPhy::DefaultFadingValue" value="1"/>
  <default name="ns3::SatGeoFeederPhy::ExtNoisePowerDensityDbwhz" value="-207"/>
  <default name="ns3::SatGeoFeederPhy::ImIfCOverIDb" value="27"/>
+ <default name="ns3::SatGeoFeederPhy::FixedAmplificationGainDb" value="82"/>
  <default name="ns3::SatPhy::EnableStatisticsTags" value="false"/>
  <default name="ns3::SatGeoUserPhy::RxTemperatureDbk" value="28.4"/>
  <default name="ns3::SatGeoUserPhy::RxMaxAntennaGainDb" value="54"/>

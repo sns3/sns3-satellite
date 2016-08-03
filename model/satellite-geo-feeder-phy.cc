@@ -105,6 +105,11 @@ SatGeoFeederPhy::GetTypeId (void)
                     DoubleValue (27.0),
                     MakeDoubleAccessor (&SatGeoFeederPhy::m_imInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
+    .AddAttribute ( "FixedAmplificationGainDb",
+                    "Fixed amplification gain used in RTN link at the satellite.",
+                    DoubleValue (82.0),
+                    MakeDoubleAccessor (&SatGeoFeederPhy::m_fixedAmplificationGainDb),
+                    MakeDoubleChecker<double> ())
   ;
   return tid;
 }
@@ -120,7 +125,8 @@ SatGeoFeederPhy::GetInstanceTypeId (void) const
 SatGeoFeederPhy::SatGeoFeederPhy (void)
   : m_extNoisePowerDensityDbwHz (-207.0),
     m_imInterferenceCOverIDb (27.0),
-    m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
+    m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb)),
+    m_fixedAmplificationGainDb (82.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoFeederPhy default constructor is not allowed to use");
@@ -196,7 +202,22 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   // copy on tx power too.
 
   txParams->m_phyTx = m_phyTx;
-  txParams->m_txPower_W = m_eirpWoGainW;
+
+  /**
+   * In return link, at the satellite, instead of using a constant EIRP (without gain), we are
+   * using a fixed amplifier gain amplifying the received signal. With this fixed gain, all bursts
+   * in a slot are amplified by the same amplification gain before being transmitted on the feeder
+   * link downlink. So, the tx power will be weak for the weak burst, and strong for the strong burst.
+   * This approach shall be used for:
+   * 1) RTN link only.
+   * 2) For all CRDSA, SA, and DA.
+   */
+
+  txParams->m_txPower_W = txParams->m_rxPower_W * SatUtils::DbToLinear(m_fixedAmplificationGainDb);
+
+  NS_LOG_INFO ("Amplified Tx power: " << SatUtils::LinearToDb (txParams->m_txPower_W));
+  NS_LOG_INFO ("Statically configured tx power: " << SatUtils::LinearToDb (m_eirpWoGainW));
+
   m_phyTx->StartTx (txParams);
 }
 
