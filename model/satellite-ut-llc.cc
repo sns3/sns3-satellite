@@ -81,6 +81,9 @@ SatUtLlc::DoDispose ()
       m_requestManager->DoDispose ();
       m_requestManager = 0;
     }
+
+  m_macQueueEventCb.Nullify ();
+
   SatLlc::DoDispose ();
 }
 
