@@ -149,6 +149,7 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
     }
 
   m_duration = Time ( carrierSlotCount * timeSlotDuration.GetInteger () );
+
   m_maxSymbolsPerCarrier = carrierSlotCount * defWaveform->GetBurstLengthInSymbols ();
 
   if ( defaultWaveformInUse || (m_waveformConf->IsAcmEnabled () == false ))
@@ -663,6 +664,13 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
   bool useDefaultWaveform = false;
   bool checkSlotLimit = true;
 
+  /**
+   * Note, that the superframe duration may be a bit longer than the frame
+   * durations, since the frame duration is counted based on the time slot
+   * duration.
+   */
+  m_duration = targetDuration;
+
   // make actual configuration
 
   switch (m_configType)
@@ -697,13 +705,6 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
 
             m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
-
-            // if frame duration is greater than current super frame duration, set it as super frame duration
-            // super frame must last as long as the longest frame
-            if ( frameConf->GetDuration () > m_duration )
-              {
-                m_duration = frameConf->GetDuration ();
-              }
 
             // Add created frame to super frame configuration
             AddFrameConf (frameConf);

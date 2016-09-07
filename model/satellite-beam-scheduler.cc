@@ -148,7 +148,7 @@ SatBeamScheduler::SatUtInfo::IsControlSlotGenerationTime () const
 
   bool isGenerationTime = false;
 
-  if ( m_controlSlotsEnabled && ( m_controlSlotGenerationTime < Simulator::Now () ) )
+  if ( m_controlSlotsEnabled && ( m_controlSlotGenerationTime <= Simulator::Now () ) )
     {
       isGenerationTime = true;
     }
