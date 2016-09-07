@@ -635,10 +635,10 @@ SatPhyRxCarrier::EndRxDataNormal (uint32_t key)
 
     	  cno *= m_rxBandwidthHz;
 
-          m_cnoCallback (iter->second.rxParams->m_beamId,
-        		  	  	  iter->second.sourceAddress,
-						  m_ownAddress,
-						  cno);
+    	  m_cnoCallback (iter->second.rxParams->m_beamId,
+    	                 iter->second.sourceAddress,
+    	                 m_ownAddress,
+    	                 cno);
         }
 
       iter->second.rxParams = NULL;

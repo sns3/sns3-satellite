@@ -124,7 +124,12 @@ SatWaveform::GetCNoThreshold (double symbolRateInBaud) const
    * symbol rate and log2(modulatedBits).
    * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
    */
-  return m_ebnoRequirement * symbolRateInBaud * log2 (m_modulatedBits);
+  double cnoRequirement = m_ebnoRequirement *
+                           symbolRateInBaud *
+                           m_codingRate *
+                           m_modulatedBits;
+
+  return cnoRequirement;
 }
 
 void
@@ -364,6 +369,8 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
             }
         }
     }
+
+  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb(cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId);
 
   return success;
 }
