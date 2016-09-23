@@ -97,6 +97,12 @@ public:
   std::string GetOutputPath ();
 
   /**
+   * \brief Method for setting the simulation output path. Tha path must exist.
+   * \param outputPath The new output path.
+   */
+  void SetOutputPath (std::string outputPath);
+
+  /**
    * \brief Function for locating the data directory within the NS-3 simulator folder
    * \return path to the data directory
    */

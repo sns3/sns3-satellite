@@ -205,6 +205,14 @@ SatEnvVariables::GetOutputPath ()
 }
 
 void
+SatEnvVariables::SetOutputPath (std::string outputPath)
+{
+  NS_ASSERT_MSG (IsValidDirectory (outputPath), outputPath << " is not a valid directory");
+  m_outputPath = outputPath;
+  m_isOutputPathInitialized = true;
+}
+
+void
 SatEnvVariables::SetOutputVariables (std::string campaignName, std::string simTag, bool enableOutputOverwrite)
 {
   NS_LOG_FUNCTION (this);
