@@ -194,7 +194,7 @@ SimulationHelper::SetDefaultValues ()
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue ("Configuration_0"));
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_1"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
   Config::SetDefault ("ns3::SatSuperframeSeq::TargetDuration", TimeValue (MilliSeconds (100)));
 
   Config::SetDefault ("ns3::SatRequestManager::EvaluationInterval", TimeValue (MilliSeconds (100)));
@@ -209,10 +209,8 @@ SimulationHelper::SetDefaultValues ()
   SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET);
 
   // ACM enabled
-  //EnableAcm(SatEnums::LD_FORWARD);
-  //EnableAcm(SatEnums::LD_RETURN);
-  DisableAcm(SatEnums::LD_FORWARD);
-  DisableAcm(SatEnums::LD_RETURN);
+  EnableAcm(SatEnums::LD_FORWARD);
+  EnableAcm(SatEnums::LD_RETURN);
 
   DisableAllCapacityAssignmentCategories ();
   EnableOnlyVbdc (3);
