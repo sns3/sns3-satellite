@@ -85,7 +85,7 @@ main (int argc, char *argv[])
       Ptr<CbrApplication> rtnApp = CreateObject<CbrApplication> ();
       rtnApp->SetAttribute ("Protocol", StringValue (protocol));
       rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (100));
+      rtnApp->SetAttribute ("PacketSize", UintegerValue (64));
       rtnApp->SetAttribute ("Interval", TimeValue (Seconds (2)));
       rtnApp->SetStartTime (Seconds (1));
       (*It)->AddApplication (rtnApp);
@@ -99,7 +99,7 @@ main (int argc, char *argv[])
       Ptr<CbrApplication> fwdApp = CreateObject<CbrApplication> ();
       fwdApp->SetAttribute ("Protocol", StringValue (protocol));
       fwdApp->SetAttribute ("Remote", AddressValue (utAddr));
-      fwdApp->SetAttribute ("PacketSize", UintegerValue (100));
+      fwdApp->SetAttribute ("PacketSize", UintegerValue (64));
       fwdApp->SetAttribute ("Interval", TimeValue (Seconds (2)));
       fwdApp->SetStartTime (Seconds (1));
       gwUsers.Get (0)->AddApplication (fwdApp);
@@ -113,7 +113,7 @@ main (int argc, char *argv[])
   // ----- CREATE CBR APPLICATION -----
   // ----------------------------------
 
-  //simulationHelper->CreateDefaultStats ();
+  //simulationHelper->CreateDefaultRtnLinkStats ();
   simulationHelper->EnableProgressLogging ();
   simulationHelper->RunSimulation ();
 
