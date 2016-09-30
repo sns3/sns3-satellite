@@ -37,43 +37,15 @@ namespace ns3 {
  *
  * Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("My satellite simulation");
  *
- * simulationHelper->SetDefaultValues (SimulationHelper::BASIC_SET);
+ * simulationHelper->SetDefaultValues ();
  *
  * simulationHelper->SetBeams ("28 46 48 50 59");
  * simulationHelper->SetUtCountPerBeam (20);
  * simulationHelper->SetUserCountPerUt (1);
  * simulationHelper->SetSimulationTime (300);
  *
- * simulationHelper->SetErrorModel (SatPhyRxCarrierConf::EM_AVI);
- *
- * //Custom configurations here
- *
- * std::stringstream sstag;
- * sstag << simulationName  << "-" << caseNumber << "-UTs=" << utsPerBeam;
- *
- * /// Set simulation output details
- * Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue (simulationName));
- * Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (sstag.str ()));
- * Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
- *
- * simulationHelper->SetOutputPath (outputPath);
- *
- * simulationHelper->EnableExternalFadingInputTrace ();
- *
- * // Create satellite scenario
- * Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
- *
- * // Now nodes are available for application installation
- *
- * // Create statistics
- * simulationHelper->CreateStats ();
- *
- * // Enable progress logging (for e.g. GUI)
- * simulationHelper->EnableProgressLogging ();
- *
- * // Run the simulation
- * simulationHelper->RunSimulation ();
- *
+ * You may also customize the attribute settings with variety of different
+ * public methods grouping several attributes under specific features.
  *
  */
 class SimulationHelper : public Object
@@ -229,7 +201,6 @@ public:
   /**
    * \brief Configure a frame for a certain superframe id.
    * \param superFrameId Superframe id (currently always 0)
-   * \param frameId Frame id
    * \param bw Frame bandwidth
    * \param carrierBw Bandwidth of the carriers within frame
    * \param rollOf Roll-off
@@ -237,7 +208,6 @@ public:
    * \param isRandomAccess Is this a RA or DA frame
    */
   void ConfigureFrame (uint32_t superFrameId,
-                       uint32_t frameId,
                        double bw,
                        double carrierBw,
                        double rollOff,
@@ -300,10 +270,22 @@ public:
   Ptr<SatHelper> CreateSatScenario ();
 
   /**
-   * \brief Create stats collectors. Adjust this method to your needs.
-   * TODO: Create statistics modes.
+   * \brief Create stats collectors and set default statistics settings
+   * for both FWD and RTN links.
    */
   void CreateDefaultStats ();
+
+  /**
+   * \brief Create stats collectors if needed and set default statistics settings
+   * for both FWD link. Adjust this method to your needs.
+   */
+  void CreateDefaultFwdLinkStats ();
+
+  /**
+   * \brief Create stats collectors if needed and set default statistics settings
+   * for both RTN link. Adjust this method to your needs.
+   */
+  void CreateDefaultRtnLinkStats ();
 
   /**
    * \brief Set simulation output tag, which is the basename of the directory where
@@ -354,7 +336,7 @@ protected:
 private:
 
   Ptr<SatHelper> m_satHelper;
-  Ptr<SatStatsHelperContainer> statContainer;
+  Ptr<SatStatsHelperContainer> m_statContainer;
 
   std::string                  m_simulationName;
   std::string                  m_enabledBeamsStr;

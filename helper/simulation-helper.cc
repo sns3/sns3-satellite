@@ -29,7 +29,7 @@
 #include <ns3/config.h>
 #include <ns3/config-store.h>
 #include <ns3/satellite-env-variables.h>
-#include <ns3/advanced-on-off-application.h>
+
 #include <ns3/packet-sink.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/satellite-enums.h>
@@ -68,17 +68,33 @@ SimulationHelper::GetInstanceTypeId (void) const
 }
 
 SimulationHelper::SimulationHelper ()
-  : m_utCount (0),
+  : m_satHelper (NULL),
+	m_statContainer (NULL),
+	m_simulationName (""),
+	m_enabledBeamsStr (""),
+	m_enabledBeams (),
+	m_utCount (0),
     m_utUserCount (0),
+    m_simTime (0),
+    m_uiOutputPath (""),
+    m_uiOutputFileName (""),
     m_numberOfConfiguredFrames (0),
     m_randomAccessConfigured (false)
 {
-  NS_FATAL_ERROR ("SimulationHelper: Default contructor not in use. Please create with simulation name. ");
+  NS_FATAL_ERROR ("SimulationHelper: Default constructor not in use. Please create with simulation name. ");
 }
 
 SimulationHelper::SimulationHelper (std::string simulationName)
-  : m_utCount (0),
+  : m_satHelper (NULL),
+	m_statContainer (NULL),
+	m_simulationName (""),
+	m_enabledBeamsStr (""),
+	m_enabledBeams (),
+	m_utCount (0),
     m_utUserCount (0),
+    m_simTime (0),
+    m_uiOutputPath (""),
+    m_uiOutputFileName (""),
     m_numberOfConfiguredFrames (0),
     m_randomAccessConfigured (false)
 {
@@ -178,7 +194,7 @@ SimulationHelper::SetDefaultValues ()
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
 
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue ("Configuration_0"));
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_1"));
   Config::SetDefault ("ns3::SatSuperframeSeq::TargetDuration", TimeValue (MilliSeconds (100)));
 
   Config::SetDefault ("ns3::SatRequestManager::EvaluationInterval", TimeValue (MilliSeconds (100)));
@@ -187,14 +203,16 @@ SimulationHelper::SetDefaultValues ()
   Config::SetDefault ("ns3::SatBbFrameConf::BBFrameUsageMode", StringValue ("NormalFrames"));
 
   ConfigureFrequencyBands ();
-  ConfigureFrame (0, 0, 2.0e7, 2.0e6, 0.2, 0.3, false);
+  ConfigureFrame (0, 15.0e6, 2.0e6, 0.2, 0.3, false);
 
   SetErrorModel(SatPhyRxCarrierConf::EM_AVI);
   SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET);
 
   // ACM enabled
-  EnableAcm(SatEnums::LD_FORWARD);
-  EnableAcm(SatEnums::LD_RETURN);
+  //EnableAcm(SatEnums::LD_FORWARD);
+  //EnableAcm(SatEnums::LD_RETURN);
+  DisableAcm(SatEnums::LD_FORWARD);
+  DisableAcm(SatEnums::LD_RETURN);
 
   DisableAllCapacityAssignmentCategories ();
   EnableOnlyVbdc (3);
@@ -360,9 +378,7 @@ SimulationHelper::EnableSlottedAloha ()
     }
 
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
-
   EnableRandomAccess ();
-
 }
 
 void
@@ -385,8 +401,9 @@ SimulationHelper::EnableRandomAccess ()
 {
   NS_LOG_FUNCTION (this);
 
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
+  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
 
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaServiceCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -405,7 +422,7 @@ SimulationHelper::EnableRandomAccess ()
 
   m_randomAccessConfigured = true;
 
-  SimulationHelper::ConfigureFrame (0, 0, 2.0e7, 2.0e6, 0.2, 0.3, true);
+  ConfigureFrame (0, 1.25e6, 1.25e6, 0.2, 0.3, true);
 }
 
 void
@@ -497,54 +514,106 @@ SimulationHelper::ProgressCb ()
 void
 SimulationHelper::CreateDefaultStats ()
 {
+	NS_ASSERT_MSG (m_satHelper != 0, "Satellite scenario not created yet!");
+
+	if (!m_statContainer)
+	{
+		Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+		m_statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
+	}
+
+	CreateDefaultFwdLinkStats ();
+	CreateDefaultRtnLinkStats ();
+}
+
+
+void
+SimulationHelper::CreateDefaultFwdLinkStats ()
+{
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT_MSG (m_satHelper != 0, "Satellite scenario not created yet!");
-
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-
-  statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
+  if (!m_statContainer)
+  {
+	  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+	  m_statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
+  }
 
   // Throughput
-  statContainer->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  statContainer->AddAverageUtRtnPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  statContainer->AddAverageBeamRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  statContainer->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageUtFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  // Granted resources
-  statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
-  statContainer->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  // Frame load
-  statContainer->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  statContainer->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   // SINR
-  statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   // Delay
-  statContainer->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  statContainer->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // Packet error
-  statContainer->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+}
+
+void
+SimulationHelper::CreateDefaultRtnLinkStats ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_statContainer)
+	{
+	  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+	  m_statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
+	}
+
+  // Throughput
+  m_statContainer->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageUtRtnPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageBeamRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Granted resources
+  m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Frame load
+  m_statContainer->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  // SINR
+  m_statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Delay
+  m_statContainer->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+
+  // Packet error
+  m_statContainer->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Waveform
-  statContainer->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Capacity request
-  statContainer->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  statContainer->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 }
 
 void
@@ -578,21 +647,19 @@ SimulationHelper::SetInterferenceModel(SatPhyRxCarrierConf::InterferenceModel if
 
 void
 SimulationHelper::ConfigureFrame (uint32_t superFrameId,
-                                  uint32_t frameId,
                                   double bw,
                                   double carrierBw,
                                   double rollOff,
                                   double carrierSpacing,
                                   bool isRandomAccess)
 {
-  NS_LOG_FUNCTION (this << frameId << bw << carrierBw << rollOff << carrierSpacing << isRandomAccess);
+  NS_LOG_FUNCTION (this << bw << carrierBw << rollOff << carrierSpacing << isRandomAccess);
 
   std::stringstream sfId, fId;
   sfId << superFrameId;
-  fId << frameId;
+  fId << m_numberOfConfiguredFrames;
   std::string attributeDefault ("ns3::SatSuperframeConf" + sfId.str() + "::Frame" + fId.str());
 
-  //Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType" value="ConfigType_0"/>
   Config::SetDefault (attributeDefault + "_AllocatedBandwidthHz", DoubleValue (bw));
   Config::SetDefault (attributeDefault + "_CarrierAllocatedBandwidthHz", DoubleValue (carrierBw));
   Config::SetDefault (attributeDefault + "_CarrierRollOff", DoubleValue (rollOff));
