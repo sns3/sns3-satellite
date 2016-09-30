@@ -659,6 +659,16 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 {
   NS_LOG_FUNCTION (this);
 
+  if (m_configType == CONFIG_TYPE_0 && waveformConf->IsAcmEnabled() == true)
+    {
+      NS_LOG_WARN ("Superframe is configured to use config type 0, thus ACM should be disabled!");
+    }
+
+  if (m_configType == CONFIG_TYPE_1 && waveformConf->IsAcmEnabled() == false)
+    {
+      NS_FATAL_ERROR ("Superframe is configured to use config type 1, thus ACM should be enabled!");
+    }
+
   DoConfigure ();
 
   bool useDefaultWaveform = false;
