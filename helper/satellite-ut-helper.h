@@ -176,6 +176,11 @@ private:
   SatPhy::ErrorModel m_errorModel;
 
   /*
+   * Constant error rate for dedicated access in the FWD link.
+   */
+  double m_daConstantErrorRate;
+
+  /*
    * Forward channel link results (DVB-S2) are created if ErrorModel
    * is configured to be AVI. Note, that only one instance of the
    * link results is needed for all UTs.

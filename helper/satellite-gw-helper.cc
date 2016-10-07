@@ -59,13 +59,6 @@ SatGwHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGwHelper")
     .SetParent<Object> ()
     .AddConstructor<SatGwHelper> ()
-    .AddAttribute ("RtnLinkErrorModel",
-                   "Return link error model for",
-                   EnumValue (SatPhyRxCarrierConf::EM_AVI),
-                   MakeEnumAccessor (&SatGwHelper::m_errorModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
-                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
-                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
     .AddAttribute ("DaRtnLinkInterferenceModel",
                    "Return link interference model for dedicated access",
                    EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
@@ -73,6 +66,18 @@ SatGwHelper::GetTypeId (void)
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+    .AddAttribute ("RtnLinkErrorModel",
+                   "Return link error model for",
+                   EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                   MakeEnumAccessor (&SatGwHelper::m_errorModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
+    .AddAttribute ("RtnLinkConstantErrorRate",
+                   "Constant error rate",
+                   DoubleValue (0.01),
+                   MakeDoubleAccessor (&SatGwHelper::m_daConstantErrorRate),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("EnableChannelEstimationError",
                    "Enable channel estimation error in return link receiver at GW.",
                    BooleanValue (true),
@@ -96,6 +101,7 @@ SatGwHelper::SatGwHelper ()
   : m_rtnLinkCarrierCount (0),
     m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_daConstantErrorRate (0.0),
     m_symbolRate (0.0),
     m_enableChannelEstimationError (false),
     m_raSettings ()
@@ -119,6 +125,7 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
     m_sendCtrlCb (sendCb),
     m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_daConstantErrorRate (0.0),
     m_symbolRate (0.0),
     m_enableChannelEstimationError (false),
     m_raSettings (randomAccessSettings)
@@ -243,12 +250,14 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parameters.m_errorModel = m_errorModel;
+  parameters.m_daConstantErrorRate = m_daConstantErrorRate;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_rtnLinkCarrierCount;
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
+  parameters.m_raConstantErrorRate = m_raSettings.m_raConstantErrorRate;
 
   if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {

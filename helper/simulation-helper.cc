@@ -406,6 +406,7 @@ SimulationHelper::EnableRandomAccess ()
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+  Config::SetDefault ("ns3::SatBeamHelper::RaConstantErrorRate", DoubleValue (0.0));
 
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
@@ -624,7 +625,8 @@ SimulationHelper::SetErrorModel (SatPhyRxCarrierConf::ErrorModel em, double erro
 
   if (errorRate == SatPhyRxCarrierConf::EM_CONSTANT)
     {
-      Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue(errorRate));
+      Config::SetDefault ("ns3::SatGwHelper::RtnLinkConstantErrorRate", DoubleValue(errorRate));
+      Config::SetDefault ("ns3::SatUtHelper::FwdLinkConstantErrorRate", DoubleValue(errorRate));
     }
 }
 

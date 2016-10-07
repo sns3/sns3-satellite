@@ -101,6 +101,7 @@ public:
     double                                   m_extNoiseDensityWhz;
     double                                   m_aciIfWrtNoiseFactor;
     ErrorModel                               m_errorModel;
+    double                                   m_daConstantErrorRate;
     InterferenceModel                        m_daIfModel;
     InterferenceModel                        m_raIfModel;
     RxMode                                   m_rxMode;
@@ -109,6 +110,7 @@ public:
     uint32_t                                 m_carrierCount;
     Ptr<SatChannelEstimationErrorContainer>  m_cec;
     RandomAccessCollisionModel               m_raCollisionModel;
+    double                                   m_raConstantErrorRate;
     bool                                     m_isRandomAccessEnabled;
 
     RxCarrierCreateParams_s ()
@@ -116,6 +118,7 @@ public:
         m_extNoiseDensityWhz (0.0),
         m_aciIfWrtNoiseFactor (0.0),
         m_errorModel (SatPhyRxCarrierConf::EM_NONE),
+        m_daConstantErrorRate (0.0),
         m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
         m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
         m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
@@ -124,6 +127,7 @@ public:
         m_carrierCount (0),
         m_cec (NULL),
         m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+        m_raConstantErrorRate (0.0),
         m_isRandomAccessEnabled (false)
     {
       // do nothing
@@ -173,6 +177,12 @@ public:
   ErrorModel GetErrorModel () const;
 
   /**
+   * \brief Get constant error rate for dedicated access
+   * \return configured constant error rate
+   */
+  double GetConstantDaErrorRate () const;
+
+  /**
    * \brief Get configured interference model
    * \param isRandomAccessCarrier Do we want RA or DA IF model
    * \return configured interference model
@@ -218,12 +228,6 @@ public:
   RxMode GetRxMode () const;
 
   /**
-   * \brief Function for getting the error rate for constant error model
-   * \return error rate for constant error model
-   */
-  double GetConstantErrorRate () const;
-
-  /**
    * \brief Get channel type
    * \return channel type
    */
@@ -266,6 +270,13 @@ public:
   RandomAccessCollisionModel GetRandomAccessCollisionModel () const;
 
   /**
+   * \brief Get random access constant error rate. Used if
+   * collision model is RA_CONSTANT_COLLISION_PROBABILITY.
+   * \return constant error rate
+   */
+  double GetRandomAccessConstantErrorRate () const;
+
+  /**
    * \brief Get random access average normalized offered load measurement window size
    * \return average normalized offered load measurement window size
    */
@@ -287,6 +298,7 @@ private:
   InterferenceModel m_daIfModel;
   InterferenceModel m_raIfModel;
   ErrorModel m_errorModel;
+  double m_daConstantErrorRate;
   double m_rxTemperatureK;
   double m_rxAciIfWrtNoiseFactor;
   RxMode m_rxMode;
@@ -295,12 +307,12 @@ private:
   SatEnums::ChannelType_t m_channelType;
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
   SinrCalculatorCallback m_sinrCalculate;
-  double m_constantErrorRate;
   Ptr<SatLinkResults> m_linkResults;
   double m_rxExtNoiseDensityWhz;
   bool m_enableIntfOutputTrace;
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
   RandomAccessCollisionModel m_raCollisionModel;
+  double m_raConstantErrorRate;
   bool m_enableRandomAccessDynamicLoadControl;
 };
 

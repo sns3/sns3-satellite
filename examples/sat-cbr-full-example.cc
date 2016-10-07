@@ -77,8 +77,9 @@ main (int argc, char *argv[])
   // Configure a static error probability
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_CONSTANT);
   double errorRate (0.2);
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (errorRate));
+  Config::SetDefault ("ns3::SatUtHelper::FwdLinkConstantErrorRate", DoubleValue (errorRate));
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+  Config::SetDefault ("ns3::SatGwHelper::RtnLinkConstantErrorRate", DoubleValue (errorRate));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   // Create full scenario

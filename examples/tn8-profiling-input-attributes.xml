@@ -350,7 +350,6 @@
  <default name="ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace" value="false"/>
  <default name="ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize" value="10"/>
  <default name="ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl" value="false"/>
- <default name="ns3::SatPhyRxCarrierConf::ConstantErrorRatio" value="0.01"/>
  <default name="ns3::SatPhyTx::TxMode" value="Normal Tx mode"/>
  <default name="ns3::SatPositionAllocator::AsGeoCoordinates" value="true"/>
  <default name="ns3::SatRandomBoxPositionAllocator::Longitude" value="ns3::UniformRandomVariable[Min=-180.0|Max=180.0]"/>
@@ -401,6 +400,7 @@
  <default name="ns3::SatBeamHelper::RandomAccessModel" value="RaOff"/>
  <default name="ns3::SatBeamHelper::RaInterferenceModel" value="PerPacket"/>
  <default name="ns3::SatBeamHelper::RaCollisionModel" value="RaCollisionCheckAgainstSinr"/>
+ <default name="ns3::SatBeamHelper::RaConstantErrorRate" value="0.0"/>
  <default name="ns3::SatBeamHelper::PropagationDelayModel" value="ConstantSpeed"/>
  <default name="ns3::SatBeamHelper::ConstantPropagationDelay" value="+130000000.0ns"/>
  <default name="ns3::SatBeamHelper::PrintDetailedInformationToCreationTraces" value="true"/>
@@ -422,6 +422,7 @@
  <default name="ns3::SatConf::FwdCarrierSpacing" value="0"/>
  <default name="ns3::SatGeoHelper::DaFwdLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGeoHelper::DaRtnLinkInterferenceModel" value="PerPacket"/>
+ <default name="ns3::SatGwHelper::RtnLinkConstantErrorRate" value="0.01"/>
  <default name="ns3::SatGwHelper::RtnLinkErrorModel" value="AVI"/>
  <default name="ns3::SatGwHelper::DaRtnLinkInterferenceModel" value="PerPacket"/>
  <default name="ns3::SatGwHelper::EnableChannelEstimationError" value="true"/>
@@ -436,6 +437,7 @@
  <default name="ns3::SatHelper::UtNetworkMask" value="255.255.0.0"/>
  <default name="ns3::SatUserHelper::BackboneNetworkType" value="SatSimple"/>
  <default name="ns3::SatUserHelper::SubscriberNetworkType" value="Csma"/>
+ <default name="ns3::SatUtHelper::FwdLinkConstantErrorRate" value="0.01"/>
  <default name="ns3::SatUtHelper::FwdLinkErrorModel" value="None"/>
  <default name="ns3::SatUtHelper::DaFwdLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatUtHelper::EnableChannelEstimationError" value="true"/>

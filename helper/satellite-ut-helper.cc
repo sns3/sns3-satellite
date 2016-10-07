@@ -71,13 +71,6 @@ SatUtHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtHelper")
     .SetParent<Object> ()
     .AddConstructor<SatUtHelper> ()
-    .AddAttribute ("FwdLinkErrorModel",
-                   "Forward link error model",
-                   EnumValue (SatPhyRxCarrierConf::EM_AVI),
-                   MakeEnumAccessor (&SatUtHelper::m_errorModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
-                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
-                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
     .AddAttribute ("DaFwdLinkInterferenceModel",
                    "Forward link interference model for dedicated access",
                    EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -85,6 +78,18 @@ SatUtHelper::GetTypeId (void)
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+    .AddAttribute ("FwdLinkErrorModel",
+                   "Forward link error model",
+                   EnumValue (SatPhyRxCarrierConf::EM_AVI),
+                   MakeEnumAccessor (&SatUtHelper::m_errorModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
+    .AddAttribute ("FwdLinkConstantErrorRate",
+                   "Constant error rate",
+                   DoubleValue (0.01),
+                   MakeDoubleAccessor (&SatUtHelper::m_daConstantErrorRate),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("LowerLayerServiceConf",
                    "Pointer to lower layer service configuration.",
                    PointerValue (),
@@ -122,6 +127,7 @@ SatUtHelper::SatUtHelper ()
     m_superframeSeq (),
     m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_daConstantErrorRate (0.0),
     m_linkResults (),
     m_llsConf (),
     m_enableChannelEstimationError (false),
@@ -149,6 +155,7 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
     m_sendCtrlCb (sendCb),
     m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+    m_daConstantErrorRate (0.0),
     m_linkResults (),
     m_llsConf (),
     m_enableChannelEstimationError (false),
@@ -255,6 +262,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parameters.m_errorModel = m_errorModel;
+  parameters.m_daConstantErrorRate = m_daConstantErrorRate;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_bwConverter = m_carrierBandwidthConverter;

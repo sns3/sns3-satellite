@@ -210,7 +210,7 @@ main (int argc, char *argv[])
       // Slotted Aloha
       Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
       //Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", StringValue ("RaCollisionConstantErrorProbability"));
-      //Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (0.3));
+      //Config::SetDefault ("ns3::SatBeamHelper::RaConstantErrorRate", DoubleValue (0.3));
 
       // CRDSA
       //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
@@ -254,7 +254,7 @@ main (int argc, char *argv[])
       // Slotted Aloha
       Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
       //Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", StringValue ("RaCollisionConstantErrorProbability"));
-      //Config::SetDefault ("ns3::SatPhyRxCarrierConf::ConstantErrorRatio", DoubleValue (0.3));
+      //Config::SetDefault ("ns3::SatBeamHelper::RaConstantErrorRate", DoubleValue (0.3));
 
       // CRDSA
       //Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));

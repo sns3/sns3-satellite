@@ -60,6 +60,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
     m_numOfOngoingRx (0),
     m_rxPacketCounter (0),
     m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
+    m_randomAccessConstantErrorRate (0.0),
     m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
     m_isRandomAccessEnabledForThisCarrier (isRandomAccessEnabledForThisCarrier),
     m_randomAccessBitsInFrame (0),
@@ -124,7 +125,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   m_sinrCalculate = carrierConf->GetSinrCalculatorCb ();
 
-  m_constantErrorRate = carrierConf->GetConstantErrorRate ();
+  // Constant error rate for dedicated access.
+  m_constantErrorRate = carrierConf->GetConstantDaErrorRate ();
 
   /**
    * Uniform random variable used for checking whether a packet
@@ -138,6 +140,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   if (m_isRandomAccessEnabledForThisCarrier)
     {
       m_randomAccessCollisionModel = carrierConf->GetRandomAccessCollisionModel ();
+      m_randomAccessConstantErrorRate = carrierConf->GetRandomAccessConstantErrorRate ();
       m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize = carrierConf->GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize ();
       m_enableRandomAccessDynamicLoadControl = carrierConf->IsRandomAccessDynamicLoadControlEnabled ();
     }
@@ -697,7 +700,7 @@ SatPhyRxCarrier::ProcessSlottedAlohaCollisions (double cSinr, Ptr<SatSignalParam
   else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_CONSTANT_COLLISION_PROBABILITY)
     {
       double r = m_uniformVariable->GetValue (0, 1);
-      if (r <  m_constantErrorRate)
+      if (r <  m_randomAccessConstantErrorRate)
         {
           phyError = true;
         }

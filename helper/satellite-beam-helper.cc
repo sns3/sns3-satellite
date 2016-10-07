@@ -93,6 +93,11 @@ SatBeamHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS, "RaCollisionAlwaysDropCollidingPackets",
                                     SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR, "RaCollisionCheckAgainstSinr",
                                     SatPhyRxCarrierConf::RA_CONSTANT_COLLISION_PROBABILITY, "RaCollisionConstantErrorProbability"))
+    .AddAttribute ("RaConstantErrorRate",
+                   "Constant error rate for random access",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatBeamHelper::m_raConstantErrorRate),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("PropagationDelayModel",
                    "Propagation delay model",
                    EnumValue (SatEnums::PD_CONSTANT_SPEED),
@@ -101,7 +106,7 @@ SatBeamHelper::GetTypeId (void)
                                     SatEnums::PD_CONSTANT, "Constant"))
     .AddAttribute ("ConstantPropagationDelay",
                    "Constant propagation delay",
-                   TimeValue ( Seconds (0.13)),
+                   TimeValue (Seconds (0.13)),
                    MakeTimeAccessor (&SatBeamHelper::m_constantPropagationDelay),
                    MakeTimeChecker ())
     .AddAttribute ("PrintDetailedInformationToCreationTraces",
@@ -139,7 +144,8 @@ SatBeamHelper::SatBeamHelper ()
     m_constantPropagationDelay (Seconds (0.13)),
     m_randomAccessModel (SatEnums::RA_MODEL_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED)
+    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
+    m_raConstantErrorRate (0.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -160,7 +166,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     m_constantPropagationDelay (Seconds (0.13)),
     m_randomAccessModel (SatEnums::RA_MODEL_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
+    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+    m_raConstantErrorRate (0.0)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -191,6 +198,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   gwRaSettings.m_raInterferenceModel = m_raInterferenceModel;
   gwRaSettings.m_randomAccessModel = m_randomAccessModel;
   gwRaSettings.m_raCollisionModel = m_raCollisionModel;
+
+  // Error rate is valid only at the GW for random access
+  gwRaSettings.m_raConstantErrorRate = m_raConstantErrorRate;
 
   SatUtHelper::RandomAccessSettings_s utRaSettings;
   utRaSettings.m_raInterferenceModel = m_raInterferenceModel;

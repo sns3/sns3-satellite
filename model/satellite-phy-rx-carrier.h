@@ -650,6 +650,12 @@ private:
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel;
 
   /**
+   * \brief Constant error rate used for random access if collision model
+   * is RA_CONSTANT_COLLISION_PROBABILITY.
+   */
+  double m_randomAccessConstantErrorRate;
+
+  /**
    * \brief Random access average normalized offered load measurement window size
    */
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;

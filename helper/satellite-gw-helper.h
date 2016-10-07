@@ -50,6 +50,7 @@ public:
     SatEnums::RandomAccessModel_t m_randomAccessModel;
     SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
+    double m_raConstantErrorRate;
   } RandomAccessSettings_s;
 
   static TypeId GetTypeId (void);
@@ -181,6 +182,11 @@ private:
    * Configured error model for the return link. Set as an attribute.
    */
   SatPhy::ErrorModel m_errorModel;
+
+  /*
+   * Constant error rate for dedicated access in the RTN link.
+   */
+  double m_daConstantErrorRate;
 
   /*
    * Return channel link results (DVB-RCS2) are created if ErrorModel

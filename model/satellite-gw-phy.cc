@@ -54,11 +54,11 @@ SatGwPhy::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
                    MakePointerChecker<SatPhyTx> ())
-    .AddAttribute ( "RxTemperatureDbk",
-                    "RX noise temperature in GW in dBK.",
-                    DoubleValue (24.62),  // ~290K
-                    MakeDoubleAccessor (&SatPhy::GetRxNoiseTemperatureDbk, &SatPhy::SetRxNoiseTemperatureDbk),
-                    MakeDoubleChecker<double> ())
+    .AddAttribute ("RxTemperatureDbk",
+                   "RX noise temperature in GW in dBK.",
+                   DoubleValue (24.62),  // ~290K
+                   MakeDoubleAccessor (&SatPhy::GetRxNoiseTemperatureDbk, &SatPhy::SetRxNoiseTemperatureDbk),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("RxMaxAntennaGainDb", "Maximum RX gain in dB",
                    DoubleValue (61.50),
                    MakeDoubleAccessor (&SatPhy::GetRxAntennaGainDb, &SatPhy::SetRxAntennaGainDb),
@@ -95,17 +95,17 @@ SatGwPhy::GetTypeId (void)
                    DoubleValue (1.00),
                    MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
                    MakeDoubleChecker<double_t> ())
-    .AddAttribute ( "ImIfCOverIDb",
-                    "Intermodulation interference, C over I in dB.",
-                    DoubleValue (22.0),
-                    MakeDoubleAccessor (&SatGwPhy::m_imInterferenceCOverIDb),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ( "AciIfWrtNoisePercent",
-                    "Adjacent channel interference wrt white noise in percents.",
-                    DoubleValue (10.0),
-                    MakeDoubleAccessor (&SatGwPhy::m_aciIfWrtNoisePercent),
-                    MakeDoubleChecker<double> (0, 100))
-  ;
+    .AddAttribute ("ImIfCOverIDb",
+                   "Intermodulation interference, C over I in dB.",
+                   DoubleValue (22.0),
+                   MakeDoubleAccessor (&SatGwPhy::m_imInterferenceCOverIDb),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("AciIfWrtNoisePercent",
+                   "Adjacent channel interference wrt white noise in percents.",
+                   DoubleValue (10.0),
+                   MakeDoubleAccessor (&SatGwPhy::m_aciIfWrtNoisePercent),
+                   MakeDoubleChecker<double> (0, 100))
+                   ;
   return tid;
 }
 

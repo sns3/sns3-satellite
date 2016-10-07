@@ -353,6 +353,12 @@ private:
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
 
   /**
+   * Constant error rate for random access. Used if RA collision
+   * model is RA_CONSTANT_COLLISION_PROBABILITY.
+   */
+  double m_raConstantErrorRate;
+
+  /**
    * Packet trace
    */
   Ptr<SatPacketTrace> m_packetTrace;
