@@ -90,7 +90,7 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   Ptr<SatWaveformConf> wf = CreateObject<SatWaveformConf> (path + fileName);
   wf->InitializeEbNoRequirements ( lr );
 
-  uint32_t refResults [21] = {7, 7, 7, 8, 9, 9, 10, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
+  uint32_t refResults [21] = {6, 6, 7, 7, 7, 8, 8, 9, 9, 9, 10, 11, 11, 11, 12, 12, 12, 12, 12, 12, 12};
 
   // 250 kbaud
   double symbolRate (250000);
