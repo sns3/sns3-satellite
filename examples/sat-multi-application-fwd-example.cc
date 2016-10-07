@@ -54,9 +54,6 @@ main (int argc, char *argv[])
 //  LogComponentEnable ("CbrApplication", LOG_LEVEL_ALL);
 //  LogComponentEnable ("PacketSink", LOG_LEVEL_ALL);
   LogComponentEnable ("sat-multi-application-fwd-example", LOG_LEVEL_INFO);
-//  LogComponentEnable ("KpiHelper", LOG_LEVEL_INFO);
-//  LogComponentEnable ("CbrKpiHelper", LOG_LEVEL_INFO);
-//  LogComponentEnable ("OnOffKpiHelper", LOG_LEVEL_INFO);
 
   uint32_t endUsersPerUt (3);
   uint32_t utsPerBeam (3);
@@ -182,9 +179,6 @@ main (int argc, char *argv[])
   ApplicationContainer utCbrSinkApps;
   ApplicationContainer utOnOffSinkApps;
 
-  CbrKpiHelper cbrKpiHelper (KpiHelper::KPI_FWD);
-  OnOffKpiHelper onoffKpiHelper (KpiHelper::KPI_FWD);
-
   //---- Start CBR application definitions
 
   NS_LOG_INFO ("Creating CBR applications and sinks");
@@ -218,10 +212,6 @@ main (int argc, char *argv[])
           utCbrSinkApps.Get (i)->SetStartTime (startDelay);
           utCbrSinkApps.Get (i)->SetStopTime (appStopTime);
         }
-
-      // Add the created applications to CbrKpiHelper
-      cbrKpiHelper.AddSink (utCbrSinkApps);
-      cbrKpiHelper.AddSender (gwCbrApps);
     }
   //---- Stop CBR application definitions
 
@@ -265,9 +255,6 @@ main (int argc, char *argv[])
           utOnOffSinkApps.Get (i)->SetStartTime (startDelay);
           utOnOffSinkApps.Get (i)->SetStopTime (appStopTime);
         }
-
-      onoffKpiHelper.AddSink (utOnOffSinkApps);
-      onoffKpiHelper.AddSender (gwOnOffApps);
     }
 
   //---- Stop OnOff application definitions
@@ -283,12 +270,6 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (simLength));
   Simulator::Run ();
-
-  NS_LOG_INFO ("--- CBR KPIs ---");
-  cbrKpiHelper.Print ();
-
-  NS_LOG_INFO ("--- OnOff KPIs ---");
-  onoffKpiHelper.Print ();
 
   Simulator::Destroy ();
 

@@ -114,8 +114,6 @@ main (int argc, char *argv[])
   ApplicationContainer gwApps;
   ApplicationContainer utApps;
 
-  CbrKpiHelper kpiHelper (KpiHelper::KPI_FWD);
-
   //---- Start CBR application definitions
 
   NS_LOG_INFO ("Creating CBR applications and sinks");
@@ -148,10 +146,6 @@ main (int argc, char *argv[])
           utApps.Get (i)->SetStartTime (startDelay);
           utApps.Get (i)->SetStopTime (simLength);
         }
-
-      // Add the created applications to CbrKpiHelper
-      kpiHelper.AddSink (utApps);
-      kpiHelper.AddSender (gwApps);
     }
   //---- Stop CBR application definitions
 
@@ -167,8 +161,6 @@ main (int argc, char *argv[])
 
   Simulator::Stop (simLength);
   Simulator::Run ();
-
-  kpiHelper.Print ();
 
   Simulator::Destroy ();
 

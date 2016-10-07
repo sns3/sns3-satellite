@@ -38,7 +38,7 @@ using namespace ns3;
  *         can change the scenario size quite to be whatever between 1 and
  *         full scenario (72 beams). Currently it is configured to using only
  *         one beam. CBR application is sending packets in RTN link, i.e. from UT
- *         side to GW side. Packet trace and KpiHelper are enabled by default.
+ *         side to GW side. Packet trace is enabled by default.
  *         End user may change the number of UTs and end users from
  *         the command line.
  *
@@ -160,11 +160,6 @@ main (int argc, char *argv[])
       utApps.Get (i)->SetStopTime (simLength);
     }
 
-  // Add the created applications to CbrKpiHelper
-  CbrKpiHelper kpiHelper (KpiHelper::KPI_RTN);
-  kpiHelper.AddSink (gwApps);
-  kpiHelper.AddSender (utApps);
-
   utApps.Start (appStartTime);
   utApps.Stop (simLength);
 
@@ -178,8 +173,6 @@ main (int argc, char *argv[])
 
   Simulator::Stop (simLength);
   Simulator::Run ();
-
-  kpiHelper.Print ();
 
   Simulator::Destroy ();
 

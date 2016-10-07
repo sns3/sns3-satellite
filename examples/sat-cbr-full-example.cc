@@ -43,7 +43,6 @@ NS_LOG_COMPONENT_DEFINE ("sat-cbr-full-example");
 int
 main (int argc, char *argv[])
 {
-  // LogComponentEnable ("CbrKpiHelper", LOG_LEVEL_ALL);
   // LogComponentEnable ("CbrApplication", LOG_LEVEL_ALL);
   // LogComponentEnable ("PacketSink", LOG_LEVEL_ALL);
   // LogComponentEnable ("sat-arq-rtn-example", LOG_LEVEL_INFO);
@@ -130,11 +129,6 @@ main (int argc, char *argv[])
       gwApps.Get (i)->SetStopTime (Seconds (simLength));
     }
 
-  // Add the created applications to CbrKpiHelper
-  CbrKpiHelper kpiHelper (KpiHelper::KPI_FWD);
-  kpiHelper.AddSink (utApps);
-  kpiHelper.AddSender (gwApps);
-
   utApps.Start (appStartTime);
   utApps.Stop (Seconds (simLength));
 
@@ -148,8 +142,6 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (simLength));
   Simulator::Run ();
-
-  kpiHelper.Print ();
 
   Simulator::Destroy ();
 

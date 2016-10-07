@@ -148,11 +148,6 @@ main (int argc, char *argv[])
       utApps.Get (i)->SetStopTime (simLength);
     }
 
-  // Add the created applications to CbrKpiHelper
-  CbrKpiHelper kpiHelper (KpiHelper::KPI_RTN);
-  kpiHelper.AddSink (gwApps);
-  kpiHelper.AddSender (utApps);
-
   utApps.Start (appStartTime);
   utApps.Stop (simLength);
 
@@ -167,8 +162,6 @@ main (int argc, char *argv[])
 
   Simulator::Stop (simLength);
   Simulator::Run ();
-
-  kpiHelper.Print ();
 
   Simulator::Destroy ();
 

@@ -20,6 +20,7 @@
  */
 
 
+#include "ns3/applications-module.h"
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
@@ -200,8 +201,6 @@ main (int argc, char *argv[])
   const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
   Ptr<UniformRandomVariable> rnd = CreateObject<UniformRandomVariable> ();
 
-  OnOffKpiHelper onoffKpiHelper (KpiHelper::KPI_RTN);
-
   for (NodeContainer::Iterator itUt = utUsers.Begin ();
        itUt != utUsers.End ();
        ++itUt)
@@ -217,8 +216,6 @@ main (int argc, char *argv[])
       rtnApp->SetStartTime (appStartTime);
       (*itUt)->AddApplication (rtnApp);
 
-      onoffKpiHelper.AddSender (rtnApp);
-
       appStartTime += MilliSeconds (rnd->GetInteger (0, 50));
     }
 
@@ -227,8 +224,6 @@ main (int argc, char *argv[])
   ps->SetAttribute ("Protocol", StringValue (protocol));
   ps->SetAttribute ("Local", AddressValue (gwAddr));
   gwUsers.Get (0)->AddApplication (ps);
-
-  onoffKpiHelper.AddSink (ps);
 
   /**
    * -----------------
@@ -283,9 +278,6 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (simDuration));
   Simulator::Run ();
-
-  NS_LOG_INFO ("--- OnOff KPIs ---");
-  onoffKpiHelper.Print ();
 
   Simulator::Destroy ();
 
