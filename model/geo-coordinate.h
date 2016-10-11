@@ -140,12 +140,12 @@ public:
   // Sphere, WGS84 and GRS80 reference ellipsoides supported.
 
   // length (in meters) for semi-minor axis A. (same for all reference ellipsoides)
-  static const double equatorRadius = 6378137.0;
+  static constexpr double equatorRadius = 6378137.0;
 
   // length (in meters) for semi-minor axis B
-  static const double polarRadius_sphere = 6378137.0;         // Sphere
-  static const double polarRadius_wgs84 = 6356752.314245;     // WGS84 ellipsoide
-  static const double polarRadius_grs80 = 6356752.314103;     // GRS80 ellipsoide
+  static constexpr double polarRadius_sphere = 6378137.0;         // Sphere
+  static constexpr double polarRadius_wgs84 = 6356752.314245;     // WGS84 ellipsoide
+  static constexpr double polarRadius_grs80 = 6356752.314103;     // GRS80 ellipsoide
 
 private:
   /**

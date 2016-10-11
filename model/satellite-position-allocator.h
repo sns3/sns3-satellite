@@ -162,12 +162,12 @@ private:
   /**
    * Max number of tries to pick a random position for a UT.
    */
-  static const uint32_t MAX_TRIES = 100;
+  static constexpr uint32_t MAX_TRIES = 100;
 
   /**
    * Minimum accepted antenna gain for a UT.
    */
-  static const double MIN_ANTENNA_GAIN = 40.0;
+  static constexpr double MIN_ANTENNA_GAIN = 40.0;
 
   /**
    * Target beam id to which the UT is tried to be placed.
