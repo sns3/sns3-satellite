@@ -53,7 +53,14 @@ public:
     TRANSPARENT
   } SatPhyTxMode_t;
 
+  /**
+   * Default constructor.
+   */
   SatPhyTx ();
+
+  /**
+   * Destructor for SatPhyTx
+   */
   virtual ~SatPhyTx ();
 
   /**
@@ -64,8 +71,15 @@ public:
     IDLE, TX
   };
 
-  // inherited from Object
+
+  /**
+   * inherited from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   void SetChannel (Ptr<SatChannel> c);

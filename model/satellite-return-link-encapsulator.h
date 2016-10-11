@@ -56,9 +56,21 @@ public:
    * Constructor
    */
   SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
+
+  /**
+   * Destructor for SatReturnLinkEncapsulator
+   */
   virtual ~SatReturnLinkEncapsulator ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**
@@ -87,7 +99,7 @@ public:
 
   /**
    * Receive a control msg (ARQ ACK)
-   * \param p Control message pointer received from lower layer
+   * \param ack ACK control message pointer received from lower layer
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 

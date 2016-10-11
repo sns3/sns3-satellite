@@ -337,6 +337,7 @@ SatRequestManager::DoEvaluation ()
       if (crMsg->IsNotEmpty ())
         {
           NS_LOG_INFO ("Send CR");
+
           SendCapacityRequest (crMsg);
         }
 

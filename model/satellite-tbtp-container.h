@@ -43,6 +43,12 @@ public:
   {
   }
 
+  /**
+   * Operator overload for sorting function
+   * \param p1 Time slot configuration
+   * \param p2 Time slot configuration
+   * \return Start time of p1 < Start time of p2
+   */
   bool operator() (Ptr<SatTimeSlotConf> p1, Ptr<SatTimeSlotConf> p2)
   {
     return p1->GetStartTime () < p2->GetStartTime ();
@@ -59,12 +65,32 @@ public:
 class SatTbtpContainer : public Object
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatTbtpContainer ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param seq 
+   */
   SatTbtpContainer (Ptr<SatSuperframeSeq> seq);
+
+  /**
+   * Destructor for SatTbtpContainer
+   */
   ~SatTbtpContainer ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**

@@ -43,7 +43,15 @@ namespace ns3 {
 class SatChannelEstimationErrorContainer : public SimpleRefCount<SatChannelEstimationErrorContainer>
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatChannelEstimationErrorContainer ();
+
+  /**
+   * Destructor for SatChannelEstimationErrorContainer
+   */
   virtual ~SatChannelEstimationErrorContainer ();
 
   /**
@@ -71,7 +79,15 @@ private:
 class SatSimpleChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatSimpleChannelEstimationErrorContainer ();
+
+  /**
+   * Destructor for SatSimpleChannelEstimationErrorContainer
+   */
   virtual ~SatSimpleChannelEstimationErrorContainer ();
 
 protected:
@@ -89,7 +105,15 @@ private:
 class SatFwdLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatFwdLinkChannelEstimationErrorContainer ();
+
+  /**
+   * Destructor for SatFwdLinkChannelEstimationErrorContainer
+   */
   virtual ~SatFwdLinkChannelEstimationErrorContainer ();
 
 protected:
@@ -114,7 +138,17 @@ private:
 class SatRtnLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
 public:
+
+  /**
+   * Constructor with initialization parameters.
+   * \param minWfId 
+   * \param maxWfId 
+   */
   SatRtnLinkChannelEstimationErrorContainer (uint32_t minWfId, uint32_t maxWfId);
+
+  /**
+   * Destructor for SatRtnLinkChannelEstimationErrorContainer
+   */
   virtual ~SatRtnLinkChannelEstimationErrorContainer ();
 
 protected:

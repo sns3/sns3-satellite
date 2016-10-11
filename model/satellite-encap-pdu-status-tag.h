@@ -41,6 +41,10 @@ namespace ns3 {
 class SatEncapPduStatusTag : public Tag
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatEncapPduStatusTag ();
 
   /**
@@ -55,11 +59,40 @@ public:
    */
   uint8_t GetStatus (void) const;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get serialized size of SatEncapPduStatusTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t GetSerializedSize (void) const;
+
+  /**
+   * Serializes information to buffer from this instance of SatEncapPduStatusTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatEncapPduStatusTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void Deserialize (TagBuffer i);
+
+  /**
+   * Print time stamp of this instance of SatEncapPduStatusTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
   /**

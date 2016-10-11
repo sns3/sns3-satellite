@@ -43,7 +43,15 @@ namespace ns3 {
 class SatPacketClassifier : public SimpleRefCount<SatPacketClassifier>
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatPacketClassifier ();
+
+  /**
+   * Destructor for SatPacketClassifier
+   */
   virtual ~SatPacketClassifier ();
 
   /**

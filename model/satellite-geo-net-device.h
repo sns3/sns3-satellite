@@ -48,7 +48,16 @@ namespace ns3 {
 class SatGeoNetDevice : public NetDevice
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatGeoNetDevice ();
 
   /**
@@ -114,6 +123,10 @@ public:
   virtual Ptr<Channel> GetChannel (void) const;
 
 protected:
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose (void);
 
 private:

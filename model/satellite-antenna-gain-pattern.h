@@ -48,10 +48,28 @@ namespace ns3 {
 class SatAntennaGainPattern : public Object
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatAntennaGainPattern ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param filePathName 
+   */
   SatAntennaGainPattern (std::string filePathName);
   ~SatAntennaGainPattern ()
   {

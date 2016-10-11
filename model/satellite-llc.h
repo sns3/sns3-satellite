@@ -116,6 +116,9 @@ public:
 class SatLlc : public Object
 {
 public:
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
 
   /**
@@ -173,8 +176,8 @@ public:
     * method is not to be used in this class, but the real
     * implementation is located in inherited classes.
     *
-    * \param UtAddr MAC address of the UT with the Tx opportunity
     * \param bytes Size of the Tx opportunity
+    * \param utAddr MAC address of the UT with the Tx opportunity
     * \param flowId Flow identifier
     * \param &bytesLeft Bytes left after TxOpportunity
     * \param &nextMinTxO Minimum TxO after this TxO
@@ -184,8 +187,9 @@ public:
 
   /**
    * \brief Receive user data packet from lower layer.
-   * \param macAddr MAC address of the UT (either as transmitter or receiver)
    * \param packet Pointer to packet received.
+   * \param source MAC address of the source
+   * \param dest MAC address of the destination
    */
   virtual void Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest);
 
@@ -221,7 +225,7 @@ public:
    * \param source Source MAC address
    * \param dest Destination MAC address
    * \param flowId Flow id of this encapsulator queue
-   * \param enc Decapsulator pointer
+   * \param dec Decapsulator pointer
    */
   void AddDecap (Mac48Address source, Mac48Address dest, uint8_t flowId, Ptr<SatBaseEncapsulator> dec);
 
@@ -302,6 +306,10 @@ public:
   void SetGwAddress (Mac48Address address);
 
 protected:
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**

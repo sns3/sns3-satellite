@@ -52,8 +52,16 @@ namespace ns3 {
 class SatLinkResults : public Object
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatLinkResults ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -102,11 +110,19 @@ protected:
 class SatLinkResultsDvbRcs2 : public SatLinkResults
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatLinkResultsDvbRcs2 ();
   ~SatLinkResultsDvbRcs2 ()
   {
   }
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -162,11 +178,19 @@ private:
 class SatLinkResultsDvbS2 : public SatLinkResults
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatLinkResultsDvbS2 ();
   ~SatLinkResultsDvbS2 ()
   {
   }
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId ();
 
   /**

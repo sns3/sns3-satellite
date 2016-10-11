@@ -54,6 +54,7 @@ public:
    * \param wfId Waveform id
    * \param modulatedBits Modulated bits
    * \param codingRate Coding rate
+   * \param modcod ModCod
    * \param payloadBytes Payload in bytes
    * \param lengthInSymbols Duration in symbols
    */
@@ -180,7 +181,12 @@ private:
 class SatWaveformConf : public Object
 {
 public:
+
+  /**
+   * Define BurstLengthContainer
+   */
   typedef std::vector<uint32_t> BurstLengthContainer_t;
+
   /**
    * Default constructor, which is not to be used
    */
@@ -197,8 +203,14 @@ public:
    */
   virtual ~SatWaveformConf ();
 
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * Check if ACM is enabled.
+   */
   inline bool IsAcmEnabled () const
   {
     return m_acmEnabled;
@@ -294,9 +306,13 @@ public:
   }
 
   /**
-   * Static variables defining the available burst lengths
+   * Static variable defining short burst length
    */
   static const uint32_t SHORT_BURST_LENGTH = 536;
+
+  /**
+   * Static variable defining long burst length
+   */
   static const uint32_t LONG_BURST_LENGTH = 1616;
 
 private:

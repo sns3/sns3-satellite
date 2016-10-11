@@ -47,6 +47,10 @@ namespace ns3 {
 class SatUtHelper : public Object
 {
 public:
+
+  /**
+   * Define RandomAccessSettings as a struct
+   */
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
@@ -54,9 +58,19 @@ public:
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
   } RandomAccessSettings_s;
 
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Derived from Object
+   */
   TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor
+   */
   SatUtHelper ();
 
   /**
@@ -71,6 +85,9 @@ public:
                SatMac::SendCtrlMsgCallback sendCb,
                RandomAccessSettings_s randomAccessSettings);
 
+  /**
+   * Destructor
+   */
   virtual ~SatUtHelper ()
   {
   }
@@ -123,6 +140,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \return Container of installed net devices
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatUtHelper::SetChannelAttribute,
@@ -140,6 +158,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \return Net device installed to node
    *
    * Saves you from having to construct a temporary NodeContainer.
    */

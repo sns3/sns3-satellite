@@ -113,7 +113,7 @@ main (int argc, char *argv[])
   // ----- CREATE CBR APPLICATION -----
   // ----------------------------------
 
-  //simulationHelper->CreateDefaultRtnLinkStats ();
+  simulationHelper->CreateDefaultRtnLinkStats ();
   simulationHelper->EnableProgressLogging ();
   simulationHelper->RunSimulation ();
 

@@ -40,11 +40,19 @@ namespace ns3 {
 class SatConf : public Object
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatConf ();
   virtual ~SatConf ()
   {
   }
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 

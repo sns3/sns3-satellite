@@ -47,7 +47,17 @@ class SatLowerLayerServiceConf;
 class SatNcc : public Object
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -99,6 +109,9 @@ public:
    */
   void UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg);
 
+  /**
+   * Define type SendCallback
+   */
   typedef SatBeamScheduler::SendCtrlMsgCallback SendCallback;
 
   /**
@@ -110,7 +123,7 @@ public:
    * \param maxRcCount Maximum number of RCs in use.
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
    */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t macRcCount, uint32_t maxFrameSizeInBytes);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount, uint32_t maxFrameSizeInBytes);
 
   /**
    * \brief Function for adding the UT

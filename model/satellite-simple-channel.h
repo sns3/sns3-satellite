@@ -38,7 +38,16 @@ class Packet;
 class SatSimpleChannel : public Channel
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatSimpleChannel ();
 
   /**

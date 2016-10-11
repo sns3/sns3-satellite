@@ -572,7 +572,7 @@ SatFrameAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbt
 
               if (timeslotCount > SatFrameConf::m_maxTimeSlotCount)
                 {
-                  NS_FATAL_ERROR ("Maximum limit for time slots in a frame reached. Check frame configuration!!!");
+                  //NS_FATAL_ERROR ("Maximum limit for time slots in a frame reached. Check frame configuration!!!");
                 }
 
               tbtpToFill->SetDaTimeslot (Mac48Address::ConvertFrom (*it), m_frameId, timeSlot);

@@ -43,14 +43,34 @@ namespace ns3 {
 class SatRequestManager : public Object
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatRequestManager ();
+
+  /**
+   * Destructor for SatRequestManager
+   */
   virtual ~SatRequestManager ();
 
   void Initialize (Ptr<SatLowerLayerServiceConf> llsConf, Time superFrameDuration);
 
-  // inherited from Object
+
+  /**
+   * inherited from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**

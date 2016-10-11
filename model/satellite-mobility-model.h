@@ -39,9 +39,22 @@ namespace ns3 {
 class SatMobilityModel : public MobilityModel
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor.
+   */
   SatMobilityModel ();
+
+  /**
+   * Destructor for SatMobilityModel
+   */
   virtual ~SatMobilityModel () = 0;
 
   /**

@@ -51,7 +51,16 @@ class SatControlMessage;
 class SatNetDevice : public NetDevice
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatNetDevice ();
 
   /*
@@ -155,6 +164,10 @@ public:
   void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
 protected:
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose (void);
 
 private:

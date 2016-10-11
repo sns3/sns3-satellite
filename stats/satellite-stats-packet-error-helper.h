@@ -42,7 +42,7 @@ class Probe;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Base class for packet error statistics helpers.
  */
 class SatStatsPacketErrorHelper : public SatStatsHelper
 {
@@ -50,10 +50,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsPacketErrorHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsPacketErrorHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -161,10 +167,16 @@ public:
   // inherited from SatStatsPacketErrorHelper base class
   SatStatsFwdDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdDaPacketErrorHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 };
@@ -195,10 +207,16 @@ public:
   // inherited from SatStatsPacketErrorHelper base class
   SatStatsRtnDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnDaPacketErrorHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 };
@@ -229,10 +247,16 @@ public:
   // inherited from SatStatsPacketErrorHelper base class
   SatStatsSlottedAlohaPacketErrorHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsSlottedAlohaPacketErrorHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 };
@@ -263,10 +287,16 @@ public:
   // inherited from SatStatsPacketErrorHelper base class
   SatStatsCrdsaPacketErrorHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsCrdsaPacketErrorHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 };

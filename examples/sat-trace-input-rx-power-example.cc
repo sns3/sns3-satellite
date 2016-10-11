@@ -29,7 +29,7 @@
 using namespace ns3;
 
 /**
- * \file sat-trace-input-rx-power-example-example.cc
+ * \file sat-trace-input-rx-power-example.cc
  * \ingroup satellite
  *
  * \brief  Trace input Rx power example application based on CBR example for satellite network.

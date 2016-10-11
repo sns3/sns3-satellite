@@ -221,7 +221,7 @@ public:
    * Generate time slots for UT/RCs i.e. do actual allocation based on preallocation.
    *
    * \param tbtpContainer TBTP message container to add/fill TBTPs.
-   * \param maxFrameSizeInBytes Maximum size for a TBTP message.
+   * \param maxSizeInBytes Maximum size for a TBTP message.
    * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
    * \param rcBasedAllocationEnabled If time slot generated per RC
    * \param waveformTrace Wave form trace callback

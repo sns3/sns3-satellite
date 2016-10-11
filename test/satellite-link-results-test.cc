@@ -54,7 +54,7 @@ class SatLinkResultsDvbRcs2TestCase : public TestCase
 {
 public:
   /**
-   * \param linkresults pre-loaded DVB-RCS2 link results
+   * \param linkResults pre-loaded DVB-RCS2 link results
    * \param waveformId the specific DVB-RCS2's waveform ID to be tested
    * \param sinrDb the SINR (in dB unit) which BLER will be computed from
    * \param bler the reference BLER to be compared with the computed BLER
@@ -113,7 +113,7 @@ class SatLinkResultsDvbS2TestCase : public TestCase
 {
 public:
   /**
-   * \param linkresults pre-loaded DVB-S2 link results
+   * \param linkResults pre-loaded DVB-S2 link results
    * \param modcod the specific DVB-S2's modulation and coding scheme to be
    *               tested
    * \param sinrDb the SINR (in dB unit) which BLER will be computed from

@@ -38,7 +38,7 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Base class for link SINR statistics helpers.
  */
 class SatStatsLinkSinrHelper : public SatStatsHelper
 {
@@ -46,10 +46,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsLinkSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsLinkSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -115,10 +121,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdFeederLinkSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdFeederLinkSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -152,10 +164,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdUserLinkSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdUserLinkSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -189,10 +207,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnFeederLinkSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnFeederLinkSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -226,10 +250,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnUserLinkSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnUserLinkSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:

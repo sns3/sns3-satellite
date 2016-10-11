@@ -56,23 +56,27 @@ public:
   typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
 
   /**
-   * \enum values for pre-defined scenarios to be used by helper when building
-             satellite network topology base.
-   *
-   *  - NONE:         Not used.
-   *  - SIMPLE:       Simple scenario used as base.
-   *  - LARGER:       Larger scenario used as base.
-   *  - FULL:         Full scenario used as base.
+   * \brief Values for pre-defined scenarios to be used by helper when building
+   *        satellite network topology base.
    */
   typedef enum
   {
-    NONE,
-    SIMPLE,
-    LARGER,
-    FULL
+    NONE, //!< NONE Not used.
+    SIMPLE, //!< SIMPLE Simple scenario used as base.
+    LARGER, //!< LARGER Larger scenario used as base.
+    FULL //!< FULL Full scenario used as base.
   } PreDefinedScenario_t;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of object instance
+   * \return the TypeId of object instance
+   */
   TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -147,7 +151,7 @@ public:
    * \param source Source node of the multicast group (GW or UT connected user node)
    * \param receivers Receiver nodes of the multicast group. (GW or UT connected user nodes)
    * \param sourceAddress Source address of the multicast group.
-   * \param address Address of the multicast group.
+   * \param groupAddress Address of the multicast group.
    */
   void SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, Ipv4Address sourceAddress, Ipv4Address groupAddress );
 
@@ -164,6 +168,9 @@ public:
     return m_beamHelper->GetGeoSatNode ();
   }
 
+  /**
+   * Dispose of this class instance
+   */
   void DoDispose ();
 
 private:

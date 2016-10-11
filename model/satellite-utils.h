@@ -156,7 +156,7 @@ public:
    * Accepted values for conversion are between minimum linear value (greater than zero and
    * maximum linear value. Zero is also accepted and it is converted to -INF.
    *
-   * \param Linear value to convert
+   * \param linear value to convert
    * \return Decibels converted from linear
    */
   template <typename T>

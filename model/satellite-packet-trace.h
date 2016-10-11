@@ -50,19 +50,28 @@ public:
 
 
   TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**
    * \brief Add a packet trace entry to the log
-   * \param Time time of a trace event
-   * \param Packet event(SND, RCV, DRP, ENQ)
-   * \param Node type (UT, SAT, GW, NCC, TER)
-   * \param Node id
-   * \param MAC address
-   * \param Log level (ND, LLC, MAC, PHY, CH)
-   * \param Link direction (FWD, RTN)
-   * \param Packet info (List of: Packet id, source MAC address, destination MAC address)
+   * \param now Time time of a trace event
+   * \param packetEvent Packet event(SND, RCV, DRP, ENQ)
+   * \param nodeType Node type (UT, SAT, GW, NCC, TER)
+   * \param nodeId Node id
+   * \param macAddress MAC address
+   * \param logLevel Log level (ND, LLC, MAC, PHY, CH)
+   * \param linkDir Link direction (FWD, RTN)
+   * \param packetInfo Packet info (List of: Packet id, source MAC address, destination MAC address)
    */
   void AddTraceEntry (Time now,
                       SatEnums::SatPacketEvent_t packetEvent,

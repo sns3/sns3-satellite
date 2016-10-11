@@ -38,8 +38,22 @@ namespace ns3 {
 class SatLookUpTable : public Object
 {
 public:
+
+  /**
+   * Constructor with initialization parameters.
+   * \param linkResultPath 
+   */
   SatLookUpTable (std::string linkResultPath);
+
+  /**
+   * Destructor for SatLookUpTable
+   */
   virtual ~SatLookUpTable ();
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId ();
 
   /**

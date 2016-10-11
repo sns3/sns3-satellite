@@ -90,14 +90,14 @@ public:
   /**
    * \brief Attach MAC address to the beam ID maps
    * \param mac MAC address
-   * \param beamID beam ID
+   * \param beamId beam ID
    */
   void AttachMacToBeamId (Address mac, uint32_t beamId);
 
   /**
    * \brief Attach MAC address to the GW ID maps
    * \param mac MAC address
-   * \param gwID GW ID
+   * \param gwId GW ID
    */
   void AttachMacToGwId (Address mac, uint32_t gwId);
 
@@ -160,7 +160,7 @@ public:
    * \return the MAC address of the GW node's first satellite beam network
    *         device, or an invalid address if such device is not found.
    */
-  Address GetGwMacWithNode (Ptr<Node> utNode) const;
+  Address GetGwMacWithNode (Ptr<Node> gwNode) const;
 
   /**
    * \param utNode pointer to a UT node

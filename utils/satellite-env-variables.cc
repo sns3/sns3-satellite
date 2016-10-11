@@ -207,9 +207,9 @@ SatEnvVariables::GetOutputPath ()
 void
 SatEnvVariables::SetOutputPath (std::string outputPath)
 {
-  NS_ASSERT_MSG (IsValidDirectory (outputPath), outputPath << " is not a valid directory");
-  m_outputPath = outputPath;
-  m_isOutputPathInitialized = true;
+	NS_ASSERT_MSG (IsValidDirectory (outputPath), outputPath << " is not a valid directory");
+	m_outputPath = outputPath;
+	m_isOutputPathInitialized = true;
 }
 
 void

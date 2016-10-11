@@ -81,7 +81,7 @@ public:
 
   /**
    * \brief Function for setting the Slotted ALOHA control randomization interval
-   * \param controlRandomizationInterval control randomization interval
+   * \param controlRandomizationIntervalInMilliSeconds control randomization interval in milliseconds
    */
   void SetSlottedAlohaControlRandomizationIntervalInMilliSeconds (uint32_t controlRandomizationIntervalInMilliSeconds)
   {

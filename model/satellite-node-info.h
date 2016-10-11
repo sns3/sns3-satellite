@@ -39,8 +39,23 @@ namespace ns3 {
 class SatNodeInfo : public SimpleRefCount<SatNodeInfo>
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatNodeInfo ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param nodeType 
+   * \param nodeId 
+   * \param macAddress 
+   */
   SatNodeInfo (SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress);
+
+  /**
+   * Destructor for SatNodeInfo
+   */
   virtual ~SatNodeInfo ();
 
   /**

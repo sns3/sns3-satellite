@@ -41,18 +41,64 @@ namespace ns3 {
 class SatTimeTag : public Tag
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId  GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId  GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatTimeTag ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param senderTimestamp 
+   */
   SatTimeTag (Time senderTimestamp);
 
+  /**
+   * Serializes information to buffer from this instance of SatTimeTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void  Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatTimeTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void  Deserialize (TagBuffer i);
+
+  /**
+   * Get serialized size of SatTimeTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t  GetSerializedSize () const;
+
+  /**
+   * Print time stamp of this instance of SatTimeTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
+  /**
+   * Get sender time stamp of this tag.
+   * \return Sender timestamp
+   */
   Time GetSenderTimestamp (void) const;
+
+  /**
+   * Set sender time stamp of this tag.
+   * \param senderTimestamp Sender time stamp
+   */
   void SetSenderTimestamp (Time senderTimestamp);
 
 private:
@@ -69,18 +115,64 @@ private:
 class SatPhyTimeTag : public Tag
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId  GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId  GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatPhyTimeTag ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param senderTimestamp 
+   */
   SatPhyTimeTag (Time senderTimestamp);
 
+  /**
+   * Serializes information to buffer from this instance of SatPhyTimeTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void  Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatPhyTimeTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void  Deserialize (TagBuffer i);
+
+  /**
+   * Get serialized size of SatPhyTimeTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t  GetSerializedSize () const;
+
+  /**
+   * Print time stamp of this instance of SatPhyTimeTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
+  /**
+   * Get sender time stamp of this tag.
+   * \return Sender timestamp
+   */
   Time GetSenderTimestamp (void) const;
+
+  /**
+   * Set sender time stamp of this tag.
+   * \param senderTimestamp Sender time stamp
+   */
   void SetSenderTimestamp (Time senderTimestamp);
 
 private:
@@ -97,18 +189,64 @@ private:
 class SatMacTimeTag : public Tag
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId  GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId  GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatMacTimeTag ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param senderTimestamp 
+   */
   SatMacTimeTag (Time senderTimestamp);
 
+  /**
+   * Serializes information to buffer from this instance of SatMacTimeTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void  Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatMacTimeTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void  Deserialize (TagBuffer i);
+
+  /**
+   * Get serialized size of SatMacTimeTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t  GetSerializedSize () const;
+
+  /**
+   * Print time stamp of this instance of SatMacTimeTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
+  /**
+   * Get sender time stamp of this tag.
+   * \return Sender timestamp
+   */
   Time GetSenderTimestamp (void) const;
+
+  /**
+   * Set sender time stamp of this tag.
+   * \param senderTimestamp Sender time stamp
+   */
   void SetSenderTimestamp (Time senderTimestamp);
 
 private:
@@ -125,18 +263,64 @@ private:
 class SatDevTimeTag : public Tag
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId  GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId  GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatDevTimeTag ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param senderTimestamp 
+   */
   SatDevTimeTag (Time senderTimestamp);
 
+  /**
+   * Serializes information to buffer from this instance of SatDevTimeTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void  Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatDevTimeTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void  Deserialize (TagBuffer i);
+
+  /**
+   * Get serialized size of SatDevTimeTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t  GetSerializedSize () const;
+
+  /**
+   * Print time stamp of this instance of SatDevTimeTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
+  /**
+   * Get sender time stamp of this tag.
+   * \return Sender timestamp
+   */
   Time GetSenderTimestamp (void) const;
+
+  /**
+   * Set sender time stamp of this tag.
+   * \param senderTimestamp Sender time stamp
+   */
   void SetSenderTimestamp (Time senderTimestamp);
 
 private:

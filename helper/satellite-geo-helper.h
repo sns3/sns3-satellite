@@ -44,6 +44,10 @@ namespace ns3 {
 class SatGeoHelper : public Object
 {
 public:
+
+  /**
+   * Random access setting options.
+   */
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
@@ -51,9 +55,16 @@ public:
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
   } RandomAccessSettings_s;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatGeoHelper ();
 
   /**

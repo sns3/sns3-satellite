@@ -38,7 +38,8 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Abstract class inherited by SatStatsFwdFeederLinkRxPowerHelpe, SatStatsFwdUserLinkRxPowerHelper,
+ * SatStatsRtnFeederLinkRxPowerHelper and SatStatsRtnFeederLinkRxPowerHelper.
  */
 class SatStatsLinkRxPowerHelper : public SatStatsHelper
 {
@@ -46,10 +47,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsLinkRxPowerHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -115,10 +122,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdFeederLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdFeederLinkRxPowerHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -152,10 +165,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdUserLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdUserLinkRxPowerHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -189,10 +208,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnFeederLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnFeederLinkRxPowerHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -226,10 +251,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnUserLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnUserLinkRxPowerHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:

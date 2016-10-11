@@ -35,40 +35,41 @@ class SatTracedInterference : public SatInterference
 {
 public:
   /**
-   *
-   * \return
+   * Derived from Object
+   * \return TypeId of class
    */
   static TypeId GetTypeId (void);
 
   /**
-   *
-   * \return
+   * Derived from Object
+   * \return TypeId of instance
    */
   TypeId GetInstanceTypeId (void) const;
 
   /**
+   * Constructor
    * \param channeltype
    * \param rxBandwidth
    */
   SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth);
 
   /**
-   *
+   * Default constructor, not used
    */
   SatTracedInterference ();
 
   /**
-   *
+   * Destructor
    */
   ~SatTracedInterference ();
 
   /**
-   *
+   * Dispose of SatTracedInterference
    */
   void DoDispose ();
 
   /**
-   *
+   * Set Rx bandwidth
    * \param rxBandwidth
    */
   void SetRxBandwidth (double rxBandwidth);

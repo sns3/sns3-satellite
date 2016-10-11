@@ -54,7 +54,15 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId ();
+
+  /**
+   * Default constructor.
+   */
   SatSinrProbe ();
+
+  /**
+   * Destructor for SatSinrProbe
+   */
   virtual ~SatSinrProbe ();
 
   /**

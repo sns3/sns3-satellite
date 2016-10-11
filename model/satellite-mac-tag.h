@@ -34,7 +34,15 @@ namespace ns3 {
 class SatMacTag : public Tag
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatMacTag ();
+
+  /**
+   * Destructor for SatMacTag
+   */
   ~SatMacTag ();
 
   /**
@@ -61,11 +69,40 @@ public:
    */
   Mac48Address GetSourceAddress (void) const;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get serialized size of SatMacTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t GetSerializedSize (void) const;
+
+  /**
+   * Serializes information to buffer from this instance of SatMacTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatMacTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void Deserialize (TagBuffer i);
+
+  /**
+   * Print time stamp of this instance of SatMacTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
 private:
@@ -83,7 +120,15 @@ private:
 class SatFlowIdTag : public Tag
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatFlowIdTag ();
+
+  /**
+   * Destructor for SatFlowIdTag
+   */
   ~SatFlowIdTag ();
 
   /**
@@ -98,11 +143,40 @@ public:
    */
   uint8_t GetFlowId () const;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get serialized size of SatFlowIdTag
+   * \return Serialized size in bytes
+   */
   virtual uint32_t GetSerializedSize (void) const;
+
+  /**
+   * Serializes information to buffer from this instance of SatFlowIdTag
+   * \param i Buffer in which the information is serialized
+   */
   virtual void Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatFlowIdTag
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void Deserialize (TagBuffer i);
+
+  /**
+   * Print time stamp of this instance of SatFlowIdTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
 private:

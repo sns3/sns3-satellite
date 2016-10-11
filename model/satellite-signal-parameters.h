@@ -71,6 +71,11 @@ public:
   SatSignalParameters (const SatSignalParameters& p);
 
   Ptr<SatSignalParameters> Copy ();
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
   /**

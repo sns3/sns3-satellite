@@ -34,11 +34,20 @@ namespace ns3 {
 class SatConstantPositionMobilityModel : public SatMobilityModel
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   /**
    * Create a position located at coordinates (0,0,0)
    */
   SatConstantPositionMobilityModel ();
+
+  /**
+   * Destructor for SatConstantPositionMobilityModel
+   */
   virtual ~SatConstantPositionMobilityModel ();
 
 private:

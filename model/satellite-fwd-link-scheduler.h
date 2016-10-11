@@ -103,6 +103,10 @@ public:
    */
   static bool CompareSoPriorityHol (Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
   /**
@@ -115,10 +119,10 @@ public:
 
   /**
    * Actual constructor of a SatFwdLinkScheduler
-   *    *
+   *
    * \param conf BB Frame configuration
    * \param address MAC address
-   * \param Carrier bandwidth where scheduler is associated to [Hz].
+   * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
    */
   SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
 
@@ -132,7 +136,7 @@ public:
   /**
    * Get next frame to be transmitted.
    *
-   * \param packets Pointers to packets received.
+   * \return Pointer to frame
    */
   virtual Ptr<SatBbFrame> GetNextFrame ();
 

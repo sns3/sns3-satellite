@@ -51,8 +51,9 @@ public:
 
   /**
    * \brief Constructor
-   * \param omegaDopplerMax maximum Doppler
-   * \param numOfOscillators number of oscillators
+   * \param rayleighConf Rayleigh configuration.
+   * \param initialSet Initial set of parameters for which Rayleigh parameters are requested.
+   * \param initialState Initial state of the model.
    */
   SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState);
 

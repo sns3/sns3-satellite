@@ -44,6 +44,10 @@ namespace ns3 {
 class SatBbFrame : public SimpleRefCount<SatBbFrame>
 {
 public:
+
+  /**
+   * Define type SatBbFramePayload_t
+   */
   typedef std::vector<Ptr<Packet > > SatBbFramePayload_t;
 
   /**
@@ -123,6 +127,7 @@ public:
    * Merge given frame with this frame.
    *
    * \param mergedFrame Another frame to be merged with this frame.
+   * \param mergeTraceCb Logging trace source for BB frame optimization.
    * \return true if merging done, false otherwise.
    */
   bool MergeWithFrame (Ptr<SatBbFrame> mergedFrame, TracedCallback<Ptr<SatBbFrame>, Ptr<SatBbFrame> > mergeTraceCb);

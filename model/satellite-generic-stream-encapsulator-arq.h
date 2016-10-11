@@ -62,11 +62,22 @@ public:
    * \param flowId Flow id of the encapsulator
    */
   SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId);
+
+  /**
+   * Destructor for SatGenericStreamEncapsulatorArq
+   */
   virtual ~SatGenericStreamEncapsulatorArq ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**
@@ -82,7 +93,7 @@ public:
    * \brief Receive a packet, thus decapsulate and defragment/deconcatenate
    * if needed. The decapsuled/defragmented HL PDU is forwarded back to
    * LLC and to upper layer.
-   * \param A packet pointer received from lower layer
+   * \param p A packet pointer received from lower layer
    */
   virtual void ReceivePdu (Ptr<Packet> p);
 

@@ -44,13 +44,47 @@ public:
    * Constructor
    */
   SatArqHeader ();
+
+  /**
+   * Destructor for SatArqHeader
+   */
   ~SatArqHeader ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get serialized size of SatArqHeader
+   * \return Serialized size in bytes
+   */
   virtual uint32_t GetSerializedSize (void) const;
+
+  /**
+   * Serializes information to buffer from this instance of SatArqHeader
+   * \param start Buffer in which the information is serialized
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatArqHeader
+   * \param start Buffer from which the information is deserialized
+   * \return Serialized size of the buffer
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
+
+  /**
+   * Print time stamp of this instance of SatArqHeader
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
   /**

@@ -54,8 +54,17 @@ class SatMac;
 class SatPhy : public Object
 {
 public:
+  /**
+   * Define InterferenceModel in SatPhy
+   */
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
+  /**
+   * Define ErrorModel in SatPhy
+   */
   typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;
+  /**
+   * Define PacketContainer in SatPhy
+   */
   typedef SatSignalParameters::PacketsInBurst_t PacketContainer_t;
 
   /**
@@ -101,12 +110,27 @@ public:
    */
   SatPhy ( CreateParam_t& params );
 
+  /**
+   * Destructor
+   */
   virtual ~SatPhy ();
 
-  // inherited from Object
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
+  /**
+   * Derived from Object
+   */
   TypeId GetInstanceTypeId (void) const;
+  /**
+   * Initialization of SatPhy
+   */
   virtual void DoInitialize (void);
+
+  /**
+   * Dispose of SatPhy
+   */
   virtual void DoDispose (void);
 
   /**
@@ -114,6 +138,7 @@ public:
    * Objects inheriting this PHY object must implement this method.
    *
    * \param sinr Calculated SINR
+   * \return Final SINR
    */
   virtual double CalculateSinr (double sinr) = 0;
 
@@ -397,6 +422,7 @@ public:
    * \brief Function for getting the C/NO information
    * \param beamId Beam id of C/N0 is received
    * \param source Id (address) of the source (sender)
+   * \param destination Id (address) of the destination
    * \param cno Value of the C/N0
    */
   void CnoInfo (uint32_t beamId, Address source, Address destination, double cno);
@@ -458,7 +484,14 @@ protected:
    */
   Ptr<SatNodeInfo> m_nodeInfo;
 
+  /**
+   * Pointer to internal SatPhyTx instance
+   */
   Ptr<SatPhyTx> m_phyTx;
+
+  /**
+   * Pointer to internal SatPhyRx instance
+   */
   Ptr<SatPhyRx> m_phyRx;
 
   /**

@@ -42,6 +42,10 @@ class SatLowerLayerServiceDaEntry
 
 public:
   SatLowerLayerServiceDaEntry ();
+
+  /**
+   * Destructor for SatLowerLayerServiceDaEntry
+   */
   ~SatLowerLayerServiceDaEntry ();
 
 private:
@@ -216,6 +220,10 @@ class SatLowerLayerServiceRaEntry
 
 public:
   SatLowerLayerServiceRaEntry ();
+
+  /**
+   * Destructor for SatLowerLayerServiceRaEntry
+   */
   ~SatLowerLayerServiceRaEntry ();
 
 private:
@@ -436,8 +444,16 @@ public:
    */
   ~SatLowerLayerServiceConf ();
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**

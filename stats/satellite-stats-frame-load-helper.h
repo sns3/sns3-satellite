@@ -41,7 +41,7 @@ class ScalarCollector;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for frame load statistics. Base class.
  */
 class SatStatsFrameLoadHelper : public SatStatsHelper
 {
@@ -67,10 +67,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFrameLoadHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFrameLoadHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -178,7 +184,7 @@ SatStatsFrameLoadHelper::SetupProbe (Ptr<Object> object,
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for frame symbol load statistics.
  */
 class SatStatsFrameSymbolLoadHelper : public SatStatsFrameLoadHelper
 {
@@ -186,10 +192,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFrameSymbolLoadHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFrameSymbolLoadHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 }; // end of class SatStatsFrameSymbolLoadHelper
@@ -199,7 +211,7 @@ public:
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for frame user load statistics.
  */
 class SatStatsFrameUserLoadHelper : public SatStatsFrameLoadHelper
 {
@@ -207,10 +219,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFrameUserLoadHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFrameUserLoadHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 }; // end of class SatStatsFrameUserLoadHelper

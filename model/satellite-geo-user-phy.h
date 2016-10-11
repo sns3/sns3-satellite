@@ -51,12 +51,22 @@ public:
                  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                  Ptr<SatSuperframeConf> superFrameConf);
 
+  /**
+   * Destructor for SatGeoUserPhy
+   */
   virtual ~SatGeoUserPhy ();
 
-  // inherited from Object
+
+  /**
+   * inherited from Object
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
   virtual void DoInitialize (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose (void);
 
   /**

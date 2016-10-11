@@ -52,7 +52,7 @@ using namespace ns3;
  *  5. Finally generate time slots for UTs (method GenerateTimeSlots) by
  *     enabling/disabling RC based allocation.
  *  6. Repeat steps 2 - 5 with different combination of UT/RCs.
- * *
+ *
  *  Expected result:
  *     Time slots for UT/RC should be generated according to allocation requests and limits in frames.
  *

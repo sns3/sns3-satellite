@@ -56,9 +56,9 @@ public:
 
   /**
    * \brief Constructor
-   * \param markovConf Markov configuration object
-   * \param looConf Loo configuration object
-   * \param currentPosition current position
+   * \param markovConf Markov configuration object.
+   * \param elevation Elevation angle callback.
+   * \param velocity Velocity callback.
    */
   SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFading::ElevationCallback elevation, SatBaseFading::VelocityCallback velocity);
 

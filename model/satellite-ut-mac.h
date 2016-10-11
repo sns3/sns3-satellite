@@ -64,9 +64,18 @@ class UniformRandomVariable;
 class SatUtMac : public SatMac
 {
 public:
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
+  /**
+   * Derived from Object
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor, which is not used.
+   */
   SatUtMac ();
 
   /**
@@ -185,6 +194,10 @@ public:
   typedef void (* TbtpResourcesTraceCallback)(uint32_t size);
 
 protected:
+
+  /**
+   * Dispose of SatUtMac
+   */
   void DoDispose (void);
 
 private:

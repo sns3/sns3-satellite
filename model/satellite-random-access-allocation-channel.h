@@ -64,7 +64,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA backoff time
-   * \param crdsaBackoffTime CRDSA backoff time
+   * \param crdsaBackoffTimeInMilliSeconds CRDSA backoff time in milliseconds
    */
   void SetCrdsaBackoffTimeInMilliSeconds (uint32_t crdsaBackoffTimeInMilliSeconds)
   {
@@ -118,7 +118,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA minimum randomization value
-   * \param CRDSA minimum randomization value
+   * \param minRandomizationValue CRDSA minimum randomization value
    */
   void SetCrdsaMinRandomizationValue (uint32_t minRandomizationValue)
   {
@@ -136,7 +136,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA maximum randomization value
-   * \param CRDSA maximum randomization value
+   * \param maxRandomizationValue CRDSA maximum randomization value
    */
   void SetCrdsaMaxRandomizationValue (uint32_t maxRandomizationValue)
   {
@@ -154,7 +154,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA number of packet instances (replicas)
-   * \param CRDSA number of instances
+   * \param numOfInstances CRDSA number of instances
    */
   void SetCrdsaNumOfInstances (uint32_t numOfInstances)
   {
@@ -172,7 +172,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA minimum number of idle blocks
-   * \param CRDSA minimum idle blocks
+   * \param minIdleBlocks CRDSA minimum idle blocks
    */
   void SetCrdsaMinIdleBlocks (uint32_t minIdleBlocks)
   {
@@ -190,7 +190,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA number of idle blocks left
-   * \param CRDSA number of idle blocks left
+   * \param idleBlocksLeft CRDSA number of idle blocks left
    */
   void SetCrdsaIdleBlocksLeft (uint32_t idleBlocksLeft)
   {
@@ -208,7 +208,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA maximum number of unique payloads per block
-   * \param CRDSA maximum number of unique payloads per block
+   * \param maxUniquePayloadPerBlock CRDSA maximum number of unique payloads per block
    */
   void SetCrdsaMaxUniquePayloadPerBlock (uint32_t maxUniquePayloadPerBlock)
   {
@@ -226,7 +226,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA maximum number of consecutive blocks accessed
-   * \param CRDSA maximum number of consecutive blocks accessed
+   * \param maxConsecutiveBlocksAccessed CRDSA maximum number of consecutive blocks accessed
    */
   void SetCrdsaMaxConsecutiveBlocksAccessed (uint32_t maxConsecutiveBlocksAccessed)
   {
@@ -244,7 +244,7 @@ public:
 
   /**
    * \brief Function for setting the CRDSA number of consecutive blocks used
-   * \param CRDSA number of consecutive blocks used
+   * \param numOfConsecutiveBlocksUsed CRDSA number of consecutive blocks used
    */
   void SetCrdsaNumOfConsecutiveBlocksUsed (uint32_t numOfConsecutiveBlocksUsed)
   {

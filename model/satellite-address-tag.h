@@ -34,7 +34,10 @@ namespace ns3 {
 class SatAddressTag : public Tag
 {
 public:
-  /// Creates a SatAddressTag instance with an invalid source address.
+
+  /**
+   * / Creates a SatAddressTag instance with an invalid source address.
+   */
   SatAddressTag ();
 
   /**
@@ -55,14 +58,40 @@ public:
    */
   Address GetSourceAddress () const;
 
-  // Inherited from ObjectBase base class.
+
+  /**
+   * Inherited from ObjectBase base class.
+   */
   static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId () const;
 
-  // Inherited from Tag base class.
+
+  /**
+   * Inherited from Tag base class.
+   */
   virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * Serializes information to buffer from this instance of Inherited
+   * \param buf Buffer in which the information is serialized
+   */
   virtual void Serialize (TagBuffer buf) const;
+
+  /**
+   * Deserializes information from buffer to this instance of Inherited
+   * \param buf Buffer from which the information is deserialized
+   */
   virtual void Deserialize (TagBuffer buf);
+
+  /**
+   * Print time stamp of this instance of Inherited
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
 private:

@@ -43,6 +43,10 @@ class SatNodeInfo;
 class SatUtLlc : public SatLlc
 {
 public:
+
+  /**
+   * Derived form Object
+   */
   static TypeId GetTypeId (void);
 
   /**
@@ -103,7 +107,7 @@ public:
    * maximum packets size threshold specified as an argument. Note, that each
    * queue is gone through from the front up until there is first packet larger
    * than threshold.
-   * \param maxPacketSize Maximum packet size threshold in Bytes
+   * \param maxPacketSizeBytes Maximum packet size threshold in Bytes
    * \return uint32_t Number of packets
    */
   virtual uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;
@@ -140,6 +144,10 @@ public:
   void SetMacQueueEventCallback (SatQueue::QueueEventCallback cb);
 
 protected:
+
+  /**
+   * Dispose of SatUtLLc
+   */
   void DoDispose ();
 
   /**

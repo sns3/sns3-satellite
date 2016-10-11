@@ -139,7 +139,7 @@ public:
   /**
    * Construct a SatCnoEstimator with given estimation mode type.
    */
-  SatBasicCnoEstimator (EstimationMode_t mode, Time window);
+  SatBasicCnoEstimator (SatCnoEstimator::EstimationMode_t mode, Time window);
 
   /**
    * Destroy a SatCnoEstimator

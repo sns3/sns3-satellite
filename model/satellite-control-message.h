@@ -93,12 +93,40 @@ public:
    */
   virtual uint32_t GetMsgId () const;
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get serialized size of methods
+   * \return Serialized size in bytes
+   */
   virtual uint32_t GetSerializedSize (void) const;
+
+  /**
+   * Serializes information to buffer from this instance of methods
+   * \param i Buffer in which the information is serialized
+   */
   virtual void Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of methods
+   * \param i Buffer from which the information is deserialized
+   */
   virtual void Deserialize (TagBuffer i);
+
+  /**
+   * Print time stamp of this instance of methods
+   * \param &os Output stream to which tag timestamp is printed.
+   */
   virtual void Print (std::ostream &os) const;
 
 private:
@@ -115,7 +143,10 @@ private:
 class SatControlMessage : public Object
 {
 public:
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
 
   /**
@@ -207,8 +238,16 @@ public:
    */
   static const uint32_t m_tbtpFrameBodySizeInBytes = 5;
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -288,9 +327,9 @@ public:
   /**
    * Set a DA time slot information
    *
-   * \param utId  id of the UT which time slot information is set
-   * \param frameID  Frame ID of the time slot
-   * \param timeSlotId Id of the time slot
+   * \param utId id of the UT which time slot information is set
+   * \param frameId Frame ID of the time slot
+   * \param conf Pointer to time slot configuration
    */
   void SetDaTimeslot (Mac48Address utId, uint8_t frameId, Ptr<SatTimeSlotConf> conf);
 
@@ -304,8 +343,8 @@ public:
   /**
    * Set a RA time slot information
    *
-   * \param raChannel  raChannel index
-   * \param frameID  Frame ID of ra channel
+   * \param raChannel raChannel index
+   * \param frameId Frame ID of RA channel
    * \param timeSlotCount Timeslots in channel
    */
   void SetRaChannel (uint32_t raChannel, uint8_t frameId, uint16_t timeSlotCount);
@@ -373,11 +412,26 @@ public:
    */
   ~SatCrMessage ();
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Define type RequestDescriptor_t
+   */
   typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> RequestDescriptor_t;
+
+  /**
+   * Define type RequestContainer_t
+   */
   typedef std::map<RequestDescriptor_t, uint16_t > RequestContainer_t;
 
   /**
@@ -480,8 +534,16 @@ public:
    */
   ~SatArqAckMessage ();
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -550,8 +612,16 @@ public:
    */
   ~SatCnoReportMessage ();
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -608,8 +678,16 @@ public:
    */
   ~SatRaMessage ();
 
-  // methods derived from base classes
+
+  /**
+   * methods derived from base classes
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -642,7 +720,7 @@ public:
 
   /**
    * \brief Set backoff time
-   * \param backoffProbability Backoff time
+   * \param backoffTime Backoff time
    */
   void SetBackoffTime (uint16_t backoffTime);
 
@@ -724,7 +802,7 @@ public:
   /**
    * \brief Reserve an id and store a control message.
    *
-   * \param Pointer to message to be added.
+   * \param controlMsg Pointer to message to be added.
    * \return Reserved send ID of the created added message.
    */
   uint32_t ReserveIdAndStore (Ptr<SatControlMessage> controlMsg);
@@ -740,7 +818,7 @@ public:
   /**
    * \brief Read a control message.
    *
-   * \param Id of the message to read.
+   * \param recvId Id of the message to read.
    * \return Pointer to message.
    */
   Ptr<SatControlMessage> Read (uint32_t recvId);

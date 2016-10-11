@@ -50,9 +50,21 @@ public:
     RANDOM_MODE     //!< RANDOM_MODE
   } InputMode_t;
 
+  /**
+   * Define type ChannelTracePair_t
+   */
   typedef std::pair<Ptr<SatFadingExternalInputTrace>, Ptr<SatFadingExternalInputTrace> >  ChannelTracePair_t;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**

@@ -41,7 +41,7 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for queue statistics. Base class.
  */
 class SatStatsQueueHelper : public SatStatsHelper
 {
@@ -65,10 +65,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsQueueHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsQueueHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -144,7 +150,7 @@ class SatLlc;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for forward link queue statistics. Base class for forward link.
  */
 class SatStatsFwdQueueHelper : public SatStatsQueueHelper
 {
@@ -152,10 +158,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdQueueHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -175,7 +187,7 @@ private:
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for forward link queue statistics using byte as unit.
  */
 class SatStatsFwdQueueBytesHelper : public SatStatsFwdQueueHelper
 {
@@ -183,10 +195,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdQueueBytesHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 }; // end of class SatStatsFwdQueueBytesHelper
@@ -194,7 +212,7 @@ public:
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for forward link queue statistics using packet as unit.
  */
 class SatStatsFwdQueuePacketsHelper : public SatStatsFwdQueueHelper
 {
@@ -202,10 +220,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdQueuePacketsHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 }; // end of class SatStatsFwdQueuePacketsHelper
@@ -215,7 +239,7 @@ public:
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for return link queue statistics. Base class for return link.
  */
 class SatStatsRtnQueueHelper : public SatStatsQueueHelper
 {
@@ -223,10 +247,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnQueueHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnQueueHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -235,6 +265,7 @@ protected:
   void DoPoll ();
 
 private:
+
   /// Maintains a list of UT LLC and its identifier.
   std::list<std::pair<Ptr<SatLlc>, uint32_t> > m_llc;
 
@@ -243,7 +274,7 @@ private:
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for return link queue statistics using byte as unit.
  */
 class SatStatsRtnQueueBytesHelper : public SatStatsRtnQueueHelper
 {
@@ -251,10 +282,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnQueueBytesHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnQueueBytesHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 }; // end of class SatStatsRtnQueueBytesHelper
@@ -262,7 +299,7 @@ public:
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Helper for return link queue statistics using packet as unit.
  */
 class SatStatsRtnQueuePacketsHelper : public SatStatsRtnQueueHelper
 {
@@ -270,10 +307,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnQueuePacketsHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnQueuePacketsHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 }; // end of class SatStatsRtnQueuePacketsHelper

@@ -46,11 +46,26 @@ class SatPhyRx : public Object
 {
 
 public:
+
+  /**
+   * Default constructor.
+   */
   SatPhyRx ();
+
+  /**
+   * Destructor for SatPhyRx
+   */
   virtual ~SatPhyRx ();
 
-  // inherited from Object
+
+  /**
+   * inherited from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   void SetMobility (Ptr<MobilityModel> m);

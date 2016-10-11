@@ -33,12 +33,17 @@ namespace ns3 {
  * \brief Observes given mobilities and keeps track of certain wanted properties.
  * Properties can be observed currently are; the timing advance and elevation angle.
  *
- * Observing of timing advance is set by \method ObserveTimingAdvance
+ * Observing of timing advance is set by method ObserveTimingAdvance
  *
  */
 class SatMobilityObserver : public Object
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
@@ -60,6 +65,9 @@ public:
    */
   virtual ~SatMobilityObserver ();
 
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose (void);
 
   /**

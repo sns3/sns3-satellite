@@ -178,7 +178,7 @@ public:
   /**
    * Set RC index of the time slot.
    *
-   * \param RC index of the time slot.
+   * \param rcIndex RC index of the time slot.
    */
   inline void SetRcIndex (uint8_t rcIndex)
   {
@@ -208,7 +208,7 @@ public:
   /**
    * Set time slot type.
    *
-   * \param Type of the time slot to set.
+   * \param slotType Type of the time slot to set.
    */
   inline void SetSlotType (SatTimeSlotConf::SatTimeSlotType_t slotType)
   {
@@ -232,6 +232,10 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
+
+  /**
+   * Define type SatTimeSlotConfContainer_t
+   */
   typedef std::vector<Ptr<SatTimeSlotConf> > SatTimeSlotConfContainer_t;
 
   static const uint16_t m_maxTimeSlotCount = SatConstVariables::MAXIMUM_TIME_SLOT_ID + 1;
@@ -249,7 +253,7 @@ public:
    * \param btuConf               BTU configuration of the frame
    * \param waveformConf          Waveform configuration
    * \param isRandomAccess        Flag telling if random access frame
-   * \param defaultwaveformInUse  Flag telling if default waveform should be used with frame
+   * \param defaultWaveformInUse  Flag telling if default waveform should be used with frame
    * \param checkSlotLimit        Flag telling if slot limit should be checked already in frame creation phase
    */
   SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf, Ptr<SatWaveformConf> waveformConf,
@@ -427,6 +431,9 @@ public:
     SUPER_FRAME_CONFIG_3,  //!< SUPER_FRAME_CONFIG_3
   } SuperFrameConfiguration_t;
 
+  /**
+   * Define type SatFrameConfList_t
+   */
   typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
   /**
@@ -472,7 +479,16 @@ public:
    */
   static std::string GetIndexAsFrameName (uint32_t index);
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -560,7 +576,7 @@ public:
   /**
    * Configures super frame configuration according to set attributes.
    *
-   * \param bandwidthHz Allocated bandwidth for super frame.
+   * \param allocatedBandwidthHz Allocated bandwidth for super frame.
    * \param targetDuration Target duration for super frame sequence
    * \param waveformConf Wave Form Configuration
    */
@@ -642,7 +658,7 @@ public:
   /**
    * Set frame configuration type to be used in super frame.
    *
-   * \param configType index of the frame configuration type
+   * \param type Index of the frame configuration type
    */
   inline void SetConfigType (SatSuperframeConf::ConfigType_t type)
   {
@@ -753,7 +769,17 @@ public:
 class SatSuperframeConf0 : public SatSuperframeConf
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -778,7 +804,17 @@ private:
 class SatSuperframeConf1 : public SatSuperframeConf
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -804,7 +840,17 @@ private:
 class SatSuperframeConf2 : public SatSuperframeConf
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -829,7 +875,17 @@ private:
 class SatSuperframeConf3 : public SatSuperframeConf
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**

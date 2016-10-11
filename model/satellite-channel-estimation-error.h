@@ -39,6 +39,10 @@ namespace ns3 {
 class SatChannelEstimationError : public Object
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatChannelEstimationError ();
 
   /**
@@ -47,10 +51,21 @@ public:
    * gaussian distribution mean and STD.
    */
   SatChannelEstimationError (std::string filePathName);
+
+  /**
+   * Destructor for SatChannelEstimationError
+   */
   virtual ~SatChannelEstimationError ();
 
-  // inherited from Object
+
+  /**
+   * inherited from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**

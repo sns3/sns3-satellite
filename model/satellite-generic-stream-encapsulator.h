@@ -55,9 +55,21 @@ public:
    * Constuctor
    */
   SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId);
+
+  /**
+   * Destructor for SatGenericStreamEncapsulator
+   */
   virtual ~SatGenericStreamEncapsulator ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**

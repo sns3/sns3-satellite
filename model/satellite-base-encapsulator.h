@@ -64,8 +64,20 @@ public:
    */
   SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId);
 
+  /**
+   * Destructor for SatBaseEncapsulator
+   */
   virtual ~SatBaseEncapsulator ();
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**
@@ -92,7 +104,7 @@ public:
 
   /**
    * Get the queue instance
-   * \param queue
+   * \return queue
    */
   Ptr<SatQueue> GetQueue ();
 

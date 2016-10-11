@@ -33,9 +33,22 @@ namespace ns3 {
 class SatConstantInterference : public SatInterference
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor.
+   */
   SatConstantInterference ();
+
+  /**
+   * Destructor for SatConstantInterference
+   */
   ~SatConstantInterference ();
 
 private:

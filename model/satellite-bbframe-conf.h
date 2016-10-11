@@ -53,7 +53,7 @@ public:
    * \param modcod MODCOD
    * \param fType BB frame type (short, normal)
    * \param frameLen BB frame length in Time
-   * \param Payload in bits
+   * \param payloadBits Payload in bits
    */
   SatDvbS2Waveform (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t fType, Time frameLen, uint32_t payloadBits);
 
@@ -84,7 +84,7 @@ public:
   /**
    * \brief Set the C/No requirement of the waveform  in linear domain.
    * based on the used link results.
-   * \param esnoThreshold EsNo threshold
+   * \param cnoRequirement C/No Requirement
    */
   void SetCNoRequirement (double cnoRequirement);
 
@@ -163,9 +163,21 @@ public:
    */
   virtual ~SatBbFrameConf ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Define type waveformMap_t
+   */
   typedef std::map<std::pair<SatEnums::SatModcod_t, SatEnums::SatBbFrameType_t>, Ptr<SatDvbS2Waveform> > waveformMap_t;
 
   /**

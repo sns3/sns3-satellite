@@ -34,8 +34,16 @@ namespace ns3 {
 class SatConstantPropagationDelayModel : public PropagationDelayModel
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * Default constructor.
+   */
   SatConstantPropagationDelayModel ();
 
   /**

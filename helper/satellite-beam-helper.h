@@ -55,7 +55,15 @@ namespace ns3 {
 class SatBeamHelper : public Object
 {
 public:
+
+  /**
+   * Define type CarrierFreqConverter
+   */
   typedef SatChannel::CarrierFreqConverter CarrierFreqConverter;
+
+  /**
+   * Define type CarrierBandwidthConverter
+   */
   typedef SatTypedefs::CarrierBandwidthConverter_t CarrierBandwidthConverter;
 
   typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> >  ChannelPair_t;    //forward = first, return  = second
@@ -65,7 +73,16 @@ public:
   typedef std::set<Ptr<Node> >                          MulticastBeamInfoItem_t;  // set container having receiving UT nodes in beam
   typedef std::map<uint32_t, std::set<Ptr<Node> > >     MulticastBeamInfo_t;      // key = beam ID, value = receiving UT nodes in beam
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -259,6 +276,9 @@ public:
   NetDeviceContainer AddMulticastGroupRoutes (MulticastBeamInfo_t beamInfo, Ptr<Node> sourceUtNode, Ipv4Address sourceAddress,
                                               Ipv4Address groupAddress, bool routeToGwUsers, Ptr<NetDevice>& gwOutputDev );
 
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**

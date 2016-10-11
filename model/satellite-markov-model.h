@@ -48,7 +48,8 @@ public:
 
   /**
    * \brief Constructor
-   * \param numOfStates number of states
+   * \param numOfStates Number of states.
+   * \param initialState Initial state of the model.
    */
   SatMarkovModel (uint32_t numOfStates, uint32_t initialState);
 

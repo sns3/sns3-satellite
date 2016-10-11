@@ -45,6 +45,11 @@ namespace ns3 {
 class SatQueue : public Object
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
   /**
@@ -83,8 +88,15 @@ public:
    * Constructor
    */
   SatQueue (uint8_t flowId);
+
+  /**
+   * Destructor for SatQueue
+   */
   ~SatQueue ();
 
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**
@@ -205,7 +217,7 @@ public:
    * maximum packets size threshold specified as an argument. Note, that each
    * queue is gone through from the front up until there is first packet larger
    * than threshold.
-   * \param maxPacketSize Maximum packet size threshold in Bytes
+   * \param maxPacketSizeBytes Maximum packet size threshold in Bytes
    * \return Number of packets
    */
   uint32_t GetNumSmallerPackets (uint32_t maxPacketSizeBytes) const;

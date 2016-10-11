@@ -40,9 +40,22 @@ namespace ns3 {
 class SatSuperframeSeq : public Object
 {
 public:
+
+  /**
+   * Define type SatSuperframeConfList
+   */
   typedef std::vector<Ptr<SatSuperframeConf> > SatSuperframeConfList;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**

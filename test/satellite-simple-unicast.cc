@@ -19,7 +19,7 @@
  */
 
 /**
- * \file satellite-simple_unicast.cc
+ * \file satellite-simple-unicast.cc
  * \ingroup satellite
  * \brief 'Simple Point-to-Point Test Cases' implementation of TN4.
  *

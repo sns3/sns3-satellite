@@ -43,7 +43,7 @@ class DistributionCollector;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Base class for delay statistics helpers.
  */
 class SatStatsDelayHelper : public SatStatsHelper
 {
@@ -51,10 +51,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -165,15 +171,23 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * Destructor for SatStatsFwdAppDelayHelper.
+   */
   virtual ~SatStatsFwdAppDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
    * \brief Receive inputs from trace sources and determine the right collector
    *        to forward the inputs to.
+   * \param helper Pointer to the delay statistics collector helper
+   * \param identifier Identifier used to group statistics.
    * \param packet the received packet, expected to have been tagged with
    *               TrafficTimeTag.
    * \param from the InetSocketAddress of the sender of the packet.
@@ -219,10 +233,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdDevDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdDevDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -261,10 +281,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdMacDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdMacDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -303,10 +329,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdPhyDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdPhyDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -345,10 +377,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnAppDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -413,10 +451,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnDevDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnDevDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -451,10 +495,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnMacDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnMacDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -489,10 +539,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnPhyDelayHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnPhyDelayHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:

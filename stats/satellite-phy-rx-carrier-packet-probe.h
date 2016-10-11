@@ -55,7 +55,15 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId ();
+
+  /**
+   * Default constructor.
+   */
   SatPhyRxCarrierPacketProbe ();
+
+  /**
+   * Destructor for SatPhyRxCarrierPacketProbe
+   */
   virtual ~SatPhyRxCarrierPacketProbe ();
 
   /**

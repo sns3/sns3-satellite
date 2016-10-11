@@ -39,6 +39,10 @@ public:
    * Default constructor
    */
   SatRtnLinkTime ();
+
+  /**
+   * Destructor for SatRtnLinkTime
+   */
   virtual ~SatRtnLinkTime ();
 
   /**

@@ -43,21 +43,41 @@ class SatUtPhy : public SatPhy
 {
 public:
   /**
-   * Default constructor
+   * Default constructor, which is not used.
    */
   SatUtPhy (void);
 
+  /**
+   * Constructor.
+   * \param params Creation parameters
+   * \param linkResults Link results
+   * \param parameters Rx carrier creation parameters
+   * \param superFrameConf Superframe configuration
+   */
   SatUtPhy (SatPhy::CreateParam_t & params,
             Ptr<SatLinkResults> linkResults,
             SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
             Ptr<SatSuperframeConf> superFrameConf);
 
+  /**
+   * Destructor
+   */
   virtual ~SatUtPhy ();
 
-  // inherited from Object
+
+  /**
+   * inherited from Object
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
+  /**
+   * Initialization of SatUtPhy
+   */
   virtual void DoInitialize (void);
+
+  /**
+   * Dispose of SatUtPhy
+   */
   virtual void DoDispose (void);
 
   /**
@@ -65,6 +85,7 @@ public:
    * Calculate SINR with UT PHY specific parameters and given SINR.
    *
    * \param sinr Calculated (C/NI)
+   * \return Final SINR, which takes into account configured additional interferences (C over I)
    */
   virtual double CalculateSinr (double sinr);
 

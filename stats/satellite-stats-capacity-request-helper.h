@@ -34,7 +34,12 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Produce capacity request statistics of Random Access Slotted ALOHA
+ *        from a satellite module simulation.
+ *
+ * Statistics logs every capacity request made in a simulation.
+ * Statistics consists of tuples: time, node id, rc id, type (RBDC/VBDC),
+ * kbps (RBDC) / bytes (VBDC), queued bytes.
  */
 class SatStatsCapacityRequestHelper : public SatStatsHelper
 {
@@ -42,10 +47,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsCapacityRequestHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsCapacityRequestHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:

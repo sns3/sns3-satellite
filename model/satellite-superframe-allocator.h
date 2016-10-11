@@ -56,8 +56,16 @@ public:
    */
   ~SatSuperframeAllocator ();
 
-  // derived from object
+
+  /**
+   * derived from object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -88,9 +96,11 @@ public:
    * \brief Generate time slots in TBTP(s) for the UT/RC.
    *
    * \param tbtpContainer TBTP message container to add/fill TBTPs.
-   * \param maxFrameSizeInBytes Maximum size for a TBTP message.
+   * \param maxSizeInBytes Maximum size for a TBTP message.
+   * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
    * \param waveformTrace Wave form trace callback
    * \param utLoadTrace UT load per the frame trace callback
+   * \param loadTrace Load per the frame trace callback
    */
   void GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
                           TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace);

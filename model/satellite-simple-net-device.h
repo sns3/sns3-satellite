@@ -46,9 +46,21 @@ namespace ns3 {
 class SatSimpleNetDevice : public NetDevice
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * Default constructor.
+   */
   SatSimpleNetDevice ();
+
+  /**
+   * Destructor for SatSimpleNetDevice
+   */
   ~SatSimpleNetDevice ();
 
   /**
@@ -113,6 +125,10 @@ public:
   virtual bool SupportsSendFrom (void) const;
 
 protected:
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose (void);
 private:
   Ptr<SatSimpleChannel>             m_channel;

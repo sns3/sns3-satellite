@@ -48,12 +48,23 @@ class SatSchedulingObject;
 class SortByMetric
 {
 public:
+
+  /**
+   * Sort a vector available RC indices based on unallocated load.
+   * \param m Vector to be sorted.
+   */
   SortByMetric (const std::vector<uint32_t> &m)
     : m_cont (m)
   {
 
   }
 
+  /**
+   * Operator overload for function call
+   * \param p1 Index of value in vector
+   * \param p2 Index of value in vector
+   * \return True, if value at first index was smaller than value at second index, otherwise false.
+   */
   bool operator() (uint8_t p1, uint8_t p2)
   {
     return m_cont.at (p1) < m_cont.at (p2);
@@ -85,6 +96,9 @@ public:
    */
   SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls);
 
+  /**
+   * Destructor
+   */
   virtual ~SatUtScheduler ();
 
   /**
@@ -98,9 +112,17 @@ public:
     LOOSE = 1
   } SatCompliancePolicy_t;
 
-  // inherited from Object
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
+  /**
+   * Derived from Object
+   */
   virtual TypeId GetInstanceTypeId (void) const;
+  /**
+   * Dispose of SatUtScheduler
+   */
   virtual void DoDispose (void);
 
   /**

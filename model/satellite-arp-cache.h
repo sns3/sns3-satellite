@@ -35,8 +35,21 @@ namespace ns3 {
 class SatArpCache : public ArpCache
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatArpCache ();
+
+  /**
+   * Destructor for SatArpCache
+   */
   ~SatArpCache ();
 
   /**

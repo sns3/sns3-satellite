@@ -93,7 +93,14 @@ private:
     Address m_satEarthStationAddress;
   };
 
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Derived from Object
+   */
   TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -120,11 +127,8 @@ private:
 
   /**
    * Calculates interference power for the given reference
-   * Sets final power at end time to given variable pointed by finalPower.
    *
    * \param event Reference event which for interference is calculated.
-   * \param finalPower Pointer to variable to store calculated power value at end of receiving
-   *
    * \return Calculated power value at end of receiving
    */
   double Calculate (Ptr<SatInterference::InterferenceChangeEvent> event );

@@ -38,12 +38,24 @@ namespace ns3 {
 class SatArqBufferContext : public Object
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatArqBufferContext ();
   ~SatArqBufferContext ()
   {
   }
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId ();
+
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
 public:

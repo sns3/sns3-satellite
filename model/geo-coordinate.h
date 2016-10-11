@@ -77,7 +77,7 @@ public:
    * \param vector coordinates as Vector (x,y,z) (Cartesian)
    * \param refEllipsoid Reference ellipsoid to be used
    */
-  GeoCoordinate (Vector vector, ReferenceEllipsoid_t refEllipsoide);
+  GeoCoordinate (Vector vector, ReferenceEllipsoid_t refEllipsoid);
 
   /**
    * Create GeoCoordinate with zero values of longitude, latitude and altitude. Reference ellipsoid to be used is sphere.

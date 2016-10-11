@@ -51,6 +51,9 @@ class Packet;
 class SatMac : public Object
 {
 public:
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
 
   /**
@@ -182,13 +185,19 @@ private:
   SatMac (const SatMac &);
 
 protected:
+  /**
+   * Dispose of SatMac
+   */
   void DoDispose (void);
 
   /**
-   * \brief Send packet to lower layer by using a callback
+   * \brief Send packets to lower layer by using a callback
    * \param packets Packets to be sent.
+   * \param carrierId ID of the carrier used for transmission.
+   * \param duration Duration of the physical layer transmission.
+   * \param txInfo Additional parameterization for burst transmission.
    */
-  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s);
+  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * \brief Invoke the `Rx` trace source for each received packet.

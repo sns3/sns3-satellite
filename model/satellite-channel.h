@@ -61,7 +61,15 @@ namespace ns3 {
 class SatChannel : public Channel
 {
 public:
+
+  /**
+   * Default constructor.
+   */
   SatChannel ();
+
+  /**
+   * Destructor for SatChannel
+   */
   virtual ~SatChannel ();
 
   /**
@@ -76,8 +84,15 @@ public:
     ALL_BEAMS
   };
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * Define type PhyRxContainer
+   */
   typedef std::vector<Ptr<SatPhyRx> > PhyRxContainer;
 
   /**

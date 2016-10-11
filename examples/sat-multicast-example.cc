@@ -46,8 +46,6 @@ NS_LOG_COMPONENT_DEFINE ("sat-multicast-example");
  * Receive RX traces from packet sinks
  *
  * \param context Context of the receive (multicast group and UT/GW user info)
- * \param
- * \param
  */
 static void SinkReceive (std::string context, Ptr<const Packet>, const Address &)
 {

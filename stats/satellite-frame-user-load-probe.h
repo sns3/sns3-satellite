@@ -52,7 +52,15 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId ();
+
+  /**
+   * Default constructor.
+   */
   SatFrameUserLoadProbe ();
+
+  /**
+   * Destructor for SatFrameUserLoadProbe
+   */
   virtual ~SatFrameUserLoadProbe ();
 
   /**

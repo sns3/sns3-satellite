@@ -39,9 +39,21 @@ namespace ns3 {
 class SatPositionAllocator : public PositionAllocator
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatPositionAllocator ();
 
+  /**
+   * Destructor for SatPositionAllocator
+   */
   virtual ~SatPositionAllocator ();
 
   /**
@@ -74,7 +86,16 @@ private:
 class SatListPositionAllocator : public SatPositionAllocator
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatListPositionAllocator ();
 
   /**
@@ -110,8 +131,21 @@ private:
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatRandomBoxPositionAllocator ();
+
+  /**
+   * Destructor for SatRandomBoxPositionAllocator
+   */
   virtual ~SatRandomBoxPositionAllocator ();
 
   void SetLatitude (Ptr<RandomVariableStream> latitude);
@@ -138,7 +172,16 @@ private:
 class SatSpotBeamPositionAllocator : public SatPositionAllocator
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
   SatSpotBeamPositionAllocator ();
 
   /**
@@ -148,6 +191,10 @@ public:
    * \param geoPos GEO coordinate of the satellite for elevation angle calculations
    */
   SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patternContainer, GeoCoordinate geoPos);
+
+  /**
+   * Destructor for SatSpotBeamPositionAllocator
+   */
   virtual ~SatSpotBeamPositionAllocator ();
 
   void SetAltitude (Ptr<RandomVariableStream> altitude);

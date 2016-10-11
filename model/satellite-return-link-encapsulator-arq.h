@@ -63,11 +63,22 @@ public:
    * \param rcIndex RC index of the encapsulator
    */
   SatReturnLinkEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
+
+  /**
+   * Destructor for SatReturnLinkEncapsulatorArq
+   */
   virtual ~SatReturnLinkEncapsulatorArq ();
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Dispose of this class instance
+   */
   virtual void DoDispose ();
 
   /**
@@ -89,7 +100,7 @@ public:
 
   /**
    * \brief Receive a control message (ARQ ACK)
-   * \param p Control message pointer received from lower layer
+   * \param ack ACK control message pointer received from lower layer
    */
   virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
 

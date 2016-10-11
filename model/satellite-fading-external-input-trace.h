@@ -41,9 +41,21 @@ public:
     FT_THREE_COLUMN
   };
 
+  /**
+   * Default constructor.
+   */
   SatFadingExternalInputTrace ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param type 
+   * \param filePathName 
+   */
   SatFadingExternalInputTrace (TraceFileType_e type, std::string filePathName);
 
+  /**
+   * Destructor for SatFadingExternalInputTrace
+   */
   ~SatFadingExternalInputTrace ();
 
   /**

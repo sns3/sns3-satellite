@@ -33,7 +33,7 @@ namespace ns3 {
  * \ingroup satellite
  * \brief A helper to make it easier to create example simulation cases.
  *
- * \example
+ * Example usage:
  *
  * Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("My satellite simulation");
  *
@@ -73,8 +73,14 @@ public:
    */
   void DoDispose (void);
 
-  // derived from Object
+  /**
+   * \brief Derived from Object.
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Derived from Object.
+   */
   TypeId GetInstanceTypeId (void) const;
 
   /**
@@ -85,10 +91,9 @@ public:
 
   /**
    * \brief Set enabled beams (1-72) as a string.
+   * \param beamList List of beams.
    * \example simulationHelper->SetBeams ("1 5 20 71")
    *          enables beams 1, 5, 20 and 71.
-   * \param beamList List of beams.
-   *
    */
   void SetBeams (std::string beamList);
 
@@ -203,7 +208,7 @@ public:
    * \param superFrameId Superframe id (currently always 0)
    * \param bw Frame bandwidth
    * \param carrierBw Bandwidth of the carriers within frame
-   * \param rollOf Roll-off
+   * \param rollOff Roll-off
    * \param carrierSpacing Carrier spacing between frames
    * \param isRandomAccess Is this a RA or DA frame
    */
@@ -246,8 +251,8 @@ public:
 
   /**
    * \brief Set simulation interference model.
-   * \param em Interference model.
-   * \param constatIf Static interference if constant interference model used
+   * \param ifModel Interference model.
+   * \param constantIf Static interference if constant interference model used
    */
   void SetInterferenceModel(SatPhyRxCarrierConf::InterferenceModel ifModel,
                             double constantIf = 0.0);
@@ -328,9 +333,24 @@ protected:
    */
   void EnableRandomAccess ();
 
+  /**
+   * \brief Callback that prints simulation progress to stdout.
+   */
   void ProgressCb ();
+
+  /**
+   * \brief Check if a beam is enabled.
+   */
   bool IsBeamEnabled (uint32_t beamId) const;
+
+  /**
+   * \brief Get next UT count from internal random variable stream.
+   */
   inline uint32_t GetNextUtCount () const { return m_utCount->GetInteger (); }
+
+  /**
+   * \brief Get next UT user count from internal random variable stream.
+   */
   inline uint32_t GetNextUtUserCount () const { return m_utUserCount->GetInteger (); }
 
 private:

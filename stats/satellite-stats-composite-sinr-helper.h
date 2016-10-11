@@ -41,7 +41,7 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief
+ * \brief Abstract class inherited by SatStatsFwdCompositeSinrHelper and SatStatsRtnCompositeSinrHelper.
  */
 class SatStatsCompositeSinrHelper : public SatStatsHelper
 {
@@ -49,10 +49,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsCompositeSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsCompositeSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -106,10 +112,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsFwdCompositeSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsFwdCompositeSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 protected:
@@ -148,10 +160,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsRtnCompositeSinrHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsRtnCompositeSinrHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**

@@ -45,6 +45,10 @@ namespace ns3 {
 class SatGwHelper : public Object
 {
 public:
+
+  /**
+   * Random access setting options.
+   */
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
@@ -53,9 +57,16 @@ public:
     double m_raConstantErrorRate;
   } RandomAccessSettings_s;
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
   static TypeId GetTypeId (void);
   TypeId GetInstanceTypeId (void) const;
 
+  /**
+   * Default constructor.
+   */
   SatGwHelper ();
   /**
    * Create a SatGwHelper to make life easier when creating Satellite point to

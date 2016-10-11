@@ -110,7 +110,10 @@ public:
    */
   SatStatsHelperContainer (Ptr<const SatHelper> satHelper);
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -285,7 +288,10 @@ public:
   static std::string GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType);
 
 protected:
-  // Inherited from Object base class
+
+  /**
+   * Inherited from Object base class
+   */
   virtual void DoDispose ();
 
 private:

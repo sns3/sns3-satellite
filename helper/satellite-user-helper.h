@@ -50,9 +50,19 @@ public:
     NETWORK_TYPE_SAT_SIMPLE, NETWORK_TYPE_CSMA
   };
 
+  /**
+   * Define UT user container
+   */
   typedef std::map<Ptr<Node>, NodeContainer>    UtUsersContainer_t;
 
+  /**
+   * Derived from Object
+   */
   static TypeId GetTypeId (void);
+
+  /**
+   * Derived from Object
+   */
   TypeId GetInstanceTypeId (void) const;
   /**
    * Create a SatUserHelper to make life easier when creating Users and their connections to satellite network.
@@ -219,7 +229,7 @@ public:
   uint32_t GetUtUserCount (Ptr<Node> ut) const;
 
   /**
-   * \param pointer to the UT user node
+   * \param utUserNode Pointer to the UT user node
    * \return a pointer to the UT node which serves the specified UT user node,
    *         or zero if the UT user node is invalid
    */

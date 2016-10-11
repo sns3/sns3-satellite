@@ -48,10 +48,16 @@ public:
   // inherited from SatStatsHelper base class
   SatStatsPacketCollisionHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsPacketCollisionHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -128,10 +134,16 @@ public:
   // inherited from SatStatsPacketCollisionHelper base class
   SatStatsSlottedAlohaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsSlottedAlohaPacketCollisionHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 };
@@ -162,10 +174,16 @@ public:
   // inherited from SatStatsPacketCollisionHelper base class
   SatStatsCrdsaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
 
-  /// Destructor.
+
+  /**
+   * / Destructor.
+   */
   virtual ~SatStatsCrdsaPacketCollisionHelper ();
 
-  // inherited from ObjectBase base class
+
+  /**
+   * inherited from ObjectBase base class
+   */
   static TypeId GetTypeId ();
 
 };
