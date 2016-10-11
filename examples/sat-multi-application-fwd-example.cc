@@ -153,22 +153,18 @@ main (int argc, char *argv[])
   uint8_t onOffTos (0x28);
   uint8_t cbrTos (0xB8);
 
-  // Divide the users into CBR and On-Off users and set the ToS values.
+  // Divide the users into CBR and On-Off users
   for (NodeContainer::Iterator i = utUsers.Begin ();  i != utUsers.End (); i++)
-    {
+  {
       // CBR
       if (rand->GetValue () < cbrProbability)
         {
           utCbrUsers.Add (*i);
-          Ptr<Ipv4L3Protocol> ipv4Prot = (*i)->GetObject<Ipv4L3Protocol> ();
-          ipv4Prot->SetAttribute ("DefaultTos", UintegerValue (cbrTos));
         }
       // OnOff
       else
         {
           utOnOffUsers.Add (*i);
-          Ptr<Ipv4L3Protocol> ipv4Prot = (*i)->GetObject<Ipv4L3Protocol> ();
-          ipv4Prot->SetAttribute ("DefaultTos", UintegerValue (onOffTos));
         }
     }
 
@@ -185,6 +181,8 @@ main (int argc, char *argv[])
 
   uint16_t port = 9;
   Time startDelay = appStartTime;
+  uint32_t cbrGwUserId (0);
+  uint32_t onOffGwUserId (1);
 
   if (utCbrUsers.GetN () > 0)
     {
@@ -194,14 +192,17 @@ main (int argc, char *argv[])
       cbrHelper.SetAttribute ("Interval", StringValue (interval));
       cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
-      // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
+      // Cbr and Sink applications creation. CBR to GW users and sinks to UT users.
       for ( uint32_t i = 0; i < utCbrUsers.GetN (); i++)
         {
-          // CBR sends packets to GW user no 4.
-          cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (i)), port))));
-          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utCbrUsers.Get (i)), port))));
+    	  // Set destination addresses
+    	  InetSocketAddress cbrDest (helper->GetUserAddress (utCbrUsers.Get (i)), port);
+    	  cbrDest.SetTos (cbrTos);
 
-          gwCbrApps.Add (cbrHelper.Install (gwUsers.Get (4)));
+          cbrHelper.SetAttribute ("Remote", AddressValue (Address (cbrDest)));
+          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (cbrDest)));
+
+          gwCbrApps.Add (cbrHelper.Install (gwUsers.Get (cbrGwUserId)));
           utCbrSinkApps.Add (cbrSinkHelper.Install (utCbrUsers.Get (i)));
 
           startDelay += Seconds (0.001);
@@ -225,7 +226,6 @@ main (int argc, char *argv[])
       std::string onTime = "2.0";
       std::string offTime = "2.0";
 
-
       Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (packetSize));
       Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue (dataRate));
       Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
@@ -241,11 +241,15 @@ main (int argc, char *argv[])
       // Cbr and Sink applications creation
       for ( uint32_t i = 0; i < utOnOffUsers.GetN (); i++)
         {
-          // On-Off sends packets to GW user no 3.
-          onOffHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utOnOffUsers.Get (i)), port))));
-          onOffSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utOnOffUsers.Get (i)), port))));
+    	  // Set destination addresses
+    	  InetSocketAddress onOffDest (helper->GetUserAddress (utOnOffUsers.Get (i)), port);
+    	  onOffDest.SetTos (onOffTos);
 
-          gwOnOffApps.Add (onOffHelper.Install (gwUsers.Get (0)));
+          // On-Off sends packets to GW user no 3.
+          onOffHelper.SetAttribute ("Remote", AddressValue (Address (onOffDest)));
+          onOffSinkHelper.SetAttribute ("Local", AddressValue (Address (onOffDest)));
+
+          gwOnOffApps.Add (onOffHelper.Install (gwUsers.Get (onOffGwUserId)));
           utOnOffSinkApps.Add (onOffSinkHelper.Install (utOnOffUsers.Get (i)));
 
           startDelay += Seconds (0.001);

@@ -160,15 +160,11 @@ main (int argc, char *argv[])
       if (rand->GetValue () < cbrProbability)
         {
           utCbrUsers.Add (*i);
-          Ptr<Ipv4L3Protocol> ipv4Prot = (*i)->GetObject<Ipv4L3Protocol> ();
-          ipv4Prot->SetAttribute ("DefaultTos", UintegerValue (cbrTos));
         }
       // OnOff
       else
         {
           utOnOffUsers.Add (*i);
-          Ptr<Ipv4L3Protocol> ipv4Prot = (*i)->GetObject<Ipv4L3Protocol> ();
-          ipv4Prot->SetAttribute ("DefaultTos", UintegerValue (onOffTos));
         }
     }
 
@@ -186,23 +182,29 @@ main (int argc, char *argv[])
   uint16_t port = 9;
   Time startDelay = appStartTime;
 
+  uint32_t cbrGwUserId (0);
+  uint32_t onOffGwUserId (1);
+
   if (utCbrUsers.GetN () > 0)
     {
       // create application on UT user
-      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (4)), port));
-      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (4)), port));
+      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port));
+      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port));
       cbrHelper.SetAttribute ("Interval", StringValue (interval));
       cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
       // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
       for ( uint32_t i = 0; i < utCbrUsers.GetN (); i++)
         {
-          // CBR sends packets to GW user no 4.
-          cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (4)), port))));
-          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (4)), port))));
+    	  // Set destination addresses
+    	  InetSocketAddress cbrDest (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port);
+    	  cbrDest.SetTos (cbrTos);
+
+          cbrHelper.SetAttribute ("Remote", AddressValue (Address (cbrDest)));
+          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (cbrDest)));
 
           utCbrApps.Add (cbrHelper.Install (utCbrUsers.Get (i)));
-          gwCbrSinkApps.Add (cbrSinkHelper.Install (gwUsers.Get (4)));
+          gwCbrSinkApps.Add (cbrSinkHelper.Install (gwUsers.Get (cbrGwUserId)));
 
           startDelay += Seconds (0.001);
 
@@ -225,7 +227,6 @@ main (int argc, char *argv[])
       std::string onTime = "2.0";
       std::string offTime = "2.0";
 
-
       Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (packetSize));
       Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue (dataRate));
       Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
@@ -241,12 +242,15 @@ main (int argc, char *argv[])
       // Cbr and Sink applications creation
       for ( uint32_t i = 0; i < utOnOffUsers.GetN (); i++)
         {
-          // On-Off sends packets to GW user no 3.
-          onOffHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (3)), port))));
-          onOffSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (3)), port))));
+    	  // Set destination addresses
+    	  InetSocketAddress onOffDest (helper->GetUserAddress (gwUsers.Get (onOffGwUserId)), port);
+    	  onOffDest.SetTos (onOffTos);
+
+          onOffHelper.SetAttribute ("Remote", AddressValue (Address (onOffDest)));
+          onOffSinkHelper.SetAttribute ("Local", AddressValue (Address (onOffDest)));
 
           utOnOffApps.Add (onOffHelper.Install (utOnOffUsers.Get (i)));
-          gwOnOffSinkApps.Add (onOffSinkHelper.Install (gwUsers.Get (3)));
+          gwOnOffSinkApps.Add (onOffSinkHelper.Install (gwUsers.Get (onOffGwUserId)));
 
           startDelay += Seconds (0.001);
 
