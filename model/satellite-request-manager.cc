@@ -355,7 +355,7 @@ void
 SatRequestManager::AddQueueCallback (uint8_t rcIndex, SatRequestManager::QueueCallback cb)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rcIndex) << &cb);
-  m_queueCallbacks.insert (std::make_pair<uint8_t, SatRequestManager::QueueCallback> (rcIndex, cb));
+  m_queueCallbacks.insert (std::make_pair (rcIndex, cb));
 }
 
 void
@@ -653,7 +653,7 @@ SatRequestManager::UpdatePendingRbdcCounters (uint8_t rc, uint32_t kbps)
   if (kbps > 0)
     {
       Time now = Simulator::Now ();
-      std::pair<Time, uint32_t> item = std::make_pair<Time, uint32_t> (now, kbps);
+      std::pair<Time, uint32_t> item = std::make_pair (now, kbps);
       m_pendingRbdcRequestsKbps.at (rc).push_back (item);
     }
 }

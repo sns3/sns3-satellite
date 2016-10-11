@@ -210,7 +210,7 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           m_txedBufferSize += context->m_pdu->GetSize ();
 
           // Store it back to the transmitted packet container.
-          m_txedBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (context->m_seqNo, context));
+          m_txedBuffer.insert (std::make_pair (context->m_seqNo, context));
 
           // Create the retransmission event and store it to the context. Event is cancelled if a ACK
           // is received. However, if the event triggers, we shall send the packet again, if the packet still
@@ -271,7 +271,7 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
 
           // Update the buffer status
           m_txedBufferSize += packet->GetSize ();
-          m_txedBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (seqNo, arqContext));
+          m_txedBuffer.insert (std::make_pair (seqNo, arqContext));
 
           if (packet->GetSize () > bytes)
             {
@@ -317,7 +317,7 @@ SatReturnLinkEncapsulatorArq::ArqReTxTimerExpired (uint8_t seqNo)
           m_retxBufferSize += context->m_pdu->GetSize ();
 
           // Push to the retransmission buffer
-          m_retxBuffer.insert (std::make_pair<uint8_t, Ptr<SatArqBufferContext> > (seqNo, context));
+          m_retxBuffer.insert (std::make_pair (seqNo, context));
         }
       // Maximum retransmissions reached
       else
@@ -437,7 +437,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
           arqContext->m_rxStatus = true;
           arqContext->m_seqNo = sn;
           arqContext->m_retransmissionCount = 0;
-          m_reorderingBuffer.insert (std::make_pair<uint32_t, Ptr<SatArqBufferContext> > (sn, arqContext));
+          m_reorderingBuffer.insert (std::make_pair (sn, arqContext));
         }
       // If the context is found, update it.
       else
@@ -470,7 +470,7 @@ SatReturnLinkEncapsulatorArq::ReceivePdu (Ptr<Packet> p)
                   arqContext->m_rxStatus = false;
                   arqContext->m_seqNo = i;
                   arqContext->m_retransmissionCount = 0;
-                  m_reorderingBuffer.insert (std::make_pair<uint32_t, Ptr<SatArqBufferContext> > (i, arqContext));
+                  m_reorderingBuffer.insert (std::make_pair (i, arqContext));
                   EventId id = Simulator::Schedule (m_rxWaitingTimer, &SatReturnLinkEncapsulatorArq::RxWaitingTimerExpired, this, i);
                   arqContext->m_waitingTimer = id;
                 }

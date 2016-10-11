@@ -416,8 +416,8 @@ SatCrMessage::AddControlElement (uint8_t rcIndex, SatEnums::SatCapacityAllocatio
 {
   NS_LOG_FUNCTION (this << (uint32_t) rcIndex << cac << value);
 
-  RequestDescriptor_t p = std::make_pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> (rcIndex, cac);
-  m_requestData.insert (std::make_pair<RequestDescriptor_t, uint32_t> (p, value));
+  RequestDescriptor_t p = std::make_pair (rcIndex, cac);
+  m_requestData.insert (std::make_pair (p, value));
 }
 
 
@@ -718,7 +718,7 @@ SatControlMsgContainer::ReserveIdAndStore (Ptr<SatControlMessage> ctrlMsg)
   uint32_t id = m_sendId;
   m_sendId++;
 
-  m_reservedCtrlMsgs.insert (std::make_pair<uint32_t, Ptr<SatControlMessage> > (id, ctrlMsg));
+  m_reservedCtrlMsgs.insert (std::make_pair (id, ctrlMsg));
 
   return id;
 }
@@ -748,7 +748,7 @@ SatControlMsgContainer::Send (uint32_t sendId)
         }
 
       // Add it to id map for possible future use
-      std::pair<CtrlIdMap_t::iterator, bool> idResult = m_ctrlIdMap.insert (std::make_pair<uint32_t, uint32_t> (sendId, recvId));
+      std::pair<CtrlIdMap_t::iterator, bool> idResult = m_ctrlIdMap.insert (std::make_pair (sendId, recvId));
       if (idResult.second == false)
         {
           NS_FATAL_ERROR ("ID map entry cannot be added!");

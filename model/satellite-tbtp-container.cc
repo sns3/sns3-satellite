@@ -97,7 +97,7 @@ SatTbtpContainer::Add (Time startTime, Ptr<SatTbtpMessage> tbtp)
 
   ++m_rcvdTbtps;
 
-  m_tbtps.insert (std::make_pair<Time, Ptr<SatTbtpMessage> > (startTime, tbtp));
+  m_tbtps.insert (std::make_pair (startTime, tbtp));
 
   // If there are too many TBTPs in the container, erase the first
   if (m_tbtps.size () > m_maxStoredTbtps)

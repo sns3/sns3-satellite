@@ -127,7 +127,7 @@ SatRtnLinkChannelEstimationErrorContainer::SatRtnLinkChannelEstimationErrorConta
       ss << i;
       filePathName = dataPath + "/sinrmeaserror/ChannelEstimationErrorRtnLinkWf_" + ss.str () + ".txt";
       ce = CreateObject<SatChannelEstimationError> (filePathName);
-      m_channelEstimationErrors.insert (std::make_pair<uint32_t, Ptr<SatChannelEstimationError> > (i, ce));
+      m_channelEstimationErrors.insert (std::make_pair (i, ce));
     }
 }
 
