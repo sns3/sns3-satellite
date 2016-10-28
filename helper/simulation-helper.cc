@@ -203,7 +203,7 @@ SimulationHelper::SetDefaultValues ()
   Config::SetDefault ("ns3::SatBbFrameConf::BBFrameUsageMode", StringValue ("NormalFrames"));
 
   ConfigureFrequencyBands ();
-  ConfigureFrame (0, 15.0e6, 2.0e6, 0.2, 0.3, false);
+  ConfigureFrame (0, 5e5, 5e5, 0.2, 0.3, false);
 
   SetErrorModel(SatPhyRxCarrierConf::EM_AVI);
   SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET);
@@ -595,6 +595,9 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   // Frame load
   m_statContainer->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  m_statContainer->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // SINR
   m_statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);

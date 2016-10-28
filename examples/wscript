@@ -131,6 +131,12 @@ def build(bld):
     obj = bld.create_ns3_program('sat-random-access-slotted-aloha-example', ['satellite'])
     obj.source = 'sat-random-access-slotted-aloha-example.cc'
  
+    obj = bld.create_ns3_program('sat-rtn-link-da-example', ['satellite'])
+    obj.source = 'sat-rtn-link-da-example.cc'
+    
+    obj = bld.create_ns3_program('sat-rtn-link-ra-example', ['satellite'])
+    obj.source = 'sat-rtn-link-ra-example.cc'
+ 
     obj = bld.create_ns3_program('sat-rtn-system-test', ['satellite'])
     obj.source = 'sat-rtn-system-test-example.cc'
         
