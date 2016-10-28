@@ -376,9 +376,39 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
               break;
             }
           case SatEnums::FORWARD_USER_CH:
+          {
+        	  interferenceEvent = m_satInterference->Add (rxParams->m_duration,
+        	                                              rxParams->m_rxPower_W,
+        	                                              m_ownAddress);
+        	  break;
+          }
           case SatEnums::RETURN_FEEDER_CH:
             {
-              interferenceEvent = m_satInterference->Add (rxParams->m_duration, rxParams->m_rxPower_W, m_ownAddress);
+              // In feeder downlink the interference by UTs in the same
+              // beam (intra-beam interference e.g. due to random access) SHOULD NOT be tracked.
+              // Intra-beam interference is already taken into account at the satellite. Thus,
+              // here we pass intra-beam transmissions with zero interference power to the
+              // interference model.
+              // Rx power in the rxParams is the received power of only one of the interfering
+              // signals of the wanted signal. In reality, we are receiving the same signal
+              // through all the co-channel transponders of the satellite, where the rxPower
+              // is the C and all the other components are considered as interference I.
+              // This can be compensated with the following equation:
+              // rxPower = rxParams->m_rxPower_W * (1 + 1/rxParams->m_sinr);
+              // See more from satellite module documentation.
+
+              double rxPower (0.0);
+
+              if (rxParams->m_beamId != m_beamId)
+                {
+                  rxPower = rxParams->m_rxPower_W * (1 + 1/rxParams->m_sinr);
+                }
+
+              // Add the interference even regardless.
+              interferenceEvent = m_satInterference->Add (rxParams->m_duration,
+                                                          rxPower,
+                                                          m_ownAddress);
+
               break;
             }
           case SatEnums::UNKNOWN_CH:
@@ -1571,21 +1601,19 @@ SatPhyRxCarrier::EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarr
                        " RX gnd: " << iterList->rxParams->m_rxPower_W <<
                        " IF gnd: " << iterList->rxParams->m_ifPower_W);
 
-          /// reduce interference power for the colliding packets
+          /// Reduce interference power for the colliding packets. Note, that the interference is
+          /// eliminated only from the user link interference power at the satellite! The intra-beam
+          /// interference is not handled in the return feeder link so that the intra-beam interference
+          /// is not taken into account twice!
           /// TODO A more novel way to eliminate partially overlapping interference should be considered!
           /// In addition, as the interference values are extremely small, the use of long double (instead
           /// of double) should be considered to improve the accuracy.
+
           iterList->rxParams->m_ifPowerInSatellite_W -= processedPacket.rxParams->m_rxPowerInSatellite_W;
-          iterList->rxParams->m_ifPower_W -= processedPacket.rxParams->m_rxPower_W;
 
           if (fabs (iterList->rxParams->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
             {
               iterList->rxParams->m_ifPowerInSatellite_W = 0;
-            }
-
-          if (fabs (iterList->rxParams->m_ifPower_W) < std::numeric_limits<double>::epsilon ())
-            {
-              iterList->rxParams->m_ifPower_W = 0;
             }
 
           if (iterList->rxParams->m_ifPower_W < 0 || iterList->rxParams->m_ifPowerInSatellite_W < 0)
