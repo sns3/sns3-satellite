@@ -120,10 +120,9 @@ public:
    * \param cb callback to invoke whenever a TBTP is ready for sending and must
    *        be forwarded to the Beam UTs.
    * \param seq Super frame sequence
-   * \param maxRcCount Maximum number of RCs in use.
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
    */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount, uint32_t maxFrameSizeInBytes);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes);
 
   /**
    * \brief Function for adding the UT

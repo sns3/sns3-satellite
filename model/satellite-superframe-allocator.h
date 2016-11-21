@@ -47,9 +47,8 @@ public:
   /**
    * \brief Construct SatSuperframeAllocator
    * \param superFrameConf Super frame configuration
-   * \param maxRcCount Maximum number of the RCs
    */
-  SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, uint8_t maxRcCount);
+  SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf);
 
   /**
    * Destruct SatSuperframeAllocator
@@ -127,9 +126,6 @@ private:
 
   // flag telling if FCA (free capacity allocation) is on
   bool  m_fcaEnabled;
-
-  // maximum count for RCs
-  uint32_t  m_maxRcCount;
 
   // minimum carrier payload in bytes
   uint32_t  m_minCarrierPayloadInBytes;

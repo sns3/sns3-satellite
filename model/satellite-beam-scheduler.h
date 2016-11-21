@@ -106,10 +106,9 @@ public:
    * \param cb callback to invoke whenever a TBTP is ready for sending and must
    *        be forwarded to the Beam UTs.
    * \param seq Superframe sequence.
-   * \param maxRcCount Maximum number of the RCs in use.
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
    */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount, uint32_t maxFrameSizeInBytes);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes);
 
   /**
    * Add UT to scheduler.

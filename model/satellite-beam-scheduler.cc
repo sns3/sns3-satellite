@@ -275,7 +275,7 @@ SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 }
 
 void
-SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint8_t maxRcCount, uint32_t maxFrameSizeInBytes)
+SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
 
@@ -313,7 +313,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
-  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE), maxRcCount);
+  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
   NS_LOG_INFO ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
 

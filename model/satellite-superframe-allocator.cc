@@ -64,11 +64,10 @@ SatSuperframeAllocator::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
-SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf, uint8_t maxRcCount)
+SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf)
   : m_superframeConf (superFrameConf),
     m_targetLoad (0.0),
     m_fcaEnabled (false),
-    m_maxRcCount (maxRcCount),
     m_minCarrierPayloadInBytes (0),
     m_minimumRateBasedBytesLeft (0),
     m_rcBasedAllocationEnabled (false)
