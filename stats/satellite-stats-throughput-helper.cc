@@ -507,13 +507,13 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes ()
                                                            identifier,
                                                            &UnitConversionCollector::TraceSinkUinteger32))
                 {
-                  NS_LOG_INFO (this << " created probe " << probeName
+                  NS_LOG_INFO (this << " created probe " << probeName.str ()
                                     << ", connected to collector " << identifier);
                   m_probes.push_back (probe->GetObject<Probe> ());
                 }
               else
                 {
-                  NS_LOG_WARN (this << " unable to connect probe " << probeName
+                  NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
                                     << " to collector " << identifier);
                 }
             }
@@ -524,7 +524,7 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes ()
                * not every kind of Application is equipped with the expected
                * Rx trace source.
                */
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
+              NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
                                 << " with node ID " << (*it)->GetId ()
                                 << " application #" << i);
             }
@@ -593,7 +593,7 @@ SatStatsFwdDevThroughputHelper::DoInstallProbes ()
                                                        identifier,
                                                        &UnitConversionCollector::TraceSinkUinteger32))
             {
-              NS_LOG_INFO (this << " created probe " << probeName
+              NS_LOG_INFO (this << " created probe " << probeName.str ()
                                 << ", connected to collector " << identifier);
               m_probes.push_back (probe->GetObject<Probe> ());
 
@@ -602,7 +602,7 @@ SatStatsFwdDevThroughputHelper::DoInstallProbes ()
             }
           else
             {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
+              NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
                                 << " to collector " << identifier);
             }
 
@@ -693,7 +693,7 @@ SatStatsFwdMacThroughputHelper::DoInstallProbes ()
                                                        identifier,
                                                        &UnitConversionCollector::TraceSinkUinteger32))
             {
-              NS_LOG_INFO (this << " created probe " << probeName
+              NS_LOG_INFO (this << " created probe " << probeName.str ()
                                 << ", connected to collector " << identifier);
               m_probes.push_back (probe->GetObject<Probe> ());
 
@@ -703,7 +703,7 @@ SatStatsFwdMacThroughputHelper::DoInstallProbes ()
             }
           else
             {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
+              NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
                                 << " to collector " << identifier);
             }
 
@@ -799,7 +799,7 @@ SatStatsFwdPhyThroughputHelper::DoInstallProbes ()
                                                        identifier,
                                                        &UnitConversionCollector::TraceSinkUinteger32))
             {
-              NS_LOG_INFO (this << " created probe " << probeName
+              NS_LOG_INFO (this << " created probe " << probeName.str ()
                                 << ", connected to collector " << identifier);
               m_probes.push_back (probe->GetObject<Probe> ());
 
@@ -809,7 +809,7 @@ SatStatsFwdPhyThroughputHelper::DoInstallProbes ()
             }
           else
             {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
+              NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
                                 << " to collector " << identifier);
             }
 

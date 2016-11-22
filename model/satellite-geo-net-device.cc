@@ -69,8 +69,7 @@ SatGeoNetDevice::GetTypeId (void)
 SatGeoNetDevice::SatGeoNetDevice ()
   : m_node (0),
     m_mtu (0xffff),
-    m_ifIndex (0),
-    m_phyCount (0)
+    m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }

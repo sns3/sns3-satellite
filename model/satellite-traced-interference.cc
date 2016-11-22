@@ -53,7 +53,7 @@ SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltyp
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_rxBandwidth_Hz > 0)
+  if (m_rxBandwidth_Hz <= std::numeric_limits<double>::epsilon ())
     {
       NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Invalid value");
     }
@@ -133,7 +133,7 @@ SatTracedInterference::SetRxBandwidth (double rxBandwidth)
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_rxBandwidth_Hz > 0)
+  if (rxBandwidth <= std::numeric_limits<double>::epsilon ())
     {
       NS_FATAL_ERROR ("SatTracedInterference::SetRxBandwidth - Invalid value");
     }

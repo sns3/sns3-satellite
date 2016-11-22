@@ -98,7 +98,7 @@ SatRayleighConf::GetParameters (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
-  if ( (set < 0) || (set >= m_elevationCount) )
+  if (set >= m_elevationCount)
     {
       NS_FATAL_ERROR ("SatRayleighConf::GetParameters - Invalid set");
     }

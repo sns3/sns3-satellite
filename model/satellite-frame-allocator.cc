@@ -174,8 +174,7 @@ SatFrameAllocator::SatFrameAllocator ()
     m_preAllocatedVdbcSymbols (0.0),
     m_maxSymbolsPerCarrier (0),
     m_configType (SatSuperframeConf::CONFIG_TYPE_0),
-    m_frameId (0),
-    m_rcBasedAllocation (false)
+    m_frameId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");

@@ -48,7 +48,7 @@ SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
-  if (!m_valuesInRow > 0)
+  if (!(m_valuesInRow > 0))
     {
       NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer - No values in the row");
     }
@@ -152,7 +152,7 @@ SatOutputFileStreamLongDoubleContainer::AddToContainer (std::vector<long double>
 {
   NS_LOG_FUNCTION (this);
 
-  if (!newItem.size () == m_valuesInRow)
+  if (newItem.size () != m_valuesInRow)
     {
       NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer::AddToContainer - Invalid vector size");
     }

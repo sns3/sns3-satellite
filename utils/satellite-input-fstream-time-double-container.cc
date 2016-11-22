@@ -208,8 +208,8 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
     {
       if (m_container[i].at (m_timeColumn) + timeShiftValue >= comparisonTimeValue)
         {
-          double difference1 = fabs (m_container[lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
-          double difference2 = fabs (m_container[i].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
+          double difference1 = std::abs (m_container[lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
+          double difference2 = std::abs (m_container[i].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
 
           if (difference1 < difference2)
             {
@@ -227,8 +227,8 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
 
   if (valueFound && m_numOfPasses > 0 && m_lastValidPosition == 0)
     {
-      double difference1 = fabs (m_container[m_lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
-      double difference2 = fabs (m_container[m_container.size () - 1].at (m_timeColumn) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (m_timeColumn)) - comparisonTimeValue);
+      double difference1 = std::abs (m_container[m_lastValidPosition].at (m_timeColumn) + timeShiftValue - comparisonTimeValue);
+      double difference2 = std::abs (m_container[m_container.size () - 1].at (m_timeColumn) + ((m_numOfPasses - 1) * m_container[m_container.size () - 1].at (m_timeColumn)) - comparisonTimeValue);
 
       if (difference1 > difference2)
         {

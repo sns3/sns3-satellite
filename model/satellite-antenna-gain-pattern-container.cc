@@ -74,7 +74,7 @@ SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
-  if (beamId < 0 || beamId > m_antennaPatternMap.size ())
+  if (beamId > m_antennaPatternMap.size ())
     {
       NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetAntennaGainPattern - unvalid beam id: " << beamId);
     }

@@ -444,13 +444,13 @@ SatStatsRtnSignallingLoadHelper::DoInstallProbes ()
                                                        identifier,
                                                        &UnitConversionCollector::TraceSinkUinteger32))
             {
-              NS_LOG_INFO (this << " created probe " << probeName
+              NS_LOG_INFO (this << " created probe " << probeName.str ()
                                 << ", connected to collector " << identifier);
               m_probes.push_back (probe->GetObject<Probe> ());
             }
           else
             {
-              NS_LOG_WARN (this << " unable to connect probe " << probeName
+              NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
                                 << " to collector " << identifier);
             }
 

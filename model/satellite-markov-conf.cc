@@ -128,7 +128,7 @@ SatMarkovConf::SatMarkovConf ()
   m_looConf = CreateObject<SatLooConf> ();
   m_rayleighConf = CreateObject<SatRayleighConf> ();
 
-  if (!m_markovElevations.size () == m_elevationCount)
+  if (m_markovElevations.size () != m_elevationCount)
     {
       NS_FATAL_ERROR ("SatMarkovConf::SatMarkovConf - Markov elevations does not match");
     }
@@ -175,7 +175,7 @@ SatMarkovConf::GetElevationProbabilities (uint32_t set)
 {
   NS_LOG_FUNCTION (this << set);
 
-  if (set < 0 && set >= m_elevationCount)
+  if (set >= m_elevationCount)
     {
       NS_FATAL_ERROR ("SatMarkovConf::GetElevationProbabilities - Invalid set");
     }
@@ -258,7 +258,7 @@ SatMarkovConf::GetInitialState ()
       total += m_initialProbabilities[i];
     }
 
-  if (!total == 1)
+  if (total != 1)
     {
       NS_FATAL_ERROR ("SatMarkovConf::GetInitialState - Total sum doesn not match");
     }

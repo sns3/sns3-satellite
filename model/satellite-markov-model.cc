@@ -104,7 +104,7 @@ SatMarkovModel::SetState (uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newState);
 
-  if ( (newState < 0) || (newState >= m_numOfStates ))
+  if (newState >= m_numOfStates )
     {
       NS_FATAL_ERROR ("SatMarkovModel::SetState - Invalid state");
     }

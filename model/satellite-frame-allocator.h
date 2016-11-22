@@ -424,12 +424,6 @@ private:
   // Id of the frame
   uint8_t  m_frameId;
 
-  /**
-   * flag indicating if RC based allocation is used. When flag is on then
-   * RC is tried to allocate fully. UT total request is used allocation criteria when flag is off.
-   */
-  bool  m_rcBasedAllocation;
-
   // Burst lengths in use.
   SatWaveformConf::BurstLengthContainer_t m_burstLenghts;
 

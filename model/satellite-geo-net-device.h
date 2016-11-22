@@ -135,7 +135,6 @@ private:
   Ptr<Node> m_node;
   uint16_t m_mtu;
   uint32_t m_ifIndex;
-  uint16_t m_phyCount;
   Mac48Address m_address;
   Ptr<ErrorModel> m_receiveErrorModel;
   std::map<uint32_t, Ptr<SatPhy> > m_userPhy;

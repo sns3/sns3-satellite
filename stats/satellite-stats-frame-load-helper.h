@@ -169,7 +169,7 @@ SatStatsFrameLoadHelper::SetupProbe (Ptr<Object> object,
                               oss.str (),
                               MakeCallback (traceSink, this)))
     {
-      m_probes.push_back (probe->GetObject<Probe> ());
+      m_probes.push_back (probe->template GetObject<Probe> ());
       return true;
     }
   else

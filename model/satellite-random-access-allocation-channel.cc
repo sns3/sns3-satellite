@@ -60,9 +60,9 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_crdsaMinRandomizationValue < 0 || m_crdsaMaxRandomizationValue < 1)
+  if (m_crdsaMaxRandomizationValue < 1)
     {
-      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - min < 0 || max < 1");
+      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - max < 1");
     }
 
   if (m_crdsaMinRandomizationValue > m_crdsaMaxRandomizationValue)
@@ -78,11 +78,6 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
   if ( (m_crdsaMaxRandomizationValue - m_crdsaMinRandomizationValue) < m_crdsaNumOfInstances)
     {
       NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - (max - min) < instances");
-    }
-
-  if (m_crdsaBackoffTimeInMilliSeconds < 0)
-    {
-      NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaBackoffTime < 0");
     }
 
   if (m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0)

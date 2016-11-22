@@ -69,7 +69,7 @@ SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t chan
 {
   NS_LOG_FUNCTION (this << channelType << rxBandwidthHz);
 
-  if (!m_rxBandwidth_Hz > 0)
+  if (m_rxBandwidth_Hz <= std::numeric_limits<double>::epsilon ())
     {
       NS_FATAL_ERROR ("SatPerPacketInterference::SatPerPacketInterference - Invalid value");
     }
@@ -249,7 +249,7 @@ SatPerPacketInterference::SetRxBandwidth (double rxBandwidth)
 {
   NS_LOG_FUNCTION (this << rxBandwidth);
 
-  if (!m_rxBandwidth_Hz > 0)
+  if (rxBandwidth <= std::numeric_limits<double>::epsilon ())
     {
       NS_FATAL_ERROR ("SatPerPacketInterference::SetRxBandwidth - Invalid value");
     }

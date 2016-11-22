@@ -27,6 +27,10 @@
 #include "ns3/boolean.h"
 #include "satellite-env-variables.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 NS_LOG_COMPONENT_DEFINE ("SatEnvVariables");
 
 namespace ns3 {
@@ -139,9 +143,18 @@ SatEnvVariables::DoInitialize ()
 
       char pathToExecutable[FILENAME_MAX] = "";
 
-      if (readlink ("/proc/self/exe",
-                    pathToExecutable,
-                    sizeof (pathToExecutable)) < 0)
+      int res;
+#ifdef __linux__
+      res = readlink ("/proc/self/exe",
+              pathToExecutable,
+              sizeof (pathToExecutable));
+#elif __APPLE__
+      uint32_t size = sizeof (pathToExecutable);
+      res = _NSGetExecutablePath (pathToExecutable, &size);
+#else
+      NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Unknown compiler.");
+#endif
+      if (res < 0)
         {
           NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
         }

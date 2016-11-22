@@ -69,7 +69,7 @@ public:
 class EncapKeyCompare
 {
 public:
-  bool operator() (Ptr<EncapKey> key1, Ptr<EncapKey> key2)
+  bool operator() (Ptr<EncapKey> key1, Ptr<EncapKey> key2) const
   {
     if ( key1->m_source == key2->m_source )
       {

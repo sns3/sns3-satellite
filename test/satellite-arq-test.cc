@@ -449,10 +449,6 @@ private:
   // Interval for creating tx opportunities
   Time m_txoInterval;
 
-  // Jitter (or addition to static Tx opportunity interval)
-  double m_minTimeSlotJitterInMs;
-  double m_maxTimeSlotJitterInMs;
-
   uint32_t m_txs;
   uint32_t m_txErrors;
   uint32_t m_acks;

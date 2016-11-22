@@ -378,11 +378,11 @@ SatMarkovContainer::LockToSetAndState (uint32_t newSet, uint32_t newState)
 {
   NS_LOG_FUNCTION (this << newSet << " " << newState);
 
-  if ( newState < 0 || newState >= m_numOfStates)
+  if (newState >= m_numOfStates)
     {
       NS_FATAL_ERROR ("SatMarkovContainer::LockToSetAndState - Invalid state");
     }
-  if ( newSet < 0 || newSet >= m_numOfSets)
+  if (newSet >= m_numOfSets)
     {
       NS_FATAL_ERROR ("SatMarkovContainer::LockToSetAndState - Invalid set");
     }
@@ -401,7 +401,7 @@ SatMarkovContainer::LockToSet (uint32_t newSet)
 {
   NS_LOG_FUNCTION (this << newSet);
 
-  if ( newSet < 0 || newSet >= m_numOfSets)
+  if (newSet >= m_numOfSets)
     {
       NS_FATAL_ERROR ("SatMarkovContainer::LockToSet - Invalid set");
     }
