@@ -65,6 +65,8 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.001);
   Time appStopTime = Seconds (10.0);
 
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-multi-application-fwd");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   // read command line parameters given by user
@@ -73,12 +75,14 @@ main (int argc, char *argv[])
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("cbrProbability", "Probability of CBR end users", cbrProbability);
   cmd.AddValue ("simLength", "Simulation length in seconds", simLength);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-multi-application-fwd"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetBeamSet ({12,22});
+  simulationHelper->SetSimulationTime (simLength);
+
 
   // No PHY errors
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
@@ -89,20 +93,7 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  NS_LOG_INFO ("Using: " << scenarioName);
-
-  // Create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // Create user defined scenario with beams 12 and 22
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[12] = beamInfo;
-  beamMap[22] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
 
   // Get the end users so that it is possible to attach
   // applications on them
@@ -272,10 +263,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 } // end of `int main (int argc, char *argv[])`

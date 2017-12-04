@@ -65,9 +65,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.1);
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-profiling-sim-tn8"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-profiling-sim-tn8");
 
   // To read attributes from file
 //  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/tn8-profiling-input-attributes.xml";
@@ -81,6 +79,7 @@ main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("profilingConf", "Profiling configuration", profilingConf);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
@@ -95,10 +94,7 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
+  Ptr<SatHelper> helper;
   switch (profilingConf)
     {
     // Single beam
@@ -109,17 +105,20 @@ main (int argc, char *argv[])
         simLength = 60.0; // in seconds
 
         // create user defined scenario
-        std::map<uint32_t, SatBeamUserInfo > beamMap;
-        SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-        beamMap[beamId] = beamInfo;
-        helper->CreateUserDefinedScenario (beamMap);
+        simulationHelper->SetUtCountPerBeam (utsPerBeam);
+        simulationHelper->SetUserCountPerUt (endUsersPerUt);
+        simulationHelper->SetBeamSet ({beamId});
+        simulationHelper->SetSimulationTime (simLength);
+        helper = simulationHelper->CreateSatScenario ();
         break;
       }
     // Full
     case 1:
       {
         simLength = 30.0; // in seconds
-        helper->CreatePredefinedScenario (SatHelper::FULL);
+
+        simulationHelper->SetSimulationTime (simLength);
+        helper = simulationHelper->CreateSatScenario (SatHelper::FULL);
         break;
       }
     default:
@@ -128,40 +127,17 @@ main (int argc, char *argv[])
       }
     }
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-  const std::string protocol = "ns3::UdpSocketFactory";
-
   /**
    * Set-up CBR traffic
    */
-  const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
 
-  for (NodeContainer::Iterator itUt = utUsers.Begin ();
-       itUt != utUsers.End ();
-       ++itUt)
-    {
-      appStartTime += MilliSeconds (10);
-
-      // return link
-      Ptr<CbrApplication> rtnApp = CreateObject<CbrApplication> ();
-      rtnApp->SetAttribute ("Protocol", StringValue (protocol));
-      rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
-      rtnApp->SetAttribute ("Interval", TimeValue (Seconds (intervalSeconds)));
-      rtnApp->SetStartTime (appStartTime);
-      (*itUt)->AddApplication (rtnApp);
-    }
-
-  // setup packet sinks at all users
-  Ptr<PacketSink> ps = CreateObject<PacketSink> ();
-  ps->SetAttribute ("Protocol", StringValue (protocol));
-  ps->SetAttribute ("Local", AddressValue (gwAddr));
-  gwUsers.Get (0)->AddApplication (ps);
+	Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+	Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Seconds (intervalSeconds)));
+	simulationHelper->InstallTrafficModel (
+	  		SimulationHelper::CBR,
+				SimulationHelper::UDP,
+				SimulationHelper::RTN_LINK,
+				appStartTime, Seconds (simLength + 1), MilliSeconds (10));
 
   /**
    * Set-up statistics
@@ -210,10 +186,7 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

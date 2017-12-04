@@ -98,7 +98,7 @@ SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) const
 
       // The antenna pattern has returned a NAN gain. This means
       // that this position is not valid. Return 0, which is not a valid beam id.
-      if (isnan (gain))
+      if (std::isnan (gain))
         {
           NS_FATAL_ERROR (this << " returned a NAN antenna gain value!");
         }

@@ -88,7 +88,7 @@ public:
    * Used in return link statistics. DoInstallProbes() is expected to connect
    * the right trace sources to this method.
    */
-  void RxDelayCallback (Time delay, const Address &from);
+  void RxDelayCallback (const Time &delay, const Address &from);
 
 protected:
   // inherited from SatStatsHelper base class
@@ -124,7 +124,7 @@ protected:
    * \param delay
    * \param identifier
    */
-  void PassSampleToCollector (Time delay, uint32_t identifier);
+  void PassSampleToCollector (const Time &delay, uint32_t identifier);
 
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
@@ -404,7 +404,7 @@ public:
    * \param delay packet delay.
    * \param from the InetSocketAddress of the sender of the packet.
    */
-  void Ipv4Callback (Time delay, const Address &from);
+  void Ipv4Callback (const Time &delay, const Address &from);
 
 protected:
   // inherited from SatStatsDelayHelper base class

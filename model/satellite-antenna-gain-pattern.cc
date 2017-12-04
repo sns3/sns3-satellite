@@ -296,10 +296,10 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   // All the values within the grid box has to be valid! If UT is placed (or
   // is moving outside) the valid simulation area, the simulation will crash
   // to a fatal error.
-  if (isnan (m_antennaPattern[minLatIndex][minLonIndex])
-      || isnan (m_antennaPattern[minLatIndex][minLonIndex + 1])
-      || isnan (m_antennaPattern[minLatIndex + 1][minLonIndex])
-      || isnan (m_antennaPattern[minLatIndex + 1][minLonIndex + 1]))
+  if (std::isnan (m_antennaPattern[minLatIndex][minLonIndex])
+      || std::isnan (m_antennaPattern[minLatIndex][minLonIndex + 1])
+      || std::isnan (m_antennaPattern[minLatIndex + 1][minLonIndex])
+      || std::isnan (m_antennaPattern[minLatIndex + 1][minLonIndex + 1]))
     {
       NS_FATAL_ERROR (this << ", some value(s) of the interpolated grid point(s) is/are NAN!");
     }

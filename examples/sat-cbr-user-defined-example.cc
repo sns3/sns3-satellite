@@ -82,12 +82,18 @@ main (int argc, char *argv[])
   Time simLength (Seconds (20.0));
   Time appStartTime = Seconds (0.1);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-cbr-user-defined");
 
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   // dama-input-attributes.xml
@@ -96,10 +102,13 @@ main (int argc, char *argv[])
   // tn9-ra-input-attributes.xml
   // training-input-attributes.xml
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr-user-defined"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetSimulationTime (simLength);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+
+  // Set beam ID
+  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  simulationHelper->SetBeams (beamsEnabled.str ());
 
   // Configure error model
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
@@ -108,60 +117,20 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
   // Create reference system
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
+  simulationHelper->CreateSatScenario ();
 
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/CrTrace",
                                  MakeCallback (&CrTraceCb));
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
   // >>> Start of actual test using Full scenario >>>
 
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
+  // setup CBR traffic
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute ("Interval", TimeValue (interval));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
-
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-  // initialized time values for simulation
-  uint32_t maxTransmitters = utUsers.GetN ();
-
-  ApplicationContainer gwApps;
-  ApplicationContainer utApps;
-
-  Time cbrStartDelay = appStartTime;
-
-  // Cbr and Sink applications creation
-  for ( uint32_t i = 0; i < maxTransmitters; i++)
-    {
-      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-      utApps.Add (cbrHelper.Install (utUsers.Get (i)));
-      gwApps.Add (sinkHelper.Install (gwUsers.Get (0)));
-
-      cbrStartDelay += Seconds (0.05);
-
-      utApps.Get (i)->SetStartTime (cbrStartDelay);
-      utApps.Get (i)->SetStopTime (simLength);
-    }
-
-  utApps.Start (appStartTime);
-  utApps.Stop (simLength);
+  simulationHelper->InstallTrafficModel (
+  					SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+  					appStartTime, Seconds (simLength), Seconds (0.05));
 
   NS_LOG_INFO ("--- sat-cbr-user-defined-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
@@ -171,10 +140,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (simLength);
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

@@ -67,6 +67,9 @@ main (int argc, char *argv[])
   double duration = 100;
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-nrtv");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
   // read command line parameters given by user
@@ -75,6 +78,7 @@ main (int argc, char *argv[])
                 scenario);
   cmd.AddValue ("duration", "Simulation duration (in seconds)",
                 duration);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   if (scenario == "larger")
@@ -87,9 +91,8 @@ main (int argc, char *argv[])
     }
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-nrtv"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetOutputTag (scenario);
+  simulationHelper->SetSimulationTime (duration);
 
   //LogComponentEnableAll (LOG_PREFIX_ALL);
   //LogComponentEnable ("NrtvClient", LOG_LEVEL_ALL);
@@ -103,34 +106,34 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->CreatePredefinedScenario (satScenario);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
 
-  NrtvHelper nrtvHelper ("ns3::TcpSocketFactory");
+  NrtvHelper nrtvHelper (TypeId::LookupByName ("ns3::TcpSocketFactory"));
   nrtvHelper.InstallUsingIpv4 (gwUsers.Get (0), utUsers);
   nrtvHelper.GetServer ().Start (Seconds (1.0));
-  nrtvHelper.GetClients ().Start (Seconds (3.0));
 
-  // install KPI statistics collector
-  NrtvKpiHelper kpiHelper (&nrtvHelper);
+  auto apps = nrtvHelper.GetClients ();
+  apps.Start (Seconds (3.0));
+  uint32_t i = 0;
+  std::vector<Ptr<ClientRxTracePlot> > plots;
+  for (auto app = apps.Begin (); app != apps.End (); app++, i++)
+  {
+    std::stringstream plotName;
+    plotName << "NRTV-TCP-client-" << i << "-trace";
+  	plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
+  }
+
 
   NS_LOG_INFO ("--- sat-nrtv-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (duration));
-  Simulator::Run ();
-
-  kpiHelper.Print ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
+  plots.clear();
 
   return 0;
 

@@ -79,12 +79,16 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+  std::string simulationName = "example-trace-input-external-fading";
+  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+
 
   /// Read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   /// Enable external fading trace input
@@ -116,9 +120,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-trace-input-external-fading"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetOutputTag (scenario);
 
   /// Disable figure output
   //Singleton<SatFadingOutputTraceContainer>::Get ()->EnableFigureOutput (false);
@@ -149,52 +151,36 @@ main (int argc, char *argv[])
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   LogComponentEnable ("sat-trace-input-external-fading-example", LOG_LEVEL_INFO);
 
+
+  // Set simulation time
+  simulationHelper->SetSimulationTime (Seconds (11));
+
   /// Remove next line from comments to run real time simulation
   //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
-
-  /// Create satellite helper with given scenario default=simple
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
+  simulationHelper->CreateSatScenario (satScenario);
 
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->CreatePredefinedScenario (satScenario);
-
-  /// Get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  uint16_t port = 9;
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Time (interval)));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   /// Create application on GW user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-  cbrHelper.SetAttribute ("Interval", StringValue (interval));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
-
-  ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
-  gwSink.Start (Seconds (1.0));
-  gwSink.Stop (Seconds (10.0));
-
-  ApplicationContainer gwCbr = cbrHelper.Install (gwUsers.Get (0));
-  gwCbr.Start (Seconds (3.0));
-  gwCbr.Stop (Seconds (5.1));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+			SimulationHelper::UDP,
+			SimulationHelper::FWD_LINK,
+			Seconds (3.0), Seconds (5.1));
 
   /// Create application on UT user
-  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
-  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+  simulationHelper->InstallTrafficModel (
+    		SimulationHelper::CBR,
+  			SimulationHelper::UDP,
+  			SimulationHelper::RTN_LINK,
+  			Seconds (7.0), Seconds (9.1));
 
-  ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
-  utSink.Start (Seconds (1.0));
-  utSink.Stop (Seconds (10.0));
-
-  ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
-  utCbr.Start (Seconds (7.0));
-  utCbr.Stop (Seconds (9.1));
 
   NS_LOG_INFO ("--- input-external-fading-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
@@ -202,9 +188,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Interval: " << interval);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (11));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

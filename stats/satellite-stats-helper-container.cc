@@ -54,7 +54,6 @@ SatStatsHelperContainer::SatStatsHelperContainer (Ptr<const SatHelper> satHelper
   NS_LOG_FUNCTION (this);
 }
 
-
 void
 SatStatsHelperContainer::DoDispose ()
 {

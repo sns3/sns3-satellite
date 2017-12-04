@@ -43,7 +43,7 @@ NS_LOG_COMPONENT_DEFINE ("sat-arq-fwd-example");
 int
 main (int argc, char *argv[])
 {
-  uint32_t beamId = 1;
+	uint32_t beamId (1);
   uint32_t endUsersPerUt (3);
   uint32_t utsPerBeam (3);
   uint32_t packetSize (128);
@@ -56,18 +56,28 @@ main (int argc, char *argv[])
   //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   //LogComponentEnable ("sat-arq-fwd-example", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-arq-fwd");
 
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-arq-fwd"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetDefaultValues ();
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetSimulationTime (simLength);
+
+  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  simulationHelper->SetBeams (beamsEnabled.str ());
+
 
   // Configure error model
   double errorRate (0.10);
@@ -89,63 +99,24 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
-
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // >>> Start of actual test using Full scenario >>>
-
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-  ApplicationContainer gwApps;
-  ApplicationContainer utApps;
+  simulationHelper->CreateSatScenario ();
 
   //---- Start CBR application definitions
 
   NS_LOG_INFO ("Creating CBR applications and sinks");
 
-  Time startDelay = appStartTime;
-
-  if (utUsers.GetN () > 0)
+  if (endUsersPerUt * utsPerBeam > 0)
     {
-      // create application on UT user
-      PacketSinkHelper cbrSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-      cbrHelper.SetAttribute ("Interval", TimeValue (interval));
-      cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
+      Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Time (interval)));
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-      // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
-      for ( uint32_t i = 0; i < utUsers.GetN (); i++)
-        {
-          // CBR sends packets to GW user no 4.
-          cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-          cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
+      /// Create applicationa on GW user
+      simulationHelper->InstallTrafficModel (
+      		SimulationHelper::CBR,
+    			SimulationHelper::UDP,
+    			SimulationHelper::FWD_LINK,
+					appStartTime, Seconds (simLength), Seconds (0.001));
 
-          gwApps.Add (cbrHelper.Install (gwUsers.Get (4)));
-          utApps.Add (cbrSinkHelper.Install (utUsers.Get (i)));
-
-          startDelay += Seconds (0.001);
-
-          // Set start and end times
-          gwApps.Get (i)->SetStartTime (Seconds (0.1));
-          gwApps.Get (i)->SetStopTime (simLength);
-          utApps.Get (i)->SetStartTime (startDelay);
-          utApps.Get (i)->SetStopTime (simLength);
-        }
     }
   //---- Stop CBR application definitions
 
@@ -159,10 +130,8 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  ");
 
 
-  Simulator::Stop (simLength);
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->EnableProgressLogs ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

@@ -20,10 +20,10 @@
  */
 
 #include "ns3/core-module.h"
+#include "ns3/traffic-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/satellite-module.h"
-#include "ns3/traffic-module.h"
 #include "ns3/config-store-module.h"
 
 
@@ -54,17 +54,13 @@ main (int argc, char *argv[])
   double simLength (300.0); // in seconds
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-dama-http-sim-tn9"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-dama-http-sim-tn9");
 
   // To read attributes from file
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/tn9-dama-input-attributes.xml";
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
 
   /**
    * Attributes:
@@ -107,7 +103,22 @@ main (int argc, char *argv[])
   cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
+  simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
+
+  simulationHelper->SetSimulationTime (simLength);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+
+  // Set beam ID
+  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  simulationHelper->SetBeams (beamsEnabled.str ());
 
   // NCC configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
@@ -154,33 +165,19 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
-
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+  simulationHelper->CreateSatScenario ();
 
   /**
    * Set-up HTTP traffic
    */
-  HttpHelper httpHelper ("ns3::TcpSocketFactory");
-  httpHelper.InstallUsingIpv4 (gwUsers.Get (0), utUsers);
-  httpHelper.GetServer ().Start (MilliSeconds (1));
-  httpHelper.GetClients ().Start (MilliSeconds (3));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::HTTP, SimulationHelper::TCP, SimulationHelper::FWD_LINK,
+			MilliSeconds (3));
 
   /**
    * Set-up statistics
    */
-  Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -241,10 +238,7 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

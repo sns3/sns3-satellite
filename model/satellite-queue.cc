@@ -154,6 +154,8 @@ SatQueue::Enqueue (Ptr<Packet> p)
       return false;
     }
 
+  bool emptyBeforeEnque = m_packets.empty ();
+
   m_nBytes += p->GetSize ();
   ++m_nPackets;
 
@@ -168,7 +170,7 @@ SatQueue::Enqueue (Ptr<Packet> p)
   NS_LOG_INFO ("Number bytes " << m_nBytes);
   m_traceEnqueue (p);
 
-  if (m_packets.empty ())
+  if (emptyBeforeEnque == true)
     {
       SendEvent (SatQueue::FIRST_BUFFERED_PKT);
     }

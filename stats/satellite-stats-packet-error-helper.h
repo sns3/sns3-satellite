@@ -24,6 +24,7 @@
 
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
@@ -93,9 +94,21 @@ public:
    */
   SatEnums::SatLinkDir_t GetLinkDirection () const;
 
+  /**
+   * \brief Get the valid carrier type
+   * \return the valid carrier type
+   */
+  inline SatPhyRxCarrier::CarrierType GetValidCarrierType () const { return m_carrierType; };
+
 protected:
   // inherited from SatStatsHelper base class
   void DoInstall ();
+
+  /**
+   * \brief Set valid carrier type for this statistics helper type.
+   * \param carrierType
+   */
+  inline void SetValidCarrierType (SatPhyRxCarrier::CarrierType carrierType) { m_carrierType = carrierType; };
 
 private:
   /**
@@ -138,6 +151,9 @@ private:
 
   /// Link direction where statistics are gathered from.
   SatEnums::SatLinkDir_t m_linkDirection;
+
+  /// Valid carrier type
+  SatPhyRxCarrier::CarrierType m_carrierType;
 
 }; // end of class SatStatsPacketErrorHelper
 

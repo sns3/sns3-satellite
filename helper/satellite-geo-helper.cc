@@ -216,6 +216,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
   parametersUser.m_cec = cec;
   parametersUser.m_raCollisionModel = m_raSettings.m_raCollisionModel;
+  parametersUser.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
@@ -224,17 +225,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
   parametersFeeder.m_cec = cec;
   parametersFeeder.m_raCollisionModel = m_raSettings.m_raCollisionModel;
-
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
-    {
-      parametersUser.m_isRandomAccessEnabled = true;
-      parametersFeeder.m_isRandomAccessEnabled = true;
-    }
-  else
-    {
-      parametersUser.m_isRandomAccessEnabled = false;
-      parametersFeeder.m_isRandomAccessEnabled = false;
-    }
+  parametersFeeder.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
                                                          parametersUser,

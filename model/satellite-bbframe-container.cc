@@ -96,7 +96,7 @@ SatBbFrameContainer::GetModcod (uint32_t priorityClass, double cno)
     {
       modcod = m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType);
     }
-  else if ( isnan (cno) == false )
+  else if ( std::isnan (cno) == false )
     {
       modcod = m_bbFrameConf->GetBestModcod (cno, m_defaultBbFrameType);
     }

@@ -34,8 +34,8 @@ using namespace ns3;
  * \ingroup satellite
  *
  * \brief  List position external fading example demonstrates how to set user defined (list)
- *         positions with external fading. The example is useful, when taken into use new list positions
- *         and external fading trace sources.
+ *         positions with external fading. The example is useful when new list positions and
+ *         external fading trace sources are taken into use.
  *
  *         The default values for list position (UT positions) and external fading trace are
  *         set before command line parsing, in order to replace them without re-compiling the example.
@@ -78,34 +78,14 @@ main (int argc, char *argv[])
   uint32_t usersPerUt = 1;
   uint32_t beamId = 1;
   bool checkBeam = false;
+  std::string extUtPositions = "utpositions/BeamId-1_256_UT_Positions.txt";
 
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
-  // Set default values for some attributes for position setting and external fading trace
-  // This done before command line parsing in order to overrided them if needed
 
-  // Set user specific UT position file (UserDefinedUtPos.txt) to be utilized by SatConf.
-  // Given file must locate in /satellite/data folder
-  //
-  // This enables user defined positions used instead of default positions (default position file UtPos.txt replaced),
-  Config::SetDefault ("ns3::SatConf::UtPositionInputFileName", StringValue ("utpositions/BeamId-1_256_UT_Positions.txt"));
-
-  // Set external fading input trace container mode as list mode
-  // Now external fading input file used for UT1 is input file defined in row one in set index file,
-  // for UT2 second input file defined in row two in set index file etc.
-  // Position info in index file is ignored by list mode
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtInputMode", StringValue ("ListMode"));
-
-  // Set index files defining external tracing input files for UTs
-  // Given index files must locate in /satellite/data/ext-fadingtraces/input folder
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
-  Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
-
-  // for GWs we don't set up index files, so default ones are used (GW_fading_fwdup_traces.txt and GW_fading_rtndwn_traces.txt)
-  // in case that those are wanted to change, it can be done via command line arguments
-
-  // enable/disable external fading input on SatChannel as user requests
-  Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-list-position-external-fading");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // read command line parameters can be given by user
   CommandLine cmd;
@@ -113,12 +93,23 @@ main (int argc, char *argv[])
   cmd.AddValue ("checkBeam", "Check that given beam is the best according in the configured positions.", checkBeam);
   cmd.AddValue ("utCount", "Number of the UTs.", utCount);
   cmd.AddValue ("usersPerUt", "Users per UT.", usersPerUt);
+  cmd.AddValue ("externalUtPositionFile", "UT position input file (in data/)", extUtPositions);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-list-position-external-fading"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  // Set default values for some attributes for position setting and external fading trace
+  // This done before command line parsing in order to override them if needed
+
+  simulationHelper->SetUserCountPerUt (usersPerUt);
+  simulationHelper->SetUtCountPerBeam (utCount);
+  simulationHelper->SetBeamSet ({beamId});
+  simulationHelper->SetSimulationTime (Seconds (1.1));
+
+  // Enable default fading traces
+  simulationHelper->EnableExternalFadingInputTrace ();
+
+  // Enable UT positions from input file
+  simulationHelper->EnableUtListPositionsFromInputFile (extUtPositions, checkBeam);
 
   // enable info logs
   LogComponentEnable ("sat-list-position-ext-fading-example", LOG_LEVEL_INFO);
@@ -127,27 +118,7 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  // create helper
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  /** create user defined scenario */
-
-  // define how many UTs and users per UT is created
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utCount, usersPerUt);
-  SatHelper::BeamUserInfoMap_t beamMap;
-  beamMap[beamId] = beamInfo; // use only one beam
-
-  // Now earlier defined/set positions for SatConf are set for UTs from input file
-  // (defined by attribute 'ns3::SatConf::UtPositionInputFileName)
-  // When creating user defined scenario with method SatHelper::CreateUserDefinedScenarioFromListPositions
-  // position are set from input file in creation order (so position should follow beams in ascending order).
-  // So first created UT get position from row one, second from row two etc.
-  // Note also that trace input files for external fading in index files should follow this same order,
-  // when LIST_MODE for external fading trace is used.
-
-  helper->CreateUserDefinedScenarioFromListPositions (beamMap, checkBeam);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
 
   // set callback traces where we want results out
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
@@ -159,42 +130,21 @@ main (int argc, char *argv[])
   Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                    MakeCallback (&LinkBudgetTraceCb));
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+  // Install CBR traffic model
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("0.1s"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+  		SimulationHelper::UDP,
+			SimulationHelper::FWD_LINK,
+			Seconds (0.1), Seconds (0.25));
 
-  uint16_t port = 9;
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+  		SimulationHelper::UDP,
+			SimulationHelper::RTN_LINK,
+			Seconds (0.1), Seconds (0.25));
 
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-
-  // create sink application on GW user
-  ApplicationContainer sinkContainer = sinkHelper.Install (gwUsers.Get (0));
-  sinkContainer.Start (Seconds (0.1));
-  sinkContainer.Stop (Seconds (1.0));
-
-  ApplicationContainer cbrContainer;
-  cbrContainer.Start (Seconds (0.1));
-  cbrContainer.Stop (Seconds (0.25));
-
-  CbrHelper gwCbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-  gwCbrHelper.SetAttribute ("Interval", StringValue ("0.1s"));
-  gwCbrHelper.SetAttribute ("PacketSize", UintegerValue (512) );
-
-  CbrHelper utCbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-  utCbrHelper.SetAttribute ("Interval", StringValue ("0.1s"));
-  utCbrHelper.SetAttribute ("PacketSize", UintegerValue (512) );
-
-  // create sink applications on UT users, CBR applications on GW user and UT users
-  for (uint32_t i = 0; i < utUsers.GetN (); i++)
-    {
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-      sinkContainer.Add (sinkHelper.Install (utUsers.Get (i)));
-
-      gwCbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-      cbrContainer.Add (gwCbrHelper.Install (gwUsers.Get (0)));
-
-      cbrContainer.Add (utCbrHelper.Install (utUsers.Get (i)));
-    }
 
   NS_LOG_INFO ("--- List Position External Fading Example ---");
   NS_LOG_INFO ("UT info (Beam ID, UT ID, Latitude, Longitude, Altitude + addresses");
@@ -204,9 +154,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Link results (Time, Channel type, Own address, Dest. address, Beam ID, SINR, Composite SINR) :");
   // results are printed out in callback (PacketTraceCb)
 
-  Simulator::Stop (Seconds (1.1));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

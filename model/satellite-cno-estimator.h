@@ -123,7 +123,7 @@ public:
   {
     double newSum = currentSum;
 
-    if ( !isnan (sample.second) )
+    if ( !std::isnan (sample.second) )
       {
         newSum += sample.second;
       }

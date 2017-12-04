@@ -46,16 +46,14 @@ main (int argc, char *argv[])
   Time simLength (Seconds (50.0));
 
   std::string simulationName ("sat-rtn-link-ra-example");
-  std::string outputPath ("");
+  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue ("OutputPath", "Output path for statistics files.", outputPath);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
-
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
   simulationHelper->SetDefaultValues ();
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
@@ -72,56 +70,25 @@ main (int argc, char *argv[])
   sstag << simulationName  << "UTs=" << utsPerBeam;
   simulationHelper->SetOutputTag (sstag.str ());
 
-  if (outputPath != "")
-  {
-      simulationHelper->SetOutputPath (outputPath);
-  }
-
-  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
-
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+  // Create satellite scenario
+  simulationHelper->CreateSatScenario ();
 
   // >>> Start of actual test using Full scenario >>>
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (33)));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (20) );
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+			SimulationHelper::UDP,
+			SimulationHelper::RTN_LINK,
+			Seconds (1), Seconds (simLength), Seconds (0.05));
 
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute ("Interval", TimeValue (MilliSeconds (33)));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (20) );
-
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-  // initialized time values for simulation
-  uint32_t maxTransmitters = utUsers.GetN ();
-
-  ApplicationContainer gwApps;
-  ApplicationContainer utApps;
-
-  Time cbrStartDelay = Seconds (1);
-
-  // Cbr and Sink applications creation
-  for ( uint32_t i = 0; i < maxTransmitters; i++)
-    {
-      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-      utApps.Add (cbrHelper.Install (utUsers.Get (i)));
-      gwApps.Add (sinkHelper.Install (gwUsers.Get (0)));
-
-      cbrStartDelay += Seconds (0.05);
-
-      utApps.Get (i)->SetStartTime (cbrStartDelay);
-      utApps.Get (i)->SetStopTime (simLength);
-    }
-
-  utApps.Start (Seconds (1));
-  utApps.Stop (simLength);
-
+  // Create RTN link statistics
   simulationHelper->CreateDefaultRtnLinkStats ();
-  simulationHelper->EnableProgressLogging ();
+
+  // Enable logs
+  simulationHelper->EnableProgressLogs ();
+
+  // Run
   simulationHelper->RunSimulation ();
 
   return 0;

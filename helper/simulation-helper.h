@@ -23,6 +23,7 @@
 
 #include <set>
 #include <ns3/random-variable-stream.h>
+#include <ns3/command-line.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/satellite-enums.h>
@@ -98,6 +99,14 @@ public:
   void SetBeams (std::string beamList);
 
   /**
+   * \brief Set enabled beams (1-72) as a set.
+   * \param beamSet List of beams.
+   * \example simulationHelper->SetBeams ({1,2,3})
+   *          enables beams 1, 2 and 3..
+   */
+  void SetBeamSet (std::set<uint32_t> beamSet);
+
+  /**
    * \brief Set UT count per beam.
    * \param count Number of UTs per beam.
    */
@@ -122,10 +131,23 @@ public:
   void SetUserCountPerUt (Ptr<RandomVariableStream> rs);
 
   /**
+   * \brief Set the number of GW users in the scenario.
+   * Must be called before creation of satellite scenario.
+   * \param gwUserCount
+   */
+  void SetGwUserCount (uint32_t gwUserCount);
+
+  /**
    * \brief Set simulation time in seconds.
    * \param seconds
    */
   void SetSimulationTime (double seconds);
+
+  /**
+   * \brief Set simulation time
+   * \param time
+   */
+  inline void SetSimulationTime (Time time) { m_simTime = time; };
 
   /**
    * \brief Set ideal channel/physical layer parameterization.
@@ -261,7 +283,27 @@ public:
    * \brief Enables simulation progress logging.
    * Progress is logged to stdout in form of 'Progress: (current simulation time)/(simulation length)'.
    */
-  void EnableProgressLogging ();
+  void EnableProgressLogs ();
+
+  /**
+   * \brief Disables simulation progress logs.
+   */
+  void DisableProgressLogs ();
+
+  /**
+   * \brief Add default command line arguments for the simulation.
+   * This method must be called between creation of the CommandLine helper and CommandLine::Parse () call.
+   * \param cmd Reference to CommandLine helper instance
+   */
+  void AddDefaultUiArguments (CommandLine &cmd);
+
+  /**
+   * \brief Add default command line arguments for the simulation.
+   * This method must be called between creation of the CommandLine helper and CommandLine::Parse () call.
+   * \param cmd Reference to CommandLine helper instance
+   * \param xmlInputFile Reference to string containing XML input file name
+   */
+  void AddDefaultUiArguments (CommandLine &cmd, std::string &xmlInputFile);
 
   /**
    * \brief Run the simulation
@@ -272,7 +314,7 @@ public:
    * \brief Create the satellite scenario.
    * \return satHelper Satellite helper, which provides e.g. nodes for application installation.
    */
-  Ptr<SatHelper> CreateSatScenario ();
+  Ptr<SatHelper> CreateSatScenario (SatHelper::PreDefinedScenario_t scenario = SatHelper::NONE);
 
   /**
    * \brief Create stats collectors and set default statistics settings
@@ -326,6 +368,121 @@ public:
 
   inline Time& GetSimTime () { return m_simTime; }
 
+  /**
+   * \brief Set common UT position allocator for all beams.
+   * The position allocator is used to draw UT position geocoordinates
+   * in order of the beam IDs and number of UTs configured.
+   * No validation is done.
+   * \param posAllocator
+   */
+  void SetCommonUtPositionAllocator (Ptr<SatListPositionAllocator> posAllocator);
+
+  /**
+   * \brief Set a list position allocator for UTs of a specific beam.
+   * The position allocator is used to draw UT position geocoordinates
+   * when UTs are created for that specific beam-
+   * \param beamId Beam ID
+   * \param posAllocator List of UT positions, *must* match the number of UTs configured
+   */
+  void SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator);
+
+  /**
+   * \brief Enable reading UT list positions from input file
+   * \param inputFile List postion file path (starting from data/)
+   * \param checkBeam
+   */
+  void EnableUtListPositionsFromInputFile (std::string inputFile, bool checkBeams = true);
+
+  /**
+   * \brief If lower layer API access is required, use this to access SatHelper.
+   * You MUST have called CreateSatScenario before calling this method.
+   */
+  inline Ptr<SatHelper> GetSatelliteHelper () { return m_satHelper; };
+
+  /**
+   * \brief Get the statistics container of this helper. If does not exist, one is created.
+   * \return Statistics helper container
+   */
+  Ptr<SatStatsHelperContainer> GetStatisticsContainer ();
+
+  typedef enum
+  {
+  	CBR,
+		ONOFF,
+  	HTTP,
+		NRTV,
+  } TrafficModel_t;
+
+  typedef enum
+  {
+  	UDP, TCP
+  } TransportLayerProtocol_t;
+
+  typedef enum
+  {
+  	RTN_LINK, FWD_LINK
+  } TrafficDirection_t;
+
+  /**
+   * \brief Install simple traffic model from GW users to UT users or vice versa.
+   * If traffic source/target is a single GW user, then its ID can be changed with
+   * SetGwUserId ().
+   * \param trafficModel Traffic models
+   * \param protocol Transport layer protocol
+   * \param direction Direction of traffic
+   * \param startTime Application Start time
+   * \param stopTime Application stop time
+   * \param startDelay application start delay between each user
+   */
+  void InstallTrafficModel (TrafficModel_t trafficModel,
+														TransportLayerProtocol_t protocol,
+														TrafficDirection_t direction,
+														Time startTime,
+														Time stopTime,
+														Time startDelay);
+
+  void InstallTrafficModel (TrafficModel_t trafficModel,
+  		                      TransportLayerProtocol_t protocol,
+			                      TrafficDirection_t direction,
+														Time startTime,
+														Time stopTime)
+  {
+  	InstallTrafficModel (
+  			trafficModel, protocol, direction,
+				startTime,
+				stopTime,
+				Seconds (0));
+  }
+
+  void InstallTrafficModel (TrafficModel_t trafficModel,
+  		                      TransportLayerProtocol_t protocol,
+			                      TrafficDirection_t direction,
+														Time startTime)
+  {
+  	InstallTrafficModel (
+  			trafficModel, protocol, direction,
+				startTime,
+				m_simTime + Seconds (1),
+				Seconds (0));
+  }
+
+  void InstallTrafficModel (TrafficModel_t trafficModel,
+														TransportLayerProtocol_t protocol,
+														TrafficDirection_t direction)
+  {
+  	InstallTrafficModel (
+  			trafficModel, protocol, direction,
+  			Seconds (0.001),
+				m_simTime + Seconds (1),
+				Seconds (0));
+  }
+
+  /**
+   * \brief Set the ID of the GW user for traffic models.
+   * \param gwUserId GW user's ID
+   */
+  inline void SetGwUserId (uint32_t gwUserId) { m_gwUserId = gwUserId; };
+
 protected:
 
   /**
@@ -346,28 +503,56 @@ protected:
   /**
    * \brief Get next UT count from internal random variable stream.
    */
-  inline uint32_t GetNextUtCount () const { return m_utCount->GetInteger (); }
+  inline uint32_t GetNextUtCount () const
+  {
+  	NS_ASSERT_MSG (m_utCount != NULL, "UT count per beam not set");
+  	return m_utCount->GetInteger ();
+  }
 
   /**
    * \brief Get next UT user count from internal random variable stream.
    */
-  inline uint32_t GetNextUtUserCount () const { return m_utUserCount->GetInteger (); }
+  inline uint32_t GetNextUtUserCount () const
+  {
+  	NS_ASSERT_MSG (m_utCount != NULL, "User count per UT not set");
+  	return m_utUserCount->GetInteger ();
+  }
+
+  /**
+   * \brief Check if node has a PacketSink installed at certain port.
+   */
+  bool HasSinkInstalled (Ptr<Node> node, uint16_t port);
+
+  /**
+   * \brief Check if output path has been set. If not, then create a default
+   * output directory inside satellite/data/sims/campaign-name/tag-name.
+   */
+  void SetupOutputPath ();
 
 private:
 
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
+  Ptr<SatListPositionAllocator> m_commonUtPositions;
+  std::map<uint32_t, Ptr<SatListPositionAllocator> > m_utPositionsByBeam;
 
   std::string                  m_simulationName;
+  std::string                  m_simulationTag;
   std::string                  m_enabledBeamsStr;
   std::set<uint32_t>           m_enabledBeams;
+  std::string                  m_outputPath;
   Ptr<RandomVariableStream>    m_utCount;
   Ptr<RandomVariableStream>    m_utUserCount;
   Time                         m_simTime;
-  std::string                  m_uiOutputPath;
-  std::string                  m_uiOutputFileName;
   uint32_t                     m_numberOfConfiguredFrames;
   bool                         m_randomAccessConfigured;
+  bool                         m_enableInputFileUtListPositions;
+  bool                         m_inputFileUtPositionsCheckBeams;
+  uint32_t                     m_gwUserId;
+
+  bool                         m_progressLoggingEnabled;
+  Time 												 m_progressUpdateInterval;
+  EventId                      m_progressReportEvent;
 };
 
 } // namespace ns3

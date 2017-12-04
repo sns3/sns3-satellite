@@ -111,7 +111,7 @@ public:
     Ptr<SatChannelEstimationErrorContainer>  m_cec;
     RandomAccessCollisionModel               m_raCollisionModel;
     double                                   m_raConstantErrorRate;
-    bool                                     m_isRandomAccessEnabled;
+    SatEnums::RandomAccessModel_t            m_randomAccessModel;
 
     RxCarrierCreateParams_s ()
       : m_rxTemperatureK (0.0),
@@ -128,7 +128,7 @@ public:
         m_cec (NULL),
         m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
         m_raConstantErrorRate (0.0),
-        m_isRandomAccessEnabled (false)
+				m_randomAccessModel (SatEnums::RA_MODEL_OFF)
     {
       // do nothing
     }
@@ -292,6 +292,8 @@ public:
    */
   bool IsRandomAccessDynamicLoadControlEnabled () const;
 
+  inline SatEnums::RandomAccessModel_t GetRandomAccessModel () const { return m_randomAccessModel; };
+
 private:
   /*
    * Note, that different carriers may be different bandwidth (symbol rate).
@@ -318,6 +320,7 @@ private:
   RandomAccessCollisionModel m_raCollisionModel;
   double m_raConstantErrorRate;
   bool m_enableRandomAccessDynamicLoadControl;
+  SatEnums::RandomAccessModel_t m_randomAccessModel;
 };
 
 } // namespace ns3

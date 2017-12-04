@@ -402,7 +402,7 @@ SatStatsDelayHelper::InstallProbes ()
 
 
 void
-SatStatsDelayHelper::RxDelayCallback (Time delay, const Address &from)
+SatStatsDelayHelper::RxDelayCallback (const Time &delay, const Address &from)
 {
   //NS_LOG_FUNCTION (this << delay.GetSeconds () << from);
 
@@ -523,7 +523,7 @@ SatStatsDelayHelper::ConnectProbeToCollector (Ptr<Probe> probe,
 
 
 void
-SatStatsDelayHelper::PassSampleToCollector (Time delay, uint32_t identifier)
+SatStatsDelayHelper::PassSampleToCollector (const Time &delay, uint32_t identifier)
 {
   //NS_LOG_FUNCTION (this << delay.GetSeconds () << identifier);
 
@@ -1090,7 +1090,7 @@ SatStatsRtnAppDelayHelper::DoInstallProbes ()
   // Connect to trace sources at GW user node's applications.
 
   NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  Callback<void, Time, const Address &> rxDelayCallback
+  Callback<void, const Time &, const Address &> rxDelayCallback
     = MakeCallback (&SatStatsRtnAppDelayHelper::Ipv4Callback, this);
   Callback<void, Ptr<const Packet>, const Address &> rxCallback
     = MakeCallback (&SatStatsRtnAppDelayHelper::RxCallback, this);
@@ -1194,7 +1194,7 @@ SatStatsRtnAppDelayHelper::RxCallback (Ptr<const Packet> packet,
 
 
 void
-SatStatsRtnAppDelayHelper::Ipv4Callback (Time delay, const Address &from)
+SatStatsRtnAppDelayHelper::Ipv4Callback (const Time &delay, const Address &from)
 {
   //NS_LOG_FUNCTION (this << Time.GetSeconds () << from);
 
@@ -1307,7 +1307,7 @@ SatStatsRtnDevDelayHelper::DoInstallProbes ()
   // Connect to trace sources at GW nodes.
 
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  Callback<void, Time, const Address &> callback
+  Callback<void, const Time &, const Address &> callback
     = MakeCallback (&SatStatsRtnDevDelayHelper::RxDelayCallback, this);
 
   for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
@@ -1394,7 +1394,7 @@ SatStatsRtnMacDelayHelper::DoInstallProbes ()
   // Connect to trace sources at GW nodes.
 
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  Callback<void, Time, const Address &> callback
+  Callback<void, const Time &, const Address &> callback
     = MakeCallback (&SatStatsRtnMacDelayHelper::RxDelayCallback, this);
 
   for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
@@ -1485,7 +1485,7 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes ()
   // Connect to trace sources at GW nodes.
 
   NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  Callback<void, Time, const Address &> callback
+  Callback<void, const Time &, const Address &> callback
     = MakeCallback (&SatStatsRtnPhyDelayHelper::RxDelayCallback, this);
 
   for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)

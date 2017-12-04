@@ -74,20 +74,38 @@ main (int argc, char *argv[])
 
   // All the co-channel beams enabled for user link
   // frequency color 1
-  const unsigned int BEAMS (16);
-  unsigned int coChannelBeams [BEAMS] = {1, 3, 5, 7, 9, 22, 24, 26, 28, 30, 44, 46, 48, 50,  59, 61};
+  std::set<uint32_t> coChannelBeams = {1, 3, 5, 7, 9, 22, 24, 26, 28, 30, 44, 46, 48, 50,  59, 61};
+
+  /**
+   * Create simulation helper
+   */
+  std::string simulationName = "example-training";
+  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+
+  // Find the input xml file in case example is run from other than ns-3 root directory
+  Singleton<SatEnvVariables> satEnvVariables;
+  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/training-input-attributes.xml");
+
+
+  /**
+   * ----------------------------------------------------------------
+   * Read the command line arguments. Note, that this allows the user
+   * to change also the ns3 attributes from command line.
+   * ----------------------------------------------------------------
+   */
+  CommandLine cmd;
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("simDurationInSeconds", "Simulation duration in seconds", simDuration);
+  simulationHelper->AddDefaultUiArguments (cmd, pathToFile);
+  cmd.Parse (argc, argv);
+
 
   /**
    * ---------------------------------------------------
    * Read the default attributes from XML attribute file
    * ---------------------------------------------------
    */
-
   NS_LOG_INFO ("Reading the XML input: training-input-attributes.xml");
-
-  // Find the input xml file in case example is run from other than ns-3 root directory
-  Singleton<SatEnvVariables> satEnvVariables;
-  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/training-input-attributes.xml");
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (pathToFile));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
@@ -100,10 +118,6 @@ main (int argc, char *argv[])
    * Overwrite some attribute values for this script
    * -----------------------------------------------
    */
-
-  // Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("example-training"));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // Enable RBDC for BE
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -136,42 +150,23 @@ main (int argc, char *argv[])
   // Enable packet traces
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
-  /**
-   * ----------------------------------------------------------------
-   * Read the command line arguments. Note, that this allows the user
-   * to change also the ns3 attributes from command line.
-   * ----------------------------------------------------------------
-   */
-  CommandLine cmd;
-  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue ("simDurationInSeconds", "Simulation duration in seconds", simDuration);
-  cmd.Parse (argc, argv);
 
   /**
    * --------------------------------------------------------------------
    * Create satellite system by the usage of satellite helper structures:
-   * - helper->CreateSimpleScenario ();
-   * - helper->CreateLargerScenario ();
-   * - helper->CreateFullScenario ();
-   * - helper->CreateUserDefinedScenario (beamMap);
+   * - simulationHelper->CreateSatScenario (SatHelper::SIMPLE)
    * --------------------------------------------------------------------
    */
   NS_LOG_INFO ("Creating the satellite scenario");
-
-  std::string scenarioName = "Scenario72";
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
   // Each beam will have 'utsPerBeam' user terminals and 'endUsersPerUt'
-  // end users per UT. Note, that this allows also different configurations
-  // per spot-beam.
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  for (unsigned i = 0; i < BEAMS; ++i)
-    {
-      beamMap[coChannelBeams[i]] = beamInfo;
-    }
+	// end users per UT. Note, that this allows also different configurations
+	// per spot-beam.
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetBeamSet (coChannelBeams);
+  simulationHelper->SetSimulationTime (simDuration);
 
-  helper->CreateUserDefinedScenario (beamMap);
+  simulationHelper->CreateSatScenario ();
 
   /**
    * --------------------------------------------------------
@@ -183,47 +178,23 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("Configuring the on-off application!");
 
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-  const std::string protocol = "ns3::UdpSocketFactory";
   uint32_t packetSize (1280); // in bytes
   DataRate dataRate (128000); // in bps
-
-  // UT users are the senders
-  NodeContainer utUsers = helper->GetUtUsers ();
-  // GW users are the receivers
-  NodeContainer gwUsers = helper->GetGwUsers ();
 
   // The application start time is varied to avoid the situation
   // in the beginning that all applications start at the same time.
   Time appStartTime (MilliSeconds (100));
-  // Destination address
-  const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
-  Ptr<UniformRandomVariable> rnd = CreateObject<UniformRandomVariable> ();
 
-  for (NodeContainer::Iterator itUt = utUsers.Begin ();
-       itUt != utUsers.End ();
-       ++itUt)
-    {
-      // Create an OnOff application
-      Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();
-      rtnApp->SetAttribute ("Protocol", StringValue (protocol));
-      rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
-      rtnApp->SetAttribute ("DataRate", DataRateValue (dataRate));
-      rtnApp->SetAttribute ("OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-      rtnApp->SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-      rtnApp->SetStartTime (appStartTime);
-      (*itUt)->AddApplication (rtnApp);
+  Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (packetSize));
+  Config::SetDefault ("ns3::OnOffApplication::DataRate", DataRateValue (dataRate));
+  Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
+  Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
-      appStartTime += MilliSeconds (rnd->GetInteger (0, 50));
-    }
-
-  // Create and install a packet sink to receiver the packets
-  Ptr<PacketSink> ps = CreateObject<PacketSink> ();
-  ps->SetAttribute ("Protocol", StringValue (protocol));
-  ps->SetAttribute ("Local", AddressValue (gwAddr));
-  gwUsers.Get (0)->AddApplication (ps);
+  simulationHelper->InstallTrafficModel (
+      		SimulationHelper::ONOFF,
+    			SimulationHelper::UDP,
+    			SimulationHelper::RTN_LINK,
+					appStartTime, Seconds (simDuration + 1), MilliSeconds (25));
 
   /**
    * -----------------
@@ -234,7 +205,7 @@ main (int argc, char *argv[])
 
   // SatStatsHelperContainer is the interface for satellite related
   // statistics configuration.
-  Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   // Delay
   s->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
@@ -276,10 +247,7 @@ main (int argc, char *argv[])
    */
   NS_LOG_INFO ("Running network simulator 3");
 
-  Simulator::Stop (Seconds (simDuration));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

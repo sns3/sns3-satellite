@@ -57,17 +57,12 @@ main (int argc, char *argv[])
   uint32_t crTxConf (0);
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-dama-onoff-sim-tn9"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-dama-onoff-sim-tn9");
 
   // To read attributes from file
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/tn9-dama-input-attributes.xml";
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
 
   /**
    * Attributes:
@@ -120,7 +115,23 @@ main (int argc, char *argv[])
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("damaConf", "DAMA configuration", damaConf);
   cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
+  simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
+
+  simulationHelper->SetDefaultValues ();
+
+  // Set default attribute values from XML file
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
+
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  // Set beam ID
+  simulationHelper->SetBeamSet ({beamId});
+  simulationHelper->SetSimulationTime (simLength);
 
   // NCC configuration
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
@@ -209,58 +220,22 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
-
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-  const std::string protocol = "ns3::UdpSocketFactory";
+  simulationHelper->CreateSatScenario ();
 
   /**
    * Set-up on-off traffic
    */
-  const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
+  Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
+  Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
-  for (NodeContainer::Iterator itUt = utUsers.Begin ();
-       itUt != utUsers.End ();
-       ++itUt)
-    {
-      appStartTime += MilliSeconds (50);
-
-      // return link
-      Ptr<SatOnOffApplication> rtnApp = CreateObject<SatOnOffApplication> ();
-      rtnApp->SetAttribute ("Protocol", StringValue (protocol));
-      rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (packetSize));
-      rtnApp->SetAttribute ("DataRate", DataRateValue (dataRate));
-      rtnApp->SetAttribute ("OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-      rtnApp->SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-      rtnApp->SetStartTime (appStartTime);
-      (*itUt)->AddApplication (rtnApp);
-    }
-
-  // setup packet sinks at all users
-  Ptr<PacketSink> ps = CreateObject<PacketSink> ();
-  ps->SetAttribute ("Protocol", StringValue (protocol));
-  ps->SetAttribute ("Local", AddressValue (gwAddr));
-  gwUsers.Get (0)->AddApplication (ps);
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::ONOFF, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+			appStartTime, Seconds (simLength), MilliSeconds (50));
 
   /**
    * Set-up statistics
    */
-  Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -310,10 +285,8 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->EnableProgressLogs ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

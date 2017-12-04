@@ -65,12 +65,16 @@ main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-http");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full)",
                 scenario);
   cmd.AddValue ("duration", "Simulation duration (in seconds)",
                 duration);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   if (scenario == "larger")
@@ -83,9 +87,8 @@ main (int argc, char *argv[])
     }
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-http"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetSimulationTime (duration);
+  simulationHelper->SetOutputTag (scenario);
 
   //LogComponentEnableAll (LOG_PREFIX_ALL);
   //LogComponentEnable ("HttpClient", LOG_LEVEL_ALL);
@@ -99,34 +102,35 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->CreatePredefinedScenario (satScenario);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   // get users
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
 
-  HttpHelper httpHelper ("ns3::TcpSocketFactory");
+  ThreeGppHttpHelper httpHelper;
   httpHelper.InstallUsingIpv4 (gwUsers.Get (0), utUsers);
   httpHelper.GetServer ().Start (Seconds (1.0));
-  httpHelper.GetClients ().Start (Seconds (3.0));
 
-  // install KPI statistics collector
-  HttpKpiHelper kpiHelper (&httpHelper);
+  auto apps = httpHelper.GetClients ();
+  apps.Start (Seconds (3.0));
+
+  uint32_t i = 0;
+  std::vector<Ptr<ClientRxTracePlot> > plots;
+  for (auto app = apps.Begin (); app != apps.End (); app++, i++)
+  {
+    std::stringstream plotName;
+    plotName << "3GPP-HTTP-client-" << i << "-trace";
+  	plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
+  }
 
   NS_LOG_INFO ("--- sat-http-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (duration));
-  Simulator::Run ();
+  simulationHelper->RunSimulation();
 
-  kpiHelper.Print ();
-
-  Simulator::Destroy ();
+  plots.clear();
 
   return 0;
 

@@ -52,7 +52,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
     m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
     m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
     m_raConstantErrorRate (0.0),
-    m_enableRandomAccessDynamicLoadControl (true)
+    m_enableRandomAccessDynamicLoadControl (true),
+		m_randomAccessModel ()
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
@@ -76,7 +77,8 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
     m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
     m_raCollisionModel (createParams.m_raCollisionModel),
     m_raConstantErrorRate (createParams.m_raConstantErrorRate),
-    m_enableRandomAccessDynamicLoadControl (true)
+    m_enableRandomAccessDynamicLoadControl (true),
+		m_randomAccessModel (createParams.m_randomAccessModel)
 {
   NS_LOG_FUNCTION (this);
 }

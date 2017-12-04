@@ -63,8 +63,12 @@ main (int argc, char *argv[])
 //  ConfigStore inputConfig;
 //  inputConfig.ConfigureDefaults ();
 
-  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-cbr");
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -72,6 +76,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   if ( scenario == "larger")
@@ -82,11 +87,14 @@ main (int argc, char *argv[])
     {
       satScenario = SatHelper::FULL;
     }
+  // Set tag, if output path is not explicitly defined
+  simulationHelper->SetOutputTag (scenario);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetSimulationTime (Seconds (11));
+
+  // Set beam ID
+  std::stringstream beamsEnabled; beamsEnabled  << beamIdInFullScenario;
+  simulationHelper->SetBeams (beamsEnabled.str ());
 
   // enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -102,57 +110,61 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->CreatePredefinedScenario (satScenario);
-
-  // get users
-
-  NodeContainer utUsers;
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   // in full scenario get given beam UTs and use first UT's users
   // other scenarios get all UT users.
   if ( scenario == "full")
     {
+  		// Manual configuration of applications
+
+  		// get users
       NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (beamIdInFullScenario);
-      utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
+      NodeContainer utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
+
+      NodeContainer gwUsers = helper->GetGwUsers ();
+
+      uint16_t port = 9;
+
+      // create application on GW user
+      PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
+      CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
+      cbrHelper.SetAttribute ("Interval", StringValue (interval));
+      cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
+
+      ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
+      gwSink.Start (Seconds (1.0));
+      gwSink.Stop (Seconds (10.0));
+
+      ApplicationContainer gwCbr = cbrHelper.Install (gwUsers.Get (0));
+      gwCbr.Start (Seconds (1.0));
+      gwCbr.Stop (Seconds (2.1));
+
+      // create application on UT user
+      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
+      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
+
+      ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
+      utSink.Start (Seconds (1.0));
+      utSink.Stop (Seconds (10.0));
+
+      ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
+      utCbr.Start (Seconds (7.0));
+      utCbr.Stop (Seconds (9.1));
     }
   else
     {
-      utUsers = helper->GetUtUsers ();
+      Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
+
+		  simulationHelper->InstallTrafficModel (
+					       SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+					       Seconds (1.0), Seconds (2.1));
+		  simulationHelper->InstallTrafficModel (
+		  					 SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+		  					 Seconds (7.0), Seconds (9.1));
+
     }
-
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  uint16_t port = 9;
-
-  // create application on GW user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-  cbrHelper.SetAttribute ("Interval", StringValue (interval));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
-
-  ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
-  gwSink.Start (Seconds (1.0));
-  gwSink.Stop (Seconds (10.0));
-
-  ApplicationContainer gwCbr = cbrHelper.Install (gwUsers.Get (0));
-  gwCbr.Start (Seconds (1.0));
-  gwCbr.Stop (Seconds (2.1));
-
-  // create application on UT user
-  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
-  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-  ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
-  utSink.Start (Seconds (1.0));
-  utSink.Stop (Seconds (10.0));
-
-  ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
-  utCbr.Start (Seconds (7.0));
-  utCbr.Stop (Seconds (9.1));
 
   NS_LOG_INFO ("--- sat-cbr-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
@@ -171,9 +183,7 @@ main (int argc, char *argv[])
   // ConfigStore outputConfig;
   // outputConfig.ConfigureDefaults ();
 
-  Simulator::Stop (Seconds (11));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

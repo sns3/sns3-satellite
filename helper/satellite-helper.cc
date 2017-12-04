@@ -149,7 +149,8 @@ SatHelper::SatHelper ()
     m_packetTraces (false),
     m_utsInBeam (0),
     m_gwUsers (0),
-    m_utUsers (0)
+    m_utUsers (0),
+		m_utPositionsByBeam ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -384,6 +385,20 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
 }
 
 void
+SatHelper::SetCustomUtPositionAllocator (Ptr<SatListPositionAllocator> posAllocator)
+{
+	NS_LOG_FUNCTION (this);
+	m_utPositions = posAllocator;
+}
+
+void
+SatHelper::SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator)
+{
+	NS_LOG_FUNCTION (this << beamId);
+	m_utPositionsByBeam[beamId] = posAllocator;
+}
+
+void
 SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos, bool checkBeam)
 {
   NS_LOG_FUNCTION (this);
@@ -518,7 +533,11 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 
   // if position allocator (list) for UTs is created by helper already use it,
   // in other case use the spot beam position allocator
-  if ( m_utPositions != NULL )
+  if (m_utPositionsByBeam.find (beamId) != m_utPositionsByBeam.end ())
+    {
+    	allocator = m_utPositionsByBeam[beamId];
+    }
+  else if ( m_utPositions != NULL )
     {
       allocator = m_utPositions;
     }
@@ -707,6 +726,8 @@ void
 SatHelper::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+
+  m_utPositionsByBeam.clear ();
 }
 
 bool

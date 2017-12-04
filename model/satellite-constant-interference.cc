@@ -78,7 +78,11 @@ SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEve
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (m_rxing);
+  if (m_rxing == false)
+    {
+      NS_LOG_WARN ("Most likely two overlapping receptions! With random access carrier"
+          " this should be fine, but with dedicated access prohibited!");
+    }
 
   return m_power;
 }

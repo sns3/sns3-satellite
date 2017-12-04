@@ -217,7 +217,7 @@ private:
    * Traced callback for all received packets, including delay information and
    * the address of the senders.
    */
-  TracedCallback<Time, const Address &> m_rxDelayTrace;
+  TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
 };
 

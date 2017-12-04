@@ -361,8 +361,8 @@ SatMobilityObserverTestCase::DoRun (void)
   utEl = utObserver->GetElevationAngle ();
   gwEl = gwObserver->GetElevationAngle ();
 
-  NS_TEST_ASSERT_MSG_EQ ( isnan (utEl), false, "UT elevation angle incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (gwEl), false, "GW elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (utEl), false, "UT elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (gwEl), false, "GW elevation angle incorrect");
 
   gwMob->SetGeoPosition (GeoCoordinate (10.0, 10.00, 0.00));
   utMob->SetGeoPosition (GeoCoordinate (0.00, 0.00, 0.00));
@@ -370,8 +370,8 @@ SatMobilityObserverTestCase::DoRun (void)
   utEl = utObserver->GetElevationAngle ();
   gwEl = gwObserver->GetElevationAngle ();
 
-  NS_TEST_ASSERT_MSG_EQ ( isnan (utEl), false, "UT elevation angle incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (gwEl), false, "GW elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (utEl), false, "UT elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (gwEl), false, "GW elevation angle incorrect");
 
 
   // Test that we get invalid elevation angle at points where we shouldn't see satellite
@@ -382,8 +382,8 @@ SatMobilityObserverTestCase::DoRun (void)
   utEl = utObserver->GetElevationAngle ();
   gwEl = gwObserver->GetElevationAngle ();
 
-  NS_TEST_ASSERT_MSG_EQ ( isnan (utEl), true, "UT elevation angle incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (gwEl), true, "GW elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (utEl), true, "UT elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (gwEl), true, "GW elevation angle incorrect");
 
   gwMob->SetGeoPosition (GeoCoordinate (90.0, 0.00, 0.00));
   utMob->SetGeoPosition (GeoCoordinate (0.00, 180.00, 0.00));
@@ -391,8 +391,8 @@ SatMobilityObserverTestCase::DoRun (void)
   utEl = utObserver->GetElevationAngle ();
   gwEl = gwObserver->GetElevationAngle ();
 
-  NS_TEST_ASSERT_MSG_EQ ( isnan (utEl), true, "UT elevation angle incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (gwEl), true, "GW elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (utEl), true, "UT elevation angle incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (gwEl), true, "GW elevation angle incorrect");
 
   // Test that we get correct elevation angle with our reference satellite
 
@@ -423,12 +423,12 @@ SatMobilityObserverTestCase::DoRun (void)
           if ( refValue < 0 )
             {
               // NAN should be returned, because only points where we can see satellite is accepted
-              NS_TEST_ASSERT_MSG_EQ ( isnan (gwEl), true, "UT elevation angle incorrect: lat-> " << lat << " lon-> " << " alt->" << alt );
+              NS_TEST_ASSERT_MSG_EQ ( std::isnan (gwEl), true, "UT elevation angle incorrect: lat-> " << lat << " lon-> " << " alt->" << alt );
             }
           else
             {
               // valid values should be returned and it should be inside tolerance
-              NS_TEST_ASSERT_MSG_EQ ( isnan (gwEl), false, "UT elevation angle incorrect (NAN): lat-> " << lat << " lon-> " << " alt" << alt );
+              NS_TEST_ASSERT_MSG_EQ ( std::isnan (gwEl), false, "UT elevation angle incorrect (NAN): lat-> " << lat << " lon-> " << " alt" << alt );
               NS_TEST_ASSERT_MSG_EQ_TOL ( gwEl, refValue, 0.00001, "UT elevation angle incorrect: lat-> " << lat << " lon-> " << " alt" << alt );
             }
         }

@@ -192,7 +192,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   SatGeoHelper::RandomAccessSettings_s geoRaSettings;
   geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;
   geoRaSettings.m_randomAccessModel = m_randomAccessModel;
-  geoRaSettings.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED; // no collision checks at satellite
+  geoRaSettings.m_raCollisionModel = m_raCollisionModel;
 
   SatGwHelper::RandomAccessSettings_s gwRaSettings;
   gwRaSettings.m_raInterferenceModel = m_raInterferenceModel;
@@ -203,9 +203,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   gwRaSettings.m_raConstantErrorRate = m_raConstantErrorRate;
 
   SatUtHelper::RandomAccessSettings_s utRaSettings;
-  utRaSettings.m_raInterferenceModel = m_raInterferenceModel;
   utRaSettings.m_randomAccessModel = m_randomAccessModel;
-  utRaSettings.m_raCollisionModel = SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED; // no random access in fwd link
+  utRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  utRaSettings.m_raCollisionModel = m_raCollisionModel;
 
   // create needed low level satellite helpers
   m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, geoRaSettings);
@@ -405,10 +405,6 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
                                              m_ncc);
 
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
-
-  // add beam to NCC
-  PointerValue llsConf;
-  m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
 
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();

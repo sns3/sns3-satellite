@@ -110,7 +110,6 @@ public:
    */
   SatStatsHelperContainer (Ptr<const SatHelper> satHelper);
 
-
   /**
    * inherited from ObjectBase base class
    */

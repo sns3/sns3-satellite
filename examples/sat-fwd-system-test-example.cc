@@ -99,7 +99,7 @@ main (int argc, char *argv[])
   uint32_t gwEndUsers = 10;
 
   uint32_t testCase = 0;
-  uint32_t trafficModel = 0;
+  std::string trafficModel = "cbr";
   double simLength (400.0); // in seconds
   Time senderAppStartTime = Seconds (0.1);
   bool traceFrameInfo = true;
@@ -108,6 +108,11 @@ main (int argc, char *argv[])
   UintegerValue packetSize (128); // in bytes
   TimeValue interval (MicroSeconds (10));
   DataRateValue dataRate (DataRate (16000));
+
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-fwd-system-test");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
 
   // set default values for traffic model apps here
   // attributes can be overridden by command line arguments when needed
@@ -131,13 +136,21 @@ main (int argc, char *argv[])
   cmd.AddValue ("traceFrameInfo", "Trace (print) BB frame info", traceFrameInfo);
   cmd.AddValue ("traceMergeInfo", "Trace (print) BB frame merge info", traceMergeInfo);
   cmd.AddValue ("beamId", "Beam Id", beamId);
+  cmd.AddValue ("trafficModel", "Traffic model: either 'cbr' or 'onoff'", trafficModel);
   cmd.AddValue ("senderAppStartTime", "Sender application (first) start time", senderAppStartTime);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-fwd-system-test"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  if (trafficModel != "cbr" && trafficModel != "onoff")
+		{
+			NS_FATAL_ERROR ("Invalid traffic model, use either 'cbr' or 'onoff'");
+		}
+  SimulationHelper::TrafficModel_t model = trafficModel == "cbr" ? SimulationHelper::CBR : SimulationHelper::ONOFF;
+
+  simulationHelper->SetUtCountPerBeam (gwEndUsers);
+  simulationHelper->SetUserCountPerUt (1);
+  simulationHelper->SetSimulationTime (simLength);
+  simulationHelper->SetGwUserCount (gwEndUsers);
+  simulationHelper->SetBeamSet ({beamId});
 
   /**
    * Select test case to execute
@@ -174,17 +187,7 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (gwEndUsers));
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (gwEndUsers, 1);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
+  simulationHelper->CreateSatScenario ();
 
   // connect BB frame TX traces on, if enabled
   if (traceFrameInfo)
@@ -198,54 +201,13 @@ main (int argc, char *argv[])
       Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatMac/Scheduler/BBFrameContainer/BBFrameMergeTrace", MakeCallback (&PrintBbFrameMergeInfo));
     }
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
   /**
    * Set-up CBR or OnOff traffic with sink receivers
    */
+	simulationHelper->InstallTrafficModel (
+						model, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+						senderAppStartTime, Seconds (simLength), MicroSeconds (20));
 
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address ());
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address ());
-  SatOnOffHelper onOff ("ns3::UdpSocketFactory", Address ());
-
-  // Create a packet sink to receive packets and CBR to sent packets
-
-  for ( uint32_t i = 0; i < gwEndUsers; i++)
-    {
-      sink.SetAttribute ("Local", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port)));
-      sink.Install (utUsers.Get (i));
-
-      ApplicationContainer senderAppAdded;
-
-      switch (trafficModel)
-        {
-        case 0:   // CBR
-          cbr.SetAttribute ("Remote", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port)));
-          senderAppAdded = cbr.Install (gwUsers.Get (i));
-          DynamicCast<CbrApplication> (senderAppAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-          DynamicCast<CbrApplication> (senderAppAdded.Get (0))->GetAttribute ("Interval", interval );
-          break;
-
-        case 1:   // On-Off
-          onOff.SetAttribute ("Remote", AddressValue (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port)));
-          senderAppAdded = onOff.Install (gwUsers.Get (i));
-          DynamicCast<OnOffApplication> (senderAppAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-          DynamicCast<OnOffApplication> (senderAppAdded.Get (0))->GetAttribute ("DataRate", dataRate );
-          break;
-
-        default:
-          NS_FATAL_ERROR ("Not Supported Traffic Model!");
-          break;
-        }
-
-      senderAppAdded.Get (0)->SetStartTime (senderAppStartTime);
-      senderAppStartTime += MicroSeconds (20);
-    }
 
   NS_LOG_INFO ("--- sat-fwd-sys-test ---");
   NS_LOG_INFO ("  Packet size: " << packetSize.Get ());
@@ -267,10 +229,7 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

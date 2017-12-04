@@ -49,6 +49,10 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
   std::string scenario = "Simple";
 
+  // Create simulation helper
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-tutorial");
+
+
   // Enable creation traces
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
@@ -60,7 +64,6 @@ main (int argc, char *argv[])
    -- Start --                                                                */
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-tutorial"));
   Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
@@ -82,6 +85,7 @@ main (int argc, char *argv[])
 
   CommandLine cmd;
   cmd.AddValue ("scenario", "Scenario to be created", scenario);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
   /**
 -- End --
@@ -101,6 +105,10 @@ Read command line arguments
     {
       satScenario = SatHelper::FULL;
     }
+
+  simulationHelper->SetOutputTag (scenario);
+  simulationHelper->SetSimulationTime (Seconds (11));
+
 
   // enable info logs
   LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -128,17 +136,16 @@ Read command line arguments
 'To Select super frame configuration, Option 1'
 ******************************************************************************/
 
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // Create satellite helper with given scenario default=simple
-  helper->CreatePredefinedScenario (satScenario);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
   /**
 -- End --
 Create helper and simulation scenario
 ******************************************************************************/
 
   /*****************************************************************************
-    Creating an installing application (users) to satellite network
+    Manually creating an installing application (users) to satellite network.
+    Note that you may simply call SimulationHelper::Install TrafficModel when
+    using all nodes.
     -- Start --
                                                                     */
   // for getting UT users
@@ -216,9 +223,7 @@ Creating and installing application (users) to satellite network
    Run, stop and destroy simulation
    -- Start --                                                                */
 
-  Simulator::Stop (Seconds (11));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
   /**
 -- End --
 Run, stop and destroy simulation

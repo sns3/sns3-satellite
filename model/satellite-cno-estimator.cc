@@ -130,7 +130,7 @@ SatBasicCnoEstimator::DoGetCnoEstimation ()
         case MINIMUM:
           for ( SampleMap_t::const_iterator it = m_samples.begin (); it != m_samples.end (); it++ )
             {
-              if ( isnan (estimatedCno) || (( !isnan (it->second)) && (it->second < estimatedCno)) )
+              if ( std::isnan (estimatedCno) || (( !std::isnan (it->second)) && (it->second < estimatedCno)) )
                 {
                   estimatedCno = it->second;
                 }

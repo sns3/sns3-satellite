@@ -65,6 +65,9 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.001);
   Time appStopTime = Seconds (10.0);
 
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-multi-application-rtn");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   // read command line parameters given by user
@@ -73,12 +76,13 @@ main (int argc, char *argv[])
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("cbrProbability", "Probability of CBR end users", cbrProbability);
   cmd.AddValue ("simLength", "Simulation length in seconds", simLength);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-multi-application-rtn"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetUtCountPerBeam (1);
+  simulationHelper->SetUserCountPerUt (1);
+  simulationHelper->SetBeamSet ({12,22});
+  simulationHelper->SetSimulationTime (simLength);
 
   // No PHY errors
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
@@ -89,20 +93,7 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  NS_LOG_INFO ("Using: " << scenarioName);
-
-  // Create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // Create user defined scenario with beams 12 and 22
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[12] = beamInfo;
-  beamMap[22] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
 
   // Get the end users so that it is possible to attach
   // applications on them
@@ -193,26 +184,29 @@ main (int argc, char *argv[])
       cbrHelper.SetAttribute ("Interval", StringValue (interval));
       cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
+  	  // Set destination addresses
+  	  InetSocketAddress cbrDest (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port);
+  	  cbrDest.SetTos (cbrTos);
+
       // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
+      gwCbrSinkApps.Add (cbrSinkHelper.Install (gwUsers.Get (cbrGwUserId)));
+      gwCbrSinkApps.Get (0)->SetStartTime (Seconds (0.1));
+      gwCbrSinkApps.Get (0)->SetStopTime (appStopTime);
+
       for ( uint32_t i = 0; i < utCbrUsers.GetN (); i++)
         {
-    	  // Set destination addresses
-    	  InetSocketAddress cbrDest (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port);
-    	  cbrDest.SetTos (cbrTos);
+
 
           cbrHelper.SetAttribute ("Remote", AddressValue (Address (cbrDest)));
           cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (cbrDest)));
 
           utCbrApps.Add (cbrHelper.Install (utCbrUsers.Get (i)));
-          gwCbrSinkApps.Add (cbrSinkHelper.Install (gwUsers.Get (cbrGwUserId)));
 
           startDelay += Seconds (0.001);
 
           // Set start and end times
           utCbrApps.Get (i)->SetStartTime (startDelay);
           utCbrApps.Get (i)->SetStopTime (appStopTime);
-          gwCbrSinkApps.Get (i)->SetStartTime (Seconds (0.1));
-          gwCbrSinkApps.Get (i)->SetStopTime (appStopTime);
         }
     }
   //---- Stop CBR application definitions
@@ -239,25 +233,26 @@ main (int argc, char *argv[])
 
       startDelay = appStartTime;
 
+  	  // Set destination addresses
+  	  InetSocketAddress onOffDest (helper->GetUserAddress (gwUsers.Get (onOffGwUserId)), port);
+  	  onOffDest.SetTos (onOffTos);
+
       // Cbr and Sink applications creation
+      gwOnOffSinkApps.Add (onOffSinkHelper.Install (gwUsers.Get (onOffGwUserId)));
+      gwOnOffSinkApps.Get (0)->SetStartTime (Seconds (0.1));
+      gwOnOffSinkApps.Get (0)->SetStopTime (appStopTime);
+
       for ( uint32_t i = 0; i < utOnOffUsers.GetN (); i++)
         {
-    	  // Set destination addresses
-    	  InetSocketAddress onOffDest (helper->GetUserAddress (gwUsers.Get (onOffGwUserId)), port);
-    	  onOffDest.SetTos (onOffTos);
-
           onOffHelper.SetAttribute ("Remote", AddressValue (Address (onOffDest)));
           onOffSinkHelper.SetAttribute ("Local", AddressValue (Address (onOffDest)));
 
           utOnOffApps.Add (onOffHelper.Install (utOnOffUsers.Get (i)));
-          gwOnOffSinkApps.Add (onOffSinkHelper.Install (gwUsers.Get (onOffGwUserId)));
 
           startDelay += Seconds (0.001);
 
           utOnOffApps.Get (i)->SetStartTime (startDelay);
           utOnOffApps.Get (i)->SetStopTime (appStopTime);
-          gwOnOffSinkApps.Get (i)->SetStartTime (Seconds (0.1));
-          gwOnOffSinkApps.Get (i)->SetStopTime (appStopTime);
         }
     }
 
@@ -272,10 +267,6 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
-
+  simulationHelper->RunSimulation ();
   return 0;
 }

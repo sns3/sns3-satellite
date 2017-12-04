@@ -159,19 +159,19 @@ SatBasicEstimatorLastTestCase::DoRun (void)
   // After simulation check that estimations are as expected
 
   // estimations with window 100 ms
-  NS_TEST_ASSERT_MSG_EQ (isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ (std::isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ (m_cnoEstimations[1], -5.0, "second estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ (m_cnoEstimations[2], 5.0, "third estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ (m_cnoEstimations[3], -15.0, "fourth estimation incorrect");
-  NS_TEST_ASSERT_MSG_EQ (isnan (m_cnoEstimations[4]), true, "fifth estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ (std::isnan (m_cnoEstimations[4]), true, "fifth estimation incorrect");
 
   // estimations with window 300 ms
-  NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[6], -6.0, "seventh estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[7], 1.0, "eight estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[8], 1.0, "ninth estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[9], -5.0, "tenth estimation incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[10]), true, "eleventh estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (m_cnoEstimations[10]), true, "eleventh estimation incorrect");
 
   Simulator::Destroy ();
 
@@ -238,12 +238,12 @@ SatBasicEstimatorMinTestCase::DoRun (void)
   // After simulation check that estimations are as expected
 
   // estimations with window 200 ms
-  NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[1], -4.2, "second estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[2], -4.2, "third estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[3], 8.1, "fourth estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ ( m_cnoEstimations[4], -15.7, "fifth estimation incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
 
   Simulator::Destroy ();
 
@@ -310,12 +310,12 @@ SatBasicEstimatorAverageTestCase::DoRun (void)
   // After simulation check that estimations are as expected
 
   // estimations with window 200 ms
-  NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (m_cnoEstimations[0]), true, "first estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[1], -4.2, 0.0001, "second estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[2], (-4.2 + 8.1 - 15.7) / 3, 0.0001, "third estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[3], (8.1 - 15.7) / 2, 0.0001, "fourth estimation incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( m_cnoEstimations[4], 2.4, 0.0001, "fifth estimation incorrect");
-  NS_TEST_ASSERT_MSG_EQ ( isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
+  NS_TEST_ASSERT_MSG_EQ ( std::isnan (m_cnoEstimations[5]), true, "sixth estimation incorrect");
 
   Simulator::Destroy ();
 

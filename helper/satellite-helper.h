@@ -146,6 +146,20 @@ public:
   Ptr<SatUserHelper> GetUserHelper () const;
 
   /**
+   * \brief Set custom position allocator
+   * \param posAllocator
+   */
+  void SetCustomUtPositionAllocator (Ptr<SatListPositionAllocator> posAllocator);
+
+  /**
+   * \brief Set custom position allocator for specific beam.
+   * This overrides the custom position allocator for this beam.
+   * \param beamId
+   * \param posAllocator
+   */
+  void SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator);
+
+  /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
    *
    * \param source Source node of the multicast group (GW or UT connected user node)
@@ -289,7 +303,13 @@ private:
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
   /**
-   * User defined UT positions from SatConf.
+   * User defined UT positions by beam ID. This is preferred to m_utPositions,
+   * which is a common list for all UTs.
+   */
+  std::map<uint32_t, Ptr<SatListPositionAllocator> > m_utPositionsByBeam;
+
+  /**
+   * User defined UT positions from SatConf (or manually set)
    */
   Ptr<SatListPositionAllocator> m_utPositions;
 

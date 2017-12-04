@@ -86,6 +86,12 @@ public:
   void SetPathToExecutable (std::string pathToExecutable);
 
   /**
+   * Function for creating a directory
+   * \param path path to the directory to be created
+   */
+  void CreateDirectory (std::string path);
+
+  /**
    * \brief Function for locating the data folder
    * \return path to data folder
    */
@@ -101,7 +107,7 @@ public:
   std::string GetOutputPath ();
 
   /**
-   * \brief Method for setting the simulation output path. Tha path must exist.
+   * \brief Method for setting the simulation output path. The path must exist.
    * \param outputPath The new output path.
    */
   void SetOutputPath (std::string outputPath);
@@ -211,12 +217,6 @@ private:
    * \return path to the created folder
    */
   std::string FormOutputPath (std::string simRootPath, std::string campaignName, std::string simTag, std::string safetyTag);
-
-  /**
-   * Function for creating a directory
-   * \param path path to the directory to be created
-   */
-  void CreateDirectory (std::string path);
 
   /**
    * \brief Path to current working directory

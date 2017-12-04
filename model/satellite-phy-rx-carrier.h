@@ -27,7 +27,10 @@
 #include <ns3/traced-callback.h>
 #include <ns3/mac48-address.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-utils.h>
 #include <ns3/satellite-interference.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
 #include <vector>
 #include <map>
@@ -43,14 +46,11 @@ class SatLinkResults;
 class SatChannelEstimationErrorContainer;
 class SatNodeInfo;
 
-
 /**
  * \ingroup satellite
  *
- * The SatPhyRxCarrier models the physical layer receiver of satellite system. There
- * are one SatPhyRxCarrier receiver for each carrier in both forward and return links.
+ * \brief Base class for all SatPhyRxCarriers.
  */
-
 class SatPhyRxCarrier : public Object
 {
 public:
@@ -64,122 +64,6 @@ public:
     Mac48Address sourceAddress;
     Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
   } rxParams_s;
-
-  /**
-   * \brief Struct for storing the CRDSA packet specific Rx parameters
-   */
-  typedef struct
-  {
-    Ptr<SatSignalParameters> rxParams;
-    Mac48Address destAddress;
-    Mac48Address sourceAddress;
-    uint16_t ownSlotId;
-    std::vector<uint16_t> slotIdsForOtherReplicas;
-    bool hasCollision;
-    bool packetHasBeenProcessed;
-    double cSinr;
-    double ifPower;
-    bool phyError;
-  } crdsaPacketRxParams_s;
-
-  /**
-   * \brief Constructor
-   * \param carrierId Carrier ID
-   * \param carrierConf Carrier configuration object
-   * \param isRandomAccessEnabledForThisCarrier Is random access enabled for this carrier
-   */
-  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabledForThisCarrier);
-
-  /**
-   * \brief Destructor
-   */
-  virtual ~SatPhyRxCarrier ();
-
-  /**
-   * \brief Enum for PHY states
-   */
-  enum State
-  {
-    IDLE, RX
-  };
-
-  /**
-   * \brief Function for gettign the NS-3 type ID
-   * \return
-   */
-  static TypeId GetTypeId (void);
-
-  /**
-   * \brief Dispose function
-   */
-  virtual void DoDispose ();
-
-  /**
-  * \brief Function for setting the SatPhy module
-  * \param phy PHY module
-  */
-  void SetPhy (Ptr<SatPhy> phy);
-
-  /**
-   * \brief Function for setting the beam id for all the transmissions from this SatPhyTx
-   * \param beamId the Beam Identifier
-   */
-  void SetBeamId (uint32_t beamId);
-
-  /**
-   * \brief Function for setting the node info class
-   * \param nodeInfo Node information related to this SatPhyRxCarrier
-   */
-  void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
-
-  /**
-   * \brief Function for starting packet reception from the SatChannel
-   * \param rxParams The needed parameters for the received signal
-   */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
-
-  /**
-   * \brief Function for setting the receive callback
-   * \param cb callback
-   */
-  void SetReceiveCb (SatPhyRx::ReceiveCallback cb);
-
-  /**
-   * \brief Function for settign the C/NO callback
-   * \param cb callback
-   */
-  void SetCnoCb (SatPhyRx::CnoCallback cb);
-
-  /**
-   * \brief Function for setting the AverageNormalizedOfferedLoadCallback callback
-   * \param callback callback
-   */
-  void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
-
-  /**
-   * \brief Function for comparing the CRDSA unique packet IDs
-   * \param obj1 Comparison object 1
-   * \param obj2 Comparison object 2
-   * \return Comparison result
-   */
-  static bool CompareCrdsaPacketId (SatPhyRxCarrier::crdsaPacketRxParams_s obj1, SatPhyRxCarrier::crdsaPacketRxParams_s obj2);
-
-  /**
-   * \brief Function for initializing the frame end scheduling
-   */
-  void BeginFrameEndScheduling ();
-
-  /**
-   * \brief Function for setting the random access allocation channel ID
-   * \param randomAccessAllocationChannelId
-   */
-  void SetRandomAccessAllocationChannelId (uint8_t randomAccessAllocationChannelId);
-
-  /**
-   * \brief Function for getting the random access allocation channel ID
-   * \return randomAccessAllocationChannelId
-   */
-  uint8_t GetRandomAccessAllocationChannelId () const;
 
   /**
    * \brief Callback signature for `LinkBudgetTrace` trace source.
@@ -228,7 +112,160 @@ public:
   typedef void (*PhyRxCollisionCallback)
     (uint32_t nPackets, const Address &from, bool isCollided);
 
-private:
+  /**
+   * Constructor
+   * \param carrierId
+   * \param carrierConf
+   * \param isRandomAccessEnabled
+   */
+  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabled);
+
+  /**
+   * \brief Destructor
+   */
+  virtual ~SatPhyRxCarrier ();
+
+  /**
+   * \brief Enum for PHY states
+   */
+  enum State
+  {
+    IDLE, RX
+  };
+
+  /**
+   * \brief Possible carrier types
+   */
+  enum CarrierType
+	{
+  	BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA
+	};
+
+  /**
+   * \brief Function for gettign the NS-3 type ID
+   * \return
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+  * \brief Function for setting the SatPhy module
+  * \param phy PHY module
+  */
+  void SetPhy (Ptr<SatPhy> phy);
+
+  /**
+   * \brief Function for setting the beam id for all the transmissions from this SatPhyTx
+   * \param beamId the Beam Identifier
+   */
+  inline void SetBeamId (uint32_t beamId) { m_beamId = beamId; };
+
+  /**
+   * \brief Get ID the ID of the beam this carrier is attached to
+   * \return Beam ID
+   */
+  inline uint32_t GetBeamId () { return m_beamId; };
+
+
+  /**
+   * \brief Function for setting the node info class
+   * \param nodeInfo Node information related to this SatPhyRxCarrier
+   */
+  void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
+
+  /**
+   * \brief Function for starting packet reception from the SatChannel
+   * \param rxParams The needed parameters for the received signal
+   */
+  void StartRx (Ptr<SatSignalParameters> rxParams);
+
+  /**
+   * \brief Method for querying the type of the carrier
+   */
+  inline virtual CarrierType GetCarrierType () { return BASE; }
+
+  //////////// Set callbacks ///////////////
+
+  /**
+   * \brief Function for setting the receive callback
+   * \param cb callback
+   */
+  void SetReceiveCb (SatPhyRx::ReceiveCallback cb);
+
+  /**
+   * \brief Function for settign the C/NO callback
+   * \param cb callback
+   */
+  void SetCnoCb (SatPhyRx::CnoCallback cb);
+
+  /**
+   * \brief Function for setting the AverageNormalizedOfferedLoadCallback callback
+   * \param callback callback
+   */
+  void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
+
+protected:
+
+  /**
+   * Get the default receive mode for the carrier. In satellite nodes, this will
+   * be overrided to always receive packets.
+   * \return True or false, false by default in base class
+   */
+  inline virtual const bool GetDefaultReceiveMode () { return false; };
+
+  /**
+   * \brief Check if the carrier is receiving a dedicated access packet
+   * \return true or false
+   */
+  inline bool IsReceivingDedicatedAccess () { return m_receivingDedicatedAccess; };
+
+  /**
+   * \brief Get pointer to the current interference model.
+   * \return interference model
+   */
+  inline Ptr<SatInterference> GetInterferenceModel () { return m_satInterference; };
+
+  /**
+   * \brief Create an interference event based on Rx parameters and address.
+   * 				Implemented by child classes.
+   *
+   * \return Pointer to the interference event.
+   */
+	virtual Ptr<SatInterference::InterferenceChangeEvent>
+	  CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress) = 0;
+
+	/**
+	 * Rx parameter storage methods
+	 */
+
+	/**
+	 * Get receive parameters from signal parameters.
+	 * \param rxParams SatSignalParameters
+	 * \return A pair of boolean and rxParams_s struct. Boolean tells if we are about to receive a packet
+	 * 				 and struct contains all receiveing info.
+	 */
+	std::pair<bool, SatPhyRxCarrier::rxParams_s> GetReceiveParams (Ptr<SatSignalParameters> rxParams);
+
+	/// Get stored rxParams under a key
+  inline rxParams_s GetStoredRxParams (uint32_t key) { return m_rxParamsMap[key]; }
+
+  /// Store rxParams under a key
+  inline void StoreRxParams (uint32_t key, rxParams_s rxParams) { m_rxParamsMap[key] = rxParams; }
+
+  /// Remove stored rxParams under a key
+  inline void RemoveStoredRxParams (uint32_t key) { m_rxParamsMap.erase (key); }
+
+  /**
+   * Get the MAC address of the carrier
+   * \return MAC address
+   */
+  inline Mac48Address GetOwnAddress () { return m_ownAddress; };
+
+  /**
+   * Get the satellite node info.
+   * \return SatNodeInfo pointer
+   */
+  inline Ptr<SatNodeInfo> GetNodeInfo () { return m_nodeInfo; };
+
   /**
    * \brief Function for composite SINR output tracing
    * \param cSinr composite SINR
@@ -236,10 +273,38 @@ private:
   void DoCompositeSinrOutputTrace (double cSinr);
 
   /**
+   * Create an interference model for this carrier.
+   * \param carrierConf
+   * \param carrierId
+   * \param rxBandwidthHz
+   * \param randomAccessEnabled
+   */
+  virtual void DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId, double rxBandwidthHz);
+
+  /**
+   * \brief Get the channel type. Base class has undefined channel type, while child classes have
+   * 				can have other channel types.
+   * \return Channel type
+   */
+  inline virtual SatEnums::ChannelType_t GetChannelType () { return m_channelType; };
+
+  /**
+   * \brief Set the channel type for the carrier
+   * \param channelType Channel type.
+   */
+  inline void SetChannelType (SatEnums::ChannelType_t channelType) { m_channelType = channelType; };
+
+  /**
    * \brief Function for changing the receiver state
    * \param newState New state
    */
   void ChangeState (State newState);
+
+  /**
+   * \brief Get the state of the carrier
+   * \return State of the carrier.
+   */
+  inline State GetState () { return m_state; }
 
   /**
    * \brief Function for checking the SINR against the link results
@@ -253,24 +318,17 @@ private:
    * \brief Function for ending the packet reception from the SatChannel
    * \param key Key for Rx params map
    */
-  void EndRxData (uint32_t key);
+  virtual void EndRxData (uint32_t key) = 0;
 
   /**
-   * \brief Function for ending the packet reception from the SatChannel in the satellite
-   * \param key Key for Rx params map
+   * Is random access enabled for this carrier.
    */
-  void EndRxDataTransparent (uint32_t key);
+  const bool m_randomAccessEnabled;
 
   /**
-   * \brief Function for ending the packet reception from the SatChannel in the ground node
-   * \param key Key for Rx params map
+   * \brief Dispose
    */
-  void EndRxDataNormal (uint32_t key);
-
-  /**
-   * \brief Function for processing the frame interval operations
-   */
-  void DoFrameEnd ();
+  virtual void DoDispose ();
 
   /**
    * \brief Function for calculating the SINR
@@ -315,134 +373,41 @@ private:
   void CheckRxStateSanity ();
 
   /**
-   * \brief Funciton for storing the received CRDSA packets
-   * \param Rx parameters of the packet
+   * \brief Get the ID of the carrier
+   * \return Carrier ID
    */
-  void AddCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s rxParams);
+  inline uint32_t GetCarrierId () const { return m_carrierId; }
 
   /**
-   * \brief Function for processing the CRDSA frame
-   * \return Processed packets
+   * \brief Get pointer to the link results given by the carrier
+   * 				creation configuration.
+   * \return Link results
    */
-  std::vector<SatPhyRxCarrier::crdsaPacketRxParams_s> ProcessFrame ();
+  inline Ptr<SatLinkResults> GetLinkResults () { return m_linkResults; };
 
   /**
-   * \brief Function for processing the received CRDSA packets
-   * \param packet Received packet
-   * \param numOfPacketsForThisSlot Number of packets in this slot
-   * \return Processed packet
+   * \brief Get a pointer to the channel estimation error container of the carrier.
+   * \return channel estimation error containe pointer
    */
-  SatPhyRxCarrier::crdsaPacketRxParams_s ProcessReceivedCrdsaPacket (SatPhyRxCarrier::crdsaPacketRxParams_s packet,
-                                                                     uint32_t numOfPacketsForThisSlot);
+  inline Ptr<SatChannelEstimationErrorContainer> GetChannelEstimationErrorContainer ()
+  {
+  	return m_channelEstimationError;
+  };
 
   /**
-   * \brief Function for finding and removing the replicas of the CRDSA packet
-   * \param packet CRDSA packet
+   * \brief Check if composite SINR output trace is enabled.
    */
-  void FindAndRemoveReplicas (SatPhyRxCarrier::crdsaPacketRxParams_s packet);
+  inline bool IsCompositeSinrOutputTraceEnabled () const { return m_enableCompositeSinrOutputTrace; };
 
   /**
-   * \brief Function for eliminating the interference to other packets in the slot from the correctly received packet
-   * \param iter Packets in the slot
-   * \param processedPacket Correctly received processed packet
+   * \brief A helper method for getting values form a uniform random variable in child classes.
+   * \param min Minimum value
+   * \param max Maximum value
+   * \return Double between min and max
    */
-  void EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> >::iterator iter, SatPhyRxCarrier::crdsaPacketRxParams_s processedPacket);
+  inline double GetUniformRandomValue (double min, double max) { return m_uniformVariable->GetValue (min, max); };
 
-  /**
-   * \brief Function for identifying whether the packet is a replica of another packet
-   * \param packet Packet
-   * \param iter A packet in certain slot
-   * \return Is the packet a replica
-   */
-  bool IsReplica (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
-
-  /**
-   * \brief Function for checking do the packets have identical slots
-   * \param packet Packet
-   * \param iter A packet in certain slot
-   * \return Have the packets identical slots
-   */
-  bool HaveSameSlotIds (SatPhyRxCarrier::crdsaPacketRxParams_s packet, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s>::iterator iter);
-
-  /**
-   * \brief Function for processing the Slotted ALOHA collisions
-   * \param cSinr Composite SINR
-   * \param rxParams Rx parameters of the packet
-   * \param interferenceEvent Interference event details
-   * \return PHY error
-   */
-  bool ProcessSlottedAlohaCollisions (double cSinr,
-                                      Ptr<SatSignalParameters> rxParams,
-                                      Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent);
-
-  /**
-   * Update the random access load for CRDSA. Count only the
-   * received unique payloads.
-   */
-  void UpdateRandomAccessLoad ();
-
-  /**
-   * \brief Function for measuring the random access load
-   */
-  void MeasureRandomAccessLoad ();
-
-  /**
-   * \brief Function for calculating the normalized offered random access load
-   * \return Normalized offered load
-   */
-  double CalculateNormalizedOfferedRandomAccessLoad ();
-
-  /**
-   * \brief Function for saving the measured random access load
-   * \param measuredRandomAccessLoad Measured random access load
-   */
-  void SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad);
-
-  /**
-   * \brief Function for calculating the average normalized offered random access load
-   * \return Average normalized offered load
-   */
-  double CalculateAverageNormalizedOfferedRandomAccessLoad ();
-
-  /**
-   * \brief CRDSA packet container
-   */
-  std::map<uint32_t, std::list<SatPhyRxCarrier::crdsaPacketRxParams_s> > m_crdsaPacketContainer;
-
-  /**
-   * \brief Rx state
-   */
-  State m_state;
-
-  /**
-   * \brief Are we receiving dedicated access at this moment
-   */
-  bool m_receivingDedicatedAccess;
-
-  /**
-   * \brief Beam ID
-   */
-  uint32_t m_beamId;
-
-  /**
-   * \brief Carrier ID
-   */
-  uint32_t m_carrierId;
-
-  /**
-   * \brief
-   * Interference model:
-   * - Constant
-   * - Per-packet
-   * - Traced
-   */
-  Ptr<SatInterference> m_satInterference;
-
-  /**
-   * \brief Link results used for error modeling
-   */
-  Ptr<SatLinkResults> m_linkResults;
-
+  ///// CALCULATION VARIABLES //////////
   /**
    * \brief RX noise temperature in K.
    */
@@ -468,51 +433,7 @@ private:
    */
   double m_rxAciIfPowerW;
 
-  /**
-   * \brief The upper layer package receive callback.
-   */
-  SatPhyRx::ReceiveCallback m_rxCallback;
-
-  /**
-   * \brief The upper layer C/N0 receive callback.
-   */
-  SatPhy::CnoCallback m_cnoCallback;
-
-  /**
-   * \brief Average normalized offered load callback
-   */
-  SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
-
-  /**
-   * \brief Address of the device owning this object.
-   */
-  Mac48Address m_ownAddress;
-
-  /**
-   * \brief Receiving mode.
-   */
-  SatPhyRxCarrierConf::RxMode m_rxMode;
-
-  /**
-   * \brief Error model.
-   */
-  SatPhyRxCarrierConf::ErrorModel m_errorModel;
-
-  /**
-   * \brief Channel type.
-   */
-  SatEnums::ChannelType_t m_channelType;
-
-  /**
-   * \brief Callback to calculate SINR.
-   */
-  SatPhyRxCarrierConf::SinrCalculatorCallback m_sinrCalculate;
-
-  /**
-   * \brief Error rate for constant error model
-   */
-  double m_constantErrorRate;
-
+  //////// TRACED CALLBACKS ////////////
   /**
    * \brief The trace source on packet receptiong
    *
@@ -547,6 +468,8 @@ private:
    */
   TracedCallback<double> m_linkSinrTrace;
 
+  ////////////// CALLBACKS /////////////////////
+
   /**
    * \brief `DaRx` trace source.
    *
@@ -560,69 +483,41 @@ private:
   TracedCallback<uint32_t, const Address &, bool> m_daRxTrace;
 
   /**
-   * \brief `SlottedAlohaRxCollision` trace source.
-   *
-   * Fired when a packet burst is received through Random Access Slotted ALOHA.
-   *
-   * Contains the following information:
-   * - number of upper layer packets in the received packet burst;
-   * - the MAC48 address of the sender; and
-   * - whether a collision has occurred.
+   * \brief Callback to calculate SINR.
    */
-  TracedCallback<uint32_t, const Address &, bool> m_slottedAlohaRxCollisionTrace;
+  SatPhyRxCarrierConf::SinrCalculatorCallback m_sinrCalculate;
 
   /**
-   * \brief `SlottedAlohaRxError` trace source.
-   *
-   * Fired when a packet burst is received through Random Access Slotted ALOHA.
-   *
-   * Contains the following information:
-   * - number of upper layer packets in the received packet burst;
-   * - the MAC48 address of the sender; and
-   * - whether a PHY error has occurred.
+   * \brief The upper layer package receive callback.
    */
-  TracedCallback<uint32_t, const Address &, bool> m_slottedAlohaRxErrorTrace;
+  SatPhyRx::ReceiveCallback m_rxCallback;
 
   /**
-   * \brief `CrdsaReplicaRx` trace source.
-   *
-   * Fired when a CRDSA packet replica is received through Random Access CRDSA.
-   *
-   * Contains the following information:
-   * - number of upper layer packets in the received packet burst;
-   * - the MAC48 address of the sender; and
-   * - whether a collision has occurred.
+   * \brief The upper layer C/N0 receive callback.
    */
-  TracedCallback<uint32_t, const Address &, bool> m_crdsaReplicaRxTrace;
+  SatPhy::CnoCallback m_cnoCallback;
 
   /**
-   * \brief `CrdsaUniquePayloadRx` trace source.
-   *
-   * Fired when a unique CRDSA payload is received (after frame processing)
-   * through Random Access CRDSA.
-   *
-   * Contains the following information:
-   * - number of upper layer packets in the received packet burst;
-   * - the MAC48 address of the sender; and
-   * - whether a PHY error has occurred.
+   * \brief Average normalized offered load callback
    */
-  TracedCallback<uint32_t, const Address &, bool> m_crdsaUniquePayloadRxTrace;
+  SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
+
+private:
 
   /**
-   * \brief Enable composite SINR output tracing
+   * \brief Function for checking the SINR against the link results
+   * \param cSinr composite SINR
+   * \param rxParams Rx parameters
+   * \return result of the check
    */
-  bool m_enableCompositeSinrOutputTrace;
+  bool CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams);
 
-  /**
-   * \brief A random variable for packet reception
-   */
-  Ptr<UniformRandomVariable> m_uniformVariable;
-
-  /**
-   * \brief A node info class containing node related
-   * information, such as node id and address.
-   */
-  Ptr<SatNodeInfo> m_nodeInfo;
+  State m_state; 																//< Current state of the carrier
+  uint32_t m_beamId; 														//< Beam ID
+  uint32_t m_carrierId; 												//< Carrier ID
+  bool m_receivingDedicatedAccess; 							//< Is the carrier receiving a dedicated access packet
+  Ptr<SatInterference> m_satInterference; 			//< Interference model
+  bool m_enableCompositeSinrOutputTrace;				//< Enable composite SINR output tracing
 
   /**
    * \brief Contains information about how many ongoing Rx events there are
@@ -634,61 +529,20 @@ private:
    */
   uint32_t m_rxPacketCounter;
 
-  /**
-   * \brief A map of Rx params
-   */
-  std::map <uint32_t, SatPhyRxCarrier::rxParams_s> m_rxParamsMap;
+  std::map<uint32_t, rxParams_s> m_rxParamsMap; //< Storage for Rx parameters by ID
+  Mac48Address m_ownAddress; 										//< Carrier address
+  Ptr<SatNodeInfo> m_nodeInfo; 									//< NodeInfo of the node where carrier is attached
+  SatEnums::ChannelType_t m_channelType;				//< Channel type
+  Ptr<SatLinkResults> m_linkResults; 						//< Link results from the carrier configuration
+  Ptr<UniformRandomVariable> m_uniformVariable;	//< Uniform helper random variable
+  SatPhyRxCarrierConf::ErrorModel m_errorModel;	//< Error model
+  double m_constantErrorRate;										//< Error rate for constant error model
 
   /**
    * \brief Channel estimation error container
    */
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
 
-  /**
-   * \brief Random access collision model
-   */
-  SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel;
-
-  /**
-   * \brief Constant error rate used for random access if collision model
-   * is RA_CONSTANT_COLLISION_PROBABILITY.
-   */
-  double m_randomAccessConstantErrorRate;
-
-  /**
-   * \brief Random access average normalized offered load measurement window size
-   */
-  uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
-
-  /**
-   * \brief Container for calculated normalized offered loads
-   */
-  std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad;
-
-  /**
-   * \brief Is random access enabled for this carrier
-   */
-  bool m_isRandomAccessEnabledForThisCarrier;
-
-  /**
-   * \brief Number of random access bits in the frame
-   */
-  uint32_t m_randomAccessBitsInFrame;
-
-  /**
-   * \brief Has the frame end scheduling been initialized
-   */
-  bool m_frameEndSchedulingInitialized;
-
-  /**
-   * \brief Random access allocation channel ID
-   */
-  uint8_t m_randomAccessAllocationChannelId;
-
-  /**
-   * \brief Enable random access dynamic load control
-   */
-  bool m_enableRandomAccessDynamicLoadControl;
 };
 
 }

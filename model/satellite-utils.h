@@ -143,7 +143,7 @@ public:
   template <typename T>
   static inline T DbToLinear ( T db )
   {
-    if ((db < MinDb<T> () && (isinf (-db) != false)) || db > MaxDb<T> ())
+    if ((db < MinDb<T> () && (std::isinf (-db) != false)) || db > MaxDb<T> ())
       {
         NS_FATAL_ERROR ("SatUtils::DbToLinear - unsupported value: " <<  db);
       }

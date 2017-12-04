@@ -379,6 +379,8 @@ SatStatsPacketErrorHelper::InstallProbeOnGw (Ptr<Node> gwNode)
       for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
            itCarrier != carriers.End (); ++itCarrier)
         {
+					if (DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType () != GetValidCarrierType ())
+						continue;
           const bool ret = itCarrier->second->TraceConnectWithoutContext (
               GetTraceSourceName (), callback);
           if (ret)
@@ -437,6 +439,8 @@ SatStatsPacketErrorHelper::InstallProbeOnUt (Ptr<Node> utNode)
   for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
        itCarrier != carriers.End (); ++itCarrier)
     {
+  		if (DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType () != GetValidCarrierType ())
+  			continue;
       // Connect the object to the probe.
       if (probe->ConnectByObject (GetTraceSourceName (), itCarrier->second))
         {
@@ -504,6 +508,7 @@ SatStatsFwdDaPacketErrorHelper::SatStatsFwdDaPacketErrorHelper (Ptr<const SatHel
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("DaRx");
   SetLinkDirection (SatEnums::LD_FORWARD);
+  SetValidCarrierType (SatPhyRxCarrier::DEDICATED_ACCESS);
 }
 
 
@@ -533,6 +538,7 @@ SatStatsRtnDaPacketErrorHelper::SatStatsRtnDaPacketErrorHelper (Ptr<const SatHel
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("DaRx");
   SetLinkDirection (SatEnums::LD_RETURN);
+  SetValidCarrierType (SatPhyRxCarrier::DEDICATED_ACCESS);
 }
 
 
@@ -562,6 +568,7 @@ SatStatsSlottedAlohaPacketErrorHelper::SatStatsSlottedAlohaPacketErrorHelper (Pt
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("SlottedAlohaRxError");
   SetLinkDirection (SatEnums::LD_RETURN);
+  SetValidCarrierType (SatPhyRxCarrier::RA_SLOTTED_ALOHA);
 }
 
 
@@ -591,6 +598,7 @@ SatStatsCrdsaPacketErrorHelper::SatStatsCrdsaPacketErrorHelper (Ptr<const SatHel
   NS_LOG_FUNCTION (this << satHelper);
   SetTraceSourceName ("CrdsaUniquePayloadRx");
   SetLinkDirection (SatEnums::LD_RETURN);
+  SetValidCarrierType (SatPhyRxCarrier::RA_CRDSA);
 }
 
 

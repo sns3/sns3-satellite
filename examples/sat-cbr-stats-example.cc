@@ -99,7 +99,12 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
   double duration = 4;
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-cbr-stats");
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -107,6 +112,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue ("duration", "Simulation duration (in seconds)", duration);
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   if ( scenario == "larger")
@@ -118,10 +124,9 @@ main (int argc, char *argv[])
       satScenario = SatHelper::FULL;
     }
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr-stats"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  // Set tag, if output path is not explicitly defined
+  simulationHelper->SetOutputTag (scenario);
+  simulationHelper->SetSimulationTime (duration);
 
   // enable info logs
   //LogComponentEnable ("CbrApplication", LOG_LEVEL_INFO);
@@ -137,23 +142,32 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
-
-  helper->CreatePredefinedScenario (satScenario);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
+ // NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
 
-  uint16_t port = 9;
-  const std::string protocol = "ns3::UdpSocketFactory";
+  //uint16_t port = 9;
+  //const std::string protocol = "ns3::UdpSocketFactory";
 
   // setup CBR traffic
-  for (NodeContainer::Iterator itGw = gwUsers.Begin ();
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+
+  for (uint32_t i = 0; i < gwUsers.GetN (); i++)
+		{
+  		simulationHelper->SetGwUserId (i);
+			simulationHelper->InstallTrafficModel (
+					SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+					Seconds (0.1), Seconds (duration), Seconds (0.001));
+			simulationHelper->InstallTrafficModel (
+								SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+								Seconds (0.1), Seconds (duration), Seconds (0.001));
+		}
+
+  /*for (NodeContainer::Iterator itGw = gwUsers.Begin ();
        itGw != gwUsers.End (); ++itGw)
     {
       const InetSocketAddress gwAddr
@@ -194,9 +208,9 @@ main (int argc, char *argv[])
       ps->SetAttribute ("Protocol", StringValue (protocol));
       ps->SetAttribute ("Local", AddressValue (addr));
       (*it)->AddApplication (ps);
-    }
+    }*/
 
-  Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   /*
    * The following is the statements for enabling *all* the satellite
@@ -352,9 +366,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Interval: " << interval);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (duration));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

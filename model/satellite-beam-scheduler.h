@@ -329,9 +329,9 @@ public:
       double cnoFirst = m_utInfoMap.at (utReqInfo1.first)->GetCnoEstimation ();
       double cnoSecond = m_utInfoMap.at (utReqInfo2.first)->GetCnoEstimation ();
 
-      if ( !isnan (cnoFirst) )
+      if ( !std::isnan (cnoFirst) )
         {
-          if ( isnan (cnoSecond) )
+          if ( std::isnan (cnoSecond) )
             {
               result = false;
             }

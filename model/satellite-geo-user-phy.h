@@ -32,6 +32,10 @@
 
 namespace ns3 {
 
+class SatPhyRxCarrier;
+class SatPhyRxCarrierUplink;
+class SatPhyRxCarrierPerSlot;
+class SatPhyRxCarrierPerFrame;
 
 /**
  * \ingroup satellite

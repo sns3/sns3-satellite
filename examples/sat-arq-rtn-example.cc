@@ -56,18 +56,26 @@ main (int argc, char *argv[])
   //LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
   //LogComponentEnable ("sat-arq-rtn-example", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-arq-rtn");
 
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-arq-rtn"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetSimulationTime (simLength);
+
+  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  simulationHelper->SetBeams (beamsEnabled.str ());
 
   // Configure error model
   double errorRate (0.1);
@@ -99,57 +107,18 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
+  simulationHelper->CreateSatScenario ();
 
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Time (interval)));
+	Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam,endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
+	/// Create applicationa on UT users
+	simulationHelper->InstallTrafficModel (
+			SimulationHelper::CBR,
+			SimulationHelper::UDP,
+			SimulationHelper::RTN_LINK,
+			appStartTime, Seconds (simLength), Seconds (0.05));
 
-  helper->CreateUserDefinedScenario (beamMap);
-
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // >>> Start of actual test using Full scenario >>>
-
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute ("Interval", TimeValue (interval));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
-
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-  // initialized time values for simulation
-  uint32_t maxTransmitters = utUsers.GetN ();
-
-  ApplicationContainer gwApps;
-  ApplicationContainer utApps;
-
-  Time cbrStartDelay = appStartTime;
-
-  // Cbr and Sink applications creation
-  for ( uint32_t i = 0; i < maxTransmitters; i++)
-    {
-      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-      utApps.Add (cbrHelper.Install (utUsers.Get (i)));
-      gwApps.Add (sinkHelper.Install (gwUsers.Get (0)));
-
-      cbrStartDelay += Seconds (0.05);
-
-      utApps.Get (i)->SetStartTime (cbrStartDelay);
-      utApps.Get (i)->SetStopTime (simLength);
-    }
-
-  utApps.Start (appStartTime);
-  utApps.Stop (simLength);
 
   NS_LOG_INFO ("--- sat-arq-rtn-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
@@ -160,10 +129,8 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  ");
 
 
-  Simulator::Stop (simLength);
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->EnableProgressLogs ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

@@ -23,6 +23,7 @@
 #define SATELLITE_STATS_PACKET_COLLISION_HELPER_H
 
 #include <ns3/satellite-stats-helper.h>
+#include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
@@ -72,18 +73,30 @@ public:
                             bool isCollided);
 
   /**
+   * \return
+   */
+  std::string GetTraceSourceName () const;
+
+  /**
+   * \brief Get the valid carrier type
+   * \return the valid carrier type
+   */
+  inline SatPhyRxCarrier::CarrierType GetValidCarrierType () const { return m_carrierType; };
+
+protected:
+  // inherited from SatStatsHelper base class
+  void DoInstall ();
+
+  /**
    * \param traceSourceName
    */
   void SetTraceSourceName (std::string traceSourceName);
 
   /**
-   * \return
+   * \brief Set valid carrier type for this statistics helper type.
+   * \param carrierType
    */
-  std::string GetTraceSourceName () const;
-
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  inline void SetValidCarrierType (SatPhyRxCarrier::CarrierType carrierType) { m_carrierType = carrierType; };
 
 private:
   /**
@@ -105,6 +118,8 @@ private:
   std::map<const Address, uint32_t> m_identifierMap;
 
   std::string m_traceSourceName;
+
+  SatPhyRxCarrier::CarrierType m_carrierType;
 
 }; // end of class SatStatsPacketCollisionHelper
 

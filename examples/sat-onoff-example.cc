@@ -56,6 +56,9 @@ main (int argc, char *argv[])
   std::string sender = "both";
   std::string simDuration = "11s";
 
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-onoff");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
 
   // enable packet traces on satellite modules
@@ -72,7 +75,11 @@ main (int argc, char *argv[])
   cmd.AddValue ("sender", "Packet sender (ut, gw, or both).", sender);
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
   cmd.AddValue ("simDuration", "Duration of the simulation (Time)", simDuration);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
+
+  simulationHelper->SetSimulationTime (Time (simDuration));
+  simulationHelper->SetOutputTag (scenario);
 
   // select scenario, if correct one given, by default simple scenarion is used.
   if ( scenario == "larger")
@@ -90,11 +97,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-onoff"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-
   // enable info logs
   LogComponentEnable ("OnOffApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("PacketSink", LOG_LEVEL_INFO);
@@ -109,26 +111,9 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create scenario
-  helper->CreatePredefinedScenario (satScenario);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   // --- Create applications according to given user parameters
-
-  // get users (first GW side user and first UT connected users)
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // select port
-  uint16_t port = 9;
-
-  // create helpers for application creation
-  // set address of the first UT connected user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-  SatOnOffHelper onOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
 
   // assert if sender is not valid
   NS_ASSERT_MSG ( ( (sender == "gw") || ( sender == "ut") || ( sender == "both") ), "Sender argument invalid.");
@@ -137,26 +122,22 @@ main (int argc, char *argv[])
   // and Sink application to UT connected user
   if ( (sender == "gw" ) || ( sender == "both") )
     {
-      ApplicationContainer gwOnOff = onOffHelper.Install (gwUsers.Get (0));
-      gwOnOff.Start (Seconds (1.0));
-
-      ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
-      utSink.Start (Seconds (0.1));
+      simulationHelper->InstallTrafficModel (
+      		SimulationHelper::ONOFF,
+					SimulationHelper::UDP,
+					SimulationHelper::FWD_LINK,
+					Seconds (1.0));
     }
 
   // in case of sender is UT or Both, create OnOff application to UT connected user
   // and Sink application to GW connected user
   if (sender == "ut" || sender == "both" )
     {
-      // set address of the first GW connected user
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-      onOffHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-      ApplicationContainer utOnOff = onOffHelper.Install (utUsers.Get (0));
-      utOnOff.Start (Seconds (2.0));
-
-      ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
-      gwSink.Start (Seconds (0.1));
+  		simulationHelper->InstallTrafficModel (
+  	   		SimulationHelper::ONOFF,
+  				SimulationHelper::UDP,
+  				SimulationHelper::RTN_LINK,
+  				Seconds (2.0));
     }
 
   // prompt info of the used parameters
@@ -171,9 +152,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  ");
 
   // run simulation and finally destroy it
-  Simulator::Stop (Time (simDuration));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

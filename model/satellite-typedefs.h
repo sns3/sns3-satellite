@@ -69,11 +69,9 @@ public:
    * \brief Common callback signature for packet delay and address.
    * \param delay the packet delay
    * \param sourceAddress the source address
-   *
-   * \todo Optimize by using const-reference of Time.
    */
   typedef void (*PacketDelayAddressCallback)
-    (Time delay, const Address &sourceAddress);
+    (const Time &delay, const Address &sourceAddress);
 
   /**
    * \brief Common callback signature for `PacketTrace` trace sources.

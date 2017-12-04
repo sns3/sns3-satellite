@@ -230,6 +230,8 @@ main (int argc, char *argv[])
   Ptr<Node> groupSource;
   NodeContainer groupReceivers;
 
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-multicast");
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
@@ -239,16 +241,16 @@ main (int argc, char *argv[])
   cmd.AddValue ("preDefinedGroup", "Pre-defined multicast group for larger scenario. (0 = all)", preDefinedGroup);
   cmd.AddValue ("fullScenarioReceivers", "Number of the receivers in full scenario", fullScenarioReceivers);
   cmd.AddValue ("sinkToAll", "Add multicast sink to all users.", sinkToAll);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   /// Set network types which support multicast
   Config::SetDefault ("ns3::SatUserHelper::BackboneNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
   Config::SetDefault ("ns3::SatUserHelper::SubscriberNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-multicast"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (scenario));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  Time startTime = Seconds (1.2);
+  simulationHelper->SetOutputTag (scenario);
+  simulationHelper->SetSimulationTime (startTime + Seconds (3.0));
 
   if ( scenario == "larger")
     {
@@ -272,7 +274,7 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   NS_LOG_INFO ("--- Creating scenario: " << scenario << " ---");
 
@@ -281,9 +283,6 @@ main (int argc, char *argv[])
       NS_LOG_INFO ("--- Add sink to each users ---");
     }
 
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  helper->CreatePredefinedScenario (satScenario);
 
   uint16_t multicastPort = 9;   // Discard port (RFC 863)
 
@@ -291,7 +290,6 @@ main (int argc, char *argv[])
   NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
 
-  Time startTime = Seconds (1.2);
 
   if ( scenario == "larger")
     {
@@ -458,9 +456,7 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("--- Running simulation ---");
 
-  Simulator::Stop (startTime + Seconds (3.0));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   NS_LOG_INFO ("--- Finished ---");
   return 0;

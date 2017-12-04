@@ -43,9 +43,13 @@ main (int argc, char *argv[])
   LogComponentEnable ("SatEnvVariables", LOG_LEVEL_INFO);
 
   /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("exampleCampaign"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue ("exampleTag"));
+  auto simulationHelper = CreateObject<SimulationHelper> ("exampleCampaign");
+  simulationHelper->SetOutputTag ("exampleTag");
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  CommandLine cmd;
+  simulationHelper->AddDefaultUiArguments (cmd);
+  cmd.Parse (argc, argv);
 
   /// Create default environmental variables
   Ptr<SatEnvVariables> envVariables = CreateObject<SatEnvVariables> ();
@@ -60,8 +64,8 @@ main (int argc, char *argv[])
   Simulator::Schedule (MilliSeconds (6), &SatEnvVariables::IsValidDirectory, envVariables, "contrib/satellite/data/notfound");
   Simulator::Schedule (MilliSeconds (7), &SatEnvVariables::GetCurrentDateAndTime, envVariables);
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->SetSimulationTime (Seconds (1));
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

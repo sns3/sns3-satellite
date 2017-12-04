@@ -258,15 +258,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
   parameters.m_raConstantErrorRate = m_raSettings.m_raConstantErrorRate;
-
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
-    {
-      parameters.m_isRandomAccessEnabled = true;
-    }
-  else
-    {
-      parameters.m_isRandomAccessEnabled = false;
-    }
+  parameters.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
                                               m_linkResults,

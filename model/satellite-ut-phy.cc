@@ -118,11 +118,11 @@ SatUtPhy::SatUtPhy (void)
   NS_FATAL_ERROR ("SatUtPhy default constructor is not allowed to be used");
 }
 
-SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
+SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                     Ptr<SatSuperframeConf> superFrameConf)
-  : SatPhy (params)
+  :SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
 
@@ -145,7 +145,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t & params,
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatUtPhy::CalculateSinr, this));
 
-  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf, parameters.m_isRandomAccessEnabled);
+  SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
 
 SatUtPhy::~SatUtPhy ()

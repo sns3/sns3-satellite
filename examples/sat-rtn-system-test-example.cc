@@ -91,6 +91,10 @@ main (int argc, char *argv[])
 
   LogComponentEnable ("sat-rtn-system-test-example", LOG_LEVEL_INFO);
 
+  /// Set simulation output details
+  std::string simulationName = "example-rtn-system-test";
+	auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+
   // set default values for traffic model apps here
   // attributes can be overridden by command line arguments or input xml when needed
   //Config::SetDefault ("ns3::CbrApplication::PacketSize", packetSize);
@@ -100,19 +104,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-rtn-system-test"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-
   // To read input attributes from input xml-file
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sys-rtn-test.xml";
-
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputFrameConfig;
-  inputFrameConfig.ConfigureDefaults ();
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -122,7 +115,14 @@ main (int argc, char *argv[])
   cmd.AddValue ("simLength", "Simulation length", simLength);
   cmd.AddValue ("beamId", "Beam Id", beamId);
   cmd.AddValue ("utAppStartTime", "Application (first) start time.", utAppStartTime);
+  simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
+
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputFrameConfig;
+  inputFrameConfig.ConfigureDefaults ();
 
   // select pre-defined super frame configuration wanted to use.
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue (preDefinedFrameConfig));
@@ -277,16 +277,13 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetBeamSet ({beamId});
+  simulationHelper->SetSimulationTime (simLength);
 
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (utsPerBeam, endUsersPerUt);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[beamId] = beamInfo;
-
-  helper->CreateUserDefinedScenario (beamMap);
+  // Create satellite scenario
+  simulationHelper->CreateSatScenario ();
 
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatRequestManager/RbdcTrace",
                                  MakeCallback (&RbcdRcvdCb));
@@ -303,59 +300,36 @@ main (int argc, char *argv[])
   //Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/SatEncapsulator/SatQueue/Enqueue",
   //                               MakeCallback (&PacketEnqueu));
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
   /**
    * Set-up CBR or OnOff traffic
    */
+  SimulationHelper::TrafficModel_t model;
 
-  // Create and install sink application to first GW user to received packets from UTs
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-  sink.Install (gwUsers.Get (0));
+	switch (trafficModel)
+		{
+		case 0:   // CBR
+			model = SimulationHelper::CBR;
+			break;
 
-  /**
-   * Create traffic model to sent packets
-   */
+		case 1:   // On-Off
+			model = SimulationHelper::ONOFF;
+			break;
 
-  CbrHelper cbr ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-  SatOnOffHelper onOff ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
+		default:
+			NS_FATAL_ERROR ("Not Supported Traffic Model!");
+			break;
+		};
 
-  for ( NodeContainer::Iterator it = utUsers.Begin (); it != utUsers.End (); it++ )
-    {
-      ApplicationContainer appAdded;
-
-      switch (trafficModel)
-        {
-        case 0:   // CBR
-          appAdded = cbr.Install (*it);
-          //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-          //DynamicCast<CbrApplication> (appAdded.Get (0))->GetAttribute ("Interval", interval );
-          break;
-
-        case 1:   // On-Off
-          appAdded = onOff.Install (*it);
-          //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("PacketSize", packetSize );
-          //DynamicCast<OnOffApplication> (appAdded.Get (0))->GetAttribute ("DataRate", dataRate );
-          break;
-
-        default:
-          NS_FATAL_ERROR ("Not Supported Traffic Model!");
-          break;
-        }
-
-      appAdded.Get (0)->SetStartTime (utAppStartTime);
-      utAppStartTime += MilliSeconds (100);
-    }
+  simulationHelper->InstallTrafficModel (
+  		model,
+			SimulationHelper::UDP,
+			SimulationHelper::RTN_LINK,
+			utAppStartTime, Seconds (simLength+1), Seconds (0.1));
 
   /**
    * Set-up statistics
    */
-  Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer> (helper);
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -404,10 +378,7 @@ main (int argc, char *argv[])
   /**
    * Run simulation
    */
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

@@ -41,7 +41,7 @@ consists of 72 spot-beams and the user beams are served by 5 gateways. This is i
 
 .. _fig-sat-frequency-plan:
 
-.. figure:: figures/satellite-freq-plan2.*
+.. figure:: figures/satellite-freq-plan2.png
 
    Satellite frequency plan
 

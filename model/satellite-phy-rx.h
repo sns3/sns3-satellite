@@ -33,8 +33,11 @@
 
 namespace ns3 {
 
-class SatPhyRxCarrier;
 class SatPhyRxCarrierConf;
+class SatPhyRxCarrier;
+class SatPhyRxCarrierPerSlot;
+class SatPhyRxCarrierPerFrame;
+class SatPhyRxCarrierUplink;
 
 /**
  * \ingroup satellite
@@ -143,9 +146,8 @@ public:
   /**
    * \param carrierConf Carrier configuration class
    * \param superFrameConf Superframe configuration
-   * \param isRandomAccessEnabled Is random access enabled
    */
-  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf, bool isRandomAccessEnabled);
+  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf);
 
   /**
    * Start packet reception from the SatChannel

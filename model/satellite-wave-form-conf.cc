@@ -345,7 +345,7 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
   bool success (false);
 
   // If ACM is disabled, return the default waveform
-  if (!m_acmEnabled || isnan (cno))
+  if (!m_acmEnabled || std::isnan (cno))
     {
       wfId = m_defaultWfId;
       success = true;

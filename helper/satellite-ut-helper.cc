@@ -269,15 +269,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
   parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
-
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
-    {
-      parameters.m_isRandomAccessEnabled = true;
-    }
-  else
-    {
-      parameters.m_isRandomAccessEnabled = false;
-    }
+  parameters.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,
@@ -412,7 +404,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
     {
-      Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf,m_superframeSeq);
+      Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf, m_superframeSeq);
 
       /// create RA module with defaults
       Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);

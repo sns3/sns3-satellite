@@ -77,55 +77,46 @@ main (int argc, char *argv[])
   double longitude = -1.00;
   double altitude = 0.00;
 
+  /// Set simulation output details
+  auto simulationHelper = CreateObject<SimulationHelper> ("example-link-budget");
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sat-link-budget-input-attributes.xml";
+
   // read command line parameters can be given by user
   CommandLine cmd;
   cmd.AddValue ("beam", "Beam to use for testing. (1 - 72)", beamId);
   cmd.AddValue ("latitude", "Latitude of UT position (-90 ... 90.0)", latitude);
   cmd.AddValue ("longitude", "Longitude of UT position (-180 ... 180)", longitude);
   cmd.AddValue ("altitude", "Altitude of UT position (meters)", altitude);
+  simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
-
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-link-budget"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
   // To change attributes having affect on link budget,
   // modify attributes available in sat-link-budget-input-attributes.xml found in same directory this source file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/sat-link-budget-input-attributes.xml";
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   ConfigStore inputConfig;
   inputConfig.ConfigureDefaults ();
 
+  simulationHelper->SetUtCountPerBeam (1);
+  simulationHelper->SetUserCountPerUt (1);
+  simulationHelper->SetBeamSet ({beamId});
+  simulationHelper->SetSimulationTime (Seconds (1.1));
+
   // enable info logs
   LogComponentEnable ("sat-link-budget-example", LOG_LEVEL_INFO);
+
+  // Create a position allocator for our single UT
+  Ptr<SatListPositionAllocator> posAllocator = CreateObject<SatListPositionAllocator> ();
+  posAllocator->Add ( GeoCoordinate (latitude, longitude, altitude));
+  simulationHelper->SetUtPositionAllocatorForBeam (beamId, posAllocator);
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  // create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-
-  // configure helpers
-  Ptr<SatBeamHelper> beamHelper = helper->GetBeamHelper ();
-  Ptr<SatUtHelper> utHelper = beamHelper->GetUtHelper ();
-  Ptr<SatGwHelper> gwHelper = beamHelper->GetGwHelper ();
-  Ptr<SatGeoHelper> geoHelper = beamHelper->GetGeoHelper ();
-
-  // create user defined scenario
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
-  SatHelper::BeamUserInfoMap_t beamMap;
-  beamMap[beamId] = beamInfo;
-
-  Ptr<SatListPositionAllocator> posAllocator = CreateObject<SatListPositionAllocator> ();
-  posAllocator->Add ( GeoCoordinate (latitude, longitude, altitude));
-
-  helper->CreateUserDefinedScenarioFromListPositions (beamMap, false);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
 
   // set callback traces where we want results out
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",
@@ -140,37 +131,20 @@ main (int argc, char *argv[])
   NodeContainer ut = helper->UtNodes ();
   Ptr<SatMobilityModel> utMob = ut.Get (0)->GetObject<SatMobilityModel> ();
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+  // Install CBR traffic model
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("0.1s"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+  		SimulationHelper::UDP,
+			SimulationHelper::FWD_LINK,
+			Seconds (0.1), Seconds (0.25));
 
-  uint16_t port = 9;
-
-  // create application on GW user
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port));
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port));
-  cbrHelper.SetAttribute ("Interval", StringValue ("0.1s"));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (512) );
-
-  ApplicationContainer gwSink = sinkHelper.Install (gwUsers.Get (0));
-  gwSink.Start (Seconds (0.1));
-  gwSink.Stop (Seconds (1.0));
-
-  ApplicationContainer gwCbr = cbrHelper.Install (gwUsers.Get (0));
-  gwCbr.Start (Seconds (0.1));
-  gwCbr.Stop (Seconds (0.25));
-
-  // create application on UT user
-  sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port))));
-  cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port))));
-
-  ApplicationContainer utSink = sinkHelper.Install (utUsers.Get (0));
-  utSink.Start (Seconds (0.1));
-  utSink.Stop (Seconds (1.0));
-
-  ApplicationContainer utCbr = cbrHelper.Install (utUsers.Get (0));
-  utCbr.Start (Seconds (0.1));
-  utCbr.Stop (Seconds (0.25));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+  		SimulationHelper::UDP,
+			SimulationHelper::RTN_LINK,
+			Seconds (0.1), Seconds (0.25));
 
   NodeContainer gw = helper->GwNodes ();
   Ptr<SatMobilityModel> gwMob = gw.Get (0)->GetObject<SatMobilityModel> ();
@@ -188,9 +162,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Link results (Time, Channel type, Own address, Dest. address, Beam ID, Carrier Center freq, IF Power, RX Power, SINR, Composite SINR) :");
   // results are printed out in callback (LinkBudgetTraceCb)
 
-  Simulator::Stop (Seconds (1.1));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 }

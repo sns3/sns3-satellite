@@ -24,6 +24,7 @@
 #include <ns3/pointer.h>
 #include <ns3/string.h>
 #include <ns3/uinteger.h>
+#include <ns3/address.h>
 #include <ns3/singleton.h>
 #include <ns3/enum.h>
 #include <ns3/config.h>
@@ -31,6 +32,11 @@
 #include <ns3/satellite-env-variables.h>
 
 #include <ns3/packet-sink.h>
+#include <ns3/packet-sink-helper.h>
+#include <ns3/cbr-helper.h>
+#include <ns3/satellite-on-off-helper.h>
+#include <ns3/nrtv-helper.h>
+#include <ns3/three-gpp-http-helper.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/satellite-enums.h>
 
@@ -50,11 +56,6 @@ SimulationHelper::GetTypeId (void)
                      TimeValue (Seconds (100)),
                      MakeTimeAccessor (&SimulationHelper::m_simTime),
                      MakeTimeChecker (Seconds (10)))
-      .AddAttribute ("UiOutputPath",
-                     "Path to store simulation information for the UI.",
-                     StringValue (""),
-                     MakeStringAccessor (&SimulationHelper::m_uiOutputPath),
-                     MakeStringChecker ())
 ;
     return tid;
 }
@@ -70,16 +71,22 @@ SimulationHelper::GetInstanceTypeId (void) const
 SimulationHelper::SimulationHelper ()
   : m_satHelper (NULL),
 	m_statContainer (NULL),
+	m_commonUtPositions (),
+	m_utPositionsByBeam (),
 	m_simulationName (""),
 	m_enabledBeamsStr (""),
 	m_enabledBeams (),
+	m_outputPath (""),
 	m_utCount (0),
-    m_utUserCount (0),
-    m_simTime (0),
-    m_uiOutputPath (""),
-    m_uiOutputFileName (""),
-    m_numberOfConfiguredFrames (0),
-    m_randomAccessConfigured (false)
+	m_utUserCount (0),
+	m_simTime (0),
+	m_numberOfConfiguredFrames (0),
+	m_randomAccessConfigured (false),
+	m_enableInputFileUtListPositions (false),
+	m_inputFileUtPositionsCheckBeams (true),
+	m_gwUserId (0),
+	m_progressLoggingEnabled (false),
+	m_progressUpdateInterval (Seconds (0.5))
 {
   NS_FATAL_ERROR ("SimulationHelper: Default constructor not in use. Please create with simulation name. ");
 }
@@ -87,31 +94,30 @@ SimulationHelper::SimulationHelper ()
 SimulationHelper::SimulationHelper (std::string simulationName)
   : m_satHelper (NULL),
 	m_statContainer (NULL),
+  m_commonUtPositions (),
+  m_utPositionsByBeam (),
 	m_simulationName (""),
 	m_enabledBeamsStr (""),
 	m_enabledBeams (),
+	m_outputPath (""),
 	m_utCount (0),
-    m_utUserCount (0),
-    m_simTime (0),
-    m_uiOutputPath (""),
-    m_uiOutputFileName (""),
-    m_numberOfConfiguredFrames (0),
-    m_randomAccessConfigured (false)
+	m_utUserCount (0),
+	m_simTime (0),
+	m_numberOfConfiguredFrames (0),
+	m_randomAccessConfigured (false),
+	m_enableInputFileUtListPositions (false),
+	m_inputFileUtPositionsCheckBeams (true),
+	m_gwUserId (0),
+	m_progressLoggingEnabled (false),
+	m_progressUpdateInterval (Seconds (0.5))
 {
   NS_LOG_FUNCTION (this);
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  if (m_uiOutputPath != "")
-    {
-      StringValue simulationTag;
-      Singleton<SatEnvVariables>::Get ()->GetAttribute ("SimulationTag", simulationTag);
-      m_uiOutputFileName = m_uiOutputPath + "/" + simulationTag.Get ();
-      std::remove (m_uiOutputFileName.c_str ());
-    }
-
   m_simulationName = simulationName;
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue (m_simulationName));
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 }
 
 SimulationHelper::~SimulationHelper ()
@@ -125,12 +131,8 @@ SimulationHelper::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_uiOutputFileName != "")
-    {
-      Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (m_uiOutputFileName.c_str (), std::ios::out);
-      outputContainer->AddToContainer (Singleton<SatEnvVariables>::Get ()->GetOutputPath ());
-      outputContainer->WriteContainerToFile ();
-    }
+  m_commonUtPositions = NULL;
+  m_utPositionsByBeam.clear ();
 }
 
 void
@@ -160,6 +162,14 @@ SimulationHelper::SetUserCountPerUt (uint32_t count)
 }
 
 void
+SimulationHelper::SetGwUserCount (uint32_t gwUserCount)
+{
+	NS_LOG_FUNCTION (this << gwUserCount);
+
+	Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (gwUserCount));
+}
+
+void
 SimulationHelper::SetSimulationTime (double seconds)
 {
   NS_LOG_FUNCTION (this << seconds);
@@ -173,7 +183,7 @@ SimulationHelper::SetOutputTag (std::string tag)
   NS_LOG_FUNCTION (this << tag);
 
   // Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (tag));
+  m_simulationTag = tag;
 }
 
 void
@@ -182,7 +192,25 @@ SimulationHelper::SetOutputPath (std::string path)
   NS_LOG_FUNCTION (this << path);
 
   // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->SetOutputPath (path);
+  m_outputPath = path;
+}
+
+void
+SimulationHelper::AddDefaultUiArguments (CommandLine &cmd, std::string &xmlInputFile)
+{
+	NS_LOG_FUNCTION (this);
+
+	AddDefaultUiArguments (cmd);
+	cmd.AddValue ("InputXml", "Input attributes in XML file", xmlInputFile);
+}
+
+void
+SimulationHelper::AddDefaultUiArguments (CommandLine &cmd)
+{
+	NS_LOG_FUNCTION (this);
+
+	// Create a customizable output path
+	cmd.AddValue ("OutputPath", "Output path for storing the simulation statistics", m_outputPath);
 }
 
 void
@@ -507,7 +535,7 @@ void
 SimulationHelper::ProgressCb ()
 {
   std::cout << "Progress: " << Simulator::Now ().GetSeconds () << "/" << GetSimTime ().GetSeconds () << std::endl;
-  Simulator::Schedule (Seconds (1), &SimulationHelper::ProgressCb, this);
+  m_progressReportEvent = Simulator::Schedule (m_progressUpdateInterval, &SimulationHelper::ProgressCb, this);
 }
 
 void
@@ -771,51 +799,366 @@ SimulationHelper::EnableExternalFadingInputTrace ()
   NS_LOG_FUNCTION (this);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_OFF));
+
+  // Set index files defining external tracing input files for UTs
+  // Given index files must locate in /satellite/data/ext-fadingtraces/input folder
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtRtnUpIndexFileName", StringValue ("BeamId-1_256_UT_fading_rtnup_trace_index.txt"));
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtFwdDownIndexFileName", StringValue ("BeamId-1_256_UT_fading_fwddwn_trace_index.txt"));
+
+  // Set external fading input trace container mode as list mode
+  // Now external fading input file used for UT1 is input file defined in row one in set index file,
+  // for UT2 second input file defined in row two in set index file etc.
+  // Position info in index file is ignored by list mode
   Config::SetDefault ("ns3::SatFadingExternalInputTraceContainer::UtInputMode", StringValue ("ListMode"));
+
+  // enable/disable external fading input on SatChannel as user requests
   Config::SetDefault ("ns3::SatChannel::EnableExternalFadingInputTrace", BooleanValue (true));
 }
 
+void
+SimulationHelper::SetCommonUtPositionAllocator (Ptr<SatListPositionAllocator> posAllocator)
+{
+	NS_LOG_FUNCTION (this);
+	m_commonUtPositions = posAllocator;
+}
+
+void
+SimulationHelper::SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator)
+{
+	NS_LOG_FUNCTION (this << beamId);
+	m_utPositionsByBeam[beamId] = posAllocator;
+}
+
+void
+SimulationHelper::EnableUtListPositionsFromInputFile (std::string inputFile, bool checkBeams)
+{
+	NS_LOG_FUNCTION (this << inputFile);
+
+  // Set user specific UT position file (UserDefinedUtPos.txt) to be utilized by SatConf.
+  // Given file must locate in /satellite/data folder
+  //
+  // This enables user defined positions used instead of default positions (default position file UtPos.txt replaced),
+  Config::SetDefault ("ns3::SatConf::UtPositionInputFileName", StringValue (inputFile));
+  m_enableInputFileUtListPositions = true;
+  m_inputFileUtPositionsCheckBeams = checkBeams;
+
+}
+
+Ptr<SatStatsHelperContainer>
+SimulationHelper::GetStatisticsContainer ()
+{
+	NS_LOG_FUNCTION (this);
+
+	if (!m_statContainer)
+	{
+		Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+		m_statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
+	}
+
+	return m_statContainer;
+}
+
+void
+SimulationHelper::SetupOutputPath ()
+{
+	NS_LOG_FUNCTION (this);
+  if (m_outputPath == "")
+    {
+  	  m_outputPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/sims/" + m_simulationName + "/";
+  	  // Create the simulation campaign output directory in data/sims/
+  	  if (!Singleton<SatEnvVariables>::Get ()->IsValidDirectory (m_outputPath))
+  	  	{
+  	  		Singleton<SatEnvVariables>::Get ()->CreateDirectory (m_outputPath);
+  	  	}
+  	  if (m_simulationTag != "")
+  	  {
+  	  	m_outputPath += m_simulationTag + "/";
+  	    Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (m_simulationTag));
+
+    	  // Create the simulation output directory by tag name in data/sims/simulation-campaign-directory/
+    	  if (!Singleton<SatEnvVariables>::Get ()->IsValidDirectory (m_outputPath))
+    	  	{
+    	  		Singleton<SatEnvVariables>::Get ()->CreateDirectory (m_outputPath);
+    	  	}
+  	  }
+
+    }
+  Singleton<SatEnvVariables>::Get ()->SetOutputPath (m_outputPath);
+}
+
 Ptr<SatHelper>
-SimulationHelper::CreateSatScenario ()
+SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
 {
   NS_LOG_FUNCTION (this);
 
   std::stringstream ss;
   ss << "Created scenario: " << std::endl;
 
-  SatHelper::BeamUserInfoMap_t beamInfo;
-
-  for (uint32_t i = 1; i <= 72; i++)
-    {
-      if (IsBeamEnabled (i))
-        {
-          SatBeamUserInfo info;
-          uint32_t utCount = GetNextUtCount ();
-
-          ss << "  Beam " << i << ": UT count= " << utCount;
-
-          for (uint32_t j = 1; j < utCount + 1; j++)
-            {
-              uint32_t utUserCount = GetNextUtUserCount ();
-              info.AppendUt (GetNextUtUserCount ());
-              ss << ", " <<  j << ". UT user count= " << utUserCount;
-            }
-
-          beamInfo.insert (std::make_pair (i, info));
-
-          ss << std::endl;
-        }
-    }
+  // Set final output path
+  SetupOutputPath ();
 
   std::string scenarioName = "Scenario72";
   m_satHelper = CreateObject<SatHelper> (scenarioName);
-  m_satHelper->CreateUserDefinedScenario (beamInfo);
+
+  // Set UT position allocators, if any
+  if (!m_enableInputFileUtListPositions)
+    {
+      if (m_commonUtPositions) m_satHelper->SetCustomUtPositionAllocator (m_commonUtPositions);
+      for (auto it : m_utPositionsByBeam) m_satHelper->SetUtPositionAllocatorForBeam (it.first, it.second);
+    }
+
+  // Determine scenario
+  if (scenario == SatHelper::NONE)
+		{
+			// Create beam scenario
+			SatHelper::BeamUserInfoMap_t beamInfo;
+
+			for (uint32_t i = 1; i <= 72; i++)
+				{
+					if (IsBeamEnabled (i))
+						{
+							SatBeamUserInfo info;
+							uint32_t utCount = GetNextUtCount ();
+
+							ss << "  Beam " << i << ": UT count= " << utCount;
+
+							for (uint32_t j = 1; j < utCount + 1; j++)
+								{
+									uint32_t utUserCount = GetNextUtUserCount ();
+									info.AppendUt (GetNextUtUserCount ());
+									ss << ", " <<  j << ". UT user count= " << utUserCount;
+								}
+
+							beamInfo.insert (std::make_pair (i, info));
+
+							ss << std::endl;
+						}
+				}
+
+			// Now, create either a scenario based on list positions in input file
+			// or create a generic scenario with UT positions configured by other ways..
+			if (m_enableInputFileUtListPositions) m_satHelper->CreateUserDefinedScenarioFromListPositions (beamInfo, m_inputFileUtPositionsCheckBeams);
+			else m_satHelper->CreateUserDefinedScenario (beamInfo);
+		}
+  else
+		{
+			m_satHelper->CreatePredefinedScenario (scenario);
+		}
 
   NS_LOG_INFO (ss.str ());
 
   return m_satHelper;
+}
+
+bool
+SimulationHelper::HasSinkInstalled (Ptr<Node> node, uint16_t port)
+{
+	NS_LOG_FUNCTION (this << node->GetId () << port);
+
+	for (uint32_t i = 0; i < node->GetNApplications (); i++)
+	{
+		auto sink = DynamicCast<PacketSink> (node->GetApplication (i));
+		if (sink != NULL)
+		{
+			AddressValue av;
+			sink->GetAttribute ("Local", av);
+			if (InetSocketAddress::ConvertFrom (av.Get ()).GetPort() == port) return true;
+		}
+	}
+	return false;
+}
+
+
+void
+SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
+  		                                 TransportLayerProtocol_t protocol,
+			                                 TrafficDirection_t direction,
+																			 Time startTime,
+																			 Time stopTime,
+																			 Time startDelay)
+{
+	NS_LOG_FUNCTION (this);
+
+	std::string socketFactory = protocol == SimulationHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory";
+
+  // get users
+  NodeContainer utUsers = m_satHelper->GetUtUsers ();
+  NodeContainer gwUsers = m_satHelper->GetGwUsers ();
+  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+
+	switch (trafficModel)
+	{
+	case SimulationHelper::CBR:
+		{
+		  uint16_t port = 9;
+		  InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gwUsers.Get (m_gwUserId)), port);
+
+			PacketSinkHelper sinkHelper (socketFactory, Address ());
+			CbrHelper cbrHelper (socketFactory, Address ());
+			ApplicationContainer sinkContainer;
+			ApplicationContainer cbrContainer;
+			if (direction == SimulationHelper::RTN_LINK)
+			{
+				// create sink application on GW user
+				if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+					{
+						sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+						sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
+					}
+
+				cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+				// create CBR applications on UT users
+				for (uint32_t i = 0; i < utUsers.GetN (); i++)
+					{
+				    auto app = cbrHelper.Install (utUsers.Get (i)).Get (0);
+				    app->SetStartTime (startTime + (i+1) * startDelay);
+				    cbrContainer.Add (app);
+					}
+			}
+			else if (direction == SimulationHelper::FWD_LINK)
+			{
+
+				// create CBR applications on UT users
+				for (uint32_t i = 0; i < utUsers.GetN (); i++)
+					{
+						InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (utUsers.Get (i)), port);
+						if (!HasSinkInstalled (utUsers.Get (i), port))
+							{
+								sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+								sinkContainer.Add (sinkHelper.Install (utUsers.Get (i)));
+							}
+
+						cbrHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+						auto app = cbrHelper.Install (gwUsers.Get (m_gwUserId)).Get (0);
+						app->SetStartTime (startTime + (i+1) * startDelay);
+						cbrContainer.Add (app);
+					}
+			}
+			sinkContainer.Start (startTime);
+			sinkContainer.Stop (stopTime);
+		}
+		break;
+
+	case SimulationHelper::ONOFF:
+		{
+		  uint16_t port = 9;
+		  InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gwUsers.Get (m_gwUserId)), port);
+
+			PacketSinkHelper sinkHelper (socketFactory, Address ());
+			SatOnOffHelper onOffHelper (socketFactory, Address ());
+			ApplicationContainer sinkContainer;
+			ApplicationContainer onOffContainer;
+			if (direction == SimulationHelper::RTN_LINK)
+			{
+				// create sink application on GW user
+				if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+					{
+						sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+						sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
+					}
+
+				onOffHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+				// create OnOff applications on UT users
+				for (uint32_t i = 0; i < utUsers.GetN (); i++)
+					{
+						auto app = onOffHelper.Install (utUsers.Get (i)).Get (0);
+						app->SetStartTime (startTime + (i+1) * startDelay);
+						onOffContainer.Add (app);
+					}
+			}
+			else if (direction == SimulationHelper::FWD_LINK)
+			{
+
+				// create OnOff applications on UT users
+				for (uint32_t i = 0; i < utUsers.GetN (); i++)
+					{
+						InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (utUsers.Get (i)), port);
+
+						if (!HasSinkInstalled (utUsers.Get (i), port))
+							{
+								sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+								sinkContainer.Add (sinkHelper.Install (utUsers.Get (i)));
+							}
+
+						onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+						auto app = onOffHelper.Install (gwUsers.Get (i)).Get (0);
+						app->SetStartTime (startTime + (i+1) * startDelay);
+						onOffContainer.Add (app);
+					}
+			}
+			sinkContainer.Start (startTime);
+			sinkContainer.Stop (stopTime);
+		}
+		break;
+
+	case SimulationHelper::HTTP:
+		{
+			ThreeGppHttpHelper httpHelper;
+			// Since more content should be transferred from server to clients,
+			// we call server behind GW and clients behind UTs scenario DOWNLINK
+			if (direction == SimulationHelper::FWD_LINK)
+			{
+				auto apps = httpHelper.InstallUsingIpv4 (gwUsers.Get (m_gwUserId), utUsers);
+				for (uint32_t i = 1; i < apps.GetN (); i++)
+				{
+					apps.Get (i)->SetStartTime (startTime + (i+1) * startDelay);
+				}
+			}
+			// An unlikely, but possible scenario where a HTTP server
+			// (e.g. web user interface of a device) is reachable only by satellite.
+			// Note that parameters should be defined by user.
+			// We also assume that a single gateway user accesses all HTTP servers.
+			// Modify this if other scenarios are required.
+			else if (direction == SimulationHelper::RTN_LINK)
+			{
+				for (uint32_t i = 0; i < utUsers.GetN (); i++)
+				{
+					auto apps = httpHelper.InstallUsingIpv4 (utUsers.Get (i), gwUsers.Get (m_gwUserId));
+					apps.Get (1)->SetStartTime (startTime + (i+1) * startDelay);
+				}
+			}
+			httpHelper.GetServer ().Start (startTime);
+			httpHelper.GetServer ().Stop (stopTime);
+		}
+		break;
+
+	case SimulationHelper::NRTV:
+		{
+		  NrtvHelper nrtvHelper (TypeId::LookupByName (socketFactory));
+			// Since more content should be transferred from server to clients,
+			// we call server behind GW and clients behind UTs scenario DOWNLINK
+			if (direction == SimulationHelper::FWD_LINK)
+			{
+				auto apps = nrtvHelper.InstallUsingIpv4 (gwUsers.Get (m_gwUserId), utUsers);
+				for (uint32_t i = 1; i < apps.GetN (); i++)
+				{
+					apps.Get (i)->SetStartTime (startTime + (i+1) * startDelay);
+				}
+			}
+			// An unlikely, but possible scenario where an NRTV server
+			// (e.g. video surveillance feed) is reachable only by satellite.
+			// Note that parameters should be defined by user.
+			// We also assume that a single gateway user accesses all NRTV servers.
+			// Modify this if other scenarios are required.
+			else if (direction == SimulationHelper::RTN_LINK)
+			{
+				for (uint32_t i = 0; i < utUsers.GetN (); i++)
+				{
+					auto apps = nrtvHelper.InstallUsingIpv4 (utUsers.Get (i), gwUsers.Get (m_gwUserId));
+					apps.Get (1)->SetStartTime (startTime + (i+1) * startDelay);
+				}
+			}
+			nrtvHelper.GetServer ().Start (startTime);
+			nrtvHelper.GetServer ().Stop (stopTime);
+		}
+		break;
+
+	default:
+		NS_FATAL_ERROR ("Invalid traffic model");
+		break;
+	}
 }
 
 void
@@ -840,6 +1183,17 @@ SimulationHelper::SetBeams (std::string enabledBeams)
           number = std::string ();
         }
     }
+}
+
+void
+SimulationHelper::SetBeamSet (std::set<uint32_t> beamSet)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_enabledBeams = beamSet;
+  std::stringstream bss;
+  for (auto beamId : beamSet) bss << beamId << " ";
+  m_enabledBeamsStr = bss.str ();
 }
 
 bool
@@ -876,11 +1230,32 @@ void SimulationHelper::RunSimulation ()
 }
 
 void
-SimulationHelper::EnableProgressLogging ()
+SimulationHelper::EnableProgressLogs ()
 {
   NS_LOG_FUNCTION (this);
 
-  Simulator::Schedule (Seconds (1), &SimulationHelper::ProgressCb, this);
+  if (!m_progressLoggingEnabled)
+		{
+			if (GetSimTime ().GetSeconds() > 20)
+				{
+					m_progressUpdateInterval = Seconds (GetSimTime ().GetSeconds() / 100);
+				}
+			else
+				{
+					m_progressUpdateInterval = Seconds (0.2);
+				}
+			m_progressReportEvent = Simulator::Schedule (m_progressUpdateInterval, &SimulationHelper::ProgressCb, this);
+			m_progressLoggingEnabled = true;
+		}
+}
+
+void
+SimulationHelper::DisableProgressLogs ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_progressLoggingEnabled = false;
+  m_progressReportEvent.Cancel ();
 }
 
 void

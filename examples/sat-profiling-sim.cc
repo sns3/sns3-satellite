@@ -64,57 +64,28 @@ main (int argc, char *argv[])
   // ----------------------------------
   // ----- CREATE CBR APPLICATION -----
   // ----------------------------------
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-  const std::string protocol = "ns3::UdpSocketFactory";
-
-  NodeContainer gwUsers = helper->GetGwUsers ();
   NodeContainer utUsers = helper->GetUtUsers ();
 
   NS_ASSERT (utUsers.GetN () == 1);
 
-
-  for (NodeContainer::Iterator It = utUsers.Begin ();
-      It != utUsers.End ();
-      It++)
-    {
-      const InetSocketAddress gwAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), port);
-      const InetSocketAddress utAddr = InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port);
-
-      // return link
-      Ptr<CbrApplication> rtnApp = CreateObject<CbrApplication> ();
-      rtnApp->SetAttribute ("Protocol", StringValue (protocol));
-      rtnApp->SetAttribute ("Remote", AddressValue (gwAddr));
-      rtnApp->SetAttribute ("PacketSize", UintegerValue (64));
-      rtnApp->SetAttribute ("Interval", TimeValue (Seconds (2)));
-      rtnApp->SetStartTime (Seconds (1));
-      (*It)->AddApplication (rtnApp);
-
-      Ptr<PacketSink> gwSink = CreateObject<PacketSink> ();
-      gwSink->SetAttribute ("Protocol", StringValue (protocol));
-      gwSink->SetAttribute ("Local", AddressValue (gwAddr));
-      gwUsers.Get (0)->AddApplication (gwSink);
-
-      // Forward link
-      Ptr<CbrApplication> fwdApp = CreateObject<CbrApplication> ();
-      fwdApp->SetAttribute ("Protocol", StringValue (protocol));
-      fwdApp->SetAttribute ("Remote", AddressValue (utAddr));
-      fwdApp->SetAttribute ("PacketSize", UintegerValue (64));
-      fwdApp->SetAttribute ("Interval", TimeValue (Seconds (2)));
-      fwdApp->SetStartTime (Seconds (1));
-      gwUsers.Get (0)->AddApplication (fwdApp);
-
-      Ptr<PacketSink> utSink = CreateObject<PacketSink> ();
-      utSink->SetAttribute ("Protocol", StringValue (protocol));
-      utSink->SetAttribute ("Local", AddressValue (utAddr));
-      (*It)->AddApplication (utSink);
-    }
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (64));
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Seconds (2)));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR,
+			SimulationHelper::UDP,
+			SimulationHelper::RTN_LINK,
+			Seconds (1));
+  simulationHelper->InstallTrafficModel (
+			SimulationHelper::CBR,
+			SimulationHelper::UDP,
+			SimulationHelper::FWD_LINK,
+			Seconds (1));
   // ----------------------------------
   // ----- CREATE CBR APPLICATION -----
   // ----------------------------------
 
   simulationHelper->CreateDefaultRtnLinkStats ();
-  simulationHelper->EnableProgressLogging ();
+  simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 
   return 0;

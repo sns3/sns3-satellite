@@ -55,7 +55,12 @@ main (int argc, char *argv[])
 
   Time appStartTime = Seconds (0.001);
 
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-cbr-full");
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -64,13 +69,12 @@ main (int argc, char *argv[])
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
   cmd.AddValue ("simLength", "Simulation length in seconds", simLength);
+  simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-cbr-full"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  simulationHelper->SetSimulationTime (simLength);
 
+  // We set the UT count and UT user count using attributes when configuring a pre-defined scenario
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (utsPerBeam));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (endUsersPerUt));
 
@@ -88,50 +92,15 @@ main (int argc, char *argv[])
   // only one reference system, which is named as "Scenario72". The string is utilized
   // in mapping the scenario to the needed reference system configuration files. Arbitrary
   // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  helper->CreatePredefinedScenario (SatHelper::FULL);
-
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+  simulationHelper->CreateSatScenario (SatHelper::FULL);
 
   // >>> Start of actual test using Full scenario >>>
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute ("Interval", StringValue (interval));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize) );
-
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-  // initialized time values for simulation
-  uint32_t maxReceivers = utUsers.GetN ();
-
-  ApplicationContainer gwApps;
-  ApplicationContainer utApps;
-
-  Time cbrStartDelay = appStartTime;
-
-  // Cbr and Sink applications creation
-  for ( uint32_t i = 0; i < maxReceivers; i++)
-    {
-      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-
-      gwApps.Add (cbrHelper.Install (gwUsers.Get (4)));
-      utApps.Add (sinkHelper.Install (utUsers.Get (i)));
-
-      cbrStartDelay += Seconds (0.001);
-
-      gwApps.Get (i)->SetStartTime (cbrStartDelay);
-      gwApps.Get (i)->SetStopTime (Seconds (simLength));
-    }
-
-  utApps.Start (appStartTime);
-  utApps.Stop (Seconds (simLength));
+  simulationHelper->InstallTrafficModel (
+  		SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+			appStartTime, Seconds (simLength), Seconds (0.001));
 
   NS_LOG_INFO ("--- sat-cbr-full-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
@@ -141,10 +110,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 
-  Simulator::Stop (Seconds (simLength));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
+  simulationHelper->RunSimulation ();
 
   return 0;
 
