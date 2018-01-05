@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# Hook to check for NS-3 coding style violations.
+#
+# To enable this hook, move it to the .git/hooks folder
+# and rename the file to "pre-commit".
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Be sure to check only stuff that has been added to the index
+git stash -q --keep-index
+
+# If there are coding-style errors in source files, print the offending file names and fail.
+ext-utils/coding_style.sh git-check 
+result=$?
+
+# Restore working version
+git stash pop -q
+
+# Check whether the user whish to commit when coding-style errors are present
+if [ $result -ne 0 ]
+then
+  echo
+  read -n 1 -p 'Commit anyway? [y/N] ' answer < /dev/tty
+  if [ "Y$answer" != "Y" ]; then echo; fi
+  if [ "Y$answer" != "Yy" ] && [ "Y$answer" != "YY" ]
+  then
+    exit 1
+  else
+    echo -e "\nApplying commit anyway:\n"
+  fi
+fi
+
+exit 0
