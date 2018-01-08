@@ -54,24 +54,21 @@ public:
    * \param packet the packet
    * \param destinationAddress the destination address
    */
-  typedef void (*PacketDestinationAddressCallback)
-    (Ptr<const Packet> packet, const Address &destinationAddress);
+  typedef void (*PacketDestinationAddressCallback)(Ptr<const Packet> packet, const Address &destinationAddress);
 
   /**
    * \brief Common callback signature of a packet and a source address.
    * \param packet the packet
    * \param sourceAddress the source address
    */
-  typedef void (*PacketSenderAddressCallback)
-    (Ptr<const Packet> packet, const Address &sourceAddress);
+  typedef void (*PacketSenderAddressCallback)(Ptr<const Packet> packet, const Address &sourceAddress);
 
   /**
    * \brief Common callback signature for packet delay and address.
    * \param delay the packet delay
    * \param sourceAddress the source address
    */
-  typedef void (*PacketDelayAddressCallback)
-    (const Time &delay, const Address &sourceAddress);
+  typedef void (*PacketDelayAddressCallback)(const Time &delay, const Address &sourceAddress);
 
   /**
    * \brief Common callback signature for `PacketTrace` trace sources.
@@ -89,23 +86,21 @@ public:
    *                   and destination address
    * \todo Use const-reference for Time argument.
    */
-  typedef void (*PacketTraceCallback)
-    (Time                        now,
-    SatEnums::SatPacketEvent_t  eventType,
-    SatEnums::SatNodeType_t     nodeType,
-    uint32_t                    nodeId,
-    Mac48Address                nodeMacAddress,
-    SatEnums::SatLogLevel_t     logLevel,
-    SatEnums::SatLinkDir_t      linkDirection,
-    std::string                 packetInfo);
+  typedef void (*PacketTraceCallback)(Time                        now,
+                                      SatEnums::SatPacketEvent_t  eventType,
+                                      SatEnums::SatNodeType_t     nodeType,
+                                      uint32_t                    nodeId,
+                                      Mac48Address                nodeMacAddress,
+                                      SatEnums::SatLogLevel_t     logLevel,
+                                      SatEnums::SatLinkDir_t      linkDirection,
+                                      std::string                 packetInfo);
 
   /**
    * \brief Common callback signature for scenario creation trace sources by
    *        helpers.
    * \param trace textual description of the creation being done
    */
-  typedef void (*CreationCallback)
-    (std::string trace);
+  typedef void (*CreationCallback)(std::string trace);
 
 private:
   /**

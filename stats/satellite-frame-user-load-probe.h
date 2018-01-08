@@ -105,8 +105,7 @@ public:
    * \param frameId The current frame number.
    * \param utCount The number of scheduled users.
    */
-  typedef void (*FrameUserLoadCallback)
-    (uint32_t frameId, uint32_t utCount);
+  typedef void (*FrameUserLoadCallback)(uint32_t frameId, uint32_t utCount);
 
 private:
   /**

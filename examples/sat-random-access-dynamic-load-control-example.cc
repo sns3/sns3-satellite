@@ -149,10 +149,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
   sh->InstallTrafficModel (
-  		SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			appStartTime, Seconds (simLength + 1), Seconds (0.05));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength + 1), Seconds (0.05));
 
   NS_LOG_INFO ("--- Cbr-user-defined-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);

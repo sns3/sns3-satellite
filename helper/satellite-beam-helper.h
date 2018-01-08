@@ -55,7 +55,6 @@ namespace ns3 {
 class SatBeamHelper : public Object
 {
 public:
-
   /**
    * Define type CarrierFreqConverter
    */

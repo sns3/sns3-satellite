@@ -47,7 +47,6 @@ class SatLowerLayerServiceConf;
 class SatNcc : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

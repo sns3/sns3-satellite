@@ -109,10 +109,10 @@ SatStatsHelper::GetOutputTypeName (SatStatsHelper::OutputType_t outputType)
 
 SatStatsHelper::SatStatsHelper (Ptr<const SatHelper> satHelper)
   : m_name ("stat"),
-    m_identifierType (SatStatsHelper::IDENTIFIER_GLOBAL),
-    m_outputType (SatStatsHelper::OUTPUT_SCATTER_FILE),
-    m_isInstalled (false),
-    m_satHelper (satHelper)
+  m_identifierType (SatStatsHelper::IDENTIFIER_GLOBAL),
+  m_outputType (SatStatsHelper::OUTPUT_SCATTER_FILE),
+  m_isInstalled (false),
+  m_satHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }

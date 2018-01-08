@@ -53,8 +53,8 @@ public:
 
   EncapKey (const Mac48Address source, const Mac48Address dest, const uint8_t flowId)
     : m_source (source),
-      m_destination (dest),
-      m_flowId (flowId)
+    m_destination (dest),
+    m_flowId (flowId)
   {
   }
 };
@@ -306,7 +306,6 @@ public:
   void SetGwAddress (Mac48Address address);
 
 protected:
-
   /**
    * Dispose of this class instance
    */

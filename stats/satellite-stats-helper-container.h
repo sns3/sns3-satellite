@@ -287,7 +287,6 @@ public:
   static std::string GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType);
 
 protected:
-
   /**
    * Inherited from Object base class
    */

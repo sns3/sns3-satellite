@@ -160,17 +160,17 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Seconds (intervalInSeconds)));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
   sh->InstallTrafficModel (
-  		SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			appStartTime, Seconds (simLength + 1), Seconds (0.01));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength + 1), Seconds (0.01));
 
-	if (isNoisy)
-		{
-			const double kbps = packetSize / intervalInSeconds / 125.0;
-			std::cout << "Each of " << utsPerBeam * endUsersPerUt  <<" UT Users"
-								<< " offer bandwidth of " << kbps << " kbps" << std::endl;
-		}
+  if (isNoisy)
+    {
+      const double kbps = packetSize / intervalInSeconds / 125.0;
+      std::cout << "Each of " << utsPerBeam * endUsersPerUt  << " UT Users"
+                << " offer bandwidth of " << kbps << " kbps" << std::endl;
+    }
 
   /**
    * Set-up statistics

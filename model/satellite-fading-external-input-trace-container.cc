@@ -81,8 +81,8 @@ TypeId SatFadingExternalInputTraceContainer::GetInstanceTypeId (void) const
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
   : m_utInputMode (LIST_MODE),
-    m_indexFilesLoaded (false),
-    m_maxDistanceToFading (0)
+  m_indexFilesLoaded (false),
+  m_maxDistanceToFading (0)
 {
   NS_LOG_FUNCTION (this);
 

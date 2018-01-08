@@ -91,13 +91,13 @@ protected:
 
 SatPerPacketBaseTestCase::SatPerPacketBaseTestCase ()
   : TestCase (""),
-    m_Interval1 (),
-    m_Interval2 (),
-    m_PackageSize1 (),
-    m_PackageSize2 (),
-    m_extName (),
-    m_fading (),
-    m_dummyFrames (false)
+  m_Interval1 (),
+  m_Interval2 (),
+  m_PackageSize1 (),
+  m_PackageSize2 (),
+  m_extName (),
+  m_fading (),
+  m_dummyFrames (false)
 {
 
 }
@@ -105,13 +105,13 @@ SatPerPacketBaseTestCase::SatPerPacketBaseTestCase ()
 SatPerPacketBaseTestCase::SatPerPacketBaseTestCase (std::string name, std::string extName, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                     StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
   : TestCase (name),
-    m_Interval1 (ival1),
-    m_Interval2 (ival2),
-    m_PackageSize1 (pSize1),
-    m_PackageSize2 (pSize2),
-    m_extName (extName),
-    m_fading (fading),
-    m_dummyFrames (dummyFrames)
+  m_Interval1 (ival1),
+  m_Interval2 (ival2),
+  m_PackageSize1 (pSize1),
+  m_PackageSize2 (pSize2),
+  m_extName (extName),
+  m_fading (fading),
+  m_dummyFrames (dummyFrames)
 {
 
 }

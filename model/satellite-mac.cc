@@ -67,8 +67,8 @@ SatMac::GetTypeId (void)
 
 SatMac::SatMac ()
   : m_isStatisticsTagsEnabled (false),
-    m_nodeInfo (),
-    m_beamId (0)
+  m_nodeInfo (),
+  m_beamId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
@@ -76,8 +76,8 @@ SatMac::SatMac ()
 
 SatMac::SatMac (uint32_t beamId)
   : m_isStatisticsTagsEnabled (false),
-    m_nodeInfo (),
-    m_beamId (beamId)
+  m_nodeInfo (),
+  m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
 }

@@ -68,9 +68,9 @@ GeoCoordinate::GeoCoordinate (Vector vector, ReferenceEllipsoid_t refEllipsoid)
 
 GeoCoordinate::GeoCoordinate ()
   : m_latitude (NAN),
-    m_longitude (NAN),
-    m_altitude (NAN),
-    m_refEllipsoid (GeoCoordinate::SPHERE)
+  m_longitude (NAN),
+  m_altitude (NAN),
+  m_refEllipsoid (GeoCoordinate::SPHERE)
 {
   NS_LOG_FUNCTION (this);
 

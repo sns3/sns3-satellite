@@ -52,7 +52,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsLinkRxPowerHelper);
 
 SatStatsLinkRxPowerHelper::SatStatsLinkRxPowerHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_traceSinkCallback (MakeCallback (&SatStatsLinkRxPowerHelper::RxPowerCallback, this))
+  m_traceSinkCallback (MakeCallback (&SatStatsLinkRxPowerHelper::RxPowerCallback, this))
 {
   NS_LOG_FUNCTION (this << satHelper);
 }

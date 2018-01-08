@@ -123,16 +123,16 @@ SatUtHelper::GetInstanceTypeId (void) const
 
 SatUtHelper::SatUtHelper ()
   : m_carrierBandwidthConverter (),
-    m_fwdLinkCarrierCount (),
-    m_superframeSeq (),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_linkResults (),
-    m_llsConf (),
-    m_enableChannelEstimationError (false),
-    m_crdsaOnlyForControl (false),
-    m_raSettings ()
+  m_fwdLinkCarrierCount (),
+  m_superframeSeq (),
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_linkResults (),
+  m_llsConf (),
+  m_enableChannelEstimationError (false),
+  m_crdsaOnlyForControl (false),
+  m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -148,19 +148,19 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
                           SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
   : m_carrierBandwidthConverter (carrierBandwidthConverter),
-    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-    m_superframeSeq (seq),
-    m_readCtrlCb (readCb),
-    m_reserveCtrlCb (reserveCb),
-    m_sendCtrlCb (sendCb),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_linkResults (),
-    m_llsConf (),
-    m_enableChannelEstimationError (false),
-    m_crdsaOnlyForControl (false),
-    m_raSettings (randomAccessSettings)
+  m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+  m_superframeSeq (seq),
+  m_readCtrlCb (readCb),
+  m_reserveCtrlCb (reserveCb),
+  m_sendCtrlCb (sendCb),
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_linkResults (),
+  m_llsConf (),
+  m_enableChannelEstimationError (false),
+  m_crdsaOnlyForControl (false),
+  m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");

@@ -45,9 +45,9 @@ SatRandomAccessConf::GetTypeId (void)
 }
 SatRandomAccessConf::SatRandomAccessConf ()
   : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
-    m_allocationChannelCount (),
-    m_crdsaSignalingOverheadInBytes (),
-    m_slottedAlohaSignalingOverheadInBytes ()
+  m_allocationChannelCount (),
+  m_crdsaSignalingOverheadInBytes (),
+  m_slottedAlohaSignalingOverheadInBytes ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - Constructor not in use");
@@ -55,9 +55,9 @@ SatRandomAccessConf::SatRandomAccessConf ()
 
 SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> superframeSeq)
   : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
-    m_allocationChannelCount (llsConf->GetRaServiceCount ()),
-    m_crdsaSignalingOverheadInBytes (5),
-    m_slottedAlohaSignalingOverheadInBytes (3)
+  m_allocationChannelCount (llsConf->GetRaServiceCount ()),
+  m_crdsaSignalingOverheadInBytes (5),
+  m_slottedAlohaSignalingOverheadInBytes (3)
 {
   NS_LOG_FUNCTION (this);
 

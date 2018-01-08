@@ -123,21 +123,21 @@ main (int argc, char *argv[])
   if ( (sender == "gw" ) || ( sender == "both") )
     {
       simulationHelper->InstallTrafficModel (
-      		SimulationHelper::ONOFF,
-					SimulationHelper::UDP,
-					SimulationHelper::FWD_LINK,
-					Seconds (1.0));
+        SimulationHelper::ONOFF,
+        SimulationHelper::UDP,
+        SimulationHelper::FWD_LINK,
+        Seconds (1.0));
     }
 
   // in case of sender is UT or Both, create OnOff application to UT connected user
   // and Sink application to GW connected user
   if (sender == "ut" || sender == "both" )
     {
-  		simulationHelper->InstallTrafficModel (
-  	   		SimulationHelper::ONOFF,
-  				SimulationHelper::UDP,
-  				SimulationHelper::RTN_LINK,
-  				Seconds (2.0));
+      simulationHelper->InstallTrafficModel (
+        SimulationHelper::ONOFF,
+        SimulationHelper::UDP,
+        SimulationHelper::RTN_LINK,
+        Seconds (2.0));
     }
 
   // prompt info of the used parameters

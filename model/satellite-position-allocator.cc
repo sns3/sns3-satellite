@@ -227,16 +227,16 @@ SatSpotBeamPositionAllocator::GetTypeId (void)
 
 SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator ()
   : m_targetBeamId (0),
-    m_minElevationAngleInDeg (1)
+  m_minElevationAngleInDeg (1)
 {
 
 }
 
 SatSpotBeamPositionAllocator::SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patterns, GeoCoordinate geoPos)
   : m_targetBeamId (beamId),
-    m_minElevationAngleInDeg (1),
-    m_antennaGainPatterns (patterns),
-    m_geoPos (geoPos)
+  m_minElevationAngleInDeg (1),
+  m_antennaGainPatterns (patterns),
+  m_geoPos (geoPos)
 {
 }
 

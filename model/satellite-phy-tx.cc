@@ -44,10 +44,10 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyTx);
 
 SatPhyTx::SatPhyTx ()
   : m_maxAntennaGain (),
-    m_state (IDLE),
-    m_beamId (),
-    m_txMode (),
-    m_defaultFadingValue ()
+  m_state (IDLE),
+  m_beamId (),
+  m_txMode (),
+  m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }

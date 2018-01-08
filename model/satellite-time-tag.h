@@ -41,7 +41,6 @@ namespace ns3 {
 class SatTimeTag : public Tag
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -61,7 +60,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param senderTimestamp 
+   * \param senderTimestamp
    */
   SatTimeTag (Time senderTimestamp);
 
@@ -115,7 +114,6 @@ private:
 class SatPhyTimeTag : public Tag
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -135,7 +133,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param senderTimestamp 
+   * \param senderTimestamp
    */
   SatPhyTimeTag (Time senderTimestamp);
 
@@ -189,7 +187,6 @@ private:
 class SatMacTimeTag : public Tag
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -209,7 +206,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param senderTimestamp 
+   * \param senderTimestamp
    */
   SatMacTimeTag (Time senderTimestamp);
 
@@ -263,7 +260,6 @@ private:
 class SatDevTimeTag : public Tag
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -283,7 +279,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param senderTimestamp 
+   * \param senderTimestamp
    */
   SatDevTimeTag (Time senderTimestamp);
 

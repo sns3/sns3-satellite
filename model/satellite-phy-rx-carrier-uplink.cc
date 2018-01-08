@@ -31,9 +31,9 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierUplink);
 SatPhyRxCarrierUplink::SatPhyRxCarrierUplink (uint32_t carrierId,
                                               Ptr<SatPhyRxCarrierConf> carrierConf,
                                               bool randomAccessEnabled)
-: SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled)
+  : SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled)
 {
-	NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 SatPhyRxCarrierUplink::~SatPhyRxCarrierUplink ()
@@ -46,15 +46,15 @@ TypeId
 SatPhyRxCarrierUplink::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierUplink")
-	.SetParent<SatPhyRxCarrier> ()
-	;
+    .SetParent<SatPhyRxCarrier> ()
+  ;
   return tid;
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
 SatPhyRxCarrierUplink::CreateInterference (Ptr<SatSignalParameters> rxParams, Address senderAddress)
 {
-	return GetInterferenceModel()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
+  return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
 }
 
 void
@@ -81,7 +81,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// calculates sinr for 1st link
   double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
-  															packetRxParams.rxParams->m_ifPower_W,
+                                packetRxParams.rxParams->m_ifPower_W,
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
@@ -101,7 +101,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
-  		packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, sinr);
+                     packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, sinr);
 
   /// Send packet upwards
   m_rxCallback ( packetRxParams.rxParams, phyError );

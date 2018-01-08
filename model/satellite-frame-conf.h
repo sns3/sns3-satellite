@@ -232,7 +232,6 @@ private:
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
 public:
-
   /**
    * Define type SatTimeSlotConfContainer_t
    */
@@ -769,7 +768,6 @@ public:
 class SatSuperframeConf0 : public SatSuperframeConf
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -804,7 +802,6 @@ private:
 class SatSuperframeConf1 : public SatSuperframeConf
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -840,7 +837,6 @@ private:
 class SatSuperframeConf2 : public SatSuperframeConf
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -875,7 +871,6 @@ private:
 class SatSuperframeConf3 : public SatSuperframeConf
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

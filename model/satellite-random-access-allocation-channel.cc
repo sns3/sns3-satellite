@@ -36,16 +36,16 @@ SatRandomAccessAllocationChannel::GetTypeId (void)
 
 SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
   : m_crdsaMinRandomizationValue (),
-    m_crdsaMaxRandomizationValue (),
-    m_crdsaNumOfInstances (),
-    m_crdsaMinIdleBlocks (),
-    m_crdsaIdleBlocksLeft (0),
-    m_crdsaBackoffTimeInMilliSeconds (),
-    m_crdsaBackoffProbability (),
-    m_crdsaMaxUniquePayloadPerBlock (),
-    m_crdsaMaxConsecutiveBlocksAccessed (),
-    m_crdsaNumOfConsecutiveBlocksUsed (0),
-    m_crdsaBackoffReleaseTime (0)
+  m_crdsaMaxRandomizationValue (),
+  m_crdsaNumOfInstances (),
+  m_crdsaMinIdleBlocks (),
+  m_crdsaIdleBlocksLeft (0),
+  m_crdsaBackoffTimeInMilliSeconds (),
+  m_crdsaBackoffProbability (),
+  m_crdsaMaxUniquePayloadPerBlock (),
+  m_crdsaMaxConsecutiveBlocksAccessed (),
+  m_crdsaNumOfConsecutiveBlocksUsed (0),
+  m_crdsaBackoffReleaseTime (0)
 {
   NS_LOG_FUNCTION (this);
 }

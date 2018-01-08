@@ -34,20 +34,20 @@ namespace ns3 {
 
 SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo ()
   : m_ctrlSlotPresent (false),
-    m_craSymbols (0.0),
-    m_minRbdcSymbols (0.0),
-    m_rbdcSymbols (0.0),
-    m_vbdcSymbols (0.0)
+  m_craSymbols (0.0),
+  m_minRbdcSymbols (0.0),
+  m_rbdcSymbols (0.0),
+  m_vbdcSymbols (0.0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo (uint8_t countOfRcs)
   : m_ctrlSlotPresent (false),
-    m_craSymbols (0.0),
-    m_minRbdcSymbols (0.0),
-    m_rbdcSymbols (0.0),
-    m_vbdcSymbols (0.0)
+  m_craSymbols (0.0),
+  m_minRbdcSymbols (0.0),
+  m_rbdcSymbols (0.0),
+  m_vbdcSymbols (0.0)
 {
   NS_LOG_FUNCTION (this << (uint32_t) countOfRcs);
 
@@ -57,10 +57,10 @@ SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo (uint8_t countOfRcs)
 SatFrameAllocator::SatFrameAllocInfo::SatFrameAllocInfo (SatFrameAllocReqItemContainer_t &req, Ptr<SatWaveform> trcWaveForm,
                                                          bool ctrlSlotPresent, double ctrlSlotLength)
   : m_ctrlSlotPresent (ctrlSlotPresent),
-    m_craSymbols (0.0),
-    m_minRbdcSymbols (0.0),
-    m_rbdcSymbols (0.0),
-    m_vbdcSymbols (0.0)
+  m_craSymbols (0.0),
+  m_minRbdcSymbols (0.0),
+  m_rbdcSymbols (0.0),
+  m_vbdcSymbols (0.0)
 {
   NS_LOG_FUNCTION (this << ctrlSlotPresent << ctrlSlotLength);
 
@@ -127,7 +127,7 @@ SatFrameAllocator::SatFrameAllocInfo::GetTotalSymbols ()
 
 SatFrameAllocator::CcReqCompare::CcReqCompare (const UtAllocContainer_t& utAllocContainer, CcReqCompare::CcReqType_t ccReqType)
   : m_utAllocContainer (utAllocContainer),
-    m_ccReqType (ccReqType)
+  m_ccReqType (ccReqType)
 {
 
 }
@@ -166,15 +166,15 @@ SatFrameAllocator::CcReqCompare::operator() (RcAllocItem_t rcAlloc1, RcAllocItem
 
 SatFrameAllocator::SatFrameAllocator ()
   : m_allocationDenied (true),
-    m_totalSymbolsInFrame (0.0),
-    m_availableSymbolsInFrame (0.0),
-    m_preAllocatedCraSymbols (0.0),
-    m_preAllocatedMinRdbcSymbols (0.0),
-    m_preAllocatedRdbcSymbols (0.0),
-    m_preAllocatedVdbcSymbols (0.0),
-    m_maxSymbolsPerCarrier (0),
-    m_configType (SatSuperframeConf::CONFIG_TYPE_0),
-    m_frameId (0)
+  m_totalSymbolsInFrame (0.0),
+  m_availableSymbolsInFrame (0.0),
+  m_preAllocatedCraSymbols (0.0),
+  m_preAllocatedMinRdbcSymbols (0.0),
+  m_preAllocatedRdbcSymbols (0.0),
+  m_preAllocatedVdbcSymbols (0.0),
+  m_maxSymbolsPerCarrier (0),
+  m_configType (SatSuperframeConf::CONFIG_TYPE_0),
+  m_frameId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -182,9 +182,9 @@ SatFrameAllocator::SatFrameAllocator ()
 
 SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frameId, SatSuperframeConf::ConfigType_t configType)
   : m_allocationDenied (true),
-    m_configType (configType),
-    m_frameId (frameId),
-    m_frameConf (frameConf)
+  m_configType (configType),
+  m_frameId (frameId),
+  m_frameConf (frameConf)
 {
   NS_LOG_FUNCTION (this << (uint32_t) frameId);
 

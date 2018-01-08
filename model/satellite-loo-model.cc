@@ -37,11 +37,11 @@ TypeId SatLooModel::GetTypeId (void)
 
 SatLooModel::SatLooModel ()
   : m_numOfStates (0),
-    m_currentSet (0),
-    m_currentState (0),
-    m_looConf (NULL),
-    m_normalRandomVariable (NULL),
-    m_uniformVariable (NULL)
+  m_currentSet (0),
+  m_currentState (0),
+  m_looConf (NULL),
+  m_normalRandomVariable (NULL),
+  m_uniformVariable (NULL)
 {
   NS_LOG_FUNCTION (this);
 
@@ -50,11 +50,11 @@ SatLooModel::SatLooModel ()
 
 SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState)
   : m_numOfStates (numOfStates),
-    m_currentSet (initialSet),
-    m_currentState (initialState),
-    m_looConf (looConf),
-    m_normalRandomVariable (NULL),
-    m_uniformVariable (NULL)
+  m_currentSet (initialSet),
+  m_currentState (initialState),
+  m_looConf (looConf),
+  m_normalRandomVariable (NULL),
+  m_uniformVariable (NULL)
 {
   NS_LOG_FUNCTION (this << numOfStates << " " << initialSet << " " << initialState);
 

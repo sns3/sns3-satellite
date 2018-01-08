@@ -99,12 +99,12 @@ SatGwHelper::GetInstanceTypeId (void) const
 
 SatGwHelper::SatGwHelper ()
   : m_rtnLinkCarrierCount (0),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_symbolRate (0.0),
-    m_enableChannelEstimationError (false),
-    m_raSettings ()
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_symbolRate (0.0),
+  m_enableChannelEstimationError (false),
+  m_raSettings ()
 {
   // this default constructor should be never called
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -118,17 +118,17 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
                           SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
   : m_carrierBandwidthConverter (carrierBandwidthConverter),
-    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-    m_superframeSeq (seq),
-    m_readCtrlCb (readCb),
-    m_reserveCtrlCb (reserveCb),
-    m_sendCtrlCb (sendCb),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_symbolRate (0.0),
-    m_enableChannelEstimationError (false),
-    m_raSettings (randomAccessSettings)
+  m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+  m_superframeSeq (seq),
+  m_readCtrlCb (readCb),
+  m_reserveCtrlCb (reserveCb),
+  m_sendCtrlCb (sendCb),
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_symbolRate (0.0),
+  m_enableChannelEstimationError (false),
+  m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 

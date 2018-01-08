@@ -43,16 +43,16 @@ NS_OBJECT_ENSURE_REGISTERED (SatReturnLinkEncapsulatorArq);
 
 SatReturnLinkEncapsulatorArq::SatReturnLinkEncapsulatorArq ()
   : m_seqNo (),
-    m_txedBuffer (),
-    m_retxBuffer (),
-    m_retxBufferSize (0),
-    m_txedBufferSize (0),
-    m_maxRtnArqSegmentSize (37),
-    m_maxNoOfRetransmissions (2),
-    m_retransmissionTimer (Seconds (0.6)),
-    m_arqWindowSize (10),
-    m_arqHeaderSize (1),
-    m_nextExpectedSeqNo (0)
+  m_txedBuffer (),
+  m_retxBuffer (),
+  m_retxBufferSize (0),
+  m_txedBufferSize (0),
+  m_maxRtnArqSegmentSize (37),
+  m_maxNoOfRetransmissions (2),
+  m_retransmissionTimer (Seconds (0.6)),
+  m_arqWindowSize (10),
+  m_arqHeaderSize (1),
+  m_nextExpectedSeqNo (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -65,17 +65,17 @@ SatReturnLinkEncapsulatorArq::SatReturnLinkEncapsulatorArq ()
 
 SatReturnLinkEncapsulatorArq::SatReturnLinkEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId)
   : SatReturnLinkEncapsulator (source, dest, flowId),
-    m_seqNo (),
-    m_txedBuffer (),
-    m_retxBuffer (),
-    m_retxBufferSize (0),
-    m_txedBufferSize (0),
-    m_maxRtnArqSegmentSize (37),
-    m_maxNoOfRetransmissions (2),
-    m_retransmissionTimer (Seconds (0.6)),
-    m_arqWindowSize (10),
-    m_arqHeaderSize (1),
-    m_nextExpectedSeqNo (0)
+  m_seqNo (),
+  m_txedBuffer (),
+  m_retxBuffer (),
+  m_retxBufferSize (0),
+  m_txedBufferSize (0),
+  m_maxRtnArqSegmentSize (37),
+  m_maxNoOfRetransmissions (2),
+  m_retransmissionTimer (Seconds (0.6)),
+  m_arqWindowSize (10),
+  m_arqHeaderSize (1),
+  m_nextExpectedSeqNo (0)
 {
   NS_LOG_FUNCTION (this);
 

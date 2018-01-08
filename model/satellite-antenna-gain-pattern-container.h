@@ -40,7 +40,6 @@ namespace ns3 {
 class SatAntennaGainPatternContainer : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

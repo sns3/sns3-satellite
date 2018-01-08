@@ -42,10 +42,10 @@ SatIdMapper::GetTypeId (void)
 
 SatIdMapper::SatIdMapper ()
   : m_traceIdIndex (1),
-    m_utIdIndex (1),
-    m_utUserIdIndex (1),
-    m_gwUserIdIndex (1),
-    m_enableMapPrint (false)
+  m_utIdIndex (1),
+  m_utUserIdIndex (1),
+  m_gwUserIdIndex (1),
+  m_enableMapPrint (false)
 {
   NS_LOG_FUNCTION (this);
 }

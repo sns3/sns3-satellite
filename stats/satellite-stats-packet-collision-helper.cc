@@ -241,8 +241,11 @@ SatStatsPacketCollisionHelper::DoInstall ()
           for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
                itCarrier != carriers.End (); ++itCarrier)
             {
-          		SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
-          		if (ct != GetValidCarrierType ()) continue;
+              SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
+              if (ct != GetValidCarrierType ())
+                {
+                  continue;
+                }
 
               const bool ret = itCarrier->second->TraceConnectWithoutContext (
                   GetTraceSourceName (), callback);

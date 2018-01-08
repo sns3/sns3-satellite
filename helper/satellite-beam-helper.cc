@@ -139,13 +139,13 @@ SatBeamHelper::GetInstanceTypeId (void) const
 
 SatBeamHelper::SatBeamHelper ()
   : m_printDetailedInformationToCreationTraces (false),
-    m_fadingModel (),
-    m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
-    m_constantPropagationDelay (Seconds (0.13)),
-    m_randomAccessModel (SatEnums::RA_MODEL_OFF),
-    m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
-    m_raConstantErrorRate (0.0)
+  m_fadingModel (),
+  m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
+  m_constantPropagationDelay (Seconds (0.13)),
+  m_randomAccessModel (SatEnums::RA_MODEL_OFF),
+  m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
+  m_raConstantErrorRate (0.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -159,15 +159,15 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
                               uint32_t fwdLinkCarrierCount,
                               Ptr<SatSuperframeSeq> seq)
   : m_carrierBandwidthConverter (bandwidthConverterCb),
-    m_superframeSeq (seq),
-    m_printDetailedInformationToCreationTraces (false),
-    m_fadingModel (SatEnums::FADING_MARKOV),
-    m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
-    m_constantPropagationDelay (Seconds (0.13)),
-    m_randomAccessModel (SatEnums::RA_MODEL_OFF),
-    m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-    m_raConstantErrorRate (0.0)
+  m_superframeSeq (seq),
+  m_printDetailedInformationToCreationTraces (false),
+  m_fadingModel (SatEnums::FADING_MARKOV),
+  m_propagationDelayModel (SatEnums::PD_CONSTANT_SPEED),
+  m_constantPropagationDelay (Seconds (0.13)),
+  m_randomAccessModel (SatEnums::RA_MODEL_OFF),
+  m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+  m_raConstantErrorRate (0.0)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 

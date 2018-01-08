@@ -135,16 +135,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("0.1s"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR,
-  		SimulationHelper::UDP,
-			SimulationHelper::FWD_LINK,
-			Seconds (0.1), Seconds (0.25));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    Seconds (0.1), Seconds (0.25));
 
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR,
-  		SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			Seconds (0.1), Seconds (0.25));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (0.1), Seconds (0.25));
 
   NodeContainer gw = helper->GwNodes ();
   Ptr<SatMobilityModel> gwMob = gw.Get (0)->GetObject<SatMobilityModel> ();

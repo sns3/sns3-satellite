@@ -74,7 +74,8 @@ main (int argc, char *argv[])
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetSimulationTime (simLength);
 
-  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  std::stringstream beamsEnabled;
+  beamsEnabled << beamId;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
   // Configure error model
@@ -110,14 +111,14 @@ main (int argc, char *argv[])
   simulationHelper->CreateSatScenario ();
 
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Time (interval)));
-	Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-	/// Create applicationa on UT users
-	simulationHelper->InstallTrafficModel (
-			SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			appStartTime, Seconds (simLength), Seconds (0.05));
+  /// Create applicationa on UT users
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength), Seconds (0.05));
 
 
   NS_LOG_INFO ("--- sat-arq-rtn-example ---");

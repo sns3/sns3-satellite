@@ -38,7 +38,6 @@ namespace ns3 {
 class SatArqBufferContext : public Object
 {
 public:
-
   /**
    * Default constructor.
    */

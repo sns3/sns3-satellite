@@ -65,7 +65,6 @@ public:
 class SatTbtpContainer : public Object
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -73,7 +72,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param seq 
+   * \param seq
    */
   SatTbtpContainer (Ptr<SatSuperframeSeq> seq);
 

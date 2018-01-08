@@ -30,21 +30,21 @@ namespace ns3 {
 
 SatSignalParameters::SatSignalParameters ()
   : m_beamId (),
-    m_carrierId (),
-    m_carrierFreq_hz (),
-    m_duration (),
-    m_txPower_W (),
-    m_rxPower_W (),
-    m_phyTx (),
-    m_sinr (),
-    m_channelType (),
-    m_rxPowerInSatellite_W (),
-    m_ifPower_W (),
-    m_ifPowerInSatellite_W (),
-    m_rxNoisePowerInSatellite_W (),
-    m_rxAciIfPowerInSatellite_W (),
-    m_rxExtNoisePowerInSatellite_W (),
-    m_sinrCalculate ()
+  m_carrierId (),
+  m_carrierFreq_hz (),
+  m_duration (),
+  m_txPower_W (),
+  m_rxPower_W (),
+  m_phyTx (),
+  m_sinr (),
+  m_channelType (),
+  m_rxPowerInSatellite_W (),
+  m_ifPower_W (),
+  m_ifPowerInSatellite_W (),
+  m_rxNoisePowerInSatellite_W (),
+  m_rxAciIfPowerInSatellite_W (),
+  m_rxExtNoisePowerInSatellite_W (),
+  m_sinrCalculate ()
 {
   NS_LOG_FUNCTION (this);
 }

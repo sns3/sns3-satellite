@@ -43,7 +43,6 @@ class SatNodeInfo;
 class SatUtLlc : public SatLlc
 {
 public:
-
   /**
    * Derived form Object
    */
@@ -144,7 +143,6 @@ public:
   void SetMacQueueEventCallback (SatQueue::QueueEventCallback cb);
 
 protected:
-
   /**
    * Dispose of SatUtLLc
    */

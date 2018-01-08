@@ -52,7 +52,6 @@ namespace ns3 {
 class SimulationHelper : public Object
 {
 public:
-
   /**
    * Default constructor, which is not used.
    */
@@ -147,7 +146,10 @@ public:
    * \brief Set simulation time
    * \param time
    */
-  inline void SetSimulationTime (Time time) { m_simTime = time; };
+  inline void SetSimulationTime (Time time)
+  {
+    m_simTime = time;
+  }
 
   /**
    * \brief Set ideal channel/physical layer parameterization.
@@ -276,8 +278,8 @@ public:
    * \param ifModel Interference model.
    * \param constantIf Static interference if constant interference model used
    */
-  void SetInterferenceModel(SatPhyRxCarrierConf::InterferenceModel ifModel,
-                            double constantIf = 0.0);
+  void SetInterferenceModel (SatPhyRxCarrierConf::InterferenceModel ifModel,
+                             double constantIf = 0.0);
 
   /**
    * \brief Enables simulation progress logging.
@@ -366,7 +368,10 @@ public:
    * \return errorRate Simulation time
    */
 
-  inline Time& GetSimTime () { return m_simTime; }
+  inline Time& GetSimTime ()
+  {
+    return m_simTime;
+  }
 
   /**
    * \brief Set common UT position allocator for all beams.
@@ -397,7 +402,10 @@ public:
    * \brief If lower layer API access is required, use this to access SatHelper.
    * You MUST have called CreateSatScenario before calling this method.
    */
-  inline Ptr<SatHelper> GetSatelliteHelper () { return m_satHelper; };
+  inline Ptr<SatHelper> GetSatelliteHelper ()
+  {
+    return m_satHelper;
+  }
 
   /**
    * \brief Get the statistics container of this helper. If does not exist, one is created.
@@ -407,20 +415,20 @@ public:
 
   typedef enum
   {
-  	CBR,
-		ONOFF,
-  	HTTP,
-		NRTV,
+    CBR,
+    ONOFF,
+    HTTP,
+    NRTV,
   } TrafficModel_t;
 
   typedef enum
   {
-  	UDP, TCP
+    UDP, TCP
   } TransportLayerProtocol_t;
 
   typedef enum
   {
-  	RTN_LINK, FWD_LINK
+    RTN_LINK, FWD_LINK
   } TrafficDirection_t;
 
   /**
@@ -435,56 +443,58 @@ public:
    * \param startDelay application start delay between each user
    */
   void InstallTrafficModel (TrafficModel_t trafficModel,
-														TransportLayerProtocol_t protocol,
-														TrafficDirection_t direction,
-														Time startTime,
-														Time stopTime,
-														Time startDelay);
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime,
+                            Time stopTime,
+                            Time startDelay);
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
-  		                      TransportLayerProtocol_t protocol,
-			                      TrafficDirection_t direction,
-														Time startTime,
-														Time stopTime)
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime,
+                            Time stopTime)
   {
-  	InstallTrafficModel (
-  			trafficModel, protocol, direction,
-				startTime,
-				stopTime,
-				Seconds (0));
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      startTime,
+      stopTime,
+      Seconds (0));
   }
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
-  		                      TransportLayerProtocol_t protocol,
-			                      TrafficDirection_t direction,
-														Time startTime)
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime)
   {
-  	InstallTrafficModel (
-  			trafficModel, protocol, direction,
-				startTime,
-				m_simTime + Seconds (1),
-				Seconds (0));
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      startTime,
+      m_simTime + Seconds (1),
+      Seconds (0));
   }
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
-														TransportLayerProtocol_t protocol,
-														TrafficDirection_t direction)
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction)
   {
-  	InstallTrafficModel (
-  			trafficModel, protocol, direction,
-  			Seconds (0.001),
-				m_simTime + Seconds (1),
-				Seconds (0));
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      Seconds (0.001),
+      m_simTime + Seconds (1),
+      Seconds (0));
   }
 
   /**
    * \brief Set the ID of the GW user for traffic models.
    * \param gwUserId GW user's ID
    */
-  inline void SetGwUserId (uint32_t gwUserId) { m_gwUserId = gwUserId; };
+  inline void SetGwUserId (uint32_t gwUserId)
+  {
+    m_gwUserId = gwUserId;
+  }
 
 protected:
-
   /**
    * \brief Enable random access
    */
@@ -505,8 +515,8 @@ protected:
    */
   inline uint32_t GetNextUtCount () const
   {
-  	NS_ASSERT_MSG (m_utCount != NULL, "UT count per beam not set");
-  	return m_utCount->GetInteger ();
+    NS_ASSERT_MSG (m_utCount != NULL, "UT count per beam not set");
+    return m_utCount->GetInteger ();
   }
 
   /**
@@ -514,8 +524,8 @@ protected:
    */
   inline uint32_t GetNextUtUserCount () const
   {
-  	NS_ASSERT_MSG (m_utCount != NULL, "User count per UT not set");
-  	return m_utUserCount->GetInteger ();
+    NS_ASSERT_MSG (m_utCount != NULL, "User count per UT not set");
+    return m_utUserCount->GetInteger ();
   }
 
   /**
@@ -530,7 +540,6 @@ protected:
   void SetupOutputPath ();
 
 private:
-
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
   Ptr<SatListPositionAllocator> m_commonUtPositions;
@@ -551,7 +560,7 @@ private:
   uint32_t                     m_gwUserId;
 
   bool                         m_progressLoggingEnabled;
-  Time 												 m_progressUpdateInterval;
+  Time                                                                                           m_progressUpdateInterval;
   EventId                      m_progressReportEvent;
 };
 

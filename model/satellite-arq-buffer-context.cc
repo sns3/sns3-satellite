@@ -31,10 +31,10 @@ NS_OBJECT_ENSURE_REGISTERED (SatArqBufferContext);
 
 SatArqBufferContext::SatArqBufferContext ()
   : m_pdu (),
-    m_seqNo (0),
-    m_retransmissionCount (0),
-    m_waitingTimer (),
-    m_rxStatus (false)
+  m_seqNo (0),
+  m_retransmissionCount (0),
+  m_waitingTimer (),
+  m_rxStatus (false)
 {
 
 }

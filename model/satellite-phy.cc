@@ -48,18 +48,18 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
   : m_eirpWoGainW (0),
-    m_beamId (0),
-    m_isStatisticsTagsEnabled (false),
-    m_rxNoiseTemperatureDbk (0),
-    m_rxMaxAntennaGainDb (0),
-    m_rxAntennaLossDb (0),
-    m_txMaxAntennaGainDb (0),
-    m_txMaxPowerDbw (0),
-    m_txOutputLossDb (0),
-    m_txPointingLossDb (0),
-    m_txOboLossDb (0),
-    m_txAntennaLossDb (0),
-    m_defaultFadingValue (1.0)
+  m_beamId (0),
+  m_isStatisticsTagsEnabled (false),
+  m_rxNoiseTemperatureDbk (0),
+  m_rxMaxAntennaGainDb (0),
+  m_rxAntennaLossDb (0),
+  m_txMaxAntennaGainDb (0),
+  m_txMaxPowerDbw (0),
+  m_txOutputLossDb (0),
+  m_txPointingLossDb (0),
+  m_txOboLossDb (0),
+  m_txAntennaLossDb (0),
+  m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
@@ -67,18 +67,18 @@ SatPhy::SatPhy (void)
 
 SatPhy::SatPhy (CreateParam_t & params)
   : m_eirpWoGainW (0),
-    m_beamId (0),
-    m_isStatisticsTagsEnabled (false),
-    m_rxNoiseTemperatureDbk (0),
-    m_rxMaxAntennaGainDb (0),
-    m_rxAntennaLossDb (0),
-    m_txMaxAntennaGainDb (0),
-    m_txMaxPowerDbw (0),
-    m_txOutputLossDb (0),
-    m_txPointingLossDb (0),
-    m_txOboLossDb (0),
-    m_txAntennaLossDb (0),
-    m_defaultFadingValue (1.0)
+  m_beamId (0),
+  m_isStatisticsTagsEnabled (false),
+  m_rxNoiseTemperatureDbk (0),
+  m_rxMaxAntennaGainDb (0),
+  m_rxAntennaLossDb (0),
+  m_txMaxAntennaGainDb (0),
+  m_txMaxPowerDbw (0),
+  m_txOutputLossDb (0),
+  m_txPointingLossDb (0),
+  m_txOboLossDb (0),
+  m_txAntennaLossDb (0),
+  m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
@@ -381,7 +381,7 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     {
       // If there was a PHY error, the packet is dropped here.
       NS_LOG_INFO (this << " dropped " << rxParams->m_packetsInBurst.size ()
-                         << " packets because of PHY error.");
+                        << " packets because of PHY error.");
     }
   else
     {

@@ -107,7 +107,8 @@ main (int argc, char *argv[])
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
 
   // Set beam ID
-  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  std::stringstream beamsEnabled;
+  beamsEnabled << beamId;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
   // Configure error model
@@ -129,8 +130,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   simulationHelper->InstallTrafficModel (
-  					SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-  					appStartTime, Seconds (simLength), Seconds (0.05));
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength), Seconds (0.05));
 
   NS_LOG_INFO ("--- sat-cbr-user-defined-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);

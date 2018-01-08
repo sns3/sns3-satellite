@@ -48,7 +48,6 @@ namespace ns3 {
 class SatAntennaGainPattern : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -68,7 +67,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param filePathName 
+   * \param filePathName
    */
   SatAntennaGainPattern (std::string filePathName);
   ~SatAntennaGainPattern ()

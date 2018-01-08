@@ -30,8 +30,8 @@ namespace ns3 {
 
 SatFwdCarrierConf::SatFwdCarrierConf ()
   : m_allocatedBandwidthInHz (0.0),
-    m_occupiedBandwidthInHz (0.0),
-    m_effectiveBandwidthInHz (0.0)
+  m_occupiedBandwidthInHz (0.0),
+  m_effectiveBandwidthInHz (0.0)
 {
   // default constructor should not be used
   NS_ASSERT (false);
@@ -57,4 +57,4 @@ SatFwdCarrierConf::~SatFwdCarrierConf ()
   NS_LOG_FUNCTION (this);
 }
 
-}; // namespace ns3
+}  // namespace ns3

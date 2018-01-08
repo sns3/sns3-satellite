@@ -43,9 +43,9 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRx);
 
 SatPhyRx::SatPhyRx ()
   : m_beamId (),
-    m_maxAntennaGain (),
-    m_antennaLoss (),
-    m_defaultFadingValue ()
+  m_maxAntennaGain (),
+  m_antennaLoss (),
+  m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -206,8 +206,11 @@ SatPhyRx::BeginFrameEndScheduling ()
        it != m_rxCarriers.end ();
        ++it)
     {
-  		Ptr<SatPhyRxCarrierPerFrame> crdsaPrxc = (*it)->GetObject<SatPhyRxCarrierPerFrame> ();
-      if (crdsaPrxc != 0) crdsaPrxc->BeginFrameEndScheduling ();
+      Ptr<SatPhyRxCarrierPerFrame> crdsaPrxc = (*it)->GetObject<SatPhyRxCarrierPerFrame> ();
+      if (crdsaPrxc != 0)
+        {
+          crdsaPrxc->BeginFrameEndScheduling ();
+        }
     }
 }
 
@@ -287,68 +290,68 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
   Ptr<SatPhyRxCarrier> rxc (nullptr);
   bool isRandomAccessCarrier (false);
 
-  SatEnums::RandomAccessModel_t raModel = carrierConf->GetRandomAccessModel();
+  SatEnums::RandomAccessModel_t raModel = carrierConf->GetRandomAccessModel ();
 
   for (uint32_t i = 0; i < carrierConf->GetCarrierCount (); ++i)
     {
       NS_LOG_INFO (this << " Create carrier: " << i);
 
       switch (carrierConf->GetChannelType ())
-				{
-          case SatEnums::FORWARD_FEEDER_CH:
-            {
-              // Satellite is the receiver in feeder uplink
-              rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, false);
-              break;
-            }
-					case SatEnums::FORWARD_USER_CH:
-					  {
-					    // UT has only per slot non-random access carriers
-					    rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, false);
-					    break;
-					  }
-          case SatEnums::RETURN_USER_CH:
-            {
-              isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
-
-              // Satellite is the receiver in either user or feeder uplink
-              rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, isRandomAccessCarrier);
-              break;
-            }
-					case SatEnums::RETURN_FEEDER_CH:
-					  {
-					    isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
-
-					    // DA carrier
-					    if (!isRandomAccessCarrier)
-                {
-                  rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, false);
-                }
-					    // RA slotted aloha
-					    else if (raModel == SatEnums::RA_MODEL_SLOTTED_ALOHA)
-					      {
-                  rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, true);
-                  DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                      SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-					      }
-					    // Note, that random access model of DVB-RCS2 specification may be configured
-					    // to be either slotted ALOHA and CRDSA (wit no of unique payloads attribute).
-					    // Here we make a short-cut such that the RCS2_SPECIFICATION random access
-					    // always uses the CRDSA frame type receiver.
-					    else if (raModel == SatEnums::RA_MODEL_CRDSA || raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
-					      {
-                  rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, true);
-                  DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                      SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-					      }
-					    break;
+        {
+        case SatEnums::FORWARD_FEEDER_CH:
+          {
+            // Satellite is the receiver in feeder uplink
+            rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, false);
+            break;
           }
-					case SatEnums::UNKNOWN_CH:
-					default:
-					{
-						NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
-					}
-				}
+        case SatEnums::FORWARD_USER_CH:
+          {
+            // UT has only per slot non-random access carriers
+            rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, false);
+            break;
+          }
+        case SatEnums::RETURN_USER_CH:
+          {
+            isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
+
+            // Satellite is the receiver in either user or feeder uplink
+            rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, isRandomAccessCarrier);
+            break;
+          }
+        case SatEnums::RETURN_FEEDER_CH:
+          {
+            isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
+
+            // DA carrier
+            if (!isRandomAccessCarrier)
+              {
+                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, false);
+              }
+            // RA slotted aloha
+            else if (raModel == SatEnums::RA_MODEL_SLOTTED_ALOHA)
+              {
+                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, true);
+                DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
+                SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
+              }
+            // Note, that random access model of DVB-RCS2 specification may be configured
+            // to be either slotted ALOHA and CRDSA (wit no of unique payloads attribute).
+            // Here we make a short-cut such that the RCS2_SPECIFICATION random access
+            // always uses the CRDSA frame type receiver.
+            else if (raModel == SatEnums::RA_MODEL_CRDSA || raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+              {
+                rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, true);
+                DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
+                SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
+              }
+            break;
+          }
+        case SatEnums::UNKNOWN_CH:
+        default:
+          {
+            NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
+          }
+        }
       m_rxCarriers.push_back (rxc);
     }
 }

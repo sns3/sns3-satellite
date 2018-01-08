@@ -71,7 +71,7 @@ SatBasicCnoEstimator::SatBasicCnoEstimator ()
 
 SatBasicCnoEstimator::SatBasicCnoEstimator (SatCnoEstimator::EstimationMode_t mode, Time window)
   : m_window (window),
-    m_mode (mode)
+  m_mode (mode)
 
 {
   NS_LOG_FUNCTION (this);

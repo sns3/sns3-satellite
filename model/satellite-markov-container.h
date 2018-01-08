@@ -122,8 +122,7 @@ public:
    *                    or RETURN_FEEDER_CH
    * \param value fading value, in unit determined by configuration
    */
-  typedef void (*FadingTraceCallback)
-    (double time, SatEnums::ChannelType_t channelType, double value);
+  typedef void (*FadingTraceCallback)(double time, SatEnums::ChannelType_t channelType, double value);
 
 private:
   /**

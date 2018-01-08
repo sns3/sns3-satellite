@@ -35,9 +35,9 @@ TypeId SatFadingOscillator::GetTypeId (void)
 
 SatFadingOscillator::SatFadingOscillator ()
   : m_complexAmplitude (0,0),
-    m_amplitude (0),
-    m_phase (0),
-    m_omega (0)
+  m_amplitude (0),
+  m_phase (0),
+  m_omega (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -46,18 +46,18 @@ SatFadingOscillator::SatFadingOscillator ()
 
 SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega)
   : m_complexAmplitude (amplitude),
-    m_amplitude (0),
-    m_phase (initialPhase),
-    m_omega (omega)
+  m_amplitude (0),
+  m_phase (initialPhase),
+  m_omega (omega)
 {
   NS_LOG_FUNCTION (this << amplitude << " " << initialPhase << " " << omega);
 }
 
 SatFadingOscillator::SatFadingOscillator (double amplitude, double initialPhase, double omega)
   : m_complexAmplitude (0,0),
-    m_amplitude (amplitude),
-    m_phase (initialPhase),
-    m_omega (omega)
+  m_amplitude (amplitude),
+  m_phase (initialPhase),
+  m_omega (omega)
 {
   NS_LOG_FUNCTION (this << amplitude << " " << initialPhase << " " << omega);
 }

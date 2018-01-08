@@ -194,9 +194,9 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
           uint32_t p = bbFrameConf->GetBbFramePayloadBits (*it, frameTypes[i]);
 
           std::cout << "MODCOD: " << SatEnums::GetModcodTypeName (*it) <<
-          ", frameType: " << frameTypes[i] <<
-          ", length [s]: " << l.GetSeconds () <<
-          ", payload [b]: " << p << std::endl;
+            ", frameType: " << frameTypes[i] <<
+            ", length [s]: " << l.GetSeconds () <<
+            ", payload [b]: " << p << std::endl;
         }
     }
   Singleton<SatEnvVariables>::Get ()->DoDispose ();

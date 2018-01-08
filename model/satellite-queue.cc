@@ -64,18 +64,18 @@ TypeId SatQueue::GetTypeId (void)
 
 SatQueue::SatQueue ()
   : Object (),
-    m_packets (),
-    m_maxPackets (0),
-    m_flowId (0),
-    m_nBytes (0),
-    m_nTotalReceivedBytes (0),
-    m_nPackets (0),
-    m_nTotalReceivedPackets (0),
-    m_nTotalDroppedBytes (0),
-    m_nTotalDroppedPackets (),
-    m_nEnqueBytesSinceReset (0),
-    m_nDequeBytesSinceReset (0),
-    m_statResetTime (0)
+  m_packets (),
+  m_maxPackets (0),
+  m_flowId (0),
+  m_nBytes (0),
+  m_nTotalReceivedBytes (0),
+  m_nPackets (0),
+  m_nTotalReceivedPackets (0),
+  m_nTotalDroppedBytes (0),
+  m_nTotalDroppedPackets (),
+  m_nEnqueBytesSinceReset (0),
+  m_nDequeBytesSinceReset (0),
+  m_statResetTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -83,18 +83,18 @@ SatQueue::SatQueue ()
 
 SatQueue::SatQueue (uint8_t flowId)
   : Object (),
-    m_packets (),
-    m_maxPackets (0),
-    m_flowId (flowId),
-    m_nBytes (0),
-    m_nTotalReceivedBytes (0),
-    m_nPackets (0),
-    m_nTotalReceivedPackets (0),
-    m_nTotalDroppedBytes (0),
-    m_nTotalDroppedPackets (),
-    m_nEnqueBytesSinceReset (0),
-    m_nDequeBytesSinceReset (0),
-    m_statResetTime (Seconds (0.0))
+  m_packets (),
+  m_maxPackets (0),
+  m_flowId (flowId),
+  m_nBytes (0),
+  m_nTotalReceivedBytes (0),
+  m_nPackets (0),
+  m_nTotalReceivedPackets (0),
+  m_nTotalDroppedBytes (0),
+  m_nTotalDroppedPackets (),
+  m_nEnqueBytesSinceReset (0),
+  m_nDequeBytesSinceReset (0),
+  m_statResetTime (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 }

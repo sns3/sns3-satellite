@@ -45,14 +45,14 @@ NS_LOG_COMPONENT_DEFINE ("sat-fwd-sys-test");
 static void PrintBbFrameInfo (Ptr<SatBbFrame> bbFrame)
 {
   std::cout
-  << "[BBFrameTx] "
-  << "Time: " << Now ().GetSeconds ()
-  << ", Frame Type: " << SatEnums::GetFrameTypeName (bbFrame->GetFrameType ())
-  << ", ModCod: " << SatEnums::GetModcodTypeName (bbFrame->GetModcod ())
-  << ", Occupancy: " << bbFrame->GetOccupancy ()
-  << ", Duration: " << bbFrame->GetDuration ()
-  << ", Space used: " << bbFrame->GetSpaceUsedInBytes ()
-  << ", Space Left: " << bbFrame->GetSpaceLeftInBytes ();
+    << "[BBFrameTx] "
+    << "Time: " << Now ().GetSeconds ()
+    << ", Frame Type: " << SatEnums::GetFrameTypeName (bbFrame->GetFrameType ())
+    << ", ModCod: " << SatEnums::GetModcodTypeName (bbFrame->GetModcod ())
+    << ", Occupancy: " << bbFrame->GetOccupancy ()
+    << ", Duration: " << bbFrame->GetDuration ()
+    << ", Space used: " << bbFrame->GetSpaceUsedInBytes ()
+    << ", Space Left: " << bbFrame->GetSpaceLeftInBytes ();
 
   std::cout << " [Receivers: ";
 
@@ -141,9 +141,9 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   if (trafficModel != "cbr" && trafficModel != "onoff")
-		{
-			NS_FATAL_ERROR ("Invalid traffic model, use either 'cbr' or 'onoff'");
-		}
+    {
+      NS_FATAL_ERROR ("Invalid traffic model, use either 'cbr' or 'onoff'");
+    }
   SimulationHelper::TrafficModel_t model = trafficModel == "cbr" ? SimulationHelper::CBR : SimulationHelper::ONOFF;
 
   simulationHelper->SetUtCountPerBeam (gwEndUsers);
@@ -204,9 +204,9 @@ main (int argc, char *argv[])
   /**
    * Set-up CBR or OnOff traffic with sink receivers
    */
-	simulationHelper->InstallTrafficModel (
-						model, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-						senderAppStartTime, Seconds (simLength), MicroSeconds (20));
+  simulationHelper->InstallTrafficModel (
+    model, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    senderAppStartTime, Seconds (simLength), MicroSeconds (20));
 
 
   NS_LOG_INFO ("--- sat-fwd-sys-test ---");

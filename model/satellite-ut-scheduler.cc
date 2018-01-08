@@ -64,22 +64,22 @@ SatUtScheduler::GetInstanceTypeId (void) const
 
 SatUtScheduler::SatUtScheduler ()
   : m_schedContextCallback (),
-    m_txOpportunityCallback (),
-    m_llsConf (),
-    m_prioritizeControl (true),
-    m_framePduHeaderSizeInBytes (1),
-    m_nodeInfo ()
+  m_txOpportunityCallback (),
+  m_llsConf (),
+  m_prioritizeControl (true),
+  m_framePduHeaderSizeInBytes (1),
+  m_nodeInfo ()
 {
 
 }
 
 SatUtScheduler::SatUtScheduler (Ptr<SatLowerLayerServiceConf> lls)
   : m_schedContextCallback (),
-    m_txOpportunityCallback (),
-    m_llsConf (lls),
-    m_prioritizeControl (true),
-    m_framePduHeaderSizeInBytes (1),
-    m_nodeInfo ()
+  m_txOpportunityCallback (),
+  m_llsConf (lls),
+  m_prioritizeControl (true),
+  m_framePduHeaderSizeInBytes (1),
+  m_nodeInfo ()
 {
   NS_LOG_FUNCTION (this);
 

@@ -36,12 +36,12 @@ SatRandomAccess::GetTypeId (void)
 
 SatRandomAccess::SatRandomAccess ()
   : m_uniformRandomVariable (),
-    m_randomAccessModel (SatEnums::RA_MODEL_OFF),
-    m_randomAccessConf (),
-    m_numOfAllocationChannels (),
+  m_randomAccessModel (SatEnums::RA_MODEL_OFF),
+  m_randomAccessConf (),
+  m_numOfAllocationChannels (),
 
-    /// CRDSA variables
-    m_crdsaNewData (true)
+  /// CRDSA variables
+  m_crdsaNewData (true)
 {
   NS_LOG_FUNCTION (this);
 
@@ -50,12 +50,12 @@ SatRandomAccess::SatRandomAccess ()
 
 SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, SatEnums::RandomAccessModel_t randomAccessModel)
   : m_uniformRandomVariable (),
-    m_randomAccessModel (randomAccessModel),
-    m_randomAccessConf (randomAccessConf),
-    m_numOfAllocationChannels (randomAccessConf->GetNumOfAllocationChannels ()),
+  m_randomAccessModel (randomAccessModel),
+  m_randomAccessConf (randomAccessConf),
+  m_numOfAllocationChannels (randomAccessConf->GetNumOfAllocationChannels ()),
 
-    /// CRDSA variables
-    m_crdsaNewData (true)
+  /// CRDSA variables
+  m_crdsaNewData (true)
 {
   NS_LOG_FUNCTION (this);
 

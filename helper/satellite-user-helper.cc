@@ -69,8 +69,8 @@ SatUserHelper::GetInstanceTypeId (void) const
 
 SatUserHelper::SatUserHelper ()
   : m_backboneNetworkType (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
-    m_subscriberNetworkType (SatUserHelper::NETWORK_TYPE_CSMA),
-    m_router (0)
+  m_subscriberNetworkType (SatUserHelper::NETWORK_TYPE_CSMA),
+  m_router (0)
 
 {
   NS_LOG_FUNCTION (this);

@@ -72,7 +72,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbRcs2);
 
 SatLinkResultsDvbRcs2::SatLinkResultsDvbRcs2 ()
   : SatLinkResults (),
-    m_table ()
+  m_table ()
 {
 }
 
@@ -132,8 +132,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
 
 SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
   : SatLinkResults (),
-    m_table (),
-    m_shortFrameOffsetInDb (0.0)
+  m_table (),
+  m_shortFrameOffsetInDb (0.0)
 {
 
 }

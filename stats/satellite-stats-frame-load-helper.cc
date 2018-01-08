@@ -69,11 +69,11 @@ SatStatsFrameLoadHelper::GetUnitTypeName (SatStatsFrameLoadHelper::UnitType_t un
 
 SatStatsFrameLoadHelper::SatStatsFrameLoadHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_unitType (SatStatsFrameLoadHelper::UNIT_SYMBOLS),
-    m_shortLabel (""),
-    m_longLabel (""),
-    m_objectTraceSourceName (""),
-    m_probeTraceSourceName ("")
+  m_unitType (SatStatsFrameLoadHelper::UNIT_SYMBOLS),
+  m_shortLabel (""),
+  m_longLabel (""),
+  m_objectTraceSourceName (""),
+  m_probeTraceSourceName ("")
 {
   NS_LOG_FUNCTION (this << satHelper);
 }

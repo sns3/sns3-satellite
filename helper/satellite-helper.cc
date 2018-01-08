@@ -144,13 +144,13 @@ SatHelper::GetInstanceTypeId (void) const
 
 SatHelper::SatHelper ()
   : m_scenarioCreated (false),
-    m_creationTraces (false),
-    m_detailedCreationTraces (false),
-    m_packetTraces (false),
-    m_utsInBeam (0),
-    m_gwUsers (0),
-    m_utUsers (0),
-		m_utPositionsByBeam ()
+  m_creationTraces (false),
+  m_detailedCreationTraces (false),
+  m_packetTraces (false),
+  m_utsInBeam (0),
+  m_gwUsers (0),
+  m_utUsers (0),
+  m_utPositionsByBeam ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -160,7 +160,7 @@ SatHelper::SatHelper ()
 
 SatHelper::SatHelper (std::string scenarioName)
   : m_scenarioCreated (false),
-    m_detailedCreationTraces (false)
+  m_detailedCreationTraces (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -387,15 +387,15 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
 void
 SatHelper::SetCustomUtPositionAllocator (Ptr<SatListPositionAllocator> posAllocator)
 {
-	NS_LOG_FUNCTION (this);
-	m_utPositions = posAllocator;
+  NS_LOG_FUNCTION (this);
+  m_utPositions = posAllocator;
 }
 
 void
 SatHelper::SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator)
 {
-	NS_LOG_FUNCTION (this << beamId);
-	m_utPositionsByBeam[beamId] = posAllocator;
+  NS_LOG_FUNCTION (this << beamId);
+  m_utPositionsByBeam[beamId] = posAllocator;
 }
 
 void
@@ -535,7 +535,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   // in other case use the spot beam position allocator
   if (m_utPositionsByBeam.find (beamId) != m_utPositionsByBeam.end ())
     {
-    	allocator = m_utPositionsByBeam[beamId];
+      allocator = m_utPositionsByBeam[beamId];
     }
   else if ( m_utPositions != NULL )
     {
@@ -979,9 +979,9 @@ SatHelper::CheckNetwork (std::string networkName,
 
   // test that configured mask is valid (address prefix length is in valid range)
   if ((addressPrefixLength < MIN_ADDRESS_PREFIX_LENGTH) || (addressPrefixLength > MAX_ADDRESS_PREFIX_LENGTH))
-      {
-        NS_FATAL_ERROR (networkName << " network mask value out of range (0xFFFFFF70 to 0x10000000).");
-      }
+    {
+      NS_FATAL_ERROR (networkName << " network mask value out of range (0xFFFFFF70 to 0x10000000).");
+    }
 
   // test that configured initial network number (prefix) is valid, consistent with mask
   if ((firstNetwork.Get () & mask.GetInverse ()) != 0)
@@ -1004,8 +1004,8 @@ SatHelper::CheckNetwork (std::string networkName,
 
       // test in the case that checked address space is not last ('highest') in the
       // given address container that the address space doesn't overlap with other configured address spaces
-      if ( (currentAddressIt != networkAddresses.end ()) &&
-           (firstAddressValue + (networkCount  << (32 - addressPrefixLength))) >= *currentAddressIt)
+      if ( (currentAddressIt != networkAddresses.end ())
+           && (firstAddressValue + (networkCount << (32 - addressPrefixLength))) >= *currentAddressIt)
         {
           NS_FATAL_ERROR (networkName << " network's addresses overlaps with some other network)");
         }

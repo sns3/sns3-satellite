@@ -93,7 +93,8 @@ main (int argc, char *argv[])
   simulationHelper->SetSimulationTime (Seconds (11));
 
   // Set beam ID
-  std::stringstream beamsEnabled; beamsEnabled  << beamIdInFullScenario;
+  std::stringstream beamsEnabled;
+  beamsEnabled << beamIdInFullScenario;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
   // enable info logs
@@ -116,9 +117,9 @@ main (int argc, char *argv[])
   // other scenarios get all UT users.
   if ( scenario == "full")
     {
-  		// Manual configuration of applications
+      // Manual configuration of applications
 
-  		// get users
+      // get users
       NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (beamIdInFullScenario);
       NodeContainer utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
 
@@ -157,12 +158,12 @@ main (int argc, char *argv[])
       Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
       Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
 
-		  simulationHelper->InstallTrafficModel (
-					       SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-					       Seconds (1.0), Seconds (2.1));
-		  simulationHelper->InstallTrafficModel (
-		  					 SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-		  					 Seconds (7.0), Seconds (9.1));
+      simulationHelper->InstallTrafficModel (
+        SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+        Seconds (1.0), Seconds (2.1));
+      simulationHelper->InstallTrafficModel (
+        SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+        Seconds (7.0), Seconds (9.1));
 
     }
 

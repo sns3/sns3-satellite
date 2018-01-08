@@ -37,8 +37,8 @@ TypeId SatMarkovModel::GetTypeId (void)
 
 SatMarkovModel::SatMarkovModel ()
   : m_probabilities (new double[3 * 3]),
-    m_numOfStates (3),
-    m_currentState (0)
+  m_numOfStates (3),
+  m_currentState (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -47,8 +47,8 @@ SatMarkovModel::SatMarkovModel ()
 
 SatMarkovModel::SatMarkovModel (uint32_t numOfStates, uint32_t initialState)
   : m_probabilities (new double[numOfStates * numOfStates]),
-    m_numOfStates (numOfStates),
-    m_currentState (initialState)
+  m_numOfStates (numOfStates),
+  m_currentState (initialState)
 {
   NS_LOG_FUNCTION (this << numOfStates);
 

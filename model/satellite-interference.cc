@@ -28,10 +28,10 @@ namespace ns3 {
 
 SatInterference::InterferenceChangeEvent::InterferenceChangeEvent (uint32_t id, Time rxDuration, double rxPower, Address satEarthStationAddress)
   : m_startTime (Simulator::Now ()),
-    m_endTime (m_startTime + rxDuration),
-    m_rxPower (rxPower),
-    m_id (id),
-    m_satEarthStationAddress (satEarthStationAddress)
+  m_endTime (m_startTime + rxDuration),
+  m_rxPower (rxPower),
+  m_id (id),
+  m_satEarthStationAddress (satEarthStationAddress)
 {
 }
 SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent ()

@@ -48,8 +48,8 @@ namespace ns3 {
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator, Time controlSlotOffset, bool controlSlotsEnabled )
   : m_damaEntry (damaEntry),
-    m_cnoEstimator (cnoEstimator),
-    m_controlSlotsEnabled (controlSlotsEnabled)
+  m_cnoEstimator (cnoEstimator),
+  m_controlSlotsEnabled (controlSlotsEnabled)
 {
   NS_LOG_FUNCTION (this);
 
@@ -240,12 +240,12 @@ SatBeamScheduler::GetTypeId (void)
 
 SatBeamScheduler::SatBeamScheduler ()
   : m_beamId (0),
-    m_superframeSeq (0),
-    m_superFrameCounter (0),
-    m_txCallback (0),
-    m_cnoEstimatorMode (SatCnoEstimator::LAST),
-    m_maxBbFrameSize (0),
-    m_controlSlotsEnabled (false)
+  m_superframeSeq (0),
+  m_superFrameCounter (0),
+  m_txCallback (0),
+  m_cnoEstimatorMode (SatCnoEstimator::LAST),
+  m_maxBbFrameSize (0),
+  m_controlSlotsEnabled (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -657,8 +657,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
               offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
 
               NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
-                            " rate based bytes: " << rateBasedBytes <<
-                            " allocated bytes: " << allocInfo->second.first[i]);
+                           " rate based bytes: " << rateBasedBytes <<
+                           " allocated bytes: " << allocInfo->second.first[i]);
 
               // The scheduler has allocated more than the rate based bytes (CRA+RBDC)
               if ( rateBasedBytes < allocInfo->second.first[i] )
@@ -666,7 +666,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                   // Requested VBDC
                   uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
-                  NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<" requested VBDC bytes: " << vbdcBytes);
+                  NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i << " requested VBDC bytes: " << vbdcBytes);
 
                   // Allocated VBDC for this RC index
                   uint32_t allocVbdcBytes = allocInfo->second.first[i] - rateBasedBytes;
@@ -677,8 +677,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                       uint32_t remainingVbdcBytes = vbdcBytes - allocVbdcBytes;
 
                       NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
-                                    " VBDC allocation: " << allocVbdcBytes <<
-                                    " remaining VBDC bytes: " << remainingVbdcBytes);
+                                   " VBDC allocation: " << allocVbdcBytes <<
+                                   " remaining VBDC bytes: " << remainingVbdcBytes);
 
                       damaEntry->SetVbdcInBytes (i, remainingVbdcBytes);
                     }
@@ -686,8 +686,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                   else
                     {
                       NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
-                                    " VBDC allocation: " << allocVbdcBytes <<
-                                    " remaining VBDC bytes: " << 0);
+                                   " VBDC allocation: " << allocVbdcBytes <<
+                                   " remaining VBDC bytes: " << 0);
 
                       damaEntry->SetVbdcInBytes (i, 0);
                     }

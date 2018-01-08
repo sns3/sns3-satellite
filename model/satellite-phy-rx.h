@@ -49,7 +49,6 @@ class SatPhyRx : public Object
 {
 
 public:
-
   /**
    * Default constructor.
    */

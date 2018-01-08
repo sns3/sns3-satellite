@@ -35,7 +35,6 @@ namespace ns3 {
 class SatArpCache : public ArpCache
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

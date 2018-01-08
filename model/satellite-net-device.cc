@@ -108,12 +108,12 @@ SatNetDevice::GetTypeId (void)
 
 SatNetDevice::SatNetDevice ()
   : m_phy (0),
-    m_mac (0),
-    m_llc (0),
-    m_isStatisticsTagsEnabled (false),
-    m_node (0),
-    m_mtu (0xffff),
-    m_ifIndex (0)
+  m_mac (0),
+  m_llc (0),
+  m_isStatisticsTagsEnabled (false),
+  m_node (0),
+  m_mtu (0xffff),
+  m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }

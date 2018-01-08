@@ -131,13 +131,13 @@ main (int argc, char *argv[])
    * Set-up CBR traffic
    */
 
-	Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
-	Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Seconds (intervalSeconds)));
-	simulationHelper->InstallTrafficModel (
-	  		SimulationHelper::CBR,
-				SimulationHelper::UDP,
-				SimulationHelper::RTN_LINK,
-				appStartTime, Seconds (simLength + 1), MilliSeconds (10));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (Seconds (intervalSeconds)));
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength + 1), MilliSeconds (10));
 
   /**
    * Set-up statistics

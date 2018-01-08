@@ -61,7 +61,7 @@ SatLooConf::GetTypeId (void)
 
 SatLooConf::SatLooConf ()
   : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-    m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
+  m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
 

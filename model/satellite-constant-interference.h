@@ -33,7 +33,6 @@ namespace ns3 {
 class SatConstantInterference : public SatInterference
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

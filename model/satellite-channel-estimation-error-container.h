@@ -43,7 +43,6 @@ namespace ns3 {
 class SatChannelEstimationErrorContainer : public SimpleRefCount<SatChannelEstimationErrorContainer>
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -79,7 +78,6 @@ private:
 class SatSimpleChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -105,7 +103,6 @@ private:
 class SatFwdLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -138,11 +135,10 @@ private:
 class SatRtnLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
 public:
-
   /**
    * Constructor with initialization parameters.
-   * \param minWfId 
-   * \param maxWfId 
+   * \param minWfId
+   * \param maxWfId
    */
   SatRtnLinkChannelEstimationErrorContainer (uint32_t minWfId, uint32_t maxWfId);
 

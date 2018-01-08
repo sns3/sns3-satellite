@@ -117,7 +117,8 @@ main (int argc, char *argv[])
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
 
   // Set beam ID
-  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  std::stringstream beamsEnabled;
+  beamsEnabled << beamId;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
   // NCC configuration
@@ -171,8 +172,8 @@ main (int argc, char *argv[])
    * Set-up HTTP traffic
    */
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::HTTP, SimulationHelper::TCP, SimulationHelper::FWD_LINK,
-			MilliSeconds (3));
+    SimulationHelper::HTTP, SimulationHelper::TCP, SimulationHelper::FWD_LINK,
+    MilliSeconds (3));
 
   /**
    * Set-up statistics

@@ -40,21 +40,21 @@ const uint32_t SatRequestManager::m_vbdcScalingFactors[4] = {1, 8, 64, 512};
 
 SatRequestManager::SatRequestManager ()
   : m_gwAddress (),
-    m_lastCno (NAN),
-    m_llsConf (),
-    m_evaluationInterval (Seconds (0.1)),
-    m_cnoReportInterval (Seconds (0.0)),
-    m_gainValueK (1.0),
-    m_rttEstimate (MilliSeconds (560)),
-    m_overEstimationFactor (1.1),
-    m_enableOnDemandEvaluation (false),
-    m_pendingRbdcRequestsKbps (),
-    m_pendingVbdcBytes (),
-    m_previousEvaluationTime (),
-    m_lastVbdcCrSent (Seconds (0)),
-    m_superFrameDuration (Seconds (0)),
-    m_forcedAvbdcUpdate (false),
-    m_numValues (256)
+  m_lastCno (NAN),
+  m_llsConf (),
+  m_evaluationInterval (Seconds (0.1)),
+  m_cnoReportInterval (Seconds (0.0)),
+  m_gainValueK (1.0),
+  m_rttEstimate (MilliSeconds (560)),
+  m_overEstimationFactor (1.1),
+  m_enableOnDemandEvaluation (false),
+  m_pendingRbdcRequestsKbps (),
+  m_pendingVbdcBytes (),
+  m_previousEvaluationTime (),
+  m_lastVbdcCrSent (Seconds (0)),
+  m_superFrameDuration (Seconds (0)),
+  m_forcedAvbdcUpdate (false),
+  m_numValues (256)
 {
   NS_LOG_FUNCTION (this);
 

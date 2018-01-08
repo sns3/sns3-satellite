@@ -49,23 +49,23 @@ NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
   : m_fwdMode (SatChannel::ALL_BEAMS),
-    m_phyRxContainer (),
-    m_channelType (SatEnums::UNKNOWN_CH),
-    m_carrierFreqConverter (),
-    m_freqId (),
-    m_propagationDelay (),
-    m_freeSpaceLoss (),
-    m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
-    /*
-     * Currently, the Rx power calculation mode is fully independent of other
-     * possible satellite network configurations, e.g. fading, antenna patterns.
-     * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
-     * configurations. If using input Rx trace, there is no need to enable e.g. Markov
-     * fading, nor antenna patterns.
-     */
-    m_enableRxPowerOutputTrace (false),
-    m_enableFadingOutputTrace (false),
-    m_enableExternalFadingInputTrace (false)
+  m_phyRxContainer (),
+  m_channelType (SatEnums::UNKNOWN_CH),
+  m_carrierFreqConverter (),
+  m_freqId (),
+  m_propagationDelay (),
+  m_freeSpaceLoss (),
+  m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
+  /*
+   * Currently, the Rx power calculation mode is fully independent of other
+   * possible satellite network configurations, e.g. fading, antenna patterns.
+   * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
+   * configurations. If using input Rx trace, there is no need to enable e.g. Markov
+   * fading, nor antenna patterns.
+   */
+  m_enableRxPowerOutputTrace (false),
+  m_enableFadingOutputTrace (false),
+  m_enableExternalFadingInputTrace (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -371,9 +371,9 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
   double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
 
   NS_LOG_INFO ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
-                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
-                ", carrierId: " << rxParams->m_carrierId <<
-                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
+               ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
+               ", carrierId: " << rxParams->m_carrierId <<
+               ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
 
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
@@ -436,9 +436,9 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
     }
 
   NS_LOG_INFO ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
-                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
-                ", carrierId: " << rxParams->m_carrierId <<
-                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
+               ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
+               ", carrierId: " << rxParams->m_carrierId <<
+               ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
 
   // get external fading input trace
   if (m_enableExternalFadingInputTrace)

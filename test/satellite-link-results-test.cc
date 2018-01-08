@@ -77,10 +77,10 @@ SatLinkResultsDvbRcs2TestCase::SatLinkResultsDvbRcs2TestCase (Ptr<SatLinkResults
                                                               double sinrDb,
                                                               double bler)
   : TestCase ("Comparing SatLinkResults for DVB-RCS2 with reference link results"),
-    m_linkResults (linkResults),
-    m_waveformId (waveformId),
-    m_sinrDb (sinrDb),
-    m_bler (bler)
+  m_linkResults (linkResults),
+  m_waveformId (waveformId),
+  m_sinrDb (sinrDb),
+  m_bler (bler)
 {
 }
 
@@ -137,10 +137,10 @@ SatLinkResultsDvbS2TestCase::SatLinkResultsDvbS2TestCase (Ptr<SatLinkResultsDvbS
                                                           double sinrDb,
                                                           double bler)
   : TestCase ("Comparing SatLinkResults for DVB-S2 with reference link results"),
-    m_linkResults (linkResults),
-    m_modcod (modcod),
-    m_sinrDb (sinrDb),
-    m_bler (bler)
+  m_linkResults (linkResults),
+  m_modcod (modcod),
+  m_sinrDb (sinrDb),
+  m_bler (bler)
 {
 }
 

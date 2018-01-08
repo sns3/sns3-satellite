@@ -75,18 +75,18 @@ SatGwMac::GetTypeId (void)
 
 SatGwMac::SatGwMac ()
   : SatMac (),
-    m_fwdScheduler (),
-    m_dummyFrameSendingEnabled (false),
-    m_guardTime (MicroSeconds (1))
+  m_fwdScheduler (),
+  m_dummyFrameSendingEnabled (false),
+  m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatGwMac::SatGwMac (uint32_t beamId)
   : SatMac (beamId),
-    m_fwdScheduler (),
-    m_dummyFrameSendingEnabled (false),
-    m_guardTime (MicroSeconds (1))
+  m_fwdScheduler (),
+  m_dummyFrameSendingEnabled (false),
+  m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 }

@@ -118,19 +118,19 @@ main (int argc, char *argv[])
   uint32_t i = 0;
   std::vector<Ptr<ClientRxTracePlot> > plots;
   for (auto app = apps.Begin (); app != apps.End (); app++, i++)
-  {
-    std::stringstream plotName;
-    plotName << "3GPP-HTTP-client-" << i << "-trace";
-  	plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
-  }
+    {
+      std::stringstream plotName;
+      plotName << "3GPP-HTTP-client-" << i << "-trace";
+      plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
+    }
 
   NS_LOG_INFO ("--- sat-http-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
   NS_LOG_INFO ("  ");
 
-  simulationHelper->RunSimulation();
+  simulationHelper->RunSimulation ();
 
-  plots.clear();
+  plots.clear ();
 
   return 0;
 

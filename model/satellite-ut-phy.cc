@@ -112,7 +112,7 @@ SatUtPhy::GetInstanceTypeId (void) const
 
 SatUtPhy::SatUtPhy (void)
   : m_otherSysInterferenceCOverIDb (24.7),
-    m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
+  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatUtPhy default constructor is not allowed to be used");
@@ -122,7 +122,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                     Ptr<SatSuperframeConf> superFrameConf)
-  :SatPhy (params)
+  : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
 

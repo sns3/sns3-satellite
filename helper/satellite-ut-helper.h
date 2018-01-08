@@ -47,7 +47,6 @@ namespace ns3 {
 class SatUtHelper : public Object
 {
 public:
-
   /**
    * Define RandomAccessSettings as a struct
    */

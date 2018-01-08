@@ -45,7 +45,6 @@ namespace ns3 {
 class SatGwHelper : public Object
 {
 public:
-
   /**
    * Random access setting options.
    */

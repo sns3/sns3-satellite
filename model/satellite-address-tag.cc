@@ -37,7 +37,7 @@ SatAddressTag::SatAddressTag ()
 
 SatAddressTag::SatAddressTag (Address addr)
   : Tag (),
-    m_sourceAddress (addr)
+  m_sourceAddress (addr)
 {
   NS_LOG_FUNCTION (this);
 }

@@ -39,13 +39,13 @@ NS_OBJECT_ENSURE_REGISTERED (SatReturnLinkEncapsulator);
 
 SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
   : m_txFragmentId (0),
-    m_currRxFragmentId (0),
-    m_currRxPacketSize (0),
-    m_currRxPacketFragmentBytes (0),
-    m_minTxOpportunity (0),
-    MAX_FRAGMENT_ID (8),
-    MAX_PPDU_PACKET_SIZE (2048),
-    MAX_HL_PDU_PACKET_SIZE (4096)
+  m_currRxFragmentId (0),
+  m_currRxPacketSize (0),
+  m_currRxPacketFragmentBytes (0),
+  m_minTxOpportunity (0),
+  MAX_FRAGMENT_ID (8),
+  MAX_PPDU_PACKET_SIZE (2048),
+  MAX_HL_PDU_PACKET_SIZE (4096)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -58,14 +58,14 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
 
 SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
   : SatBaseEncapsulator (source, dest, flowId),
-    m_txFragmentId (0),
-    m_currRxFragmentId (0),
-    m_currRxPacketSize (0),
-    m_currRxPacketFragmentBytes (0),
-    m_minTxOpportunity (0),
-    MAX_FRAGMENT_ID (8),
-    MAX_PPDU_PACKET_SIZE (2048),
-    MAX_HL_PDU_PACKET_SIZE (4096)
+  m_txFragmentId (0),
+  m_currRxFragmentId (0),
+  m_currRxPacketSize (0),
+  m_currRxPacketFragmentBytes (0),
+  m_minTxOpportunity (0),
+  MAX_FRAGMENT_ID (8),
+  MAX_PPDU_PACKET_SIZE (2048),
+  MAX_HL_PDU_PACKET_SIZE (4096)
 {
   NS_LOG_FUNCTION (this);
 

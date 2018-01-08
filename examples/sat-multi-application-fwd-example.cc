@@ -146,7 +146,7 @@ main (int argc, char *argv[])
 
   // Divide the users into CBR and On-Off users
   for (NodeContainer::Iterator i = utUsers.Begin ();  i != utUsers.End (); i++)
-  {
+    {
       // CBR
       if (rand->GetValue () < cbrProbability)
         {
@@ -186,9 +186,9 @@ main (int argc, char *argv[])
       // Cbr and Sink applications creation. CBR to GW users and sinks to UT users.
       for ( uint32_t i = 0; i < utCbrUsers.GetN (); i++)
         {
-    	  // Set destination addresses
-    	  InetSocketAddress cbrDest (helper->GetUserAddress (utCbrUsers.Get (i)), port);
-    	  cbrDest.SetTos (cbrTos);
+          // Set destination addresses
+          InetSocketAddress cbrDest (helper->GetUserAddress (utCbrUsers.Get (i)), port);
+          cbrDest.SetTos (cbrTos);
 
           cbrHelper.SetAttribute ("Remote", AddressValue (Address (cbrDest)));
           cbrSinkHelper.SetAttribute ("Local", AddressValue (Address (cbrDest)));
@@ -232,9 +232,9 @@ main (int argc, char *argv[])
       // Cbr and Sink applications creation
       for ( uint32_t i = 0; i < utOnOffUsers.GetN (); i++)
         {
-    	  // Set destination addresses
-    	  InetSocketAddress onOffDest (helper->GetUserAddress (utOnOffUsers.Get (i)), port);
-    	  onOffDest.SetTos (onOffTos);
+          // Set destination addresses
+          InetSocketAddress onOffDest (helper->GetUserAddress (utOnOffUsers.Get (i)), port);
+          onOffDest.SetTos (onOffTos);
 
           // On-Off sends packets to GW user no 3.
           onOffHelper.SetAttribute ("Remote", AddressValue (Address (onOffDest)));

@@ -35,7 +35,6 @@ namespace ns3 {
 class SatGwLlc : public SatLlc
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -96,7 +95,6 @@ public:
   virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
 
 protected:
-
   /**
    * Dispose of this class instance
    */

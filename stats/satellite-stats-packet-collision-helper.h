@@ -81,7 +81,10 @@ public:
    * \brief Get the valid carrier type
    * \return the valid carrier type
    */
-  inline SatPhyRxCarrier::CarrierType GetValidCarrierType () const { return m_carrierType; };
+  inline SatPhyRxCarrier::CarrierType GetValidCarrierType () const
+  {
+    return m_carrierType;
+  }
 
 protected:
   // inherited from SatStatsHelper base class
@@ -96,7 +99,10 @@ protected:
    * \brief Set valid carrier type for this statistics helper type.
    * \param carrierType
    */
-  inline void SetValidCarrierType (SatPhyRxCarrier::CarrierType carrierType) { m_carrierType = carrierType; };
+  inline void SetValidCarrierType (SatPhyRxCarrier::CarrierType carrierType)
+  {
+    m_carrierType = carrierType;
+  }
 
 private:
   /**

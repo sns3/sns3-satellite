@@ -200,8 +200,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   simulationHelper->InstallTrafficModel (
-  					SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-  					appStartTime, Seconds (simLength), MilliSeconds (50));
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength), MilliSeconds (50));
 
   /**
    * Set-up statistics

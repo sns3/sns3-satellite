@@ -38,13 +38,13 @@ SatOutputFileStreamLongDoubleContainer::GetTypeId (void)
 
 SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
   : m_outputFileStreamWrapper (),
-    m_outputFileStream (),
-    m_container (),
-    m_fileName (filename),
-    m_fileMode (filemode),
-    m_valuesInRow (valuesInRow),
-    m_printFigure (false),
-    m_figureUnitConversionType (RAW)
+  m_outputFileStream (),
+  m_container (),
+  m_fileName (filename),
+  m_fileMode (filemode),
+  m_valuesInRow (valuesInRow),
+  m_printFigure (false),
+  m_figureUnitConversionType (RAW)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
@@ -56,13 +56,13 @@ SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer (
 
 SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer ()
   : m_outputFileStreamWrapper (),
-    m_outputFileStream (),
-    m_container (),
-    m_fileName (),
-    m_fileMode (),
-    m_valuesInRow (),
-    m_printFigure (),
-    m_figureUnitConversionType ()
+  m_outputFileStream (),
+  m_container (),
+  m_fileName (),
+  m_fileMode (),
+  m_valuesInRow (),
+  m_printFigure (),
+  m_figureUnitConversionType ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatOutputFileStreamLongDoubleContainer::SatOutputFileStreamLongDoubleContainer - Constructor not in use");

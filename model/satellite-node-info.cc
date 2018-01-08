@@ -28,16 +28,16 @@ namespace ns3 {
 
 SatNodeInfo::SatNodeInfo ()
   : m_nodeId (0),
-    m_nodeType (SatEnums::NT_UNDEFINED),
-    m_macAddress ()
+  m_nodeType (SatEnums::NT_UNDEFINED),
+  m_macAddress ()
 {
 
 }
 
 SatNodeInfo::SatNodeInfo (SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress)
   : m_nodeId (nodeId),
-    m_nodeType (nodeType),
-    m_macAddress (macAddress)
+  m_nodeType (nodeType),
+  m_macAddress (macAddress)
 {
 
 }

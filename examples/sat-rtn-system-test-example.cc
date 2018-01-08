@@ -93,7 +93,7 @@ main (int argc, char *argv[])
 
   /// Set simulation output details
   std::string simulationName = "example-rtn-system-test";
-	auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
   // set default values for traffic model apps here
   // attributes can be overridden by command line arguments or input xml when needed
@@ -305,26 +305,26 @@ main (int argc, char *argv[])
    */
   SimulationHelper::TrafficModel_t model;
 
-	switch (trafficModel)
-		{
-		case 0:   // CBR
-			model = SimulationHelper::CBR;
-			break;
+  switch (trafficModel)
+    {
+    case 0:               // CBR
+      model = SimulationHelper::CBR;
+      break;
 
-		case 1:   // On-Off
-			model = SimulationHelper::ONOFF;
-			break;
+    case 1:               // On-Off
+      model = SimulationHelper::ONOFF;
+      break;
 
-		default:
-			NS_FATAL_ERROR ("Not Supported Traffic Model!");
-			break;
-		};
+    default:
+      NS_FATAL_ERROR ("Not Supported Traffic Model!");
+      break;
+    }
 
   simulationHelper->InstallTrafficModel (
-  		model,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			utAppStartTime, Seconds (simLength+1), Seconds (0.1));
+    model,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    utAppStartTime, Seconds (simLength + 1), Seconds (0.1));
 
   /**
    * Set-up statistics

@@ -77,10 +77,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (33)));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (20) );
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			Seconds (1), Seconds (simLength), Seconds (0.05));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (1), Seconds (simLength), Seconds (0.05));
 
   // Create RTN link statistics
   simulationHelper->CreateDefaultRtnLinkStats ();

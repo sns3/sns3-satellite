@@ -143,7 +143,6 @@ private:
 class SatControlMessage : public Object
 {
 public:
-
   /**
    * methods derived from base classes
    */

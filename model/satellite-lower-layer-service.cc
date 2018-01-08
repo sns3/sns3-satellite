@@ -36,12 +36,12 @@ namespace ns3 {
 
 SatLowerLayerServiceDaEntry::SatLowerLayerServiceDaEntry ()
   : m_constantAssignmentProvided (false),
-    m_rbdcAllowed (false),
-    m_volumeAllowed (false),
-    m_constantServiceRateStream (0),
-    m_maximumServiceRateKbps (0.0),
-    m_minimumServiceRateKbps (0.0),
-    m_maximumBacklogInKbytes (0)
+  m_rbdcAllowed (false),
+  m_volumeAllowed (false),
+  m_constantServiceRateStream (0),
+  m_maximumServiceRateKbps (0.0),
+  m_minimumServiceRateKbps (0.0),
+  m_maximumBacklogInKbytes (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -53,14 +53,14 @@ SatLowerLayerServiceDaEntry::~SatLowerLayerServiceDaEntry ()
 
 SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
   : m_maxUniquePayloadPerBlock (0),
-    m_maxConsecutiveBlockAccessed (0),
-    m_minimumIdleBlock (0),
-    m_backOffTimeInMilliSeconds (0),
-    m_highLoadBackOffTimeInMilliSeconds (0),
-    m_backOffProbability (0),
-    m_highLoadBackOffProbability (0),
-    m_numberOfInstances (0),
-    m_averageNormalizedOfferedLoadThreshold (0.0)
+  m_maxConsecutiveBlockAccessed (0),
+  m_minimumIdleBlock (0),
+  m_backOffTimeInMilliSeconds (0),
+  m_highLoadBackOffTimeInMilliSeconds (0),
+  m_backOffProbability (0),
+  m_highLoadBackOffProbability (0),
+  m_numberOfInstances (0),
+  m_averageNormalizedOfferedLoadThreshold (0.0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -74,10 +74,10 @@ NS_OBJECT_ENSURE_REGISTERED (SatLowerLayerServiceConf);
 
 SatLowerLayerServiceConf::SatLowerLayerServiceConf ()
   : m_dynamicRatePersistence (0),
-    m_volumeBacklogPersistence (0),
-    m_defaultControlRandomizationInterval (0.0),
-    m_daServiceEntryCount (0),
-    m_raServiceEntryCount (0)
+  m_volumeBacklogPersistence (0),
+  m_defaultControlRandomizationInterval (0.0),
+  m_daServiceEntryCount (0),
+  m_raServiceEntryCount (0)
 {
   NS_LOG_FUNCTION (this);
 

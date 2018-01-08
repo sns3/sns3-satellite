@@ -40,16 +40,15 @@ class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink : public SatPhyRxCarrier
 {
 public:
-
-	/**
-	 * Constructor.
-	 * \param carrierId ID of the carrier
-	 * \param carrierConf Carrier configuration
-	 * \param randomAccessEnabled Is this a RA carrier
-	 */
-	SatPhyRxCarrierUplink (uint32_t carrierId,
-	                       Ptr<SatPhyRxCarrierConf> carrierConf,
-	                       bool randomAccessEnabled);
+  /**
+   * Constructor.
+   * \param carrierId ID of the carrier
+   * \param carrierConf Carrier configuration
+   * \param randomAccessEnabled Is this a RA carrier
+   */
+  SatPhyRxCarrierUplink (uint32_t carrierId,
+                         Ptr<SatPhyRxCarrierConf> carrierConf,
+                         bool randomAccessEnabled);
 
   /**
    * \brief Destructor
@@ -65,27 +64,32 @@ public:
   /**
    * \brief Method for querying the type of the carrier
    */
-  inline virtual CarrierType GetCarrierType () { return CarrierType::DEDICATED_ACCESS; }
+  inline virtual CarrierType GetCarrierType ()
+  {
+    return CarrierType::DEDICATED_ACCESS;
+  }
 
 protected:
-
   /**
    * Get the default receive mode. In satellite node always true.
    */
-  inline virtual const bool GetDefaultReceiveMode () { return true; };
+  inline virtual const bool GetDefaultReceiveMode ()
+  {
+    return true;
+  }
 
   /**
    * \brief Function for ending the packet reception from the SatChannel
    * \param key Key for Rx params map
    */
-	virtual void EndRxData (uint32_t key);
+  virtual void EndRxData (uint32_t key);
 
   /**
    * \brief Create an interference event based on Rx parameters and address.
    *
    * \return Pointer to the interference event.
    */
-	virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
+  virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
 };
 
 }

@@ -35,8 +35,8 @@ TypeId SatRayleighModel::GetTypeId (void)
 
 SatRayleighModel::SatRayleighModel ()
   : m_currentSet (),
-    m_currentState (),
-    m_rayleighConf ()
+  m_currentState (),
+  m_rayleighConf ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -45,8 +45,8 @@ SatRayleighModel::SatRayleighModel ()
 
 SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState)
   : m_currentSet (initialSet),
-    m_currentState (initialState),
-    m_rayleighConf (rayleighConf)
+  m_currentState (initialState),
+  m_rayleighConf (rayleighConf)
 {
   NS_LOG_FUNCTION (this);
 

@@ -38,13 +38,13 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierPerSlot);
 SatPhyRxCarrierPerSlot::SatPhyRxCarrierPerSlot (uint32_t carrierId,
                                                 Ptr<SatPhyRxCarrierConf> carrierConf,
                                                 bool randomAccessEnabled)
-: SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled),
-	m_randomAccessBitsInFrame (0),
-	m_randomAccessAllocationChannelId (0),
-	m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
-	m_randomAccessConstantErrorRate (0.0),
-	m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
-	m_enableRandomAccessDynamicLoadControl (false)
+  : SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled),
+  m_randomAccessBitsInFrame (0),
+  m_randomAccessAllocationChannelId (0),
+  m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
+  m_randomAccessConstantErrorRate (0.0),
+  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
+  m_enableRandomAccessDynamicLoadControl (false)
 {
   if (randomAccessEnabled)
     {
@@ -69,35 +69,35 @@ TypeId
 SatPhyRxCarrierPerSlot::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierPerSlot")
-	.SetParent<SatPhyRxCarrier> ()
-  .AddTraceSource ("SlottedAlohaRxCollision",
-                   "Received a packet burst through Random Access Slotted ALOHA",
-                   MakeTraceSourceAccessor (&SatPhyRxCarrierPerSlot::m_slottedAlohaRxCollisionTrace),
-                   "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
-  .AddTraceSource ("SlottedAlohaRxError",
-                   "Received a packet burst through Random Access Slotted ALOHA",
-                   MakeTraceSourceAccessor (&SatPhyRxCarrierPerSlot::m_slottedAlohaRxErrorTrace),
-                   "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
-	;
+    .SetParent<SatPhyRxCarrier> ()
+    .AddTraceSource ("SlottedAlohaRxCollision",
+                     "Received a packet burst through Random Access Slotted ALOHA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrierPerSlot::m_slottedAlohaRxCollisionTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+    .AddTraceSource ("SlottedAlohaRxError",
+                     "Received a packet burst through Random Access Slotted ALOHA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrierPerSlot::m_slottedAlohaRxErrorTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+  ;
   return tid;
 }
 
 void
 SatPhyRxCarrierPerSlot::DoDispose ()
 {
-	NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 
-	SatPhyRxCarrier::DoDispose ();
-	m_randomAccessDynamicLoadControlNormalizedOfferedLoad.clear ();
+  SatPhyRxCarrier::DoDispose ();
+  m_randomAccessDynamicLoadControlNormalizedOfferedLoad.clear ();
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
 SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, Address senderAddress)
 {
-	SatEnums::ChannelType_t ct = GetChannelType ();
-	if (ct == SatEnums::RETURN_FEEDER_CH)
-	  {
-	    // In feeder downlink the interference by UTs in the same
+  SatEnums::ChannelType_t ct = GetChannelType ();
+  if (ct == SatEnums::RETURN_FEEDER_CH)
+    {
+      // In feeder downlink the interference by UTs in the same
       // beam (intra-beam interference e.g. due to random access) SHOULD NOT be tracked.
       // Intra-beam interference is already taken into account at the satellite. Thus,
       // here we pass intra-beam transmissions with zero interference power to the
@@ -110,25 +110,25 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
       // rxPower = rxParams->m_rxPower_W * (1 + 1/rxParams->m_sinr);
       // See more from satellite module documentation.
 
-	    double rxPower (0.0);
+      double rxPower (0.0);
 
-	    if (rxParams->m_beamId != GetBeamId ())
-	      {
-	        rxPower = rxParams->m_rxPower_W * (1 + 1/rxParams->m_sinr);
-	      }
+      if (rxParams->m_beamId != GetBeamId ())
+        {
+          rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->m_sinr);
+        }
 
-	    // Add the interference even regardless.
-	    return GetInterferenceModel()->Add (rxParams->m_duration,
-	                                        rxPower,
-	                                        GetOwnAddress ());
-	  }
-	else if (ct == SatEnums::FORWARD_USER_CH)
-	  {
-	    return GetInterferenceModel()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
-	  }
+      // Add the interference even regardless.
+      return GetInterferenceModel ()->Add (rxParams->m_duration,
+                                           rxPower,
+                                           GetOwnAddress ());
+    }
+  else if (ct == SatEnums::FORWARD_USER_CH)
+    {
+      return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
+    }
 
-	NS_FATAL_ERROR ("SatSatellitePhyRxCarrier::CreateInterference - Invalid channel type!");
-	return NULL;
+  NS_FATAL_ERROR ("SatSatellitePhyRxCarrier::CreateInterference - Invalid channel type!");
+  return NULL;
 }
 
 void
@@ -160,8 +160,8 @@ SatPhyRxCarrierPerSlot::EndRxData (uint32_t key)
 
 bool
 SatPhyRxCarrierPerSlot::ProcessSlottedAlohaCollisions (double cSinr,
-																														Ptr<SatSignalParameters> rxParams,
-																														Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent)
+                                                       Ptr<SatSignalParameters> rxParams,
+                                                       Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions");
@@ -201,113 +201,113 @@ void
 SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets)
 {
   NS_ASSERT (packetRxParams.rxParams->m_txInfo.packetType != SatEnums::PACKET_TYPE_CRDSA);
-	/// calculates sinr for 2nd link
-	double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
-																packetRxParams.rxParams->m_ifPower_W,
-																m_rxNoisePowerW,
-																m_rxAciIfPowerW,
-																m_rxExtNoisePowerW,
-																m_sinrCalculate);
+  /// calculates sinr for 2nd link
+  double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
+                                packetRxParams.rxParams->m_ifPower_W,
+                                m_rxNoisePowerW,
+                                m_rxAciIfPowerW,
+                                m_rxExtNoisePowerW,
+                                m_sinrCalculate);
 
-	// Update link specific SINR trace
-	m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  // Update link specific SINR trace
+  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
 
-	/// PHY transmission decoded successfully. Note, that at transparent satellite,
-	/// all the transmissions are not decoded.
-	bool phyError (false);
+  /// PHY transmission decoded successfully. Note, that at transparent satellite,
+  /// all the transmissions are not decoded.
+  bool phyError (false);
 
-	/// calculate composite SINR
-	double cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->m_sinr);
+  /// calculate composite SINR
+  double cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->m_sinr);
 
-	// Update composite SINR trace for DAMA and Slotted ALOHA packets
-	m_sinrTrace (SatUtils::LinearToDb (cSinr), packetRxParams.sourceAddress);
+  // Update composite SINR trace for DAMA and Slotted ALOHA packets
+  m_sinrTrace (SatUtils::LinearToDb (cSinr), packetRxParams.sourceAddress);
 
-	/// composite sinr output trace
-	if (IsCompositeSinrOutputTraceEnabled ())
-		{
-			DoCompositeSinrOutputTrace (cSinr);
-		}
+  /// composite sinr output trace
+  if (IsCompositeSinrOutputTraceEnabled ())
+    {
+      DoCompositeSinrOutputTrace (cSinr);
+    }
 
-	if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA)
-		{
-			NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
+  if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA)
+    {
+      NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
 
-			// Update the load with FEC block size!
-			m_randomAccessBitsInFrame += packetRxParams.rxParams->m_txInfo.fecBlockSizeInBytes * SatConstVariables::BITS_PER_BYTE;
+      // Update the load with FEC block size!
+      m_randomAccessBitsInFrame += packetRxParams.rxParams->m_txInfo.fecBlockSizeInBytes * SatConstVariables::BITS_PER_BYTE;
 
-			/// check for slotted aloha packet collisions
-			phyError = ProcessSlottedAlohaCollisions (cSinr, packetRxParams.rxParams, packetRxParams.interferenceEvent);
+      /// check for slotted aloha packet collisions
+      phyError = ProcessSlottedAlohaCollisions (cSinr, packetRxParams.rxParams, packetRxParams.interferenceEvent);
 
-			if (nPackets > 0)
-				{
-					const bool hasCollision = GetInterferenceModel ()->HasCollision (packetRxParams.interferenceEvent);
-					m_slottedAlohaRxCollisionTrace (nPackets,                    // number of packets
-																					packetRxParams.sourceAddress,  // sender address
-																					hasCollision                 // collision flag
-																					);
-					m_slottedAlohaRxErrorTrace (nPackets,                    // number of packets
-																			packetRxParams.sourceAddress,  // sender address
-																			phyError                     // error flag
-																			);
-				}
-		}
-	else
-		{
-			/// check against link results
-			phyError = CheckAgainstLinkResults (cSinr, packetRxParams.rxParams);
+      if (nPackets > 0)
+        {
+          const bool hasCollision = GetInterferenceModel ()->HasCollision (packetRxParams.interferenceEvent);
+          m_slottedAlohaRxCollisionTrace (nPackets,                                                  // number of packets
+                                          packetRxParams.sourceAddress,                                                                                                                                // sender address
+                                          hasCollision                                                                                                                                               // collision flag
+                                          );
+          m_slottedAlohaRxErrorTrace (nPackets,                                                  // number of packets
+                                      packetRxParams.sourceAddress,                                                                                                                    // sender address
+                                      phyError                                                                                                                                       // error flag
+                                      );
+        }
+    }
+  else
+    {
+      /// check against link results
+      phyError = CheckAgainstLinkResults (cSinr, packetRxParams.rxParams);
 
-			if (nPackets > 0)
-				{
-					m_daRxTrace (nPackets,                    // number of packets
-											 packetRxParams.sourceAddress,  // sender address
-											 phyError                     // error flag
-											 );
-				}
-		}
+      if (nPackets > 0)
+        {
+          m_daRxTrace (nPackets,                                                  // number of packets
+                       packetRxParams.sourceAddress,                                                                    // sender address
+                       phyError                                                                                       // error flag
+                       );
+        }
+    }
 
-	/// save 2nd link sinr value
-	packetRxParams.rxParams->m_sinr = sinr;
+  /// save 2nd link sinr value
+  packetRxParams.rxParams->m_sinr = sinr;
 
-	/// uses composite sinr
-	m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (), packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, cSinr);
+  /// uses composite sinr
+  m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (), packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, cSinr);
 
-	/// send packet upwards
-	m_rxCallback (packetRxParams.rxParams, phyError);
+  /// send packet upwards
+  m_rxCallback (packetRxParams.rxParams, phyError);
 
-	/// uses composite sinr
-	if (!m_cnoCallback.IsNull ())
-		{
-		/**
-		 * Channel estimation error is added to the cno measurement,
-		 * which is utilized e.g. for ACM.
-		 */
-		double cno = cSinr;
+  /// uses composite sinr
+  if (!m_cnoCallback.IsNull ())
+    {
+      /**
+       * Channel estimation error is added to the cno measurement,
+       * which is utilized e.g. for ACM.
+       */
+      double cno = cSinr;
 
-			// Forward link
-			if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_UT)
-				{
-					cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
-				}
-			// Return link
-			else if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_GW)
-				{
-					cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (
-							SatUtils::LinearToDb (cno), packetRxParams.rxParams->m_txInfo.waveformId));
-				}
-			else
-				{
-					NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
-				}
+      // Forward link
+      if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_UT)
+        {
+          cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
+        }
+      // Return link
+      else if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_GW)
+        {
+          cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (
+                                        SatUtils::LinearToDb (cno), packetRxParams.rxParams->m_txInfo.waveformId));
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
+        }
 
-		cno *= m_rxBandwidthHz;
+      cno *= m_rxBandwidthHz;
 
-		m_cnoCallback (packetRxParams.rxParams->m_beamId,
-									 packetRxParams.sourceAddress,
-									 GetOwnAddress (),
-									 cno);
-		}
+      m_cnoCallback (packetRxParams.rxParams->m_beamId,
+                     packetRxParams.sourceAddress,
+                     GetOwnAddress (),
+                     cno);
+    }
 
-	packetRxParams.rxParams = NULL;
+  packetRxParams.rxParams = NULL;
 }
 
 void
@@ -321,7 +321,7 @@ SatPhyRxCarrierPerSlot::SaveMeasuredRandomAccessLoad (double measuredRandomAcces
   m_randomAccessDynamicLoadControlNormalizedOfferedLoad.push_back (measuredRandomAccessLoad);
 
   while (m_randomAccessDynamicLoadControlNormalizedOfferedLoad.size () >
-          m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize)
+         m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize)
     {
       m_randomAccessDynamicLoadControlNormalizedOfferedLoad.pop_front ();
     }

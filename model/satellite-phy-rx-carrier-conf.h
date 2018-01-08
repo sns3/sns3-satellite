@@ -115,20 +115,20 @@ public:
 
     RxCarrierCreateParams_s ()
       : m_rxTemperatureK (0.0),
-        m_extNoiseDensityWhz (0.0),
-        m_aciIfWrtNoiseFactor (0.0),
-        m_errorModel (SatPhyRxCarrierConf::EM_NONE),
-        m_daConstantErrorRate (0.0),
-        m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-        m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-        m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
-        m_chType (SatEnums::RETURN_USER_CH),
-        m_bwConverter (),
-        m_carrierCount (0),
-        m_cec (NULL),
-        m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-        m_raConstantErrorRate (0.0),
-				m_randomAccessModel (SatEnums::RA_MODEL_OFF)
+      m_extNoiseDensityWhz (0.0),
+      m_aciIfWrtNoiseFactor (0.0),
+      m_errorModel (SatPhyRxCarrierConf::EM_NONE),
+      m_daConstantErrorRate (0.0),
+      m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
+      m_chType (SatEnums::RETURN_USER_CH),
+      m_bwConverter (),
+      m_carrierCount (0),
+      m_cec (NULL),
+      m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+      m_raConstantErrorRate (0.0),
+      m_randomAccessModel (SatEnums::RA_MODEL_OFF)
     {
       // do nothing
     }
@@ -292,7 +292,10 @@ public:
    */
   bool IsRandomAccessDynamicLoadControlEnabled () const;
 
-  inline SatEnums::RandomAccessModel_t GetRandomAccessModel () const { return m_randomAccessModel; };
+  inline SatEnums::RandomAccessModel_t GetRandomAccessModel () const
+  {
+    return m_randomAccessModel;
+  }
 
 private:
   /*

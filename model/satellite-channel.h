@@ -61,7 +61,6 @@ namespace ns3 {
 class SatChannel : public Channel
 {
 public:
-
   /**
    * Default constructor.
    */

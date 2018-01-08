@@ -229,8 +229,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::ONOFF, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-			appStartTime, Seconds (simLength), MilliSeconds (50));
+    SimulationHelper::ONOFF, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength), MilliSeconds (50));
 
   /**
    * Set-up statistics

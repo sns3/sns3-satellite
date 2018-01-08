@@ -37,9 +37,9 @@ namespace ns3 {
 
 SatBtuConf::SatBtuConf ()
   : m_allocatedBandwidthInHz (0.0),
-    m_occupiedBandwidthInHz (0.0),
-    m_effectiveBandwidthInHz (0.0),
-    m_duration (0.0)
+  m_occupiedBandwidthInHz (0.0),
+  m_effectiveBandwidthInHz (0.0),
+  m_duration (0.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -77,10 +77,10 @@ SatBtuConf::~SatBtuConf ()
 
 SatTimeSlotConf::SatTimeSlotConf ()
   : m_startTime (0),
-    m_waveFormId (0),
-    m_frameCarrierId (0),
-    m_rcIndex (0),
-    m_slotType (SatTimeSlotConf::SLOT_TYPE_TRC)
+  m_waveFormId (0),
+  m_frameCarrierId (0),
+  m_rcIndex (0),
+  m_slotType (SatTimeSlotConf::SLOT_TYPE_TRC)
 {
   NS_LOG_FUNCTION (this);
 
@@ -90,10 +90,10 @@ SatTimeSlotConf::SatTimeSlotConf ()
 
 SatTimeSlotConf::SatTimeSlotConf (Time startTime, uint32_t waveFormId, uint16_t frameCarrierId, SatTimeSlotConf::SatTimeSlotType_t slotType)
   : m_startTime (startTime),
-    m_waveFormId (waveFormId),
-    m_frameCarrierId (frameCarrierId),
-    m_rcIndex (0),
-    m_slotType (slotType)
+  m_waveFormId (waveFormId),
+  m_frameCarrierId (frameCarrierId),
+  m_rcIndex (0),
+  m_slotType (slotType)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -107,12 +107,12 @@ SatTimeSlotConf::~SatTimeSlotConf ()
 
 SatFrameConf::SatFrameConf ()
   : m_bandwidthHz (0.0),
-    m_duration (0.0),
-    m_isRandomAccess (false),
-    m_btuConf (0),
-    m_carrierCount (0),
-    m_maxSymbolsPerCarrier (0),
-    m_minPayloadPerCarrierInBytes (0)
+  m_duration (0.0),
+  m_isRandomAccess (false),
+  m_btuConf (0),
+  m_carrierCount (0),
+  m_maxSymbolsPerCarrier (0),
+  m_minPayloadPerCarrierInBytes (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -123,9 +123,9 @@ SatFrameConf::SatFrameConf ()
 SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtuConf> btuConf, Ptr<SatWaveformConf> waveformConf,
                              bool isRandomAccess, bool defaultWaveformInUse, bool checkSlotLimit )
   : m_bandwidthHz (bandwidthHz),
-    m_isRandomAccess (isRandomAccess),
-    m_btuConf (btuConf),
-    m_waveformConf (waveformConf)
+  m_isRandomAccess (isRandomAccess),
+  m_btuConf (btuConf),
+  m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -386,10 +386,10 @@ SatSuperframeConf::CreateSuperframeConf (SuperFrameConfiguration_t conf)
 
 SatSuperframeConf::SatSuperframeConf ()
   : m_usedBandwidthHz (0.0),
-    m_duration (0.0),
-    m_frameCount (0),
-    m_configType (CONFIG_TYPE_0),
-    m_carrierCount (0)
+  m_duration (0.0),
+  m_frameCount (0),
+  m_configType (CONFIG_TYPE_0),
+  m_carrierCount (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -659,12 +659,12 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_configType == CONFIG_TYPE_0 && waveformConf->IsAcmEnabled() == true)
+  if (m_configType == CONFIG_TYPE_0 && waveformConf->IsAcmEnabled () == true)
     {
       NS_LOG_WARN ("Superframe is configured to use config type 0, thus ACM should be disabled!");
     }
 
-  if (m_configType == CONFIG_TYPE_1 && waveformConf->IsAcmEnabled() == false)
+  if (m_configType == CONFIG_TYPE_1 && waveformConf->IsAcmEnabled () == false)
     {
       NS_FATAL_ERROR ("Superframe is configured to use config type 1, thus ACM should be enabled!");
     }
@@ -1143,4 +1143,4 @@ SatSuperframeConf3::DoConfigure ()
 }
 
 
-}; // namespace ns3
+}  // namespace ns3

@@ -38,15 +38,15 @@ SatInputFileStreamTimeLongDoubleContainer::GetTypeId (void)
 
 SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
   : m_inputFileStreamWrapper (),
-    m_inputFileStream (),
-    m_container (),
-    m_fileName (filename),
-    m_fileMode (filemode),
-    m_valuesInRow (valuesInRow),
-    m_lastValidPosition (0),
-    m_numOfPasses (0),
-    m_timeShiftValue (0),
-    m_timeColumn (0)
+  m_inputFileStream (),
+  m_container (),
+  m_fileName (filename),
+  m_fileMode (filemode),
+  m_valuesInRow (valuesInRow),
+  m_lastValidPosition (0),
+  m_numOfPasses (0),
+  m_timeShiftValue (0),
+  m_timeColumn (0)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
@@ -55,15 +55,15 @@ SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleConta
 
 SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer ()
   : m_inputFileStreamWrapper (),
-    m_inputFileStream (),
-    m_container (),
-    m_fileName (),
-    m_fileMode (),
-    m_valuesInRow (),
-    m_lastValidPosition (),
-    m_numOfPasses (),
-    m_timeShiftValue (),
-    m_timeColumn ()
+  m_inputFileStream (),
+  m_container (),
+  m_fileName (),
+  m_fileMode (),
+  m_valuesInRow (),
+  m_lastValidPosition (),
+  m_numOfPasses (),
+  m_timeShiftValue (),
+  m_timeColumn ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer - Constructor not in use");

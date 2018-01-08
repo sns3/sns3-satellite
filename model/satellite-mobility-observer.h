@@ -39,7 +39,6 @@ namespace ns3 {
 class SatMobilityObserver : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -108,8 +107,7 @@ public:
    * \param mobilityObserver An instance of SatMobilityObserver which property
    *                         has changed.
    */
-  typedef void (*PropertyChangedCallback)
-    (Ptr<const SatMobilityObserver> mobilityObserver);
+  typedef void (*PropertyChangedCallback)(Ptr<const SatMobilityObserver> mobilityObserver);
 
 private:
   /**

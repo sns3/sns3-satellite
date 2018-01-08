@@ -119,9 +119,9 @@ SatGeoUserPhy::GetInstanceTypeId (void) const
 
 SatGeoUserPhy::SatGeoUserPhy (void)
   : m_aciInterferenceCOverIDb (17.0),
-    m_otherSysInterferenceCOverIDb (27.5),
-    m_aciInterferenceCOverI (SatUtils::DbToLinear (m_aciInterferenceCOverIDb)),
-    m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
+  m_otherSysInterferenceCOverIDb (27.5),
+  m_aciInterferenceCOverI (SatUtils::DbToLinear (m_aciInterferenceCOverIDb)),
+  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoUserPhy default constructor is not allowed to use");

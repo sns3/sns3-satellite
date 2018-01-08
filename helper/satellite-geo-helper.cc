@@ -84,14 +84,14 @@ SatGeoHelper::GetInstanceTypeId (void) const
 
 SatGeoHelper::SatGeoHelper ()
   : m_nodeId (0),
-    m_carrierBandwidthConverter (),
-    m_fwdLinkCarrierCount (),
-    m_rtnLinkCarrierCount (),
-    m_deviceCount (0),
-    m_deviceFactory (),
-    m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_raSettings ()
+  m_carrierBandwidthConverter (),
+  m_fwdLinkCarrierCount (),
+  m_rtnLinkCarrierCount (),
+  m_deviceCount (0),
+  m_deviceFactory (),
+  m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_raSettings ()
 {
   NS_LOG_FUNCTION (this );
 
@@ -105,15 +105,15 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
                             Ptr<SatSuperframeSeq> seq,
                             RandomAccessSettings_s randomAccessSettings)
   : m_nodeId (0),
-    m_carrierBandwidthConverter (bandwidthConverterCb),
-    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-    m_deviceCount (0),
-    m_deviceFactory (),
-    m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_superframeSeq (seq),
-    m_raSettings (randomAccessSettings)
+  m_carrierBandwidthConverter (bandwidthConverterCb),
+  m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+  m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+  m_deviceCount (0),
+  m_deviceFactory (),
+  m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_superframeSeq (seq),
+  m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 

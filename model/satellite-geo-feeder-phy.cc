@@ -124,9 +124,9 @@ SatGeoFeederPhy::GetInstanceTypeId (void) const
 
 SatGeoFeederPhy::SatGeoFeederPhy (void)
   : m_extNoisePowerDensityDbwHz (-207.0),
-    m_imInterferenceCOverIDb (27.0),
-    m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb)),
-    m_fixedAmplificationGainDb (82.0)
+  m_imInterferenceCOverIDb (27.0),
+  m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb)),
+  m_fixedAmplificationGainDb (82.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoFeederPhy default constructor is not allowed to use");
@@ -213,7 +213,7 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
    * 2) For all CRDSA, SA, and DA.
    */
 
-  txParams->m_txPower_W = txParams->m_rxPower_W * SatUtils::DbToLinear(m_fixedAmplificationGainDb);
+  txParams->m_txPower_W = txParams->m_rxPower_W * SatUtils::DbToLinear (m_fixedAmplificationGainDb);
   //txParams->m_txPower_W = m_eirpWoGainW;
 
   NS_LOG_INFO ("Amplified Tx power: " << SatUtils::LinearToDb (txParams->m_txPower_W));

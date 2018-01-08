@@ -38,7 +38,6 @@ class Packet;
 class SatSimpleChannel : public Channel
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

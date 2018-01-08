@@ -265,7 +265,6 @@ protected:
   void DoPoll ();
 
 private:
-
   /// Maintains a list of UT LLC and its identifier.
   std::list<std::pair<Ptr<SatLlc>, uint32_t> > m_llc;
 

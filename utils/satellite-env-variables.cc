@@ -99,21 +99,21 @@ SatEnvVariables::GetInstanceTypeId (void) const
 
 SatEnvVariables::SatEnvVariables ()
   : m_currentWorkingDirectory (""),
-    m_pathToExecutable (""),
-    m_currentWorkingDirectoryFromAttribute (""),
-    m_pathToExecutableFromAttribute (""),
-    m_levelsToCheck (10),
-    m_dataPath ("contrib/satellite/data"),
-    m_outputPath (""),
-    m_campaignName (""),
-    m_simRootPath ("contrib/satellite/data/sims"),
-    m_simTag ("default"),
-    m_enableOutputOverwrite (true),
-    m_isOutputPathInitialized (false),
-    m_enableSimInfoOutput (true),
-    m_enableSimInfoDiffOutput (true),
-    m_excludeDataFolderFromDiff (true),
-    m_isInitialized (false)
+  m_pathToExecutable (""),
+  m_currentWorkingDirectoryFromAttribute (""),
+  m_pathToExecutableFromAttribute (""),
+  m_levelsToCheck (10),
+  m_dataPath ("contrib/satellite/data"),
+  m_outputPath (""),
+  m_campaignName (""),
+  m_simRootPath ("contrib/satellite/data/sims"),
+  m_simTag ("default"),
+  m_enableOutputOverwrite (true),
+  m_isOutputPathInitialized (false),
+  m_enableSimInfoOutput (true),
+  m_enableSimInfoDiffOutput (true),
+  m_excludeDataFolderFromDiff (true),
+  m_isInitialized (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -146,8 +146,8 @@ SatEnvVariables::DoInitialize ()
       int res;
 #ifdef __linux__
       res = readlink ("/proc/self/exe",
-              pathToExecutable,
-              sizeof (pathToExecutable));
+                      pathToExecutable,
+                      sizeof (pathToExecutable));
 #elif __APPLE__
       uint32_t size = sizeof (pathToExecutable);
       res = _NSGetExecutablePath (pathToExecutable, &size);
@@ -220,9 +220,9 @@ SatEnvVariables::GetOutputPath ()
 void
 SatEnvVariables::SetOutputPath (std::string outputPath)
 {
-	NS_ASSERT_MSG (IsValidDirectory (outputPath), outputPath << " is not a valid directory");
-	m_outputPath = outputPath;
-	m_isOutputPathInitialized = true;
+  NS_ASSERT_MSG (IsValidDirectory (outputPath), outputPath << " is not a valid directory");
+  m_outputPath = outputPath;
+  m_isOutputPathInitialized = true;
 }
 
 void

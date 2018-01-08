@@ -30,7 +30,7 @@ namespace ns3 {
 
 SatDamaEntry::SatDamaEntry ()
   : m_dynamicRatePersistence (0),
-    m_volumeBacklogPersistence (0)
+  m_volumeBacklogPersistence (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("The default version of the constructor not supported!!!");
@@ -38,8 +38,8 @@ SatDamaEntry::SatDamaEntry ()
 
 SatDamaEntry::SatDamaEntry (Ptr<SatLowerLayerServiceConf> llsConf)
   : m_dynamicRatePersistence (0),
-    m_volumeBacklogPersistence (0),
-    m_llsConf (llsConf)
+  m_volumeBacklogPersistence (0),
+  m_llsConf (llsConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -235,8 +235,8 @@ SatDamaEntry::UpdateVbdcInBytes (uint8_t index, uint32_t volumeInBytes)
   if ( m_llsConf->GetDaVolumeAllowed (index) )
     {
       NS_LOG_INFO ("Update VBDC! RC index: " << index <<
-                    " existing VBDC bytes: " << m_volumeBacklogRequestedInBytes[index] <<
-                    " updated with " << volumeInBytes << " bytes!");
+                   " existing VBDC bytes: " << m_volumeBacklogRequestedInBytes[index] <<
+                   " updated with " << volumeInBytes << " bytes!");
 
       SetVbdcInBytes (index, m_volumeBacklogRequestedInBytes[index] + volumeInBytes);
     }

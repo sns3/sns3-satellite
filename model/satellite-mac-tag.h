@@ -34,7 +34,6 @@ namespace ns3 {
 class SatMacTag : public Tag
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -120,7 +119,6 @@ private:
 class SatFlowIdTag : public Tag
 {
 public:
-
   /**
    * Default constructor.
    */

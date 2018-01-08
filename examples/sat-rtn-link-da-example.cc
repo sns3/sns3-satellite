@@ -58,7 +58,7 @@ main (int argc, char *argv[])
   simulationHelper->SetDefaultValues ();
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
-  simulationHelper->SetSimulationTime (simLength.GetSeconds());
+  simulationHelper->SetSimulationTime (simLength.GetSeconds ());
   simulationHelper->EnableOnlyRbdc (3);
 
   simulationHelper->SetBeams ("1 3 5 7 9 22 24 26 28 30 44 46 48 50 59 61 70 72");
@@ -76,10 +76,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (5)));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (128) );
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			Seconds (1), Seconds (simLength), Seconds (0.05));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (1), Seconds (simLength), Seconds (0.05));
 
   // Create RTN link statistics
   simulationHelper->CreateDefaultRtnLinkStats ();

@@ -50,22 +50,22 @@ SatPerPacketInterference::GetInstanceTypeId (void) const
 
 SatPerPacketInterference::SatPerPacketInterference ()
   : m_residualPowerW (0.0),
-    m_rxing (false),
-    m_nextEventId (0),
-    m_enableTraceOutput (false),
-    m_channelType (),
-    m_rxBandwidth_Hz ()
+  m_rxing (false),
+  m_nextEventId (0),
+  m_enableTraceOutput (false),
+  m_channelType (),
+  m_rxBandwidth_Hz ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz)
   : m_residualPowerW (0.0),
-    m_rxing (false),
-    m_nextEventId (0),
-    m_enableTraceOutput (true),
-    m_channelType (channelType),
-    m_rxBandwidth_Hz (rxBandwidthHz)
+  m_rxing (false),
+  m_nextEventId (0),
+  m_enableTraceOutput (true),
+  m_channelType (channelType),
+  m_rxBandwidth_Hz (rxBandwidthHz)
 {
   NS_LOG_FUNCTION (this << channelType << rxBandwidthHz);
 
@@ -153,7 +153,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   bool ownStartReached = false;
 
   NS_LOG_INFO ( "Calculate: IfPower (W)= " << ifPowerW << ", Duration= " << event->GetDuration () <<
-                 ", StartTime= " << event->GetStartTime () << ", EndTime= " << event->GetEndTime () );
+                ", StartTime= " << event->GetStartTime () << ", EndTime= " << event->GetEndTime () );
 
   InterferenceChanges::iterator currentItem = m_interferenceChanges.begin ();
 
@@ -175,7 +175,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
           ifPowerW += ((rxEndTime - itemTime) / rxDuration) * currentItem->second.second;
 
           NS_LOG_INFO ( "Update (partial): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second <<
-                         ", Time= " << currentItem->first << ", DeltaTime= " << (rxEndTime - itemTime) );
+                        ", Time= " << currentItem->first << ", DeltaTime= " << (rxEndTime - itemTime) );
 
           NS_LOG_INFO ( "IfPower after update: " << ifPowerW );
         }

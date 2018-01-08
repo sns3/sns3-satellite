@@ -52,7 +52,6 @@ namespace ns3 {
 class SatLinkResults : public Object
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -110,7 +109,6 @@ protected:
 class SatLinkResultsDvbRcs2 : public SatLinkResults
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -178,7 +176,6 @@ private:
 class SatLinkResultsDvbS2 : public SatLinkResults
 {
 public:
-
   /**
    * Default constructor.
    */

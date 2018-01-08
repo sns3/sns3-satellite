@@ -159,8 +159,8 @@ main (int argc, char *argv[])
    */
   NS_LOG_INFO ("Creating the satellite scenario");
   // Each beam will have 'utsPerBeam' user terminals and 'endUsersPerUt'
-	// end users per UT. Note, that this allows also different configurations
-	// per spot-beam.
+  // end users per UT. Note, that this allows also different configurations
+  // per spot-beam.
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
   simulationHelper->SetBeamSet (coChannelBeams);
@@ -191,10 +191,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
   simulationHelper->InstallTrafficModel (
-      		SimulationHelper::ONOFF,
-    			SimulationHelper::UDP,
-    			SimulationHelper::RTN_LINK,
-					appStartTime, Seconds (simDuration + 1), MilliSeconds (25));
+    SimulationHelper::ONOFF,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simDuration + 1), MilliSeconds (25));
 
   /**
    * -----------------

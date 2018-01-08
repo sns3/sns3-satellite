@@ -85,13 +85,13 @@ SatUtMac::GetInstanceTypeId (void) const
 
 SatUtMac::SatUtMac ()
   : SatMac (),
-    m_superframeSeq (),
-    m_timingAdvanceCb (0),
-    m_randomAccess (NULL),
-    m_guardTime (MicroSeconds (1)),
-    m_raChannel (0),
-    m_crdsaUniquePacketId (1),
-    m_crdsaOnlyForControl (false)
+  m_superframeSeq (),
+  m_timingAdvanceCb (0),
+  m_randomAccess (NULL),
+  m_guardTime (MicroSeconds (1)),
+  m_raChannel (0),
+  m_crdsaUniquePacketId (1),
+  m_crdsaOnlyForControl (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -101,12 +101,12 @@ SatUtMac::SatUtMac ()
 
 SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyForControl)
   : SatMac (beamId),
-    m_superframeSeq (seq),
-    m_timingAdvanceCb (0),
-    m_guardTime (MicroSeconds (1)),
-    m_raChannel (0),
-    m_crdsaUniquePacketId (1),
-    m_crdsaOnlyForControl (crdsaOnlyForControl)
+  m_superframeSeq (seq),
+  m_timingAdvanceCb (0),
+  m_guardTime (MicroSeconds (1)),
+  m_raChannel (0),
+  m_crdsaUniquePacketId (1),
+  m_crdsaOnlyForControl (crdsaOnlyForControl)
 {
   NS_LOG_FUNCTION (this);
 
@@ -717,8 +717,8 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       while (!result.first)
         {
           NS_LOG_INFO ("Time now: " << Now ().GetSeconds () <<
-                        ", superFrameId: " << superFrameId <<
-                        ", superframeStartTime: " << superframeStartTime.GetSeconds ());
+                       ", superFrameId: " << superFrameId <<
+                       ", superframeStartTime: " << superframeStartTime.GetSeconds ());
 
           result = SearchFrameForAvailableSlot (superframeStartTime, frameConf, timeSlotCount, superFrameId, allocationChannel);
 
@@ -750,13 +750,13 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
       uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
       NS_LOG_INFO ("SatUtMac::ScheduleSlottedAlohaTransmission - Starting to schedule @ " << Now ().GetSeconds () <<
-                    ", SF ID: " << superFrameId <<
-                    " slot: " << result.second <<
-                    " SF start: " << superframeStartTime.GetSeconds () <<
-                    " Tx start: " << (Now () + offset).GetSeconds () <<
-                    " duration: " << duration.GetSeconds () <<
-                    " carrier ID: " << carrierId <<
-                    " payload in bytes: " << wf->GetPayloadInBytes ());
+                   ", SF ID: " << superFrameId <<
+                   " slot: " << result.second <<
+                   " SF start: " << superframeStartTime.GetSeconds () <<
+                   " Tx start: " << (Now () + offset).GetSeconds () <<
+                   " duration: " << duration.GetSeconds () <<
+                   " carrier ID: " << carrierId <<
+                   " payload in bytes: " << wf->GetPayloadInBytes ());
 
       /// schedule transmission
       Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::STRICT);
@@ -826,9 +826,9 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
     }
 
   NS_LOG_INFO ("SatUtMac::FindNextAvailableRandomAccessSlot - Success: " << availableSlotFound
-                                                                          << " SF: " << superFrameId
-                                                                          << " AC: " << allocationChannel
-                                                                          << " slot: " << slotId << "/" << timeSlotCount);
+                                                                         << " SF: " << superFrameId
+                                                                         << " AC: " << allocationChannel
+                                                                         << " slot: " << slotId << "/" << timeSlotCount);
 
   return std::make_pair (availableSlotFound, slotId);
 }
@@ -930,8 +930,8 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
             {
               rep.push_back ((*it)->Copy ());
               NS_LOG_INFO ("Replica in slot: " << (*iterSet)
-                                                << ", original (HL packet) fragment UID: " << (*it)->GetUid ()
-                                                << ", copied replica fragment (HL packet) UID: " << rep.back ()->GetUid ());
+                                               << ", original (HL packet) fragment UID: " << (*it)->GetUid ()
+                                               << ", copied replica fragment (HL packet) UID: " << rep.back ()->GetUid ());
             }
 
           NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - One replica created");
@@ -970,10 +970,10 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           for (uint32_t j = 0; j < replicas[i].second.size (); j++)
             {
               NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - replica: " << i
-                                                                               << ", fragment: " << j
-                                                                               << ", key: " << replicas[i].first
-                                                                               << ", tag: " << tags.at (replicas[i].first).GetSlotIds ().at (0)
-                                                                               << ", fragment (HL packet) UID: " << replicas[i].second.at (j)->GetUid ());
+                                                                              << ", fragment: " << j
+                                                                              << ", key: " << replicas[i].first
+                                                                              << ", tag: " << tags.at (replicas[i].first).GetSlotIds ().at (0)
+                                                                              << ", fragment (HL packet) UID: " << replicas[i].second.at (j)->GetUid ());
 
               /// attach the replica tag
               replicas[i].second.at (j)->AddPacketTag (tags.at (replicas[i].first));

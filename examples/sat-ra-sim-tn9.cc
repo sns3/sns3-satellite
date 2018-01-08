@@ -78,10 +78,10 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-	Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-	Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-	ConfigStore inputConfig;
-	inputConfig.ConfigureDefaults ();
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
 
   // Enable Random Access with all available modules
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
@@ -217,10 +217,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
   sh->InstallTrafficModel (
-  		SimulationHelper::ONOFF,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			Seconds (0), Seconds (simLength - 2.0));
+    SimulationHelper::ONOFF,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (0), Seconds (simLength - 2.0));
 
   /**
    * Set-up statistics

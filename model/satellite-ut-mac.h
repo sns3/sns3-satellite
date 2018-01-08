@@ -194,7 +194,6 @@ public:
   typedef void (* TbtpResourcesTraceCallback)(uint32_t size);
 
 protected:
-
   /**
    * Dispose of SatUtMac
    */

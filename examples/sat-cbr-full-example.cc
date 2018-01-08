@@ -99,8 +99,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-			appStartTime, Seconds (simLength), Seconds (0.001));
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    appStartTime, Seconds (simLength), Seconds (0.001));
 
   NS_LOG_INFO ("--- sat-cbr-full-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);

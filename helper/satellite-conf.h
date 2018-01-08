@@ -40,7 +40,6 @@ namespace ns3 {
 class SatConf : public Object
 {
 public:
-
   /**
    * Default constructor.
    */

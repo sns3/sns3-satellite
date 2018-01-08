@@ -44,7 +44,6 @@ namespace ns3 {
 class SatBbFrame : public SimpleRefCount<SatBbFrame>
 {
 public:
-
   /**
    * Define type SatBbFramePayload_t
    */
@@ -194,8 +193,7 @@ public:
    * \param to The frame merged to.
    * \param to The frame merged from.
    */
-  typedef void (*BbFrameMergeCallback)
-    (Ptr<SatBbFrame> to, Ptr<SatBbFrame> from);
+  typedef void (*BbFrameMergeCallback)(Ptr<SatBbFrame> to, Ptr<SatBbFrame> from);
 
 private:
   SatEnums::SatModcod_t m_modCod;

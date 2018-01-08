@@ -44,7 +44,6 @@ namespace ns3 {
 class SatGeoHelper : public Object
 {
 public:
-
   /**
    * Random access setting options.
    */

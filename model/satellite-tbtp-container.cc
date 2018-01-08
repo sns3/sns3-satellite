@@ -54,19 +54,19 @@ SatTbtpContainer::GetTypeId (void)
 
 SatTbtpContainer::SatTbtpContainer ()
   : m_address (),
-    m_maxStoredTbtps (100),
-    m_rcvdTbtps (0),
-    m_superFrameDuration (0)
+  m_maxStoredTbtps (100),
+  m_rcvdTbtps (0),
+  m_superFrameDuration (0)
 {
   NS_FATAL_ERROR ("SatTbtpContainer::SatTbtpContainer - Constructor not in use");
 }
 
 SatTbtpContainer::SatTbtpContainer (Ptr<SatSuperframeSeq> seq)
   : m_address (),
-    m_superframeSeq (seq),
-    m_maxStoredTbtps (100),
-    m_rcvdTbtps (0),
-    m_superFrameDuration (seq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ())
+  m_superframeSeq (seq),
+  m_maxStoredTbtps (100),
+  m_rcvdTbtps (0),
+  m_superFrameDuration (seq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetDuration ())
 {
 
 }

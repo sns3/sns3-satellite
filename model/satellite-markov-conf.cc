@@ -85,13 +85,13 @@ SatMarkovConf::GetTypeId (void)
 
 SatMarkovConf::SatMarkovConf ()
   : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-    m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT),
-    m_minimumPositionChangeInMeters (1000.0),
-    m_cooldownPeriodLength (Seconds (0.00005)),
-    m_useDecibels (false),
-    m_looConf (NULL),
-    m_rayleighConf (NULL),
-    m_faderType (SatMarkovConf::LOO_FADER)
+  m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT),
+  m_minimumPositionChangeInMeters (1000.0),
+  m_cooldownPeriodLength (Seconds (0.00005)),
+  m_useDecibels (false),
+  m_looConf (NULL),
+  m_rayleighConf (NULL),
+  m_faderType (SatMarkovConf::LOO_FADER)
 {
   NS_LOG_FUNCTION (this);
 

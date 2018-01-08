@@ -37,7 +37,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatControlMsgTag);
 
 SatControlMsgTag::SatControlMsgTag ()
   : m_msgType (SAT_NON_CTRL_MSG),
-    m_msgId (0)
+  m_msgId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -144,16 +144,16 @@ NS_OBJECT_ENSURE_REGISTERED (SatTbtpMessage);
 
 SatTbtpMessage::SatTbtpMessage ( )
   : m_superframeCounter (0),
-    m_superframeSeqId (0),
-    m_assignmentFormat (0)
+  m_superframeSeqId (0),
+  m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
   : m_superframeCounter (0),
-    m_superframeSeqId (seqId),
-    m_assignmentFormat (0)
+  m_superframeSeqId (seqId),
+  m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 }
@@ -358,8 +358,8 @@ uint32_t SatTbtpMessage::GetSizeInBytes () const
 void SatTbtpMessage::Dump () const
 {
   std::cout << "Superframe counter: " << m_superframeCounter <<
-  ", superframe sequence id: " << m_superframeSeqId <<
-  ", assignment format: " << m_assignmentFormat << std::endl;
+    ", superframe sequence id: " << m_superframeSeqId <<
+    ", assignment format: " << m_assignmentFormat << std::endl;
 
   for (DaTimeSlotMap_t::const_iterator mit = m_daTimeSlots.begin ();
        mit != m_daTimeSlots.end ();
@@ -401,7 +401,7 @@ SatCrMessage::GetInstanceTypeId (void) const
 
 SatCrMessage::SatCrMessage ()
   : m_crBlockSizeType (SatCrMessage::CR_BLOCK_SMALL),
-    m_forwardLinkCNo (NAN)
+  m_forwardLinkCNo (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -546,8 +546,8 @@ SatRaMessage::GetInstanceTypeId (void) const
 
 SatRaMessage::SatRaMessage ()
   : m_allocationChannelId (0),
-    m_backoffProbability (0),
-    m_backoffTime (0)
+  m_backoffProbability (0),
+  m_backoffTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -634,7 +634,7 @@ SatArqAckMessage::GetInstanceTypeId (void) const
 
 SatArqAckMessage::SatArqAckMessage ()
   : m_sequenceNumber (0),
-    m_flowId (0)
+  m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -686,18 +686,18 @@ NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");
 
 SatControlMsgContainer::SatControlMsgContainer ()
   : m_sendId (0),
-    m_recvId (0),
-    m_storeTime (MilliSeconds (300)),
-    m_deleteOnRead (false)
+  m_recvId (0),
+  m_storeTime (MilliSeconds (300)),
+  m_deleteOnRead (false)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatControlMsgContainer::SatControlMsgContainer (Time storeTime, bool deleteOnRead)
   : m_sendId (0),
-    m_recvId (0),
-    m_storeTime (storeTime),
-    m_deleteOnRead (deleteOnRead)
+  m_recvId (0),
+  m_storeTime (storeTime),
+  m_deleteOnRead (deleteOnRead)
 
 {
   NS_LOG_FUNCTION (this);
@@ -862,4 +862,4 @@ SatControlMsgContainer::CleanUpIdMap (uint32_t recvId)
     }
 }
 
-}; // namespace ns3
+}  // namespace ns3

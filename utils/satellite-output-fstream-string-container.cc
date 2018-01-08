@@ -38,20 +38,20 @@ SatOutputFileStreamStringContainer::GetTypeId (void)
 
 SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer (std::string filename, std::ios::openmode filemode)
   : m_outputFileStreamWrapper (),
-    m_outputFileStream (),
-    m_container (),
-    m_fileName (filename),
-    m_fileMode (filemode)
+  m_outputFileStream (),
+  m_container (),
+  m_fileName (filename),
+  m_fileMode (filemode)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 }
 
 SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer ()
   : m_outputFileStreamWrapper (),
-    m_outputFileStream (),
-    m_container (),
-    m_fileName (),
-    m_fileMode ()
+  m_outputFileStream (),
+  m_container (),
+  m_fileName (),
+  m_fileMode ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer - Constructor not in use");
