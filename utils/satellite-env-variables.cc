@@ -577,11 +577,11 @@ SatEnvVariables::DumpSimulationInformation ()
 
   std::ostringstream revisionCommand;
   revisionCommand << "cd contrib/satellite"
-                  << " && hg log | head --lines=5 2>&1";
+                  << " && git log -1 2>&1";
   ExecuteCommandAndReadOutput (revisionCommand.str (), outputContainer);
 
   std::stringstream line1;
-  line1 << "Simulation finished at " << GetCurrentDateAndTime ();
+  line1 << "\nSimulation finished at " << GetCurrentDateAndTime ();
 
   outputContainer->AddToContainer (line1.str ());
 
@@ -604,15 +604,15 @@ SatEnvVariables::DumpRevisionDiff (std::string dataPath)
 
   std::ostringstream diffCommand;
   diffCommand << "cd contrib/satellite"
-              << " && hg diff"
-              << " --show-function"
+              << " && git diff"
               << " --ignore-all-space"
               << " --ignore-space-change"
               << " --ignore-blank-lines";
 
   if (m_excludeDataFolderFromDiff)
     {
-      diffCommand << " --exclude " << m_dataPath;
+      // Requires git 1.9 to work
+      diffCommand << " \":(exclude)" << m_dataPath << "\" ";
     }
 
   diffCommand << " 2>&1";
