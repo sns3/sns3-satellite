@@ -141,4 +141,7 @@ def build(bld):
     obj.source = 'sat-rtn-system-test-example.cc'
         
     obj = bld.create_ns3_program('sat-tutorial-example', ['satellite'])
-    obj.source = 'sat-tutorial-example.cc'   
+    obj.source = 'sat-tutorial-example.cc'
+
+    obj = bld.create_ns3_program('sat-generic-launcher', ['satellite'])
+    obj.source = 'sat-generic-launcher.cc'

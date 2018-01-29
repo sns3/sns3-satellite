@@ -56,6 +56,28 @@ SimulationHelper::GetTypeId (void)
                    TimeValue (Seconds (100)),
                    MakeTimeAccessor (&SimulationHelper::m_simTime),
                    MakeTimeChecker (Seconds (10)))
+    .AddAttribute ("BeamsIDs",
+                   "Enabled Beams IDs",
+                   StringValue ("10 11 12 23 24 25"),
+                   MakeStringAccessor (&SimulationHelper::SetBeams),
+                   MakeStringChecker ())
+    .AddAttribute ("UserCountPerUt",
+                   "Amount of user per User Terminal",
+                   StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
+                   MakePointerAccessor (&SimulationHelper::m_utUserCount),
+                   MakePointerChecker<RandomVariableStream> ())
+    .AddAttribute ("UtCountPerBeam",
+                   "Amount of User Terminal associated to each Beam",
+                   StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
+                   MakePointerAccessor (&SimulationHelper::m_utCount),
+                   MakePointerChecker<RandomVariableStream> ())
+    .AddAttribute ("CrTxConf",
+                   "CR transmission modes",
+                   EnumValue (SimulationHelper::CR_NOT_CONFIGURED),
+                   MakeEnumAccessor (&SimulationHelper::SetCrTxConf),
+                   MakeEnumChecker (SimulationHelper::CR_PERIODIC_CONTROL, "PeriodicControl",
+                                    SimulationHelper::CR_SLOTTED_ALOHA, "SlottedAloha",
+                                    SimulationHelper::CR_CRDSA_LOOSE_RC_0, "CRDSA"))
   ;
   return tid;
 }
@@ -118,12 +140,21 @@ SimulationHelper::SimulationHelper (std::string simulationName)
   m_simulationName = simulationName;
   Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue (m_simulationName));
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  // NCC configuration
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
+  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
+
+  // RBDC
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (16));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 }
 
 SimulationHelper::~SimulationHelper ()
 {
   NS_LOG_FUNCTION (this);
-
 }
 
 void
@@ -1173,6 +1204,42 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
     default:
       NS_FATAL_ERROR ("Invalid traffic model");
       break;
+    }
+}
+
+void
+SimulationHelper::SetCrTxConf (CrTxConf_t crTxConf)
+{
+  switch (crTxConf)
+    {
+    case CR_NOT_CONFIGURED:
+      {
+        break;
+      }
+    case CR_PERIODIC_CONTROL:
+      {
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+        break;
+      }
+    case CR_SLOTTED_ALOHA:
+      {
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+        break;
+      }
+    case CR_CRDSA_LOOSE_RC_0:
+      {
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
+        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+        Config::SetDefault ("ns3::SatUtHelper::UseCrdsaOnlyForControlPackets", BooleanValue (false));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Unsupported crTxConf: " << crTxConf);
+        break;
+      }
     }
 }
 

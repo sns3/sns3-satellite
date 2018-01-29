@@ -485,6 +485,16 @@ public:
       Seconds (0));
   }
 
+  typedef enum
+  {
+    CR_NOT_CONFIGURED,
+    CR_PERIODIC_CONTROL,
+    CR_SLOTTED_ALOHA,
+    CR_CRDSA_LOOSE_RC_0,
+  } CrTxConf_t;
+
+  void SetCrTxConf (CrTxConf_t crTxConf);
+
   /**
    * \brief Set the ID of the GW user for traffic models.
    * \param gwUserId GW user's ID
