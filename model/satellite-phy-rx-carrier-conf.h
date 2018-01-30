@@ -75,6 +75,14 @@ public:
   };
 
   /**
+   * \brief Interference cancelation model enum
+   */
+  enum InterferenceEliminationModel
+  {
+    SIC_PERFECT,
+  };
+
+  /**
    * \brief Random access collision model enum
    */
   enum RandomAccessCollisionModel
@@ -89,6 +97,8 @@ public:
    * \param errorModel Used error model
    * \param daIfModel Used interference model for dedicated access
    * \param raIfModel Used interference model for random access
+   * \param daIfEliminateModel Used interference elimination model for dedicated access
+   * \param raIfEliminateModel Used interference elimination model for random access
    * \param rxMode RX mode used in carrier
    * \param chType RX channel type
    * \param converter Bandwidth converter
@@ -104,6 +114,8 @@ public:
     double                                   m_daConstantErrorRate;
     InterferenceModel                        m_daIfModel;
     InterferenceModel                        m_raIfModel;
+    InterferenceEliminationModel             m_daIfEliminateModel;
+    InterferenceEliminationModel             m_raIfEliminateModel;
     RxMode                                   m_rxMode;
     SatEnums::ChannelType_t                  m_chType;
     SatTypedefs::CarrierBandwidthConverter_t m_bwConverter;
@@ -121,6 +133,8 @@ public:
       m_daConstantErrorRate (0.0),
       m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
       m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_daIfEliminateModel (SatPhyRxCarrierConf::SIC_PERFECT),
+      m_raIfEliminateModel (SatPhyRxCarrierConf::SIC_PERFECT),
       m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
       m_chType (SatEnums::RETURN_USER_CH),
       m_bwConverter (),
@@ -192,6 +206,13 @@ public:
    * \return configured interference model
    */
   InterferenceModel GetInterferenceModel (bool isRandomAccessCarrier) const;
+
+  /**
+   * \brief Get configured interference cancelation model
+   * \param isRandomAccessCarrier Do we want RA or DA SIC model
+   * \return configured interference cancelation model
+   */
+  InterferenceEliminationModel GetInterferenceEliminationModel (bool isRandomAccessCarrier) const;
 
   /**
    * \brief Get configured link results
@@ -306,6 +327,8 @@ private:
    */
   InterferenceModel m_daIfModel;
   InterferenceModel m_raIfModel;
+  InterferenceEliminationModel m_daIfEliminateModel;
+  InterferenceEliminationModel m_raIfEliminateModel;
   ErrorModel m_errorModel;
   double m_daConstantErrorRate;
   double m_rxTemperatureK;

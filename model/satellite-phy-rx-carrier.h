@@ -29,6 +29,7 @@
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-interference.h>
+#include <ns3/satellite-interference-elimination.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
@@ -311,6 +312,13 @@ protected:
   virtual void DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId, double rxBandwidthHz);
 
   /**
+   * Create an interference cancelation model for this carrier.
+   * \param carrierConf
+   * \param carrierId
+   */
+  virtual void DoCreateInterferenceEliminationModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId);
+
+  /**
    * \brief Get the channel type. Base class has undefined channel type, while child classes have
    *                            can have other channel types.
    * \return Channel type
@@ -564,8 +572,9 @@ private:
   State m_state;                                                                                                                                //< Current state of the carrier
   uint32_t m_beamId;                                                                                                            //< Beam ID
   uint32_t m_carrierId;                                                                                                 //< Carrier ID
-  bool m_receivingDedicatedAccess;                                                      //< Is the carrier receiving a dedicated access packet
-  Ptr<SatInterference> m_satInterference;                       //< Interference model
+  bool m_receivingDedicatedAccess;                                      //< Is the carrier receiving a dedicated access packet
+  Ptr<SatInterference> m_satInterference;                               //< Interference model
+  Ptr<SatInterferenceElimination> m_satInterferenceElimination;         //< Interference model
   bool m_enableCompositeSinrOutputTrace;                                //< Enable composite SINR output tracing
 
   /**

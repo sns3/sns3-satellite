@@ -26,6 +26,7 @@
 #include <ns3/satellite-per-fragment-interference.h>
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
+#include <ns3/satellite-perfect-interference-elimination.h>
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-composite-sinr-output-trace-container.h>
@@ -56,6 +57,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_carrierId (carrierId),
   m_receivingDedicatedAccess (false),
   m_satInterference (),
+  m_satInterferenceElimination (),
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
   m_rxPacketCounter (0)
@@ -69,6 +71,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   // Create proper interference object for carrier i
   DoCreateInterferenceModel (carrierConf, carrierId, m_rxBandwidthHz);
+  DoCreateInterferenceEliminationModel (carrierConf, carrierId);
 
   m_rxExtNoisePowerW = carrierConf->GetExtPowerDensityWhz () * m_rxBandwidthHz;
 
@@ -161,6 +164,28 @@ SatPhyRxCarrier::DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf
 }
 
 
+void
+SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
+  Ptr<SatPhyRxCarrierConf> carrierConf,
+  uint32_t carrierId)
+{
+  switch (carrierConf->GetInterferenceEliminationModel (m_randomAccessEnabled))
+    {
+    case SatPhyRxCarrierConf::SIC_PERFECT:
+      {
+        NS_LOG_INFO (this << " Perfect interference elimination model created for carrier: " << carrierId);
+        m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
+        break;
+      }
+    default:
+      {
+        NS_LOG_ERROR (this << " Not a valid interference elimination model!");
+        break;
+      }
+    }
+}
+
+
 SatPhyRxCarrier::~SatPhyRxCarrier ()
 {
   NS_LOG_FUNCTION (this);
@@ -212,6 +237,7 @@ SatPhyRxCarrier::DoDispose ()
   m_sinrCalculate.Nullify ();
   m_avgNormalizedOfferedLoadCallback.Nullify ();
   m_satInterference = NULL;
+  m_satInterferenceElimination = NULL;
   m_uniformVariable = NULL;
 
   Object::DoDispose ();
