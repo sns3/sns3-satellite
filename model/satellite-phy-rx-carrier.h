@@ -240,6 +240,15 @@ protected:
   }
 
   /**
+   * \brief Get pointer to the current interference elimination model.
+   * \return interference elimination model
+   */
+  inline Ptr<SatInterferenceElimination> GetInterferenceEliminationModel ()
+  {
+    return m_satInterferenceElimination;
+  }
+
+  /**
    * \brief Create an interference event based on Rx parameters and address.
    *                            Implemented by child classes.
    *

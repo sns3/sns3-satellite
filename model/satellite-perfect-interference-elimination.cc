@@ -20,6 +20,7 @@
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "satellite-signal-parameters.h"
 #include "satellite-perfect-interference-elimination.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatPerfectInterferenceElimination");
@@ -55,9 +56,18 @@ SatPerfectInterferenceElimination::~SatPerfectInterferenceElimination ()
 }
 
 void
-SatPerfectInterferenceElimination::EliminateInterferences ()
+SatPerfectInterferenceElimination::EliminateInterferences (
+  Ptr<SatSignalParameters> packetInterferedWith,
+  Ptr<SatSignalParameters> processedPacket)
 {
-  NS_LOG_INFO (this << " Eliminate interferences");
+  NS_LOG_INFO ("SatPerfectInterferenceElimination::ComputeRemovedInterferenceValue");
+
+  packetInterferedWith->m_ifPowerInSatellite_W -= processedPacket->m_rxPowerInSatellite_W;
+
+  if (std::abs (packetInterferedWith->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
+    {
+      packetInterferedWith->m_ifPowerInSatellite_W = 0;
+    }
 }
 
 }  // namespace ns3

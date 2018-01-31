@@ -714,14 +714,7 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           /// In addition, as the interference values are extremely small, the use of long double (instead
           /// of double) should be considered to improve the accuracy.
 
-          auto ifPowerPerFragment = iterList->rxParams->GetInterferencePowerInSatellitePerFragment ();
-          for (std::pair<double, double>& ifPower : ifPowerPerFragment)
-            {
-              ifPower.second -= processedPacket.rxParams->m_rxPowerInSatellite_W;
-              if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
-                {
-                  ifPower.second = 0.0;
-                }
+          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams);
 
               if (iterList->rxParams->GetInterferencePower () < 0 || ifPower.second < 0)
                 {
