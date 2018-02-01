@@ -38,7 +38,6 @@
 #include <ns3/nrtv-helper.h>
 #include <ns3/three-gpp-http-helper.h>
 #include <ns3/random-variable-stream.h>
-#include <ns3/satellite-enums.h>
 
 NS_LOG_COMPONENT_DEFINE ("SimulationHelper");
 
@@ -78,6 +77,11 @@ SimulationHelper::GetTypeId (void)
                    MakeEnumChecker (SimulationHelper::CR_PERIODIC_CONTROL, "PeriodicControl",
                                     SimulationHelper::CR_SLOTTED_ALOHA, "SlottedAloha",
                                     SimulationHelper::CR_CRDSA_LOOSE_RC_0, "CRDSA"))
+    .AddAttribute ("ActivateStatistics",
+                   "Enable outputing values from stats helpers",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SimulationHelper::ActivateStatistics),
+                   MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -1374,6 +1378,52 @@ SimulationHelper::StoreAttributesToFile (std::string fileName)
   outputConfig.ConfigureAttributes ();
 
   return outputPath;
+}
+
+void
+SimulationHelper::ActivateStatistics (bool doActivate)
+{
+  if (doActivate)
+    {
+      Ptr<SatStatsHelperContainer> s = GetStatisticsContainer ();
+
+      s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+      s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+      s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+      s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+      s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+      s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+      s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+      s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+      s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+      s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+      s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+      s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+      s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+      s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+
+      s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+
+      s->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+    }
 }
 
 } // namespace ns3

@@ -549,6 +549,13 @@ protected:
    */
   void SetupOutputPath ();
 
+  /**
+   * \brief Select if you want some statistics to be generated in the cwd
+   * \param doActivate boolean to select whether or not the activation
+   *        take place, so that this function can be parametrized from XML
+   */
+  void ActivateStatistics (bool doActivate);
+
 private:
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
@@ -570,7 +577,7 @@ private:
   uint32_t                     m_gwUserId;
 
   bool                         m_progressLoggingEnabled;
-  Time                                                                                           m_progressUpdateInterval;
+  Time                         m_progressUpdateInterval;
   EventId                      m_progressReportEvent;
 };
 
