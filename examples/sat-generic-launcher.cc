@@ -32,13 +32,9 @@ main (int argc, char *argv[])
   simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
-
+  simulationHelper->ReadInputAttributesFromFile (inputFileNameWithPath);
   simulationHelper->CreateSatScenario ();
+  simulationHelper->CreateDefaultStats ();
   simulationHelper->ConfigureTrafficModel ();
   simulationHelper->RunSimulation ();
 }

@@ -352,9 +352,9 @@ public:
 
   /**
    * \brief Read input attributes from XML file
-   * \param fileName Input XML file name
+   * \param filePath full path to an Input XML file
    */
-  void ReadInputAttributesFromFile (std::string fileName);
+  void ReadInputAttributesFromFile (std::string filePath);
 
   /**
    * \brief Store all used attributes
@@ -572,13 +572,6 @@ protected:
    */
   void SetupOutputPath ();
 
-  /**
-   * \brief Select if you want some statistics to be generated in the cwd
-   * \param doActivate boolean to select whether or not the activation
-   *        take place, so that this function can be parametrized from XML
-   */
-  void ActivateStatistics (bool doActivate);
-
 private:
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
@@ -598,6 +591,7 @@ private:
   bool                         m_enableInputFileUtListPositions;
   bool                         m_inputFileUtPositionsCheckBeams;
   uint32_t                     m_gwUserId;
+  bool                         m_activateStatistics;
   TrafficModelLoad_t           m_trafficModelLoad;
 
   bool                         m_progressLoggingEnabled;
