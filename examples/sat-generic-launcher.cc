@@ -39,11 +39,6 @@ main (int argc, char *argv[])
   inputConfig.ConfigureDefaults ();
 
   simulationHelper->CreateSatScenario ();
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::HTTP,
-    SimulationHelper::TCP,
-    SimulationHelper::FWD_LINK,
-    MilliSeconds (3));
-
+  simulationHelper->ConfigureTrafficModel ();
   simulationHelper->RunSimulation ();
 }

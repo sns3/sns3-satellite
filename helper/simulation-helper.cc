@@ -82,6 +82,14 @@ SimulationHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SimulationHelper::ActivateStatistics),
                    MakeBooleanChecker ())
+    .AddAttribute ("TrafficLoad",
+                   "Load for predifined traffic models",
+                   EnumValue (SimulationHelper::TRAFFIC_MODEL_LIGHT),
+                   MakeEnumAccessor (&SimulationHelper::m_trafficModelLoad),
+                   MakeEnumChecker (SimulationHelper::TRAFFIC_MODEL_NONE, "Off",
+                                    SimulationHelper::TRAFFIC_MODEL_LIGHT, "Light",
+                                    SimulationHelper::TRAFFIC_MODEL_MEDIUM, "Medium",
+                                    SimulationHelper::TRAFFIC_MODEL_HEAVY, "Heavy"))
   ;
   return tid;
 }
@@ -111,6 +119,7 @@ SimulationHelper::SimulationHelper ()
   m_enableInputFileUtListPositions (false),
   m_inputFileUtPositionsCheckBeams (true),
   m_gwUserId (0),
+  m_trafficModelLoad (SimulationHelper::TRAFFIC_MODEL_NONE),
   m_progressLoggingEnabled (false),
   m_progressUpdateInterval (Seconds (0.5))
 {
@@ -134,6 +143,7 @@ SimulationHelper::SimulationHelper (std::string simulationName)
   m_enableInputFileUtListPositions (false),
   m_inputFileUtPositionsCheckBeams (true),
   m_gwUserId (0),
+  m_trafficModelLoad (SimulationHelper::TRAFFIC_MODEL_NONE),
   m_progressLoggingEnabled (false),
   m_progressUpdateInterval (Seconds (0.5))
 {
@@ -1208,6 +1218,57 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
     default:
       NS_FATAL_ERROR ("Invalid traffic model");
       break;
+    }
+}
+
+void
+SimulationHelper::ConfigureTrafficModel ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_satHelper == NULL)
+    {
+      NS_FATAL_ERROR (
+        "Configuration of traffic model called without any SatHelper. "
+        "Please call CreateSatScenario before ConfigureTrafficModel!");
+    }
+
+  switch (m_trafficModelLoad)
+    {
+    case TRAFFIC_MODEL_NONE:
+      break;
+    case TRAFFIC_MODEL_LIGHT:
+      {
+        InstallTrafficModel (
+          SimulationHelper::HTTP,
+          SimulationHelper::TCP,
+          SimulationHelper::FWD_LINK,
+          MilliSeconds (3));
+        break;
+      }
+    case TRAFFIC_MODEL_MEDIUM:
+      {
+        InstallTrafficModel (
+          SimulationHelper::HTTP,
+          SimulationHelper::TCP,
+          SimulationHelper::FWD_LINK,
+          MilliSeconds (3));
+        break;
+      }
+    case TRAFFIC_MODEL_HEAVY:
+      {
+        InstallTrafficModel (
+          SimulationHelper::HTTP,
+          SimulationHelper::TCP,
+          SimulationHelper::FWD_LINK,
+          MilliSeconds (3));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Invalid traffic model load");
+        break;
+      }
     }
 }
 

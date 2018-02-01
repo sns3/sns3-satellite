@@ -487,6 +487,29 @@ public:
 
   typedef enum
   {
+    TRAFFIC_MODEL_NONE,
+    TRAFFIC_MODEL_LIGHT,
+    TRAFFIC_MODEL_MEDIUM,
+    TRAFFIC_MODEL_HEAVY,
+  } TrafficModelLoad_t;
+
+  /**
+   * \brief Configure simple traffic load from GW users to UT users
+   * or vice versa from a predefined set.
+   */
+  void ConfigureTrafficModel ();
+
+  /**
+   * \brief Select predefined traffic load.
+   * \param trafficLoad the traffic load to select before its configuration.
+   */
+  inline void SetTrafficModelLoad (TrafficModelLoad_t trafficLoad)
+  {
+    m_trafficModelLoad = trafficLoad;
+  }
+
+  typedef enum
+  {
     CR_NOT_CONFIGURED,
     CR_PERIODIC_CONTROL,
     CR_SLOTTED_ALOHA,
@@ -575,6 +598,7 @@ private:
   bool                         m_enableInputFileUtListPositions;
   bool                         m_inputFileUtPositionsCheckBeams;
   uint32_t                     m_gwUserId;
+  TrafficModelLoad_t           m_trafficModelLoad;
 
   bool                         m_progressLoggingEnabled;
   Time                         m_progressUpdateInterval;
