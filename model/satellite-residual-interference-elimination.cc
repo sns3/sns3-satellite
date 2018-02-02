@@ -34,7 +34,7 @@ TypeId
 SatResidualInterferenceElimination::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatResidualInterferenceElimination")
-    .SetParent<SatResidualInterferenceElimination> ()
+    .SetParent<SatInterferenceElimination> ()
     .AddConstructor<SatResidualInterferenceElimination> ()
     .AddAttribute ("SamplingError",
                    "Residual sampling error corresponding to E[g(τ)]/g(0) for the simulation",
