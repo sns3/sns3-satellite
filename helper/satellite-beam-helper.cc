@@ -92,7 +92,8 @@ SatBeamHelper::GetTypeId (void)
                    "Interference elimination model for random access",
                    EnumValue (SatPhyRxCarrierConf::SIC_PERFECT),
                    MakeEnumAccessor (&SatBeamHelper::m_raInterferenceEliminationModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
+                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect",
+                                    SatPhyRxCarrierConf::SIC_RESIDUAL, "Residual"))
     .AddAttribute ("RaCollisionModel",
                    "Collision model for random access",
                    EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
