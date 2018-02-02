@@ -59,6 +59,10 @@ public:
    */
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
   /**
+   * Define InterferenceEliminationModel in SatPhy
+   */
+  typedef SatPhyRxCarrierConf::InterferenceEliminationModel InterferenceEliminationModel;
+  /**
    * Define ErrorModel in SatPhy
    */
   typedef SatPhyRxCarrierConf::ErrorModel ErrorModel;

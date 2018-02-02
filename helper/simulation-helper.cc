@@ -281,7 +281,7 @@ SimulationHelper::SetDefaultValues ()
   ConfigureFrame (0, 5e5, 5e5, 0.2, 0.3, false);
 
   SetErrorModel (SatPhyRxCarrierConf::EM_AVI);
-  SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET);
+  SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET, SatPhyRxCarrierConf::SIC_RESIDUAL);
 
   // ACM enabled
   EnableAcm (SatEnums::LD_FORWARD);
@@ -436,6 +436,7 @@ SimulationHelper::DisableRandomAccess ()
 {
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_CONSTANT));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_PERFECT));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
 }
@@ -480,6 +481,7 @@ SimulationHelper::EnableRandomAccess ()
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaServiceCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_PERFECT));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
   Config::SetDefault ("ns3::SatBeamHelper::RaConstantErrorRate", DoubleValue (0.0));
 
@@ -511,10 +513,11 @@ SimulationHelper::SetIdealPhyParameterization ()
   Config::SetDefault ("ns3::SatUtHelper::EnableChannelEstimationError", BooleanValue (false));
   Config::SetDefault ("ns3::SatGwHelper::EnableChannelEstimationError", BooleanValue (false));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", StringValue ("Constant"));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", StringValue ("Perfect"));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", StringValue ("RaCollisionNotDefined"));
 
   SetErrorModel (SatPhyRxCarrierConf::EM_NONE);
-  SetInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT);
+  SetInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT, SatPhyRxCarrierConf::SIC_PERFECT);
 }
 
 
@@ -715,16 +718,24 @@ SimulationHelper::SetErrorModel (SatPhyRxCarrierConf::ErrorModel em, double erro
 
 void
 SimulationHelper::SetInterferenceModel (SatPhyRxCarrierConf::InterferenceModel ifModel,
-                                        double constantIf)
+                                        SatPhyRxCarrierConf::InterferenceEliminationModel ifEliminationModel,
+                                        double constantIf, double residualSamplingError)
 {
   NS_LOG_FUNCTION (this << ifModel << constantIf);
 
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (ifModel));
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceEliminationModel", EnumValue (ifEliminationModel));
   Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (ifModel));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceEliminationModel", EnumValue (ifEliminationModel));
 
   if (ifModel == SatPhyRxCarrierConf::IF_CONSTANT)
     {
       Config::SetDefault ("ns3::SatConstantInterference::ConstantInterferencePower", DoubleValue (constantIf));
+    }
+
+  if (ifEliminationModel == SatPhyRxCarrierConf::SIC_RESIDUAL)
+    {
+      Config::SetDefault ("ns3::SatResidualInterferenceElimination::SamplingError", DoubleValue (residualSamplingError));
     }
 }
 

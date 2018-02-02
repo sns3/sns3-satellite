@@ -52,6 +52,7 @@ public:
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
     SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+    SatPhyRxCarrierConf::InterferenceEliminationModel m_raInterferenceEliminationModel;
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
     double m_raConstantErrorRate;
   } RandomAccessSettings_s;
@@ -187,6 +188,11 @@ private:
    * Configured dedicated access interference model for the return link. Set as an attribute.
    */
   SatPhy::InterferenceModel m_daInterferenceModel;
+
+  /*
+   * Configured dedicated access interference model for the return link. Set as an attribute.
+   */
+  SatPhy::InterferenceEliminationModel m_daInterferenceEliminationModel;
 
   /*
    * Configured error model for the return link. Set as an attribute.

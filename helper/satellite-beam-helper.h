@@ -367,6 +367,11 @@ private:
   SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
 
   /**
+   * The used interference model for random access
+   */
+  SatPhyRxCarrierConf::InterferenceEliminationModel m_raInterferenceEliminationModel;
+
+  /**
    * The used collision model for random access
    */
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;

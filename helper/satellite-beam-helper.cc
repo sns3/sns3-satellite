@@ -86,6 +86,11 @@ SatBeamHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
+    .AddAttribute ("RaInterferenceEliminationModel",
+                   "Interference elimination model for random access",
+                   EnumValue (SatPhyRxCarrierConf::SIC_PERFECT),
+                   MakeEnumAccessor (&SatBeamHelper::m_raInterferenceEliminationModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
     .AddAttribute ("RaCollisionModel",
                    "Collision model for random access",
                    EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
@@ -145,6 +150,7 @@ SatBeamHelper::SatBeamHelper ()
   m_constantPropagationDelay (Seconds (0.13)),
   m_randomAccessModel (SatEnums::RA_MODEL_OFF),
   m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_raInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
   m_raConstantErrorRate (0.0)
 {
@@ -167,6 +173,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_constantPropagationDelay (Seconds (0.13)),
   m_randomAccessModel (SatEnums::RA_MODEL_OFF),
   m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_raInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
   m_raConstantErrorRate (0.0)
 {
@@ -192,11 +199,13 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   SatGeoHelper::RandomAccessSettings_s geoRaSettings;
   geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  geoRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   geoRaSettings.m_randomAccessModel = m_randomAccessModel;
   geoRaSettings.m_raCollisionModel = m_raCollisionModel;
 
   SatGwHelper::RandomAccessSettings_s gwRaSettings;
   gwRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  gwRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   gwRaSettings.m_randomAccessModel = m_randomAccessModel;
   gwRaSettings.m_raCollisionModel = m_raCollisionModel;
 
@@ -206,6 +215,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   SatUtHelper::RandomAccessSettings_s utRaSettings;
   utRaSettings.m_randomAccessModel = m_randomAccessModel;
   utRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  utRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   utRaSettings.m_raCollisionModel = m_raCollisionModel;
 
   // create needed low level satellite helpers

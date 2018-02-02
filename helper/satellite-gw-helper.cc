@@ -67,6 +67,11 @@ SatGwHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
+    .AddAttribute ("DaRtnLinkInterferenceEliminationModel",
+                   "Return link interference elimination model for dedicated access",
+                   EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
+                   MakeEnumAccessor (&SatGwHelper::m_daInterferenceEliminationModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
     .AddAttribute ("RtnLinkErrorModel",
                    "Return link error model for",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
@@ -101,6 +106,7 @@ SatGwHelper::GetInstanceTypeId (void) const
 SatGwHelper::SatGwHelper ()
   : m_rtnLinkCarrierCount (0),
   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_daInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
   m_daConstantErrorRate (0.0),
   m_symbolRate (0.0),
@@ -125,6 +131,7 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
   m_reserveCtrlCb (reserveCb),
   m_sendCtrlCb (sendCb),
   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_daInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
   m_daConstantErrorRate (0.0),
   m_symbolRate (0.0),

@@ -51,6 +51,7 @@ public:
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
     SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+    SatPhyRxCarrierConf::InterferenceEliminationModel m_raInterferenceEliminationModel;
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
   } RandomAccessSettings_s;
 
@@ -195,6 +196,16 @@ private:
    * Configured return link interference model for dedicated access
    */
   SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
+
+  /*
+   * Configured forward link interference elimination model for dedicated access
+   */
+  SatPhy::InterferenceEliminationModel m_daFwdLinkInterferenceEliminationModel;
+
+  /*
+   * Configured return link interference elimination model for dedicated access
+   */
+  SatPhy::InterferenceEliminationModel m_daRtnLinkInterferenceEliminationModel;
 
   /**
    * \brief Trace callback for creation traces

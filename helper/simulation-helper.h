@@ -276,10 +276,13 @@ public:
   /**
    * \brief Set simulation interference model.
    * \param ifModel Interference model.
+   * \param ifEliminationModel Interference elimination model.
    * \param constantIf Static interference if constant interference model used
+   * \param residualSamplingError Sampling error if residual interference elimination model used
    */
   void SetInterferenceModel (SatPhyRxCarrierConf::InterferenceModel ifModel,
-                             double constantIf = 0.0);
+                             SatPhyRxCarrierConf::InterferenceEliminationModel ifEliminationModel,
+                             double constantIf = 0.0, double residualSamplingError = 0.99);
 
   /**
    * \brief Enables simulation progress logging.
