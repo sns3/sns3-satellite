@@ -180,6 +180,12 @@ SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
         m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
         break;
       }
+    case SatPhyRxCarrierConf::SIC_RESIDUAL:
+      {
+        NS_LOG_INFO (this << " Residual interference elimination model created for carrier: " << carrierId);
+        m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
+        break;
+      }
     default:
       {
         NS_LOG_ERROR (this << " Not a valid interference elimination model!");
