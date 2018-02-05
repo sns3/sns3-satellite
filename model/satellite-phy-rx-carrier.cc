@@ -29,6 +29,7 @@
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
 #include <ns3/satellite-perfect-interference-elimination.h>
+#include <ns3/satellite-residual-interference-elimination.h>
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-composite-sinr-output-trace-container.h>
@@ -183,7 +184,7 @@ SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
     case SatPhyRxCarrierConf::SIC_RESIDUAL:
       {
         NS_LOG_INFO (this << " Residual interference elimination model created for carrier: " << carrierId);
-        m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
+        m_satInterferenceElimination = CreateObject<SatResidualInterferenceElimination> (waveformConf);
         break;
       }
     default:

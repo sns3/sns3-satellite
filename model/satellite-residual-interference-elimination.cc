@@ -54,6 +54,17 @@ SatResidualInterferenceElimination::GetInstanceTypeId (void) const
 
 SatResidualInterferenceElimination::SatResidualInterferenceElimination ()
   : SatInterferenceElimination (),
+  m_waveformConf (0),
+  m_samplingError (0.99)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
+}
+
+SatResidualInterferenceElimination::SatResidualInterferenceElimination (Ptr<SatWaveformConf> waveformConf)
+  : SatInterferenceElimination (),
+  m_waveformConf (waveformConf),
   m_samplingError (0.99)
 {
   NS_LOG_FUNCTION (this);
@@ -67,9 +78,43 @@ SatResidualInterferenceElimination::~SatResidualInterferenceElimination ()
 void
 SatResidualInterferenceElimination::EliminateInterferences (
   Ptr<SatSignalParameters> packetInterferedWith,
-  Ptr<SatSignalParameters> processedPacket)
+  Ptr<SatSignalParameters> processedPacket,
+  double EsNo)
 {
-  NS_LOG_INFO ("SatResidualInterferenceElimination::EliminateInterferences");
+  NS_LOG_FUNCTION (this);
+
+  NS_LOG_INFO ("Removing interference power of packet from Beam[Carrier] " <<
+               processedPacket->m_beamId <<
+               "[" << processedPacket->m_carrierId << "]");
+  double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
+  double ifPowerToRemove = processedPacket->m_rxPowerInSatellite_W;
+
+  uint32_t L = GetBurstLengthInSymbols (processedPacket->m_txInfo.waveformId);
+  NS_LOG_INFO ("Burst length in symbols is " << L << " and Es/N0 of the packet is " << EsNo);
+  double sigma_lambda_2 = 1.0 / (8.0 * L * EsNo);
+  double sigma_phy_2 = 1.0 / (2.0 * L * EsNo);
+  double residualPower = (2.0 + sigma_lambda_2 - (2.0 * m_samplingError * std::exp (-sigma_phy_2 / 2.0))) * ifPowerToRemove;
+
+  auto ifPowerPerFragment = packetInterferedWith->GetInterferencePowerInSatellitePerFragment ();
+  for (std::pair<double, double>& ifPower : ifPowerPerFragment)
+    {
+      ifPower.second -= ifPowerToRemove;
+      ifPower.second += residualPower;
+      if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
+        {
+          ifPower.second = 0.0;
+        }
+
+      if (ifPower.second < 0)
+        {
+          NS_FATAL_ERROR ("Negative interference");
+        }
+    }
+  packetInterferedWith->SetInterferencePowerInSatellite (ifPowerPerFragment);
+
+  NS_LOG_INFO ("Interfered packet ifPower went from " <<
+               oldIfPower << " to " <<
+               packetInterferedWith->GetInterferencePowerInSatellite ());
 }
 
 }  // namespace ns3

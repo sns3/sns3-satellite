@@ -23,6 +23,7 @@
 
 #include "satellite-interference-elimination.h"
 #include "satellite-enums.h"
+#include "satellite-wave-form-conf.h"
 
 namespace ns3 {
 
@@ -44,9 +45,14 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Default constructor
+   * Default constructor. Should not be used.
    */
   SatResidualInterferenceElimination ();
+
+  /**
+   * Constructor
+   */
+  SatResidualInterferenceElimination (Ptr<SatWaveformConf> waveformConf);
 
   /**
    * Destructor
@@ -58,9 +64,15 @@ public:
    * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
    * \param processedPacket Parameters of the packet we want to remove interference from
    */
-  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket);
+  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo);
+
+  inline uint32_t GetBurstLengthInSymbols (uint32_t waveformId) const
+  {
+    return m_waveformConf->GetWaveform (waveformId)->GetBurstLengthInSymbols ();
+  }
 
 private:
+  Ptr<SatWaveformConf> m_waveformConf;
   double m_samplingError;
 };
 
