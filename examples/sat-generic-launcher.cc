@@ -36,5 +36,6 @@ main (int argc, char *argv[])
   simulationHelper->CreateSatScenario ();
   simulationHelper->CreateDefaultStats ();
   simulationHelper->ConfigureTrafficModel ();
+  simulationHelper->StoreAttributesToFile ("parametersUsed.xml");
   simulationHelper->RunSimulation ();
 }
