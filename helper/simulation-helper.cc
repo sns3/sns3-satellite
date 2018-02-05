@@ -74,7 +74,8 @@ SimulationHelper::GetTypeId (void)
                    "CR transmission modes",
                    EnumValue (SimulationHelper::CR_NOT_CONFIGURED),
                    MakeEnumAccessor (&SimulationHelper::SetCrTxConf),
-                   MakeEnumChecker (SimulationHelper::CR_PERIODIC_CONTROL, "PeriodicControl",
+                   MakeEnumChecker (SimulationHelper::CR_NOT_CONFIGURED, "NotConfigured",
+                                    SimulationHelper::CR_PERIODIC_CONTROL, "PeriodicControl",
                                     SimulationHelper::CR_SLOTTED_ALOHA, "SlottedAloha",
                                     SimulationHelper::CR_CRDSA_LOOSE_RC_0, "CRDSA"))
     .AddAttribute ("ActivateStatistics",
