@@ -454,6 +454,7 @@ SimulationHelper::EnableSlottedAloha ()
 
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
   EnableRandomAccess ();
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
 }
 
 void
@@ -469,6 +470,7 @@ SimulationHelper::EnableCrdsa ()
   Config::SetDefault ("ns3::SatUtHelper::UseCrdsaOnlyForControlPackets", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
   EnableRandomAccess ();
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_CRDSA));
 }
 
 void

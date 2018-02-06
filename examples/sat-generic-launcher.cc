@@ -25,8 +25,11 @@ NS_LOG_COMPONENT_DEFINE ("sat-generic-launcher");
 int
 main (int argc, char *argv[])
 {
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("generic-launcher");
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/generic-input-attributes.xml";
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("generic-launcher");
+  simulationHelper->DisableAllCapacityAssignmentCategories ();
+  simulationHelper->EnableCrdsa ();
 
   CommandLine cmd;
   simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
