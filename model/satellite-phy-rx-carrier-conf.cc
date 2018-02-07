@@ -36,7 +36,6 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   : m_daIfModel (),
   m_raIfModel (),
-  m_daIfEliminateModel (),
   m_raIfEliminateModel (),
   m_errorModel (),
   m_daConstantErrorRate (0.0),
@@ -63,7 +62,6 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
 SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
   : m_daIfModel (createParams.m_daIfModel),
   m_raIfModel (createParams.m_raIfModel),
-  m_daIfEliminateModel (createParams.m_daIfEliminateModel),
   m_raIfEliminateModel (createParams.m_raIfEliminateModel),
   m_errorModel (createParams.m_errorModel),
   m_daConstantErrorRate (createParams.m_daConstantErrorRate),
@@ -171,7 +169,7 @@ SatPhyRxCarrierConf::GetInterferenceEliminationModel (bool isRandomAccessCarrier
     }
   else
     {
-      return m_daIfEliminateModel;
+      return SatPhyRxCarrierConf::SIC_NONE;
     }
 }
 

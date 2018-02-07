@@ -281,8 +281,7 @@ public:
    * \param residualSamplingError Sampling error if residual interference elimination model used
    */
   void SetInterferenceModel (SatPhyRxCarrierConf::InterferenceModel ifModel,
-                             SatPhyRxCarrierConf::InterferenceEliminationModel ifEliminationModel,
-                             double constantIf = 0.0, double residualSamplingError = 0.99);
+                             double constantIf = 0.0);
 
   /**
    * \brief Enables simulation progress logging.

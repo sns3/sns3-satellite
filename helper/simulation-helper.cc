@@ -54,7 +54,7 @@ SimulationHelper::GetTypeId (void)
                    "Simulation time",
                    TimeValue (Seconds (100)),
                    MakeTimeAccessor (&SimulationHelper::m_simTime),
-                   MakeTimeChecker (Seconds (10)))
+                   MakeTimeChecker (Seconds (1)))
     .AddAttribute ("BeamsIDs",
                    "Enabled Beams IDs",
                    StringValue ("10 11 12 23 24 25"),
@@ -721,24 +721,16 @@ SimulationHelper::SetErrorModel (SatPhyRxCarrierConf::ErrorModel em, double erro
 
 void
 SimulationHelper::SetInterferenceModel (SatPhyRxCarrierConf::InterferenceModel ifModel,
-                                        SatPhyRxCarrierConf::InterferenceEliminationModel ifEliminationModel,
-                                        double constantIf, double residualSamplingError)
+                                        double constantIf)
 {
   NS_LOG_FUNCTION (this << ifModel << constantIf);
 
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (ifModel));
-  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceEliminationModel", EnumValue (ifEliminationModel));
   Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (ifModel));
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceEliminationModel", EnumValue (ifEliminationModel));
 
   if (ifModel == SatPhyRxCarrierConf::IF_CONSTANT)
     {
       Config::SetDefault ("ns3::SatConstantInterference::ConstantInterferencePower", DoubleValue (constantIf));
-    }
-
-  if (ifEliminationModel == SatPhyRxCarrierConf::SIC_RESIDUAL)
-    {
-      Config::SetDefault ("ns3::SatResidualInterferenceElimination::SamplingError", DoubleValue (residualSamplingError));
     }
 }
 

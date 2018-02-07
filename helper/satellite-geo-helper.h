@@ -197,16 +197,6 @@ private:
    */
   SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
 
-  /*
-   * Configured forward link interference elimination model for dedicated access
-   */
-  SatPhy::InterferenceEliminationModel m_daFwdLinkInterferenceEliminationModel;
-
-  /*
-   * Configured return link interference elimination model for dedicated access
-   */
-  SatPhy::InterferenceEliminationModel m_daRtnLinkInterferenceEliminationModel;
-
   /**
    * \brief Trace callback for creation traces
    */

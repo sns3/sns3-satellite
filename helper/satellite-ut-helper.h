@@ -190,11 +190,6 @@ private:
   SatPhy::InterferenceModel m_daInterferenceModel;
 
   /*
-   * Configured dedicated access interference elimination model for the forward link. Set as an attribute.
-   */
-  SatPhy::InterferenceEliminationModel m_daInterferenceEliminationModel;
-
-  /*
    * Configured error model for the forward link. Set as an attribute.
    */
   SatPhy::ErrorModel m_errorModel;

@@ -79,7 +79,7 @@ public:
    */
   enum InterferenceEliminationModel
   {
-    SIC_PERFECT,
+    SIC_NONE, SIC_PERFECT,
   };
 
   /**
@@ -97,7 +97,6 @@ public:
    * \param errorModel Used error model
    * \param daIfModel Used interference model for dedicated access
    * \param raIfModel Used interference model for random access
-   * \param daIfEliminateModel Used interference elimination model for dedicated access
    * \param raIfEliminateModel Used interference elimination model for random access
    * \param rxMode RX mode used in carrier
    * \param chType RX channel type
@@ -114,7 +113,6 @@ public:
     double                                   m_daConstantErrorRate;
     InterferenceModel                        m_daIfModel;
     InterferenceModel                        m_raIfModel;
-    InterferenceEliminationModel             m_daIfEliminateModel;
     InterferenceEliminationModel             m_raIfEliminateModel;
     RxMode                                   m_rxMode;
     SatEnums::ChannelType_t                  m_chType;
@@ -133,7 +131,6 @@ public:
       m_daConstantErrorRate (0.0),
       m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
       m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-      m_daIfEliminateModel (SatPhyRxCarrierConf::SIC_PERFECT),
       m_raIfEliminateModel (SatPhyRxCarrierConf::SIC_PERFECT),
       m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
       m_chType (SatEnums::RETURN_USER_CH),
@@ -327,7 +324,6 @@ private:
    */
   InterferenceModel m_daIfModel;
   InterferenceModel m_raIfModel;
-  InterferenceEliminationModel m_daIfEliminateModel;
   InterferenceEliminationModel m_raIfEliminateModel;
   ErrorModel m_errorModel;
   double m_daConstantErrorRate;

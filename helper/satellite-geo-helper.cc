@@ -60,11 +60,6 @@ SatGeoHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
-    .AddAttribute ("DaFwdLinkInterferenceEliminationModel",
-                   "Forward link interference elimination model for dedicated access",
-                   EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
-                   MakeEnumAccessor (&SatGeoHelper::m_daFwdLinkInterferenceEliminationModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
     .AddAttribute ("DaRtnLinkInterferenceModel",
                    "Return link interference model for dedicated access",
                    EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
@@ -73,11 +68,6 @@ SatGeoHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
-    .AddAttribute ("DaRtnLinkInterferenceEliminationModel",
-                   "Return link interference elimination model for dedicated access",
-                   EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
-                   MakeEnumAccessor (&SatGeoHelper::m_daRtnLinkInterferenceEliminationModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -103,8 +93,6 @@ SatGeoHelper::SatGeoHelper ()
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_daFwdLinkInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
-  m_daRtnLinkInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_raSettings ()
 {
   NS_LOG_FUNCTION (this );
@@ -126,8 +114,6 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_daFwdLinkInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
-  m_daRtnLinkInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_superframeSeq (seq),
   m_raSettings (randomAccessSettings)
 {
@@ -228,6 +214,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
   parametersUser.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parametersUser.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parametersUser.m_bwConverter = m_carrierBandwidthConverter;
   parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
   parametersUser.m_cec = cec;
@@ -237,6 +224,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
   parametersFeeder.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parametersFeeder.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parametersFeeder.m_bwConverter = m_carrierBandwidthConverter;
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
   parametersFeeder.m_cec = cec;

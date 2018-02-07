@@ -79,11 +79,6 @@ SatUtHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
-    .AddAttribute ("DaFwdLinkInterferenceEliminationModel",
-                   "Forward link interference elimination model for dedicated access",
-                   EnumValue (SatPhyRxCarrierConf::SIC_PERFECT),
-                   MakeEnumAccessor (&SatUtHelper::m_daInterferenceEliminationModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
     .AddAttribute ("FwdLinkErrorModel",
                    "Forward link error model",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
@@ -132,7 +127,6 @@ SatUtHelper::SatUtHelper ()
   m_fwdLinkCarrierCount (),
   m_superframeSeq (),
   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_daInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
   m_daConstantErrorRate (0.0),
   m_linkResults (),
@@ -161,7 +155,6 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
   m_reserveCtrlCb (reserveCb),
   m_sendCtrlCb (sendCb),
   m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_daInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_errorModel (SatPhyRxCarrierConf::EM_AVI),
   m_daConstantErrorRate (0.0),
   m_linkResults (),
@@ -273,7 +266,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   parameters.m_daConstantErrorRate = m_daConstantErrorRate;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
-  parameters.m_daIfEliminateModel = m_daInterferenceEliminationModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
