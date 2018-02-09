@@ -43,37 +43,38 @@ NS_LOG_COMPONENT_DEFINE ("SimulationHelper");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SimulationHelper);
+NS_OBJECT_ENSURE_REGISTERED (SimulationHelperConf);
+
 TypeId
-SimulationHelper::GetTypeId (void)
+SimulationHelperConf::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SimulationHelper")
+  static TypeId tid = TypeId ("ns3::SimulationHelperConf")
     .SetParent<Object> ()
-    .AddConstructor<SimulationHelper> ()
+    .AddConstructor<SimulationHelperConf> ()
     .AddAttribute ("SimTime",
                    "Simulation time",
                    TimeValue (Seconds (100)),
-                   MakeTimeAccessor (&SimulationHelper::m_simTime),
+                   MakeTimeAccessor (&SimulationHelperConf::m_simTime),
                    MakeTimeChecker (Seconds (1)))
     .AddAttribute ("BeamsIDs",
                    "Enabled Beams IDs",
                    StringValue ("10 11 12 23 24 25"),
-                   MakeStringAccessor (&SimulationHelper::SetBeams),
+                   MakeStringAccessor (&SimulationHelperConf::m_enabledBeams),
                    MakeStringChecker ())
     .AddAttribute ("UserCountPerUt",
                    "Amount of user per User Terminal",
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
-                   MakePointerAccessor (&SimulationHelper::m_utUserCount),
+                   MakePointerAccessor (&SimulationHelperConf::m_utUserCount),
                    MakePointerChecker<RandomVariableStream> ())
     .AddAttribute ("UtCountPerBeam",
                    "Amount of User Terminal associated to each Beam",
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
-                   MakePointerAccessor (&SimulationHelper::m_utCount),
+                   MakePointerAccessor (&SimulationHelperConf::m_utCount),
                    MakePointerChecker<RandomVariableStream> ())
     .AddAttribute ("CrTxConf",
                    "CR transmission modes",
                    EnumValue (SimulationHelper::CR_NOT_CONFIGURED),
-                   MakeEnumAccessor (&SimulationHelper::SetCrTxConf),
+                   MakeEnumAccessor (&SimulationHelperConf::m_crTxConf),
                    MakeEnumChecker (SimulationHelper::CR_NOT_CONFIGURED, "NotConfigured",
                                     SimulationHelper::CR_PERIODIC_CONTROL, "PeriodicControl",
                                     SimulationHelper::CR_SLOTTED_ALOHA, "SlottedAloha",
@@ -81,16 +82,62 @@ SimulationHelper::GetTypeId (void)
     .AddAttribute ("ActivateStatistics",
                    "Enable outputing values from stats helpers",
                    BooleanValue (true),
-                   MakeBooleanAccessor (&SimulationHelper::m_activateStatistics),
+                   MakeBooleanAccessor (&SimulationHelperConf::m_activateStatistics),
+                   MakeBooleanChecker ())
+    .AddAttribute ("ActivateProgressLogs",
+                   "Enable outputing progress of the simulation",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SimulationHelperConf::m_activateProgressLogging),
                    MakeBooleanChecker ())
     .AddAttribute ("TrafficLoad",
                    "Load for predifined traffic models",
                    EnumValue (SimulationHelper::TRAFFIC_MODEL_LIGHT),
-                   MakeEnumAccessor (&SimulationHelper::m_trafficModelLoad),
+                   MakeEnumAccessor (&SimulationHelperConf::m_trafficModelLoad),
                    MakeEnumChecker (SimulationHelper::TRAFFIC_MODEL_NONE, "Off",
                                     SimulationHelper::TRAFFIC_MODEL_LIGHT, "Light",
                                     SimulationHelper::TRAFFIC_MODEL_MEDIUM, "Medium",
                                     SimulationHelper::TRAFFIC_MODEL_HEAVY, "Heavy"))
+  ;
+  return tid;
+}
+
+
+TypeId
+SimulationHelperConf::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+
+SimulationHelperConf::SimulationHelperConf ()
+  : m_simTime (0),
+  m_enabledBeams (""),
+  m_utCount (0),
+  m_utUserCount (0),
+  m_activateStatistics (false),
+  m_activateProgressLogging (false),
+  m_crTxConf (SimulationHelper::CR_NOT_CONFIGURED)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+SimulationHelperConf::~SimulationHelperConf ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SimulationHelper);
+
+TypeId
+SimulationHelper::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SimulationHelper")
+    .SetParent<Object> ()
+    .AddConstructor<SimulationHelper> ()
   ;
   return tid;
 }
@@ -120,8 +167,6 @@ SimulationHelper::SimulationHelper ()
   m_enableInputFileUtListPositions (false),
   m_inputFileUtPositionsCheckBeams (true),
   m_gwUserId (0),
-  m_activateStatistics (true),
-  m_trafficModelLoad (SimulationHelper::TRAFFIC_MODEL_NONE),
   m_progressLoggingEnabled (false),
   m_progressUpdateInterval (Seconds (0.5))
 {
@@ -145,8 +190,6 @@ SimulationHelper::SimulationHelper (std::string simulationName)
   m_enableInputFileUtListPositions (false),
   m_inputFileUtPositionsCheckBeams (true),
   m_gwUserId (0),
-  m_activateStatistics (true),
-  m_trafficModelLoad (SimulationHelper::TRAFFIC_MODEL_NONE),
   m_progressLoggingEnabled (false),
   m_progressUpdateInterval (Seconds (0.5))
 {
@@ -207,6 +250,14 @@ SimulationHelper::SetUserCountPerUt (uint32_t count)
 
   m_utUserCount = CreateObject<ConstantRandomVariable> ();
   m_utUserCount->SetAttribute ("Constant", DoubleValue (count));
+}
+
+void
+SimulationHelper::SetUserCountPerUt (Ptr<RandomVariableStream> rs)
+{
+  NS_LOG_FUNCTION (this << &rs);
+
+  m_utUserCount = rs;
 }
 
 void
@@ -594,11 +645,6 @@ SimulationHelper::ProgressCb ()
 void
 SimulationHelper::CreateDefaultStats ()
 {
-  if (!m_activateStatistics)
-    {
-      return;
-    }
-
   NS_ASSERT_MSG (m_satHelper != 0, "Satellite scenario not created yet!");
 
   if (!m_statContainer)
@@ -1235,7 +1281,7 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
 }
 
 void
-SimulationHelper::ConfigureTrafficModel ()
+SimulationHelper::ConfigureTrafficModel (TrafficModelLoad_t trafficModelLoad)
 {
   NS_LOG_FUNCTION (this);
 
@@ -1246,7 +1292,7 @@ SimulationHelper::ConfigureTrafficModel ()
         "Please call CreateSatScenario before ConfigureTrafficModel!");
     }
 
-  switch (m_trafficModelLoad)
+  switch (trafficModelLoad)
     {
     case TRAFFIC_MODEL_NONE:
       break;
@@ -1255,7 +1301,7 @@ SimulationHelper::ConfigureTrafficModel ()
         InstallTrafficModel (
           SimulationHelper::HTTP,
           SimulationHelper::TCP,
-          SimulationHelper::FWD_LINK,
+          SimulationHelper::RTN_LINK,
           MilliSeconds (3));
         break;
       }
@@ -1264,7 +1310,12 @@ SimulationHelper::ConfigureTrafficModel ()
         InstallTrafficModel (
           SimulationHelper::HTTP,
           SimulationHelper::TCP,
-          SimulationHelper::FWD_LINK,
+          SimulationHelper::RTN_LINK,
+          MilliSeconds (3));
+        InstallTrafficModel (
+          SimulationHelper::CBR,
+          SimulationHelper::TCP,
+          SimulationHelper::RTN_LINK,
           MilliSeconds (3));
         break;
       }
@@ -1273,7 +1324,12 @@ SimulationHelper::ConfigureTrafficModel ()
         InstallTrafficModel (
           SimulationHelper::HTTP,
           SimulationHelper::TCP,
-          SimulationHelper::FWD_LINK,
+          SimulationHelper::RTN_LINK,
+          MilliSeconds (3));
+        InstallTrafficModel (
+          SimulationHelper::CBR,
+          SimulationHelper::TCP,
+          SimulationHelper::RTN_LINK,
           MilliSeconds (3));
         break;
       }
@@ -1322,7 +1378,7 @@ SimulationHelper::SetCrTxConf (CrTxConf_t crTxConf)
 }
 
 void
-SimulationHelper::SetBeams (std::string enabledBeams)
+SimulationHelper::SetBeams (const std::string& enabledBeams)
 {
   NS_LOG_FUNCTION (this << enabledBeams);
 
@@ -1419,6 +1475,30 @@ SimulationHelper::DisableProgressLogs ()
 
   m_progressLoggingEnabled = false;
   m_progressReportEvent.Cancel ();
+}
+
+void
+SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
+{
+  ReadInputAttributesFromFile (filePath);
+  Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
+
+  SetBeams (simulationConf->m_enabledBeams);
+  SetUtCountPerBeam (simulationConf->m_utCount);
+  SetUserCountPerUt (simulationConf->m_utUserCount);
+  SetSimulationTime (simulationConf->m_simTime);
+  SetCrTxConf (simulationConf->m_crTxConf);
+
+  CreateSatScenario ();
+  if (simulationConf->m_activateStatistics)
+    {
+      CreateDefaultStats ();
+    }
+  if (simulationConf->m_activateProgressLogging)
+    {
+      EnableProgressLogs ();
+    }
+  ConfigureTrafficModel (simulationConf->m_trafficModelLoad);
 }
 
 void

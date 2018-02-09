@@ -35,10 +35,7 @@ main (int argc, char *argv[])
   simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
 
-  simulationHelper->ReadInputAttributesFromFile (inputFileNameWithPath);
-  simulationHelper->CreateSatScenario ();
-  simulationHelper->CreateDefaultStats ();
-  simulationHelper->ConfigureTrafficModel ();
+  simulationHelper->ConfigureAttributesFromFile (inputFileNameWithPath);
   simulationHelper->StoreAttributesToFile ("parametersUsed.xml");
   simulationHelper->RunSimulation ();
 }

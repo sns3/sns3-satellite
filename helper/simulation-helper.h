@@ -95,7 +95,7 @@ public:
    * \example simulationHelper->SetBeams ("1 5 20 71")
    *          enables beams 1, 5, 20 and 71.
    */
-  void SetBeams (std::string beamList);
+  void SetBeams (const std::string& beamList);
 
   /**
    * \brief Set enabled beams (1-72) as a set.
@@ -353,6 +353,12 @@ public:
   void SetOutputPath (std::string path);
 
   /**
+   * \brief Configure this instance after reading input attributes from XML file
+   * \param filePath full path to an Input XML file
+   */
+  void ConfigureAttributesFromFile (std::string filePath);
+
+  /**
    * \brief Read input attributes from XML file
    * \param filePath full path to an Input XML file
    */
@@ -498,17 +504,9 @@ public:
   /**
    * \brief Configure simple traffic load from GW users to UT users
    * or vice versa from a predefined set.
+   * \param trafficModelLoad the traffic load to configure.
    */
-  void ConfigureTrafficModel ();
-
-  /**
-   * \brief Select predefined traffic load.
-   * \param trafficLoad the traffic load to select before its configuration.
-   */
-  inline void SetTrafficModelLoad (TrafficModelLoad_t trafficLoad)
-  {
-    m_trafficModelLoad = trafficLoad;
-  }
+  void ConfigureTrafficModel (TrafficModelLoad_t trafficModelLoad);
 
   typedef enum
   {
@@ -593,12 +591,44 @@ private:
   bool                         m_enableInputFileUtListPositions;
   bool                         m_inputFileUtPositionsCheckBeams;
   uint32_t                     m_gwUserId;
-  bool                         m_activateStatistics;
-  TrafficModelLoad_t           m_trafficModelLoad;
 
   bool                         m_progressLoggingEnabled;
   Time                         m_progressUpdateInterval;
   EventId                      m_progressReportEvent;
+};
+
+
+class SimulationHelperConf : public Object
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SimulationHelperConf ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~SimulationHelperConf ();
+
+  /**
+   * \brief Derived from Object.
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Derived from Object.
+   */
+  TypeId GetInstanceTypeId (void) const;
+
+  Time                                  m_simTime;
+  std::string                           m_enabledBeams;
+  Ptr<RandomVariableStream>             m_utCount;
+  Ptr<RandomVariableStream>             m_utUserCount;
+  bool                                  m_activateStatistics;
+  bool                                  m_activateProgressLogging;
+  SimulationHelper::CrTxConf_t          m_crTxConf;
+  SimulationHelper::TrafficModelLoad_t  m_trafficModelLoad;
 };
 
 } // namespace ns3
