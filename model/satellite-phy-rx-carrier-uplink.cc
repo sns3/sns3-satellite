@@ -30,8 +30,9 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierUplink);
 
 SatPhyRxCarrierUplink::SatPhyRxCarrierUplink (uint32_t carrierId,
                                               Ptr<SatPhyRxCarrierConf> carrierConf,
+                                              Ptr<SatWaveformConf> waveformConf,
                                               bool randomAccessEnabled)
-  : SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled)
+  : SatPhyRxCarrier (carrierId, carrierConf, waveformConf, randomAccessEnabled)
 {
   NS_LOG_FUNCTION (this);
 }

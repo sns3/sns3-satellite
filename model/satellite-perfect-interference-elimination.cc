@@ -58,16 +58,26 @@ SatPerfectInterferenceElimination::~SatPerfectInterferenceElimination ()
 void
 SatPerfectInterferenceElimination::EliminateInterferences (
   Ptr<SatSignalParameters> packetInterferedWith,
-  Ptr<SatSignalParameters> processedPacket)
+  Ptr<SatSignalParameters> processedPacket,
+  double EsNo)
 {
-  NS_LOG_INFO ("SatPerfectInterferenceElimination::ComputeRemovedInterferenceValue");
+  NS_LOG_FUNCTION (this);
 
+  NS_LOG_INFO (
+    "Removing interference power of packet from Beam[Carrier] " <<
+      processedPacket->m_beamId <<
+      "[" << processedPacket->m_carrierId << "]");
+  auto oldIfPower = packetInterferedWith->m_ifPowerInSatellite_W;
   packetInterferedWith->m_ifPowerInSatellite_W -= processedPacket->m_rxPowerInSatellite_W;
 
   if (std::abs (packetInterferedWith->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
     {
       packetInterferedWith->m_ifPowerInSatellite_W = 0;
     }
+
+  NS_LOG_INFO (
+    "Interfered packet ifPower went from " << oldIfPower <<
+      " to " << packetInterferedWith->m_ifPowerInSatellite_W);
 }
 
 }  // namespace ns3

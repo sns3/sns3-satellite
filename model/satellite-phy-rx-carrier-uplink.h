@@ -44,10 +44,12 @@ public:
    * Constructor.
    * \param carrierId ID of the carrier
    * \param carrierConf Carrier configuration
+   * \param waveformConf Waveform configuration
    * \param randomAccessEnabled Is this a RA carrier
    */
   SatPhyRxCarrierUplink (uint32_t carrierId,
                          Ptr<SatPhyRxCarrierConf> carrierConf,
+                         Ptr<SatWaveformConf> waveformConf,
                          bool randomAccessEnabled);
 
   /**

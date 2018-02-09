@@ -565,6 +565,15 @@ public:
   double GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
+   * Get the frame configuration of the requested carrier.
+   *
+   * \param carrierId  Id of the carrier inside super frame which frame configuration is requested.
+   *
+   * \return The SatFrameConf of the requested carrier.
+   */
+  Ptr<SatFrameConf> GetCarrierFrameConf (uint32_t carrierId) const;
+
+  /**
    * Check if given carrier is random access carrier.
    *
    * \param carrierId Id of the carrier inside super frame which is requested.

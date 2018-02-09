@@ -295,19 +295,20 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
   for (uint32_t i = 0; i < carrierConf->GetCarrierCount (); ++i)
     {
       NS_LOG_INFO (this << " Create carrier: " << i);
+      Ptr<SatWaveformConf> waveformConf = superFrameConf->GetCarrierFrameConf (i)->GetWaveformConf ();
 
       switch (carrierConf->GetChannelType ())
         {
         case SatEnums::FORWARD_FEEDER_CH:
           {
             // Satellite is the receiver in feeder uplink
-            rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, false);
+            rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, waveformConf, false);
             break;
           }
         case SatEnums::FORWARD_USER_CH:
           {
             // UT has only per slot non-random access carriers
-            rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, false);
+            rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
             break;
           }
         case SatEnums::RETURN_USER_CH:
@@ -315,7 +316,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
 
             // Satellite is the receiver in either user or feeder uplink
-            rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, isRandomAccessCarrier);
+            rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, waveformConf, isRandomAccessCarrier);
             break;
           }
         case SatEnums::RETURN_FEEDER_CH:
@@ -325,12 +326,12 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             // DA carrier
             if (!isRandomAccessCarrier)
               {
-                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, false);
+                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
               }
             // RA slotted aloha
             else if (raModel == SatEnums::RA_MODEL_SLOTTED_ALOHA)
               {
-                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, true);
+                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, true);
                 DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
                 SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
               }
@@ -340,7 +341,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             // always uses the CRDSA frame type receiver.
             else if (raModel == SatEnums::RA_MODEL_CRDSA || raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
               {
-                rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, true);
+                rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, waveformConf, true);
                 DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
                 SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
               }

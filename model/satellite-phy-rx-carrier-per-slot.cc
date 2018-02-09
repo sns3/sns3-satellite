@@ -37,8 +37,9 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierPerSlot);
 
 SatPhyRxCarrierPerSlot::SatPhyRxCarrierPerSlot (uint32_t carrierId,
                                                 Ptr<SatPhyRxCarrierConf> carrierConf,
+                                                Ptr<SatWaveformConf> waveformConf,
                                                 bool randomAccessEnabled)
-  : SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled),
+  : SatPhyRxCarrier (carrierId, carrierConf, waveformConf, randomAccessEnabled),
   m_randomAccessBitsInFrame (0),
   m_randomAccessAllocationChannelId (0),
   m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),

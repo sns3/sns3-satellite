@@ -37,11 +37,13 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierPerFrame);
 
 SatPhyRxCarrierPerFrame::SatPhyRxCarrierPerFrame (uint32_t carrierId,
                                                   Ptr<SatPhyRxCarrierConf> carrierConf,
+                                                  Ptr<SatWaveformConf> waveformConf,
                                                   bool randomAccessEnabled)
-  : SatPhyRxCarrierPerSlot (carrierId, carrierConf, randomAccessEnabled),
+  : SatPhyRxCarrierPerSlot (carrierId, carrierConf, waveformConf, randomAccessEnabled),
   m_frameEndSchedulingInitialized (false)
 {
   NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
 
   NS_ASSERT (m_randomAccessEnabled == true);
 }
@@ -714,7 +716,7 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           /// In addition, as the interference values are extremely small, the use of long double (instead
           /// of double) should be considered to improve the accuracy.
 
-          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams);
+          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
 
               if (iterList->rxParams->GetInterferencePower () < 0 || ifPower.second < 0)
                 {

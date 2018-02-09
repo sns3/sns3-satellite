@@ -50,7 +50,7 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
-SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabled)
+SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccessEnabled)
   : m_randomAccessEnabled (isRandomAccessEnabled),
   m_state (IDLE),
   m_beamId (),
@@ -71,7 +71,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
 
   // Create proper interference object for carrier i
   DoCreateInterferenceModel (carrierConf, carrierId, m_rxBandwidthHz);
-  DoCreateInterferenceEliminationModel (carrierConf, carrierId);
+  DoCreateInterferenceEliminationModel (carrierConf, carrierId, waveformConf);
 
   m_rxExtNoisePowerW = carrierConf->GetExtPowerDensityWhz () * m_rxBandwidthHz;
 
@@ -167,7 +167,8 @@ SatPhyRxCarrier::DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf
 void
 SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
   Ptr<SatPhyRxCarrierConf> carrierConf,
-  uint32_t carrierId)
+  uint32_t carrierId,
+  Ptr<SatWaveformConf> waveformConf)
 {
   switch (carrierConf->GetInterferenceEliminationModel (m_randomAccessEnabled))
     {

@@ -513,6 +513,16 @@ SatSuperframeConf::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierB
   return m_frames[frameId]->GetCarrierBandwidthHz (bandwidthType);
 }
 
+Ptr<SatFrameConf>
+SatSuperframeConf::GetCarrierFrameConf (uint32_t carrierId) const
+{
+  NS_LOG_FUNCTION (this << carrierId);
+
+  uint8_t frameId = GetCarrierFrame (carrierId);
+
+  return m_frames[frameId];
+}
+
 bool
 SatSuperframeConf::IsRandomAccessCarrier (uint32_t carrierId) const
 {

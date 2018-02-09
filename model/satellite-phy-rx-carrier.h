@@ -33,6 +33,7 @@
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-wave-form-conf.h>
 #include <vector>
 #include <map>
 #include <list>
@@ -114,9 +115,10 @@ public:
    * Constructor
    * \param carrierId
    * \param carrierConf
+   * \param waveformConf
    * \param isRandomAccessEnabled
    */
-  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabled);
+  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccessEnabled);
 
   /**
    * \brief Destructor
@@ -324,8 +326,9 @@ protected:
    * Create an interference cancelation model for this carrier.
    * \param carrierConf
    * \param carrierId
+   * \param frameConf
    */
-  virtual void DoCreateInterferenceEliminationModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId);
+  virtual void DoCreateInterferenceEliminationModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId, Ptr<SatWaveformConf> waveformConf);
 
   /**
    * \brief Get the channel type. Base class has undefined channel type, while child classes have
@@ -609,7 +612,6 @@ private:
    * \brief Channel estimation error container
    */
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
-
 };
 
 }

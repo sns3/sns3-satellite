@@ -59,7 +59,7 @@ public:
    * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
    * \param processedPacket Parameters of the packet we want to remove interference from
    */
-  virtual void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket) = 0;
+  virtual void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo) = 0;
 };
 
 } // namespace ns3
