@@ -567,31 +567,7 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
                " RX gnd: " << packet.rxParams->m_rxPower_W <<
                " IF gnd: " << packet.rxParams->GetInterferencePower ());
 
-  double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
-                                         packet.rxParams->GetInterferencePowerInSatellite (),
-                                         packet.rxParams->m_rxNoisePowerInSatellite_W,
-                                         packet.rxParams->m_rxAciIfPowerInSatellite_W,
-                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
-                                         packet.rxParams->m_sinrCalculate);
-
-  double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
-                                packet.rxParams->GetInterferencePower (),
-                                m_rxNoisePowerW,
-                                m_rxAciIfPowerW,
-                                m_rxExtNoisePowerW,
-                                m_sinrCalculate);
-
-  /*
-   * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
-   * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
-   * method!
-   */
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
-
-  double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
-
-  packet.cSinr = cSinr;
-  packet.ifPower = packet.rxParams->GetInterferencePower ();
+  CalculatePacketCompositeSinr (packet, true);
 
   if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
     {
@@ -627,6 +603,38 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
   packet.packetHasBeenProcessed = true;
 
   return packet;
+}
+
+void
+SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                                                       bool updateFeederLinkSinr)
+{
+  double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
+                                         packet.rxParams->m_ifPowerInSatellite_W,
+                                         packet.rxParams->m_rxNoisePowerInSatellite_W,
+                                         packet.rxParams->m_rxAciIfPowerInSatellite_W,
+                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
+                                         packet.rxParams->m_sinrCalculate);
+
+  double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
+                                packet.rxParams->m_ifPower_W,
+                                m_rxNoisePowerW,
+                                m_rxAciIfPowerW,
+                                m_rxExtNoisePowerW,
+                                m_sinrCalculate);
+
+  if (updateFeederLinkSinr)
+    {
+      /*
+       * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
+       * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
+       * method!
+       */
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+    }
+
+  packet.cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+  packet.ifPower = packet.rxParams->m_ifPower_W;
 }
 
 void
@@ -676,6 +684,7 @@ SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPa
 
       if (!packet.phyError)
         {
+          CalculatePacketCompositeSinr (removedPacket, false);
           EliminateInterference (iter, removedPacket);
         }
     }

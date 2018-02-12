@@ -194,6 +194,13 @@ private:
   double CalculateNormalizedOfferedRandomAccessLoad ();
 
   /**
+   * \brief Function for computing the composite SINR of the given packet
+   * \param packet  The packet whose SINR should be updated
+   * \param updateFeederLinkSinr  Whether or not to update the link specific SINR trace for the RETURN_FEEDER link
+   */
+  void CalculatePacketCompositeSinr (crdsaPacketRxParams_s& packet, bool updateFeederLinkSinr);
+
+  /**
    * \brief Function for processing the frame interval operations
    */
   void DoFrameEnd ();
