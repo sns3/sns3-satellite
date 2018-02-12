@@ -43,7 +43,6 @@ SatPhyRxCarrierPerFrame::SatPhyRxCarrierPerFrame (uint32_t carrierId,
   m_frameEndSchedulingInitialized (false)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
 
   NS_ASSERT (m_randomAccessEnabled == true);
 }
@@ -410,90 +409,8 @@ SatPhyRxCarrierPerFrame::ProcessFrame ()
 
   std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> combinedPacketsForFrame;
-  SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket;
 
-  bool nothingToProcess = true;
-
-  NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Packets to process: " << m_crdsaPacketContainer.size ());
-
-  do
-    {
-      NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Searching for the next successfully received packet");
-
-      /// reset the flag
-      nothingToProcess = true;
-
-      /// go through the packets
-      for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
-        {
-          NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Iterating slot: " << iter->first);
-
-          if (iter->second.size () < 1)
-            {
-              NS_FATAL_ERROR ("SatPhyRxCarrierPerFrame::ProcessFrame - This should not happen");
-            }
-
-          std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iterList;
-
-          for (iterList = iter->second.begin (); iterList != iter->second.end (); iterList++)
-            {
-              NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Iterating packet in slot: " << iterList->ownSlotId);
-
-              if (!iterList->packetHasBeenProcessed)
-                {
-                  NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Found a packet ready for processing");
-
-                  /// process the received packet
-                  *iterList = ProcessReceivedCrdsaPacket (*iterList, iter->second.size ());
-
-                  NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Packet error: " << iterList->phyError);
-
-                  /// packet successfully received
-                  if (!iterList->phyError)
-                    {
-                      NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Packet successfully received, breaking the slot iteration");
-
-                      nothingToProcess = false;
-
-                      /// save packet for processing outside the loop
-                      processedPacket = *iterList;
-
-                      /// remove the successfully received packet from the container
-                      iter->second.erase (iterList);
-
-                      /// eliminate the interference caused by this packet to other packets in this slot
-                      EliminateInterference (iter,processedPacket);
-
-                      /// break the cycle
-                      break;
-                    }
-                }
-              else
-                {
-                  NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - This packet has already been processed");
-                }
-            }
-
-          /// successfully received packet found
-          if (!nothingToProcess)
-            {
-              NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Packet successfully received, breaking the container iteration");
-              break;
-            }
-        }
-
-      if (!nothingToProcess)
-        {
-          NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Packet successfully received, processing the replicas");
-
-          /// find and remove replicas of the received packet
-          FindAndRemoveReplicas (processedPacket);
-
-          /// save the the received packet
-          combinedPacketsForFrame.push_back (processedPacket);
-        }
-    }
-  while (!nothingToProcess);
+  PerformSicCycles (combinedPacketsForFrame);
 
   NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - All successfully received packets processed, packets left in container: " << m_crdsaPacketContainer.size ());
 
@@ -544,6 +461,97 @@ SatPhyRxCarrierPerFrame::ProcessFrame ()
   NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessFrame - Container processed, packets left: " << m_crdsaPacketContainer.size ());
 
   return combinedPacketsForFrame;
+}
+
+void
+SatPhyRxCarrierPerFrame::PerformSicCycles (
+  std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame)
+{
+  std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
+  SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket;
+  bool nothingToProcess = true;
+
+  NS_LOG_INFO ("Packets to process: " << m_crdsaPacketContainer.size ());
+
+  do
+    {
+      NS_LOG_INFO ("Searching for the next successfully received packet");
+
+      /// reset the flag
+      nothingToProcess = true;
+
+      /// go through the packets
+      for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); ++iter)
+        {
+          NS_LOG_INFO ("Iterating slot: " << iter->first);
+          std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent = iter->second;
+
+          if (slotContent.size () < 1)
+            {
+              NS_FATAL_ERROR ("No packet in slot! This should not happen");
+            }
+
+          std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator currentPacket;
+
+          for (currentPacket = slotContent.begin (); currentPacket != slotContent.end (); currentPacket++)
+            {
+              NS_LOG_INFO ("Iterating packet in slot: " << currentPacket->ownSlotId);
+
+              if (!currentPacket->packetHasBeenProcessed)
+                {
+                  NS_LOG_INFO ("Found a packet ready for processing");
+
+                  /// process the received packet
+                  *currentPacket = ProcessReceivedCrdsaPacket (*currentPacket, slotContent.size ());
+
+                  NS_LOG_INFO ("Packet error: " << currentPacket->phyError);
+
+                  /// packet successfully received
+                  if (!currentPacket->phyError)
+                    {
+                      NS_LOG_INFO ("Packet successfully received, breaking the slot iteration");
+
+                      nothingToProcess = false;
+
+                      /// save packet for processing outside the loop
+                      processedPacket = *currentPacket;
+
+                      /// remove the successfully received packet from the container
+                      slotContent.erase (currentPacket);
+
+                      /// eliminate the interference caused by this packet to other packets in this slot
+                      EliminateInterference (iter, processedPacket);
+
+                      /// break the cycle
+                      break;
+                    }
+                }
+              else
+                {
+                  NS_LOG_INFO ("This packet has already been processed");
+                }
+            }
+
+          /// successfully received packet found
+          if (!nothingToProcess)
+            {
+              NS_LOG_INFO ("Packet successfully received, breaking the container iteration");
+              break;
+            }
+        }
+
+      if (!nothingToProcess)
+        {
+          NS_LOG_INFO ("Packet successfully received, processing the replicas");
+
+          /// find and remove replicas of the received packet
+          FindAndRemoveReplicas (processedPacket);
+
+          /// save the the received packet
+          combinedPacketsForFrame.push_back (processedPacket);
+        }
+    }
+  while (!nothingToProcess);
 }
 
 SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s
@@ -662,7 +670,7 @@ SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPa
       for (iterList = iter->second.begin (); iterList != iter->second.end (); )
         {
           /// check for the same UT & same slots
-          if (IsReplica (packet, iterList))
+          if (IsReplica (packet, *iterList))
             {
               /// replica found for removal
               replicaFound = true;
@@ -694,7 +702,6 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
   SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierPerFrame::EliminateInterference");
 
   if (iter->second.empty ())
     {
@@ -740,8 +747,8 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
 }
 
 bool
-SatPhyRxCarrierPerFrame::IsReplica (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
-                                    std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iter)
+SatPhyRxCarrierPerFrame::IsReplica (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                                    const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrier::IsReplica - Time: " << Now ().GetSeconds ());
@@ -750,11 +757,11 @@ SatPhyRxCarrierPerFrame::IsReplica (SatPhyRxCarrierPerFrame::crdsaPacketRxParams
 
   bool isReplica = false;
 
-  if (iter->sourceAddress == packet.sourceAddress)
+  if (otherPacket.sourceAddress == packet.sourceAddress)
     {
       NS_LOG_INFO ("SatPhyRxCarrier::IsReplica - Same source addresses, checking slot IDs");
 
-      if (HaveSameSlotIds (packet, iter))
+      if (HaveSameSlotIds (packet, otherPacket))
         {
           NS_LOG_INFO ("SatPhyRxCarrier::IsReplica - Same slot IDs, replica found");
           isReplica = true;
@@ -764,8 +771,8 @@ SatPhyRxCarrierPerFrame::IsReplica (SatPhyRxCarrierPerFrame::crdsaPacketRxParams
 }
 
 bool
-SatPhyRxCarrierPerFrame::HaveSameSlotIds (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
-                                          std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iter)
+SatPhyRxCarrierPerFrame::HaveSameSlotIds (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                                          const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrierUt::HaveSameSlotIds - Time: " << Now ().GetSeconds ());
@@ -777,10 +784,10 @@ SatPhyRxCarrierPerFrame::HaveSameSlotIds (SatPhyRxCarrierPerFrame::crdsaPacketRx
   bool haveSameSlotIds = true;
 
   firstSet.insert (packet.ownSlotId);
-  secondSet.insert (iter->ownSlotId);
+  secondSet.insert (otherPacket.ownSlotId);
 
   /// sanity check
-  if (iter->slotIdsForOtherReplicas.size () != packet.slotIdsForOtherReplicas.size ())
+  if (otherPacket.slotIdsForOtherReplicas.size () != packet.slotIdsForOtherReplicas.size ())
     {
       NS_FATAL_ERROR ("SatPhyRxCarrierUt::HaveSameSlotIds - The amount of replicas does not match");
     }
@@ -788,10 +795,10 @@ SatPhyRxCarrierPerFrame::HaveSameSlotIds (SatPhyRxCarrierPerFrame::crdsaPacketRx
   NS_LOG_INFO ("SatPhyRxCarrierUt::HaveSameSlotIds - Comparing slot IDs");
 
   /// form sets
-  for (uint32_t i = 0; i < iter->slotIdsForOtherReplicas.size (); i++)
+  for (uint32_t i = 0; i < otherPacket.slotIdsForOtherReplicas.size (); i++)
     {
       firstSet.insert (packet.slotIdsForOtherReplicas[i]);
-      secondSet.insert (iter->slotIdsForOtherReplicas[i]);
+      secondSet.insert (otherPacket.slotIdsForOtherReplicas[i]);
     }
 
   uint32_t numOfMatchingSlots = 0;

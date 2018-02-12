@@ -617,7 +617,7 @@ public:
     RA_MODEL_OFF = 0,
     RA_MODEL_SLOTTED_ALOHA = 1,
     RA_MODEL_CRDSA = 2,
-    RA_MODEL_RCS2_SPECIFICATION = 3
+    RA_MODEL_RCS2_SPECIFICATION = 3,
   } RandomAccessModel_t;
 
   static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)

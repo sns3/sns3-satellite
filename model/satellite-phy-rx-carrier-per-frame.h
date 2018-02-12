@@ -117,7 +117,31 @@ protected:
    */
   virtual void DoDispose ();
 
-private:
+  /**
+   * \brief Function for receiving decodable packets and removing their
+   * interference from the other packets in the slots they’re in; perform
+   * as many cycles as needed to try to decode each packet.
+   * \param combinedPacketsForFrame  container to store packets
+   * as they are decoded and removed from the frame
+   */
+  virtual void PerformSicCycles (std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame);
+
+  /**
+   * \brief Function for identifying whether the packet is a replica of another packet
+   * \param packet A packet
+   * \param otherPacket A packet that we want to check if it is a duplicate
+   * \return Is the packet a replica
+   */
+  bool IsReplica (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                  const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const;
+
+  /**
+   * \brief Function for computing the composite SINR of the given packet
+   * \param packet  The packet whose composite SINR should be updated
+   * \return SINR for the given packet
+   */
+  double CalculatePacketCompositeSinr (crdsaPacketRxParams_s& packet);
+
   /**
    * \brief Function for eliminating the interference to other packets in the slot from the correctly received packet
    * \param iter Packets in the slot
@@ -126,6 +150,18 @@ private:
   void EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
                               SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket);
 
+  /**
+   * \brief Function for finding and removing the replicas of the CRDSA packet
+   * \param packet CRDSA packet
+   */
+  void FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet);
+
+  inline std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >& GetCrdsaPacketContainer ()
+  {
+    return m_crdsaPacketContainer;
+  }
+
+private:
   /**
    * \brief Function for storing the received CRDSA packets
    * \param Rx parameters of the packet
@@ -164,41 +200,19 @@ private:
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> ProcessFrame ();
 
   /**
-   * \brief Function for finding and removing the replicas of the CRDSA packet
-   * \param packet CRDSA packet
-   */
-  void FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet);
-
-  /**
-   * \brief Function for identifying whether the packet is a replica of another packet
-   * \param packet Packet
-   * \param iter A packet in certain slot
-   * \return Is the packet a replica
-   */
-  bool IsReplica (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
-                  std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iter);
-
-  /**
    * \brief Function for checking do the packets have identical slots
-   * \param packet Packet
-   * \param iter A packet in certain slot
+   * \param packet A packet
+   * \param otherPacket A packet that we want to check if it has identical slots
    * \return Have the packets identical slots
    */
-  bool HaveSameSlotIds (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
-                        std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iter);
+  bool HaveSameSlotIds (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                        const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const;
 
   /**
    * \brief Function for calculating the normalized offered random access load
    * \return Normalized offered load
    */
   double CalculateNormalizedOfferedRandomAccessLoad ();
-
-  /**
-   * \brief Function for computing the composite SINR of the given packet
-   * \param packet  The packet whose composite SINR should be updated
-   * \return SINR for the given packet
-   */
-  double CalculatePacketCompositeSinr (crdsaPacketRxParams_s& packet);
 
   /**
    * \brief Function for processing the frame interval operations
