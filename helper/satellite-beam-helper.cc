@@ -79,7 +79,8 @@ SatBeamHelper::GetTypeId (void)
                    MakeEnumChecker (SatEnums::RA_MODEL_OFF, "RaOff",
                                     SatEnums::RA_MODEL_SLOTTED_ALOHA, "RaSlottedAloha",
                                     SatEnums::RA_MODEL_CRDSA, "RaCrdsa",
-                                    SatEnums::RA_MODEL_RCS2_SPECIFICATION, "RaRcs2Specification"))
+                                    SatEnums::RA_MODEL_RCS2_SPECIFICATION, "RaRcs2Specification",
+                                    SatEnums::RA_MODEL_MARSALA, "RaMarsala"))
     .AddAttribute ("RaInterferenceModel",
                    "Interference model for random access",
                    EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
