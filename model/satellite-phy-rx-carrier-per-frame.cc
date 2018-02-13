@@ -567,7 +567,14 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
                " RX gnd: " << packet.rxParams->m_rxPower_W <<
                " IF gnd: " << packet.rxParams->GetInterferencePower ());
 
-  CalculatePacketCompositeSinr (packet, true);
+  double sinr = CalculatePacketCompositeSinr (packet);
+
+  /*
+   * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
+   * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
+   * method!
+   */
+  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
 
   if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
     {
@@ -605,9 +612,8 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
   return packet;
 }
 
-void
-SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
-                                                       bool updateFeederLinkSinr)
+double
+SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet)
 {
   double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
                                          packet.rxParams->m_ifPowerInSatellite_W,
@@ -623,18 +629,10 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
 
-  if (updateFeederLinkSinr)
-    {
-      /*
-       * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
-       * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
-       * method!
-       */
-      m_linkSinrTrace (SatUtils::LinearToDb (sinr));
-    }
-
   packet.cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
   packet.ifPower = packet.rxParams->m_ifPower_W;
+
+  return sinr;
 }
 
 void
@@ -684,7 +682,7 @@ SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPa
 
       if (!packet.phyError)
         {
-          CalculatePacketCompositeSinr (removedPacket, false);
+          CalculatePacketCompositeSinr (removedPacket);
           EliminateInterference (iter, removedPacket);
         }
     }
