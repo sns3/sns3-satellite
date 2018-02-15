@@ -69,6 +69,15 @@ private:
    * \return Whether or not a packet was decoded
    */
   bool PerformMarsala (std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame);
+
+  /**
+   * \brief Function for verifying if a replica of a given packet is found in the given slot
+   * \param slotContent  The slot in which to search for replica
+   * \param packet  The packet whose replica should be searched for
+   * \return Whether or not a replica of the packet has been found in the slot
+   */
+  bool CheckReplicaInSlot (const std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent,
+                           const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet) const;
 };
 
 }  // namespace ns3
