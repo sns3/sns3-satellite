@@ -105,11 +105,14 @@ SatPhyRxCarrierMarsala::PerformMarsala (
 
       return false;
     }
+  else if (GetRandomAccessCollisionModel () != SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
+    {
+      NS_FATAL_ERROR ("Random access collision model not defined");
+    }
+
+  NS_LOG_INFO ("Number of slots: " << GetCrdsaPacketContainer ().size ());
 
   std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
-  SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket;
-  bool packetSuccessfullyDecoded = false;
-
   for (iter = GetCrdsaPacketContainer ().begin (); iter != GetCrdsaPacketContainer ().end (); ++iter)
     {
       NS_LOG_INFO ("Iterating slot: " << iter->first);
@@ -125,88 +128,69 @@ SatPhyRxCarrierMarsala::PerformMarsala (
         {
           NS_LOG_INFO ("Iterating packet in slot: " << currentPacket->ownSlotId);
 
-          // reset processing state of all packets so that SIC can happen again
-          currentPacket->packetHasBeenProcessed = false;
+          // process the packet
+          uint32_t packetsInSlotsCount = slotContent.size ();
 
-          if (!packetSuccessfullyDecoded)
+          for (uint16_t& replicaSlotId : currentPacket->slotIdsForOtherReplicas)
             {
-              // process the packet
-              uint32_t packetsInSlotsCount = slotContent.size ();
+              NS_LOG_INFO ("Processing replica in slot: " << replicaSlotId);
 
-              for (uint16_t& replicaSlotId : currentPacket->slotIdsForOtherReplicas)
+              std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator replicaSlot;
+              replicaSlot = GetCrdsaPacketContainer ().find (replicaSlotId);
+              if (replicaSlot == GetCrdsaPacketContainer ().end ())
                 {
-                  NS_LOG_INFO ("Processing replica in slot: " << replicaSlotId);
-
-                  std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator replicaSlot;
-                  replicaSlot = GetCrdsaPacketContainer ().find (replicaSlotId);
-                  if (replicaSlot == GetCrdsaPacketContainer ().end ())
-                    {
-                      NS_FATAL_ERROR ("Slot " << replicaSlotId << " not found in frame!");
-                    }
-
-                  if (!CheckReplicaInSlot (replicaSlot->second, *currentPacket))
-                    {
-                      NS_FATAL_ERROR ("Slot " << replicaSlotId << " does not contain a replica of the current packet!");
-                    }
-
-                  packetsInSlotsCount += replicaSlot->second.size ();
+                  NS_FATAL_ERROR ("Slot " << replicaSlotId << " not found in frame!");
                 }
 
-              uint32_t replicasCount = 1 + currentPacket->slotIdsForOtherReplicas.size ();
-              // Account for the fact that we use the size of each slot so we must remove each replica
-              // ratio = N_interferent / N_replicas = (N_packets_in_slots - N_replicas) / N_replicas
-              double ratioOfInterferentPerReplica = (double (packetsInSlotsCount) / replicasCount) - 1;
-
-              double sinr = CalculatePacketCompositeSinr (*currentPacket);
-              /*
-               * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
-               * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
-               * method!
-               */
-              m_linkSinrTrace (SatUtils::LinearToDb (sinr));
-
-              if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
+              if (!CheckReplicaInSlot (replicaSlot->second, *currentPacket))
                 {
-                  double correlatedSinr = replicasCount / (ratioOfInterferentPerReplica + (1 / currentPacket->cSinr));
-
-                  NS_LOG_INFO ("MARSALA correlation computation, Replicas: " << replicasCount <<
-                               " Interferents: " << (packetsInSlotsCount - replicasCount) <<
-                               " Packet SINR: " << currentPacket->cSinr <<
-                               " Correlated SINR: " << correlatedSinr);
-
-                  currentPacket->phyError = CheckAgainstLinkResults (correlatedSinr, currentPacket->rxParams);
-                }
-              else
-                {
-                  NS_FATAL_ERROR ("Random access collision model not defined");
+                  NS_FATAL_ERROR ("Slot " << replicaSlotId << " does not contain a replica of the current packet!");
                 }
 
-              NS_LOG_INFO ("Packet error: " << currentPacket->phyError);
+              packetsInSlotsCount += replicaSlot->second.size ();
+            }
 
-              if (!currentPacket->phyError)
-                {
-                  packetSuccessfullyDecoded = true;
-                  processedPacket = *currentPacket;
-                  slotContent.erase (currentPacket);
-                  EliminateInterference (iter, processedPacket);
+          uint32_t replicasCount = 1 + currentPacket->slotIdsForOtherReplicas.size ();
+          // Account for the fact that we use the size of each slot so we must remove each replica
+          // ratio = N_interferent / N_replicas = (N_packets_in_slots - N_replicas) / N_replicas
+          double ratioOfInterferentPerReplica = (double (packetsInSlotsCount) / replicasCount) - 1;
 
-                  // No need to continue further in this slot,
-                  // EliminateInterference will already mark packets as not processed
-                  break;
-                }
+          double sinr = CalculatePacketCompositeSinr (*currentPacket);
+          /*
+           * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
+           * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
+           * method!
+           */
+          m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+
+          double correlatedSinr = replicasCount / (ratioOfInterferentPerReplica + (1 / sinr));
+
+          NS_LOG_INFO ("MARSALA correlation computation, Replicas: " << replicasCount <<
+                       " Interferents: " << (packetsInSlotsCount - replicasCount) <<
+                       " Packet SINR: " << sinr <<
+                       " Correlated SINR: " << correlatedSinr);
+
+          currentPacket->phyError = CheckAgainstLinkResults (correlatedSinr, currentPacket->rxParams);
+
+          NS_LOG_INFO ("Packet error: " << currentPacket->phyError);
+
+          if (!currentPacket->phyError)
+            {
+              // Save packet for further processing
+              SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket = *currentPacket;
+              NS_LOG_INFO ("Packet successfully received, removing its interference and processing the replicas");
+
+              slotContent.erase (currentPacket);
+              EliminateInterference (iter, processedPacket);
+              FindAndRemoveReplicas (processedPacket);
+              combinedPacketsForFrame.push_back (processedPacket);
+
+              return true;
             }
         }
     }
 
-  if (packetSuccessfullyDecoded)
-    {
-      NS_LOG_INFO ("Packet successfully received, processing the replicas");
-
-      FindAndRemoveReplicas (processedPacket);
-      combinedPacketsForFrame.push_back (processedPacket);
-    }
-
-  return packetSuccessfullyDecoded;
+  return false;
 }
 
 
