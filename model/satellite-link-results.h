@@ -153,13 +153,49 @@ protected:
    */
   void DoInitialize ();
 
-private:
   /**
    * \brief Map of satellite link result look up tables.
    * - key = uint32_t, i.e. waveform id
    * - value = Ptr<SatLookUpTable>, i.e. look-up table containing the link results
    */
   std::map<uint32_t, Ptr<SatLookUpTable> > m_table;
+};
+
+
+/**
+ * \ingroup satellite
+ *
+ * \brief Link results for F-SIM.
+ *
+ * Loads and maintains multiple SatLookUpTable. Provides query service based on
+ * waveform id.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
+ */
+// TODO: this is only a temporary solution. SatLinkResultsFSim could inherit from
+// a class such as SatLinkResultsReturn, as well as SatLinkResultsDvbRcs2
+class SatLinkResultsFSim : public SatLinkResultsDvbRcs2
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SatLinkResultsFSim ();
+  ~SatLinkResultsFSim ()
+  {
+  }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  /**
+   * \brief Initialize by loading DVB-RCS2 look up tables.
+   */
+  void DoInitialize ();
 };
 
 

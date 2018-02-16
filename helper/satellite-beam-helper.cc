@@ -136,6 +136,11 @@ SatBeamHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatBeamHelper::m_enableTracesOnReturnLink),
                    MakeBooleanChecker ())
+    .AddAttribute ("ReturnLinkLinkResults", "Protocol used for the return link link results.",
+                   EnumValue (SatEnums::LR_RCS2),
+                   MakeEnumAccessor (&SatBeamHelper::m_rlLinkResultsType),
+                   MakeEnumChecker (SatEnums::LR_RCS2, "RCS2",
+                                    SatEnums::LR_FSIM, "FSIM"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -244,7 +249,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // packet reception for packet decoding, but on the other hand they are utilized in
   // transmission side in ACM for deciding the best MODCOD.
   //
-  // DVB-RCS2 link results:
+  // Return link results:
   // - Packet reception at the GW
   // - RTN link packet scheduling at the NCC
   // DVB-S2 link results:
@@ -252,17 +257,36 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // - FWD link packet scheduling at the GW
   //
   Ptr<SatLinkResultsDvbS2> linkResultsS2 = CreateObject<SatLinkResultsDvbS2> ();
-  Ptr<SatLinkResultsDvbRcs2> linkResultsRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
+  Ptr<SatLinkResultsDvbRcs2> linkResultsReturnLink;
+  switch (m_rlLinkResultsType)
+    {
+    case SatEnums::LR_RCS2:
+      {
+        linkResultsReturnLink = CreateObject<SatLinkResultsDvbRcs2> ();
+        break;
+      }
+    case SatEnums::LR_FSIM:
+      {
+        linkResultsReturnLink = CreateObject<SatLinkResultsFSim> ();
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Invalid address for multicast group");
+        break;
+      }
+    }
+
   linkResultsS2->Initialize ();
-  linkResultsRcs2->Initialize ();
+  linkResultsReturnLink->Initialize ();
 
   // DVB-S2 link results for packet decoding at the UT
   m_utHelper->Initialize (linkResultsS2);
-  // DVB-RCS2 link results for packet decoding at the GW +
+  // Return link results for packet decoding at the GW +
   // DVB-S2 link results for FWD link RRM
-  m_gwHelper->Initialize (linkResultsRcs2, linkResultsS2);
+  m_gwHelper->Initialize (linkResultsReturnLink, linkResultsS2);
   // DVB-RCS2 link results for RTN link waveform configurations
-  m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsRcs2);
+  m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsReturnLink);
 
   m_geoNode = geoNode;
   m_geoHelper->Install (m_geoNode);

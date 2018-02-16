@@ -728,6 +728,17 @@ public:
     return "";
   }
 
+  /**
+   * \enum LinkResults_t
+   * \brief Return link Link result types. These are used to define which type of
+   * waveforms are used to check link results on the return link.
+   */
+  typedef enum
+  {
+    LR_RCS2 = 0,
+    LR_FSIM = 1
+  } LinkResults_t;
+
 private:
   /**
    * Destructor

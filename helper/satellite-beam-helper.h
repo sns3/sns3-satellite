@@ -336,6 +336,11 @@ private:
   Time m_ctrlMsgStoreTimeRtnLink;
 
   /**
+   * Type of Return channel link results.
+   */
+  SatEnums::LinkResults_t m_rlLinkResultsType;
+
+  /**
    * Configured fading model. Set as an attribute.
    */
   SatEnums::FadingModel_t m_fadingModel;
