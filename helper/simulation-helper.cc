@@ -71,14 +71,6 @@ SimulationHelperConf::GetTypeId (void)
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
                    MakePointerAccessor (&SimulationHelperConf::m_utCount),
                    MakePointerChecker<RandomVariableStream> ())
-    .AddAttribute ("CrTxConf",
-                   "CR transmission modes",
-                   EnumValue (SimulationHelper::CR_NOT_CONFIGURED),
-                   MakeEnumAccessor (&SimulationHelperConf::m_crTxConf),
-                   MakeEnumChecker (SimulationHelper::CR_NOT_CONFIGURED, "NotConfigured",
-                                    SimulationHelper::CR_PERIODIC_CONTROL, "PeriodicControl",
-                                    SimulationHelper::CR_SLOTTED_ALOHA, "SlottedAloha",
-                                    SimulationHelper::CR_CRDSA_LOOSE_RC_0, "CRDSA"))
     .AddAttribute ("ActivateStatistics",
                    "Enable outputing values from stats helpers",
                    BooleanValue (true),
@@ -117,8 +109,7 @@ SimulationHelperConf::SimulationHelperConf ()
   m_utCount (0),
   m_utUserCount (0),
   m_activateStatistics (false),
-  m_activateProgressLogging (false),
-  m_crTxConf (SimulationHelper::CR_NOT_CONFIGURED)
+  m_activateProgressLogging (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -1346,10 +1337,6 @@ SimulationHelper::SetCrTxConf (CrTxConf_t crTxConf)
 {
   switch (crTxConf)
     {
-    case CR_NOT_CONFIGURED:
-      {
-        break;
-      }
     case CR_PERIODIC_CONTROL:
       {
         Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
@@ -1487,7 +1474,6 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
   SetUtCountPerBeam (simulationConf->m_utCount);
   SetUserCountPerUt (simulationConf->m_utUserCount);
   SetSimulationTime (simulationConf->m_simTime);
-  SetCrTxConf (simulationConf->m_crTxConf);
 
   CreateSatScenario ();
   if (simulationConf->m_activateStatistics)

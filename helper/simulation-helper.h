@@ -510,7 +510,6 @@ public:
 
   typedef enum
   {
-    CR_NOT_CONFIGURED,
     CR_PERIODIC_CONTROL,
     CR_SLOTTED_ALOHA,
     CR_CRDSA_LOOSE_RC_0,
@@ -627,7 +626,6 @@ public:
   Ptr<RandomVariableStream>             m_utUserCount;
   bool                                  m_activateStatistics;
   bool                                  m_activateProgressLogging;
-  SimulationHelper::CrTxConf_t          m_crTxConf;
   SimulationHelper::TrafficModelLoad_t  m_trafficModelLoad;
 };
 
