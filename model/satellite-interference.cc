@@ -170,8 +170,8 @@ SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> ev
 
   m_currentlyReceiving++;
 
-  std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator,bool> result;
-  result = m_packetCollisions.insert (std::make_pair (event,false));
+  std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator, bool> result;
+  result = m_packetCollisions.insert (std::make_pair (event, false));
 
   if (!result.second)
     {

@@ -311,7 +311,7 @@ SatHelper::CreateSimpleScenario ()
 {
   NS_LOG_FUNCTION (this);
 
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   BeamUserInfoMap_t beamUserInfos;
   beamUserInfos[8] = beamInfo;
 
@@ -326,14 +326,14 @@ SatHelper::CreateLargerScenario ()
   NS_LOG_FUNCTION (this);
 
   // install one user for UTs in beams 12 and 22
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   BeamUserInfoMap_t beamUserInfos;
 
   beamUserInfos[12] = beamInfo;
   beamUserInfos[22] = beamInfo;
 
   // install two users for UT1 and one for UT2 in beam 3
-  beamInfo.SetUtUserCount (0,2);
+  beamInfo.SetUtUserCount (0, 2);
   beamInfo.AppendUt (1);
 
   beamUserInfos[3] = beamInfo;
@@ -655,7 +655,7 @@ SatHelper::SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, I
           // traffic is coming form user network (some GW user)
 
           // find matching device using source node
-          std::pair<Ptr<NetDevice>,Ptr<NetDevice> > devices;
+          std::pair<Ptr<NetDevice>, Ptr<NetDevice> > devices;
 
           if ( FindMatchingDevices (source, routerNode, devices) )
             {

@@ -40,7 +40,7 @@ public:
    */
   static TypeId GetTypeId (void);
   /**
-   * Create a position located at coordinates (0,0,0)
+   * Create a position located at coordinates (0, 0, 0)
    */
   SatConstantPositionMobilityModel ();
 

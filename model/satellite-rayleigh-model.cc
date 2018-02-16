@@ -98,7 +98,7 @@ SatRayleighModel::ConstructOscillators ()
     {
       uint32_t n = i + 1;
       /// 1. Rotation speed
-      /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
+      /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1, 2, \ldots, M\f], n is oscillatorNumber, M is m_nOscillators
       double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_rayleighParameters[0][1]);
       /// 1b. Initiate rotation speed:
       double omega = 2.0 * m_rayleighParameters[0][0] * M_PI * std::cos (alpha);
@@ -117,7 +117,7 @@ SatRayleighModel::GetComplexGain ()
 
   double timeInSeconds = Now ().GetSeconds ();
 
-  std::complex<double> sumAmplitude = std::complex<double> (0,0);
+  std::complex<double> sumAmplitude = std::complex<double> (0, 0);
   for (uint32_t i = 0; i < m_oscillators.size (); i++)
     {
       sumAmplitude += m_oscillators[i]->GetComplexValueAt (timeInSeconds);

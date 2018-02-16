@@ -38,9 +38,9 @@ static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
   /// TODO: The elevation values should eventually be formed from attributes for each state!
 
   /* Elevation 30 degrees */
-  {{10,10},
-   {10,10},
-   {10,10}}
+  {{10, 10},
+   {10, 10},
+   {10, 10}}
 };
 
 TypeId

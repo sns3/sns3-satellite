@@ -177,7 +177,7 @@ main (int argc, char *argv[])
     case 1:
       {
         // choose beams from user link frequency ID = 1 (TN3 appendix A)
-        simulationHelper->SetBeamSet ({1,3,5,7,9,22,24,26,28,30,44,46,48,50,59,61,70,72});
+        simulationHelper->SetBeamSet ({1, 3, 5, 7, 9, 22, 24, 26, 28, 30, 44, 46, 48, 50, 59, 61, 70, 72});
         break;
       }
     default:

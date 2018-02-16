@@ -35,26 +35,26 @@ namespace ns3 {
  * majority of methods in this class. Below is the list of the class methods
  * created using this C++ pre-processing approach.
  *
- * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] CompositeSinr
- * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppThroughput
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
- * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
- * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
- * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
- * - Add [Global,PerGw,PerBeam] BackloggedRequest
- * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
- * - Add [Global,PerGw,PerBeam] WaveformUsage
- * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
- * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppDelay
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
+ * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppThroughput
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
+ * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa] PacketCollision
+ * - Add [Global, PerGw, PerBeam, PerUt] CapacityRequest
+ * - Add [Global, PerGw, PerBeam, PerUt] ResourcesGranted
+ * - Add [Global, PerGw, PerBeam] BackloggedRequest
+ * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
+ * - Add [Global, PerGw, PerBeam] WaveformUsage
+ * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  *
  * Also check the Doxygen documentation of this class for more information.
  */

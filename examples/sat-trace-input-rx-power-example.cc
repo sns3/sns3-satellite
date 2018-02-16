@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 
 
   /// Enable Rx power density input trace
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode",EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
 
   /// Set simulation output details
   simulationHelper->SetOutputTag (scenario);

@@ -65,16 +65,16 @@ public:
   GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid);
 
   /**
-   * Create GeoCoordinate from given vector (x,y,z). Reference ellipsoid to be used is sphere.
+   * Create GeoCoordinate from given vector (x, y, z). Reference ellipsoid to be used is sphere.
    *
-   * \param vector coordinates as Vector (x,y,z) (Cartesian)
+   * \param vector coordinates as Vector (x, y, z) (Cartesian)
    */
   GeoCoordinate (Vector vector);
 
   /**
-   * Create GeoCoordinate from given vector (x,y,z) and reference ellipsoid.
+   * Create GeoCoordinate from given vector (x, y, z) and reference ellipsoid.
    *
-   * \param vector coordinates as Vector (x,y,z) (Cartesian)
+   * \param vector coordinates as Vector (x, y, z) (Cartesian)
    * \param refEllipsoid Reference ellipsoid to be used
    */
   GeoCoordinate (Vector vector, ReferenceEllipsoid_t refEllipsoid);

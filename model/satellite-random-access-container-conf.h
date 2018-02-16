@@ -124,7 +124,7 @@ private:
   /**
    * \brief Map containing the allocation channel configurations
    */
-  std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
+  std::map<uint32_t, Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
 
   /**
    * \brief Slotted ALOHA control randomization interval in milliseconds

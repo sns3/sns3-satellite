@@ -59,7 +59,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
       std::string filePathName = path + ss.str () + ".txt";
       Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePathName);
 
-      std::pair<std::map<uint32_t,Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
+      std::pair<std::map<uint32_t, Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
       ret = m_antennaPatternMap.insert (std::pair<uint32_t, Ptr<SatAntennaGainPattern> > (i, gainPattern));
 
       if (ret.second == false)

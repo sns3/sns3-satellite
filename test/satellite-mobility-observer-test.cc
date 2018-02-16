@@ -293,7 +293,7 @@ SatMobilityObserverTestCase::DoRun (void)
   utProgDelay->SetDelay (Seconds (300));
 
   // set satellite position, altitude is the Earth radius
-  double earthRadius = CalculateDistance ( GeoCoordinate (0.00, 0.00, 0.00).ToVector (), Vector (0,0,0) );
+  double earthRadius = CalculateDistance ( GeoCoordinate (0.00, 0.00, 0.00).ToVector (), Vector (0, 0, 0) );
   GeoCoordinate satellitePosition = GeoCoordinate (0.00, 0.00, earthRadius);
   geoMob->SetGeoPosition (satellitePosition);
 

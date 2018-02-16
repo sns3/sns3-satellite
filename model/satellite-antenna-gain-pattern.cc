@@ -306,9 +306,9 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 
   /**
    * 4-point bilinear interpolation
-   * R(x,y1) = (x2 - x)/(x2 - x1) * Q(x1,y1)) + (x - x1)/(x2 - x1) * Q(x2,y1);
-   * R(x,y2) = (x2 - x)/(x2 - x1) * Q(x1,y2)) + (x - x1)/(x2 - x1) * Q(x2,y2);
-   * R = (y2 - y)/(y2 - y1) * R(x,y1) + (y - y1)/(y2 - y1) * R(x,y2);
+   * R(x, y1) = (x2 - x)/(x2 - x1) * Q(x1, y1)) + (x - x1)/(x2 - x1) * Q(x2, y1);
+   * R(x, y2) = (x2 - x)/(x2 - x1) * Q(x1, y2)) + (x - x1)/(x2 - x1) * Q(x2, y2);
+   * R = (y2 - y)/(y2 - y1) * R(x, y1) + (y - y1)/(y2 - y1) * R(x, y2);
    */
 
   // Longitude direction with latitude minLatIndex
@@ -340,10 +340,10 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
       ", y1 = " << m_latitudes[minLatIndex] <<
       ", x2 = " << m_longitudes[minLonIndex+1] <<
       ", y2 = " << m_latitudes[minLatIndex+1] <<
-      ", G(x1,y1) = " << m_antennaPattern[minLatIndex][minLonIndex] <<
-      ", G(x1,y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex] <<
-      ", G(x2,y1) = " << m_antennaPattern[minLatIndex][minLonIndex+1] <<
-      ", G(x2,y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex+1] <<
+      ", G(x1, y1) = " << m_antennaPattern[minLatIndex][minLonIndex] <<
+      ", G(x1, y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex] <<
+      ", G(x2, y1) = " << m_antennaPattern[minLatIndex][minLonIndex+1] <<
+      ", G(x2, y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex+1] <<
       ", x = " << longitude <<
       ", y = " << latitude <<
       ", interpolated gain: " << gain << std::endl;

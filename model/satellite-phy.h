@@ -91,7 +91,7 @@ public:
    * \param allocation channel Id
    * \param average normalized offered load
    */
-  typedef Callback<void,uint32_t,uint32_t,uint8_t,double> AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void, uint32_t, uint32_t, uint8_t, double> AverageNormalizedOfferedLoadCallback;
 
   /**
    * \brief Creation parameters for base PHY object

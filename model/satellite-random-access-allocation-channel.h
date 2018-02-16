@@ -104,7 +104,7 @@ public:
    */
   void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability)
   {
-    m_crdsaBackoffProbability = (crdsaBackoffProbability + 1) * (1 / (std::pow (2,16)));
+    m_crdsaBackoffProbability = (crdsaBackoffProbability + 1) * (1 / (std::pow (2, 16)));
   }
 
   /**

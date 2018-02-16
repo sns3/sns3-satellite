@@ -147,7 +147,7 @@ protected:
    * \param iter Packets in the slot
    * \param processedPacket Correctly received processed packet
    */
-  void EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
+  void EliminateInterference (std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
                               SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket);
 
   /**

@@ -178,7 +178,7 @@ SatPhyRxCarrierPerSlot::ProcessSlottedAlohaCollisions (double cSinr,
   else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
     {
       /// check cSinr against link results
-      phyError = CheckAgainstLinkResults (cSinr,rxParams);
+      phyError = CheckAgainstLinkResults (cSinr, rxParams);
       NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Composite SINR mode, phyError: " << phyError);
     }
   else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_CONSTANT_COLLISION_PROBABILITY)

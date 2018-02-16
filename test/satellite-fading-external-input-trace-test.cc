@@ -85,7 +85,7 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-fading-external-input-trace", "", true);
 
   // Test the fading traces
-  bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts,numGws);
+  bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts, numGws);
   NS_TEST_ASSERT_MSG_EQ (success, true, "SatChannelFadingTrace test failed");
 
   double time [4] = {1.434, 40.923, 80.503, 140.3};

@@ -292,7 +292,7 @@ SatEnvVariables::IsValidDirectory (std::string path)
   struct stat st;
   bool validDirectory = false;
 
-  if (stat (path.c_str (),&st) == 0)
+  if (stat (path.c_str (), &st) == 0)
     {
       if (st.st_mode && S_IFDIR != 0)
         {
@@ -532,7 +532,7 @@ SatEnvVariables::GetCurrentDateAndTime ()
   time (&rawtime);
   timeinfo = localtime (&rawtime);
 
-  strftime (buffer,80,"%d-%m-%Y %I:%M:%S",timeinfo);
+  strftime (buffer, 80, "%d-%m-%Y %I:%M:%S", timeinfo);
   std::string str (buffer);
 
   NS_LOG_INFO ("SatEnvVariables::GetCurrentRealDateAndTime - " + str);

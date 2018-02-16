@@ -96,7 +96,7 @@ SatInputFileStreamTimeDoubleContainer::UpdateContainer (std::string filename, st
   m_fileMode = filemode;
   m_valuesInRow = valuesInRow;
 
-  m_inputFileStreamWrapper = new SatInputFileStreamWrapper (filename,filemode);
+  m_inputFileStreamWrapper = new SatInputFileStreamWrapper (filename, filemode);
   m_inputFileStream = m_inputFileStreamWrapper->GetStream ();
 
   if (m_inputFileStream->is_open ())
@@ -173,7 +173,7 @@ SatInputFileStreamTimeDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
-  while (!FindNextClosest (m_lastValidPosition,m_timeShiftValue, Now ().GetSeconds ()))
+  while (!FindNextClosest (m_lastValidPosition, m_timeShiftValue, Now ().GetSeconds ()))
     {
       m_lastValidPosition = 0;
       m_numOfPasses++;

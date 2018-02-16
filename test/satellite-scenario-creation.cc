@@ -317,7 +317,7 @@ ScenarioCreationUser::DoRun (void)
   std::string scenarioName = "Scenario72";
 
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[8] = beamInfo;
   beamMap[3] = beamInfo;

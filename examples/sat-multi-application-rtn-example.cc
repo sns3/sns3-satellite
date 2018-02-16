@@ -81,7 +81,7 @@ main (int argc, char *argv[])
 
   simulationHelper->SetUtCountPerBeam (1);
   simulationHelper->SetUserCountPerUt (1);
-  simulationHelper->SetBeamSet ({12,22});
+  simulationHelper->SetBeamSet ({12, 22});
   simulationHelper->SetSimulationTime (simLength);
 
   // No PHY errors

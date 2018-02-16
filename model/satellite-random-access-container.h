@@ -63,7 +63,7 @@ public:
   {
     SatEnums::RandomAccessTxOpportunityType_t txOpportunityType;
     uint32_t slottedAlohaTxOpportunity;
-    std::map <uint32_t,std::set<uint32_t> > crdsaTxOpportunities;
+    std::map <uint32_t, std::set<uint32_t> > crdsaTxOpportunities;
     uint32_t allocationChannel;
   } RandomAccessTxOpportunities_s;
 

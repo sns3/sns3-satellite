@@ -96,15 +96,15 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
   NS_LOG_FUNCTION (this << beamId << carrierId << (uint32_t) allocationChannelId << averageNormalizedOfferedLoad);
 
   bool isLowRandomAccessLoad = true;
-  std::map<std::pair<uint32_t,uint8_t>,bool>::iterator findResult;
-  std::pair<std::map<std::pair<uint32_t,uint8_t>,bool>::iterator,bool> insertResult;
+  std::map<std::pair<uint32_t, uint8_t>, bool>::iterator findResult;
+  std::pair<std::map<std::pair<uint32_t, uint8_t>, bool>::iterator, bool> insertResult;
 
   /// search for the current status of load control
-  findResult = m_isLowRandomAccessLoad.find (std::make_pair (beamId,allocationChannelId));
+  findResult = m_isLowRandomAccessLoad.find (std::make_pair (beamId, allocationChannelId));
 
   if (findResult == m_isLowRandomAccessLoad.end ())
     {
-      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (std::make_pair (beamId,allocationChannelId),isLowRandomAccessLoad));
+      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (std::make_pair (beamId, allocationChannelId), isLowRandomAccessLoad));
 
       if (!insertResult.second)
         {
@@ -122,7 +122,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
 
   NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Measuring the average normalized offered random access load: " << averageNormalizedOfferedLoad);
 
-  std::map<uint8_t,double>::iterator itThreshold = m_randomAccessAverageNormalizedOfferedLoadThreshold.find (allocationChannelId);
+  std::map<uint8_t, double>::iterator itThreshold = m_randomAccessAverageNormalizedOfferedLoadThreshold.find (allocationChannelId);
 
   if (itThreshold == m_randomAccessAverageNormalizedOfferedLoadThreshold.end ())
     {
@@ -136,7 +136,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
       /// check the load against the parameterized value
       if (averageNormalizedOfferedLoad >= itThreshold->second)
         {
-          std::map<uint8_t,uint16_t>::iterator it;
+          std::map<uint8_t, uint16_t>::iterator it;
 
           it = m_highLoadBackOffProbability.find (allocationChannelId);
 
@@ -162,7 +162,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
           NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Switching to HIGH LOAD back off parameterization");
 
           /// flag RA load as high load
-          m_isLowRandomAccessLoad.at (std::make_pair (beamId,allocationChannelId)) = false;
+          m_isLowRandomAccessLoad.at (std::make_pair (beamId, allocationChannelId)) = false;
         }
     }
   /// high RA load in effect
@@ -173,7 +173,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
       /// check the load against the parameterized value
       if (averageNormalizedOfferedLoad < itThreshold->second)
         {
-          std::map<uint8_t,uint16_t>::iterator it;
+          std::map<uint8_t, uint16_t>::iterator it;
 
           it = m_lowLoadBackOffProbability.find (allocationChannelId);
 
@@ -199,7 +199,7 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
           NS_LOG_INFO ("SatNcc::DoRandomAccessDynamicLoadControl - Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Switching to LOW LOAD back off parameterization");
 
           /// flag RA load as low load
-          m_isLowRandomAccessLoad.at (std::make_pair (beamId,allocationChannelId)) = true;
+          m_isLowRandomAccessLoad.at (std::make_pair (beamId, allocationChannelId)) = true;
         }
     }
 }

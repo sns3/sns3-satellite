@@ -34,7 +34,7 @@ TypeId SatFadingOscillator::GetTypeId (void)
 }
 
 SatFadingOscillator::SatFadingOscillator ()
-  : m_complexAmplitude (0,0),
+  : m_complexAmplitude (0, 0),
   m_amplitude (0),
   m_phase (0),
   m_omega (0)
@@ -54,7 +54,7 @@ SatFadingOscillator::SatFadingOscillator (std::complex<double> amplitude, double
 }
 
 SatFadingOscillator::SatFadingOscillator (double amplitude, double initialPhase, double omega)
-  : m_complexAmplitude (0,0),
+  : m_complexAmplitude (0, 0),
   m_amplitude (amplitude),
   m_phase (initialPhase),
   m_omega (omega)

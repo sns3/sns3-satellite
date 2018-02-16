@@ -144,7 +144,7 @@ public:
    * \brief Receive callback used for sending packet to netdevice layer.
     * \param packet the packet received
     */
-  typedef Callback<void,Ptr<const Packet> > ReceiveCallback;
+  typedef Callback<void, Ptr<const Packet> > ReceiveCallback;
 
   /**
    * \brief Callback to read control messages from container storing control messages.

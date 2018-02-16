@@ -44,7 +44,7 @@ namespace ns3 {
 const uint32_t payloadConf[4][3] = { { 2, 360, 90 },
                                      { 3, 240, 60 },
                                      { 4, 180, 45 },
-                                     { 5, 144, 36 },};
+                                     { 5, 144, 36 }, };
 
 
 SatDvbS2Waveform::SatDvbS2Waveform ()

@@ -262,7 +262,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   // create user defined scenario with beams 1 and 5
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[1] = beamInfo;
   beamMap[5] = beamInfo;
@@ -411,7 +411,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
   Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   // Creating the reference system. Note, currently the satellite module supports
   // only one reference system, which is named as "Scenario72". The string is utilized
@@ -566,9 +566,9 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
 
@@ -576,7 +576,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
 
   // create user defined scenario with beams 1 and 5
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[1] = beamInfo;
   beamMap[5] = beamInfo;
@@ -699,9 +699,9 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   std::string scenarioName = "Scenario72";
 

@@ -261,11 +261,11 @@ private:
    * \param allocationChannel
    * \return
    */
-  std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
-                                                              Ptr<SatFrameConf> frameConf,
-                                                              uint32_t timeSlotCount,
-                                                              uint32_t superFrameId,
-                                                              uint32_t allocationChannel);
+  std::pair<bool, uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
+                                                               Ptr<SatFrameConf> frameConf,
+                                                               uint32_t timeSlotCount,
+                                                               uint32_t superFrameId,
+                                                               uint32_t allocationChannel);
 
   /**
    *
@@ -276,11 +276,11 @@ private:
    * \param allocationChannel
    * \return
    */
-  std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
-                                                        Ptr<SatFrameConf> frameConf,
-                                                        uint32_t timeSlotCount,
-                                                        uint32_t superFrameId,
-                                                        uint32_t allocationChannel);
+  std::pair<bool, uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
+                                                         Ptr<SatFrameConf> frameConf,
+                                                         uint32_t timeSlotCount,
+                                                         uint32_t superFrameId,
+                                                         uint32_t allocationChannel);
 
   /**
    *

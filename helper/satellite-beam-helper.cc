@@ -265,7 +265,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
           m_ncc->SetRandomAccessHighLoadBackoffProbability (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaHighLoadBackOffProbability (i));
           m_ncc->SetRandomAccessLowLoadBackoffTime (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaBackOffTimeInMilliSeconds (i));
           m_ncc->SetRandomAccessHighLoadBackoffTime (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaHighLoadBackOffTimeInMilliSeconds (i));
-          m_ncc->SetRandomAccessAverageNormalizedOfferedLoadThreshold (i,llsConf.Get<SatLowerLayerServiceConf> ()->GetRaAverageNormalizedOfferedLoadThreshold (i));
+          m_ncc->SetRandomAccessAverageNormalizedOfferedLoadThreshold (i, llsConf.Get<SatLowerLayerServiceConf> ()->GetRaAverageNormalizedOfferedLoadThreshold (i));
         }
     }
 
@@ -339,7 +339,7 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   NS_LOG_FUNCTION (this << gwNode << gwId << beamId << ulFreqId << flFreqId);
 
   // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
-  std::pair<std::map<uint32_t,uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (beamId, gwId));
+  std::pair<std::map<uint32_t, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (beamId, gwId));
   NS_ASSERT (beam.second == true);
 
   // add gwId and flFreqId pair to GW link set. In case it's there already, assertion failure is caused
@@ -1088,7 +1088,7 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
               Ipv4Address address = ipv4Ut->GetAddress (j, 0).GetLocal ();
               Ipv4Mask mask = ipv4Ut->GetAddress (j, 0).GetMask ();
 
-              srGw->AddNetworkRouteTo (address.CombineMask (mask), mask, utIfs.GetAddress (utAddressIndex),gwNd->GetIfIndex ());
+              srGw->AddNetworkRouteTo (address.CombineMask (mask), mask, utIfs.GetAddress (utAddressIndex), gwNd->GetIfIndex ());
               NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, GW Network route:  " << address.CombineMask (mask) <<
                            ", " << mask << ", " << utIfs.GetAddress (utAddressIndex));
             }

@@ -168,7 +168,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
                 {
                   uint32_t bytesReq = 0;
 
-                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, i, j, k, l, 1,(bool) std::rand () % 2 );
+                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, i, j, k, l, 1, (bool) std::rand () % 2 );
 
                   // repeat with all CC levels
                   for (uint32_t o = 0; o < m_ccLevelCount; o++ )
@@ -311,7 +311,7 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
     }
   else
     {
-      NS_TEST_ASSERT_MSG_EQ (utAllocContainer.empty (), true,"No allocations expected!");
+      NS_TEST_ASSERT_MSG_EQ (utAllocContainer.empty (), true, "No allocations expected!");
       NS_ASSERT (utAllocContainer.empty () == true);
     }
 

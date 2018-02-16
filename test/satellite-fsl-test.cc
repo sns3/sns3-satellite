@@ -110,7 +110,7 @@ SatFreeSpaceLossTestCase::DoRun (void)
   // Calculations with big double numbers there will produce results
   // with different precisions when compiled with optimized and debug flags.
   // TODO: check whether we could change e.g. the waf configure to avoid the precision problem.
-  //  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 883122910318077150000.0, 1.1,"FSL (UT-GEO) ratio incorrect");
+  //  NS_TEST_ASSERT_MSG_EQ_TOL( fsl_ratio, 883122910318077150000.0, 1.1, "FSL (UT-GEO) ratio incorrect");
   NS_TEST_ASSERT_MSG_EQ_TOL ( fsl_dB, 209.460211515483, 0.1, "FSL (UT-GEO) in dBs incorrect");
 
   // test fsl calculation in path GW - Geo Satellite

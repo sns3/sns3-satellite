@@ -210,32 +210,32 @@ private:
   /**
    * Map for keeping track of the load status of each random access allocation channel
    */
-  std::map<std::pair<uint32_t,uint8_t>,bool> m_isLowRandomAccessLoad;
+  std::map<std::pair<uint32_t, uint8_t>, bool> m_isLowRandomAccessLoad;
 
   /**
    * Map for random access allocation channel specific load thresholds
    */
-  std::map<uint8_t,double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
+  std::map<uint8_t, double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
 
   /**
    * Map for random access allocation channel specific low load backoff probabilities
    */
-  std::map<uint8_t,uint16_t> m_lowLoadBackOffProbability;
+  std::map<uint8_t, uint16_t> m_lowLoadBackOffProbability;
 
   /**
    * Map for random access allocation channel specific high load backoff probabilities
    */
-  std::map<uint8_t,uint16_t> m_highLoadBackOffProbability;
+  std::map<uint8_t, uint16_t> m_highLoadBackOffProbability;
 
   /**
    * Map for random access allocation channel specific low load backoff time
    */
-  std::map<uint8_t,uint16_t> m_lowLoadBackOffTime;
+  std::map<uint8_t, uint16_t> m_lowLoadBackOffTime;
 
   /**
    * Map for random access allocation channel specific high load backoff time
    */
-  std::map<uint8_t,uint16_t> m_highLoadBackOffTime;
+  std::map<uint8_t, uint16_t> m_highLoadBackOffTime;
 };
 
 } // namespace ns3

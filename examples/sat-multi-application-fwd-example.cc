@@ -80,7 +80,7 @@ main (int argc, char *argv[])
 
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
-  simulationHelper->SetBeamSet ({12,22});
+  simulationHelper->SetBeamSet ({12, 22});
   simulationHelper->SetSimulationTime (simLength);
 
 

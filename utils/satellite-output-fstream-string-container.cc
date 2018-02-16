@@ -109,7 +109,7 @@ SatOutputFileStreamStringContainer::OpenStream ()
 {
   NS_LOG_FUNCTION (this);
 
-  m_outputFileStreamWrapper = new SatOutputFileStreamWrapper (m_fileName,m_fileMode);
+  m_outputFileStreamWrapper = new SatOutputFileStreamWrapper (m_fileName, m_fileMode);
   m_outputFileStream = m_outputFileStreamWrapper->GetStream ();
 }
 

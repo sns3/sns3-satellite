@@ -89,7 +89,7 @@ SatMarkovContainer::SatMarkovContainer (Ptr<SatMarkovConf> markovConf, SatBaseFa
   NS_LOG_FUNCTION (this);
 
   /// create Markov model
-  m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates,m_currentState);
+  m_markovModel = CreateObject<SatMarkovModel> (m_numOfStates, m_currentState);
 
   /// initialize Markov model
   m_currentSet = m_markovConf->GetProbabilitySetID (m_currentElevation ());
@@ -151,14 +151,14 @@ SatMarkovContainer::CreateFaders (SatMarkovConf::MarkovFaderType_t faderType)
     {
     case SatMarkovConf::LOO_FADER:
       {
-        m_fader_up = CreateObject<SatLooModel> (m_markovConf->GetLooConf (),m_numOfStates,m_currentSet,m_currentState);
-        m_fader_down = CreateObject<SatLooModel> (m_markovConf->GetLooConf (),m_numOfStates,m_currentSet,m_currentState);
+        m_fader_up = CreateObject<SatLooModel> (m_markovConf->GetLooConf (), m_numOfStates, m_currentSet, m_currentState);
+        m_fader_down = CreateObject<SatLooModel> (m_markovConf->GetLooConf (), m_numOfStates, m_currentSet, m_currentState);
         break;
       }
     case SatMarkovConf::RAYLEIGH_FADER:
       {
-        m_fader_up = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (),m_currentSet,m_currentState);
-        m_fader_down = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (),m_currentSet,m_currentState);
+        m_fader_up = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (), m_currentSet, m_currentState);
+        m_fader_down = CreateObject<SatRayleighModel> (m_markovConf->GetRayleighConf (), m_currentSet, m_currentState);
         break;
       }
     default:
@@ -240,7 +240,7 @@ SatMarkovContainer::EvaluateStateChange (SatEnums::ChannelType_t channelType)
             {
               NS_LOG_INFO ("Time " << Now ().GetSeconds ()
                                    << " SatMarkovContainer::EvaluateStateChange - elevation: " << m_currentElevation ()
-                                   << ", set ID [old,new]: [" << m_currentSet << "," << newSetId << "]");
+                                   << ", set ID [old, new]: [" << m_currentSet << "," << newSetId << "]");
 
               m_currentSet = newSetId;
               UpdateProbabilities (m_currentSet);
@@ -301,7 +301,7 @@ SatMarkovContainer::UpdateProbabilities (uint32_t set)
     {
       for (uint32_t j = 0; j < m_numOfStates; ++j)
         {
-          m_markovModel->SetProbability (i,j,probabilities[i][j]);
+          m_markovModel->SetProbability (i, j, probabilities[i][j]);
         }
       NS_LOG_INFO ("------");
     }
@@ -432,7 +432,7 @@ SatMarkovContainer::RandomizeLockedSetAndState ()
       newState = (rand () % (m_numOfStates - 1));
     }
 
-  LockToSetAndState (newSet,newState);
+  LockToSetAndState (newSet, newState);
 }
 
 void

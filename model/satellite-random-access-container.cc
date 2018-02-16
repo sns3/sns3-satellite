@@ -133,7 +133,7 @@ SatRandomAccess::AddCrdsaAllocationChannel (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<std::set<uint32_t>::iterator,bool> result = m_crdsaAllocationChannels.insert (allocationChannel);
+  std::pair<std::set<uint32_t>::iterator, bool> result = m_crdsaAllocationChannels.insert (allocationChannel);
 
   if (!result.second)
     {
@@ -146,7 +146,7 @@ SatRandomAccess::AddSlottedAlohaAllocationChannel (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<std::set<uint32_t>::iterator,bool> result = m_slottedAlohaAllocationChannels.insert (allocationChannel);
+  std::pair<std::set<uint32_t>::iterator, bool> result = m_slottedAlohaAllocationChannels.insert (allocationChannel);
 
   if (!result.second)
     {
@@ -628,7 +628,7 @@ SatRandomAccess::CrdsaDoBackoff (uint32_t allocationChannel)
 
   bool doCrdsaBackoff = false;
 
-  if (m_uniformRandomVariable->GetValue (0.0,1.0) < m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffProbability ())
+  if (m_uniformRandomVariable->GetValue (0.0, 1.0) < m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaBackoffProbability ())
     {
       doCrdsaBackoff = true;
     }
@@ -684,7 +684,7 @@ SatRandomAccess::CrdsaPrepareToTransmit (uint32_t allocationChannel)
               NS_LOG_INFO ("SatRandomAccess::CrdsaPrepareToTransmit - Preparing for transmission with allocation channel: " << allocationChannel);
 
               /// randomize instance slots for this unique packet
-              slots = CrdsaRandomizeTxOpportunities (allocationChannel,slots);
+              slots = CrdsaRandomizeTxOpportunities (allocationChannel, slots);
 
               /// save the packet specific Tx opportunities into a vector
               txOpportunities.crdsaTxOpportunities.insert (std::make_pair (*slots.second.begin (), slots.second));
@@ -825,8 +825,8 @@ SatRandomAccess::CrdsaRandomizeTxOpportunities (uint32_t allocationChannel, std:
 {
   NS_LOG_FUNCTION (this);
 
-  std::pair<std::set<uint32_t>::iterator,bool> resultAllSlotsInFrame;
-  std::pair<std::set<uint32_t>::iterator,bool> resultThisUniquePacket;
+  std::pair<std::set<uint32_t>::iterator, bool> resultAllSlotsInFrame;
+  std::pair<std::set<uint32_t>::iterator, bool> resultThisUniquePacket;
 
   std::set<uint32_t> emptySet;
   slots.second = emptySet;

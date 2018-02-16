@@ -767,7 +767,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
     }
 }
 
-std::pair<bool,uint32_t>
+std::pair<bool, uint32_t>
 SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime,
                                        Ptr<SatFrameConf> frameConf,
                                        uint32_t timeSlotCount,
@@ -789,7 +789,7 @@ SatUtMac::SearchFrameForAvailableSlot (Time superframeStartTime,
   return FindNextAvailableRandomAccessSlot (opportunityOffset, frameConf, timeSlotCount, superFrameId, allocationChannel);
 }
 
-std::pair<bool,uint32_t>
+std::pair<bool, uint32_t>
 SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
                                              Ptr<SatFrameConf> frameConf,
                                              uint32_t timeSlotCount,
@@ -843,7 +843,7 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 
   NS_LOG_INFO ("SatUtMac::ScheduleCrdsaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel << ", SF: " << superFrameId << ", num of opportunities: " << txOpportunities.crdsaTxOpportunities.size ());
 
-  std::map<uint32_t,std::set<uint32_t> >::iterator iter;
+  std::map<uint32_t, std::set<uint32_t> >::iterator iter;
 
   /// loop through the unique packets
   for (iter = txOpportunities.crdsaTxOpportunities.begin (); iter != txOpportunities.crdsaTxOpportunities.end (); iter++)
@@ -959,7 +959,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
                   NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Other packet tag: " << replicas[j].first);
                 }
             }
-          tags.insert (std::make_pair (replicas[i].first,replicaTag));
+          tags.insert (std::make_pair (replicas[i].first, replicaTag));
         }
 
       NS_LOG_INFO ("SatUtMac::CreateCrdsaPacketInstances - Scheduling replicas");
@@ -1052,7 +1052,7 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
     }
   else
     {
-      std::pair<std::set<uint32_t>::iterator,bool> result;
+      std::pair<std::set<uint32_t>::iterator, bool> result;
       result = iter->second.insert (slotId);
 
       if (result.second)

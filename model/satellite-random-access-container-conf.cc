@@ -72,7 +72,7 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
   for (uint32_t i = 0; i < m_allocationChannelCount; i++)
     {
       Ptr<SatRandomAccessAllocationChannel> allocationChannel = CreateObject<SatRandomAccessAllocationChannel> ();
-      m_allocationChannelConf.insert (std::make_pair (i,allocationChannel));
+      m_allocationChannelConf.insert (std::make_pair (i, allocationChannel));
 
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
       GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
@@ -100,7 +100,7 @@ SatRandomAccessConf::GetAllocationChannelConfiguration (uint32_t allocationChann
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> >::iterator iter = m_allocationChannelConf.find (allocationChannel);
+  std::map<uint32_t, Ptr<SatRandomAccessAllocationChannel> >::iterator iter = m_allocationChannelConf.find (allocationChannel);
 
   if (iter == m_allocationChannelConf.end ())
     {

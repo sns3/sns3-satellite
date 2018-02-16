@@ -66,26 +66,26 @@ SatStatsHelperContainer::DoDispose ()
  * attributes of this class. Below is the list of attributes created using this
  * C++ pre-processing approach.
  *
- * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - Average [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay
- * - Average [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
- * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
- * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] CompositeSinr
- * - [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
- * - [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - Average [Beam,Ut,UtUser] [Fwd,Rtn] AppThroughput
- * - Average [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
- * - [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
- * - [Global,PerGw,PerBeam,PerUt] CapacityRequest
- * - [Global,PerGw,PerBeam,PerUt] ResourcesGranted
- * - [Global,PerGw,PerBeam] BackloggedRequest
- * - [Global,PerGw,PerBeam] Frame [Symbol,User] Load
- * - [Global,PerGw,PerBeam] WaveformUsage
- * - Global [Fwd,Rtn] [Feeder,User] LinkSinr
- * - Global [Fwd,Rtn] [Feeder,User] LinkRxPower
+ * - [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppDelay
+ * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Average [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
+ * - Average [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
+ * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
+ * - [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppThroughput
+ * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Average [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
+ * - Average [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
+ * - [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa] PacketCollision
+ * - [Global, PerGw, PerBeam, PerUt] CapacityRequest
+ * - [Global, PerGw, PerBeam, PerUt] ResourcesGranted
+ * - [Global, PerGw, PerBeam] BackloggedRequest
+ * - [Global, PerGw, PerBeam] Frame [Symbol, User] Load
+ * - [Global, PerGw, PerBeam] WaveformUsage
+ * - Global [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - Global [Fwd, Rtn] [Feeder, User] LinkRxPower
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -485,26 +485,26 @@ SatStatsHelperContainer::GetName () const
  * majority of methods in this class. Below is the list of the class methods
  * created using this C++ pre-processing approach.
  *
- * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] CompositeSinr
- * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppThroughput
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
- * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
- * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
- * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
- * - Add [Global,PerGw,PerBeam] BackloggedRequest
- * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
- * - Add [Global,PerGw,PerBeam] WaveformUsage
- * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
- * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppDelay
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
+ * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppThroughput
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
+ * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa] PacketCollision
+ * - Add [Global, PerGw, PerBeam, PerUt] CapacityRequest
+ * - Add [Global, PerGw, PerBeam, PerUt] ResourcesGranted
+ * - Add [Global, PerGw, PerBeam] BackloggedRequest
+ * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
+ * - Add [Global, PerGw, PerBeam] WaveformUsage
+ * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  *
  * Also check the Doxygen documentation of this class for more information.
  */

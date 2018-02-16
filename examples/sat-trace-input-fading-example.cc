@@ -75,7 +75,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   /// Enable fading input trace
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_TRACE));
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_TRACE));
 
   /// Set simulation output details
   simulationHelper->SetOutputTag (scenario);

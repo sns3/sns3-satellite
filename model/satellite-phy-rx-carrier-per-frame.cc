@@ -69,7 +69,7 @@ SatPhyRxCarrierPerFrame::BeginFrameEndScheduling ()
 
       m_frameEndSchedulingInitialized = true;
 
-      Simulator::ScheduleWithContext (GetNodeInfo ()->GetNodeId (),schedulingDelay, &SatPhyRxCarrierPerFrame::DoFrameEnd, this);
+      Simulator::ScheduleWithContext (GetNodeInfo ()->GetNodeId (), schedulingDelay, &SatPhyRxCarrierPerFrame::DoFrameEnd, this);
     }
 }
 
@@ -103,7 +103,7 @@ void
 SatPhyRxCarrierPerFrame::DoDispose ()
 {
   SatPhyRxCarrierPerSlot::DoDispose ();
-  std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
+  std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
 
   for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
     {
@@ -250,7 +250,7 @@ SatPhyRxCarrierPerFrame::UpdateRandomAccessLoad ()
   uint32_t uniqueCrdsaBytes (0);
 
   // Go through all the received CRDSA packets
-  std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
+  std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
   for (iter = m_crdsaPacketContainer.begin (); iter != m_crdsaPacketContainer.end (); iter++)
     {
       // Go through all the packets received in the same slot id
@@ -407,7 +407,7 @@ SatPhyRxCarrierPerFrame::ProcessFrame ()
 
   NS_LOG_INFO ("SatPhyRxCarrier::ProcessFrame - Time: " << Now ().GetSeconds ());
 
-  std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
+  std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> combinedPacketsForFrame;
 
   PerformSicCycles (combinedPacketsForFrame);
@@ -599,14 +599,14 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
         {
           NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket - Only packet in this slot, checking against link results");
           /// check against link results
-          packet.phyError = CheckAgainstLinkResults (packet.cSinr,packet.rxParams);
+          packet.phyError = CheckAgainstLinkResults (packet.cSinr, packet.rxParams);
         }
       NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket - Strict collision detection, phy error: " << packet.phyError);
     }
   else if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
     {
       /// check against link results
-      packet.phyError = CheckAgainstLinkResults (packet.cSinr,packet.rxParams);
+      packet.phyError = CheckAgainstLinkResults (packet.cSinr, packet.rxParams);
       NS_LOG_INFO ("SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket - Check against link results, phy error: " << packet.phyError);
     }
   else
@@ -654,7 +654,7 @@ SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPa
       NS_LOG_INFO ("SatPhyRxCarrier::FindAndRemoveReplicas - Processing replica in slot: " << packet.slotIdsForOtherReplicas[i]);
 
       /// get the vector of packets for processing
-      std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
+      std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
       iter = m_crdsaPacketContainer.find (packet.slotIdsForOtherReplicas[i]);
 
       if (iter == m_crdsaPacketContainer.end ())
@@ -698,7 +698,7 @@ SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPa
 
 void
 SatPhyRxCarrierPerFrame::EliminateInterference (
-  std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
+  std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
   SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket)
 {
   NS_LOG_FUNCTION (this);
