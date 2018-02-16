@@ -153,8 +153,8 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
   NS_LOG_INFO ("------ Starting Random Access ------");
   NS_LOG_INFO ("------------------------------------");
 
-  /// Do CRDSA
-  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA && triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA)
+  /// Do CRDSA (MARSALA being a special form of CRDSA)
+  if (triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA && (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_MARSALA))
     {
       NS_LOG_INFO ("Only CRDSA enabled && CRDSA trigger, checking allocation channel");
 
@@ -180,7 +180,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
         }
     }
   /// Do Slotted ALOHA
-  else if (m_randomAccessModel == SatEnums::RA_MODEL_SLOTTED_ALOHA && triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA)
+  else if (triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA && m_randomAccessModel == SatEnums::RA_MODEL_SLOTTED_ALOHA)
     {
       NS_LOG_INFO ("Only SA enabled, checking allocation channel");
 
@@ -250,11 +250,11 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
             }
         }
     }
-  else if (m_randomAccessModel != SatEnums::RA_MODEL_SLOTTED_ALOHA && triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA)
+  else if (triggerType == SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA && m_randomAccessModel != SatEnums::RA_MODEL_SLOTTED_ALOHA)
     {
       NS_LOG_INFO ("Slotted ALOHA is disabled");
     }
-  else if (m_randomAccessModel != SatEnums::RA_MODEL_CRDSA && triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA)
+  else if (triggerType == SatEnums::RA_TRIGGER_TYPE_CRDSA && m_randomAccessModel != SatEnums::RA_MODEL_CRDSA && m_randomAccessModel != SatEnums::RA_MODEL_MARSALA)
     {
       NS_LOG_INFO ("CRDSA is disabled");
     }
@@ -417,7 +417,7 @@ SatRandomAccess::SetCrdsaBackoffTimeInMilliSeconds (uint32_t allocationChannel,
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_MARSALA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffTimeInMilliSeconds (backoffTimeInMilliSeconds);
 
@@ -435,7 +435,7 @@ SatRandomAccess::SetCrdsaBackoffProbability (uint32_t allocationChannel,
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_MARSALA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaBackoffProbability (backoffProbability);
 
@@ -455,7 +455,7 @@ SatRandomAccess::SetCrdsaRandomizationParameters (uint32_t allocationChannel,
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_MARSALA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMinRandomizationValue (minRandomizationValue);
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaxRandomizationValue (maxRandomizationValue);
@@ -477,7 +477,7 @@ SatRandomAccess::SetCrdsaMaximumDataRateLimitationParameters (uint32_t allocatio
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+  if (m_randomAccessModel == SatEnums::RA_MODEL_CRDSA || m_randomAccessModel == SatEnums::RA_MODEL_MARSALA || m_randomAccessModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
     {
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaxUniquePayloadPerBlock (maxUniquePayloadPerBlock);
       m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetCrdsaMaxConsecutiveBlocksAccessed (maxConsecutiveBlocksAccessed);
