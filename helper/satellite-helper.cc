@@ -123,6 +123,11 @@ SatHelper::GetTypeId (void)
                    StringValue ("CreationTraceUt"),
                    MakeStringAccessor (&SatHelper::m_utCreationFileName),
                    MakeStringChecker ())
+    .AddAttribute ("WaveformConfigFileName",
+                   "File name that contains return channel waveform configurations",
+                   StringValue ("dvbRcs2Waveforms.txt"),
+                   MakeStringAccessor (&SatHelper::m_wfConfigFileName),
+                   MakeStringChecker ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -170,13 +175,12 @@ SatHelper::SatHelper (std::string scenarioName)
   std::string satConf = scenarioName + "Conf.txt";
   std::string gwPos = scenarioName + "GwPos.txt";
   std::string satPos = scenarioName + "GeoPos.txt";
-  std::string wfConf = "dvbRcs2Waveforms.txt";
 
   Singleton<SatEnvVariables>::Get ()->Initialize ();
 
   m_satConf = CreateObject<SatConf> ();
 
-  m_satConf->Initialize (satConf, gwPos, satPos, wfConf);
+  m_satConf->Initialize (satConf, gwPos, satPos, m_wfConfigFileName);
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();

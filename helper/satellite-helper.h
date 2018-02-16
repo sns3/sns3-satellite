@@ -298,6 +298,11 @@ private:
   std::string m_utCreationFileName;
 
   /**
+   * File name for Waveform configurations file
+   */
+  std::string m_wfConfigFileName;
+
+  /**
    * Antenna gain patterns for all spot-beams. Used for beam selection.
    */
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
