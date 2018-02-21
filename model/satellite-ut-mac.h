@@ -226,6 +226,12 @@ private:
   void ScheduleSlottedAlohaTransmission (uint32_t allocationChannel);
 
   /**
+   * \brief Function for scheduling the ESSA transmissions
+   * \param allocationChannel RA allocation channel
+   */
+  void ScheduleEssaTransmission (uint32_t allocationChannel);
+
+  /**
    * \brief Function for scheduling the CRDSA transmissions
    * \param allocationChannel RA allocation channel
    * \param txOpportunities Tx opportunities
@@ -337,6 +343,17 @@ private:
   void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
   /**
+   * Notify the upper layer about the ESSA Tx opportunity. If upper layer
+   * returns a PDU, send it to lower layer.
+   *
+   * \param duration duration of the burst
+   * \param waveform waveform
+   * \param carrierId Carrier id used for the transmission
+   * \param rcIndex RC index
+   */
+  void DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+
+  /**
    *
    * \param payloadBytes Tx opportunity payload
    * \param type Time slot type
@@ -437,6 +454,11 @@ private:
    * - false -> for control and user data
    */
   bool m_crdsaOnlyForControl;
+
+  /**
+   * Next time when a next ESSA packet can be safely sent.
+   */
+  Time m_nextPacketTime;
 };
 
 } // namespace ns3
