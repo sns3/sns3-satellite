@@ -586,7 +586,8 @@ public:
   typedef enum
   {
     RA_TRIGGER_TYPE_SLOTTED_ALOHA = 0,
-    RA_TRIGGER_TYPE_CRDSA = 1
+    RA_TRIGGER_TYPE_CRDSA = 1,
+    RA_TRIGGER_TYPE_ESSA = 2
   } RandomAccessTriggerType_t;
 
   static inline std::string GetRandomAccessTriggerTypeName (RandomAccessTriggerType_t triggerType)
@@ -600,6 +601,10 @@ public:
       case RA_TRIGGER_TYPE_CRDSA:
         {
           return "RA_TRIGGER_TYPE_CRDSA";
+        }
+      case RA_TRIGGER_TYPE_ESSA:
+        {
+          return "RA_TRIGGER_TYPE_ESSA";
         }
       default:
         {
@@ -621,6 +626,7 @@ public:
     RA_MODEL_SLOTTED_ALOHA = 1,
     RA_MODEL_CRDSA = 2,
     RA_MODEL_RCS2_SPECIFICATION = 3,
+    RA_MODEL_ESSA = 4
   } RandomAccessModel_t;
 
   static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)
@@ -643,6 +649,10 @@ public:
         {
           return "RA_MODEL_RCS2_SPECIFICATION";
         }
+      case RA_MODEL_ESSA:
+        {
+          return "RA_MODEL_ESSA";
+        }
       default:
         {
           NS_FATAL_ERROR ("SatEnums::GetRandomAccessModelName - Invalid model");
@@ -663,6 +673,7 @@ public:
     RA_TX_OPPORTUNITY_DO_NOTHING = 0,
     RA_TX_OPPORTUNITY_SLOTTED_ALOHA = 1,
     RA_TX_OPPORTUNITY_CRDSA = 2,
+    RA_TX_OPPORTUNITY_ESSA = 2,
   } RandomAccessTxOpportunityType_t;
 
   static inline std::string GetRandomAccessOpportunityTypeName (RandomAccessTxOpportunityType_t opportunityType)
@@ -680,6 +691,10 @@ public:
       case RA_TX_OPPORTUNITY_CRDSA:
         {
           return "RA_TX_OPPORTUNITY_CRDSA";
+        }
+      case RA_TX_OPPORTUNITY_ESSA:
+        {
+          return "RA_TX_OPPORTUNITY_ESSA";
         }
       default:
         {
@@ -700,6 +715,7 @@ public:
     PACKET_TYPE_DEDICATED_ACCESS = 0,
     PACKET_TYPE_SLOTTED_ALOHA = 1,
     PACKET_TYPE_CRDSA = 2,
+    PACKET_TYPE_ESSA = 3,
   } PacketType_t;
 
   static inline std::string GetPacketTypeName (PacketType_t packetType)
@@ -715,6 +731,10 @@ public:
           return "PACKET_TYPE_SLOTTED_ALOHA";
         }
       case PACKET_TYPE_CRDSA:
+        {
+          return "PACKET_TYPE_CRDSA";
+        }
+      case PACKET_TYPE_ESSA:
         {
           return "PACKET_TYPE_CRDSA";
         }
