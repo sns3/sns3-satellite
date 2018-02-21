@@ -204,6 +204,12 @@ private:
   uint32_t GetConfigurationIdForAllocationChannel (uint32_t allocationChannelId);
 
   /**
+   * \brief Main function for ESSA
+   * \return ESSA algorithm results (Tx opportunity)
+   */
+  SatRandomAccess::RandomAccessTxOpportunities_s DoEssa ();
+
+  /**
    * \brief Main function for Slotted ALOHA
    * \return Slotted ALOHA algorithm results (Tx opportunity)
    */
@@ -313,6 +319,13 @@ private:
    * \return Is Slotted ALOHA allocation channel
    */
   bool IsSlottedAlohaAllocationChannel (uint32_t allocationChannel);
+
+  /**
+   * \brief Function for checking if the allocation channel is ESSA allocation channel
+   * \param allocationChannel allocation channel
+   * \return Is ESSA allocation channel
+   */
+  bool IsEssaAllocationChannel (uint32_t allocationChannel);
 
   /**
    * \brief Uniform random variable object

@@ -92,6 +92,24 @@ public:
   }
 
   /**
+   * \brief Function for getting the status of ESSA allowance
+   * \return Is ESSA allowed
+   */
+  bool GetEssaAllowed ()
+  {
+    return m_essaAllowed;
+  }
+
+  /**
+   * \brief Function for setting the status of ESSA allowance
+   * \param isEssaAllowed Is ESSA allowed
+   */
+  void SetEssaAllowed (bool isEssaAllowed)
+  {
+    m_essaAllowed = isEssaAllowed;
+  }
+
+  /**
    * \brief Function for getting the CRDSA backoff time
    * \return CRDSA  backoff time
    */
@@ -304,6 +322,11 @@ private:
    * \brief CRDSA allowed
    */
   bool m_crdsaAllowed;
+
+  /**
+   * \brief ESSA allowed
+   */
+  bool m_essaAllowed;
 
   /**
    * \brief CRDSA minimum randomization value

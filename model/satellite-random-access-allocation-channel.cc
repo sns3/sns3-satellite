@@ -39,6 +39,7 @@ SatRandomAccessAllocationChannel::GetTypeId (void)
 SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
   : m_slottedAlohaAllowed (false),
   m_crdsaAllowed (false),
+  m_essaAllowed (false),
   m_crdsaMinRandomizationValue (),
   m_crdsaMaxRandomizationValue (),
   m_crdsaNumOfInstances (),
