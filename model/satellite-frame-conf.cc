@@ -383,6 +383,10 @@ SatSuperframeConf::CreateSuperframeConf (SuperFrameConfiguration_t conf)
       superFrameConf = CreateObject<SatSuperframeConf3> ();
       break;
 
+    case SUPER_FRAME_CONFIG_4:
+      superFrameConf = CreateObject<SatSuperframeConf4> ();
+      break;
+
     default:
       NS_FATAL_ERROR ("Not supported super frame configuration!!!");
       break;
@@ -736,7 +740,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
         m_frames.clear ();
         m_carrierCount = 0;
 
-        if ( m_configType == CONFIG_TYPE_0)
+        if ( m_configType == CONFIG_TYPE_0 )
           {
             useDefaultWaveform = true;
           }
@@ -782,6 +786,10 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
     case CONFIG_TYPE_3:
       NS_FATAL_ERROR ("Configuration type 3 is not supported!!!");
+      break;
+
+    case CONFIG_TYPE_4:
+      // Timeslot configuration is not needed for ESSA (asynchronous)
       break;
 
     default:
@@ -973,7 +981,8 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                                     &SatSuperframeConf::GetConfigType), \
                  MakeEnumChecker ( SatSuperframeConf::CONFIG_TYPE_0, "ConfigType_0", \
                                    SatSuperframeConf::CONFIG_TYPE_1, "ConfigType_1", \
-                                   SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2"))
+                                   SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2", \
+                                   SatSuperframeConf::CONFIG_TYPE_4, "ConfigType_4"))
 
 
 uint8_t
@@ -1209,6 +1218,43 @@ SatSuperframeConf3::GetTypeId (void)
 
 TypeId
 SatSuperframeConf3::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return GetTypeId ();
+}
+
+void
+SatSuperframeConf3::DoConfigure ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+// Super frame configuration 4.
+
+SatSuperframeConf4::SatSuperframeConf4 ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatSuperframeConf4::~SatSuperframeConf4 ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+TypeId
+SatSuperframeConf4::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatSuperframeConf4")
+    .SetParent<ns3::SatSuperframeConf> ()
+    .AddConstructor<SatSuperframeConf4> ()
+    ADD_SUPER_FRAME_ATTRIBUTES (0, SatSuperframeConf::CONFIG_TYPE_4)
+  ;
+
+  return tid;
+}
+
+TypeId
+SatSuperframeConf4::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
   return GetTypeId ();

@@ -458,6 +458,7 @@ public:
     SUPER_FRAME_CONFIG_1,  //!< SUPER_FRAME_CONFIG_1
     SUPER_FRAME_CONFIG_2,  //!< SUPER_FRAME_CONFIG_2
     SUPER_FRAME_CONFIG_3,  //!< SUPER_FRAME_CONFIG_3
+    SUPER_FRAME_CONFIG_4,  //!< SUPER_FRAME_CONFIG_4
   } SuperFrameConfiguration_t;
 
   /**
@@ -474,6 +475,7 @@ public:
     CONFIG_TYPE_1, //!< Configuration type 1
     CONFIG_TYPE_2, //!< Configuration type 2
     CONFIG_TYPE_3 //!< Configuration type 3
+    CONFIG_TYPE_4 //!< Configuration type 4 (ESSA)
   } ConfigType_t;
 
   static const uint8_t m_maxFrameCount = 10;
@@ -946,6 +948,40 @@ public:
    * Destructor for SatSuperframeConf
    */
   ~SatSuperframeConf3 ();
+
+  virtual void DoConfigure ();
+
+private:
+};
+
+/**
+ * \ingroup satellite
+ * \brief This class implements super frame configuration 4
+ */
+class SatSuperframeConf4 : public SatSuperframeConf
+{
+public:
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor for SatSuperframeConf
+   */
+  SatSuperframeConf4 ();
+
+  /**
+   * Destructor for SatSuperframeConf
+   */
+  ~SatSuperframeConf4 ();
 
   virtual void DoConfigure ();
 
