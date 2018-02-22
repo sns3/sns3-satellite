@@ -98,18 +98,6 @@ SatPhyRxCarrierMarsala::PerformMarsala (
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame)
 {
   NS_LOG_FUNCTION (this);
-
-  if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
-    {
-      NS_LOG_INFO ("Strict collision detection is ENABLED! MARSALA cannot be applied!");
-
-      return false;
-    }
-  else if (GetRandomAccessCollisionModel () != SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
-    {
-      NS_FATAL_ERROR ("Random access collision model not defined");
-    }
-
   NS_LOG_INFO ("Number of slots: " << GetCrdsaPacketContainer ().size ());
 
   std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
