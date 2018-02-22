@@ -93,7 +93,9 @@ SatUtMac::SatUtMac ()
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
-  m_crdsaOnlyForControl (false)
+  m_crdsaOnlyForControl (false),
+  m_nextPacketTime (Now ()),
+  m_isRandomAccessScheduled (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -448,6 +450,7 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
       /// schedule a DoRandomAccess then in case there still are packets to transmit
       /// ( schedule DoRandomAccess in case there is a back-off to compute )
       Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
+      m_isRandomAccessScheduled = true;
     }
 }
 
@@ -537,6 +540,31 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
               NS_LOG_INFO ("Doing Slotted ALOHA");
 
               DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA);
+            }
+        }
+    }
+}
+
+void
+SatUtMac::ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex)
+{
+  NS_LOG_FUNCTION (this << event << (uint32_t) rcIndex);
+
+  NS_LOG_INFO ("SatUtMac::ReceiveQueueEventEssa - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " Queue: " << (uint32_t)rcIndex);
+
+  // DoRandomAccess only if it is not scheduled yet
+  // NOTE: could use m_nextPacketTime to do the check
+  if (!m_isRandomAccessScheduled)
+    {
+      if (event == SatQueue::FIRST_BUFFERED_PKT || event == SatQueue::BUFFERED_PKT)
+        {
+          NS_LOG_INFO ("SatUtMac::ReceiveQueueEventEssa - Buffered packet event received");
+
+          if (m_randomAccess != NULL)
+            {
+              NS_LOG_INFO ("SatUtMac::ReceiveQueueEventEssa - Doing ESSA");
+
+              DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_ESSA);
             }
         }
     }
@@ -713,6 +741,9 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
   NS_LOG_FUNCTION (this << randomAccessTriggerType);
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
+
+  /// reset the isRaandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
+  m_isRandomAccessScheduled = false;
 
   SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities;
 

@@ -459,6 +459,12 @@ private:
    * Next time when a next ESSA packet can be safely sent.
    */
   Time m_nextPacketTime;
+
+  /**
+   * Flag that indicates if a method DoRandomAccess is scheduled for
+   * asynchronous access.
+   */
+  bool m_isRandomAccessScheduled;
 };
 
 } // namespace ns3

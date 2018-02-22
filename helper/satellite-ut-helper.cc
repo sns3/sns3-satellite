@@ -108,6 +108,11 @@ SatUtHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatUtHelper::m_crdsaOnlyForControl),
                    MakeBooleanChecker ())
+    .AddAttribute ("AsynchronousReturnAccess",
+                   "Use asynchronous access methods on the return channel.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatUtHelper::m_asyncAccess),
+                   MakeBooleanChecker ())
     .AddTraceSource ("Creation",
                      "Creation traces",
                      MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace),
@@ -354,7 +359,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
 
   // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
-  SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+  SatQueue::QueueEventCallback macCb;
+  if (m_raSettings.m_randomAccessModel == SatEnums::RA_MODEL_ESSA)
+    {
+      macCb = MakeCallback (&SatUtMac::ReceiveQueueEventEssa, mac);
+    }
+  else
+    {
+      macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+    }
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
   // Create a queue
