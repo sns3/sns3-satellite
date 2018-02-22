@@ -410,7 +410,7 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
 
   /// get the next packets
   SatPhy::PacketContainer_t packets;
-  m_utScheduler->DoScheduling (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, uint8_t (SatEnums::CONTROL_FID), policy);
+  m_utScheduler->DoScheduling (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, rcIndex, policy);
 
   if ( !packets.empty () )
     {
@@ -443,6 +443,11 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
       TransmitPackets (packets, duration, carrierId, txInfo);
 
       m_crdsaUniquePacketId++;
+      /// update m_nextPacketTime
+      m_nextPacketTime = Now () + duration; // TODO: this doesn't take into account the guard bands !!
+      /// schedule a DoRandomAccess then in case there still are packets to transmit
+      /// ( schedule DoRandomAccess in case there is a back-off to compute )
+      Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
     }
 }
 
@@ -927,9 +932,6 @@ SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel, SatRandomAccess:
   Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
   Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
-  /// update m_nextPacketTime
-  m_nextPacketTime = Now () + offset + duration; // TODO: this doesn't take into account the guard bands !!
-
   NS_LOG_INFO ("SatUtMac::ScheduleEssaTransmission - Starting to schedule @ " << Now ().GetSeconds () <<
                " Tx start: " << (Now () + offset).GetSeconds () <<
                " duration: " << duration.GetSeconds () <<
@@ -939,7 +941,7 @@ SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel, SatRandomAccess:
   uint32_t carrierId = 0; // TODO: for now we use 0 as we have a single carrier
 
   /// schedule transmission
-  Simulator::Schedule (offset, &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::STRICT);
+  Simulator::Schedule (offset, &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
 }
 
 void
