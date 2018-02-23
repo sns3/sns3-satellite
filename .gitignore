@@ -1,3 +1,4 @@
+__pycache__
 ext-utils/.uncrustifyignore
 data/
 *.xz
