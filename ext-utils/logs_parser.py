@@ -126,6 +126,19 @@ class Frame:
         return self
 
 
+class CarrierSizeTracker:
+    def __init__(self, size):
+        self.size = size
+        self.carrier_size_pattern = re.compile(r'SatFrameConf:SatFrameConf\(\): Carrier slot count (\d+)')
+
+    def __call__(self, logs_file):
+        for line in logs_file:
+            count = self.carrier_size_pattern.search(line)
+            if count:
+                self.size = int(count.group(1))
+            yield line
+
+
 def command_line_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('log_file', type=argparse.FileType('rb'), help='')
@@ -228,6 +241,7 @@ def generate_sic_from_logs(logs, date, frame_content):
             error = int(correlated.group(1))
             yield SicEvent(date, frame_content.copy(), iterated_slot, current_packet, not error)
             if not error:
+                frame_content[iterated_slot] -= 1
                 current_packet = 0
             continue
 
@@ -270,8 +284,10 @@ def simplify_frame_content(frame):
     }
 
 
-def process_frames(log_filename):
+def process_frames(log_filename, size_tracker=None):
     logs = logs_content(log_filename)
+    if size_tracker is not None:
+        logs = size_tracker(logs)
     for frame in generate_frames_from_logs(logs):
         events = list(animate_frame_content(frame))
         frame_content = simplify_frame_content(frame)
@@ -279,8 +295,10 @@ def process_frames(log_filename):
         yield events
 
 
-def parse_logs(log_filename):
+def parse_logs(log_filename, size_tracker=None):
     logs = logs_content(log_filename)
+    if size_tracker is not None:
+        logs = size_tracker(logs)
     for frame in generate_frames_from_logs(logs):
         yield from animate_frame_content(frame)
         frame_content = simplify_frame_content(frame)
@@ -290,10 +308,10 @@ def parse_logs(log_filename):
 def main():
     args = command_line_parser().parse_args()
 
-    carrier_size = args.slots_count
+    carrier = CarrierSizeTracker(args.slots_count)
 
-    for event in parse_logs(args.log_file):
-        print(event.format(carrier_size))
+    for event in parse_logs(args.log_file, carrier):
+        print(event.format(carrier.size))
 
 
 if __name__ == '__main__':

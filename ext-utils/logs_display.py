@@ -56,15 +56,16 @@ class MainWindow:
 
         self.slots = [Gtk.Button('') for _ in range(carrier_size)]
         self.reference = [Gtk.Button('') for _ in range(carrier_size)]
-        carrier = builder.get_object('carrier')
-        carrier.set_sensitive(False)
-        reference = builder.get_object('reference')
-        reference.set_sensitive(False)
+        self.carrier = builder.get_object('carrier')
+        self.carrier.set_sensitive(False)
+        self.carrier_ref = builder.get_object('reference')
+        self.carrier_ref.set_sensitive(False)
         for button, ref in zip(self.slots, self.reference):
-            carrier.pack_start(button, True, True, 0)
-            reference.pack_start(ref, True, True, 0)
+            self.carrier.pack_start(button, True, True, 0)
+            self.carrier_ref.pack_start(ref, True, True, 0)
 
-        self.frames = logs_parser.process_frames(log_filename)
+        self.size_tracker = logs_parser.CarrierSizeTracker(carrier_size)
+        self.frames = logs_parser.process_frames(log_filename, self.size_tracker)
         self.on_next_frame()
 
     def on_delete_window(self, *args):
@@ -82,6 +83,9 @@ class MainWindow:
 
         index = int(adjustment.get_value())
         if not index:
+            self.forward_sic.set_sensitive(True)
+            self.backward_sic.set_sensitive(True)
+
             if not self.frame:
                 self.controls.set_sensitive(False)
                 self.set_status('Date: —\n\nSimulation ended')
@@ -89,6 +93,7 @@ class MainWindow:
                 self.backward_controls.set_sensitive(False)
                 self.forward_controls.set_sensitive(True)
                 self.set_status('Date: {0[0].date}'.format(self.frame))
+
             return
         else:
             self.backward_controls.set_sensitive(True)
@@ -128,7 +133,19 @@ class MainWindow:
                 current_button.get_style_context().add_class(css_class)
 
     def on_next_frame(self, *args):
+        carrier_size = self.size_tracker.size
         self.frame = next(self.frames, [])
+
+        if self.size_tracker.size != carrier_size:
+            carrier_size = self.size_tracker.size
+            for button, ref in zip(self.slots, self.reference):
+                button.destroy()
+                ref.destroy()
+            self.slots = [Gtk.Button('') for _ in range(carrier_size)]
+            self.reference = [Gtk.Button('') for _ in range(carrier_size)]
+            for button, ref in zip(self.slots, self.reference):
+                self.carrier.pack_start(button, True, True, 0)
+                self.carrier_ref.pack_start(ref, True, True, 0)
 
         self._index_of_first_sic_event = -1
         try:

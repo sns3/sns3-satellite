@@ -147,6 +147,10 @@ SatFrameConf::SatFrameConf ( double bandwidthHz, Time targetDuration, Ptr<SatBtu
     {
       NS_FATAL_ERROR ("Time slots cannot be created with target frame duration. Check frame target duration!!!");
     }
+  else
+    {
+      NS_LOG_INFO ("Carrier slot count " << carrierSlotCount);
+    }
 
   m_duration = Time ( carrierSlotCount * timeSlotDuration.GetInteger () );
 
