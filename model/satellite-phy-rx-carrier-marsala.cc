@@ -51,6 +51,10 @@ SatPhyRxCarrierMarsala::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierMarsala")
     .SetParent<SatPhyRxCarrierPerFrame> ()
+    .AddTraceSource ("MarsalaCorrelationRx",
+                     "Correlate a CRDSA packet replica through Random Access",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrierMarsala::m_marsalaCorrelationRxTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
   ;
   return tid;
 }
@@ -98,7 +102,9 @@ SatPhyRxCarrierMarsala::PerformMarsala (
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Number of slots: " << GetCrdsaPacketContainer ().size ());
+
+  const uint32_t nbSlots = GetCrdsaPacketContainer ().size ();
+  NS_LOG_INFO ("Number of slots: " << nbSlots);
 
   std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
   for (iter = GetCrdsaPacketContainer ().begin (); iter != GetCrdsaPacketContainer ().end (); ++iter)
@@ -138,7 +144,8 @@ SatPhyRxCarrierMarsala::PerformMarsala (
               packetsInSlotsCount += replicaSlot->second.size ();
             }
 
-          uint32_t replicasCount = 1 + currentPacket->slotIdsForOtherReplicas.size ();
+          uint32_t otherReplicasCount = currentPacket->slotIdsForOtherReplicas.size ();
+          uint32_t replicasCount = 1 + otherReplicasCount;
           // Account for the fact that we use the size of each slot so we must remove each replica
           // ratio = N_interferent / N_replicas = (N_packets_in_slots - N_replicas) / N_replicas
           double ratioOfInterferentPerReplica = (double (packetsInSlotsCount) / replicasCount) - 1;
@@ -159,6 +166,13 @@ SatPhyRxCarrierMarsala::PerformMarsala (
                        " Correlated SINR: " << correlatedSinr);
 
           currentPacket->phyError = CheckAgainstLinkResults (correlatedSinr, currentPacket->rxParams);
+
+          uint32_t correlations = 1;
+          for (uint32_t i = nbSlots - otherReplicasCount; i < nbSlots; ++i)
+            {
+              correlations *= i;
+            }
+          m_marsalaCorrelationRxTrace (correlations, currentPacket->sourceAddress, currentPacket->phyError);
 
           NS_LOG_INFO ("Packet error: " << currentPacket->phyError);
 

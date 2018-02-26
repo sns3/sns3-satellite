@@ -78,6 +78,18 @@ private:
    */
   bool CheckReplicaInSlot (const std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent,
                            const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet) const;
+
+  /**
+   * \brief `MarsalaCorrelationRx` trace source.
+   *
+   * Fired when a unique CRDSA payload is correlated using MARSALA
+   *
+   * Contains the following information:
+   * - number of correlations needed for this packet;
+   * - the MAC48 address of the sender; and
+   * - whether a PHY error has occurred.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_marsalaCorrelationRxTrace;
 };
 
 }  // namespace ns3

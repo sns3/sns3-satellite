@@ -32,6 +32,7 @@
 #include <ns3/satellite-stats-frame-load-helper.h>
 #include <ns3/satellite-stats-link-rx-power-helper.h>
 #include <ns3/satellite-stats-link-sinr-helper.h>
+#include <ns3/satellite-stats-marsala-correlation-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
@@ -876,6 +877,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision"
 SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketCollision, "crdsa-collision")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
+
+// Random Access MARSALA packet correlation statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (MarsalaCorrelation, "marsala-correlation")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (MarsalaCorrelation, "marsala-correlation")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (MarsalaCorrelation, "marsala-correlation")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (MarsalaCorrelation, "marsala-correlation")
 
 // Capacity request statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
