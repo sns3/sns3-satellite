@@ -147,7 +147,7 @@ SatPhyRxCarrierPerSlot::EndRxData (uint32_t key)
 
   NS_ASSERT (packetRxParams.rxParams->m_sinr != 0);
 
-  packetRxParams.rxParams->m_ifPower_W = GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent);
+  packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
 
   ReceiveSlot (packetRxParams, nPackets);
 
@@ -203,7 +203,7 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   NS_ASSERT (packetRxParams.rxParams->m_txInfo.packetType != SatEnums::PACKET_TYPE_CRDSA);
   /// calculates sinr for 2nd link
   double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
-                                packetRxParams.rxParams->m_ifPower_W,
+                                packetRxParams.rxParams->GetInterferencePower (),
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
@@ -241,13 +241,13 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
       if (nPackets > 0)
         {
           const bool hasCollision = GetInterferenceModel ()->HasCollision (packetRxParams.interferenceEvent);
-          m_slottedAlohaRxCollisionTrace (nPackets,                                                  // number of packets
-                                          packetRxParams.sourceAddress,                                                                                                                                // sender address
-                                          hasCollision                                                                                                                                               // collision flag
+          m_slottedAlohaRxCollisionTrace (nPackets,                      // number of packets
+                                          packetRxParams.sourceAddress,  // sender address
+                                          hasCollision                   // collision flag
                                           );
-          m_slottedAlohaRxErrorTrace (nPackets,                                                  // number of packets
-                                      packetRxParams.sourceAddress,                                                                                                                    // sender address
-                                      phyError                                                                                                                                       // error flag
+          m_slottedAlohaRxErrorTrace (nPackets,                      // number of packets
+                                      packetRxParams.sourceAddress,  // sender address
+                                      phyError                       // error flag
                                       );
         }
     }
@@ -258,9 +258,9 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
       if (nPackets > 0)
         {
-          m_daRxTrace (nPackets,                                                  // number of packets
-                       packetRxParams.sourceAddress,                                                                    // sender address
-                       phyError                                                                                       // error flag
+          m_daRxTrace (nPackets,                      // number of packets
+                       packetRxParams.sourceAddress,  // sender address
+                       phyError                       // error flag
                        );
         }
     }
@@ -269,7 +269,9 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   packetRxParams.rxParams->m_sinr = sinr;
 
   /// uses composite sinr
-  m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (), packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, cSinr);
+  m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
+                     packetRxParams.destAddress,
+                     packetRxParams.rxParams->GetInterferencePower (), cSinr);
 
   /// send packet upwards
   m_rxCallback (packetRxParams.rxParams, phyError);

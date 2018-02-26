@@ -39,12 +39,14 @@ SatSignalParameters::SatSignalParameters ()
   m_sinr (),
   m_channelType (),
   m_rxPowerInSatellite_W (),
-  m_ifPower_W (),
-  m_ifPowerInSatellite_W (),
   m_rxNoisePowerInSatellite_W (),
   m_rxAciIfPowerInSatellite_W (),
   m_rxExtNoisePowerInSatellite_W (),
-  m_sinrCalculate ()
+  m_sinrCalculate (),
+  m_ifPower_W (),
+  m_ifPowerInSatellite_W (),
+  m_ifPowerPerFragment_W (),
+  m_ifPowerInSatellitePerFragment_W ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -72,12 +74,12 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_txInfo.packetType = p.m_txInfo.packetType;
   m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;
   m_rxPowerInSatellite_W = p.m_rxPowerInSatellite_W;
-  m_ifPower_W = p.m_ifPower_W;
-  m_ifPowerInSatellite_W = p.m_ifPowerInSatellite_W;
   m_rxNoisePowerInSatellite_W = p.m_rxNoisePowerInSatellite_W;
   m_rxAciIfPowerInSatellite_W = p.m_rxAciIfPowerInSatellite_W;
   m_rxExtNoisePowerInSatellite_W = p.m_rxExtNoisePowerInSatellite_W;
   m_sinrCalculate = p.m_sinrCalculate;
+  SetInterferencePowerInSatellite (p.m_ifPowerInSatellitePerFragment_W);
+  SetInterferencePower (p.m_ifPowerPerFragment_W);
 }
 
 Ptr<SatSignalParameters>
@@ -96,6 +98,17 @@ SatSignalParameters::GetTypeId (void)
     .SetParent<Object> ()
   ;
   return tid;
+}
+
+double
+SatSignalParameters::ComputeIfPowerFromFragments (const std::vector< std::pair<double, double> >& ifPowerPerFragment)
+{
+  double ifPower = 0.0;
+  for (const std::pair<double, double>& interferenceLevel : ifPowerPerFragment)
+    {
+      ifPower += interferenceLevel.first * interferenceLevel.second;
+    }
+  return ifPower;
 }
 
 

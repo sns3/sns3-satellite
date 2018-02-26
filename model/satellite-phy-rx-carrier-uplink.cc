@@ -69,10 +69,10 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   DecreaseNumOfRxState (packetRxParams.rxParams->m_txInfo.packetType);
 
-  packetRxParams.rxParams->m_ifPower_W = GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent);
+  packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
 
   /// save values for CRDSA receiver
-  packetRxParams.rxParams->m_ifPowerInSatellite_W = packetRxParams.rxParams->m_ifPower_W;
+  packetRxParams.rxParams->SetInterferencePowerInSatellite (packetRxParams.rxParams->GetInterferencePowerPerFragment ());
   packetRxParams.rxParams->m_rxPowerInSatellite_W = packetRxParams.rxParams->m_rxPower_W;
   packetRxParams.rxParams->m_rxNoisePowerInSatellite_W = m_rxNoisePowerW;
   packetRxParams.rxParams->m_rxAciIfPowerInSatellite_W = m_rxAciIfPowerW;
@@ -81,7 +81,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// calculates sinr for 1st link
   double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
-                                packetRxParams.rxParams->m_ifPower_W,
+                                packetRxParams.rxParams->GetInterferencePower (),
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
@@ -101,7 +101,8 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
-                     packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, sinr);
+                     packetRxParams.destAddress,
+                     packetRxParams.rxParams->GetInterferencePower (), sinr);
 
   /// Send packet upwards
   m_rxCallback ( packetRxParams.rxParams, phyError );
