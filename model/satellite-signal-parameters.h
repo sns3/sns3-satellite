@@ -175,17 +175,6 @@ public:
   }
 
   /**
-   * \brief Set interference power for the whole packet
-   * \param ifPower
-   */
-  inline void SetInterferencePower (double ifPower)
-  {
-    m_ifPowerPerFragment_W = std::vector< std::pair<double, double> > ();
-    m_ifPowerPerFragment_W.emplace_back (1.0, ifPower);
-    m_ifPower_W = ComputeIfPowerFromFragments (m_ifPowerPerFragment_W);
-  }
-
-  /**
    * \brief Get interference power (I)
    */
   inline double GetInterferencePower ()
@@ -208,17 +197,6 @@ public:
   inline void SetInterferencePowerInSatellite (std::vector< std::pair<double, double> > ifPowerPerFragment)
   {
     m_ifPowerInSatellitePerFragment_W = ifPowerPerFragment;
-    m_ifPowerInSatellite_W = ComputeIfPowerFromFragments (m_ifPowerInSatellitePerFragment_W);
-  }
-
-  /**
-   * \brief Set interference power in satellite for the whole packet
-   * \param ifPower
-   */
-  inline void SetInterferencePowerInSatellite (double ifPower)
-  {
-    m_ifPowerInSatellitePerFragment_W = std::vector< std::pair<double, double> > ();
-    m_ifPowerInSatellitePerFragment_W.emplace_back (1.0, ifPower);
     m_ifPowerInSatellite_W = ComputeIfPowerFromFragments (m_ifPowerInSatellitePerFragment_W);
   }
 

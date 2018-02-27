@@ -714,17 +714,21 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           /// In addition, as the interference values are extremely small, the use of long double (instead
           /// of double) should be considered to improve the accuracy.
 
-          iterList->rxParams->SetInterferencePowerInSatellite (iterList->rxParams->GetInterferencePowerInSatellite () - processedPacket.rxParams->m_rxPowerInSatellite_W);
-
-          if (std::abs (iterList->rxParams->GetInterferencePowerInSatellite ()) < std::numeric_limits<double>::epsilon ())
+          auto ifPowerPerFragment = iterList->rxParams->GetInterferencePowerInSatellitePerFragment ();
+          for (std::pair<double, double>& ifPower : ifPowerPerFragment)
             {
-              iterList->rxParams->SetInterferencePowerInSatellite (0.0);
-            }
+              ifPower.second -= processedPacket.rxParams->m_rxPowerInSatellite_W;
+              if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
+                {
+                  ifPower.second = 0.0;
+                }
 
-          if (iterList->rxParams->GetInterferencePower () < 0 || iterList->rxParams->GetInterferencePowerInSatellite () < 0)
-            {
-              NS_FATAL_ERROR ("SatPhyRxCarrierPerFrame::EliminateInterference - Negative interference");
+              if (iterList->rxParams->GetInterferencePower () < 0 || ifPower.second < 0)
+                {
+                  NS_FATAL_ERROR ("SatPhyRxCarrierPerFrame::EliminateInterference - Negative interference");
+                }
             }
+          iterList->rxParams->SetInterferencePowerInSatellite (ifPowerPerFragment);
 
           NS_LOG_INFO ("SatPhyRxCarrierPerFrame::EliminateInterference- AFTER INTERFERENCE ELIMINATION, RX sat: " <<
                        iterList->rxParams->m_rxPowerInSatellite_W <<
