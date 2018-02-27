@@ -71,7 +71,7 @@ public:
    */
   enum InterferenceModel
   {
-    IF_PER_PACKET, IF_TRACE, IF_CONSTANT
+    IF_PER_PACKET, IF_PER_FRAGMENT, IF_TRACE, IF_CONSTANT
   };
 
   /**

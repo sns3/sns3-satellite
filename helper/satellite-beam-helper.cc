@@ -84,7 +84,8 @@ SatBeamHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatBeamHelper::m_raInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddAttribute ("RaCollisionModel",
                    "Collision model for random access",
                    EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),

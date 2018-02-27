@@ -23,6 +23,7 @@
 #include <ns3/boolean.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-constant-interference.h>
+#include <ns3/satellite-per-fragment-interference.h>
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
 #include <ns3/satellite-mac-tag.h>
@@ -129,6 +130,19 @@ SatPhyRxCarrier::DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf
         else
           {
             m_satInterference = CreateObject<SatPerPacketInterference> ();
+          }
+        break;
+      }
+    case SatPhyRxCarrierConf::IF_PER_FRAGMENT:
+      {
+        NS_LOG_INFO (this << " Per fragment interference model created for carrier: " << carrierId);
+        if (carrierConf->IsIntfOutputTraceEnabled ())
+          {
+            m_satInterference = CreateObject<SatPerFragmentInterference> (GetChannelType (), rxBandwidthHz);
+          }
+        else
+          {
+            m_satInterference = CreateObject<SatPerFragmentInterference> ();
           }
         break;
       }

@@ -77,7 +77,8 @@ SatUtHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatUtHelper::m_daInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddAttribute ("FwdLinkErrorModel",
                    "Forward link error model",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),

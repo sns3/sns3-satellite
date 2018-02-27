@@ -58,14 +58,16 @@ SatGeoHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatGeoHelper::m_daFwdLinkInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddAttribute ("DaRtnLinkInterferenceModel",
                    "Return link interference model for dedicated access",
                    EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET),
                    MakeEnumAccessor (&SatGeoHelper::m_daRtnLinkInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")

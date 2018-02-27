@@ -215,7 +215,7 @@ SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer () const
 SatPhyRxCarrierConf::RandomAccessCollisionModel
 SatPhyRxCarrierConf::GetRandomAccessCollisionModel () const
 {
-  if (m_raIfModel == IF_PER_PACKET)
+  if (m_raIfModel == IF_PER_PACKET || m_raIfModel == IF_PER_FRAGMENT)
     {
       return m_raCollisionModel;
     }

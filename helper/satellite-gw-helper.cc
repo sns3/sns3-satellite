@@ -65,7 +65,8 @@ SatGwHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatGwHelper::m_daInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddAttribute ("RtnLinkErrorModel",
                    "Return link error model for",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
