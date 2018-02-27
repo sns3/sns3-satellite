@@ -125,7 +125,7 @@ SatInterference::Add (Time duration, double power, Address rxAddress)
   return DoAdd (duration, power, rxAddress);
 }
 
-double
+std::vector< std::pair<double, double> >
 SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);

@@ -137,7 +137,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
   return event;
 }
 
-double
+std::vector< std::pair<double, double> >
 SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
@@ -199,7 +199,10 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
       Singleton<SatInterferenceOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (event->GetSatEarthStationAddress (), m_channelType), tempVector);
     }
 
-  return ifPowerW;
+  std::vector< std::pair<double, double> > ifPowerPerFragment;
+  ifPowerPerFragment.emplace_back (1.0, ifPowerW);
+
+  return ifPowerPerFragment;
 }
 
 void

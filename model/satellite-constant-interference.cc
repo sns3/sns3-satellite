@@ -73,7 +73,7 @@ SatConstantInterference::DoAdd (Time duration, double power, Address rxAddress)
   return event;
 }
 
-double
+std::vector< std::pair<double, double> >
 SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
@@ -84,7 +84,10 @@ SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEve
                    " this should be fine, but with dedicated access prohibited!");
     }
 
-  return m_power;
+  std::vector< std::pair<double, double> > ifPowerPerFragment;
+  ifPowerPerFragment.emplace_back (1.0, m_power);
+
+  return ifPowerPerFragment;
 }
 
 void

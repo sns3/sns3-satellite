@@ -94,9 +94,11 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   interference->NotifyRxStart (event);
 
-  double power = interference->Calculate (event);
+  std::vector< std::pair<double, double> > power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ (100, power, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (1, power.size (), "Calculated power returned more than one fragment");
+  NS_TEST_ASSERT_MSG_EQ (1.0, power[0].first, "Calculated power does not span the whole packet");
+  NS_TEST_ASSERT_MSG_EQ (100, power[1].second, "Calculated power not correct");
 
   interference->NotifyRxEnd (event);
 
@@ -107,7 +109,9 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ (50, power, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (1, power.size (), "Calculated power returned more than one fragment");
+  NS_TEST_ASSERT_MSG_EQ (1.0, power[0].first, "Calculated power does not span the whole packet");
+  NS_TEST_ASSERT_MSG_EQ (50, power[0].second, "Calculated power not correct");
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
@@ -190,7 +194,11 @@ SatPerPacketInterferenceTestCase::StartReceiver (Time duration, double power, Ad
 void
 SatPerPacketInterferenceTestCase::Receive (uint32_t rxIndex)
 {
-  finalPower[rxIndex] = m_interference->Calculate (m_rxEvent[rxIndex]);
+  std::vector< std::pair<double, double> > ifPower =  m_interference->Calculate (m_rxEvent[rxIndex]);
+  NS_TEST_ASSERT_MSG_EQ (1, ifPower.size (), "Calculated power returned more than one fragment");
+  NS_TEST_ASSERT_MSG_EQ (1.0, ifPower[0].first, "Calculated power does not span the whole packet");
+
+  finalPower[rxIndex] = ifPower[0].second;
   m_interference->NotifyRxEnd (m_rxEvent[rxIndex]);
 }
 

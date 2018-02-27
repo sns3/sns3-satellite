@@ -73,7 +73,7 @@ private:
    *
    * \return Final power value at end of receiving
    */
-  virtual double DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
+  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Resets current interference.
