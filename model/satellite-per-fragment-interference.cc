@@ -38,6 +38,7 @@ SatPerFragmentInterference::GetTypeId (void)
   return tid;
 }
 
+
 TypeId
 SatPerFragmentInterference::GetInstanceTypeId (void) const
 {
@@ -45,21 +46,65 @@ SatPerFragmentInterference::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
+
 SatPerFragmentInterference::SatPerFragmentInterference ()
-  : SatPerPacketInterference ()
+  : SatPerPacketInterference (),
+  m_ifPowerAtEventChangeW ()
 {
   NS_LOG_FUNCTION (this);
 }
 
+
 SatPerFragmentInterference::SatPerFragmentInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz)
-  : SatPerPacketInterference (channelType, rxBandwidthHz)
+  : SatPerPacketInterference (channelType, rxBandwidthHz),
+  m_ifPowerAtEventChangeW ()
 {
   NS_LOG_FUNCTION (this);
 }
+
 
 SatPerFragmentInterference::~SatPerFragmentInterference ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+
+std::vector< std::pair<double, double> >
+SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_ifPowerAtEventChangeW.clear ();
+
+  std::vector< std::pair<double, double> > ifPowerPerFragment = SatPerPacketInterference::DoCalculate (event);
+  ifPowerPerFragment.clear ();
+  ifPowerPerFragment.reserve (m_ifPowerAtEventChangeW.size ());
+
+  std::map<double, double>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
+  std::pair<double, double> eventChangeInPower = *iter;
+  for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
+    {
+      ifPowerPerFragment.emplace_back (iter->first - eventChangeInPower.first, eventChangeInPower.second);
+      eventChangeInPower = *iter;
+    }
+  ifPowerPerFragment.emplace_back (1.0 - eventChangeInPower.first, eventChangeInPower.second);
+
+  return ifPowerPerFragment;
+}
+
+
+void
+SatPerFragmentInterference::onOwnStartReached (double ifPowerW)
+{
+  m_ifPowerAtEventChangeW[0.0] = ifPowerW;
+}
+
+
+void
+SatPerFragmentInterference::onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW)
+{
+  ifPowerW += interferenceValue;
+  m_ifPowerAtEventChangeW[1.0 - timeRatio] = ifPowerW;
 }
 
 }

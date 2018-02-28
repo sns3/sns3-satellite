@@ -78,6 +78,43 @@ public:
    */
   void SetRxBandwidth (double rxBandwidth);
 
+protected:
+  /**
+   * Calculates interference power for the given reference
+   * Sets final power at end time to finalPower.
+   *
+   * \param event Reference event which for interference is calculated.
+   *
+   * \return Final calculated power value at end of receiving
+   */
+  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
+
+  /**
+   * Helper function meant for subclasses to override.
+   * Called during DoCalculate when the start of the event whose
+   * interferences are being calculated has been reached.
+   */
+  virtual void onOwnStartReached (double ifPowerW);
+
+  /**
+   * Helper function meant for subclasses to override.
+   * Called during DoCalculate after the start of the event whose
+   * interferences are being calculated has been reached.
+   *
+   * Update the current interference power by adding the power of
+   * the event being processed proportional to the remaining time
+   * until the end of the event whose interferences are being calculated.
+   *
+   * \param timeRatio ratio of time compared to an event duration of the
+   * distance between the event being processed and the end of the event
+   * whose interferences are being calculated.
+   * \param interferenceValue the interference value of the event being
+   * processed.
+   * \param ifPowerW the current value of the interference for the event
+   * whose interferences are being calculated; which will be updated.
+   */
+  virtual void onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW);
+
 private:
   /**
    * Adds interference power to interference object.
@@ -88,16 +125,6 @@ private:
    * \return the pointer to interference event as a reference of the addition
    */
   virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
-
-  /**
-   * Calculates interference power for the given reference
-   * Sets final power at end time to finalPower.
-   *
-   * \param event Reference event which for interference is calculated.
-   *
-   * \return Final calculated power value at end of receiving
-   */
-  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Resets current interference.

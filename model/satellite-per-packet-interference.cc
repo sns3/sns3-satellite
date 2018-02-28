@@ -167,12 +167,13 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
           // needed to support multiple simultaneous receiving (currently not supported)
           // own event is not updated to ifPower
           ownStartReached = true;
+          onOwnStartReached (ifPowerW);
         }
       else if (ownStartReached)
         {
           // increase/decrease interference power with relative part of duration of power change in list
           double itemTime = currentItem->first.GetDouble ();
-          ifPowerW += ((rxEndTime - itemTime) / rxDuration) * currentItem->second.second;
+          onInterferentEvent (((rxEndTime - itemTime) / rxDuration), currentItem->second.second, ifPowerW);
 
           NS_LOG_INFO ( "Update (partial): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second <<
                         ", Time= " << currentItem->first << ", DeltaTime= " << (rxEndTime - itemTime) );
@@ -203,6 +204,18 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   ifPowerPerFragment.emplace_back (1.0, ifPowerW);
 
   return ifPowerPerFragment;
+}
+
+void
+SatPerPacketInterference::onOwnStartReached (double ifPowerW)
+{
+  // do nothing, meant for subclasses to override
+}
+
+void
+SatPerPacketInterference::onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW)
+{
+  ifPowerW += timeRatio * interferenceValue;
 }
 
 void
