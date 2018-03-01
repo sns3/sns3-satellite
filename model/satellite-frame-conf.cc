@@ -1261,7 +1261,7 @@ SatSuperframeConf4::GetInstanceTypeId (void) const
 }
 
 void
-SatSuperframeConf3::DoConfigure ()
+SatSuperframeConf4::DoConfigure ()
 {
   NS_LOG_FUNCTION (this);
 }

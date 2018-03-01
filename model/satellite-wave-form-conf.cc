@@ -203,7 +203,7 @@ SatWaveformConf::GetTypeId (void)
                     "Default waveform id",
                     UintegerValue (3),
                     MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
-                    MakeUintegerChecker<uint32_t> (3, 22))
+                    MakeUintegerChecker<uint32_t> (1, 22))
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
@@ -450,6 +450,19 @@ SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNum
 
   switch (modulatedBits)
     {
+    // BPSK
+    case 1:
+      {
+        if (codingRateNumerator == 1 && codingRateDenominator == 3)
+          {
+            return SatEnums::SAT_MODCOD_BPSK_1_TO_3;
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported coding rate numerator: " << codingRateNumerator << ", denominator: " << codingRateDenominator);
+          }
+        break;
+      }
     // QPSK
     case 2:
       {

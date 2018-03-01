@@ -137,6 +137,7 @@ SatRandomAccess::IsSlottedAlohaAllocationChannel (uint32_t allocationChannel)
   return m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetSlottedAlohaAllowed ();
 }
 
+bool
 SatRandomAccess::IsEssaAllocationChannel (uint32_t allocationChannel)
 {
   NS_LOG_FUNCTION (this << allocationChannel);

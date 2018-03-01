@@ -116,7 +116,8 @@ public:
     SAT_MODCOD_32APSK_3_TO_4,  // 0.75
     SAT_MODCOD_32APSK_4_TO_5,  // 0.80
     SAT_MODCOD_32APSK_5_TO_6,  // 0.83
-    SAT_MODCOD_32APSK_8_TO_9   // 0.89
+    SAT_MODCOD_32APSK_8_TO_9,  // 0.89
+    SAT_MODCOD_BPSK_1_TO_3     // 0.33
   } SatModcod_t;
 
 
@@ -239,6 +240,8 @@ public:
         return "32APSK_5_TO_6";
       case SAT_MODCOD_32APSK_8_TO_9:
         return "32APSK_8_TO_9";
+      case SAT_MODCOD_BPSK_1_TO_3:
+        return "BPSK_1_TO_3";
       default:
         {
           NS_FATAL_ERROR ("SatEnums::GetModcodTypeName - Invalid modcod type");
@@ -673,7 +676,7 @@ public:
     RA_TX_OPPORTUNITY_DO_NOTHING = 0,
     RA_TX_OPPORTUNITY_SLOTTED_ALOHA = 1,
     RA_TX_OPPORTUNITY_CRDSA = 2,
-    RA_TX_OPPORTUNITY_ESSA = 2,
+    RA_TX_OPPORTUNITY_ESSA = 3,
   } RandomAccessTxOpportunityType_t;
 
   static inline std::string GetRandomAccessOpportunityTypeName (RandomAccessTxOpportunityType_t opportunityType)

@@ -474,7 +474,7 @@ public:
     CONFIG_TYPE_0, //!< Configuration type 0
     CONFIG_TYPE_1, //!< Configuration type 1
     CONFIG_TYPE_2, //!< Configuration type 2
-    CONFIG_TYPE_3 //!< Configuration type 3
+    CONFIG_TYPE_3, //!< Configuration type 3
     CONFIG_TYPE_4 //!< Configuration type 4 (ESSA)
   } ConfigType_t;
 
