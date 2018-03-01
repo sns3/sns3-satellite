@@ -39,7 +39,10 @@ SatPhyRxCarrierPerWindow::SatPhyRxCarrierPerWindow (uint32_t carrierId,
                                                     Ptr<SatPhyRxCarrierConf> carrierConf,
                                                     Ptr<SatWaveformConf> waveformConf,
                                                     bool randomAccessEnabled)
-  : SatPhyRxCarrierPerSlot (carrierId, carrierConf, waveformConf, randomAccessEnabled)
+  : SatPhyRxCarrierPerSlot (carrierId, carrierConf, waveformConf, randomAccessEnabled),
+  m_windowDuration (Seconds (0.004)),
+  m_windowStep (Seconds (0.0005)),
+  m_windowSicIterations (10)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
@@ -59,6 +62,21 @@ SatPhyRxCarrierPerWindow::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierPerWindow")
     .SetParent<SatPhyRxCarrierPerSlot> ()
+    .AddAttribute ( "WindowDuration",
+                    "The duration of the sliding window",
+                    TimeValue (Seconds (0.004)),
+                    MakeTimeAccessor (&SatPhyRxCarrierPerWindow::m_windowDuration),
+                    MakeTimeChecker ())
+    .AddAttribute ( "WindowStep",
+                    "The length of the step between two window iterations",
+                    TimeValue (Seconds (0.0005)),
+                    MakeTimeAccessor (&SatPhyRxCarrierPerWindow::m_windowStep),
+                    MakeTimeChecker ())
+    .AddAttribute ( "WindowSICIterations",
+                    "The number of SIC iterations performed on each window",
+                    UintegerValue (10),
+                    MakeUintegerAccessor (&SatPhyRxCarrierPerWindow::m_windowSicIterations),
+                    MakeUintegerChecker<uint32_t> ())
     .AddTraceSource ("EssaRxCollision",
                      "Received a packet through Random Access ESSA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_essaRxCollisionTrace),

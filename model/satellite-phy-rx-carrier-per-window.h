@@ -98,6 +98,23 @@ protected:
    * \brief Dispose implementation
    */
   virtual void DoDispose ();
+
+private:
+  /**
+   * The duration of the sliding window
+   */
+  Time m_windowDuration;
+
+  /**
+   * The step of the sliding window
+   */
+  Time m_windowStep;
+
+  /**
+   * The number of SIC iterations performed on each window
+   */
+  uint32_t m_windowSicIterations;
+
 };
 
 
